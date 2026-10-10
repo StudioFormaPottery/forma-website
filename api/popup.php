@@ -19,6 +19,7 @@ try {
         'button_text' => $p['button_text'],
         'button_link' => $p['button_link'],
         'image' => $p['image'] !== '' ? 'api/popup-image.php?v=' . (int)$p['version'] : '',
+        'theme' => ($preview && isset($_GET['thema'])) ? preg_replace('/[^a-z]/', '', (string)$_GET['thema']) : (string)($p['theme'] ?? ''),
     ]]);
 } catch (Throwable $e) {
     error_log('FORMA popup: ' . $e->getMessage());

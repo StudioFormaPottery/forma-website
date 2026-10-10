@@ -64,6 +64,7 @@ p{margin:0}
 .top .wrap{max-width:1320px;display:flex;align-items:center;gap:20px;padding-block:12px}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto}
 .brand img{width:60px;height:60px;object-fit:contain}
+@media (min-width:861px){.brand img{width:84px;height:84px}.brand span{font-size:16px!important}.nav a{font-size:19px!important}.nav{gap:4px 30px}.nav .btn{font-size:18px!important;min-height:48px;padding:10px 24px}}
 .brand span{font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase}
 .nav{display:flex;flex-wrap:wrap;gap:4px 26px;margin-left:auto;align-items:center}
 .nav a{text-decoration:none;font-weight:500;font-size:15.5px;padding:6px 0;background:linear-gradient(currentColor,currentColor) 0 100%/0 1.5px no-repeat;transition:background-size .25s ease}
@@ -103,12 +104,13 @@ p{margin:0}
 .hero-copy .eyebrow::before{content:"";width:42px;height:1.5px;background:currentColor;opacity:.6}
 .hero-copy p.lead{font-size:clamp(18px,1.5vw,20px);max-width:40ch;color:var(--ink-soft)}
 .actions{display:flex;flex-wrap:wrap;gap:12px}
-.hero-week{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
-.hero-week li{display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 10px;border-radius:999px;background:color-mix(in srgb,var(--paper) 62%,transparent);font-size:14.5px;color:var(--ink)}
-.hero-week li::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--clay-soft)}
-.hero-week li:nth-child(2)::before{background:var(--clay)}
-.hero-week li:nth-child(3)::before{background:var(--blush);box-shadow:inset 0 0 0 2px var(--clay)}
-.hero-week b{font-weight:600}
+.hero-week{list-style:none;margin:10px 0 0;padding:18px 0 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1.5px solid color-mix(in srgb,var(--clay) 35%,transparent);max-width:680px}
+.hero-week li{display:flex;flex-direction:column;gap:2px;padding:0 18px;border-left:1.5px solid color-mix(in srgb,var(--clay) 35%,transparent);min-width:0}
+.hero-week li:first-child{padding-left:0;border-left:0}
+.hero-week .day{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--clay)}
+.hero-week .name{font-family:var(--display);font-weight:600;font-size:21px;line-height:1.15;letter-spacing:-.01em;color:var(--ink)}
+.hero-week .sub{font-size:14.5px;color:var(--ink-soft)}
+@media (max-width:480px){.hero-week li{padding:0 10px}.hero-week .name{font-size:17px}.hero-week .day{font-size:11.5px;letter-spacing:.08em}.hero-week .sub{font-size:13px}}
 
 /* Fotocollage im Kopfbereich */
 .collage{position:relative;min-width:0;aspect-ratio:1/1.04;width:100%;max-width:640px;justify-self:end}
@@ -174,6 +176,12 @@ section{scroll-margin-top:96px}
 .price small{font-family:var(--body);font-size:15px;font-weight:400;letter-spacing:0;margin-left:8px}
 .offer .btn{align-self:flex-start}
 .offer.is-featured .btn{background:var(--on-clay);color:var(--clay);border-color:var(--on-clay)}
+.offer.is-blush{background:var(--blush);border-color:var(--blush)}
+.offer.is-blush .note{background:var(--paper)}
+.offer.is-brown{background:var(--ink-soft);color:var(--on-clay);border-color:var(--ink-soft)}
+.offer.is-brown h3{color:var(--on-clay)}
+.offer.is-brown .note{background:color-mix(in srgb,var(--on-clay) 14%,transparent);color:var(--on-clay)}
+.offer.is-brown .btn{background:var(--on-clay);color:var(--ink-soft);border-color:var(--on-clay)}
 .note{font-size:14.5px;line-height:1.5;padding:14px 16px;border-radius:16px;background:var(--paper);color:var(--ink-soft)}
 
 
@@ -241,7 +249,33 @@ section{scroll-margin-top:96px}
 #book-submit{align-self:flex-start}
 #book-submit[disabled]{opacity:.6;cursor:wait}
 
+/* Stornobedingungen */
+.storno{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(20px,4vw,60px);margin-top:clamp(36px,5vw,56px);padding:clamp(26px,4vw,44px);border-radius:32px;background:var(--paper-2)}
+@media (max-width:780px){.storno{grid-template-columns:1fr}}
+.storno h3{font-family:var(--display);font-weight:650;font-size:clamp(26px,2.6vw,34px);line-height:1.1;letter-spacing:-.02em;color:var(--clay);margin:6px 0 12px}
+.storno p{color:var(--ink-soft)}
+.storno-list{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column}
+.storno-list li{padding:12px 0 12px 30px;border-top:1px solid var(--line);position:relative}
+.storno-list li:last-child{border-bottom:1px solid var(--line)}
+.storno-list li::before{content:"";position:absolute;left:4px;top:22px;width:10px;height:10px;border-radius:50%;background:var(--clay)}
+.storno-list b{font-weight:600;color:var(--ink)}
+.storno-warm{font-size:.95em}
+.book-storno{font-size:14.5px;line-height:1.5;padding:12px 14px;border-radius:14px;background:var(--paper-2);color:var(--ink-soft)}
+.book-storno a{color:var(--clay)}
+@media (min-width:861px){.book-storno{font-size:16px}}
+
 /* Saison-Pop-up */
+.season .deco{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden;border-radius:inherit}
+.season .garland{position:absolute;left:-2%;right:-2%;top:-6px;width:104%;height:auto}
+.season .flake{position:absolute;top:-30px;color:#FBF1EA;opacity:.9;animation:snow linear infinite;filter:drop-shadow(0 1px 2px rgba(51,33,27,.25))}
+.season .flake svg{display:block;width:100%;height:100%}
+.season .flake.red{color:var(--clay);filter:none;opacity:.7}
+@keyframes snow{0%{transform:translate(0,-20px) rotate(0)}50%{transform:translate(18px,300px) rotate(120deg)}100%{transform:translate(-8px,700px) rotate(240deg)}}
+.season.theme-advent .season-img{background:var(--clay)}
+.season.theme-advent .season-body{padding-top:64px}
+.season.theme-advent .season-body::before{background:var(--clay);opacity:.12}
+.season.theme-advent .season-date{background:var(--clay);color:var(--on-clay)}
+
 .season{border:0;padding:0;border-radius:32px;width:min(860px,calc(100vw - 32px));max-height:calc(100dvh - 32px);background:var(--paper);color:var(--ink);box-shadow:0 30px 80px rgba(51,33,27,.35);overflow:hidden}
 .season::backdrop{background:rgba(51,33,27,.5)}
 .season[open]{animation:pop .45s cubic-bezier(.2,.9,.3,1.2)}
@@ -289,7 +323,7 @@ section{scroll-margin-top:96px}
 .about-photo img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;object-position:50% 25%;border-radius:var(--blob);animation:morph 18s ease-in-out infinite alternate-reverse}
 .about-copy{display:flex;flex-direction:column;gap:18px;max-width:58ch;min-width:0}
 .about-copy p{color:var(--ink)}
-.signature{font-family:var(--script);font-size:34px;color:var(--clay)}
+.signature{font-family:var(--script);font-size:42px;color:var(--clay)}
 @media (max-width:860px){.about .wrap{grid-template-columns:1fr}.about-photo{max-width:420px}}
 
 /* Gutscheine */
@@ -342,16 +376,18 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 
 /* Desktop: größere, gut lesbare Schrift (Handy bleibt wie es ist) */
 @media (min-width:861px){
-  body{font-size:20px}
+  body{font-size:21px}
   .nav a{font-size:17px}
   .nav .btn,.btn{font-size:17px}
   .eyebrow{font-size:clamp(28px,2.6vw,36px)}
-  .hero-copy p.lead{font-size:22px}
-  .hero-week li{font-size:16.5px;padding:8px 16px 8px 12px}
-  .section-head p:not(.eyebrow){font-size:20px}
+  .hero-copy p.lead{font-size:23px}
+  .hero-week .name{font-size:22px}
+  .hero-week .day{font-size:14px}
+  .hero-week .sub{font-size:16px}
+  .section-head p:not(.eyebrow){font-size:21.5px}
   .kicker{font-size:14px}
-  .offer > p:not(.price):not(.kicker):not(.note){font-size:19px}
-  .facts{font-size:17.5px}
+  .offer > p:not(.price):not(.kicker):not(.note){font-size:20px}
+  .facts{font-size:18.5px}
   .facts dt{font-size:13.5px}
   .price small{font-size:16.5px}
   .note{font-size:16.5px}
@@ -360,15 +396,17 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   .tile .price{font-size:23px}
   .tile .go{font-size:16.5px}
   .film figcaption{font-size:15.5px}
-  .gift p,.about-copy p{font-size:20px}
+  .gift p:not(.eyebrow),.about-copy p:not(.eyebrow):not(.signature){font-size:22px}
+  .signature{font-size:52px}
+  .gift .btn{font-size:18px}
   .contact-list dt,.week-label{font-size:13.5px}
   .contact-list dd{font-size:20.5px}
   a.more{font-size:17px}
   .week-hours p.small{font-size:17px}
   .week-plan li{font-size:19px}
   .week-plan .day{font-size:27px}
-  .foot .inner{font-size:16.5px}
-  .privacy{font-size:17px}
+  .foot .inner{font-size:18px}
+  .privacy{font-size:18px}
   .step-meta,.step-foot,.book-price{font-size:17px}
   .field label{font-size:16.5px}
   .consent{font-size:15.5px}
@@ -418,9 +456,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <a class="btn btn-ghost" href="#angebote">Kurse &amp; Preise</a>
         </div>
         <ul class="hero-week" aria-label="Jede Woche im Studio">
-          <li><span><b>Mi &amp; Fr</b> · Spin &amp; Go</span></li>
-          <li><span><b>Do</b> · Offenes Atelier</span></li>
-          <li><span><b>Fr abends</b> · Pottery Pause</span></li>
+          <li><span class="day">Mi &amp; Fr</span><span class="name">Spin &amp; Go</span><span class="sub">9–11 Uhr</span></li>
+          <li><span class="day">Donnerstag</span><span class="name">Offenes Atelier</span><span class="sub">8–11 Uhr</span></li>
+          <li><span class="day">Fr abends</span><span class="name">Pottery Pause</span><span class="sub">5-Wochen-Kurs</span></li>
         </ul>
       </div>
       <div class="collage">
@@ -450,7 +488,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     <div class="wrap">
       <div class="section-head">
         <p class="eyebrow">Angebote</p>
-        <h2 class="display">Kurse &amp; offenes Atelier</h2>
+        <h2 class="display">Kurse &amp; Workshops</h2>
         <p>Wähle das Format, das zu dir passt: im mehrwöchigen Kurs, als kurzer Einstieg an der Scheibe, ganz persönlich in der Einzelstunde oder selbstständig im offenen Atelier.</p>
       </div>
       <div class="offers">
@@ -465,7 +503,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="price">€ 295<small>für alle fünf Termine</small></p>
           <a class="btn" href="#anmeldung" data-book="Pottery Pause">Platz buchen</a>
         </article>
-        <article class="offer">
+        <article class="offer is-blush">
           <p class="kicker">Drehscheibe · 2 Stunden</p>
           <h3>Spin &amp; Go</h3>
           <p>Zwei Stunden an der Töpferscheibe, begleitet von Anfang an: Ich zeige dir Schritt für Schritt, wie du an der Scheibe arbeitest, und du gestaltest dein eigenes Werkstück.</p>
@@ -489,7 +527,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="price">€ 65<small>pro Stunde</small></p>
           <a class="btn btn-solid" href="#kontakt">Termin anfragen</a>
         </article>
-        <article class="offer">
+        <article class="offer is-brown">
           <p class="kicker">Für Töpfernde mit Erfahrung</p>
           <h3>Offenes Atelier</h3>
           <p>Für alle, die selbstständig an eigenen Projekten arbeiten möchten. Material, Werkzeuge und Maschinen stehen dir zur Verfügung.</p>
@@ -514,6 +552,21 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       </div>
       <div class="slots" id="slots" aria-live="polite">
         <p class="slots-note">Die Termine werden geladen …</p>
+      </div>
+      <div class="storno" id="storno">
+        <div>
+          <p class="eyebrow">Gut zu wissen</p>
+          <h3>Wenn doch etwas dazwischenkommt</h3>
+          <p>Das Leben ist manchmal unberechenbar, das verstehe ich gut. Damit ich gut planen kann und alle Plätze fair vergeben werden, gilt Folgendes:</p>
+        </div>
+        <div>
+          <ul class="storno-list">
+            <li><b>Bis 48 Stunden</b> vor Kursbeginn stornierst du kostenlos.</li>
+            <li><b>Innerhalb von 48 Stunden</b> vor Kursbeginn werden 50&nbsp;% der Kursgebühr fällig.</li>
+            <li><b>Ohne Absage nicht erschienen?</b> Dann wird die volle Kursgebühr einbehalten.</li>
+          </ul>
+          <p class="storno-warm">Melde dich bitte trotzdem jederzeit bei mir, wenn etwas dazwischenkommt. Gemeinsam finden wir bestimmt eine Lösung, zum Beispiel einen Ersatztermin oder jemanden, der deinen Platz übernimmt. Bei der Pottery Pause zählt der erste Kurstag.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -566,7 +619,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <div class="field"><label for="book-persons">Personen</label><select id="book-persons" name="persons"></select></div>
         </div>
         <div class="field"><label for="book-message">Nachricht <span class="opt">(optional)</span></label><textarea id="book-message" name="message" rows="2"></textarea></div>
-        <label class="consent"><input type="checkbox" name="consent" id="book-consent" value="1" required> <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Anmeldung gespeichert werden. Mehr dazu in der <a href="#datenschutz" id="book-privacy">Datenschutzerklärung</a>.</span></label>
+        <p class="book-storno">Kostenlos stornieren bis 48 Stunden vor Kursbeginn. Danach werden 50&nbsp;% fällig, bei Nichterscheinen der volle Betrag. Wenn etwas dazwischenkommt, melde dich einfach, wir finden gemeinsam eine Lösung. <a href="#storno" id="book-storno-link">Mehr dazu</a></p>
+        <label class="consent"><input type="checkbox" name="consent" id="book-consent" value="1" required> <span>Ich habe die Stornobedingungen gelesen und bin einverstanden, dass meine Angaben zur Bearbeitung meiner Anmeldung gespeichert werden. Mehr dazu in der <a href="#datenschutz" id="book-privacy">Datenschutzerklärung</a>.</span></label>
         <p class="book-error" id="book-error" role="alert" hidden></p>
         <button class="btn btn-solid" type="submit" id="book-submit">Verbindlich anmelden</button>
         <p class="pay-note" id="book-paynote" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>Du bezahlst sicher über Stripe, z. B. mit Karte, Apple Pay oder Google Pay.</p>
@@ -582,6 +636,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   </dialog>
 
   <dialog class="season" id="season" aria-labelledby="season-title">
+    <div class="deco" id="season-deco" aria-hidden="true"></div>
     <button class="season-close" type="button" id="season-close" aria-label="Schließen">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
     </button>
@@ -711,6 +766,21 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <span>Website: www.forma-pottery.com</span>
           <span>UID-Nummer: ATU83602825</span>
           <span>Unternehmensgegenstand: Töpferkurse und Keramik</span>
+        </div>
+      </details>
+      <details id="stornobedingungen">
+        <summary>Stornobedingungen</summary>
+        <div class="privacy">
+          <h3>Stornobedingungen für Kurse</h3>
+          <ul class="storno-list">
+            <li><b>Bis 48 Stunden</b> vor Kursbeginn stornierst du kostenlos.</li>
+            <li><b>Innerhalb von 48 Stunden</b> vor Kursbeginn werden 50&nbsp;% der Kursgebühr fällig.</li>
+            <li><b>Ohne Absage nicht erschienen?</b> Dann wird die volle Kursgebühr einbehalten.</li>
+          </ul>
+          <p>Bei mehrteiligen Kursen wie der Pottery Pause zählt der erste Kurstag. Absagen schickst du am besten per E-Mail an hello@forma-pottery.com oder per Telefon bzw. WhatsApp an +43 677 63 90 70 80. Online bezahlte Beträge erstatte ich auf dem gleichen Weg zurück, auf dem du bezahlt hast.</p>
+          <p>Findet ein Kurs nicht statt, zum Beispiel weil zu wenige Anmeldungen da sind oder ich krank bin, bekommst du die volle Kursgebühr zurück oder wir finden gemeinsam einen Ersatztermin.</p>
+          <p>Bei Kursen und Workshops mit festem Termin besteht kein gesetzliches Rücktrittsrecht nach dem Fern- und Auswärtsgeschäfte-Gesetz (§ 18 Abs. 1 Z 10 FAGG). Es gelten die oben beschriebenen Stornobedingungen.</p>
+          <p>Und ganz ehrlich: Wenn etwas dazwischenkommt, schreib mir einfach. Gemeinsam finden wir eine Lösung.</p>
         </div>
       </details>
       <details id="datenschutz">
@@ -911,6 +981,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   $('book-done-close').addEventListener('click',function(){hide(dlg);});
   $('to-contact').addEventListener('click',function(){hide(dlg);});
   $('book-privacy').addEventListener('click',function(){hide(dlg);var d=$('datenschutz');if(d)d.open=true;});
+  $('book-storno-link').addEventListener('click',function(){hide(dlg);});
   dlg.addEventListener('click',function(e){if(e.target===dlg)hide(dlg);});
 
   // Alle „Buchen“-Knöpfe öffnen direkt das Buchungsfenster
@@ -977,7 +1048,24 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   var season=document.getElementById('season');
   var preview=params.get('popup')==='vorschau';
   function seen(id,set){try{if(set){sessionStorage.setItem('forma-popup',id);return true;}return sessionStorage.getItem('forma-popup')===id;}catch(e){return false;}}
+  var STARP='<path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" fill="currentColor"></path>';
+  var DOTP='<circle cx="12" cy="12" r="10" fill="currentColor"></circle>';
+  function adventDeco(){
+    var deco=document.getElementById('season-deco');deco.innerHTML='';
+    var g='<svg class="garland" viewBox="0 0 860 90" preserveAspectRatio="none"><path d="M0 8 Q 107 70 215 18 T 430 18 T 645 18 T 860 8" fill="none" stroke="#674B40" stroke-width="2.5"></path>';
+    var cols=['#8C2C1D','#DDBFA8','#FBF1EA','#8C2C1D','#674B40','#DDBFA8','#8C2C1D','#FBF1EA','#8C2C1D','#DDBFA8','#674B40','#8C2C1D'];
+    for(var i=0;i<12;i++){var x=36+i*68,t=(x%215)/215,y=8+Math.sin(t*Math.PI)*(x<215?30:22)+4;
+      if(i%3===1){g+='<g transform="translate('+(x-9)+' '+(y+2)+') scale(.75)"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" fill="'+cols[i]+'"></path></g>';}
+      else{g+='<line x1="'+x+'" y1="'+y+'" x2="'+x+'" y2="'+(y+8)+'" stroke="#674B40" stroke-width="1.5"></line><circle cx="'+x+'" cy="'+(y+16)+'" r="8" fill="'+cols[i]+'" stroke="rgba(51,33,27,.25)"></circle>';}}
+    g+='</svg>';deco.innerHTML=g;
+    for(var k=0;k<22;k++){var f=document.createElement('span');var size=8+Math.round(Math.random()*14);
+      f.className='flake'+(k%5===0?' red':'');f.style.left=(Math.random()*100)+'%';f.style.width=f.style.height=size+'px';
+      f.style.animationDuration=(7+Math.random()*7)+'s';f.style.animationDelay=(-Math.random()*12)+'s';
+      f.innerHTML='<svg viewBox="0 0 24 24">'+(k%3===0?DOTP:STARP)+'</svg>';deco.appendChild(f);}
+  }
   function openSeason(p){
+    season.classList.toggle('theme-advent',p.theme==='advent');
+    if(p.theme==='advent')adventDeco();else document.getElementById('season-deco').innerHTML='';
     var img=document.getElementById('season-img');
     if(p.image){document.getElementById('season-pic').src=p.image;img.hidden=false;document.getElementById('season-inner').classList.remove('no-img');}
     else{img.hidden=true;document.getElementById('season-inner').classList.add('no-img');}
@@ -1018,7 +1106,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       .catch(function(){se.textContent='Keine Verbindung. Bitte versuch es noch einmal.';se.hidden=false;})
       .then(function(){btn.disabled=false;});
   });
-  fetch('api/popup.php'+(preview?'?vorschau=1':''),{cache:'no-store'})
+  fetch('api/popup.php'+(preview?'?vorschau=1'+(params.get('thema')?'&thema='+encodeURIComponent(params.get('thema')):''):''),{cache:'no-store'})
     .then(function(r){return r.json();})
     .then(function(d){
       var p=d&&d.popup;

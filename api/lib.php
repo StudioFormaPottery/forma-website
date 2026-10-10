@@ -562,6 +562,7 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
         . "Kurs: {$b['title']}\nTermin: {$b['date_text']}\nPersonen: $personsText\n$payLine\nOrt: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
         . $minNote
         . "\nBitte komm in Kleidung, die schmutzig werden darf. Schürzen und Werkzeug habe ich im Studio.\n"
+        . "\nFalls doch etwas dazwischenkommt: Bis 48 Stunden vor Kursbeginn kannst du kostenlos stornieren. Danach werden 50 % der Kursgebühr fällig, wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit bei mir, gemeinsam finden wir bestimmt eine Lösung.\n"
         . "\nFalls du Fragen hast oder doch verhindert bist, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n";
 
     $admin = ($paid ? 'Neue bezahlte Buchung über die Website' : 'Neue Kursanmeldung über die Website') . "\n\n"
@@ -660,7 +661,7 @@ function forma_popup(PDO $pdo): array
 {
     $p = json_decode(forma_setting($pdo, 'popup') ?? '', true);
     $defaults = ['active' => false, 'eyebrow' => '', 'title' => '', 'text' => '', 'date_line' => '', 'start' => '', 'end' => '',
-        'signup' => true, 'button_text' => '', 'button_link' => '', 'image' => '', 'version' => 1];
+        'signup' => true, 'button_text' => '', 'button_link' => '', 'image' => '', 'version' => 1, 'theme' => ''];
     return is_array($p) ? array_merge($defaults, $p) : $defaults;
 }
 

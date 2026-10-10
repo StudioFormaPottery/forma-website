@@ -374,6 +374,7 @@ if ($action === 'save_popup') {
     $p['start'] = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST['start'] ?? '')) ? $_POST['start'] : '';
     $p['end'] = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST['end'] ?? '')) ? $_POST['end'] : '';
     $p['signup'] = !empty($_POST['signup']);
+    $p['theme'] = ($_POST['theme'] ?? '') === 'advent' ? 'advent' : '';
     $p['button_text'] = forma_clean((string)($_POST['button_text'] ?? ''), 40);
     $link = forma_clean((string)($_POST['button_link'] ?? ''), 300);
     $p['button_link'] = ($link === '' || preg_match('~^(#|/|https://)~', $link)) ? $link : '';
@@ -575,6 +576,11 @@ if ($view === 'popup') {
             <label for="image">Bild oder Flyer <span class="muted">(optional, JPG/PNG)</span></label>
             <?php if ($p['image']): ?><img class="thumb" src="../api/popup-image.php?v=<?= (int)$p['version'] ?>" alt=""><label class="check"><input type="checkbox" name="remove_image" value="1"> Bild entfernen</label><?php endif; ?>
             <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp">
+            <label for="theme">Gestaltung</label>
+            <select id="theme" name="theme">
+                <option value="" <?= $p['theme'] === '' ? 'selected' : '' ?>>Schlicht</option>
+                <option value="advent" <?= $p['theme'] === 'advent' ? 'selected' : '' ?>>Weihnachtlich (Girlande und rieselnde Sternchen)</option>
+            </select>
             <label class="check"><input type="checkbox" name="signup" value="1" <?= $p['signup'] ? 'checked' : '' ?>> Eintragen für die E-Mail-Liste anbieten</label>
             <div class="row">
                 <div class="stack"><label for="button_text">Zusätzlicher Knopf <span class="muted">(optional)</span></label><input id="button_text" name="button_text" value="<?= forma_h($p['button_text']) ?>" placeholder="z. B. Jetzt buchen"></div>
@@ -799,7 +805,7 @@ function render_page(string $title, callable $body): void
 @font-face{font-family:"Bricolage Grotesque";font-weight:600 800;font-display:swap;src:url(../fonts/BricolageGrotesque-Bold.woff) format("woff")}
 :root{--paper:#EEE2D4;--card:#F8F1EA;--ink:#33211B;--soft:#674B40;--clay:#8C2C1D;--line:#D9C5B2;color-scheme:light}
 *{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.55 "Outfit",system-ui,sans-serif}
+body{margin:0;background:var(--paper);color:var(--ink);font:18.5px/1.55 "Outfit",system-ui,sans-serif}
 main{max-width:720px;margin:0 auto;padding:24px 16px 64px}
 h1,h2{font-family:"Bricolage Grotesque","Outfit",sans-serif;color:var(--clay);letter-spacing:-.01em;line-height:1.15}
 h1{font-size:30px;margin:8px 0 12px}h2{font-size:21px;margin:32px 0 12px}
@@ -845,22 +851,26 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 @media (max-width:480px){.row{grid-template-columns:1fr}}
 /* Desktop: ganze Bildschirmbreite, größere Schrift */
 @media (min-width:900px){
-  body{font-size:19px}
-  main{max-width:1440px;padding:32px 48px 80px}
-  h1{font-size:40px}h2{font-size:26px;margin-top:40px}
-  .brand{font-size:14px}.brand img{width:56px;height:56px}
+  body{font-size:21.5px}
+  main{max-width:1500px;padding:32px 48px 80px}
+  h1{font-size:46px}h2{font-size:30px;margin-top:44px}
+  .brand{font-size:16px}.brand img{width:68px;height:68px}
+  .btn{font-size:20px;min-height:52px;padding:12px 26px}
+  .link{font-size:19px}
+  .alert{font-size:20px}
+  .muted{font-size:20px}
   .tiles{grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
-  .tile{padding:20px 22px}.tile strong{font-size:20px}
+  .tile{padding:22px 24px}.tile strong{font-size:23px}
   .group .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
   .group .card{padding:14px 18px}
-  .group summary{font-size:21px}
+  .group summary{font-size:24px}
   .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
   form.card,div.card.stack{max-width:none}
   .card{padding:20px 24px}
-  label{font-size:16.5px}
-  input,textarea,select{font-size:17px}
-  .small{font-size:15.5px}
-  .pill{font-size:15px}
+  label{font-size:19px}
+  input,textarea,select{font-size:20px;padding:13px 15px}
+  .small{font-size:17.5px}
+  .pill{font-size:17px;padding:3px 12px}
 }
 @media (min-width:1200px){
   form.card.stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:900px}
