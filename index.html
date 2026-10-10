@@ -243,6 +243,8 @@ section{scroll-margin-top:96px}
 .opt{font-weight:400;color:var(--ink-soft)}
 .field input,.field select,.field textarea{font:inherit;font-size:16px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:#FFFBF7;color:var(--ink);width:100%}
 .field input:focus,.field select:focus,.field textarea:focus{outline:3px solid var(--focus);outline-offset:1px}
+.missing{background:#F6DED3!important;border-color:var(--clay)!important;box-shadow:0 0 0 2px rgba(140,44,29,.22)}
+.consent.missing{background:#F6DED3;color:var(--ink);border-radius:14px;padding:10px 12px;margin-left:-2px}
 .consent{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.45;color:var(--ink-soft)}
 .consent input{margin-top:3px;width:18px;height:18px;accent-color:var(--clay);flex:0 0 auto}
 .book-error{background:#FFF4EE;border:1px solid var(--clay-soft);border-radius:14px;padding:10px 14px;font-size:15px}
@@ -312,6 +314,7 @@ section{scroll-margin-top:96px}
 .maker-form{display:flex;flex-direction:column;gap:10px;margin-top:18px;max-width:560px}
 .maker .btn{background:var(--on-clay);color:var(--clay);border-color:var(--on-clay)}
 .maker .consent{color:#F3E2D6}.maker .consent a{color:var(--on-clay)}
+.maker .consent.missing,.season .consent.missing{color:var(--ink)}.maker .consent.missing a{color:var(--clay)}.maker .book-error{color:var(--ink)}
 .maker-done{margin-top:16px;font-weight:500;color:var(--on-clay)!important;background:rgba(251,241,234,.14);padding:14px 16px;border-radius:16px}
 .maker-art{position:relative;min-height:220px;display:grid;place-items:center}
 .maker-art::before{content:"";position:absolute;width:78%;aspect-ratio:1;border-radius:var(--blob);background:var(--blush);opacity:.9;animation:morph 14s ease-in-out infinite alternate}
@@ -1324,9 +1327,33 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   }
 
 
-  // Fehlermeldungen in Fenstern immer ins Blickfeld holen, damit man sie am Handy sicher sieht
+  // Fehlende Pflichtfelder farbig markieren und die erste Stelle ins Blickfeld holen
+  var EMAIL=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  function isMissing(f){
+    if(f.type==='checkbox')return !f.checked;
+    var v=(f.value||'').trim();
+    if(f.id==='p-project')return v.length<5;
+    if(f.type==='email')return !EMAIL.test(v);
+    return v.length<(f.autocomplete==='name'?2:1);
+  }
+  function markMissing(form){
+    var first=null;
+    form.querySelectorAll('input[required],textarea[required],select[required],.consent input[type=checkbox]').forEach(function(f){
+      if(f.closest('[hidden]'))return;
+      var bad=isMissing(f),box=f.type==='checkbox'?f.closest('.consent'):f;
+      box.classList.toggle('missing',bad);
+      if(bad&&!first)first=box;
+    });
+    return first;
+  }
+  document.addEventListener('input',function(e){var f=e.target;if(!f.closest)return;var box=f.type==='checkbox'?f.closest('.consent'):f;if(box&&box.classList.contains('missing')&&!isMissing(f))box.classList.remove('missing');},true);
+  document.addEventListener('change',function(e){var f=e.target;if(f.type==='checkbox'&&f.closest&&f.closest('.consent.missing')&&f.checked)f.closest('.consent').classList.remove('missing');},true);
   if(window.MutationObserver)document.querySelectorAll('.book-error').forEach(function(el){
-    new MutationObserver(function(){if(!el.hidden){try{el.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){el.scrollIntoView();}}}).observe(el,{attributes:true,attributeFilter:['hidden'],childList:true,characterData:true,subtree:true});
+    new MutationObserver(function(){
+      if(el.hidden)return;
+      var form=el.closest('form'),first=form&&markMissing(form),target=first||el;
+      try{target.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){target.scrollIntoView();}
+    }).observe(el,{attributes:true,attributeFilter:['hidden'],childList:true,characterData:true,subtree:true});
   });
 
   // Private Pottery buchen oder anfragen
