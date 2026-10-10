@@ -91,6 +91,27 @@ function forma_migrate(PDO $pdo): void
         created_at TEXT NOT NULL,
         confirmed_at TEXT
     )');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS vouchers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nr TEXT,
+        product TEXT NOT NULL,
+        qty INTEGER NOT NULL,
+        amount_cents INTEGER NOT NULL,
+        recipient TEXT NOT NULL DEFAULT \'\',
+        sender TEXT NOT NULL DEFAULT \'\',
+        message TEXT NOT NULL DEFAULT \'\',
+        design INTEGER NOT NULL DEFAULT 1,
+        buyer_name TEXT NOT NULL DEFAULT \'\',
+        buyer_email TEXT NOT NULL DEFAULT \'\',
+        status TEXT NOT NULL DEFAULT \'offen\',
+        stripe_session TEXT NOT NULL DEFAULT \'\',
+        token TEXT NOT NULL,
+        mailed INTEGER NOT NULL DEFAULT 0,
+        note TEXT NOT NULL DEFAULT \'\',
+        created_at TEXT NOT NULL,
+        paid_at TEXT,
+        redeemed_at TEXT
+    )');
     forma_add_column($pdo, 'courses', 'price_cents', 'INTEGER NOT NULL DEFAULT 0');
     forma_add_column($pdo, 'bookings', 'amount_cents', 'INTEGER NOT NULL DEFAULT 0');
     forma_add_column($pdo, 'bookings', 'stripe_session', "TEXT NOT NULL DEFAULT ''");
@@ -521,6 +542,15 @@ function forma_reconcile_payments(PDO $pdo, bool $force = false): void
             error_log('FORMA reconcile: ' . $e->getMessage());
         }
     }
+    $stmt = $pdo->prepare("SELECT * FROM vouchers WHERE status = 'offen' AND stripe_session != '' AND created_at >= ?");
+    $stmt->execute([date('c', time() - 3 * 86400)]);
+    foreach ($stmt->fetchAll() as $v) {
+        try {
+            forma_voucher_check($pdo, $v);
+        } catch (Throwable $e) {
+            error_log('FORMA reconcile voucher: ' . $e->getMessage());
+        }
+    }
 }
 
 /** Bestätigung an die Kundin und Info an Vivien. Wird pro Buchung nur einmal verschickt. */
@@ -653,6 +683,101 @@ function forma_ml_sync(string $email, string $name, bool $active = true): bool
         error_log('FORMA MailerLite: ' . $e->getMessage());
         return false;
     }
+}
+
+// --- Gutscheine ----------------------------------------------------------------
+
+const FORMA_VOUCHERS = [
+    'spin' => [
+        'name' => 'Spin & Go Workshop', 'price' => 7000, 'one' => 'Platz', 'many' => 'Plätze', 'small' => 'im Spin & Go Workshop',
+        'desc' => 'Ein Workshop dauert 2 Stunden: begleitet an der Töpferscheibe, inkl. eines Werkstücks pro Platz.',
+    ],
+    'private' => [
+        'name' => 'Private Pottery', 'price' => 6500, 'one' => 'Stunde', 'many' => 'Stunden', 'small' => 'Private Pottery',
+        'desc' => 'Persönliche Einzelstunde Handbuilding, inkl. Material und Werkstücken. Zum Schluss wird bemalt.',
+    ],
+    'atelier' => [
+        'name' => 'Offenes Atelier', 'price' => 3000, 'one' => 'Stunde', 'many' => 'Stunden', 'small' => 'im Offenen Atelier',
+        'desc' => 'Selbstständig im Studio arbeiten, inkl. Material, Werkzeug und Maschinen. Nur für Töpfernde mit Vorerfahrung, die ohne Anleitung arbeiten. Brennen & Glasieren € 22/kg extra.',
+    ],
+];
+
+/** „2 Plätze“ / „1 Stunde“ */
+function forma_voucher_qty(array $v): string
+{
+    $p = FORMA_VOUCHERS[$v['product']];
+    return (int)$v['qty'] . ' ' . ((int)$v['qty'] === 1 ? $p['one'] : $p['many']);
+}
+
+function forma_voucher_title(array $v): string
+{
+    return forma_voucher_qty($v) . ' ' . FORMA_VOUCHERS[$v['product']]['small'];
+}
+
+/** Bezahlung bestätigen, fortlaufende Nummer vergeben (FORMA-JJJJ-0001) und Mails verschicken. */
+function forma_voucher_paid(PDO $pdo, int $id): void
+{
+    $pdo->exec('BEGIN IMMEDIATE');
+    $stmt = $pdo->prepare("SELECT * FROM vouchers WHERE id = ? AND status IN ('offen', 'abgebrochen')");
+    $stmt->execute([$id]);
+    if ($stmt->fetch()) {
+        $year = date('Y');
+        $n = (int)$pdo->query("SELECT COUNT(*) FROM vouchers WHERE nr LIKE 'FORMA-$year-%'")->fetchColumn() + 1;
+        $nr = sprintf('FORMA-%s-%04d', $year, $n);
+        $pdo->prepare("UPDATE vouchers SET status = 'bezahlt', paid_at = ?, nr = ? WHERE id = ?")->execute([date('c'), $nr, $id]);
+    }
+    $pdo->exec('COMMIT');
+    forma_voucher_mails($pdo, $id);
+}
+
+function forma_voucher_link(array $v): string
+{
+    return forma_site_url() . '/api/gutschein-pdf.php?v=' . (int)$v['id'] . '&k=' . $v['token'];
+}
+
+function forma_voucher_mails(PDO $pdo, int $id): void
+{
+    $pdo->exec('BEGIN IMMEDIATE');
+    $stmt = $pdo->prepare("SELECT * FROM vouchers WHERE id = ? AND status = 'bezahlt' AND mailed = 0");
+    $stmt->execute([$id]);
+    $v = $stmt->fetch();
+    if (!$v) {
+        $pdo->exec('ROLLBACK');
+        return;
+    }
+    $pdo->prepare('UPDATE vouchers SET mailed = 1 WHERE id = ?')->execute([$id]);
+    $pdo->exec('COMMIT');
+    $first = forma_first_name($v['buyer_name']);
+    $title = forma_voucher_title($v);
+    $amount = forma_euro((int)$v['amount_cents']);
+    $link = forma_voucher_link($v);
+    $phone = FORMA_PHONE;
+    $site = forma_site_url();
+    forma_mail($v['buyer_email'], 'Dein FORMA Gutschein ' . $v['nr'], "Hallo $first,\n\nvielen Dank für deinen Gutschein-Kauf! Was für ein schönes Geschenk.\n\n"
+        . "Gutschein: $title\nWert: $amount\nGutschein-Nr.: {$v['nr']}\n" . ($v['recipient'] ? "Für: {$v['recipient']}\n" : '')
+        . "\nHier kannst du den Gutschein jederzeit als PDF herunterladen und ausdrucken:\n$link\n\n"
+        . "Zum Einlösen meldet sich die beschenkte Person einfach bei mir, telefonisch oder per WhatsApp unter $phone oder per E-Mail an hello@forma-pottery.com, und wir finden gemeinsam einen Termin.\n\n"
+        . "Herzliche Grüße\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
+    forma_mail(FORMA_NOTIFY_EMAIL, 'Gutschein verkauft: ' . $v['nr'] . ' (' . $amount . ')', "Ein Gutschein wurde online gekauft und bezahlt.\n\n"
+        . "Nr.: {$v['nr']}\nInhalt: $title\nBetrag: $amount\nFür: {$v['recipient']}\nVon: {$v['sender']}\n\n"
+        . "Käufer:in: {$v['buyer_name']}\nE-Mail: {$v['buyer_email']}\n\nPDF: $link\nAlle Gutscheine: $site/verwaltung/?view=gutscheine\n", $v['buyer_email']);
+}
+
+function forma_voucher_check(PDO $pdo, array $v): string
+{
+    if ($v['status'] !== 'offen' || $v['stripe_session'] === '') {
+        return (string)$v['status'];
+    }
+    $session = forma_stripe('GET', '/v1/checkout/sessions/' . rawurlencode($v['stripe_session']));
+    if (($session['payment_status'] ?? '') === 'paid') {
+        forma_voucher_paid($pdo, (int)$v['id']);
+        return 'bezahlt';
+    }
+    if (($session['status'] ?? '') === 'expired') {
+        $pdo->prepare("UPDATE vouchers SET status = 'abgebrochen' WHERE id = ? AND status = 'offen'")->execute([(int)$v['id']]);
+        return 'abgebrochen';
+    }
+    return 'offen';
 }
 
 // --- Pop-up & E-Mail-Liste ------------------------------------------------------

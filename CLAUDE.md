@@ -60,3 +60,9 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 
 ## Nicht anfassen (DNS bei Hostinger)
 - E-Mail-Einträge (MX, hostingermail, autodiscover, autoconfig, _dmarc, SPF) und MailerLite-Einträge bleiben unverändert.
+
+## Gutscheine (seit 10.10.2026)
+- Kauf über „Gutschein kaufen“ (`data-voucher`) → `api/gutschein.php` (Stripe Checkout) → `api/gutschein-bezahlt.php` vergibt die fortlaufende Nummer FORMA-JJJJ-0001 und schickt die Mails. PDF: `api/gutschein-pdf.php?v=ID&k=TOKEN` (FPDF in `api/fpdf/`, Hintergründe und Textpositionen in `api/gutschein/design1|2.*`, erzeugt per Playwright aus HTML-Vorlagen).
+- Produkte und Preise in `FORMA_VOUCHERS` (lib.php): Spin & Go € 70 pro Platz, Private Pottery € 65 pro Stunde, Offenes Atelier € 30 pro Stunde. Formulierung „2 Plätze im Spin & Go Workshop“, nicht „Einheiten“.
+- Zwei Designs zur Wahl („Bogen“, „Freiformen“), weißes Papier, keine Fotos. Kein Ablaufdatum auf dem Gutschein.
+- Verwaltung → Gutscheine: Liste, als eingelöst markieren, CSV für die Buchhaltung.

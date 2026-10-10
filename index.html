@@ -39,6 +39,7 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
+button,input,select,textarea{font-family:inherit}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.65;-webkit-font-smoothing:antialiased}
 img{max-width:100%;display:block}
@@ -263,6 +264,32 @@ section{scroll-margin-top:96px}
 .book-storno{font-size:14.5px;line-height:1.5;padding:12px 14px;border-radius:14px;background:var(--paper-2);color:var(--ink-soft)}
 .book-storno a{color:var(--clay)}
 @media (min-width:861px){.book-storno{font-size:16px}}
+
+/* Gutschein kaufen */
+.voucher-dialog{width:min(720px,calc(100vw - 24px))}
+.vgroup{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.vgroup legend{font-family:var(--display);font-weight:600;font-size:19px;color:var(--ink);margin-bottom:10px;padding:0}
+.vchoice{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.vchoice{grid-template-columns:1fr}}
+.vchoice label,.vdesigns label{position:relative;cursor:pointer;display:block}
+.vchoice input,.vdesigns input{position:absolute;opacity:0;pointer-events:none}
+.vchoice span{display:flex;flex-direction:column;gap:4px;height:100%;padding:14px 16px;border-radius:18px;border:1.5px solid var(--line);background:var(--paper-2);transition:border-color .2s ease,background-color .2s ease}
+.vchoice b{font-family:var(--display);font-weight:600;font-size:18px;color:var(--clay);line-height:1.15}
+.vchoice i{font-style:normal;font-weight:500}
+.vchoice small{font-size:13.5px;line-height:1.4;color:var(--ink-soft)}
+.vchoice input:checked+span{border-color:var(--clay);background:var(--blush);box-shadow:inset 0 0 0 1.5px var(--clay)}
+.vchoice input:focus-visible+span,.vdesigns input:focus-visible+img{outline:3px solid var(--focus);outline-offset:2px}
+.stepper{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.stepper button{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--clay);background:var(--paper);color:var(--clay);font-size:24px;line-height:1;cursor:pointer}
+.stepper button:disabled{opacity:.35;cursor:default}
+.stepper output{min-width:120px;text-align:center;font-family:var(--display);font-weight:600;font-size:21px}
+.vtotal{margin-left:auto;font-family:var(--display);font-weight:650;font-size:26px;color:var(--clay)}
+.vdesigns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.vdesigns img{width:100%;height:auto;border-radius:12px;border:2px solid var(--line);box-shadow:0 6px 18px rgba(51,33,27,.08);transition:border-color .2s ease}
+.vdesigns span{display:block;text-align:center;font-weight:500;font-size:15px;margin-top:6px}
+.vdesigns input:checked+img{border-color:var(--clay);box-shadow:0 0 0 2px var(--clay)}
+.field-row.two{grid-template-columns:1fr 1fr}
+@media (max-width:460px){.field-row.two{grid-template-columns:1fr}}
 
 /* Saison-Pop-up */
 .season .deco{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden;border-radius:inherit}
@@ -635,6 +662,64 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     </div>
   </dialog>
 
+  <dialog class="book-dialog voucher-dialog" id="voucher-dialog" aria-labelledby="v-title">
+    <div class="book-inner">
+      <button class="book-close" type="button" id="v-close" aria-label="Schließen">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+      <form id="v-form" class="step" novalidate>
+        <p class="eyebrow">Ein Geschenk aus Ton</p>
+        <h3 class="step-title" id="v-title" tabindex="-1">Gutschein kaufen</h3>
+        <input type="hidden" name="t" id="v-t">
+        <div class="hp" aria-hidden="true"><label for="v-website">Bitte leer lassen</label><input id="v-website" name="website" tabindex="-1" autocomplete="off"></div>
+        <fieldset class="vgroup"><legend>1 · Was möchtest du verschenken?</legend>
+          <div class="vchoice">
+            <label><input type="radio" name="product" value="spin" checked><span><b>Spin &amp; Go Workshop</b><i>€ 70 pro Platz</i><small>2 Stunden an der Töpferscheibe, begleitet, inkl. eines Werkstücks</small></span></label>
+            <label><input type="radio" name="product" value="private"><span><b>Private Pottery</b><i>€ 65 pro Stunde</i><small>Persönliche Einzelstunde Handbuilding, zum Schluss wird bemalt</small></span></label>
+            <label><input type="radio" name="product" value="atelier"><span><b>Offenes Atelier</b><i>€ 30 pro Stunde</i><small>Nur für Töpfernde mit Vorerfahrung, die selbstständig ohne Anleitung arbeiten</small></span></label>
+          </div>
+        </fieldset>
+        <fieldset class="vgroup"><legend id="v-qty-legend">2 · Wie viele Plätze?</legend>
+          <div class="stepper">
+            <button type="button" id="v-minus" aria-label="Weniger">−</button>
+            <output id="v-qty-out" aria-live="polite">1 Platz</output>
+            <button type="button" id="v-plus" aria-label="Mehr">+</button>
+            <input type="hidden" name="qty" id="v-qty" value="1">
+            <span class="vtotal" id="v-total">€ 70</span>
+          </div>
+        </fieldset>
+        <fieldset class="vgroup"><legend>3 · Welches Design gefällt dir?</legend>
+          <div class="vdesigns">
+            <label><input type="radio" name="design" value="1" checked><img src="img/gutschein-1.jpg" alt="Design Bogen: links die Namen, rechts ein großer Bogen mit dem Inhalt" loading="lazy"><span>Bogen</span></label>
+            <label><input type="radio" name="design" value="2"><img src="img/gutschein-2.jpg" alt="Design Freiformen: alles mittig, mit Formen in den Ecken" loading="lazy"><span>Freiformen</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="vgroup"><legend>4 · Persönlich gestalten <span class="opt">(optional)</span></legend>
+          <div class="field-row two">
+            <div class="field"><label for="v-to">Für</label><input id="v-to" name="recipient" maxlength="40" placeholder="z. B. Anna"></div>
+            <div class="field"><label for="v-from">Von</label><input id="v-from" name="sender" maxlength="40" placeholder="z. B. Marie"></div>
+          </div>
+          <div class="field"><label for="v-msg">Persönliche Nachricht <span class="opt" id="v-count">(220 Zeichen)</span></label><textarea id="v-msg" name="message" rows="3" maxlength="220" placeholder="z. B. Alles Liebe zum Geburtstag!"></textarea></div>
+        </fieldset>
+        <fieldset class="vgroup"><legend>5 · Deine Angaben</legend>
+          <div class="field"><label for="v-name">Dein Name</label><input id="v-name" name="buyer_name" autocomplete="name" required></div>
+          <div class="field"><label for="v-email">Deine E-Mail <span class="opt">(dorthin schicke ich den Gutschein)</span></label><input id="v-email" name="buyer_email" type="email" autocomplete="email" required></div>
+        </fieldset>
+        <label class="consent"><input type="checkbox" name="consent" id="v-consent" value="1"> <span>Ich bin einverstanden, dass meine Angaben zur Abwicklung des Gutscheins gespeichert werden. Mehr dazu in der <a href="#datenschutz" id="v-privacy">Datenschutzerklärung</a>.</span></label>
+        <p class="book-error" id="v-error" role="alert" hidden></p>
+        <button class="btn btn-solid" type="submit" id="v-submit">Weiter zur Bezahlung · € 70</button>
+        <p class="pay-note">Nach der Bezahlung kannst du den Gutschein sofort als PDF herunterladen und ausdrucken. Er kommt zusätzlich per E-Mail.</p>
+      </form>
+      <div class="book-done" id="v-done" hidden>
+        <p class="eyebrow">Danke!</p>
+        <h3 id="v-done-title" tabindex="-1">Dein Gutschein ist fertig</h3>
+        <p id="v-done-text"></p>
+        <a class="btn btn-solid" id="v-download" href="#" target="_blank" rel="noopener" hidden>Gutschein herunterladen (PDF)</a>
+        <button class="btn btn-ghost" type="button" id="v-done-close">Schließen</button>
+      </div>
+    </div>
+  </dialog>
+
   <dialog class="season" id="season" aria-labelledby="season-title">
     <div class="deco" id="season-deco" aria-hidden="true"></div>
     <button class="season-close" type="button" id="season-close" aria-label="Schließen">
@@ -703,16 +788,16 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     </div>
   </section>
 
-  <section class="gift" aria-labelledby="gutschein-titel">
+  <section class="gift" id="gutschein" aria-labelledby="gutschein-titel">
     <svg class="wave" style="--to:var(--blush);background:var(--paper)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60c140-30 300-50 470-32s300 66 480 62 330-54 490-58v88H0z"></path></svg>
     <svg class="float f2" viewBox="0 0 200 200" aria-hidden="true" style="top:30%"><path d="M100 8c38 2 66 22 80 56s6 80-26 104-82 30-112 2S2 98 22 58 62 6 100 8z"></path></svg>
     <div class="wrap">
       <div class="gift-text">
         <p class="eyebrow">Gutscheine</p>
         <h2 class="display" id="gutschein-titel">Ein Geschenk aus Ton</h2>
-        <p>Ein Kursplatz oder eine Einzelstunde ist ein Geschenk, das in Erinnerung bleibt. Gutscheine stelle ich dir gern persönlich aus.</p>
+        <p>Ein Platz an der Töpferscheibe, eine Einzelstunde oder Zeit im offenen Atelier: ein Geschenk, das in Erinnerung bleibt. Du kaufst den Gutschein hier online und kannst ihn sofort als PDF ausdrucken.</p>
       </div>
-      <a class="btn btn-solid" href="#kontakt">Gutschein anfragen</a>
+      <a class="btn btn-solid" href="#gutschein" data-voucher="">Gutschein kaufen</a>
     </div>
     <svg class="wave" style="--to:var(--paper);background:var(--blush)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70c150 28 310 40 480 22s310-70 490-66 310 56 470 50v44H0z"></path></svg>
   </section>
@@ -806,6 +891,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 
           <h4>Online-Bezahlung mit Stripe</h4>
           <p>Kurse kannst du online bezahlen. Dafür wirst du zum Zahlungsdienstleister Stripe (Stripe Payments Europe Ltd., 1 Grand Canal Street Lower, Dublin 2, Irland) weitergeleitet. Stripe erhält die für die Zahlung nötigen Daten: deine E-Mail-Adresse, den gebuchten Kurs mit Termin und Betrag sowie deine Zahlungsdaten, die du direkt bei Stripe eingibst. Deine Karten- oder Kontodaten sehe und speichere ich nicht. Rechtsgrundlage ist die Erfüllung des Vertrags (Art. 6 Abs. 1 lit. b DSGVO). Stripe verarbeitet Daten teilweise auch in den USA; die Übermittlung ist über das EU-US Data Privacy Framework und Standardvertragsklauseln abgesichert. Mehr dazu unter stripe.com/at/privacy. Zahlungsbelege bewahre ich sieben Jahre auf, wie es das Steuerrecht verlangt.</p>
+
+          <h4>Gutscheine</h4>
+          <p>Wenn du einen Gutschein kaufst, speichere ich deinen Namen, deine E-Mail-Adresse, den gewählten Gutschein und die Angaben, die auf dem Gutschein stehen sollen (für wen, von wem, persönliche Nachricht). Ich nutze sie, um den Gutschein zu erstellen, ihn dir zu schicken und ihn beim Einlösen zuzuordnen (Art. 6 Abs. 1 lit. b DSGVO). Die Bezahlung läuft wie bei den Kursen über Stripe. Gutschein- und Zahlungsdaten bewahre ich so lange auf, wie es das Steuerrecht verlangt.</p>
 
           <h4>E-Mail-Liste für neue Kurse und Specials</h4>
           <p>Wenn du dich für meine E-Mail-Liste einträgst, speichere ich deine E-Mail-Adresse, den Zeitpunkt der Eintragung und über welches Angebot du dich eingetragen hast. Du bekommst zuerst eine E-Mail mit einem Bestätigungslink; erst nach deinem Klick stehst du auf der Liste (Double-Opt-in). Ich schreibe dir dann gelegentlich zu neuen Kursen und Specials im Studio. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, § 174 TKG 2021). Du kannst sie jederzeit widerrufen, über den Abmeldelink in jeder E-Mail oder mit einer kurzen Nachricht an mich. Für den Versand nutze ich den Dienst MailerLite (MailerLite Limited, Ground Floor, 71 Lower Baggot Street, Dublin 2, Irland) als Auftragsverarbeiter: Nach deiner Bestätigung wird deine Adresse dorthin übertragen. MailerLite kann außerdem erfassen, ob eine E-Mail geöffnet oder ein Link darin angeklickt wurde, damit ich sehe, welche Inhalte interessieren. Nach deiner Abmeldung lösche ich deine Adresse.</p>
@@ -1042,6 +1130,56 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     showDone(messages[result][0],messages[result][1]);
     try{params.delete('buchung');history.replaceState(null,'',location.pathname+(params.toString()?'?'+params:'')+location.hash);}catch(e){}
   }
+
+  // Gutschein kaufen
+  var vd=$('voucher-dialog'),vf=$('v-form'),vq=$('v-qty'),vErr=$('v-error'),vSubmit=$('v-submit');
+  var VP={spin:{price:7000,one:'Platz',many:'Plätze',q:'Wie viele Plätze?'},private:{price:6500,one:'Stunde',many:'Stunden',q:'Wie viele Stunden?'},atelier:{price:3000,one:'Stunde',many:'Stunden',q:'Wie viele Stunden?'}};
+  function vProd(){var r=vf.querySelector('input[name="product"]:checked');return r?r.value:'spin';}
+  function vUpdate(){
+    var p=VP[vProd()],n=+vq.value;
+    $('v-qty-legend').textContent='2 · '+p.q;
+    $('v-qty-out').textContent=n+' '+(n===1?p.one:p.many);
+    $('v-total').textContent=euro(p.price*n);
+    $('v-minus').disabled=n<=1;$('v-plus').disabled=n>=10;
+    vSubmit.textContent='Weiter zur Bezahlung · '+euro(p.price*n);
+    $('v-count').textContent='(noch '+(220-$('v-msg').value.length)+' Zeichen)';
+  }
+  vf.querySelectorAll('input[name="product"]').forEach(function(r){r.addEventListener('change',vUpdate);});
+  $('v-minus').addEventListener('click',function(){vq.value=Math.max(1,+vq.value-1);vUpdate();});
+  $('v-plus').addEventListener('click',function(){vq.value=Math.min(10,+vq.value+1);vUpdate();});
+  $('v-msg').addEventListener('input',vUpdate);
+  function vOpen(){vf.hidden=false;$('v-done').hidden=true;vErr.hidden=true;$('v-t').value=Date.now();vUpdate();show(vd);vd.querySelector('.book-inner').scrollTop=0;setTimeout(function(){try{$('v-title').focus({preventScroll:true});}catch(e){}},30);}
+  function vDone(title,text,link){vf.hidden=true;$('v-done').hidden=false;$('v-done-title').textContent=title;$('v-done-text').textContent=text;var d=$('v-download');if(link){d.href=link;d.hidden=false;}else d.hidden=true;show(vd);}
+  document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('[data-voucher]');if(!a)return;e.preventDefault();closeNav();vOpen();});
+  $('v-close').addEventListener('click',function(){hide(vd);});
+  $('v-done-close').addEventListener('click',function(){hide(vd);});
+  $('v-privacy').addEventListener('click',function(){hide(vd);var d=$('datenschutz');if(d)d.open=true;});
+  vd.addEventListener('click',function(e){if(e.target===vd)hide(vd);});
+  vf.addEventListener('submit',function(e){
+    e.preventDefault();vErr.hidden=true;
+    var name=$('v-name').value.trim(),email=$('v-email').value.trim(),msg='';
+    if(name.length<2)msg='Bitte gib deinen Namen an.';
+    else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))msg='Bitte gib eine gültige E-Mail-Adresse an.';
+    else if(!$('v-consent').checked)msg='Bitte bestätige noch die Hinweise zum Datenschutz.';
+    if(msg){vErr.textContent=msg;vErr.hidden=false;return;}
+    vSubmit.disabled=true;vSubmit.textContent='Einen Moment …';
+    var going=false;
+    fetch('api/gutschein.php',{method:'POST',body:new FormData(vf)})
+      .then(function(r){return r.json().catch(function(){return {ok:false};});})
+      .then(function(d){
+        if(d&&d.ok&&d.redirect){going=true;location.href=d.redirect;return;}
+        vErr.textContent=(d&&d.error)||'Das hat leider nicht geklappt. Bitte versuch es noch einmal.';vErr.hidden=false;
+      })
+      .catch(function(){vErr.textContent='Keine Verbindung. Bitte versuch es noch einmal.';vErr.hidden=false;})
+      .then(function(){if(!going){vSubmit.disabled=false;vUpdate();}});
+  });
+  var gres=params.get('gutschein');
+  if(gres==='bezahlt'&&params.get('v')&&params.get('k')){
+    vDone('Dein Gutschein ist fertig!','Danke für deinen Kauf. Hier kannst du den Gutschein gleich als PDF herunterladen und ausdrucken. Er ist außerdem per E-Mail zu dir unterwegs.','api/gutschein-pdf.php?v='+encodeURIComponent(params.get('v'))+'&k='+encodeURIComponent(params.get('k')));
+  }else if(gres==='wartet'){vDone('Fast geschafft','Deine Zahlung wird noch verarbeitet. Sobald sie da ist, bekommst du den Gutschein per E-Mail.');}
+  else if(gres==='abgebrochen'){vDone('Bezahlung abgebrochen','Kein Problem, es wurde nichts abgebucht. Du kannst den Gutschein jederzeit neu kaufen.');}
+  else if(gres==='fehler'){vDone('Das hat nicht geklappt','Dieser Link ist leider nicht gültig. Melde dich gern bei mir unter '+phone+'.');}
+  if(gres){try{['gutschein','v','k'].forEach(function(k){params.delete(k);});history.replaceState(null,'',location.pathname+(params.toString()?'?'+params:'')+location.hash);}catch(e){}}
   load();
 
   // Saison-Pop-up

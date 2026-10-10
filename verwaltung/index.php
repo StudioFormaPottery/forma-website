@@ -408,6 +408,14 @@ if ($action === 'save_popup') {
     go($self . '?view=popup', $p['active'] ? (forma_popup_live($p) ? 'Gespeichert. Das Pop-up ist jetzt auf der Website zu sehen.' : 'Gespeichert. Das Pop-up erscheint im eingestellten Zeitraum.') : 'Gespeichert. Das Pop-up ist ausgeschaltet.');
 }
 
+if ($action === 'voucher_status') {
+    $vid = (int)($_POST['vid'] ?? 0);
+    $redeem = ($_POST['to'] ?? '') === 'eingeloest';
+    $pdo->prepare("UPDATE vouchers SET status = ?, redeemed_at = ? WHERE id = ? AND status IN ('bezahlt','eingeloest')")
+        ->execute([$redeem ? 'eingeloest' : 'bezahlt', $redeem ? date('c') : null, $vid]);
+    go($self . '?view=gutscheine', $redeem ? 'Der Gutschein ist als eingelöst markiert.' : 'Der Gutschein ist wieder offen.');
+}
+
 if ($action === 'delete_subscriber') {
     $pdo->prepare('DELETE FROM subscribers WHERE id = ?')->execute([(int)($_POST['sid'] ?? 0)]);
     go($self . '?view=liste', 'Der Kontakt ist gelöscht.');
@@ -425,6 +433,54 @@ if ($view === 'export') {
         fputcsv($out, [$r['email'], $r['name'], $r['source'], $r['confirmed_at'] ? date('d.m.Y', strtotime($r['confirmed_at'])) : ''], ';');
     }
     exit;
+}
+
+if ($view === 'gutscheine_export') {
+    $rows = $pdo->query("SELECT * FROM vouchers WHERE status IN ('bezahlt','eingeloest') ORDER BY paid_at")->fetchAll();
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="forma-gutscheine-' . date('Y-m-d') . '.csv"');
+    $out = fopen('php://output', 'w');
+    fwrite($out, "\xEF\xBB\xBF");
+    fputcsv($out, ['Gutschein-Nr', 'Verkauft am', 'Inhalt', 'Betrag EUR', 'Fuer', 'Von', 'Kaeufer', 'E-Mail', 'Status', 'Eingeloest am'], ';');
+    foreach ($rows as $r) {
+        fputcsv($out, [$r['nr'], date('d.m.Y', strtotime($r['paid_at'])), forma_voucher_title($r), number_format($r['amount_cents'] / 100, 2, ',', ''),
+            $r['recipient'], $r['sender'], $r['buyer_name'], $r['buyer_email'], $r['status'] === 'eingeloest' ? 'eingelöst' : 'offen',
+            $r['redeemed_at'] ? date('d.m.Y', strtotime($r['redeemed_at'])) : ''], ';');
+    }
+    exit;
+}
+
+if ($view === 'gutscheine') {
+    forma_reconcile_payments($pdo, true);
+    $vs = $pdo->query("SELECT * FROM vouchers WHERE status IN ('bezahlt','eingeloest') ORDER BY id DESC")->fetchAll();
+    $sum = array_sum(array_column($vs, 'amount_cents'));
+    render_page('Gutscheine', function () use ($self, $flash, $vs, $sum) { ?>
+        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
+        <h1>Gutscheine</h1>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <div class="card stack">
+            <p><strong><?= count($vs) ?></strong> verkaufte Gutscheine · zusammen <strong><?= forma_h(forma_euro((int)$sum)) ?></strong></p>
+            <p class="muted small">Jeder online gekaufte Gutschein bekommt automatisch eine fortlaufende Nummer. Wenn jemand einen Gutschein einlöst, markierst du ihn hier als eingelöst. Die Liste kannst du für die Buchhaltung herunterladen.</p>
+            <p><a class="btn" href="<?= forma_h($self) ?>?view=gutscheine_export">Liste herunterladen (CSV)</a></p>
+        </div>
+        <div class="list" style="margin-top:16px">
+        <?php foreach ($vs as $v): $done = $v['status'] === 'eingeloest'; ?>
+            <div class="card booking<?= $done ? ' is-cancelled' : '' ?>">
+                <div class="booking-head"><strong><?= forma_h($v['nr']) ?></strong><span class="pill<?= $done ? '' : ' pill-ok' ?>"><?= $done ? 'eingelöst am ' . forma_h(date('d. m. Y', strtotime($v['redeemed_at']))) : 'offen' ?></span></div>
+                <div><?= forma_h(forma_voucher_title($v)) ?> · <?= forma_h(forma_euro((int)$v['amount_cents'])) ?></div>
+                <?php if ($v['recipient'] || $v['sender']): ?><div class="muted small"><?= $v['recipient'] ? 'Für ' . forma_h($v['recipient']) : '' ?><?= $v['recipient'] && $v['sender'] ? ' · ' : '' ?><?= $v['sender'] ? 'von ' . forma_h($v['sender']) : '' ?></div><?php endif; ?>
+                <div class="muted small">Gekauft am <?= forma_h(date('d. m. Y', strtotime($v['paid_at']))) ?> von <?= forma_h($v['buyer_name']) ?></div>
+                <div class="sel small"><?= forma_h($v['buyer_email']) ?></div>
+                <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+                    <a href="<?= forma_h(forma_voucher_link($v)) ?>" target="_blank" rel="noopener">PDF ansehen</a>
+                    <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="voucher_status"><input type="hidden" name="vid" value="<?= (int)$v['id'] ?>"><input type="hidden" name="to" value="<?= $done ? 'bezahlt' : 'eingeloest' ?>">
+                    <button class="link" type="submit"><?= $done ? 'Doch nicht eingelöst' : 'Als eingelöst markieren' ?></button></form>
+                </div>
+            </div>
+        <?php endforeach; ?>
+        <?php if (!$vs): ?><p class="muted">Noch keine Gutscheine verkauft.</p><?php endif; ?>
+        </div>
+    <?php });
 }
 
 if ($view === 'series') {
@@ -738,7 +794,8 @@ $stmt->execute([date('Y-m-d')]);
 $past = $stmt->fetchAll();
 $subCount = (int)$pdo->query("SELECT COUNT(*) FROM subscribers WHERE status = 'bestaetigt'")->fetchColumn();
 $popupLive = forma_popup_live(forma_popup($pdo));
-render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive) { ?>
+$voucherOpen = (int)$pdo->query("SELECT COUNT(*) FROM vouchers WHERE status = 'bezahlt'")->fetchColumn();
+render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive, $voucherOpen) { ?>
     <div class="top">
         <h1>Kursverwaltung</h1>
         <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="logout"><button class="link" type="submit">Abmelden</button></form>
@@ -749,6 +806,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
         <a class="tile" href="<?= forma_h($self) ?>?view=edit"><strong>+ Einzeltermin</strong><span class="muted small">z. B. ein Special-Kurs</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=series"><strong>+ Serientermine</strong><span class="muted small">z. B. jeden Mi &amp; Fr</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=popup"><strong>Saison-Pop-up</strong><span class="muted small"><?= $popupLive ? 'gerade sichtbar' : 'ausgeschaltet' ?></span></a>
+        <a class="tile" href="<?= forma_h($self) ?>?view=gutscheine"><strong>Gutscheine</strong><span class="muted small"><?= $voucherOpen ?> offen</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=liste"><strong>E-Mail-Liste</strong><span class="muted small"><?= $subCount ?> <?= $subCount === 1 ? 'Kontakt' : 'Kontakte' ?></span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=einstellungen"><strong>Einstellungen</strong><span class="muted small">Stripe, MailerLite, E-Mail</span></a>
     </nav>
@@ -859,7 +917,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
   .link{font-size:19px}
   .alert{font-size:20px}
   .muted{font-size:20px}
-  .tiles{grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+  .tiles{grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
   .tile{padding:22px 24px}.tile strong{font-size:23px}
   .group .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
   .group .card{padding:14px 18px}
