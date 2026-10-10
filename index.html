@@ -297,6 +297,11 @@ section{scroll-margin-top:96px}
 @keyframes sway{from{transform:rotate(var(--r,0deg)) translateY(0)}to{transform:rotate(calc(var(--r,0deg) + 8deg)) translateY(-8px)}}
 @media (max-width:860px){.season-deco.desk{display:none}.season-deco{transform:scale(.8) rotate(var(--r,0deg))}}
 
+.vchoice.hours{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:640px){.vchoice.hours{grid-template-columns:1fr}}
+.hint{font-size:14.5px;color:var(--ink-soft)}
+.p-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
 /* Saison-Pop-up */
 .season .deco{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden;border-radius:inherit}
 .season .garland{position:absolute;left:-2%;right:-2%;top:-6px;width:104%;height:auto}
@@ -549,14 +554,14 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <article class="offer">
           <p class="kicker">Einzelstunde · Handbuilding</p>
           <h3>Private Pottery</h3>
-          <p>Dein Kreativprojekt, gemeinsam umgesetzt: Wir gestalten von Hand, was immer du dir vorstellst, und zum Schluss bemalst du deine Keramik. Ich stehe dir dabei mit Rat und Tat zur Seite.</p>
+          <p>Dein Projekt, gemeinsam umgesetzt: Wir gestalten dein Werkstück von Anfang bis Ende, formen, ritzen, beschriften, verzieren und bemalen. Du machst es selbst, und ich unterstütze dich Schritt für Schritt, damit es wirklich schön wird.</p>
           <dl class="facts">
-            <dt>Dauer</dt><dd>kleinere Projekte meist 1–2 Std., größere oder aufwendigere 2–4 Std.</dd>
+            <dt>Dauer</dt><dd>je nach Projekt 1–4 Std., im Buchungsfenster siehst du, was wie lange dauert</dd>
             <dt>Termine</dt><dd>individuell, gern auf mehrere Abende verteilt</dd>
             <dt>Inklusive</dt><dd>alle Materialien und deine Werkstücke</dd>
           </dl>
           <p class="price">€ 65<small>pro Stunde</small></p>
-          <a class="btn btn-solid" href="#kontakt">Termin anfragen</a>
+          <a class="btn btn-solid" href="#angebote" data-private="">Projekt buchen</a>
         </article>
         <article class="offer is-brown">
           <p class="kicker">Für Töpfernde mit Erfahrung</p>
@@ -614,7 +619,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <section class="step" id="step-kurs">
         <h3 class="step-title" id="book-heading" tabindex="-1">Was möchtest du buchen?</h3>
         <div class="pick" id="pick-list"></div>
-        <p class="step-foot">Lieber eine Einzelstunde? <a href="#kontakt" id="to-contact">Private Pottery anfragen</a></p>
+        <p class="step-foot">Lieber eine Einzelstunde? <a href="#angebote" id="to-contact" data-private="">Private Pottery buchen</a></p>
       </section>
 
       <section class="step" id="step-datum" hidden>
@@ -662,6 +667,55 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <h3 id="book-done-title" tabindex="-1">Deine Anmeldung ist da.</h3>
         <p id="book-done-text"></p>
         <button class="btn btn-solid" type="button" id="book-done-close">Schließen</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="book-dialog voucher-dialog" id="private-dialog" aria-labelledby="p-title">
+    <div class="book-inner">
+      <button class="book-close" type="button" id="p-close" aria-label="Schließen">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+      <form id="p-form" class="step" novalidate>
+        <p class="eyebrow">Private Pottery</p>
+        <h3 class="step-title" id="p-title" tabindex="-1">Dein Projekt, gemeinsam umgesetzt</h3>
+        <p class="step-meta">Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inklusive Material und Brennen.</p>
+        <input type="hidden" name="t" id="p-t">
+        <input type="hidden" name="kind" id="p-kind" value="buchung">
+        <div class="hp" aria-hidden="true"><label for="p-website">Bitte leer lassen</label><input id="p-website" name="website" tabindex="-1" autocomplete="off"></div>
+        <fieldset class="vgroup"><legend>1 · Wie lange brauchen wir?</legend>
+          <div class="vchoice hours">
+            <label><input type="radio" name="hours" value="1"><span><b>1 Stunde</b><i>€ 65</i><small>Ganz kleine Projekte, z. B. Kühlschrankmagnete oder zwei Espressotassen</small></span></label>
+            <label><input type="radio" name="hours" value="2" checked><span><b>2 Stunden</b><i>€ 130</i><small>Kleine Projekte, z. B. zwei Kaffeetassen oder Becher, ein kleines Espresso-Set mit Untertellern, Frühstücksteller oder eine große Schale (mindestens 2 Std.)</small></span></label>
+            <label><input type="radio" name="hours" value="3"><span><b>3 Stunden</b><i>€ 195</i><small>Größere Projekte, z. B. eine große Salatschüssel oder mehrere Teile</small></span></label>
+            <label><input type="radio" name="hours" value="4"><span><b>4 Stunden</b><i>€ 260</i><small>Ein Service oder etwas ganz Besonderes. Gern auf mehrere Termine verteilt</small></span></label>
+          </div>
+          <p class="hint">Alle Zeiten inklusive Bemalen. Du bist unsicher? Dann wähl unten „Erst mal anfragen“, ich melde mich bei dir.</p>
+        </fieldset>
+        <fieldset class="vgroup"><legend>2 · Was möchtest du gestalten?</legend>
+          <div class="field"><label for="p-project">Dein Projekt</label><textarea id="p-project" name="project" rows="3" maxlength="1500" placeholder="z. B. Zwei Kaffeebecher mit unseren Initialen und passende Unterteller" required></textarea></div>
+          <div class="field"><label for="p-wish">Wunschtermin <span class="opt">(Tage und Uhrzeiten, die dir gut passen)</span></label><input id="p-wish" name="wish" maxlength="300" placeholder="z. B. Dienstag- oder Donnerstagabend ab 18 Uhr"></div>
+        </fieldset>
+        <fieldset class="vgroup"><legend>3 · Deine Angaben</legend>
+          <div class="field"><label for="p-name">Vor- und Nachname</label><input id="p-name" name="name" autocomplete="name" required></div>
+          <div class="field-row two">
+            <div class="field"><label for="p-email">E-Mail</label><input id="p-email" name="email" type="email" autocomplete="email" required></div>
+            <div class="field"><label for="p-phone">Telefon <span class="opt">(optional)</span></label><input id="p-phone" name="phone" type="tel" autocomplete="tel"></div>
+          </div>
+        </fieldset>
+        <p class="book-storno">Den genauen Termin machen wir nach deiner Buchung gemeinsam aus. Kostenlos stornieren bis 48 Stunden vorher, danach 50&nbsp;%, bei Nichterscheinen der volle Betrag. Wenn etwas dazwischenkommt, melde dich einfach.</p>
+        <label class="consent"><input type="checkbox" name="consent" id="p-consent" value="1"> <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Buchung gespeichert werden. Mehr dazu in der <a href="#datenschutz" class="p-privacy">Datenschutzerklärung</a>.</span></label>
+        <p class="book-error" id="p-error" role="alert" hidden></p>
+        <div class="p-actions">
+          <button class="btn btn-solid" type="submit" id="p-submit" data-kind="buchung">Weiter zur Bezahlung · € 130</button>
+          <button class="btn btn-ghost" type="submit" id="p-ask" data-kind="anfrage">Erst mal anfragen</button>
+        </div>
+      </form>
+      <div class="book-done" id="p-done" hidden>
+        <p class="eyebrow">Danke!</p>
+        <h3 id="p-done-title" tabindex="-1">Schön, dass du dabei bist</h3>
+        <p id="p-done-text"></p>
+        <button class="btn btn-solid" type="button" id="p-done-close">Schließen</button>
       </div>
     </div>
   </dialog>
@@ -812,7 +866,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <div class="section-head">
           <p class="eyebrow">Kontakt</p>
           <h2 class="display">Komm vorbei</h2>
-          <p>Kurse buchst du direkt hier auf der Seite. Für Private Pottery, Gutscheine und alle Fragen erreichst du mich am schnellsten telefonisch oder per WhatsApp.</p>
+          <p>Kurse, Private Pottery und Gutscheine buchst du direkt hier auf der Seite. Für alle Fragen erreichst du mich am schnellsten telefonisch oder per WhatsApp.</p>
         </div>
         <dl class="contact-list">
           <div><dt>Telefon</dt><dd><a href="tel:+4367763907080">+43 677 63 90 70 80</a><a class="more" href="https://wa.me/4367763907080" target="_blank" rel="noopener">Nachricht per WhatsApp →</a></dd></div>
@@ -895,6 +949,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 
           <h4>Online-Bezahlung mit Stripe</h4>
           <p>Kurse kannst du online bezahlen. Dafür wirst du zum Zahlungsdienstleister Stripe (Stripe Payments Europe Ltd., 1 Grand Canal Street Lower, Dublin 2, Irland) weitergeleitet. Stripe erhält die für die Zahlung nötigen Daten: deine E-Mail-Adresse, den gebuchten Kurs mit Termin und Betrag sowie deine Zahlungsdaten, die du direkt bei Stripe eingibst. Deine Karten- oder Kontodaten sehe und speichere ich nicht. Rechtsgrundlage ist die Erfüllung des Vertrags (Art. 6 Abs. 1 lit. b DSGVO). Stripe verarbeitet Daten teilweise auch in den USA; die Übermittlung ist über das EU-US Data Privacy Framework und Standardvertragsklauseln abgesichert. Mehr dazu unter stripe.com/at/privacy. Zahlungsbelege bewahre ich sieben Jahre auf, wie es das Steuerrecht verlangt.</p>
+
+          <h4>Private Pottery</h4>
+          <p>Wenn du Private Pottery buchst oder anfragst, speichere ich deine Angaben (Name, E-Mail, optional Telefon, deine Projektbeschreibung und deinen Wunschtermin), um mit dir den Termin auszumachen und das Projekt vorzubereiten (Art. 6 Abs. 1 lit. b DSGVO). Die Bezahlung läuft über Stripe wie bei den Kursen.</p>
 
           <h4>Gutscheine</h4>
           <p>Wenn du einen Gutschein kaufst, speichere ich deinen Namen, deine E-Mail-Adresse, den gewählten Gutschein und die Angaben, die auf dem Gutschein stehen sollen (für wen, von wem, persönliche Nachricht). Ich nutze sie, um den Gutschein zu erstellen, ihn dir zu schicken und ihn beim Einlösen zuzuordnen (Art. 6 Abs. 1 lit. b DSGVO). Die Bezahlung läuft wie bei den Kursen über Stripe. Gutschein- und Zahlungsdaten bewahre ich so lange auf, wie es das Steuerrecht verlangt.</p>
@@ -1135,6 +1192,45 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     try{params.delete('buchung');history.replaceState(null,'',location.pathname+(params.toString()?'?'+params:'')+location.hash);}catch(e){}
   }
 
+
+  // Private Pottery buchen oder anfragen
+  var pd=$('private-dialog'),pf=$('p-form'),pErr=$('p-error'),pSub=$('p-submit'),pAsk=$('p-ask');
+  function pHours(){var r=pf.querySelector('input[name="hours"]:checked');return r?+r.value:2;}
+  function pUpdate(){pSub.textContent='Weiter zur Bezahlung · '+euro(6500*pHours());}
+  pf.querySelectorAll('input[name="hours"]').forEach(function(r){r.addEventListener('change',pUpdate);});
+  function pOpen(){pf.hidden=false;$('p-done').hidden=true;pErr.hidden=true;$('p-t').value=Date.now();pUpdate();show(pd);pd.querySelector('.book-inner').scrollTop=0;setTimeout(function(){try{$('p-title').focus({preventScroll:true});}catch(e){}},30);}
+  function pDone(t,x){pf.hidden=true;$('p-done').hidden=false;$('p-done-title').textContent=t;$('p-done-text').textContent=x;show(pd);}
+  document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('[data-private]');if(!a)return;e.preventDefault();closeNav();pOpen();});
+  $('p-close').addEventListener('click',function(){hide(pd);});
+  $('p-done-close').addEventListener('click',function(){hide(pd);});
+  pd.querySelector('.p-privacy').addEventListener('click',function(){hide(pd);var d=$('datenschutz');if(d)d.open=true;});
+  pd.addEventListener('click',function(e){if(e.target===pd)hide(pd);});
+  pf.addEventListener('submit',function(e){
+    e.preventDefault();pErr.hidden=true;
+    var kind=(e.submitter&&e.submitter.getAttribute('data-kind'))||'buchung';$('p-kind').value=kind;
+    var name=$('p-name').value.trim(),email=$('p-email').value.trim(),proj=$('p-project').value.trim(),msg='';
+    if(proj.length<5)msg='Beschreib bitte kurz, was du gestalten möchtest.';
+    else if(name.length<2)msg='Bitte gib deinen Namen an.';
+    else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))msg='Bitte gib eine gültige E-Mail-Adresse an.';
+    else if(!$('p-consent').checked)msg='Bitte bestätige noch die Hinweise zum Datenschutz.';
+    if(msg){pErr.textContent=msg;pErr.hidden=false;return;}
+    var btn=kind==='anfrage'?pAsk:pSub;pSub.disabled=pAsk.disabled=true;btn.textContent='Einen Moment …';
+    var going=false;
+    fetch('api/private.php',{method:'POST',body:new FormData(pf)})
+      .then(function(r){return r.json().catch(function(){return {ok:false};});})
+      .then(function(d){
+        if(d&&d.ok&&d.redirect){going=true;location.href=d.redirect;return;}
+        if(d&&d.ok){pDone('Danke, '+name.split(/\s+/)[0]+'!','Deine Anfrage ist bei mir angekommen. Ich schaue mir dein Projekt an und melde mich in den nächsten Tagen bei dir, wie lange wir brauchen und wann wir loslegen.');return;}
+        pErr.textContent=(d&&d.error)||'Das hat leider nicht geklappt. Bitte versuch es noch einmal.';pErr.hidden=false;
+      })
+      .catch(function(){pErr.textContent='Keine Verbindung. Bitte versuch es noch einmal.';pErr.hidden=false;})
+      .then(function(){if(!going){pSub.disabled=pAsk.disabled=false;pAsk.textContent='Erst mal anfragen';pUpdate();}});
+  });
+  var pres=params.get('private');
+  if(pres==='bezahlt')pDone('Deine Stunden sind gebucht!','Danke! Deine Zahlung ist angekommen und die Bestätigung ist unterwegs in dein Postfach. Ich melde mich in den nächsten Tagen bei dir, damit wir den genauen Termin ausmachen.');
+  else if(pres==='wartet')pDone('Fast geschafft','Deine Zahlung wird noch verarbeitet. Sobald sie da ist, bekommst du die Bestätigung per E-Mail.');
+  else if(pres==='abgebrochen')pDone('Bezahlung abgebrochen','Kein Problem, es wurde nichts abgebucht. Du kannst jederzeit neu buchen oder mir erst einmal eine Anfrage schicken.');
+  if(pres){try{params.delete('private');history.replaceState(null,'',location.pathname+(params.toString()?'?'+params:'')+location.hash);}catch(e){}}
   // Gutschein kaufen
   var vd=$('voucher-dialog'),vf=$('v-form'),vq=$('v-qty'),vErr=$('v-error'),vSubmit=$('v-submit');
   var VP={spin:{price:7000,one:'Platz',many:'Plätze',q:'Wie viele Plätze?'},private:{price:6500,one:'Stunde',many:'Stunden',q:'Wie viele Stunden?'},atelier:{price:3000,one:'Stunde',many:'Stunden',q:'Wie viele Stunden?'}};

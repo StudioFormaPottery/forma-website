@@ -67,3 +67,6 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Produkte und Preise in `FORMA_VOUCHERS` (lib.php): Spin & Go € 70 pro Platz, Private Pottery € 65 pro Stunde, Offenes Atelier € 30 pro Stunde. Formulierung „2 Plätze im Spin & Go Workshop“, nicht „Einheiten“.
 - Zwei Designs zur Wahl („Bogen“, „Freiformen“), weißes Papier, keine Fotos. Kein Ablaufdatum auf dem Gutschein.
 - Verwaltung → Gutscheine: Liste, als eingelöst markieren, CSV für die Buchhaltung.
+
+## Private Pottery (seit 10.10.2026)
+- „Projekt buchen“ (`data-private`) öffnet ein Fenster: Stunden 1–4 mit Projektbeispielen (1 Std. Magnete/2 Espressotassen, 2 Std. Tassen, Espresso-Set, Teller, große Schale, 3–4 Std. Salatschüssel, Service), Projektbeschreibung, Wunschtermin. Direkt bezahlen (€ 65 × Stunden) oder „Erst mal anfragen“ ohne Zahlung. `api/private.php`, Tabelle `private_bookings`, Verwaltung → Private Pottery.

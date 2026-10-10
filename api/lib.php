@@ -112,6 +112,26 @@ function forma_migrate(PDO $pdo): void
         paid_at TEXT,
         redeemed_at TEXT
     )');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS private_bookings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        kind TEXT NOT NULL DEFAULT \'buchung\',
+        hours INTEGER NOT NULL DEFAULT 0,
+        amount_cents INTEGER NOT NULL DEFAULT 0,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        phone TEXT NOT NULL DEFAULT \'\',
+        persons INTEGER NOT NULL DEFAULT 1,
+        project TEXT NOT NULL DEFAULT \'\',
+        wish TEXT NOT NULL DEFAULT \'\',
+        status TEXT NOT NULL DEFAULT \'offen\',
+        stripe_session TEXT NOT NULL DEFAULT \'\',
+        token TEXT NOT NULL,
+        mailed INTEGER NOT NULL DEFAULT 0,
+        ip_hash TEXT NOT NULL DEFAULT \'\',
+        created_at TEXT NOT NULL,
+        paid_at TEXT,
+        done INTEGER NOT NULL DEFAULT 0
+    )');
     forma_add_column($pdo, 'courses', 'price_cents', 'INTEGER NOT NULL DEFAULT 0');
     forma_add_column($pdo, 'bookings', 'amount_cents', 'INTEGER NOT NULL DEFAULT 0');
     forma_add_column($pdo, 'bookings', 'stripe_session', "TEXT NOT NULL DEFAULT ''");
@@ -213,6 +233,20 @@ function forma_migrate(PDO $pdo): void
             forma_set_setting($pdo, 'popup', json_encode($p, JSON_UNESCAPED_UNICODE));
         }
         forma_set_setting($pdo, 'popup_date_v6', '1');
+    }
+
+    // 10.10.2026: Offenes Atelier an Heiligabend und Silvester abgesagt.
+    if (forma_setting($pdo, 'remove_dates_v7') === null) {
+        foreach (['2026-12-24', '2026-12-31'] as $day) {
+            $stmt = $pdo->prepare('SELECT id FROM courses WHERE title = ? AND start_date = ?');
+            $stmt->execute(['Offenes Atelier', $day]);
+            foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $cid) {
+                $has = $pdo->prepare("SELECT COUNT(*) FROM bookings WHERE course_id = ? AND status IN ('bestaetigt','offen')");
+                $has->execute([$cid]);
+                $pdo->prepare((int)$has->fetchColumn() > 0 ? 'UPDATE courses SET visible = 0 WHERE id = ?' : 'DELETE FROM courses WHERE id = ?')->execute([$cid]);
+            }
+        }
+        forma_set_setting($pdo, 'remove_dates_v7', '1');
     }
 }
 
@@ -582,6 +616,15 @@ function forma_reconcile_payments(PDO $pdo, bool $force = false): void
             error_log('FORMA reconcile: ' . $e->getMessage());
         }
     }
+    $stmt = $pdo->prepare("SELECT * FROM private_bookings WHERE status = 'offen' AND stripe_session != '' AND created_at >= ?");
+    $stmt->execute([date('c', time() - 3 * 86400)]);
+    foreach ($stmt->fetchAll() as $pb) {
+        try {
+            forma_private_check($pdo, $pb);
+        } catch (Throwable $e) {
+            error_log('FORMA reconcile private: ' . $e->getMessage());
+        }
+    }
     $stmt = $pdo->prepare("SELECT * FROM vouchers WHERE status = 'offen' AND stripe_session != '' AND created_at >= ?");
     $stmt->execute([date('c', time() - 3 * 86400)]);
     foreach ($stmt->fetchAll() as $v) {
@@ -815,6 +858,60 @@ function forma_voucher_check(PDO $pdo, array $v): string
     }
     if (($session['status'] ?? '') === 'expired') {
         $pdo->prepare("UPDATE vouchers SET status = 'abgebrochen' WHERE id = ? AND status = 'offen'")->execute([(int)$v['id']]);
+        return 'abgebrochen';
+    }
+    return 'offen';
+}
+
+// --- Private Pottery -------------------------------------------------------------
+
+const FORMA_PRIVATE_HOUR = 6500;
+
+function forma_private_mails(PDO $pdo, int $id): void
+{
+    $pdo->exec('BEGIN IMMEDIATE');
+    $stmt = $pdo->prepare("SELECT * FROM private_bookings WHERE id = ? AND mailed = 0 AND (kind = 'anfrage' OR status = 'bezahlt')");
+    $stmt->execute([$id]);
+    $b = $stmt->fetch();
+    if (!$b) {
+        $pdo->exec('ROLLBACK');
+        return;
+    }
+    $pdo->prepare('UPDATE private_bookings SET mailed = 1 WHERE id = ?')->execute([$id]);
+    $pdo->exec('COMMIT');
+    $first = forma_first_name($b['name']);
+    $phone = FORMA_PHONE;
+    $site = forma_site_url();
+    $hours = (int)$b['hours'] === 1 ? '1 Stunde' : $b['hours'] . ' Stunden';
+    $persons = (int)$b['persons'] === 1 ? '1 Person' : $b['persons'] . ' Personen';
+    if ($b['kind'] === 'anfrage') {
+        forma_mail($b['email'], 'Deine Anfrage für Private Pottery', "Hallo $first,\n\ndanke für deine Anfrage! Ich schaue mir dein Projekt in Ruhe an und melde mich in den nächsten Tagen bei dir, wie lange wir ungefähr brauchen und wann wir loslegen können.\n\n"
+            . "Dein Projekt: {$b['project']}\nWunschtermin: {$b['wish']}\n\nWenn dir noch etwas einfällt, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nHerzlich,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
+        forma_mail(FORMA_NOTIFY_EMAIL, 'Anfrage Private Pottery (' . $b['name'] . ')', "Neue Anfrage für Private Pottery (noch nicht gebucht)\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nPersonen: $persons\n\nProjekt:\n{$b['project']}\n\nWunschtermin: {$b['wish']}\n\nAlle Anfragen: $site/verwaltung/?view=private\n", $b['email']);
+        return;
+    }
+    $amount = forma_euro((int)$b['amount_cents']);
+    forma_mail($b['email'], 'Deine Private Pottery Stunden sind gebucht', "Hallo $first,\n\nwie schön, dass wir dein Projekt gemeinsam umsetzen! Deine Zahlung ist angekommen.\n\n"
+        . "Gebucht: $hours Private Pottery ($persons)\nBezahlt: $amount\nDein Projekt: {$b['project']}\nWunschtermin: {$b['wish']}\n\n"
+        . "Ich melde mich in den nächsten Tagen bei dir, damit wir den genauen Termin festmachen. Die Stunden können wir gern auch auf mehrere Termine aufteilen.\n"
+        . "Falls doch etwas dazwischenkommt: Bis 48 Stunden vor unserem Termin kannst du kostenlos stornieren, danach werden 50 % fällig, wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit, gemeinsam finden wir eine Lösung.\n\n"
+        . "Bis bald im Studio!\nVivien\nFORMA Earth & Art\n$phone\nwww.forma-pottery.com\n");
+    forma_mail(FORMA_NOTIFY_EMAIL, 'Private Pottery gebucht: ' . $hours . ' (' . $b['name'] . ')', "Neue bezahlte Buchung Private Pottery\n\n$hours · $amount bezahlt über Stripe\nPersonen: $persons\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\n\nProjekt:\n{$b['project']}\n\nWunschtermin: {$b['wish']}\n\nBitte Termin bestätigen. Übersicht: $site/verwaltung/?view=private\n", $b['email']);
+}
+
+function forma_private_check(PDO $pdo, array $b): string
+{
+    if ($b['status'] !== 'offen' || $b['stripe_session'] === '') {
+        return (string)$b['status'];
+    }
+    $session = forma_stripe('GET', '/v1/checkout/sessions/' . rawurlencode($b['stripe_session']));
+    if (($session['payment_status'] ?? '') === 'paid') {
+        $pdo->prepare("UPDATE private_bookings SET status = 'bezahlt', paid_at = ? WHERE id = ? AND status = 'offen'")->execute([date('c'), (int)$b['id']]);
+        forma_private_mails($pdo, (int)$b['id']);
+        return 'bezahlt';
+    }
+    if (($session['status'] ?? '') === 'expired') {
+        $pdo->prepare("UPDATE private_bookings SET status = 'abgebrochen' WHERE id = ? AND status = 'offen'")->execute([(int)$b['id']]);
         return 'abgebrochen';
     }
     return 'offen';

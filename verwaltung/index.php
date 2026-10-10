@@ -422,6 +422,11 @@ if ($action === 'voucher_status') {
     go($self . '?view=gutscheine', $redeem ? 'Der Gutschein ist als eingelöst markiert.' : 'Der Gutschein ist wieder offen.');
 }
 
+if ($action === 'private_done') {
+    $pdo->prepare('UPDATE private_bookings SET done = 1 - done WHERE id = ?')->execute([(int)($_POST['pid'] ?? 0)]);
+    go($self . '?view=private', 'Gespeichert.');
+}
+
 if ($action === 'delete_subscriber') {
     $pdo->prepare('DELETE FROM subscribers WHERE id = ?')->execute([(int)($_POST['sid'] ?? 0)]);
     go($self . '?view=liste', 'Der Kontakt ist gelöscht.');
@@ -454,6 +459,32 @@ if ($view === 'gutscheine_export') {
             $r['redeemed_at'] ? date('d.m.Y', strtotime($r['redeemed_at'])) : ''], ';');
     }
     exit;
+}
+
+if ($view === 'private') {
+    forma_reconcile_payments($pdo, true);
+    $rows = $pdo->query("SELECT * FROM private_bookings WHERE status IN ('bezahlt','anfrage') ORDER BY done, id DESC")->fetchAll();
+    render_page('Private Pottery', function () use ($self, $flash, $rows) { ?>
+        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
+        <h1>Private Pottery</h1>
+        <p class="muted">Bezahlte Buchungen und Anfragen. Mach mit jeder Person den Termin aus und hake sie danach als erledigt ab.</p>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <div class="list">
+        <?php foreach ($rows as $b): $paid = $b['status'] === 'bezahlt'; ?>
+            <div class="card booking<?= $b['done'] ? ' is-cancelled' : '' ?>">
+                <div class="booking-head"><strong><?= forma_h($b['name']) ?></strong>
+                    <span class="pill<?= $paid ? ' pill-ok' : '' ?>"><?= $paid ? forma_h(((int)$b['hours'] === 1 ? '1 Stunde' : $b['hours'] . ' Stunden') . ' · ' . forma_euro((int)$b['amount_cents']) . ' bezahlt') : 'Anfrage, noch nicht gebucht' ?></span></div>
+                <div><?= nl2br(forma_h($b['project'])) ?></div>
+                <?php if ($b['wish']): ?><div class="muted small">Wunschtermin: <?= forma_h($b['wish']) ?></div><?php endif; ?>
+                <div class="sel small"><?= forma_h($b['email']) ?><?= $b['phone'] ? ' · ' . forma_h($b['phone']) : '' ?></div>
+                <div class="muted small"><?= $paid ? 'Gebucht' : 'Angefragt' ?> am <?= forma_h(date('d. m. Y, H:i', strtotime($b['created_at']))) ?></div>
+                <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="private_done"><input type="hidden" name="pid" value="<?= (int)$b['id'] ?>">
+                <button class="link" type="submit"><?= $b['done'] ? 'Wieder als offen markieren' : 'Termin ausgemacht / erledigt' ?></button></form>
+            </div>
+        <?php endforeach; ?>
+        <?php if (!$rows): ?><p class="muted">Noch keine Buchungen oder Anfragen.</p><?php endif; ?>
+        </div>
+    <?php });
 }
 
 if ($view === 'gutscheine') {
@@ -816,7 +847,8 @@ $past = $stmt->fetchAll();
 $subCount = (int)$pdo->query("SELECT COUNT(*) FROM subscribers WHERE status = 'bestaetigt'")->fetchColumn();
 $popupLive = forma_popup_live(forma_popup($pdo));
 $voucherOpen = (int)$pdo->query("SELECT COUNT(*) FROM vouchers WHERE status = 'bezahlt'")->fetchColumn();
-render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive, $voucherOpen) { ?>
+$privateOpen = (int)$pdo->query("SELECT COUNT(*) FROM private_bookings WHERE status IN ('bezahlt','anfrage') AND done = 0")->fetchColumn();
+render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive, $voucherOpen, $privateOpen) { ?>
     <div class="top">
         <h1>Kursverwaltung</h1>
         <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="logout"><button class="link" type="submit">Abmelden</button></form>
@@ -827,6 +859,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
         <a class="tile" href="<?= forma_h($self) ?>?view=edit"><strong>+ Einzeltermin</strong><span class="muted small">z. B. ein Special-Kurs</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=series"><strong>+ Serientermine</strong><span class="muted small">z. B. jeden Mi &amp; Fr</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=popup"><strong>Pop-up &amp; Deko</strong><span class="muted small"><?= $popupLive ? 'gerade sichtbar' : 'ausgeschaltet' ?> · Deko</span></a>
+        <a class="tile" href="<?= forma_h($self) ?>?view=private"><strong>Private Pottery</strong><span class="muted small"><?= $privateOpen ?> offen</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=gutscheine"><strong>Gutscheine</strong><span class="muted small"><?= $voucherOpen ?> offen</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=liste"><strong>E-Mail-Liste</strong><span class="muted small"><?= $subCount ?> <?= $subCount === 1 ? 'Kontakt' : 'Kontakte' ?></span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=einstellungen"><strong>Einstellungen</strong><span class="muted small">Stripe, MailerLite, E-Mail</span></a>
@@ -938,7 +971,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
   .link{font-size:19px}
   .alert{font-size:20px}
   .muted{font-size:20px}
-  .tiles{grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
   .tile{padding:22px 24px}.tile strong{font-size:23px}
   .group .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
   .group .card{padding:14px 18px}
