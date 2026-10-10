@@ -1300,6 +1300,11 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   }
 
 
+  // Fehlermeldungen in Fenstern immer ins Blickfeld holen, damit man sie am Handy sicher sieht
+  if(window.MutationObserver)document.querySelectorAll('.book-error').forEach(function(el){
+    new MutationObserver(function(){if(!el.hidden){try{el.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){el.scrollIntoView();}}}).observe(el,{attributes:true,attributeFilter:['hidden'],childList:true,characterData:true,subtree:true});
+  });
+
   // Private Pottery buchen oder anfragen
   var pd=$('private-dialog'),pf=$('p-form'),pErr=$('p-error'),pSub=$('p-submit'),pAsk=$('p-ask');
   function pHours(){var r=pf.querySelector('input[name="hours"]:checked');return r?+r.value:2;}
@@ -1312,9 +1317,10 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   $('p-done-close').addEventListener('click',function(){hide(pd);});
   pd.querySelector('.p-privacy').addEventListener('click',function(){hide(pd);var d=$('datenschutz');if(d)d.open=true;});
   pd.addEventListener('click',function(e){if(e.target===pd)hide(pd);});
+  var pLast='';[pSub,pAsk].forEach(function(b){b.addEventListener('click',function(){pLast=b.getAttribute('data-kind');});});
   pf.addEventListener('submit',function(e){
     e.preventDefault();pErr.hidden=true;
-    var kind=(e.submitter&&e.submitter.getAttribute('data-kind'))||'buchung';$('p-kind').value=kind;
+    var kind=(e.submitter&&e.submitter.getAttribute('data-kind'))||pLast||'buchung';$('p-kind').value=kind;
     var name=$('p-name').value.trim(),email=$('p-email').value.trim(),proj=$('p-project').value.trim(),msg='';
     if(proj.length<5)msg='Beschreib bitte kurz, was du gestalten möchtest.';
     else if(name.length<2)msg='Bitte gib deinen Namen an.';
@@ -1611,11 +1617,14 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     .then(function(d){
       var p=d&&d.popup;
       if(!p||(!preview&&seen(p.id)))return;
-      setTimeout(function(){
-        if(dlg.open)return;
+      // nie über ein anderes Fenster legen: warten, bis gerade nichts anderes offen ist
+      var tries=0;
+      function tryOpen(){
+        if(document.querySelector('dialog[open]')||document.querySelector('.nav.open')||(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))){if(++tries<40)setTimeout(tryOpen,3000);return;}
         seen(p.id,true);
         openSeason(p);
-      },preview?300:2500);
+      }
+      setTimeout(tryOpen,preview?300:2500);
     }).catch(function(){});
 })();
 try{if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){document.querySelectorAll('video[autoplay]').forEach(function(v){v.removeAttribute('autoplay');v.pause();});}}catch(e){}
