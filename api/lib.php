@@ -174,6 +174,17 @@ function forma_migrate(PDO $pdo): void
         }
         forma_set_setting($pdo, 'popup_on_v3', '1');
     }
+
+    // 10.10.2026: Advents-Pop-up weihnachtlich gestalten (Girlande, Sternchen, Advents-Bild).
+    if (forma_setting($pdo, 'popup_theme_v4') === null) {
+        $p = json_decode(forma_setting($pdo, 'popup') ?? '', true);
+        if (is_array($p)) {
+            $p['theme'] = 'advent';
+            $p['version'] = (int)($p['version'] ?? 1) + 1;
+            forma_set_setting($pdo, 'popup', json_encode($p, JSON_UNESCAPED_UNICODE));
+        }
+        forma_set_setting($pdo, 'popup_theme_v4', '1');
+    }
 }
 
 /** Vorlagen für Serientermine. */

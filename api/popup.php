@@ -18,7 +18,7 @@ try {
         'signup' => (bool)$p['signup'],
         'button_text' => $p['button_text'],
         'button_link' => $p['button_link'],
-        'image' => $p['image'] !== '' ? 'api/popup-image.php?v=' . (int)$p['version'] : '',
+        'image' => $p['image'] !== '' ? 'api/popup-image.php?v=' . (int)$p['version'] : ((($p['theme'] ?? '') === 'advent' || isset($_GET['thema'])) ? 'img/popup-advent.jpg' : ''),
         'theme' => ($preview && isset($_GET['thema'])) ? preg_replace('/[^a-z]/', '', (string)$_GET['thema']) : (string)($p['theme'] ?? ''),
     ]]);
 } catch (Throwable $e) {
