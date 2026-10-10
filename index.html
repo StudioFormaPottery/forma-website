@@ -302,6 +302,39 @@ section{scroll-margin-top:96px}
 .hint{font-size:14.5px;color:var(--ink-soft)}
 .p-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 
+/* Templates & Maker Club */
+.maker{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:clamp(20px,4vw,48px);align-items:center;padding:clamp(26px,4vw,48px);border-radius:32px;background:var(--clay);color:var(--on-clay);position:relative;overflow:hidden;margin-bottom:clamp(32px,4vw,48px)}
+@media (max-width:780px){.maker{grid-template-columns:1fr}}
+.maker h3{font-family:var(--display);font-weight:650;font-size:clamp(30px,3.4vw,44px);line-height:1.05;letter-spacing:-.02em;margin:6px 0 12px}
+.maker p{color:#F3E2D6}
+.maker .kicker{color:var(--blush);opacity:1}
+.maker-now{margin-top:10px;font-weight:500;color:var(--on-clay)!important}
+.maker-form{display:flex;flex-direction:column;gap:10px;margin-top:18px;max-width:560px}
+.maker .btn{background:var(--on-clay);color:var(--clay);border-color:var(--on-clay)}
+.maker .consent{color:#F3E2D6}.maker .consent a{color:var(--on-clay)}
+.maker-done{margin-top:16px;font-weight:500;color:var(--on-clay)!important;background:rgba(251,241,234,.14);padding:14px 16px;border-radius:16px}
+.maker-art{position:relative;min-height:220px;display:grid;place-items:center}
+.maker-art::before{content:"";position:absolute;width:78%;aspect-ratio:1;border-radius:var(--blob);background:var(--blush);opacity:.9;animation:morph 14s ease-in-out infinite alternate}
+.maker-art img{position:relative;width:78%;aspect-ratio:4/5;object-fit:cover;border-radius:999px 999px 24px 24px;box-shadow:0 18px 40px rgba(51,33,27,.25)}
+.tpl-filters{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{font:inherit;font-size:15px;padding:8px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--ink-soft);border-color:var(--ink-soft);color:var(--on-clay)}
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:20px}
+.tpl{display:flex;flex-direction:column;border-radius:26px;background:var(--paper-2);border:1px solid var(--line);overflow:hidden;min-width:0}
+.tpl-img{aspect-ratio:4/3;background:var(--blush);display:grid;place-items:center;overflow:hidden}
+.tpl-img img{width:100%;height:100%;object-fit:cover}
+.tpl-body{display:flex;flex-direction:column;gap:8px;padding:18px 20px 20px;flex:1}
+.tpl-tags{display:flex;flex-wrap:wrap;gap:6px}
+.tpl-tags span{font-size:12.5px;padding:3px 10px;border-radius:999px;background:var(--paper);color:var(--ink-soft)}
+.tpl h4{font-family:var(--display);font-weight:650;font-size:23px;line-height:1.1;color:var(--clay);margin:0}
+.tpl p{font-size:15.5px;color:var(--ink-soft)}
+.tpl-level{display:inline-flex;gap:4px;align-items:center;font-size:13px;color:var(--ink-soft)}
+.tpl-level i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.tpl-level i.on{background:var(--clay)}
+.tpl-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:12px;border-top:1px solid var(--line)}
+.tpl-foot b{font-family:var(--display);font-weight:600;font-size:22px}
+
 /* Saison-Pop-up */
 .season .deco{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden;border-radius:inherit}
 .season .garland{position:absolute;left:-2%;right:-2%;top:-6px;width:104%;height:auto}
@@ -471,6 +504,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     <nav class="nav" id="nav" aria-label="Hauptnavigation">
       <a href="#angebote">Kurse</a>
       <a href="#studio">Studio</a>
+      <a href="#templates">Templates</a>
       <a href="#ueber-mich">Hallo!</a>
       <a href="#kontakt">Kontakt</a>
       <a class="btn btn-solid" href="#anmeldung" data-book="">Kurs buchen</a>
@@ -671,6 +705,34 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     </div>
   </dialog>
 
+  <dialog class="book-dialog" id="tpl-dialog" aria-labelledby="tpl-title">
+    <div class="book-inner">
+      <button class="book-close" type="button" id="tpl-close" aria-label="Schließen">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+      <form id="tpl-form" class="step" novalidate>
+        <p class="eyebrow">Template kaufen</p>
+        <h3 class="step-title" id="tpl-title" tabindex="-1"></h3>
+        <p class="step-meta" id="tpl-meta"></p>
+        <input type="hidden" name="template_id" id="tpl-id">
+        <div class="hp" aria-hidden="true"><label for="tpl-website">Bitte leer lassen</label><input id="tpl-website" name="website" tabindex="-1" autocomplete="off"></div>
+        <div class="field"><label for="tpl-name">Dein Name</label><input id="tpl-name" name="name" autocomplete="name" required></div>
+        <div class="field"><label for="tpl-email">Deine E-Mail <span class="opt">(dorthin schicke ich den Download-Link)</span></label><input id="tpl-email" name="email" type="email" autocomplete="email" required></div>
+        <label class="consent"><input type="checkbox" name="waiver" id="tpl-waiver" value="1"> <span>Ich möchte das Template sofort nach dem Kauf herunterladen. Mir ist bewusst, dass ich dadurch mein Rücktrittsrecht verliere.</span></label>
+        <label class="consent"><input type="checkbox" name="consent" id="tpl-consent" value="1"> <span>Ich bin einverstanden, dass meine Angaben zur Abwicklung des Kaufs gespeichert werden. <a href="#datenschutz" class="tpl-privacy">Datenschutz</a></span></label>
+        <p class="book-error" id="tpl-error" role="alert" hidden></p>
+        <button class="btn btn-solid" type="submit" id="tpl-submit">Weiter zur Bezahlung</button>
+      </form>
+      <div class="book-done" id="tpl-done" hidden>
+        <p class="eyebrow">Danke!</p>
+        <h3 id="tpl-done-title" tabindex="-1">Dein Template ist bereit</h3>
+        <p id="tpl-done-text"></p>
+        <a class="btn btn-solid" id="tpl-download" href="#" hidden>Template herunterladen (PDF)</a>
+        <button class="btn btn-ghost" type="button" id="tpl-done-close">Schließen</button>
+      </div>
+    </div>
+  </dialog>
+
   <dialog class="book-dialog voucher-dialog" id="private-dialog" aria-labelledby="p-title">
     <div class="book-inner">
       <button class="book-close" type="button" id="p-close" aria-label="Schließen">
@@ -860,6 +922,45 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     <svg class="wave" style="--to:var(--paper);background:var(--blush)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70c150 28 310 40 480 22s310-70 490-66 310 56 470 50v44H0z"></path></svg>
   </section>
 
+  <section class="section templates" id="templates">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Für zu Hause</p>
+        <h2 class="display">Templates zum Selbermachen</h2>
+        <p>Schablonen und Bild-Anleitungen für deine eigene Pottery-Praxis zu Hause, auf Deutsch und Englisch. Nach dem Kauf sofort als PDF zum Herunterladen.</p>
+      </div>
+      <div class="maker">
+        <div class="maker-copy">
+          <p class="kicker">FORMA Maker Club</p>
+          <h3>Jeden Monat ein Template gratis</h3>
+          <p id="maker-text">Trag dich ein und hol dir jeden Monat ein neues Pottery-Template zum Selbermachen, kostenlos, direkt in dein Postfach.</p>
+          <p class="maker-now" id="maker-now" hidden></p>
+          <form class="maker-form" id="maker-form" novalidate>
+            <input type="hidden" name="t" id="maker-t">
+            <input type="hidden" name="source" value="Maker Club">
+            <div class="hp" aria-hidden="true"><label for="maker-website">Bitte leer lassen</label><input id="maker-website" name="website" tabindex="-1" autocomplete="off"></div>
+            <div class="season-row">
+              <label class="hp" for="maker-email">E-Mail</label>
+              <input id="maker-email" name="email" type="email" autocomplete="email" placeholder="Deine E-Mail-Adresse" required>
+              <button class="btn" type="submit" id="maker-submit">Gratis-Template holen</button>
+            </div>
+            <label class="consent"><input type="checkbox" name="consent" id="maker-consent" value="1"> <span>Ja, ich möchte dem Maker Club beitreten und per E-Mail Templates und Neuigkeiten bekommen. Abmelden geht jederzeit. <a href="#datenschutz" class="maker-privacy">Datenschutz</a></span></label>
+            <p class="book-error" id="maker-error" role="alert" hidden></p>
+          </form>
+          <p class="maker-done" id="maker-done" hidden></p>
+        </div>
+        <div class="maker-art" id="maker-art" aria-hidden="true">
+          <img id="maker-img" alt="" hidden>
+        </div>
+      </div>
+      <div class="tpl-filters" id="tpl-filters" hidden>
+        <div class="chips" id="tpl-season" role="group" aria-label="Jahreszeit"></div>
+        <div class="chips" id="tpl-age" role="group" aria-label="Für wen"></div>
+      </div>
+      <div class="tpl-grid" id="tpl-grid"><p class="slots-note">Die ersten Templates kommen bald. Im Maker Club erfährst du es zuerst.</p></div>
+    </div>
+  </section>
+
   <section class="section" id="kontakt">
     <div class="wrap contact-layout">
       <div>
@@ -952,6 +1053,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 
           <h4>Private Pottery</h4>
           <p>Wenn du Private Pottery buchst oder anfragst, speichere ich deine Angaben (Name, E-Mail, optional Telefon, deine Projektbeschreibung und deinen Wunschtermin), um mit dir den Termin auszumachen und das Projekt vorzubereiten (Art. 6 Abs. 1 lit. b DSGVO). Die Bezahlung läuft über Stripe wie bei den Kursen.</p>
+
+          <h4>Templates und FORMA Maker Club</h4>
+          <p>Wenn du ein Template kaufst, speichere ich deinen Namen, deine E-Mail-Adresse und den Kauf, um dir den Download bereitzustellen und die Buchhaltung zu führen (Art. 6 Abs. 1 lit. b DSGVO); die Bezahlung läuft über Stripe. Für den Maker Club speichere ich deine E-Mail-Adresse mit deiner Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), bestätigt per Double-Opt-in, und schicke dir monatlich ein Gratis-Template und Neuigkeiten, auch über MailerLite. Du kannst dich jederzeit abmelden.</p>
 
           <h4>Gutscheine</h4>
           <p>Wenn du einen Gutschein kaufst, speichere ich deinen Namen, deine E-Mail-Adresse, den gewählten Gutschein und die Angaben, die auf dem Gutschein stehen sollen (für wen, von wem, persönliche Nachricht). Ich nutze sie, um den Gutschein zu erstellen, ihn dir zu schicken und ihn beim Einlösen zuzuordnen (Art. 6 Abs. 1 lit. b DSGVO). Die Bezahlung läuft wie bei den Kursen über Stripe. Gutschein- und Zahlungsdaten bewahre ich so lange auf, wie es das Steuerrecht verlangt.</p>
@@ -1231,6 +1335,82 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   else if(pres==='wartet')pDone('Fast geschafft','Deine Zahlung wird noch verarbeitet. Sobald sie da ist, bekommst du die Bestätigung per E-Mail.');
   else if(pres==='abgebrochen')pDone('Bezahlung abgebrochen','Kein Problem, es wurde nichts abgebucht. Du kannst jederzeit neu buchen oder mir erst einmal eine Anfrage schicken.');
   if(pres){try{params.delete('private');history.replaceState(null,'',location.pathname+(params.toString()?'?'+params:'')+location.hash);}catch(e){}}
+
+  // Templates & Maker Club
+  var tplData=[],tplSeason='alle',tplAge='alle',tplCur=null;
+  var SEASONS_L={alle:'Alle',herbst:'Herbst',winter:'Weihnachten & Winter',fruehling:'Frühling',sommer:'Sommer',ganzjaehrig:'Ganzjährig'};
+  var AGES_L={alle:'Für alle',kinder46:'Kinder 4–6',kinder710:'Kinder 7–10',erwachsene:'Ab 11 & Erwachsene',erfahren:'Mit Erfahrung'};
+  function chips(box,map,present,cur,cb){box.innerHTML='';Object.keys(map).forEach(function(k){if(k!=='alle'&&present.indexOf(k)<0)return;var b=el('button',null,map[k]);b.type='button';b.setAttribute('aria-pressed',k===cur?'true':'false');b.addEventListener('click',function(){cb(k);});box.appendChild(b);});}
+  function renderTpl(){
+    var grid=$('tpl-grid');grid.innerHTML='';
+    if(!tplData.length){grid.appendChild(el('p','slots-note','Die ersten Templates kommen bald. Im Maker Club erfährst du es zuerst.'));$('tpl-filters').hidden=true;return;}
+    $('tpl-filters').hidden=false;
+    var seasons=tplData.map(function(t){return t.season;}),ages=tplData.map(function(t){return t.age;});
+    chips($('tpl-season'),SEASONS_L,seasons,tplSeason,function(k){tplSeason=k;renderTpl();});
+    chips($('tpl-age'),AGES_L,ages,tplAge,function(k){tplAge=k;renderTpl();});
+    var list=tplData.filter(function(t){return (tplSeason==='alle'||t.season===tplSeason)&&(tplAge==='alle'||t.age===tplAge);});
+    if(!list.length){grid.appendChild(el('p','slots-note','Für diese Auswahl gibt es gerade noch kein Template.'));return;}
+    list.forEach(function(t){
+      var c=el('article','tpl'),im=el('div','tpl-img');
+      if(t.image){var i=document.createElement('img');i.src=t.image;i.alt='Vorschau: '+t.title;i.loading='lazy';im.appendChild(i);}
+      c.appendChild(im);
+      var b=el('div','tpl-body'),tags=el('div','tpl-tags');
+      tags.appendChild(el('span',null,t.season_label));tags.appendChild(el('span',null,t.age_label));b.appendChild(tags);
+      b.appendChild(el('h4',null,t.title));
+      if(t.description)b.appendChild(el('p',null,t.description));
+      var lv=el('span','tpl-level');for(var n=1;n<=3;n++)lv.appendChild(el('i',n<=t.level?'on':null));lv.appendChild(document.createTextNode(' '+['leicht','mittel','anspruchsvoll'][t.level-1]));b.appendChild(lv);
+      var f=el('div','tpl-foot');f.appendChild(el('b',null,euro(t.price_cents)));
+      var btn=el('button','btn btn-solid',t.buyable?'Kaufen':'Bald erhältlich');btn.type='button';
+      if(t.buyable)btn.addEventListener('click',function(){tplOpen(t);});else{btn.disabled=true;btn.style.opacity='.55';}
+      f.appendChild(btn);b.appendChild(f);c.appendChild(b);grid.appendChild(c);
+    });
+  }
+  var curSeason=(function(){var m=new Date().getMonth()+1;return m>=3&&m<=5?'fruehling':m>=6&&m<=8?'sommer':m>=9&&m<=11?'herbst':'winter';})();
+  fetch('api/templates.php',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+    if(!d||!d.ok)return;tplData=d.templates||[];
+    if(tplData.some(function(t){return t.season===curSeason;}))tplSeason=curSeason;
+    renderTpl();
+    var m=d.maker||{};
+    if(m.text)$('maker-text').textContent=m.text;
+    if(m.title){var mn=$('maker-now');mn.textContent='Template des Monats: '+m.title;mn.hidden=false;}
+    if(m.image){var mi=$('maker-img');mi.src=m.image;mi.alt='Template des Monats: '+(m.title||'');mi.hidden=false;}
+  }).catch(function(){});
+  $('maker-t').value=Date.now();
+  document.querySelector('.maker-privacy').addEventListener('click',function(){var d=$('datenschutz');if(d)d.open=true;});
+  $('maker-form').addEventListener('submit',function(e){
+    e.preventDefault();var er=$('maker-error'),btn=$('maker-submit'),email=$('maker-email').value.trim();er.hidden=true;
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){er.textContent='Bitte gib eine gültige E-Mail-Adresse an.';er.hidden=false;return;}
+    if(!$('maker-consent').checked){er.textContent='Bitte setz noch das Häkchen, damit ich dir die Templates schicken darf.';er.hidden=false;return;}
+    btn.disabled=true;
+    fetch('api/subscribe.php',{method:'POST',body:new FormData(e.target)}).then(function(r){return r.json().catch(function(){return {ok:false};});}).then(function(d){
+      if(d&&d.ok){e.target.hidden=true;var dn=$('maker-done');dn.textContent=d.already?'Du bist schon im Maker Club! Ich habe dir den Link zum aktuellen Template gerade per E-Mail geschickt.':'Fast geschafft! Ich habe dir eine E-Mail an '+email+' geschickt. Bitte bestätige kurz deine Adresse, danach kannst du dein Template sofort herunterladen.';dn.hidden=false;}
+      else{er.textContent=(d&&d.error)||'Das hat leider nicht geklappt. Bitte versuch es noch einmal.';er.hidden=false;}
+    }).catch(function(){er.textContent='Keine Verbindung. Bitte versuch es noch einmal.';er.hidden=false;}).then(function(){btn.disabled=false;});
+  });
+  var td=$('tpl-dialog'),tf=$('tpl-form');
+  function tplOpen(t){tplCur=t;tf.hidden=false;$('tpl-done').hidden=true;$('tpl-error').hidden=true;$('tpl-id').value=t.id;$('tpl-title').textContent=t.title;$('tpl-meta').textContent=t.season_label+' · '+t.age_label+' · digitaler Download (PDF) · '+euro(t.price_cents);$('tpl-submit').textContent='Weiter zur Bezahlung · '+euro(t.price_cents);show(td);}
+  function tplDone(t,x,link){tf.hidden=true;$('tpl-done').hidden=false;$('tpl-done-title').textContent=t;$('tpl-done-text').textContent=x;var a=$('tpl-download');if(link){a.href=link;a.hidden=false;}else a.hidden=true;show(td);}
+  $('tpl-close').addEventListener('click',function(){hide(td);});$('tpl-done-close').addEventListener('click',function(){hide(td);});
+  td.querySelector('.tpl-privacy').addEventListener('click',function(){hide(td);var d=$('datenschutz');if(d)d.open=true;});
+  td.addEventListener('click',function(e){if(e.target===td)hide(td);});
+  tf.addEventListener('submit',function(e){
+    e.preventDefault();var er=$('tpl-error'),btn=$('tpl-submit'),msg='';er.hidden=true;
+    if($('tpl-name').value.trim().length<2)msg='Bitte gib deinen Namen an.';
+    else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('tpl-email').value.trim()))msg='Bitte gib eine gültige E-Mail-Adresse an.';
+    else if(!$('tpl-waiver').checked)msg='Bitte bestätige den Hinweis zum sofortigen Download.';
+    else if(!$('tpl-consent').checked)msg='Bitte bestätige noch die Hinweise zum Datenschutz.';
+    if(msg){er.textContent=msg;er.hidden=false;return;}
+    btn.disabled=true;btn.textContent='Einen Moment …';var going=false;
+    fetch('api/template-buy.php',{method:'POST',body:new FormData(tf)}).then(function(r){return r.json().catch(function(){return {ok:false};});}).then(function(d){
+      if(d&&d.ok&&d.redirect){going=true;location.href=d.redirect;return;}
+      er.textContent=(d&&d.error)||'Das hat leider nicht geklappt.';er.hidden=false;
+    }).catch(function(){er.textContent='Keine Verbindung. Bitte versuch es noch einmal.';er.hidden=false;}).then(function(){if(!going){btn.disabled=false;if(tplCur)btn.textContent='Weiter zur Bezahlung · '+euro(tplCur.price_cents);}});
+  });
+  var tres=params.get('template');
+  if(tres==='bezahlt'&&params.get('o')&&params.get('k'))tplDone('Dein Template ist bereit!','Danke für deinen Kauf! Hier kannst du dein Template herunterladen. Den Link bekommst du zusätzlich per E-Mail, so kannst du es jederzeit wieder herunterladen.','api/template-download.php?o='+encodeURIComponent(params.get('o'))+'&k='+encodeURIComponent(params.get('k')));
+  else if(tres==='wartet')tplDone('Fast geschafft','Deine Zahlung wird noch verarbeitet. Sobald sie da ist, bekommst du den Download-Link per E-Mail.');
+  else if(tres==='abgebrochen')tplDone('Bezahlung abgebrochen','Kein Problem, es wurde nichts abgebucht.');
+  if(tres){try{['template','o','k'].forEach(function(k){params.delete(k);});history.replaceState(null,'',location.pathname+(params.toString()?'?'+params:'')+location.hash);}catch(e){}}
   // Gutschein kaufen
   var vd=$('voucher-dialog'),vf=$('v-form'),vq=$('v-qty'),vErr=$('v-error'),vSubmit=$('v-submit');
   var VP={spin:{price:7000,one:'Platz',many:'Plätze',q:'Wie viele Plätze?'},private:{price:6500,one:'Stunde',many:'Stunden',q:'Wie viele Stunden?'},atelier:{price:3000,one:'Stunde',many:'Stunden',q:'Wie viele Stunden?'}};

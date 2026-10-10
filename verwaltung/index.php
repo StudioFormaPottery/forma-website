@@ -91,6 +91,37 @@ function shrink_image(string $src, string $target, array $info): bool
     return $info[2] === IMAGETYPE_WEBP ? imagewebp($out, $target, 84) : imagejpeg($out, $target, 84);
 }
 
+/** Speichert eine hochgeladene Datei (PDF oder Bild) im Template-Ordner. Gibt den Dateinamen zurück, '' wenn nichts hochgeladen wurde. */
+function store_upload(string $field, string $kind, string $prefix): string
+{
+    $up = $_FILES[$field] ?? null;
+    if (!$up || ($up['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        return '';
+    }
+    if (($up['error'] ?? 1) !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('Die Datei konnte nicht hochgeladen werden. Bitte versuch es mit einer kleineren Datei.');
+    }
+    $dir = forma_template_dir();
+    $base = $prefix . '-' . bin2hex(random_bytes(4));
+    if ($kind === 'pdf') {
+        $head = (string)file_get_contents($up['tmp_name'], false, null, 0, 5);
+        if ($head !== '%PDF-' || $up['size'] > 40 * 1024 * 1024) {
+            throw new RuntimeException('Bitte lade eine PDF-Datei bis 40 MB hoch.');
+        }
+        move_uploaded_file($up['tmp_name'], "$dir/$base.pdf");
+        return "$base.pdf";
+    }
+    $info = @getimagesize($up['tmp_name']);
+    $ext = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'][$info[2] ?? 0] ?? null;
+    if (!$ext || $up['size'] > 10 * 1024 * 1024) {
+        throw new RuntimeException('Bitte lade ein JPG-, PNG- oder WebP-Bild bis 10 MB hoch.');
+    }
+    if (!shrink_image($up['tmp_name'], "$dir/$base.$ext", $info)) {
+        move_uploaded_file($up['tmp_name'], "$dir/$base.$ext");
+    }
+    return "$base.$ext";
+}
+
 $hash = forma_setting($pdo, 'admin_hash');
 $loggedIn = !empty($_SESSION['admin']);
 $action = $_POST['action'] ?? '';
@@ -422,6 +453,55 @@ if ($action === 'voucher_status') {
     go($self . '?view=gutscheine', $redeem ? 'Der Gutschein ist als eingelöst markiert.' : 'Der Gutschein ist wieder offen.');
 }
 
+if ($action === 'save_maker') {
+    $m = forma_maker($pdo);
+    try {
+        $pdf = store_upload('maker_pdf', 'pdf', 'maker');
+        $img = store_upload('maker_image', 'image', 'maker');
+    } catch (Throwable $e) {
+        go($self . '?view=templates', $e->getMessage());
+    }
+    if ($pdf !== '') { if ($m['file']) @unlink(forma_template_dir() . '/' . basename($m['file'])); $m['file'] = $pdf; }
+    if ($img !== '') { if ($m['image']) @unlink(forma_template_dir() . '/' . basename($m['image'])); $m['image'] = $img; }
+    $m['title'] = forma_clean((string)($_POST['maker_title'] ?? ''), 90);
+    $m['text'] = forma_clean((string)($_POST['maker_text'] ?? ''), 400);
+    $m['version'] = (int)$m['version'] + 1;
+    forma_set_setting($pdo, 'maker', json_encode($m, JSON_UNESCAPED_UNICODE));
+    go($self . '?view=templates', 'Das Template des Monats ist gespeichert' . ($m['file'] ? ' und auf der Website verfügbar.' : '. Lade noch die PDF hoch, damit man es herunterladen kann.'));
+}
+
+if ($action === 'save_template') {
+    $id = (int)($_POST['tid'] ?? 0);
+    $title = forma_clean((string)($_POST['title'] ?? ''), 90);
+    if ($title === '') {
+        go($self . '?view=template_edit' . ($id ? '&id=' . $id : ''), 'Bitte gib dem Template einen Namen.');
+    }
+    try {
+        $pdf = store_upload('pdf', 'pdf', 'tpl');
+        $img = store_upload('image', 'image', 'tpl');
+    } catch (Throwable $e) {
+        go($self . '?view=template_edit' . ($id ? '&id=' . $id : ''), $e->getMessage());
+    }
+    $season = array_key_exists($_POST['season'] ?? '', FORMA_SEASONS) ? $_POST['season'] : 'ganzjaehrig';
+    $age = array_key_exists($_POST['age'] ?? '', FORMA_AGES) ? $_POST['age'] : 'erwachsene';
+    $vals = [$title, forma_clean((string)($_POST['description'] ?? ''), 600), $season, $age, max(1, min(3, (int)($_POST['level'] ?? 1))),
+        euro_to_cents((string)($_POST['price'] ?? '')), !empty($_POST['visible']) ? 1 : 0, (int)($_POST['sort'] ?? 0)];
+    if ($id > 0) {
+        $old = $pdo->prepare('SELECT * FROM templates WHERE id = ?'); $old->execute([$id]); $old = $old->fetch();
+        $pdo->prepare('UPDATE templates SET title=?, description=?, season=?, age=?, level=?, price_cents=?, visible=?, sort=?' . ($pdf ? ', file=?' : '') . ($img ? ', image=?' : '') . ' WHERE id=?')
+            ->execute(array_merge($vals, $pdf ? [$pdf] : [], $img ? [$img] : [], [$id]));
+    } else {
+        $pdo->prepare('INSERT INTO templates (title, description, season, age, level, price_cents, visible, sort, file, image, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)')
+            ->execute(array_merge($vals, [$pdf, $img, date('c')]));
+    }
+    go($self . '?view=templates', 'Das Template ist gespeichert.');
+}
+
+if ($action === 'delete_template') {
+    $pdo->prepare('UPDATE templates SET visible = 0, sort = 9999 WHERE id = ?')->execute([(int)($_POST['tid'] ?? 0)]);
+    go($self . '?view=templates', 'Das Template ist ausgeblendet. Bereits gekaufte Downloads funktionieren weiter.');
+}
+
 if ($action === 'private_done') {
     $pdo->prepare('UPDATE private_bookings SET done = 1 - done WHERE id = ?')->execute([(int)($_POST['pid'] ?? 0)]);
     go($self . '?view=private', 'Gespeichert.');
@@ -459,6 +539,96 @@ if ($view === 'gutscheine_export') {
             $r['redeemed_at'] ? date('d.m.Y', strtotime($r['redeemed_at'])) : ''], ';');
     }
     exit;
+}
+
+if ($view === 'templates_export') {
+    $rows = $pdo->query("SELECT * FROM template_orders WHERE status = 'bezahlt' ORDER BY paid_at")->fetchAll();
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="forma-template-verkaeufe-' . date('Y-m-d') . '.csv"');
+    $out = fopen('php://output', 'w');
+    fwrite($out, "\xEF\xBB\xBF");
+    fputcsv($out, ['Bestellung', 'Datum', 'Template', 'Betrag EUR', 'Name', 'E-Mail'], ';');
+    foreach ($rows as $r) {
+        fputcsv($out, ['T-' . $r['id'], date('d.m.Y', strtotime($r['paid_at'])), $r['title'], number_format($r['amount_cents'] / 100, 2, ',', ''), $r['name'], $r['email']], ';');
+    }
+    exit;
+}
+
+if ($view === 'template_edit') {
+    $id = (int)($_GET['id'] ?? 0);
+    $t = ['id' => 0, 'title' => '', 'description' => '', 'season' => 'herbst', 'age' => 'erwachsene', 'level' => 1, 'price_cents' => 500, 'file' => '', 'image' => '', 'visible' => 1, 'sort' => 0];
+    if ($id) { $st = $pdo->prepare('SELECT * FROM templates WHERE id = ?'); $st->execute([$id]); $t = $st->fetch() ?: $t; }
+    render_page($id ? 'Template bearbeiten' : 'Neues Template', function () use ($self, $flash, $t) { ?>
+        <p><a href="<?= forma_h($self) ?>?view=templates">← Zu den Templates</a></p>
+        <h1><?= $t['id'] ? 'Template bearbeiten' : 'Neues Template' ?></h1>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <form method="post" enctype="multipart/form-data" class="card stack">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="save_template"><input type="hidden" name="tid" value="<?= (int)$t['id'] ?>">
+            <label for="title">Name</label><input id="title" name="title" value="<?= forma_h($t['title']) ?>" placeholder="z. B. Weihnachtsbaum-Anhänger" required>
+            <label for="description">Beschreibung</label><textarea id="description" name="description" rows="3" placeholder="Was ist drin? z. B. Schablone A4, Bild-Anleitung, Materialliste, Deutsch &amp; Englisch"><?= forma_h($t['description']) ?></textarea>
+            <div class="row">
+                <div class="stack"><label for="season">Jahreszeit</label><select id="season" name="season"><?php foreach (FORMA_SEASONS as $k => $l): ?><option value="<?= $k ?>" <?= $t['season'] === $k ? 'selected' : '' ?>><?= forma_h($l) ?></option><?php endforeach; ?></select></div>
+                <div class="stack"><label for="age">Für wen</label><select id="age" name="age"><?php foreach (FORMA_AGES as $k => $l): ?><option value="<?= $k ?>" <?= $t['age'] === $k ? 'selected' : '' ?>><?= forma_h($l) ?></option><?php endforeach; ?></select></div>
+            </div>
+            <div class="row">
+                <div class="stack"><label for="level">Schwierigkeit</label><select id="level" name="level"><?php foreach ([1 => 'leicht', 2 => 'mittel', 3 => 'anspruchsvoll'] as $k => $l): ?><option value="<?= $k ?>" <?= (int)$t['level'] === $k ? 'selected' : '' ?>><?= $l ?></option><?php endforeach; ?></select></div>
+                <div class="stack"><label for="price">Preis in €</label><input id="price" name="price" inputmode="decimal" value="<?= forma_h(rtrim(rtrim(number_format($t['price_cents'] / 100, 2, ',', ''), '0'), ',')) ?>"></div>
+            </div>
+            <label for="pdf">PDF zum Herunterladen <?= $t['file'] ? '<span class="muted">(vorhanden, nur hochladen zum Ersetzen)</span>' : '' ?></label><input id="pdf" name="pdf" type="file" accept="application/pdf">
+            <label for="image">Vorschaubild <?= $t['image'] ? '<span class="muted">(vorhanden)</span>' : '' ?></label><input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp">
+            <label for="sort">Reihenfolge <span class="muted">(kleine Zahl = weiter vorne)</span></label><input id="sort" name="sort" type="number" value="<?= (int)$t['sort'] ?>">
+            <label class="check"><input type="checkbox" name="visible" value="1" <?= $t['visible'] ? 'checked' : '' ?>> Auf der Website anzeigen</label>
+            <button class="btn" type="submit">Speichern</button>
+        </form>
+        <?php if ($t['id']): ?>
+        <form method="post" class="card stack danger"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="delete_template"><input type="hidden" name="tid" value="<?= (int)$t['id'] ?>"><button class="btn btn-danger" type="submit">Template entfernen</button></form>
+        <?php endif; ?>
+    <?php });
+}
+
+if ($view === 'templates') {
+    forma_reconcile_payments($pdo, true);
+    $m = forma_maker($pdo);
+    $makers = (int)$pdo->query("SELECT COUNT(*) FROM subscribers WHERE status = 'bestaetigt' AND source LIKE '%Maker%'")->fetchColumn();
+    $tpls = $pdo->query('SELECT t.*, (SELECT COUNT(*) FROM template_orders o WHERE o.template_id = t.id AND o.status = \'bezahlt\') AS sold FROM templates t ORDER BY t.visible DESC, t.sort, t.id DESC')->fetchAll();
+    $orders = $pdo->query("SELECT * FROM template_orders WHERE status = 'bezahlt' ORDER BY id DESC LIMIT 50")->fetchAll();
+    render_page('Templates & Maker Club', function () use ($self, $flash, $m, $makers, $tpls, $orders) { ?>
+        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
+        <h1>Templates &amp; Maker Club</h1>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <h2>FORMA Maker Club · Template des Monats</h2>
+        <form method="post" enctype="multipart/form-data" class="card stack">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="save_maker">
+            <p><strong><?= $makers ?></strong> <?= $makers === 1 ? 'Mitglied' : 'Mitglieder' ?> im Maker Club. Sie stehen in MailerLite in der Gruppe „Maker Club“ (sobald MailerLite verbunden ist).</p>
+            <label for="maker_title">Name des Templates</label><input id="maker_title" name="maker_title" value="<?= forma_h($m['title']) ?>" placeholder="z. B. Herbstblatt-Schälchen">
+            <label for="maker_text">Kurze Beschreibung</label><input id="maker_text" name="maker_text" value="<?= forma_h($m['text']) ?>" placeholder="z. B. Ein kleines Schälchen in Blattform, ideal für Ringe oder Teebeutel">
+            <label for="maker_pdf">PDF <?= $m['file'] ? '<span class="muted">(vorhanden, nur hochladen zum Ersetzen)</span>' : '' ?></label><input id="maker_pdf" name="maker_pdf" type="file" accept="application/pdf">
+            <label for="maker_image">Vorschaubild <?= $m['image'] ? '<span class="muted">(vorhanden)</span>' : '' ?></label><input id="maker_image" name="maker_image" type="file" accept="image/jpeg,image/png,image/webp">
+            <p class="muted small">Tipp: Jeden Monat hier das neue Template hochladen und danach in MailerLite eine kurze Mail an die Gruppe „Maker Club“ schicken.</p>
+            <button class="btn" type="submit">Speichern</button>
+        </form>
+        <h2>Templates zum Kaufen</h2>
+        <p><a class="btn" href="<?= forma_h($self) ?>?view=template_edit">+ Neues Template</a></p>
+        <div class="list">
+        <?php foreach ($tpls as $t): ?>
+            <a class="card course-link<?= $t['visible'] ? '' : ' is-cancelled' ?>" href="<?= forma_h($self) ?>?view=template_edit&amp;id=<?= (int)$t['id'] ?>">
+                <strong><?= forma_h($t['title']) ?></strong>
+                <span class="muted small"><?= forma_h(FORMA_SEASONS[$t['season']] ?? '') ?> · <?= forma_h(FORMA_AGES[$t['age']] ?? '') ?> · <?= forma_h(forma_euro((int)$t['price_cents'])) ?><?= $t['file'] ? '' : ' · <b>PDF fehlt</b>' ?><?= $t['visible'] ? '' : ' · ausgeblendet' ?></span>
+                <span class="pill"><?= (int)$t['sold'] ?> verkauft</span>
+            </a>
+        <?php endforeach; ?>
+        <?php if (!$tpls): ?><p class="muted">Noch keine Templates angelegt.</p><?php endif; ?>
+        </div>
+        <h2>Verkäufe</h2>
+        <p><a href="<?= forma_h($self) ?>?view=templates_export">Liste herunterladen (CSV)</a></p>
+        <div class="list">
+        <?php foreach ($orders as $o): ?>
+            <div class="card booking"><div class="booking-head"><strong><?= forma_h($o['title']) ?></strong><span class="pill pill-ok"><?= forma_h(forma_euro((int)$o['amount_cents'])) ?></span></div>
+            <div class="muted small"><?= forma_h(date('d. m. Y', strtotime($o['paid_at']))) ?> · <?= forma_h($o['name']) ?> · <span class="sel"><?= forma_h($o['email']) ?></span></div></div>
+        <?php endforeach; ?>
+        <?php if (!$orders): ?><p class="muted">Noch keine Verkäufe.</p><?php endif; ?>
+        </div>
+    <?php });
 }
 
 if ($view === 'private') {
@@ -859,6 +1029,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
         <a class="tile" href="<?= forma_h($self) ?>?view=edit"><strong>+ Einzeltermin</strong><span class="muted small">z. B. ein Special-Kurs</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=series"><strong>+ Serientermine</strong><span class="muted small">z. B. jeden Mi &amp; Fr</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=popup"><strong>Pop-up &amp; Deko</strong><span class="muted small"><?= $popupLive ? 'gerade sichtbar' : 'ausgeschaltet' ?> · Deko</span></a>
+        <a class="tile" href="<?= forma_h($self) ?>?view=templates"><strong>Templates</strong><span class="muted small">&amp; Maker Club</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=private"><strong>Private Pottery</strong><span class="muted small"><?= $privateOpen ?> offen</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=gutscheine"><strong>Gutscheine</strong><span class="muted small"><?= $voucherOpen ?> offen</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=liste"><strong>E-Mail-Liste</strong><span class="muted small"><?= $subCount ?> <?= $subCount === 1 ? 'Kontakt' : 'Kontakte' ?></span></a>

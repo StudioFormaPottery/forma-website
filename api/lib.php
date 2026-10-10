@@ -132,6 +132,35 @@ function forma_migrate(PDO $pdo): void
         paid_at TEXT,
         done INTEGER NOT NULL DEFAULT 0
     )');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS templates (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL DEFAULT \'\',
+        season TEXT NOT NULL DEFAULT \'ganzjaehrig\',
+        age TEXT NOT NULL DEFAULT \'erwachsene\',
+        level INTEGER NOT NULL DEFAULT 1,
+        price_cents INTEGER NOT NULL DEFAULT 0,
+        file TEXT NOT NULL DEFAULT \'\',
+        image TEXT NOT NULL DEFAULT \'\',
+        visible INTEGER NOT NULL DEFAULT 1,
+        sort INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL
+    )');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS template_orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        template_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        amount_cents INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT \'offen\',
+        stripe_session TEXT NOT NULL DEFAULT \'\',
+        token TEXT NOT NULL,
+        mailed INTEGER NOT NULL DEFAULT 0,
+        ip_hash TEXT NOT NULL DEFAULT \'\',
+        created_at TEXT NOT NULL,
+        paid_at TEXT
+    )');
     forma_add_column($pdo, 'courses', 'price_cents', 'INTEGER NOT NULL DEFAULT 0');
     forma_add_column($pdo, 'bookings', 'amount_cents', 'INTEGER NOT NULL DEFAULT 0');
     forma_add_column($pdo, 'bookings', 'stripe_session', "TEXT NOT NULL DEFAULT ''");
@@ -616,6 +645,15 @@ function forma_reconcile_payments(PDO $pdo, bool $force = false): void
             error_log('FORMA reconcile: ' . $e->getMessage());
         }
     }
+    $stmt = $pdo->prepare("SELECT * FROM template_orders WHERE status = 'offen' AND stripe_session != '' AND created_at >= ?");
+    $stmt->execute([date('c', time() - 3 * 86400)]);
+    foreach ($stmt->fetchAll() as $to) {
+        try {
+            forma_template_check($pdo, $to);
+        } catch (Throwable $e) {
+            error_log('FORMA reconcile template: ' . $e->getMessage());
+        }
+    }
     $stmt = $pdo->prepare("SELECT * FROM private_bookings WHERE status = 'offen' AND stripe_session != '' AND created_at >= ?");
     $stmt->execute([date('c', time() - 3 * 86400)]);
     foreach ($stmt->fetchAll() as $pb) {
@@ -745,7 +783,7 @@ function forma_ml_group(string $key, string $name = 'Website'): string
 }
 
 /** Überträgt eine bestätigte Adresse (oder eine Abmeldung) an MailerLite. Fehler werden nur protokolliert. */
-function forma_ml_sync(string $email, string $name, bool $active = true): bool
+function forma_ml_sync(string $email, string $name, bool $active = true, bool $maker = false): bool
 {
     $cfg = forma_mailerlite();
     if (!$cfg) {
@@ -753,7 +791,19 @@ function forma_ml_sync(string $email, string $name, bool $active = true): bool
     }
     $body = ['email' => $email, 'status' => $active ? 'active' : 'unsubscribed'];
     if ($active) {
-        $body['groups'] = array_values(array_filter([(string)($cfg['group_id'] ?? '')]));
+        $groups = [(string)($cfg['group_id'] ?? '')];
+        if ($maker) {
+            if (empty($cfg['maker_group_id'])) {
+                try {
+                    $cfg['maker_group_id'] = forma_ml_group($cfg['api_key'], 'Maker Club');
+                    forma_save_mailerlite($cfg);
+                } catch (Throwable $e) {
+                    error_log('FORMA MailerLite Maker-Gruppe: ' . $e->getMessage());
+                }
+            }
+            $groups[] = (string)($cfg['maker_group_id'] ?? '');
+        }
+        $body['groups'] = array_values(array_filter($groups));
         if ($name !== '') {
             $body['fields'] = ['name' => $name];
         }
@@ -917,6 +967,71 @@ function forma_private_check(PDO $pdo, array $b): string
     return 'offen';
 }
 
+// --- Templates & Maker Club --------------------------------------------------------
+
+const FORMA_SEASONS = ['herbst' => 'Herbst', 'winter' => 'Weihnachten & Winter', 'fruehling' => 'Frühling', 'sommer' => 'Sommer', 'ganzjaehrig' => 'Ganzjährig'];
+const FORMA_AGES = ['kinder46' => 'Kinder 4–6 (mit Hilfe)', 'kinder710' => 'Kinder 7–10', 'erwachsene' => 'Ab 11 & Erwachsene', 'erfahren' => 'Mit Töpfererfahrung'];
+
+function forma_template_dir(): string
+{
+    $dir = forma_data_dir() . '/templates';
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0700, true);
+    }
+    return $dir;
+}
+
+/** Das aktuelle Gratis-Template des Maker Clubs (Titel, Text, PDF, Bild) */
+function forma_maker(PDO $pdo): array
+{
+    $m = json_decode(forma_setting($pdo, 'maker') ?? '', true);
+    $d = ['title' => '', 'text' => '', 'file' => '', 'image' => '', 'version' => 1];
+    return is_array($m) ? array_merge($d, $m) : $d;
+}
+
+function forma_maker_link(array $sub): string
+{
+    return forma_site_url() . '/api/maker-download.php?t=' . $sub['token'];
+}
+
+function forma_template_order_paid(PDO $pdo, int $id): void
+{
+    $pdo->prepare("UPDATE template_orders SET status = 'bezahlt', paid_at = ? WHERE id = ? AND status IN ('offen','abgebrochen')")->execute([date('c'), $id]);
+    $pdo->exec('BEGIN IMMEDIATE');
+    $stmt = $pdo->prepare("SELECT * FROM template_orders WHERE id = ? AND status = 'bezahlt' AND mailed = 0");
+    $stmt->execute([$id]);
+    $o = $stmt->fetch();
+    if (!$o) {
+        $pdo->exec('ROLLBACK');
+        return;
+    }
+    $pdo->prepare('UPDATE template_orders SET mailed = 1 WHERE id = ?')->execute([$id]);
+    $pdo->exec('COMMIT');
+    $first = forma_first_name($o['name']);
+    $link = forma_site_url() . '/api/template-download.php?o=' . $o['id'] . '&k=' . $o['token'];
+    $amount = forma_euro((int)$o['amount_cents']);
+    forma_mail($o['email'], 'Dein FORMA Template: ' . $o['title'], "Hallo $first,\n\nvielen Dank für deinen Kauf! Hier kannst du dein Template jederzeit herunterladen:\n\n$link\n\n"
+        . "Template: {$o['title']}\nBezahlt: $amount\n\nViel Freude beim Töpfern! Ich freu mich, wenn du mir dein Ergebnis auf Instagram zeigst: @forma.potteryartcraft\n\nHerzlich,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
+    forma_mail(FORMA_NOTIFY_EMAIL, 'Template verkauft: ' . $o['title'] . ' (' . $amount . ')', "Ein Template wurde verkauft.\n\nTemplate: {$o['title']}\nBetrag: $amount\nKäufer:in: {$o['name']}\nE-Mail: {$o['email']}\n\nAlle Verkäufe: " . forma_site_url() . "/verwaltung/?view=templates\n", $o['email']);
+}
+
+function forma_template_check(PDO $pdo, array $o): string
+{
+    if ($o['status'] !== 'offen' || $o['stripe_session'] === '') {
+        return (string)$o['status'];
+    }
+    $session = forma_stripe('GET', '/v1/checkout/sessions/' . rawurlencode($o['stripe_session']));
+    if (($session['payment_status'] ?? '') === 'paid') {
+        forma_template_order_paid($pdo, (int)$o['id']);
+        return 'bezahlt';
+    }
+    if (($session['status'] ?? '') === 'expired') {
+        $pdo->prepare("UPDATE template_orders SET status = 'abgebrochen' WHERE id = ? AND status = 'offen'")->execute([(int)$o['id']]);
+        return 'abgebrochen';
+    }
+    return 'offen';
+}
+
 // --- Pop-up & E-Mail-Liste ------------------------------------------------------
 
 function forma_popup(PDO $pdo): array
@@ -936,12 +1051,13 @@ function forma_popup_live(array $p): bool
 }
 
 /** Einfache Seite für Bestätigungs- und Abmeldelinks. */
-function forma_message_page(string $title, string $text): void
+function forma_message_page(string $title, string $text, string $btnText = '', string $btnUrl = ''): void
 {
     header('Content-Type: text/html; charset=utf-8');
     header('X-Robots-Tag: noindex');
     $t = forma_h($title);
     $x = nl2br(forma_h($text));
+    $extra = $btnUrl !== '' ? '<a class="b" href="' . forma_h($btnUrl) . '" style="margin-right:8px">' . forma_h($btnText) . '</a>' : '';
     echo <<<HTML
 <!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
 <title>$t · FORMA</title><link rel="icon" href="/img/forma-logo.png">
@@ -951,7 +1067,7 @@ main{background:#EEE2D4;max-width:520px;width:100%;padding:56px 32px 36px;border
 img{width:72px;margin:0 auto 10px;display:block}p.e{font-family:"Italiana",serif;font-size:28px;color:#8C2C1D;margin:0}
 h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:650;color:#8C2C1D;font-size:34px;line-height:1.1;margin:6px 0 14px;letter-spacing:-.02em}
 a.b{display:inline-block;margin-top:22px;background:#8C2C1D;color:#FBF1EA;border-radius:999px;padding:12px 24px;text-decoration:none}</style></head>
-<body><main><img src="/img/forma-logo.png" alt="FORMA"><p class="e">FORMA Earth &amp; Art</p><h1>$t</h1><p>$x</p><a class="b" href="/">Zur Website</a></main></body></html>
+<body><main><img src="/img/forma-logo.png" alt="FORMA"><p class="e">FORMA Earth &amp; Art</p><h1>$t</h1><p>$x</p>$extra<a class="b" href="/" style="background:transparent;color:#8C2C1D;border:1.5px solid #8C2C1D">Zur Website</a></main></body></html>
 HTML;
     exit;
 }

@@ -70,3 +70,9 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 
 ## Private Pottery (seit 10.10.2026)
 - „Projekt buchen“ (`data-private`) öffnet ein Fenster: Stunden 1–4 mit Projektbeispielen (1 Std. Magnete/2 Espressotassen, 2 Std. Tassen, Espresso-Set, Teller, große Schale, 3–4 Std. Salatschüssel, Service), Projektbeschreibung, Wunschtermin. Direkt bezahlen (€ 65 × Stunden) oder „Erst mal anfragen“ ohne Zahlung. `api/private.php`, Tabelle `private_bookings`, Verwaltung → Private Pottery.
+
+## Templates & FORMA Maker Club (seit 10.10.2026)
+- Bereich `#templates` (Menü „Templates“): oben der Maker Club (Gratis-Template des Monats per E-Mail, Double-Opt-in über `api/subscribe.php` mit source „Maker Club“, Download `api/maker-download.php?t=TOKEN`, MailerLite-Gruppe „Maker Club“), darunter bezahlte Templates mit Filtern Jahreszeit/Alter.
+- Kauf: `api/template-buy.php` (Stripe, Häkchen zum Verzicht auf das Rücktrittsrecht bei digitalen Inhalten), `api/template-bezahlt.php`, Download `api/template-download.php`. Tabellen `templates`, `template_orders`. Dateien in `../forma-data/templates/`.
+- Verwaltung → Templates: Template des Monats hochladen, Templates anlegen (PDF, Vorschaubild, Preis, Jahreszeit, Alter, Schwierigkeit), Verkäufe + CSV.
+- Templates immer Deutsch + Englisch, Anleitungen mit wenig Text und viel Bild.
