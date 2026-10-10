@@ -119,6 +119,40 @@ section{scroll-margin-top:96px}
 .offer.is-featured .btn{background:var(--on-clay);color:var(--clay);border-color:var(--on-clay)}
 .note{font-size:14.5px;line-height:1.5;padding:14px 16px;border-radius:16px;background:var(--paper);color:var(--ink-soft)}
 
+
+/* Termine & Anmeldung */
+.slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+@media (max-width:780px){.slots{grid-template-columns:1fr}}
+.slots-note{grid-column:1/-1;color:var(--ink-soft);padding:22px 24px;border:1px dashed var(--line);border-radius:24px}
+.slot{display:flex;flex-direction:column;gap:10px;padding:24px 24px 22px;border-radius:26px;background:var(--paper-2);border:1px solid var(--line);min-width:0}
+.slot h3{font-family:var(--display);font-weight:650;letter-spacing:-.02em;font-size:26px;line-height:1.1;color:var(--clay)}
+.slot-date{font-weight:500}
+.slot-desc{font-size:15.5px;color:var(--ink-soft)}
+.slot-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:12px}
+.slot-price{font-size:15.5px;color:var(--ink-soft)}
+.badge{display:inline-flex;align-items:center;gap:6px;width:max-content;padding:4px 12px;border-radius:999px;font-size:13.5px;font-weight:500;background:var(--paper);color:var(--clay)}
+.badge.is-full{background:var(--clay);color:var(--on-clay)}
+.book-dialog{border:0;padding:0;border-radius:28px;width:min(560px,calc(100vw - 32px));max-height:calc(100dvh - 32px);background:var(--paper);color:var(--ink);box-shadow:0 30px 80px rgba(51,33,27,.35)}
+.book-dialog::backdrop{background:rgba(51,33,27,.45)}
+.book-inner{position:relative;padding:30px 28px 28px;overflow:auto;max-height:calc(100dvh - 32px)}
+.book-close{position:absolute;top:14px;right:14px;width:44px;height:44px;border-radius:50%;border:0;background:var(--paper-2);color:var(--ink);display:grid;place-items:center;cursor:pointer}
+#book-form,.book-done{display:flex;flex-direction:column;gap:14px}
+#book-form h3,.book-done h3{font-family:var(--display);font-weight:650;font-size:28px;line-height:1.1;letter-spacing:-.02em;color:var(--clay);padding-right:44px}
+.book-price{color:var(--ink-soft);margin-top:-6px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field-row{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px}
+@media (max-width:460px){.field-row{grid-template-columns:1fr}}
+.field label{font-weight:500;font-size:15px}
+.opt{font-weight:400;color:var(--ink-soft)}
+.field input,.field select,.field textarea{font:inherit;font-size:16px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:#FFFBF7;color:var(--ink);width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{outline:3px solid var(--focus);outline-offset:1px}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.45;color:var(--ink-soft)}
+.consent input{margin-top:3px;width:18px;height:18px;accent-color:var(--clay);flex:0 0 auto}
+.book-error{background:#FFF4EE;border:1px solid var(--clay-soft);border-radius:14px;padding:10px 14px;font-size:15px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+#book-submit{align-self:flex-start}
+#book-submit[disabled]{opacity:.6;cursor:wait}
+
 /* Studio */
 .studio{background:var(--lilac)}
 .gallery{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:clamp(120px,15vw,200px);gap:14px}
@@ -192,7 +226,7 @@ section{scroll-margin-top:96px}
       <a href="#studio">Studio</a>
       <a href="#ueber-mich">Über mich</a>
       <a href="#kontakt">Kontakt</a>
-      <a class="btn btn-solid" href="https://app.zenamu.com/events/2561ae37441453905e1030eca840ef25" target="_blank" rel="noopener">Kurs buchen</a>
+      <a class="btn btn-solid" href="#anmeldung">Kurs buchen</a>
     </nav>
   </div>
 </header>
@@ -237,7 +271,7 @@ section{scroll-margin-top:96px}
             <dt>Für</dt><dd>Einsteiger und Fortgeschrittene</dd>
           </dl>
           <p class="price">€ 295<small>für alle fünf Termine</small></p>
-          <a class="btn" href="https://app.zenamu.com/events/2561ae37441453905e1030eca840ef25" target="_blank" rel="noopener">Platz buchen</a>
+          <a class="btn" href="#anmeldung">Platz reservieren</a>
         </article>
         <article class="offer">
           <p class="kicker">Drehscheibe · 2 Stunden</p>
@@ -249,7 +283,7 @@ section{scroll-margin-top:96px}
             <dt>Gruppe</dt><dd>ab 2 Personen</dd>
           </dl>
           <p class="price">€ 70<small>pro Person, inkl. eines Werkstücks</small></p>
-          <a class="btn btn-solid" href="#kontakt">Termin anfragen</a>
+          <a class="btn btn-solid" href="#anmeldung">Termine ansehen</a>
         </article>
         <article class="offer">
           <p class="kicker">Einzelstunde · Handbuilding</p>
@@ -278,6 +312,51 @@ section{scroll-margin-top:96px}
       </div>
     </div>
   </section>
+
+  <section class="section booking" id="anmeldung">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Anmeldung</p>
+        <h2 class="display">Termine &amp; Anmeldung</h2>
+        <p>Such dir einen Termin aus und reserviere deinen Platz direkt hier. Du bekommst sofort eine Bestätigung per E-Mail. Online bezahlen musst du dabei nichts.</p>
+      </div>
+      <div class="slots" id="slots" aria-live="polite">
+        <p class="slots-note">Die Termine werden geladen …</p>
+      </div>
+    </div>
+  </section>
+
+  <dialog class="book-dialog" id="book-dialog" aria-labelledby="book-title">
+    <div class="book-inner">
+      <button class="book-close" type="button" id="book-close" aria-label="Schließen">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+      <form id="book-form" novalidate>
+        <p class="kicker" id="book-date"></p>
+        <h3 id="book-title">Anmeldung</h3>
+        <p class="book-price" id="book-price"></p>
+        <input type="hidden" name="course_id" id="book-course">
+        <input type="hidden" name="t" id="book-t">
+        <div class="hp" aria-hidden="true"><label for="book-website">Bitte leer lassen</label><input id="book-website" name="website" tabindex="-1" autocomplete="off"></div>
+        <div class="field"><label for="book-name">Vor- und Nachname</label><input id="book-name" name="name" autocomplete="name" required></div>
+        <div class="field"><label for="book-email">E-Mail</label><input id="book-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field-row">
+          <div class="field"><label for="book-phone">Telefon <span class="opt">(optional)</span></label><input id="book-phone" name="phone" type="tel" autocomplete="tel"></div>
+          <div class="field"><label for="book-persons">Personen</label><select id="book-persons" name="persons"></select></div>
+        </div>
+        <div class="field"><label for="book-message">Nachricht <span class="opt">(optional)</span></label><textarea id="book-message" name="message" rows="3"></textarea></div>
+        <label class="consent"><input type="checkbox" name="consent" id="book-consent" value="1" required> <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Anmeldung gespeichert werden. Mehr dazu in der <a href="#datenschutz" id="book-privacy">Datenschutzerklärung</a>.</span></label>
+        <p class="book-error" id="book-error" role="alert" hidden></p>
+        <button class="btn btn-solid" type="submit" id="book-submit">Verbindlich anmelden</button>
+      </form>
+      <div class="book-done" id="book-done" hidden>
+        <p class="eyebrow">Danke!</p>
+        <h3 id="book-done-title">Deine Anmeldung ist da.</h3>
+        <p id="book-done-text"></p>
+        <button class="btn btn-solid" type="button" id="book-done-close">Schließen</button>
+      </div>
+    </div>
+  </dialog>
 
   <section class="studio" id="studio">
     <svg class="wave" style="--to:var(--lilac);background:var(--paper)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70c150 30 300 46 470 28s300-74 480-72 330 58 490 52v42H0z"></path></svg>
@@ -336,7 +415,7 @@ section{scroll-margin-top:96px}
       <div class="section-head">
         <p class="eyebrow">Kontakt</p>
         <h2 class="display">So erreichst du mich</h2>
-        <p>Kursplätze buchst du bequem online. Für Einzelstunden, das offene Atelier und Gutscheine erreichst du mich am schnellsten telefonisch oder per WhatsApp.</p>
+        <p>Kursplätze reservierst du direkt hier auf der Seite unter „Termine &amp; Anmeldung“. Für Private Pottery, das offene Atelier und Gutscheine erreichst du mich am schnellsten telefonisch oder per WhatsApp.</p>
       </div>
       <div class="contact-grid">
         <div class="contact-card">
@@ -400,11 +479,11 @@ section{scroll-margin-top:96px}
           <h4>Kontakt per Telefon, WhatsApp oder E-Mail</h4>
           <p>Wenn du mich kontaktierst, verarbeite ich deine Angaben (zum Beispiel Name, Telefonnummer, Nachricht), um deine Anfrage zu beantworten und gegebenenfalls einen Termin zu vereinbaren (Art. 6 Abs. 1 lit. b DSGVO). Deine Daten gebe ich nicht ohne deine Zustimmung weiter. Nutzt du WhatsApp, gelten zusätzlich die Datenschutzbestimmungen von WhatsApp (Meta Platforms Ireland Ltd.).</p>
 
-          <h4>Kursbuchung über Zenamu</h4>
-          <p>Kursplätze kannst du online über das Buchungssystem Zenamu buchen. Wenn du auf „Kurs buchen“ oder „Platz buchen“ klickst, verlässt du diese Website. Die Daten, die du bei der Buchung angibst, werden von Zenamu in meinem Auftrag verarbeitet, um deine Buchung zu verwalten (Art. 6 Abs. 1 lit. b DSGVO). Es gilt zusätzlich die Datenschutzerklärung von Zenamu.</p>
+          <h4>Kursanmeldung über diese Website</h4>
+          <p>Wenn du dich über das Anmeldeformular für einen Kurs anmeldest, speichere ich deine Angaben (Name, E-Mail-Adresse, optional Telefonnummer und Nachricht, Anzahl der Personen) auf dem Server dieser Website bei Hostinger. Ich nutze sie ausschließlich, um deine Anmeldung zu verwalten, dir eine Bestätigung zu schicken und dich bei Änderungen zum Kurs zu kontaktieren (Art. 6 Abs. 1 lit. b DSGVO). Zum Schutz vor Missbrauch wird außerdem ein verschlüsselter Kurzwert deiner IP-Adresse gespeichert, aus dem sich die Adresse nicht zurückrechnen lässt. Deine Anmeldedaten lösche ich spätestens zwölf Monate nach dem Kurs, soweit keine gesetzlichen Aufbewahrungspflichten entgegenstehen.</p>
 
           <h4>Links zu anderen Websites</h4>
-          <p>Diese Seite enthält Links zu Google Maps, WhatsApp und Zenamu. Erst wenn du einen Link anklickst, werden Daten an den jeweiligen Anbieter übertragen. Für deren Inhalte und Datenverarbeitung bin ich nicht verantwortlich.</p>
+          <p>Diese Seite enthält Links zu Google Maps und WhatsApp. Erst wenn du einen Link anklickst, werden Daten an den jeweiligen Anbieter übertragen. Für deren Inhalte und Datenverarbeitung bin ich nicht verantwortlich.</p>
 
           <h4>Speicherdauer</h4>
           <p>Ich speichere deine Daten nur so lange, wie es für den jeweiligen Zweck nötig ist oder gesetzliche Aufbewahrungsfristen es verlangen, etwa sieben Jahre für Rechnungen nach der Bundesabgabenordnung.</p>
@@ -419,6 +498,103 @@ section{scroll-margin-top:96px}
   </div>
 </footer>
 <script>
+(function(){
+  var slots=document.getElementById('slots');
+  var dlg=document.getElementById('book-dialog');
+  var form=document.getElementById('book-form');
+  var done=document.getElementById('book-done');
+  var err=document.getElementById('book-error');
+  var submit=document.getElementById('book-submit');
+  var courses=[];
+  var phone='+43 677 63 90 70 80';
+
+  function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+  function note(text){slots.innerHTML='';slots.appendChild(el('p','slots-note',text));}
+
+  function render(){
+    slots.innerHTML='';
+    if(!courses.length){note('Gerade sind keine Termine online. Melde dich gern direkt bei mir unter '+phone+' oder per WhatsApp, dann finden wir einen Termin für dich.');return;}
+    courses.forEach(function(c){
+      var card=el('article','slot');
+      var full=c.free<=0;
+      card.appendChild(el('span','badge'+(full?' is-full':''),full?'Ausgebucht':(c.free===1?'Noch 1 Platz frei':'Noch '+c.free+' Plätze frei')));
+      card.appendChild(el('h3',null,c.title));
+      card.appendChild(el('p','slot-date',c.date_text));
+      if(c.description)card.appendChild(el('p','slot-desc',c.description));
+      if(c.min_participants>1)card.appendChild(el('p','slot-desc','Findet ab '+c.min_participants+' Personen statt.'));
+      var foot=el('div','slot-foot');
+      foot.appendChild(el('span','slot-price',c.price_text||''));
+      var b=el('button','btn btn-solid',full?'Ausgebucht':'Platz reservieren');
+      b.type='button';
+      if(full){b.disabled=true;b.style.opacity='.55';}
+      else b.addEventListener('click',function(){openBooking(c);});
+      foot.appendChild(b);
+      card.appendChild(foot);
+      slots.appendChild(card);
+    });
+  }
+
+  function load(){
+    fetch('api/courses.php',{cache:'no-store'})
+      .then(function(r){if(!r.ok)throw new Error();return r.json();})
+      .then(function(d){if(!d.ok)throw new Error();courses=d.courses||[];render();})
+      .catch(function(){note('Die Termine können gerade nicht geladen werden. Melde dich gern direkt bei mir unter '+phone+' oder per WhatsApp.');});
+  }
+
+  function openBooking(c){
+    form.reset();
+    err.hidden=true;
+    form.hidden=false;done.hidden=true;
+    document.getElementById('book-course').value=c.id;
+    document.getElementById('book-t').value=Date.now();
+    document.getElementById('book-title').textContent=c.title;
+    document.getElementById('book-date').textContent=c.date_text;
+    document.getElementById('book-price').textContent=c.price_text||'';
+    var sel=document.getElementById('book-persons');sel.innerHTML='';
+    var max=Math.min(c.free,10);
+    for(var i=1;i<=max;i++){var o=el('option',null,i===1?'1 Person':i+' Personen');o.value=i;sel.appendChild(o);}
+    if(c.min_participants>1&&max>=c.min_participants)sel.value=String(Math.min(c.min_participants,max));
+    if(typeof dlg.showModal==='function')dlg.showModal();else dlg.setAttribute('open','');
+    setTimeout(function(){document.getElementById('book-name').focus();},50);
+  }
+  function closeBooking(){if(typeof dlg.close==='function')dlg.close();else dlg.removeAttribute('open');}
+
+  document.getElementById('book-close').addEventListener('click',closeBooking);
+  document.getElementById('book-done-close').addEventListener('click',closeBooking);
+  document.getElementById('book-privacy').addEventListener('click',function(){closeBooking();var d=document.getElementById('datenschutz');if(d)d.open=true;});
+  dlg.addEventListener('click',function(e){if(e.target===dlg)closeBooking();});
+
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    err.hidden=true;
+    var name=document.getElementById('book-name').value.trim(),email=document.getElementById('book-email').value.trim();
+    var msg='';
+    if(name.length<2)msg='Bitte gib deinen Namen an.';
+    else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))msg='Bitte gib eine gültige E-Mail-Adresse an.';
+    else if(!document.getElementById('book-consent').checked)msg='Bitte bestätige noch die Hinweise zum Datenschutz.';
+    if(msg){err.textContent=msg;err.hidden=false;return;}
+    submit.disabled=true;submit.textContent='Wird gesendet …';
+    fetch('api/book.php',{method:'POST',body:new FormData(form)})
+      .then(function(r){return r.json().catch(function(){return {ok:false};});})
+      .then(function(d){
+        if(d&&d.ok){
+          var first=name.split(/\s+/)[0];
+          document.getElementById('book-done-title').textContent='Danke, '+first+'!';
+          document.getElementById('book-done-text').textContent='Deine Anmeldung für „'+document.getElementById('book-title').textContent+'“ ist bei mir eingegangen. Die Bestätigung ist unterwegs an '+email+'. Ich freue mich auf dich!';
+          form.hidden=true;done.hidden=false;
+          load();
+        }else{
+          err.textContent=(d&&d.error)||('Das hat leider nicht geklappt. Bitte melde dich telefonisch unter '+phone+'.');
+          err.hidden=false;
+          if(d&&typeof d.free==='number')load();
+        }
+      })
+      .catch(function(){err.textContent='Keine Verbindung. Bitte versuch es noch einmal oder melde dich unter '+phone+'.';err.hidden=false;})
+      .then(function(){submit.disabled=false;submit.textContent='Verbindlich anmelden';});
+  });
+
+  load();
+})();
 try{if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){document.querySelectorAll('video[autoplay]').forEach(function(v){v.removeAttribute('autoplay');v.pause();});}}catch(e){}
 </script>
 

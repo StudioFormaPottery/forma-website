@@ -1,0 +1,10 @@
+# Keine Ordnerlisten anzeigen
+Options -Indexes
+
+# Interne Dateien nicht über das Web ausliefern
+<FilesMatch "\.(md|sqlite|log)$">
+  Require all denied
+</FilesMatch>
+<Files "lib.php">
+  Require all denied
+</Files>
