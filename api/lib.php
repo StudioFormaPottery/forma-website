@@ -149,7 +149,7 @@ function forma_migrate(PDO $pdo): void
                 'eyebrow' => 'Special im Advent',
                 'title' => 'Pottery bemalen im Advent',
                 'text' => "Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Schalen und kleine Teller bemalen, ganz entspannt bei Kerzenlicht im Studio.\nDie Termine kommen bald. Trag dich ein, dann erfährst du als Erste davon.",
-                'date_line' => 'Ab Ende November im FORMA Studio',
+                'date_line' => 'Ab Ende Oktober im FORMA Studio',
                 'start' => date('Y-m-d'),
                 'end' => '2026-12-20',
                 'signup' => true,
@@ -202,6 +202,17 @@ function forma_migrate(PDO $pdo): void
             }
         }
         forma_set_setting($pdo, 'remove_dates_v5', '1');
+    }
+
+    // 10.10.2026: Die Advents-Kurse starten schon Ende Oktober.
+    if (forma_setting($pdo, 'popup_date_v6') === null) {
+        $p = json_decode(forma_setting($pdo, 'popup') ?? '', true);
+        if (is_array($p) && str_contains((string)($p['date_line'] ?? ''), 'Ende November')) {
+            $p['date_line'] = str_replace('Ende November', 'Ende Oktober', $p['date_line']);
+            $p['version'] = (int)($p['version'] ?? 1) + 1;
+            forma_set_setting($pdo, 'popup', json_encode($p, JSON_UNESCAPED_UNICODE));
+        }
+        forma_set_setting($pdo, 'popup_date_v6', '1');
     }
 }
 
