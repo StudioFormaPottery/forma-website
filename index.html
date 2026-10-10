@@ -316,6 +316,18 @@ section{scroll-margin-top:96px}
 .maker-art{position:relative;min-height:220px;display:grid;place-items:center}
 .maker-art::before{content:"";position:absolute;width:78%;aspect-ratio:1;border-radius:var(--blob);background:var(--blush);opacity:.9;animation:morph 14s ease-in-out infinite alternate}
 .maker-art img{position:relative;width:78%;aspect-ratio:4/5;object-fit:cover;border-radius:999px 999px 24px 24px;box-shadow:0 18px 40px rgba(51,33,27,.25)}
+.shop-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:18px 40px;margin:0 0 22px;padding-bottom:22px;border-bottom:1px solid var(--line);scroll-margin-top:110px}
+.shop-head h3{font-family:var(--display);font-weight:650;font-size:clamp(28px,3.4vw,42px);line-height:1.05;color:var(--clay);margin:6px 0 8px}
+.shop-head p:not(.kicker){max-width:52ch;color:var(--ink-soft)}
+.shop-steps{list-style:none;margin:0;padding:0;display:flex;gap:10px;flex-wrap:wrap}
+.shop-steps li{display:flex;align-items:center;gap:10px;padding:10px 16px 10px 10px;border-radius:999px;background:var(--paper-2);border:1px solid var(--line);font-size:15px}
+.shop-steps b{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--clay);color:var(--on-clay);font-size:14px}
+.shop-soon{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:center;border-radius:26px;overflow:hidden;background:var(--paper-2);border:1px solid var(--line)}
+.shop-soon img{width:100%;height:100%;min-height:220px;object-fit:cover;display:block}
+.shop-soon div{padding:clamp(22px,3vw,40px)}
+.shop-soon h4{font-family:var(--display);font-weight:650;font-size:clamp(24px,2.6vw,32px);line-height:1.1;color:var(--clay);margin:0 0 10px}
+.shop-soon p{color:var(--ink-soft);margin:0 0 18px}
+@media (max-width:700px){.shop-soon{grid-template-columns:1fr}.shop-soon img{min-height:0;aspect-ratio:4/3}}
 .tpl-filters{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips button{font:inherit;font-size:15px;padding:8px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
@@ -506,7 +518,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     <nav class="nav" id="nav" aria-label="Hauptnavigation">
       <a href="#angebote">Kurse</a>
       <a href="#studio">Studio</a>
-      <a href="#templates">Templates</a>
+      <a href="#shop">Shop</a>
       <a href="#ueber-mich">Hallo!</a>
       <a href="#kontakt">Kontakt</a>
       <a class="btn btn-solid" href="#anmeldung" data-book="">Kurs buchen</a>
@@ -955,6 +967,18 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <img id="maker-img" alt="" hidden>
         </div>
       </div>
+      <div class="shop-head" id="shop">
+        <div>
+          <p class="kicker">Template-Shop · digitaler Download</p>
+          <h3 id="shop-title">Der Herbst-Shop</h3>
+          <p>Jede Jahreszeit kommen neue Templates in den Shop. Du suchst dir eins aus, bezahlst online und lädst dein PDF sofort herunter.</p>
+        </div>
+        <ol class="shop-steps">
+          <li><b>1</b><span>Template aussuchen</span></li>
+          <li><b>2</b><span>Online bezahlen</span></li>
+          <li><b>3</b><span>PDF herunterladen</span></li>
+        </ol>
+      </div>
       <div class="tpl-filters" id="tpl-filters" hidden>
         <div class="chips" id="tpl-season" role="group" aria-label="Jahreszeit"></div>
         <div class="chips" id="tpl-age" role="group" aria-label="Für wen"></div>
@@ -1347,12 +1371,19 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 
   // Templates & Maker Club
   var tplData=[],tplSeason='alle',tplAge='alle',tplCur=null;
+  var curSeason=(function(){var m=new Date().getMonth()+1;return m>=3&&m<=5?'fruehling':m>=6&&m<=8?'sommer':m>=9&&m<=11?'herbst':'winter';})();
+  var SHOP_L={herbst:'Herbst-Shop',winter:'Winter- & Weihnachts-Shop',fruehling:'Frühlings-Shop',sommer:'Sommer-Shop'};
   var SEASONS_L={alle:'Alle',herbst:'Herbst',winter:'Weihnachten & Winter',fruehling:'Frühling',sommer:'Sommer',ganzjaehrig:'Ganzjährig'};
   var AGES_L={alle:'Für alle',kinder46:'Kinder 4–6',kinder710:'Kinder 7–10',erwachsene:'Ab 11 & Erwachsene',erfahren:'Mit Erfahrung'};
   function chips(box,map,present,cur,cb){box.innerHTML='';Object.keys(map).forEach(function(k){if(k!=='alle'&&present.indexOf(k)<0)return;var b=el('button',null,map[k]);b.type='button';b.setAttribute('aria-pressed',k===cur?'true':'false');b.addEventListener('click',function(){cb(k);});box.appendChild(b);});}
   function renderTpl(){
     var grid=$('tpl-grid');grid.innerHTML='';
-    if(!tplData.length){grid.appendChild(el('p','slots-note','Die ersten Templates kommen bald. Im Maker Club erfährst du es zuerst.'));$('tpl-filters').hidden=true;return;}
+    if(!tplData.length){
+      var so=el('div','shop-soon'),si=document.createElement('img');si.src='img/tpl-'+curSeason+'.jpg';si.alt='';so.appendChild(si);
+      var sd=el('div');sd.appendChild(el('h4',null,'Der '+SHOP_L[curSeason]+' öffnet bald'));
+      sd.appendChild(el('p',null,'Die ersten Templates sind gerade in Arbeit. Im FORMA Maker Club erfährst du als Erstes, wenn sie da sind, und bekommst jeden Monat eins gratis dazu.'));
+      var sa=el('a','btn btn-solid','Zum Maker Club');sa.href='#templates';sd.appendChild(sa);so.appendChild(sd);grid.appendChild(so);
+      $('tpl-filters').hidden=true;return;}
     $('tpl-filters').hidden=false;
     var seasons=tplData.map(function(t){return t.season;}),ages=tplData.map(function(t){return t.age;});
     chips($('tpl-season'),SEASONS_L,seasons,tplSeason,function(k){tplSeason=k;renderTpl();});
@@ -1374,7 +1405,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       f.appendChild(btn);b.appendChild(f);c.appendChild(b);grid.appendChild(c);
     });
   }
-  var curSeason=(function(){var m=new Date().getMonth()+1;return m>=3&&m<=5?'fruehling':m>=6&&m<=8?'sommer':m>=9&&m<=11?'herbst':'winter';})();
+  $('shop-title').textContent='Der '+SHOP_L[curSeason];
+  renderTpl();
   fetch('api/templates.php',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
     if(!d||!d.ok)return;tplData=d.templates||[];
     if(tplData.some(function(t){return t.season===curSeason;}))tplSeason=curSeason;
@@ -1612,6 +1644,13 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       .catch(function(){se.textContent='Keine Verbindung. Bitte versuch es noch einmal.';se.hidden=false;})
       .then(function(){btn.disabled=false;});
   });
+  // Direktlinks (z. B. aus der Link-in-Bio-Seite): öffnen gleich das passende Fenster
+  (function(){
+    var h=location.hash,f={'#jetzt-buchen':function(){openWizard();},'#gutschein-kaufen':vOpen,'#private-pottery':pOpen}[h];
+    if(!f)return;
+    try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+    setTimeout(f,500);
+  })();
   fetch('api/popup.php'+(preview?'?vorschau=1'+(params.get('thema')?'&thema='+encodeURIComponent(params.get('thema')):''):''),{cache:'no-store'})
     .then(function(r){return r.json();})
     .then(function(d){
