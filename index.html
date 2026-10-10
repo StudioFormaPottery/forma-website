@@ -618,7 +618,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <article class="offer is-featured">
           <p class="kicker">Kurs · 5 Wochen</p>
           <h3>Pottery Pause</h3>
-          <p>An fünf Freitagabenden lernst du Schritt für Schritt das Arbeiten an der Töpferscheibe und gestaltest acht individuelle Keramikstücke.</p>
+          <p>An fünf Freitagabenden lernst du Schritt für Schritt das Arbeiten an der Töpferscheibe und gestaltest acht individuelle Werkstücke.</p>
           <dl class="facts">
             <dt>Termine</dt><dd>6. 11. – 4. 12. 2026<br>freitags, 18–20 Uhr</dd>
             <dt>Für</dt><dd>Einsteiger und Fortgeschrittene</dd>
@@ -955,7 +955,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <div class="films">
         <figure class="film"><video src="video/krug.mp4" poster="img/krug-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Ein Krug wird Schritt für Schritt von Hand aufgebaut"></video><figcaption>Ein Krug entsteht</figcaption></figure>
         <figure class="film"><video src="video/studio-rundgang.mp4" poster="img/studio-rundgang-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Rundgang durch das helle FORMA Studio"></video><figcaption>Rundgang durchs Studio</figcaption></figure>
-        <figure class="film"><video src="video/bergblick.mp4" poster="img/bergblick-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Handgemachte Keramik am Fenster mit Blick ins Paznaun"></video><figcaption>Mit Blick auf die Berge</figcaption></figure>
+        <figure class="film"><video src="video/bergblick.mp4" poster="img/bergblick-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Handgemachte Stücke am Fenster mit Blick ins Paznaun"></video><figcaption>Mit Blick auf die Berge</figcaption></figure>
       </div>
       <div class="gallery">
         <figure class="g1"><img src="img/studio.jpg" alt="Langer Holztisch mit Vasen, Tassen und Trockenblumen im Studio" loading="lazy"></figure>
@@ -1096,7 +1096,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <span>E-Mail: hello@forma-pottery.com</span>
           <span>Website: www.forma-pottery.com</span>
           <span>UID-Nummer: ATU83602825</span>
-          <span>Unternehmensgegenstand: Töpferkurse und Keramik</span>
+          <span>Unternehmensgegenstand: Kreativwerkstatt und Töpferkurse</span>
         </div>
       </details>
       <details id="stornobedingungen">
@@ -1684,7 +1684,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   var decoParam=params.get('deko');
   fetch('api/deko.php',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){drawDeco(decoParam||(d&&d.mode)||'auto');if(d&&d.community){$('community-link').href=d.community;$('community-row').hidden=false;}}).catch(function(){drawDeco(decoParam||'auto');});
 
-  // Mitte des roten Kreises: bei jedem Besuch ein anderes Keramik-Motiv
+  // Mitte des roten Kreises: bei jedem Besuch ein anderes Töpfer-Motiv
   (function(){
     var g=document.getElementById('ring-center');if(!g)return;
     var b='#DDBFA8',p='#FBF1EA',k='#674B40';

@@ -180,7 +180,7 @@ function forma_migrate(PDO $pdo): void
             1,
             1,
             '€ 295 für alle fünf Termine',
-            'Fünf Freitagabende an der Töpferscheibe, 8 eigene Keramikstücke. Für Einsteiger und Fortgeschrittene.',
+            'Fünf Freitagabende an der Töpferscheibe, 8 eigene Werkstücke. Für Einsteiger und Fortgeschrittene.',
             date('c'),
         ]);
         forma_set_setting($pdo, 'seeded', '1');
@@ -277,6 +277,12 @@ function forma_migrate(PDO $pdo): void
             }
         }
         forma_set_setting($pdo, 'remove_dates_v7', '1');
+    }
+
+    // 11.10.2026: Das Wort „Keramik“ soll nirgends auf der Website stehen.
+    if (forma_setting($pdo, 'no_keramik_v9') === null) {
+        $pdo->exec("UPDATE courses SET description = REPLACE(description, 'Keramikstücke', 'Werkstücke') WHERE description LIKE '%Keramik%'");
+        forma_set_setting($pdo, 'no_keramik_v9', '1');
     }
 
     // 10.10.2026: Link zur WhatsApp-Community eintragen (falls noch keiner gesetzt ist).
