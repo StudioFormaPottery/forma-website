@@ -39,7 +39,8 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Diese Zeiten stehen in `index.html` an drei Stellen: Kopfbereich (`.hero-week`), Angebotskarten, Kontakt (`.week-plan`).
 - Farben: nur Sand/Ton, FORMA-Rot und Braun. Keine dritte Akzentfarbe (Vivien mag das Orange nicht), `--clay-soft` ist deshalb Braun.
 - Buchen: Jeder Knopf mit `data-book="Kursname"` öffnet direkt das Buchungsfenster (Schritt 1 Kurs, 2 Kalender, 3 Angaben), ohne zu scrollen. Keine langen Terminlisten.
-- Handy: Menü mit drei Strichen (`#nav-toggle`).
+- Handy: Menü mit drei Strichen (`#nav-toggle`). Menü: Kurse · Studio · Hallo! · Kontakt + „Kurs buchen“.
+- Saisonale Deko: kleine SVG-Icons (Herbst, Winter, Frühling, Sommer), automatisch nach Monat oder in der Verwaltung unter „Pop-up & Deko“ festlegbar (`api/deko.php`, Setting `deko`). Vorschau mit `/?deko=winter`.
 
 ## Online-Bezahlung (Stripe Checkout)
 - Pro Termin `price_cents` > 0 und Stripe-Schlüssel hinterlegt → `api/book.php` legt die Buchung als `offen` an, erstellt eine Checkout-Session und leitet weiter. Plätze bleiben 40 Min. reserviert (`FORMA_HOLD_SECONDS`).

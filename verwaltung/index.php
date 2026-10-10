@@ -364,6 +364,12 @@ if ($action === 'remove_mailerlite') {
     go($self . '?view=einstellungen', 'MailerLite ist getrennt. Neue Adressen sammeln sich nur noch hier in deiner Liste.');
 }
 
+if ($action === 'save_deko') {
+    $m = (string)($_POST['deko'] ?? 'auto');
+    forma_set_setting($pdo, 'deko', in_array($m, ['auto', 'herbst', 'winter', 'fruehling', 'sommer', 'aus'], true) ? $m : 'auto');
+    go($self . '?view=popup', 'Die saisonale Deko ist gespeichert.');
+}
+
 if ($action === 'save_popup') {
     $p = forma_popup($pdo);
     $p['active'] = !empty($_POST['active']);
@@ -644,6 +650,21 @@ if ($view === 'popup') {
             </div>
             <button class="btn" type="submit">Speichern</button>
         </form>
+        <h2>Saisonale Deko auf der Website</h2>
+        <form method="post" class="card stack">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
+            <input type="hidden" name="action" value="save_deko">
+            <p class="muted small">Kleine Icons, die zur Jahreszeit passen: Herbstblätter, Kürbis und Tasse, im Winter Schneeflocken und Tannen, im Frühling Tulpen, im Sommer Sonne und Berge. „Automatisch“ wechselt von selbst nach Monat.</p>
+            <label for="deko">Deko</label>
+            <select id="deko" name="deko">
+                <?php $cur = forma_setting($GLOBALS['pdo'], 'deko') ?? 'auto';
+                foreach (['auto' => 'Automatisch nach Jahreszeit', 'herbst' => 'Herbst', 'winter' => 'Winter', 'fruehling' => 'Frühling', 'sommer' => 'Sommer', 'aus' => 'Keine Deko'] as $k => $l): ?>
+                <option value="<?= $k ?>" <?= $cur === $k ? 'selected' : '' ?>><?= $l ?></option>
+                <?php endforeach; ?>
+            </select>
+            <p class="muted small">Vorschau: <a href="/?deko=herbst" target="_blank" rel="noopener">Herbst</a> · <a href="/?deko=winter" target="_blank" rel="noopener">Winter</a> · <a href="/?deko=fruehling" target="_blank" rel="noopener">Frühling</a> · <a href="/?deko=sommer" target="_blank" rel="noopener">Sommer</a></p>
+            <button class="btn" type="submit">Speichern</button>
+        </form>
     <?php });
 }
 
@@ -805,7 +826,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
     <nav class="tiles">
         <a class="tile" href="<?= forma_h($self) ?>?view=edit"><strong>+ Einzeltermin</strong><span class="muted small">z. B. ein Special-Kurs</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=series"><strong>+ Serientermine</strong><span class="muted small">z. B. jeden Mi &amp; Fr</span></a>
-        <a class="tile" href="<?= forma_h($self) ?>?view=popup"><strong>Saison-Pop-up</strong><span class="muted small"><?= $popupLive ? 'gerade sichtbar' : 'ausgeschaltet' ?></span></a>
+        <a class="tile" href="<?= forma_h($self) ?>?view=popup"><strong>Pop-up &amp; Deko</strong><span class="muted small"><?= $popupLive ? 'gerade sichtbar' : 'ausgeschaltet' ?> · Deko</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=gutscheine"><strong>Gutscheine</strong><span class="muted small"><?= $voucherOpen ?> offen</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=liste"><strong>E-Mail-Liste</strong><span class="muted small"><?= $subCount ?> <?= $subCount === 1 ? 'Kontakt' : 'Kontakte' ?></span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=einstellungen"><strong>Einstellungen</strong><span class="muted small">Stripe, MailerLite, E-Mail</span></a>
