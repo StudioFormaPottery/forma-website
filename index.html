@@ -416,7 +416,9 @@ section{scroll-margin-top:96px}
 .contact-list dt,.week-label{font-size:12.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--clay);padding-top:4px}
 .contact-list dd{margin:0;display:flex;flex-direction:column;gap:4px;font-size:18.5px;min-width:0;overflow-wrap:anywhere}
 .contact-list dd a:not(.more){text-decoration:none}
-.contact-list dd a:not(.more):hover{color:var(--clay)}
+.contact-list dd a.btn{color:var(--on-clay)}
+.contact-list dd a:not(.more):not(.btn):hover{color:var(--clay)}
+.wa-btn{gap:10px;width:max-content;margin-top:6px;font-size:16px}
 a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:4px;width:max-content}
 .week{position:relative;padding:clamp(28px,4vw,48px);border-radius:240px 240px 32px 32px;background:var(--paper-2);padding-top:clamp(64px,8vw,110px);text-align:left}
 .week::before{content:"";position:absolute;inset:12px;border:1px dashed var(--line);border-radius:228px 228px 24px 24px;pointer-events:none}
@@ -971,6 +973,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         </div>
         <dl class="contact-list">
           <div><dt>Telefon</dt><dd><a href="tel:+4367763907080">+43 677 63 90 70 80</a><a class="more" href="https://wa.me/4367763907080" target="_blank" rel="noopener">Nachricht per WhatsApp →</a></dd></div>
+          <div id="community-row" hidden><dt>Community</dt><dd><span>Neuigkeiten, freie Plätze und Specials direkt aufs Handy</span><a class="btn btn-solid wa-btn" id="community-link" href="#" target="_blank" rel="noopener"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18.2a8.2 8.2 0 01-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1112 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 01-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 00-.7.3 3 3 0 00-.9 2.2 5.2 5.2 0 001.1 2.7 11.8 11.8 0 004.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 001.8-1.2 2.2 2.2 0 00.1-1.3c0-.1-.2-.2-.5-.3z"/></svg>WhatsApp-Community beitreten</a></dd></div>
           <div><dt>E-Mail</dt><dd><a href="mailto:hello@forma-pottery.com">hello@forma-pottery.com</a></dd></div>
           <div><dt>Studio</dt><dd><span>Silvrettastraße 58<br>6562 Mathon, Tirol</span><a class="more" href="https://www.google.com/maps/search/?api=1&amp;query=Silvrettastra%C3%9Fe%2058%2C%206562%20Mathon" target="_blank" rel="noopener">Route planen →</a></dd></div>
         </dl>
@@ -1352,7 +1355,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     if(!list.length){grid.appendChild(el('p','slots-note','Für diese Auswahl gibt es gerade noch kein Template.'));return;}
     list.forEach(function(t){
       var c=el('article','tpl'),im=el('div','tpl-img');
-      if(t.image){var i=document.createElement('img');i.src=t.image;i.alt='Vorschau: '+t.title;i.loading='lazy';im.appendChild(i);}
+      var i=document.createElement('img');i.src=t.image||('img/tpl-'+t.season+'.jpg');i.alt=t.image?'Vorschau: '+t.title:'';i.loading='lazy';im.appendChild(i);
       c.appendChild(im);
       var b=el('div','tpl-body'),tags=el('div','tpl-tags');
       tags.appendChild(el('span',null,t.season_label));tags.appendChild(el('span',null,t.age_label));b.appendChild(tags);
@@ -1373,7 +1376,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     var m=d.maker||{};
     if(m.text)$('maker-text').textContent=m.text;
     if(m.title){var mn=$('maker-now');mn.textContent='Template des Monats: '+m.title;mn.hidden=false;}
-    if(m.image){var mi=$('maker-img');mi.src=m.image;mi.alt='Template des Monats: '+(m.title||'');mi.hidden=false;}
+    var mi=$('maker-img');mi.src=m.image||('img/tpl-'+curSeason+'-hoch.jpg');mi.alt=m.image?'Template des Monats: '+(m.title||''):'';mi.hidden=false;
   }).catch(function(){});
   $('maker-t').value=Date.now();
   document.querySelector('.maker-privacy').addEventListener('click',function(){var d=$('datenschutz');if(d)d.open=true;});
@@ -1515,7 +1518,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     });
   }
   var decoParam=params.get('deko');
-  fetch('api/deko.php',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){drawDeco(decoParam||(d&&d.mode)||'auto');}).catch(function(){drawDeco(decoParam||'auto');});
+  fetch('api/deko.php',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){drawDeco(decoParam||(d&&d.mode)||'auto');if(d&&d.community){$('community-link').href=d.community;$('community-row').hidden=false;}}).catch(function(){drawDeco(decoParam||'auto');});
 
   // Saison-Pop-up
   var season=document.getElementById('season');

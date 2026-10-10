@@ -395,6 +395,15 @@ if ($action === 'remove_mailerlite') {
     go($self . '?view=einstellungen', 'MailerLite ist getrennt. Neue Adressen sammeln sich nur noch hier in deiner Liste.');
 }
 
+if ($action === 'save_community') {
+    $link = trim((string)($_POST['community'] ?? ''));
+    if ($link !== '' && !preg_match('~^https://(chat\.whatsapp\.com|whatsapp\.com|www\.whatsapp\.com)/~', $link)) {
+        go($self . '?view=einstellungen', 'Das sieht nicht wie ein WhatsApp-Einladungslink aus. Er beginnt mit https://chat.whatsapp.com/');
+    }
+    forma_set_setting($pdo, 'community', $link === '' ? null : $link);
+    go($self . '?view=einstellungen', $link === '' ? 'Der Community-Knopf ist ausgeblendet.' : 'Gespeichert. Der Knopf „WhatsApp-Community beitreten“ ist jetzt auf der Website.');
+}
+
 if ($action === 'save_deko') {
     $m = (string)($_POST['deko'] ?? 'auto');
     forma_set_setting($pdo, 'deko', in_array($m, ['auto', 'herbst', 'winter', 'fruehling', 'sommer', 'aus'], true) ? $m : 'auto');
@@ -768,6 +777,14 @@ if ($view === 'einstellungen') {
             <input id="stripe_key" name="stripe_key" type="password" autocomplete="off" required>
             <button class="btn" type="submit">Prüfen und speichern</button>
             <p class="muted small">Der Schlüssel wird nur auf deinem Server gespeichert und nie angezeigt. Bitte gib ihn niemandem weiter, auch nicht per Chat oder Mail.</p>
+        </form>
+        <h2>WhatsApp-Community</h2>
+        <form method="post" class="card stack">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="save_community">
+            <p class="muted small">In WhatsApp deine Community öffnen → „Mitglieder einladen“ → „Link kopieren“ und hier einfügen. Dann erscheint auf der Website im Kontaktbereich der Knopf „WhatsApp-Community beitreten“. Feld leer lassen und speichern blendet ihn wieder aus.</p>
+            <label for="community">Einladungslink</label>
+            <input id="community" name="community" value="<?= forma_h(forma_setting($GLOBALS['pdo'], 'community') ?? '') ?>" placeholder="https://chat.whatsapp.com/…">
+            <button class="btn" type="submit">Speichern</button>
         </form>
         <h2>MailerLite (E-Mail-Liste)</h2>
         <?php if (forma_mailerlite()): ?>
