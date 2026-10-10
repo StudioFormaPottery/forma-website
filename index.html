@@ -176,7 +176,13 @@ section{scroll-margin-top:96px}
 .price{font-family:var(--display);font-weight:650;font-size:44px;line-height:1;letter-spacing:-.02em;margin-top:auto;font-variant-numeric:tabular-nums}
 .price small{font-family:var(--body);font-size:15px;font-weight:400;letter-spacing:0;margin-left:8px}
 .offer .btn{align-self:flex-start}
-.offer-btns{display:flex;flex-wrap:wrap;gap:10px}
+.offer-btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-self:stretch}
+.offer-btns .btn{min-width:0;align-self:stretch;justify-content:center;text-align:center;padding:10px 8px;line-height:1.2}
+@media (max-width:520px){.offer-btns .btn{font-size:15px}}
+.offer-btns .btn-ask{background:var(--ink-soft);color:var(--on-clay);border-color:var(--ink-soft)}
+.offer-btns .btn-ask:hover{background:#523A31;border-color:#523A31;color:var(--on-clay)}
+.p-switch{margin:0 0 18px;padding:14px 16px;border-radius:16px;background:var(--blush);font-size:15px;line-height:1.45}
+.linkbtn{border:0;background:none;padding:0;font:inherit;font-weight:600;color:var(--clay);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .offer.is-featured .btn{background:var(--on-clay);color:var(--clay);border-color:var(--on-clay)}
 .offer.is-blush{background:var(--blush);border-color:var(--blush)}
 .offer.is-blush .note{background:var(--paper)}
@@ -616,7 +622,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
             <dt>Inklusive</dt><dd>alle Materialien und deine Werkstücke</dd>
           </dl>
           <p class="price">€ 65<small>pro Stunde</small></p>
-          <div class="offer-btns"><a class="btn btn-solid" href="#angebote" data-private="buchung">Projekt buchen</a><a class="btn btn-ghost" href="#angebote" data-private="anfrage">Erst mal anfragen</a></div>
+          <div class="offer-btns"><a class="btn btn-solid" href="#angebote" data-private="buchung">Projekt buchen</a><a class="btn btn-ask" href="#angebote" data-private="anfrage">Erst mal anfragen</a></div>
         </article>
         <article class="offer is-brown">
           <p class="kicker">Für Töpfernde mit Erfahrung</p>
@@ -762,17 +768,18 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <form id="p-form" class="step" novalidate>
         <p class="eyebrow">Private Pottery</p>
         <h3 class="step-title" id="p-title" tabindex="-1">Dein Projekt, gemeinsam umgesetzt</h3>
-        <p class="step-meta">Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inklusive Material und Brennen.</p>
+        <p class="step-meta" id="p-meta">Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inklusive Material und Brennen.</p>
         <input type="hidden" name="t" id="p-t">
         <input type="hidden" name="kind" id="p-kind" value="buchung">
         <div class="hp" aria-hidden="true"><label for="p-website">Bitte leer lassen</label><input id="p-website" name="website" tabindex="-1" autocomplete="off"></div>
-        <fieldset class="vgroup"><legend>Wie möchtest du starten?</legend>
+        <p class="p-switch" id="p-switch" hidden>Du weißt schon, was du machen möchtest? <button type="button" class="linkbtn" id="p-to-book">Dann buch direkt deine Stunden →</button></p>
+        <fieldset class="vgroup" hidden><legend>Wie möchtest du starten?</legend>
           <div class="vchoice mode">
             <label><input type="radio" name="mode" value="buchung" checked><span><b>Direkt buchen</b><small>Stunden wählen und online bezahlen. Den Termin machen wir danach gemeinsam aus.</small></span></label>
             <label><input type="radio" name="mode" value="anfrage"><span><b>Erst mal anfragen</b><small>Kostenlos und unverbindlich. Ich sehe mir dein Projekt an und melde mich bei dir.</small></span></label>
           </div>
         </fieldset>
-        <fieldset class="vgroup"><legend id="p-hours-legend">1 · Wie lange brauchen wir?</legend>
+        <fieldset class="vgroup" id="p-hours-set"><legend id="p-hours-legend">1 · Wie lange brauchen wir?</legend>
           <div class="vchoice hours">
             <label><input type="radio" name="hours" value="1"><span><b>1 Stunde</b><i>€ 65</i><small>Ganz kleine Projekte, z. B. Kühlschrankmagnete oder zwei Espressotassen</small></span></label>
             <label><input type="radio" name="hours" value="2" checked><span><b>2 Stunden</b><i>€ 130</i><small>Kleine Projekte, z. B. zwei Kaffeetassen oder Becher, ein kleines Espresso-Set mit Untertellern, Frühstücksteller oder eine große Schale (mindestens 2 Std.)</small></span></label>
@@ -781,11 +788,11 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           </div>
           <p class="hint" id="p-hours-hint">Alle Zeiten inklusive Bemalen. Du bist unsicher? Dann wähl oben „Erst mal anfragen“.</p>
         </fieldset>
-        <fieldset class="vgroup"><legend>2 · Was möchtest du gestalten?</legend>
+        <fieldset class="vgroup"><legend id="p-leg-proj">2 · Was möchtest du gestalten?</legend>
           <div class="field"><label for="p-project">Dein Projekt</label><textarea id="p-project" name="project" rows="3" maxlength="1500" placeholder="z. B. Zwei Kaffeebecher mit unseren Initialen und passende Unterteller" required></textarea></div>
           <div class="field"><label for="p-wish">Wunschtermin <span class="opt">(Tage und Uhrzeiten, die dir gut passen)</span></label><input id="p-wish" name="wish" maxlength="300" placeholder="z. B. Dienstag- oder Donnerstagabend ab 18 Uhr"></div>
         </fieldset>
-        <fieldset class="vgroup"><legend>3 · Deine Angaben</legend>
+        <fieldset class="vgroup"><legend id="p-leg-you">3 · Deine Angaben</legend>
           <div class="field"><label for="p-name">Vor- und Nachname</label><input id="p-name" name="name" autocomplete="name" required></div>
           <div class="field-row two">
             <div class="field"><label for="p-email">E-Mail</label><input id="p-email" name="email" type="email" autocomplete="email" required></div>
@@ -1379,14 +1386,18 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   function pUpdate(){
     var ask=pMode()==='anfrage';
     pSub.textContent=ask?'Anfrage senden':'Weiter zur Bezahlung · '+euro(6500*pHours());
-    $('p-hours-legend').textContent=ask?'1 · Wie lange schätzt du? (ungefähr)':'1 · Wie lange brauchen wir?';
-    $('p-hours-hint').textContent=ask?'Nur zur Orientierung. Wie lange wir wirklich brauchen, besprechen wir gemeinsam.':'Alle Zeiten inklusive Bemalen. Du bist unsicher? Dann wähl oben „Erst mal anfragen“.';
-    $('p-storno').hidden=ask;
+    $('p-title').textContent=ask?'Erzähl mir von deinem Projekt':'Dein Projekt, gemeinsam umgesetzt';
+    $('p-meta').textContent=ask?'Beschreib mir kurz, was du gestalten möchtest. Ich sehe es mir an und melde mich mit einem Vorschlag, wie lange wir brauchen und wann wir loslegen. Kostenlos und unverbindlich.':'Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inklusive Material und Brennen.';
+    $('p-hours-set').hidden=ask;$('p-switch').hidden=!ask;$('p-storno').hidden=ask;
+    $('p-leg-proj').textContent=(ask?'1':'2')+' · Was möchtest du gestalten?';
+    $('p-leg-you').textContent=(ask?'2':'3')+' · Deine Angaben';
     $('p-phone-opt').textContent=pPhone()?'(damit ich dich anrufen kann)':'(optional)';
     $('p-phone').required=pPhone();
     if(!pPhone())$('p-phone').classList.remove('missing');
   }
   pf.querySelectorAll('input[name="hours"],input[name="mode"],input[name="contact"]').forEach(function(r){r.addEventListener('change',pUpdate);});
+  function pSetMode(mode){var m=pf.querySelector('input[name="mode"][value="'+mode+'"]');if(m)m.checked=true;pUpdate();pd.querySelector('.book-inner').scrollTop=0;}
+  $('p-to-book').addEventListener('click',function(){pSetMode('buchung');});
   function pOpen(mode){pf.hidden=false;$('p-done').hidden=true;pErr.hidden=true;$('p-t').value=Date.now();var m=pf.querySelector('input[name="mode"][value="'+(mode||'buchung')+'"]');if(m)m.checked=true;pUpdate();show(pd);pd.querySelector('.book-inner').scrollTop=0;setTimeout(function(){try{$('p-title').focus({preventScroll:true});}catch(e){}},30);}
   function pDone(t,x){pf.hidden=true;$('p-done').hidden=false;$('p-done-title').textContent=t;$('p-done-text').textContent=x;show(pd);pd.querySelector('.book-inner').scrollTop=0;}
   document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('[data-private]');if(!a)return;e.preventDefault();closeNav();pOpen(a.getAttribute('data-private')||'buchung');});
