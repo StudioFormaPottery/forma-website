@@ -150,8 +150,46 @@ function forma_clean(string $s, int $max): string
     return mb_substr($s, 0, $max);
 }
 
+function forma_mail_config(): ?array
+{
+    $file = forma_data_dir() . '/mail.json';
+    if (!is_file($file)) {
+        return null;
+    }
+    $cfg = json_decode((string)file_get_contents($file), true);
+    return (is_array($cfg) && !empty($cfg['password'])) ? $cfg : null;
+}
+
+function forma_save_mail_password(?string $password): void
+{
+    $file = forma_data_dir() . '/mail.json';
+    if ($password === null || $password === '') {
+        @unlink($file);
+        return;
+    }
+    file_put_contents($file, json_encode(['password' => $password]));
+    @chmod($file, 0600);
+}
+
 function forma_mail(string $to, string $subject, string $body, ?string $replyTo = null): bool
 {
+    if (getenv('FORMA_MAIL_LOG')) {
+        // Testbetrieb: Mails zusätzlich in eine Datei schreiben.
+        file_put_contents(getenv('FORMA_MAIL_LOG'), "TO: $to\nSUBJECT: $subject\n$body\n-----\n", FILE_APPEND);
+        if (!getenv('FORMA_SMTP_HOST')) {
+            return true;
+        }
+    }
+    $cfg = forma_mail_config();
+    if ($cfg) {
+        try {
+            forma_smtp_send($cfg['password'], $to, $subject, $body, $replyTo);
+            return true;
+        } catch (Throwable $e) {
+            error_log('FORMA SMTP: ' . $e->getMessage());
+            // Fällt unten auf den einfachen Versand zurück.
+        }
+    }
     $headers = [
         'From' => mb_encode_mimeheader(FORMA_FROM_NAME, 'UTF-8') . ' <' . FORMA_FROM_EMAIL . '>',
         'Reply-To' => $replyTo ?: FORMA_FROM_EMAIL,
@@ -159,12 +197,68 @@ function forma_mail(string $to, string $subject, string $body, ?string $replyTo 
         'Content-Type' => 'text/plain; charset=UTF-8',
         'Content-Transfer-Encoding' => '8bit',
     ];
-    if (getenv('FORMA_MAIL_LOG')) {
-        // Testbetrieb: Mails in eine Datei schreiben statt verschicken.
-        file_put_contents(getenv('FORMA_MAIL_LOG'), "TO: $to\nSUBJECT: $subject\n$body\n-----\n", FILE_APPEND);
-        return true;
-    }
     return @mail($to, mb_encode_mimeheader($subject, 'UTF-8'), $body, $headers, '-f' . FORMA_FROM_EMAIL);
+}
+
+/**
+ * Versand über das Postfach hello@forma-pottery.com bei Hostinger (SMTP mit Anmeldung).
+ * So werden die Mails mit der Domain signiert und landen nicht im Spam.
+ */
+function forma_smtp_send(string $password, string $to, string $subject, string $body, ?string $replyTo): void
+{
+    $host = getenv('FORMA_SMTP_HOST') ?: 'ssl://smtp.hostinger.com:465';
+    $ctx = stream_context_create(['ssl' => ['verify_peer' => true, 'verify_peer_name' => true]]);
+    $fp = @stream_socket_client($host, $errno, $errstr, 15, STREAM_CLIENT_CONNECT, $ctx);
+    if (!$fp) {
+        throw new RuntimeException("Verbindung fehlgeschlagen: $errstr");
+    }
+    stream_set_timeout($fp, 15);
+    $read = function () use ($fp): string {
+        $out = '';
+        while (($line = fgets($fp, 1024)) !== false) {
+            $out .= $line;
+            if (strlen($line) < 4 || $line[3] === ' ') {
+                break;
+            }
+        }
+        return $out;
+    };
+    $cmd = function (?string $line, array $ok) use ($fp, $read): string {
+        if ($line !== null) {
+            fwrite($fp, $line . "\r\n");
+        }
+        $resp = $read();
+        if (!in_array((int)substr($resp, 0, 3), $ok, true)) {
+            throw new RuntimeException('SMTP-Antwort: ' . trim($resp));
+        }
+        return $resp;
+    };
+    try {
+        $cmd(null, [220]);
+        $cmd('EHLO forma-pottery.com', [250]);
+        $cmd('AUTH LOGIN', [334]);
+        $cmd(base64_encode(FORMA_FROM_EMAIL), [334]);
+        $cmd(base64_encode($password), [235]);
+        $cmd('MAIL FROM:<' . FORMA_FROM_EMAIL . '>', [250]);
+        $cmd('RCPT TO:<' . $to . '>', [250, 251]);
+        $cmd('DATA', [354]);
+        $headers = [
+            'Date: ' . date('r'),
+            'Message-ID: <' . bin2hex(random_bytes(12)) . '@forma-pottery.com>',
+            'From: ' . mb_encode_mimeheader(FORMA_FROM_NAME, 'UTF-8') . ' <' . FORMA_FROM_EMAIL . '>',
+            'To: <' . $to . '>',
+            'Reply-To: ' . ($replyTo ?: FORMA_FROM_EMAIL),
+            'Subject: ' . mb_encode_mimeheader($subject, 'UTF-8'),
+            'MIME-Version: 1.0',
+            'Content-Type: text/plain; charset=UTF-8',
+            'Content-Transfer-Encoding: base64',
+        ];
+        $data = implode("\r\n", $headers) . "\r\n\r\n" . rtrim(chunk_split(base64_encode($body), 76, "\r\n")) . "\r\n.";
+        $cmd($data, [250]);
+        fwrite($fp, "QUIT\r\n");
+    } finally {
+        fclose($fp);
+    }
 }
 
 function forma_h(?string $s): string

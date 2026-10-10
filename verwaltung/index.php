@@ -235,6 +235,27 @@ if ($action === 'add_booking') {
     go($self . '?view=course&id=' . $cid, 'Die Person ist eingetragen.');
 }
 
+if ($action === 'save_mail') {
+    $pw = (string)($_POST['mail_password'] ?? '');
+    if ($pw === '') {
+        go($self, 'Bitte gib das Passwort deines Postfachs ein.');
+    }
+    try {
+        forma_smtp_send($pw, FORMA_NOTIFY_EMAIL, 'Test: E-Mail-Versand ist eingerichtet',
+            "Hallo Vivien,\n\ndiese Test-Mail kommt von deiner Website. Ab jetzt gehen alle Bestätigungen über dein Postfach " . FORMA_FROM_EMAIL . " raus.\n", null);
+        forma_save_mail_password($pw);
+        go($self, 'Geschafft! Der E-Mail-Versand läuft jetzt über dein Postfach. Eine Test-Mail ist unterwegs an ' . FORMA_NOTIFY_EMAIL . '.');
+    } catch (Throwable $e) {
+        error_log('FORMA SMTP Test: ' . $e->getMessage());
+        go($self, 'Die Anmeldung beim Postfach hat nicht geklappt. Bitte prüfe das Passwort von ' . FORMA_FROM_EMAIL . ' und versuch es noch einmal.');
+    }
+}
+
+if ($action === 'remove_mail') {
+    forma_save_mail_password(null);
+    go($self, 'Der Versand über dein Postfach ist ausgeschaltet.');
+}
+
 // --- Ansichten -------------------------------------------------------------
 if ($view === 'edit') {
     $id = (int)($_GET['id'] ?? 0);
@@ -371,6 +392,27 @@ render_page('Kursverwaltung', function () use ($upcoming, $past, $self, $flash, 
         </div>
     <?php endforeach; ?>
     </div>
+    <h2>E-Mail-Versand</h2>
+    <?php if (forma_mail_config()): ?>
+        <div class="card stack">
+            <p><span class="pill">Eingerichtet</span></p>
+            <p class="muted">Bestätigungen und Benachrichtigungen gehen über dein Postfach <?= forma_h(FORMA_FROM_EMAIL) ?> raus.</p>
+            <form method="post">
+                <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
+                <input type="hidden" name="action" value="remove_mail">
+                <button class="link" type="submit">Ausschalten</button>
+            </form>
+        </div>
+    <?php else: ?>
+        <form method="post" class="card stack">
+            <p>Damit deine E-Mails nicht im Spam landen, verschickt die Website sie am besten über dein Postfach <strong><?= forma_h(FORMA_FROM_EMAIL) ?></strong>. Gib dafür hier einmal das Passwort dieses Postfachs ein. Es wird nur auf deinem Server gespeichert.</p>
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
+            <input type="hidden" name="action" value="save_mail">
+            <label for="mail_password">Passwort von <?= forma_h(FORMA_FROM_EMAIL) ?></label>
+            <input id="mail_password" name="mail_password" type="password" autocomplete="off" required>
+            <button class="btn" type="submit">Speichern und Test-Mail schicken</button>
+        </form>
+    <?php endif; ?>
     <?php if ($past): ?>
     <details class="past">
         <summary>Vergangene Termine</summary>

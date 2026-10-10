@@ -23,7 +23,8 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - `api/courses.php` liefert die kommenden, sichtbaren Termine mit freien Plätzen; `api/book.php` nimmt Anmeldungen an (Platzprüfung in einer Transaktion, Honeypot-Feld `website`, Mindestzeit 3 s, max. 6 Anmeldungen pro Stunde und IP-Hash).
 - `api/lib.php`: gemeinsame Funktionen, Absender/Empfänger der Mails, Startinhalt (Pottery Pause mit 1 Platz).
 - Daten: SQLite unter `../forma-data/buchungen.sqlite`, also außerhalb von `public_html`. Bleibt bei Deployments erhalten. Nie ins Repository legen.
-- Mails über PHP `mail()` von hello@forma-pottery.com: Bestätigung an die Kundin, Benachrichtigung an hello@forma-pottery.com.
+- Mails: Bestätigung an die Kundin, Benachrichtigung an hello@forma-pottery.com. Versand per SMTP über das Hostinger-Postfach hello@forma-pottery.com (ssl://smtp.hostinger.com:465), sobald Vivien in der Verwaltung unter „E-Mail-Versand“ das Postfach-Passwort hinterlegt hat (liegt in `../forma-data/mail.json`, nie ins Repo). Ohne Passwort Rückfall auf PHP `mail()`, das oft im Spam landet.
+- SMTP lokal testen: `FORMA_SMTP_HOST=tcp://127.0.0.1:2525` mit einem Test-Mailserver.
 - `verwaltung/index.php`: Viviens Kursverwaltung. Erstes Passwort und „Passwort vergessen“ laufen über einen Link per Mail an hello@forma-pottery.com (1 Stunde gültig). Termine anlegen/bearbeiten/ausblenden/löschen, Anmeldungen sehen, stornieren, Personen von Hand eintragen.
 - Kurse werden nur in der Verwaltung gepflegt, nicht im HTML. Die Angebotskarten in `index.html` beschreiben die Formate, der Bereich `#anmeldung` lädt die echten Termine.
 - Lokal testen: im Repo-Ordner `FORMA_DATA_DIR=/tmp/x FORMA_MAIL_LOG=/tmp/mail.log php -S 127.0.0.1:8765`.
