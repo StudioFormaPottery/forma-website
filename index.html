@@ -123,7 +123,7 @@ p{margin:0}
 .dot.d1 svg{width:84%;height:84%}
 .dot.d2{left:10%;top:6%;width:26%;aspect-ratio:1;background:var(--paper);z-index:1}
 .dot.d3{left:30%;top:30%;width:9%;aspect-ratio:1;background:var(--ink-soft);z-index:1;animation:bob 7s ease-in-out infinite alternate-reverse}
-.dot .ring{animation:turn 26s linear infinite;transform-origin:50% 50%}
+.dot .ring{transform-origin:50% 50%;transform:rotate(-18deg)}
 .dot text{font-family:var(--body);font-size:15.5px;font-weight:500;letter-spacing:.2em;fill:var(--on-clay)}
 .spark{position:absolute;z-index:3;pointer-events:none;animation:twinkle 3.6s ease-in-out infinite}
 .spark path{fill:var(--clay)}
@@ -1750,7 +1750,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         seen(p.id,true);
         openSeason(p);
       }
-      setTimeout(tryOpen,preview?300:2500);
+      setTimeout(tryOpen,preview?300:10000);
     }).catch(function(){});
 })();
 try{if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){document.querySelectorAll('video[autoplay]').forEach(function(v){v.removeAttribute('autoplay');v.pause();});}}catch(e){}
