@@ -65,7 +65,7 @@ p{margin:0}
 .top .wrap{max-width:1320px;display:flex;align-items:center;gap:20px;padding-block:12px}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto}
 .brand img{width:60px;height:60px;object-fit:contain}
-@media (min-width:861px){.brand img{width:84px;height:84px}.brand span{font-size:16px!important}.nav a{font-size:19px!important}.nav{gap:4px 30px}.nav .btn{font-size:18px!important;min-height:48px;padding:10px 24px}}
+@media (min-width:861px){.brand img{width:104px;height:104px}.brand span{font-size:17px!important}.nav a{font-size:21px!important}.nav{gap:4px 34px}.nav .btn{font-size:20px!important;min-height:54px;padding:12px 28px}}
 .brand span{font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase}
 .nav{display:flex;flex-wrap:wrap;gap:4px 26px;margin-left:auto;align-items:center}
 .nav a{text-decoration:none;font-weight:500;font-size:15.5px;padding:6px 0;background:linear-gradient(currentColor,currentColor) 0 100%/0 1.5px no-repeat;transition:background-size .25s ease}
@@ -474,44 +474,60 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 
 /* Desktop: größere, gut lesbare Schrift (Handy bleibt wie es ist) */
 @media (min-width:861px){
-  body{font-size:21px}
-  .nav a{font-size:17px}
-  .nav .btn,.btn{font-size:17px}
-  .eyebrow{font-size:clamp(28px,2.6vw,36px)}
-  .hero-copy p.lead{font-size:23px}
-  .hero-week .name{font-size:22px}
-  .hero-week .day{font-size:14px}
-  .hero-week .sub{font-size:16px}
-  .section-head p:not(.eyebrow){font-size:21.5px}
-  .kicker{font-size:14px}
-  .offer > p:not(.price):not(.kicker):not(.note){font-size:20px}
-  .facts{font-size:18.5px}
-  .facts dt{font-size:13.5px}
-  .price small{font-size:16.5px}
-  .note{font-size:16.5px}
-  .tile .next{font-size:17px}
-  .tile h4{font-size:29px}
-  .tile .price{font-size:23px}
-  .tile .go{font-size:16.5px}
-  .film figcaption{font-size:15.5px}
-  .gift p:not(.eyebrow),.about-copy p:not(.eyebrow):not(.signature){font-size:22px}
-  .signature{font-size:52px}
-  .gift .btn{font-size:18px}
-  .contact-list dt,.week-label{font-size:13.5px}
-  .contact-list dd{font-size:20.5px}
-  a.more{font-size:17px}
-  .week-hours p.small{font-size:17px}
-  .week-plan li{font-size:19px}
-  .week-plan .day{font-size:27px}
-  .foot .inner{font-size:18px}
-  .privacy{font-size:18px}
-  .step-meta,.step-foot,.book-price{font-size:17px}
-  .field label{font-size:16.5px}
-  .consent{font-size:15.5px}
-  .cal-grid .d,.cal-grid button.d{font-size:16.5px}
-  .cal-month{font-size:21px}
-  .season-text{font-size:19px}
-  .season .consent{font-size:14.5px}
+  :root{--wrap:1720px}
+  .wrap{padding-inline:clamp(24px,4vw,64px)}
+  .hero .wrap,.top .wrap{max-width:var(--wrap)}
+  .section-head p{max-width:64ch}
+  body{font-size:22.5px}
+  .btn{font-size:19px;min-height:54px;padding:13px 30px}
+  .eyebrow{font-size:clamp(30px,2.6vw,40px)}
+  .hero-copy p.lead{font-size:25px}
+  .hero-week{max-width:760px}
+  .hero-week .name{font-size:25px}
+  .hero-week .day{font-size:16px}
+  .hero-week .sub{font-size:19px}
+  .section-head p:not(.eyebrow){font-size:23px}
+  .kicker{font-size:15.5px}
+  .offer > p:not(.price):not(.kicker):not(.note){font-size:21.5px}
+  .facts{font-size:20px}
+  .facts dt{font-size:15px}
+  .price small{font-size:18.5px}
+  .note{font-size:18px}
+  .tile p{font-size:19px}
+  .tile .next{font-size:19px}
+  .tile h4{font-size:30px}
+  .tile .price{font-size:24px}
+  .tile .go{font-size:18px}
+  .film figcaption{font-size:17.5px}
+  .gift p:not(.eyebrow),.about-copy p:not(.eyebrow):not(.signature){font-size:23.5px}
+  .signature{font-size:56px}
+  .gift .btn{font-size:20px}
+  .contact-list dt,.week-label{font-size:15px}
+  .contact-list dd{font-size:22px}
+  a.more{font-size:19px}
+  .week-hours p.small{font-size:19px}
+  .week-plan li{font-size:21px}
+  .week-plan .day{font-size:28px}
+  .foot .inner{font-size:19.5px}
+  .privacy{font-size:19px}
+  .step-meta,.step-foot,.book-price{font-size:18.5px}
+  .field label{font-size:18px}
+  .field input,.field select,.field textarea{font-size:18px}
+  .consent{font-size:17px}
+  .vchoice small{font-size:15.5px}
+  .hint{font-size:16.5px}
+  .cal-grid .d,.cal-grid button.d{font-size:18px}
+  .cal-month{font-size:22px}
+  .season-text{font-size:20px}
+  .season .consent{font-size:16px}
+  .tpl p{font-size:17.5px}
+  .tpl-tags span{font-size:14.5px}
+  .tpl-level{font-size:15px}
+  .shop-steps li{font-size:17px}
+  .shop-head p:not(.kicker),.shop-soon p{font-size:20px}
+  .chips button{font-size:17px}
+  .maker p,.maker .consent{font-size:inherit}
+  .book-dialog,.voucher-dialog{width:min(680px,calc(100vw - 24px))}
 }
 
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
