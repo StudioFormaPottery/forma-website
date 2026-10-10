@@ -794,9 +794,9 @@ function render_page(string $title, callable $body): void
 <title><?= forma_h($title) ?> · FORMA</title>
 <link rel="icon" type="image/png" href="../img/forma-logo.png">
 <style>
-@font-face{font-family:"Outfit";font-weight:300 500;src:url(../fonts/Outfit-Regular.woff) format("woff")}
-@font-face{font-family:"Outfit";font-weight:600 800;src:url(../fonts/Outfit-Bold.woff) format("woff")}
-@font-face{font-family:"Bricolage Grotesque";font-weight:600 800;src:url(../fonts/BricolageGrotesque-Bold.woff) format("woff")}
+@font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(../fonts/Outfit-Regular.woff) format("woff")}
+@font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(../fonts/Outfit-Bold.woff) format("woff")}
+@font-face{font-family:"Bricolage Grotesque";font-weight:600 800;font-display:swap;src:url(../fonts/BricolageGrotesque-Bold.woff) format("woff")}
 :root{--paper:#EEE2D4;--card:#F8F1EA;--ink:#33211B;--soft:#674B40;--clay:#8C2C1D;--line:#D9C5B2;color-scheme:light}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.55 "Outfit",system-ui,sans-serif}
@@ -843,6 +843,28 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .thumb{max-width:220px;border-radius:12px}
 .past{margin-top:28px}.past summary{cursor:pointer;font-weight:500;margin-bottom:12px}
 @media (max-width:480px){.row{grid-template-columns:1fr}}
+/* Desktop: ganze Bildschirmbreite, größere Schrift */
+@media (min-width:900px){
+  body{font-size:19px}
+  main{max-width:1440px;padding:32px 48px 80px}
+  h1{font-size:40px}h2{font-size:26px;margin-top:40px}
+  .brand{font-size:14px}.brand img{width:56px;height:56px}
+  .tiles{grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+  .tile{padding:20px 22px}.tile strong{font-size:20px}
+  .group .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+  .group .card{padding:14px 18px}
+  .group summary{font-size:21px}
+  .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+  form.card,div.card.stack{max-width:none}
+  .card{padding:20px 24px}
+  label{font-size:16.5px}
+  input,textarea,select{font-size:17px}
+  .small{font-size:15.5px}
+  .pill{font-size:15px}
+}
+@media (min-width:1200px){
+  form.card.stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:900px}
+}
 </style>
 </head>
 <body>
