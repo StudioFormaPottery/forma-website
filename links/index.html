@@ -92,13 +92,13 @@ h1{font-family:var(--display);font-weight:650;font-size:38px;line-height:1.02;le
     </div>
   </header>
 
-  <a class="special" id="special" href="../#special" hidden>
-    <img id="sp-img" src="../img/popup-advent.jpg" alt="">
+  <a class="special" id="special" href="../#pottery-pause">
+    <img src="../img/scheiben-abend.jpg" alt="Töpferscheiben im Abendlicht im FORMA Studio" style="object-position:62% 78%">
     <div>
-      <p class="k" id="sp-k">Special</p>
-      <h2 id="sp-title"></h2>
-      <p id="sp-date"></p>
-      <span class="go" id="sp-go">Mehr erfahren</span>
+      <p class="k">5-Wochen-Kurs · Fr 18–20 Uhr</p>
+      <h2>Pottery Pause</h2>
+      <p id="sp-date">Fünf Freitagabende an der Töpferscheibe, für Einsteiger und Fortgeschrittene.</p>
+      <span class="go" id="sp-go">Platz sichern</span>
     </div>
     <svg class="star" viewBox="0 0 24 24" style="right:16px;top:14px" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg>
   </a>
@@ -133,19 +133,9 @@ h1{font-family:var(--display);font-weight:650;font-size:38px;line-height:1.02;le
 
   <p class="group">In Kontakt bleiben</p>
   <ul class="links">
-    <li id="community-li" hidden><a id="community" href="#" target="_blank" rel="noopener">
+    <li id="community-li"><a class="main" id="community" href="https://chat.whatsapp.com/Kw3hNMTZToU95lJahyKVrE" target="_blank" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3.5 19c.6-3 2.8-5 5.5-5s4.9 2 5.5 5M15 14.3c2.6-.3 4.8 1.4 5.5 4.2"/></svg></span>
-      <span class="t"><b>WhatsApp-Community</b><small>News, freie Plätze und Specials zuerst erfahren</small></span>
-      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
-    </a></li>
-    <li><a href="https://wa.me/4367763907080" target="_blank" rel="noopener">
-      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.4-4A8 8 0 1112 20a8 8 0 01-3.9-1z"/></svg></span>
-      <span class="t"><b>Schreib mir auf WhatsApp</b><small>+43 677 63 90 70 80</small></span>
-      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
-    </a></li>
-    <li><a href="https://www.google.com/maps/search/?api=1&amp;query=Silvrettastra%C3%9Fe%2058%2C%206562%20Mathon" target="_blank" rel="noopener">
-      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0114 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
-      <span class="t"><b>So findest du mich</b><small>Silvrettastraße 58, 6562 Mathon</small></span>
+      <span class="t"><b>WhatsApp-Community</b><small>Freie Plätze, neue Kurse und Specials als Erste erfahren</small></span>
       <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
     </a></li>
     <li><a href="../">
@@ -160,24 +150,16 @@ h1{font-family:var(--display);font-weight:650;font-size:38px;line-height:1.02;le
 <script>
 (function(){
   function get(u){return fetch(u,{cache:'no-store'}).then(function(r){return r.json();});}
-  // Aktuelles Special aus dem Pop-up der Website
-  get('../api/popup.php').then(function(d){
-    var p=d&&d.popup;if(!p)return;
-    document.getElementById('sp-k').textContent=p.eyebrow||'Special';
-    document.getElementById('sp-title').textContent=p.title;
-    document.getElementById('sp-date').textContent=p.date_line||'';
-    if(p.image)document.getElementById('sp-img').src='../'+p.image.replace(/^\//,'');
-    document.getElementById('sp-go').textContent=p.signup?'Als Erste erfahren':'Mehr erfahren';
-    document.getElementById('special').hidden=false;
-  }).catch(function(){});
   // Nächster freier Termin
   get('../api/courses.php').then(function(d){
-    var c=(d&&d.courses||[]).filter(function(c){return !c.full&&(c.free===undefined||c.free>0);});
+    var all=d&&d.courses||[],pp=all.filter(function(c){return /Pottery Pause/.test(c.title)&&c.free>0;})[0];
+    if(pp){var dt=pp.date_text.split('·')[0].replace(/^[A-Za-zÄÖÜäöü]+,\s*/,'').split(',')[0].trim();document.getElementById('sp-date').textContent=dt+(pp.free===1?' · nur noch 1 Platz frei':' · noch '+pp.free+' Plätze frei');document.getElementById('sp-go').textContent=pp.free===1?'Letzten Platz sichern':'Platz sichern';}
+    var c=all.filter(function(c){return !c.full&&(c.free===undefined||c.free>0);});
     if(c.length)document.getElementById('next').textContent='Nächster freier Termin: '+c[0].title+', '+c[0].date_text;
   }).catch(function(){});
   // Link zur WhatsApp-Community (in der Kursverwaltung eingetragen)
   get('../api/deko.php').then(function(d){
-    if(d&&d.community){document.getElementById('community').href=d.community;document.getElementById('community-li').hidden=false;}
+    if(d&&d.community)document.getElementById('community').href=d.community;
   }).catch(function(){});
   var m=new Date().getMonth()+1,s=m>=3&&m<=5?'Frühlings':m>=6&&m<=8?'Sommer':m>=9&&m<=11?'Herbst':'Winter';
   document.getElementById('shop-sub').textContent='Jetzt im '+s+'-Shop · digitaler Download';

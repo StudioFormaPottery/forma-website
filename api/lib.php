@@ -277,6 +277,14 @@ function forma_migrate(PDO $pdo): void
         }
         forma_set_setting($pdo, 'remove_dates_v7', '1');
     }
+
+    // 10.10.2026: Link zur WhatsApp-Community eintragen (falls noch keiner gesetzt ist).
+    if (forma_setting($pdo, 'community_v8') === null) {
+        if ((string)(forma_setting($pdo, 'community') ?? '') === '') {
+            forma_set_setting($pdo, 'community', 'https://chat.whatsapp.com/Kw3hNMTZToU95lJahyKVrE');
+        }
+        forma_set_setting($pdo, 'community_v8', '1');
+    }
 }
 
 /** Vorlagen für Serientermine. */

@@ -1648,7 +1648,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   var wantSpecial=location.hash==='#special';
   if(wantSpecial)try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
   (function(){
-    var h=location.hash,f={'#jetzt-buchen':function(){openWizard();},'#gutschein-kaufen':vOpen,'#private-pottery':pOpen}[h];
+    var h=location.hash,f={'#jetzt-buchen':function(){openWizard();},'#gutschein-kaufen':vOpen,'#private-pottery':pOpen,'#pottery-pause':function(){var b=document.querySelector('[data-book="Pottery Pause"]');if(b)b.click();else openWizard();}}[h];
     if(!f)return;
     try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
     setTimeout(f,500);
