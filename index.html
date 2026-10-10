@@ -176,6 +176,7 @@ section{scroll-margin-top:96px}
 .price{font-family:var(--display);font-weight:650;font-size:44px;line-height:1;letter-spacing:-.02em;margin-top:auto;font-variant-numeric:tabular-nums}
 .price small{font-family:var(--body);font-size:15px;font-weight:400;letter-spacing:0;margin-left:8px}
 .offer .btn{align-self:flex-start}
+.offer-btns{display:flex;flex-wrap:wrap;gap:10px}
 .offer.is-featured .btn{background:var(--on-clay);color:var(--clay);border-color:var(--on-clay)}
 .offer.is-blush{background:var(--blush);border-color:var(--blush)}
 .offer.is-blush .note{background:var(--paper)}
@@ -299,7 +300,10 @@ section{scroll-margin-top:96px}
 @keyframes sway{from{transform:rotate(var(--r,0deg)) translateY(0)}to{transform:rotate(calc(var(--r,0deg) + 8deg)) translateY(-8px)}}
 @media (max-width:860px){.season-deco.desk{display:none}.season-deco{transform:scale(.8) rotate(var(--r,0deg))}}
 
-.vchoice.hours{grid-template-columns:repeat(2,minmax(0,1fr))}
+.vchoice.hours,.vchoice.mode,.vchoice.contact{grid-template-columns:repeat(2,minmax(0,1fr))}
+.vchoice.contact span{flex-direction:row;align-items:center;justify-content:center;padding:12px 14px}
+.flabel{display:block;font-size:15px;font-weight:500;margin-bottom:6px}
+#p-phone.missing{background:#F6DED3}
 @media (max-width:640px){.vchoice.hours{grid-template-columns:1fr}}
 .hint{font-size:14.5px;color:var(--ink-soft)}
 .p-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
@@ -612,7 +616,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
             <dt>Inklusive</dt><dd>alle Materialien und deine Werkstücke</dd>
           </dl>
           <p class="price">€ 65<small>pro Stunde</small></p>
-          <a class="btn btn-solid" href="#angebote" data-private="">Projekt buchen</a>
+          <div class="offer-btns"><a class="btn btn-solid" href="#angebote" data-private="buchung">Projekt buchen</a><a class="btn btn-ghost" href="#angebote" data-private="anfrage">Erst mal anfragen</a></div>
         </article>
         <article class="offer is-brown">
           <p class="kicker">Für Töpfernde mit Erfahrung</p>
@@ -762,14 +766,20 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <input type="hidden" name="t" id="p-t">
         <input type="hidden" name="kind" id="p-kind" value="buchung">
         <div class="hp" aria-hidden="true"><label for="p-website">Bitte leer lassen</label><input id="p-website" name="website" tabindex="-1" autocomplete="off"></div>
-        <fieldset class="vgroup"><legend>1 · Wie lange brauchen wir?</legend>
+        <fieldset class="vgroup"><legend>Wie möchtest du starten?</legend>
+          <div class="vchoice mode">
+            <label><input type="radio" name="mode" value="buchung" checked><span><b>Direkt buchen</b><small>Stunden wählen und online bezahlen. Den Termin machen wir danach gemeinsam aus.</small></span></label>
+            <label><input type="radio" name="mode" value="anfrage"><span><b>Erst mal anfragen</b><small>Kostenlos und unverbindlich. Ich sehe mir dein Projekt an und melde mich bei dir.</small></span></label>
+          </div>
+        </fieldset>
+        <fieldset class="vgroup"><legend id="p-hours-legend">1 · Wie lange brauchen wir?</legend>
           <div class="vchoice hours">
             <label><input type="radio" name="hours" value="1"><span><b>1 Stunde</b><i>€ 65</i><small>Ganz kleine Projekte, z. B. Kühlschrankmagnete oder zwei Espressotassen</small></span></label>
             <label><input type="radio" name="hours" value="2" checked><span><b>2 Stunden</b><i>€ 130</i><small>Kleine Projekte, z. B. zwei Kaffeetassen oder Becher, ein kleines Espresso-Set mit Untertellern, Frühstücksteller oder eine große Schale (mindestens 2 Std.)</small></span></label>
             <label><input type="radio" name="hours" value="3"><span><b>3 Stunden</b><i>€ 195</i><small>Größere Projekte, z. B. eine große Salatschüssel oder mehrere Teile</small></span></label>
             <label><input type="radio" name="hours" value="4"><span><b>4 Stunden</b><i>€ 260</i><small>Ein Service oder etwas ganz Besonderes. Gern auf mehrere Termine verteilt</small></span></label>
           </div>
-          <p class="hint">Alle Zeiten inklusive Bemalen. Du bist unsicher? Dann wähl unten „Erst mal anfragen“, ich melde mich bei dir.</p>
+          <p class="hint" id="p-hours-hint">Alle Zeiten inklusive Bemalen. Du bist unsicher? Dann wähl oben „Erst mal anfragen“.</p>
         </fieldset>
         <fieldset class="vgroup"><legend>2 · Was möchtest du gestalten?</legend>
           <div class="field"><label for="p-project">Dein Projekt</label><textarea id="p-project" name="project" rows="3" maxlength="1500" placeholder="z. B. Zwei Kaffeebecher mit unseren Initialen und passende Unterteller" required></textarea></div>
@@ -779,15 +789,20 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <div class="field"><label for="p-name">Vor- und Nachname</label><input id="p-name" name="name" autocomplete="name" required></div>
           <div class="field-row two">
             <div class="field"><label for="p-email">E-Mail</label><input id="p-email" name="email" type="email" autocomplete="email" required></div>
-            <div class="field"><label for="p-phone">Telefon <span class="opt">(optional)</span></label><input id="p-phone" name="phone" type="tel" autocomplete="tel"></div>
+            <div class="field"><label for="p-phone">Telefon <span class="opt" id="p-phone-opt">(optional)</span></label><input id="p-phone" name="phone" type="tel" autocomplete="tel"></div>
+          </div>
+          <div class="field"><span class="flabel">Wie soll ich mich bei dir melden?</span>
+            <div class="vchoice contact">
+              <label><input type="radio" name="contact" value="email" checked><span><b>Per E-Mail</b></span></label>
+              <label><input type="radio" name="contact" value="telefon"><span><b>Per Telefon</b></span></label>
+            </div>
           </div>
         </fieldset>
-        <p class="book-storno">Den genauen Termin machen wir nach deiner Buchung gemeinsam aus. Kostenlos stornieren bis 48 Stunden vorher, danach 50&nbsp;%, bei Nichterscheinen der volle Betrag. Wenn etwas dazwischenkommt, melde dich einfach.</p>
+        <p class="book-storno" id="p-storno">Den genauen Termin machen wir nach deiner Buchung gemeinsam aus. Kostenlos stornieren bis 48 Stunden vorher, danach 50&nbsp;%, bei Nichterscheinen der volle Betrag. Wenn etwas dazwischenkommt, melde dich einfach.</p>
         <label class="consent"><input type="checkbox" name="consent" id="p-consent" value="1"> <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Buchung gespeichert werden. Mehr dazu in der <a href="#datenschutz" class="p-privacy">Datenschutzerklärung</a>.</span></label>
         <p class="book-error" id="p-error" role="alert" hidden></p>
         <div class="p-actions">
-          <button class="btn btn-solid" type="submit" id="p-submit" data-kind="buchung">Weiter zur Bezahlung · € 130</button>
-          <button class="btn btn-ghost" type="submit" id="p-ask" data-kind="anfrage">Erst mal anfragen</button>
+          <button class="btn btn-solid" type="submit" id="p-submit">Weiter zur Bezahlung · € 130</button>
         </div>
       </form>
       <div class="book-done" id="p-done" hidden>
@@ -1357,38 +1372,52 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   });
 
   // Private Pottery buchen oder anfragen
-  var pd=$('private-dialog'),pf=$('p-form'),pErr=$('p-error'),pSub=$('p-submit'),pAsk=$('p-ask');
+  var pd=$('private-dialog'),pf=$('p-form'),pErr=$('p-error'),pSub=$('p-submit');
   function pHours(){var r=pf.querySelector('input[name="hours"]:checked');return r?+r.value:2;}
-  function pUpdate(){pSub.textContent='Weiter zur Bezahlung · '+euro(6500*pHours());}
-  pf.querySelectorAll('input[name="hours"]').forEach(function(r){r.addEventListener('change',pUpdate);});
-  function pOpen(){pf.hidden=false;$('p-done').hidden=true;pErr.hidden=true;$('p-t').value=Date.now();pUpdate();show(pd);pd.querySelector('.book-inner').scrollTop=0;setTimeout(function(){try{$('p-title').focus({preventScroll:true});}catch(e){}},30);}
-  function pDone(t,x){pf.hidden=true;$('p-done').hidden=false;$('p-done-title').textContent=t;$('p-done-text').textContent=x;show(pd);}
-  document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('[data-private]');if(!a)return;e.preventDefault();closeNav();pOpen();});
+  function pMode(){var r=pf.querySelector('input[name="mode"]:checked');return r?r.value:'buchung';}
+  function pPhone(){var r=pf.querySelector('input[name="contact"]:checked');return r&&r.value==='telefon';}
+  function pUpdate(){
+    var ask=pMode()==='anfrage';
+    pSub.textContent=ask?'Anfrage senden':'Weiter zur Bezahlung · '+euro(6500*pHours());
+    $('p-hours-legend').textContent=ask?'1 · Wie lange schätzt du? (ungefähr)':'1 · Wie lange brauchen wir?';
+    $('p-hours-hint').textContent=ask?'Nur zur Orientierung. Wie lange wir wirklich brauchen, besprechen wir gemeinsam.':'Alle Zeiten inklusive Bemalen. Du bist unsicher? Dann wähl oben „Erst mal anfragen“.';
+    $('p-storno').hidden=ask;
+    $('p-phone-opt').textContent=pPhone()?'(damit ich dich anrufen kann)':'(optional)';
+    $('p-phone').required=pPhone();
+    if(!pPhone())$('p-phone').classList.remove('missing');
+  }
+  pf.querySelectorAll('input[name="hours"],input[name="mode"],input[name="contact"]').forEach(function(r){r.addEventListener('change',pUpdate);});
+  function pOpen(mode){pf.hidden=false;$('p-done').hidden=true;pErr.hidden=true;$('p-t').value=Date.now();var m=pf.querySelector('input[name="mode"][value="'+(mode||'buchung')+'"]');if(m)m.checked=true;pUpdate();show(pd);pd.querySelector('.book-inner').scrollTop=0;setTimeout(function(){try{$('p-title').focus({preventScroll:true});}catch(e){}},30);}
+  function pDone(t,x){pf.hidden=true;$('p-done').hidden=false;$('p-done-title').textContent=t;$('p-done-text').textContent=x;show(pd);pd.querySelector('.book-inner').scrollTop=0;}
+  document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('[data-private]');if(!a)return;e.preventDefault();closeNav();pOpen(a.getAttribute('data-private')||'buchung');});
   $('p-close').addEventListener('click',function(){hide(pd);});
   $('p-done-close').addEventListener('click',function(){hide(pd);});
   pd.querySelector('.p-privacy').addEventListener('click',function(){hide(pd);var d=$('datenschutz');if(d)d.open=true;});
   pd.addEventListener('click',function(e){if(e.target===pd)hide(pd);});
-  var pLast='';[pSub,pAsk].forEach(function(b){b.addEventListener('click',function(){pLast=b.getAttribute('data-kind');});});
   pf.addEventListener('submit',function(e){
     e.preventDefault();pErr.hidden=true;
-    var kind=(e.submitter&&e.submitter.getAttribute('data-kind'))||pLast||'buchung';$('p-kind').value=kind;
-    var name=$('p-name').value.trim(),email=$('p-email').value.trim(),proj=$('p-project').value.trim(),msg='';
+    var kind=pMode();$('p-kind').value=kind;
+    var name=$('p-name').value.trim(),email=$('p-email').value.trim(),proj=$('p-project').value.trim(),phone=$('p-phone').value.replace(/\D/g,''),msg='';
     if(proj.length<5)msg='Beschreib bitte kurz, was du gestalten möchtest.';
     else if(name.length<2)msg='Bitte gib deinen Namen an.';
     else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))msg='Bitte gib eine gültige E-Mail-Adresse an.';
+    else if(pPhone()&&phone.length<6)msg='Bitte gib deine Telefonnummer an, damit ich dich anrufen kann.';
     else if(!$('p-consent').checked)msg='Bitte bestätige noch die Hinweise zum Datenschutz.';
     if(msg){pErr.textContent=msg;pErr.hidden=false;return;}
-    var btn=kind==='anfrage'?pAsk:pSub;pSub.disabled=pAsk.disabled=true;btn.textContent='Einen Moment …';
+    var wait=3200-(Date.now()-(+$('p-t').value||0));
+    pSub.disabled=true;pSub.textContent='Einen Moment …';
     var going=false;
+    setTimeout(function(){
     fetch('api/private.php',{method:'POST',body:new FormData(pf)})
       .then(function(r){return r.json().catch(function(){return {ok:false};});})
       .then(function(d){
         if(d&&d.ok&&d.redirect){going=true;location.href=d.redirect;return;}
-        if(d&&d.ok){pDone('Danke, '+name.split(/\s+/)[0]+'!','Deine Anfrage ist bei mir angekommen. Ich schaue mir dein Projekt an und melde mich in den nächsten Tagen bei dir, wie lange wir brauchen und wann wir loslegen.');return;}
+        if(d&&d.ok){pDone('Vielen Dank für deine Nachricht, '+name.split(/\s+/)[0]+'!','Ich sehe mir dein Projekt an und melde mich so bald wie möglich '+(pPhone()?'telefonisch':'per E-Mail')+' bei dir. Eine Bestätigung deiner Anfrage ist schon in deinem Postfach.');return;}
         pErr.textContent=(d&&d.error)||'Das hat leider nicht geklappt. Bitte versuch es noch einmal.';pErr.hidden=false;
       })
       .catch(function(){pErr.textContent='Keine Verbindung. Bitte versuch es noch einmal.';pErr.hidden=false;})
-      .then(function(){if(!going){pSub.disabled=pAsk.disabled=false;pAsk.textContent='Erst mal anfragen';pUpdate();}});
+      .then(function(){if(!going){pSub.disabled=false;pUpdate();}});
+    },Math.max(0,wait));
   });
   var pres=params.get('private');
   if(pres==='bezahlt')pDone('Deine Stunden sind gebucht!','Danke! Deine Zahlung ist angekommen und die Bestätigung ist unterwegs in dein Postfach. Ich melde mich in den nächsten Tagen bei dir, damit wir den genauen Termin ausmachen.');

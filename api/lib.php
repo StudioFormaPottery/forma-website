@@ -167,6 +167,7 @@ function forma_migrate(PDO $pdo): void
     forma_add_column($pdo, 'bookings', 'pay_token', "TEXT NOT NULL DEFAULT ''");
     forma_add_column($pdo, 'bookings', 'paid_at', 'TEXT');
     forma_add_column($pdo, 'bookings', 'mailed', 'INTEGER NOT NULL DEFAULT 0');
+    forma_add_column($pdo, 'private_bookings', 'contact', "TEXT NOT NULL DEFAULT 'email'");
 
     // Startinhalt beim allerersten Aufruf: der laufende Pottery-Pause-Kurs.
     if (forma_setting($pdo, 'seeded') === null) {
@@ -942,10 +943,12 @@ function forma_private_mails(PDO $pdo, int $id): void
     $site = forma_site_url();
     $hours = (int)$b['hours'] === 1 ? '1 Stunde' : $b['hours'] . ' Stunden';
     $persons = (int)$b['persons'] === 1 ? '1 Person' : $b['persons'] . ' Personen';
+    $viaPhone = ($b['contact'] ?? 'email') === 'telefon';
+    $contactLine = $viaPhone ? "Bitte melden per: TELEFON ({$b['phone']})" : 'Bitte melden per: E-Mail';
     if ($b['kind'] === 'anfrage') {
-        forma_mail($b['email'], 'Deine Anfrage für Private Pottery', "Hallo $first,\n\ndanke für deine Anfrage! Ich schaue mir dein Projekt in Ruhe an und melde mich in den nächsten Tagen bei dir, wie lange wir ungefähr brauchen und wann wir loslegen können.\n\n"
+        forma_mail($b['email'], 'Deine Anfrage für Private Pottery', "Hallo $first,\n\nvielen Dank für deine Nachricht! Ich sehe mir dein Projekt an und melde mich so bald wie möglich " . ($viaPhone ? 'telefonisch' : 'per E-Mail') . " bei dir.\n\n"
             . "Dein Projekt: {$b['project']}\nWunschtermin: {$b['wish']}\n\nWenn dir noch etwas einfällt, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nHerzlich,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
-        forma_mail(FORMA_NOTIFY_EMAIL, 'Anfrage Private Pottery (' . $b['name'] . ')', "Neue Anfrage für Private Pottery (noch nicht gebucht)\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nPersonen: $persons\n\nProjekt:\n{$b['project']}\n\nWunschtermin: {$b['wish']}\n\nAlle Anfragen: $site/verwaltung/?view=private\n", $b['email']);
+        forma_mail(FORMA_NOTIFY_EMAIL, 'Anfrage Private Pottery (' . $b['name'] . ')', "Neue Anfrage für Private Pottery (noch nicht gebucht)\n$contactLine\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nPersonen: $persons\n\nProjekt:\n{$b['project']}\n\nWunschtermin: {$b['wish']}\n\nAlle Anfragen: $site/verwaltung/?view=private\n", $b['email']);
         return;
     }
     $amount = forma_euro((int)$b['amount_cents']);
@@ -954,7 +957,7 @@ function forma_private_mails(PDO $pdo, int $id): void
         . "Ich melde mich in den nächsten Tagen bei dir, damit wir den genauen Termin festmachen. Die Stunden können wir gern auch auf mehrere Termine aufteilen.\n"
         . "Falls doch etwas dazwischenkommt: Bis 48 Stunden vor unserem Termin kannst du kostenlos stornieren, danach werden 50 % fällig, wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit, gemeinsam finden wir eine Lösung.\n\n"
         . "Bis bald im Studio!\nVivien\nFORMA Earth & Art\n$phone\nwww.forma-pottery.com\n");
-    forma_mail(FORMA_NOTIFY_EMAIL, 'Private Pottery gebucht: ' . $hours . ' (' . $b['name'] . ')', "Neue bezahlte Buchung Private Pottery\n\n$hours · $amount bezahlt über Stripe\nPersonen: $persons\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\n\nProjekt:\n{$b['project']}\n\nWunschtermin: {$b['wish']}\n\nBitte Termin bestätigen. Übersicht: $site/verwaltung/?view=private\n", $b['email']);
+    forma_mail(FORMA_NOTIFY_EMAIL, 'Private Pottery gebucht: ' . $hours . ' (' . $b['name'] . ')', "Neue bezahlte Buchung Private Pottery\n$contactLine\n\n$hours · $amount bezahlt über Stripe\nPersonen: $persons\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\n\nProjekt:\n{$b['project']}\n\nWunschtermin: {$b['wish']}\n\nBitte Termin bestätigen. Übersicht: $site/verwaltung/?view=private\n", $b['email']);
 }
 
 function forma_private_check(PDO $pdo, array $b): string

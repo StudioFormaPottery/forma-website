@@ -656,6 +656,7 @@ if ($view === 'private') {
                 <div><?= nl2br(forma_h($b['project'])) ?></div>
                 <?php if ($b['wish']): ?><div class="muted small">Wunschtermin: <?= forma_h($b['wish']) ?></div><?php endif; ?>
                 <div class="sel small"><?= forma_h($b['email']) ?><?= $b['phone'] ? ' · ' . forma_h($b['phone']) : '' ?></div>
+                <div><strong>Melden per <?= ($b['contact'] ?? 'email') === 'telefon' ? 'Telefon' : 'E-Mail' ?></strong><?= (int)$b['hours'] > 0 && !$paid ? ' · geschätzt ' . ((int)$b['hours'] === 1 ? '1 Stunde' : (int)$b['hours'] . ' Stunden') : '' ?></div>
                 <div class="muted small"><?= $paid ? 'Gebucht' : 'Angefragt' ?> am <?= forma_h(date('d. m. Y, H:i', strtotime($b['created_at']))) ?></div>
                 <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="private_done"><input type="hidden" name="pid" value="<?= (int)$b['id'] ?>">
                 <button class="link" type="submit"><?= $b['done'] ? 'Wieder als offen markieren' : 'Termin ausgemacht / erledigt' ?></button></form>
