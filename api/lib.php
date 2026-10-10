@@ -185,6 +185,24 @@ function forma_migrate(PDO $pdo): void
         }
         forma_set_setting($pdo, 'popup_theme_v4', '1');
     }
+
+    // 10.10.2026: Vivien hat diese Spin-&-Go-Termine abgesagt. Ohne Anmeldungen löschen, sonst nur ausblenden.
+    if (forma_setting($pdo, 'remove_dates_v5') === null) {
+        foreach (['2026-10-16', '2026-10-21', '2026-12-23', '2026-12-25', '2026-12-30'] as $day) {
+            $stmt = $pdo->prepare('SELECT id FROM courses WHERE title = ? AND start_date = ?');
+            $stmt->execute(['Spin & Go', $day]);
+            foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $cid) {
+                $has = $pdo->prepare("SELECT COUNT(*) FROM bookings WHERE course_id = ? AND status IN ('bestaetigt','offen')");
+                $has->execute([$cid]);
+                if ((int)$has->fetchColumn() > 0) {
+                    $pdo->prepare('UPDATE courses SET visible = 0 WHERE id = ?')->execute([$cid]);
+                } else {
+                    $pdo->prepare('DELETE FROM courses WHERE id = ?')->execute([$cid]);
+                }
+            }
+        }
+        forma_set_setting($pdo, 'remove_dates_v5', '1');
+    }
 }
 
 /** Vorlagen für Serientermine. */
