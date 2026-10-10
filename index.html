@@ -1645,6 +1645,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       .then(function(){btn.disabled=false;});
   });
   // Direktlinks (z. B. aus der Link-in-Bio-Seite): öffnen gleich das passende Fenster
+  var wantSpecial=location.hash==='#special';
+  if(wantSpecial)try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
   (function(){
     var h=location.hash,f={'#jetzt-buchen':function(){openWizard();},'#gutschein-kaufen':vOpen,'#private-pottery':pOpen}[h];
     if(!f)return;
@@ -1655,7 +1657,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     .then(function(r){return r.json();})
     .then(function(d){
       var p=d&&d.popup;
-      if(!p||(!preview&&seen(p.id)))return;
+      if(!p)return;
+      if(wantSpecial){seen(p.id,true);setTimeout(function(){openSeason(p);},300);return;}
+      if(!preview&&seen(p.id))return;
       // nie über ein anderes Fenster legen: warten, bis gerade nichts anderes offen ist
       var tries=0;
       function tryOpen(){

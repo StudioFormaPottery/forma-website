@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FORMA Earth &amp; Art · Links</title>
+<meta name="description" content="Kurse buchen, Gutscheine, Private Pottery und Templates: alle Links von FORMA Earth &amp; Art, dem Töpferstudio in Mathon im Paznaun.">
+<meta name="theme-color" content="#DDBFA8">
+<link rel="icon" href="../img/forma-logo.png">
+<meta property="og:title" content="FORMA Earth & Art · Töpferstudio in Mathon">
+<meta property="og:description" content="Kurse buchen, Gutscheine, Private Pottery und Templates.">
+<meta property="og:image" content="https://www.forma-pottery.com/img/tonkugeln.jpg">
+<style>
+@font-face{font-family:"Bricolage Grotesque";font-weight:600 800;font-display:swap;src:url(../fonts/BricolageGrotesque-Bold.woff) format("woff")}
+@font-face{font-family:"Italiana";font-weight:400;font-display:swap;src:url(../fonts/Italiana-Regular.woff) format("woff")}
+@font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(../fonts/Outfit-Regular.woff) format("woff")}
+@font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(../fonts/Outfit-Bold.woff) format("woff")}
+:root{
+  --paper:#EEE2D4;--paper-2:#E4D2BF;--blush:#DDBFA8;--ink:#33211B;--ink-soft:#674B40;
+  --clay:#8C2C1D;--brown:#674B40;--on-clay:#FBF1EA;--line:#CDB59F;
+  --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --body:"Outfit",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --script:"Italiana",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0}
+[hidden]{display:none!important}
+html{background:var(--blush)}
+body{min-height:100dvh;font-family:var(--body);color:var(--ink);background:var(--blush);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.page{position:relative;max-width:520px;margin:0 auto;padding:max(28px,env(safe-area-inset-top)) 16px max(36px,env(safe-area-inset-bottom))}
+.bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg span{position:absolute;border-radius:50%}
+.bg .a{width:420px;height:420px;right:-190px;top:-140px;background:var(--paper)}
+.bg .b{width:300px;height:300px;left:-170px;top:46%;background:#D2AF96}
+.bg .c{width:90px;height:90px;right:8%;bottom:9%;background:var(--brown);opacity:.9}
+.page>*{position:relative;z-index:1}
+
+/* Kopf */
+.head{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:26px}
+.arch{width:168px;height:206px;border-radius:999px 999px 26px 26px;overflow:hidden;box-shadow:0 22px 44px rgba(103,48,30,.22);position:relative}
+.arch img{width:100%;height:100%;object-fit:cover;object-position:50% 60%}
+.logo{width:78px;height:78px;margin-top:-40px;border-radius:50%;box-shadow:0 10px 24px rgba(103,48,30,.25);position:relative}
+.eyebrow{font-family:var(--script);font-size:24px;color:var(--ink-soft);margin-top:14px}
+h1{font-family:var(--display);font-weight:650;font-size:38px;line-height:1.02;letter-spacing:-.02em;color:var(--clay);margin-top:4px}
+.sub{font-size:16.5px;line-height:1.5;color:var(--ink-soft);margin-top:10px;max-width:34ch}
+.week{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:16px}
+.week span{font-size:13px;padding:6px 12px;border-radius:999px;background:var(--paper);color:var(--ink-soft);border:1px solid var(--line)}
+.week b{color:var(--clay);font-weight:600}
+
+/* Special */
+.special{display:grid;grid-template-columns:104px 1fr;gap:16px;align-items:center;padding:12px 18px 12px 12px;border-radius:28px;background:var(--clay);color:var(--on-clay);text-decoration:none;box-shadow:0 18px 36px rgba(103,48,30,.25);margin-bottom:14px;position:relative;overflow:hidden}
+.special img{width:104px;height:120px;object-fit:cover;border-radius:999px 999px 16px 16px}
+.special .k{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--blush)}
+.special h2{font-family:var(--display);font-weight:650;font-size:22px;line-height:1.1;margin:4px 0 6px}
+.special p{font-size:14.5px;line-height:1.45;color:#F3DFD2}
+.special .go{display:inline-block;margin-top:10px;font-size:14px;font-weight:600;padding:7px 14px;border-radius:999px;background:var(--on-clay);color:var(--clay)}
+.star{position:absolute;width:16px;height:16px;fill:var(--blush);opacity:.8}
+
+/* Links */
+.links{display:flex;flex-direction:column;gap:10px;list-style:none;padding:0}
+.links a{display:grid;grid-template-columns:48px 1fr 22px;gap:14px;align-items:center;padding:12px 16px 12px 12px;border-radius:22px;background:var(--paper);color:var(--ink);text-decoration:none;border:1px solid rgba(205,181,159,.7);box-shadow:0 6px 16px rgba(103,48,30,.07);transition:transform .15s ease,box-shadow .15s ease,background .15s ease}
+.links a:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(103,48,30,.13);background:#F3E9DD}
+.links a:active{transform:scale(.985)}
+.links a:focus-visible{outline:3px solid var(--clay);outline-offset:3px}
+.ic{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--blush);color:var(--clay)}
+.ic svg{width:24px;height:24px}
+.links .main .ic{background:var(--clay);color:var(--on-clay)}
+.links .brown .ic{background:var(--brown);color:var(--on-clay)}
+.t{min-width:0}
+.t b{display:block;font-family:var(--display);font-weight:600;font-size:18.5px;line-height:1.15;color:var(--clay)}
+.t small{display:block;font-size:14px;line-height:1.35;color:var(--ink-soft);margin-top:2px}
+.arrow{width:22px;height:22px;color:var(--ink-soft)}
+.group{font-family:var(--script);font-size:22px;color:var(--ink-soft);margin:22px 4px 10px}
+
+.foot{text-align:center;margin-top:30px;font-size:13.5px;line-height:1.7;color:var(--ink-soft)}
+.foot a{color:var(--ink-soft)}
+@media (prefers-reduced-motion:reduce){.links a{transition:none}}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+<main class="page">
+  <header class="head">
+    <div class="arch"><img src="../img/tonkugeln.jpg" alt="Vorbereitete Tonkugeln auf dem Werktisch im FORMA Studio"></div>
+    <img class="logo" src="../img/forma-logo.png" alt="FORMA Earth &amp; Art">
+    <p class="eyebrow">Töpferstudio im Paznaun</p>
+    <h1>Zeit für Ton.<br>Zeit für dich.</h1>
+    <p class="sub">Kurse, Einzelstunden und Templates zum Selbermachen. Silvrettastraße 58, Mathon.</p>
+    <div class="week" aria-label="Die Woche im Studio">
+      <span><b>Mi &amp; Fr</b> Spin &amp; Go 9–11</span>
+      <span><b>Do</b> Offenes Atelier 8–11</span>
+      <span><b>Fr</b> Pottery Pause 18–20</span>
+    </div>
+  </header>
+
+  <a class="special" id="special" href="../#special" hidden>
+    <img id="sp-img" src="../img/popup-advent.jpg" alt="">
+    <div>
+      <p class="k" id="sp-k">Special</p>
+      <h2 id="sp-title"></h2>
+      <p id="sp-date"></p>
+      <span class="go" id="sp-go">Mehr erfahren</span>
+    </div>
+    <svg class="star" viewBox="0 0 24 24" style="right:16px;top:14px" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg>
+  </a>
+
+  <ul class="links">
+    <li><a class="main" href="../#jetzt-buchen">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></span>
+      <span class="t"><b>Kurs buchen</b><small id="next">Spin &amp; Go, Offenes Atelier, Pottery Pause</small></span>
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+    </a></li>
+    <li><a href="../#private-pottery">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9h12l-1.5 10a2 2 0 01-2 1.7h-5a2 2 0 01-2-1.7z"/><path d="M8.5 9C8.5 6 10 4 12 4s3.5 2 3.5 5"/></svg></span>
+      <span class="t"><b>Private Pottery</b><small>Dein Projekt, gemeinsam umgesetzt · € 65 pro Stunde</small></span>
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+    </a></li>
+    <li><a href="../#gutschein-kaufen">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="2"/><path d="M12 9v12M3 13h18M12 9C10 5 6.5 5 6.5 7.5S10 9 12 9zM12 9c2-4 5.5-4 5.5-1.5S14 9 12 9z"/></svg></span>
+      <span class="t"><b>Gutschein kaufen</b><small>Sofort als PDF zum Ausdrucken, mit persönlicher Nachricht</small></span>
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+    </a></li>
+    <li><a class="brown" href="../#shop">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg></span>
+      <span class="t"><b>Template-Shop</b><small id="shop-sub">Saisonale Templates als digitaler Download</small></span>
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+    </a></li>
+    <li><a href="../#templates">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1 4.5 3.5 7 8 8-4.5 1-7 3.5-8 8-1-4.5-3.5-7-8-8 4.5-1 7-3.5 8-8z"/></svg></span>
+      <span class="t"><b>FORMA Maker Club</b><small>Jeden Monat ein Template gratis per E-Mail</small></span>
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+    </a></li>
+  </ul>
+
+  <p class="group">In Kontakt bleiben</p>
+  <ul class="links">
+    <li id="community-li" hidden><a id="community" href="#" target="_blank" rel="noopener">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3.5 19c.6-3 2.8-5 5.5-5s4.9 2 5.5 5M15 14.3c2.6-.3 4.8 1.4 5.5 4.2"/></svg></span>
+      <span class="t"><b>WhatsApp-Community</b><small>News, freie Plätze und Specials zuerst erfahren</small></span>
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+    </a></li>
+    <li><a href="https://wa.me/4367763907080" target="_blank" rel="noopener">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.4-4A8 8 0 1112 20a8 8 0 01-3.9-1z"/></svg></span>
+      <span class="t"><b>Schreib mir auf WhatsApp</b><small>+43 677 63 90 70 80</small></span>
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+    </a></li>
+    <li><a href="https://www.google.com/maps/search/?api=1&amp;query=Silvrettastra%C3%9Fe%2058%2C%206562%20Mathon" target="_blank" rel="noopener">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0114 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
+      <span class="t"><b>So findest du mich</b><small>Silvrettastraße 58, 6562 Mathon</small></span>
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+    </a></li>
+    <li><a href="../">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg></span>
+      <span class="t"><b>Zur Website</b><small>forma-pottery.com</small></span>
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+    </a></li>
+  </ul>
+
+  <p class="foot">FORMA Earth &amp; Art · Vivien Malonga<br><a href="mailto:hello@forma-pottery.com">hello@forma-pottery.com</a></p>
+</main>
+<script>
+(function(){
+  function get(u){return fetch(u,{cache:'no-store'}).then(function(r){return r.json();});}
+  // Aktuelles Special aus dem Pop-up der Website
+  get('../api/popup.php').then(function(d){
+    var p=d&&d.popup;if(!p)return;
+    document.getElementById('sp-k').textContent=p.eyebrow||'Special';
+    document.getElementById('sp-title').textContent=p.title;
+    document.getElementById('sp-date').textContent=p.date_line||'';
+    if(p.image)document.getElementById('sp-img').src='../'+p.image.replace(/^\//,'');
+    document.getElementById('sp-go').textContent=p.signup?'Als Erste erfahren':'Mehr erfahren';
+    document.getElementById('special').hidden=false;
+  }).catch(function(){});
+  // Nächster freier Termin
+  get('../api/courses.php').then(function(d){
+    var c=(d&&d.courses||[]).filter(function(c){return !c.full&&(c.free===undefined||c.free>0);});
+    if(c.length)document.getElementById('next').textContent='Nächster freier Termin: '+c[0].title+', '+c[0].date_text;
+  }).catch(function(){});
+  // Link zur WhatsApp-Community (in der Kursverwaltung eingetragen)
+  get('../api/deko.php').then(function(d){
+    if(d&&d.community){document.getElementById('community').href=d.community;document.getElementById('community-li').hidden=false;}
+  }).catch(function(){});
+  var m=new Date().getMonth()+1,s=m>=3&&m<=5?'Frühlings':m>=6&&m<=8?'Sommer':m>=9&&m<=11?'Herbst':'Winter';
+  document.getElementById('shop-sub').textContent='Jetzt im '+s+'-Shop · digitaler Download';
+})();
+</script>
+</body>
+</html>

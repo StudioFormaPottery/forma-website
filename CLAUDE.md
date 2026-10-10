@@ -76,3 +76,8 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Kauf: `api/template-buy.php` (Stripe, Häkchen zum Verzicht auf das Rücktrittsrecht bei digitalen Inhalten), `api/template-bezahlt.php`, Download `api/template-download.php`. Tabellen `templates`, `template_orders`. Dateien in `../forma-data/templates/`.
 - Verwaltung → Templates: Template des Monats hochladen, Templates anlegen (PDF, Vorschaubild, Preis, Jahreszeit, Alter, Schwierigkeit), Verkäufe + CSV.
 - Templates immer Deutsch + Englisch, Anleitungen mit wenig Text und viel Bild.
+
+## Link in Bio
+- `links/index.html` = eigene Link-in-Bio-Seite für Instagram: www.forma-pottery.com/links
+- Zieht automatisch: aktuelles Special (api/popup.php), nächsten freien Termin (api/courses.php), WhatsApp-Community-Link (api/deko.php)
+- Direktlinks auf der Startseite: `#jetzt-buchen`, `#private-pottery`, `#gutschein-kaufen`, `#special` (öffnet Pop-up), `#shop`
