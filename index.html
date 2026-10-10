@@ -1210,19 +1210,23 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   };
   var SEASONS={herbst:['leaf','pumpkin','mug','leaf2','mushroom','acorn','leaf','mug'],winter:['snow','tree','mug','star','mitten','snow','tree','star'],fruehling:['tulip','daisy','sprout','butterfly','tulip','daisy','sprout','butterfly'],sommer:['sun','mountain','flower','icecream','sun','flower','mountain','daisy']};
   var SPOTS=[
-    ['.hero',{left:'41%',top:'5%'},78,1],['.hero',{right:'1.5%',bottom:'24%'},66,0],
-    ['#angebote',{right:'8%',top:'56px'},96,1],['#angebote',{right:'21%',top:'170px'},58,0],
-    ['#anmeldung',{right:'8%',top:'48px'},84,1],
-    ['#studio',{right:'6%',top:'110px'},76,0],
-    ['#ueber-mich',{right:'5%',top:'36px'},74,0],
+    ['.hero',{left:'41%',top:'5%'},78,1],['.hero',{right:'1.5%',bottom:'24%'},66,0],['.hero',{left:'48%',bottom:'17%'},48,0],['.hero',{right:'1.5%',top:'8%'},44,1],
+    ['#angebote',{right:'8%',top:'56px'},96,1],['#angebote',{right:'21%',top:'170px'},58,0],['#angebote',{left:'2%',bottom:'90px'},62,0],
+    ['#anmeldung',{right:'8%',top:'48px'},84,1],['#anmeldung',{left:'2.5%',top:'38%'},54,0],
+    ['#studio',{right:'6%',top:'110px'},76,0],['#studio',{left:'2%',bottom:'120px'},58,0],
+    ['#ueber-mich',{right:'5%',top:'36px'},74,0],['#ueber-mich',{right:'14%',bottom:'40px'},52,1],
     ['#gutschein',{right:'31%',top:'30%'},74,0],['#gutschein',{left:'46%',bottom:'18%'},52,0],
-    ['#kontakt',{left:'3%',top:'36px'},70,1]
+    ['#kontakt',{left:'3%',top:'36px'},70,1],['#kontakt',{right:'3%',bottom:'50px'},58,0],
+    ['.foot',{right:'6%',top:'90px'},56,0]
   ];
   function seasonFor(d){var m=d.getMonth()+1;return m>=3&&m<=5?'fruehling':m>=6&&m<=8?'sommer':m>=9&&m<=11?'herbst':'winter';}
   function drawDeco(mode){
     document.querySelectorAll('.season-deco').forEach(function(e){e.remove();});
     if(mode==='aus')return;
-    var season=SEASONS[mode]?mode:seasonFor(new Date()),list=SEASONS[season];
+    var season=SEASONS[mode]?mode:seasonFor(new Date()),all=SEASONS[season].filter(function(v,i,a){return a.indexOf(v)===i;});
+    // bei jedem Besuch eine andere Auswahl: 3 Motive, zufällig verteilt
+    for(var j=all.length-1;j>0;j--){var q=Math.floor(Math.random()*(j+1)),t=all[j];all[j]=all[q];all[q]=t;}
+    var pick=all.slice(0,3),list=SPOTS.map(function(_,i){return pick[(i+Math.floor(Math.random()*3))%3];});
     SPOTS.forEach(function(s,i){
       var host=document.querySelector(s[0]);if(!host)return;
       if(getComputedStyle(host).position==='static')host.style.position='relative';
@@ -1230,7 +1234,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       for(var k in s[1])w.style[k]=s[1][k];
       w.style.width=w.style.height=s[2]+'px';
       w.style.setProperty('--r',((i*37)%40-20)+'deg');w.style.animationDelay=(-i*1.3)+'s';
-      w.innerHTML='<svg viewBox="0 0 64 64">'+ICONS[list[i%list.length]]+'</svg>';
+      w.innerHTML='<svg viewBox="0 0 64 64">'+ICONS[list[i]]+'</svg>';
       host.appendChild(w);
     });
   }
