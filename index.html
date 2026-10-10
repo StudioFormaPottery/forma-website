@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FORMA Earth &amp; Art – Töpferstudio in Mathon</title>
+<meta name="description" content="FORMA Earth &amp; Art – Töpferstudio in Mathon im Paznaun. Töpferkurse, Private Pottery, Spin &amp; Go und offenes Atelier.">
+<meta property="og:title" content="FORMA Earth &amp; Art – Töpferstudio in Mathon">
+<meta property="og:description" content="Töpferkurse, Private Pottery, Spin &amp; Go und offenes Atelier in Mathon im Paznaun.">
+<meta property="og:image" content="img/tonkugeln.jpg">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/png" href="img/forma-logo.png">
+
+<style>
+@font-face{font-family:"Bricolage Grotesque";font-weight:600 800;font-display:swap;src:url(fonts/BricolageGrotesque-Bold.woff) format("woff")}
+@font-face{font-family:"Bricolage Grotesque";font-weight:300 599;font-display:swap;src:url(fonts/BricolageGrotesque-Regular.woff) format("woff")}
+@font-face{font-family:"Italiana";font-weight:400;font-display:swap;src:url(fonts/Italiana-Regular.woff) format("woff")}
+@font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(fonts/Outfit-Regular.woff) format("woff")}
+@font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(fonts/Outfit-Bold.woff) format("woff")}
+/* Layout: erdiger Töpfer-Onepager. Tonfarbener Kopfbereich, der in einer weichen Welle ausläuft, schwebende Tonformen, drei gleich gebaute Angebotskarten. Bewusst nur ein heller Look. */
+:root{
+  --paper:#EEE2D4;      /* Sand */
+  --paper-2:#E4D2BF;    /* Hafer, Karten */
+  --blush:#DDBFA8;      /* gebrannter Ton, Kopfbereich */
+  --lilac:#D8C3AD;      /* Steinzeug, Studio */
+  --ink:#33211B;
+  --ink-soft:#674B40;
+  --clay:#8C2C1D;       /* FORMA-Rot */
+  --clay-soft:#B05A38;  /* gebrannte Terracotta */
+  --on-clay:#FBF1EA;
+  --line:#CDB59F;
+  --focus:#B05A38;
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --body:"Outfit",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --script:"Italiana",Georgia,"Times New Roman",serif;
+  --wrap:1180px;
+  --blob:58% 42% 47% 53% / 52% 46% 54% 48%;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.65;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit}
+a:focus-visible,summary:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:6px}
+h1,h2,h3,h4{margin:0;text-wrap:balance;font-weight:600}
+p{margin:0}
+.wrap{max-width:var(--wrap);margin-inline:auto;padding-inline:clamp(16px,4vw,40px)}
+.eyebrow{font-family:var(--script);font-size:clamp(24px,2.8vw,32px);line-height:1.15;color:var(--clay)}
+.display{font-family:var(--display);font-weight:650;letter-spacing:-.025em;line-height:1;font-variation-settings:"opsz" 96}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 26px;border-radius:999px;font-weight:500;font-size:16px;letter-spacing:.01em;text-decoration:none;border:1.5px solid var(--clay);transition:transform .2s ease,background-color .2s ease,color .2s ease}
+.btn:hover{transform:translateY(-2px)}
+.btn-solid{background:var(--clay);color:var(--on-clay)}
+.btn-ghost{background:transparent;color:var(--clay)}
+.btn-ghost:hover{background:var(--clay);color:var(--on-clay)}
+
+/* Wellen */
+.wave{display:block;width:100%;height:clamp(48px,7vw,110px)}
+.wave path{fill:var(--to)}
+
+/* Kopfbereich */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--blush)}
+.top .wrap{display:flex;align-items:center;gap:20px;padding-block:12px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto}
+.brand img{width:60px;height:60px;object-fit:contain}
+.brand span{font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase}
+.nav{display:flex;flex-wrap:wrap;gap:4px 26px;margin-left:auto;align-items:center}
+.nav a{text-decoration:none;font-weight:500;font-size:15.5px;padding:6px 0;background:linear-gradient(currentColor,currentColor) 0 100%/0 1.5px no-repeat;transition:background-size .25s ease}
+.nav a:hover{background-size:100% 1.5px;color:var(--clay)}
+.nav .btn{min-height:42px;padding:8px 20px;font-size:15px;background:var(--clay);color:var(--on-clay)}
+.nav .btn:hover{background:var(--clay);color:var(--on-clay)}
+@media (max-width:860px){.nav a:not(.btn){display:none}.brand span{display:none}}
+
+.hero{position:relative;background:var(--blush);overflow:hidden}
+.hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(28px,5vw,64px);align-items:center;padding-block:clamp(28px,5vw,64px) clamp(8px,2vw,24px)}
+.hero h1{font-size:clamp(52px,8.4vw,116px);color:var(--clay)}
+.hero h1 em{font-style:normal;color:var(--clay-soft)}
+.hero-copy{display:flex;flex-direction:column;gap:24px;min-width:0}
+.hero-copy p.lead{font-size:clamp(18px,1.6vw,20px);max-width:38ch;color:var(--ink-soft)}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.hero-photo{position:relative;min-width:0}
+.hero-photo img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:var(--blob);animation:morph 16s ease-in-out infinite alternate}
+.stamp{position:absolute;left:-26px;bottom:8%;width:140px;height:140px;border-radius:50%;background:var(--clay);color:var(--on-clay);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transform:rotate(-10deg);line-height:1.2;box-shadow:0 12px 30px rgba(150,47,33,.2)}
+.stamp b{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase}
+.stamp span{font-family:var(--script);font-size:26px}
+.float{position:absolute;pointer-events:none;z-index:0;animation:drift 14s ease-in-out infinite alternate}
+.float.f1{width:240px;left:-70px;top:44%;opacity:.35;animation-duration:17s}
+.float.f2{width:150px;right:6%;top:6%;opacity:.4}
+.float.f3{width:90px;left:46%;bottom:14%;opacity:.45;animation-duration:12s}
+.float path{fill:var(--paper)}
+.float.f3 path{fill:var(--clay-soft)}
+@keyframes drift{from{transform:translate(0,0) rotate(0deg)}to{transform:translate(18px,-22px) rotate(8deg)}}
+@keyframes morph{from{border-radius:58% 42% 47% 53% / 52% 46% 54% 48%}to{border-radius:46% 54% 56% 44% / 44% 56% 46% 54%}}
+@media (max-width:860px){.hero .wrap{grid-template-columns:1fr}.hero-photo{max-width:440px}.stamp{left:auto;right:-6px;width:118px;height:118px}.float.f3{display:none}}
+
+/* Abschnitte */
+section{scroll-margin-top:96px}
+.section{padding-block:clamp(56px,8vw,112px)}
+.section-head{display:flex;flex-direction:column;gap:12px;margin-bottom:clamp(32px,4vw,52px);max-width:680px}
+.section-head h2,.about-copy h2{font-size:clamp(38px,5.4vw,66px);color:var(--clay)}
+.section-head p{color:var(--ink-soft);max-width:56ch}
+
+/* Angebote */
+.offers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:stretch}
+@media (max-width:780px){.offers{grid-template-columns:1fr;max-width:620px}}
+.offer{display:flex;flex-direction:column;gap:18px;padding:32px 28px;border-radius:30px;background:var(--paper-2);border:1px solid var(--line);min-width:0;transition:transform .25s ease,box-shadow .25s ease}
+.offer:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(150,47,33,.08)}
+.offer.is-featured{background:var(--clay);color:var(--on-clay);border-color:var(--clay)}
+.kicker{font-size:12.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;opacity:.8}
+.offer h3{font-family:var(--display);font-weight:650;letter-spacing:-.02em;font-size:clamp(30px,2.8vw,36px);line-height:1.05;color:var(--clay)}
+.offer.is-featured h3{color:var(--on-clay)}
+.offer > p{font-size:16.5px}
+.facts{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 16px;font-size:15.5px;padding-top:18px;border-top:1px solid color-mix(in srgb,currentColor 22%,transparent)}
+.facts dt{font-weight:500;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;padding-top:3px;opacity:.75}
+.facts dd{margin:0}
+.price{font-family:var(--display);font-weight:650;font-size:44px;line-height:1;letter-spacing:-.02em;margin-top:auto;font-variant-numeric:tabular-nums}
+.price small{font-family:var(--body);font-size:15px;font-weight:400;letter-spacing:0;margin-left:8px}
+.offer .btn{align-self:flex-start}
+.offer.is-featured .btn{background:var(--on-clay);color:var(--clay);border-color:var(--on-clay)}
+.note{font-size:14.5px;line-height:1.5;padding:14px 16px;border-radius:16px;background:var(--paper);color:var(--ink-soft)}
+
+/* Studio */
+.studio{background:var(--lilac)}
+.gallery{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:clamp(120px,15vw,200px);gap:14px}
+.gallery figure{margin:0;overflow:hidden;border-radius:24px;min-width:0}
+.gallery img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
+.gallery figure:hover img{transform:scale(1.04)}
+.g1{grid-column:span 3;grid-row:span 2}.g2{grid-column:span 3}.g3{grid-column:span 2}.g4{grid-column:span 1}
+.g1{border-radius:120px 24px 24px 24px!important}
+@media (max-width:700px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:170px}.g1,.g2{grid-column:span 2;grid-row:span 1}.g3,.g4{grid-column:span 1;grid-row:span 1}.g1{border-radius:80px 24px 24px 24px!important}}
+
+.films{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.film{margin:0;position:relative;aspect-ratio:9/13;border-radius:240px 240px 24px 24px;overflow:hidden;background:var(--paper-2);min-width:0}
+.film video{width:100%;height:100%;object-fit:cover;display:block}
+.film figcaption{position:absolute;left:14px;bottom:14px;padding:6px 14px;border-radius:999px;background:color-mix(in srgb,var(--paper) 90%,transparent);color:var(--ink);font-size:14px;font-weight:500}
+@media (max-width:700px){.films{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:64%;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}.film{scroll-snap-align:start;border-radius:160px 160px 22px 22px}}
+
+/* Über mich */
+.about{overflow:hidden}
+.about .wrap{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(28px,6vw,80px);align-items:center}
+.about-photo{position:relative}
+.about-photo img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;object-position:50% 25%;border-radius:var(--blob);animation:morph 18s ease-in-out infinite alternate-reverse}
+.about-copy{display:flex;flex-direction:column;gap:18px;max-width:58ch;min-width:0}
+.about-copy p{color:var(--ink)}
+.signature{font-family:var(--script);font-size:34px;color:var(--clay)}
+@media (max-width:860px){.about .wrap{grid-template-columns:1fr}.about-photo{max-width:420px}}
+
+/* Gutscheine */
+.gift{background:var(--blush);position:relative;overflow:hidden}
+.gift .wrap{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:20px 48px;align-items:center;justify-content:space-between;padding-block:clamp(36px,5vw,64px)}
+.gift-text{display:flex;flex-direction:column;gap:10px;max-width:560px;min-width:0}
+.gift h2{font-size:clamp(34px,4.6vw,56px);color:var(--clay)}
+.gift p{color:var(--ink-soft)}
+.gift .float{opacity:.6}
+
+/* Kontakt */
+.contact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+@media (max-width:900px){.contact-grid{grid-template-columns:1fr;max-width:560px}}
+.contact-card{display:flex;flex-direction:column;gap:10px;padding:28px;border:1px solid var(--line);border-radius:28px;background:var(--paper);min-width:0}
+.contact-card h3{font-size:12.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--clay)}
+.contact-card .big{font-family:var(--display);font-weight:600;font-size:23px;line-height:1.3;letter-spacing:-.01em;user-select:all;overflow-wrap:anywhere}
+.contact-card a.link{font-weight:500;color:var(--clay);text-underline-offset:4px}
+.times{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-variant-numeric:tabular-nums}
+
+/* Fuß */
+.foot{background:var(--paper-2)}
+.foot .inner{padding-block:20px 56px;font-size:15px;color:var(--ink-soft);display:grid;grid-template-columns:auto minmax(0,1fr);gap:28px 48px;align-items:start}
+.foot img.logo{width:96px}
+.foot details{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+.foot summary{cursor:pointer;font-weight:500;color:var(--ink)}
+.foot .legal{display:grid;gap:4px;margin-top:12px}
+.privacy{display:flex;flex-direction:column;gap:10px;margin-top:14px;max-width:68ch;color:var(--ink)}
+.privacy h3{font-size:20px;color:var(--clay)}
+.privacy h4{margin:12px 0 0;font-size:15px;font-weight:600;letter-spacing:.02em}
+.privacy .stand{color:var(--ink-soft);font-size:14px}
+.placeholder{background:var(--blush);color:var(--ink);padding:0 6px;border-radius:6px}
+@media (max-width:640px){.foot .inner{grid-template-columns:1fr}}
+
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#start" aria-label="FORMA Earth &amp; Art – zum Seitenanfang">
+      <img src="img/forma-logo.png" alt="FORMA Earth &amp; Art Logo">
+      <span>Töpferstudio Mathon</span>
+    </a>
+    <nav class="nav" aria-label="Hauptnavigation">
+      <a href="#angebote">Kurse</a>
+      <a href="#angebote">Offenes Atelier</a>
+      <a href="#studio">Studio</a>
+      <a href="#ueber-mich">Über mich</a>
+      <a href="#kontakt">Kontakt</a>
+      <a class="btn btn-solid" href="https://app.zenamu.com/events/2561ae37441453905e1030eca840ef25" target="_blank" rel="noopener">Kurs buchen</a>
+    </nav>
+  </div>
+</header>
+
+<main id="start">
+  <section class="hero">
+    <svg class="float f1" viewBox="0 0 200 200" aria-hidden="true"><path d="M41 23c27-21 79-27 112 0s41 78 20 113-63 63-104 55S5 147 3 104 14 44 41 23z"></path></svg>
+    <svg class="float f2" viewBox="0 0 200 200" aria-hidden="true"><path d="M100 8c38 2 66 22 80 56s6 80-26 104-82 30-112 2S2 98 22 58 62 6 100 8z"></path></svg>
+    <svg class="float f3" viewBox="0 0 200 200" aria-hidden="true"><path d="M60 14c40-14 108 4 126 46s-8 104-56 124S22 180 10 130 20 28 60 14z"></path></svg>
+    <div class="wrap">
+      <div class="hero-copy">
+        <p class="eyebrow">FORMA Earth &amp; Art · Töpferstudio im Paznaun</p>
+        <h1 class="display">Zeit für Ton. <em>Zeit für dich.</em></h1>
+        <p class="lead">In meinem Studio in Mathon gestaltest du Tassen, Schalen und Vasen mit deinen eigenen Händen: im angeleiteten Kurs, in einer persönlichen Einzelstunde oder frei im offenen Atelier.</p>
+        <div class="actions">
+          <a class="btn btn-solid" href="#angebote">Kurse &amp; Preise</a>
+          <a class="btn btn-ghost" href="#kontakt">Kontakt</a>
+        </div>
+      </div>
+      <div class="hero-photo">
+        <img src="img/tonkugeln.jpg" alt="Vorbereitete Tonkugeln auf dem Werktisch, dahinter Werkzeuge in handgemachten Bechern" width="1050" height="1400" style="object-position:50% 60%">
+        <div class="stamp" aria-hidden="true"><b>Hand&shy;gemacht</b><span>in</span><b>Mathon</b></div>
+      </div>
+    </div>
+    <svg class="wave" style="--to:var(--paper)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 64c120-34 248-52 384-30s246 70 392 66 266-62 412-70 192 14 252 30v60H0z"></path></svg>
+  </section>
+
+  <section class="section" id="angebote">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Angebote</p>
+        <h2 class="display">Kurse &amp; offenes Atelier</h2>
+        <p>Wähle das Format, das zu dir passt: im mehrwöchigen Kurs, als kurzer Einstieg an der Scheibe, ganz persönlich in der Einzelstunde oder selbstständig im offenen Atelier.</p>
+      </div>
+      <div class="offers">
+        <article class="offer is-featured">
+          <p class="kicker">Kurs · 5 Wochen</p>
+          <h3>Pottery Pause</h3>
+          <p>An fünf Freitagabenden lernst du Schritt für Schritt das Arbeiten an der Töpferscheibe und gestaltest acht individuelle Keramikstücke.</p>
+          <dl class="facts">
+            <dt>Termine</dt><dd>6. 11. – 4. 12. 2026<br>freitags, 18–20 Uhr</dd>
+            <dt>Für</dt><dd>Einsteiger und Fortgeschrittene</dd>
+          </dl>
+          <p class="price">€ 295<small>für alle fünf Termine</small></p>
+          <a class="btn" href="https://app.zenamu.com/events/2561ae37441453905e1030eca840ef25" target="_blank" rel="noopener">Platz buchen</a>
+        </article>
+        <article class="offer">
+          <p class="kicker">Drehscheibe · 2 Stunden</p>
+          <h3>Spin &amp; Go</h3>
+          <p>Zwei Stunden an der Töpferscheibe, begleitet von Anfang an: Ich zeige dir Schritt für Schritt, wie du an der Scheibe arbeitest, und du gestaltest dein eigenes Werkstück.</p>
+          <dl class="facts">
+            <dt>Termine</dt><dd><span class="placeholder">[Termine folgen]</span></dd>
+            <dt>Für</dt><dd>Einsteiger und Fortgeschrittene</dd>
+            <dt>Gruppe</dt><dd>ab 2 Personen</dd>
+          </dl>
+          <p class="price">€ 70<small>pro Person, inkl. eines Werkstücks</small></p>
+          <a class="btn btn-solid" href="#kontakt">Termin anfragen</a>
+        </article>
+        <article class="offer">
+          <p class="kicker">Einzelstunde · Handbuilding</p>
+          <h3>Private Pottery</h3>
+          <p>Dein Kreativprojekt, gemeinsam umgesetzt: Wir gestalten von Hand, was immer du dir vorstellst, und zum Schluss bemalst du deine Keramik. Ich stehe dir dabei mit Rat und Tat zur Seite.</p>
+          <dl class="facts">
+            <dt>Dauer</dt><dd>kleinere Projekte meist 1–2 Std., größere oder aufwendigere 2–4 Std.</dd>
+            <dt>Termine</dt><dd>individuell, gern auf mehrere Abende verteilt</dd>
+            <dt>Inklusive</dt><dd>alle Materialien und deine Werkstücke</dd>
+          </dl>
+          <p class="price">€ 65<small>pro Stunde</small></p>
+          <a class="btn btn-solid" href="#kontakt">Termin anfragen</a>
+        </article>
+        <article class="offer">
+          <p class="kicker">Für Töpfernde mit Erfahrung</p>
+          <h3>Offenes Atelier</h3>
+          <p>Für alle, die selbstständig an eigenen Projekten arbeiten möchten. Material, Werkzeuge und Maschinen stehen dir zur Verfügung.</p>
+          <dl class="facts">
+            <dt>Zeiten</dt><dd><span class="placeholder">[Zeiten folgen]</span></dd>
+            <dt>Brand</dt><dd>Brennen &amp; Glasieren € 22 pro kg, bei Abholung</dd>
+          </dl>
+          <p class="note">Das offene Atelier ist kein betreuter Kurs und richtet sich an alle mit Vorerfahrung.</p>
+          <p class="price">€ 30<small>pro Stunde</small></p>
+          <a class="btn btn-solid" href="#kontakt">Platz anfragen</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="studio" id="studio">
+    <svg class="wave" style="--to:var(--lilac);background:var(--paper)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70c150 30 300 46 470 28s300-74 480-72 330 58 490 52v42H0z"></path></svg>
+    <div class="wrap section" style="padding-block:clamp(24px,4vw,56px) clamp(40px,6vw,80px)">
+      <div class="section-head">
+        <p class="eyebrow">Das Studio</p>
+        <h2 class="display">Ein Ort zum Ankommen</h2>
+        <p>Helles Licht, ein langer Holztisch, Töpferscheiben und ein eigener Brennofen: In der Silvrettastraße 58 in Mathon findest du alles, was du für deine Keramik brauchst.</p>
+      </div>
+      <div class="films">
+        <figure class="film"><video src="video/krug.mp4" poster="img/krug-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Ein Krug wird Schritt für Schritt von Hand aufgebaut"></video><figcaption>Ein Krug entsteht</figcaption></figure>
+        <figure class="film"><video src="video/studio-rundgang.mp4" poster="img/studio-rundgang-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Rundgang durch das helle FORMA Studio"></video><figcaption>Rundgang durchs Studio</figcaption></figure>
+        <figure class="film"><video src="video/bergblick.mp4" poster="img/bergblick-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Handgemachte Keramik am Fenster mit Blick ins Paznaun"></video><figcaption>Mit Blick auf die Berge</figcaption></figure>
+      </div>
+      <div class="gallery">
+        <figure class="g1"><img src="img/studio.jpg" alt="Langer Holztisch mit Vasen, Tassen und Trockenblumen im Studio" loading="lazy"></figure>
+        <figure class="g2"><img src="img/toepferscheiben.jpg" alt="Töpferscheiben mit blauen Hockern" loading="lazy" style="object-position:50% 70%"></figure>
+        <figure class="g3"><img src="img/schlicker.jpg" alt="Frisch gedrehte Becher in einem Eimer mit Tonschlicker" loading="lazy" style="object-position:50% 45%"></figure>
+        <figure class="g4"><img src="img/schalen.jpg" alt="Handgemachte Schalen und Becher von oben" loading="lazy"></figure>
+      </div>
+    </div>
+    <svg class="wave" style="--to:var(--paper);background:var(--lilac)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40c160 44 330 66 520 50s320-72 500-70 290 44 420 40v60H0z"></path></svg>
+  </section>
+
+  <section class="section about" id="ueber-mich">
+    <div class="wrap">
+      <div class="about-photo">
+        <img src="img/vivien.jpg" alt="Vivien im FORMA Studio mit einer selbstgemachten Tasse" loading="lazy">
+      </div>
+      <div class="about-copy">
+        <p class="eyebrow">Über mich</p>
+        <h2 class="display">Hallo, ich bin Vivien</h2>
+        <p>Ich bin Töpferin und habe FORMA Earth &amp; Art gegründet. Am liebsten arbeite ich frei mit den Händen und lasse Formen entstehen, die Charakter haben und Spuren ihrer Entstehung tragen.</p>
+        <p>In meinen Kursen begleite ich dich mit Ruhe, Geduld und viel Freude am Material, damit du mit einem guten Gefühl und deinen eigenen Stücken nach Hause gehst.</p>
+        <p class="signature">Vivien</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="gift" aria-labelledby="gutschein-titel">
+    <svg class="wave" style="--to:var(--blush);background:var(--paper)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60c140-30 300-50 470-32s300 66 480 62 330-54 490-58v88H0z"></path></svg>
+    <svg class="float f2" viewBox="0 0 200 200" aria-hidden="true" style="top:30%"><path d="M100 8c38 2 66 22 80 56s6 80-26 104-82 30-112 2S2 98 22 58 62 6 100 8z"></path></svg>
+    <div class="wrap">
+      <div class="gift-text">
+        <p class="eyebrow">Gutscheine</p>
+        <h2 class="display" id="gutschein-titel">Ein Geschenk aus Ton</h2>
+        <p>Ein Kursplatz oder eine Einzelstunde ist ein Geschenk, das in Erinnerung bleibt. Gutscheine stelle ich dir gern persönlich aus.</p>
+      </div>
+      <a class="btn btn-solid" href="#kontakt">Gutschein anfragen</a>
+    </div>
+    <svg class="wave" style="--to:var(--paper);background:var(--blush)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70c150 28 310 40 480 22s310-70 490-66 310 56 470 50v44H0z"></path></svg>
+  </section>
+
+  <section class="section" id="kontakt">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Kontakt</p>
+        <h2 class="display">So erreichst du mich</h2>
+        <p>Kursplätze buchst du bequem online. Für Einzelstunden, das offene Atelier und Gutscheine erreichst du mich am schnellsten telefonisch oder per WhatsApp.</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <h3>Telefon &amp; WhatsApp</h3>
+          <p class="big">+43 677 63 90 70 80</p>
+          <a class="link" href="https://wa.me/4367763907080" target="_blank" rel="noopener">Nachricht per WhatsApp</a>
+        </div>
+        <div class="contact-card">
+          <h3>Studio</h3>
+          <p class="big">Silvrettastraße 58<br>6562 Mathon, Tirol</p>
+          <a class="link" href="https://www.google.com/maps/search/?api=1&amp;query=Silvrettastra%C3%9Fe%2058%2C%206562%20Mathon" target="_blank" rel="noopener">Route planen</a>
+        </div>
+        <div class="contact-card">
+          <h3>Zeiten</h3>
+          <div class="times">
+            <span>Fr</span><span>18–20 Uhr · Pottery Pause</span>
+            <span><span class="placeholder">[Tag]</span></span><span><span class="placeholder">[Uhrzeit]</span> · Spin &amp; Go</span>
+            <span><span class="placeholder">[Tag]</span></span><span><span class="placeholder">[Uhrzeit]</span> · Offenes Atelier</span>
+          </div>
+          <p style="color:var(--ink-soft);font-size:15.5px">Private Pottery nach Vereinbarung</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <svg class="wave" style="--to:var(--paper-2);background:var(--paper)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 64c120-34 248-52 384-30s246 70 392 66 266-62 412-70 192 14 252 30v60H0z"></path></svg>
+  <div class="wrap inner">
+    <img class="logo" src="img/forma-logo.png" alt="FORMA Earth &amp; Art">
+    <div>
+      <p>© 2026 FORMA Earth &amp; Art · Töpferstudio in Mathon</p>
+      <details id="impressum">
+        <summary>Impressum</summary>
+        <div class="legal">
+          <span>Studio Forma – Kreativwerkstatt</span>
+          <span>Vivien Malonga</span>
+          <span>Silvrettastraße 58, 6562 Mathon, Österreich</span>
+          <span>Telefon: +43 677 63 90 70 80</span>
+          <span>E-Mail: hello@forma-pottery.com</span>
+          <span>Website: www.forma-pottery.com</span>
+          <span>UID-Nummer: ATU83602825</span>
+          <span>Unternehmensgegenstand: Töpferkurse und Keramik</span>
+        </div>
+      </details>
+      <details id="datenschutz">
+        <summary>Datenschutz</summary>
+        <div class="privacy">
+          <h3>Datenschutzerklärung</h3>
+          <p>Der Schutz deiner persönlichen Daten ist mir wichtig. Ich verarbeite deine Daten ausschließlich auf Grundlage der gesetzlichen Bestimmungen (DSGVO, DSG, TKG 2021). Hier erfährst du, welche Daten beim Besuch dieser Website anfallen und wofür sie verwendet werden.</p>
+
+          <h4>Verantwortliche</h4>
+          <p>Studio Forma – Kreativwerkstatt, Vivien Malonga<br>Silvrettastraße 58, 6562 Mathon, Österreich<br>Telefon: +43 677 63 90 70 80<br>E-Mail: hello@forma-pottery.com</p>
+
+          <h4>Besuch der Website und Hosting</h4>
+          <p>Diese Website wird bei Hostinger (Hostinger International Ltd.) gehostet, einem Anbieter mit Sitz in der Europäischen Union. Beim Aufruf der Seite werden automatisch technisch notwendige Daten verarbeitet, die dein Browser übermittelt: IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene Seite, Browser und Betriebssystem. Diese Daten dienen nur dazu, die Website sicher und stabil auszuliefern, und werden nicht mit anderen Daten zusammengeführt. Rechtsgrundlage ist mein berechtigtes Interesse an einem funktionierenden Webauftritt (Art. 6 Abs. 1 lit. f DSGVO). Mit Hostinger besteht ein Vertrag zur Auftragsverarbeitung.</p>
+
+          <h4>Cookies, Analyse und Schriften</h4>
+          <p>Diese Website setzt keine Cookies und verwendet keine Analyse- oder Tracking-Tools. Die Schriften sind direkt auf dem Server dieser Website gespeichert, es wird dafür keine Verbindung zu Google oder anderen Anbietern hergestellt.</p>
+
+          <h4>Kontakt per Telefon, WhatsApp oder E-Mail</h4>
+          <p>Wenn du mich kontaktierst, verarbeite ich deine Angaben (zum Beispiel Name, Telefonnummer, Nachricht), um deine Anfrage zu beantworten und gegebenenfalls einen Termin zu vereinbaren (Art. 6 Abs. 1 lit. b DSGVO). Deine Daten gebe ich nicht ohne deine Zustimmung weiter. Nutzt du WhatsApp, gelten zusätzlich die Datenschutzbestimmungen von WhatsApp (Meta Platforms Ireland Ltd.).</p>
+
+          <h4>Kursbuchung über Zenamu</h4>
+          <p>Kursplätze kannst du online über das Buchungssystem Zenamu buchen. Wenn du auf „Kurs buchen“ oder „Platz buchen“ klickst, verlässt du diese Website. Die Daten, die du bei der Buchung angibst, werden von Zenamu in meinem Auftrag verarbeitet, um deine Buchung zu verwalten (Art. 6 Abs. 1 lit. b DSGVO). Es gilt zusätzlich die Datenschutzerklärung von Zenamu.</p>
+
+          <h4>Links zu anderen Websites</h4>
+          <p>Diese Seite enthält Links zu Google Maps, WhatsApp und Zenamu. Erst wenn du einen Link anklickst, werden Daten an den jeweiligen Anbieter übertragen. Für deren Inhalte und Datenverarbeitung bin ich nicht verantwortlich.</p>
+
+          <h4>Speicherdauer</h4>
+          <p>Ich speichere deine Daten nur so lange, wie es für den jeweiligen Zweck nötig ist oder gesetzliche Aufbewahrungsfristen es verlangen, etwa sieben Jahre für Rechnungen nach der Bundesabgabenordnung.</p>
+
+          <h4>Deine Rechte</h4>
+          <p>Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Schreib mir dafür einfach. Wenn du glaubst, dass die Verarbeitung deiner Daten gegen das Datenschutzrecht verstößt, kannst du dich bei der Österreichischen Datenschutzbehörde beschweren: Barichgasse 40–42, 1030 Wien, www.dsb.gv.at.</p>
+
+          <p class="stand">Stand: Oktober 2026</p>
+        </div>
+      </details>
+    </div>
+  </div>
+</footer>
+<script>
+try{if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){document.querySelectorAll('video[autoplay]').forEach(function(v){v.removeAttribute('autoplay');v.pause();});}}catch(e){}
+</script>
+
+</body>
+</html>
