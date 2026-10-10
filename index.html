@@ -26,10 +26,10 @@
   --ink:#33211B;
   --ink-soft:#674B40;
   --clay:#8C2C1D;       /* FORMA-Rot */
-  --clay-soft:#B05A38;  /* gebrannte Terracotta */
+  --clay-soft:#674B40;  /* bewusst keine dritte Farbe: Braun */
   --on-clay:#FBF1EA;
   --line:#CDB59F;
-  --focus:#B05A38;
+  --focus:#8C2C1D;
   --display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
   --body:"Outfit",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
   --script:"Italiana",Georgia,"Times New Roman",serif;
@@ -70,16 +70,33 @@ p{margin:0}
 .nav a:hover{background-size:100% 1.5px;color:var(--clay)}
 .nav .btn{min-height:42px;padding:8px 20px;font-size:15px;background:var(--clay);color:var(--on-clay)}
 .nav .btn:hover{background:var(--clay);color:var(--on-clay)}
-@media (max-width:860px){.nav a:not(.btn){display:none}.brand span{display:none}}
+.top-actions{display:none;align-items:center;gap:10px;margin-left:auto}
+.nav-toggle{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--clay);background:transparent;color:var(--clay);display:grid;place-items:center;cursor:pointer;padding:0}
+.nav-toggle span{display:block;width:20px;height:2px;background:currentColor;border-radius:2px;position:relative;transition:background-color .2s ease}
+.nav-toggle span::before,.nav-toggle span::after{content:"";position:absolute;left:0;width:20px;height:2px;background:currentColor;border-radius:2px;transition:transform .25s ease}
+.nav-toggle span::before{top:-6px}.nav-toggle span::after{top:6px}
+.nav-toggle[aria-expanded="true"] span{background:transparent}
+.nav-toggle[aria-expanded="true"] span::before{transform:translateY(6px) rotate(45deg)}
+.nav-toggle[aria-expanded="true"] span::after{transform:translateY(-6px) rotate(-45deg)}
+.top-actions .btn{min-height:42px;padding:8px 18px;font-size:15px}
+@media (max-width:860px){
+  .brand span{display:none}
+  .top-actions{display:flex}
+  .nav{position:absolute;left:0;right:0;top:100%;margin:0;flex-direction:column;align-items:stretch;gap:0;padding:6px 20px 22px;background:var(--blush);border-bottom:1px solid var(--line);box-shadow:0 18px 30px rgba(51,33,27,.12);display:none}
+  .nav.open{display:flex}
+  .nav a:not(.btn){font-family:var(--display);font-weight:600;font-size:24px;letter-spacing:-.01em;padding:12px 0;border-bottom:1px solid color-mix(in srgb,var(--clay) 18%,transparent);background:none;color:var(--clay)}
+  .nav .btn{display:none}
+}
 
 .hero{position:relative;background:var(--blush);overflow:hidden}
 .hero .wrap{max-width:1320px;position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:center;padding-block:clamp(28px,4vw,56px) 0}
-.hero h1{font-size:clamp(46px,5.5vw,84px);color:var(--clay);line-height:.98}
+.hero h1{font-size:clamp(46px,5.5vw,84px);color:var(--clay);line-height:1.04}
+.hero h1 em.l{margin-top:.04em;padding-bottom:.28em}
 .hero h1 span.l{display:block}
 .hero h1 em{font-style:normal;color:var(--clay-soft)}
 .scribble{position:relative;display:inline-block}
-.scribble svg{position:absolute;left:-4%;bottom:-.2em;width:108%;height:.42em;overflow:visible}
-.scribble path{fill:none;stroke:var(--clay);stroke-width:5;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420;animation:draw 1.4s .6s ease-out forwards}
+.scribble svg{position:absolute;left:0;bottom:-.3em;width:100%;height:.22em;overflow:visible}
+.scribble path{fill:none;stroke:var(--clay);stroke-width:3.5;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420;animation:draw 1.4s .6s ease-out forwards}
 @keyframes draw{to{stroke-dashoffset:0}}
 .hero-copy{display:flex;flex-direction:column;gap:24px;min-width:0}
 .hero-copy .eyebrow{display:flex;align-items:center;gap:12px}
@@ -90,29 +107,28 @@ p{margin:0}
 .hero-week li{display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 10px;border-radius:999px;background:color-mix(in srgb,var(--paper) 62%,transparent);font-size:14.5px;color:var(--ink)}
 .hero-week li::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--clay-soft)}
 .hero-week li:nth-child(2)::before{background:var(--clay)}
-.hero-week li:nth-child(3)::before{background:#C99A6B}
+.hero-week li:nth-child(3)::before{background:var(--blush);box-shadow:inset 0 0 0 2px var(--clay)}
 .hero-week b{font-weight:600}
 
 /* Fotocollage im Kopfbereich */
 .collage{position:relative;min-width:0;aspect-ratio:1/1.04;width:100%;max-width:640px;justify-self:end}
 .collage figure{margin:0;position:absolute;overflow:hidden;background:var(--paper-2)}
 .collage img{width:100%;height:100%;object-fit:cover}
-.c-main{right:0;top:2%;width:62%;height:86%;border-radius:999px 999px 34px 34px;box-shadow:0 24px 50px rgba(103,48,30,.18)}
-.c-round{left:2%;bottom:1%;width:43%;aspect-ratio:1;border-radius:50%;border:9px solid var(--blush);z-index:2;animation:bob 9s ease-in-out infinite alternate}
-.c-small{left:9%;top:4%;width:30%;aspect-ratio:4/5;border-radius:var(--blob);transform:rotate(-7deg);z-index:1;animation:morph 14s ease-in-out infinite alternate}
-.spin{position:absolute;right:-3%;bottom:-1%;width:clamp(104px,11vw,150px);aspect-ratio:1;z-index:3}
-.spin svg{width:100%;height:100%;display:block}
-.spin .ring{animation:turn 26s linear infinite;transform-origin:50% 50%}
-.spin text{font-family:var(--body);font-size:15.5px;font-weight:500;letter-spacing:.2em;fill:var(--on-clay)}
+.c-main{right:0;top:2%;width:64%;height:92%;border-radius:999px 999px 34px 34px;box-shadow:0 24px 50px rgba(103,48,30,.18)}
+.dot{position:absolute;border-radius:50%;pointer-events:none}
+.dot.d1{left:0;bottom:2%;width:46%;aspect-ratio:1;background:var(--clay);z-index:2;display:grid;place-items:center;animation:bob 9s ease-in-out infinite alternate;box-shadow:0 18px 40px rgba(103,48,30,.18)}
+.dot.d1 svg{width:84%;height:84%}
+.dot.d2{left:10%;top:6%;width:26%;aspect-ratio:1;background:var(--paper);z-index:1}
+.dot.d3{left:30%;top:30%;width:9%;aspect-ratio:1;background:var(--ink-soft);z-index:1;animation:bob 7s ease-in-out infinite alternate-reverse}
+.dot .ring{animation:turn 26s linear infinite;transform-origin:50% 50%}
+.dot text{font-family:var(--body);font-size:15.5px;font-weight:500;letter-spacing:.2em;fill:var(--on-clay)}
 .spark{position:absolute;z-index:3;pointer-events:none;animation:twinkle 3.6s ease-in-out infinite}
 .spark path{fill:var(--clay)}
 .spark.s1{width:34px;left:44%;top:0}
 .spark.s2{width:22px;left:0;top:44%;animation-delay:1.2s}
-.spark.s2 path{fill:var(--clay-soft)}
+.spark.s2 path{fill:var(--clay)}
 .spark.s3{width:26px;right:2%;top:-3%;animation-delay:2.1s}
 .spark.s3 path{fill:var(--paper)}
-.doodle{position:absolute;left:28%;top:44%;width:44%;z-index:0;pointer-events:none}
-.doodle path{fill:none;stroke:var(--paper);stroke-width:3;stroke-linecap:round;stroke-dasharray:3 10;opacity:.9}
 @keyframes turn{to{transform:rotate(360deg)}}
 @keyframes bob{from{transform:translateY(0) rotate(-2deg)}to{transform:translateY(-12px) rotate(2deg)}}
 @keyframes twinkle{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(.7) rotate(25deg)}}
@@ -129,7 +145,7 @@ p{margin:0}
 .ribbon{background:var(--clay);color:var(--on-clay);transform:rotate(-1.6deg);width:104%;margin-left:-2%;padding-block:14px;overflow:hidden}
 .ribbon-track{display:flex;width:max-content;animation:marquee 38s linear infinite}
 .ribbon-track span{display:inline-flex;align-items:center;gap:22px;padding-right:22px;white-space:nowrap;font-family:var(--display);font-weight:600;font-size:clamp(18px,1.8vw,24px);letter-spacing:-.01em}
-.ribbon-track i{font-family:var(--script);font-style:normal;font-weight:400;font-size:1.15em}
+.ribbon-track i{font-style:normal;font-weight:600;color:var(--blush)}
 .ribbon-track svg{width:18px;height:18px;flex:0 0 auto}
 .ribbon-track svg path{fill:var(--blush)}
 @keyframes marquee{to{transform:translateX(-50%)}}
@@ -162,33 +178,55 @@ section{scroll-margin-top:96px}
 
 
 /* Termine & Anmeldung */
-.slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px;align-items:start}
+.slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:18px}
 .slots-note{grid-column:1/-1;color:var(--ink-soft);padding:22px 24px;border:1px dashed var(--line);border-radius:24px}
-.slot{display:flex;flex-direction:column;gap:12px;padding:28px 26px 26px;border-radius:30px;background:var(--paper-2);border:1px solid var(--line);min-width:0}
-.slot h3{font-family:var(--display);font-weight:650;letter-spacing:-.02em;font-size:30px;line-height:1.1;color:var(--clay)}
-.slot-desc{font-size:15.5px;color:var(--ink-soft)}
-.slot-meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:15px}
-.slot-meta span{display:inline-flex;align-items:center;gap:6px}
-.slot-meta span::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--clay-soft)}
-.dates{display:flex;flex-wrap:wrap;gap:8px;margin-top:-4px}
-.date{font:inherit;font-size:14.5px;line-height:1.25;display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:9px 14px;border-radius:16px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;text-align:left;transition:border-color .2s ease,background-color .2s ease}
-.date small{font-size:12.5px;color:var(--ink-soft)}
-.date:hover{border-color:var(--clay-soft)}
-.date[aria-pressed="true"]{background:var(--clay);border-color:var(--clay);color:var(--on-clay)}
-.date[aria-pressed="true"] small{color:var(--on-clay);opacity:.85}
-.date:disabled{opacity:.5;cursor:not-allowed}
-.more-dates{font:inherit;font-size:14.5px;background:none;border:0;padding:6px 2px;color:var(--clay);text-decoration:underline;text-underline-offset:4px;cursor:pointer;align-self:flex-start}
-.slot-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:6px;padding-top:16px;border-top:1px solid var(--line)}
-.slot-price{font-family:var(--display);font-weight:600;font-size:22px;letter-spacing:-.01em;min-width:0}
-.slot-price small{display:block;font-family:var(--body);font-weight:400;font-size:13.5px;color:var(--ink-soft);letter-spacing:0}
-.pay-note{font-size:13.5px;color:var(--ink-soft);display:flex;align-items:center;gap:8px}
-.book-dialog{border:0;padding:0;border-radius:28px;width:min(560px,calc(100vw - 32px));max-height:calc(100dvh - 32px);background:var(--paper);color:var(--ink);box-shadow:0 30px 80px rgba(51,33,27,.35)}
-.book-dialog::backdrop{background:rgba(51,33,27,.45)}
-.book-inner{position:relative;padding:30px 28px 28px;overflow:auto;max-height:calc(100dvh - 32px)}
-.book-close{position:absolute;top:14px;right:14px;width:44px;height:44px;border-radius:50%;border:0;background:var(--paper-2);color:var(--ink);display:grid;place-items:center;cursor:pointer}
-#book-form,.book-done{display:flex;flex-direction:column;gap:14px}
-#book-form h3,.book-done h3{font-family:var(--display);font-weight:650;font-size:28px;line-height:1.1;letter-spacing:-.02em;color:var(--clay);padding-right:44px}
+.tile{font:inherit;text-align:left;color:inherit;cursor:pointer;display:flex;flex-direction:column;gap:8px;padding:24px 24px 22px;border-radius:28px;background:var(--paper-2);border:1px solid var(--line);min-width:0;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.tile:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(103,48,30,.1);border-color:var(--clay)}
+.tile h4{font-family:var(--display);font-weight:650;letter-spacing:-.02em;font-size:26px;line-height:1.1;color:var(--clay);margin:0}
+.tile .next{font-size:15px;color:var(--ink-soft)}
+.tile .row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:12px;border-top:1px solid var(--line)}
+.tile .price{font-family:var(--display);font-weight:600;font-size:21px;margin:0}
+.tile .go{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:8px 18px;border-radius:999px;background:var(--clay);color:var(--on-clay);font-weight:500;font-size:15px;white-space:nowrap}
+.book-dialog{border:0;padding:0;border-radius:30px;width:min(580px,calc(100vw - 24px));max-height:calc(100dvh - 24px);background:var(--paper);color:var(--ink);box-shadow:0 30px 80px rgba(51,33,27,.35)}
+.book-dialog[open]{animation:pop .4s cubic-bezier(.2,.9,.3,1.15)}
+.book-dialog::backdrop{background:rgba(51,33,27,.5)}
+.book-inner{position:relative;padding:24px 28px 28px;overflow:auto;max-height:calc(100dvh - 24px)}
+@media (max-width:480px){.book-inner{padding:20px 18px 24px}}
+.book-close{position:absolute;top:14px;right:14px;width:44px;height:44px;border-radius:50%;border:0;background:var(--paper-2);color:var(--ink);display:grid;place-items:center;cursor:pointer;z-index:2}
+.stepbar{list-style:none;margin:4px 0 18px;padding:0 52px 0 0;display:flex;gap:6px;counter-reset:st}
+.stepbar li{counter-increment:st;flex:1;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);padding-top:8px;border-top:3px solid var(--line)}
+.stepbar li::before{content:counter(st) " · "}
+@media (max-width:480px){.stepbar li{font-size:11px;letter-spacing:.03em}}
+.stepbar li.on{color:var(--clay);border-top-color:var(--clay);font-weight:500}
+.step,#book-form,.book-done{display:flex;flex-direction:column;gap:14px}
+.step-title,.book-done h3{font-family:var(--display);font-weight:650;font-size:28px;line-height:1.1;letter-spacing:-.02em;color:var(--clay);outline:none;padding-right:44px}
+.step-meta{color:var(--ink-soft);font-size:15.5px;margin-top:-6px}
+.step-foot{font-size:15px;color:var(--ink-soft)}
+.step-foot a{color:var(--clay)}
+.pick{display:flex;flex-direction:column;gap:10px}
+.pick .tile{padding:16px 18px;border-radius:20px;gap:4px;background:var(--paper-2)}
+.pick .tile h4{font-size:22px}
+.pick .tile .row{border:0;padding-top:4px}
+.back{align-self:flex-start;font:inherit;font-size:14.5px;background:none;border:0;padding:4px 0;color:var(--clay);cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+.cal{border:1px solid var(--line);border-radius:22px;padding:14px 14px 10px;background:#F6EDE3}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cal-month{font-family:var(--display);font-weight:600;font-size:19px}
+.cal-nav{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--paper);color:var(--clay);font-size:22px;line-height:1;cursor:pointer}
+.cal-nav:disabled{opacity:.35;cursor:default}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}
+.cal-grid .wd{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);padding:4px 0}
+.cal-grid .d{aspect-ratio:1;display:grid;place-items:center;border-radius:50%;font-size:15px;color:color-mix(in srgb,var(--ink) 38%,transparent);font-variant-numeric:tabular-nums}
+.cal-grid button.d{font:inherit;font-size:15px;font-weight:500;border:1.5px solid var(--clay);background:var(--paper);color:var(--clay);cursor:pointer;position:relative;padding:0}
+.cal-grid button.d:hover{background:var(--blush)}
+.cal-grid button.d[aria-pressed="true"]{background:var(--clay);color:var(--on-clay)}
+.cal-grid button.d.full{border-style:dashed;opacity:.5;cursor:not-allowed;text-decoration:line-through}
+.cal-legend{font-size:13px;color:var(--ink-soft);margin-top:6px}
+.cal-pick{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border-radius:18px;background:var(--paper-2)}
+.cal-pick p{margin:0;line-height:1.4}
+.cal-pick .kicker{font-size:11.5px}
+#cal-pick-free{color:var(--ink-soft);font-size:14.5px}
 .book-price{color:var(--ink-soft);margin-top:-6px}
+.pay-note{font-size:13.5px;color:var(--ink-soft);display:flex;align-items:center;gap:8px}
 .field{display:flex;flex-direction:column;gap:6px;min-width:0}
 .field-row{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px}
 @media (max-width:460px){.field-row{grid-template-columns:1fr}}
@@ -312,13 +350,18 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <img src="img/forma-logo.png" alt="FORMA Earth &amp; Art Logo">
       <span>Töpferstudio Mathon</span>
     </a>
-    <nav class="nav" aria-label="Hauptnavigation">
+    <div class="top-actions">
+      <a class="btn btn-solid" href="#anmeldung" data-book="">Kurs buchen</a>
+      <button class="nav-toggle" type="button" id="nav-toggle" aria-expanded="false" aria-controls="nav" aria-label="Menü öffnen"><span></span></button>
+    </div>
+    <nav class="nav" id="nav" aria-label="Hauptnavigation">
       <a href="#angebote">Kurse</a>
       <a href="#angebote">Offenes Atelier</a>
+      <a href="#anmeldung">Termine</a>
       <a href="#studio">Studio</a>
       <a href="#ueber-mich">Über mich</a>
       <a href="#kontakt">Kontakt</a>
-      <a class="btn btn-solid" href="#anmeldung">Kurs buchen</a>
+      <a class="btn btn-solid" href="#anmeldung" data-book="">Kurs buchen</a>
     </nav>
   </div>
 </header>
@@ -333,7 +376,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <h1 class="display"><span class="l">Zeit für Ton.</span> <em class="l">Zeit für <span class="scribble">dich.<svg viewBox="0 0 200 30" preserveAspectRatio="none" aria-hidden="true"><path d="M4 18c30-12 58-14 84-6s52 10 80-2 26-6 28-4"></path></svg></span></em></h1>
         <p class="lead">In meinem Studio in Mathon gestaltest du Tassen, Schalen und Vasen mit deinen eigenen Händen: im angeleiteten Kurs, in einer persönlichen Einzelstunde oder frei im offenen Atelier.</p>
         <div class="actions">
-          <a class="btn btn-solid" href="#anmeldung">Termin buchen</a>
+          <a class="btn btn-solid" href="#anmeldung" data-book="">Termin buchen</a>
           <a class="btn btn-ghost" href="#angebote">Kurse &amp; Preise</a>
         </div>
         <ul class="hero-week" aria-label="Jede Woche im Studio">
@@ -343,18 +386,16 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         </ul>
       </div>
       <div class="collage">
-        <svg class="doodle" viewBox="0 0 300 200" aria-hidden="true"><path d="M10 150c40-90 120-140 170-90s-30 110-60 70 40-120 170-110"></path></svg>
+        <span class="dot d2" aria-hidden="true"></span>
+        <span class="dot d3" aria-hidden="true"></span>
         <figure class="c-main"><img src="img/tonkugeln.jpg" alt="Vorbereitete Tonkugeln auf dem Werktisch, dahinter Werkzeuge in handgemachten Bechern" width="1050" height="1400" style="object-position:50% 60%"></figure>
-        <figure class="c-small"><img src="img/schalen.jpg" alt="Handgemachte Schalen und Becher" width="1050" height="1400"></figure>
-        <figure class="c-round"><img src="img/werktisch.jpg" alt="Werktisch mit Tassen, Pinseln und Glasuren" width="1050" height="1400" style="object-position:40% 40%"></figure>
-        <div class="spin" aria-hidden="true">
+        <span class="dot d1" aria-hidden="true">
           <svg viewBox="0 0 200 200">
-            <circle cx="100" cy="100" r="100" fill="#8C2C1D"></circle>
-            <g class="ring"><path id="ring-path" d="M100 100m-72 0a72 72 0 1 1 144 0a72 72 0 1 1-144 0" fill="none"></path>
-            <text><textPath href="#ring-path" textLength="440">HANDGEMACHT · IN MATHON · EARTH &amp; ART ·</textPath></text></g>
-            <g transform="translate(82 82) scale(1.5)"><path fill="#DDBFA8" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></g>
+            <g class="ring"><path id="ring-path" d="M100 100m-74 0a74 74 0 1 1 148 0a74 74 0 1 1-148 0" fill="none"></path>
+            <text><textPath href="#ring-path" textLength="452">HANDGEMACHT · IN MATHON · EARTH &amp; ART ·</textPath></text></g>
+            <g transform="translate(76 76) scale(2)"><path fill="#DDBFA8" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></g>
           </svg>
-        </div>
+        </span>
         <svg class="spark s1" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg>
         <svg class="spark s2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg>
         <svg class="spark s3" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg>
@@ -384,7 +425,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
             <dt>Für</dt><dd>Einsteiger und Fortgeschrittene</dd>
           </dl>
           <p class="price">€ 295<small>für alle fünf Termine</small></p>
-          <a class="btn" href="#anmeldung">Platz reservieren</a>
+          <a class="btn" href="#anmeldung" data-book="Pottery Pause">Platz buchen</a>
         </article>
         <article class="offer">
           <p class="kicker">Drehscheibe · 2 Stunden</p>
@@ -396,7 +437,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
             <dt>Gruppe</dt><dd>findet ab 2 Personen statt</dd>
           </dl>
           <p class="price">€ 70<small>pro Person, inkl. eines Werkstücks</small></p>
-          <a class="btn btn-solid" href="#anmeldung">Termin buchen</a>
+          <a class="btn btn-solid" href="#anmeldung" data-book="Spin &amp; Go">Termin buchen</a>
         </article>
         <article class="offer">
           <p class="kicker">Einzelstunde · Handbuilding</p>
@@ -420,7 +461,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           </dl>
           <p class="note">Das offene Atelier ist kein betreuter Kurs und richtet sich an alle mit Vorerfahrung.</p>
           <p class="price">€ 30<small>pro Stunde</small></p>
-          <a class="btn btn-solid" href="#anmeldung">Platz reservieren</a>
+          <a class="btn btn-solid" href="#anmeldung" data-book="Offenes Atelier">Platz reservieren</a>
         </article>
       </div>
     </div>
@@ -431,7 +472,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <div class="section-head">
         <p class="eyebrow">Anmeldung</p>
         <h2 class="display">Termine &amp; Anmeldung</h2>
-        <p>Such dir einen Termin aus und sichere dir deinen Platz direkt hier. Kurse bezahlst du bequem online, das offene Atelier rechnen wir vor Ort ab. Die Bestätigung kommt sofort per E-Mail.</p>
+        <p>Wähl deinen Kurs und such dir im Kalender einen Tag aus. Kurse bezahlst du bequem online, das offene Atelier rechnen wir vor Ort ab. Die Bestätigung kommt sofort per E-Mail.</p>
       </div>
       <div class="slots" id="slots" aria-live="polite">
         <p class="slots-note">Die Termine werden geladen …</p>
@@ -439,14 +480,43 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     </div>
   </section>
 
-  <dialog class="book-dialog" id="book-dialog" aria-labelledby="book-title">
+  <dialog class="book-dialog" id="book-dialog" aria-labelledby="book-heading">
     <div class="book-inner">
       <button class="book-close" type="button" id="book-close" aria-label="Schließen">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
       </button>
-      <form id="book-form" novalidate>
+      <ol class="stepbar" id="stepbar" aria-label="Schritte">
+        <li data-step="kurs">Kurs</li><li data-step="datum">Termin</li><li data-step="form">Angaben</li>
+      </ol>
+
+      <section class="step" id="step-kurs">
+        <h3 class="step-title" id="book-heading" tabindex="-1">Was möchtest du buchen?</h3>
+        <div class="pick" id="pick-list"></div>
+        <p class="step-foot">Lieber eine Einzelstunde? <a href="#kontakt" id="to-contact">Private Pottery anfragen</a></p>
+      </section>
+
+      <section class="step" id="step-datum" hidden>
+        <button class="back" type="button" data-back="kurs">← Anderer Kurs</button>
+        <h3 class="step-title" id="cal-title" tabindex="-1"></h3>
+        <p class="step-meta" id="cal-meta"></p>
+        <div class="cal" id="cal">
+          <div class="cal-head">
+            <button class="cal-nav" type="button" id="cal-prev" aria-label="Vorheriger Monat">‹</button>
+            <p class="cal-month" id="cal-month" aria-live="polite"></p>
+            <button class="cal-nav" type="button" id="cal-next" aria-label="Nächster Monat">›</button>
+          </div>
+          <div class="cal-grid" id="cal-grid" role="grid"></div>
+        </div>
+        <div class="cal-pick" id="cal-pick" hidden>
+          <p><span class="kicker">Dein Termin</span><br><strong id="cal-pick-date"></strong> <span id="cal-pick-free"></span></p>
+          <button class="btn btn-solid" type="button" id="to-form">Weiter</button>
+        </div>
+      </section>
+
+      <form class="step" id="book-form" novalidate hidden>
+        <button class="back" type="button" data-back="datum">← Anderer Termin</button>
         <p class="kicker" id="book-date"></p>
-        <h3 id="book-title">Anmeldung</h3>
+        <h3 class="step-title" id="book-title" tabindex="-1">Anmeldung</h3>
         <p class="book-price" id="book-price"></p>
         <input type="hidden" name="course_id" id="book-course">
         <input type="hidden" name="t" id="book-t">
@@ -457,15 +527,16 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <div class="field"><label for="book-phone">Telefon <span class="opt">(optional)</span></label><input id="book-phone" name="phone" type="tel" autocomplete="tel"></div>
           <div class="field"><label for="book-persons">Personen</label><select id="book-persons" name="persons"></select></div>
         </div>
-        <div class="field"><label for="book-message">Nachricht <span class="opt">(optional)</span></label><textarea id="book-message" name="message" rows="3"></textarea></div>
+        <div class="field"><label for="book-message">Nachricht <span class="opt">(optional)</span></label><textarea id="book-message" name="message" rows="2"></textarea></div>
         <label class="consent"><input type="checkbox" name="consent" id="book-consent" value="1" required> <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Anmeldung gespeichert werden. Mehr dazu in der <a href="#datenschutz" id="book-privacy">Datenschutzerklärung</a>.</span></label>
         <p class="book-error" id="book-error" role="alert" hidden></p>
         <button class="btn btn-solid" type="submit" id="book-submit">Verbindlich anmelden</button>
         <p class="pay-note" id="book-paynote" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>Du bezahlst sicher über Stripe, z. B. mit Karte, Apple Pay oder Google Pay.</p>
       </form>
+
       <div class="book-done" id="book-done" hidden>
         <p class="eyebrow">Danke!</p>
-        <h3 id="book-done-title">Deine Anmeldung ist da.</h3>
+        <h3 id="book-done-title" tabindex="-1">Deine Anmeldung ist da.</h3>
         <p id="book-done-text"></p>
         <button class="btn btn-solid" type="button" id="book-done-close">Schließen</button>
       </div>
@@ -656,118 +727,172 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   var submit=document.getElementById('book-submit');
   var persons=document.getElementById('book-persons');
   var payNote=document.getElementById('book-paynote');
-  var courses=[];
-  var current=null;
+  var stepKurs=document.getElementById('step-kurs'),stepDatum=document.getElementById('step-datum');
   var phone='+43 677 63 90 70 80';
-  var SHOW=6;
+  var MONTHS=['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  var groups=[],loaded=null,group=null,current=null,month=null,pending=null;
 
+  function $(id){return document.getElementById(id);}
   function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
-  function note(text){slots.innerHTML='';slots.appendChild(el('p','slots-note',text));}
   function euro(c){return '€ '+(c%100===0?String(c/100):(c/100).toFixed(2).replace('.',','));}
-  function freeText(n){return n<=0?'ausgebucht':(n===1?'noch 1 Platz':'noch '+n+' Plätze');}
-
-  function render(){
-    slots.innerHTML='';
-    if(!courses.length){note('Gerade sind keine Termine online. Melde dich gern direkt bei mir unter '+phone+' oder per WhatsApp, dann finden wir einen Termin für dich.');return;}
-    var groups=[],byTitle={};
-    courses.forEach(function(c){if(!byTitle[c.title]){byTitle[c.title]=[];groups.push(c.title);}byTitle[c.title].push(c);});
-    groups.forEach(function(title){
-      var list=byTitle[title],first=list[0];
-      var card=el('article','slot');
-      card.appendChild(el('h3',null,title));
-      if(first.description)card.appendChild(el('p','slot-desc',first.description));
-      var meta=el('p','slot-meta');
-      if(first.min_participants>1)meta.appendChild(el('span',null,'findet ab '+first.min_participants+' Personen statt'));
-      meta.appendChild(el('span',null,first.price_cents>0?'online bezahlen':'Bezahlung vor Ort'));
-      card.appendChild(meta);
-      card.appendChild(el('p','kicker',list.length>1?'Termin wählen':'Termin'));
-      var dates=el('div','dates'),chosen=null,btns=[];
-      var go=el('button','btn btn-solid','Platz buchen');go.type='button';
-      function pick(c,b){chosen=c;btns.forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});go.disabled=false;go.style.opacity='';}
-      list.forEach(function(c,i){
-        var b=el('button','date');b.type='button';b.setAttribute('aria-pressed','false');
-        b.appendChild(document.createTextNode(c.date_text));
-        b.appendChild(el('small',null,freeText(c.free)));
-        if(c.free<=0)b.disabled=true;else b.addEventListener('click',function(){pick(c,b);});
-        if(i>=SHOW)b.hidden=true;
-        btns.push(b);dates.appendChild(b);
-      });
-      card.appendChild(dates);
-      if(list.length>SHOW){
-        var more=el('button','more-dates','Weitere '+(list.length-SHOW)+' Termine anzeigen');more.type='button';
-        more.addEventListener('click',function(){btns.forEach(function(b){b.hidden=false;});more.remove();});
-        card.appendChild(more);
-      }
-      var foot=el('div','slot-foot');
-      var price=el('p','slot-price',first.price_cents>0?euro(first.price_cents):'');
-      price.appendChild(el('small',null,first.price_text||''));
-      foot.appendChild(price);
-      var firstFree=null;list.some(function(c,i){if(c.free>0){firstFree=i;return true;}return false;});
-      if(firstFree===null){go.disabled=true;go.textContent='Ausgebucht';go.style.opacity='.55';}
-      else pick(list[firstFree],btns[firstFree]);
-      go.addEventListener('click',function(){if(chosen)openBooking(chosen);});
-      foot.appendChild(go);
-      card.appendChild(foot);
-      slots.appendChild(card);
-    });
-  }
+  function freeText(n){return n<=0?'ausgebucht':(n===1?'noch 1 Platz frei':'noch '+n+' Plätze frei');}
+  function show(d){if(typeof d.showModal==='function'){if(!d.open)d.showModal();}else d.setAttribute('open','');}
+  function hide(d){if(typeof d.close==='function')d.close();else d.removeAttribute('open');}
+  function norm(t){return String(t||'').toLowerCase().replace(/&amp;/g,'&').trim();}
+  function findGroup(key){key=norm(key);if(!key)return null;for(var i=0;i<groups.length;i++){if(norm(groups[i].title).indexOf(key)===0)return groups[i];}return null;}
+  function ym(d){return d.slice(0,7);}
 
   function load(){
-    return fetch('api/courses.php',{cache:'no-store'})
+    loaded=fetch('api/courses.php',{cache:'no-store'})
       .then(function(r){if(!r.ok)throw new Error();return r.json();})
-      .then(function(d){if(!d.ok)throw new Error();courses=d.courses||[];render();})
-      .catch(function(){note('Die Termine können gerade nicht geladen werden. Melde dich gern direkt bei mir unter '+phone+' oder per WhatsApp.');});
+      .then(function(d){
+        if(!d.ok)throw new Error();
+        var by={};groups=[];
+        (d.courses||[]).forEach(function(c){if(!by[c.title]){by[c.title]={title:c.title,list:[]};groups.push(by[c.title]);}by[c.title].list.push(c);});
+        groups.forEach(function(g){var f=g.list[0];g.description=f.description;g.price_cents=f.price_cents;g.price_text=f.price_text;g.min=f.min_participants;g.nextFree=null;g.list.some(function(c){if(c.free>0){g.nextFree=c;return true;}return false;});});
+        renderTiles(slots,true);
+        return groups;
+      })
+      .catch(function(){slots.innerHTML='';slots.appendChild(el('p','slots-note','Die Termine können gerade nicht geladen werden. Melde dich gern direkt bei mir unter '+phone+' oder per WhatsApp.'));groups=[];return groups;});
+    return loaded;
   }
 
-  function submitLabel(){
-    if(current&&current.price_cents>0){
-      submit.textContent='Weiter zur Bezahlung · '+euro(current.price_cents*(+persons.value||1));
-    }else submit.textContent='Verbindlich anmelden';
+  function tile(g,big){
+    var b=el('button','tile');b.type='button';
+    b.appendChild(el('h4',null,g.title));
+    if(big&&g.description)b.appendChild(el('p','next',g.description));
+    b.appendChild(el('p','next',g.nextFree?('Nächster freier Termin: '+g.nextFree.date_text):'Gerade alles ausgebucht'));
+    if(g.min>1)b.appendChild(el('p','next','Findet ab '+g.min+' Personen statt'));
+    var row=el('div','row');
+    row.appendChild(el('p','price',g.price_cents>0?euro(g.price_cents):(g.price_text.split(',')[0]||'')));
+    row.appendChild(el('span','go',g.list.length>1?'Termin wählen':'Auswählen'));
+    b.appendChild(row);
+    b.addEventListener('click',function(){openWizard(g);});
+    return b;
+  }
+  function renderTiles(target,big){
+    target.innerHTML='';
+    if(!groups.length){target.appendChild(el('p','slots-note','Gerade sind keine Termine online. Melde dich gern direkt bei mir unter '+phone+' oder per WhatsApp, dann finden wir einen Termin für dich.'));return;}
+    groups.forEach(function(g){target.appendChild(tile(g,big));});
   }
 
-  function show(dialog){if(typeof dialog.showModal==='function'){if(!dialog.open)dialog.showModal();}else dialog.setAttribute('open','');}
-  function hide(dialog){if(typeof dialog.close==='function')dialog.close();else dialog.removeAttribute('open');}
+  function setStep(name){
+    stepKurs.hidden=name!=='kurs';stepDatum.hidden=name!=='datum';form.hidden=name!=='form';done.hidden=name!=='done';
+    $('stepbar').hidden=name==='done';
+    var order=['kurs','datum','form'],idx=order.indexOf(name);
+    document.querySelectorAll('#stepbar li').forEach(function(li,i){li.classList.toggle('on',i<=idx);});
+    var focus={kurs:'book-heading',datum:'cal-title',form:'book-title',done:'book-done-title'}[name];
+    setTimeout(function(){var f=$(focus);if(f)try{f.focus({preventScroll:true});}catch(e){}},30);
+    dlg.querySelector('.book-inner').scrollTop=0;
+  }
 
-  function openBooking(c){
+  // Schritt 1: Kurs
+  function openWizard(g){
+    show(dlg);
+    if(g){chooseGroup(g);return;}
+    renderTiles($('pick-list'),false);
+    setStep('kurs');
+  }
+
+  // Schritt 2: Termin im Kalender
+  function chooseGroup(g){
+    group=g;current=null;
+    $('cal-title').textContent=g.title;
+    var meta=[];if(g.price_text)meta.push(g.price_text);if(g.min>1)meta.push('findet ab '+g.min+' Personen statt');
+    $('cal-meta').textContent=meta.join(' · ');
+    var first=g.nextFree||g.list[0];
+    month=ym(first.start_date);
+    renderCal();
+    if(g.nextFree)pickDate(g.nextFree);else $('cal-pick').hidden=true;
+    setStep('datum');
+  }
+  function months(){var m=[];group.list.forEach(function(c){var k=ym(c.start_date);if(m.indexOf(k)<0)m.push(k);});return m.sort();}
+  function renderCal(){
+    var grid=$('cal-grid');grid.innerHTML='';
+    var p=month.split('-'),y=+p[0],mo=+p[1]-1;
+    $('cal-month').textContent=MONTHS[mo]+' '+y;
+    var ms=months();$('cal-prev').disabled=ms.indexOf(month)<=0;$('cal-next').disabled=ms.indexOf(month)>=ms.length-1;
+    ['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(function(w){grid.appendChild(el('span','wd',w));});
+    var byDay={};group.list.forEach(function(c){if(!byDay[c.start_date])byDay[c.start_date]=c;});
+    var firstDow=(new Date(y,mo,1).getDay()+6)%7,days=new Date(y,mo+1,0).getDate();
+    for(var i=0;i<firstDow;i++)grid.appendChild(el('span','d',''));
+    for(var d=1;d<=days;d++){
+      var key=y+'-'+String(mo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'),c=byDay[key];
+      if(!c){grid.appendChild(el('span','d',String(d)));continue;}
+      var b=el('button','d'+(c.free<=0?' full':''),String(d));b.type='button';
+      b.setAttribute('aria-label',c.date_text+', '+freeText(c.free));b.title=freeText(c.free);
+      b.setAttribute('aria-pressed',current&&current.id===c.id?'true':'false');
+      if(c.free<=0)b.disabled=true;else(function(c){b.addEventListener('click',function(){pickDate(c);});})(c);
+      grid.appendChild(b);
+    }
+  }
+  function pickDate(c){
     current=c;
-    form.reset();
+    if(ym(c.start_date)!==month){month=ym(c.start_date);}
+    renderCal();
+    $('cal-pick-date').textContent=c.date_text;
+    $('cal-pick-free').textContent='· '+freeText(c.free);
+    $('cal-pick').hidden=false;
+  }
+  $('cal-prev').addEventListener('click',function(){var ms=months(),i=ms.indexOf(month);if(i>0){month=ms[i-1];renderCal();}});
+  $('cal-next').addEventListener('click',function(){var ms=months(),i=ms.indexOf(month);if(i<ms.length-1){month=ms[i+1];renderCal();}});
+  $('to-form').addEventListener('click',function(){if(current)openForm(current);});
+
+  // Schritt 3: Angaben
+  function submitLabel(){
+    if(current&&current.price_cents>0)submit.textContent='Weiter zur Bezahlung · '+euro(current.price_cents*(+persons.value||1));
+    else submit.textContent='Verbindlich anmelden';
+  }
+  function openForm(c){
+    var keep={name:$('book-name').value,email:$('book-email').value,phone:$('book-phone').value};
+    form.reset();$('book-name').value=keep.name;$('book-email').value=keep.email;$('book-phone').value=keep.phone;
     err.hidden=true;
-    form.hidden=false;done.hidden=true;
-    document.getElementById('book-course').value=c.id;
-    document.getElementById('book-t').value=Date.now();
-    document.getElementById('book-title').textContent=c.title;
-    document.getElementById('book-date').textContent=c.date_text;
-    document.getElementById('book-price').textContent=c.price_text||'';
+    $('book-course').value=c.id;
+    $('book-t').value=Date.now();
+    $('book-title').textContent=c.title;
+    $('book-date').textContent=c.date_text;
+    $('book-price').textContent=c.price_text||'';
     persons.innerHTML='';
     var max=Math.min(c.free,10);
     for(var i=1;i<=max;i++){var o=el('option',null,i===1?'1 Person':i+' Personen');o.value=i;persons.appendChild(o);}
     payNote.hidden=!(c.price_cents>0);
     submitLabel();
-    show(dlg);
-    setTimeout(function(){document.getElementById('book-name').focus();},50);
+    setStep('form');
   }
   function showDone(title,text){
-    form.hidden=true;done.hidden=false;
-    document.getElementById('book-done-title').textContent=title;
-    document.getElementById('book-done-text').textContent=text;
-    show(dlg);
+    $('book-done-title').textContent=title;
+    $('book-done-text').textContent=text;
+    show(dlg);setStep('done');
   }
-  function closeBooking(){hide(dlg);}
 
+  dlg.querySelectorAll('[data-back]').forEach(function(b){b.addEventListener('click',function(){
+    if(b.getAttribute('data-back')==='kurs'){renderTiles($('pick-list'),false);setStep('kurs');}else setStep('datum');
+  });});
   persons.addEventListener('change',submitLabel);
-  document.getElementById('book-close').addEventListener('click',closeBooking);
-  document.getElementById('book-done-close').addEventListener('click',closeBooking);
-  document.getElementById('book-privacy').addEventListener('click',function(){closeBooking();var d=document.getElementById('datenschutz');if(d)d.open=true;});
-  dlg.addEventListener('click',function(e){if(e.target===dlg)closeBooking();});
+  $('book-close').addEventListener('click',function(){hide(dlg);});
+  $('book-done-close').addEventListener('click',function(){hide(dlg);});
+  $('to-contact').addEventListener('click',function(){hide(dlg);});
+  $('book-privacy').addEventListener('click',function(){hide(dlg);var d=$('datenschutz');if(d)d.open=true;});
+  dlg.addEventListener('click',function(e){if(e.target===dlg)hide(dlg);});
+
+  // Alle „Buchen“-Knöpfe öffnen direkt das Buchungsfenster
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('[data-book]');
+    if(!a)return;
+    e.preventDefault();
+    closeNav();
+    var key=a.getAttribute('data-book');
+    (loaded||load()).then(function(){openWizard(findGroup(key));});
+  });
 
   form.addEventListener('submit',function(e){
     e.preventDefault();
     err.hidden=true;
-    var name=document.getElementById('book-name').value.trim(),email=document.getElementById('book-email').value.trim();
+    var name=$('book-name').value.trim(),email=$('book-email').value.trim();
     var msg='';
     if(name.length<2)msg='Bitte gib deinen Namen an.';
     else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))msg='Bitte gib eine gültige E-Mail-Adresse an.';
-    else if(!document.getElementById('book-consent').checked)msg='Bitte bestätige noch die Hinweise zum Datenschutz.';
+    else if(!$('book-consent').checked)msg='Bitte bestätige noch die Hinweise zum Datenschutz.';
     if(msg){err.textContent=msg;err.hidden=false;return;}
     submit.disabled=true;submit.textContent=current&&current.price_cents>0?'Einen Moment …':'Wird gesendet …';
     var redirecting=false;
@@ -776,8 +901,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       .then(function(d){
         if(d&&d.ok&&d.redirect){redirecting=true;window.location.href=d.redirect;return;}
         if(d&&d.ok){
-          var first=name.split(/\s+/)[0];
-          showDone('Danke, '+first+'!','Deine Anmeldung für „'+document.getElementById('book-title').textContent+'“ ist bei mir eingegangen. Die Bestätigung ist unterwegs an '+email+'. Ich freue mich auf dich!');
+          showDone('Danke, '+name.split(/\s+/)[0]+'!','Deine Anmeldung für „'+current.title+'“ am '+current.date_text+' ist bei mir eingegangen. Die Bestätigung ist unterwegs an '+email+'. Ich freue mich auf dich!');
           load();
         }else{
           err.textContent=(d&&d.error)||('Das hat leider nicht geklappt. Bitte melde dich telefonisch unter '+phone+'.');
@@ -788,6 +912,13 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       .catch(function(){err.textContent='Keine Verbindung. Bitte versuch es noch einmal oder melde dich unter '+phone+'.';err.hidden=false;})
       .then(function(){if(!redirecting){submit.disabled=false;submitLabel();}});
   });
+
+  // Menü am Handy
+  var nav=$('nav'),toggle=$('nav-toggle');
+  function closeNav(){nav.classList.remove('open');toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Menü öffnen');}
+  toggle.addEventListener('click',function(){var o=!nav.classList.contains('open');nav.classList.toggle('open',o);toggle.setAttribute('aria-expanded',o?'true':'false');toggle.setAttribute('aria-label',o?'Menü schließen':'Menü öffnen');});
+  nav.querySelectorAll('a').forEach(function(a){a.addEventListener('click',closeNav);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeNav();});
 
   // Rückkehr von der Bezahlung
   var params=new URLSearchParams(location.search);
@@ -820,7 +951,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     document.getElementById('season-t').value=Date.now();
     document.getElementById('season-source').value=p.title;
     var b=document.getElementById('season-btn');
-    if(p.button_text&&p.button_link){b.textContent=p.button_text;b.href=p.button_link;b.hidden=false;b.className='btn '+(p.signup?'btn-ghost':'btn-solid');}
+    if(p.button_text&&p.button_link){b.textContent=p.button_text;b.href=p.button_link;b.hidden=false;b.className='btn '+(p.signup?'btn-ghost':'btn-solid');if(p.button_link.indexOf('#anmeldung')===0)b.setAttribute('data-book','');}
     show(season);
     try{document.getElementById('season-title').focus({preventScroll:true});}catch(e){}
   }

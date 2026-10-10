@@ -37,6 +37,9 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Pottery Pause: freitags 18–20 Uhr, 5 Termine, € 295, online bezahlt.
 - Private Pottery: nach Vereinbarung, € 65/Std.
 - Diese Zeiten stehen in `index.html` an drei Stellen: Kopfbereich (`.hero-week`), Angebotskarten, Kontakt (`.week-plan`).
+- Farben: nur Sand/Ton, FORMA-Rot und Braun. Keine dritte Akzentfarbe (Vivien mag das Orange nicht), `--clay-soft` ist deshalb Braun.
+- Buchen: Jeder Knopf mit `data-book="Kursname"` öffnet direkt das Buchungsfenster (Schritt 1 Kurs, 2 Kalender, 3 Angaben), ohne zu scrollen. Keine langen Terminlisten.
+- Handy: Menü mit drei Strichen (`#nav-toggle`).
 
 ## Online-Bezahlung (Stripe Checkout)
 - Pro Termin `price_cents` > 0 und Stripe-Schlüssel hinterlegt → `api/book.php` legt die Buchung als `offen` an, erstellt eine Checkout-Session und leitet weiter. Plätze bleiben 40 Min. reserviert (`FORMA_HOLD_SECONDS`).

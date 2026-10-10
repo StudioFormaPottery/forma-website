@@ -13,6 +13,7 @@ try {
             'id' => (int)$c['id'],
             'title' => $c['title'],
             'date_text' => $c['date_text'],
+            'start_date' => $c['start_date'],
             'price_text' => $c['price_text'],
             'description' => $c['description'],
             'free' => (int)$c['free'],
