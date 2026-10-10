@@ -18,7 +18,7 @@ if (!empty($in['website'])) {
     forma_json(['ok' => true]);
 }
 $loadedAt = (int)($in['t'] ?? 0);
-if ($loadedAt > 0 && (time() * 1000 - $loadedAt) < 3000) {
+if ($loadedAt > 0 && ((int)(microtime(true) * 1000) - $loadedAt) < 3000) {
     forma_json(['ok' => false, 'error' => 'Bitte versuch es in ein paar Sekunden noch einmal.'], 429);
 }
 
@@ -68,9 +68,13 @@ try {
         $msg = $free === 1 ? 'Es ist nur noch 1 Platz frei.' : "Es sind nur noch $free Plätze frei.";
         forma_json(['ok' => false, 'error' => $msg, 'free' => $free], 409);
     }
-    $pdo->prepare('INSERT INTO bookings (course_id, name, email, phone, persons, message, status, ip_hash, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, \'bestaetigt\', ?, ?)')
-        ->execute([$courseId, $name, $email, $phone, $persons, $message, $ipHash, date('c')]);
+    $priceCents = (int)$course['price_cents'];
+    $online = $priceCents > 0 && forma_stripe_key() !== null;
+    $payToken = bin2hex(random_bytes(16));
+    $pdo->prepare('INSERT INTO bookings (course_id, name, email, phone, persons, message, status, ip_hash, created_at, amount_cents, pay_token)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        ->execute([$courseId, $name, $email, $phone, $persons, $message, $online ? 'offen' : 'bestaetigt', $ipHash, date('c'),
+            $online ? $priceCents * $persons : 0, $payToken]);
     $bookingId = (int)$pdo->lastInsertId();
     $pdo->exec('COMMIT');
 } catch (Throwable $e) {
@@ -81,54 +85,37 @@ try {
     forma_json(['ok' => false, 'error' => 'Die Anmeldung konnte gerade nicht gespeichert werden. Bitte melde dich telefonisch unter ' . FORMA_PHONE . '.'], 500);
 }
 
-$firstName = preg_split('/\s+/', $name)[0] ?? $name;
-$personsText = $persons === 1 ? '1 Person' : "$persons Personen";
-$freeAfter = $free - $persons;
-$formaPhone = FORMA_PHONE;
-$siteUrl = FORMA_SITE_URL;
-$minNote = ((int)$course['min_participants'] > 1)
-    ? "\nDer Kurs findet ab {$course['min_participants']} Personen statt. Falls es zu wenige Anmeldungen gibt, melde ich mich rechtzeitig bei dir.\n"
-    : '';
+if (!$online) {
+    forma_send_booking_mails($pdo, $bookingId);
+    forma_json(['ok' => true, 'booking_id' => $bookingId, 'free' => $free - $persons]);
+}
 
-$customerBody = <<<TXT
-Hallo $firstName,
-
-danke, dass du dich für „{$course['title']}“ angemeldet hast! Deine Anmeldung ist verbindlich bei mir eingegangen, und ich freue mich schon sehr auf dich.
-
-Hier noch einmal alles auf einen Blick:
-
-Kurs: {$course['title']}
-Termin: {$course['date_text']}
-Personen: $personsText
-Preis: {$course['price_text']}
-Ort: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon
-$minNote
-Falls du Fragen hast oder doch verhindert bist, antworte einfach auf diese E-Mail oder ruf mich an: $formaPhone
-
-Bis bald im Studio!
-Vivien
-FORMA Earth & Art
-www.forma-pottery.com
-TXT;
-
-$adminBody = <<<TXT
-Neue Kursanmeldung über die Website
-
-Kurs: {$course['title']}
-Termin: {$course['date_text']}
-Personen: $personsText
-
-Name: $name
-E-Mail: $email
-Telefon: $phone
-Nachricht: $message
-
-Freie Plätze danach: $freeAfter
-
-Alle Buchungen: $siteUrl/verwaltung/
-TXT;
-
-forma_mail($email, 'Deine Anmeldung: ' . $course['title'], $customerBody);
-forma_mail(FORMA_NOTIFY_EMAIL, 'Neue Anmeldung: ' . $course['title'] . ' (' . $name . ')', $adminBody, $email);
-
-forma_json(['ok' => true, 'booking_id' => $bookingId, 'free' => $freeAfter]);
+// Online bezahlen: Stripe-Checkout anlegen und die Kundin dorthin weiterleiten.
+$site = forma_site_url();
+try {
+    $session = forma_stripe('POST', '/v1/checkout/sessions', [
+        'mode' => 'payment',
+        'locale' => 'de',
+        'customer_email' => $email,
+        'client_reference_id' => (string)$bookingId,
+        'metadata' => ['booking_id' => (string)$bookingId, 'kurs' => $course['title'], 'termin' => $course['date_text']],
+        'line_items' => [[
+            'quantity' => $persons,
+            'price_data' => [
+                'currency' => 'eur',
+                'unit_amount' => $priceCents,
+                'product_data' => ['name' => $course['title'], 'description' => $course['date_text'] . ' · FORMA Studio, Mathon'],
+            ],
+        ]],
+        'payment_intent_data' => ['description' => $course['title'] . ' · ' . $course['date_text'] . ' · ' . $name],
+        'expires_at' => time() + 31 * 60,
+        'success_url' => $site . '/api/paid.php?b=' . $bookingId . '&k=' . $payToken,
+        'cancel_url' => $site . '/api/cancel.php?b=' . $bookingId . '&k=' . $payToken,
+    ]);
+} catch (Throwable $e) {
+    error_log('FORMA Stripe: ' . $e->getMessage());
+    $pdo->prepare("UPDATE bookings SET status = 'abgebrochen' WHERE id = ?")->execute([$bookingId]);
+    forma_json(['ok' => false, 'error' => 'Die Online-Bezahlung ist gerade nicht erreichbar. Bitte versuch es gleich noch einmal oder melde dich unter ' . FORMA_PHONE . '.'], 502);
+}
+$pdo->prepare('UPDATE bookings SET stripe_session = ? WHERE id = ?')->execute([(string)$session['id'], $bookingId]);
+forma_json(['ok' => true, 'redirect' => (string)$session['url']]);

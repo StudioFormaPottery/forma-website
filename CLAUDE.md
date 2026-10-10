@@ -30,8 +30,29 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Lokal testen: im Repo-Ordner `FORMA_DATA_DIR=/tmp/x FORMA_MAIL_LOG=/tmp/mail.log php -S 127.0.0.1:8765`.
 - `.htaccess` sperrt `.md`, `.sqlite` und `api/lib.php` für Web-Zugriffe.
 
+## Zeiten (Stand Oktober 2026)
+- Öffnungszeiten Studio: Mo–Fr 8–10 Uhr.
+- Spin & Go: Mi + Fr 9–11 Uhr, findet ab 2 Personen statt, € 70 p. P., online bezahlt.
+- Offenes Atelier: Do 8–11 Uhr, € 30/Std., Brennen & Glasieren € 22/kg, Bezahlung vor Ort.
+- Pottery Pause: freitags 18–20 Uhr, 5 Termine, € 295, online bezahlt.
+- Private Pottery: nach Vereinbarung, € 65/Std.
+- Diese Zeiten stehen in `index.html` an drei Stellen: Kopfbereich (`.hero-week`), Angebotskarten, Kontakt (`.week-plan`).
+
+## Online-Bezahlung (Stripe Checkout)
+- Pro Termin `price_cents` > 0 und Stripe-Schlüssel hinterlegt → `api/book.php` legt die Buchung als `offen` an, erstellt eine Checkout-Session und leitet weiter. Plätze bleiben 40 Min. reserviert (`FORMA_HOLD_SECONDS`).
+- `api/paid.php` (success_url) und `api/cancel.php` (cancel_url) prüfen ein Token pro Buchung. Bestätigt wird nur, wenn Stripe `payment_status = paid` meldet. `forma_reconcile_payments()` gleicht offene Zahlungen bei jedem Laden der Termine nach (falls jemand das Fenster nach der Zahlung schließt). Mails gehen genau einmal raus (`bookings.mailed`).
+- Vivien trägt den geheimen Schlüssel selbst in der Verwaltung unter Einstellungen ein (`../forma-data/stripe.json`). Nie im Chat oder Repo. Testmodus zuerst (Testkarte 4242 4242 4242 4242).
+- Lokal testen: `FORMA_STRIPE_API=http://127.0.0.1:12111` mit einem Fake-Server, `FORMA_SITE_URL=http://127.0.0.1:8765`.
+
+## Serientermine
+- Verwaltung → „+ Serientermine“: Vorlagen Spin & Go und Offenes Atelier (`FORMA_SERIES` in lib.php). Die Migration `seeded_v2` hat Mi/Fr Spin & Go und Do Atelier bis 31.12.2026 angelegt (je 4 Plätze).
+
+## Saison-Pop-up und E-Mail-Liste
+- Verwaltung → „Saison-Pop-up“: Titel, Text, Zeitraum, Bild (liegt in `../forma-data/popup.*`, ausgeliefert über `api/popup-image.php`). Vorschau: `/?popup=vorschau`. Erscheint einmal pro Browser-Sitzung (sessionStorage).
+- Eintragung über `api/subscribe.php` mit Double-Opt-in (`api/confirm.php`, Abmeldung `api/unsubscribe.php`). Tabelle `subscribers`. CSV-Export in der Verwaltung.
+- MailerLite: Vivien trägt einen API-Schlüssel unter Einstellungen ein (`../forma-data/mailerlite.json`). Bestätigte Adressen gehen dann automatisch in die MailerLite-Gruppe „Website“.
+
 ## Inhalte, die sich ändern
-- Platzhalter (`<span class="placeholder">`) stehen noch bei den Zeiten für Spin & Go und das offene Atelier.
 - Wenn neue Dienste dazukommen (Newsletter, Formulare, eingebettete Inhalte), die Datenschutzerklärung im Footer anpassen.
 
 ## Nicht anfassen (DNS bei Hostinger)

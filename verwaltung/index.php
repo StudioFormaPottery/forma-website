@@ -55,6 +55,42 @@ function send_setup_link(PDO $pdo): bool
     return forma_mail(FORMA_NOTIFY_EMAIL, 'Passwort für die FORMA Kursverwaltung', $body);
 }
 
+function euro_to_cents(string $v): int
+{
+    $v = str_replace([' ', '€'], '', trim($v));
+    if ($v === '') {
+        return 0;
+    }
+    if (str_contains($v, ',')) {
+        $v = str_replace(['.', ','], ['', '.'], $v);
+    }
+    return max(0, (int)round((float)$v * 100));
+}
+
+/** Verkleinert große Fotos auf max. 1400 px, damit das Pop-up schnell lädt. */
+function shrink_image(string $src, string $target, array $info): bool
+{
+    if (!function_exists('imagecreatetruecolor') || ($info[0] <= 1400 && $info[1] <= 1400)) {
+        return false;
+    }
+    $img = match ($info[2]) {
+        IMAGETYPE_JPEG => @imagecreatefromjpeg($src),
+        IMAGETYPE_PNG => @imagecreatefrompng($src),
+        IMAGETYPE_WEBP => @imagecreatefromwebp($src),
+        default => false,
+    };
+    if (!$img) {
+        return false;
+    }
+    $scale = 1400 / max($info[0], $info[1]);
+    $out = imagescale($img, (int)round($info[0] * $scale), (int)round($info[1] * $scale), IMG_BICUBIC);
+    if ($info[2] === IMAGETYPE_PNG) {
+        imagesavealpha($out, true);
+        return imagepng($out, $target, 7);
+    }
+    return $info[2] === IMAGETYPE_WEBP ? imagewebp($out, $target, 84) : imagejpeg($out, $target, 84);
+}
+
 $hash = forma_setting($pdo, 'admin_hash');
 $loggedIn = !empty($_SESSION['admin']);
 $action = $_POST['action'] ?? '';
@@ -186,16 +222,17 @@ if ($action === 'save_course') {
         forma_clean((string)($_POST['price_text'] ?? ''), 120),
         forma_clean((string)($_POST['description'] ?? ''), 600),
         !empty($_POST['visible']) ? 1 : 0,
+        euro_to_cents((string)($_POST['price_online'] ?? '')),
     ];
     if ($data[0] === '' || $data[1] === '') {
         go($self . '?view=edit' . ($id ? '&id=' . $id : ''), 'Bitte gib mindestens einen Namen und den Termin an.');
     }
     if ($id > 0) {
-        $pdo->prepare('UPDATE courses SET title=?, date_text=?, start_date=?, capacity=?, min_participants=?, price_text=?, description=?, visible=? WHERE id=?')
+        $pdo->prepare('UPDATE courses SET title=?, date_text=?, start_date=?, capacity=?, min_participants=?, price_text=?, description=?, visible=?, price_cents=? WHERE id=?')
             ->execute([...$data, $id]);
         go($self . '?view=course&id=' . $id, 'Gespeichert.');
     }
-    $pdo->prepare('INSERT INTO courses (title, date_text, start_date, capacity, min_participants, price_text, description, visible, created_at) VALUES (?,?,?,?,?,?,?,?,?)')
+    $pdo->prepare('INSERT INTO courses (title, date_text, start_date, capacity, min_participants, price_text, description, visible, price_cents, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)')
         ->execute([...$data, date('c')]);
     go($self, 'Der Termin ist angelegt' . ($data[7] ? ' und auf der Website sichtbar.' : '.'));
 }
@@ -238,28 +275,344 @@ if ($action === 'add_booking') {
 if ($action === 'save_mail') {
     $pw = (string)($_POST['mail_password'] ?? '');
     if ($pw === '') {
-        go($self, 'Bitte gib das Passwort deines Postfachs ein.');
+        go($self . '?view=einstellungen', 'Bitte gib das Passwort deines Postfachs ein.');
     }
     try {
         forma_smtp_send($pw, FORMA_NOTIFY_EMAIL, 'Test: E-Mail-Versand ist eingerichtet',
             "Hallo Vivien,\n\ndiese Test-Mail kommt von deiner Website. Ab jetzt gehen alle Bestätigungen über dein Postfach " . FORMA_FROM_EMAIL . " raus.\n", null);
         forma_save_mail_password($pw);
-        go($self, 'Geschafft! Der E-Mail-Versand läuft jetzt über dein Postfach. Eine Test-Mail ist unterwegs an ' . FORMA_NOTIFY_EMAIL . '.');
+        go($self . '?view=einstellungen', 'Geschafft! Der E-Mail-Versand läuft jetzt über dein Postfach. Eine Test-Mail ist unterwegs an ' . FORMA_NOTIFY_EMAIL . '.');
     } catch (Throwable $e) {
         error_log('FORMA SMTP Test: ' . $e->getMessage());
-        go($self, 'Die Anmeldung beim Postfach hat nicht geklappt. Bitte prüfe das Passwort von ' . FORMA_FROM_EMAIL . ' und versuch es noch einmal.');
+        go($self . '?view=einstellungen', 'Die Anmeldung beim Postfach hat nicht geklappt. Bitte prüfe das Passwort von ' . FORMA_FROM_EMAIL . ' und versuch es noch einmal.');
     }
 }
 
 if ($action === 'remove_mail') {
     forma_save_mail_password(null);
-    go($self, 'Der Versand über dein Postfach ist ausgeschaltet.');
+    go($self . '?view=einstellungen', 'Der Versand über dein Postfach ist ausgeschaltet.');
+}
+
+if ($action === 'create_series') {
+    $weekdays = array_values(array_filter(array_map('intval', (array)($_POST['weekdays'] ?? [])), fn($d) => $d >= 1 && $d <= 7));
+    $from = (string)($_POST['from_date'] ?? '');
+    $to = (string)($_POST['to_date'] ?? '');
+    $tpl = [
+        'title' => forma_clean((string)($_POST['title'] ?? ''), 120),
+        'from' => forma_clean((string)($_POST['time_from'] ?? ''), 8),
+        'to' => forma_clean((string)($_POST['time_to'] ?? ''), 8),
+        'capacity' => max(1, min(200, (int)($_POST['capacity'] ?? 4))),
+        'min' => max(1, min(50, (int)($_POST['min_participants'] ?? 1))),
+        'price_text' => forma_clean((string)($_POST['price_text'] ?? ''), 120),
+        'price_cents' => euro_to_cents((string)($_POST['price_online'] ?? '')),
+        'description' => forma_clean((string)($_POST['description'] ?? ''), 600),
+    ];
+    $validDates = preg_match('/^\d{4}-\d{2}-\d{2}$/', $from) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $to) && $from <= $to;
+    if ($tpl['title'] === '' || !$weekdays || !$validDates || $tpl['from'] === '' || $tpl['to'] === '') {
+        go($self . '?view=series', 'Bitte gib Name, Wochentage, Uhrzeit und Zeitraum an.');
+    }
+    if ((strtotime($to) - strtotime($from)) > 370 * 86400) {
+        go($self . '?view=series', 'Bitte leg höchstens ein Jahr auf einmal an.');
+    }
+    $n = forma_create_series($pdo, $tpl, $weekdays, $from, $to);
+    go($self, $n === 0 ? 'Es gab keine neuen Termine anzulegen (sie existieren schon).' : ($n === 1 ? '1 Termin ist angelegt.' : "$n Termine sind angelegt und auf der Website sichtbar."));
+}
+
+if ($action === 'save_stripe') {
+    $key = trim((string)($_POST['stripe_key'] ?? ''));
+    if (!preg_match('/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/', $key)) {
+        go($self . '?view=einstellungen', 'Das sieht nicht wie ein geheimer Stripe-Schlüssel aus. Er beginnt mit „sk_test_“, „sk_live_“ oder „rk_live_“.');
+    }
+    try {
+        forma_stripe('GET', '/v1/checkout/sessions', ['limit' => 1], $key);
+        forma_save_stripe_key($key);
+        go($self . '?view=einstellungen', forma_stripe_test_mode($key)
+            ? 'Stripe ist im Testmodus verbunden. Du kannst jetzt mit der Testkarte 4242 4242 4242 4242 eine Buchung ausprobieren.'
+            : 'Stripe ist verbunden. Ab jetzt bezahlen deine Kundinnen Kurse direkt online.');
+    } catch (Throwable $e) {
+        error_log('FORMA Stripe Test: ' . $e->getMessage());
+        go($self . '?view=einstellungen', 'Stripe hat den Schlüssel nicht angenommen. Bitte kopiere ihn noch einmal vollständig aus deinem Stripe-Dashboard.');
+    }
+}
+
+if ($action === 'remove_stripe') {
+    forma_save_stripe_key(null);
+    go($self . '?view=einstellungen', 'Stripe ist getrennt. Anmeldungen laufen wieder ohne Online-Bezahlung.');
+}
+
+if ($action === 'save_mailerlite') {
+    $key = trim((string)($_POST['ml_key'] ?? ''));
+    if (strlen($key) < 20) {
+        go($self . '?view=einstellungen', 'Bitte füge den vollständigen API-Schlüssel aus MailerLite ein.');
+    }
+    try {
+        $group = forma_ml_group($key);
+        forma_save_mailerlite(['api_key' => $key, 'group_id' => $group]);
+        $n = 0;
+        foreach ($pdo->query("SELECT email, name FROM subscribers WHERE status = 'bestaetigt'")->fetchAll() as $r) {
+            $n += forma_ml_sync($r['email'], $r['name']) ? 1 : 0;
+        }
+        go($self . '?view=einstellungen', 'MailerLite ist verbunden. Neue bestätigte Adressen landen ab jetzt automatisch in der Gruppe „Website“.' . ($n ? " $n vorhandene Kontakte wurden übertragen." : ''));
+    } catch (Throwable $e) {
+        error_log('FORMA MailerLite Test: ' . $e->getMessage());
+        go($self . '?view=einstellungen', 'MailerLite hat den Schlüssel nicht angenommen. Bitte erstelle in MailerLite unter Integrationen → API einen neuen Schlüssel und füge ihn vollständig ein.');
+    }
+}
+
+if ($action === 'remove_mailerlite') {
+    forma_save_mailerlite(null);
+    go($self . '?view=einstellungen', 'MailerLite ist getrennt. Neue Adressen sammeln sich nur noch hier in deiner Liste.');
+}
+
+if ($action === 'save_popup') {
+    $p = forma_popup($pdo);
+    $p['active'] = !empty($_POST['active']);
+    $p['eyebrow'] = forma_clean((string)($_POST['eyebrow'] ?? ''), 60);
+    $p['title'] = forma_clean((string)($_POST['title'] ?? ''), 90);
+    $p['text'] = trim(preg_replace("/\r\n?/", "\n", mb_substr((string)($_POST['text'] ?? ''), 0, 700)) ?? '');
+    $p['date_line'] = forma_clean((string)($_POST['date_line'] ?? ''), 90);
+    $p['start'] = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST['start'] ?? '')) ? $_POST['start'] : '';
+    $p['end'] = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST['end'] ?? '')) ? $_POST['end'] : '';
+    $p['signup'] = !empty($_POST['signup']);
+    $p['button_text'] = forma_clean((string)($_POST['button_text'] ?? ''), 40);
+    $link = forma_clean((string)($_POST['button_link'] ?? ''), 300);
+    $p['button_link'] = ($link === '' || preg_match('~^(#|/|https://)~', $link)) ? $link : '';
+    if (!empty($_POST['remove_image']) && $p['image'] !== '') {
+        @unlink(forma_data_dir() . '/' . basename($p['image']));
+        $p['image'] = '';
+    }
+    $up = $_FILES['image'] ?? null;
+    if ($up && ($up['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+        $info = @getimagesize($up['tmp_name']);
+        $ext = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'][$info[2] ?? 0] ?? null;
+        if (!$ext || $up['size'] > 8 * 1024 * 1024) {
+            go($self . '?view=popup', 'Bitte lade ein JPG-, PNG- oder WebP-Bild bis 8 MB hoch.');
+        }
+        foreach (glob(forma_data_dir() . '/popup.*') ?: [] as $old) {
+            @unlink($old);
+        }
+        $target = forma_data_dir() . '/popup.' . $ext;
+        if (!shrink_image($up['tmp_name'], $target, $info)) {
+            move_uploaded_file($up['tmp_name'], $target);
+        }
+        $p['image'] = 'popup.' . $ext;
+    } elseif ($up && ($up['error'] ?? 0) !== UPLOAD_ERR_NO_FILE) {
+        go($self . '?view=popup', 'Das Bild konnte nicht hochgeladen werden. Bitte versuch es mit einem kleineren Bild.');
+    }
+    if ($p['title'] === '') {
+        go($self . '?view=popup', 'Bitte gib dem Pop-up einen Titel.');
+    }
+    $p['version'] = (int)$p['version'] + 1;
+    forma_set_setting($pdo, 'popup', json_encode($p, JSON_UNESCAPED_UNICODE));
+    go($self . '?view=popup', $p['active'] ? (forma_popup_live($p) ? 'Gespeichert. Das Pop-up ist jetzt auf der Website zu sehen.' : 'Gespeichert. Das Pop-up erscheint im eingestellten Zeitraum.') : 'Gespeichert. Das Pop-up ist ausgeschaltet.');
+}
+
+if ($action === 'delete_subscriber') {
+    $pdo->prepare('DELETE FROM subscribers WHERE id = ?')->execute([(int)($_POST['sid'] ?? 0)]);
+    go($self . '?view=liste', 'Der Kontakt ist gelöscht.');
 }
 
 // --- Ansichten -------------------------------------------------------------
+if ($view === 'export') {
+    $rows = $pdo->query("SELECT email, name, source, confirmed_at FROM subscribers WHERE status = 'bestaetigt' ORDER BY confirmed_at")->fetchAll();
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="forma-email-liste-' . date('Y-m-d') . '.csv"');
+    $out = fopen('php://output', 'w');
+    fwrite($out, "\xEF\xBB\xBF");
+    fputcsv($out, ['email', 'name', 'quelle', 'bestaetigt_am'], ';');
+    foreach ($rows as $r) {
+        fputcsv($out, [$r['email'], $r['name'], $r['source'], $r['confirmed_at'] ? date('d.m.Y', strtotime($r['confirmed_at'])) : ''], ';');
+    }
+    exit;
+}
+
+if ($view === 'series') {
+    render_page('Serientermine', function () use ($self, $flash) { ?>
+        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
+        <h1>Serientermine anlegen</h1>
+        <p class="muted">Legt für jeden gewählten Wochentag im Zeitraum einen eigenen Termin an. Termine, die es schon gibt, werden übersprungen.</p>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <form method="post" class="card stack" id="series">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
+            <input type="hidden" name="action" value="create_series">
+            <label for="tpl">Vorlage</label>
+            <select id="tpl">
+                <option value="">Eigener Kurs</option>
+                <?php foreach (FORMA_SERIES as $k => $t): ?><option value="<?= forma_h($k) ?>" <?= $k === 'spin' ? 'selected' : '' ?>><?= forma_h($t['title']) ?></option><?php endforeach; ?>
+            </select>
+            <label for="title">Name des Kurses</label><input id="title" name="title" required>
+            <fieldset class="days"><legend>Wochentage</legend>
+                <?php foreach (FORMA_WEEKDAYS as $n => $d): ?><label class="check"><input type="checkbox" name="weekdays[]" value="<?= $n ?>"> <?= $d ?></label><?php endforeach; ?>
+            </fieldset>
+            <div class="row">
+                <div class="stack"><label for="time_from">Von (Uhr)</label><input id="time_from" name="time_from" placeholder="9" required></div>
+                <div class="stack"><label for="time_to">Bis (Uhr)</label><input id="time_to" name="time_to" placeholder="11" required></div>
+            </div>
+            <div class="row">
+                <div class="stack"><label for="from_date">Ab</label><input id="from_date" name="from_date" type="date" value="<?= date('Y-m-d', strtotime('+1 day')) ?>" required></div>
+                <div class="stack"><label for="to_date">Bis</label><input id="to_date" name="to_date" type="date" value="<?= date('Y-m-d', strtotime('+3 months')) ?>" required></div>
+            </div>
+            <div class="row">
+                <div class="stack"><label for="capacity">Plätze pro Termin</label><input id="capacity" name="capacity" type="number" min="1"></div>
+                <div class="stack"><label for="min_participants">Findet statt ab</label><input id="min_participants" name="min_participants" type="number" min="1"></div>
+            </div>
+            <label for="price_text">Preis, wie er auf der Website steht</label><input id="price_text" name="price_text">
+            <label for="price_online">Online bezahlen: Betrag pro Person in € <span class="muted">(leer lassen = Bezahlung vor Ort)</span></label><input id="price_online" name="price_online" inputmode="decimal">
+            <label for="description">Kurze Beschreibung</label><textarea id="description" name="description" rows="3"></textarea>
+            <button class="btn" type="submit">Termine anlegen</button>
+        </form>
+        <script>
+        (function(){
+          var T=<?= json_encode(FORMA_SERIES, JSON_UNESCAPED_UNICODE) ?>, days={spin:[3,5],atelier:[4]};
+          var f=document.getElementById('series'), sel=document.getElementById('tpl');
+          function v(n,x){f.elements.namedItem(n).value=x;}
+          function fill(){var t=T[sel.value];if(!t)return;
+            v('title',t.title);v('time_from',t.from);v('time_to',t.to);v('capacity',t.capacity);v('min_participants',t.min);
+            v('price_text',t.price_text);v('price_online',t.price_cents?String(t.price_cents/100).replace('.',','):'');v('description',t.description);
+            f.querySelectorAll('input[name="weekdays[]"]').forEach(function(c){c.checked=(days[sel.value]||[]).indexOf(+c.value)>-1;});}
+          sel.addEventListener('change',fill);fill();
+        })();
+        </script>
+    <?php });
+}
+
+if ($view === 'einstellungen') {
+    render_page('Einstellungen', function () use ($self, $flash) { $key = forma_stripe_key(); ?>
+        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
+        <h1>Einstellungen</h1>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <h2>Online-Bezahlung mit Stripe</h2>
+        <?php if ($key): ?>
+            <div class="card stack">
+                <p><span class="pill<?= forma_stripe_test_mode($key) ? '' : ' pill-ok' ?>"><?= forma_stripe_test_mode($key) ? 'Testmodus' : 'Live' ?></span></p>
+                <p class="muted"><?= forma_stripe_test_mode($key)
+                    ? 'Im Testmodus wird kein echtes Geld bewegt. Probiere eine Buchung mit der Testkarte 4242 4242 4242 4242 (beliebiges Ablaufdatum in der Zukunft, beliebige Prüfziffer). Wenn alles passt, trägst du hier deinen Live-Schlüssel ein.'
+                    : 'Kurse mit Online-Preis werden direkt bei der Buchung bezahlt. Das Geld landet auf deinem Stripe-Konto, Rückerstattungen machst du im Stripe-Dashboard.' ?></p>
+                <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="remove_stripe"><button class="link" type="submit">Stripe trennen</button></form>
+            </div>
+        <?php endif; ?>
+        <form method="post" class="card stack">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
+            <input type="hidden" name="action" value="save_stripe">
+            <p><?= $key ? 'Schlüssel wechseln (z. B. vom Test- auf den Live-Schlüssel):' : 'Damit deine Kundinnen Kurse online bezahlen können, verbindest du hier einmal dein Stripe-Konto.' ?></p>
+            <ol class="muted small steps">
+                <li>Melde dich bei <strong>dashboard.stripe.com</strong> an.</li>
+                <li>Geh auf <strong>Entwickler → API-Schlüssel</strong>. Zum Ausprobieren oben den <strong>Testmodus</strong> einschalten.</li>
+                <li>Beim <strong>Geheimschlüssel</strong> auf „Anzeigen“ klicken, kopieren und hier einfügen. Er beginnt mit „sk_test_“ bzw. „sk_live_“.</li>
+            </ol>
+            <label for="stripe_key">Geheimer Schlüssel</label>
+            <input id="stripe_key" name="stripe_key" type="password" autocomplete="off" required>
+            <button class="btn" type="submit">Prüfen und speichern</button>
+            <p class="muted small">Der Schlüssel wird nur auf deinem Server gespeichert und nie angezeigt. Bitte gib ihn niemandem weiter, auch nicht per Chat oder Mail.</p>
+        </form>
+        <h2>MailerLite (E-Mail-Liste)</h2>
+        <?php if (forma_mailerlite()): ?>
+            <div class="card stack">
+                <p><span class="pill pill-ok">Verbunden</span></p>
+                <p class="muted">Wer sich über das Pop-up einträgt und die Adresse bestätigt, landet automatisch in MailerLite in der Gruppe „Website“. Abmeldungen werden ebenfalls übertragen.</p>
+                <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="remove_mailerlite"><button class="link" type="submit">MailerLite trennen</button></form>
+            </div>
+        <?php else: ?>
+            <form method="post" class="card stack">
+                <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
+                <input type="hidden" name="action" value="save_mailerlite">
+                <p>Verbinde deine E-Mail-Liste mit MailerLite, dann landen neue Kontakte automatisch dort und du kannst ihnen direkt Newsletter schicken.</p>
+                <ol class="muted small steps">
+                    <li>In MailerLite links auf <strong>Integrationen</strong> klicken.</li>
+                    <li>Bei <strong>MailerLite API</strong> auf „Verwenden“ und dann „Neuen Token erstellen“, Name z. B. „Website“.</li>
+                    <li>Den Schlüssel kopieren und hier einfügen.</li>
+                </ol>
+                <label for="ml_key">API-Schlüssel von MailerLite</label>
+                <input id="ml_key" name="ml_key" type="password" autocomplete="off" required>
+                <button class="btn" type="submit">Verbinden</button>
+            </form>
+        <?php endif; ?>
+        <h2>E-Mail-Versand</h2>
+        <?php if (forma_mail_config()): ?>
+            <div class="card stack">
+                <p><span class="pill pill-ok">Eingerichtet</span></p>
+                <p class="muted">Bestätigungen und Benachrichtigungen gehen über dein Postfach <?= forma_h(FORMA_FROM_EMAIL) ?> raus.</p>
+                <form method="post">
+                    <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
+                    <input type="hidden" name="action" value="remove_mail">
+                    <button class="link" type="submit">Ausschalten</button>
+                </form>
+            </div>
+        <?php else: ?>
+            <form method="post" class="card stack">
+                <p>Damit deine E-Mails nicht im Spam landen, verschickt die Website sie am besten über dein Postfach <strong><?= forma_h(FORMA_FROM_EMAIL) ?></strong>. Gib dafür hier einmal das Passwort dieses Postfachs ein. Es wird nur auf deinem Server gespeichert.</p>
+                <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
+                <input type="hidden" name="action" value="save_mail">
+                <label for="mail_password">Passwort von <?= forma_h(FORMA_FROM_EMAIL) ?></label>
+                <input id="mail_password" name="mail_password" type="password" autocomplete="off" required>
+                <button class="btn" type="submit">Speichern und Test-Mail schicken</button>
+            </form>
+        <?php endif; ?>
+    <?php });
+}
+
+if ($view === 'popup') {
+    $p = forma_popup($pdo);
+    render_page('Saison-Pop-up', function () use ($self, $flash, $p) { $live = forma_popup_live($p); ?>
+        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
+        <h1>Saison-Pop-up</h1>
+        <p class="muted">Ein kleines Fenster, das beim Besuch der Website einmal aufgeht, z. B. für Specials im Advent oder in den Ferien. Besucherinnen können sich dort für deine E-Mail-Liste eintragen.</p>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <p><span class="pill<?= $live ? ' pill-ok' : '' ?>"><?= $live ? 'Gerade auf der Website sichtbar' : ($p['active'] ? 'Eingeschaltet, aber außerhalb des Zeitraums' : 'Ausgeschaltet') ?></span>
+           · <a href="/?popup=vorschau" target="_blank" rel="noopener">Vorschau ansehen</a></p>
+        <form method="post" enctype="multipart/form-data" class="card stack">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
+            <input type="hidden" name="action" value="save_popup">
+            <label class="check"><input type="checkbox" name="active" value="1" <?= $p['active'] ? 'checked' : '' ?>> Pop-up auf der Website anzeigen</label>
+            <div class="row">
+                <div class="stack"><label for="start">Sichtbar ab</label><input id="start" name="start" type="date" value="<?= forma_h($p['start']) ?>"></div>
+                <div class="stack"><label for="end">Sichtbar bis</label><input id="end" name="end" type="date" value="<?= forma_h($p['end']) ?>"></div>
+            </div>
+            <label for="eyebrow">Kleine Zeile oben <span class="muted">(z. B. „Special im Advent“)</span></label><input id="eyebrow" name="eyebrow" value="<?= forma_h($p['eyebrow']) ?>">
+            <label for="ptitle">Titel</label><input id="ptitle" name="title" value="<?= forma_h($p['title']) ?>" required>
+            <label for="ptext">Text</label><textarea id="ptext" name="text" rows="5"><?= forma_h($p['text']) ?></textarea>
+            <label for="date_line">Termin oder Zeitraum <span class="muted">(optional)</span></label><input id="date_line" name="date_line" value="<?= forma_h($p['date_line']) ?>">
+            <label for="image">Bild oder Flyer <span class="muted">(optional, JPG/PNG)</span></label>
+            <?php if ($p['image']): ?><img class="thumb" src="../api/popup-image.php?v=<?= (int)$p['version'] ?>" alt=""><label class="check"><input type="checkbox" name="remove_image" value="1"> Bild entfernen</label><?php endif; ?>
+            <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp">
+            <label class="check"><input type="checkbox" name="signup" value="1" <?= $p['signup'] ? 'checked' : '' ?>> Eintragen für die E-Mail-Liste anbieten</label>
+            <div class="row">
+                <div class="stack"><label for="button_text">Zusätzlicher Knopf <span class="muted">(optional)</span></label><input id="button_text" name="button_text" value="<?= forma_h($p['button_text']) ?>" placeholder="z. B. Jetzt buchen"></div>
+                <div class="stack"><label for="button_link">Ziel des Knopfs</label><input id="button_link" name="button_link" value="<?= forma_h($p['button_link']) ?>" placeholder="#anmeldung"></div>
+            </div>
+            <button class="btn" type="submit">Speichern</button>
+        </form>
+    <?php });
+}
+
+if ($view === 'liste') {
+    $subs = $pdo->query("SELECT * FROM subscribers ORDER BY status = 'bestaetigt' DESC, created_at DESC")->fetchAll();
+    $confirmed = count(array_filter($subs, fn($s) => $s['status'] === 'bestaetigt'));
+    render_page('E-Mail-Liste', function () use ($self, $flash, $subs, $confirmed) { ?>
+        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
+        <h1>E-Mail-Liste</h1>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <div class="card stack">
+            <p><strong><?= $confirmed ?></strong> bestätigte <?= $confirmed === 1 ? 'Kontakt' : 'Kontakte' ?></p>
+            <p class="muted small">Hier stehen alle, die sich über das Pop-up eingetragen und ihre Adresse per Klick bestätigt haben. <?= forma_mailerlite() ? 'Bestätigte Kontakte werden automatisch an MailerLite (Gruppe „Website“) übertragen.' : 'Für einen Newsletter lädst du die Liste herunter und importierst sie in MailerLite, oder du verbindest MailerLite unter Einstellungen, dann geht das automatisch.' ?></p>
+            <p><a class="btn" href="<?= forma_h($self) ?>?view=export">Liste herunterladen (CSV)</a></p>
+        </div>
+        <div class="list" style="margin-top:16px">
+        <?php foreach ($subs as $s): ?>
+            <div class="card booking<?= $s['status'] === 'bestaetigt' ? '' : ' is-cancelled' ?>">
+                <div class="booking-head"><span class="sel"><?= forma_h($s['email']) ?></span>
+                    <span class="pill"><?= ['bestaetigt' => 'bestätigt', 'offen' => 'noch nicht bestätigt', 'abgemeldet' => 'abgemeldet'][$s['status']] ?? forma_h($s['status']) ?></span></div>
+                <?php if ($s['name'] || $s['source']): ?><div class="muted small"><?= forma_h(trim($s['name'] . ($s['source'] ? ' · über „' . $s['source'] . '“' : ''), ' ·')) ?></div><?php endif; ?>
+                <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="delete_subscriber"><input type="hidden" name="sid" value="<?= (int)$s['id'] ?>"><button class="link" type="submit">Löschen</button></form>
+            </div>
+        <?php endforeach; ?>
+        </div>
+    <?php });
+}
+
 if ($view === 'edit') {
     $id = (int)($_GET['id'] ?? 0);
-    $c = ['id' => 0, 'title' => '', 'date_text' => '', 'start_date' => date('Y-m-d'), 'capacity' => 6, 'min_participants' => 1, 'price_text' => '', 'description' => '', 'visible' => 1];
+    $c = ['id' => 0, 'title' => '', 'date_text' => '', 'start_date' => date('Y-m-d'), 'capacity' => 6, 'min_participants' => 1, 'price_text' => '', 'description' => '', 'visible' => 1, 'price_cents' => 0];
     if ($id) {
         $stmt = $pdo->prepare('SELECT * FROM courses WHERE id = ?');
         $stmt->execute([$id]);
@@ -285,6 +638,8 @@ if ($view === 'edit') {
             </div>
             <label for="price_text">Preis</label>
             <input id="price_text" name="price_text" value="<?= forma_h($c['price_text']) ?>" placeholder="z. B. € 70 pro Person, inkl. eines Werkstücks">
+            <label for="price_online">Online bezahlen: Betrag pro Person in € <span class="muted">(leer lassen = Bezahlung vor Ort)</span></label>
+            <input id="price_online" name="price_online" inputmode="decimal" value="<?= (int)$c['price_cents'] > 0 ? forma_h(rtrim(rtrim(number_format($c['price_cents'] / 100, 2, ',', ''), '0'), ',')) : '' ?>" placeholder="z. B. 70">
             <label for="description">Kurze Beschreibung (optional)</label>
             <textarea id="description" name="description" rows="3"><?= forma_h($c['description']) ?></textarea>
             <label class="check"><input type="checkbox" name="visible" value="1" <?= $c['visible'] ? 'checked' : '' ?>> Auf der Website anzeigen</label>
@@ -310,7 +665,8 @@ if ($view === 'course') {
     if (!$c) {
         go($self, 'Diesen Termin gibt es nicht mehr.');
     }
-    $stmt = $pdo->prepare('SELECT * FROM bookings WHERE course_id = ? ORDER BY status, created_at');
+    forma_reconcile_payments($pdo, true);
+    $stmt = $pdo->prepare("SELECT * FROM bookings WHERE course_id = ? AND status != 'abgebrochen' ORDER BY status, created_at");
     $stmt->execute([$id]);
     $bookings = $stmt->fetchAll();
     $booked = forma_booked($pdo, $id);
@@ -323,16 +679,18 @@ if ($view === 'course') {
         <h2>Anmeldungen</h2>
         <?php if (!$bookings): ?><p class="muted">Noch keine Anmeldungen.</p><?php endif; ?>
         <div class="list">
-        <?php foreach ($bookings as $b): $cancel = $b['status'] === 'storniert'; ?>
+        <?php foreach ($bookings as $b): $cancel = $b['status'] === 'storniert'; $open = $b['status'] === 'offen'; ?>
             <div class="card booking<?= $cancel ? ' is-cancelled' : '' ?>">
                 <div class="booking-head">
                     <strong><?= forma_h($b['name']) ?></strong>
-                    <span class="pill"><?= (int)$b['persons'] ?> <?= (int)$b['persons'] === 1 ? 'Person' : 'Personen' ?><?= $cancel ? ' · storniert' : '' ?></span>
+                    <span class="pill"><?= (int)$b['persons'] ?> <?= (int)$b['persons'] === 1 ? 'Person' : 'Personen' ?><?= $cancel ? ' · storniert' : '' ?><?= $open ? ' · Zahlung läuft' : '' ?><?= (!$open && $b['paid_at']) ? ' · ' . forma_h(forma_euro((int)$b['amount_cents'])) . ' bezahlt' : '' ?></span>
                 </div>
                 <?php if ($b['email']): ?><div class="sel"><?= forma_h($b['email']) ?></div><?php endif; ?>
                 <?php if ($b['phone']): ?><div class="sel"><?= forma_h($b['phone']) ?></div><?php endif; ?>
                 <?php if ($b['message']): ?><div class="muted">„<?= forma_h($b['message']) ?>“</div><?php endif; ?>
                 <div class="muted small">Angemeldet am <?= forma_h(date('d. m. Y, H:i', strtotime($b['created_at']))) ?></div>
+                <?php if ($cancel && $b['paid_at']): ?><div class="muted small">Online bezahlt. Die Rückerstattung machst du im Stripe-Dashboard unter Zahlungen.</div><?php endif; ?>
+                <?php if (!$open): ?>
                 <form method="post">
                     <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
                     <input type="hidden" name="action" value="booking_status">
@@ -341,6 +699,7 @@ if ($view === 'course') {
                     <input type="hidden" name="status" value="<?= $cancel ? 'bestaetigt' : 'storniert' ?>">
                     <button class="link" type="submit"><?= $cancel ? 'Wieder aktivieren' : 'Stornieren (Platz wird frei)' ?></button>
                 </form>
+                <?php endif; ?>
             </div>
         <?php endforeach; ?>
         </div>
@@ -362,57 +721,54 @@ if ($view === 'course') {
 }
 
 // Übersicht
+forma_reconcile_payments($pdo);
 $upcoming = forma_upcoming_courses($pdo, false);
+$groups = [];
+foreach ($upcoming as $c) {
+    $groups[$c['title']][] = $c;
+}
 $stmt = $pdo->prepare('SELECT * FROM courses WHERE start_date < ? ORDER BY start_date DESC LIMIT 20');
 $stmt->execute([date('Y-m-d')]);
 $past = $stmt->fetchAll();
-render_page('Kursverwaltung', function () use ($upcoming, $past, $self, $flash, $pdo) { ?>
+$subCount = (int)$pdo->query("SELECT COUNT(*) FROM subscribers WHERE status = 'bestaetigt'")->fetchColumn();
+$popupLive = forma_popup_live(forma_popup($pdo));
+render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive) { ?>
     <div class="top">
         <h1>Kursverwaltung</h1>
         <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="logout"><button class="link" type="submit">Abmelden</button></form>
     </div>
     <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
-    <p><a class="btn" href="<?= forma_h($self) ?>?view=edit">+ Neuen Termin anlegen</a></p>
+    <?php if (!forma_stripe_key()): ?><p class="alert">Die Online-Bezahlung ist noch nicht eingerichtet. Bis dahin werden alle Kurse ohne Bezahlung reserviert. <a href="<?= forma_h($self) ?>?view=einstellungen">Jetzt Stripe verbinden</a></p><?php endif; ?>
+    <nav class="tiles">
+        <a class="tile" href="<?= forma_h($self) ?>?view=edit"><strong>+ Einzeltermin</strong><span class="muted small">z. B. ein Special-Kurs</span></a>
+        <a class="tile" href="<?= forma_h($self) ?>?view=series"><strong>+ Serientermine</strong><span class="muted small">z. B. jeden Mi &amp; Fr</span></a>
+        <a class="tile" href="<?= forma_h($self) ?>?view=popup"><strong>Saison-Pop-up</strong><span class="muted small"><?= $popupLive ? 'gerade sichtbar' : 'ausgeschaltet' ?></span></a>
+        <a class="tile" href="<?= forma_h($self) ?>?view=liste"><strong>E-Mail-Liste</strong><span class="muted small"><?= $subCount ?> <?= $subCount === 1 ? 'Kontakt' : 'Kontakte' ?></span></a>
+        <a class="tile" href="<?= forma_h($self) ?>?view=einstellungen"><strong>Einstellungen</strong><span class="muted small">Stripe, MailerLite, E-Mail</span></a>
+    </nav>
     <h2>Kommende Termine</h2>
-    <?php if (!$upcoming): ?><p class="muted">Gerade sind keine Termine eingetragen.</p><?php endif; ?>
-    <div class="list">
-    <?php foreach ($upcoming as $c): $full = $c['free'] <= 0; ?>
-        <div class="card course">
-            <a class="course-link" href="<?= forma_h($self) ?>?view=course&amp;id=<?= (int)$c['id'] ?>">
-                <strong><?= forma_h($c['title']) ?></strong>
-                <span class="muted"><?= forma_h($c['date_text']) ?></span>
-                <span class="pill<?= $full ? ' pill-full' : '' ?>"><?= (int)$c['booked'] ?> / <?= (int)$c['capacity'] ?> belegt<?= $full ? ' · ausgebucht' : '' ?></span>
-            </a>
-            <form method="post">
-                <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
-                <input type="hidden" name="action" value="toggle_visible">
-                <input type="hidden" name="id" value="<?= (int)$c['id'] ?>">
-                <button class="link" type="submit"><?= $c['visible'] ? 'Sichtbar · ausblenden' : 'Ausgeblendet · anzeigen' ?></button>
-            </form>
+    <?php if (!$groups): ?><p class="muted">Gerade sind keine Termine eingetragen.</p><?php endif; ?>
+    <?php foreach ($groups as $title => $list): $bookedSum = array_sum(array_column($list, 'booked')); ?>
+    <details class="group" <?= count($list) <= 3 || $bookedSum > 0 ? 'open' : '' ?>>
+        <summary><strong><?= forma_h($title) ?></strong> <span class="muted small"><?= count($list) ?> <?= count($list) === 1 ? 'Termin' : 'Termine' ?> · <?= $bookedSum ?> <?= $bookedSum === 1 ? 'Person' : 'Personen' ?> angemeldet</span></summary>
+        <div class="list">
+        <?php foreach ($list as $c): $full = $c['free'] <= 0; ?>
+            <div class="card course">
+                <a class="course-link" href="<?= forma_h($self) ?>?view=course&amp;id=<?= (int)$c['id'] ?>">
+                    <span><?= forma_h($c['date_text']) ?></span>
+                    <span class="pill<?= $full ? ' pill-full' : '' ?><?= $c['booked'] > 0 && !$full ? ' pill-ok' : '' ?>"><?= (int)$c['booked'] ?> / <?= (int)$c['capacity'] ?> belegt<?= $full ? ' · ausgebucht' : '' ?><?= (int)$c['price_cents'] > 0 ? ' · online ' . forma_h(forma_euro((int)$c['price_cents'])) : '' ?></span>
+                </a>
+                <form method="post">
+                    <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
+                    <input type="hidden" name="action" value="toggle_visible">
+                    <input type="hidden" name="id" value="<?= (int)$c['id'] ?>">
+                    <button class="link" type="submit"><?= $c['visible'] ? 'Sichtbar · ausblenden' : 'Ausgeblendet · anzeigen' ?></button>
+                </form>
+            </div>
+        <?php endforeach; ?>
         </div>
+    </details>
     <?php endforeach; ?>
-    </div>
-    <h2>E-Mail-Versand</h2>
-    <?php if (forma_mail_config()): ?>
-        <div class="card stack">
-            <p><span class="pill">Eingerichtet</span></p>
-            <p class="muted">Bestätigungen und Benachrichtigungen gehen über dein Postfach <?= forma_h(FORMA_FROM_EMAIL) ?> raus.</p>
-            <form method="post">
-                <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
-                <input type="hidden" name="action" value="remove_mail">
-                <button class="link" type="submit">Ausschalten</button>
-            </form>
-        </div>
-    <?php else: ?>
-        <form method="post" class="card stack">
-            <p>Damit deine E-Mails nicht im Spam landen, verschickt die Website sie am besten über dein Postfach <strong><?= forma_h(FORMA_FROM_EMAIL) ?></strong>. Gib dafür hier einmal das Passwort dieses Postfachs ein. Es wird nur auf deinem Server gespeichert.</p>
-            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
-            <input type="hidden" name="action" value="save_mail">
-            <label for="mail_password">Passwort von <?= forma_h(FORMA_FROM_EMAIL) ?></label>
-            <input id="mail_password" name="mail_password" type="password" autocomplete="off" required>
-            <button class="btn" type="submit">Speichern und Test-Mail schicken</button>
-        </form>
-    <?php endif; ?>
     <?php if ($past): ?>
     <details class="past">
         <summary>Vergangene Termine</summary>
@@ -475,6 +831,16 @@ input:focus,textarea:focus{outline:3px solid #B05A38;outline-offset:1px}
 .is-cancelled{opacity:.6}
 .sel{user-select:all;overflow-wrap:anywhere}
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:8px 0 4px}
+.tile{display:flex;flex-direction:column;gap:2px;padding:14px 16px;border-radius:16px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.tile:hover{border-color:var(--clay)}
+.group{margin-bottom:12px}.group summary{cursor:pointer;padding:8px 0;list-style-position:outside}
+.group .list{margin-top:6px;gap:8px}.group .card{padding:10px 14px}
+.pill-ok{background:#DCE3C8}
+select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);width:100%}
+.days{border:0;padding:0;margin:4px 0;display:flex;flex-wrap:wrap;gap:6px 18px}.days legend{font-weight:500;font-size:15px;margin-bottom:6px;padding:0}
+.steps{margin:0;padding-left:20px;display:grid;gap:4px}
+.thumb{max-width:220px;border-radius:12px}
 .past{margin-top:28px}.past summary{cursor:pointer;font-weight:500;margin-bottom:12px}
 @media (max-width:480px){.row{grid-template-columns:1fr}}
 </style>

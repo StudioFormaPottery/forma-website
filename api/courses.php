@@ -5,6 +5,8 @@ require __DIR__ . '/lib.php';
 
 try {
     $pdo = forma_db();
+    forma_reconcile_payments($pdo);
+    $online = forma_stripe_key() !== null;
     $out = [];
     foreach (forma_upcoming_courses($pdo) as $c) {
         $out[] = [
@@ -15,6 +17,7 @@ try {
             'description' => $c['description'],
             'free' => (int)$c['free'],
             'min_participants' => (int)$c['min_participants'],
+            'price_cents' => $online ? (int)$c['price_cents'] : 0,
         ];
     }
     forma_json(['ok' => true, 'courses' => $out]);

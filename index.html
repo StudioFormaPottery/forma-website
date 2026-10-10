@@ -38,6 +38,7 @@
   color-scheme:light;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.65;-webkit-font-smoothing:antialiased}
 img{max-width:100%;display:block}
@@ -60,7 +61,7 @@ p{margin:0}
 
 /* Kopfbereich */
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--blush)}
-.top .wrap{display:flex;align-items:center;gap:20px;padding-block:12px}
+.top .wrap{max-width:1320px;display:flex;align-items:center;gap:20px;padding-block:12px}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto}
 .brand img{width:60px;height:60px;object-fit:contain}
 .brand span{font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase}
@@ -72,26 +73,66 @@ p{margin:0}
 @media (max-width:860px){.nav a:not(.btn){display:none}.brand span{display:none}}
 
 .hero{position:relative;background:var(--blush);overflow:hidden}
-.hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(28px,5vw,64px);align-items:center;padding-block:clamp(28px,5vw,64px) clamp(8px,2vw,24px)}
-.hero h1{font-size:clamp(52px,8.4vw,116px);color:var(--clay)}
+.hero .wrap{max-width:1320px;position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:center;padding-block:clamp(28px,4vw,56px) 0}
+.hero h1{font-size:clamp(46px,5.5vw,84px);color:var(--clay);line-height:.98}
+.hero h1 span.l{display:block}
 .hero h1 em{font-style:normal;color:var(--clay-soft)}
+.scribble{position:relative;display:inline-block}
+.scribble svg{position:absolute;left:-4%;bottom:-.2em;width:108%;height:.42em;overflow:visible}
+.scribble path{fill:none;stroke:var(--clay);stroke-width:5;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420;animation:draw 1.4s .6s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
 .hero-copy{display:flex;flex-direction:column;gap:24px;min-width:0}
-.hero-copy p.lead{font-size:clamp(18px,1.6vw,20px);max-width:38ch;color:var(--ink-soft)}
+.hero-copy .eyebrow{display:flex;align-items:center;gap:12px}
+.hero-copy .eyebrow::before{content:"";width:42px;height:1.5px;background:currentColor;opacity:.6}
+.hero-copy p.lead{font-size:clamp(18px,1.5vw,20px);max-width:40ch;color:var(--ink-soft)}
 .actions{display:flex;flex-wrap:wrap;gap:12px}
-.hero-photo{position:relative;min-width:0}
-.hero-photo img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:var(--blob);animation:morph 16s ease-in-out infinite alternate}
-.stamp{position:absolute;left:-26px;bottom:8%;width:140px;height:140px;border-radius:50%;background:var(--clay);color:var(--on-clay);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transform:rotate(-10deg);line-height:1.2;box-shadow:0 12px 30px rgba(150,47,33,.2)}
-.stamp b{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase}
-.stamp span{font-family:var(--script);font-size:26px}
+.hero-week{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.hero-week li{display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 10px;border-radius:999px;background:color-mix(in srgb,var(--paper) 62%,transparent);font-size:14.5px;color:var(--ink)}
+.hero-week li::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--clay-soft)}
+.hero-week li:nth-child(2)::before{background:var(--clay)}
+.hero-week li:nth-child(3)::before{background:#C99A6B}
+.hero-week b{font-weight:600}
+
+/* Fotocollage im Kopfbereich */
+.collage{position:relative;min-width:0;aspect-ratio:1/1.04;width:100%;max-width:640px;justify-self:end}
+.collage figure{margin:0;position:absolute;overflow:hidden;background:var(--paper-2)}
+.collage img{width:100%;height:100%;object-fit:cover}
+.c-main{right:0;top:2%;width:62%;height:86%;border-radius:999px 999px 34px 34px;box-shadow:0 24px 50px rgba(103,48,30,.18)}
+.c-round{left:2%;bottom:1%;width:43%;aspect-ratio:1;border-radius:50%;border:9px solid var(--blush);z-index:2;animation:bob 9s ease-in-out infinite alternate}
+.c-small{left:9%;top:4%;width:30%;aspect-ratio:4/5;border-radius:var(--blob);transform:rotate(-7deg);z-index:1;animation:morph 14s ease-in-out infinite alternate}
+.spin{position:absolute;right:-3%;bottom:-1%;width:clamp(104px,11vw,150px);aspect-ratio:1;z-index:3}
+.spin svg{width:100%;height:100%;display:block}
+.spin .ring{animation:turn 26s linear infinite;transform-origin:50% 50%}
+.spin text{font-family:var(--body);font-size:15.5px;font-weight:500;letter-spacing:.2em;fill:var(--on-clay)}
+.spark{position:absolute;z-index:3;pointer-events:none;animation:twinkle 3.6s ease-in-out infinite}
+.spark path{fill:var(--clay)}
+.spark.s1{width:34px;left:44%;top:0}
+.spark.s2{width:22px;left:0;top:44%;animation-delay:1.2s}
+.spark.s2 path{fill:var(--clay-soft)}
+.spark.s3{width:26px;right:2%;top:-3%;animation-delay:2.1s}
+.spark.s3 path{fill:var(--paper)}
+.doodle{position:absolute;left:28%;top:44%;width:44%;z-index:0;pointer-events:none}
+.doodle path{fill:none;stroke:var(--paper);stroke-width:3;stroke-linecap:round;stroke-dasharray:3 10;opacity:.9}
+@keyframes turn{to{transform:rotate(360deg)}}
+@keyframes bob{from{transform:translateY(0) rotate(-2deg)}to{transform:translateY(-12px) rotate(2deg)}}
+@keyframes twinkle{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(.7) rotate(25deg)}}
 .float{position:absolute;pointer-events:none;z-index:0;animation:drift 14s ease-in-out infinite alternate}
-.float.f1{width:240px;left:-70px;top:44%;opacity:.35;animation-duration:17s}
-.float.f2{width:150px;right:6%;top:6%;opacity:.4}
-.float.f3{width:90px;left:46%;bottom:14%;opacity:.45;animation-duration:12s}
+.float.f1{width:260px;left:-90px;top:52%;opacity:.35;animation-duration:17s}
+.float.f2{width:150px;right:3%;top:4%;opacity:.4}
 .float path{fill:var(--paper)}
-.float.f3 path{fill:var(--clay-soft)}
 @keyframes drift{from{transform:translate(0,0) rotate(0deg)}to{transform:translate(18px,-22px) rotate(8deg)}}
 @keyframes morph{from{border-radius:58% 42% 47% 53% / 52% 46% 54% 48%}to{border-radius:46% 54% 56% 44% / 44% 56% 46% 54%}}
-@media (max-width:860px){.hero .wrap{grid-template-columns:1fr}.hero-photo{max-width:440px}.stamp{left:auto;right:-6px;width:118px;height:118px}.float.f3{display:none}}
+@media (max-width:900px){.hero .wrap{grid-template-columns:1fr}.collage{justify-self:center;max-width:520px}.float.f1{display:none}}
+
+/* Laufband */
+.ribbon-wrap{position:relative;z-index:2;overflow:hidden;margin-top:clamp(-56px,-4vw,-24px);padding-block:18px}
+.ribbon{background:var(--clay);color:var(--on-clay);transform:rotate(-1.6deg);width:104%;margin-left:-2%;padding-block:14px;overflow:hidden}
+.ribbon-track{display:flex;width:max-content;animation:marquee 38s linear infinite}
+.ribbon-track span{display:inline-flex;align-items:center;gap:22px;padding-right:22px;white-space:nowrap;font-family:var(--display);font-weight:600;font-size:clamp(18px,1.8vw,24px);letter-spacing:-.01em}
+.ribbon-track i{font-family:var(--script);font-style:normal;font-weight:400;font-size:1.15em}
+.ribbon-track svg{width:18px;height:18px;flex:0 0 auto}
+.ribbon-track svg path{fill:var(--blush)}
+@keyframes marquee{to{transform:translateX(-50%)}}
 
 /* Abschnitte */
 section{scroll-margin-top:96px}
@@ -121,17 +162,26 @@ section{scroll-margin-top:96px}
 
 
 /* Termine & Anmeldung */
-.slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-@media (max-width:780px){.slots{grid-template-columns:1fr}}
+.slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px;align-items:start}
 .slots-note{grid-column:1/-1;color:var(--ink-soft);padding:22px 24px;border:1px dashed var(--line);border-radius:24px}
-.slot{display:flex;flex-direction:column;gap:10px;padding:24px 24px 22px;border-radius:26px;background:var(--paper-2);border:1px solid var(--line);min-width:0}
-.slot h3{font-family:var(--display);font-weight:650;letter-spacing:-.02em;font-size:26px;line-height:1.1;color:var(--clay)}
-.slot-date{font-weight:500}
+.slot{display:flex;flex-direction:column;gap:12px;padding:28px 26px 26px;border-radius:30px;background:var(--paper-2);border:1px solid var(--line);min-width:0}
+.slot h3{font-family:var(--display);font-weight:650;letter-spacing:-.02em;font-size:30px;line-height:1.1;color:var(--clay)}
 .slot-desc{font-size:15.5px;color:var(--ink-soft)}
-.slot-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:12px}
-.slot-price{font-size:15.5px;color:var(--ink-soft)}
-.badge{display:inline-flex;align-items:center;gap:6px;width:max-content;padding:4px 12px;border-radius:999px;font-size:13.5px;font-weight:500;background:var(--paper);color:var(--clay)}
-.badge.is-full{background:var(--clay);color:var(--on-clay)}
+.slot-meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:15px}
+.slot-meta span{display:inline-flex;align-items:center;gap:6px}
+.slot-meta span::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--clay-soft)}
+.dates{display:flex;flex-wrap:wrap;gap:8px;margin-top:-4px}
+.date{font:inherit;font-size:14.5px;line-height:1.25;display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:9px 14px;border-radius:16px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;text-align:left;transition:border-color .2s ease,background-color .2s ease}
+.date small{font-size:12.5px;color:var(--ink-soft)}
+.date:hover{border-color:var(--clay-soft)}
+.date[aria-pressed="true"]{background:var(--clay);border-color:var(--clay);color:var(--on-clay)}
+.date[aria-pressed="true"] small{color:var(--on-clay);opacity:.85}
+.date:disabled{opacity:.5;cursor:not-allowed}
+.more-dates{font:inherit;font-size:14.5px;background:none;border:0;padding:6px 2px;color:var(--clay);text-decoration:underline;text-underline-offset:4px;cursor:pointer;align-self:flex-start}
+.slot-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:6px;padding-top:16px;border-top:1px solid var(--line)}
+.slot-price{font-family:var(--display);font-weight:600;font-size:22px;letter-spacing:-.01em;min-width:0}
+.slot-price small{display:block;font-family:var(--body);font-weight:400;font-size:13.5px;color:var(--ink-soft);letter-spacing:0}
+.pay-note{font-size:13.5px;color:var(--ink-soft);display:flex;align-items:center;gap:8px}
 .book-dialog{border:0;padding:0;border-radius:28px;width:min(560px,calc(100vw - 32px));max-height:calc(100dvh - 32px);background:var(--paper);color:var(--ink);box-shadow:0 30px 80px rgba(51,33,27,.35)}
 .book-dialog::backdrop{background:rgba(51,33,27,.45)}
 .book-inner{position:relative;padding:30px 28px 28px;overflow:auto;max-height:calc(100dvh - 32px)}
@@ -152,6 +202,31 @@ section{scroll-margin-top:96px}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 #book-submit{align-self:flex-start}
 #book-submit[disabled]{opacity:.6;cursor:wait}
+
+/* Saison-Pop-up */
+.season{border:0;padding:0;border-radius:32px;width:min(860px,calc(100vw - 32px));max-height:calc(100dvh - 32px);background:var(--paper);color:var(--ink);box-shadow:0 30px 80px rgba(51,33,27,.35);overflow:hidden}
+.season::backdrop{background:rgba(51,33,27,.5)}
+.season[open]{animation:pop .45s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes pop{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
+.season-inner{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);max-height:calc(100dvh - 32px)}
+.season-inner.no-img{grid-template-columns:1fr}
+.season-img{position:relative;background:var(--blush);padding:22px;min-height:100%}
+.season-img img{width:100%;height:100%;min-height:300px;object-fit:cover;border-radius:999px 999px 24px 24px}
+.season-body{position:relative;display:flex;flex-direction:column;gap:14px;padding:40px 36px 32px;overflow:auto}
+.season-body::before{content:"";position:absolute;width:150px;height:150px;right:-50px;top:-50px;border-radius:var(--blob);background:var(--blush);opacity:.55}
+.season-body > *{position:relative}
+.season h3:focus{outline:none}
+.season h3{font-family:var(--display);font-weight:650;font-size:clamp(30px,3.6vw,42px);line-height:1.04;letter-spacing:-.02em;color:var(--clay);padding-right:36px}
+.season-text{color:var(--ink-soft);white-space:pre-line}
+.season-date{display:inline-flex;align-items:center;gap:8px;width:max-content;max-width:100%;padding:6px 14px;border-radius:999px;background:var(--paper-2);font-weight:500;font-size:15px}
+.season-form{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.season-row{display:flex;gap:8px;flex-wrap:wrap}
+.season-row input{flex:1 1 200px;min-width:0;font:inherit;font-size:16px;padding:12px 16px;border-radius:999px;border:1px solid var(--line);background:#FFFBF7;color:var(--ink)}
+.season-row input:focus{outline:3px solid var(--focus);outline-offset:1px}
+.season .consent{font-size:13.5px}
+.season-close{position:absolute;top:14px;right:14px;z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:var(--paper);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px rgba(51,33,27,.12)}
+@media (max-width:700px){.season-inner{grid-template-columns:1fr;overflow:auto}.season-img{padding:14px 14px 0;min-height:0}.season-img img{min-height:0;height:220px;border-radius:24px}.season-body{padding:24px 22px 24px;overflow:visible}.season h3:focus{outline:none}
+.season h3{padding-right:0}}
 
 /* Studio */
 .studio{background:var(--lilac)}
@@ -188,13 +263,30 @@ section{scroll-margin-top:96px}
 .gift .float{opacity:.6}
 
 /* Kontakt */
-.contact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
-@media (max-width:900px){.contact-grid{grid-template-columns:1fr;max-width:560px}}
-.contact-card{display:flex;flex-direction:column;gap:10px;padding:28px;border:1px solid var(--line);border-radius:28px;background:var(--paper);min-width:0}
-.contact-card h3{font-size:12.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--clay)}
-.contact-card .big{font-family:var(--display);font-weight:600;font-size:23px;line-height:1.3;letter-spacing:-.01em;user-select:all;overflow-wrap:anywhere}
-.contact-card a.link{font-weight:500;color:var(--clay);text-underline-offset:4px}
-.times{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-variant-numeric:tabular-nums}
+.contact-layout{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(40px,7vw,110px);align-items:start}
+@media (max-width:900px){.contact-layout{grid-template-columns:1fr}}
+.contact-layout .section-head{margin-bottom:28px}
+.contact-list{margin:0;display:flex;flex-direction:column}
+.contact-list > div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 20px;padding:18px 0;border-top:1px solid var(--line)}
+.contact-list > div:last-child{border-bottom:1px solid var(--line)}
+@media (max-width:480px){.contact-list > div{grid-template-columns:1fr}}
+.contact-list dt,.week-label{font-size:12.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--clay);padding-top:4px}
+.contact-list dd{margin:0;display:flex;flex-direction:column;gap:4px;font-size:18.5px;min-width:0;overflow-wrap:anywhere}
+.contact-list dd a:not(.more){text-decoration:none}
+.contact-list dd a:not(.more):hover{color:var(--clay)}
+a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:4px;width:max-content}
+.week{position:relative;padding:clamp(28px,4vw,48px);border-radius:240px 240px 32px 32px;background:var(--paper-2);padding-top:clamp(64px,8vw,110px);text-align:left}
+.week::before{content:"";position:absolute;inset:12px;border:1px dashed var(--line);border-radius:228px 228px 24px 24px;pointer-events:none}
+.week-hours{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;margin-bottom:26px}
+.week-hours .eyebrow{font-size:clamp(26px,2.6vw,34px)}
+.week-hours p.big{font-family:var(--display);font-weight:500;font-size:clamp(26px,2.6vw,34px);letter-spacing:-.015em;line-height:1.15;color:var(--ink)}
+.week-hours p.small{color:var(--ink-soft);font-size:15.5px}
+.week-plan{position:relative;list-style:none;margin:0;padding:0}
+.week-plan li{display:grid;grid-template-columns:150px minmax(0,1fr) auto;align-items:baseline;gap:4px 16px;padding:13px 2px;border-top:1px solid var(--line)}
+.week-plan .day{font-family:var(--script);font-size:24px;line-height:1.1;color:var(--clay)}
+.week-plan .what{font-weight:500}
+.week-plan .when{font-variant-numeric:tabular-nums;color:var(--ink-soft);text-align:right;white-space:nowrap}
+@media (max-width:520px){.week{border-radius:160px 160px 26px 26px}.week::before{border-radius:150px 150px 18px 18px}.week-plan li{grid-template-columns:minmax(0,1fr) auto}.week-plan .day{grid-column:1/-1}}
 
 /* Fuß */
 .foot{background:var(--paper-2)}
@@ -235,24 +327,45 @@ section{scroll-margin-top:96px}
   <section class="hero">
     <svg class="float f1" viewBox="0 0 200 200" aria-hidden="true"><path d="M41 23c27-21 79-27 112 0s41 78 20 113-63 63-104 55S5 147 3 104 14 44 41 23z"></path></svg>
     <svg class="float f2" viewBox="0 0 200 200" aria-hidden="true"><path d="M100 8c38 2 66 22 80 56s6 80-26 104-82 30-112 2S2 98 22 58 62 6 100 8z"></path></svg>
-    <svg class="float f3" viewBox="0 0 200 200" aria-hidden="true"><path d="M60 14c40-14 108 4 126 46s-8 104-56 124S22 180 10 130 20 28 60 14z"></path></svg>
     <div class="wrap">
       <div class="hero-copy">
-        <p class="eyebrow">FORMA Earth &amp; Art · Töpferstudio im Paznaun</p>
-        <h1 class="display">Zeit für Ton. <em>Zeit für dich.</em></h1>
+        <p class="eyebrow">Töpferstudio im Paznaun</p>
+        <h1 class="display"><span class="l">Zeit für Ton.</span> <em class="l">Zeit für <span class="scribble">dich.<svg viewBox="0 0 200 30" preserveAspectRatio="none" aria-hidden="true"><path d="M4 18c30-12 58-14 84-6s52 10 80-2 26-6 28-4"></path></svg></span></em></h1>
         <p class="lead">In meinem Studio in Mathon gestaltest du Tassen, Schalen und Vasen mit deinen eigenen Händen: im angeleiteten Kurs, in einer persönlichen Einzelstunde oder frei im offenen Atelier.</p>
         <div class="actions">
-          <a class="btn btn-solid" href="#angebote">Kurse &amp; Preise</a>
-          <a class="btn btn-ghost" href="#kontakt">Kontakt</a>
+          <a class="btn btn-solid" href="#anmeldung">Termin buchen</a>
+          <a class="btn btn-ghost" href="#angebote">Kurse &amp; Preise</a>
         </div>
+        <ul class="hero-week" aria-label="Jede Woche im Studio">
+          <li><span><b>Mi &amp; Fr</b> · Spin &amp; Go</span></li>
+          <li><span><b>Do</b> · Offenes Atelier</span></li>
+          <li><span><b>Fr abends</b> · Pottery Pause</span></li>
+        </ul>
       </div>
-      <div class="hero-photo">
-        <img src="img/tonkugeln.jpg" alt="Vorbereitete Tonkugeln auf dem Werktisch, dahinter Werkzeuge in handgemachten Bechern" width="1050" height="1400" style="object-position:50% 60%">
-        <div class="stamp" aria-hidden="true"><b>Hand&shy;gemacht</b><span>in</span><b>Mathon</b></div>
+      <div class="collage">
+        <svg class="doodle" viewBox="0 0 300 200" aria-hidden="true"><path d="M10 150c40-90 120-140 170-90s-30 110-60 70 40-120 170-110"></path></svg>
+        <figure class="c-main"><img src="img/tonkugeln.jpg" alt="Vorbereitete Tonkugeln auf dem Werktisch, dahinter Werkzeuge in handgemachten Bechern" width="1050" height="1400" style="object-position:50% 60%"></figure>
+        <figure class="c-small"><img src="img/schalen.jpg" alt="Handgemachte Schalen und Becher" width="1050" height="1400"></figure>
+        <figure class="c-round"><img src="img/werktisch.jpg" alt="Werktisch mit Tassen, Pinseln und Glasuren" width="1050" height="1400" style="object-position:40% 40%"></figure>
+        <div class="spin" aria-hidden="true">
+          <svg viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="100" fill="#8C2C1D"></circle>
+            <g class="ring"><path id="ring-path" d="M100 100m-72 0a72 72 0 1 1 144 0a72 72 0 1 1-144 0" fill="none"></path>
+            <text><textPath href="#ring-path" textLength="440">HANDGEMACHT · IN MATHON · EARTH &amp; ART ·</textPath></text></g>
+            <g transform="translate(82 82) scale(1.5)"><path fill="#DDBFA8" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></g>
+          </svg>
+        </div>
+        <svg class="spark s1" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg>
+        <svg class="spark s2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg>
+        <svg class="spark s3" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg>
       </div>
     </div>
     <svg class="wave" style="--to:var(--paper)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 64c120-34 248-52 384-30s246 70 392 66 266-62 412-70 192 14 252 30v60H0z"></path></svg>
   </section>
+
+  <div class="ribbon-wrap" aria-hidden="true">
+    <div class="ribbon"><div class="ribbon-track"><span>Pottery Pause<svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg><i>Spin &amp; Go</i><svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg>Private Pottery<svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg><i>Offenes Atelier</i><svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg>Handgemacht in Mathon<svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg><i>Zeit für dich</i><svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg></span><span>Pottery Pause<svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg><i>Spin &amp; Go</i><svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg>Private Pottery<svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg><i>Offenes Atelier</i><svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg>Handgemacht in Mathon<svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg><i>Zeit für dich</i><svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg></span><span>Pottery Pause<svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg><i>Spin &amp; Go</i><svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg>Private Pottery<svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg><i>Offenes Atelier</i><svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg>Handgemacht in Mathon<svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg><i>Zeit für dich</i><svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg></span><span>Pottery Pause<svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg><i>Spin &amp; Go</i><svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg>Private Pottery<svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg><i>Offenes Atelier</i><svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg>Handgemacht in Mathon<svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg><i>Zeit für dich</i><svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"></path></svg></span></div></div>
+  </div>
 
   <section class="section" id="angebote">
     <div class="wrap">
@@ -278,12 +391,12 @@ section{scroll-margin-top:96px}
           <h3>Spin &amp; Go</h3>
           <p>Zwei Stunden an der Töpferscheibe, begleitet von Anfang an: Ich zeige dir Schritt für Schritt, wie du an der Scheibe arbeitest, und du gestaltest dein eigenes Werkstück.</p>
           <dl class="facts">
-            <dt>Termine</dt><dd><span class="placeholder">[Termine folgen]</span></dd>
+            <dt>Termine</dt><dd>mittwochs &amp; freitags, 9–11 Uhr</dd>
             <dt>Für</dt><dd>Einsteiger und Fortgeschrittene</dd>
-            <dt>Gruppe</dt><dd>ab 2 Personen</dd>
+            <dt>Gruppe</dt><dd>findet ab 2 Personen statt</dd>
           </dl>
           <p class="price">€ 70<small>pro Person, inkl. eines Werkstücks</small></p>
-          <a class="btn btn-solid" href="#anmeldung">Termine ansehen</a>
+          <a class="btn btn-solid" href="#anmeldung">Termin buchen</a>
         </article>
         <article class="offer">
           <p class="kicker">Einzelstunde · Handbuilding</p>
@@ -302,12 +415,12 @@ section{scroll-margin-top:96px}
           <h3>Offenes Atelier</h3>
           <p>Für alle, die selbstständig an eigenen Projekten arbeiten möchten. Material, Werkzeuge und Maschinen stehen dir zur Verfügung.</p>
           <dl class="facts">
-            <dt>Zeiten</dt><dd><span class="placeholder">[Zeiten folgen]</span></dd>
+            <dt>Zeiten</dt><dd>donnerstags, 8–11 Uhr</dd>
             <dt>Brand</dt><dd>Brennen &amp; Glasieren € 22 pro kg, bei Abholung</dd>
           </dl>
           <p class="note">Das offene Atelier ist kein betreuter Kurs und richtet sich an alle mit Vorerfahrung.</p>
           <p class="price">€ 30<small>pro Stunde</small></p>
-          <a class="btn btn-solid" href="#kontakt">Platz anfragen</a>
+          <a class="btn btn-solid" href="#anmeldung">Platz reservieren</a>
         </article>
       </div>
     </div>
@@ -318,7 +431,7 @@ section{scroll-margin-top:96px}
       <div class="section-head">
         <p class="eyebrow">Anmeldung</p>
         <h2 class="display">Termine &amp; Anmeldung</h2>
-        <p>Such dir einen Termin aus und reserviere deinen Platz direkt hier. Du bekommst sofort eine Bestätigung per E-Mail. Online bezahlen musst du dabei nichts.</p>
+        <p>Such dir einen Termin aus und sichere dir deinen Platz direkt hier. Kurse bezahlst du bequem online, das offene Atelier rechnen wir vor Ort ab. Die Bestätigung kommt sofort per E-Mail.</p>
       </div>
       <div class="slots" id="slots" aria-live="polite">
         <p class="slots-note">Die Termine werden geladen …</p>
@@ -348,12 +461,42 @@ section{scroll-margin-top:96px}
         <label class="consent"><input type="checkbox" name="consent" id="book-consent" value="1" required> <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Anmeldung gespeichert werden. Mehr dazu in der <a href="#datenschutz" id="book-privacy">Datenschutzerklärung</a>.</span></label>
         <p class="book-error" id="book-error" role="alert" hidden></p>
         <button class="btn btn-solid" type="submit" id="book-submit">Verbindlich anmelden</button>
+        <p class="pay-note" id="book-paynote" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>Du bezahlst sicher über Stripe, z. B. mit Karte, Apple Pay oder Google Pay.</p>
       </form>
       <div class="book-done" id="book-done" hidden>
         <p class="eyebrow">Danke!</p>
         <h3 id="book-done-title">Deine Anmeldung ist da.</h3>
         <p id="book-done-text"></p>
         <button class="btn btn-solid" type="button" id="book-done-close">Schließen</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="season" id="season" aria-labelledby="season-title">
+    <button class="season-close" type="button" id="season-close" aria-label="Schließen">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+    </button>
+    <div class="season-inner" id="season-inner">
+      <div class="season-img" id="season-img" hidden><img id="season-pic" alt=""></div>
+      <div class="season-body">
+        <p class="eyebrow" id="season-eyebrow"></p>
+        <h3 id="season-title" tabindex="-1"></h3>
+        <p class="season-date" id="season-date" hidden></p>
+        <p class="season-text" id="season-text"></p>
+        <form class="season-form" id="season-form" novalidate hidden>
+          <input type="hidden" name="t" id="season-t">
+          <input type="hidden" name="source" id="season-source">
+          <div class="hp" aria-hidden="true"><label for="season-website">Bitte leer lassen</label><input id="season-website" name="website" tabindex="-1" autocomplete="off"></div>
+          <div class="season-row">
+            <label class="hp" for="season-email">E-Mail</label>
+            <input id="season-email" name="email" type="email" autocomplete="email" placeholder="Deine E-Mail-Adresse" required>
+            <button class="btn btn-solid" type="submit" id="season-submit">Sag mir Bescheid</button>
+          </div>
+          <label class="consent"><input type="checkbox" name="consent" id="season-consent" value="1"> <span>Ja, ich möchte per E-Mail von neuen Kursen und Specials hören. Abmelden geht jederzeit. <a href="#datenschutz" id="season-privacy">Datenschutz</a></span></label>
+          <p class="book-error" id="season-error" role="alert" hidden></p>
+        </form>
+        <p id="season-done" hidden></p>
+        <a class="btn btn-ghost" id="season-btn" hidden></a>
       </div>
     </div>
   </dialog>
@@ -411,32 +554,32 @@ section{scroll-margin-top:96px}
   </section>
 
   <section class="section" id="kontakt">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">Kontakt</p>
-        <h2 class="display">So erreichst du mich</h2>
-        <p>Kursplätze reservierst du direkt hier auf der Seite unter „Termine &amp; Anmeldung“. Für Private Pottery, das offene Atelier und Gutscheine erreichst du mich am schnellsten telefonisch oder per WhatsApp.</p>
+    <div class="wrap contact-layout">
+      <div>
+        <div class="section-head">
+          <p class="eyebrow">Kontakt</p>
+          <h2 class="display">Komm vorbei</h2>
+          <p>Kurse buchst du direkt hier auf der Seite. Für Private Pottery, Gutscheine und alle Fragen erreichst du mich am schnellsten telefonisch oder per WhatsApp.</p>
+        </div>
+        <dl class="contact-list">
+          <div><dt>Telefon</dt><dd><a href="tel:+4367763907080">+43 677 63 90 70 80</a><a class="more" href="https://wa.me/4367763907080" target="_blank" rel="noopener">Nachricht per WhatsApp →</a></dd></div>
+          <div><dt>E-Mail</dt><dd><a href="mailto:hello@forma-pottery.com">hello@forma-pottery.com</a></dd></div>
+          <div><dt>Studio</dt><dd><span>Silvrettastraße 58<br>6562 Mathon, Tirol</span><a class="more" href="https://www.google.com/maps/search/?api=1&amp;query=Silvrettastra%C3%9Fe%2058%2C%206562%20Mathon" target="_blank" rel="noopener">Route planen →</a></dd></div>
+        </dl>
       </div>
-      <div class="contact-grid">
-        <div class="contact-card">
-          <h3>Telefon &amp; WhatsApp</h3>
-          <p class="big">+43 677 63 90 70 80</p>
-          <a class="link" href="https://wa.me/4367763907080" target="_blank" rel="noopener">Nachricht per WhatsApp</a>
+      <div class="week">
+        <div class="week-hours">
+          <p class="eyebrow">Öffnungszeiten</p>
+          <p class="big">Montag bis Freitag<br>8–10 Uhr</p>
         </div>
-        <div class="contact-card">
-          <h3>Studio</h3>
-          <p class="big">Silvrettastraße 58<br>6562 Mathon, Tirol</p>
-          <a class="link" href="https://www.google.com/maps/search/?api=1&amp;query=Silvrettastra%C3%9Fe%2058%2C%206562%20Mathon" target="_blank" rel="noopener">Route planen</a>
-        </div>
-        <div class="contact-card">
-          <h3>Zeiten</h3>
-          <div class="times">
-            <span>Fr</span><span>18–20 Uhr · Pottery Pause</span>
-            <span><span class="placeholder">[Tag]</span></span><span><span class="placeholder">[Uhrzeit]</span> · Spin &amp; Go</span>
-            <span><span class="placeholder">[Tag]</span></span><span><span class="placeholder">[Uhrzeit]</span> · Offenes Atelier</span>
-          </div>
-          <p style="color:var(--ink-soft);font-size:15.5px">Private Pottery nach Vereinbarung</p>
-        </div>
+        <p class="week-label" style="margin-bottom:6px">Kurse &amp; Atelier</p>
+        <ul class="week-plan">
+          <li><span class="day">Mittwoch</span><span class="what">Spin &amp; Go</span><span class="when">9–11 Uhr</span></li>
+          <li><span class="day">Donnerstag</span><span class="what">Offenes Atelier</span><span class="when">8–11 Uhr</span></li>
+          <li><span class="day">Freitag</span><span class="what">Spin &amp; Go</span><span class="when">9–11 Uhr</span></li>
+          <li><span class="day">Freitagabend</span><span class="what">Pottery Pause</span><span class="when">18–20 Uhr</span></li>
+          <li><span class="day">Individuell</span><span class="what">Private Pottery</span><span class="when">nach Vereinbarung</span></li>
+        </ul>
       </div>
     </div>
   </section>
@@ -474,13 +617,19 @@ section{scroll-margin-top:96px}
           <p>Diese Website wird bei Hostinger (Hostinger International Ltd.) gehostet, einem Anbieter mit Sitz in der Europäischen Union. Beim Aufruf der Seite werden automatisch technisch notwendige Daten verarbeitet, die dein Browser übermittelt: IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene Seite, Browser und Betriebssystem. Diese Daten dienen nur dazu, die Website sicher und stabil auszuliefern, und werden nicht mit anderen Daten zusammengeführt. Rechtsgrundlage ist mein berechtigtes Interesse an einem funktionierenden Webauftritt (Art. 6 Abs. 1 lit. f DSGVO). Mit Hostinger besteht ein Vertrag zur Auftragsverarbeitung.</p>
 
           <h4>Cookies, Analyse und Schriften</h4>
-          <p>Diese Website setzt keine Cookies und verwendet keine Analyse- oder Tracking-Tools. Die Schriften sind direkt auf dem Server dieser Website gespeichert, es wird dafür keine Verbindung zu Google oder anderen Anbietern hergestellt.</p>
+          <p>Diese Website setzt keine Cookies und verwendet keine Analyse- oder Tracking-Tools. Damit ein saisonales Hinweisfenster nicht bei jedem Seitenaufruf erneut erscheint, merkt sich dein Browser nur für die Dauer deines Besuchs (Session Storage), dass du es schon gesehen hast. Diese Information verlässt dein Gerät nicht und wird beim Schließen des Browserfensters gelöscht. Die Schriften sind direkt auf dem Server dieser Website gespeichert, es wird dafür keine Verbindung zu Google oder anderen Anbietern hergestellt.</p>
 
           <h4>Kontakt per Telefon, WhatsApp oder E-Mail</h4>
           <p>Wenn du mich kontaktierst, verarbeite ich deine Angaben (zum Beispiel Name, Telefonnummer, Nachricht), um deine Anfrage zu beantworten und gegebenenfalls einen Termin zu vereinbaren (Art. 6 Abs. 1 lit. b DSGVO). Deine Daten gebe ich nicht ohne deine Zustimmung weiter. Nutzt du WhatsApp, gelten zusätzlich die Datenschutzbestimmungen von WhatsApp (Meta Platforms Ireland Ltd.).</p>
 
           <h4>Kursanmeldung über diese Website</h4>
           <p>Wenn du dich über das Anmeldeformular für einen Kurs anmeldest, speichere ich deine Angaben (Name, E-Mail-Adresse, optional Telefonnummer und Nachricht, Anzahl der Personen) auf dem Server dieser Website bei Hostinger. Ich nutze sie ausschließlich, um deine Anmeldung zu verwalten, dir eine Bestätigung zu schicken und dich bei Änderungen zum Kurs zu kontaktieren (Art. 6 Abs. 1 lit. b DSGVO). Zum Schutz vor Missbrauch wird außerdem ein verschlüsselter Kurzwert deiner IP-Adresse gespeichert, aus dem sich die Adresse nicht zurückrechnen lässt. Deine Anmeldedaten lösche ich spätestens zwölf Monate nach dem Kurs, soweit keine gesetzlichen Aufbewahrungspflichten entgegenstehen.</p>
+
+          <h4>Online-Bezahlung mit Stripe</h4>
+          <p>Kurse kannst du online bezahlen. Dafür wirst du zum Zahlungsdienstleister Stripe (Stripe Payments Europe Ltd., 1 Grand Canal Street Lower, Dublin 2, Irland) weitergeleitet. Stripe erhält die für die Zahlung nötigen Daten: deine E-Mail-Adresse, den gebuchten Kurs mit Termin und Betrag sowie deine Zahlungsdaten, die du direkt bei Stripe eingibst. Deine Karten- oder Kontodaten sehe und speichere ich nicht. Rechtsgrundlage ist die Erfüllung des Vertrags (Art. 6 Abs. 1 lit. b DSGVO). Stripe verarbeitet Daten teilweise auch in den USA; die Übermittlung ist über das EU-US Data Privacy Framework und Standardvertragsklauseln abgesichert. Mehr dazu unter stripe.com/at/privacy. Zahlungsbelege bewahre ich sieben Jahre auf, wie es das Steuerrecht verlangt.</p>
+
+          <h4>E-Mail-Liste für neue Kurse und Specials</h4>
+          <p>Wenn du dich für meine E-Mail-Liste einträgst, speichere ich deine E-Mail-Adresse, den Zeitpunkt der Eintragung und über welches Angebot du dich eingetragen hast. Du bekommst zuerst eine E-Mail mit einem Bestätigungslink; erst nach deinem Klick stehst du auf der Liste (Double-Opt-in). Ich schreibe dir dann gelegentlich zu neuen Kursen und Specials im Studio. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, § 174 TKG 2021). Du kannst sie jederzeit widerrufen, über den Abmeldelink in jeder E-Mail oder mit einer kurzen Nachricht an mich. Für den Versand nutze ich den Dienst MailerLite (MailerLite Limited, Ground Floor, 71 Lower Baggot Street, Dublin 2, Irland) als Auftragsverarbeiter: Nach deiner Bestätigung wird deine Adresse dorthin übertragen. MailerLite kann außerdem erfassen, ob eine E-Mail geöffnet oder ein Link darin angeklickt wurde, damit ich sehe, welche Inhalte interessieren. Nach deiner Abmeldung lösche ich deine Adresse.</p>
 
           <h4>Links zu anderen Websites</h4>
           <p>Diese Seite enthält Links zu Google Maps und WhatsApp. Erst wenn du einen Link anklickst, werden Daten an den jeweiligen Anbieter übertragen. Für deren Inhalte und Datenverarbeitung bin ich nicht verantwortlich.</p>
@@ -505,43 +654,82 @@ section{scroll-margin-top:96px}
   var done=document.getElementById('book-done');
   var err=document.getElementById('book-error');
   var submit=document.getElementById('book-submit');
+  var persons=document.getElementById('book-persons');
+  var payNote=document.getElementById('book-paynote');
   var courses=[];
+  var current=null;
   var phone='+43 677 63 90 70 80';
+  var SHOW=6;
 
   function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
   function note(text){slots.innerHTML='';slots.appendChild(el('p','slots-note',text));}
+  function euro(c){return '€ '+(c%100===0?String(c/100):(c/100).toFixed(2).replace('.',','));}
+  function freeText(n){return n<=0?'ausgebucht':(n===1?'noch 1 Platz':'noch '+n+' Plätze');}
 
   function render(){
     slots.innerHTML='';
     if(!courses.length){note('Gerade sind keine Termine online. Melde dich gern direkt bei mir unter '+phone+' oder per WhatsApp, dann finden wir einen Termin für dich.');return;}
-    courses.forEach(function(c){
+    var groups=[],byTitle={};
+    courses.forEach(function(c){if(!byTitle[c.title]){byTitle[c.title]=[];groups.push(c.title);}byTitle[c.title].push(c);});
+    groups.forEach(function(title){
+      var list=byTitle[title],first=list[0];
       var card=el('article','slot');
-      var full=c.free<=0;
-      card.appendChild(el('span','badge'+(full?' is-full':''),full?'Ausgebucht':(c.free===1?'Noch 1 Platz frei':'Noch '+c.free+' Plätze frei')));
-      card.appendChild(el('h3',null,c.title));
-      card.appendChild(el('p','slot-date',c.date_text));
-      if(c.description)card.appendChild(el('p','slot-desc',c.description));
-      if(c.min_participants>1)card.appendChild(el('p','slot-desc','Findet ab '+c.min_participants+' Personen statt.'));
+      card.appendChild(el('h3',null,title));
+      if(first.description)card.appendChild(el('p','slot-desc',first.description));
+      var meta=el('p','slot-meta');
+      if(first.min_participants>1)meta.appendChild(el('span',null,'findet ab '+first.min_participants+' Personen statt'));
+      meta.appendChild(el('span',null,first.price_cents>0?'online bezahlen':'Bezahlung vor Ort'));
+      card.appendChild(meta);
+      card.appendChild(el('p','kicker',list.length>1?'Termin wählen':'Termin'));
+      var dates=el('div','dates'),chosen=null,btns=[];
+      var go=el('button','btn btn-solid','Platz buchen');go.type='button';
+      function pick(c,b){chosen=c;btns.forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});go.disabled=false;go.style.opacity='';}
+      list.forEach(function(c,i){
+        var b=el('button','date');b.type='button';b.setAttribute('aria-pressed','false');
+        b.appendChild(document.createTextNode(c.date_text));
+        b.appendChild(el('small',null,freeText(c.free)));
+        if(c.free<=0)b.disabled=true;else b.addEventListener('click',function(){pick(c,b);});
+        if(i>=SHOW)b.hidden=true;
+        btns.push(b);dates.appendChild(b);
+      });
+      card.appendChild(dates);
+      if(list.length>SHOW){
+        var more=el('button','more-dates','Weitere '+(list.length-SHOW)+' Termine anzeigen');more.type='button';
+        more.addEventListener('click',function(){btns.forEach(function(b){b.hidden=false;});more.remove();});
+        card.appendChild(more);
+      }
       var foot=el('div','slot-foot');
-      foot.appendChild(el('span','slot-price',c.price_text||''));
-      var b=el('button','btn btn-solid',full?'Ausgebucht':'Platz reservieren');
-      b.type='button';
-      if(full){b.disabled=true;b.style.opacity='.55';}
-      else b.addEventListener('click',function(){openBooking(c);});
-      foot.appendChild(b);
+      var price=el('p','slot-price',first.price_cents>0?euro(first.price_cents):'');
+      price.appendChild(el('small',null,first.price_text||''));
+      foot.appendChild(price);
+      var firstFree=null;list.some(function(c,i){if(c.free>0){firstFree=i;return true;}return false;});
+      if(firstFree===null){go.disabled=true;go.textContent='Ausgebucht';go.style.opacity='.55';}
+      else pick(list[firstFree],btns[firstFree]);
+      go.addEventListener('click',function(){if(chosen)openBooking(chosen);});
+      foot.appendChild(go);
       card.appendChild(foot);
       slots.appendChild(card);
     });
   }
 
   function load(){
-    fetch('api/courses.php',{cache:'no-store'})
+    return fetch('api/courses.php',{cache:'no-store'})
       .then(function(r){if(!r.ok)throw new Error();return r.json();})
       .then(function(d){if(!d.ok)throw new Error();courses=d.courses||[];render();})
       .catch(function(){note('Die Termine können gerade nicht geladen werden. Melde dich gern direkt bei mir unter '+phone+' oder per WhatsApp.');});
   }
 
+  function submitLabel(){
+    if(current&&current.price_cents>0){
+      submit.textContent='Weiter zur Bezahlung · '+euro(current.price_cents*(+persons.value||1));
+    }else submit.textContent='Verbindlich anmelden';
+  }
+
+  function show(dialog){if(typeof dialog.showModal==='function'){if(!dialog.open)dialog.showModal();}else dialog.setAttribute('open','');}
+  function hide(dialog){if(typeof dialog.close==='function')dialog.close();else dialog.removeAttribute('open');}
+
   function openBooking(c){
+    current=c;
     form.reset();
     err.hidden=true;
     form.hidden=false;done.hidden=true;
@@ -550,15 +738,23 @@ section{scroll-margin-top:96px}
     document.getElementById('book-title').textContent=c.title;
     document.getElementById('book-date').textContent=c.date_text;
     document.getElementById('book-price').textContent=c.price_text||'';
-    var sel=document.getElementById('book-persons');sel.innerHTML='';
+    persons.innerHTML='';
     var max=Math.min(c.free,10);
-    for(var i=1;i<=max;i++){var o=el('option',null,i===1?'1 Person':i+' Personen');o.value=i;sel.appendChild(o);}
-    if(c.min_participants>1&&max>=c.min_participants)sel.value=String(Math.min(c.min_participants,max));
-    if(typeof dlg.showModal==='function')dlg.showModal();else dlg.setAttribute('open','');
+    for(var i=1;i<=max;i++){var o=el('option',null,i===1?'1 Person':i+' Personen');o.value=i;persons.appendChild(o);}
+    payNote.hidden=!(c.price_cents>0);
+    submitLabel();
+    show(dlg);
     setTimeout(function(){document.getElementById('book-name').focus();},50);
   }
-  function closeBooking(){if(typeof dlg.close==='function')dlg.close();else dlg.removeAttribute('open');}
+  function showDone(title,text){
+    form.hidden=true;done.hidden=false;
+    document.getElementById('book-done-title').textContent=title;
+    document.getElementById('book-done-text').textContent=text;
+    show(dlg);
+  }
+  function closeBooking(){hide(dlg);}
 
+  persons.addEventListener('change',submitLabel);
   document.getElementById('book-close').addEventListener('click',closeBooking);
   document.getElementById('book-done-close').addEventListener('click',closeBooking);
   document.getElementById('book-privacy').addEventListener('click',function(){closeBooking();var d=document.getElementById('datenschutz');if(d)d.open=true;});
@@ -573,15 +769,15 @@ section{scroll-margin-top:96px}
     else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))msg='Bitte gib eine gültige E-Mail-Adresse an.';
     else if(!document.getElementById('book-consent').checked)msg='Bitte bestätige noch die Hinweise zum Datenschutz.';
     if(msg){err.textContent=msg;err.hidden=false;return;}
-    submit.disabled=true;submit.textContent='Wird gesendet …';
+    submit.disabled=true;submit.textContent=current&&current.price_cents>0?'Einen Moment …':'Wird gesendet …';
+    var redirecting=false;
     fetch('api/book.php',{method:'POST',body:new FormData(form)})
       .then(function(r){return r.json().catch(function(){return {ok:false};});})
       .then(function(d){
+        if(d&&d.ok&&d.redirect){redirecting=true;window.location.href=d.redirect;return;}
         if(d&&d.ok){
           var first=name.split(/\s+/)[0];
-          document.getElementById('book-done-title').textContent='Danke, '+first+'!';
-          document.getElementById('book-done-text').textContent='Deine Anmeldung für „'+document.getElementById('book-title').textContent+'“ ist bei mir eingegangen. Die Bestätigung ist unterwegs an '+email+'. Ich freue mich auf dich!';
-          form.hidden=true;done.hidden=false;
+          showDone('Danke, '+first+'!','Deine Anmeldung für „'+document.getElementById('book-title').textContent+'“ ist bei mir eingegangen. Die Bestätigung ist unterwegs an '+email+'. Ich freue mich auf dich!');
           load();
         }else{
           err.textContent=(d&&d.error)||('Das hat leider nicht geklappt. Bitte melde dich telefonisch unter '+phone+'.');
@@ -590,10 +786,80 @@ section{scroll-margin-top:96px}
         }
       })
       .catch(function(){err.textContent='Keine Verbindung. Bitte versuch es noch einmal oder melde dich unter '+phone+'.';err.hidden=false;})
-      .then(function(){submit.disabled=false;submit.textContent='Verbindlich anmelden';});
+      .then(function(){if(!redirecting){submit.disabled=false;submitLabel();}});
   });
 
+  // Rückkehr von der Bezahlung
+  var params=new URLSearchParams(location.search);
+  var result=params.get('buchung');
+  var messages={
+    bezahlt:['Danke für deine Buchung!','Deine Zahlung ist angekommen und dein Platz ist fix. Die Bestätigung mit allen Infos ist unterwegs in dein Postfach. Ich freue mich auf dich!'],
+    wartet:['Fast geschafft','Deine Zahlung wird gerade noch verarbeitet. Sobald sie angekommen ist, bekommst du die Bestätigung per E-Mail.'],
+    abgebrochen:['Bezahlung abgebrochen','Kein Problem: Es wurde nichts abgebucht und der Platz ist wieder frei. Du kannst jederzeit neu buchen.'],
+    fehler:['Das hat nicht geklappt','Dieser Link ist leider nicht gültig. Melde dich gern bei mir unter '+phone+'.']
+  };
+  if(result&&messages[result]){
+    showDone(messages[result][0],messages[result][1]);
+    try{params.delete('buchung');history.replaceState(null,'',location.pathname+(params.toString()?'?'+params:'')+location.hash);}catch(e){}
+  }
   load();
+
+  // Saison-Pop-up
+  var season=document.getElementById('season');
+  var preview=params.get('popup')==='vorschau';
+  function seen(id,set){try{if(set){sessionStorage.setItem('forma-popup',id);return true;}return sessionStorage.getItem('forma-popup')===id;}catch(e){return false;}}
+  function openSeason(p){
+    var img=document.getElementById('season-img');
+    if(p.image){document.getElementById('season-pic').src=p.image;img.hidden=false;document.getElementById('season-inner').classList.remove('no-img');}
+    else{img.hidden=true;document.getElementById('season-inner').classList.add('no-img');}
+    document.getElementById('season-eyebrow').textContent=p.eyebrow||'';
+    document.getElementById('season-title').textContent=p.title;
+    document.getElementById('season-text').textContent=p.text||'';
+    var dl=document.getElementById('season-date');dl.textContent=p.date_line||'';dl.hidden=!p.date_line;
+    var sf=document.getElementById('season-form');sf.hidden=!p.signup;
+    document.getElementById('season-t').value=Date.now();
+    document.getElementById('season-source').value=p.title;
+    var b=document.getElementById('season-btn');
+    if(p.button_text&&p.button_link){b.textContent=p.button_text;b.href=p.button_link;b.hidden=false;b.className='btn '+(p.signup?'btn-ghost':'btn-solid');}
+    show(season);
+    try{document.getElementById('season-title').focus({preventScroll:true});}catch(e){}
+  }
+  function closeSeason(){hide(season);}
+  document.getElementById('season-close').addEventListener('click',closeSeason);
+  document.getElementById('season-btn').addEventListener('click',closeSeason);
+  document.getElementById('season-privacy').addEventListener('click',function(){closeSeason();var d=document.getElementById('datenschutz');if(d)d.open=true;});
+  season.addEventListener('click',function(e){if(e.target===season)closeSeason();});
+  document.getElementById('season-form').addEventListener('submit',function(e){
+    e.preventDefault();
+    var f=e.target,se=document.getElementById('season-error'),btn=document.getElementById('season-submit');
+    var email=document.getElementById('season-email').value.trim();
+    se.hidden=true;
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){se.textContent='Bitte gib eine gültige E-Mail-Adresse an.';se.hidden=false;return;}
+    if(!document.getElementById('season-consent').checked){se.textContent='Bitte setz noch das Häkchen, damit ich dir schreiben darf.';se.hidden=false;return;}
+    btn.disabled=true;
+    fetch('api/subscribe.php',{method:'POST',body:new FormData(f)})
+      .then(function(r){return r.json().catch(function(){return {ok:false};});})
+      .then(function(d){
+        if(d&&d.ok){
+          f.hidden=true;var dn=document.getElementById('season-done');
+          dn.textContent=d.already?'Du stehst schon auf meiner Liste. Ich melde mich, sobald es losgeht!':'Fast geschafft! Ich habe dir eine E-Mail an '+email+' geschickt. Bitte klick dort kurz auf den Bestätigungslink.';
+          dn.hidden=false;
+        }else{se.textContent=(d&&d.error)||'Das hat leider nicht geklappt. Bitte versuch es noch einmal.';se.hidden=false;}
+      })
+      .catch(function(){se.textContent='Keine Verbindung. Bitte versuch es noch einmal.';se.hidden=false;})
+      .then(function(){btn.disabled=false;});
+  });
+  fetch('api/popup.php'+(preview?'?vorschau=1':''),{cache:'no-store'})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var p=d&&d.popup;
+      if(!p||(!preview&&seen(p.id)))return;
+      setTimeout(function(){
+        if(dlg.open)return;
+        seen(p.id,true);
+        openSeason(p);
+      },preview?300:2500);
+    }).catch(function(){});
 })();
 try{if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){document.querySelectorAll('video[autoplay]').forEach(function(v){v.removeAttribute('autoplay');v.pause();});}}catch(e){}
 </script>
