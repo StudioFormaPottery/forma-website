@@ -140,6 +140,19 @@ function forma_migrate(PDO $pdo): void
         }
         forma_set_setting($pdo, 'seeded_v2', '1');
     }
+
+    // 10.10.2026: Vivien möchte das Advents-Pop-up sofort einschalten.
+    if (forma_setting($pdo, 'popup_on_v3') === null) {
+        $p = json_decode(forma_setting($pdo, 'popup') ?? '', true);
+        if (is_array($p)) {
+            $p['active'] = true;
+            $p['start'] = '2026-10-10';
+            $p['end'] = $p['end'] ?: '2026-12-20';
+            $p['version'] = (int)($p['version'] ?? 1) + 1;
+            forma_set_setting($pdo, 'popup', json_encode($p, JSON_UNESCAPED_UNICODE));
+        }
+        forma_set_setting($pdo, 'popup_on_v3', '1');
+    }
 }
 
 /** Vorlagen für Serientermine. */
