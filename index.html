@@ -166,7 +166,7 @@ section{scroll-margin-top:96px}
 .kicker{font-size:12.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;opacity:.8}
 .offer h3{font-family:var(--display);font-weight:650;letter-spacing:-.02em;font-size:clamp(30px,2.8vw,36px);line-height:1.05;color:var(--clay)}
 .offer.is-featured h3{color:var(--on-clay)}
-.offer > p{font-size:16.5px}
+.offer > p:not(.price):not(.kicker):not(.note){font-size:16.5px}
 .facts{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 16px;font-size:15.5px;padding-top:18px;border-top:1px solid color-mix(in srgb,currentColor 22%,transparent)}
 .facts dt{font-weight:500;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;padding-top:3px;opacity:.75}
 .facts dd{margin:0}
@@ -339,6 +339,44 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .privacy .stand{color:var(--ink-soft);font-size:14px}
 .placeholder{background:var(--blush);color:var(--ink);padding:0 6px;border-radius:6px}
 @media (max-width:640px){.foot .inner{grid-template-columns:1fr}}
+
+/* Desktop: größere, gut lesbare Schrift (Handy bleibt wie es ist) */
+@media (min-width:861px){
+  body{font-size:20px}
+  .nav a{font-size:17px}
+  .nav .btn,.btn{font-size:17px}
+  .eyebrow{font-size:clamp(28px,2.6vw,36px)}
+  .hero-copy p.lead{font-size:22px}
+  .hero-week li{font-size:16.5px;padding:8px 16px 8px 12px}
+  .section-head p:not(.eyebrow){font-size:20px}
+  .kicker{font-size:14px}
+  .offer > p:not(.price):not(.kicker):not(.note){font-size:19px}
+  .facts{font-size:17.5px}
+  .facts dt{font-size:13.5px}
+  .price small{font-size:16.5px}
+  .note{font-size:16.5px}
+  .tile .next{font-size:17px}
+  .tile h4{font-size:29px}
+  .tile .price{font-size:23px}
+  .tile .go{font-size:16.5px}
+  .film figcaption{font-size:15.5px}
+  .gift p,.about-copy p{font-size:20px}
+  .contact-list dt,.week-label{font-size:13.5px}
+  .contact-list dd{font-size:20.5px}
+  a.more{font-size:17px}
+  .week-hours p.small{font-size:17px}
+  .week-plan li{font-size:19px}
+  .week-plan .day{font-size:27px}
+  .foot .inner{font-size:16.5px}
+  .privacy{font-size:17px}
+  .step-meta,.step-foot,.book-price{font-size:17px}
+  .field label{font-size:16.5px}
+  .consent{font-size:15.5px}
+  .cal-grid .d,.cal-grid button.d{font-size:16.5px}
+  .cal-month{font-size:21px}
+  .season-text{font-size:19px}
+  .season .consent{font-size:14.5px}
+}
 
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
 </style>
