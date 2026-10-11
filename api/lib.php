@@ -645,6 +645,51 @@ function forma_save_mail_password(?string $password): void
     @chmod($file, 0600);
 }
 
+/** Schlichte HTML-Fassung einer Text-Mail: Links klickbar, Zeilen nur mit Link werden zum Button. */
+function forma_mail_html(string $text): string
+{
+    $label = function (string $url): string {
+        if (str_contains($url, 'confirm.php')) return 'E-Mail-Adresse bestätigen';
+        if (str_contains($url, 'maker-download') || str_contains($url, 'template-download') || str_contains($url, 'maker-mail')) return 'Template herunterladen';
+        if (str_contains($url, 'gutschein-pdf')) return 'Gutschein herunterladen';
+        if (str_contains($url, 'cancel.php')) return 'Buchung ansehen';
+        if (str_contains($url, '/verwaltung')) return 'Zur Verwaltung';
+        return 'Link öffnen';
+    };
+    $out = '';
+    foreach (preg_split("/\r?\n/", rtrim($text)) as $line) {
+        $t = trim($line);
+        if (preg_match('~^https?://\S+$~', $t)) {
+            $u = htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
+            $out .= '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:6px 0 4px"><tr><td style="border-radius:999px;background:#8C2C1D">'
+                . '<a href="' . $u . '" style="display:inline-block;padding:13px 28px;font-family:Arial,Helvetica,sans-serif;font-size:16px;color:#FBF1EA;text-decoration:none;border-radius:999px">' . htmlspecialchars($label($t), ENT_QUOTES, 'UTF-8') . '</a></td></tr></table>'
+                . '<p style="margin:0 0 4px;font-size:12px;color:#674B40;word-break:break-all">Falls der Button nicht geht: <a href="' . $u . '" style="color:#8C2C1D">' . $u . '</a></p>';
+            continue;
+        }
+        $h = htmlspecialchars($line, ENT_QUOTES, 'UTF-8');
+        $h = preg_replace('~(https?://[^\s<]+[^\s<.,;:!?)\]“”"\'])~u', '<a href="$1" style="color:#8C2C1D">$1</a>', $h);
+        $h = preg_replace('~(?<![/\w.@])(www\.forma-pottery\.com)(?![\w/])~', '<a href="https://$1" style="color:#8C2C1D">$1</a>', $h);
+        $h = preg_replace('~([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})~', '<a href="mailto:$1" style="color:#8C2C1D">$1</a>', $h);
+        $out .= $t === '' ? '<div style="height:12px"></div>' : '<div>' . $h . '</div>';
+    }
+    return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>'
+        . '<body style="margin:0;padding:0;background:#EEE2D4"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#EEE2D4"><tr><td align="center" style="padding:24px 12px">'
+        . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FBF1EA;border-radius:22px"><tr><td style="padding:28px 30px;font-family:Arial,Helvetica,sans-serif;font-size:15.5px;line-height:1.6;color:#33211B">'
+        . '<img src="https://www.forma-pottery.com/img/forma-logo.png" width="56" height="56" alt="FORMA" style="display:block;width:56px;height:56px;margin:0 0 18px">'
+        . $out . '</td></tr></table></td></tr></table></body></html>';
+}
+
+/** Baut Text + HTML als multipart/alternative. Gibt [Content-Type, Körper] zurück. */
+function forma_mail_mime(string $body): array
+{
+    $b = 'forma' . bin2hex(random_bytes(10));
+    $enc = fn(string $s) => rtrim(chunk_split(base64_encode($s), 76, "\r\n"));
+    $mime = "--$b\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . $enc($body) . "\r\n"
+        . "--$b\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . $enc(forma_mail_html($body)) . "\r\n"
+        . "--$b--";
+    return ['multipart/alternative; boundary="' . $b . '"', $mime];
+}
+
 function forma_mail(string $to, string $subject, string $body, ?string $replyTo = null): bool
 {
     if (getenv('FORMA_MAIL_LOG')) {
@@ -664,14 +709,14 @@ function forma_mail(string $to, string $subject, string $body, ?string $replyTo 
             // Fällt unten auf den einfachen Versand zurück.
         }
     }
+    [$ctype, $mime] = forma_mail_mime($body);
     $headers = [
         'From' => mb_encode_mimeheader(FORMA_FROM_NAME, 'UTF-8') . ' <' . FORMA_FROM_EMAIL . '>',
         'Reply-To' => $replyTo ?: FORMA_FROM_EMAIL,
         'MIME-Version' => '1.0',
-        'Content-Type' => 'text/plain; charset=UTF-8',
-        'Content-Transfer-Encoding' => '8bit',
+        'Content-Type' => $ctype,
     ];
-    return @mail($to, mb_encode_mimeheader($subject, 'UTF-8'), $body, $headers, '-f' . FORMA_FROM_EMAIL);
+    return @mail($to, mb_encode_mimeheader($subject, 'UTF-8'), $mime, $headers, '-f' . FORMA_FROM_EMAIL);
 }
 
 /**
@@ -716,6 +761,7 @@ function forma_smtp_send(string $password, string $to, string $subject, string $
         $cmd('MAIL FROM:<' . FORMA_FROM_EMAIL . '>', [250]);
         $cmd('RCPT TO:<' . $to . '>', [250, 251]);
         $cmd('DATA', [354]);
+        [$ctype, $mime] = forma_mail_mime($body);
         $headers = [
             'Date: ' . date('r'),
             'Message-ID: <' . bin2hex(random_bytes(12)) . '@forma-pottery.com>',
@@ -724,10 +770,9 @@ function forma_smtp_send(string $password, string $to, string $subject, string $
             'Reply-To: ' . ($replyTo ?: FORMA_FROM_EMAIL),
             'Subject: ' . mb_encode_mimeheader($subject, 'UTF-8'),
             'MIME-Version: 1.0',
-            'Content-Type: text/plain; charset=UTF-8',
-            'Content-Transfer-Encoding: base64',
+            'Content-Type: ' . $ctype,
         ];
-        $data = implode("\r\n", $headers) . "\r\n\r\n" . rtrim(chunk_split(base64_encode($body), 76, "\r\n")) . "\r\n.";
+        $data = implode("\r\n", $headers) . "\r\n\r\n" . $mime . "\r\n.";
         $cmd($data, [250]);
         fwrite($fp, "QUIT\r\n");
     } finally {
