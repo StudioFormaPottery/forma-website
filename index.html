@@ -1875,7 +1875,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     document.getElementById('season-t').value=Date.now();
     document.getElementById('season-source').value=p.title;
     var b=document.getElementById('season-btn');
-    if(p.button_text&&p.button_link){b.textContent=p.button_text;b.href=p.button_link;b.hidden=false;b.className='btn '+(p.signup?'btn-ghost':'btn-solid');if(p.button_link.indexOf('#anmeldung')===0)b.setAttribute('data-book','');}
+    if(p.button_text&&p.button_link){b.textContent=p.button_text;b.href=p.button_link;b.hidden=false;b.className='btn '+(p.signup?'btn-ghost':'btn-solid');if(p.button_link.indexOf('#anmeldung')===0)b.setAttribute('data-book','');if(p.button_link.indexOf('#pottery-bemalen')===0)b.setAttribute('data-book','Pottery bemalen');}
     show(season);
     try{document.getElementById('season-title').focus({preventScroll:true});}catch(e){}
   }
@@ -1909,7 +1909,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   var wantSpecial=location.hash==='#special';
   if(wantSpecial)try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
   (function(){
-    var h=location.hash,f={'#jetzt-buchen':function(){openWizard();},'#gutschein-kaufen':vOpen,'#private-pottery':pOpen,'#pottery-pause':function(){var b=document.querySelector('[data-book="Pottery Pause"]');if(b)b.click();else openWizard();}}[h];
+    var h=location.hash,f={'#jetzt-buchen':function(){openWizard();},'#gutschein-kaufen':vOpen,'#private-pottery':pOpen,'#pottery-bemalen':function(){var a=document.createElement('a');a.href='#angebote';a.setAttribute('data-book','Pottery bemalen');a.hidden=true;document.body.appendChild(a);a.click();a.remove();},'#pottery-pause':function(){var b=document.querySelector('[data-book="Pottery Pause"]');if(b)b.click();else openWizard();}}[h];
     if(!f)return;
     try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
     setTimeout(f,500);

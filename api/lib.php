@@ -266,6 +266,29 @@ function forma_migrate(PDO $pdo): void
         forma_set_setting($pdo, 'popup_date_v6', '1');
     }
 
+    // 11.10.2026: Pottery bemalen im Advent, Mi & Do 15–18 Uhr, 4.11.–17.12.2026. Erst ab 19.10. sichtbar.
+    if (forma_setting($pdo, 'bemalen_v16') === null) {
+        forma_create_series($pdo, FORMA_SERIES['bemalen'], [3, 4], '2026-11-04', '2026-12-17');
+        $pdo->exec("UPDATE courses SET visible = 0 WHERE title = 'Pottery bemalen'");
+        forma_set_setting($pdo, 'bemalen_v16', '1');
+    }
+    // Ab 19.10.2026 buchbar: Termine sichtbar, Pop-up mit Buchungsknopf.
+    if (date('Y-m-d') >= '2026-10-19' && forma_setting($pdo, 'bemalen_live_v17') === null) {
+        $pdo->exec("UPDATE courses SET visible = 1 WHERE title = 'Pottery bemalen'");
+        $p = json_decode(forma_setting($pdo, 'popup') ?? '', true);
+        if (is_array($p) && str_contains((string)($p['title'] ?? ''), 'Pottery bemalen')) {
+            $p['eyebrow'] = 'Jetzt buchbar';
+            $p['date_line'] = 'Ab 4. November · Mi & Do 15–18 Uhr';
+            $p['text'] = "Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Schalen und kleine Teller bemalen, ganz entspannt bei Kerzenlicht im Studio.\nJeden Mittwoch und Donnerstag von 15 bis 18 Uhr, abholen kannst du deine Stücke am Montag darauf. Die Plätze sind begrenzt, such dir gleich deinen Termin aus.";
+            $p['signup'] = false;
+            $p['button_text'] = 'Jetzt Termin buchen';
+            $p['button_link'] = '#pottery-bemalen';
+            $p['version'] = (int)($p['version'] ?? 1) + 1;
+            forma_set_setting($pdo, 'popup', json_encode($p, JSON_UNESCAPED_UNICODE));
+        }
+        forma_set_setting($pdo, 'bemalen_live_v17', '1');
+    }
+
     // 11.10.2026: Brennen & Glasieren im offenen Atelier jetzt € 25/kg.
     if (forma_setting($pdo, 'atelier_kg_v15') === null) {
         $pdo->exec("UPDATE courses SET price_text = REPLACE(price_text, '€ 22/kg', '€ 25/kg') WHERE price_text LIKE '%€ 22/kg%'");
@@ -422,6 +445,14 @@ const FORMA_SERIES = [
         'price_text' => '€ 30 pro Stunde, Brennen & Glasieren € 25/kg, Bezahlung vor Ort',
         'price_cents' => 0,
         'description' => 'Selbstständig an eigenen Projekten arbeiten. Kein betreuter Kurs, für alle mit Vorerfahrung.',
+    ],
+    'bemalen' => [
+        'title' => 'Pottery bemalen',
+        'from' => '15', 'to' => '18',
+        'capacity' => 8, 'min' => 1,
+        'price_text' => '€ 15 Atelierbeitrag pro Person, dazu dein Stück ab € 15 (Becher € 18, Teller € 22), vor Ort',
+        'price_cents' => 1500,
+        'description' => 'Tassen, Schalen und kleine Teller bemalen, ganz entspannt bei Kerzenlicht. Online zahlst du den Atelierbeitrag, dein Stück suchst du dir vor Ort aus. Abholung am Montag darauf.',
     ],
 ];
 
