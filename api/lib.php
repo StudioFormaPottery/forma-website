@@ -280,6 +280,26 @@ function forma_migrate(PDO $pdo): void
         forma_set_setting($pdo, 'remove_dates_v7', '1');
     }
 
+    // 11.10.2026: Gratis-Template für November vorab planen (Sternen-Anhänger), wird am 1. 11. automatisch aktiv.
+    if (forma_setting($pdo, 'maker_sterne_v12') === null) {
+        $seed = __DIR__ . '/seed';
+        $dir = forma_template_dir();
+        $ok = true;
+        foreach (['maker-sterne-de.pdf', 'maker-sterne-en.pdf', 'maker-sterne.jpg'] as $f) {
+            if (!is_file("$dir/seed-$f")) {
+                $ok = $ok && is_file("$seed/$f") && @copy("$seed/$f", "$dir/seed-$f");
+            }
+        }
+        if ($ok) {
+            $sched = json_decode(forma_setting($pdo, 'maker_schedule') ?? '', true);
+            $sched = is_array($sched) ? $sched : [];
+            $sched['2026-11'] = ['title' => 'Sternen-Anhänger', 'text' => 'Kleine Sterne für den Adventskranz, als Geschenkanhänger oder für den Baum. Ganz einfach, in 30 Minuten gemacht und wunderbar mit Kindern.',
+                'file' => 'seed-maker-sterne-de.pdf', 'file_en' => 'seed-maker-sterne-en.pdf', 'image' => 'seed-maker-sterne.jpg'];
+            forma_set_setting($pdo, 'maker_schedule', json_encode($sched, JSON_UNESCAPED_UNICODE));
+            forma_set_setting($pdo, 'maker_sterne_v12', '1');
+        }
+    }
+
     // 11.10.2026: Gratis-Template des Monats (Oktober): Blatt-Schälchen, Deutsch & Englisch.
     if (forma_setting($pdo, 'maker_blatt_v11') === null) {
         $m = forma_maker($pdo);
@@ -1058,11 +1078,39 @@ function forma_template_dir(): string
 }
 
 /** Das aktuelle Gratis-Template des Maker Clubs (Titel, Text, PDF, Bild) */
+// Template des Monats: das zuletzt in der Verwaltung gespeicherte oder ein vorab geplantes
+// (Einstellung „maker_schedule“, Schlüssel = Monat „JJJJ-MM“). Es gilt jeweils das neueste,
+// dessen Monat schon begonnen hat. So wechselt es am Monatsersten automatisch.
 function forma_maker(PDO $pdo): array
 {
+    $d = ['title' => '', 'text' => '', 'file' => '', 'file_en' => '', 'image' => '', 'version' => 1, 'month' => ''];
     $m = json_decode(forma_setting($pdo, 'maker') ?? '', true);
-    $d = ['title' => '', 'text' => '', 'file' => '', 'file_en' => '', 'image' => '', 'version' => 1];
-    return is_array($m) ? array_merge($d, $m) : $d;
+    $m = is_array($m) ? array_merge($d, $m) : $d;
+    $now = date('Y-m');
+    $sched = json_decode(forma_setting($pdo, 'maker_schedule') ?? '', true);
+    if (is_array($sched)) {
+        $best = null;
+        foreach ($sched as $month => $entry) {
+            if (is_array($entry) && $month <= $now && $month > (string)$m['month'] && ($best === null || $month > $best)) {
+                $best = $month;
+            }
+        }
+        if ($best !== null) {
+            $m = array_merge($d, $sched[$best], ['month' => $best, 'version' => (int)str_replace('-', '', $best)]);
+        }
+    }
+    return $m;
+}
+
+function forma_maker_planned(PDO $pdo): array
+{
+    $sched = json_decode(forma_setting($pdo, 'maker_schedule') ?? '', true);
+    $out = [];
+    foreach (is_array($sched) ? $sched : [] as $month => $entry) {
+        if ($month > date('Y-m')) $out[$month] = $entry['title'] ?? '';
+    }
+    ksort($out);
+    return $out;
 }
 
 function forma_maker_link(array $sub): string

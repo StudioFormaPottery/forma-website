@@ -477,6 +477,7 @@ if ($action === 'save_maker') {
     $m['title'] = forma_clean((string)($_POST['maker_title'] ?? ''), 90);
     $m['text'] = forma_clean((string)($_POST['maker_text'] ?? ''), 400);
     $m['version'] = (int)$m['version'] + 1;
+    $m['month'] = date('Y-m');
     forma_set_setting($pdo, 'maker', json_encode($m, JSON_UNESCAPED_UNICODE));
     go($self . '?view=templates', 'Das Template des Monats ist gespeichert' . ($m['file'] ? ' und auf der Website verfügbar.' : '. Lade noch die PDF hoch, damit man es herunterladen kann.'));
 }
@@ -605,7 +606,7 @@ if ($view === 'templates') {
     $makers = (int)$pdo->query("SELECT COUNT(*) FROM subscribers WHERE status = 'bestaetigt' AND source LIKE '%Maker%'")->fetchColumn();
     $tpls = $pdo->query('SELECT t.*, (SELECT COUNT(*) FROM template_orders o WHERE o.template_id = t.id AND o.status = \'bezahlt\') AS sold FROM templates t ORDER BY t.visible DESC, t.sort, t.id DESC')->fetchAll();
     $orders = $pdo->query("SELECT * FROM template_orders WHERE status = 'bezahlt' ORDER BY id DESC LIMIT 50")->fetchAll();
-    render_page('Templates & Maker Club', function () use ($self, $flash, $m, $makers, $tpls, $orders) { ?>
+    render_page('Templates & Maker Club', function () use ($self, $flash, $m, $makers, $tpls, $orders, $pdo) { ?>
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Templates &amp; Maker Club</h1>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
@@ -613,6 +614,7 @@ if ($view === 'templates') {
         <form method="post" enctype="multipart/form-data" class="card stack">
             <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="save_maker">
             <p><strong><?= $makers ?></strong> <?= $makers === 1 ? 'Mitglied' : 'Mitglieder' ?> im Maker Club. Sie stehen in MailerLite in der Gruppe „Maker Club“ (sobald MailerLite verbunden ist).</p>
+            <?php foreach (forma_maker_planned($pdo) as $pm => $pt): ?><p class="muted">Schon geplant: ab <?= forma_h(date('m/Y', strtotime($pm . '-01'))) ?> automatisch „<?= forma_h($pt) ?>“.</p><?php endforeach; ?>
             <label for="maker_title">Name des Templates</label><input id="maker_title" name="maker_title" value="<?= forma_h($m['title']) ?>" placeholder="z. B. Herbstblatt-Schälchen">
             <label for="maker_text">Kurze Beschreibung</label><input id="maker_text" name="maker_text" value="<?= forma_h($m['text']) ?>" placeholder="z. B. Ein kleines Schälchen in Blattform, ideal für Ringe oder Teebeutel">
             <label for="maker_pdf">PDF auf Deutsch <?= $m['file'] ? '<span class="muted">(vorhanden, nur hochladen zum Ersetzen)</span>' : '' ?></label><input id="maker_pdf" name="maker_pdf" type="file" accept="application/pdf">
