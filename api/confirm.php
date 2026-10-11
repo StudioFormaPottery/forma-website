@@ -22,4 +22,4 @@ if (str_contains($s['source'], 'Maker')) {
     $m = forma_maker($pdo);
     forma_message_page('Willkommen im Maker Club!', "Danke, deine E-Mail-Adresse ist bestätigt. Ab jetzt bekommst du jeden Monat ein Gratis-Template von mir." . ($m['file'] !== '' ? "\nHier ist gleich das Template des Monats" . ($m['title'] ? ": {$m['title']}" : '') . '.' : "\nDas erste Template schicke ich dir, sobald es fertig ist."), $m['file'] !== '' ? 'Template herunterladen' : '', $m['file'] !== '' ? forma_maker_link($s) : '');
 }
-forma_message_page('Du bist dabei!', "Danke, deine E-Mail-Adresse ist bestätigt. Sobald es neue Kurse oder Specials gibt, schreibe ich dir.\nDu kannst dich jederzeit mit einem Klick wieder abmelden.");
+forma_message_page('Du bist dabei!', "Danke, deine E-Mail-Adresse ist bestätigt. Sobald es neue Kurse oder Specials gibt, schreibe ich dir als Erstes.\n\nPsst, kennst du schon den FORMA Maker Club? Jeden Monat ein Pottery-Template gratis, dazu kleine Rezepte zur Jahreszeit und DIY-Ideen wie Räucherbündel.", 'Zum Maker Club', '/#templates');

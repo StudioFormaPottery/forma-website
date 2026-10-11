@@ -66,9 +66,10 @@ $link = forma_site_url() . '/api/confirm.php?t=' . $token;
 $isMaker = str_contains($source, 'Maker');
 $maker = forma_maker($pdo);
 $dl = ($isMaker && $maker['file'] !== '') ? forma_maker_link(['token' => $token]) : '';
-$body = "$hello\n\n" . ($isMaker ? "willkommen im FORMA Maker Club! Jeden Monat bekommst du ein Pottery-Template zum Selbermachen gratis von mir.\n\n" . ($dl ? "Dein Template des Monats" . ($maker['title'] ? " („{$maker['title']}“)" : '') . " kannst du hier herunterladen:\n$dl\n\n" : '') : "schön, dass du von neuen Kursen und Specials im FORMA Studio hören möchtest!\n\n")
+$body = "$hello\n\n" . ($isMaker ? "willkommen im FORMA Maker Club! Jeden Monat bekommst du ein Pottery-Template zum Selbermachen gratis von mir.\n\n" . ($dl ? "Dein Template des Monats" . ($maker['title'] ? " („{$maker['title']}“)" : '') . " kannst du hier herunterladen:\n$dl\n\n" : '') : "schön, dass du von neuen Kursen und Specials im FORMA Studio hören möchtest!" . ($source !== '' ? " Sobald die Termine für „{$source}“ feststehen, erfährst du es als Erste." : '') . "\n\n")
     . "Bitte bestätige kurz deine E-Mail-Adresse mit einem Klick auf diesen Link" . ($isMaker ? ', damit ich dir jeden Monat das neue Template schicken darf' : '') . ":\n\n$link\n\n"
     . "Erst danach stehst du auf meiner Liste. Falls du dich nicht eingetragen hast, ignoriere diese E-Mail einfach, dann passiert nichts.\n\n"
-    . "Herzlich,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n";
+    . "Herzlich,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n"
+    . ($isMaker ? '' : "\nP.S. Kennst du schon den FORMA Maker Club? Jeden Monat ein Pottery-Template gratis, dazu kleine Rezepte zur Jahreszeit und DIY-Ideen wie Räucherbündel: " . forma_site_url() . "/#templates\n");
 forma_mail($email, $isMaker ? 'Dein Gratis-Template & kurz bestätigen' : 'Bitte bestätige deine E-Mail-Adresse', $body);
 forma_json(['ok' => true, 'download' => $dl]);

@@ -204,6 +204,12 @@ section{scroll-margin-top:96px}
 .faq-item summary::after{content:"+";flex:0 0 auto;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--blush);color:var(--clay);font-size:22px;font-weight:500;transition:transform .2s ease}
 .faq-item[open] summary::after{transform:rotate(45deg)}
 .faq-item p{padding:0 22px 20px;color:var(--ink-soft)}
+.season-maker{margin-top:16px;padding:16px 18px 18px;border-radius:20px;background:var(--paper-2);border:1px solid var(--line)}
+.season-maker .sm-k{font-size:14px;color:var(--ink-soft);margin:0}
+.season-maker .sm-t{font-family:var(--display);font-weight:650;font-size:22px;color:var(--clay);margin:0 0 8px}
+.season-maker ul{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:6px}
+.season-maker li{position:relative;padding-left:26px;font-size:15px;line-height:1.4}
+.season-maker li::before{content:"";position:absolute;left:0;top:2px;width:16px;height:16px;border-radius:50%;background:var(--clay);box-shadow:inset 0 0 0 4px var(--blush)}
 .slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:18px}
 .slots-note{grid-column:1/-1;color:var(--ink-soft);padding:22px 24px;border:1px dashed var(--line);border-radius:24px}
 .tile{font:inherit;text-align:left;color:inherit;cursor:pointer;display:flex;flex-direction:column;gap:8px;padding:24px 24px 22px;border-radius:28px;background:var(--paper-2);border:1px solid var(--line);min-width:0;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
@@ -330,6 +336,7 @@ section{scroll-margin-top:96px}
 .maker h3{font-family:var(--display);font-weight:650;font-size:clamp(30px,3.4vw,44px);line-height:1.05;letter-spacing:-.02em;margin:6px 0 12px}
 .maker p{color:#F3E2D6}
 .maker .kicker{color:var(--blush);opacity:1}
+.maker-extra{margin-top:8px;color:var(--on-clay)!important;font-weight:500}
 .maker-how{list-style:none;margin:16px 0 4px;padding:0;display:flex;flex-wrap:wrap;gap:8px 18px}
 .maker-how li{display:flex;align-items:center;gap:10px;font-size:16px;color:var(--on-clay)}
 .maker-how b{width:28px;height:28px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;background:var(--on-clay);color:var(--clay);font-size:14px}
@@ -953,6 +960,16 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="book-error" id="season-error" role="alert" hidden></p>
         </form>
         <p id="season-done" hidden></p>
+        <div class="season-maker" id="season-maker" hidden>
+          <p class="sm-k">Psst, kennst du schon den</p>
+          <p class="sm-t">FORMA Maker Club?</p>
+          <ul>
+            <li>Jeden Monat ein Pottery-Template gratis</li>
+            <li>Kleine Rezepte, passend zur Jahreszeit</li>
+            <li>DIY-Ideen, zum Beispiel Räucherbündel</li>
+          </ul>
+          <a class="btn btn-solid" href="#templates" id="season-maker-go">Zum Maker Club</a>
+        </div>
         <a class="btn btn-ghost" id="season-btn" hidden></a>
       </div>
     </div>
@@ -1027,6 +1044,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="kicker">FORMA Maker Club</p>
           <h3>Jeden Monat ein Template gratis</h3>
           <p id="maker-text">Trag dich ein und hol dir jeden Monat ein neues Pottery-Template zum Selbermachen, kostenlos, direkt in dein Postfach.</p>
+          <p class="maker-extra">Dazu gibt es kleine Rezepte zur Jahreszeit und DIY-Ideen, zum Beispiel für Räucherbündel.</p>
           <ol class="maker-how">
             <li><b>1</b><span>E-Mail eintragen</span></li>
             <li><b>2</b><span>Template sofort herunterladen</span></li>
@@ -1773,6 +1791,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   }
   function closeSeason(){hide(season);}
   document.getElementById('season-close').addEventListener('click',closeSeason);
+  document.getElementById('season-maker-go').addEventListener('click',closeSeason);
   document.getElementById('season-btn').addEventListener('click',closeSeason);
   document.getElementById('season-privacy').addEventListener('click',function(){closeSeason();var d=document.getElementById('datenschutz');if(d)d.open=true;});
   season.addEventListener('click',function(e){if(e.target===season)closeSeason();});
@@ -1788,7 +1807,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       .then(function(r){return r.json().catch(function(){return {ok:false};});})
       .then(function(d){
         if(d&&d.ok){
-          f.hidden=true;var dn=document.getElementById('season-done');
+          f.hidden=true;document.getElementById('season-maker').hidden=false;var dn=document.getElementById('season-done');
           dn.textContent=d.already?'Du stehst schon auf meiner Liste. Ich melde mich, sobald es losgeht!':'Fast geschafft! Ich habe dir eine E-Mail an '+email+' geschickt. Bitte klick dort kurz auf den Bestätigungslink.';
           dn.hidden=false;
         }else{se.textContent=(d&&d.error)||'Das hat leider nicht geklappt. Bitte versuch es noch einmal.';se.hidden=false;}
