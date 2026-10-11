@@ -67,6 +67,7 @@ p{margin:0}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto}
 .brand img{width:60px;height:60px;object-fit:contain}
 @media (min-width:861px){.brand img{width:104px;height:104px}.brand span{font-size:17px!important}.nav a{font-size:21px!important}.nav{gap:4px 34px}.nav .btn{font-size:20px!important;min-height:54px;padding:12px 28px}}
+@media (min-width:861px) and (max-width:1240px){.brand span{display:none}.nav{gap:4px 22px}.nav a{font-size:18px!important}.nav .btn{font-size:17px!important;padding:10px 20px}}
 .brand span{font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase}
 .nav{display:flex;flex-wrap:wrap;gap:4px 26px;margin-left:auto;align-items:center}
 .nav a{text-decoration:none;font-weight:500;font-size:15.5px;padding:6px 0;background:linear-gradient(currentColor,currentColor) 0 100%/0 1.5px no-repeat;transition:background-size .25s ease}
@@ -572,6 +573,10 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .team-tags li{border:1px solid rgba(251,241,234,.45);border-radius:999px;padding:6px 14px;font-size:.88em}
 .team-card .btn-team{background:#FBF1EA;color:var(--clay);border-color:#FBF1EA}
 .team-card .btn-team:hover{background:#fff}
+.team-facts{font-size:.92em;color:#F1D9C6!important;margin:-6px 0 22px!important}
+.team-btns{display:flex;flex-wrap:wrap;gap:10px}
+.team-card .btn-team-ghost{background:transparent;color:#FBF1EA;border-color:rgba(251,241,234,.7)}
+.team-card .btn-team-ghost:hover{background:rgba(251,241,234,.12)}
 .team-art{width:100%;max-width:340px;justify-self:center}
 @media (max-width:760px){.team-card{grid-template-columns:1fr}.team-art{max-width:220px;order:-1}}
 </style>
@@ -591,6 +596,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <a href="#angebote">Kurse</a>
       <a href="#studio">Studio</a>
       <a href="#shop">Shop</a>
+      <a href="#gutschein" data-voucher="">Gutscheine</a>
       <a href="#ueber-mich">Hallo!</a>
       <a href="#kontakt">Kontakt</a>
       <a class="btn btn-solid" href="#angebote" data-book="">Kurs buchen</a>
@@ -1117,8 +1123,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="eyebrow">Teambuilding &amp; Events</p>
           <h2 id="team-titel">Gemeinsam formen verbindet</h2>
           <p>Du möchtest, dass dein Team ein Stück näher zusammenrückt? Dann bucht doch einen gemeinsamen Töpferworkshop im FORMA. Raus aus dem Alltag, rein in den Ton: Zusammen mit den Händen etwas zu gestalten entschleunigt, macht Spaß und stärkt den Zusammenhalt.</p>
-          <ul class="team-tags"><li>Firmen &amp; Teams</li><li>Vereine</li><li>Geburtstage &amp; Feiern</li></ul>
-          <a class="btn btn-team" href="#teambuilding" data-private="team">Event anfragen</a>
+          <ul class="team-tags"><li>Firmen &amp; Teams</li><li>Female Events</li><li>Vereine &amp; Feiern</li></ul>
+          <p class="team-facts">5 bis 10 Personen · 4 Stunden im Studio oder als Töpfer-Wochenende mit Übernachtung im Heindalishof</p>
+          <div class="team-btns"><a class="btn btn-team" href="#teambuilding" data-private="team">Event anfragen</a><a class="btn btn-team-ghost" href="downloads/FORMA_Teambuilding.pdf" target="_blank" rel="noopener">Infos &amp; Preise (PDF)</a></div>
         </div>
         <svg class="team-art" viewBox="0 0 240 200" fill="none" aria-hidden="true">
             <ellipse cx="120" cy="176" rx="104" ry="12" fill="#7A2417" opacity=".45"/>

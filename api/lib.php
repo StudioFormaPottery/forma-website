@@ -200,7 +200,7 @@ function forma_migrate(PDO $pdo): void
                 'eyebrow' => 'Special im Advent',
                 'title' => 'Pottery bemalen im Advent',
                 'text' => "Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Schalen und kleine Teller bemalen, ganz entspannt bei Kerzenlicht im Studio.\nDie Termine kommen bald. Trag dich ein, dann erfährst du als Erste davon.",
-                'date_line' => 'Ab Ende Oktober im FORMA Studio',
+                'date_line' => 'Ab November · Mi & Do 15–18 Uhr',
                 'start' => date('Y-m-d'),
                 'end' => '2026-12-20',
                 'signup' => true,
@@ -264,6 +264,18 @@ function forma_migrate(PDO $pdo): void
             forma_set_setting($pdo, 'popup', json_encode($p, JSON_UNESCAPED_UNICODE));
         }
         forma_set_setting($pdo, 'popup_date_v6', '1');
+    }
+
+    // 11.10.2026: Pottery bemalen im Advent ab November, Mi & Do 15–18 Uhr, Abholung am Montag darauf.
+    if (forma_setting($pdo, 'popup_advent_v14') === null) {
+        $p = json_decode(forma_setting($pdo, 'popup') ?? '', true);
+        if (is_array($p) && str_contains((string)($p['date_line'] ?? ''), 'Ende Oktober')) {
+            $p['date_line'] = 'Ab November · Mi & Do 15–18 Uhr';
+            $p['text'] = "Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Schalen und kleine Teller bemalen, ganz entspannt bei Kerzenlicht im Studio.\nJeden Mittwoch und Donnerstag von 15 bis 18 Uhr, abholen kannst du deine Stücke am Montag darauf. Trag dich ein, dann erfährst du als Erste, wann die Anmeldung startet.";
+            $p['version'] = (int)($p['version'] ?? 1) + 1;
+            forma_set_setting($pdo, 'popup', json_encode($p, JSON_UNESCAPED_UNICODE));
+        }
+        forma_set_setting($pdo, 'popup_advent_v14', '1');
     }
 
     // 10.10.2026: Offenes Atelier an Heiligabend und Silvester abgesagt.
