@@ -92,7 +92,8 @@ Läuft am 20. jedes Monats (automatische Session) für den **nächsten** Monat:
    Absender hello@forma-pottery.com, Name „Vivien · FORMA Earth & Art“, Sprache ID 5.
    Button-Link immer `https://www.forma-pottery.com/api/maker-mail.php?e={$email}` (direkter Download).
    Inhalt: kurze, warme Einstimmung zur Jahreszeit, das Template, ein kleiner Tipp oder ein saisonales
-   Rezept/DIY, Hinweis auf aktuelle Kurse/Shop, Signatur-Bild `img/signatur-liebe-zum-ton.png`.
+   Rezept/DIY, **immer ein kurzer Teaser „Was gerade im Atelier ansteht“** (nächste Kurse, neue Angebote, Specials,
+   mit Link zur Website), Hinweis auf den Shop, Signatur-Bild `img/signatur-liebe-zum-ton.png`.
 6. Eine Kopie mit „[Test]“ im Betreff an die Gruppe **Test (nur Vivien)** (ID 201062038181512426) sofort senden,
    das Original für den 1. des Monats, 8:00 Uhr (Zeitzone-ID 370, Europe/Vienna) planen.
 7. Vivien kurz Bescheid geben (Template, Vorschau, Mail geplant).
@@ -107,3 +108,17 @@ Läuft am 20. jedes Monats (automatische Session) für den **nächsten** Monat:
 | 2027-04 | Kräuterschilder für Balkon und Garten | maker-kraeuter |
 
 Ab Mai 2027: selbst passende, einfache Ideen wählen (Scandi/Hygge, nicht auf der Ausschlussliste) und hier eintragen.
+
+## Atelier-Newsletter „Neues aus dem Atelier“ (alle Abonnent:innen)
+
+Wird in derselben Sitzung am 20. mit vorbereitet und für den **15. des nächsten Monats, 8:00 Uhr** geplant
+(so kommen Maker-Mail am 1. und Atelier-Newsletter am 15. nie am selben Tag).
+
+- Gruppe **Website** (ID 200959703678714898). Darin sind alle: Pop-up-Anmeldungen und auch alle Maker-Club-Mitglieder.
+  Das Pop-up auf der Website ist die Anmeldung für diesen Newsletter, es bleibt so.
+- Gleiches Design wie die Maker-Mails (Farben, Logo, Signatur), aber **kein Template und kein Download**.
+- Inhalt: was gerade im Atelier los ist (kommende Kurse und Termine mit Buchungs-Link, neue Angebote, Specials,
+  Gutscheine zur passenden Zeit), ein Foto-/Illustrationsbild, ein kleines saisonales Rezept oder Ritual
+  (z. B. Rauch, Salz & Mondlicht, Räucherbündel, Wintertee), kurzer Hinweis auf den Maker Club (`/#templates`).
+- Kurse und Termine aus `api/lib.php` (FORMA_SERIES, Migrationen) bzw. der Website ablesen, nichts erfinden.
+- Eine „[Test]“-Kopie sofort an die Gruppe **Test (nur Vivien)** senden, das Original planen, Vivien Bescheid geben.
