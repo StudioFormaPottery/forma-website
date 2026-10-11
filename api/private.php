@@ -21,6 +21,9 @@ $name = forma_clean((string)($in['name'] ?? ''), 120);
 $email = forma_clean((string)($in['email'] ?? ''), 160);
 $phone = forma_clean((string)($in['phone'] ?? ''), 40);
 $project = trim(mb_substr(preg_replace("/[\x00-\x09\x0B-\x1F\x7F]/u", '', (string)($in['project'] ?? '')) ?? '', 0, 1500));
+if (($in['topic'] ?? '') === 'team' && $project !== '') {
+    $project = 'Teambuilding/Event: ' . $project;
+}
 $wish = forma_clean((string)($in['wish'] ?? ''), 300);
 $contact = ($in['contact'] ?? '') === 'telefon' ? 'telefon' : 'email';
 

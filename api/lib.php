@@ -1052,10 +1052,11 @@ function forma_private_mails(PDO $pdo, int $id): void
     $persons = (int)$b['persons'] === 1 ? '1 Person' : $b['persons'] . ' Personen';
     $viaPhone = ($b['contact'] ?? 'email') === 'telefon';
     $contactLine = $viaPhone ? "Bitte melden per: TELEFON ({$b['phone']})" : 'Bitte melden per: E-Mail';
+    $isTeam = str_starts_with((string)$b['project'], 'Teambuilding/Event:');
     if ($b['kind'] === 'anfrage') {
-        forma_mail($b['email'], 'Deine Anfrage für Private Pottery', "Hallo $first,\n\nvielen Dank für deine Nachricht! Ich sehe mir dein Projekt an und melde mich so bald wie möglich " . ($viaPhone ? 'telefonisch' : 'per E-Mail') . " bei dir.\n\n"
+        forma_mail($b['email'], $isTeam ? 'Deine Anfrage für ein Teambuilding-Event' : 'Deine Anfrage für Private Pottery', "Hallo $first,\n\nvielen Dank für deine Nachricht! Ich sehe mir " . ($isTeam ? 'eure Idee' : 'dein Projekt') . " an und melde mich so bald wie möglich " . ($viaPhone ? 'telefonisch' : 'per E-Mail') . " bei dir.\n\n"
             . "Dein Projekt: {$b['project']}\nWunschtermin: {$b['wish']}\n\nWenn dir noch etwas einfällt, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nHerzlich,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
-        forma_mail(FORMA_NOTIFY_EMAIL, 'Anfrage Private Pottery (' . $b['name'] . ')', "Neue Anfrage für Private Pottery (noch nicht gebucht)\n$contactLine\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nPersonen: $persons\n\nProjekt:\n{$b['project']}\n\nWunschtermin: {$b['wish']}\n\nAlle Anfragen: $site/verwaltung/?view=private\n", $b['email']);
+        forma_mail(FORMA_NOTIFY_EMAIL, ($isTeam ? 'Anfrage Teambuilding/Event (' : 'Anfrage Private Pottery (') . $b['name'] . ')', "Neue Anfrage für " . ($isTeam ? 'Teambuilding/Event' : 'Private Pottery (noch nicht gebucht)') . "\n$contactLine\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nPersonen: $persons\n\nProjekt:\n{$b['project']}\n\nWunschtermin: {$b['wish']}\n\nAlle Anfragen: $site/verwaltung/?view=private\n", $b['email']);
         return;
     }
     $amount = forma_euro((int)$b['amount_cents']);

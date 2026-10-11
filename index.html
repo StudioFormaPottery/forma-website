@@ -563,6 +563,17 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 }
 
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+.team{padding:0 0 clamp(40px,6vw,80px)}
+.team-card{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:center;background:var(--clay);color:#FBF1EA;border-radius:40px;padding:clamp(28px,5vw,64px)}
+.team-card .eyebrow{color:#F1D9C6}
+.team-card h2{font-family:var(--display);font-weight:650;font-size:clamp(32px,4.4vw,58px);line-height:1.04;letter-spacing:-.02em;margin:6px 0 16px;color:#FBF1EA}
+.team-card p{color:#F6E6DA;margin:0 0 18px;max-width:46ch}
+.team-tags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:0;list-style:none}
+.team-tags li{border:1px solid rgba(251,241,234,.45);border-radius:999px;padding:6px 14px;font-size:.88em}
+.team-card .btn-team{background:#FBF1EA;color:var(--clay);border-color:#FBF1EA}
+.team-card .btn-team:hover{background:#fff}
+.team-art{width:100%;max-width:340px;justify-self:center}
+@media (max-width:760px){.team-card{grid-template-columns:1fr}.team-art{max-width:220px;order:-1}}
 </style>
 </head>
 <body>
@@ -829,11 +840,12 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
       </button>
       <form id="p-form" class="step" novalidate>
-        <p class="eyebrow">Private Pottery</p>
+        <p class="eyebrow" id="p-eyebrow">Private Pottery</p>
         <h3 class="step-title" id="p-title" tabindex="-1">Dein Projekt, gemeinsam umgesetzt</h3>
         <p class="step-meta" id="p-meta">Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inklusive Material und Brennen.</p>
         <input type="hidden" name="t" id="p-t">
         <input type="hidden" name="kind" id="p-kind" value="buchung">
+        <input type="hidden" name="topic" id="p-topic" value="">
         <div class="hp" aria-hidden="true"><label for="p-website">Bitte leer lassen</label><input id="p-website" name="website" tabindex="-1" autocomplete="off"></div>
         <p class="p-switch" id="p-switch" hidden>Du weißt schon, was du machen möchtest? <button type="button" class="linkbtn" id="p-to-book">Dann buch direkt deine Stunden →</button></p>
         <fieldset class="vgroup" hidden><legend>Wie möchtest du starten?</legend>
@@ -852,7 +864,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="hint" id="p-hours-hint">Alle Zeiten inklusive Bemalen. Du bist unsicher? Dann wähl oben „Erst mal anfragen“.</p>
         </fieldset>
         <fieldset class="vgroup"><legend id="p-leg-proj">2 · Was möchtest du gestalten?</legend>
-          <div class="field"><label for="p-project">Dein Projekt</label><textarea id="p-project" name="project" rows="3" maxlength="1500" placeholder="z. B. Zwei Kaffeebecher mit unseren Initialen und passende Unterteller" required></textarea></div>
+          <div class="field"><label for="p-project" id="p-project-label">Dein Projekt</label><textarea id="p-project" name="project" rows="3" maxlength="1500" placeholder="z. B. Zwei Kaffeebecher mit unseren Initialen und passende Unterteller" required></textarea></div>
           <div class="field"><label for="p-wish">Wunschtermin <span class="opt">(Tage und Uhrzeiten, die dir gut passen)</span></label><input id="p-wish" name="wish" maxlength="300" placeholder="z. B. Dienstag- oder Donnerstagabend ab 18 Uhr"></div>
         </fieldset>
         <fieldset class="vgroup"><legend id="p-leg-you">3 · Deine Angaben</legend>
@@ -1095,6 +1107,29 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <div class="chips" id="tpl-age" role="group" aria-label="Für wen"></div>
       </div>
       <div class="tpl-grid" id="tpl-grid"><p class="slots-note">Die ersten Templates kommen bald. Im Maker Club erfährst du es zuerst.</p></div>
+    </div>
+  </section>
+
+  <section class="team" id="teambuilding" aria-labelledby="team-titel">
+    <div class="wrap">
+      <div class="team-card">
+        <div>
+          <p class="eyebrow">Teambuilding &amp; Events</p>
+          <h2 id="team-titel">Gemeinsam formen verbindet</h2>
+          <p>Du möchtest, dass dein Team ein Stück näher zusammenrückt? Dann bucht doch einen gemeinsamen Töpferworkshop im FORMA. Raus aus dem Alltag, rein in den Ton: Zusammen mit den Händen etwas zu gestalten entschleunigt, macht Spaß und stärkt den Zusammenhalt.</p>
+          <ul class="team-tags"><li>Firmen &amp; Teams</li><li>Vereine</li><li>Geburtstage &amp; Feiern</li></ul>
+          <a class="btn btn-team" href="#teambuilding" data-private="team">Event anfragen</a>
+        </div>
+        <svg class="team-art" viewBox="0 0 240 200" fill="none" aria-hidden="true">
+            <ellipse cx="120" cy="176" rx="104" ry="12" fill="#7A2417" opacity=".45"/>
+            <path d="M34 92h46l-5 70c-.6 7-6 12-13 12H52c-7 0-12.4-5-13-12z" fill="#F1D9C6"/><path d="M80 108c14 0 16 26 0 28" stroke="#F1D9C6" stroke-width="6" stroke-linecap="round"/>
+            <path d="M98 70h52l-6 92c-.5 7-6 12-13 12h-14c-7 0-12.5-5-13-12z" fill="#FBF1EA"/><path d="M106 96c10 6 26 6 36 0" stroke="#B08E7A" stroke-width="3" stroke-linecap="round"/>
+            <path d="M164 100h44l-4 62c-.5 7-6 12-13 12h-10c-7 0-12.5-5-13-12z" fill="#DDBFA8"/><path d="M164 116c-14 0-15 24 0 26" stroke="#DDBFA8" stroke-width="6" stroke-linecap="round"/>
+            <path d="M116 20c.7 5 4.3 8.6 9.3 9.3-5 .7-8.6 4.3-9.3 9.3-.7-5-4.3-8.6-9.3-9.3 5-.7 8.6-4.3 9.3-9.3z" fill="#FBF1EA"/>
+            <path d="M60 52c.5 3.6 3 6 6.6 6.6-3.6.5-6 3-6.6 6.6-.5-3.6-3-6-6.6-6.6 3.6-.5 6-3 6.6-6.6z" fill="#F1D9C6"/>
+            <path d="M190 58c.5 3.6 3 6 6.6 6.6-3.6.5-6 3-6.6 6.6-.5-3.6-3-6-6.6-6.6 3.6-.5 6-3 6.6-6.6z" fill="#F1D9C6"/>
+          </svg>
+      </div>
     </div>
   </section>
 
@@ -1466,7 +1501,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   });
 
   // Private Pottery buchen oder anfragen
-  var pd=$('private-dialog'),pf=$('p-form'),pErr=$('p-error'),pSub=$('p-submit');
+  var pd=$('private-dialog'),pf=$('p-form'),pErr=$('p-error'),pSub=$('p-submit'),pTeam=false;
   function pHours(){var r=pf.querySelector('input[name="hours"]:checked');return r?+r.value:2;}
   function pMode(){var r=pf.querySelector('input[name="mode"]:checked');return r?r.value:'buchung';}
   function pPhone(){var r=pf.querySelector('input[name="contact"]:checked');return r&&r.value==='telefon';}
@@ -1481,11 +1516,17 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     $('p-phone-opt').textContent=pPhone()?'(damit ich dich anrufen kann)':'(optional)';
     $('p-phone').required=pPhone();
     if(!pPhone())$('p-phone').classList.remove('missing');
+    $('p-topic').value=pTeam?'team':'';
+    $('p-eyebrow').textContent=pTeam?'Teambuilding & Events':'Private Pottery';
+    $('p-project-label').textContent=pTeam?'Eure Idee':'Dein Projekt';
+    $('p-project').placeholder=pTeam?'z. B. Teamevent für 8 Personen, jede:r gestaltet eine eigene Tasse':'z. B. Zwei Kaffeebecher mit unseren Initialen und passende Unterteller';
+    $('p-wish').placeholder=pTeam?'z. B. ein Freitagnachmittag im November':'z. B. Dienstag- oder Donnerstagabend ab 18 Uhr';
+    if(pTeam){$('p-title').textContent='Erzähl mir von eurem Event';$('p-meta').textContent='Teamevent, Vereinsausflug oder Feier: Beschreib mir kurz, was ihr euch vorstellt und wie viele ihr seid. Ich melde mich mit einem Vorschlag. Kostenlos und unverbindlich.';$('p-switch').hidden=true;$('p-leg-proj').textContent='1 · Was habt ihr vor?';}
   }
   pf.querySelectorAll('input[name="hours"],input[name="mode"],input[name="contact"]').forEach(function(r){r.addEventListener('change',pUpdate);});
   function pSetMode(mode){var m=pf.querySelector('input[name="mode"][value="'+mode+'"]');if(m)m.checked=true;pUpdate();pd.querySelector('.book-inner').scrollTop=0;}
-  $('p-to-book').addEventListener('click',function(){pSetMode('buchung');});
-  function pOpen(mode){pf.hidden=false;$('p-done').hidden=true;pErr.hidden=true;$('p-t').value=Date.now();var m=pf.querySelector('input[name="mode"][value="'+(mode||'buchung')+'"]');if(m)m.checked=true;pUpdate();show(pd);pd.querySelector('.book-inner').scrollTop=0;setTimeout(function(){try{$('p-title').focus({preventScroll:true});}catch(e){}},30);}
+  $('p-to-book').addEventListener('click',function(){pTeam=false;pSetMode('buchung');});
+  function pOpen(mode){pTeam=mode==='team';if(pTeam)mode='anfrage';pf.hidden=false;$('p-done').hidden=true;pErr.hidden=true;$('p-t').value=Date.now();var m=pf.querySelector('input[name="mode"][value="'+(mode||'buchung')+'"]');if(m)m.checked=true;pUpdate();show(pd);pd.querySelector('.book-inner').scrollTop=0;setTimeout(function(){try{$('p-title').focus({preventScroll:true});}catch(e){}},30);}
   function pDone(t,x){pf.hidden=true;$('p-done').hidden=false;$('p-done-title').textContent=t;$('p-done-text').textContent=x;show(pd);pd.querySelector('.book-inner').scrollTop=0;}
   document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('[data-private]');if(!a)return;e.preventDefault();closeNav();pOpen(a.getAttribute('data-private')||'buchung');});
   $('p-close').addEventListener('click',function(){hide(pd);});
@@ -1510,7 +1551,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       .then(function(r){return r.json().catch(function(){return {ok:false};});})
       .then(function(d){
         if(d&&d.ok&&d.redirect){going=true;location.href=d.redirect;return;}
-        if(d&&d.ok){pDone('Vielen Dank für deine Nachricht, '+name.split(/\s+/)[0]+'!','Ich sehe mir dein Projekt an und melde mich so bald wie möglich '+(pPhone()?'telefonisch':'per E-Mail')+' bei dir. Eine Bestätigung deiner Anfrage ist schon in deinem Postfach.');return;}
+        if(d&&d.ok){pDone('Vielen Dank für deine Nachricht, '+name.split(/\s+/)[0]+'!','Ich sehe mir '+(pTeam?'eure Idee':'dein Projekt')+' an und melde mich so bald wie möglich '+(pPhone()?'telefonisch':'per E-Mail')+' bei dir. Eine Bestätigung deiner Anfrage ist schon in deinem Postfach.');return;}
         pErr.textContent=(d&&d.error)||'Das hat leider nicht geklappt. Bitte versuch es noch einmal.';pErr.hidden=false;
       })
       .catch(function(){pErr.textContent='Keine Verbindung. Bitte versuch es noch einmal.';pErr.hidden=false;})
