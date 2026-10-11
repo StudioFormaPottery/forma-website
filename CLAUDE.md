@@ -85,3 +85,9 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - `links/index.html` = eigene Link-in-Bio-Seite für Instagram: www.forma-pottery.com/links
 - Zieht automatisch: aktuelles Special (api/popup.php), nächsten freien Termin (api/courses.php), WhatsApp-Community-Link (api/deko.php)
 - Direktlinks auf der Startseite: `#jetzt-buchen`, `#private-pottery`, `#gutschein-kaufen`, `#special` (öffnet Pop-up), `#shop`
+
+## Rechnungen (seit 12.10.2026)
+- `api/invoices.php`: nach jeder Online-Zahlung (Kurs, Private Pottery, Template) automatisch Rechnung mit eigenem Nummernkreis `FO-<Jahr>-001` (Kürzel in der Verwaltung), PDF mit FPDF (`api/vendor/fpdf`, Schriften Outfit/Bricolage), Mail mit PDF an Kundin und an hello@.
+- Steuer: Kurse immer AT 20 %; Templates EU → AT 20 % solange nicht OSS-registriert (Schwelle 10.000 €), mit Häkchen „OSS“ der Satz des Wohnsitzlandes (`FORMA_EU_VAT`); Drittland → 0 % mit Hinweis.
+- Google Tabelle: optional per Google-Dienstkonto (JSON-Schlüssel in der Verwaltung hochladen, liegt nur im Datenordner) → trägt in „Rechnungen“ und „Kurse & Leistungen“ ein.
+- Gutscheine bekommen keine Rechnung (Mehrzweckgutschein, USt. erst bei Einlösung).

@@ -525,7 +525,99 @@ if ($action === 'delete_subscriber') {
     go($self . '?view=liste', 'Der Kontakt ist gelöscht.');
 }
 
+if ($action === 'invoice_settings') {
+    $prefix = preg_replace('/[^A-Za-z0-9]/', '', (string)($_POST['prefix'] ?? 'FO')) ?: 'FO';
+    forma_set_setting($pdo, 'invoice_prefix', $prefix);
+    forma_set_setting($pdo, 'oss_active', !empty($_POST['oss']) ? '1' : '0');
+    $sheet = trim((string)($_POST['sheet_id'] ?? ''));
+    if (preg_match('~/d/([A-Za-z0-9_-]{20,})~', $sheet, $m)) $sheet = $m[1];
+    forma_set_setting($pdo, 'sheet_id', preg_replace('/[^A-Za-z0-9_-]/', '', $sheet));
+    if (!empty($_FILES['gkey']['tmp_name']) && is_uploaded_file($_FILES['gkey']['tmp_name'])) {
+        $k = json_decode((string)file_get_contents($_FILES['gkey']['tmp_name']), true);
+        if (!is_array($k) || empty($k['private_key']) || empty($k['client_email'])) {
+            go($self . '?view=rechnungen', 'Das ist keine gültige Schlüsseldatei eines Google-Dienstkontos (JSON).');
+        }
+        file_put_contents(forma_data_dir() . '/google-key.json', json_encode($k));
+        @chmod(forma_data_dir() . '/google-key.json', 0600);
+    }
+    forma_sheet_sync($pdo);
+    go($self . '?view=rechnungen', 'Gespeichert.');
+}
+
+if ($action === 'invoice_resend') {
+    $id = (int)($_POST['iid'] ?? 0);
+    $pdo->prepare('UPDATE invoices SET mailed = 0 WHERE id = ?')->execute([$id]);
+    forma_invoice_send($pdo, $id);
+    go($self . '?view=rechnungen', 'Die Rechnung wurde noch einmal verschickt.');
+}
+
 // --- Ansichten -------------------------------------------------------------
+if ($view === 'rechnung_pdf') {
+    forma_invoice_schema($pdo);
+    $inv = forma_invoice_get($pdo, (int)($_GET['id'] ?? 0));
+    if (!$inv) { http_response_code(404); exit('Nicht gefunden'); }
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: inline; filename="Rechnung_' . $inv['nr'] . '.pdf"');
+    echo forma_invoice_pdf($inv);
+    exit;
+}
+
+if ($view === 'rechnungen_export') {
+    forma_invoice_schema($pdo);
+    $rows = $pdo->query('SELECT * FROM invoices ORDER BY year, seq')->fetchAll();
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="forma-online-rechnungen-' . date('Y-m-d') . '.csv"');
+    $out = fopen('php://output', 'w');
+    fwrite($out, "\xEF\xBB\xBF");
+    fputcsv($out, ['Firma', 'Rechnungsnr.', 'Rechnungsdatum = Zahlungseingang', 'Leistungsdatum', 'Kunde', 'E-Mail', 'Land', 'Leistung', 'Brutto', 'Netto', 'USt.-Satz', 'USt.', 'Zahlungsart'], ';');
+    $de = fn(int $c) => number_format($c / 100, 2, ',', '');
+    foreach ($rows as $r) {
+        $items = implode(' + ', array_map(fn($i) => $i['qty'] . '× ' . $i['text'], json_decode($r['items'], true)));
+        fputcsv($out, ['Forma', $r['nr'], date('d.m.Y', strtotime($r['issued_at'])), $r['service_date'], $r['name'], $r['email'], $r['country'], $items,
+            $de((int)$r['gross_cents']), $de((int)$r['net_cents']), rtrim(rtrim(number_format((float)$r['vat_rate'], 1, ',', ''), '0'), ',') . ' %', $de((int)$r['vat_cents']), 'online (Stripe)'], ';');
+    }
+    exit;
+}
+
+if ($view === 'rechnungen') {
+    forma_invoice_schema($pdo);
+    forma_sheet_sync($pdo);
+    $rows = $pdo->query('SELECT * FROM invoices ORDER BY id DESC LIMIT 300')->fetchAll();
+    $sum = array_sum(array_column($rows, 'gross_cents'));
+    $gkey = forma_google_key();
+    $cfg = ['prefix' => forma_setting($pdo, 'invoice_prefix') ?? 'FO', 'oss' => forma_setting($pdo, 'oss_active') === '1', 'sheet' => forma_setting($pdo, 'sheet_id') ?? '', 'err' => forma_setting($pdo, 'sheet_error') ?? ''];
+    render_page('Rechnungen', function () use ($self, $flash, $rows, $sum, $gkey, $cfg) { ?>
+        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
+        <h1>Rechnungen</h1>
+        <p class="muted">Nach jeder Online-Zahlung (Kurs, Private Pottery, Template) wird automatisch eine Rechnung erstellt und als PDF an die Kundin und an dich geschickt. Eigener Nummernkreis für Online-Verkäufe, lückenlos pro Jahr.</p>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <p><a class="btn" href="<?= forma_h($self) ?>?view=rechnungen_export">Liste herunterladen (CSV für die Buchhaltung)</a></p>
+        <p class="muted small"><?= count($rows) ?> Rechnungen · <?= forma_h(forma_euro((int)$sum)) ?> brutto</p>
+        <div class="list">
+        <?php foreach ($rows as $r): ?>
+            <div class="card booking">
+                <div class="booking-head"><strong><?= forma_h($r['nr']) ?> · <?= forma_h($r['name']) ?></strong><span class="pill pill-ok"><?= forma_h(forma_euro((int)$r['gross_cents'])) ?> bezahlt</span></div>
+                <div class="muted small"><?= forma_h(date('d.m.Y', strtotime($r['issued_at']))) ?> · <?= forma_h($r['country']) ?> · USt. <?= forma_h((string)(float)$r['vat_rate']) ?> % · <?= $r['synced'] ? 'in Google Tabelle eingetragen' : 'noch nicht in Google Tabelle' ?></div>
+                <div><a href="<?= forma_h($self) ?>?view=rechnung_pdf&amp;id=<?= (int)$r['id'] ?>" target="_blank">PDF ansehen</a></div>
+                <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="invoice_resend"><input type="hidden" name="iid" value="<?= (int)$r['id'] ?>"><button class="link" type="submit">Noch einmal an die Kundin schicken</button></form>
+            </div>
+        <?php endforeach; ?>
+        <?php if (!$rows): ?><p class="muted">Noch keine Online-Rechnungen.</p><?php endif; ?>
+        </div>
+        <h2>Einstellungen</h2>
+        <form class="card" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="invoice_settings">
+            <label>Kürzel für den Nummernkreis (z. B. FO → FO-2026-001)<input name="prefix" value="<?= forma_h($cfg['prefix']) ?>" maxlength="8"></label>
+            <label class="check"><input type="checkbox" name="oss" value="1" <?= $cfg['oss'] ? 'checked' : '' ?>> Ich bin für OSS registriert: Templates mit dem Steuersatz des Wohnsitzlandes verrechnen (erst nötig ab 10.000 € Online-Verkäufen in andere EU-Länder pro Jahr)</label>
+            <label>Google Tabelle für die Buchhaltung (Link oder ID)<input name="sheet_id" value="<?= forma_h($cfg['sheet']) ?>"></label>
+            <label>Google-Dienstkonto-Schlüssel (JSON-Datei) <?= $gkey ? '· hinterlegt für ' . forma_h($gkey['client_email']) : '· noch nicht hinterlegt' ?><input type="file" name="gkey" accept=".json,application/json"></label>
+            <?php if ($gkey): ?><p class="muted small">Gib die Google Tabelle für <strong><?= forma_h($gkey['client_email']) ?></strong> als Bearbeiter:in frei. Dann trägt die Website jede neue Rechnung in die Blätter „Rechnungen“ und „Kurse &amp; Leistungen“ ein.</p><?php endif; ?>
+            <?php if ($cfg['err']): ?><p class="alert">Letzter Fehler beim Eintragen: <?= forma_h($cfg['err']) ?></p><?php endif; ?>
+            <button class="btn" type="submit">Speichern</button>
+        </form>
+    <?php });
+}
+
 if ($view === 'export') {
     $rows = $pdo->query("SELECT email, name, source, confirmed_at FROM subscribers WHERE status = 'bestaetigt' ORDER BY confirmed_at")->fetchAll();
     header('Content-Type: text/csv; charset=utf-8');
@@ -1057,6 +1149,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
         <a class="tile" href="<?= forma_h($self) ?>?view=templates"><strong>Templates</strong><span class="muted small">&amp; Maker Club</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=private"><strong>Private Pottery</strong><span class="muted small"><?= $privateOpen ?> offen</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=gutscheine"><strong>Gutscheine</strong><span class="muted small"><?= $voucherOpen ?> offen</span></a>
+        <a class="tile" href="<?= forma_h($self) ?>?view=rechnungen"><strong>Rechnungen</strong><span class="muted small">automatisch nach Zahlung</span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=liste"><strong>E-Mail-Liste</strong><span class="muted small"><?= $subCount ?> <?= $subCount === 1 ? 'Kontakt' : 'Kontakte' ?></span></a>
         <a class="tile" href="<?= forma_h($self) ?>?view=einstellungen"><strong>Einstellungen</strong><span class="muted small">Stripe, MailerLite, E-Mail</span></a>
     </nav>

@@ -760,21 +760,31 @@ function forma_mail_html(string $text): string
 }
 
 /** Baut Text + HTML als multipart/alternative. Gibt [Content-Type, Körper] zurück. */
-function forma_mail_mime(string $body): array
+function forma_mail_mime(string $body, array $attachments = []): array
 {
     $b = 'forma' . bin2hex(random_bytes(10));
     $enc = fn(string $s) => rtrim(chunk_split(base64_encode($s), 76, "\r\n"));
     $mime = "--$b\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . $enc($body) . "\r\n"
         . "--$b\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . $enc(forma_mail_html($body)) . "\r\n"
         . "--$b--";
-    return ['multipart/alternative; boundary="' . $b . '"', $mime];
+    if (!$attachments) {
+        return ['multipart/alternative; boundary="' . $b . '"', $mime];
+    }
+    // Mit Anhängen (z. B. Rechnung als PDF): multipart/mixed um den Text-/HTML-Teil
+    $m = 'formamix' . bin2hex(random_bytes(10));
+    $out = "--$m\r\nContent-Type: multipart/alternative; boundary=\"$b\"\r\n\r\n" . $mime . "\r\n";
+    foreach ($attachments as [$name, $data, $type]) {
+        $out .= "--$m\r\nContent-Type: $type; name=\"$name\"\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename=\"$name\"\r\n\r\n" . $enc($data) . "\r\n";
+    }
+    return ['multipart/mixed; boundary="' . $m . '"', $out . "--$m--"];
 }
 
-function forma_mail(string $to, string $subject, string $body, ?string $replyTo = null): bool
+function forma_mail(string $to, string $subject, string $body, ?string $replyTo = null, array $attachments = []): bool
 {
     if (getenv('FORMA_MAIL_LOG')) {
         // Testbetrieb: Mails zusätzlich in eine Datei schreiben.
-        file_put_contents(getenv('FORMA_MAIL_LOG'), "TO: $to\nSUBJECT: $subject\n$body\n-----\n", FILE_APPEND);
+        file_put_contents(getenv('FORMA_MAIL_LOG'), "TO: $to\nSUBJECT: $subject\n$body" . ($attachments ? 'ANHANG: ' . implode(', ', array_column($attachments, 0)) . "\n" : '') . "-----\n", FILE_APPEND);
+        foreach ($attachments as [$n, $d]) @file_put_contents(dirname(getenv('FORMA_MAIL_LOG')) . '/mail_' . $n, $d);
         if (!getenv('FORMA_SMTP_HOST')) {
             return true;
         }
@@ -782,14 +792,14 @@ function forma_mail(string $to, string $subject, string $body, ?string $replyTo 
     $cfg = forma_mail_config();
     if ($cfg) {
         try {
-            forma_smtp_send($cfg['password'], $to, $subject, $body, $replyTo);
+            forma_smtp_send($cfg['password'], $to, $subject, $body, $replyTo, $attachments);
             return true;
         } catch (Throwable $e) {
             error_log('FORMA SMTP: ' . $e->getMessage());
             // Fällt unten auf den einfachen Versand zurück.
         }
     }
-    [$ctype, $mime] = forma_mail_mime($body);
+    [$ctype, $mime] = forma_mail_mime($body, $attachments);
     $headers = [
         'From' => mb_encode_mimeheader(FORMA_FROM_NAME, 'UTF-8') . ' <' . FORMA_FROM_EMAIL . '>',
         'Reply-To' => $replyTo ?: FORMA_FROM_EMAIL,
@@ -803,7 +813,7 @@ function forma_mail(string $to, string $subject, string $body, ?string $replyTo 
  * Versand über das Postfach hello@forma-pottery.com bei Hostinger (SMTP mit Anmeldung).
  * So werden die Mails mit der Domain signiert und landen nicht im Spam.
  */
-function forma_smtp_send(string $password, string $to, string $subject, string $body, ?string $replyTo): void
+function forma_smtp_send(string $password, string $to, string $subject, string $body, ?string $replyTo, array $attachments = []): void
 {
     $host = getenv('FORMA_SMTP_HOST') ?: 'ssl://smtp.hostinger.com:465';
     $ctx = stream_context_create(['ssl' => ['verify_peer' => true, 'verify_peer_name' => true]]);
@@ -841,7 +851,7 @@ function forma_smtp_send(string $password, string $to, string $subject, string $
         $cmd('MAIL FROM:<' . FORMA_FROM_EMAIL . '>', [250]);
         $cmd('RCPT TO:<' . $to . '>', [250, 251]);
         $cmd('DATA', [354]);
-        [$ctype, $mime] = forma_mail_mime($body);
+        [$ctype, $mime] = forma_mail_mime($body, $attachments);
         $headers = [
             'Date: ' . date('r'),
             'Message-ID: <' . bin2hex(random_bytes(12)) . '@forma-pottery.com>',
@@ -1075,6 +1085,7 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
 
     forma_mail($b['email'], ($paid ? 'Dein Platz ist fix: ' : 'Deine Anmeldung: ') . $b['title'], $customer);
     forma_mail(FORMA_NOTIFY_EMAIL, ($paid ? 'Bezahlt: ' : 'Neue Anmeldung: ') . $b['title'] . ' (' . $b['name'] . ')', $admin, $b['email']);
+    if ($paid) forma_invoice_for($pdo, 'kurs', $bookingId);
 }
 
 // --- MailerLite -------------------------------------------------------------------
@@ -1301,6 +1312,7 @@ function forma_private_mails(PDO $pdo, int $id): void
         . "Falls doch etwas dazwischenkommt: Bis 48 Stunden vor unserem Termin kannst du kostenlos stornieren, danach werden 50 % fällig, wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit, gemeinsam finden wir eine Lösung.\n\n"
         . "Bis bald im Studio!\nVivien\nFORMA Earth & Art\n$phone\nwww.forma-pottery.com\n");
     forma_mail(FORMA_NOTIFY_EMAIL, 'Private Pottery gebucht: ' . $hours . ' (' . $b['name'] . ')', "Neue bezahlte Buchung Private Pottery\n$contactLine\n\n$hours · $amount bezahlt über Stripe\nPersonen: $persons\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\n\nProjekt:\n{$b['project']}\n\nWunschtermin: {$b['wish']}\n\nBitte Termin bestätigen. Übersicht: $site/verwaltung/?view=private\n", $b['email']);
+    forma_invoice_for($pdo, 'private', $id);
 }
 
 function forma_private_check(PDO $pdo, array $b): string
@@ -1395,6 +1407,7 @@ function forma_template_order_paid(PDO $pdo, int $id): void
     forma_mail($o['email'], 'Dein FORMA Template: ' . $o['title'], "Hallo $first,\n\nvielen Dank für deinen Kauf! Hier kannst du dein Template jederzeit herunterladen" . (($o['file_en'] ?? '') !== '' ? ' (auf Deutsch und auf Englisch)' : '') . ":\n\n$link\n\n"
         . "Template: {$o['title']}\nBezahlt: $amount\n\nViel Freude beim Töpfern! Ich freu mich, wenn du mir dein Ergebnis auf Instagram zeigst: @forma.potteryartcraft\n\nHerzlich,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
     forma_mail(FORMA_NOTIFY_EMAIL, 'Template verkauft: ' . $o['title'] . ' (' . $amount . ')', "Ein Template wurde verkauft.\n\nTemplate: {$o['title']}\nBetrag: $amount\nKäufer:in: {$o['name']}\nE-Mail: {$o['email']}\n\nAlle Verkäufe: " . forma_site_url() . "/verwaltung/?view=templates\n", $o['email']);
+    forma_invoice_for($pdo, 'template', $id);
 }
 
 function forma_template_check(PDO $pdo, array $o): string
@@ -1483,3 +1496,5 @@ function forma_confirm_reminders(PDO $pdo): void
         forma_mail((string)$s['email'], 'Kurze Erinnerung: Bitte bestätige deine E-Mail-Adresse', $body);
     }
 }
+
+require_once __DIR__ . '/invoices.php';

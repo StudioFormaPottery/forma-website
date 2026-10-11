@@ -36,6 +36,7 @@ $oid = (int)$pdo->lastInsertId();
 $site = forma_site_url();
 try {
     $session = forma_stripe('POST', '/v1/checkout/sessions', [
+        'billing_address_collection' => 'required',
         'mode' => 'payment',
         'locale' => 'de',
         'customer_email' => $email,
