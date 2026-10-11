@@ -10,7 +10,7 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 ## Aufbau
 - `index.html`: die gesamte Seite als Onepager mit Inline-CSS. Bewusst nur ein heller Look, kein Dark Mode.
 - `fonts/`: selbst gehostete Schriften (Bricolage Grotesque, Italiana, Outfit; SIL OFL). Kein Google Fonts, damit die Datenschutzerklärung stimmt.
-- `img/`: Fotos. Alle mit dem warmen, erdigen Look bearbeitet (wärmer, etwas mehr Kontrast, leichter Sepia-Anteil, feines Korn), max. 1400 px.
+- `img/`: Fotos im natürlichen, hellen Look wie das Über-mich-Bild (kein Sepia mehr!): nur Helligkeit und Wärme sanft an `vivien-toepfern.jpg` angeglichen, max. 1400 px. Videos genauso (leicht heller, minimal wärmer).
 - `video/`: Studio-Videos als H.264-MP4, 720 px breit, ohne Ton, mit Poster-Bild in `img/`.
 
 ## Design
