@@ -369,9 +369,11 @@ section{scroll-margin-top:96px}
 .tpl-tags span{font-size:12.5px;padding:3px 10px;border-radius:999px;background:var(--paper);color:var(--ink-soft)}
 .tpl h4{font-family:var(--display);font-weight:650;font-size:23px;line-height:1.1;color:var(--clay);margin:0}
 .tpl p{font-size:15.5px;color:var(--ink-soft)}
-.tpl-level{display:inline-flex;gap:4px;align-items:center;font-size:13px;color:var(--ink-soft)}
-.tpl-level i{width:10px;height:10px;border-radius:50%;background:var(--line)}
-.tpl-level i.on{background:var(--clay)}
+.tpl-level{display:inline-flex;gap:8px;align-items:center;align-self:flex-start;font-size:13.5px;font-weight:500;color:var(--ink);background:var(--paper);border-radius:999px;padding:5px 12px 5px 10px}
+.tpl-level .bars{display:inline-flex;align-items:flex-end;gap:3px;height:16px}
+.tpl-level .bars i{width:6px;border-radius:2px;background:var(--line)}
+.tpl-level .bars i:nth-child(1){height:8px}.tpl-level .bars i:nth-child(2){height:12px}.tpl-level .bars i:nth-child(3){height:16px}
+.tpl-level .bars i.on{background:var(--clay)}
 .tpl-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:12px;border-top:1px solid var(--line)}
 .tpl-foot b{font-family:var(--display);font-weight:600;font-size:22px}
 
@@ -1503,7 +1505,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     $('tpl-filters').hidden=false;
     var seasons=tplData.map(function(t){return t.season;}),ages=tplData.map(function(t){return t.age;});
     chips($('tpl-season'),SEASONS_L,seasons,tplSeason,function(k){tplSeason=k;renderTpl();});
-    chips($('tpl-age'),AGES_L,ages,tplAge,function(k){tplAge=k;renderTpl();});
+    $('tpl-age').hidden=true;
     var list=tplData.filter(function(t){return (tplSeason==='alle'||t.season===tplSeason)&&(tplAge==='alle'||t.age===tplAge);});
     if(!list.length){grid.appendChild(el('p','slots-note','Für diese Auswahl gibt es gerade noch kein Template.'));return;}
     list.forEach(function(t){
@@ -1511,10 +1513,10 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       var i=document.createElement('img');i.src=t.image||('img/tpl-'+t.season+'.jpg');i.alt=t.image?'Vorschau: '+t.title:'';i.loading='lazy';im.appendChild(i);
       c.appendChild(im);
       var b=el('div','tpl-body'),tags=el('div','tpl-tags');
-      tags.appendChild(el('span',null,t.season_label));tags.appendChild(el('span',null,t.age_label));if(t.langs)tags.appendChild(el('span',null,t.langs));b.appendChild(tags);
+      tags.appendChild(el('span',null,t.season_label));if(t.langs)tags.appendChild(el('span',null,t.langs));b.appendChild(tags);
       b.appendChild(el('h4',null,t.title));
       if(t.description)b.appendChild(el('p',null,t.description));
-      var lv=el('span','tpl-level');for(var n=1;n<=3;n++)lv.appendChild(el('i',n<=t.level?'on':null));lv.appendChild(document.createTextNode(' '+['leicht','mittel','anspruchsvoll'][t.level-1]));b.appendChild(lv);
+      var lv=el('span','tpl-level'),bars=el('span','bars');lv.title='Schwierigkeit';for(var n=1;n<=3;n++)bars.appendChild(el('i',n<=t.level?'on':null));lv.appendChild(bars);lv.appendChild(document.createTextNode(['Einfach','Mittel','Anspruchsvoll'][t.level-1]));b.appendChild(lv);
       var f=el('div','tpl-foot');f.appendChild(el('b',null,euro(t.price_cents)));
       var btn=el('button','btn btn-solid',t.buyable?'Kaufen':'Bald erhältlich');btn.type='button';
       if(t.buyable)btn.addEventListener('click',function(){tplOpen(t);});else{btn.disabled=true;btn.style.opacity='.55';}
