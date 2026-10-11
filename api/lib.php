@@ -280,6 +280,28 @@ function forma_migrate(PDO $pdo): void
         forma_set_setting($pdo, 'remove_dates_v7', '1');
     }
 
+    // 11.10.2026: Erstes Shop-Template „Kürbisteller“ (Deutsch & Englisch) einstellen.
+    if (forma_setting($pdo, 'tpl_kuerbis_v10') === null) {
+        $seed = __DIR__ . '/seed';
+        $dir = forma_template_dir();
+        $ok = true;
+        foreach (['kuerbisteller-de.pdf', 'kuerbisteller-en.pdf', 'kuerbisteller.jpg'] as $f) {
+            if (!is_file("$dir/seed-$f")) {
+                $ok = $ok && is_file("$seed/$f") && @copy("$seed/$f", "$dir/seed-$f");
+            }
+        }
+        if ($ok) {
+            $has = $pdo->prepare('SELECT COUNT(*) FROM templates WHERE title = ?');
+            $has->execute(['Kürbisteller']);
+            if ((int)$has->fetchColumn() === 0) {
+                $pdo->prepare('INSERT INTO templates (title, description, season, age, level, price_cents, file, file_en, image, visible, sort, created_at) VALUES (?,?,?,?,?,?,?,?,?,1,0,?)')
+                    ->execute(['Kürbisteller', 'Ein flacher Teller in Kürbisform mit sanft hochgebogenem Rand, kleinem Stiel und Blatt. Mit Schablonen in Originalgröße und einer Schritt-für-Schritt-Anleitung in Bildern. Perfekt für Kekse, Herbstdeko oder als Frühstücksteller.',
+                        'herbst', 'erwachsene', 1, 399, 'seed-kuerbisteller-de.pdf', 'seed-kuerbisteller-en.pdf', 'seed-kuerbisteller.jpg', date('c')]);
+            }
+            forma_set_setting($pdo, 'tpl_kuerbis_v10', '1');
+        }
+    }
+
     // 11.10.2026: Das Wort „Keramik“ soll nirgends auf der Website stehen.
     if (forma_setting($pdo, 'no_keramik_v9') === null) {
         $pdo->exec("UPDATE courses SET description = REPLACE(description, 'Keramikstücke', 'Werkstücke') WHERE description LIKE '%Keramik%'");

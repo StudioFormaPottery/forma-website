@@ -12,5 +12,5 @@ Options -Indexes
 # Interne Dateien für die Gutscheine
 <IfModule mod_rewrite.c>
 RewriteEngine On
-RewriteRule ^api/(fpdf|gutschein)/ - [F,L]
+RewriteRule ^api/(fpdf|gutschein|seed)/ - [F,L]
 </IfModule>

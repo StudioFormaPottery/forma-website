@@ -186,10 +186,11 @@ section{scroll-margin-top:96px}
 .offer.is-featured .btn{background:var(--on-clay);color:var(--clay);border-color:var(--on-clay)}
 .offer.is-blush{background:var(--blush);border-color:var(--blush)}
 .offer.is-blush .note{background:var(--paper)}
-.offer.is-brown{background:var(--ink-soft);color:var(--on-clay);border-color:var(--ink-soft)}
-.offer.is-brown h3{color:var(--on-clay)}
-.offer.is-brown .note{background:color-mix(in srgb,var(--on-clay) 14%,transparent);color:var(--on-clay)}
-.offer.is-brown .btn{background:var(--on-clay);color:var(--ink-soft);border-color:var(--on-clay)}
+.offer.is-brown{background:#B08E7A;color:var(--ink);border-color:#B08E7A}
+.offer.is-brown h3{color:var(--ink)}
+.offer.is-brown .note{background:color-mix(in srgb,var(--on-clay) 45%,transparent);color:var(--ink)}
+.offer.is-brown .btn{background:var(--ink-soft);color:var(--on-clay);border-color:var(--ink-soft)}
+.offer.is-brown .btn:hover{background:var(--ink);border-color:var(--ink)}
 .note{font-size:14.5px;line-height:1.5;padding:14px 16px;border-radius:16px;background:var(--paper);color:var(--ink-soft)}
 
 
@@ -328,6 +329,9 @@ section{scroll-margin-top:96px}
 .maker h3{font-family:var(--display);font-weight:650;font-size:clamp(30px,3.4vw,44px);line-height:1.05;letter-spacing:-.02em;margin:6px 0 12px}
 .maker p{color:#F3E2D6}
 .maker .kicker{color:var(--blush);opacity:1}
+.maker-how{list-style:none;margin:16px 0 4px;padding:0;display:flex;flex-wrap:wrap;gap:8px 18px}
+.maker-how li{display:flex;align-items:center;gap:10px;font-size:16px;color:var(--on-clay)}
+.maker-how b{width:28px;height:28px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;background:var(--on-clay);color:var(--clay);font-size:14px}
 .maker-now{margin-top:10px;font-weight:500;color:var(--on-clay)!important}
 .maker-form{display:flex;flex-direction:column;gap:10px;margin-top:18px;max-width:560px}
 .maker .btn{background:var(--on-clay);color:var(--clay);border-color:var(--on-clay)}
@@ -337,9 +341,12 @@ section{scroll-margin-top:96px}
 .maker-art{position:relative;min-height:220px;display:grid;place-items:center}
 .maker-art::before{content:"";position:absolute;width:78%;aspect-ratio:1;border-radius:var(--blob);background:var(--blush);opacity:.9;animation:morph 14s ease-in-out infinite alternate}
 .maker-art img{position:relative;width:78%;aspect-ratio:4/5;object-fit:cover;border-radius:999px 999px 24px 24px;box-shadow:0 18px 40px rgba(51,33,27,.25)}
-.shop-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:18px 40px;margin:0 0 22px;padding-bottom:22px;border-bottom:1px solid var(--line);scroll-margin-top:110px}
+.shop-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);align-items:center;gap:18px 40px;margin:0 0 22px;padding-bottom:22px;border-bottom:1px solid var(--line);scroll-margin-top:110px}
 .shop-head h3{font-family:var(--display);font-weight:650;font-size:clamp(28px,3.4vw,42px);line-height:1.05;color:var(--clay);margin:6px 0 8px}
 .shop-head p:not(.kicker){max-width:52ch;color:var(--ink-soft)}
+.shop-copy{display:flex;flex-direction:column;gap:14px;min-width:0}
+.shop-art{width:100%;max-width:520px;justify-self:end;display:block}
+@media (max-width:760px){.shop-head{grid-template-columns:1fr}.shop-art{max-width:360px;justify-self:center;order:-1}}
 .shop-steps{list-style:none;margin:0;padding:0;display:flex;gap:10px;flex-wrap:wrap}
 .shop-steps li{display:flex;align-items:center;gap:10px;padding:10px 16px 10px 10px;border-radius:999px;background:var(--paper-2);border:1px solid var(--line);font-size:15px}
 .shop-steps b{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--clay);color:var(--on-clay);font-size:14px}
@@ -534,6 +541,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   .tpl-tags span{font-size:14.5px}
   .tpl-level{font-size:15px}
   .shop-steps li{font-size:17px}
+  .maker-how li{font-size:18.5px}
   .shop-head p:not(.kicker),.shop-soon p{font-size:20px}
   .chips button{font-size:17px}
   .maker p,.maker .consent{font-size:inherit}
@@ -1008,6 +1016,11 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="kicker">FORMA Maker Club</p>
           <h3>Jeden Monat ein Template gratis</h3>
           <p id="maker-text">Trag dich ein und hol dir jeden Monat ein neues Pottery-Template zum Selbermachen, kostenlos, direkt in dein Postfach.</p>
+          <ol class="maker-how">
+            <li><b>1</b><span>E-Mail eintragen und kurz bestätigen</span></li>
+            <li><b>2</b><span>Template des Monats sofort herunterladen</span></li>
+            <li><b>3</b><span>Jeden Monat ein neues per E-Mail, gratis</span></li>
+          </ol>
           <p class="maker-now" id="maker-now" hidden></p>
           <form class="maker-form" id="maker-form" novalidate>
             <input type="hidden" name="t" id="maker-t">
@@ -1028,16 +1041,17 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         </div>
       </div>
       <div class="shop-head" id="shop">
-        <div>
+        <div class="shop-copy">
           <p class="kicker">Template-Shop · digitaler Download</p>
           <h3 id="shop-title">Der Herbst-Shop</h3>
           <p>Jede Jahreszeit kommen neue Templates in den Shop. Du suchst dir eins aus, bezahlst online und lädst dein PDF sofort herunter.</p>
-        </div>
         <ol class="shop-steps">
           <li><b>1</b><span>Template aussuchen</span></li>
           <li><b>2</b><span>Online bezahlen</span></li>
           <li><b>3</b><span>PDF herunterladen</span></li>
         </ol>
+        </div>
+        <img class="shop-art" id="shop-art" src="img/shop-herbst.svg" alt="">
       </div>
       <div class="tpl-filters" id="tpl-filters" hidden>
         <div class="chips" id="tpl-season" role="group" aria-label="Jahreszeit"></div>
@@ -1481,7 +1495,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   function renderTpl(){
     var grid=$('tpl-grid');grid.innerHTML='';
     if(!tplData.length){
-      var so=el('div','shop-soon'),si=document.createElement('img');si.src='img/tpl-'+curSeason+'.jpg';si.alt='';so.appendChild(si);
+      var so=el('div','shop-soon'),si=document.createElement('img');si.src=curSeason==='herbst'?'img/shop-herbst.svg':'img/tpl-'+curSeason+'.jpg';si.alt='';so.appendChild(si);
       var sd=el('div');sd.appendChild(el('h4',null,'Der '+SHOP_L[curSeason]+' öffnet bald'));
       sd.appendChild(el('p',null,'Die ersten Templates sind gerade in Arbeit. Im FORMA Maker Club erfährst du als Erstes, wenn sie da sind, und bekommst jeden Monat eins gratis dazu.'));
       var sa=el('a','btn btn-solid','Zum Maker Club');sa.href='#templates';sd.appendChild(sa);so.appendChild(sd);grid.appendChild(so);
@@ -1508,6 +1522,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     });
   }
   $('shop-title').textContent='Der '+SHOP_L[curSeason];
+  if(curSeason!=='herbst'){var sa=$('shop-art');sa.src='img/tpl-'+curSeason+'.jpg';sa.style.borderRadius='999px 999px 28px 28px';sa.style.maxWidth='380px';}
   renderTpl();
   fetch('api/templates.php',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
     if(!d||!d.ok)return;tplData=d.templates||[];
