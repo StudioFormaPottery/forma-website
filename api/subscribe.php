@@ -17,6 +17,9 @@ if ($loadedAt > 0 && ((int)(microtime(true) * 1000) - $loadedAt) < 2000) {
 $email = mb_strtolower(forma_clean((string)($in['email'] ?? ''), 160));
 $name = forma_clean((string)($in['name'] ?? ''), 80);
 $source = forma_clean((string)($in['source'] ?? ''), 120);
+if (mb_strlen($name) < 2) {
+    forma_json(['ok' => false, 'error' => 'Bitte gib noch deinen Vornamen an.'], 422);
+}
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     forma_json(['ok' => false, 'error' => 'Bitte gib eine gültige E-Mail-Adresse an.'], 422);
 }

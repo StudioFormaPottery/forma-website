@@ -424,6 +424,8 @@ section{scroll-margin-top:96px}
 .season-date{display:inline-flex;align-items:center;gap:8px;width:max-content;max-width:100%;padding:6px 14px;border-radius:999px;background:var(--paper-2);font-weight:500;font-size:15px}
 .season-form{display:flex;flex-direction:column;gap:10px;margin-top:4px}
 .season-row{display:flex;gap:8px;flex-wrap:wrap}
+.season-row input[name=name]{flex:1 1 150px;max-width:220px}
+@media (max-width:600px){.season-row input[name=name]{max-width:none}}
 .season-row input{flex:1 1 200px;min-width:0;font:inherit;font-size:18px;padding:13px 18px;border-radius:999px;border:1px solid var(--line);background:#FFFBF7;color:var(--ink)}
 .season-row input:focus{outline:3px solid var(--focus);outline-offset:1px}
 .season .consent{font-size:13.5px}
@@ -995,6 +997,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <input type="hidden" name="source" id="season-source">
           <div class="hp" aria-hidden="true"><label for="season-website">Bitte leer lassen</label><input id="season-website" name="website" tabindex="-1" autocomplete="off"></div>
           <div class="season-row">
+            <label class="hp" for="season-name">Vorname</label>
+            <input id="season-name" name="name" type="text" autocomplete="given-name" placeholder="Dein Vorname" maxlength="80" required>
             <label class="hp" for="season-email">E-Mail</label>
             <input id="season-email" name="email" type="email" autocomplete="email" placeholder="Deine E-Mail-Adresse" required>
             <button class="btn btn-solid" type="submit" id="season-submit">Sag mir Bescheid</button>
@@ -1087,7 +1091,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p id="maker-text">Trag dich ein und hol dir jeden Monat ein neues Pottery-Template zum Selbermachen, kostenlos, direkt in dein Postfach.</p>
           <p class="maker-extra">Dazu gibt es kleine Rezepte zur Jahreszeit und DIY-Ideen, zum Beispiel für Räucherbündel.</p>
           <ol class="maker-how">
-            <li><b>1</b><span>E-Mail eintragen</span></li>
+            <li><b>1</b><span>Vorname und E-Mail eintragen</span></li>
             <li><b>2</b><span>Adresse in deinem Postfach bestätigen</span></li>
             <li><b>3</b><span>Template herunterladen und jeden Monat ein neues bekommen</span></li>
           </ol>
@@ -1097,6 +1101,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
             <input type="hidden" name="source" value="Maker Club">
             <div class="hp" aria-hidden="true"><label for="maker-website">Bitte leer lassen</label><input id="maker-website" name="website" tabindex="-1" autocomplete="off"></div>
             <div class="season-row">
+              <label class="hp" for="maker-name">Vorname</label>
+              <input id="maker-name" name="name" type="text" autocomplete="given-name" placeholder="Dein Vorname" maxlength="80" required>
               <label class="hp" for="maker-email">E-Mail</label>
               <input id="maker-email" name="email" type="email" autocomplete="email" placeholder="Deine E-Mail-Adresse" required>
               <button class="btn" type="submit" id="maker-submit">Gratis-Template holen</button>
@@ -1668,6 +1674,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   document.querySelector('.maker-privacy').addEventListener('click',function(){var d=$('datenschutz');if(d)d.open=true;});
   $('maker-form').addEventListener('submit',function(e){
     e.preventDefault();var er=$('maker-error'),btn=$('maker-submit'),email=$('maker-email').value.trim();er.hidden=true;
+    if($('maker-name').value.trim().length<2){er.textContent='Bitte gib noch deinen Vornamen an.';er.hidden=false;$('maker-name').focus();return;}
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){er.textContent='Bitte gib eine gültige E-Mail-Adresse an.';er.hidden=false;return;}
     if(!$('maker-consent').checked){er.textContent='Bitte setz noch das Häkchen, damit ich dir die Templates schicken darf.';er.hidden=false;return;}
     btn.disabled=true;
@@ -1905,6 +1912,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     var f=e.target,se=document.getElementById('season-error'),btn=document.getElementById('season-submit');
     var email=document.getElementById('season-email').value.trim();
     se.hidden=true;
+    if(document.getElementById('season-name').value.trim().length<2){se.textContent='Bitte gib noch deinen Vornamen an.';se.hidden=false;document.getElementById('season-name').focus();return;}
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){se.textContent='Bitte gib eine gültige E-Mail-Adresse an.';se.hidden=false;return;}
     if(!document.getElementById('season-consent').checked){se.textContent='Bitte setz noch das Häkchen, damit ich dir schreiben darf.';se.hidden=false;return;}
     btn.disabled=true;
