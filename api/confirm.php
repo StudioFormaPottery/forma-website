@@ -20,6 +20,9 @@ if ($s['status'] !== 'bestaetigt') {
 }
 if (str_contains($s['source'], 'Maker')) {
     $m = forma_maker($pdo);
-    forma_message_page('Willkommen im Maker Club!', "Danke, deine E-Mail-Adresse ist bestätigt. Ab jetzt bekommst du jeden Monat ein Gratis-Template von mir." . ($m['file'] !== '' ? "\nHier ist gleich das Template des Monats" . ($m['title'] ? ": {$m['title']}" : '') . '.' : "\nDas erste Template schicke ich dir, sobald es fertig ist."), $m['file'] !== '' ? 'Template herunterladen' : '', $m['file'] !== '' ? forma_maker_link($s) : '');
+    if ($s['status'] !== 'bestaetigt' && $m['file'] !== '') {
+        forma_mail($s['email'], 'Dein Gratis-Template von FORMA', "Hallo" . ($s['name'] !== '' ? ' ' . forma_first_name($s['name']) : '') . ",\n\nwillkommen im FORMA Maker Club! Hier ist dein Template des Monats" . ($m['title'] ? " („{$m['title']}“)" : '') . ":\n\n" . forma_maker_link($s) . "\n\nAb jetzt bekommst du jeden Monat ein neues Template von mir.\n\nViel Freude beim Töpfern!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
+    }
+    forma_message_page('Willkommen im Maker Club!', "Danke, deine E-Mail-Adresse ist bestätigt. Ab jetzt bekommst du jeden Monat ein Gratis-Template von mir." . ($m['file'] !== '' ? "\nHier kannst du gleich das Template des Monats herunterladen, den Link findest du auch in deinem Postfach" . ($m['title'] ? ": {$m['title']}" : '') . '.' : "\nDas erste Template schicke ich dir, sobald es fertig ist."), $m['file'] !== '' ? 'Template herunterladen' : '', $m['file'] !== '' ? forma_maker_link($s) : '');
 }
 forma_message_page('Du bist dabei!', "Danke, deine E-Mail-Adresse ist bestätigt. Sobald es neue Kurse oder Specials gibt, schreibe ich dir als Erstes.\n\nPsst, kennst du schon den FORMA Maker Club? Jeden Monat ein Pottery-Template gratis, dazu kleine Rezepte zur Jahreszeit und DIY-Ideen wie Räucherbündel.", 'Zum Maker Club', '/#templates');

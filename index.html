@@ -66,15 +66,20 @@ p{margin:0}
 .top .wrap{max-width:1320px;display:flex;align-items:center;gap:20px;padding-block:12px}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto}
 .brand img{width:60px;height:60px;object-fit:contain}
-@media (min-width:861px){.brand img{width:104px;height:104px}.brand span{font-size:17px!important}.nav a{font-size:21px!important}.nav{gap:4px 34px}.nav .btn{font-size:20px!important;min-height:54px;padding:12px 28px}}
-@media (min-width:861px) and (max-width:1240px){.brand span{display:none}.nav{gap:4px 22px}.nav a{font-size:18px!important}.nav .btn{font-size:17px!important;padding:10px 20px}}
+@media (min-width:861px){.brand img{width:104px;height:104px}.brand span{font-size:17px!important}.top-actions .btn{font-size:19px;min-height:54px;padding:12px 28px}.nav-toggle{width:56px;height:56px}}
 .brand span{font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase}
-.nav{display:flex;flex-wrap:wrap;gap:4px 26px;margin-left:auto;align-items:center}
-.nav a{text-decoration:none;font-weight:500;font-size:15.5px;padding:6px 0;background:linear-gradient(currentColor,currentColor) 0 100%/0 1.5px no-repeat;transition:background-size .25s ease}
-.nav a:hover{background-size:100% 1.5px;color:var(--clay)}
-.nav .btn{min-height:42px;padding:8px 20px;font-size:15px;background:var(--clay);color:var(--on-clay)}
-.nav .btn:hover{background:var(--clay);color:var(--on-clay)}
-.top-actions{display:none;align-items:center;gap:10px;margin-left:auto}
+.nav{position:fixed;top:0;right:0;bottom:0;z-index:60;width:min(420px,88vw);display:flex;flex-direction:column;gap:0;padding:18px 28px 28px;background:var(--blush);box-shadow:-20px 0 40px rgba(51,33,27,.18);overflow-y:auto;transform:translateX(105%);visibility:hidden;transition:transform .35s ease,visibility 0s linear .35s}
+.nav.open{transform:none;visibility:visible;transition:transform .35s ease}
+.nav-backdrop{position:fixed;inset:0;z-index:55;background:rgba(51,33,27,.35)}
+.nav-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.nav-head img{width:64px;height:64px}
+.nav-close{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--clay);background:transparent;color:var(--clay);display:grid;place-items:center;cursor:pointer}
+.nav a:not(.btn){text-decoration:none;font-family:var(--display);font-weight:600;font-size:clamp(22px,2.2vw,26px);letter-spacing:-.01em;padding:12px 0;border-bottom:1px solid color-mix(in srgb,var(--clay) 18%,transparent);color:var(--clay)}
+.nav a:not(.btn):hover{color:var(--ink)}
+.nav a.nav-hl{margin:10px 0 4px;padding:12px 18px;border-radius:18px;border:0;background:var(--clay);color:var(--on-clay)}
+.nav a.nav-hl:hover{color:var(--on-clay);opacity:.92}
+.nav .btn{margin-top:22px;align-self:flex-start;min-height:50px;padding:12px 26px;font-size:17px;background:var(--clay);color:var(--on-clay)}
+.top-actions{display:flex;align-items:center;gap:12px;margin-left:auto}
 .nav-toggle{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--clay);background:transparent;color:var(--clay);display:grid;place-items:center;cursor:pointer;padding:0}
 .nav-toggle span{display:block;width:20px;height:2px;background:currentColor;border-radius:2px;position:relative;transition:background-color .2s ease}
 .nav-toggle span::before,.nav-toggle span::after{content:"";position:absolute;left:0;width:20px;height:2px;background:currentColor;border-radius:2px;transition:transform .25s ease}
@@ -83,13 +88,7 @@ p{margin:0}
 .nav-toggle[aria-expanded="true"] span::before{transform:translateY(6px) rotate(45deg)}
 .nav-toggle[aria-expanded="true"] span::after{transform:translateY(-6px) rotate(-45deg)}
 .top-actions .btn{min-height:42px;padding:8px 18px;font-size:15px}
-@media (max-width:860px){
-  .brand span{display:none}
-  .top-actions{display:flex}
-  .nav{position:absolute;left:0;right:0;top:100%;margin:0;flex-direction:column;align-items:stretch;gap:0;padding:6px 20px 22px;background:var(--blush);border-bottom:1px solid var(--line);box-shadow:0 18px 30px rgba(51,33,27,.12);display:none}
-  .nav.open{display:flex}
-  .nav a:not(.btn){font-family:var(--display);font-weight:600;font-size:24px;letter-spacing:-.01em;padding:12px 0;border-bottom:1px solid color-mix(in srgb,var(--clay) 18%,transparent);background:none;color:var(--clay)}
-  .nav .btn{display:none}
+@media (max-width:860px){.brand span{display:none}.top-gift{display:none!important}}
 }
 
 .hero{position:relative;background:var(--blush);overflow:hidden}
@@ -353,7 +352,7 @@ section{scroll-margin-top:96px}
 .maker-art{position:relative;min-height:220px;display:grid;place-items:center}
 .maker-art::before{content:"";position:absolute;width:78%;aspect-ratio:1;border-radius:var(--blob);background:var(--blush);opacity:.9;animation:morph 14s ease-in-out infinite alternate}
 .maker-art img{position:relative;width:78%;aspect-ratio:4/5;object-fit:cover;border-radius:999px 999px 24px 24px;box-shadow:0 18px 40px rgba(51,33,27,.25)}
-.shop-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);align-items:center;gap:18px 40px;margin:0 0 22px;padding-bottom:22px;border-bottom:1px solid var(--line);scroll-margin-top:110px}
+.shop-head{scroll-margin-top:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);align-items:center;gap:18px 40px;margin:0 0 22px;padding-bottom:22px;border-bottom:1px solid var(--line);scroll-margin-top:110px}
 .shop-head h3{font-family:var(--display);font-weight:650;font-size:clamp(28px,3.4vw,42px);line-height:1.05;color:var(--clay);margin:6px 0 8px}
 .shop-head p:not(.kicker){max-width:52ch;color:var(--ink-soft)}
 .shop-copy{display:flex;flex-direction:column;gap:14px;min-width:0}
@@ -427,12 +426,12 @@ section{scroll-margin-top:96px}
 
 /* Studio */
 .studio{background:var(--lilac)}
-.gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(3,clamp(150px,17vw,260px));grid-template-areas:"a b c d" "a e c f" "g e h i";gap:14px}
+.gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,clamp(170px,19vw,300px));grid-template-areas:"a b c d" "a e c f";gap:14px}
 .gallery figure{margin:0;overflow:hidden;border-radius:24px;min-width:0}
 .gallery img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
 .gallery figure:hover img{transform:scale(1.04)}
 .gallery figure:first-child{border-radius:999px 999px 24px 24px}
-@media (max-width:700px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(6,150px);grid-template-areas:"a b" "a c" "d c" "e f" "e g" "h i"}}
+@media (max-width:700px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(4,150px);grid-template-areas:"a b" "a c" "d c" "e f"}}
 
 .films{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:14px}
 .film{margin:0;position:relative;aspect-ratio:9/13;border-radius:240px 240px 24px 24px;overflow:hidden;background:var(--paper-2);min-width:0}
@@ -564,7 +563,11 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 }
 
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
-.team{padding:0 0 clamp(40px,6vw,80px)}
+.team{background:var(--paper-2);padding:clamp(24px,4vw,48px) 0 0}
+.team .wave{margin-top:clamp(40px,6vw,80px)}
+.shop-sec{background:var(--lilac);scroll-margin-top:90px}
+.shop-sec>.wrap{padding-top:clamp(20px,3vw,40px)}
+.shop-sec .shop-head{border-bottom-color:color-mix(in srgb,var(--clay) 20%,transparent)}
 .team-card{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:center;background:var(--clay);color:#FBF1EA;border-radius:40px;padding:clamp(28px,5vw,64px)}
 .team-card .eyebrow{color:#F1D9C6}
 .team-card h2{font-family:var(--display);font-weight:650;font-size:clamp(32px,4.4vw,58px);line-height:1.04;letter-spacing:-.02em;margin:6px 0 16px;color:#FBF1EA}
@@ -589,15 +592,21 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <span>Töpferstudio Mathon</span>
     </a>
     <div class="top-actions">
+      <a class="btn btn-ghost top-gift" href="#gutschein" data-voucher="">Gutscheine</a>
       <a class="btn btn-solid" href="#angebote" data-book="">Kurs buchen</a>
       <button class="nav-toggle" type="button" id="nav-toggle" aria-expanded="false" aria-controls="nav" aria-label="Menü öffnen"><span></span></button>
     </div>
+    <div class="nav-backdrop" id="nav-backdrop" hidden></div>
     <nav class="nav" id="nav" aria-label="Hauptnavigation">
+      <div class="nav-head"><img src="img/forma-logo.png" alt=""><button class="nav-close" type="button" id="nav-close" aria-label="Menü schließen"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
       <a href="#angebote">Kurse</a>
       <a href="#studio">Studio</a>
+      <a href="#templates">Templates &amp; Maker Club</a>
       <a href="#shop">Shop</a>
       <a href="#gutschein" data-voucher="">Gutscheine</a>
+      <a class="nav-hl" href="#teambuilding">Teambuilding &amp; Events</a>
       <a href="#ueber-mich">Hallo!</a>
+      <a href="#fragen">Fragen</a>
       <a href="#kontakt">Kontakt</a>
       <a class="btn btn-solid" href="#angebote" data-book="">Kurs buchen</a>
     </nav>
@@ -628,7 +637,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <span class="dot d3" aria-hidden="true"></span>
         <figure class="c-main hero-slides" id="hero-slides">
           <img class="slide on" src="img/atelier-ecke.jpg" alt="Gemütliche Ecke im FORMA Studio mit Fell-Stuhl und Wandnische" style="object-position:28% 50%" width="1400" height="1867">
-          <video class="slide" src="video/regal-nische.mp4" poster="img/regal-nische-poster.jpg" muted playsinline preload="auto" aria-label="Video: Handgemachte Becher und Vase in der Wandnische" width="720" height="1280"></video>
+          <video class="slide" src="video/regal-nische.mp4?v=2" poster="img/regal-nische-poster.jpg?v=2" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-label="Video: Handgemachte Becher und Vase in der Wandnische" width="720" height="1280"></video>
           <img class="slide" src="img/scheiben-studio.jpg" alt="Die Töpferscheiben im FORMA Studio" style="object-position:50% 60%" loading="lazy" width="1142" height="2000">
         </figure>
         <span class="dot d1" aria-hidden="true">
@@ -677,7 +686,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
             <dt>Termine</dt><dd>mittwochs &amp; freitags, 9–11 Uhr</dd>
             <dt>Für</dt><dd>Einsteiger und Fortgeschrittene</dd>
             <dt>Gruppe</dt><dd>findet ab 2 Personen statt</dd>
-            <dt>Abholen</dt><dd>nach 3–4 Wochen im Atelier, ich versende nichts. Nur im Urlaub hier? Dann bekommst du stattdessen ein kleines Andenken aus meiner Saisonkollektion.</dd>
+            <dt>Abholen</dt><dd>Dein Werkstück wartet nach 3–4 Wochen im Atelier auf dich. Nur im Urlaub hier? Dann such dir zum Abschied ein kleines Andenken aus meiner Saisonkollektion aus.</dd>
           </dl>
           <p class="price">€ 70<small>pro Person, inkl. eines Werkstücks</small></p>
           <a class="btn btn-solid" href="#angebote" data-book="Spin &amp; Go">Termin buchen</a>
@@ -689,7 +698,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <dl class="facts">
             <dt>Dauer</dt><dd>je nach Projekt 1–4 Std., im Buchungsfenster siehst du, was wie lange dauert</dd>
             <dt>Termine</dt><dd>individuell, gern auf mehrere Abende verteilt</dd>
-            <dt>Inklusive</dt><dd>alle Materialien und deine Werkstücke</dd>
+            <dt>Inklusive</dt><dd>dein handgefertigtes Werkstück, Material zum Arbeiten und Brennen</dd>
           </dl>
           <p class="price">€ 65<small>pro Stunde</small></p>
           <div class="offer-btns"><a class="btn btn-solid" href="#angebote" data-private="buchung">Projekt buchen</a><a class="btn btn-ask" href="#angebote" data-private="anfrage">Erst mal anfragen</a></div>
@@ -724,7 +733,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <details class="faq-item"><summary>Was ist im Preis enthalten?</summary><p>Bei Spin &amp; Go ist ein Werkstück inklusive. Bei Private Pottery ist dein komplettes Werkstück enthalten, Aufwand und Umfang besprechen wir vorher gemeinsam. Im offenen Atelier nutzt du das Studio vor Ort als deinen kreativen Workspace, Brennen und Glasieren werden hier separat abgerechnet (€ 22 pro kg, bei der Abholung).</p></details>
         <details class="faq-item"><summary>Was soll ich anziehen?</summary><p>Am besten bequeme Kleidung, die ruhig etwas Ton abbekommen darf. Kurze Fingernägel machen das Arbeiten an der Töpferscheibe leichter.</p></details>
         <details class="faq-item"><summary>Wann kann ich meine Stücke mitnehmen?</summary><p>Ton muss erst trocknen und gebrannt werden, das dauert meist 3–4 Wochen. Ich melde mich bei dir, sobald deine Stücke fertig zum Abholen sind.</p></details>
-        <details class="faq-item"><summary>Ich bin nur im Urlaub hier. Was passiert mit meinem Werkstück?</summary><p>Ich versende keine Werkstücke, sie können nur bei mir im Atelier abgeholt werden. Wenn du nicht noch einmal vorbeikommen kannst, darfst du dir nach deinem Spin &amp; Go stattdessen ein kleines Accessoire aus meiner aktuellen Saisonkollektion aussuchen, als Andenken an deine Zeit im FORMA.</p></details>
+        <details class="faq-item"><summary>Ich bin nur im Urlaub hier. Was passiert mit meinem Werkstück?</summary><p>Deine Werkstücke holst du nach 3–4 Wochen bei mir im Atelier ab, verschicken kann ich sie leider nicht. Wenn du nicht noch einmal vorbeikommen kannst, darfst du dir nach deinem Spin &amp; Go stattdessen ein kleines Accessoire aus meiner aktuellen Saisonkollektion aussuchen, als Andenken an deine Zeit im FORMA.</p></details>
         <details class="faq-item"><summary>Ich weiß noch nicht genau, was ich machen möchte.</summary><p>Dann schick mir bei Private Pottery einfach eine unverbindliche Anfrage. Ich sehe mir deine Idee an und melde mich mit einem Vorschlag, wie lange wir brauchen.</p></details>
         <details class="faq-item"><summary>Kann ich mit einer Gruppe kommen?</summary><p>Gern! Für Geburtstage, Freundinnen-Abende oder Teamevents schreib mir einfach, dann finden wir gemeinsam das Passende.</p></details>
         <details class="faq-item"><summary>Wie funktionieren die Gutscheine?</summary><p>Du wählst Kurs und Menge, schreibst eine persönliche Nachricht dazu und bezahlst online. Den Gutschein bekommst du sofort als PDF zum Ausdrucken oder Verschicken.</p></details>
@@ -848,7 +857,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <form id="p-form" class="step" novalidate>
         <p class="eyebrow" id="p-eyebrow">Private Pottery</p>
         <h3 class="step-title" id="p-title" tabindex="-1">Dein Projekt, gemeinsam umgesetzt</h3>
-        <p class="step-meta" id="p-meta">Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inklusive Material und Brennen.</p>
+        <p class="step-meta" id="p-meta">Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inklusive deinem handgefertigten Werkstück, Material und Brennen.</p>
         <input type="hidden" name="t" id="p-t">
         <input type="hidden" name="kind" id="p-kind" value="buchung">
         <input type="hidden" name="topic" id="p-topic" value="">
@@ -898,6 +907,17 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <h3 id="p-done-title" tabindex="-1">Schön, dass du dabei bist</h3>
         <p id="p-done-text"></p>
         <button class="btn btn-solid" type="button" id="p-done-close">Schließen</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="book-dialog" id="info-dialog" aria-labelledby="info-title">
+    <div class="book-inner">
+      <div class="book-done">
+        <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true" style="margin-bottom:10px"><rect x="6" y="14" width="52" height="38" rx="8" fill="#DDBFA8"/><path d="M8 18l24 18 24-18" fill="none" stroke="#8C2C1D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="52" cy="14" r="9" fill="#8C2C1D"/><path d="M48 14l3 3 5-6" fill="none" stroke="#FBF1EA" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3 id="info-title" tabindex="-1"></h3>
+        <p id="info-text"></p>
+        <button class="btn btn-solid" type="button" id="info-close">Alles klar</button>
       </div>
     </div>
   </dialog>
@@ -1018,12 +1038,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <figure style="grid-area:a"><img src="img/studio-scheiben.jpg" alt="Das helle Studio mit Töpferscheiben und blauen Hockern" loading="lazy"></figure>
         <figure style="grid-area:b"><img src="img/studio.jpg" alt="Langer Holztisch mit Vasen, Tassen und Trockenblumen im Studio" loading="lazy"></figure>
         <figure style="grid-area:c"><img src="img/drehen.jpg" alt="Vivien dreht einen Becher an der Töpferscheibe" loading="lazy" style="object-position:50% 60%"></figure>
-        <figure style="grid-area:d"><img src="img/vase.jpg" alt="Dunkle Vase mit Trockengräsern im Regal" loading="lazy" style="object-position:50% 70%"></figure>
+        <figure style="grid-area:d"><img src="img/tonkugeln.jpg" alt="Vorbereitete Tonkugeln auf dem Werktisch" loading="lazy"></figure>
+        <figure style="grid-area:e"><img src="img/schlicker.jpg" alt="Frisch gedrehte Becher in einem Eimer mit Tonschlicker" loading="lazy" style="object-position:50% 45%"></figure>
         <figure style="grid-area:f"><img src="img/abdrehen.jpg" alt="Ein frisch abgedrehter Becher" loading="lazy" style="object-position:50% 35%"></figure>
-        <figure style="grid-area:e"><img src="img/becher-tonkugeln.jpg" alt="Becher und Tonkugeln auf dem Werktisch" loading="lazy" style="object-position:50% 30%"></figure>
-        <figure style="grid-area:g"><img src="img/schalen.jpg" alt="Handgemachte Schalen und Becher von oben" loading="lazy"></figure>
-        <figure style="grid-area:h"><img src="img/schlicker.jpg" alt="Frisch gedrehte Becher in einem Eimer mit Tonschlicker" loading="lazy" style="object-position:50% 45%"></figure>
-        <figure style="grid-area:i"><img src="img/tonkugeln.jpg" alt="Vorbereitete Tonkugeln auf dem Werktisch" loading="lazy"></figure>
       </div>
     </div>
     <svg class="wave" style="--to:var(--paper);background:var(--lilac)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40c160 44 330 66 520 50s320-72 500-70 290 44 420 40v60H0z"></path></svg>
@@ -1073,8 +1090,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="maker-extra">Dazu gibt es kleine Rezepte zur Jahreszeit und DIY-Ideen, zum Beispiel für Räucherbündel.</p>
           <ol class="maker-how">
             <li><b>1</b><span>E-Mail eintragen</span></li>
-            <li><b>2</b><span>Template sofort herunterladen</span></li>
-            <li><b>3</b><span>Kurz bestätigen und jeden Monat ein neues bekommen</span></li>
+            <li><b>2</b><span>Adresse in deinem Postfach bestätigen</span></li>
+            <li><b>3</b><span>Template herunterladen und jeden Monat ein neues bekommen</span></li>
           </ol>
           <p class="maker-now" id="maker-now" hidden></p>
           <form class="maker-form" id="maker-form" novalidate>
@@ -1095,7 +1112,13 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <img id="maker-img" alt="" hidden>
         </div>
       </div>
-      <div class="shop-head" id="shop">
+    </div>
+  </section>
+
+  <section class="shop-sec" id="shop">
+    <svg class="wave" style="--to:var(--lilac);background:var(--paper)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70c150 30 300 46 470 28s300-74 480-72 330 58 490 52v42H0z"></path></svg>
+    <div class="wrap">
+      <div class="shop-head">
         <div class="shop-copy">
           <p class="kicker">Template-Shop · digitaler Download</p>
           <h3 id="shop-title">Der Herbst-Shop</h3>
@@ -1114,6 +1137,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       </div>
       <div class="tpl-grid" id="tpl-grid"><p class="slots-note">Die ersten Templates kommen bald. Im Maker Club erfährst du es zuerst.</p></div>
     </div>
+    <svg class="wave" style="--to:var(--paper-2);background:var(--lilac)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40c160 44 330 66 520 50s320-72 500-70 290 44 420 40v60H0z"></path></svg>
   </section>
 
   <section class="team" id="teambuilding" aria-labelledby="team-titel">
@@ -1138,6 +1162,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           </svg>
       </div>
     </div>
+    <svg class="wave" style="--to:var(--paper);background:var(--paper-2)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40c160 44 330 66 520 50s320-72 500-70 290 44 420 40v60H0z"></path></svg>
   </section>
 
   <section class="section" id="kontakt">
@@ -1458,8 +1483,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 
   // Menü am Handy
   var nav=$('nav'),toggle=$('nav-toggle');
-  function closeNav(){nav.classList.remove('open');toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Menü öffnen');}
-  toggle.addEventListener('click',function(){var o=!nav.classList.contains('open');nav.classList.toggle('open',o);toggle.setAttribute('aria-expanded',o?'true':'false');toggle.setAttribute('aria-label',o?'Menü schließen':'Menü öffnen');});
+  var navBd=$('nav-backdrop');function closeNav(){nav.classList.remove('open');navBd.hidden=true;toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Menü öffnen');}
+  $('nav-close').addEventListener('click',closeNav);navBd.addEventListener('click',closeNav);document.addEventListener('keydown',function(e){if(e.key==='Escape'&&nav.classList.contains('open'))closeNav();});
+  toggle.addEventListener('click',function(){var o=!nav.classList.contains('open');nav.classList.toggle('open',o);navBd.hidden=!o;toggle.setAttribute('aria-expanded',o?'true':'false');toggle.setAttribute('aria-label',o?'Menü schließen':'Menü öffnen');});
   nav.querySelectorAll('a').forEach(function(a){a.addEventListener('click',closeNav);});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')closeNav();});
 
@@ -1516,7 +1542,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     var ask=pMode()==='anfrage';
     pSub.textContent=ask?'Anfrage senden':'Weiter zur Bezahlung · '+euro(6500*pHours());
     $('p-title').textContent=ask?'Erzähl mir von deinem Projekt':'Dein Projekt, gemeinsam umgesetzt';
-    $('p-meta').textContent=ask?'Beschreib mir kurz, was du gestalten möchtest. Ich sehe es mir an und melde mich mit einem Vorschlag, wie lange wir brauchen und wann wir loslegen. Kostenlos und unverbindlich.':'Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inklusive Material und Brennen.';
+    $('p-meta').textContent=ask?'Beschreib mir kurz, was du gestalten möchtest. Ich sehe es mir an und melde mich mit einem Vorschlag, wie lange wir brauchen und wann wir loslegen. Kostenlos und unverbindlich.':'Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inklusive deinem handgefertigten Werkstück, Material und Brennen.';
     $('p-hours-set').hidden=ask;$('p-switch').hidden=!ask;$('p-storno').hidden=ask;
     $('p-leg-proj').textContent=(ask?'1':'2')+' · Was möchtest du gestalten?';
     $('p-leg-you').textContent=(ask?'2':'3')+' · Deine Angaben';
@@ -1629,11 +1655,14 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     fetch('api/subscribe.php',{method:'POST',body:new FormData(e.target)}).then(function(r){return r.json().catch(function(){return {ok:false};});}).then(function(d){
       if(d&&d.ok){e.target.hidden=true;var dn=$('maker-done');
         if(d.download){dn.innerHTML='';dn.appendChild(el('b',null,d.already?'Schön, dass du wieder da bist!':'Willkommen im Maker Club!'));dn.appendChild(el('span',null,d.already?' Hier ist dein Template des Monats.':' Hier ist dein Gratis-Template. Bitte bestätige noch kurz deine E-Mail-Adresse (Link im Postfach), damit du jeden Monat das neue bekommst.'));var dl=el('a','btn maker-dl','Template herunterladen');dl.href=d.download;dl.target='_blank';dl.rel='noopener';dn.appendChild(dl);}
-        else dn.textContent=d.already?'Du bist schon im Maker Club! Ich habe dir den Link zum aktuellen Template gerade per E-Mail geschickt.':'Fast geschafft! Ich habe dir eine E-Mail an '+email+' geschickt. Bitte bestätige kurz deine Adresse.';
+        else{dn.innerHTML='';dn.appendChild(el('b',null,d.already?'Du bist schon im Maker Club!':'Fast geschafft! Bitte bestätige deine E-Mail-Adresse.'));dn.appendChild(el('span',null,d.already?' Ich habe dir den Link zum aktuellen Template gerade per E-Mail geschickt.':' Ich habe dir eine E-Mail an '+email+' geschickt. Klick dort auf den Bestätigungslink, gleich danach kannst du dein Gratis-Template herunterladen. Schau auch im Spam-Ordner nach.'));}
+        if(!d.download&&!d.already)infoOpen('Fast geschafft!','Bitte bestätige zuerst deine E-Mail-Adresse. Ich habe dir eine E-Mail an '+email+' geschickt. Sobald du auf den Link darin klickst, kannst du dein Gratis-Template herunterladen und bekommst es zusätzlich per E-Mail. Schau auch im Spam-Ordner nach.');
         dn.hidden=false;}
       else{er.textContent=(d&&d.error)||'Das hat leider nicht geklappt. Bitte versuch es noch einmal.';er.hidden=false;}
     }).catch(function(){er.textContent='Keine Verbindung. Bitte versuch es noch einmal.';er.hidden=false;}).then(function(){btn.disabled=false;});
   });
+  var infoD=$('info-dialog');function infoOpen(t,x){$('info-title').textContent=t;$('info-text').textContent=x;show(infoD);}
+  $('info-close').addEventListener('click',function(){hide(infoD);});infoD.addEventListener('click',function(e){if(e.target===infoD)hide(infoD);});
   var td=$('tpl-dialog'),tf=$('tpl-form');
   function tplOpen(t){tplCur=t;tf.hidden=false;$('tpl-done').hidden=true;$('tpl-error').hidden=true;$('tpl-id').value=t.id;$('tpl-title').textContent=t.title;$('tpl-meta').textContent=t.season_label+(t.langs?' · '+t.langs:'')+' · digitaler Download (PDF) · '+euro(t.price_cents);$('tpl-submit').textContent='Weiter zur Bezahlung · '+euro(t.price_cents);show(td);}
   function tplDone(t,x,link){tf.hidden=true;$('tpl-done').hidden=false;$('tpl-done-title').textContent=t;$('tpl-done-text').textContent=x;var a=$('tpl-download');if(link){a.href=link;a.hidden=false;}else a.hidden=true;show(td);}
@@ -1902,10 +1931,10 @@ try{if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches
 </script>
 
 <script>
-(function(){var box=document.getElementById('hero-slides');if(!box)return;var sl=[].slice.call(box.querySelectorAll('.slide')),i=0;
+(function(){var box=document.getElementById('hero-slides');if(!box)return;var sl=[].slice.call(box.querySelectorAll('.slide')),i=0;sl.forEach(function(v){if(v.tagName==='VIDEO'){v.muted=true;v.setAttribute('muted','');var p=v.play&&v.play();if(p&&p.catch)p.catch(function(){});}});document.addEventListener('touchstart',function(){sl.forEach(function(v){if(v.tagName==='VIDEO'&&v.paused){var p=v.play();if(p&&p.catch)p.catch(function(){});}});},{once:true,passive:true});
 if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
 function show(n){sl[i].classList.remove('on');i=n%sl.length;var el=sl[i];el.classList.add('on');
- if(el.tagName==='VIDEO'){try{el.currentTime=0;var p=el.play();if(p&&p.catch)p.catch(function(){});}catch(e){}setTimeout(function(){show(i+1)},6000);}
+ if(el.tagName==='VIDEO'){try{el.muted=true;if(el.readyState>0)el.currentTime=0;var p=el.play();if(p&&p.catch)p.catch(function(){});}catch(e){}setTimeout(function(){show(i+1)},6000);}
  else setTimeout(function(){show(i+1)},4000);}
 setTimeout(function(){show(1)},4000);})();
 </script>

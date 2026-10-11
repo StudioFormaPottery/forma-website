@@ -5,7 +5,7 @@ require __DIR__ . '/lib.php';
 
 $token = (string)($_GET['t'] ?? '');
 $pdo = forma_db();
-$stmt = $pdo->prepare("SELECT * FROM subscribers WHERE token = ? AND status IN ('bestaetigt','offen')");
+$stmt = $pdo->prepare("SELECT * FROM subscribers WHERE token = ? AND status = 'bestaetigt'");
 $stmt->execute([$token]);
 $s = $token !== '' ? $stmt->fetch() : false;
 $m = forma_maker($pdo);
