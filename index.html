@@ -424,13 +424,12 @@ section{scroll-margin-top:96px}
 
 /* Studio */
 .studio{background:var(--lilac)}
-.gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:clamp(150px,17vw,260px);grid-auto-flow:dense;gap:14px}
+.gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(3,clamp(150px,17vw,260px));grid-template-areas:"a b c d" "a e c f" "g e h i";gap:14px}
 .gallery figure{margin:0;overflow:hidden;border-radius:24px;min-width:0}
 .gallery img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
 .gallery figure:hover img{transform:scale(1.04)}
-.gallery .tall{grid-row:span 2}.gallery .wide{grid-column:span 2}
 .gallery figure:first-child{border-radius:999px 999px 24px 24px}
-@media (max-width:700px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:150px}}
+@media (max-width:700px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(6,150px);grid-template-areas:"a b" "a c" "d c" "e f" "e g" "h i"}}
 
 .films{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:14px}
 .film{margin:0;position:relative;aspect-ratio:9/13;border-radius:240px 240px 24px 24px;overflow:hidden;background:var(--paper-2);min-width:0}
@@ -990,14 +989,15 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <figure class="film"><video src="video/stempel.mp4" poster="img/stempel-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Becher mit dem FORMA-Stempel am Boden"></video><figcaption>Mit FORMA-Stempel</figcaption></figure>
       </div>
       <div class="gallery">
-        <figure class="tall"><img src="img/studio-scheiben.jpg" alt="Das helle Studio mit Töpferscheiben und blauen Hockern" loading="lazy"></figure>
-        <figure class="wide"><img src="img/studio.jpg" alt="Langer Holztisch mit Vasen, Tassen und Trockenblumen im Studio" loading="lazy"></figure>
-        <figure class="tall"><img src="img/drehen.jpg" alt="Vivien dreht einen Becher an der Töpferscheibe" loading="lazy" style="object-position:50% 60%"></figure>
-        <figure><img src="img/vase.jpg" alt="Dunkle Vase mit Trockengräsern im Regal" loading="lazy" style="object-position:50% 70%"></figure>
-        <figure><img src="img/abdrehen.jpg" alt="Ein frisch abgedrehter Becher" loading="lazy" style="object-position:50% 35%"></figure>
-        <figure class="wide"><img src="img/becher-tonkugeln.jpg" alt="Becher und Tonkugeln auf dem Werktisch" loading="lazy" style="object-position:50% 40%"></figure>
-        <figure><img src="img/schalen.jpg" alt="Handgemachte Schalen und Becher von oben" loading="lazy"></figure>
-        <figure><img src="img/schlicker.jpg" alt="Frisch gedrehte Becher in einem Eimer mit Tonschlicker" loading="lazy" style="object-position:50% 45%"></figure>
+        <figure style="grid-area:a"><img src="img/studio-scheiben.jpg" alt="Das helle Studio mit Töpferscheiben und blauen Hockern" loading="lazy"></figure>
+        <figure style="grid-area:b"><img src="img/studio.jpg" alt="Langer Holztisch mit Vasen, Tassen und Trockenblumen im Studio" loading="lazy"></figure>
+        <figure style="grid-area:c"><img src="img/drehen.jpg" alt="Vivien dreht einen Becher an der Töpferscheibe" loading="lazy" style="object-position:50% 60%"></figure>
+        <figure style="grid-area:d"><img src="img/vase.jpg" alt="Dunkle Vase mit Trockengräsern im Regal" loading="lazy" style="object-position:50% 70%"></figure>
+        <figure style="grid-area:e"><img src="img/vivien-toepfern.jpg" alt="Vivien beim Töpfern, sie arbeitet konzentriert an einem Becher" loading="lazy" style="object-position:40% 30%"></figure>
+        <figure style="grid-area:f"><img src="img/abdrehen.jpg" alt="Ein frisch abgedrehter Becher" loading="lazy" style="object-position:50% 35%"></figure>
+        <figure style="grid-area:g"><img src="img/becher-tonkugeln.jpg" alt="Becher und Tonkugeln auf dem Werktisch" loading="lazy" style="object-position:50% 30%"></figure>
+        <figure style="grid-area:h"><img src="img/schalen.jpg" alt="Handgemachte Schalen und Becher von oben" loading="lazy"></figure>
+        <figure style="grid-area:i"><img src="img/schlicker.jpg" alt="Frisch gedrehte Becher in einem Eimer mit Tonschlicker" loading="lazy" style="object-position:50% 45%"></figure>
       </div>
     </div>
     <svg class="wave" style="--to:var(--paper);background:var(--lilac)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40c160 44 330 66 520 50s320-72 500-70 290 44 420 40v60H0z"></path></svg>
@@ -1006,7 +1006,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   <section class="section about" id="ueber-mich">
     <div class="wrap">
       <div class="about-photo">
-        <img src="img/vivien-toepfern.jpg" alt="Vivien beim Töpfern, sie arbeitet konzentriert an einem Becher" loading="lazy" style="object-position:40% 30%">
+        <img src="img/vivien-mit-tochter.jpg" alt="Vivien mit ihrer Tochter beim gemeinsamen Bemalen eines Bechers" loading="lazy" style="object-position:45% 40%">
       </div>
       <div class="about-copy">
         <p class="eyebrow">Über mich</p>
