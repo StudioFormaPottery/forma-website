@@ -1533,7 +1533,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     var m=d.maker||{};
     if(m.text)$('maker-text').textContent=m.text;
     if(m.title){var mn=$('maker-now');mn.textContent='Template des Monats: '+m.title;mn.hidden=false;}
-    var mi=$('maker-img');mi.src=m.image||('img/tpl-'+curSeason+'-hoch.jpg');mi.alt=m.image?'Template des Monats: '+(m.title||''):'';mi.hidden=false;
+    var mi=$('maker-img');mi.src=m.image||'img/maker-club.svg';mi.alt=m.image?'Template des Monats: '+(m.title||''):'';mi.hidden=false;
   }).catch(function(){});
   $('maker-t').value=Date.now();
   document.querySelector('.maker-privacy').addEventListener('click',function(){var d=$('datenschutz');if(d)d.open=true;});
