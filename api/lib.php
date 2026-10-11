@@ -266,6 +266,33 @@ function forma_migrate(PDO $pdo): void
         forma_set_setting($pdo, 'popup_date_v6', '1');
     }
 
+    // Maker Club: api/seed/maker.json listet die Gratis-Templates der kommenden Monate.
+    // Jeder Eintrag landet im maker_schedule und wird am 1. des Monats automatisch aktiv.
+    $makerFile = __DIR__ . '/seed/maker.json';
+    if (is_file($makerFile)) {
+        $plan = json_decode((string)file_get_contents($makerFile), true);
+        if (is_array($plan)) {
+            foreach ($plan as $mp) {
+                $key = preg_replace('/[^a-z0-9-]/', '', (string)($mp['key'] ?? ''));
+                $month = (string)($mp['month'] ?? '');
+                if ($key === '' || !preg_match('/^\d{4}-\d{2}$/', $month) || forma_setting($pdo, 'makerplan_' . $key) !== null) continue;
+                $seed = __DIR__ . '/seed/maker';
+                $dir = forma_template_dir();
+                $ok = true;
+                foreach (["$key-de.pdf", "$key-en.pdf", "$key.jpg"] as $f) {
+                    if (!is_file("$dir/seed-$f")) $ok = $ok && is_file("$seed/$f") && @copy("$seed/$f", "$dir/seed-$f");
+                }
+                if (!$ok) continue;
+                $sched = json_decode(forma_setting($pdo, 'maker_schedule') ?? '', true);
+                $sched = is_array($sched) ? $sched : [];
+                $sched[$month] = ['title' => (string)($mp['title'] ?? ''), 'text' => (string)($mp['text'] ?? ''),
+                    'file' => "seed-$key-de.pdf", 'file_en' => "seed-$key-en.pdf", 'image' => "seed-$key.jpg"];
+                forma_set_setting($pdo, 'maker_schedule', json_encode($sched, JSON_UNESCAPED_UNICODE));
+                forma_set_setting($pdo, 'makerplan_' . $key, '1');
+            }
+        }
+    }
+
     // Wöchentliche Templates: api/seed/weekly.json listet neue Shop-Templates mit Veröffentlichungszeit.
     // Jedes Template geht automatisch online, sobald publish_at erreicht ist (Zeit in Europe/Vienna).
     $weeklyFile = __DIR__ . '/seed/weekly.json';

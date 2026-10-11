@@ -73,3 +73,37 @@ eigene Illustrationen, eigene Texte. Keine niedlichen Tierfiguren, keine Kitsch-
 | 30.10. | Welliger Spiegelrahmen (runder Spiegel zum Einkleben) | Mittel | ganzjaehrig |
 
 Preis jeweils € 3,99.
+
+## Maker Club: Gratis-Template des Monats
+
+Läuft am 20. jedes Monats (automatische Session) für den **nächsten** Monat:
+
+1. Template laut Plan unten bauen (gleicher Stil und Aufbau wie oben, aber **Einfach**, ca. 30 Minuten,
+   Fußzeile „<Titel> · FORMA Maker Club“, Rechte: „Gratis-Template für Mitglieder im FORMA Maker Club.
+   Nur für den privaten Gebrauch, Weitergabe und Verkauf sind nicht erlaubt.“). Beispiel: `examples/build_star.py`.
+2. Dateien nach `api/seed/maker/` (`<key>-de.pdf`, `<key>-en.pdf`, `<key>.jpg` 1200 × 900) und
+   zusätzlich das Vorschaubild öffentlich als `img/maker-<monat-name>.jpg` (für den Newsletter).
+3. In `api/seed/maker.json` Eintrag ergänzen:
+   `{"key":"maker-tannen","month":"2026-12","title":"Stehende Ton-Tannen","text":"2 Sätze für die Website"}`
+   Die Website stellt am 1. des Monats automatisch um.
+4. Commit + Push auf `main`.
+5. Newsletter in MailerLite (Connector) anlegen, im Stil der bisherigen Maker-Club-Mails
+   (siehe `examples/maker-newsletter-vorlage.html`): Gruppe **Maker Club** (ID 200974300347368932),
+   Absender hello@forma-pottery.com, Name „Vivien · FORMA Earth & Art“, Sprache ID 5.
+   Button-Link immer `https://www.forma-pottery.com/api/maker-mail.php?e={$email}` (direkter Download).
+   Inhalt: kurze, warme Einstimmung zur Jahreszeit, das Template, ein kleiner Tipp oder ein saisonales
+   Rezept/DIY, Hinweis auf aktuelle Kurse/Shop, Signatur-Bild `img/signatur-liebe-zum-ton.png`.
+6. Eine Kopie mit „[Test]“ im Betreff an die Gruppe **Test (nur Vivien)** (ID 201062038181512426) sofort senden,
+   das Original für den 1. des Monats, 8:00 Uhr (Zeitzone-ID 370, Europe/Vienna) planen.
+7. Vivien kurz Bescheid geben (Template, Vorschau, Mail geplant).
+
+| Monat | Gratis-Template | key |
+| --- | --- | --- |
+| 2026-11 | Sternen-Anhänger (fertig, Mail geplant) | maker-sterne |
+| 2026-12 | Stehende Ton-Tannen in drei Größen, aus der Platte gerollt | maker-tannen |
+| 2027-01 | Teebeutel-Ablage, schlicht mit Wellenrand | maker-teebeutel |
+| 2027-02 | Kleines Herz-Schild mit Stempel-Botschaft zum Hinstellen | maker-herzschild |
+| 2027-03 | Osterei-Anhänger zum Bemalen (Ostern 28. 3. 2027) | maker-osterei |
+| 2027-04 | Kräuterschilder für Balkon und Garten | maker-kraeuter |
+
+Ab Mai 2027: selbst passende, einfache Ideen wählen (Scandi/Hygge, nicht auf der Ausschlussliste) und hier eintragen.
