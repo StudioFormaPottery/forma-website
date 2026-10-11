@@ -947,7 +947,7 @@ const FORMA_VOUCHERS = [
     ],
     'atelier' => [
         'name' => 'Offenes Atelier', 'price' => 3000, 'one' => 'Stunde', 'many' => 'Stunden', 'small' => 'im Offenen Atelier',
-        'desc' => 'Selbstständig im Studio arbeiten, inkl. Material, Werkzeug und Maschinen. Nur für Töpfernde mit Vorerfahrung, die ohne Anleitung arbeiten. Brennen & Glasieren € 22/kg extra.',
+        'desc' => 'Selbstständig im Studio arbeiten, Ton, Werkzeug und Maschinen vor Ort nutzen. Nur für Töpfernde mit Vorerfahrung, die ohne Anleitung arbeiten. Brennen & Glasieren € 22/kg extra.',
     ],
 ];
 
