@@ -356,6 +356,21 @@ section{scroll-margin-top:96px}
 .maker .season-row input{font-size:19px;padding:14px 20px;letter-spacing:.01em}
 .maker .season-row .btn{font-size:17px;min-height:52px}
 .maker .consent{font-size:15.5px;line-height:1.5}
+.pieces{margin:6px 0 16px;padding:16px;border-radius:20px;background:#F6EEE6}
+.pieces-title{font-family:var(--display);font-weight:600;font-size:20px;color:var(--clay);margin:0}
+.pieces-sub{font-size:14.5px;line-height:1.5;margin:4px 0 12px;color:#674B40}
+.pieces-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.piece{background:#FFFBF7;border:1.5px solid #E4D2BF;border-radius:18px;padding:10px 10px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;transition:border-color .2s ease}
+.piece.on{border-color:var(--clay);box-shadow:0 0 0 2px rgba(140,44,29,.12)}
+.piece svg{width:74px;height:60px}
+@media (max-width:600px){.pieces{padding:12px}.pieces-grid{grid-template-columns:1fr 1fr;gap:8px}.piece{padding:8px 6px 10px}.piece b{font-size:14px}.piece small{font-size:12px}}
+.piece b{font-size:14.5px;line-height:1.25;font-weight:600;color:var(--ink)}
+.piece small{font-size:12.5px;line-height:1.3;color:#674B40}
+.piece i{font-style:normal;font-family:var(--display);font-weight:600;color:var(--clay);font-size:16px}
+.qty{display:flex;align-items:center;gap:8px;margin-top:4px}
+.qty button{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--clay);background:transparent;color:var(--clay);font-size:18px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
+.qty output{min-width:18px;font-weight:600}
+@media (min-width:861px){.pieces-title{font-size:23px}.pieces-sub{font-size:16.5px}.piece b{font-size:16px}.piece small{font-size:14px}.piece i{font-size:18px}}
 .maker-art{position:relative;min-height:220px;display:grid;place-items:center}
 .maker-art::before{content:"";position:absolute;width:78%;aspect-ratio:1;border-radius:var(--blob);background:var(--blush);opacity:.9;animation:morph 14s ease-in-out infinite alternate}
 .maker-art img{position:relative;width:78%;aspect-ratio:4/5;object-fit:cover;border-radius:999px 999px 24px 24px;box-shadow:0 18px 40px rgba(51,33,27,.25)}
@@ -803,6 +818,11 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <div class="field-row">
           <div class="field"><label for="book-phone">Telefon <span class="opt">(optional)</span></label><input id="book-phone" name="phone" type="tel" autocomplete="tel"></div>
           <div class="field"><label for="book-persons">Personen</label><select id="book-persons" name="persons"></select></div>
+        </div>
+        <div class="pieces" id="book-pieces" hidden>
+          <p class="pieces-title">Such dir dein Stück aus</p>
+          <p class="pieces-sub">Wähl gleich aus, was du bemalen möchtest, dann zahlst du es direkt mit. Gefällt dir vor Ort noch mehr, rechnen wir es im Atelier ab.</p>
+          <div class="pieces-grid" id="pieces-grid"></div>
         </div>
         <div class="field"><label for="book-message">Nachricht <span class="opt">(optional)</span></label><textarea id="book-message" name="message" rows="2"></textarea></div>
         <p class="book-storno">Anmeldeschluss ist am Vorabend um 17 Uhr. Kostenlos stornieren bis 48 Stunden vor Kursbeginn. Danach werden 50&nbsp;% fällig, bei Nichterscheinen der volle Betrag. Wenn etwas dazwischenkommt, melde dich einfach, wir finden gemeinsam eine Lösung. <a href="#storno" id="book-storno-link">Mehr dazu</a></p>
@@ -1426,9 +1446,33 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   $('cal-next').addEventListener('click',function(){var ms=months(),i=ms.indexOf(month);if(i<ms.length-1){month=ms[i+1];renderCal();}});
   $('to-form').addEventListener('click',function(){if(current)openForm(current);});
 
+
+  // Pottery bemalen: Stücke zum Mitbuchen (gleiche Liste wie FORMA_BEMALEN_ITEMS in api/lib.php)
+  var cR='#8C2C1D',cK='#674B40',cB='#DDBFA8',cP='#FBF1EA';
+  function ic(x){return '<svg viewBox="0 0 64 54" aria-hidden="true">'+x+'</svg>';}
+  var BEMALEN_ITEMS=[
+    ['tasse','Tasse mit Henkel',1800,'',ic('<path d="M16 12h26v26a8 8 0 01-8 8H24a8 8 0 01-8-8z" fill="'+cR+'"/><path d="M42 18h4a7 7 0 010 14h-4" fill="none" stroke="'+cR+'" stroke-width="4"/><path d="M20 26c4-3 8 3 12 0s6-2 8 0" stroke="'+cP+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>')],
+    ['espresso','Espressotasse',1500,'',ic('<ellipse cx="30" cy="44" rx="20" ry="4" fill="'+cB+'"/><path d="M19 20h22v14a7 7 0 01-7 7h-8a7 7 0 01-7-7z" fill="'+cR+'"/><path d="M41 24h3a5 5 0 010 10h-3" fill="none" stroke="'+cR+'" stroke-width="3.5"/><path d="M27 8c2 3-2 5 0 8M33 8c2 3-2 5 0 8" stroke="'+cK+'" stroke-width="2" fill="none" stroke-linecap="round"/>')],
+    ['teller','Frühstücksteller',1500,'',ic('<ellipse cx="32" cy="30" rx="26" ry="15" fill="'+cR+'"/><ellipse cx="32" cy="29" rx="16" ry="8.5" fill="'+cP+'"/><circle cx="28" cy="28" r="2" fill="'+cR+'"/><circle cx="36" cy="30" r="2" fill="'+cB+'"/>')],
+    ['untersetzer','Untersetzer',500,'z. B. für Espressotasse oder Glas',ic('<ellipse cx="32" cy="33" rx="22" ry="10" fill="'+cK+'"/><ellipse cx="32" cy="30" rx="22" ry="10" fill="'+cB+'"/><ellipse cx="32" cy="30" rx="14" ry="6" fill="none" stroke="'+cR+'" stroke-width="2" stroke-dasharray="3 3"/>')],
+    ['unterteller','Unterteller für Tasse',900,'Design frei wählbar',ic('<ellipse cx="32" cy="32" rx="25" ry="12" fill="'+cB+'"/><ellipse cx="32" cy="30" rx="12" ry="5" fill="'+cR+'"/><path d="M12 32c6 4 14 6 20 6s14-2 20-6" stroke="'+cR+'" stroke-width="2" fill="none"/>')],
+    ['daumen','Mug mit Daumendruck',1800,'',ic('<path d="M18 10h28v30a8 8 0 01-8 8H26a8 8 0 01-8-8z" fill="'+cR+'"/><ellipse cx="38" cy="26" rx="5.5" ry="7" fill="'+cB+'"/><path d="M35 22c2-1 4-1 6 1M34 26c2-1 5-1 7 1M35 30c2-1 4-1 6 0" stroke="'+cR+'" stroke-width="1.4" fill="none" stroke-linecap="round"/>')],
+    ['formamug','FORMA Mug',2200,'ohne Henkel, mit Wellen, Schraffur oder Kerben',ic('<path d="M17 8h30v32a9 9 0 01-9 9H26a9 9 0 01-9-9z" fill="'+cR+'"/><path d="M17 20c5-4 10 4 15 0s10-4 15 0M17 30c5-4 10 4 15 0s10-4 15 0" stroke="'+cP+'" stroke-width="2.4" fill="none"/><path d="M22 40l3-4M28 40l3-4M34 40l3-4" stroke="'+cB+'" stroke-width="2" stroke-linecap="round"/>')]
+  ];
+  var piecesBox=$('book-pieces'),piecesGrid=$('pieces-grid'),pieceQty={};
+  BEMALEN_ITEMS.forEach(function(it){
+    var d=el('div','piece');d.innerHTML=it[4];d.appendChild(el('b',null,it[1]));if(it[3])d.appendChild(el('small',null,it[3]));d.appendChild(el('i',null,euro(it[2])+' / Stk.'));
+    var q=el('div','qty'),m=el('button',null,'−'),o=el('output',null,'0'),pl=el('button',null,'+'),h=document.createElement('input');
+    m.type=pl.type='button';m.setAttribute('aria-label',it[1]+' weniger');pl.setAttribute('aria-label',it[1]+' mehr');h.type='hidden';h.name='items['+it[0]+']';h.value='0';
+    function set(v){v=Math.max(0,Math.min(10,v));pieceQty[it[0]]=v;o.textContent=v;h.value=v;d.classList.toggle('on',v>0);submitLabel();}
+    m.addEventListener('click',function(){set((pieceQty[it[0]]||0)-1);});pl.addEventListener('click',function(){set((pieceQty[it[0]]||0)+1);});
+    it.reset=function(){set(0);};
+    q.appendChild(m);q.appendChild(o);q.appendChild(pl);d.appendChild(q);d.appendChild(h);piecesGrid.appendChild(d);
+  });
+  function piecesCents(){if(piecesBox.hidden)return 0;return BEMALEN_ITEMS.reduce(function(a,it){return a+(pieceQty[it[0]]||0)*it[2];},0);}
   // Schritt 3: Angaben
   function submitLabel(){
-    if(current&&current.price_cents>0)submit.textContent='Weiter zur Bezahlung · '+euro(current.price_cents*(+persons.value||1));
+    if(current&&current.price_cents>0)submit.textContent='Weiter zur Bezahlung · '+euro(current.price_cents*(+persons.value||1)+piecesCents());
     else submit.textContent='Verbindlich anmelden';
   }
   function openForm(c){
@@ -1444,6 +1488,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     var max=Math.min(c.free,10);
     for(var i=1;i<=max;i++){var o=el('option',null,i===1?'1 Person':i+' Personen');o.value=i;persons.appendChild(o);}
     payNote.hidden=!(c.price_cents>0);
+    piecesBox.hidden=c.title!=='Pottery bemalen';BEMALEN_ITEMS.forEach(function(it){it.reset();});
     submitLabel();
     setStep('form');
   }

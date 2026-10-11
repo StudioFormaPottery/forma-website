@@ -166,6 +166,7 @@ function forma_migrate(PDO $pdo): void
     forma_add_column($pdo, 'bookings', 'stripe_session', "TEXT NOT NULL DEFAULT ''");
     forma_add_column($pdo, 'bookings', 'pay_token', "TEXT NOT NULL DEFAULT ''");
     forma_add_column($pdo, 'bookings', 'paid_at', 'TEXT');
+    forma_add_column($pdo, 'bookings', 'extras', "TEXT NOT NULL DEFAULT ''");
     forma_add_column($pdo, 'bookings', 'mailed', 'INTEGER NOT NULL DEFAULT 0');
     forma_add_column($pdo, 'templates', 'file_en', "TEXT NOT NULL DEFAULT ''");
     forma_add_column($pdo, 'private_bookings', 'contact', "TEXT NOT NULL DEFAULT 'email'");
@@ -347,6 +348,18 @@ function forma_migrate(PDO $pdo): void
         forma_set_setting($pdo, 'bemalen_live_v17', '1');
     }
 
+    // 12.10.2026: Pottery bemalen mit 6 Plätzen, Atelierbeitrag vorab, Stücke direkt mitbuchen.
+    if (forma_setting($pdo, 'bemalen_items_v19') === null) {
+        $t = FORMA_SERIES['bemalen'];
+        $pdo->prepare('UPDATE courses SET price_text = ?, description = ? WHERE title = ?')->execute([$t['price_text'], $t['description'], $t['title']]);
+        $ids = $pdo->prepare('SELECT id FROM courses WHERE title = ? AND capacity > 6');
+        $ids->execute([$t['title']]);
+        foreach ($ids->fetchAll(PDO::FETCH_COLUMN) as $cid) {
+            $pdo->prepare('UPDATE courses SET capacity = ? WHERE id = ?')->execute([max(6, forma_booked($pdo, (int)$cid)), $cid]);
+        }
+        forma_set_setting($pdo, 'bemalen_items_v19', '1');
+    }
+
     // 12.10.2026: Keine Wörter wie Brennen/Glasieren auf der Website, stattdessen „Fertigstellung“.
     if (forma_setting($pdo, 'fertigstellung_v18') === null) {
         foreach (['price_text', 'description'] as $col) {
@@ -517,12 +530,40 @@ const FORMA_SERIES = [
     'bemalen' => [
         'title' => 'Pottery bemalen',
         'from' => '15', 'to' => '18',
-        'capacity' => 8, 'min' => 1,
-        'price_text' => '€ 15 Atelierbeitrag pro Person, dazu dein Stück ab € 15 (Becher € 18, Teller € 22), vor Ort',
+        'capacity' => 6, 'min' => 1,
+        'price_text' => '€ 15 Atelierbeitrag pro Person, vorab online. Dein Stück wählst du gleich mit aus (ab € 5)',
         'price_cents' => 1500,
-        'description' => 'Tassen, Schalen und kleine Teller bemalen, ganz entspannt bei Kerzenlicht. Online zahlst du den Atelierbeitrag, dein Stück suchst du dir vor Ort aus. Abholung am Montag darauf.',
+        'description' => 'Tassen, Teller und Mugs bemalen, ganz entspannt bei Kerzenlicht. Mit dem Atelierbeitrag ist dein Platz reserviert, dein Stück kannst du gleich mitbuchen. Gefällt dir vor Ort noch mehr, rechnen wir es im Atelier ab. Abholung am Montag darauf.',
     ],
 ];
+
+/** Stücke zum Bemalen (Pottery bemalen), Preise in Cent. Gleiche Liste steht in index.html (BEMALEN_ITEMS). */
+const FORMA_BEMALEN_ITEMS = [
+    'tasse' => ['Tasse mit Henkel', 1800],
+    'espresso' => ['Espressotasse', 1500],
+    'teller' => ['Frühstücksteller', 1500],
+    'untersetzer' => ['Untersetzer', 500],
+    'unterteller' => ['Unterteller für Tasse', 900],
+    'daumen' => ['Mug mit Daumendruck', 1800],
+    'formamug' => ['FORMA Mug', 2200],
+];
+
+/** Aus einer Eingabe wie ['tasse' => 2] eine geprüfte Liste machen. */
+function forma_bemalen_pick($raw): array
+{
+    $out = [];
+    if (!is_array($raw)) return $out;
+    foreach (FORMA_BEMALEN_ITEMS as $key => [$label, $cents]) {
+        $q = (int)($raw[$key] ?? 0);
+        if ($q > 0) $out[] = ['key' => $key, 'name' => $label, 'qty' => min($q, 10), 'cents' => $cents];
+    }
+    return $out;
+}
+
+function forma_bemalen_text(array $items): string
+{
+    return implode(', ', array_map(fn($i) => $i['qty'] . '× ' . $i['name'] . ' (' . forma_euro($i['cents']) . ')', $items));
+}
 
 const FORMA_WEEKDAYS = [1 => 'Mo', 2 => 'Di', 3 => 'Mi', 4 => 'Do', 5 => 'Fr', 6 => 'Sa', 7 => 'So'];
 
@@ -991,15 +1032,17 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
             . ($paid ? ' und wir finden einen neuen Termin oder du bekommst dein Geld zurück.' : '.') . "\n";
     }
 
+    $pieces = json_decode((string)($b['extras'] ?? ''), true);
+    $piecesLine = is_array($pieces) && $pieces ? 'Deine Stücke: ' . forma_bemalen_text($pieces) . "\n" : '';
     $customer = "Hallo $first,\n\n$intro\n\nHier noch einmal alles auf einen Blick:\n\n"
-        . "Kurs: {$b['title']}\nTermin: {$b['date_text']}\nPersonen: $personsText\n$payLine\nOrt: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
+        . "Kurs: {$b['title']}\nTermin: {$b['date_text']}\nPersonen: $personsText\n$piecesLine$payLine\nOrt: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
         . $minNote
         . "\nBitte komm in Kleidung, die schmutzig werden darf. Schürzen und Werkzeug habe ich im Studio.\n"
         . "\nFalls doch etwas dazwischenkommt: Bis 48 Stunden vor Kursbeginn kannst du kostenlos stornieren. Danach werden 50 % der Kursgebühr fällig, wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit bei mir, gemeinsam finden wir bestimmt eine Lösung.\n"
         . "\nFalls du Fragen hast oder doch verhindert bist, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n";
 
     $admin = ($paid ? 'Neue bezahlte Buchung über die Website' : 'Neue Kursanmeldung über die Website') . "\n\n"
-        . "Kurs: {$b['title']}\nTermin: {$b['date_text']}\nPersonen: $personsText\n"
+        . "Kurs: {$b['title']}\nTermin: {$b['date_text']}\nPersonen: $personsText\n" . $piecesLine
         . ($paid ? 'Bezahlt: ' . forma_euro((int)$b['amount_cents']) . " über Stripe\n" : "Bezahlung: vor Ort\n")
         . "\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nNachricht: {$b['message']}\n\n"
         . "Freie Plätze danach: $free\n\nAlle Buchungen: $site/verwaltung/\n";

@@ -75,12 +75,14 @@ try {
         forma_json(['ok' => false, 'error' => $msg, 'free' => $free], 409);
     }
     $priceCents = (int)$course['price_cents'];
+    $pieces = $course['title'] === FORMA_SERIES['bemalen']['title'] ? forma_bemalen_pick($in['items'] ?? []) : [];
+    $piecesCents = array_sum(array_map(fn($i) => $i['qty'] * $i['cents'], $pieces));
     $online = $priceCents > 0 && forma_stripe_key() !== null;
     $payToken = bin2hex(random_bytes(16));
-    $pdo->prepare('INSERT INTO bookings (course_id, name, email, phone, persons, message, status, ip_hash, created_at, amount_cents, pay_token)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    $pdo->prepare('INSERT INTO bookings (course_id, name, email, phone, persons, message, status, ip_hash, created_at, amount_cents, pay_token, extras)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
         ->execute([$courseId, $name, $email, $phone, $persons, $message, $online ? 'offen' : 'bestaetigt', $ipHash, date('c'),
-            $online ? $priceCents * $persons : 0, $payToken]);
+            $online ? $priceCents * $persons + $piecesCents : 0, $payToken, $pieces ? json_encode($pieces, JSON_UNESCAPED_UNICODE) : '']);
     $bookingId = (int)$pdo->lastInsertId();
     $pdo->exec('COMMIT');
 } catch (Throwable $e) {
@@ -105,14 +107,17 @@ try {
         'customer_email' => $email,
         'client_reference_id' => (string)$bookingId,
         'metadata' => ['booking_id' => (string)$bookingId, 'kurs' => $course['title'], 'termin' => $course['date_text']],
-        'line_items' => [[
+        'line_items' => array_merge([[
             'quantity' => $persons,
             'price_data' => [
                 'currency' => 'eur',
                 'unit_amount' => $priceCents,
-                'product_data' => ['name' => $course['title'], 'description' => $course['date_text'] . ' · FORMA Studio, Mathon'],
+                'product_data' => ['name' => $course['title'] . ($pieces ? ' · Atelierbeitrag' : ''), 'description' => $course['date_text'] . ' · FORMA Studio, Mathon'],
             ],
-        ]],
+        ]], array_map(fn($i) => [
+            'quantity' => $i['qty'],
+            'price_data' => ['currency' => 'eur', 'unit_amount' => $i['cents'], 'product_data' => ['name' => $i['name'] . ' zum Bemalen']],
+        ], $pieces)),
         'payment_intent_data' => ['description' => $course['title'] . ' · ' . $course['date_text'] . ' · ' . $name],
         'expires_at' => time() + 31 * 60,
         'success_url' => $site . '/api/paid.php?b=' . $bookingId . '&k=' . $payToken,
