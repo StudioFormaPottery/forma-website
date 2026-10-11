@@ -387,11 +387,20 @@ function forma_booked(PDO $pdo, int $courseId): int
     return (int)$stmt->fetchColumn();
 }
 
+// Anmeldeschluss: am Vorabend um 17 Uhr. Liefert das früheste Kursdatum, das gerade noch buchbar ist.
+const FORMA_BOOKING_CUTOFF_HOUR = 17;
+function forma_first_bookable_date(?int $now = null): string
+{
+    $now = $now ?? time();
+    $days = (int)date('G', $now) < FORMA_BOOKING_CUTOFF_HOUR ? 1 : 2;
+    return date('Y-m-d', strtotime(date('Y-m-d', $now) . " +$days day"));
+}
+
 function forma_upcoming_courses(PDO $pdo, bool $onlyVisible = true): array
 {
     $sql = 'SELECT * FROM courses WHERE start_date >= ?' . ($onlyVisible ? ' AND visible = 1' : '') . ' ORDER BY start_date, id';
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([date('Y-m-d')]);
+    $stmt->execute([$onlyVisible ? forma_first_bookable_date() : date('Y-m-d')]);
     $rows = $stmt->fetchAll();
     foreach ($rows as &$r) {
         $r['booked'] = forma_booked($pdo, (int)$r['id']);
