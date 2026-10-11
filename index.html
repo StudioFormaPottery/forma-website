@@ -417,15 +417,15 @@ section{scroll-margin-top:96px}
 
 /* Studio */
 .studio{background:var(--lilac)}
-.gallery{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:clamp(120px,15vw,200px);gap:14px}
+.gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:clamp(150px,17vw,260px);grid-auto-flow:dense;gap:14px}
 .gallery figure{margin:0;overflow:hidden;border-radius:24px;min-width:0}
 .gallery img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
 .gallery figure:hover img{transform:scale(1.04)}
-.g1{grid-column:span 3;grid-row:span 2}.g2{grid-column:span 3}.g3{grid-column:span 2}.g4{grid-column:span 1}
-.g1{border-radius:120px 24px 24px 24px!important}
-@media (max-width:700px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:170px}.g1,.g2{grid-column:span 2;grid-row:span 1}.g3,.g4{grid-column:span 1;grid-row:span 1}.g1{border-radius:80px 24px 24px 24px!important}}
+.gallery .tall{grid-row:span 2}.gallery .wide{grid-column:span 2}
+.gallery figure:first-child{border-radius:999px 999px 24px 24px}
+@media (max-width:700px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:150px}}
 
-.films{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.films{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:14px}
 .film{margin:0;position:relative;aspect-ratio:9/13;border-radius:240px 240px 24px 24px;overflow:hidden;background:var(--paper-2);min-width:0}
 .film video{width:100%;height:100%;object-fit:cover;display:block}
 .film figcaption{position:absolute;left:14px;bottom:14px;padding:6px 14px;border-radius:999px;background:color-mix(in srgb,var(--paper) 90%,transparent);color:var(--ink);font-size:14px;font-weight:500}
@@ -968,14 +968,19 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       </div>
       <div class="films">
         <figure class="film"><video src="video/krug.mp4" poster="img/krug-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Ein Krug wird Schritt für Schritt von Hand aufgebaut"></video><figcaption>Ein Krug entsteht</figcaption></figure>
-        <figure class="film"><video src="video/studio-rundgang.mp4" poster="img/studio-rundgang-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Rundgang durch das helle FORMA Studio"></video><figcaption>Rundgang durchs Studio</figcaption></figure>
-        <figure class="film"><video src="video/bergblick.mp4" poster="img/bergblick-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Handgemachte Stücke am Fenster mit Blick ins Paznaun"></video><figcaption>Mit Blick auf die Berge</figcaption></figure>
+        <figure class="film"><video src="video/ankommen.mp4" poster="img/ankommen-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Gemütliche Ecke im Studio mit Sessel und Fellen"></video><figcaption>Ankommen &amp; durchatmen</figcaption></figure>
+        <figure class="film"><video src="video/details.mp4" poster="img/details-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Ein handgemachter Becher mit kleinen Details"></video><figcaption>Liebe zum Detail</figcaption></figure>
+        <figure class="film"><video src="video/stempel.mp4" poster="img/stempel-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Becher mit dem FORMA-Stempel am Boden"></video><figcaption>Mit FORMA-Stempel</figcaption></figure>
       </div>
       <div class="gallery">
-        <figure class="g1"><img src="img/studio.jpg" alt="Langer Holztisch mit Vasen, Tassen und Trockenblumen im Studio" loading="lazy"></figure>
-        <figure class="g2"><img src="img/toepferscheiben.jpg" alt="Töpferscheiben mit blauen Hockern" loading="lazy" style="object-position:50% 70%"></figure>
-        <figure class="g3"><img src="img/schlicker.jpg" alt="Frisch gedrehte Becher in einem Eimer mit Tonschlicker" loading="lazy" style="object-position:50% 45%"></figure>
-        <figure class="g4"><img src="img/schalen.jpg" alt="Handgemachte Schalen und Becher von oben" loading="lazy"></figure>
+        <figure class="tall"><img src="img/studio-scheiben.jpg" alt="Das helle Studio mit Töpferscheiben und blauen Hockern" loading="lazy"></figure>
+        <figure class="wide"><img src="img/studio.jpg" alt="Langer Holztisch mit Vasen, Tassen und Trockenblumen im Studio" loading="lazy"></figure>
+        <figure class="tall"><img src="img/drehen.jpg" alt="Vivien dreht einen Becher an der Töpferscheibe" loading="lazy" style="object-position:50% 60%"></figure>
+        <figure><img src="img/vase.jpg" alt="Dunkle Vase mit Trockengräsern im Regal" loading="lazy" style="object-position:50% 70%"></figure>
+        <figure><img src="img/abdrehen.jpg" alt="Ein frisch abgedrehter Becher" loading="lazy" style="object-position:50% 35%"></figure>
+        <figure class="wide"><img src="img/becher-tonkugeln.jpg" alt="Becher und Tonkugeln auf dem Werktisch" loading="lazy" style="object-position:50% 40%"></figure>
+        <figure><img src="img/schalen.jpg" alt="Handgemachte Schalen und Becher von oben" loading="lazy"></figure>
+        <figure><img src="img/schlicker.jpg" alt="Frisch gedrehte Becher in einem Eimer mit Tonschlicker" loading="lazy" style="object-position:50% 45%"></figure>
       </div>
     </div>
     <svg class="wave" style="--to:var(--paper);background:var(--lilac)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40c160 44 330 66 520 50s320-72 500-70 290 44 420 40v60H0z"></path></svg>
@@ -984,7 +989,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   <section class="section about" id="ueber-mich">
     <div class="wrap">
       <div class="about-photo">
-        <img src="img/vivien.jpg" alt="Vivien im FORMA Studio mit einer selbstgemachten Tasse" loading="lazy">
+        <img src="img/vivien-toepfern.jpg" alt="Vivien beim Töpfern, sie arbeitet konzentriert an einem Becher" loading="lazy" style="object-position:40% 30%">
       </div>
       <div class="about-copy">
         <p class="eyebrow">Über mich</p>
