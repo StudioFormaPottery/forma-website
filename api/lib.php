@@ -266,6 +266,13 @@ function forma_migrate(PDO $pdo): void
         forma_set_setting($pdo, 'popup_date_v6', '1');
     }
 
+    // 11.10.2026: Brennen & Glasieren im offenen Atelier jetzt € 25/kg.
+    if (forma_setting($pdo, 'atelier_kg_v15') === null) {
+        $pdo->exec("UPDATE courses SET price_text = REPLACE(price_text, '€ 22/kg', '€ 25/kg') WHERE price_text LIKE '%€ 22/kg%'");
+        $pdo->exec("UPDATE courses SET description = REPLACE(description, '€ 22/kg', '€ 25/kg') WHERE description LIKE '%€ 22/kg%'");
+        forma_set_setting($pdo, 'atelier_kg_v15', '1');
+    }
+
     // 11.10.2026: Pottery bemalen im Advent ab November, Mi & Do 15–18 Uhr, Abholung am Montag darauf.
     if (forma_setting($pdo, 'popup_advent_v14') === null) {
         $p = json_decode(forma_setting($pdo, 'popup') ?? '', true);
@@ -412,7 +419,7 @@ const FORMA_SERIES = [
         'title' => 'Offenes Atelier',
         'from' => '8', 'to' => '11',
         'capacity' => 4, 'min' => 1,
-        'price_text' => '€ 30 pro Stunde, Brennen & Glasieren € 22/kg, Bezahlung vor Ort',
+        'price_text' => '€ 30 pro Stunde, Brennen & Glasieren € 25/kg, Bezahlung vor Ort',
         'price_cents' => 0,
         'description' => 'Selbstständig an eigenen Projekten arbeiten. Kein betreuter Kurs, für alle mit Vorerfahrung.',
     ],
@@ -959,7 +966,7 @@ const FORMA_VOUCHERS = [
     ],
     'atelier' => [
         'name' => 'Offenes Atelier', 'price' => 3000, 'one' => 'Stunde', 'many' => 'Stunden', 'small' => 'im Offenen Atelier',
-        'desc' => 'Selbstständig im Studio arbeiten, Ton, Werkzeug und Maschinen vor Ort nutzen. Nur für Töpfernde mit Vorerfahrung, die ohne Anleitung arbeiten. Brennen & Glasieren € 22/kg extra.',
+        'desc' => 'Selbstständig im Studio arbeiten, Ton, Werkzeug und Maschinen vor Ort nutzen. Nur für Töpfernde mit Vorerfahrung, die ohne Anleitung arbeiten. Brennen & Glasieren € 25/kg extra.',
     ],
 ];
 
