@@ -167,6 +167,7 @@ function forma_migrate(PDO $pdo): void
     forma_add_column($pdo, 'bookings', 'pay_token', "TEXT NOT NULL DEFAULT ''");
     forma_add_column($pdo, 'bookings', 'paid_at', 'TEXT');
     forma_add_column($pdo, 'bookings', 'extras', "TEXT NOT NULL DEFAULT ''");
+    forma_add_column($pdo, 'subscribers', 'reminded_at', 'TEXT');
     forma_add_column($pdo, 'bookings', 'mailed', 'INTEGER NOT NULL DEFAULT 0');
     forma_add_column($pdo, 'templates', 'file_en', "TEXT NOT NULL DEFAULT ''");
     forma_add_column($pdo, 'private_bookings', 'contact', "TEXT NOT NULL DEFAULT 'email'");
@@ -696,6 +697,32 @@ function forma_save_mail_password(?string $password): void
     @chmod($file, 0600);
 }
 
+/** Ostersonntag (gregorianisch) als Zeitstempel. */
+function forma_easter(int $y): int
+{
+    $a = $y % 19; $b = intdiv($y, 100); $c = $y % 100; $d = intdiv($b, 4); $e = $b % 4;
+    $f = intdiv($b + 8, 25); $g = intdiv($b - $f + 1, 3); $h = (19 * $a + $b - $d - $g + 15) % 30;
+    $i = intdiv($c, 4); $k = $c % 4; $l = (32 + 2 * $e + 2 * $i - $h - $k) % 7; $m = intdiv($a + 11 * $h + 22 * $l, 451);
+    $month = intdiv($h + $l - 7 * $m + 114, 31); $day = (($h + $l - 7 * $m + 114) % 31) + 1;
+    return mktime(12, 0, 0, $month, $day, $y);
+}
+
+/** Saisonales Mail-Design: herbst, advent, winter, fasching, valentin, ostern, fruehling, sommer (Bilder in img/mail/). */
+function forma_mail_theme(?int $ts = null): string
+{
+    $ts = $ts ?? time();
+    $y = (int)date('Y', $ts); $md = date('md', $ts); $day = 86400;
+    $easter = forma_easter($y);
+    if ($ts >= $easter - 14 * $day && $ts <= $easter + 2 * $day) return 'ostern';
+    if ($ts >= $easter - 53 * $day && $ts <= $easter - 46 * $day) return 'fasching'; // Faschingswoche bis Aschermittwoch
+    if ($md >= '0201' && $md <= '0214') return 'valentin';
+    if ($md >= '1120') return 'advent';
+    if ($md <= '0320') return 'winter';
+    if ($md <= '0531') return 'fruehling';
+    if ($md <= '0831') return 'sommer';
+    return 'herbst';
+}
+
 /** Schlichte HTML-Fassung einer Text-Mail: Links klickbar, Zeilen nur mit Link werden zum Button. */
 function forma_mail_html(string $text): string
 {
@@ -726,8 +753,7 @@ function forma_mail_html(string $text): string
     return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>'
         . '<body style="margin:0;padding:0;background:#EEE2D4"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#EEE2D4"><tr><td align="center" style="padding:24px 12px">'
         . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FBF1EA;border-radius:22px;overflow:hidden">'
-        . '<tr><td align="center" style="background:#DDBFA8;padding:22px 30px 18px"><img src="https://www.forma-pottery.com/img/forma-logo.png" width="64" height="64" alt="FORMA Earth &amp; Art" style="display:block;width:64px;height:64px">'
-        . '<div style="margin-top:8px;font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8C2C1D">FORMA Earth &amp; Art</div></td></tr>'
+        . '<tr><td style="background:#DDBFA8;padding:0;line-height:0"><img src="' . FORMA_SITE_URL . '/img/mail/' . forma_mail_theme() . '.png" width="600" alt="FORMA Earth &amp; Art" style="display:block;width:100%;max-width:600px;height:auto"></td></tr>'
         . '<tr><td style="padding:28px 30px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#33211B">'
         . $out . '<img src="https://www.forma-pottery.com/img/signatur-liebe-zum-ton.png" width="240" alt="Mit ganz viel Liebe zum Ton" style="display:block;width:240px;max-width:80%;height:auto;margin:16px 0 0 -6px"></td></tr>'
         . '<tr><td align="center" style="background:#E4D2BF;padding:18px 24px;font-family:Arial,Helvetica,sans-serif;font-size:12.5px;line-height:1.7;color:#674B40">FORMA Earth &amp; Art · Silvrettastraße 58 · 6562 Mathon<br><a href="https://www.forma-pottery.com" style="color:#674B40">www.forma-pottery.com</a> · <a href="https://www.instagram.com/forma.potteryartcraft" style="color:#674B40">Instagram</a></td></tr></table></td></tr></table></body></html>';
@@ -1432,4 +1458,28 @@ HTML;
 function forma_h(?string $s): string
 {
     return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+
+/** Einmalige Erinnerung, wenn eine Anmeldung nach 12 Stunden noch nicht bestätigt ist (läuft höchstens alle 20 Minuten). */
+function forma_confirm_reminders(PDO $pdo): void
+{
+    $last = (int)(forma_setting($pdo, 'reminders_last') ?? 0);
+    if (time() - $last < 1200) return;
+    forma_set_setting($pdo, 'reminders_last', (string)time());
+    $stmt = $pdo->prepare("SELECT * FROM subscribers WHERE status = 'offen' AND reminded_at IS NULL AND created_at <= ? AND created_at >= ? LIMIT 20");
+    $stmt->execute([date('c', time() - 12 * 3600), date('c', time() - 7 * 86400)]);
+    foreach ($stmt->fetchAll() as $s) {
+        $pdo->prepare('UPDATE subscribers SET reminded_at = ? WHERE id = ?')->execute([date('c'), $s['id']]);
+        $maker = str_contains((string)$s['source'], 'Maker');
+        $hello = $s['name'] !== '' ? 'Hallo ' . forma_first_name($s['name']) . ',' : 'Hallo,';
+        $body = "$hello\n\nschön, dass du dich " . ($maker ? 'für den FORMA Maker Club' : 'für meinen Newsletter') . " eingetragen hast! "
+            . "Deine E-Mail-Adresse ist aber noch nicht bestätigt.\n\n"
+            . "Magst du kurz auf den Button klicken? Dann darf ich dich über alles Neue im Atelier informieren"
+            . ($maker ? ' und du bekommst gleich dein Gratis-Template' : '') . ".\n\n"
+            . forma_site_url() . '/api/confirm.php?t=' . $s['token'] . "\n\n"
+            . "Falls du es dir anders überlegt hast, ist das völlig in Ordnung. Dann ignoriere diese E-Mail einfach, ich schreibe dir nicht noch einmal.\n\n"
+            . "Herzlich,\nVivien\n";
+        forma_mail((string)$s['email'], 'Kurze Erinnerung: Bitte bestätige deine E-Mail-Adresse', $body);
+    }
 }

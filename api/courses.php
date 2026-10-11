@@ -21,6 +21,10 @@ try {
             'price_cents' => $online ? (int)$c['price_cents'] : 0,
         ];
     }
+    register_shutdown_function(function () use ($pdo) {
+        if (function_exists('fastcgi_finish_request')) fastcgi_finish_request();
+        try { forma_confirm_reminders($pdo); } catch (Throwable $e) { error_log('FORMA reminders: ' . $e->getMessage()); }
+    });
     forma_json(['ok' => true, 'courses' => $out]);
 } catch (Throwable $e) {
     error_log('FORMA courses: ' . $e->getMessage());
