@@ -14,6 +14,7 @@
 <style>
 @font-face{font-family:"Bricolage Grotesque";font-weight:600 800;font-display:swap;src:url(fonts/BricolageGrotesque-Bold.woff) format("woff")}
 @font-face{font-family:"Bricolage Grotesque";font-weight:300 599;font-display:swap;src:url(fonts/BricolageGrotesque-Regular.woff) format("woff")}
+@font-face{font-family:"Parisienne";font-weight:400;font-display:swap;src:url(fonts/Parisienne-Regular.woff) format("woff")}
 @font-face{font-family:"Italiana";font-weight:400;font-display:swap;src:url(fonts/Italiana-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(fonts/Outfit-Bold.woff) format("woff")}
@@ -437,7 +438,7 @@ section{scroll-margin-top:96px}
 .about-photo img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;object-position:50% 25%;border-radius:var(--blob);animation:morph 18s ease-in-out infinite alternate-reverse}
 .about-copy{display:flex;flex-direction:column;gap:18px;max-width:58ch;min-width:0}
 .about-copy p{color:var(--ink)}
-.signature{font-family:var(--script);font-size:42px;color:var(--clay)}
+.signature{font-family:"Parisienne",var(--script);font-size:clamp(28px,8vw,38px);line-height:1.2;color:var(--clay);margin-top:6px}
 @media (max-width:860px){.about .wrap{grid-template-columns:1fr}.about-photo{max-width:420px}}
 
 /* Gutscheine */
@@ -520,7 +521,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   .tile .go{font-size:18px}
   .film figcaption{font-size:17.5px}
   .gift p:not(.eyebrow),.about-copy p:not(.eyebrow):not(.signature){font-size:23.5px}
-  .signature{font-size:56px}
+  .signature{font-size:50px}
   .gift .btn{font-size:20px}
   .contact-list dt,.week-label{font-size:15px}
   .contact-list dd{font-size:22px}
@@ -988,7 +989,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <h2 class="display">Hallo, ich bin Vivien</h2>
         <p>Ich bin Töpferin und habe FORMA Earth &amp; Art gegründet. Am liebsten arbeite ich frei mit den Händen und lasse Formen entstehen, die Charakter haben und Spuren ihrer Entstehung tragen.</p>
         <p>In meinen Kursen begleite ich dich mit Ruhe, Geduld und viel Freude am Material, damit du mit einem guten Gefühl und deinen eigenen Stücken nach Hause gehst.</p>
-        <p class="signature">Vivien</p>
+        <p class="signature">Mit ganz viel Liebe zum Ton</p>
       </div>
     </div>
   </section>
