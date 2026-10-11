@@ -19,6 +19,7 @@ try {
             'free' => (int)$c['free'],
             'min_participants' => (int)$c['min_participants'],
             'price_cents' => $online ? (int)$c['price_cents'] : 0,
+            'slots' => isset($c['slots']) ? (object)$c['slots'] : null,
         ];
     }
     register_shutdown_function(function () use ($pdo) {

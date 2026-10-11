@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>FORMA Earth &amp; Art – Töpferstudio in Mathon</title>
+<meta name="p:domain_verify" content="a91b2b874278c5d64bd7d9570e6b570d">
 <meta name="description" content="FORMA Earth &amp; Art – Töpferstudio in Mathon im Paznaun. Töpferkurse, Private Pottery, Spin &amp; Go und offenes Atelier.">
 <meta property="og:title" content="FORMA Earth &amp; Art – Töpferstudio in Mathon">
 <meta property="og:description" content="Töpferkurse, Private Pottery, Spin &amp; Go und offenes Atelier in Mathon im Paznaun.">
@@ -356,6 +357,12 @@ section{scroll-margin-top:96px}
 .maker .season-row input{font-size:19px;padding:14px 20px;letter-spacing:.01em}
 .maker .season-row .btn{font-size:17px;min-height:52px}
 .maker .consent{font-size:15.5px;line-height:1.5}
+.slot-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.slot{background:#FFFBF7;border:1.5px solid #E4D2BF;border-radius:18px;padding:12px 8px;text-align:center;cursor:pointer;font:inherit;color:var(--ink);display:flex;flex-direction:column;gap:2px;align-items:center}
+.slot b{font-family:var(--display);font-weight:600;font-size:18px;color:var(--clay)}.slot small{font-size:13px;color:#674B40}
+.slot.on{background:var(--clay);border-color:var(--clay)}.slot.on b,.slot.on small{color:var(--on-clay)}
+.slot:disabled{opacity:.45;cursor:not-allowed}
+@media (min-width:861px){.slot b{font-size:21px}.slot small{font-size:15px}}
 .pieces{margin:6px 0 16px;padding:16px;border-radius:20px;background:#F6EEE6}
 .pieces-title{font-family:var(--display);font-weight:600;font-size:20px;color:var(--clay);margin:0}
 .pieces-sub{font-size:14.5px;line-height:1.5;margin:4px 0 12px;color:#674B40}
@@ -738,12 +745,13 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <h3>Offenes Atelier</h3>
           <p>Für alle, die selbstständig an eigenen Projekten arbeiten möchten. Während deiner Zeit im Atelier kannst du Ton, Werkzeuge und Maschinen im Studio nutzen, um deine Techniken anzuwenden.</p>
           <dl class="facts">
-            <dt>Zeiten</dt><dd>donnerstags, 8–11 Uhr</dd>
+            <dt>Zeiten</dt><dd>donnerstags, 8–11 Uhr, stundenweise buchbar</dd>
+            <dt>Plätze</dt><dd>5 pro Stunde, du wählst 1 bis 3 Stunden und zahlst online</dd>
             <dt>Fertigstellung</dt><dd>€ 25 pro kg, wird bei Abholung deiner Werkstücke abgerechnet</dd>
           </dl>
           <p class="note">Das offene Atelier ist kein betreuter Kurs und richtet sich an alle mit Vorerfahrung.</p>
           <p class="price">€ 30<small>pro Stunde</small></p>
-          <a class="btn btn-solid" href="#angebote" data-book="Offenes Atelier">Platz reservieren</a>
+          <a class="btn btn-solid" href="#angebote" data-book="Offenes Atelier">Stunden buchen</a>
         </article>
       </div>
     </div>
@@ -758,7 +766,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       </div>
       <div class="faq">
         <details class="faq-item"><summary>Brauche ich Vorkenntnisse?</summary><p>Für Spin &amp; Go, die Pottery Pause und Private Pottery nicht, ich begleite dich von Anfang an. Das offene Atelier ist für alle, die schon Erfahrung haben und selbstständig arbeiten möchten.</p></details>
-        <details class="faq-item"><summary>Wie buche ich einen Kurs?</summary><p>Tipp oben bei „Kurse &amp; Workshops“ auf den Kurs, such dir im Kalender einen Tag aus und bezahl bequem online. Die Bestätigung kommt sofort per E-Mail. Das offene Atelier reservierst du genauso und zahlst vor Ort. Anmeldeschluss ist immer am Vorabend um 17 Uhr.</p></details>
+        <details class="faq-item"><summary>Wie buche ich einen Kurs?</summary><p>Tipp oben bei „Kurse &amp; Workshops“ auf den Kurs, such dir im Kalender einen Tag aus und bezahl bequem online. Die Bestätigung kommt sofort per E-Mail. Im offenen Atelier wählst du dazu, welche Stunden du bleiben möchtest, und zahlst ebenfalls online. Anmeldeschluss ist immer am Vorabend um 17 Uhr.</p></details>
         <details class="faq-item"><summary>Ab wie vielen Personen findet Spin &amp; Go statt?</summary><p>Spin &amp; Go findet ab 2 Personen statt. Am schönsten ist es, wenn du gleich eine Freundin mitbringst.</p></details>
         <details class="faq-item"><summary>Was ist im Preis enthalten?</summary><p>Bei Spin &amp; Go ist ein Werkstück inklusive. Bei Private Pottery ist dein komplettes Werkstück enthalten, Aufwand und Umfang besprechen wir vorher gemeinsam. Im offenen Atelier nutzt du das Studio vor Ort als deinen kreativen Workspace. Für die Fertigstellung deiner Werkstücke wird eine Gebühr von € 25 pro Kilo erhoben, die bei Abholung abgerechnet wird.</p></details>
         <details class="faq-item"><summary>Was soll ich anziehen?</summary><p>Am besten bequeme Kleidung, die ruhig etwas Ton abbekommen darf. Kurze Fingernägel machen das Arbeiten an der Töpferscheibe leichter.</p></details>
@@ -818,6 +826,11 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <div class="field-row">
           <div class="field"><label for="book-phone">Telefon <span class="opt">(optional)</span></label><input id="book-phone" name="phone" type="tel" autocomplete="tel"></div>
           <div class="field"><label for="book-persons">Personen</label><select id="book-persons" name="persons"></select></div>
+        </div>
+        <div class="pieces" id="book-slots" hidden>
+          <p class="pieces-title">Welche Stunden möchtest du bleiben?</p>
+          <p class="pieces-sub">Wähl eine, zwei oder alle drei Stunden. € 30 pro Stunde, 5 Plätze pro Stunde.</p>
+          <div class="slot-row" id="slot-row"></div>
         </div>
         <div class="pieces" id="book-pieces" hidden>
           <p class="pieces-title">Such dir dein Stück aus</p>
@@ -1469,10 +1482,23 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     it.reset=function(){set(0);};
     q.appendChild(m);q.appendChild(o);q.appendChild(pl);d.appendChild(q);d.appendChild(h);piecesGrid.appendChild(d);
   });
+  var slotsBox=$('book-slots'),slotRow=$('slot-row'),slotOn={};
+  function renderSlots(c){
+    slotRow.innerHTML='';slotOn={};
+    [8,9,10].forEach(function(h){
+      var free=c.slots&&c.slots[h]!=null?c.slots[h]:c.free,bt=el('button','slot');bt.type='button';
+      bt.appendChild(el('b',null,h+'–'+(h+1)+' Uhr'));bt.appendChild(el('small',null,free<=0?'ausgebucht':(free===1?'1 Platz frei':free+' Plätze frei')));
+      var hid=document.createElement('input');hid.type='hidden';hid.name='slots[]';hid.value=h;hid.disabled=true;
+      if(free<=0)bt.disabled=true;
+      bt.addEventListener('click',function(){slotOn[h]=!slotOn[h];bt.classList.toggle('on',slotOn[h]);hid.disabled=!slotOn[h];submitLabel();});
+      slotRow.appendChild(bt);slotRow.appendChild(hid);
+    });
+  }
+  function slotCount(){return Object.keys(slotOn).filter(function(h){return slotOn[h];}).length;}
   function piecesCents(){if(piecesBox.hidden)return 0;return BEMALEN_ITEMS.reduce(function(a,it){return a+(pieceQty[it[0]]||0)*it[2];},0);}
   // Schritt 3: Angaben
   function submitLabel(){
-    if(current&&current.price_cents>0)submit.textContent='Weiter zur Bezahlung · '+euro(current.price_cents*(+persons.value||1)+piecesCents());
+    if(current&&current.price_cents>0)submit.textContent='Weiter zur Bezahlung · '+euro(current.price_cents*(+persons.value||1)*(slotsBox.hidden?1:Math.max(1,slotCount()))+piecesCents());
     else submit.textContent='Verbindlich anmelden';
   }
   function openForm(c){
@@ -1488,7 +1514,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     var max=Math.min(c.free,10);
     for(var i=1;i<=max;i++){var o=el('option',null,i===1?'1 Person':i+' Personen');o.value=i;persons.appendChild(o);}
     payNote.hidden=!(c.price_cents>0);
-    piecesBox.hidden=c.title!=='Pottery bemalen';BEMALEN_ITEMS.forEach(function(it){it.reset();});
+    piecesBox.hidden=c.title!=='Pottery bemalen';
+    slotsBox.hidden=c.title!=='Offenes Atelier';if(!slotsBox.hidden)renderSlots(c);BEMALEN_ITEMS.forEach(function(it){it.reset();});
     submitLabel();
     setStep('form');
   }
@@ -1524,7 +1551,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     err.hidden=true;
     var name=$('book-name').value.trim(),email=$('book-email').value.trim();
     var msg='';
-    if(name.length<2)msg='Bitte gib deinen Namen an.';
+    if(!slotsBox.hidden&&!slotCount())msg='Bitte wähle mindestens eine Stunde aus.';
+    else if(name.length<2)msg='Bitte gib deinen Namen an.';
     else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))msg='Bitte gib eine gültige E-Mail-Adresse an.';
     else if(!$('book-consent').checked)msg='Bitte bestätige noch die Hinweise zum Datenschutz.';
     if(msg){err.textContent=msg;err.hidden=false;return;}

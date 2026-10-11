@@ -349,6 +349,14 @@ function forma_migrate(PDO $pdo): void
         forma_set_setting($pdo, 'bemalen_live_v17', '1');
     }
 
+    // 12.10.2026: Offenes Atelier online buchbar, stundenweise, 5 Plätze pro Stunde, € 30 pro Stunde.
+    if (forma_setting($pdo, 'atelier_online_v20') === null) {
+        $t = FORMA_SERIES['atelier'];
+        $pdo->prepare('UPDATE courses SET price_cents = ?, capacity = ?, price_text = ?, description = ? WHERE title = ?')
+            ->execute([$t['price_cents'], $t['capacity'], $t['price_text'], $t['description'], $t['title']]);
+        forma_set_setting($pdo, 'atelier_online_v20', '1');
+    }
+
     // 12.10.2026: Pottery bemalen mit 6 Plätzen, Atelierbeitrag vorab, Stücke direkt mitbuchen.
     if (forma_setting($pdo, 'bemalen_items_v19') === null) {
         $t = FORMA_SERIES['bemalen'];
@@ -523,10 +531,10 @@ const FORMA_SERIES = [
     'atelier' => [
         'title' => 'Offenes Atelier',
         'from' => '8', 'to' => '11',
-        'capacity' => 4, 'min' => 1,
-        'price_text' => '€ 30 pro Stunde, Fertigstellung € 25/kg bei Abholung, Bezahlung vor Ort',
-        'price_cents' => 0,
-        'description' => 'Selbstständig an eigenen Projekten arbeiten. Kein betreuter Kurs, für alle mit Vorerfahrung.',
+        'capacity' => 5, 'min' => 1,
+        'price_text' => '€ 30 pro Stunde, du wählst 1 bis 3 Stunden · Fertigstellung € 25/kg bei Abholung',
+        'price_cents' => 3000,
+        'description' => 'Selbstständig an eigenen Projekten arbeiten. Such dir aus, welche Stunden du bleiben möchtest, 5 Plätze pro Stunde. Kein betreuter Kurs, für alle mit Vorerfahrung.',
     ],
     'bemalen' => [
         'title' => 'Pottery bemalen',
@@ -648,6 +656,40 @@ function forma_first_bookable_date(?int $now = null): string
     return date('Y-m-d', strtotime(date('Y-m-d', $now) . " +$days day"));
 }
 
+/** Offenes Atelier: stundenweise buchbar, 5 Plätze pro Stunde. */
+const FORMA_ATELIER_SLOTS = [8, 9, 10];
+const FORMA_ATELIER_SEATS = 5;
+
+function forma_is_atelier(array $course): bool
+{
+    return ($course['title'] ?? '') === FORMA_SERIES['atelier']['title'];
+}
+
+function forma_atelier_slot_label(int $h): string
+{
+    return $h . '–' . ($h + 1) . ' Uhr';
+}
+
+/** Freie Plätze je Stunde. Ältere Reservierungen ohne Stundenangabe belegen alle Stunden. */
+function forma_atelier_free(PDO $pdo, int $courseId, int $seats = FORMA_ATELIER_SEATS): array
+{
+    $used = array_fill_keys(FORMA_ATELIER_SLOTS, 0);
+    $stmt = $pdo->prepare("SELECT persons, extras FROM bookings WHERE course_id = ? AND (status = 'bestaetigt' OR (status = 'offen' AND created_at >= ?))");
+    $stmt->execute([$courseId, date('c', time() - FORMA_HOLD_SECONDS)]);
+    foreach ($stmt->fetchAll() as $b) {
+        $items = json_decode((string)$b['extras'], true);
+        $hit = false;
+        foreach (is_array($items) ? $items : [] as $it) {
+            if (preg_match('/^slot(\d+)$/', (string)($it['key'] ?? ''), $m) && isset($used[(int)$m[1]])) {
+                $used[(int)$m[1]] += (int)$it['qty'];
+                $hit = true;
+            }
+        }
+        if (!$hit) foreach ($used as $h => $_) $used[$h] += (int)$b['persons'];
+    }
+    return array_map(fn($u) => max(0, $seats - $u), $used);
+}
+
 function forma_upcoming_courses(PDO $pdo, bool $onlyVisible = true): array
 {
     $sql = 'SELECT * FROM courses WHERE start_date >= ?' . ($onlyVisible ? ' AND visible = 1' : '') . ' ORDER BY start_date, id';
@@ -657,6 +699,10 @@ function forma_upcoming_courses(PDO $pdo, bool $onlyVisible = true): array
     foreach ($rows as &$r) {
         $r['booked'] = forma_booked($pdo, (int)$r['id']);
         $r['free'] = max(0, (int)$r['capacity'] - $r['booked']);
+        if (forma_is_atelier($r)) {
+            $r['slots'] = forma_atelier_free($pdo, (int)$r['id'], (int)$r['capacity']);
+            $r['free'] = max($r['slots']);
+        }
     }
     return $rows;
 }
@@ -1069,16 +1115,18 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
     }
 
     $pieces = json_decode((string)($b['extras'] ?? ''), true);
-    $piecesLine = is_array($pieces) && $pieces ? 'Deine Stücke: ' . forma_bemalen_text($pieces) . "\n" : '';
+    $isAtelier = $b['title'] === FORMA_SERIES['atelier']['title'];
+    $termin = $isAtelier ? preg_replace('/ · .*$/u', '', (string)$b['date_text']) : $b['date_text'];
+    $piecesLine = is_array($pieces) && $pieces ? ($isAtelier ? 'Deine Zeiten: ' . implode(', ', array_map(fn($i) => preg_replace('/^Offenes Atelier /', '', $i['name']), $pieces)) . ' (' . count($pieces) . ($pieces && count($pieces) === 1 ? ' Stunde' : ' Stunden') . ")\n" : 'Deine Stücke: ' . forma_bemalen_text($pieces) . "\n") : '';
     $customer = "Hallo $first,\n\n$intro\n\nHier noch einmal alles auf einen Blick:\n\n"
-        . "Kurs: {$b['title']}\nTermin: {$b['date_text']}\nPersonen: $personsText\n$piecesLine$payLine\nOrt: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
+        . "Kurs: {$b['title']}\nTermin: $termin\nPersonen: $personsText\n$piecesLine$payLine\nOrt: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
         . $minNote
         . "\nBitte komm in Kleidung, die schmutzig werden darf. Schürzen und Werkzeug habe ich im Studio.\n"
         . "\nFalls doch etwas dazwischenkommt: Bis 48 Stunden vor Kursbeginn kannst du kostenlos stornieren. Danach werden 50 % der Kursgebühr fällig, wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit bei mir, gemeinsam finden wir bestimmt eine Lösung.\n"
         . "\nFalls du Fragen hast oder doch verhindert bist, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n";
 
     $admin = ($paid ? 'Neue bezahlte Buchung über die Website' : 'Neue Kursanmeldung über die Website') . "\n\n"
-        . "Kurs: {$b['title']}\nTermin: {$b['date_text']}\nPersonen: $personsText\n" . $piecesLine
+        . "Kurs: {$b['title']}\nTermin: $termin\nPersonen: $personsText\n" . $piecesLine
         . ($paid ? 'Bezahlt: ' . forma_euro((int)$b['amount_cents']) . " über Stripe\n" : "Bezahlung: vor Ort\n")
         . "\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nNachricht: {$b['message']}\n\n"
         . "Freie Plätze danach: $free\n\nAlle Buchungen: $site/verwaltung/\n";
@@ -1252,7 +1300,7 @@ function forma_voucher_mails(PDO $pdo, int $id): void
         . "Gutschein: $title\nWert: $amount\nGutschein-Nr.: {$v['nr']}\n" . ($v['recipient'] ? "Für: {$v['recipient']}\n" : '')
         . "\nHier kannst du den Gutschein jederzeit als PDF herunterladen und ausdrucken:\n$link\n\n"
         . "Zum Einlösen meldet sich die beschenkte Person einfach bei mir, telefonisch oder per WhatsApp unter $phone oder per E-Mail an hello@forma-pottery.com, und wir finden gemeinsam einen Termin.\n\n"
-        . "Herzliche Grüße\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
+        . "Bis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
     forma_mail(FORMA_NOTIFY_EMAIL, 'Gutschein verkauft: ' . $v['nr'] . ' (' . $amount . ')', "Ein Gutschein wurde online gekauft und bezahlt.\n\n"
         . "Nr.: {$v['nr']}\nInhalt: $title\nBetrag: $amount\nFür: {$v['recipient']}\nVon: {$v['sender']}\n\n"
         . "Käufer:in: {$v['buyer_name']}\nE-Mail: {$v['buyer_email']}\n\nPDF: $link\nAlle Gutscheine: $site/verwaltung/?view=gutscheine\n", $v['buyer_email']);
@@ -1301,7 +1349,7 @@ function forma_private_mails(PDO $pdo, int $id): void
     $isTeam = str_starts_with((string)$b['project'], 'Teambuilding/Event:');
     if ($b['kind'] === 'anfrage') {
         forma_mail($b['email'], $isTeam ? 'Deine Anfrage für ein Teambuilding-Event' : 'Deine Anfrage für Private Pottery', "Hallo $first,\n\nvielen Dank für deine Nachricht! Ich sehe mir " . ($isTeam ? 'eure Idee' : 'dein Projekt') . " an und melde mich so bald wie möglich " . ($viaPhone ? 'telefonisch' : 'per E-Mail') . " bei dir.\n\n"
-            . "Dein Projekt: {$b['project']}\nWunschtermin: {$b['wish']}\n\nWenn dir noch etwas einfällt, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nHerzlich,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
+            . "Dein Projekt: {$b['project']}\nWunschtermin: {$b['wish']}\n\nWenn dir noch etwas einfällt, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nBis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
         forma_mail(FORMA_NOTIFY_EMAIL, ($isTeam ? 'Anfrage Teambuilding/Event (' : 'Anfrage Private Pottery (') . $b['name'] . ')', "Neue Anfrage für " . ($isTeam ? 'Teambuilding/Event' : 'Private Pottery (noch nicht gebucht)') . "\n$contactLine\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nPersonen: $persons\n\nProjekt:\n{$b['project']}\n\nWunschtermin: {$b['wish']}\n\nAlle Anfragen: $site/verwaltung/?view=private\n", $b['email']);
         return;
     }
@@ -1405,7 +1453,7 @@ function forma_template_order_paid(PDO $pdo, int $id): void
     $link = forma_site_url() . '/api/template-download.php?o=' . $o['id'] . '&k=' . $o['token'];
     $amount = forma_euro((int)$o['amount_cents']);
     forma_mail($o['email'], 'Dein FORMA Template: ' . $o['title'], "Hallo $first,\n\nvielen Dank für deinen Kauf! Hier kannst du dein Template jederzeit herunterladen" . (($o['file_en'] ?? '') !== '' ? ' (auf Deutsch und auf Englisch)' : '') . ":\n\n$link\n\n"
-        . "Template: {$o['title']}\nBezahlt: $amount\n\nViel Freude beim Töpfern! Ich freu mich, wenn du mir dein Ergebnis auf Instagram zeigst: @forma.potteryartcraft\n\nHerzlich,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
+        . "Template: {$o['title']}\nBezahlt: $amount\n\nViel Freude beim Töpfern! Ich freu mich, wenn du mir dein Ergebnis auf Instagram zeigst: @forma.potteryartcraft\n\nBis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
     forma_mail(FORMA_NOTIFY_EMAIL, 'Template verkauft: ' . $o['title'] . ' (' . $amount . ')', "Ein Template wurde verkauft.\n\nTemplate: {$o['title']}\nBetrag: $amount\nKäufer:in: {$o['name']}\nE-Mail: {$o['email']}\n\nAlle Verkäufe: " . forma_site_url() . "/verwaltung/?view=templates\n", $o['email']);
     forma_invoice_for($pdo, 'template', $id);
 }
@@ -1492,7 +1540,7 @@ function forma_confirm_reminders(PDO $pdo): void
             . ($maker ? ' und du bekommst gleich dein Gratis-Template' : '') . ".\n\n"
             . forma_site_url() . '/api/confirm.php?t=' . $s['token'] . "\n\n"
             . "Falls du es dir anders überlegt hast, ist das völlig in Ordnung. Dann ignoriere diese E-Mail einfach, ich schreibe dir nicht noch einmal.\n\n"
-            . "Herzlich,\nVivien\n";
+            . "Bis bald,\nVivien\n";
         forma_mail((string)$s['email'], 'Kurze Erinnerung: Bitte bestätige deine E-Mail-Adresse', $body);
     }
 }

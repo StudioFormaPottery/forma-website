@@ -89,10 +89,14 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
         if (!$b || !$b['paid_at'] || (int)$b['amount_cents'] <= 0) return null;
         $items = [['text' => $b['title'], 'detail' => $b['date_text'] . ' · FORMA Studio, Mathon', 'qty' => (int)$b['persons'], 'unit' => (int)$b['unit']]];
         $pieces = json_decode((string)($b['extras'] ?? ''), true);
+        $atelier = forma_is_atelier($b);
+        if ($atelier) $items = [];
         if (is_array($pieces)) {
-            foreach ($pieces as $p) $items[] = ['text' => $p['name'] . ' zum Bemalen', 'detail' => '', 'qty' => (int)$p['qty'], 'unit' => (int)$p['cents']];
+            foreach ($pieces as $p) $items[] = $atelier
+                ? ['text' => $p['name'], 'detail' => date('d.m.Y', strtotime($b['start_date'])) . ' · Werkstattplatz inkl. Ton und Werkzeug', 'qty' => (int)$p['qty'], 'unit' => (int)$p['cents']]
+                : ['text' => $p['name'] . ' zum Bemalen', 'detail' => '', 'qty' => (int)$p['qty'], 'unit' => (int)$p['cents']];
         }
-        if (count($items) > 1) $items[0]['text'] .= ' · Atelierbeitrag';
+        if (!$atelier && count($items) > 1) $items[0]['text'] .= ' · Atelierbeitrag';
         return ['name' => $b['name'], 'email' => $b['email'], 'session' => $b['stripe_session'], 'service' => date('d.m.Y', strtotime($b['start_date'])), 'items' => $items, 'gross' => (int)$b['amount_cents'], 'paid' => $b['paid_at'], 'type' => 'Kurs'];
     }
     if ($kind === 'private') {
@@ -282,7 +286,7 @@ function forma_invoice_mailtext(array $inv): string
     $first = forma_first_name($inv['name']);
     return "Hallo $first,\n\nvielen Dank für deine Zahlung! Im Anhang findest du deine Rechnung {$inv['nr']} als PDF.\n\n"
         . 'Rechnungsbetrag: ' . forma_cents_de((int)$inv['gross_cents']) . " (bereits bezahlt)\n\n"
-        . "Bewahre sie gern für deine Unterlagen auf. Bei Fragen antworte einfach auf diese E-Mail.\n\nHerzlich,\nVivien\n";
+        . "Bewahre sie gern für deine Unterlagen auf. Bei Fragen antworte einfach auf diese E-Mail.\n\nBis bald,\nVivien\n";
 }
 
 function forma_invoice_send(PDO $pdo, int $id): void

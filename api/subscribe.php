@@ -70,7 +70,7 @@ $isMaker = str_contains($source, 'Maker');
 $body = "$hello\n\n" . ($isMaker ? "schön, dass du in den FORMA Maker Club möchtest! Jeden Monat bekommst du ein Pottery-Template zum Selbermachen gratis von mir.\n\n" : "schön, dass du von neuen Kursen und Specials im FORMA Studio hören möchtest!" . ($source !== '' ? " Sobald die Termine für „{$source}“ feststehen, erfährst du es als Erste." : '') . "\n\n")
     . "Bitte bestätige kurz deine E-Mail-Adresse mit einem Klick auf diesen Link" . ($isMaker ? '. Gleich danach kannst du dein Gratis-Template herunterladen' : '') . ":\n\n$link\n\n"
     . "Erst danach stehst du auf meiner Liste. Falls du dich nicht eingetragen hast, ignoriere diese E-Mail einfach, dann passiert nichts.\n\n"
-    . "Herzlich,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n"
+    . "Bis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n"
     . ($isMaker ? '' : "\nP.S. Kennst du schon den FORMA Maker Club? Jeden Monat ein Pottery-Template gratis, dazu kleine Rezepte zur Jahreszeit und DIY-Ideen wie Räucherbündel: " . forma_site_url() . "/#templates\n");
 forma_mail($email, $isMaker ? 'Bitte bestätigen: dein Gratis-Template wartet' : 'Bitte bestätige deine E-Mail-Adresse', $body);
 forma_json(['ok' => true, 'confirm' => true]);

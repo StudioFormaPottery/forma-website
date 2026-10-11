@@ -64,20 +64,43 @@ try {
         $pdo->exec('ROLLBACK');
         forma_json(['ok' => false, 'error' => 'Für diesen Termin ist die Anmeldung schon geschlossen. Anmeldeschluss ist immer am Vorabend um 17 Uhr. Ruf mich gern an: ' . FORMA_PHONE], 409);
     }
+    $isAtelier = forma_is_atelier($course);
+    $slots = [];
+    if ($isAtelier) {
+        $slotFree = forma_atelier_free($pdo, $courseId, (int)$course['capacity']);
+        $want = array_values(array_unique(array_map('intval', (array)($in['slots'] ?? []))));
+        $slots = array_values(array_filter(FORMA_ATELIER_SLOTS, fn($h) => in_array($h, $want, true)));
+        if (!$slots) {
+            $pdo->exec('ROLLBACK');
+            forma_json(['ok' => false, 'error' => 'Bitte wähle mindestens eine Stunde aus.'], 422);
+        }
+        foreach ($slots as $h) {
+            if ($slotFree[$h] < $persons) {
+                $pdo->exec('ROLLBACK');
+                forma_json(['ok' => false, 'error' => 'Von ' . forma_atelier_slot_label($h) . ' ist leider ' . ($slotFree[$h] === 0 ? 'kein Platz mehr frei.' : 'nur noch ' . ($slotFree[$h] === 1 ? '1 Platz' : $slotFree[$h] . ' Plätze') . ' frei.')], 409);
+            }
+        }
+        $free = max($slotFree);
+    } else {
     $free = (int)$course['capacity'] - forma_booked($pdo, $courseId);
-    if ($free <= 0) {
+    }
+    if (!$isAtelier && $free <= 0) {
         $pdo->exec('ROLLBACK');
         forma_json(['ok' => false, 'error' => 'Dieser Kurs ist leider gerade ausgebucht. Schreib mir gern, dann melde ich mich, falls ein Platz frei wird.', 'free' => 0], 409);
     }
-    if ($persons > $free) {
+    if (!$isAtelier && $persons > $free) {
         $pdo->exec('ROLLBACK');
         $msg = $free === 1 ? 'Es ist nur noch 1 Platz frei.' : "Es sind nur noch $free Plätze frei.";
         forma_json(['ok' => false, 'error' => $msg, 'free' => $free], 409);
     }
     $priceCents = (int)$course['price_cents'];
     $pieces = $course['title'] === FORMA_SERIES['bemalen']['title'] ? forma_bemalen_pick($in['items'] ?? []) : [];
+    if ($isAtelier) {
+        $pieces = array_map(fn($h) => ['key' => 'slot' . $h, 'name' => 'Offenes Atelier ' . forma_atelier_slot_label($h), 'qty' => $persons, 'cents' => $priceCents], $slots);
+        $priceCents = 0;
+    }
     $piecesCents = array_sum(array_map(fn($i) => $i['qty'] * $i['cents'], $pieces));
-    $online = $priceCents > 0 && forma_stripe_key() !== null;
+    $online = ($priceCents > 0 || $piecesCents > 0) && forma_stripe_key() !== null;
     $payToken = bin2hex(random_bytes(16));
     $pdo->prepare('INSERT INTO bookings (course_id, name, email, phone, persons, message, status, ip_hash, created_at, amount_cents, pay_token, extras)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
@@ -107,7 +130,7 @@ try {
         'customer_email' => $email,
         'client_reference_id' => (string)$bookingId,
         'metadata' => ['booking_id' => (string)$bookingId, 'kurs' => $course['title'], 'termin' => $course['date_text']],
-        'line_items' => array_merge([[
+        'line_items' => array_merge($priceCents <= 0 ? [] : [[
             'quantity' => $persons,
             'price_data' => [
                 'currency' => 'eur',
@@ -116,7 +139,7 @@ try {
             ],
         ]], array_map(fn($i) => [
             'quantity' => $i['qty'],
-            'price_data' => ['currency' => 'eur', 'unit_amount' => $i['cents'], 'product_data' => ['name' => $i['name'] . ' zum Bemalen']],
+            'price_data' => ['currency' => 'eur', 'unit_amount' => $i['cents'], 'product_data' => ['name' => $isAtelier ? $i['name'] . ' · ' . $course['date_text'] : $i['name'] . ' zum Bemalen']],
         ], $pieces)),
         'payment_intent_data' => ['description' => $course['title'] . ' · ' . $course['date_text'] . ' · ' . $name],
         'expires_at' => time() + 31 * 60,
