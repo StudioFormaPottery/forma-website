@@ -24,6 +24,8 @@ $project = trim(mb_substr(preg_replace("/[\x00-\x09\x0B-\x1F\x7F]/u", '', (strin
 if (($in['topic'] ?? '') === 'team' && $project !== '') {
     $project = 'Teambuilding/Event: ' . $project;
 }
+$ref = forma_clean((string)($in['ref'] ?? ''), 60);
+if ($ref !== '' && mb_strlen($project) >= 5) $project = mb_substr('[Empfohlen von: ' . $ref . '] ' . $project, 0, 1600);
 $wish = forma_clean((string)($in['wish'] ?? ''), 300);
 $contact = ($in['contact'] ?? '') === 'telefon' ? 'telefon' : 'email';
 

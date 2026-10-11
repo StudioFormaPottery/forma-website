@@ -28,6 +28,8 @@ $email    = forma_clean((string)($in['email'] ?? ''), 160);
 $phone    = forma_clean((string)($in['phone'] ?? ''), 40);
 $persons  = (int)($in['persons'] ?? 1);
 $message  = forma_clean((string)($in['message'] ?? ''), 1000);
+$ref = forma_clean((string)($in['ref'] ?? ''), 60);
+if ($ref !== '') $message = mb_substr('Empfohlen von: ' . $ref . ($message !== '' ? ' · ' . $message : ''), 0, 1000);
 $consent  = !empty($in['consent']);
 
 $errors = [];
