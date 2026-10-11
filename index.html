@@ -337,6 +337,7 @@ section{scroll-margin-top:96px}
 .maker .btn{background:var(--on-clay);color:var(--clay);border-color:var(--on-clay)}
 .maker .consent{color:#F3E2D6}.maker .consent a{color:var(--on-clay)}
 .maker .consent.missing,.season .consent.missing{color:var(--ink)}.maker .consent.missing a{color:var(--clay)}.maker .book-error{color:var(--ink)}
+.maker-done .maker-dl{display:flex;width:max-content;margin-top:14px;background:var(--on-clay);color:var(--clay);border-color:var(--on-clay)}
 .maker-done{margin-top:16px;font-weight:500;color:var(--on-clay)!important;background:rgba(251,241,234,.14);padding:14px 16px;border-radius:16px}
 .maker-art{position:relative;min-height:220px;display:grid;place-items:center}
 .maker-art::before{content:"";position:absolute;width:78%;aspect-ratio:1;border-radius:var(--blob);background:var(--blush);opacity:.9;animation:morph 14s ease-in-out infinite alternate}
@@ -1019,9 +1020,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <h3>Jeden Monat ein Template gratis</h3>
           <p id="maker-text">Trag dich ein und hol dir jeden Monat ein neues Pottery-Template zum Selbermachen, kostenlos, direkt in dein Postfach.</p>
           <ol class="maker-how">
-            <li><b>1</b><span>E-Mail eintragen und kurz bestätigen</span></li>
-            <li><b>2</b><span>Template des Monats sofort herunterladen</span></li>
-            <li><b>3</b><span>Jeden Monat ein neues per E-Mail, gratis</span></li>
+            <li><b>1</b><span>E-Mail eintragen</span></li>
+            <li><b>2</b><span>Template sofort herunterladen</span></li>
+            <li><b>3</b><span>Kurz bestätigen und jeden Monat ein neues bekommen</span></li>
           </ol>
           <p class="maker-now" id="maker-now" hidden></p>
           <form class="maker-form" id="maker-form" novalidate>
@@ -1543,12 +1544,15 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     if(!$('maker-consent').checked){er.textContent='Bitte setz noch das Häkchen, damit ich dir die Templates schicken darf.';er.hidden=false;return;}
     btn.disabled=true;
     fetch('api/subscribe.php',{method:'POST',body:new FormData(e.target)}).then(function(r){return r.json().catch(function(){return {ok:false};});}).then(function(d){
-      if(d&&d.ok){e.target.hidden=true;var dn=$('maker-done');dn.textContent=d.already?'Du bist schon im Maker Club! Ich habe dir den Link zum aktuellen Template gerade per E-Mail geschickt.':'Fast geschafft! Ich habe dir eine E-Mail an '+email+' geschickt. Bitte bestätige kurz deine Adresse, danach kannst du dein Template sofort herunterladen.';dn.hidden=false;}
+      if(d&&d.ok){e.target.hidden=true;var dn=$('maker-done');
+        if(d.download){dn.innerHTML='';dn.appendChild(el('b',null,d.already?'Schön, dass du wieder da bist!':'Willkommen im Maker Club!'));dn.appendChild(el('span',null,d.already?' Hier ist dein Template des Monats.':' Hier ist dein Gratis-Template. Bitte bestätige noch kurz deine E-Mail-Adresse (Link im Postfach), damit du jeden Monat das neue bekommst.'));var dl=el('a','btn maker-dl','Template herunterladen');dl.href=d.download;dl.target='_blank';dl.rel='noopener';dn.appendChild(dl);}
+        else dn.textContent=d.already?'Du bist schon im Maker Club! Ich habe dir den Link zum aktuellen Template gerade per E-Mail geschickt.':'Fast geschafft! Ich habe dir eine E-Mail an '+email+' geschickt. Bitte bestätige kurz deine Adresse.';
+        dn.hidden=false;}
       else{er.textContent=(d&&d.error)||'Das hat leider nicht geklappt. Bitte versuch es noch einmal.';er.hidden=false;}
     }).catch(function(){er.textContent='Keine Verbindung. Bitte versuch es noch einmal.';er.hidden=false;}).then(function(){btn.disabled=false;});
   });
   var td=$('tpl-dialog'),tf=$('tpl-form');
-  function tplOpen(t){tplCur=t;tf.hidden=false;$('tpl-done').hidden=true;$('tpl-error').hidden=true;$('tpl-id').value=t.id;$('tpl-title').textContent=t.title;$('tpl-meta').textContent=t.season_label+' · '+t.age_label+' · digitaler Download (PDF) · '+euro(t.price_cents);$('tpl-submit').textContent='Weiter zur Bezahlung · '+euro(t.price_cents);show(td);}
+  function tplOpen(t){tplCur=t;tf.hidden=false;$('tpl-done').hidden=true;$('tpl-error').hidden=true;$('tpl-id').value=t.id;$('tpl-title').textContent=t.title;$('tpl-meta').textContent=t.season_label+(t.langs?' · '+t.langs:'')+' · digitaler Download (PDF) · '+euro(t.price_cents);$('tpl-submit').textContent='Weiter zur Bezahlung · '+euro(t.price_cents);show(td);}
   function tplDone(t,x,link){tf.hidden=true;$('tpl-done').hidden=false;$('tpl-done-title').textContent=t;$('tpl-done-text').textContent=x;var a=$('tpl-download');if(link){a.href=link;a.hidden=false;}else a.hidden=true;show(td);}
   $('tpl-close').addEventListener('click',function(){hide(td);});$('tpl-done-close').addEventListener('click',function(){hide(td);});
   td.querySelector('.tpl-privacy').addEventListener('click',function(){hide(td);var d=$('datenschutz');if(d)d.open=true;});

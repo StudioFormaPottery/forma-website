@@ -280,6 +280,33 @@ function forma_migrate(PDO $pdo): void
         forma_set_setting($pdo, 'remove_dates_v7', '1');
     }
 
+    // 11.10.2026: Gratis-Template des Monats (Oktober): Blatt-Schälchen, Deutsch & Englisch.
+    if (forma_setting($pdo, 'maker_blatt_v11') === null) {
+        $m = forma_maker($pdo);
+        if ($m['file'] === '') {
+            $seed = __DIR__ . '/seed';
+            $dir = forma_template_dir();
+            $ok = true;
+            foreach (['maker-blatt-de.pdf', 'maker-blatt-en.pdf', 'maker-blatt.jpg'] as $f) {
+                if (!is_file("$dir/seed-$f")) {
+                    $ok = $ok && is_file("$seed/$f") && @copy("$seed/$f", "$dir/seed-$f");
+                }
+            }
+            if ($ok) {
+                $m['title'] = 'Blatt-Schälchen';
+                $m['text'] = 'Ein kleines Schälchen in Blattform für Ringe, Teebeutel oder Herbstdeko. Ganz einfach, in 30 Minuten gemacht und auch schön mit Kindern.';
+                $m['file'] = 'seed-maker-blatt-de.pdf';
+                $m['file_en'] = 'seed-maker-blatt-en.pdf';
+                $m['image'] = 'seed-maker-blatt.jpg';
+                $m['version'] = (int)$m['version'] + 1;
+                forma_set_setting($pdo, 'maker', json_encode($m, JSON_UNESCAPED_UNICODE));
+                forma_set_setting($pdo, 'maker_blatt_v11', '1');
+            }
+        } else {
+            forma_set_setting($pdo, 'maker_blatt_v11', '1');
+        }
+    }
+
     // 11.10.2026: Erstes Shop-Template „Kürbisteller“ (Deutsch & Englisch) einstellen.
     if (forma_setting($pdo, 'tpl_kuerbis_v10') === null) {
         $seed = __DIR__ . '/seed';
@@ -1034,7 +1061,7 @@ function forma_template_dir(): string
 function forma_maker(PDO $pdo): array
 {
     $m = json_decode(forma_setting($pdo, 'maker') ?? '', true);
-    $d = ['title' => '', 'text' => '', 'file' => '', 'image' => '', 'version' => 1];
+    $d = ['title' => '', 'text' => '', 'file' => '', 'file_en' => '', 'image' => '', 'version' => 1];
     return is_array($m) ? array_merge($d, $m) : $d;
 }
 

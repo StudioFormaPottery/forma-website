@@ -466,11 +466,13 @@ if ($action === 'save_maker') {
     $m = forma_maker($pdo);
     try {
         $pdf = store_upload('maker_pdf', 'pdf', 'maker');
+        $pdfEn = store_upload('maker_pdf_en', 'pdf', 'maker');
         $img = store_upload('maker_image', 'image', 'maker');
     } catch (Throwable $e) {
         go($self . '?view=templates', $e->getMessage());
     }
     if ($pdf !== '') { if ($m['file']) @unlink(forma_template_dir() . '/' . basename($m['file'])); $m['file'] = $pdf; }
+    if ($pdfEn !== '') { if ($m['file_en']) @unlink(forma_template_dir() . '/' . basename($m['file_en'])); $m['file_en'] = $pdfEn; }
     if ($img !== '') { if ($m['image']) @unlink(forma_template_dir() . '/' . basename($m['image'])); $m['image'] = $img; }
     $m['title'] = forma_clean((string)($_POST['maker_title'] ?? ''), 90);
     $m['text'] = forma_clean((string)($_POST['maker_text'] ?? ''), 400);
@@ -613,7 +615,8 @@ if ($view === 'templates') {
             <p><strong><?= $makers ?></strong> <?= $makers === 1 ? 'Mitglied' : 'Mitglieder' ?> im Maker Club. Sie stehen in MailerLite in der Gruppe „Maker Club“ (sobald MailerLite verbunden ist).</p>
             <label for="maker_title">Name des Templates</label><input id="maker_title" name="maker_title" value="<?= forma_h($m['title']) ?>" placeholder="z. B. Herbstblatt-Schälchen">
             <label for="maker_text">Kurze Beschreibung</label><input id="maker_text" name="maker_text" value="<?= forma_h($m['text']) ?>" placeholder="z. B. Ein kleines Schälchen in Blattform, ideal für Ringe oder Teebeutel">
-            <label for="maker_pdf">PDF <?= $m['file'] ? '<span class="muted">(vorhanden, nur hochladen zum Ersetzen)</span>' : '' ?></label><input id="maker_pdf" name="maker_pdf" type="file" accept="application/pdf">
+            <label for="maker_pdf">PDF auf Deutsch <?= $m['file'] ? '<span class="muted">(vorhanden, nur hochladen zum Ersetzen)</span>' : '' ?></label><input id="maker_pdf" name="maker_pdf" type="file" accept="application/pdf">
+            <label for="maker_pdf_en">PDF auf Englisch <span class="muted"><?= $m['file_en'] ? '(vorhanden, nur hochladen zum Ersetzen)' : '(optional)' ?></span></label><input id="maker_pdf_en" name="maker_pdf_en" type="file" accept="application/pdf">
             <label for="maker_image">Vorschaubild <?= $m['image'] ? '<span class="muted">(vorhanden)</span>' : '' ?></label><input id="maker_image" name="maker_image" type="file" accept="image/jpeg,image/png,image/webp">
             <p class="muted small">Tipp: Jeden Monat hier das neue Template hochladen und danach in MailerLite eine kurze Mail an die Gruppe „Maker Club“ schicken.</p>
             <button class="btn" type="submit">Speichern</button>

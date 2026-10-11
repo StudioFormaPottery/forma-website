@@ -44,7 +44,7 @@ try {
             }
             $m = forma_maker($pdo);
             forma_mail($email, 'Dein Template des Monats von FORMA', "Hallo,\n\nschön, dass du im FORMA Maker Club bist! Hier ist dein Gratis-Template des Monats" . ($m['title'] ? " („{$m['title']}“)" : '') . ":\n\n" . forma_maker_link($row) . "\n\nViel Freude beim Töpfern!\nVivien\nFORMA Earth & Art\n");
-            forma_json(['ok' => true, 'already' => true, 'maker' => true]);
+            forma_json(['ok' => true, 'already' => true, 'maker' => true, 'download' => $m['file'] !== '' ? forma_maker_link($row) : '']);
         }
         forma_json(['ok' => true, 'already' => true]);
     }
@@ -64,9 +64,11 @@ try {
 $hello = $name !== '' ? 'Hallo ' . forma_first_name($name) . ',' : 'Hallo,';
 $link = forma_site_url() . '/api/confirm.php?t=' . $token;
 $isMaker = str_contains($source, 'Maker');
-$body = "$hello\n\n" . ($isMaker ? "willkommen im FORMA Maker Club! Jeden Monat bekommst du ein Pottery-Template zum Selbermachen gratis von mir.\n\n" : "schön, dass du von neuen Kursen und Specials im FORMA Studio hören möchtest!\n\n")
-    . "Bitte bestätige kurz deine E-Mail-Adresse mit einem Klick auf diesen Link" . ($isMaker ? ', danach kannst du dein Template sofort herunterladen' : '') . ":\n\n$link\n\n"
+$maker = forma_maker($pdo);
+$dl = ($isMaker && $maker['file'] !== '') ? forma_maker_link(['token' => $token]) : '';
+$body = "$hello\n\n" . ($isMaker ? "willkommen im FORMA Maker Club! Jeden Monat bekommst du ein Pottery-Template zum Selbermachen gratis von mir.\n\n" . ($dl ? "Dein Template des Monats" . ($maker['title'] ? " („{$maker['title']}“)" : '') . " kannst du hier herunterladen:\n$dl\n\n" : '') : "schön, dass du von neuen Kursen und Specials im FORMA Studio hören möchtest!\n\n")
+    . "Bitte bestätige kurz deine E-Mail-Adresse mit einem Klick auf diesen Link" . ($isMaker ? ', damit ich dir jeden Monat das neue Template schicken darf' : '') . ":\n\n$link\n\n"
     . "Erst danach stehst du auf meiner Liste. Falls du dich nicht eingetragen hast, ignoriere diese E-Mail einfach, dann passiert nichts.\n\n"
     . "Herzlich,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n";
-forma_mail($email, $isMaker ? 'Fast geschafft: dein Gratis-Template wartet' : 'Bitte bestätige deine E-Mail-Adresse', $body);
-forma_json(['ok' => true]);
+forma_mail($email, $isMaker ? 'Dein Gratis-Template & kurz bestätigen' : 'Bitte bestätige deine E-Mail-Adresse', $body);
+forma_json(['ok' => true, 'download' => $dl]);
