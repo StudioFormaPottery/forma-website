@@ -19,6 +19,10 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Wellen-Übergänge zwischen den Bereichen, schwebende Tonformen im Kopfbereich.
 - Das Brennofen-Foto (Keramik im Kreis auf dem Ofen) nicht verwenden.
 
+## Wortwahl
+- Nie „Keramik“, nie Brennen, Glasieren, Brennkosten o. Ä. auf der Website oder in Mails. Stattdessen „Fertigstellung“: „Für die Fertigstellung wird eine Gebühr von € 25 pro Kilo erhoben, abgerechnet bei Abholung deiner Werkstücke.“
+- FORMA ist ein Workshop-Atelier: Man besucht aktiv einen Kurs und praktiziert das Handwerk selbst.
+
 ## Eigenes Buchungssystem (seit 10.10.2026, ersetzt Zenamu)
 - `api/courses.php` liefert die kommenden, sichtbaren Termine mit freien Plätzen; `api/book.php` nimmt Anmeldungen an (Platzprüfung in einer Transaktion, Honeypot-Feld `website`, Mindestzeit 3 s, max. 6 Anmeldungen pro Stunde und IP-Hash).
 - `api/lib.php`: gemeinsame Funktionen, Absender/Empfänger der Mails, Startinhalt (Pottery Pause mit 1 Platz).

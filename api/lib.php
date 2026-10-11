@@ -347,7 +347,17 @@ function forma_migrate(PDO $pdo): void
         forma_set_setting($pdo, 'bemalen_live_v17', '1');
     }
 
-    // 11.10.2026: Brennen & Glasieren im offenen Atelier jetzt € 25/kg.
+    // 12.10.2026: Keine Wörter wie Brennen/Glasieren auf der Website, stattdessen „Fertigstellung“.
+    if (forma_setting($pdo, 'fertigstellung_v18') === null) {
+        foreach (['price_text', 'description'] as $col) {
+            $pdo->exec("UPDATE courses SET $col = REPLACE($col, 'Brennen & Glasieren € 25/kg', 'Fertigstellung € 25/kg bei Abholung') WHERE $col LIKE '%Brennen & Glasieren%'");
+            $pdo->exec("UPDATE courses SET $col = REPLACE($col, 'Brennen und Glasieren', 'Fertigstellung') WHERE $col LIKE '%Brennen und Glasieren%'");
+            $pdo->exec("UPDATE courses SET $col = REPLACE($col, 'Material und Brennen', 'Material und Fertigstellung') WHERE $col LIKE '%Material und Brennen%'");
+        }
+        forma_set_setting($pdo, 'fertigstellung_v18', '1');
+    }
+
+    // 11.10.2026: Offenes Atelier jetzt € 25/kg.
     if (forma_setting($pdo, 'atelier_kg_v15') === null) {
         $pdo->exec("UPDATE courses SET price_text = REPLACE(price_text, '€ 22/kg', '€ 25/kg') WHERE price_text LIKE '%€ 22/kg%'");
         $pdo->exec("UPDATE courses SET description = REPLACE(description, '€ 22/kg', '€ 25/kg') WHERE description LIKE '%€ 22/kg%'");
@@ -500,7 +510,7 @@ const FORMA_SERIES = [
         'title' => 'Offenes Atelier',
         'from' => '8', 'to' => '11',
         'capacity' => 4, 'min' => 1,
-        'price_text' => '€ 30 pro Stunde, Brennen & Glasieren € 25/kg, Bezahlung vor Ort',
+        'price_text' => '€ 30 pro Stunde, Fertigstellung € 25/kg bei Abholung, Bezahlung vor Ort',
         'price_cents' => 0,
         'description' => 'Selbstständig an eigenen Projekten arbeiten. Kein betreuter Kurs, für alle mit Vorerfahrung.',
     ],
@@ -1099,11 +1109,11 @@ const FORMA_VOUCHERS = [
     ],
     'private' => [
         'name' => 'Private Pottery', 'price' => 6500, 'one' => 'Stunde', 'many' => 'Stunden', 'small' => 'Private Pottery',
-        'desc' => 'Persönliche Einzelstunde Handbuilding, inkl. deinem handgefertigten Werkstück, Material und Brennen. Zum Schluss wird bemalt.',
+        'desc' => 'Persönliche Einzelstunde Handbuilding, inkl. deinem handgefertigten Werkstück, Material und Fertigstellung. Zum Schluss wird bemalt.',
     ],
     'atelier' => [
         'name' => 'Offenes Atelier', 'price' => 3000, 'one' => 'Stunde', 'many' => 'Stunden', 'small' => 'im Offenen Atelier',
-        'desc' => 'Selbstständig im Studio arbeiten, Ton, Werkzeug und Maschinen vor Ort nutzen. Nur für Töpfernde mit Vorerfahrung, die ohne Anleitung arbeiten. Brennen & Glasieren € 25/kg extra.',
+        'desc' => 'Selbstständig im Studio arbeiten, Ton, Werkzeug und Maschinen vor Ort nutzen. Nur für Töpfernde mit Vorerfahrung, die ohne Anleitung arbeiten. Fertigstellung € 25/kg, bei Abholung.',
     ],
 ];
 
