@@ -57,12 +57,19 @@ Tonperlen-Girlande, Mobile, Deko-Tablett, Schmuckdose, Buchstütze, Lichterhäus
 
 Schon im Shop / Maker Club: Kürbisteller, Herbst-Teetasse, Blatt-Schälchen, Sternen-Anhänger.
 
+## Stil der Wochen-Templates
+
+Scandi, Hygge, Interior, DIY: ruhige, organische Formen, Wellenränder, schlichte Henkel,
+Dinge für ein gemütliches Zuhause, die man wirklich benutzt. Inspiration: Pinterest, Etsy und der
+Stil von Pottery by Denise (klare, alltagstaugliche Schablonen), aber nie nachmachen: eigene Formen,
+eigene Illustrationen, eigene Texte. Keine niedlichen Tierfiguren, keine Kitsch-Motive.
+
 ## Plan Oktober 2026
 
 | Freitag 8 Uhr | Template | Level | Saison |
 | --- | --- | --- | --- |
-| 16.10. | Igel-Zahnstocherhalter (kleiner Igel, Stacheln = Zahnstocher) | Einfach | herbst |
-| 23.10. | Vogel-Futterschale zum Aufhängen (für den Garten, Steinzeug) | Mittel | herbst |
-| 30.10. | Herbstkranz aus Tonblättern zum Aufhängen | Einfach | herbst |
+| 16.10. | Wollknäuel-Schale (Yarn Bowl) mit geschwungenem Fadenschlitz | Mittel | herbst |
+| 23.10. | Kerzen-Löschhütchen mit kleinem Griff | Einfach | herbst |
+| 30.10. | Welliger Spiegelrahmen (runder Spiegel zum Einkleben) | Mittel | ganzjaehrig |
 
 Preis jeweils € 3,99.
