@@ -266,6 +266,37 @@ function forma_migrate(PDO $pdo): void
         forma_set_setting($pdo, 'popup_date_v6', '1');
     }
 
+    // Wöchentliche Templates: api/seed/weekly.json listet neue Shop-Templates mit Veröffentlichungszeit.
+    // Jedes Template geht automatisch online, sobald publish_at erreicht ist (Zeit in Europe/Vienna).
+    $weeklyFile = __DIR__ . '/seed/weekly.json';
+    if (is_file($weeklyFile)) {
+        $weekly = json_decode((string)file_get_contents($weeklyFile), true);
+        if (is_array($weekly)) {
+            $now = new DateTimeImmutable('now', new DateTimeZone('Europe/Vienna'));
+            foreach ($weekly as $w) {
+                $key = preg_replace('/[^a-z0-9-]/', '', (string)($w['key'] ?? ''));
+                if ($key === '' || forma_setting($pdo, 'weekly_' . $key) !== null) continue;
+                try { $at = new DateTimeImmutable((string)($w['publish_at'] ?? ''), new DateTimeZone('Europe/Vienna')); } catch (Throwable $e) { continue; }
+                if ($now < $at) continue;
+                $seed = __DIR__ . '/seed/weekly';
+                $dir = forma_template_dir();
+                $ok = true;
+                foreach (["$key-de.pdf", "$key-en.pdf", "$key.jpg"] as $f) {
+                    if (!is_file("$dir/seed-$f")) $ok = $ok && is_file("$seed/$f") && @copy("$seed/$f", "$dir/seed-$f");
+                }
+                if (!$ok) continue;
+                $has = $pdo->prepare('SELECT COUNT(*) FROM templates WHERE title = ?');
+                $has->execute([(string)$w['title']]);
+                if ((int)$has->fetchColumn() === 0) {
+                    $pdo->prepare('INSERT INTO templates (title, description, season, age, level, price_cents, file, file_en, image, visible, sort, created_at) VALUES (?,?,?,?,?,?,?,?,?,1,?,?)')
+                        ->execute([(string)$w['title'], (string)($w['description'] ?? ''), (string)($w['season'] ?? 'ganzjaehrig'), 'erwachsene', (int)($w['level'] ?? 1),
+                            (int)($w['price_cents'] ?? 399), "seed-$key-de.pdf", "seed-$key-en.pdf", "seed-$key.jpg", (int)($w['sort'] ?? 0), date('c')]);
+                }
+                forma_set_setting($pdo, 'weekly_' . $key, '1');
+            }
+        }
+    }
+
     // 11.10.2026: Pottery bemalen im Advent, Mi & Do 15–18 Uhr, 4.11.–17.12.2026. Erst ab 19.10. sichtbar.
     if (forma_setting($pdo, 'bemalen_v16') === null) {
         forma_create_series($pdo, FORMA_SERIES['bemalen'], [3, 4], '2026-11-04', '2026-12-17');

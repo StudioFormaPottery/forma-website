@@ -1,0 +1,41 @@
+def build(lang):
+    t=TXT[lang]
+    css=f'''@font-face{{font-family:B;font-weight:600 800;src:url({R}fonts/BricolageGrotesque-Bold.woff)}}
+@font-face{{font-family:I;src:url({R}fonts/Italiana-Regular.woff)}}
+@font-face{{font-family:O;font-weight:300 500;src:url({R}fonts/Outfit-Regular.woff)}}
+@font-face{{font-family:O;font-weight:600 800;src:url({R}fonts/Outfit-Bold.woff)}}
+@page{{size:A4;margin:0}}*{{box-sizing:border-box;margin:0}}
+body{{font-family:O;color:{ink};-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.page{{width:210mm;height:297mm;position:relative;overflow:hidden;page-break-after:always;padding:16mm 16mm 20mm;background:#fff}}
+.pfoot{{position:absolute;left:16mm;right:16mm;bottom:8mm;display:flex;align-items:center;gap:3mm;font-size:8pt;color:{k}}}
+.pfoot img{{width:7mm}}.pfoot span:last-child{{margin-left:auto}}
+h2{{font-family:B;font-weight:650;font-size:22pt;color:{r};letter-spacing:-.01em;margin-bottom:4mm}}
+h3{{font-family:B;font-weight:600;font-size:13pt;color:{r};margin-bottom:1.5mm}}
+.cover{{background:#EEE2D4;display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:22mm}}
+.cover .blob{{position:absolute;border-radius:50%}}
+.cover .logo{{width:26mm;position:relative}}
+.cover .kick{{font-family:I;font-size:18pt;color:{k};margin-top:8mm;position:relative}}
+.cover h1{{font-family:B;font-weight:650;font-size:46pt;line-height:1;letter-spacing:-.02em;color:{r};margin-top:2mm;position:relative}}
+.cover .ic{{width:120mm;height:112mm;margin:12mm 0 6mm;position:relative}}
+.cover .chips{{display:flex;gap:3mm;flex-wrap:wrap;justify-content:center;position:relative}}
+.cover .chips span{{background:{p};border:1px solid {b};border-radius:99px;padding:2mm 5mm;font-size:10.5pt;color:{k}}}
+.cover .intro{{max-width:140mm;font-size:11.5pt;line-height:1.55;color:{k};margin-top:8mm;position:relative}}
+.cover .lang{{position:absolute;right:16mm;top:16mm;font-family:B;font-weight:600;font-size:10pt;color:{p};background:{r};border-radius:99px;padding:1.5mm 4mm}}
+.two{{display:grid;grid-template-columns:1fr 1.15fr;gap:10mm;margin-bottom:5mm}}
+.box{{background:#F6EEE6;border-radius:5mm;padding:6mm}}
+.box ul{{padding-left:5mm;font-size:10.5pt;line-height:1.7}}
+.printnote{{font-size:10.5pt;line-height:1.55;color:{k}}}
+.testsq{{width:50mm;height:50mm;border:.4mm solid {r};display:grid;place-items:center;font-size:9pt;color:{r};text-align:center;margin-top:5mm}}
+.steps{{display:grid;grid-template-columns:repeat(3,1fr);gap:6mm}}
+.step{{background:#F6EEE6;border-radius:5mm;padding:4mm 4mm 5mm}}
+.step svg{{width:100%;height:26mm;display:block;margin-bottom:3mm}}
+.step b{{display:inline-grid;place-items:center;width:7mm;height:7mm;border-radius:50%;background:{r};color:{p};font-family:B;font-size:10pt;margin-right:2mm;vertical-align:middle}}
+.step p{{font-size:10pt;line-height:1.5;margin-top:2mm}}
+.tips{{display:grid;grid-template-columns:repeat(3,1fr);gap:6mm;margin-top:6mm}}
+.tips p{{font-size:9.5pt;line-height:1.5;color:{k}}}
+.tpl{{padding:10mm 10mm 14mm}}
+.tpl .lbl{{position:absolute;left:10mm;top:8mm;right:10mm}}
+.tpl .lbl p{{font-size:9pt;color:{k}}}
+.share{{margin-top:10mm;text-align:center;font-family:B;font-weight:600;font-size:12pt;color:{r}}}
+.legal{{margin-top:3mm;text-align:center;font-size:8pt;color:{k}}}
+'''
