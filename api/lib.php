@@ -167,6 +167,7 @@ function forma_migrate(PDO $pdo): void
     forma_add_column($pdo, 'bookings', 'pay_token', "TEXT NOT NULL DEFAULT ''");
     forma_add_column($pdo, 'bookings', 'paid_at', 'TEXT');
     forma_add_column($pdo, 'bookings', 'mailed', 'INTEGER NOT NULL DEFAULT 0');
+    forma_add_column($pdo, 'templates', 'file_en', "TEXT NOT NULL DEFAULT ''");
     forma_add_column($pdo, 'private_bookings', 'contact', "TEXT NOT NULL DEFAULT 'email'");
 
     // Startinhalt beim allerersten Aufruf: der laufende Pottery-Pause-Kurs.
@@ -1024,7 +1025,7 @@ function forma_template_order_paid(PDO $pdo, int $id): void
 {
     $pdo->prepare("UPDATE template_orders SET status = 'bezahlt', paid_at = ? WHERE id = ? AND status IN ('offen','abgebrochen')")->execute([date('c'), $id]);
     $pdo->exec('BEGIN IMMEDIATE');
-    $stmt = $pdo->prepare("SELECT * FROM template_orders WHERE id = ? AND status = 'bezahlt' AND mailed = 0");
+    $stmt = $pdo->prepare("SELECT o.*, t.file_en FROM template_orders o LEFT JOIN templates t ON t.id = o.template_id WHERE o.id = ? AND o.status = 'bezahlt' AND o.mailed = 0");
     $stmt->execute([$id]);
     $o = $stmt->fetch();
     if (!$o) {
@@ -1036,7 +1037,7 @@ function forma_template_order_paid(PDO $pdo, int $id): void
     $first = forma_first_name($o['name']);
     $link = forma_site_url() . '/api/template-download.php?o=' . $o['id'] . '&k=' . $o['token'];
     $amount = forma_euro((int)$o['amount_cents']);
-    forma_mail($o['email'], 'Dein FORMA Template: ' . $o['title'], "Hallo $first,\n\nvielen Dank für deinen Kauf! Hier kannst du dein Template jederzeit herunterladen:\n\n$link\n\n"
+    forma_mail($o['email'], 'Dein FORMA Template: ' . $o['title'], "Hallo $first,\n\nvielen Dank für deinen Kauf! Hier kannst du dein Template jederzeit herunterladen" . (($o['file_en'] ?? '') !== '' ? ' (auf Deutsch und auf Englisch)' : '') . ":\n\n$link\n\n"
         . "Template: {$o['title']}\nBezahlt: $amount\n\nViel Freude beim Töpfern! Ich freu mich, wenn du mir dein Ergebnis auf Instagram zeigst: @forma.potteryartcraft\n\nHerzlich,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
     forma_mail(FORMA_NOTIFY_EMAIL, 'Template verkauft: ' . $o['title'] . ' (' . $amount . ')', "Ein Template wurde verkauft.\n\nTemplate: {$o['title']}\nBetrag: $amount\nKäufer:in: {$o['name']}\nE-Mail: {$o['email']}\n\nAlle Verkäufe: " . forma_site_url() . "/verwaltung/?view=templates\n", $o['email']);
 }
@@ -1077,13 +1078,14 @@ function forma_popup_live(array $p): bool
 }
 
 /** Einfache Seite für Bestätigungs- und Abmeldelinks. */
-function forma_message_page(string $title, string $text, string $btnText = '', string $btnUrl = ''): void
+function forma_message_page(string $title, string $text, string $btnText = '', string $btnUrl = '', string $btn2Text = '', string $btn2Url = ''): void
 {
     header('Content-Type: text/html; charset=utf-8');
     header('X-Robots-Tag: noindex');
     $t = forma_h($title);
     $x = nl2br(forma_h($text));
     $extra = $btnUrl !== '' ? '<a class="b" href="' . forma_h($btnUrl) . '" style="margin-right:8px">' . forma_h($btnText) . '</a>' : '';
+    $extra .= $btn2Url !== '' ? '<a class="b" href="' . forma_h($btn2Url) . '" style="margin-right:8px">' . forma_h($btn2Text) . '</a>' : '';
     echo <<<HTML
 <!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
 <title>$t · FORMA</title><link rel="icon" href="/img/forma-logo.png">

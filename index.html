@@ -1497,7 +1497,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       var i=document.createElement('img');i.src=t.image||('img/tpl-'+t.season+'.jpg');i.alt=t.image?'Vorschau: '+t.title:'';i.loading='lazy';im.appendChild(i);
       c.appendChild(im);
       var b=el('div','tpl-body'),tags=el('div','tpl-tags');
-      tags.appendChild(el('span',null,t.season_label));tags.appendChild(el('span',null,t.age_label));b.appendChild(tags);
+      tags.appendChild(el('span',null,t.season_label));tags.appendChild(el('span',null,t.age_label));if(t.langs)tags.appendChild(el('span',null,t.langs));b.appendChild(tags);
       b.appendChild(el('h4',null,t.title));
       if(t.description)b.appendChild(el('p',null,t.description));
       var lv=el('span','tpl-level');for(var n=1;n<=3;n++)lv.appendChild(el('i',n<=t.level?'on':null));lv.appendChild(document.createTextNode(' '+['leicht','mittel','anspruchsvoll'][t.level-1]));b.appendChild(lv);

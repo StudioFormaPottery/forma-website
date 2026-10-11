@@ -487,6 +487,7 @@ if ($action === 'save_template') {
     }
     try {
         $pdf = store_upload('pdf', 'pdf', 'tpl');
+        $pdfEn = store_upload('pdf_en', 'pdf', 'tpl');
         $img = store_upload('image', 'image', 'tpl');
     } catch (Throwable $e) {
         go($self . '?view=template_edit' . ($id ? '&id=' . $id : ''), $e->getMessage());
@@ -497,11 +498,11 @@ if ($action === 'save_template') {
         euro_to_cents((string)($_POST['price'] ?? '')), !empty($_POST['visible']) ? 1 : 0, (int)($_POST['sort'] ?? 0)];
     if ($id > 0) {
         $old = $pdo->prepare('SELECT * FROM templates WHERE id = ?'); $old->execute([$id]); $old = $old->fetch();
-        $pdo->prepare('UPDATE templates SET title=?, description=?, season=?, age=?, level=?, price_cents=?, visible=?, sort=?' . ($pdf ? ', file=?' : '') . ($img ? ', image=?' : '') . ' WHERE id=?')
-            ->execute(array_merge($vals, $pdf ? [$pdf] : [], $img ? [$img] : [], [$id]));
+        $pdo->prepare('UPDATE templates SET title=?, description=?, season=?, age=?, level=?, price_cents=?, visible=?, sort=?' . ($pdf ? ', file=?' : '') . ($pdfEn ? ', file_en=?' : '') . ($img ? ', image=?' : '') . ' WHERE id=?')
+            ->execute(array_merge($vals, $pdf ? [$pdf] : [], $pdfEn ? [$pdfEn] : [], $img ? [$img] : [], [$id]));
     } else {
-        $pdo->prepare('INSERT INTO templates (title, description, season, age, level, price_cents, visible, sort, file, image, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)')
-            ->execute(array_merge($vals, [$pdf, $img, date('c')]));
+        $pdo->prepare('INSERT INTO templates (title, description, season, age, level, price_cents, visible, sort, file, file_en, image, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)')
+            ->execute(array_merge($vals, [$pdf ?: '', $pdfEn ?: '', $img ?: '', date('c')]));
     }
     go($self . '?view=templates', 'Das Template ist gespeichert.');
 }
@@ -583,7 +584,8 @@ if ($view === 'template_edit') {
                 <div class="stack"><label for="level">Schwierigkeit</label><select id="level" name="level"><?php foreach ([1 => 'leicht', 2 => 'mittel', 3 => 'anspruchsvoll'] as $k => $l): ?><option value="<?= $k ?>" <?= (int)$t['level'] === $k ? 'selected' : '' ?>><?= $l ?></option><?php endforeach; ?></select></div>
                 <div class="stack"><label for="price">Preis in €</label><input id="price" name="price" inputmode="decimal" value="<?= forma_h(rtrim(rtrim(number_format($t['price_cents'] / 100, 2, ',', ''), '0'), ',')) ?>"></div>
             </div>
-            <label for="pdf">PDF zum Herunterladen <?= $t['file'] ? '<span class="muted">(vorhanden, nur hochladen zum Ersetzen)</span>' : '' ?></label><input id="pdf" name="pdf" type="file" accept="application/pdf">
+            <label for="pdf">PDF auf Deutsch <?= $t['file'] ? '<span class="muted">(vorhanden, nur hochladen zum Ersetzen)</span>' : '' ?></label><input id="pdf" name="pdf" type="file" accept="application/pdf">
+            <label for="pdf_en">PDF auf Englisch <span class="muted"><?= ($t['file_en'] ?? '') ? '(vorhanden, nur hochladen zum Ersetzen)' : '(optional)' ?></span></label><input id="pdf_en" name="pdf_en" type="file" accept="application/pdf">
             <label for="image">Vorschaubild <?= $t['image'] ? '<span class="muted">(vorhanden)</span>' : '' ?></label><input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp">
             <label for="sort">Reihenfolge <span class="muted">(kleine Zahl = weiter vorne)</span></label><input id="sort" name="sort" type="number" value="<?= (int)$t['sort'] ?>">
             <label class="check"><input type="checkbox" name="visible" value="1" <?= $t['visible'] ? 'checked' : '' ?>> Auf der Website anzeigen</label>
