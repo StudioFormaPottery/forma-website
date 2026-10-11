@@ -118,6 +118,8 @@ p{margin:0}
 .collage{position:relative;min-width:0;aspect-ratio:1/1.04;width:100%;max-width:640px;justify-self:end}
 .collage figure{margin:0;position:absolute;overflow:hidden;background:var(--paper-2)}
 .collage img,.collage video{width:100%;height:100%;object-fit:cover;display:block}
+.hero-slides .slide{position:absolute;inset:0;opacity:0;transition:opacity 1.1s ease}
+.hero-slides .slide.on{opacity:1}
 .c-main{right:0;top:2%;width:64%;height:92%;border-radius:999px 999px 34px 34px;box-shadow:0 24px 50px rgba(103,48,30,.18)}
 .dot{position:absolute;border-radius:50%;pointer-events:none}
 .dot.d1{left:0;bottom:2%;width:46%;aspect-ratio:1;background:var(--clay);z-index:2;display:grid;place-items:center;animation:bob 9s ease-in-out infinite alternate;box-shadow:0 18px 40px rgba(103,48,30,.18)}
@@ -393,7 +395,7 @@ section{scroll-margin-top:96px}
 .season .flake svg{display:block;width:100%;height:100%}
 .season .flake.red{color:var(--clay);filter:none;opacity:.7}
 @keyframes snow{0%{transform:translate(0,-20px) rotate(0)}50%{transform:translate(18px,300px) rotate(120deg)}100%{transform:translate(-8px,700px) rotate(240deg)}}
-.season.theme-advent .season-img{background:var(--clay)}
+.season.theme-advent .season-img{background:#EEDFCF}
 .season.theme-advent .season-body{padding-top:64px}
 .season.theme-advent .season-body::before{background:var(--clay);opacity:.12}
 .season.theme-advent .season-date{background:var(--clay);color:var(--on-clay)}
@@ -419,17 +421,17 @@ section{scroll-margin-top:96px}
 .season-row input:focus{outline:3px solid var(--focus);outline-offset:1px}
 .season .consent{font-size:13.5px}
 .season-close{position:absolute;top:14px;right:14px;z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:var(--paper);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px rgba(51,33,27,.12)}
-@media (max-width:700px){.season-inner{grid-template-columns:1fr;overflow:auto}.season-img{padding:14px 14px 0;min-height:0}.season-img img{min-height:0;height:220px;border-radius:24px}.season-body{padding:24px 22px 24px;overflow:visible}.season h3:focus{outline:none}
+@media (max-width:700px){.season-inner{grid-template-columns:1fr;overflow:auto}.season-img{padding:14px 14px 0;min-height:0}.season-img img{min-height:0;height:250px;border-radius:24px;object-position:50% 54%}.season-body{padding:24px 22px 24px;overflow:visible}.season h3:focus{outline:none}
 .season h3{padding-right:0}}
 
 /* Studio */
 .studio{background:var(--lilac)}
-.gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(3,clamp(150px,17vw,260px));grid-template-areas:"a b c d" "a e c f" "g e h h";gap:14px}
+.gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(3,clamp(150px,17vw,260px));grid-template-areas:"a b c d" "a e c f" "g e h i";gap:14px}
 .gallery figure{margin:0;overflow:hidden;border-radius:24px;min-width:0}
 .gallery img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
 .gallery figure:hover img{transform:scale(1.04)}
 .gallery figure:first-child{border-radius:999px 999px 24px 24px}
-@media (max-width:700px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(6,150px);grid-template-areas:"a b" "a c" "d c" "e f" "e g" "h h"}}
+@media (max-width:700px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(6,150px);grid-template-areas:"a b" "a c" "d c" "e f" "e g" "h i"}}
 
 .films{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:14px}
 .film{margin:0;position:relative;aspect-ratio:9/13;border-radius:240px 240px 24px 24px;overflow:hidden;background:var(--paper-2);min-width:0}
@@ -607,7 +609,11 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <div class="collage">
         <span class="dot d2" aria-hidden="true"></span>
         <span class="dot d3" aria-hidden="true"></span>
-        <figure class="c-main"><video src="video/ankommen.mp4" poster="img/ankommen-poster.jpg" autoplay muted loop playsinline preload="auto" aria-label="Video: Gemütliche Ecke im FORMA Studio zum Ankommen und Durchatmen" width="720" height="1280"></video></figure>
+        <figure class="c-main hero-slides" id="hero-slides">
+          <img class="slide on" src="img/atelier-ecke.jpg" alt="Gemütliche Ecke im FORMA Studio mit Fell-Stuhl und Wandnische" style="object-position:28% 50%" width="1400" height="1867">
+          <video class="slide" src="video/regal-nische.mp4" poster="img/regal-nische-poster.jpg" muted playsinline preload="auto" aria-label="Video: Handgemachte Becher und Vase in der Wandnische" width="720" height="1280"></video>
+          <img class="slide" src="img/scheiben-studio.jpg" alt="Die Töpferscheiben im FORMA Studio" style="object-position:50% 60%" loading="lazy" width="1142" height="2000">
+        </figure>
         <span class="dot d1" aria-hidden="true">
           <svg viewBox="0 0 200 200">
             <g class="ring"><path id="ring-path" d="M100 100m-80 0a80 80 0 1 1 160 0a80 80 0 1 1-160 0" fill="none"></path>
@@ -997,6 +1003,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <figure style="grid-area:e"><img src="img/becher-tonkugeln.jpg" alt="Becher und Tonkugeln auf dem Werktisch" loading="lazy" style="object-position:50% 30%"></figure>
         <figure style="grid-area:g"><img src="img/schalen.jpg" alt="Handgemachte Schalen und Becher von oben" loading="lazy"></figure>
         <figure style="grid-area:h"><img src="img/schlicker.jpg" alt="Frisch gedrehte Becher in einem Eimer mit Tonschlicker" loading="lazy" style="object-position:50% 45%"></figure>
+        <figure style="grid-area:i"><img src="img/tonkugeln.jpg" alt="Vorbereitete Tonkugeln auf dem Werktisch" loading="lazy"></figure>
       </div>
     </div>
     <svg class="wave" style="--to:var(--paper);background:var(--lilac)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40c160 44 330 66 520 50s320-72 500-70 290 44 420 40v60H0z"></path></svg>
@@ -1843,5 +1850,13 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 try{if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){document.querySelectorAll('video[autoplay]').forEach(function(v){v.removeAttribute('autoplay');v.pause();});}}catch(e){}
 </script>
 
+<script>
+(function(){var box=document.getElementById('hero-slides');if(!box)return;var sl=[].slice.call(box.querySelectorAll('.slide')),i=0;
+if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+function show(n){sl[i].classList.remove('on');i=n%sl.length;var el=sl[i];el.classList.add('on');
+ if(el.tagName==='VIDEO'){try{el.currentTime=0;var p=el.play();if(p&&p.catch)p.catch(function(){});}catch(e){}setTimeout(function(){show(i+1)},6000);}
+ else setTimeout(function(){show(i+1)},4000);}
+setTimeout(function(){show(1)},4000);})();
+</script>
 </body>
 </html>
