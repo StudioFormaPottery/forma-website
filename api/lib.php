@@ -280,6 +280,28 @@ function forma_migrate(PDO $pdo): void
         forma_set_setting($pdo, 'remove_dates_v7', '1');
     }
 
+    // 11.10.2026: Zweites Herbst-Template im Shop: Herbst-Teetasse (Deutsch & Englisch).
+    if (forma_setting($pdo, 'tpl_teetasse_v13') === null) {
+        $seed = __DIR__ . '/seed';
+        $dir = forma_template_dir();
+        $ok = true;
+        foreach (['teetasse-de.pdf', 'teetasse-en.pdf', 'teetasse.jpg'] as $f) {
+            if (!is_file("$dir/seed-$f")) {
+                $ok = $ok && is_file("$seed/$f") && @copy("$seed/$f", "$dir/seed-$f");
+            }
+        }
+        if ($ok) {
+            $has = $pdo->prepare('SELECT COUNT(*) FROM templates WHERE title = ?');
+            $has->execute(['Herbst-Teetasse']);
+            if ((int)$has->fetchColumn() === 0) {
+                $pdo->prepare('INSERT INTO templates (title, description, season, age, level, price_cents, file, file_en, image, visible, sort, created_at) VALUES (?,?,?,?,?,?,?,?,?,1,1,?)')
+                    ->execute(['Herbst-Teetasse', 'Eine schlichte Teetasse aus der Platte mit Henkel, kleinem Herbstblatt und passender Untertasse. Anfängerfreundlich, mit Schablonen in Originalgröße und einer Schritt-für-Schritt-Anleitung in Bildern.',
+                        'herbst', 'erwachsene', 1, 399, 'seed-teetasse-de.pdf', 'seed-teetasse-en.pdf', 'seed-teetasse.jpg', date('c')]);
+            }
+            forma_set_setting($pdo, 'tpl_teetasse_v13', '1');
+        }
+    }
+
     // 11.10.2026: Gratis-Template für November vorab planen (Sternen-Anhänger), wird am 1. 11. automatisch aktiv.
     if (forma_setting($pdo, 'maker_sterne_v12') === null) {
         $seed = __DIR__ . '/seed';
