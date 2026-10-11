@@ -60,6 +60,10 @@ try {
         $pdo->exec('ROLLBACK');
         forma_json(['ok' => false, 'error' => 'Diesen Kurs gibt es leider nicht mehr.'], 404);
     }
+    if ($course['title'] === FORMA_SERIES['bemalen']['title'] && date('Y-m-d') < '2026-10-19') {
+        $pdo->exec('ROLLBACK');
+        forma_json(['ok' => false, 'error' => 'Pottery bemalen ist ab 19. Oktober buchbar. Trag dich gern in den Newsletter ein, dann sag ich dir Bescheid.'], 409);
+    }
     if ($course['start_date'] < forma_first_bookable_date()) {
         $pdo->exec('ROLLBACK');
         forma_json(['ok' => false, 'error' => 'Für diesen Termin ist die Anmeldung schon geschlossen. Anmeldeschluss ist immer am Vorabend um 17 Uhr. Ruf mich gern an: ' . FORMA_PHONE], 409);

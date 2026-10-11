@@ -544,6 +544,11 @@ if ($action === 'invoice_settings') {
     go($self . '?view=rechnungen', 'Gespeichert.');
 }
 
+if ($action === 'invoice_sample') {
+    forma_invoice_sample_send();
+    go($self . '?view=rechnungen', 'Die Testmails (Bestätigung und Muster-Rechnung) sind unterwegs an ' . FORMA_NOTIFY_EMAIL . '.');
+}
+
 if ($action === 'invoice_resend') {
     $id = (int)($_POST['iid'] ?? 0);
     $pdo->prepare('UPDATE invoices SET mailed = 0 WHERE id = ?')->execute([$id]);
@@ -592,6 +597,7 @@ if ($view === 'rechnungen') {
         <p class="muted">Nach jeder Online-Zahlung (Kurs, Private Pottery, Template) wird automatisch eine Rechnung erstellt und als PDF an die Kundin und an dich geschickt. Eigener Nummernkreis für Online-Verkäufe, lückenlos pro Jahr.</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <p><a class="btn" href="<?= forma_h($self) ?>?view=rechnungen_export">Liste herunterladen (CSV für die Buchhaltung)</a></p>
+        <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="invoice_sample"><button class="link" type="submit">Testmail mit Muster-Rechnung an mich schicken</button></form>
         <p class="muted small"><?= count($rows) ?> Rechnungen · <?= forma_h(forma_euro((int)$sum)) ?> brutto</p>
         <div class="list">
         <?php foreach ($rows as $r): ?>

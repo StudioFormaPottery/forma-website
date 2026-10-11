@@ -379,3 +379,23 @@ function forma_sheet_sync(PDO $pdo): void
         error_log('FORMA sheet: ' . $e->getMessage());
     }
 }
+
+/** Probe: Buchungsbestätigung und Muster-Rechnung an Vivien, ohne Nummer aus dem Nummernkreis zu verbrauchen. */
+function forma_invoice_sample_send(): void
+{
+    $inv = ['nr' => 'MUSTER-' . date('Y') . '-000', 'issued_at' => date('Y-m-d'), 'service_date' => '04.11.2026', 'name' => 'Lena Muster',
+        'email' => FORMA_NOTIFY_EMAIL, 'address' => "Musterweg 1\n6561 Ischgl", 'country' => 'AT', 'vat_rate' => 20, 'vat_note' => 'MUSTER – keine gültige Rechnung.',
+        'items' => json_encode([
+            ['text' => 'Pottery bemalen · Atelierbeitrag', 'detail' => 'Mi, 4. 11. 2026 · 15–18 Uhr · FORMA Studio, Mathon', 'qty' => 1, 'unit' => 1500],
+            ['text' => 'Tasse mit Henkel zum Bemalen', 'detail' => '', 'qty' => 1, 'unit' => 1800],
+            ['text' => 'FORMA Mug zum Bemalen', 'detail' => '', 'qty' => 1, 'unit' => 2200],
+        ], JSON_UNESCAPED_UNICODE),
+        'gross_cents' => 5500, 'net_cents' => 4583, 'vat_cents' => 917];
+    $confirm = "Hallo Lena,\n\ndanke für deine Buchung! Deine Zahlung ist angekommen und dein Platz für „Pottery bemalen“ ist fix. Ich freue mich schon sehr auf dich.\n\n"
+        . "Hier noch einmal alles auf einen Blick:\n\nKurs: Pottery bemalen\nTermin: Mi, 4. 11. 2026 · 15–18 Uhr\nPersonen: 1 Person\n"
+        . "Deine Stücke: 1× Tasse mit Henkel (€ 18), 1× FORMA Mug (€ 22)\nBezahlt: € 55 (online, danke!)\nOrt: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n\n"
+        . "Bitte komm in Kleidung, die schmutzig werden darf. Schürzen und Werkzeug habe ich im Studio.\n\n"
+        . "Falls du Fragen hast oder doch verhindert bist, antworte einfach auf diese E-Mail oder ruf mich an: " . FORMA_PHONE . "\n\nBis bald im Studio!\nVivien\n";
+    forma_mail(FORMA_NOTIFY_EMAIL, '[Test] Dein Platz ist fix: Pottery bemalen', $confirm);
+    forma_mail(FORMA_NOTIFY_EMAIL, '[Test] Deine Rechnung ' . $inv['nr'] . ' von FORMA', forma_invoice_mailtext($inv), null, [['Rechnung_' . $inv['nr'] . '.pdf', forma_invoice_pdf($inv), 'application/pdf']]);
+}

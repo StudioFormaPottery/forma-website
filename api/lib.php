@@ -696,6 +696,10 @@ function forma_upcoming_courses(PDO $pdo, bool $onlyVisible = true): array
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$onlyVisible ? forma_first_bookable_date() : date('Y-m-d')]);
     $rows = $stmt->fetchAll();
+    // Pottery bemalen ist erst ab 19.10.2026 buchbar, egal was in der Verwaltung eingestellt ist.
+    if ($onlyVisible && date('Y-m-d') < '2026-10-19') {
+        $rows = array_values(array_filter($rows, fn($r) => $r['title'] !== FORMA_SERIES['bemalen']['title']));
+    }
     foreach ($rows as &$r) {
         $r['booked'] = forma_booked($pdo, (int)$r['id']);
         $r['free'] = max(0, (int)$r['capacity'] - $r['booked']);
