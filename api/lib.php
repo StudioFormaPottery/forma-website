@@ -674,9 +674,12 @@ function forma_mail_html(string $text): string
     }
     return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>'
         . '<body style="margin:0;padding:0;background:#EEE2D4"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#EEE2D4"><tr><td align="center" style="padding:24px 12px">'
-        . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FBF1EA;border-radius:22px"><tr><td style="padding:28px 30px;font-family:Arial,Helvetica,sans-serif;font-size:15.5px;line-height:1.6;color:#33211B">'
-        . '<img src="https://www.forma-pottery.com/img/forma-logo.png" width="56" height="56" alt="FORMA" style="display:block;width:56px;height:56px;margin:0 0 18px">'
-        . $out . '</td></tr></table></td></tr></table></body></html>';
+        . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FBF1EA;border-radius:22px;overflow:hidden">'
+        . '<tr><td align="center" style="background:#DDBFA8;padding:22px 30px 18px"><img src="https://www.forma-pottery.com/img/forma-logo.png" width="64" height="64" alt="FORMA Earth &amp; Art" style="display:block;width:64px;height:64px">'
+        . '<div style="margin-top:8px;font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8C2C1D">FORMA Earth &amp; Art</div></td></tr>'
+        . '<tr><td style="padding:28px 30px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#33211B">'
+        . $out . '<img src="https://www.forma-pottery.com/img/signatur-liebe-zum-ton.png" width="240" alt="Mit ganz viel Liebe zum Ton" style="display:block;width:240px;max-width:80%;height:auto;margin:16px 0 0 -6px"></td></tr>'
+        . '<tr><td align="center" style="background:#E4D2BF;padding:18px 24px;font-family:Arial,Helvetica,sans-serif;font-size:12.5px;line-height:1.7;color:#674B40">FORMA Earth &amp; Art · Silvrettastraße 58 · 6562 Mathon<br><a href="https://www.forma-pottery.com" style="color:#674B40">www.forma-pottery.com</a> · <a href="https://www.instagram.com/forma.potteryartcraft" style="color:#674B40">Instagram</a></td></tr></table></td></tr></table></body></html>';
 }
 
 /** Baut Text + HTML als multipart/alternative. Gibt [Content-Type, Körper] zurück. */
