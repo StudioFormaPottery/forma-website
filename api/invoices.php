@@ -54,6 +54,7 @@ function forma_invoice_schema(PDO $pdo): void
 /** Nummernformat: Präfix + Jahr + laufende Nummer, z. B. „FO-2026-001“. Präfix und Startnummer in den Einstellungen. */
 function forma_invoice_next(PDO $pdo, int $year): array
 {
+    forma_invoice_schema($pdo);
     $prefix = forma_setting($pdo, 'invoice_prefix') ?? '';
     $start = (int)(forma_setting($pdo, 'invoice_start_' . $year) ?? 1);
     $stmt = $pdo->prepare('SELECT MAX(seq) FROM invoices WHERE year = ?');
