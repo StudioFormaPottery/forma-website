@@ -171,6 +171,7 @@ section{scroll-margin-top:96px}
 .section-head{display:flex;flex-direction:column;gap:12px;margin-bottom:clamp(32px,4vw,52px);max-width:680px}
 .section-head h2,.about-copy h2{font-size:clamp(38px,5.4vw,66px);color:var(--clay)}
 .section-head p{color:var(--ink-soft);max-width:56ch}
+@media (min-width:781px){.section-head.right{margin-left:auto;text-align:right;align-items:flex-end}.section-head.right p{margin-left:auto}}
 
 /* Angebote */
 .offers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:stretch}
@@ -359,8 +360,19 @@ section{scroll-margin-top:96px}
 .post-lead{margin:0 0 10px;font-size:15.5px;line-height:1.5;color:var(--ink)}
 .post-lead b{color:var(--clay)}
 .post-sec{padding-block:0 clamp(48px,7vw,96px)}
-.post-card{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(20px,4vw,48px);align-items:center;padding:clamp(24px,4vw,48px);border-radius:32px;background:var(--paper-2);border:1px solid var(--line)}
-@media (max-width:780px){.post-card{grid-template-columns:1fr}}
+.post-card{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(20px,4vw,48px);align-items:center;padding:clamp(24px,4vw,48px);border-radius:32px;background:var(--paper-2);border:1px solid var(--line)}
+@media (max-width:780px){.post-card{grid-template-columns:minmax(0,1fr)}.post-copy .post-badge{white-space:normal;width:auto}}
+.post-copy h2{color:var(--clay)}
+.post-card{background:#F2DDCC!important;border:0!important;padding:clamp(30px,4.5vw,56px)!important}
+.post-card .post-copy,.post-card .post-form,.post-card .post-done{position:relative;z-index:1}
+.post-card .maker-wave path{stroke:var(--clay);opacity:.4}
+.post-copy .post-badge{font-size:18px;padding:8px 18px 8px 14px}
+.post-copy .post-badge svg{width:22px;height:22px}
+.post-copy p{font-size:19px}
+.post-copy .post-maker{font-size:18px}
+.post-form label:not(.consent){font-size:17px}
+.post-form .consent{font-size:16px}
+@media (min-width:900px){.post-copy p{font-size:21px}.post-copy .post-maker{font-size:19px}.post-copy .post-badge{font-size:20px}}
 .post-copy h2{margin:12px 0 10px}
 .post-copy p{color:var(--ink-soft)}
 .post-maker{font-size:16px}
@@ -379,14 +391,14 @@ section{scroll-margin-top:96px}
 .maker-perks li{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:18px;background:rgba(251,241,234,.12);border:1px dashed rgba(251,241,234,.45)}
 .maker-perks b{font-family:var(--display);font-weight:650;font-size:18px;color:var(--on-clay)}
 .maker-perks span{font-size:14.5px;line-height:1.4;color:#F3E2D6}
-.maker-seal{position:absolute;right:clamp(18px,3vw,40px);top:clamp(18px,3vw,36px);z-index:2;width:104px;height:104px;border-radius:50%;background:var(--blush);color:var(--clay);display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-10deg);box-shadow:0 6px 18px rgba(51,33,27,.25)}
+.maker-seal{position:absolute;right:clamp(18px,3vw,44px);top:clamp(18px,3vw,36px);z-index:2;width:150px;height:150px;border-radius:50%;background:var(--blush);color:var(--clay);display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-10deg);box-shadow:0 6px 18px rgba(51,33,27,.25)}
 .maker-seal svg{position:absolute;inset:0;width:100%;height:100%;animation:sealspin 30s linear infinite}
 .maker-seal text{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;fill:var(--clay);font-weight:500}
-.maker-seal b{font-family:var(--display);font-size:26px;line-height:1}
-.maker-seal i{font-style:normal;font-size:11px;letter-spacing:.06em}
+.maker-seal b{font-family:var(--display);font-size:38px;line-height:1}
+.maker-seal i{font-style:normal;font-size:15px;letter-spacing:.06em}
 @keyframes sealspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.maker-seal svg{animation:none}}
-@media (max-width:780px){.maker-seal{width:84px;height:84px;right:14px;top:14px}.maker-seal b{font-size:21px}.maker .kicker,.maker h3{padding-right:86px}}
+@media (max-width:780px){.maker-seal{width:100px;height:100px;right:12px;top:12px}.maker-seal b{font-size:26px}.maker-seal i{font-size:11.5px}.maker .kicker,.maker h3{padding-right:100px}}
 /* Aktuelle Events & Workshops */
 .events-sec .section-head{margin-bottom:clamp(18px,3vw,32px)}
 .event-card{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr);gap:clamp(20px,4vw,52px);align-items:start;padding:clamp(22px,4vw,44px);border-radius:32px;background:var(--paper-2);border:1px solid var(--line)}
@@ -1255,7 +1267,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 
   <section class="section events-sec" id="events">
     <div class="wrap">
-      <div class="section-head">
+      <div class="section-head right">
         <p class="eyebrow">Aktuelle Events &amp; Workshops</p>
         <h2 class="display">Was gerade im Atelier los ist</h2>
       </div>
@@ -1319,7 +1331,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 
   <section class="section templates" id="templates">
     <div class="wrap">
-      <div class="section-head">
+      <div class="section-head right">
         <p class="eyebrow">Für zu Hause</p>
         <h2 class="display">Templates zum Selbermachen</h2>
         <p>Schablonen und Bild-Anleitungen für deine eigene Pottery-Praxis zu Hause, auf Deutsch und Englisch. Nach dem Kauf sofort als PDF zum Herunterladen.</p>
@@ -1472,7 +1484,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 
   <section class="post-sec" id="forma-post">
     <div class="wrap">
-      <div class="post-card">
+      <div class="post-card" id="post-card">
+        <svg class="maker-wave" aria-hidden="true"><path></path></svg>
         <div class="post-copy">
           <p class="post-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M4 7l8 6 8-6"></path></svg><span><b>FORMA Post</b> · der Newsletter aus dem Atelier</span></p>
           <h2 class="display">Nichts mehr verpassen</h2>
@@ -2134,6 +2147,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     ['#ueber-mich',{right:'5%',top:'36px'},74,0],['#ueber-mich',{right:'14%',bottom:'40px'},52,1],
     ['#gutschein',{right:'31%',top:'30%'},74,0],['#gutschein',{left:'46%',bottom:'18%'},52,0],
     ['#kontakt',{left:'3%',top:'36px'},70,1],['#kontakt',{right:'3%',bottom:'50px'},58,0],
+    ['#maker-club',{right:'30%',bottom:'34px'},70,1],['#maker-club',{right:'4%',bottom:'26px'},62,0],['#maker-club',{right:'24%',top:'26px'},50,0],['#maker-club',{right:'6%',top:'48%'},46,0],
+    ['#events',{left:'3%',top:'40px'},72,1],['#events',{right:'4%',bottom:'30px'},54,0],
+    ['#post-card',{right:'4%',top:'18px'},62,1],['#post-card',{left:'2.5%',bottom:'14px'},54,0],['#post-card',{left:'48%',top:'16px'},44,0],
     ['.foot',{right:'6%',top:'90px'},56,0]
   ];
   function seasonFor(d){var m=d.getMonth()+1;return m>=3&&m<=5?'fruehling':m>=6&&m<=8?'sommer':m>=9&&m<=11?'herbst':'winter';}
@@ -2269,8 +2285,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   });
   // Maker Club: verspielter Wellenrahmen (Wellenlänge bleibt auf jeder Bildschirmgröße gleich)
   (function(){
-    var box=document.getElementById('maker-club');if(!box)return;
-    var svg=box.querySelector('.maker-wave'),path=svg.querySelector('path');
+    document.querySelectorAll('.maker-wave').forEach(function(svg){
+    var box=svg.parentElement,path=svg.querySelector('path');
     function draw(){
       var w=svg.clientWidth,h=svg.clientHeight;if(!w||!h)return;
       var A=4,L=34,r=22,d='',first=true;
@@ -2286,6 +2302,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       path.setAttribute('d',d+'Z');
     }
     draw();if(window.ResizeObserver)new ResizeObserver(draw).observe(box);else window.addEventListener('resize',draw);
+    });
   })();
   // Studio: Videos und Fotos wechseln sich ruhig ab (alle 5 Sekunden, versetzt)
   (function(){
@@ -2298,13 +2315,19 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     films.forEach(function(f,i){
       var list=(PICS[i]||[]).map(function(p){var im=document.createElement('img');im.className='film-pic';im.alt=p[2];im.loading='lazy';im.src='img/'+p[0];im.style.objectPosition=p[1];f.insertBefore(im,f.querySelector('figcaption'));return im;});
       if(!list.length||reduce)return;
-      var step=0,n=list.length+1;
-      setTimeout(function tick(){
+      var v=f.querySelector('video'),step=0,n=list.length+1;
+      function videoMs(){var d=v&&isFinite(v.duration)&&v.duration>0?v.duration:6;return Math.max(5000,d*1000);}
+      function tick(){
         step=(step+1)%n;
         list.forEach(function(im,k){im.classList.toggle('on',step===k+1);});
         f.classList.toggle('pic-on',step>0);
-        setTimeout(tick,5000);
-      },5000+i*1200);
+        if(step===0&&v){try{v.currentTime=0;var pr=v.play();if(pr&&pr.catch)pr.catch(function(){});}catch(e){}}
+        setTimeout(tick,step===0?videoMs():5000);
+      }
+      // erst das Video einmal ganz durchlaufen lassen, dann Foto
+      function start(){if(v){try{v.currentTime=0;}catch(e){}}setTimeout(tick,videoMs()+i*900);}
+      var started=false;function go(){if(!started){started=true;start();}}
+      if(v&&v.readyState<1){v.addEventListener('loadedmetadata',go,{once:true});setTimeout(go,4000);}else go();
     });
   })();
   // Ausklappen (am Handy): Knopf zeigt/verbirgt den folgenden Bereich
