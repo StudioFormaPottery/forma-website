@@ -777,6 +777,54 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .team-card .btn-team-ghost:hover{background:rgba(251,241,234,.12)}
 .team-art{width:100%;max-width:340px;justify-self:center}
 @media (max-width:760px){.team-card{grid-template-columns:1fr}.team-art{max-width:220px;order:-1}}
+
+/* Lesbarkeit: nichts zu klein (Handy und Desktop) */
+.kicker{font-size:14px}
+.facts dt,.contact-list dt,.week-label{font-size:14px}
+.note{font-size:16px}
+.hero .day{font-size:14px}.hero .sub{font-size:15px}
+.film figcaption{font-size:15.5px}
+.maker-perks span{font-size:17px;line-height:1.45}
+.maker-perks b{font-size:20px}
+.tpl-body p{font-size:17px}
+.tpl-tags span{font-size:14.5px}
+.tpl-level{font-size:15.5px}
+.maker-seal i{font-size:15px}
+.post-form label:not(.consent){font-size:18px}
+.post-form input[type=text],.post-form input[type=email]{font-size:19px;padding:15px 20px}
+.post-form .consent{font-size:16.5px}
+.post-form .btn{font-size:19px;min-height:56px}
+@media (min-width:900px){
+  .kicker{font-size:17px}
+  .note{font-size:18px}
+  .facts dt,.contact-list dt,.week-label{font-size:17px}
+  .hero .day{font-size:17px}
+  .film figcaption{font-size:18px}
+  .maker-perks span{font-size:20px}.maker-perks b{font-size:23px}
+  .maker-perks li{padding:16px 18px}
+  .tpl-body p{font-size:19px}
+  .tpl-tags span{font-size:16.5px}.tpl-level{font-size:17px}
+  .post-form label:not(.consent){font-size:20px}
+  .post-form input[type=text],.post-form input[type=email]{font-size:21px;padding:16px 22px}
+  .post-form .consent{font-size:18px}
+  .post-form .btn{font-size:21px;min-height:62px}
+}
+/* Template-Shop als eigener, eingerahmter Shop */
+.shop-head{position:relative;overflow:hidden;background:var(--paper);border:0;border-radius:32px;padding:clamp(28px,4.5vw,56px);margin-bottom:28px}
+.shop-head .shop-copy,.shop-head .shop-art{position:relative;z-index:1}
+.shop-head .maker-wave path{stroke:var(--clay);opacity:.4}
+.shop-badge{display:inline-flex;align-items:center;gap:10px;margin:0;padding:8px 18px 8px 14px;border-radius:999px;background:var(--clay);color:var(--on-clay);font-size:17px;width:max-content;max-width:100%}
+.shop-badge b{font-family:var(--display);font-weight:650}
+.shop-head h3{font-size:clamp(36px,4.6vw,58px)}
+.shop-head p:not(.kicker){font-size:19px}
+.shop-trust{font-size:16px!important;color:var(--clay)!important;font-weight:500}
+.shop-steps li{font-size:17px;padding:12px 18px 12px 12px}
+.shop-steps b{width:34px;height:34px;font-size:16px}
+.tpl-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:24px}
+@media (min-width:900px){.shop-badge{font-size:20px}.shop-head p:not(.kicker){font-size:21px}.shop-trust{font-size:18px!important}.shop-steps li{font-size:19px}}
+@media (max-width:700px){.shop-badge{white-space:normal;width:auto}.shop-head{grid-template-columns:minmax(0,1fr)}}
+
+.season-close{z-index:6}
 </style>
 </head>
 <body>
@@ -1384,11 +1432,13 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   <section class="shop-sec" id="shop">
     <svg class="wave" style="--to:var(--lilac);background:var(--paper)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70c150 30 300 46 470 28s300-74 480-72 330 58 490 52v42H0z"></path></svg>
     <div class="wrap">
-      <div class="shop-head">
+      <div class="shop-head" id="shop-head">
+        <svg class="maker-wave" aria-hidden="true"><path></path></svg>
         <div class="shop-copy">
-          <p class="kicker">Template-Shop · digitaler Download</p>
+          <p class="shop-badge"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 01-2 1.8H8.2a2 2 0 01-2-1.8z"></path><path d="M9 8V6a3 3 0 016 0v2"></path></svg><span><b>Template-Shop</b> · hier kannst du Templates kaufen</span></p>
           <h3 id="shop-title">Der Herbst-Shop</h3>
           <p>Jede Jahreszeit kommen neue Templates in den Shop. Du suchst dir eins aus, bezahlst online und lädst dein PDF sofort herunter.</p>
+          <p class="shop-trust">Sofort als PDF · Deutsch &amp; Englisch · sichere Bezahlung mit Karte, Apple Pay oder Google Pay</p>
         <ol class="shop-steps">
           <li><b>1</b><span>Template aussuchen</span></li>
           <li><b>2</b><span>Online bezahlen</span></li>
