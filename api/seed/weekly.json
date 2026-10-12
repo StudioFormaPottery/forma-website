@@ -20,5 +20,35 @@
   "price_cents": 299,
   "sort": 0,
   "description": "Zwei Teile zusammenstecken und der Anhänger wird räumlich: Kugel in 10 und 8 cm, Stern und Baum zum Hinstellen. Einfache Bild-Anleitung für Kinder von 7 bis 10 Jahren."
+ },
+ {
+  "key": "fledermaus-wandteelicht",
+  "publish_at": "2026-10-12T13:00:00",
+  "title": "Fledermaus-Wandteelicht",
+  "season": "herbst",
+  "level": 2,
+  "price_cents": 399,
+  "sort": 0,
+  "description": "Eine Fledermaus mit geschwungenen Flügeln für die Wand, mit kleiner Ablage für ein Teelicht. Hängt an einem Nagel und sorgt für gemütlich-gruseliges Licht zu Halloween."
+ },
+ {
+  "key": "hexenhut-windlicht",
+  "publish_at": "2026-10-12T13:00:00",
+  "title": "Hexenhut-Windlicht",
+  "season": "herbst",
+  "level": 2,
+  "price_cents": 399,
+  "sort": 0,
+  "description": "Ein schiefer Hexenhut mit gewellter Krempe und kleinen Sternen, durch die das Licht funkelt. Einfach über ein Teelicht stellen."
+ },
+ {
+  "key": "gespenst-windlicht",
+  "publish_at": "2026-10-12T13:00:00",
+  "title": "Gespenst-Windlicht",
+  "season": "herbst",
+  "level": 1,
+  "price_cents": 399,
+  "sort": 0,
+  "description": "Ein freundliches kleines Gespenst mit Zipfelmütze und Ärmchen. Über ein Teelicht gestellt, leuchten Augen und Mund in der Dunkelheit."
  }
 ]
