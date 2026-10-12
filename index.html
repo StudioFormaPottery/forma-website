@@ -949,6 +949,18 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .vchoice label.popular input:checked+span .maker-wave path{opacity:1;stroke-width:2.5}
 .pop-badge{position:absolute;top:-12px;right:14px;z-index:1;font-style:normal;font-size:13.5px;font-weight:600;padding:4px 12px;border-radius:999px;background:var(--clay);color:var(--on-clay);box-shadow:0 4px 10px rgba(51,33,27,.18);white-space:nowrap}
 .vchoice.hours{padding-top:6px}
+
+/* Stimmen der Gäste (echte Google-Bewertungen), Tontöpfchen statt Sterne */
+.reviews-sec{padding-block:0 clamp(40px,6vw,72px)}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px;max-width:1100px;margin:0 auto}
+.review{position:relative;background:var(--paper-2);border-radius:28px;padding:26px 28px;display:flex;flex-direction:column;gap:12px}
+.review .pots{display:flex;gap:6px}
+.review .pots svg{width:30px;height:30px}
+.review blockquote{margin:0;font-size:19px;line-height:1.6;color:var(--ink)}
+.review cite{font-style:normal;font-weight:600;color:var(--clay)}
+.review cite span{font-weight:400;color:var(--ink-soft)}
+.reviews-more{text-align:center;margin-top:18px;font-size:18px}
+@media (min-width:900px){.review blockquote{font-size:21px}}
 </style>
 </head>
 <body>
@@ -1572,9 +1584,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="eyebrow">Teambuilding &amp; Events</p>
           <h2 id="team-titel">Gemeinsam formen verbindet</h2>
           <p>Du möchtest, dass dein Team ein Stück näher zusammenrückt? Dann bucht doch einen gemeinsamen Töpferworkshop im FORMA. Raus aus dem Alltag, rein in den Ton: Zusammen mit den Händen etwas zu gestalten entschleunigt, macht Spaß und stärkt den Zusammenhalt.</p>
-          <ul class="team-tags"><li>Firmen &amp; Teams</li><li>Geburtstage &amp; Abschiede</li><li>Mit Freundinnen</li><li>Vereine &amp; Feiern</li></ul>
+          <ul class="team-tags"><li>Firmen &amp; Teams</li><li>Geburtstage &amp; Jubiläen</li><li>Mit Freundinnen</li><li>Vereine &amp; Feiern</li></ul>
           <p class="team-facts">4 bis 8 Personen · Halbtages-Event über 4 Stunden oder Töpfer-Wochenende mit Übernachtung im Heindalishof</p>
-          <div class="team-btns"><a class="btn btn-team" href="#teambuilding" data-private="team">Event anfragen</a><a class="btn btn-team-ghost" href="downloads/FORMA_Teambuilding.pdf?v=8" target="_blank" rel="noopener">Infos &amp; Preise (PDF)</a></div>
+          <div class="team-btns"><a class="btn btn-team" href="#teambuilding" data-private="team">Event anfragen</a><a class="btn btn-team-ghost" href="downloads/FORMA_Teambuilding.pdf?v=9" target="_blank" rel="noopener">Infos &amp; Preise (PDF)</a></div>
         </div>
         <span class="team-ic t1" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 4c2 15 12 25 28 28-16 3-26 13-28 28-2-15-12-25-28-28 16-3 26-13 28-28z" fill="#FBF1EA"/></svg></span>
         <span class="team-ic t2" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M24 6c-4 4 4 6 0 11M32 4c-4 4 4 6 0 11M40 6c-4 4 4 6 0 11" stroke="#F1D9C6" stroke-width="2.5" fill="none" stroke-linecap="round"/><rect x="12" y="22" width="34" height="32" rx="8" fill="#F1D9C6"/><path d="M46 29h4a7 7 0 010 14h-4" stroke="#F1D9C6" stroke-width="5" fill="none"/><path d="M14 32h30" stroke="#8C2C1D" stroke-width="3"/></svg></span>
@@ -1675,6 +1687,17 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         </form>
         <p class="post-done" id="post-done" hidden></p>
       </div>
+    </div>
+  </section>
+
+  <section class="reviews-sec" id="stimmen" hidden>
+    <div class="wrap">
+      <div class="section-head center">
+        <p class="eyebrow">Das sagen meine Gäste</p>
+        <h2 class="display">Kleine Stimmen aus dem Atelier</h2>
+      </div>
+      <div class="reviews" id="reviews"></div>
+      <p class="reviews-more"><a href="https://g.page/r/CQ-fySEcCogPEBM" target="_blank" rel="noopener">Alle Bewertungen auf Google ansehen →</a></p>
     </div>
   </section>
 
@@ -2540,6 +2563,17 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       if(i%3===1){g+='<g transform="translate('+(x-9)+' '+(y+2)+') scale(.75)"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" fill="'+cols[i]+'"></path></g>';}
       else{g+='<line x1="'+x+'" y1="'+y+'" x2="'+x+'" y2="'+(y+8)+'" stroke="#674B40" stroke-width="1.5"></line><circle cx="'+x+'" cy="'+(y+16)+'" r="8" fill="'+cols[i]+'" stroke="rgba(51,33,27,.25)"></circle>';}}
     box.innerHTML=g+'</svg>';})();
+  // Stimmen der Gäste: nur echte Google-Bewertungen eintragen (Text unverändert, Vorname so wie auf Google)
+  var REVIEWS=[
+    // {name:'Vorname', text:'…', date:'Oktober 2026'}
+  ];
+  (function(){if(!REVIEWS.length)return;var box=document.getElementById('reviews');
+    var POT='<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 11h14l-1.6 13a3 3 0 0 1-3 2.6h-4.8a3 3 0 0 1-3-2.6z" fill="#8C2C1D"/><rect x="7.5" y="8" width="17" height="4.5" rx="2" fill="#A63A27"/><path d="M12 17c2 1.5 6 1.5 8 0" stroke="#FBF1EA" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M16 8c0-3 2-5 4-5" stroke="#674B40" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M20 3c2 0 3 1 3 2-2 1-3 0-3-2z" fill="#9AA57A"/></svg>';
+    REVIEWS.forEach(function(r){var c=document.createElement('figure');c.className='review';
+      c.innerHTML='<div class="pots" role="img" aria-label="5 von 5">'+POT+POT+POT+POT+POT+'</div>';
+      var q=document.createElement('blockquote');q.textContent='„'+r.text+'“';c.appendChild(q);
+      var f=document.createElement('figcaption');var ci=document.createElement('cite');ci.textContent=r.name;if(r.date){var sp=document.createElement('span');sp.textContent=' · '+r.date+' auf Google';ci.appendChild(sp);}f.appendChild(ci);c.appendChild(f);box.appendChild(c);});
+    document.getElementById('stimmen').hidden=false;})();
   // Ausklappen (am Handy): Knopf zeigt/verbirgt den folgenden Bereich
   document.querySelectorAll('.more-btn').forEach(function(b){
     var w=b.nextElementSibling,label=b.textContent;
