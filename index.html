@@ -399,14 +399,16 @@ section{scroll-margin-top:96px}
 .event-facts div{display:grid;grid-template-columns:96px 1fr;gap:12px}
 .event-facts dt{font-weight:600;color:var(--clay)}
 .event-facts dd{margin:0}
-.event-pieces{list-style:none;margin:0 0 16px;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
-.event-pieces li{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:16px;background:var(--paper);border:1px solid var(--line);font-size:15px;line-height:1.25}
-.event-pieces li svg{width:38px;height:32px;flex:0 0 auto}
-.event-pieces li i{font-style:normal;color:var(--ink-soft);display:block;font-size:14px}
+.event-pieces{list-style:none;margin:0 0 18px;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.event-pieces li{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:18px;background:var(--paper);border:1px solid var(--line);font-size:19px;font-weight:500;line-height:1.25}
+.event-pieces li svg{width:50px;height:42px;flex:0 0 auto}
+.event-pieces li i{font-style:normal;color:var(--clay);display:block;font-size:18px;font-weight:600;margin-top:2px}
+.event-facts{font-size:19px}.event-how{font-size:19px}
+@media (min-width:900px){.event-facts,.event-how,.event-start{font-size:21px}.event-pieces li{font-size:20px}.event-pieces li i{font-size:19px}}
 .event-how p{margin:0 0 8px}
 .event-start{padding:10px 14px;border-radius:14px;background:var(--blush)}
 .event-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-@media (max-width:600px){.event-facts div{grid-template-columns:78px 1fr;gap:8px}.event-pieces{grid-template-columns:1fr 1fr;gap:6px}.event-pieces li{padding:7px 9px;gap:7px;font-size:13.5px;overflow-wrap:anywhere}.event-pieces li svg{width:28px;height:24px}}
+@media (max-width:600px){.event-facts,.event-how{font-size:17px}.event-facts div{grid-template-columns:84px 1fr;gap:8px}.event-pieces{grid-template-columns:1fr;gap:8px}.event-pieces li{padding:10px 14px;gap:12px;font-size:17px}.event-pieces li i{font-size:16.5px}.event-pieces li svg{width:40px;height:34px}}
 /* Ausklappen am Handy */
 .more-btn,.event-when,.maker-short{display:none}
 @media (max-width:700px){
@@ -610,6 +612,10 @@ section{scroll-margin-top:96px}
 .films{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:14px}
 .film{margin:0;position:relative;aspect-ratio:9/13;border-radius:240px 240px 24px 24px;overflow:hidden;background:var(--paper-2);min-width:0}
 .film video{width:100%;height:100%;object-fit:cover;display:block}
+.film .film-pic{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.6s ease}
+.film .film-pic.on{opacity:1}
+.film figcaption{z-index:1;transition:opacity 1s ease}
+.film.pic-on figcaption{opacity:0}
 .film figcaption{position:absolute;left:14px;bottom:14px;padding:6px 14px;border-radius:999px;background:color-mix(in srgb,var(--paper) 90%,transparent);color:var(--ink);font-size:14px;font-weight:500}
 @media (max-width:700px){.films{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:64%;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}.film{scroll-snap-align:start;border-radius:160px 160px 22px 22px}}
 
@@ -2280,6 +2286,26 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       path.setAttribute('d',d+'Z');
     }
     draw();if(window.ResizeObserver)new ResizeObserver(draw).observe(box);else window.addEventListener('resize',draw);
+  })();
+  // Studio: Videos und Fotos wechseln sich ruhig ab (alle 5 Sekunden, versetzt)
+  (function(){
+    var films=[].slice.call(document.querySelectorAll('.films .film'));if(!films.length)return;
+    var PICS=[[['studio-scheiben.jpg','50% 50%','Das helle Studio mit Töpferscheiben'],['tonkugeln.jpg','50% 50%','Vorbereitete Tonkugeln auf dem Werktisch']],
+      [['studio.jpg','50% 50%','Langer Holztisch mit Vasen und Tassen'],['schlicker.jpg','50% 45%','Frisch gedrehte Becher im Tonschlicker']],
+      [['drehen.jpg','50% 60%','Vivien dreht einen Becher an der Töpferscheibe']],
+      [['abdrehen.jpg','50% 35%','Ein frisch abgedrehter Becher']]];
+    var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+    films.forEach(function(f,i){
+      var list=(PICS[i]||[]).map(function(p){var im=document.createElement('img');im.className='film-pic';im.alt=p[2];im.loading='lazy';im.src='img/'+p[0];im.style.objectPosition=p[1];f.insertBefore(im,f.querySelector('figcaption'));return im;});
+      if(!list.length||reduce)return;
+      var step=0,n=list.length+1;
+      setTimeout(function tick(){
+        step=(step+1)%n;
+        list.forEach(function(im,k){im.classList.toggle('on',step===k+1);});
+        f.classList.toggle('pic-on',step>0);
+        setTimeout(tick,5000);
+      },5000+i*1200);
+    });
   })();
   // Ausklappen (am Handy): Knopf zeigt/verbirgt den folgenden Bereich
   document.querySelectorAll('.more-btn').forEach(function(b){
