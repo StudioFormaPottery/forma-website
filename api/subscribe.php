@@ -67,10 +67,10 @@ try {
 $hello = $name !== '' ? 'Hallo ' . forma_first_name($name) . ',' : 'Hallo,';
 $link = forma_site_url() . '/api/confirm.php?t=' . $token;
 $isMaker = str_contains($source, 'Maker');
-$body = "$hello\n\n" . ($isMaker ? "schön, dass du in den FORMA Maker Club möchtest! Jeden Monat bekommst du ein Pottery-Template zum Selbermachen gratis von mir.\n\n" : "schön, dass du von neuen Kursen und Specials im FORMA Studio hören möchtest!" . ($source !== '' ? " Sobald die Termine für „{$source}“ feststehen, erfährst du es als Erste." : '') . "\n\n")
+$body = "$hello\n\n" . ($isMaker ? "schön, dass du in den FORMA Maker Club möchtest! Einmal im Monat bekommst du die Maker Post mit einem Pottery-Template zum Selbermachen gratis, dazu Rezepte und Geschichten. Die FORMA Post mit Neuigkeiten aus dem Atelier bekommst du automatisch mit dazu.\n\n" : "schön, dass du die FORMA Post bekommen möchtest! Ab und zu schreibe ich dir, wenn es Neuigkeiten, neue Kurse oder Events im Atelier gibt." . ($source !== '' && !str_contains($source, 'FORMA Post') ? " Sobald es zu „{$source}“ Neues gibt, erfährst du es als Erste." : '') . "\n\n")
     . "Bitte bestätige kurz deine E-Mail-Adresse mit einem Klick auf diesen Link" . ($isMaker ? '. Gleich danach kannst du dein Gratis-Template herunterladen' : '') . ":\n\n$link\n\n"
     . "Erst danach stehst du auf meiner Liste. Falls du dich nicht eingetragen hast, ignoriere diese E-Mail einfach, dann passiert nichts.\n\n"
     . "Bis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n"
-    . ($isMaker ? '' : "\nP.S. Kennst du schon den FORMA Maker Club? Jeden Monat ein Pottery-Template gratis, dazu kleine Rezepte zur Jahreszeit und DIY-Ideen wie Räucherbündel: " . forma_site_url() . "/#templates\n");
+    . ($isMaker ? '' : "\nP.S. Du töpferst auch selbst? Dann ist der FORMA Maker Club für dich: einmal im Monat die Maker Post mit einem Pottery-Template gratis, dazu Rezepte und Geschichten aus „Rauch, Salz & Mondlicht“: " . forma_site_url() . "/#templates\n");
 forma_mail($email, $isMaker ? 'Bitte bestätigen: dein Gratis-Template wartet' : 'Bitte bestätige deine E-Mail-Adresse', $body);
 forma_json(['ok' => true, 'confirm' => true]);

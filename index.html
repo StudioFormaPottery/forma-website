@@ -345,6 +345,25 @@ section{scroll-margin-top:96px}
 .hint{font-size:14.5px;color:var(--ink-soft)}
 .p-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 
+/* FORMA Post (Newsletter) */
+.post-badge{display:inline-flex;align-items:center;gap:8px;margin:0;padding:6px 14px 6px 10px;border-radius:999px;background:var(--blush);color:var(--clay);font-size:14px;line-height:1.3;width:max-content;max-width:100%}
+.post-badge b{font-family:var(--display);font-weight:650;letter-spacing:.01em}
+.post-badge svg{flex:0 0 auto}
+.season-body>.post-badge{margin-right:48px}
+.post-lead{margin:0 0 10px;font-size:15.5px;line-height:1.5;color:var(--ink)}
+.post-lead b{color:var(--clay)}
+.post-sec{padding-block:0 clamp(48px,7vw,96px)}
+.post-card{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(20px,4vw,48px);align-items:center;padding:clamp(24px,4vw,48px);border-radius:32px;background:var(--paper-2);border:1px solid var(--line)}
+@media (max-width:780px){.post-card{grid-template-columns:1fr}}
+.post-copy h2{margin:12px 0 10px}
+.post-copy p{color:var(--ink-soft)}
+.post-maker{font-size:16px}
+.post-form{display:flex;flex-direction:column;gap:8px}
+.post-form label:not(.consent){font-weight:500;font-size:15px}
+.post-form input[type=text],.post-form input[type=email]{font:inherit;font-size:18px;padding:13px 18px;border-radius:999px;border:1px solid var(--line);background:#FFFBF7;color:var(--ink)}
+.post-form input:focus{outline:3px solid var(--focus);outline-offset:1px}
+.post-form .btn{margin-top:6px}
+.post-done{grid-column:1/-1;margin:0;padding:16px 18px;border-radius:18px;background:var(--blush);font-weight:500}
 /* Templates & Maker Club */
 .maker{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:clamp(20px,4vw,48px);align-items:center;padding:clamp(26px,4vw,48px);border-radius:32px;background:var(--clay);color:var(--on-clay);position:relative;overflow:hidden;margin-bottom:clamp(32px,4vw,48px)}
 @media (max-width:780px){.maker{grid-template-columns:1fr}}
@@ -664,6 +683,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <a href="#ueber-mich">Hallo!</a>
       <a href="#fragen">Q&amp;A</a>
       <a href="#kontakt">Kontakt</a>
+      <a href="#forma-post">FORMA Post (Newsletter)</a>
       <a class="btn btn-solid" href="#angebote" data-book="">Kurs buchen</a>
     </nav>
   </div>
@@ -1064,11 +1084,13 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     <div class="season-inner" id="season-inner">
       <div class="season-img" id="season-img" hidden><img id="season-pic" alt=""></div>
       <div class="season-body">
+        <p class="post-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M4 7l8 6 8-6"></path></svg><span><b>FORMA Post</b> · Newsletter</span></p>
         <p class="eyebrow" id="season-eyebrow"></p>
         <h3 id="season-title" tabindex="-1"></h3>
         <p class="season-date" id="season-date" hidden></p>
         <p class="season-text" id="season-text"></p>
         <form class="season-form" id="season-form" novalidate hidden>
+          <p class="post-lead"><b>Hol dir die FORMA Post:</b> Bleib auf dem neuesten Stand und erfahre immer sofort, wenn es Neuigkeiten und neue Events im Atelier gibt.</p>
           <input type="hidden" name="t" id="season-t">
           <input type="hidden" name="source" id="season-source">
           <div class="hp" aria-hidden="true"><label for="season-website">Bitte leer lassen</label><input id="season-website" name="website" tabindex="-1" autocomplete="off"></div>
@@ -1077,19 +1099,19 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
             <input id="season-name" name="name" type="text" autocomplete="given-name" placeholder="Dein Vorname" maxlength="80" required>
             <label class="hp" for="season-email">E-Mail</label>
             <input id="season-email" name="email" type="email" autocomplete="email" placeholder="Deine E-Mail-Adresse" required>
-            <button class="btn btn-solid" type="submit" id="season-submit">Sag mir Bescheid</button>
+            <button class="btn btn-solid" type="submit" id="season-submit">FORMA Post abonnieren</button>
           </div>
-          <label class="consent"><input type="checkbox" name="consent" id="season-consent" value="1"> <span>Ja, ich möchte per E-Mail von neuen Kursen und Specials hören. Abmelden geht jederzeit. <a href="#datenschutz" id="season-privacy">Datenschutz</a></span></label>
+          <label class="consent"><input type="checkbox" name="consent" id="season-consent" value="1"> <span>Ja, ich möchte die FORMA Post bekommen: ab und zu Neuigkeiten, neue Kurse und Events aus dem Atelier. Kein Spam, abmelden geht jederzeit. <a href="#datenschutz" id="season-privacy">Datenschutz</a></span></label>
           <p class="book-error" id="season-error" role="alert" hidden></p>
         </form>
         <p id="season-done" hidden></p>
         <div class="season-maker" id="season-maker" hidden>
-          <p class="sm-k">Psst, kennst du schon den</p>
-          <p class="sm-t">FORMA Maker Club?</p>
+          <p class="sm-k">Du töpferst auch selbst, zu Hause oder mit Paperclay?</p>
+          <p class="sm-t">Dann ist der FORMA Maker Club für dich</p>
           <ul>
-            <li>Jeden Monat ein Pottery-Template gratis</li>
-            <li>Kleine Rezepte, passend zur Jahreszeit</li>
-            <li>DIY-Ideen, zum Beispiel Räucherbündel</li>
+            <li>Einmal im Monat die Maker Post, extra für Creator</li>
+            <li>Jedes Mal ein Pottery-Template gratis</li>
+            <li>Rezepte und Geschichten aus „Rauch, Salz &amp; Mondlicht“</li>
           </ul>
           <a class="btn btn-solid" href="#templates" id="season-maker-go">Zum Maker Club</a>
         </div>
@@ -1162,10 +1184,10 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       </div>
       <div class="maker">
         <div class="maker-copy">
-          <p class="kicker">FORMA Maker Club</p>
-          <h3>Jeden Monat ein Template gratis</h3>
-          <p id="maker-text">Trag dich ein und hol dir jeden Monat ein neues Pottery-Template zum Selbermachen, kostenlos, direkt in dein Postfach.</p>
-          <p class="maker-extra">Dazu gibt es kleine Rezepte zur Jahreszeit und DIY-Ideen, zum Beispiel für Räucherbündel.</p>
+          <p class="kicker">FORMA Maker Club · für Creator</p>
+          <h3>Für alle, die selbst Hand anlegen</h3>
+          <p id="maker-text">Du töpferst gern selbst, zu Hause, mit Steinzeugton oder lufttrocknendem Paperclay? Dann ist der Maker Club für dich: Einmal im Monat bekommst du die Maker Post mit einem neuen Pottery-Template gratis, direkt in dein Postfach.</p>
+          <p class="maker-extra">Dazu Rezepte zur Jahreszeit und kleine Geschichten aus „Rauch, Salz &amp; Mondlicht“. Die FORMA Post mit allen Neuigkeiten aus dem Atelier bekommst du automatisch mit dazu.</p>
           <ol class="maker-how">
             <li><b>1</b><span>Vorname und E-Mail eintragen</span></li>
             <li><b>2</b><span>Adresse in deinem Postfach bestätigen</span></li>
@@ -1183,7 +1205,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
               <input id="maker-email" name="email" type="email" autocomplete="email" placeholder="Deine E-Mail-Adresse" required>
               <button class="btn" type="submit" id="maker-submit">Gratis-Template holen</button>
             </div>
-            <label class="consent"><input type="checkbox" name="consent" id="maker-consent" value="1"> <span>Ja, ich möchte dem Maker Club beitreten und per E-Mail Templates und Neuigkeiten bekommen. Abmelden geht jederzeit. <a href="#datenschutz" class="maker-privacy">Datenschutz</a></span></label>
+            <label class="consent"><input type="checkbox" name="consent" id="maker-consent" value="1"> <span>Ja, ich möchte dem Maker Club beitreten und einmal im Monat die Maker Post mit Gratis-Template bekommen, dazu die FORMA Post mit Neuigkeiten aus dem Atelier. Abmelden geht jederzeit. <a href="#datenschutz" class="maker-privacy">Datenschutz</a></span></label>
             <p class="book-error" id="maker-error" role="alert" hidden></p>
           </form>
           <p class="maker-done" id="maker-done" hidden></p>
@@ -1292,6 +1314,32 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           </ul>
           <p class="storno-warm">Melde dich bitte trotzdem jederzeit bei mir, wenn etwas dazwischenkommt. Gemeinsam finden wir bestimmt eine Lösung, zum Beispiel einen Ersatztermin oder jemanden, der deinen Platz übernimmt. Bei der Pottery Pause zählt der erste Kurstag.</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="post-sec" id="forma-post">
+    <div class="wrap">
+      <div class="post-card">
+        <div class="post-copy">
+          <p class="post-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M4 7l8 6 8-6"></path></svg><span><b>FORMA Post</b> · der Newsletter aus dem Atelier</span></p>
+          <h2 class="display">Nichts mehr verpassen</h2>
+          <p>Neue Kurse, Events wie Pottery bemalen im Advent und kleine Specials: Trag dich ein und erfahre immer als Erste, wenn sich im Atelier etwas tut. Ich schreibe nur ab und zu, kein Spam, versprochen.</p>
+          <p class="post-maker">Du töpferst selbst? Dann schau dir auch den <a href="#templates">Maker Club für Creator</a> an, mit Gratis-Template jeden Monat.</p>
+        </div>
+        <form class="post-form" id="post-form" novalidate>
+          <input type="hidden" name="t" id="post-t">
+          <input type="hidden" name="source" value="FORMA Post">
+          <div class="hp" aria-hidden="true"><label for="post-website">Bitte leer lassen</label><input id="post-website" name="website" tabindex="-1" autocomplete="off"></div>
+          <label for="post-name">Vorname</label>
+          <input id="post-name" name="name" type="text" autocomplete="given-name" placeholder="Dein Vorname" maxlength="80" required>
+          <label for="post-email">E-Mail</label>
+          <input id="post-email" name="email" type="email" autocomplete="email" placeholder="Deine E-Mail-Adresse" required>
+          <label class="consent"><input type="checkbox" name="consent" id="post-consent" value="1"> <span>Ja, ich möchte die FORMA Post mit Neuigkeiten, neuen Kursen und Events bekommen. Abmelden geht jederzeit. <a href="#datenschutz" class="post-privacy">Datenschutz</a></span></label>
+          <button class="btn btn-solid" type="submit" id="post-submit">FORMA Post abonnieren</button>
+          <p class="book-error" id="post-error" role="alert" hidden></p>
+        </form>
+        <p class="post-done" id="post-done" hidden></p>
       </div>
     </div>
   </section>
@@ -1802,8 +1850,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     if(tplData.some(function(t){return t.season===curSeason;}))tplSeason=curSeason;
     renderTpl();
     var m=d.maker||{};
-    if(m.text)$('maker-text').textContent=m.text;
-    if(m.title){var mn=$('maker-now');mn.textContent='Template des Monats: '+m.title;mn.hidden=false;}
+    if(m.title||m.text){var mn=$('maker-now');mn.textContent=(m.title?'Template des Monats: '+m.title:'')+(m.title&&m.text?' · ':'')+(m.text||'');mn.hidden=false;}
     var mi=$('maker-img');mi.src=m.image||'img/maker-club.svg';mi.alt=m.image?'Template des Monats: '+(m.title||''):'';mi.hidden=false;
   }).catch(function(){});
   $('maker-t').value=Date.now();
@@ -2064,6 +2111,32 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       .catch(function(){se.textContent='Keine Verbindung. Bitte versuch es noch einmal.';se.hidden=false;})
       .then(function(){btn.disabled=false;});
   });
+  // FORMA Post: Anmeldung ganz unten auf der Seite
+  (function(){
+    var f=document.getElementById('post-form');if(!f)return;
+    var err=document.getElementById('post-error'),btn=document.getElementById('post-submit');
+    document.getElementById('post-t').value=Date.now();
+    f.querySelector('.post-privacy').addEventListener('click',function(){var d=document.getElementById('datenschutz');if(d)d.open=true;});
+    f.addEventListener('submit',function(e){
+      e.preventDefault();err.hidden=true;
+      var name=document.getElementById('post-name').value.trim(),email=document.getElementById('post-email').value.trim();
+      if(name.length<2){err.textContent='Bitte gib noch deinen Vornamen an.';err.hidden=false;return;}
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){err.textContent='Bitte gib eine gültige E-Mail-Adresse an.';err.hidden=false;return;}
+      if(!document.getElementById('post-consent').checked){err.textContent='Bitte setz noch das Häkchen, damit ich dir schreiben darf.';err.hidden=false;return;}
+      var wait=3200-(Date.now()-(+document.getElementById('post-t').value||0));
+      btn.disabled=true;btn.textContent='Einen Moment …';
+      setTimeout(function(){
+        fetch('api/subscribe.php',{method:'POST',body:new FormData(f)})
+          .then(function(r){return r.json().catch(function(){return {ok:false};});})
+          .then(function(d){
+            if(d&&d.ok){f.hidden=true;var dn=document.getElementById('post-done');dn.textContent=d.already?'Du bekommst die FORMA Post schon. Schön, dass du dabei bist!':'Fast geschafft, '+name.split(/\s+/)[0]+'! Ich habe dir eine E-Mail an '+email+' geschickt. Bitte klick dort kurz auf den Bestätigungslink (schau auch im Spam-Ordner).';dn.hidden=false;return;}
+            err.textContent=(d&&d.error)||'Das hat leider nicht geklappt. Bitte versuch es noch einmal.';err.hidden=false;
+          })
+          .catch(function(){err.textContent='Keine Verbindung. Bitte versuch es noch einmal.';err.hidden=false;})
+          .then(function(){btn.disabled=false;btn.textContent='FORMA Post abonnieren';});
+      },Math.max(0,wait));
+    });
+  })();
   // Direktlinks (z. B. aus der Link-in-Bio-Seite): öffnen gleich das passende Fenster
   var wantSpecial=location.hash==='#special';
   if(wantSpecial)try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
