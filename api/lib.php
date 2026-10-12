@@ -1612,7 +1612,7 @@ function forma_review_html(string $name, string $what, string $url): string
         . '<tr><td style="background:#DDBFA8;padding:0;line-height:0"><img src="' . $img . $theme . '.png" width="600" alt="FORMA Earth &amp; Art" style="display:block;width:100%;max-width:600px;height:auto"></td></tr>'
         . '<tr><td style="padding:26px 34px 6px">'
         . '<p style="margin:0 0 6px;font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-size:19px;color:#674B40">Schön, dass du da warst</p>'
-        . '<h1 style="margin:0 0 18px;font-family:Georgia,\'Times New Roman\',serif;font-weight:normal;font-size:34px;line-height:1.15;color:#8C2C1D">Danke' . ($first !== '' ? ', ' . $e($first) : '') . '!</h1>'
+        . '<h1 style="margin:0 0 18px;font-family:Georgia,\'Times New Roman\',serif;font-weight:normal;font-size:34px;line-height:1.15;color:#8C2C1D">Hallo' . ($first !== '' ? ' ' . $e($first) : '') . '!</h1>'
         . $p('Danke für deinen Besuch bei <b>„' . $e($what) . '“</b> im Atelier FORMA! Ich hoffe, du hattest eine sehr schöne und gemütliche Zeit.')
         . $p('Magst du mir einen kleinen Gefallen tun? Eine kurze Bewertung auf Google hilft mir sehr, weil andere so das Atelier finden.')
         . '</td></tr>'
