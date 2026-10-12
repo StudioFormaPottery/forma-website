@@ -531,6 +531,19 @@ if ($action === 'private_done') {
     go($self . '?view=private', $rv ? 'Gespeichert. Die Bitte um eine Google-Bewertung ist an den Gast verschickt.' : 'Gespeichert.');
 }
 
+if ($action === 'resend_confirm') {
+    $st = $pdo->prepare("SELECT * FROM subscribers WHERE id = ? AND status = 'offen'");
+    $st->execute([(int)($_POST['sid'] ?? 0)]);
+    $sub = $st->fetch();
+    if (!$sub) go($self . '?view=liste', 'Diese Adresse ist schon bestätigt oder nicht mehr da.');
+    $maker = str_contains((string)$sub['source'], 'Maker');
+    $hello = $sub['name'] !== '' ? 'Hallo ' . forma_first_name($sub['name']) . ',' : 'Hallo,';
+    forma_mail((string)$sub['email'], 'Bitte bestätige deine E-Mail-Adresse', "$hello\n\nschön, dass du dich " . ($maker ? 'für den FORMA Maker Club' : 'für meinen Newsletter') . " eingetragen hast! Magst du noch kurz deine E-Mail-Adresse bestätigen? Ein Klick auf den Button genügt.\n\n"
+        . forma_site_url() . '/api/confirm.php?t=' . $sub['token'] . "\n\nFalls du es dir anders überlegt hast, ignoriere diese E-Mail einfach.\n\nBis bald,\nVivien\n");
+    $pdo->prepare('UPDATE subscribers SET reminded_at = ? WHERE id = ?')->execute([date('c'), (int)$sub['id']]);
+    go($self . '?view=liste', 'Die Bestätigungs-Mail ist nochmal an ' . $sub['email'] . ' rausgegangen.');
+}
+
 if ($action === 'delete_subscriber') {
     $pdo->prepare('DELETE FROM subscribers WHERE id = ?')->execute([(int)($_POST['sid'] ?? 0)]);
     go($self . '?view=liste', 'Der Kontakt ist gelöscht.');
@@ -1030,6 +1043,15 @@ if ($view === 'liste') {
                 <div class="booking-head"><span class="sel"><?= forma_h($s['email']) ?></span>
                     <span class="pill"><?= ['bestaetigt' => 'bestätigt', 'offen' => 'noch nicht bestätigt', 'abgemeldet' => 'abgemeldet'][$s['status']] ?? forma_h($s['status']) ?></span></div>
                 <?php if ($s['name'] || $s['source']): ?><div class="muted small"><?= forma_h(trim($s['name'] . ($s['source'] ? ' · über „' . $s['source'] . '“' : ''), ' ·')) ?></div><?php endif; ?>
+                <?php if ($s['status'] === 'offen'):
+                    $ct = strtotime((string)$s['created_at']);
+                    if (!empty($s['reminded_at'])) $rm = 'Eingetragen am ' . date('d. m. Y, H:i', $ct) . ' · Erinnerung verschickt am ' . date('d. m. Y, H:i', strtotime((string)$s['reminded_at']));
+                    elseif ($ct > time() - 12 * 3600) $rm = 'Eingetragen am ' . date('d. m. Y, H:i', $ct) . ' · Erinnerung geht automatisch ca. ' . date('d. m., H:i', $ct + 12 * 3600) . ' Uhr raus';
+                    elseif ($ct < time() - 7 * 86400) $rm = 'Eingetragen am ' . date('d. m. Y', $ct) . ' · keine automatische Erinnerung mehr (älter als 7 Tage)';
+                    else $rm = 'Eingetragen am ' . date('d. m. Y, H:i', $ct) . ' · Erinnerung geht in Kürze raus'; ?>
+                    <div class="muted small"><?= forma_h($rm) ?></div>
+                    <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="resend_confirm"><input type="hidden" name="sid" value="<?= (int)$s['id'] ?>"><button class="link" type="submit">Bestätigungs-Mail jetzt nochmal schicken</button></form>
+                <?php endif; ?>
                 <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="delete_subscriber"><input type="hidden" name="sid" value="<?= (int)$s['id'] ?>"><button class="link" type="submit">Löschen</button></form>
             </div>
         <?php endforeach; ?>
