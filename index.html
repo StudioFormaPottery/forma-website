@@ -1741,6 +1741,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   });
   var pres=params.get('private');
   if(pres==='bezahlt')pDone('Deine Stunden sind gebucht!','Danke! Deine Zahlung ist angekommen und die Bestätigung ist unterwegs in dein Postfach. Ich schau mir deinen Wunschtermin an und schicke dir dann die Bestätigung mit deinem fixen Termin.');
+  else if(pres==='termin')pDone('Danke, alles fix!','Deine Zahlung ist angekommen und dein Termin ist fix. Eine Bestätigung und die Rechnung bekommst du per E-Mail. Ich freue mich schon sehr auf dich!');
+  else if(pres==='fehler')pDone('Das hat leider nicht geklappt','Dieser Bezahl-Link funktioniert gerade nicht. Bitte melde dich kurz bei mir, dann finden wir sofort eine Lösung: +43 677 63 90 70 80');
   else if(pres==='wartet')pDone('Fast geschafft','Deine Zahlung wird noch verarbeitet. Sobald sie da ist, bekommst du die Bestätigung per E-Mail.');
   else if(pres==='abgebrochen')pDone('Bezahlung abgebrochen','Kein Problem, es wurde nichts abgebucht. Du kannst jederzeit neu buchen oder mir erst einmal eine Anfrage schicken.');
   if(pres){try{params.delete('private');history.replaceState(null,'',location.pathname+(params.toString()?'?'+params:'')+location.hash);}catch(e){}}

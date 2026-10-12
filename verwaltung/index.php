@@ -879,7 +879,7 @@ if ($view === 'kalender') {
     foreach ($events as &$list) usort($list, fn($a, $b) => strcmp((string)$a['sort'], (string)$b['sort']));
     unset($list);
     $defaultStart = ['vormittag' => '09:00', 'nachmittag' => '14:00', 'abend' => '18:00'][$assign['wish_time'] ?? ''] ?? '18:00';
-    render_page('Kalender', function () use ($self, $flash, $assign, $open, $events, $month, $sel, $first, $defaultStart) {
+    render_page('Kalender', function () use ($self, $flash, $assign, $open, $events, $month, $sel, $first, $defaultStart, $pdo) {
         $q = fn(array $p) => forma_h($self . '?' . http_build_query(array_merge(['view' => 'kalender'], array_filter($p, fn($v) => $v !== '' && $v !== null && $v !== 0))));
         $aid = $assign ? (int)$assign['id'] : 0;
         $prev = date('Y-m', strtotime($first . ' -1 month'));
@@ -912,6 +912,7 @@ if ($view === 'kalender') {
                 <label for="c-note">Persönliche Nachricht <span class="muted small">(optional, steht in der Bestätigung)</span></label>
                 <textarea id="c-note" name="note" rows="2" maxlength="800" placeholder="z. B. Ich freu mich schon, deine Tassen mit dir zu formen!"></textarea>
                 <button class="btn" type="submit">Bestätigung mit <?= count($assign['sessions']) === 1 ? 'dem Termin' : 'allen ' . count($assign['sessions']) . ' Terminen' ?> an <?= $fn ?> schicken</button>
+                <?php if ($assign['status'] !== 'bezahlt' && forma_stripe_key()): $pl = forma_private_planned($pdo, $aid); ?><span class="small"><strong>Noch nicht bezahlt:</strong> In der Mail ist ein Knopf „Jetzt online bezahlen“ über <?= forma_h(forma_hours_text($pl) . ' · ' . forma_euro((int)round($pl * FORMA_PRIVATE_HOUR))) ?>. Sobald sie bezahlt, bekommt sie automatisch die Rechnung.</span><?php endif; ?>
                 <span class="muted small">Geht an <?= forma_h($assign['email']) ?>, mit Kalendereintrag im Anhang<?= $assign['rest'] !== null && $assign['rest'] > 0 ? '. Achtung: es sind noch ' . forma_h(forma_hours_text((float)$assign['rest'])) . ' nicht eingeplant' : '' ?>.</span>
             </form>
             <?php elseif ($assign['sessions']): ?><p class="small"><strong>Alles bestätigt.</strong> <?= $fn ?> hat ihre Termine per E-Mail. Die Bitte um eine Google-Bewertung geht automatisch ca. 1 Stunde nach dem letzten Termin raus.</p><?php endif; ?>

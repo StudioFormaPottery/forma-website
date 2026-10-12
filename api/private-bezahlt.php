@@ -13,7 +13,8 @@ try {
     $b = $stmt->fetch();
     if ($b && $token !== '' && hash_equals((string)$b['token'], $token)) {
         $status = forma_private_check($pdo, $b);
-        $result = $status === 'bezahlt' ? 'bezahlt' : ($status === 'offen' ? 'wartet' : 'abgebrochen');
+        $hasDates = (bool)forma_private_sessions($pdo, $id);
+        $result = $status === 'bezahlt' ? ($hasDates ? 'termin' : 'bezahlt') : (in_array($status, ['offen', 'anfrage-offen'], true) ? 'wartet' : 'abgebrochen');
     }
 } catch (Throwable $e) {
     error_log('FORMA private paid: ' . $e->getMessage());

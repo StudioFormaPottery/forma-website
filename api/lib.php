@@ -811,6 +811,7 @@ function forma_mail_html(string $text): string
         if (str_contains($url, 'maker-download') || str_contains($url, 'template-download') || str_contains($url, 'maker-mail')) return 'Template herunterladen';
         if (str_contains($url, 'gutschein-pdf')) return 'Gutschein herunterladen';
         if (str_contains($url, 'cancel.php')) return 'Buchung ansehen';
+        if (str_contains($url, 'private-zahlen.php')) return 'Jetzt online bezahlen';
         if (str_contains($url, '/verwaltung')) return 'Zur Verwaltung';
         if (str_contains($url, 'g.page/r/') || str_contains($url, 'writereview')) return 'Jetzt bewerten ★';
         return 'Link öffnen';
@@ -1114,6 +1115,13 @@ function forma_reconcile_payments(PDO $pdo, bool $force = false): void
             forma_private_check($pdo, $pb);
         } catch (Throwable $e) {
             error_log('FORMA reconcile private: ' . $e->getMessage());
+        }
+    }
+    foreach ($pdo->query("SELECT * FROM private_bookings WHERE status = 'anfrage' AND stripe_session != '' ORDER BY id DESC LIMIT 20")->fetchAll() as $pb) {
+        try {
+            forma_private_check($pdo, $pb);
+        } catch (Throwable $e) {
+            error_log('FORMA reconcile private later: ' . $e->getMessage());
         }
     }
     $stmt = $pdo->prepare("SELECT * FROM vouchers WHERE status = 'offen' AND stripe_session != '' AND created_at >= ?");
@@ -1459,20 +1467,54 @@ function forma_private_mails(PDO $pdo, int $id): void
 
 function forma_private_check(PDO $pdo, array $b): string
 {
-    if ($b['status'] !== 'offen' || $b['stripe_session'] === '') {
+    $later = $b['status'] === 'anfrage' && $b['stripe_session'] !== '';
+    if (($b['status'] !== 'offen' && !$later) || $b['stripe_session'] === '') {
         return (string)$b['status'];
     }
     $session = forma_stripe('GET', '/v1/checkout/sessions/' . rawurlencode($b['stripe_session']));
     if (($session['payment_status'] ?? '') === 'paid') {
-        $pdo->prepare("UPDATE private_bookings SET status = 'bezahlt', paid_at = ? WHERE id = ? AND status = 'offen'")->execute([date('c'), (int)$b['id']]);
-        forma_private_mails($pdo, (int)$b['id']);
+        $st = $pdo->prepare("UPDATE private_bookings SET status = 'bezahlt', paid_at = ? WHERE id = ? AND status = ?");
+        $st->execute([date('c'), (int)$b['id'], $later ? 'anfrage' : 'offen']);
+        if ($later) {
+            if ($st->rowCount() > 0) forma_private_paid_later($pdo, (int)$b['id']);
+        } else {
+            forma_private_mails($pdo, (int)$b['id']);
+        }
         return 'bezahlt';
     }
     if (($session['status'] ?? '') === 'expired') {
+        if ($later) {
+            $pdo->prepare("UPDATE private_bookings SET stripe_session = '' WHERE id = ? AND status = 'anfrage'")->execute([(int)$b['id']]);
+            return 'anfrage';
+        }
         $pdo->prepare("UPDATE private_bookings SET status = 'abgebrochen' WHERE id = ? AND status = 'offen'")->execute([(int)$b['id']]);
         return 'abgebrochen';
     }
-    return 'offen';
+    return $later ? 'anfrage-offen' : 'offen';
+}
+
+/** Bezahl-Link für eine Anfrage, die Vivien im Kalender eingeplant hat. */
+function forma_private_pay_url(array $b): string
+{
+    return forma_site_url() . '/api/private-zahlen.php?b=' . (int)$b['id'] . '&k=' . rawurlencode((string)$b['token']);
+}
+
+/** Eine Anfrage wurde nachträglich über den Bezahl-Link bezahlt: Danke an den Gast, Info an Vivien, Rechnung. */
+function forma_private_paid_later(PDO $pdo, int $id): void
+{
+    $st = $pdo->prepare("SELECT * FROM private_bookings WHERE id = ? AND status = 'bezahlt'");
+    $st->execute([$id]);
+    $b = $st->fetch();
+    if (!$b) return;
+    $first = forma_first_name((string)$b['name']);
+    $hours = forma_hours_text((float)$b['hours']);
+    $amount = forma_euro((int)$b['amount_cents']);
+    $sessions = forma_private_sessions($pdo, $id);
+    $list = implode("\n", array_map(fn($x) => '· ' . forma_de_date((string)$x['date']) . ' um ' . forma_de_time((string)$x['start']), $sessions));
+    forma_mail((string)$b['email'], 'Danke, deine Zahlung ist angekommen', "Hallo $first,\n\ndanke! Deine Zahlung für $hours Private Pottery ($amount) ist angekommen. Damit ist alles fix"
+        . ($sessions ? ":\n\n$list\n" : ".\n") . "\nDie Rechnung bekommst du in einer eigenen E-Mail. Ich freue mich schon sehr auf dich!\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\n" . FORMA_PHONE . "\nwww.forma-pottery.com\n");
+    forma_mail(FORMA_NOTIFY_EMAIL, 'Bezahlt: Private Pottery (' . $b['name'] . ')', "{$b['name']} hat ihre Private-Pottery-Termine über den Bezahl-Link bezahlt.\n\n$hours · $amount über Stripe\n" . ($sessions ? "\n$list\n" : '') . "\nÜbersicht: " . forma_site_url() . "/verwaltung/?view=private\n", (string)$b['email']);
+    forma_invoice_for($pdo, 'private', $id);
 }
 
 // --- Templates & Maker Club --------------------------------------------------------
@@ -1956,10 +1998,16 @@ function forma_private_confirm_mail(PDO $pdo, int $pid, string $note = ''): bool
         : "juhu, deine Private-Pottery-Termine stehen! Hier sind alle " . count($sessions) . " Termine auf einen Blick, damit du genau weißt, wann wir uns sehen. Ich freue mich schon sehr auf dich.";
     $rest = $paid ? max(0, (float)$b['hours'] - $planned) : 0;
     [$calTxt, $calAtt] = forma_cal_block($pdo, 'p', $pid);
+    $payTxt = '';
+    if (!$paid && $planned > 0 && forma_stripe_key()) {
+        $payTxt = "\nDamit dein Termin fix für dich reserviert ist, bezahl bitte die " . forma_hours_text($planned) . ' (' . forma_euro((int)round($planned * FORMA_PRIVATE_HOUR)) . ") ganz bequem online, mit Karte, Apple Pay oder Google Pay:\n"
+            . forma_private_pay_url($b) . "\n";
+    }
     $body = "Hallo $first,\n\n$intro\n\n"
         . ($one ? 'Wann: ' . $lines[0] . "\n" : implode("\n", $lines) . "\n")
         . ($paid ? 'Gebucht und bezahlt: ' . forma_hours_text((float)$b['hours']) . " Private Pottery\n" : '')
         . "Dein Projekt: {$b['project']}\nWo: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
+        . $payTxt
         . ($rest > 0 ? "\nDu hast dann noch " . forma_hours_text($rest) . " offen, die planen wir gemeinsam ein, wann es dir passt.\n" : '')
         . (trim($note) !== '' ? "\n" . trim($note) . "\n" : '')
         . $calTxt
