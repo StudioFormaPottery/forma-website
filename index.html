@@ -933,6 +933,13 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .team-seal b{font-size:46px}
 .team-seal i{font-size:18px}
 @media (max-width:760px){.team-seal{width:128px;height:128px;left:-18px;bottom:18px}.team-seal b{font-size:31px}.team-seal i{font-size:13px}}
+
+.gift-card{max-width:1180px}
+.gift-card .gift-text{max-width:820px}
+.gift-card .eyebrow{font-size:clamp(30px,3.4vw,44px);color:var(--clay);margin:0}
+.gift-ic{animation:giftwiggle 2.8s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes giftwiggle{0%,100%{transform:rotate(0)}10%{transform:rotate(-10deg) translateY(-3px)}20%{transform:rotate(9deg) translateY(-5px)}30%{transform:rotate(-6deg) translateY(-2px)}40%{transform:rotate(3deg)}50%{transform:rotate(0)}}
+@media (prefers-reduced-motion:reduce){.gift-ic{animation:none}}
 </style>
 </head>
 <body>
@@ -1558,7 +1565,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p>Du möchtest, dass dein Team ein Stück näher zusammenrückt? Dann bucht doch einen gemeinsamen Töpferworkshop im FORMA. Raus aus dem Alltag, rein in den Ton: Zusammen mit den Händen etwas zu gestalten entschleunigt, macht Spaß und stärkt den Zusammenhalt.</p>
           <ul class="team-tags"><li>Firmen &amp; Teams</li><li>Geburtstage &amp; Abschiede</li><li>Mit Freundinnen</li><li>Vereine &amp; Feiern</li></ul>
           <p class="team-facts">4 bis 8 Personen · Halbtages-Event über 4 Stunden oder Töpfer-Wochenende mit Übernachtung im Heindalishof</p>
-          <div class="team-btns"><a class="btn btn-team" href="#teambuilding" data-private="team">Event anfragen</a><a class="btn btn-team-ghost" href="downloads/FORMA_Teambuilding.pdf?v=7" target="_blank" rel="noopener">Infos &amp; Preise (PDF)</a></div>
+          <div class="team-btns"><a class="btn btn-team" href="#teambuilding" data-private="team">Event anfragen</a><a class="btn btn-team-ghost" href="downloads/FORMA_Teambuilding.pdf?v=8" target="_blank" rel="noopener">Infos &amp; Preise (PDF)</a></div>
         </div>
         <span class="team-ic t1" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 4c2 15 12 25 28 28-16 3-26 13-28 28-2-15-12-25-28-28 16-3 26-13 28-28z" fill="#FBF1EA"/></svg></span>
         <span class="team-ic t2" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M24 6c-4 4 4 6 0 11M32 4c-4 4 4 6 0 11M40 6c-4 4 4 6 0 11" stroke="#F1D9C6" stroke-width="2.5" fill="none" stroke-linecap="round"/><rect x="12" y="22" width="34" height="32" rx="8" fill="#F1D9C6"/><path d="M46 29h4a7 7 0 010 14h-4" stroke="#F1D9C6" stroke-width="5" fill="none"/><path d="M14 32h30" stroke="#8C2C1D" stroke-width="3"/></svg></span>
