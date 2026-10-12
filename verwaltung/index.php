@@ -550,8 +550,18 @@ if ($action === 'delete_subscriber') {
 }
 
 if ($action === 'invoice_settings') {
-    $prefix = preg_replace('/[^A-Za-z0-9]/', '', (string)($_POST['prefix'] ?? 'FO')) ?: 'FO';
+    $prefix = preg_replace('/[^A-Za-z0-9]/', '', (string)($_POST['prefix'] ?? ''));
     forma_set_setting($pdo, 'invoice_prefix', $prefix);
+    $nextNr = (int)($_POST['next_nr'] ?? 0);
+    if ($nextNr > 0) {
+        [$cur] = forma_invoice_next($pdo, (int)date('Y'));
+        if ($nextNr < $cur) {
+            $chk = $pdo->prepare('SELECT COUNT(*) FROM invoices WHERE year = ? AND seq >= ?');
+            $chk->execute([(int)date('Y'), $nextNr]);
+            if ((int)$chk->fetchColumn() > 0) go($self . '?view=rechnungen', 'Diese Nummer ist schon vergeben. Die nächste freie Nummer ist ' . $cur . '.');
+        }
+        forma_set_setting($pdo, 'invoice_start_' . date('Y'), (string)$nextNr);
+    }
     forma_set_setting($pdo, 'oss_active', !empty($_POST['oss']) ? '1' : '0');
     $sheet = trim((string)($_POST['sheet_id'] ?? ''));
     if (preg_match('~/d/([A-Za-z0-9_-]{20,})~', $sheet, $m)) $sheet = $m[1];
@@ -614,7 +624,7 @@ if ($view === 'rechnungen') {
     $rows = $pdo->query('SELECT * FROM invoices ORDER BY id DESC LIMIT 300')->fetchAll();
     $sum = array_sum(array_column($rows, 'gross_cents'));
     $gkey = forma_google_key();
-    $cfg = ['prefix' => forma_setting($pdo, 'invoice_prefix') ?? 'FO', 'oss' => forma_setting($pdo, 'oss_active') === '1', 'sheet' => forma_setting($pdo, 'sheet_id') ?? '', 'err' => forma_setting($pdo, 'sheet_error') ?? ''];
+    $cfg = ['prefix' => forma_setting($pdo, 'invoice_prefix') ?? '', 'oss' => forma_setting($pdo, 'oss_active') === '1', 'sheet' => forma_setting($pdo, 'sheet_id') ?? '', 'err' => forma_setting($pdo, 'sheet_error') ?? ''];
     render_page('Rechnungen', function () use ($self, $flash, $rows, $sum, $gkey, $cfg) { ?>
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Rechnungen</h1>
@@ -637,7 +647,9 @@ if ($view === 'rechnungen') {
         <h2>Einstellungen</h2>
         <form class="card" method="post" enctype="multipart/form-data">
             <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="invoice_settings">
-            <label>Kürzel für den Nummernkreis (z. B. FO → FO-2026-001)<input name="prefix" value="<?= forma_h($cfg['prefix']) ?>" maxlength="8"></label>
+            <label>Nächste Rechnungsnummer<input name="next_nr" type="number" min="1" value="<?= (int)forma_invoice_next($GLOBALS['pdo'], (int)date('Y'))[0] ?>"></label>
+            <p class="muted small">Die Website zählt fortlaufend weiter wie deine Buchhaltung. Schreibst du selbst eine Rechnung, trag hier danach die nächste freie Nummer ein, dann gibt es keine doppelte Nummer.</p>
+            <label>Kürzel vor der Nummer (leer lassen für 19, 20, 21 …)<input name="prefix" value="<?= forma_h($cfg['prefix']) ?>" maxlength="8"></label>
             <label class="check"><input type="checkbox" name="oss" value="1" <?= $cfg['oss'] ? 'checked' : '' ?>> Ich bin für OSS registriert: Templates mit dem Steuersatz des Wohnsitzlandes verrechnen (erst nötig ab 10.000 € Online-Verkäufen in andere EU-Länder pro Jahr)</label>
             <label>Google Tabelle für die Buchhaltung (Link oder ID)<input name="sheet_id" value="<?= forma_h($cfg['sheet']) ?>"></label>
             <label>Google-Dienstkonto-Schlüssel (JSON-Datei) <?= $gkey ? '· hinterlegt für ' . forma_h($gkey['client_email']) : '· noch nicht hinterlegt' ?><input type="file" name="gkey" accept=".json,application/json"></label>

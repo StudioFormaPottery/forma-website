@@ -328,6 +328,13 @@ function forma_migrate(PDO $pdo): void
         }
     }
 
+    // 12.10.2026: Rechnungsnummern laufen fortlaufend wie in der Buchhaltung weiter (manuell bis 18 → Website ab 19).
+    if (forma_setting($pdo, 'invoice_numbers_v21') === null) {
+        if ((forma_setting($pdo, 'invoice_prefix') ?? 'FO') === 'FO') forma_set_setting($pdo, 'invoice_prefix', '');
+        if (forma_setting($pdo, 'invoice_start_2026') === null) forma_set_setting($pdo, 'invoice_start_2026', '19');
+        forma_set_setting($pdo, 'invoice_numbers_v21', '1');
+    }
+
     // 11.10.2026: Pottery bemalen im Advent, Mi & Do 15–18 Uhr, 4.11.–17.12.2026. Erst ab 19.10. sichtbar.
     if (forma_setting($pdo, 'bemalen_v16') === null) {
         forma_create_series($pdo, FORMA_SERIES['bemalen'], [3, 4], '2026-11-04', '2026-12-17');
@@ -1086,6 +1093,41 @@ function forma_reconcile_payments(PDO $pdo, bool $force = false): void
     }
 }
 
+/**
+ * Kundinnen kommen nach einer Buchung automatisch auf die E-Mail-Liste (Bestandskundinnen-Regel § 174 Abs. 4 TKG):
+ * Hinweis im Buchungsformular, Abmeldelink in jeder Mail. Wer sich schon abgemeldet hat, bleibt abgemeldet.
+ * Gibt den Abmeldelink zurück, oder '' wenn die Person nicht (mehr) auf der Liste steht.
+ */
+function forma_auto_subscribe(PDO $pdo, string $email, string $name, string $source): string
+{
+    $email = mb_strtolower(trim($email));
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || forma_setting($pdo, 'auto_newsletter_off') === '1') return '';
+    $st = $pdo->prepare('SELECT * FROM subscribers WHERE email = ?');
+    $st->execute([$email]);
+    $s = $st->fetch();
+    if ($s && $s['status'] === 'abgemeldet') return '';
+    if (!$s) {
+        $token = bin2hex(random_bytes(16));
+        $pdo->prepare("INSERT INTO subscribers (email, name, source, status, token, created_at, confirmed_at) VALUES (?, ?, ?, 'bestaetigt', ?, ?, ?)")
+            ->execute([$email, $name, $source, $token, date('c'), date('c')]);
+    } else {
+        $token = (string)$s['token'];
+        if ($s['status'] !== 'bestaetigt') $pdo->prepare("UPDATE subscribers SET status = 'bestaetigt', confirmed_at = ? WHERE id = ?")->execute([date('c'), $s['id']]);
+        if ($s['name'] === '' && $name !== '') $pdo->prepare('UPDATE subscribers SET name = ? WHERE id = ?')->execute([$name, $s['id']]);
+    }
+    if (!$s || $s['status'] !== 'bestaetigt') {
+        try { forma_ml_sync($email, $name, true); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
+    }
+    return forma_site_url() . '/api/unsubscribe.php?t=' . $token;
+}
+
+function forma_newsletter_note(string $unsub): string
+{
+    if ($unsub === '') return '';
+    return "\nPS: Mit deiner Buchung bist du jetzt auch in meinem kleinen Atelier-Newsletter dabei. Keine Sorge, kein Spam! Ich bombardiere dich nicht jeden Tag mit Nachrichten, sondern schreibe dir nur ab und zu, wenn es neue Kurse, Specials oder schöne Ideen aus dem Atelier gibt.\n"
+        . "Magst du lieber keine Post von mir? Dann kannst du dich hier jederzeit mit einem Klick abmelden: $unsub\n";
+}
+
 /** Bestätigung an die Kundin und Info an Vivien. Wird pro Buchung nur einmal verschickt. */
 function forma_send_booking_mails(PDO $pdo, int $bookingId): void
 {
@@ -1125,12 +1167,15 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
     $isAtelier = $b['title'] === FORMA_SERIES['atelier']['title'];
     $termin = $isAtelier ? preg_replace('/ · .*$/u', '', (string)$b['date_text']) : $b['date_text'];
     $piecesLine = is_array($pieces) && $pieces ? ($isAtelier ? 'Deine Zeiten: ' . implode(', ', array_map(fn($i) => preg_replace('/^Offenes Atelier /', '', $i['name']), $pieces)) . ' (' . count($pieces) . ($pieces && count($pieces) === 1 ? ' Stunde' : ' Stunden') . ")\n" : 'Deine Stücke: ' . forma_bemalen_text($pieces) . "\n") : '';
+    $unsub = '';
+    try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Kursbuchung: ' . $b['title']); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
     $customer = "Hallo $first,\n\n$intro\n\nHier noch einmal alles auf einen Blick:\n\n"
         . "Kurs: {$b['title']}\nTermin: $termin\nPersonen: $personsText\n$piecesLine$payLine\nOrt: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
         . $minNote
         . "\nBitte komm in Kleidung, die schmutzig werden darf. Schürzen und Werkzeug habe ich im Studio.\n"
         . "\nFalls doch etwas dazwischenkommt: Bis 48 Stunden vor Kursbeginn kannst du kostenlos stornieren. Danach werden 50 % der Kursgebühr fällig, wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit bei mir, gemeinsam finden wir bestimmt eine Lösung.\n"
-        . "\nFalls du Fragen hast oder doch verhindert bist, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n";
+        . "\nFalls du Fragen hast oder doch verhindert bist, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n"
+        . forma_newsletter_note($unsub);
 
     $admin = ($paid ? 'Neue bezahlte Buchung über die Website' : 'Neue Kursanmeldung über die Website') . "\n\n"
         . "Kurs: {$b['title']}\nTermin: $termin\nPersonen: $personsText\n" . $piecesLine
@@ -1361,11 +1406,13 @@ function forma_private_mails(PDO $pdo, int $id): void
         return;
     }
     $amount = forma_euro((int)$b['amount_cents']);
+    $unsub = '';
+    try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Buchung: Private Pottery'); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
     forma_mail($b['email'], 'Deine Private Pottery Stunden sind gebucht', "Hallo $first,\n\nwie schön, dass wir dein Projekt gemeinsam umsetzen! Deine Zahlung ist angekommen.\n\n"
         . "Gebucht: $hours Private Pottery ($persons)\nBezahlt: $amount\nDein Projekt: {$b['project']}\nWunschtermin: {$b['wish']}\n\n"
         . "Ich melde mich in den nächsten Tagen bei dir, damit wir den genauen Termin festmachen. Die Stunden können wir gern auch auf mehrere Termine aufteilen.\n"
         . "Falls doch etwas dazwischenkommt: Bis 48 Stunden vor unserem Termin kannst du kostenlos stornieren, danach werden 50 % fällig, wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit, gemeinsam finden wir eine Lösung.\n\n"
-        . "Bis bald im Studio!\nVivien\nFORMA Earth & Art\n$phone\nwww.forma-pottery.com\n");
+        . "Bis bald im Studio!\nVivien\nFORMA Earth & Art\n$phone\nwww.forma-pottery.com\n" . forma_newsletter_note($unsub));
     forma_mail(FORMA_NOTIFY_EMAIL, 'Private Pottery gebucht: ' . $hours . ' (' . $b['name'] . ')', "Neue bezahlte Buchung Private Pottery\n$contactLine\n\n$hours · $amount bezahlt über Stripe\nPersonen: $persons\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\n\nProjekt:\n{$b['project']}\n\nWunschtermin: {$b['wish']}\n\nBitte Termin bestätigen. Übersicht: $site/verwaltung/?view=private\n", $b['email']);
     forma_invoice_for($pdo, 'private', $id);
 }

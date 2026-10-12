@@ -54,12 +54,13 @@ function forma_invoice_schema(PDO $pdo): void
 /** Nummernformat: Präfix + Jahr + laufende Nummer, z. B. „FO-2026-001“. Präfix und Startnummer in den Einstellungen. */
 function forma_invoice_next(PDO $pdo, int $year): array
 {
-    $prefix = forma_setting($pdo, 'invoice_prefix') ?? 'FO';
+    $prefix = forma_setting($pdo, 'invoice_prefix') ?? '';
     $start = (int)(forma_setting($pdo, 'invoice_start_' . $year) ?? 1);
     $stmt = $pdo->prepare('SELECT MAX(seq) FROM invoices WHERE year = ?');
     $stmt->execute([$year]);
     $seq = max($start, (int)$stmt->fetchColumn() + 1);
-    return [$seq, sprintf('%s-%d-%03d', $prefix, $year, $seq)];
+    // Ohne Kürzel: fortlaufend wie in Viviens Buchhaltung (01, 02 … 19, 20 …), pro Jahr neu.
+    return [$seq, $prefix === '' ? sprintf('%02d', $seq) : sprintf('%s-%d-%03d', $prefix, $year, $seq)];
 }
 
 /** Steuersatz: Kurse finden in Mathon statt → immer AT 20 %. Digitale Templates: Wohnsitz der Käuferin. */

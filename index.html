@@ -401,6 +401,7 @@ section{scroll-margin-top:96px}
 .shop-soon h4{font-family:var(--display);font-weight:650;font-size:clamp(24px,2.6vw,32px);line-height:1.1;color:var(--clay);margin:0 0 10px}
 .shop-soon p{color:var(--ink-soft);margin:0 0 18px}
 @media (max-width:700px){.shop-soon{grid-template-columns:1fr}.shop-soon img{min-height:0;aspect-ratio:4/3}}
+.news-note{font-size:13.5px;line-height:1.5;color:var(--ink-soft);margin:6px 0 0}
 .tpl-filters{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips button{font:inherit;font-size:15px;padding:8px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
@@ -845,6 +846,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <div class="field"><label for="book-message">Nachricht <span class="opt">(optional)</span></label><textarea id="book-message" name="message" rows="2"></textarea></div>
         <p class="book-storno">Anmeldeschluss ist am Vorabend um 17 Uhr. Kostenlos stornieren bis 48 Stunden vor Kursbeginn. Danach werden 50&nbsp;% fällig, bei Nichterscheinen der volle Betrag. Wenn etwas dazwischenkommt, melde dich einfach, wir finden gemeinsam eine Lösung. <a href="#storno" id="book-storno-link">Mehr dazu</a></p>
         <label class="consent"><input type="checkbox" name="consent" id="book-consent" value="1" required> <span>Ich habe die Stornobedingungen gelesen und bin einverstanden, dass meine Angaben zur Bearbeitung meiner Anmeldung gespeichert werden. Mehr dazu in der <a href="#datenschutz" id="book-privacy">Datenschutzerklärung</a>.</span></label>
+        <p class="news-note">Mit deiner Buchung bekommst du ab und zu meinen Atelier-Newsletter mit neuen Kursen und Specials. Kein Spam, versprochen, und abmelden geht jederzeit mit einem Klick.</p>
         <p class="book-error" id="book-error" role="alert" hidden></p>
         <button class="btn btn-solid" type="submit" id="book-submit">Verbindlich anmelden</button>
         <p class="pay-note" id="book-paynote" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>Du bezahlst sicher über Stripe, z. B. mit Karte, Apple Pay oder Google Pay.</p>
@@ -935,6 +937,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         </fieldset>
         <p class="book-storno" id="p-storno">Den genauen Termin machen wir nach deiner Buchung gemeinsam aus. Kostenlos stornieren bis 48 Stunden vorher, danach 50&nbsp;%, bei Nichterscheinen der volle Betrag. Wenn etwas dazwischenkommt, melde dich einfach.</p>
         <label class="consent"><input type="checkbox" name="consent" id="p-consent" value="1"> <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Buchung gespeichert werden. Mehr dazu in der <a href="#datenschutz" class="p-privacy">Datenschutzerklärung</a>.</span></label>
+        <p class="news-note">Mit deiner Buchung bekommst du ab und zu meinen Atelier-Newsletter mit neuen Kursen und Specials. Kein Spam, versprochen, und abmelden geht jederzeit mit einem Klick.</p>
         <p class="book-error" id="p-error" role="alert" hidden></p>
         <div class="p-actions">
           <button class="btn btn-solid" type="submit" id="p-submit">Weiter zur Bezahlung · € 130</button>
@@ -1328,6 +1331,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 
           <h4>E-Mail-Liste für neue Kurse und Specials</h4>
           <p>Wenn du dich für meine E-Mail-Liste einträgst, speichere ich deine E-Mail-Adresse, den Zeitpunkt der Eintragung und über welches Angebot du dich eingetragen hast. Du bekommst zuerst eine E-Mail mit einem Bestätigungslink; erst nach deinem Klick stehst du auf der Liste (Double-Opt-in). Ich schreibe dir dann gelegentlich zu neuen Kursen und Specials im Studio. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, § 174 TKG 2021). Du kannst sie jederzeit widerrufen, über den Abmeldelink in jeder E-Mail oder mit einer kurzen Nachricht an mich. Für den Versand nutze ich den Dienst MailerLite (MailerLite Limited, Ground Floor, 71 Lower Baggot Street, Dublin 2, Irland) als Auftragsverarbeiter: Nach deiner Bestätigung wird deine Adresse dorthin übertragen. MailerLite kann außerdem erfassen, ob eine E-Mail geöffnet oder ein Link darin angeklickt wurde, damit ich sehe, welche Inhalte interessieren. Nach deiner Abmeldung lösche ich deine Adresse.</p>
+          <p>Wenn du einen Kurs oder Private Pottery buchst, schicke ich dir an die angegebene E-Mail-Adresse gelegentlich Neuigkeiten zu ähnlichen Kursen und Angeboten aus dem Atelier (§ 174 Abs. 4 TKG 2021, Art. 6 Abs. 1 lit. f DSGVO). Darauf weise ich dich bei der Buchung hin. Du kannst dem jederzeit kostenlos widersprechen, über den Abmeldelink in jeder E-Mail oder mit einer kurzen Nachricht an mich.</p>
 
           <h4>Links zu anderen Websites</h4>
           <p>Diese Seite enthält Links zu Google Maps, WhatsApp, Instagram und Pinterest. Erst wenn du einen Link anklickst, werden Daten an den jeweiligen Anbieter übertragen. Für deren Inhalte und Datenverarbeitung bin ich nicht verantwortlich.</p>
