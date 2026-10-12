@@ -337,7 +337,8 @@ function forma_migrate(PDO $pdo): void
 
     // 12.10.2026: Rechnungen 16–18 (Pottery Pause) wurden nie ausgestellt → die Website macht mit 16 weiter.
     if (forma_setting($pdo, 'invoice_numbers_v22') === null) {
-        $max = (int)$pdo->query('SELECT COALESCE(MAX(seq), 0) FROM invoices WHERE year = 2026')->fetchColumn();
+        $max = 0;
+        try { $max = (int)$pdo->query('SELECT COALESCE(MAX(seq), 0) FROM invoices WHERE year = 2026')->fetchColumn(); } catch (Throwable $e) { $max = 0; }
         if ($max < 16) forma_set_setting($pdo, 'invoice_start_2026', '16');
         forma_set_setting($pdo, 'invoice_numbers_v22', '1');
     }
