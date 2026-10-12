@@ -313,6 +313,10 @@ section{scroll-margin-top:96px}
 .vchoice b{font-family:var(--display);font-weight:600;font-size:18px;color:var(--clay);line-height:1.15}
 .vchoice i{font-style:normal;font-weight:500}
 .vchoice small{font-size:13.5px;line-height:1.4;color:var(--ink-soft)}
+.vchoice.contact.when{grid-template-columns:repeat(4,minmax(0,1fr))}
+.vchoice.when span{padding:10px 12px;align-items:center;text-align:center}
+.vchoice.when b{font-size:16px}
+@media (max-width:640px){.vchoice.contact.when{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .vchoice input:checked+span{border-color:var(--clay);background:var(--blush);box-shadow:inset 0 0 0 1.5px var(--clay)}
 .vchoice input:focus-visible+span,.vdesigns input:focus-visible+img{outline:3px solid var(--focus);outline-offset:2px}
 .stepper{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -916,7 +920,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <p class="p-switch" id="p-switch" hidden>Du weißt schon, was du machen möchtest? <button type="button" class="linkbtn" id="p-to-book">Dann buch direkt deine Stunden →</button></p>
         <fieldset class="vgroup" hidden><legend>Wie möchtest du starten?</legend>
           <div class="vchoice mode">
-            <label><input type="radio" name="mode" value="buchung" checked><span><b>Direkt buchen</b><small>Stunden wählen und online bezahlen. Den Termin machen wir danach gemeinsam aus.</small></span></label>
+            <label><input type="radio" name="mode" value="buchung" checked><span><b>Direkt buchen</b><small>Stunden wählen, Wunschtermin angeben und online bezahlen. Ich bestätige dir deinen Termin per E-Mail.</small></span></label>
             <label><input type="radio" name="mode" value="anfrage"><span><b>Erst mal anfragen</b><small>Kostenlos und unverbindlich. Ich sehe mir dein Projekt an und melde mich bei dir.</small></span></label>
           </div>
         </fieldset>
@@ -931,7 +935,19 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         </fieldset>
         <fieldset class="vgroup"><legend id="p-leg-proj">2 · Was möchtest du gestalten?</legend>
           <div class="field"><label for="p-project" id="p-project-label">Dein Projekt</label><textarea id="p-project" name="project" rows="3" maxlength="1500" placeholder="z. B. Zwei Kaffeebecher mit unseren Initialen und passende Unterteller" required></textarea></div>
-          <div class="field"><label for="p-wish">Wunschtermin <span class="opt">(Tage und Uhrzeiten, die dir gut passen)</span></label><input id="p-wish" name="wish" maxlength="300" placeholder="z. B. Dienstag- oder Donnerstagabend ab 18 Uhr"></div>
+        </fieldset>
+        <fieldset class="vgroup"><legend id="p-leg-when">3 · Wann passt es dir?</legend>
+          <div class="field"><label for="p-date">Dein Wunschtag <span class="opt" id="p-date-opt"></span></label><input id="p-date" name="wish_date" type="date"></div>
+          <div class="field"><span class="flabel">Welche Tageszeit?</span>
+            <div class="vchoice contact when">
+              <label><input type="radio" name="wish_time" value="vormittag"><span><b>Vormittag</b></span></label>
+              <label><input type="radio" name="wish_time" value="nachmittag"><span><b>Nachmittag</b></span></label>
+              <label><input type="radio" name="wish_time" value="abend" checked><span><b>Abend</b></span></label>
+              <label><input type="radio" name="wish_time" value="egal"><span><b>Egal</b></span></label>
+            </div>
+          </div>
+          <div class="field"><label for="p-wish">Andere Tage, die dir auch passen <span class="opt">(optional)</span></label><input id="p-wish" name="wish" maxlength="300" placeholder="z. B. auch Donnerstagabend ab 18 Uhr"></div>
+          <p class="hint" id="p-when-hint">Ich schau in meinen Kalender und schicke dir die Bestätigung mit deinem fixen Termin. Mehrere Stunden können wir gern auf verschiedene Tage aufteilen.</p>
         </fieldset>
         <fieldset class="vgroup"><legend id="p-leg-you">3 · Deine Angaben</legend>
           <div class="field"><label for="p-name">Vor- und Nachname</label><input id="p-name" name="name" autocomplete="name" required></div>
@@ -946,7 +962,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
             </div>
           </div>
         </fieldset>
-        <p class="book-storno" id="p-storno">Den genauen Termin machen wir nach deiner Buchung gemeinsam aus. Kostenlos stornieren bis 48 Stunden vorher, danach 50&nbsp;%, bei Nichterscheinen der volle Betrag. Wenn etwas dazwischenkommt, melde dich einfach.</p>
+        <p class="book-storno" id="p-storno">Deinen fixen Termin bestätige ich dir nach der Buchung per E-Mail. Kostenlos stornieren bis 48 Stunden vorher, danach 50&nbsp;%, bei Nichterscheinen der volle Betrag. Wenn etwas dazwischenkommt, melde dich einfach.</p>
         <label class="consent"><input type="checkbox" name="consent" id="p-consent" value="1"> <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Buchung gespeichert werden. Mehr dazu in der <a href="#datenschutz" class="p-privacy">Datenschutzerklärung</a>.</span></label>
         <p class="news-note">Mit deiner Buchung bekommst du ab und zu meinen Atelier-Newsletter mit neuen Kursen und Specials. Kein Spam, versprochen, und abmelden geht jederzeit mit einem Klick.</p>
         <p class="book-error" id="p-error" role="alert" hidden></p>
@@ -1664,7 +1680,10 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     $('p-meta').textContent=ask?'Beschreib mir kurz, was du gestalten möchtest. Ich sehe es mir an und melde mich mit einem Vorschlag, wie lange wir brauchen und wann wir loslegen. Kostenlos und unverbindlich.':'Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inklusive deinem fix fertigen Werkstück, Material und Fertigstellung.';
     $('p-hours-set').hidden=ask;$('p-switch').hidden=!ask;$('p-storno').hidden=ask;
     $('p-leg-proj').textContent=(ask?'1':'2')+' · Was möchtest du gestalten?';
-    $('p-leg-you').textContent=(ask?'2':'3')+' · Deine Angaben';
+    $('p-leg-when').textContent=(ask?'2':'3')+' · Wann passt es '+(pTeam?'euch':'dir')+'?';
+    $('p-leg-you').textContent=(ask?'3':'4')+' · Deine Angaben';
+    $('p-date-opt').textContent=ask?'(optional)':'';$('p-date').required=!ask;
+    if(ask)$('p-date').classList.remove('missing');
     $('p-phone-opt').textContent=pPhone()?'(damit ich dich anrufen kann)':'(optional)';
     $('p-phone').required=pPhone();
     if(!pPhone())$('p-phone').classList.remove('missing');
@@ -1672,13 +1691,13 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     $('p-eyebrow').textContent=pTeam?'Teambuilding & Events':'Private Pottery';
     $('p-project-label').textContent=pTeam?'Eure Idee':'Dein Projekt';
     $('p-project').placeholder=pTeam?'z. B. Teamevent für 8 Personen, jede:r gestaltet eine eigene Tasse':'z. B. Zwei Kaffeebecher mit unseren Initialen und passende Unterteller';
-    $('p-wish').placeholder=pTeam?'z. B. ein Freitagnachmittag im November':'z. B. Dienstag- oder Donnerstagabend ab 18 Uhr';
+    $('p-wish').placeholder=pTeam?'z. B. auch ein Freitagnachmittag im November':'z. B. auch Donnerstagabend ab 18 Uhr';
     if(pTeam){$('p-title').textContent='Erzähl mir von eurem Event';$('p-meta').textContent='Teamevent, Vereinsausflug oder Feier: Beschreib mir kurz, was ihr euch vorstellt und wie viele ihr seid. Ich melde mich mit einem Vorschlag. Kostenlos und unverbindlich.';$('p-switch').hidden=true;$('p-leg-proj').textContent='1 · Was habt ihr vor?';}
   }
   pf.querySelectorAll('input[name="hours"],input[name="mode"],input[name="contact"]').forEach(function(r){r.addEventListener('change',pUpdate);});
   function pSetMode(mode){var m=pf.querySelector('input[name="mode"][value="'+mode+'"]');if(m)m.checked=true;pUpdate();pd.querySelector('.book-inner').scrollTop=0;}
   $('p-to-book').addEventListener('click',function(){pTeam=false;pSetMode('buchung');});
-  function pOpen(mode){pTeam=mode==='team';if(pTeam)mode='anfrage';pf.hidden=false;$('p-done').hidden=true;pErr.hidden=true;$('p-t').value=Date.now();var m=pf.querySelector('input[name="mode"][value="'+(mode||'buchung')+'"]');if(m)m.checked=true;pUpdate();show(pd);pd.querySelector('.book-inner').scrollTop=0;setTimeout(function(){try{$('p-title').focus({preventScroll:true});}catch(e){}},30);}
+  function pOpen(mode){pTeam=mode==='team';var tm=new Date(Date.now()+864e5),pad=function(n){return(n<10?'0':'')+n;};$('p-date').min=tm.getFullYear()+'-'+pad(tm.getMonth()+1)+'-'+pad(tm.getDate());if(pTeam)mode='anfrage';pf.hidden=false;$('p-done').hidden=true;pErr.hidden=true;$('p-t').value=Date.now();var m=pf.querySelector('input[name="mode"][value="'+(mode||'buchung')+'"]');if(m)m.checked=true;pUpdate();show(pd);pd.querySelector('.book-inner').scrollTop=0;setTimeout(function(){try{$('p-title').focus({preventScroll:true});}catch(e){}},30);}
   function pDone(t,x){pf.hidden=true;$('p-done').hidden=false;$('p-done-title').textContent=t;$('p-done-text').textContent=x;show(pd);pd.querySelector('.book-inner').scrollTop=0;}
   document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('[data-private]');if(!a)return;e.preventDefault();closeNav();pOpen(a.getAttribute('data-private')||'buchung');});
   $('p-close').addEventListener('click',function(){hide(pd);});
@@ -1690,6 +1709,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     var kind=pMode();$('p-kind').value=kind;
     var name=$('p-name').value.trim(),email=$('p-email').value.trim(),proj=$('p-project').value.trim(),phone=$('p-phone').value.replace(/\D/g,''),msg='';
     if(proj.length<5)msg='Beschreib bitte kurz, was du gestalten möchtest.';
+    else if(kind==='buchung'&&!$('p-date').value)msg='Bitte wähl deinen Wunschtag aus.';
     else if(name.length<2)msg='Bitte gib deinen Namen an.';
     else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))msg='Bitte gib eine gültige E-Mail-Adresse an.';
     else if(pPhone()&&phone.length<6)msg='Bitte gib deine Telefonnummer an, damit ich dich anrufen kann.';
@@ -1711,7 +1731,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     },Math.max(0,wait));
   });
   var pres=params.get('private');
-  if(pres==='bezahlt')pDone('Deine Stunden sind gebucht!','Danke! Deine Zahlung ist angekommen und die Bestätigung ist unterwegs in dein Postfach. Ich melde mich in den nächsten Tagen bei dir, damit wir den genauen Termin ausmachen.');
+  if(pres==='bezahlt')pDone('Deine Stunden sind gebucht!','Danke! Deine Zahlung ist angekommen und die Bestätigung ist unterwegs in dein Postfach. Ich schau mir deinen Wunschtermin an und schicke dir dann die Bestätigung mit deinem fixen Termin.');
   else if(pres==='wartet')pDone('Fast geschafft','Deine Zahlung wird noch verarbeitet. Sobald sie da ist, bekommst du die Bestätigung per E-Mail.');
   else if(pres==='abgebrochen')pDone('Bezahlung abgebrochen','Kein Problem, es wurde nichts abgebucht. Du kannst jederzeit neu buchen oder mir erst einmal eine Anfrage schicken.');
   if(pres){try{params.delete('private');history.replaceState(null,'',location.pathname+(params.toString()?'?'+params:'')+location.hash);}catch(e){}}

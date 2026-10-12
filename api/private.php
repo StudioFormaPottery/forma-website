@@ -28,6 +28,9 @@ $ref = forma_clean((string)($in['ref'] ?? ''), 60);
 if ($ref !== '' && mb_strlen($project) >= 5) $project = mb_substr('[Empfohlen von: ' . $ref . '] ' . $project, 0, 1600);
 $wish = forma_clean((string)($in['wish'] ?? ''), 300);
 $contact = ($in['contact'] ?? '') === 'telefon' ? 'telefon' : 'email';
+$wishDate = (string)($in['wish_date'] ?? '');
+if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $wishDate) || strtotime($wishDate) === false || $wishDate < date('Y-m-d')) $wishDate = '';
+$wishTime = array_key_exists((string)($in['wish_time'] ?? ''), FORMA_WISH_TIMES) ? (string)$in['wish_time'] : '';
 
 $errors = [];
 if (mb_strlen($name) < 2) $errors[] = 'Bitte gib deinen Namen an.';
@@ -35,6 +38,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Bitte gib eine gül
 if (mb_strlen($project) < 5) $errors[] = 'Beschreib bitte kurz, was du gestalten möchtest.';
 if ($kind === 'buchung' && ($hours < 1 || $hours > 8)) $errors[] = 'Bitte wähle, wie viele Stunden du buchen möchtest.';
 if ($contact === 'telefon' && mb_strlen(preg_replace('/\D/', '', $phone)) < 6) $errors[] = 'Bitte gib deine Telefonnummer an, damit ich dich anrufen kann.';
+if ($kind === 'buchung' && $wishDate === '') $errors[] = 'Bitte wähl deinen Wunschtermin aus.';
 if (empty($in['consent'])) $errors[] = 'Bitte bestätige noch die Hinweise zum Datenschutz.';
 if ($errors) {
     forma_json(['ok' => false, 'error' => implode(' ', $errors)], 422);
@@ -53,9 +57,9 @@ try {
     if ((int)$stmt->fetchColumn() >= 6) {
         forma_json(['ok' => false, 'error' => 'Bitte versuch es später noch einmal oder ruf mich an: ' . FORMA_PHONE], 429);
     }
-    $pdo->prepare('INSERT INTO private_bookings (kind, hours, amount_cents, name, email, phone, persons, project, wish, status, token, ip_hash, created_at, contact)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-        ->execute([$kind, $kind === 'buchung' ? $hours : max(0, min(8, $hours)), $amount, $name, $email, $phone, $persons, $project, $wish, $kind === 'anfrage' ? 'anfrage' : 'offen', $token, $ipHash, date('c'), $contact]);
+    $pdo->prepare('INSERT INTO private_bookings (kind, hours, amount_cents, name, email, phone, persons, project, wish, status, token, ip_hash, created_at, contact, wish_date, wish_time)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        ->execute([$kind, $kind === 'buchung' ? $hours : max(0, min(8, $hours)), $amount, $name, $email, $phone, $persons, $project, $wish, $kind === 'anfrage' ? 'anfrage' : 'offen', $token, $ipHash, date('c'), $contact, $wishDate, $wishTime]);
     $id = (int)$pdo->lastInsertId();
 } catch (Throwable $e) {
     error_log('FORMA private: ' . $e->getMessage());

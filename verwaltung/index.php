@@ -531,6 +531,55 @@ if ($action === 'private_done') {
     go($self . '?view=private', $rv ? 'Gespeichert. Die Bitte um eine Google-Bewertung ist an den Gast verschickt.' : 'Gespeichert.');
 }
 
+if ($action === 'private_assign') {
+    $pid = (int)($_POST['pid'] ?? 0);
+    $date = (string)($_POST['date'] ?? '');
+    $start = (string)($_POST['start'] ?? '');
+    $hours = round((float)str_replace(',', '.', (string)($_POST['hours'] ?? '0')) * 2) / 2;
+    $note = trim(mb_substr((string)($_POST['note'] ?? ''), 0, 800));
+    $st = $pdo->prepare("SELECT * FROM private_bookings WHERE id = ? AND status IN ('bezahlt','anfrage')");
+    $st->execute([$pid]);
+    $b = $st->fetch();
+    $back = $self . '?view=kalender&m=' . substr($date, 0, 7) . '&d=' . rawurlencode($date) . '&assign=' . $pid;
+    if (!$b) go($self . '?view=kalender', 'Diese Buchung gibt es nicht mehr.');
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !preg_match('/^([01]?\d|2[0-3]):[0-5]\d$/', $start) || $hours < 0.5 || $hours > 8) {
+        go($back, 'Bitte wähl Tag, Uhrzeit und Dauer aus.');
+    }
+    $pdo->prepare('INSERT INTO private_sessions (private_id, date, start, hours, note, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+        ->execute([$pid, $date, $start, $hours, $note, date('c')]);
+    $first = forma_first_name((string)$b['name']);
+    $rest = $b['status'] === 'bezahlt' ? max(0, (float)$b['hours'] - forma_private_planned($pdo, $pid)) : 0;
+    $msg = 'Vorgemerkt: ' . $first . ' am ' . forma_de_date($date, false) . ' um ' . forma_de_time($start) . '.'
+        . ($rest > 0 ? ' Noch ' . forma_hours_text($rest) . ' offen, tipp einfach auf den nächsten Tag.' : ' Jetzt nur noch oben auf „Bestätigung schicken“ tippen.');
+    go($self . '?view=kalender&m=' . substr($date, 0, 7) . '&d=' . rawurlencode($date) . '&assign=' . $pid, $msg);
+}
+
+if ($action === 'private_confirm') {
+    $pid = (int)($_POST['pid'] ?? 0);
+    $ok = false;
+    try { $ok = forma_private_confirm_mail($pdo, $pid, (string)($_POST['note'] ?? '')); } catch (Throwable $e) { error_log('FORMA private confirm: ' . $e->getMessage()); }
+    $st = $pdo->prepare('SELECT name FROM private_bookings WHERE id = ?');
+    $st->execute([$pid]);
+    $first = forma_first_name((string)$st->fetchColumn());
+    go($self . '?view=kalender&m=' . rawurlencode((string)($_POST['m'] ?? '')), $ok ? 'Fertig! ' . $first . ' hat die Bestätigung mit allen Terminen per E-Mail bekommen.' : 'Die Bestätigung konnte leider nicht verschickt werden.');
+}
+
+if ($action === 'private_session_delete') {
+    $sid = (int)($_POST['sid'] ?? 0);
+    $st = $pdo->prepare('SELECT s.*, p.name, p.email FROM private_sessions s JOIN private_bookings p ON p.id = s.private_id WHERE s.id = ?');
+    $st->execute([$sid]);
+    $s = $st->fetch();
+    if (!$s) go($self . '?view=kalender', 'Diesen Termin gibt es nicht mehr.');
+    $back = $self . '?view=kalender&m=' . substr((string)$s['date'], 0, 7) . '&d=' . rawurlencode((string)$s['date']);
+    $first = forma_first_name((string)$s['name']);
+    $pdo->prepare('DELETE FROM private_sessions WHERE id = ?')->execute([$sid]);
+    if (!empty($_POST['notify']) && $s['mailed_at'] && filter_var($s['email'], FILTER_VALIDATE_EMAIL)) {
+        forma_mail((string)$s['email'], 'Dein Termin am ' . forma_de_date((string)$s['date'], false) . ' wird verschoben',
+            "Hallo $first,\n\ndein Private-Pottery-Termin am " . forma_de_date((string)$s['date']) . ' um ' . forma_de_time((string)$s['start']) . " findet so leider nicht statt. Keine Sorge, deine Stunden bleiben dir natürlich erhalten! Ich melde mich gleich bei dir und wir finden einen neuen Termin. Sobald er fix ist, bekommst du wieder eine Bestätigung.\n\nBis bald,\nVivien\nFORMA Earth & Art\n" . FORMA_PHONE . "\nwww.forma-pottery.com\n");
+    }
+    go($back . '&assign=' . (int)$s['private_id'], 'Der Termin ist gelöscht' . (!empty($_POST['notify']) && $s['mailed_at'] ? ' und ' . $first . ' ist informiert' : '') . '. Tipp auf einen neuen Tag, um ihn neu einzuplanen.');
+}
+
 if ($action === 'resend_confirm') {
     $st = $pdo->prepare("SELECT * FROM subscribers WHERE id = ? AND status = 'offen'");
     $st->execute([(int)($_POST['sid'] ?? 0)]);
@@ -781,13 +830,198 @@ if ($view === 'templates') {
     <?php });
 }
 
+if ($view === 'kalender') {
+    forma_reconcile_payments($pdo, true);
+    $assignId = (int)($_GET['assign'] ?? 0);
+    $assign = null;
+    if ($assignId) {
+        $st = $pdo->prepare("SELECT * FROM private_bookings WHERE id = ? AND status IN ('bezahlt','anfrage')");
+        $st->execute([$assignId]);
+        $assign = $st->fetch() ?: null;
+    }
+    $month = (string)($_GET['m'] ?? '');
+    if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
+        $month = $assign && $assign['wish_date'] !== '' && $assign['wish_date'] >= date('Y-m-d') ? substr($assign['wish_date'], 0, 7) : date('Y-m');
+    }
+    $sel = (string)($_GET['d'] ?? '');
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $sel)) $sel = '';
+    $first = $month . '-01';
+    $last = date('Y-m-t', strtotime($first));
+    // Offene Private-Pottery-Buchungen (noch nicht alle Stunden eingeplant)
+    $open = [];
+    foreach ($pdo->query("SELECT * FROM private_bookings WHERE status IN ('bezahlt','anfrage') AND done = 0 ORDER BY id")->fetchAll() as $b) {
+        $b['planned'] = forma_private_planned($pdo, (int)$b['id']);
+        $b['rest'] = $b['status'] === 'bezahlt' ? max(0, (float)$b['hours'] - $b['planned']) : null;
+        if ($b['rest'] === null ? $b['planned'] == 0.0 : $b['rest'] > 0) $open[] = $b;
+    }
+    if ($assign) {
+        $assign['planned'] = forma_private_planned($pdo, (int)$assign['id']);
+        $assign['rest'] = $assign['status'] === 'bezahlt' ? max(0, (float)$assign['hours'] - $assign['planned']) : null;
+        $assign['sessions'] = forma_private_sessions($pdo, (int)$assign['id']);
+    }
+    $events = [];
+    $st = $pdo->prepare('SELECT * FROM courses WHERE start_date BETWEEN ? AND ? ORDER BY start_date, id');
+    $st->execute([$first, $last]);
+    foreach ($st->fetchAll() as $c) {
+        $time = preg_match('/(\d{1,2}(?::\d{2})?\s*[–-]\s*\d{1,2}(?::\d{2})?)\s*Uhr/u', (string)$c['date_text'], $m) ? str_replace(' ', '', $m[1]) : '';
+        $events[$c['start_date']][] = ['type' => 'kurs', 'sort' => $time ?: '99', 'time' => $time, 'title' => preg_replace('/\s*·.*$/u', '', (string)$c['title']), 'booked' => forma_booked($pdo, (int)$c['id']), 'cap' => (int)$c['capacity'], 'id' => (int)$c['id'], 'visible' => (int)$c['visible']];
+    }
+    $st = $pdo->prepare('SELECT s.*, p.name, p.project, p.email, p.phone, p.status FROM private_sessions s JOIN private_bookings p ON p.id = s.private_id WHERE s.date BETWEEN ? AND ? ORDER BY s.start');
+    $st->execute([$first, $last]);
+    foreach ($st->fetchAll() as $s) {
+        $events[$s['date']][] = ['type' => 'private', 'sort' => sprintf('%05s', $s['start']), 'time' => forma_de_time((string)$s['start']), 's' => $s];
+    }
+    foreach ($open as $b) {
+        if ($b['wish_date'] !== '' && $b['wish_date'] >= $first && $b['wish_date'] <= $last) {
+            $events[$b['wish_date']][] = ['type' => 'wunsch', 'sort' => 'zz', 'b' => $b];
+        }
+    }
+    foreach ($events as &$list) usort($list, fn($a, $b) => strcmp((string)$a['sort'], (string)$b['sort']));
+    unset($list);
+    $defaultStart = ['vormittag' => '09:00', 'nachmittag' => '14:00', 'abend' => '18:00'][$assign['wish_time'] ?? ''] ?? '18:00';
+    render_page('Kalender', function () use ($self, $flash, $assign, $open, $events, $month, $sel, $first, $defaultStart) {
+        $q = fn(array $p) => forma_h($self . '?' . http_build_query(array_merge(['view' => 'kalender'], array_filter($p, fn($v) => $v !== '' && $v !== null && $v !== 0))));
+        $aid = $assign ? (int)$assign['id'] : 0;
+        $prev = date('Y-m', strtotime($first . ' -1 month'));
+        $next = date('Y-m', strtotime($first . ' +1 month'));
+        $startW = ((int)date('N', strtotime($first))) - 1;
+        $days = (int)date('t', strtotime($first));
+        $today = date('Y-m-d'); ?>
+        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
+        <div class="top"><h1>Kalender</h1><a class="link" href="<?= forma_h($self) ?>?view=private">Alle Private-Pottery-Buchungen</a></div>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <?php if ($assign): ?>
+        <div class="card assign">
+            <div class="booking-head"><strong>Termin einplanen für <?= forma_h($assign['name']) ?></strong>
+            <span class="pill<?= $assign['status'] === 'bezahlt' ? ' pill-ok' : '' ?>"><?= $assign['status'] === 'bezahlt'
+                ? forma_h(forma_hours_text((float)$assign['hours']) . ' bezahlt' . ($assign['planned'] > 0 ? ($assign['rest'] > 0 ? ' · noch ' . forma_hours_text((float)$assign['rest']) . ' offen' : ' · alle eingeplant') : ''))
+                : 'Anfrage, noch nicht bezahlt' ?></span></div>
+            <div><?= nl2br(forma_h($assign['project'])) ?></div>
+            <?php $w = forma_wish_text($assign); if ($w): ?><div><span class="wish-dot"></span> Wunsch: <strong><?= forma_h($w) ?></strong></div><?php endif; ?>
+            <?php $pending = array_filter($assign['sessions'], fn($s) => !$s['mailed_at']); $fn = forma_h(forma_first_name((string)$assign['name'])); ?>
+            <?php if ($assign['sessions']): ?>
+            <ul class="sess">
+                <?php foreach ($assign['sessions'] as $k => $s): ?><li><a href="<?= $q(['m' => substr((string)$s['date'], 0, 7), 'd' => $s['date'], 'assign' => $aid]) ?>#tag"><?= forma_h(forma_de_date((string)$s['date']) . ', ' . forma_de_time((string)$s['start'])) ?></a> · <?= forma_h(forma_hours_text((float)$s['hours'])) ?> <span class="pill<?= $s['mailed_at'] ? ' pill-ok' : ' pill-wait' ?>"><?= $s['mailed_at'] ? 'bestätigt' : 'vorgemerkt' ?></span></li><?php endforeach; ?>
+            </ul>
+            <?php endif; ?>
+            <?php if ($assign['rest'] === null || $assign['rest'] > 0): ?><p class="small muted">Tipp im Kalender auf den Tag, an dem ihr euch trefft. Mehrere Stunden kannst du auf verschiedene Tage verteilen. Wenn alles eingeplant ist, schickst du <?= $fn ?> eine einzige Bestätigung mit allen Terminen.</p><?php endif; ?>
+            <?php if ($pending): ?>
+            <form method="post" class="stack confirm-form">
+                <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="private_confirm"><input type="hidden" name="pid" value="<?= $aid ?>"><input type="hidden" name="m" value="<?= forma_h($month) ?>">
+                <label for="c-note">Persönliche Nachricht <span class="muted small">(optional, steht in der Bestätigung)</span></label>
+                <textarea id="c-note" name="note" rows="2" maxlength="800" placeholder="z. B. Ich freu mich schon, deine Tassen mit dir zu formen!"></textarea>
+                <button class="btn" type="submit">Bestätigung mit <?= count($assign['sessions']) === 1 ? 'dem Termin' : 'allen ' . count($assign['sessions']) . ' Terminen' ?> an <?= $fn ?> schicken</button>
+                <span class="muted small">Geht an <?= forma_h($assign['email']) ?>, mit Kalendereintrag im Anhang<?= $assign['rest'] !== null && $assign['rest'] > 0 ? '. Achtung: es sind noch ' . forma_h(forma_hours_text((float)$assign['rest'])) . ' nicht eingeplant' : '' ?>.</span>
+            </form>
+            <?php elseif ($assign['sessions']): ?><p class="small"><strong>Alles bestätigt.</strong> <?= $fn ?> hat ihre Termine per E-Mail. Die Bitte um eine Google-Bewertung geht automatisch ca. 1 Stunde nach dem letzten Termin raus.</p><?php endif; ?>
+            <a class="link small" href="<?= $q(['m' => $month, 'd' => $sel]) ?>"><?= $pending ? 'Später weitermachen' : 'Schließen' ?></a>
+        </div>
+        <?php endif; ?>
+        <div class="cal-wrap">
+        <div class="cal-main">
+            <div class="cal-nav">
+                <a class="btn btn-ghost" href="<?= $q(['m' => $prev, 'assign' => $aid]) ?>" aria-label="Voriger Monat">‹</a>
+                <h2><?= forma_h(FORMA_MONTHS[(int)substr($month, 5, 2)] . ' ' . substr($month, 0, 4)) ?></h2>
+                <a class="btn btn-ghost" href="<?= $q(['m' => $next, 'assign' => $aid]) ?>" aria-label="Nächster Monat">›</a>
+                <a class="link small" href="<?= $q(['m' => date('Y-m'), 'd' => $today, 'assign' => $aid]) ?>">Heute</a>
+            </div>
+            <div class="cal">
+                <?php foreach (['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'] as $wd): ?><div class="cal-wd"><?= $wd ?></div><?php endforeach; ?>
+                <?php for ($i = 0; $i < $startW; $i++): ?><div class="cal-day empty"></div><?php endfor; ?>
+                <?php for ($d = 1; $d <= $days; $d++): $date = sprintf('%s-%02d', $month, $d); $ev = $events[$date] ?? [];
+                    $isWish = $assign && $assign['wish_date'] === $date; ?>
+                    <a class="cal-day<?= $date === $today ? ' today' : '' ?><?= $date === $sel ? ' sel' : '' ?><?= $date < $today ? ' past' : '' ?><?= $isWish ? ' wish' : '' ?>" href="<?= $q(['m' => $month, 'd' => $date, 'assign' => $aid]) ?>#tag">
+                        <span class="num"><?= $d ?></span>
+                        <?php foreach (array_slice($ev, 0, 4) as $e): ?>
+                            <?php if ($e['type'] === 'kurs'): ?><span class="ev ev-kurs"><?= forma_h(trim($e['time'] . ' ' . $e['title'])) ?></span>
+                            <?php elseif ($e['type'] === 'private'): ?><span class="ev ev-private<?= $e['s']['mailed_at'] ? '' : ' pending' ?>"><?= forma_h($e['time'] . ' ' . forma_first_name((string)$e['s']['name'])) ?></span>
+                            <?php else: ?><span class="ev ev-wish">Wunsch: <?= forma_h(forma_first_name((string)$e['b']['name'])) ?></span><?php endif; ?>
+                        <?php endforeach; ?>
+                        <?php if (count($ev) > 4): ?><span class="ev more">+<?= count($ev) - 4 ?></span><?php endif; ?>
+                    </a>
+                <?php endfor; ?>
+            </div>
+            <p class="legend small muted"><span class="ev ev-kurs">Kurs</span> <span class="ev ev-private">Private Pottery</span> <span class="ev ev-private pending">vorgemerkt</span> <span class="ev ev-wish">Wunschtermin</span></p>
+
+            <?php if ($sel !== ''): $ev = $events[$sel] ?? []; ?>
+            <div class="card day-panel" id="tag">
+                <h2><?= forma_h(forma_de_date($sel)) ?></h2>
+                <?php if (!$ev): ?><p class="muted">An diesem Tag ist noch nichts eingetragen.</p><?php endif; ?>
+                <div class="list day-list">
+                <?php foreach ($ev as $e): ?>
+                    <?php if ($e['type'] === 'kurs'): ?>
+                        <a class="day-item kurs" href="<?= forma_h($self) ?>?view=course&amp;id=<?= $e['id'] ?>"><strong><?= forma_h($e['time'] ? $e['time'] . ' Uhr' : '') ?></strong> <?= forma_h($e['title']) ?> <span class="muted small">· <?= $e['booked'] ?>/<?= $e['cap'] ?> belegt<?= $e['visible'] ? '' : ' · ausgeblendet' ?></span></a>
+                    <?php elseif ($e['type'] === 'private'): $s = $e['s']; ?>
+                        <div class="day-item private">
+                            <div><strong><?= forma_h(forma_de_time((string)$s['start'])) ?></strong> Private Pottery · <strong><?= forma_h($s['name']) ?></strong> <span class="muted small">· <?= forma_h(forma_hours_text((float)$s['hours'])) ?></span></div>
+                            <div class="small"><?= forma_h(mb_strimwidth((string)$s['project'], 0, 140, ' …')) ?></div>
+                            <div class="small muted"><?= forma_h($s['email']) ?><?= $s['phone'] ? ' · ' . forma_h($s['phone']) : '' ?> · <?= $s['mailed_at'] ? 'bestätigt am ' . forma_h(date('d. m., H:i', strtotime($s['mailed_at']))) : '<strong>vorgemerkt, noch nicht bestätigt</strong>' ?></div>
+                            <div class="row-actions">
+                                <a class="link small" href="<?= $q(['m' => $month, 'd' => $sel, 'assign' => (int)$s['private_id']]) ?>">Alle Termine von <?= forma_h(forma_first_name((string)$s['name'])) ?><?= $s['mailed_at'] ? '' : ' · bestätigen' ?></a>
+                                <details class="del"><summary class="link small">Verschieben / löschen</summary>
+                                    <form method="post" class="stack"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="private_session_delete"><input type="hidden" name="sid" value="<?= (int)$s['id'] ?>">
+                                    <?php if ($s['mailed_at']): ?><label class="check small"><input type="checkbox" name="notify" value="1" checked> <?= forma_h(forma_first_name((string)$s['name'])) ?> per E-Mail Bescheid geben</label><?php endif; ?>
+                                    <button class="btn btn-danger" type="submit">Termin löschen</button>
+                                    <span class="muted small">Die Stunden bleiben ihr erhalten und du kannst sie gleich neu einplanen.</span></form>
+                                </details>
+                            </div>
+                        </div>
+                    <?php else: $b = $e['b']; ?>
+                        <a class="day-item wunsch" href="<?= $q(['m' => $month, 'd' => $sel, 'assign' => (int)$b['id']]) ?>#tag"><span class="wish-dot"></span> Wunschtermin von <strong><?= forma_h($b['name']) ?></strong> <span class="muted small">· <?= forma_h(FORMA_WISH_TIMES[$b['wish_time']] ?? '') ?></span> <span class="small">Einplanen →</span></a>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+                </div>
+
+                <?php if ($assign && ($assign['rest'] === null || $assign['rest'] > 0)): $max = $assign['rest'] ?? 4.0; ?>
+                <form method="post" class="assign-form stack">
+                    <h3>Private Pottery mit <?= forma_h(forma_first_name((string)$assign['name'])) ?> eintragen</h3>
+                    <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="private_assign"><input type="hidden" name="pid" value="<?= $aid ?>"><input type="hidden" name="date" value="<?= forma_h($sel) ?>">
+                    <div class="row">
+                        <div class="stack"><label for="a-start">Uhrzeit</label><input id="a-start" name="start" type="time" step="900" value="<?= forma_h($defaultStart) ?>" required></div>
+                        <div class="stack"><label for="a-hours">Wie lange?</label><select id="a-hours" name="hours">
+                            <?php $def = $assign['rest'] === null ? max(1.0, min(4.0, (float)$assign['hours'] ?: 2.0)) : (float)$assign['rest']; for ($h = 0.5; $h <= max(1, $max) + 0.001; $h += 0.5): ?><option value="<?= $h ?>"<?= abs($h - $def) < 0.01 ? ' selected' : '' ?>><?= forma_h(forma_hours_text($h)) ?></option><?php endfor; ?>
+                        </select></div>
+                    </div>
+                    <?php if ($assign['rest'] !== null && $assign['rest'] > 1): ?><p class="small muted">Du willst die <?= forma_h(forma_hours_text((float)$assign['rest'])) ?> aufteilen? Wähl hier z. B. 1 Stunde und tipp danach auf den nächsten Tag.</p><?php endif; ?>
+                    <button class="btn" type="submit">Termin vormerken</button>
+                    <span class="muted small">Es geht noch keine E-Mail raus. Die Bestätigung schickst du oben, sobald alle Termine eingetragen sind.</span>
+                </form>
+                <?php elseif ($open): ?>
+                <form method="get" class="stack assign-pick"><input type="hidden" name="view" value="kalender"><input type="hidden" name="m" value="<?= forma_h($month) ?>"><input type="hidden" name="d" value="<?= forma_h($sel) ?>">
+                    <label for="pick">Private Pottery an diesem Tag einplanen</label>
+                    <select id="pick" name="assign" onchange="this.form.submit()"><option value="">Buchung auswählen …</option>
+                    <?php foreach ($open as $b): ?><option value="<?= (int)$b['id'] ?>"><?= forma_h($b['name'] . ' · ' . ($b['rest'] !== null ? 'noch ' . forma_hours_text((float)$b['rest']) : 'Anfrage')) ?></option><?php endforeach; ?>
+                    </select><noscript><button class="btn btn-ghost" type="submit">Auswählen</button></noscript>
+                </form>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+        <aside class="cal-side">
+            <h2>Zum Einplanen</h2>
+            <?php if (!$open): ?><p class="muted small">Alles eingeplant. Neue Private-Pottery-Buchungen erscheinen automatisch hier.</p><?php endif; ?>
+            <div class="list side-list">
+            <?php foreach ($open as $b): $w = forma_wish_text($b); ?>
+                <a class="card side-item<?= $b['id'] == $aid ? ' active' : '' ?>" href="<?= $q(['m' => $b['wish_date'] !== '' && $b['wish_date'] >= date('Y-m-d') ? substr($b['wish_date'], 0, 7) : $month, 'd' => $b['wish_date'] >= date('Y-m-d') ? $b['wish_date'] : '', 'assign' => (int)$b['id']]) ?>#tag">
+                    <strong><?= forma_h($b['name']) ?></strong>
+                    <span class="pill<?= $b['status'] === 'bezahlt' ? ' pill-ok' : '' ?>"><?= $b['status'] === 'bezahlt' ? forma_h('noch ' . forma_hours_text((float)$b['rest']) . ' · bezahlt') : 'Anfrage' ?></span>
+                    <?php if ($w): ?><span class="small"><span class="wish-dot"></span> <?= forma_h($w) ?></span><?php endif; ?>
+                    <span class="small muted"><?= forma_h(mb_strimwidth((string)$b['project'], 0, 90, ' …')) ?></span>
+                </a>
+            <?php endforeach; ?>
+            </div>
+        </aside>
+        </div>
+    <?php });
+}
+
 if ($view === 'private') {
     forma_reconcile_payments($pdo, true);
     $rows = $pdo->query("SELECT * FROM private_bookings WHERE status IN ('bezahlt','anfrage') ORDER BY done, id DESC")->fetchAll();
-    render_page('Private Pottery', function () use ($self, $flash, $rows) { ?>
+    render_page('Private Pottery', function () use ($self, $flash, $rows, $pdo) { ?>
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Private Pottery</h1>
-        <p class="muted">Bezahlte Buchungen und Anfragen. Mach mit jeder Person den Termin aus und hake sie danach als erledigt ab.</p>
+        <p class="muted">Bezahlte Buchungen und Anfragen. Mach mit jeder Person den Termin aus, trag ihn im Kalender ein und schick ihr die Bestätigung. Nach dem letzten Termin geht die Bitte um eine Google-Bewertung automatisch raus.</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <div class="list">
         <?php foreach ($rows as $b): $paid = $b['status'] === 'bezahlt'; ?>
@@ -795,12 +1029,14 @@ if ($view === 'private') {
                 <div class="booking-head"><strong><?= forma_h($b['name']) ?></strong>
                     <span class="pill<?= $paid ? ' pill-ok' : '' ?>"><?= $paid ? forma_h(((int)$b['hours'] === 1 ? '1 Stunde' : $b['hours'] . ' Stunden') . ' · ' . forma_euro((int)$b['amount_cents']) . ' bezahlt') : 'Anfrage, noch nicht gebucht' ?></span></div>
                 <div><?= nl2br(forma_h($b['project'])) ?></div>
-                <?php if ($b['wish']): ?><div class="muted small">Wunschtermin: <?= forma_h($b['wish']) ?></div><?php endif; ?>
+                <?php $w = forma_wish_text($b); if ($w): ?><div class="small"><span class="wish-dot"></span> Wunsch: <?= forma_h($w) ?></div><?php endif; ?>
+                <?php $ss = forma_private_sessions($pdo, (int)$b['id']); if ($ss): ?><ul class="sess small"><?php foreach ($ss as $s): ?><li><?= forma_h(forma_de_date((string)$s['date']) . ', ' . forma_de_time((string)$s['start']) . ' · ' . forma_hours_text((float)$s['hours'])) ?> <span class="pill<?= $s['mailed_at'] ? ' pill-ok' : ' pill-wait' ?>"><?= $s['mailed_at'] ? 'bestätigt' : 'vorgemerkt' ?></span></li><?php endforeach; ?></ul><?php endif; ?>
+                <?php if (!$b['done']): ?><a class="btn btn-ghost btn-sm" href="<?= forma_h($self) ?>?view=kalender&amp;assign=<?= (int)$b['id'] ?>">📅 <?= $ss ? 'Termine im Kalender ansehen' : 'Im Kalender einplanen' ?></a><?php endif; ?>
                 <div class="sel small"><?= forma_h($b['email']) ?><?= $b['phone'] ? ' · ' . forma_h($b['phone']) : '' ?></div>
                 <div><strong>Melden per <?= ($b['contact'] ?? 'email') === 'telefon' ? 'Telefon' : 'E-Mail' ?></strong><?= (int)$b['hours'] > 0 && !$paid ? ' · geschätzt ' . ((int)$b['hours'] === 1 ? '1 Stunde' : (int)$b['hours'] . ' Stunden') : '' ?></div>
                 <div class="muted small"><?= $paid ? 'Gebucht' : 'Angefragt' ?> am <?= forma_h(date('d. m. Y, H:i', strtotime($b['created_at']))) ?></div>
                 <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="private_done"><input type="hidden" name="pid" value="<?= (int)$b['id'] ?>">
-                <button class="link" type="submit"><?= $b['done'] ? 'Wieder als offen markieren' : 'Termin ausgemacht / erledigt' ?></button></form>
+                <button class="link" type="submit"><?= $b['done'] ? 'Wieder als offen markieren' : 'Als erledigt abhaken' ?></button></form>
             </div>
         <?php endforeach; ?>
         <?php if (!$rows): ?><p class="muted">Noch keine Buchungen oder Anfragen.</p><?php endif; ?>
@@ -1195,25 +1431,73 @@ $subCount = (int)$pdo->query("SELECT COUNT(*) FROM subscribers WHERE status = 'b
 $popupLive = forma_popup_live(forma_popup($pdo));
 $voucherOpen = (int)$pdo->query("SELECT COUNT(*) FROM vouchers WHERE status = 'bezahlt'")->fetchColumn();
 $privateOpen = (int)$pdo->query("SELECT COUNT(*) FROM private_bookings WHERE status IN ('bezahlt','anfrage') AND done = 0")->fetchColumn();
-render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive, $voucherOpen, $privateOpen) { ?>
-    <div class="top">
-        <h1>Kursverwaltung</h1>
-        <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="logout"><button class="link" type="submit">Abmelden</button></form>
-    </div>
+// Agenda für die nächsten 7 Tage: Kurse mit Anmeldungen und Private-Pottery-Termine
+$agenda = [];
+$st = $pdo->prepare('SELECT * FROM courses WHERE start_date BETWEEN ? AND ? ORDER BY start_date, id');
+$st->execute([date('Y-m-d'), date('Y-m-d', strtotime('+6 days'))]);
+foreach ($st->fetchAll() as $c) {
+    $bk = forma_booked($pdo, (int)$c['id']);
+    $time = preg_match('/(\d{1,2}(?::\d{2})?)\s*[–-]\s*\d{1,2}(?::\d{2})?\s*Uhr/u', (string)$c['date_text'], $m) ? $m[1] : '';
+    $agenda[$c['start_date']][] = ['sort' => sprintf('%05s', strlen($time) <= 2 ? $time . ':00' : $time), 'time' => $time !== '' ? forma_de_time($time) : '', 'title' => preg_replace('/\s*·.*$/u', '', (string)$c['title']), 'sub' => $bk . ' / ' . $c['capacity'] . ' angemeldet', 'href' => '?view=course&id=' . $c['id'], 'kind' => $bk > 0 ? 'kurs' : 'kurs leer'];
+}
+$st = $pdo->prepare('SELECT s.*, p.name FROM private_sessions s JOIN private_bookings p ON p.id = s.private_id WHERE s.date BETWEEN ? AND ?');
+$st->execute([date('Y-m-d'), date('Y-m-d', strtotime('+6 days'))]);
+foreach ($st->fetchAll() as $x) {
+    $agenda[$x['date']][] = ['sort' => sprintf('%05s', $x['start']), 'time' => forma_de_time((string)$x['start']), 'title' => 'Private Pottery · ' . $x['name'], 'sub' => forma_hours_text((float)$x['hours']) . ($x['mailed_at'] ? '' : ' · noch nicht bestätigt'), 'href' => '?view=kalender&m=' . substr((string)$x['date'], 0, 7) . '&d=' . $x['date'] . '#tag', 'kind' => 'private'];
+}
+ksort($agenda);
+foreach ($agenda as &$l) usort($l, fn($a, $b) => strcmp($a['sort'], $b['sort']));
+unset($l);
+$toPlan = 0;
+foreach ($pdo->query("SELECT id, hours, status FROM private_bookings WHERE status IN ('bezahlt','anfrage') AND done = 0")->fetchAll() as $pb) {
+    $pl = forma_private_planned($pdo, (int)$pb['id']);
+    if ($pb['status'] === 'bezahlt' ? $pl + 0.01 < (float)$pb['hours'] : $pl == 0.0) $toPlan++;
+}
+$newBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE status = 'bestaetigt' AND created_at >= '" . date('c', strtotime('-7 days')) . "'")->fetchColumn();
+render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive, $voucherOpen, $privateOpen, $agenda, $toPlan, $newBookings) {
+    $h = (int)date('G');
+    $hello = $h < 11 ? 'Guten Morgen' : ($h < 17 ? 'Hallo' : 'Guten Abend'); ?>
+    <section class="hero">
+        <span class="deco-slot d1"></span><span class="deco-slot d2"></span><span class="deco-slot d3"></span><span class="deco-slot d4"></span>
+        <div class="hero-text">
+            <p class="eyebrow"><?= forma_h(forma_de_date(date('Y-m-d'))) ?></p>
+            <h1><?= $hello ?>, Vivien!</h1>
+            <p class="muted">Schön, dass du da bist. Hier ist alles, was in deinem Atelier gerade los ist.</p>
+        </div>
+        <div class="stats">
+            <a class="stat" href="<?= forma_h($self) ?>?view=kalender"><b><?= $toPlan ?></b><span>Private Pottery zum Einplanen</span></a>
+            <a class="stat" href="#termine"><b><?= $newBookings ?></b><span>neue Buchungen in 7 Tagen</span></a>
+            <a class="stat" href="<?= forma_h($self) ?>?view=liste"><b><?= $subCount ?></b><span>Kontakte im Newsletter</span></a>
+        </div>
+        <form method="post" class="logout"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="logout"><button class="link small" type="submit">Abmelden</button></form>
+    </section>
     <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
     <?php if (!forma_stripe_key()): ?><p class="alert">Die Online-Bezahlung ist noch nicht eingerichtet. Bis dahin werden alle Kurse ohne Bezahlung reserviert. <a href="<?= forma_h($self) ?>?view=einstellungen">Jetzt Stripe verbinden</a></p><?php endif; ?>
-    <nav class="tiles">
-        <a class="tile" href="<?= forma_h($self) ?>?view=edit"><strong>+ Einzeltermin</strong><span class="muted small">z. B. ein Special-Kurs</span></a>
-        <a class="tile" href="<?= forma_h($self) ?>?view=series"><strong>+ Serientermine</strong><span class="muted small">z. B. jeden Mi &amp; Fr</span></a>
-        <a class="tile" href="<?= forma_h($self) ?>?view=popup"><strong>Pop-up &amp; Deko</strong><span class="muted small"><?= $popupLive ? 'gerade sichtbar' : 'ausgeschaltet' ?> · Deko</span></a>
-        <a class="tile" href="<?= forma_h($self) ?>?view=templates"><strong>Templates</strong><span class="muted small">&amp; Maker Club</span></a>
-        <a class="tile" href="<?= forma_h($self) ?>?view=private"><strong>Private Pottery</strong><span class="muted small"><?= $privateOpen ?> offen</span></a>
-        <a class="tile" href="<?= forma_h($self) ?>?view=gutscheine"><strong>Gutscheine</strong><span class="muted small"><?= $voucherOpen ?> offen</span></a>
-        <a class="tile" href="<?= forma_h($self) ?>?view=rechnungen"><strong>Rechnungen</strong><span class="muted small">automatisch nach Zahlung</span></a>
-        <a class="tile" href="<?= forma_h($self) ?>?view=liste"><strong>E-Mail-Liste</strong><span class="muted small"><?= $subCount ?> <?= $subCount === 1 ? 'Kontakt' : 'Kontakte' ?></span></a>
-        <a class="tile" href="<?= forma_h($self) ?>?view=einstellungen"><strong>Einstellungen</strong><span class="muted small">Stripe, MailerLite, E-Mail</span></a>
-    </nav>
-    <h2>Kommende Termine</h2>
+    <?php if ($toPlan > 0): ?><a class="card notice" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('private') ?></span><span><strong><?= $toPlan === 1 ? '1 Private-Pottery-Buchung wartet' : $toPlan . ' Private-Pottery-Buchungen warten' ?> auf ihren Termin.</strong><br><span class="muted small">Im Kalender einplanen und Bestätigung schicken →</span></span></a><?php endif; ?>
+    <div class="dash">
+        <section class="agenda card">
+            <h2>Die nächsten 7 Tage</h2>
+            <?php if (!$agenda): ?><p class="muted">Keine Termine in den nächsten 7 Tagen.</p><?php endif; ?>
+            <?php foreach ($agenda as $d => $items): ?>
+                <div class="ag-day"><div class="ag-date"><b><?= (int)date('j', strtotime($d)) ?></b><span><?= forma_h(mb_substr(FORMA_WEEKDAYS_LONG[(int)date('w', strtotime($d))], 0, 2)) ?></span><?php if ($d === date('Y-m-d')): ?><em>heute</em><?php endif; ?></div>
+                <div class="ag-items"><?php foreach ($items as $it): ?><a class="ag-item <?= forma_h($it['kind']) ?>" href="<?= forma_h($self . $it['href']) ?>"><strong><?= forma_h($it['time']) ?></strong> <?= forma_h($it['title']) ?> <span class="muted small">· <?= forma_h($it['sub']) ?></span></a><?php endforeach; ?></div></div>
+            <?php endforeach; ?>
+            <a class="link small" href="<?= forma_h($self) ?>?view=kalender">Ganzen Kalender öffnen →</a>
+        </section>
+        <nav class="tiles">
+            <a class="tile hl" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('kalender') ?></span><strong>Kalender</strong><span class="muted small">Kurse &amp; Private Pottery</span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=private"><span class="ic"><?= admin_icon('private') ?></span><strong>Private Pottery</strong><span class="muted small"><?= $privateOpen ?> offen</span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=edit"><span class="ic"><?= admin_icon('plus') ?></span><strong>Einzeltermin</strong><span class="muted small">z. B. ein Special-Kurs</span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=series"><span class="ic"><?= admin_icon('serie') ?></span><strong>Serientermine</strong><span class="muted small">z. B. jeden Mi &amp; Fr</span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=templates"><span class="ic"><?= admin_icon('template') ?></span><strong>Templates</strong><span class="muted small">&amp; Maker Club</span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=gutscheine"><span class="ic"><?= admin_icon('gutschein') ?></span><strong>Gutscheine</strong><span class="muted small"><?= $voucherOpen ?> offen</span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=rechnungen"><span class="ic"><?= admin_icon('rechnung') ?></span><strong>Rechnungen</strong><span class="muted small">automatisch nach Zahlung</span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=liste"><span class="ic"><?= admin_icon('mail') ?></span><strong>E-Mail-Liste</strong><span class="muted small"><?= $subCount ?> <?= $subCount === 1 ? 'Kontakt' : 'Kontakte' ?></span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=popup"><span class="ic"><?= admin_icon('popup') ?></span><strong>Pop-up &amp; Deko</strong><span class="muted small"><?= $popupLive ? 'gerade sichtbar' : 'ausgeschaltet' ?> · Deko</span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=einstellungen"><span class="ic"><?= admin_icon('settings') ?></span><strong>Einstellungen</strong><span class="muted small">Stripe, MailerLite, E-Mail</span></a>
+        </nav>
+    </div>
+    <h2 id="termine">Alle kommenden Kurstermine</h2>
     <?php if (!$groups): ?><p class="muted">Gerade sind keine Termine eingetragen.</p><?php endif; ?>
     <?php foreach ($groups as $title => $list): $bookedSum = array_sum(array_column($list, 'booked')); ?>
     <details class="group" <?= count($list) <= 3 || $bookedSum > 0 ? 'open' : '' ?>>
@@ -1250,6 +1534,23 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
     </details>
     <?php endif; ?>
 <?php });
+
+function admin_icon(string $k): string
+{
+    $p = [
+        'kalender' => '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="8.5" cy="14.5" r="1.2" fill="currentColor"/><circle cx="12" cy="14.5" r="1.2" fill="currentColor"/>',
+        'private' => '<path d="M6 10c0-3 2.7-5 6-5s6 2 6 5c0 2-1 3-1 5v1H7v-1c0-2-1-3-1-5z"/><path d="M7 19h10M9 10c.5 1 1.6 1.5 3 1.5s2.5-.5 3-1.5"/>',
+        'plus' => '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+        'serie' => '<path d="M4 12a8 8 0 0114-5.3M20 12a8 8 0 01-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/>',
+        'template' => '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h4"/>',
+        'gutschein' => '<rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-1-3-5-4-5-1.5S10 8 12 8zm0 0c1-3 5-4 5-1.5S14 8 12 8z"/>',
+        'rechnung' => '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+        'mail' => '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/>',
+        'popup' => '<path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8zM6 16l.6 1.4L8 18l-1.4.6L6 20l-.6-1.4L4 18l1.4-.6z"/>',
+        'settings' => '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
+    ][$k] ?? '';
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $p . '</svg>';
+}
 
 function render_page(string $title, callable $body): void
 { ?><!doctype html>
@@ -1310,6 +1611,96 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .thumb{max-width:220px;border-radius:12px}
 .past{margin-top:28px}.past summary{cursor:pointer;font-weight:500;margin-bottom:12px}
 @media (max-width:480px){.row{grid-template-columns:1fr}}
+/* Kopf & Saison-Icons */
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.head-deco{display:flex;gap:6px}
+.deco-slot{display:inline-block;width:34px;height:34px;transform:rotate(var(--r,0deg));animation:sway 7s ease-in-out infinite alternate}
+.deco-slot svg{width:100%;height:100%;display:block;filter:drop-shadow(0 3px 6px rgba(103,48,30,.14))}
+@keyframes sway{from{transform:rotate(calc(var(--r,0deg) - 4deg)) translateY(0)}to{transform:rotate(calc(var(--r,0deg) + 4deg)) translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.deco-slot{animation:none}}
+.no-deco .deco-slot{display:none}
+.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:13px;color:var(--soft);margin:0}
+/* Startseite */
+.hero{position:relative;background:linear-gradient(135deg,#F8F1EA,#F1E3D3);border:1px solid var(--line);border-radius:28px;padding:22px 20px 18px;margin:14px 0 16px;overflow:hidden}
+.hero h1{margin:4px 0 6px}
+.hero-text{max-width:620px;position:relative;z-index:1}
+.hero .deco-slot{position:absolute;width:44px;height:44px;opacity:.95}
+.hero .d1{right:16px;top:14px}.hero .d2{right:70px;top:54px;width:34px;height:34px}.hero .d3{right:22px;top:96px;width:38px;height:38px}.hero .d4{display:none}
+.hero-text{padding-right:110px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px;position:relative;z-index:1}
+.stat{display:flex;flex-direction:column;background:#FFFAF5;border:1px solid var(--line);border-radius:18px;padding:12px 14px;text-decoration:none;color:var(--ink)}
+.stat b{font-family:"Bricolage Grotesque","Outfit",sans-serif;font-size:30px;color:var(--clay);line-height:1.1}
+.stat span{font-size:14px;color:var(--soft);line-height:1.3}
+.stat:hover,.tile:hover{border-color:var(--clay)}
+.logout{position:absolute;right:18px;bottom:10px;z-index:1}
+.notice{display:flex;gap:14px;align-items:center;text-decoration:none;color:var(--ink);border-color:#B05A38;background:#FFF7F0;margin-bottom:16px}
+.ic{display:inline-flex;width:40px;height:40px;flex:0 0 40px;border-radius:12px;background:#F1E3D3;color:var(--clay);align-items:center;justify-content:center}
+.ic svg{width:24px;height:24px}
+.dash{display:grid;gap:16px}
+.tiles{margin:0}
+.tile{gap:4px}.tile .ic{margin-bottom:6px}
+.tile.hl{background:#F6E6DA;border-color:#C98F72}
+.agenda h2{margin-top:0}
+.ag-day{display:flex;gap:14px;padding:10px 0;border-top:1px solid var(--line)}
+.ag-date{flex:0 0 46px;display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.ag-date b{font-family:"Bricolage Grotesque","Outfit",sans-serif;font-size:26px;color:var(--clay)}
+.ag-date span{font-size:13px;color:var(--soft);text-transform:uppercase;letter-spacing:.08em}
+.ag-date em{font-style:normal;font-size:11px;background:var(--clay);color:#FBF1EA;border-radius:999px;padding:1px 7px;margin-top:3px}
+.ag-items{display:flex;flex-direction:column;gap:6px;min-width:0}
+.ag-item{text-decoration:none;color:var(--ink);padding:6px 10px;border-radius:10px;background:#F3E7DA;border-left:4px solid #C9A88E}
+.ag-item.private{background:#F6E2D9;border-left-color:var(--clay)}
+.ag-item.leer{opacity:.65}
+/* Kalender */
+.cal-wrap{display:grid;gap:18px}
+.cal-nav{display:flex;align-items:center;gap:10px;margin:6px 0 10px}
+.cal-nav h2{margin:0;min-width:180px;text-align:center}
+.cal-nav .btn{min-height:40px;padding:4px 16px;font-size:22px;line-height:1}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal-wd{text-align:center;font-size:13px;color:var(--soft);text-transform:uppercase;letter-spacing:.08em;padding:4px 0}
+.cal-day{min-height:74px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:5px;display:flex;flex-direction:column;gap:3px;text-decoration:none;color:var(--ink);min-width:0;overflow:hidden}
+.cal-day.empty{background:transparent;border:0}
+.cal-day.past{opacity:.55}
+.cal-day.today .num{background:var(--clay);color:#FBF1EA;border-radius:999px;padding:0 7px}
+.cal-day.sel{outline:3px solid var(--clay);outline-offset:-1px}
+.cal-day.wish{background:#FFF3EA;border:2px dashed #B05A38}
+.cal-day:hover{border-color:var(--clay)}
+.num{font-weight:600;font-size:14px;align-self:flex-start}
+.ev{display:block;font-size:11.5px;line-height:1.25;padding:2px 5px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#EAD8C6}
+.ev-private{background:var(--clay);color:#FBF1EA}
+.ev-private.pending{background:#fff;color:var(--clay);border:1.5px dashed var(--clay)}
+.ev-wish{background:#fff;border:1.5px dashed #B05A38;color:#8a3f24}
+.ev.more{background:none;color:var(--soft)}
+.legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.legend .ev{display:inline-block;font-size:13px}
+.wish-dot{display:inline-block;width:10px;height:10px;border-radius:50%;border:2px dashed #B05A38;vertical-align:middle}
+.day-panel{margin-top:16px;scroll-margin-top:16px}
+.day-panel h2{margin-top:0}
+.day-list{display:flex!important;flex-direction:column;gap:8px}
+.day-item{display:block;padding:10px 12px;border-radius:12px;background:#F3E7DA;border-left:4px solid #C9A88E;text-decoration:none;color:var(--ink)}
+.day-item.private{background:#F6E2D9;border-left-color:var(--clay)}
+.day-item.wunsch{background:#fff;border:1.5px dashed #B05A38}
+.row-actions{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-top:4px}
+.del summary{list-style:none;cursor:pointer}.del summary::-webkit-details-marker{display:none}
+.del form{margin-top:8px}
+.assign-form,.assign-pick{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.assign-form h3{margin:0;font-size:20px;color:var(--clay)}
+.assign{border:2px solid var(--clay);display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.confirm-form{margin-top:6px;padding:12px;border-radius:14px;background:#FFF7F0}
+.sess{margin:4px 0;padding-left:18px;display:grid;gap:4px}
+.pill-wait{background:#fff;border:1.5px dashed var(--clay);color:var(--clay)}
+.btn-sm{min-height:38px;padding:6px 14px;font-size:15px;width:max-content;margin-top:4px}
+.side-list{display:flex!important;flex-direction:column;gap:8px}
+.side-item{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink);padding:12px 14px}
+.side-item.active{border:2px solid var(--clay)}
+.cal-side h2{margin-top:0}
+@media (max-width:640px){
+  .stats{grid-template-columns:1fr 1fr 1fr;gap:6px}.stat{padding:10px}.stat b{font-size:24px}.stat span{font-size:12px}
+  .hero-text{padding-right:56px}.hero .d2{display:none}.hero .d3{top:66px}
+  .cal{gap:2px}.cal-day{min-height:54px;padding:3px;border-radius:8px}
+  .ev{font-size:0;height:6px;padding:0;border-radius:3px}
+  .legend .ev{font-size:12px;height:auto;padding:2px 6px}
+  .cal-nav h2{min-width:0;font-size:20px}
+  .logout{position:static;margin-top:10px}
+}
 /* Desktop: ganze Bildschirmbreite, größere Schrift */
 @media (min-width:900px){
   body{font-size:21.5px}
@@ -1332,7 +1723,20 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
   input,textarea,select{font-size:20px;padding:13px 15px}
   .small{font-size:17.5px}
   .pill{font-size:17px;padding:3px 12px}
+  .hero{padding:30px 34px 24px}
+  .hero .deco-slot{width:60px;height:60px}.hero .d1{right:40px;top:22px}.hero .d2{right:130px;top:70px;width:46px;height:46px}.hero .d3{right:46px;top:120px;width:50px;height:50px}.hero .d4{display:block;right:230px;top:24px;width:40px;height:40px}
+  .hero-text{padding-right:280px;max-width:none}
+  .stats{max-width:900px}.stat b{font-size:38px}.stat span{font-size:16px}
+  .deco-slot{width:44px;height:44px}
+  .dash{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}
+  .dash .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cal-wrap{grid-template-columns:minmax(0,1fr) 360px;align-items:start}
+  .cal-day{min-height:118px;padding:8px}
+  .ev{font-size:14px;padding:3px 7px}
+  .num{font-size:17px}
+  .ic{width:48px;height:48px;flex-basis:48px}.ic svg{width:28px;height:28px}
 }
+@media (min-width:1300px){.dash .tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (min-width:1200px){
   form.card.stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:900px}
 }
@@ -1340,9 +1744,10 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 </head>
 <body>
 <main>
-<a class="brand" href="/"><img src="../img/forma-logo.png" alt=""><span>FORMA · Kursverwaltung</span></a>
+<header class="head"><a class="brand" href="<?= forma_h(strtok($_SERVER['REQUEST_URI'] ?? '/verwaltung/', '?') ?: '/verwaltung/') ?>"><img src="../img/forma-logo.png" alt=""><span>FORMA · Atelier-Verwaltung</span></a><span class="head-deco"><span class="deco-slot"></span><span class="deco-slot"></span><span class="deco-slot"></span></span></header>
 <?php $body(); ?>
 </main>
+<script src="deko.js?v=1" defer></script>
 </body>
 </html>
 <?php exit;

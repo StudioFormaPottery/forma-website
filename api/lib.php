@@ -173,6 +173,18 @@ function forma_migrate(PDO $pdo): void
     forma_add_column($pdo, 'private_bookings', 'contact', "TEXT NOT NULL DEFAULT 'email'");
     forma_add_column($pdo, 'bookings', 'review_sent', 'TEXT');
     forma_add_column($pdo, 'private_bookings', 'review_sent', 'TEXT');
+    forma_add_column($pdo, 'private_bookings', 'wish_date', "TEXT NOT NULL DEFAULT ''");
+    forma_add_column($pdo, 'private_bookings', 'wish_time', "TEXT NOT NULL DEFAULT ''");
+    $pdo->exec('CREATE TABLE IF NOT EXISTS private_sessions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        private_id INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        start TEXT NOT NULL,
+        hours REAL NOT NULL DEFAULT 1,
+        note TEXT NOT NULL DEFAULT \'\',
+        mailed_at TEXT,
+        created_at TEXT NOT NULL
+    )');
 
     // Startinhalt beim allerersten Aufruf: der laufende Pottery-Pause-Kurs.
     if (forma_setting($pdo, 'seeded') === null) {
@@ -1407,21 +1419,23 @@ function forma_private_mails(PDO $pdo, int $id): void
     $viaPhone = ($b['contact'] ?? 'email') === 'telefon';
     $contactLine = $viaPhone ? "Bitte melden per: TELEFON ({$b['phone']})" : 'Bitte melden per: E-Mail';
     $isTeam = str_starts_with((string)$b['project'], 'Teambuilding/Event:');
+    $wish = forma_wish_text($b) ?: 'noch offen';
+    $planUrl = $site . '/verwaltung/?view=kalender&assign=' . (int)$b['id'];
     if ($b['kind'] === 'anfrage') {
         forma_mail($b['email'], $isTeam ? 'Deine Anfrage für ein Teambuilding-Event' : 'Deine Anfrage für Private Pottery', "Hallo $first,\n\nvielen Dank für deine Nachricht! Ich sehe mir " . ($isTeam ? 'eure Idee' : 'dein Projekt') . " an und melde mich so bald wie möglich " . ($viaPhone ? 'telefonisch' : 'per E-Mail') . " bei dir.\n\n"
-            . "Dein Projekt: {$b['project']}\nWunschtermin: {$b['wish']}\n\nWenn dir noch etwas einfällt, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nBis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
-        forma_mail(FORMA_NOTIFY_EMAIL, ($isTeam ? 'Anfrage Teambuilding/Event (' : 'Anfrage Private Pottery (') . $b['name'] . ')', "Neue Anfrage für " . ($isTeam ? 'Teambuilding/Event' : 'Private Pottery (noch nicht gebucht)') . "\n$contactLine\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nPersonen: $persons\n\nProjekt:\n{$b['project']}\n\nWunschtermin: {$b['wish']}\n\nAlle Anfragen: $site/verwaltung/?view=private\n", $b['email']);
+            . "Dein Projekt: {$b['project']}\nWunschtermin: $wish\n\nWenn dir noch etwas einfällt, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nBis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
+        forma_mail(FORMA_NOTIFY_EMAIL, ($isTeam ? 'Anfrage Teambuilding/Event (' : 'Anfrage Private Pottery (') . $b['name'] . ')', "Neue Anfrage für " . ($isTeam ? 'Teambuilding/Event' : 'Private Pottery (noch nicht gebucht)') . "\n$contactLine\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nPersonen: $persons\n\nProjekt:\n{$b['project']}\n\nWunschtermin: $wish\n\nIm Kalender einplanen: $planUrl\n", $b['email']);
         return;
     }
     $amount = forma_euro((int)$b['amount_cents']);
     $unsub = '';
     try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Buchung: Private Pottery'); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
     forma_mail($b['email'], 'Deine Private Pottery Stunden sind gebucht', "Hallo $first,\n\nwie schön, dass wir dein Projekt gemeinsam umsetzen! Deine Zahlung ist angekommen.\n\n"
-        . "Gebucht: $hours Private Pottery ($persons)\nBezahlt: $amount\nDein Projekt: {$b['project']}\nWunschtermin: {$b['wish']}\n\n"
-        . "Ich melde mich in den nächsten Tagen bei dir, damit wir den genauen Termin festmachen. Die Stunden können wir gern auch auf mehrere Termine aufteilen.\n"
+        . "Gebucht: $hours Private Pottery ($persons)\nBezahlt: $amount\nDein Projekt: {$b['project']}\nWunschtermin: $wish\n\n"
+        . "Ich schaue mir deinen Wunschtermin an und schicke dir eine eigene Bestätigung, sobald dein Termin fix ist. Deine Stunden können wir auch gern auf mehrere Tage aufteilen, du bekommst dann für jeden Termin eine Bestätigung.\n"
         . "Falls doch etwas dazwischenkommt: Bis 48 Stunden vor unserem Termin kannst du kostenlos stornieren, danach werden 50 % fällig, wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit, gemeinsam finden wir eine Lösung.\n\n"
         . "Bis bald im Studio!\nVivien\nFORMA Earth & Art\n$phone\nwww.forma-pottery.com\n" . forma_newsletter_note($unsub));
-    forma_mail(FORMA_NOTIFY_EMAIL, 'Private Pottery gebucht: ' . $hours . ' (' . $b['name'] . ')', "Neue bezahlte Buchung Private Pottery\n$contactLine\n\n$hours · $amount bezahlt über Stripe\nPersonen: $persons\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\n\nProjekt:\n{$b['project']}\n\nWunschtermin: {$b['wish']}\n\nBitte Termin bestätigen. Übersicht: $site/verwaltung/?view=private\n", $b['email']);
+    forma_mail(FORMA_NOTIFY_EMAIL, 'Private Pottery gebucht: ' . $hours . ' (' . $b['name'] . ')', "Neue bezahlte Buchung Private Pottery\n$contactLine\n\n$hours · $amount bezahlt über Stripe\nPersonen: $persons\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\n\nProjekt:\n{$b['project']}\n\nWunschtermin: $wish\n\nJetzt im Kalender einplanen (Gast bekommt automatisch die Bestätigung): $planUrl\n", $b['email']);
     forma_invoice_for($pdo, 'private', $id);
 }
 
@@ -1719,6 +1733,137 @@ function forma_review_mails(PDO $pdo, bool $force = false): int
         $title = preg_replace('/\s*·.*$/u', '', (string)$b['title']);
         forma_review_send($pdo, (string)$b['email'], (string)$b['name'], $title);
         $sent++;
+    }
+    try { $sent += forma_review_private_sessions($pdo); } catch (Throwable $e) { error_log('FORMA review private sessions: ' . $e->getMessage()); }
+    return $sent;
+}
+
+// --- Private Pottery: Termine im Kalender ---------------------------------------
+
+const FORMA_WISH_TIMES = ['vormittag' => 'vormittags', 'nachmittag' => 'nachmittags', 'abend' => 'abends', 'egal' => 'Uhrzeit egal'];
+const FORMA_WEEKDAYS_LONG = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+const FORMA_MONTHS = ['', 'Jänner', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+/** „Montag, 19. November 2026“ */
+function forma_de_date(string $ymd, bool $year = true): string
+{
+    $t = strtotime($ymd . ' 12:00');
+    if (!$t) return $ymd;
+    return FORMA_WEEKDAYS_LONG[(int)date('w', $t)] . ', ' . (int)date('j', $t) . '. ' . FORMA_MONTHS[(int)date('n', $t)] . ($year ? ' ' . date('Y', $t) : '');
+}
+
+/** „19 Uhr“ oder „19:30 Uhr“ */
+function forma_de_time(string $hm): string
+{
+    [$h, $m] = array_map('intval', explode(':', $hm . ':0'));
+    return $m ? sprintf('%d:%02d Uhr', $h, $m) : "$h Uhr";
+}
+
+function forma_hours_text(float $h): string
+{
+    $n = rtrim(rtrim(number_format($h, 1, ',', ''), '0'), ',');
+    return $n . ($h == 1.0 ? ' Stunde' : ' Stunden');
+}
+
+/** Wunschtermin lesbar: „Donnerstag, 19. November 2026, abends · auch möglich: …“ */
+function forma_wish_text(array $b): string
+{
+    $parts = [];
+    if (!empty($b['wish_date'])) {
+        $parts[] = forma_de_date((string)$b['wish_date']) . (!empty($b['wish_time']) && isset(FORMA_WISH_TIMES[$b['wish_time']]) ? ', ' . FORMA_WISH_TIMES[$b['wish_time']] : '');
+    }
+    if (trim((string)($b['wish'] ?? '')) !== '') $parts[] = ($parts ? 'auch möglich: ' : '') . trim((string)$b['wish']);
+    return implode(' · ', $parts);
+}
+
+function forma_private_sessions(PDO $pdo, int $pid): array
+{
+    $st = $pdo->prepare('SELECT * FROM private_sessions WHERE private_id = ? ORDER BY date, start');
+    $st->execute([$pid]);
+    return $st->fetchAll();
+}
+
+/** Bereits eingeplante Stunden einer Buchung. */
+function forma_private_planned(PDO $pdo, int $pid): float
+{
+    $st = $pdo->prepare('SELECT COALESCE(SUM(hours), 0) FROM private_sessions WHERE private_id = ?');
+    $st->execute([$pid]);
+    return (float)$st->fetchColumn();
+}
+
+/** Kalendereintrag (.ics) mit einem oder mehreren Terminen. */
+function forma_ics(array $events): string
+{
+    $tz = new DateTimeZone('Europe/Vienna');
+    $utc = new DateTimeZone('UTC');
+    $f = fn(DateTime $d) => (clone $d)->setTimezone($utc)->format('Ymd\THis\Z');
+    $esc = fn(string $v) => str_replace(["\\", ';', ',', "\n"], ['\\\\', '\;', '\\,', '\\n'], $v);
+    $out = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//FORMA Earth & Art//Atelier//DE\r\nMETHOD:PUBLISH\r\n";
+    foreach ($events as $e) {
+        $from = new DateTime($e['date'] . ' ' . $e['start'], $tz);
+        $to = (clone $from)->modify('+' . (int)round($e['hours'] * 60) . ' minutes');
+        $out .= "BEGIN:VEVENT\r\nUID:{$e['uid']}@forma-pottery.com\r\nDTSTAMP:" . $f(new DateTime('now', $tz)) . "\r\nDTSTART:" . $f($from) . "\r\nDTEND:" . $f($to) . "\r\n"
+            . 'SUMMARY:' . $esc($e['summary']) . "\r\nLOCATION:" . $esc('FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon') . "\r\nDESCRIPTION:" . $esc($e['desc']) . "\r\nEND:VEVENT\r\n";
+    }
+    return $out . "END:VCALENDAR\r\n";
+}
+
+/** Eine gesammelte Bestätigung mit allen eingeplanten Private-Pottery-Terminen einer Buchung. */
+function forma_private_confirm_mail(PDO $pdo, int $pid, string $note = ''): bool
+{
+    $st = $pdo->prepare("SELECT * FROM private_bookings WHERE id = ? AND status IN ('bezahlt','anfrage')");
+    $st->execute([$pid]);
+    $b = $st->fetch();
+    $sessions = forma_private_sessions($pdo, $pid);
+    if (!$b || !$sessions || !filter_var($b['email'], FILTER_VALIDATE_EMAIL)) return false;
+    $first = forma_first_name((string)$b['name']);
+    $phone = FORMA_PHONE;
+    $one = count($sessions) === 1;
+    $planned = forma_private_planned($pdo, $pid);
+    $lines = [];
+    foreach ($sessions as $k => $x) {
+        $lines[] = ($one ? '' : ($k + 1) . '. Termin: ') . forma_de_date((string)$x['date']) . ' um ' . forma_de_time((string)$x['start']) . ' (' . forma_hours_text((float)$x['hours']) . ')';
+    }
+    $paid = $b['status'] === 'bezahlt';
+    $intro = $one
+        ? "juhu, dein Private-Pottery-Termin steht! Ich freue mich schon sehr auf dich."
+        : "juhu, deine Private-Pottery-Termine stehen! Hier sind alle " . count($sessions) . " Termine auf einen Blick, damit du genau weißt, wann wir uns sehen. Ich freue mich schon sehr auf dich.";
+    $rest = $paid ? max(0, (float)$b['hours'] - $planned) : 0;
+    $body = "Hallo $first,\n\n$intro\n\n"
+        . ($one ? 'Wann: ' . $lines[0] . "\n" : implode("\n", $lines) . "\n")
+        . ($paid ? 'Gebucht und bezahlt: ' . forma_hours_text((float)$b['hours']) . " Private Pottery\n" : '')
+        . "Dein Projekt: {$b['project']}\nWo: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
+        . ($rest > 0 ? "\nDu hast dann noch " . forma_hours_text($rest) . " offen, die planen wir gemeinsam ein, wann es dir passt.\n" : '')
+        . (trim($note) !== '' ? "\n" . trim($note) . "\n" : '')
+        . "\nIm Anhang findest du " . ($one ? 'den Termin' : 'alle Termine') . " für deinen Kalender. Bitte komm in Kleidung, die schmutzig werden darf. Schürzen, Werkzeug und Ton habe ich alles im Studio.\n"
+        . "\nFalls doch etwas dazwischenkommt: Bis 48 Stunden vorher kannst du kostenlos verschieben oder stornieren. Melde dich einfach, antworte auf diese E-Mail oder ruf mich an: $phone\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n";
+    $unsub = '';
+    try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Buchung: Private Pottery'); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
+    $body .= forma_newsletter_note($unsub);
+    $ics = forma_ics(array_map(fn($x) => ['uid' => 'private-' . $x['id'], 'date' => $x['date'], 'start' => $x['start'], 'hours' => (float)$x['hours'],
+        'summary' => 'Private Pottery im Atelier FORMA', 'desc' => 'Dein Projekt: ' . $b['project'] . "\nBei Fragen: $phone"], $sessions));
+    $subject = $one ? 'Dein Termin: ' . forma_de_date((string)$sessions[0]['date'], false) . ' um ' . forma_de_time((string)$sessions[0]['start']) : 'Deine ' . count($sessions) . ' Private-Pottery-Termine';
+    $ok = forma_mail((string)$b['email'], $subject, $body, null, [['FORMA-Termine.ics', $ics, 'text/calendar']]);
+    if ($ok) $pdo->prepare('UPDATE private_sessions SET mailed_at = ? WHERE private_id = ?')->execute([date('c'), $pid]);
+    return $ok;
+}
+
+/** Bewertungs-Mail ca. 1 Stunde nach dem letzten eingeplanten Private-Pottery-Termin. */
+function forma_review_private_sessions(PDO $pdo): int
+{
+    $rows = $pdo->query("SELECT p.id, p.hours, p.status, MAX(s.date || ' ' || s.start) AS last_start
+        FROM private_bookings p JOIN private_sessions s ON s.private_id = p.id
+        WHERE p.review_sent IS NULL GROUP BY p.id")->fetchAll();
+    $sent = 0;
+    foreach ($rows as $r) {
+        $planned = forma_private_planned($pdo, (int)$r['id']);
+        if ($r['status'] === 'bezahlt' && $planned + 0.01 < (float)$r['hours']) continue; // es fehlen noch Stunden
+        $st = $pdo->prepare("SELECT hours FROM private_sessions WHERE private_id = ? AND (date || ' ' || start) = ?");
+        $st->execute([$r['id'], $r['last_start']]);
+        $end = strtotime((string)$r['last_start']) + (int)round((float)$st->fetchColumn() * 3600);
+        if (time() < $end + 3600 || time() > $end + 3 * 86400) continue;
+        $pdo->prepare('UPDATE private_bookings SET done = 1 WHERE id = ?')->execute([$r['id']]);
+        if (forma_review_private($pdo, (int)$r['id'])) $sent++;
     }
     return $sent;
 }
