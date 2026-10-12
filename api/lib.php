@@ -1587,7 +1587,7 @@ function forma_review_text(string $name, string $what): string
 {
     $hello = $name !== '' ? 'Hallo ' . forma_first_name($name) . ',' : 'Hallo,';
     return "$hello\n\n"
-        . "danke für deinen Besuch bei „{$what}“ im FORMA Atelier! Ich hoffe, du hattest eine schöne Zeit mit dem Ton.\n\n"
+        . "danke für deinen Besuch bei „{$what}“ im Atelier FORMA! Ich hoffe, du hattest eine sehr schöne und gemütliche Zeit.\n\n"
         . "Magst du mir einen kleinen Gefallen tun? Eine kurze Bewertung auf Google hilft mir sehr, weil andere so das Atelier finden. "
         . "Ein, zwei Sätze reichen völlig und es dauert nur eine Minute.\n\n"
         . "%URL%\n\n"
