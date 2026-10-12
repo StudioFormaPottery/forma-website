@@ -349,7 +349,13 @@ section{scroll-margin-top:96px}
 .post-badge{display:inline-flex;align-items:center;gap:8px;margin:0;padding:6px 14px 6px 10px;border-radius:999px;background:var(--blush);color:var(--clay);font-size:14px;line-height:1.3;width:max-content;max-width:100%}
 .post-badge b{font-family:var(--display);font-weight:650;letter-spacing:.01em}
 .post-badge svg{flex:0 0 auto}
-.season-body>.post-badge{margin-right:48px}
+.post-head{margin-right:44px}
+.post-big{display:flex;align-items:center;gap:10px;margin:0;font-family:var(--display);font-weight:650;font-size:clamp(25px,2.5vw,31px);line-height:1.1;letter-spacing:-.01em;color:var(--clay)}
+.post-big svg{width:1.05em;height:1.05em;flex:0 0 auto}
+.post-sub{margin:6px 0 0;font-size:16.5px;line-height:1.5;color:var(--ink)}
+.season-event{display:flex;flex-direction:column;gap:10px;padding:16px 18px;border-radius:22px;background:rgba(255,251,247,.6);border:1.5px dashed var(--line)}
+.season .season-event h3{margin:0;font-size:clamp(24px,2.6vw,32px);padding-right:0}
+.season-next{margin:0;font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
 .post-lead{margin:0 0 10px;font-size:15.5px;line-height:1.5;color:var(--ink)}
 .post-lead b{color:var(--clay)}
 .post-sec{padding-block:0 clamp(48px,7vw,96px)}
@@ -364,6 +370,23 @@ section{scroll-margin-top:96px}
 .post-form input:focus{outline:3px solid var(--focus);outline-offset:1px}
 .post-form .btn{margin-top:6px}
 .post-done{grid-column:1/-1;margin:0;padding:16px 18px;border-radius:18px;background:var(--blush);font-weight:500}
+/* Maker Club: eigener, verspielt eingerahmter Bereich */
+.maker-wave{position:absolute;inset:12px;width:calc(100% - 24px);height:calc(100% - 24px);pointer-events:none;overflow:visible}
+.maker-wave path{fill:none;stroke:var(--blush);stroke-width:2;opacity:.75}
+.maker-copy,.maker-art{position:relative;z-index:1}
+.maker-perks{list-style:none;margin:16px 0 6px;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:900px){.maker-perks{grid-template-columns:1fr}}
+.maker-perks li{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:18px;background:rgba(251,241,234,.12);border:1px dashed rgba(251,241,234,.45)}
+.maker-perks b{font-family:var(--display);font-weight:650;font-size:18px;color:var(--on-clay)}
+.maker-perks span{font-size:14.5px;line-height:1.4;color:#F3E2D6}
+.maker-seal{position:absolute;right:clamp(18px,3vw,40px);top:clamp(18px,3vw,36px);z-index:2;width:104px;height:104px;border-radius:50%;background:var(--blush);color:var(--clay);display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-10deg);box-shadow:0 6px 18px rgba(51,33,27,.25)}
+.maker-seal svg{position:absolute;inset:0;width:100%;height:100%;animation:sealspin 30s linear infinite}
+.maker-seal text{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;fill:var(--clay);font-weight:500}
+.maker-seal b{font-family:var(--display);font-size:26px;line-height:1}
+.maker-seal i{font-style:normal;font-size:11px;letter-spacing:.06em}
+@keyframes sealspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.maker-seal svg{animation:none}}
+@media (max-width:780px){.maker-seal{width:84px;height:84px;right:14px;top:14px}.maker-seal b{font-size:21px}.maker .kicker,.maker h3{padding-right:86px}}
 /* Templates & Maker Club */
 .maker{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:clamp(20px,4vw,48px);align-items:center;padding:clamp(26px,4vw,48px);border-radius:32px;background:var(--clay);color:var(--on-clay);position:relative;overflow:hidden;margin-bottom:clamp(32px,4vw,48px)}
 @media (max-width:780px){.maker{grid-template-columns:1fr}}
@@ -492,8 +515,8 @@ section{scroll-margin-top:96px}
 .season-row input:focus{outline:3px solid var(--focus);outline-offset:1px}
 .season .consent{font-size:13.5px}
 .season-close{position:absolute;top:14px;right:14px;z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:var(--paper);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px rgba(51,33,27,.12)}
-@media (max-width:700px){.season-inner{grid-template-columns:1fr;overflow:auto}.season-img{padding:14px 14px 0;min-height:0}.season-img img{min-height:0;height:250px;border-radius:24px;object-position:50% 54%}.season-body{padding:24px 22px 24px;overflow:visible}.season h3:focus{outline:none}
-.season h3{padding-right:0}}
+@media (max-width:700px){.season-inner{grid-template-columns:1fr;overflow:auto}.season-img{padding:14px 14px 0;min-height:0}.season-img img{min-height:0;height:190px;border-radius:24px;object-position:50% 50%}.season-body{padding:24px 22px 24px;overflow:visible}.season h3:focus{outline:none}
+.season h3{padding-right:0}.season.theme-advent .season-body{padding-top:22px}}
 
 /* Studio */
 .studio{background:var(--lilac)}
@@ -1084,13 +1107,18 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     <div class="season-inner" id="season-inner">
       <div class="season-img" id="season-img" hidden><img id="season-pic" alt=""></div>
       <div class="season-body">
-        <p class="post-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M4 7l8 6 8-6"></path></svg><span><b>FORMA Post</b> · Newsletter</span></p>
-        <p class="eyebrow" id="season-eyebrow"></p>
-        <h3 id="season-title" tabindex="-1"></h3>
-        <p class="season-date" id="season-date" hidden></p>
-        <p class="season-text" id="season-text"></p>
+        <div class="post-head">
+          <p class="post-big"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M4 7l8 6 8-6"></path></svg>FORMA Post · Newsletter!</p>
+          <p class="post-sub">Ich sag dir Bescheid, wenn es neue Events im Atelier gibt, damit du immer auf dem Laufenden bist.</p>
+        </div>
+        <div class="season-event">
+          <p class="season-next">Als Nächstes im Atelier</p>
+          <p class="eyebrow" id="season-eyebrow"></p>
+          <h3 id="season-title" tabindex="-1"></h3>
+          <p class="season-date" id="season-date" hidden></p>
+          <p class="season-text" id="season-text"></p>
+        </div>
         <form class="season-form" id="season-form" novalidate hidden>
-          <p class="post-lead"><b>Hol dir die FORMA Post:</b> Bleib auf dem neuesten Stand und erfahre immer sofort, wenn es Neuigkeiten und neue Events im Atelier gibt.</p>
           <input type="hidden" name="t" id="season-t">
           <input type="hidden" name="source" id="season-source">
           <div class="hp" aria-hidden="true"><label for="season-website">Bitte leer lassen</label><input id="season-website" name="website" tabindex="-1" autocomplete="off"></div>
@@ -1182,12 +1210,18 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <h2 class="display">Templates zum Selbermachen</h2>
         <p>Schablonen und Bild-Anleitungen für deine eigene Pottery-Praxis zu Hause, auf Deutsch und Englisch. Nach dem Kauf sofort als PDF zum Herunterladen.</p>
       </div>
-      <div class="maker">
+      <div class="maker" id="maker-club">
+        <svg class="maker-wave" aria-hidden="true"><path></path></svg>
+        <span class="maker-seal" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><path id="seal-c" d="M60 60m-42 0a42 42 0 1 1 84 0a42 42 0 1 1-84 0"></path></defs><text><textPath href="#seal-c" textLength="258" lengthAdjust="spacingAndGlyphs">gratis · jeden Monat · gratis · jeden Monat ·</textPath></text></svg><b>1×</b><i>im Monat</i></span>
         <div class="maker-copy">
-          <p class="kicker">FORMA Maker Club · für Creator</p>
+          <p class="kicker">FORMA Maker Club · kostenlos für Creator</p>
           <h3>Für alle, die selbst Hand anlegen</h3>
-          <p id="maker-text">Du töpferst gern selbst, zu Hause, mit Steinzeugton oder lufttrocknendem Paperclay? Dann ist der Maker Club für dich: Einmal im Monat bekommst du die Maker Post mit einem neuen Pottery-Template gratis, direkt in dein Postfach.</p>
-          <p class="maker-extra">Dazu Rezepte zur Jahreszeit und kleine Geschichten aus „Rauch, Salz &amp; Mondlicht“. Die FORMA Post mit allen Neuigkeiten aus dem Atelier bekommst du automatisch mit dazu.</p>
+          <p id="maker-text">Du töpferst gern selbst, mit lufttrocknendem Paperclay am Küchentisch oder mit richtigem Töpferton? Dann ist der Maker Club dein kreativer Treffpunkt. Einmal im Monat schicke ich dir die <b>Maker Post</b>: ein neues Pottery-Template, frische Ideen, ein Rezept zur Jahreszeit und kleine Geschichten aus „Rauch, Salz &amp; Mondlicht“.</p>
+          <ul class="maker-perks">
+            <li><b>Kostenlos</b><span>Du zahlst nichts, abmelden geht jederzeit mit einem Klick.</span></li>
+            <li><b>Exklusiv</b><span>Die Maker-Club-Templates gibt es nicht im Shop. Jedes gibt es nur einmal, in seinem Monat.</span></li>
+            <li><b>Plus FORMA Post</b><span>Neuigkeiten und Events aus dem Atelier bekommst du automatisch dazu.</span></li>
+          </ul>
           <ol class="maker-how">
             <li><b>1</b><span>Vorname und E-Mail eintragen</span></li>
             <li><b>2</b><span>Adresse in deinem Postfach bestätigen</span></li>
@@ -1325,7 +1359,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="post-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M4 7l8 6 8-6"></path></svg><span><b>FORMA Post</b> · der Newsletter aus dem Atelier</span></p>
           <h2 class="display">Nichts mehr verpassen</h2>
           <p>Neue Kurse, Events wie Pottery bemalen im Advent und kleine Specials: Trag dich ein und erfahre immer als Erste, wenn sich im Atelier etwas tut. Ich schreibe nur ab und zu, kein Spam, versprochen.</p>
-          <p class="post-maker">Du töpferst selbst? Dann schau dir auch den <a href="#templates">Maker Club für Creator</a> an, mit Gratis-Template jeden Monat.</p>
+          <p class="post-maker">Du töpferst selbst? Dann schau dir auch den <a href="#maker-club">Maker Club für Creator</a> an, mit Gratis-Template jeden Monat.</p>
         </div>
         <form class="post-form" id="post-form" novalidate>
           <input type="hidden" name="t" id="post-t">
@@ -2111,6 +2145,26 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       .catch(function(){se.textContent='Keine Verbindung. Bitte versuch es noch einmal.';se.hidden=false;})
       .then(function(){btn.disabled=false;});
   });
+  // Maker Club: verspielter Wellenrahmen (Wellenlänge bleibt auf jeder Bildschirmgröße gleich)
+  (function(){
+    var box=document.getElementById('maker-club');if(!box)return;
+    var svg=box.querySelector('.maker-wave'),path=svg.querySelector('path');
+    function draw(){
+      var w=svg.clientWidth,h=svg.clientHeight;if(!w||!h)return;
+      var A=4,L=34,r=22,d='',first=true;
+      function edge(x0,y0,x1,y1,nx,ny){
+        var len=Math.hypot(x1-x0,y1-y0),n=Math.max(2,Math.round(len/L)),steps=n*8;
+        for(var i=0;i<=steps;i++){var t=i/steps,o=A*Math.sin(t*n*2*Math.PI);var x=x0+(x1-x0)*t+nx*o,y=y0+(y1-y0)*t+ny*o;d+=(first?'M':'L')+x.toFixed(1)+' '+y.toFixed(1);first=false;}
+      }
+      function corner(cx,cy,a0){for(var k=1;k<=6;k++){var a=a0+k*Math.PI/12;d+='L'+(cx+r*Math.cos(a)).toFixed(1)+' '+(cy+r*Math.sin(a)).toFixed(1);}}
+      edge(r,0,w-r,0,0,-1);corner(w-r,r,-Math.PI/2);
+      edge(w,r,w,h-r,1,0);corner(w-r,h-r,0);
+      edge(w-r,h,r,h,0,1);corner(r,h-r,Math.PI/2);
+      edge(0,h-r,0,r,-1,0);corner(r,r,Math.PI);
+      path.setAttribute('d',d+'Z');
+    }
+    draw();if(window.ResizeObserver)new ResizeObserver(draw).observe(box);else window.addEventListener('resize',draw);
+  })();
   // FORMA Post: Anmeldung ganz unten auf der Seite
   (function(){
     var f=document.getElementById('post-form');if(!f)return;
