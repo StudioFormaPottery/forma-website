@@ -407,6 +407,21 @@ section{scroll-margin-top:96px}
 .event-start{padding:10px 14px;border-radius:14px;background:var(--blush)}
 .event-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
 @media (max-width:600px){.event-facts div{grid-template-columns:78px 1fr;gap:8px}.event-pieces{grid-template-columns:1fr 1fr;gap:6px}.event-pieces li{padding:7px 9px;gap:7px;font-size:13.5px;overflow-wrap:anywhere}.event-pieces li svg{width:28px;height:24px}}
+/* Ausklappen am Handy */
+.more-btn,.event-when,.maker-short{display:none}
+@media (max-width:700px){
+  .more-btn{display:inline-flex;align-items:center;gap:8px;margin:4px 0 6px;padding:9px 16px;border-radius:999px;border:1.5px solid var(--clay);background:transparent;color:var(--clay);font:inherit;font-size:15.5px;font-weight:500;cursor:pointer;width:max-content}
+  .more-btn::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .2s}
+  .more-btn[aria-expanded="true"]::after{transform:rotate(-135deg) translateY(-2px)}
+  .more-wrap{display:none}
+  .more-wrap.open{display:block;animation:fadein .3s ease}
+  .event-when{display:block;margin:0 0 8px;font-weight:500;color:var(--clay)}
+  .maker-short{display:block}
+  .event-pic img{max-width:230px}
+  .event-lead{margin-bottom:6px}
+  .maker-art{display:none}
+}
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 /* Templates & Maker Club */
 .maker{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:clamp(20px,4vw,48px);align-items:center;padding:clamp(26px,4vw,48px);border-radius:32px;background:var(--clay);color:var(--on-clay);position:relative;overflow:hidden;margin-bottom:clamp(32px,4vw,48px)}
 @media (max-width:780px){.maker{grid-template-columns:1fr}}
@@ -562,10 +577,10 @@ section{scroll-margin-top:96px}
 .season.theme-advent .season-top{padding-top:62px}
 .season-top .post-big{justify-content:center;font-size:clamp(26px,3vw,36px)}
 .season-top .post-sub{max-width:52ch;margin:6px auto 0}
-.season-inner{flex:1 1 auto;min-height:0;overflow:auto;grid-template-columns:auto minmax(0,1fr);align-items:center}
+.season-inner{flex:1 1 auto;min-height:0;overflow:auto;grid-template-columns:auto minmax(0,1fr);align-items:start}
 .season-img{padding:22px;min-height:0;background:transparent!important}
 .season-img img{width:auto;height:min(46vh,400px);aspect-ratio:4/5;border-radius:999px 999px 24px 24px;box-shadow:0 14px 30px rgba(51,33,27,.18)}
-.season-body{padding:24px 30px 26px 8px;gap:12px}
+.season-body{padding:30px 30px 26px 8px;gap:12px}
 .season.theme-advent .season-body{padding-top:24px}
 .season-body::before{display:none}
 .season-event{padding:0;border:0;background:none;gap:8px}
@@ -1243,7 +1258,10 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <div class="event-body">
           <p class="kicker">Special im Advent</p>
           <h3>Pottery bemalen im Advent</h3>
+          <p class="event-when">Ab November · Mi &amp; Do 15–18 Uhr · max. 6 Personen</p>
           <p class="event-lead">Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Teller und Mugs bemalen, ganz entspannt bei Kerzenlicht und einer Tasse Tee im Atelier.</p>
+          <button class="more-btn" type="button" aria-expanded="false">Alle Infos &amp; Preise</button>
+          <div class="more-wrap">
           <dl class="event-facts">
             <div><dt>Wann</dt><dd>Ab November, jeden Mittwoch &amp; Donnerstag, 15–18 Uhr</dd></div>
             <div><dt>Plätze</dt><dd>Höchstens 6 Personen pro Nachmittag</dd></div>
@@ -1254,6 +1272,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <div class="event-how">
             <p><b>So meldest du dich an:</b> Tag aussuchen, Atelierbeitrag online bezahlen und dein Stück gleich mitbuchen. Gefällt dir vor Ort noch mehr, rechnen wir es im Atelier ab.</p>
             <p class="event-start" id="event-start">Die Anmeldung startet am <b>19. Oktober</b>. Trag dich in die FORMA Post ein, dann sag ich dir Bescheid, sobald es losgeht.</p>
+          </div>
           </div>
           <div class="event-actions">
             <a class="btn btn-solid" href="#forma-post" id="event-btn">An die Anmeldung erinnern</a>
@@ -1305,6 +1324,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <div class="maker-copy">
           <p class="kicker">FORMA Maker Club · kostenlos für Creator</p>
           <h3>Für alle, die selbst Hand anlegen</h3>
+          <p class="maker-short">Einmal im Monat ein Pottery-Template gratis, für alle, die selbst töpfern. Kostenlos und exklusiv.</p>
+          <button class="more-btn" type="button" aria-expanded="false">Was ist der Maker Club?</button>
+          <div class="more-wrap">
           <p id="maker-text">Du töpferst gern selbst, mit lufttrocknendem Paperclay am Küchentisch oder mit richtigem Töpferton? Dann ist der Maker Club dein kreativer Treffpunkt. Einmal im Monat schicke ich dir die <b>Maker Post</b>: ein neues Pottery-Template, frische Ideen, ein Rezept zur Jahreszeit und kleine Geschichten aus „Rauch, Salz &amp; Mondlicht“.</p>
           <ul class="maker-perks">
             <li><b>Kostenlos</b><span>Du zahlst nichts, abmelden geht jederzeit mit einem Klick.</span></li>
@@ -1317,6 +1339,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
             <li><b>3</b><span>Template herunterladen und jeden Monat ein neues bekommen</span></li>
           </ol>
           <p class="maker-now" id="maker-now" hidden></p>
+          </div>
           <form class="maker-form" id="maker-form" novalidate>
             <input type="hidden" name="t" id="maker-t">
             <input type="hidden" name="source" value="Maker Club">
@@ -2258,6 +2281,11 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     }
     draw();if(window.ResizeObserver)new ResizeObserver(draw).observe(box);else window.addEventListener('resize',draw);
   })();
+  // Ausklappen (am Handy): Knopf zeigt/verbirgt den folgenden Bereich
+  document.querySelectorAll('.more-btn').forEach(function(b){
+    var w=b.nextElementSibling,label=b.textContent;
+    b.addEventListener('click',function(){var o=!w.classList.contains('open');w.classList.toggle('open',o);b.setAttribute('aria-expanded',o?'true':'false');b.textContent=o?'Weniger anzeigen':label;});
+  });
   // FORMA Post: Anmeldung ganz unten auf der Seite
   (function(){
     var f=document.getElementById('post-form');if(!f)return;
