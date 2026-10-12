@@ -37,6 +37,9 @@ Ablauf für die automatische Wochen-Session (läuft freitags früh, vor 8 Uhr):
    ```
    `level`: 1 Einfach, 2 Mittel, 3 Anspruchsvoll. `season`: herbst | winter | fruehling | sommer | ganzjaehrig.
    Die Website stellt das Template zur Zeit `publish_at` (Wiener Zeit) automatisch online.
+5b. Shop-Slides erzeugen: `python3 tools/templates/slides.py <key>` (vorher den Key in `SRC` ergänzen, falls er nicht
+   unter `api/seed/weekly/` liegt). Das legt `img/shop/<key>-2.jpg` (Blick in die Anleitung) und `-3.jpg`
+   (Schablonen) an; der Shop zeigt sie automatisch als Slides 2 und 3 neben dem Titelbild.
 6. Prüfen: PDFs öffnen (`pdftoppm`), Seiten ansehen, nichts überlappt, alles auf A4.
    `php -l api/lib.php` falls PHP geändert wurde (normalerweise nicht nötig).
 7. Commit + Push auf `main` (Hostinger übernimmt automatisch). Commit-Nachricht auf Deutsch.
