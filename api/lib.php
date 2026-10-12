@@ -379,7 +379,8 @@ function forma_migrate(PDO $pdo): void
         $pdo->exec("UPDATE courses SET visible = 1 WHERE title = 'Pottery bemalen'");
         $p = json_decode(forma_setting($pdo, 'popup') ?? '', true);
         if (is_array($p) && str_contains((string)($p['title'] ?? ''), 'Pottery bemalen')) {
-            $p['eyebrow'] = 'Jetzt buchbar';
+            $p['eyebrow'] = 'Special im Advent · jetzt buchbar';
+            $p['title'] = 'Pottery bemalen';
             $p['date_line'] = 'Ab 4. November · Mi & Do 15–18 Uhr';
             $p['text'] = "Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Schalen und kleine Teller bemalen, ganz entspannt bei Kerzenlicht im Studio.\nJeden Mittwoch und Donnerstag von 15 bis 18 Uhr, abholen kannst du deine Stücke am Montag darauf. Die Plätze sind begrenzt, such dir gleich deinen Termin aus.";
             $p['signup'] = false;
@@ -391,6 +392,16 @@ function forma_migrate(PDO $pdo): void
         forma_set_setting($pdo, 'bemalen_live_v17', '1');
     }
 
+    // 12.10.2026: Pop-up ohne doppeltes „Advent“ (Kicker „Special im Advent“, Titel „Pottery bemalen“), Anmeldestart dazu.
+    if (forma_setting($pdo, 'popup_title_v24') === null) {
+        $p = json_decode(forma_setting($pdo, 'popup') ?? '', true);
+        if (is_array($p) && ($p['title'] ?? '') === 'Pottery bemalen im Advent') {
+            $p['title'] = 'Pottery bemalen';
+            if (date('Y-m-d') < '2026-10-19' && !str_contains((string)($p['date_line'] ?? ''), 'Anmeldung')) $p['date_line'] = trim((string)$p['date_line']) . ' · Anmeldung ab 19. Oktober';
+            forma_set_setting($pdo, 'popup', json_encode($p, JSON_UNESCAPED_UNICODE));
+        }
+        forma_set_setting($pdo, 'popup_title_v24', '1');
+    }
     // 12.10.2026: Offenes Atelier online buchbar, stundenweise, 5 Plätze pro Stunde, € 30 pro Stunde.
     if (forma_setting($pdo, 'atelier_online_v20') === null) {
         $t = FORMA_SERIES['atelier'];
