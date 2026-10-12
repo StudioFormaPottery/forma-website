@@ -883,6 +883,38 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 
 .team-card{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
 @media (max-width:760px){.team-card{grid-template-columns:1fr}.team-photos{order:-1}}
+
+/* Aktuelle Events: Foto über die ganze Höhe, Hänge-Girlande oben */
+.event-card{position:relative;overflow:hidden;align-items:stretch;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);padding-top:clamp(56px,6vw,80px)}
+.event-pic{display:flex}
+.event-pic img{max-width:none;height:100%;min-height:420px;aspect-ratio:auto;object-fit:cover;object-position:50% 55%}
+.event-garland{position:absolute;left:0;right:0;top:0;height:90px;pointer-events:none;z-index:2}
+.event-garland svg{width:100%;height:100%;display:block}
+@media (max-width:780px){.event-card{grid-template-columns:1fr;padding-top:64px}.event-pic img{height:auto;min-height:0;aspect-ratio:4/5;max-width:280px;margin:0 auto}}
+/* Teambuilding: Icons und Siegel */
+.team-photo-wrap{position:relative;justify-self:center;width:100%;max-width:420px}
+.team-seal{position:absolute;left:-26px;bottom:34px;z-index:2;width:118px;height:118px;border-radius:50%;background:#FBF1EA;color:var(--clay);display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-12deg);box-shadow:0 8px 20px rgba(51,33,27,.3)}
+.team-seal svg{position:absolute;inset:0;width:100%;height:100%;animation:sealspin 30s linear infinite}
+.team-seal text{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;fill:var(--clay);font-weight:500}
+.team-seal b{font-family:var(--display);font-size:28px;line-height:1}
+.team-seal i{font-style:normal;font-size:13px}
+.team-ic{position:absolute;z-index:1;pointer-events:none;animation:sway 7s ease-in-out infinite alternate}
+.team-ic svg{width:100%;height:100%;display:block}
+.team-ic.t1{width:34px;height:34px;left:46%;top:38px}
+.team-ic.t2{width:58px;height:58px;left:50%;bottom:40px;animation-delay:-2s}
+.team-ic.t3{width:40px;height:40px;right:30px;top:26px;animation-delay:-4s}
+.team-ic.t4{width:22px;height:22px;left:38%;bottom:110px;animation-delay:-1s}
+@media (max-width:760px){.team-photo-wrap{order:-1;max-width:300px}.team-seal{width:96px;height:96px;left:-14px;bottom:20px}.team-seal b{font-size:23px}.team-ic.t1,.team-ic.t2,.team-ic.t4{display:none}}
+
+.maker-seal{width:200px!important;height:200px!important}
+.maker-seal b{font-size:50px!important}
+.maker-seal i{font-size:18px!important}
+.maker-seal text{font-size:10.5px}
+.maker .kicker,.maker h3{padding-right:210px}
+@media (max-width:780px){.maker-seal{width:122px!important;height:122px!important}.maker-seal b{font-size:30px!important}.maker-seal i{font-size:12px!important}.maker .kicker,.maker h3{padding-right:120px}}
+.team-seal{left:-30px;bottom:30px}
+
+@media (max-width:700px){.maker-art{display:none!important}}
 </style>
 </head>
 <body>
@@ -1358,6 +1390,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <h2 class="display">Was gerade im Atelier los ist</h2>
       </div>
       <article class="event-card" id="event-bemalen">
+        <div class="event-garland" id="event-garland" aria-hidden="true"></div>
         <div class="event-pic"><img src="img/popup-advent.jpg?v=4" alt="Handbemalte Wal-Tasse unter einem Weihnachtskranz" loading="lazy"></div>
         <div class="event-body">
           <p class="kicker">Special im Advent</p>
@@ -1424,9 +1457,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       </div>
       <div class="maker" id="maker-club">
         <svg class="maker-wave" aria-hidden="true"><path></path></svg>
-        <span class="maker-seal" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><path id="seal-c" d="M60 60m-42 0a42 42 0 1 1 84 0a42 42 0 1 1-84 0"></path></defs><text><textPath href="#seal-c" textLength="258" lengthAdjust="spacingAndGlyphs">gratis · jeden Monat · gratis · jeden Monat ·</textPath></text></svg><b>1×</b><i>im Monat</i></span>
+        <span class="maker-seal" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><path id="seal-c" d="M60 60m-42 0a42 42 0 1 1 84 0a42 42 0 1 1-84 0"></path></defs><text><textPath href="#seal-c" textLength="258" lengthAdjust="spacingAndGlyphs">gratis · jeden Monat · zusätzlich zur FORMA Post ·</textPath></text></svg><b>1×</b><i>im Monat</i></span>
         <div class="maker-copy">
-          <p class="kicker">FORMA Maker Club · kostenlos für Creator</p>
+          <p class="kicker">FORMA Maker Club · für den Selbermacher in dir</p>
           <h3>Für alle, die selbst Hand anlegen</h3>
           <p class="maker-short">Einmal im Monat ein Pottery-Template gratis, für alle, die selbst töpfern. Kostenlos und exklusiv.</p>
           <button class="more-btn" type="button" aria-expanded="false">Was ist der Maker Club?</button>
@@ -1505,11 +1538,18 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="team-facts">4 bis 8 Personen · Halbtages-Event über 4 Stunden oder Töpfer-Wochenende mit Übernachtung im Heindalishof</p>
           <div class="team-btns"><a class="btn btn-team" href="#teambuilding" data-private="team">Event anfragen</a><a class="btn btn-team-ghost" href="downloads/FORMA_Teambuilding.pdf?v=7" target="_blank" rel="noopener">Infos &amp; Preise (PDF)</a></div>
         </div>
+        <span class="team-ic t1" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 4c2 15 12 25 28 28-16 3-26 13-28 28-2-15-12-25-28-28 16-3 26-13 28-28z" fill="#FBF1EA"/></svg></span>
+        <span class="team-ic t2" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M24 6c-4 4 4 6 0 11M32 4c-4 4 4 6 0 11M40 6c-4 4 4 6 0 11" stroke="#F1D9C6" stroke-width="2.5" fill="none" stroke-linecap="round"/><rect x="12" y="22" width="34" height="32" rx="8" fill="#F1D9C6"/><path d="M46 29h4a7 7 0 010 14h-4" stroke="#F1D9C6" stroke-width="5" fill="none"/><path d="M14 32h30" stroke="#8C2C1D" stroke-width="3"/></svg></span>
+        <span class="team-ic t3" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 54C18 45 10 38 10 28c0-6 5-11 11-11 5 0 8 3 11 7 3-4 6-7 11-7 6 0 11 5 11 11 0 10-8 17-22 26z" fill="#F1D9C6"/></svg></span>
+        <span class="team-ic t4" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 4c2 15 12 25 28 28-16 3-26 13-28 28-2-15-12-25-28-28 16-3 26-13 28-28z" fill="#F1D9C6"/></svg></span>
+        <div class="team-photo-wrap">
+          <span class="team-seal" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><path id="team-c" d="M60 60m-42 0a42 42 0 1 1 84 0a42 42 0 1 1-84 0"></path></defs><text><textPath href="#team-c" textLength="258" lengthAdjust="spacingAndGlyphs">Teamevent · Feiern · Vereine · Teamevent ·</textPath></text></svg><b>4–8</b><i>Personen</i></span>
         <div class="team-photos" aria-hidden="true">
           <img class="on" src="img/toepferscheiben.jpg" alt="" loading="lazy">
           <img src="img/scheiben-abend.jpg" alt="" loading="lazy">
           <img src="img/atelier-ecke.jpg" alt="" loading="lazy">
           <img src="img/scheiben-studio.jpg" alt="" loading="lazy">
+        </div>
         </div>
       </div>
     </div>
@@ -2454,6 +2494,14 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   (function(){var box=document.querySelector('.team-photos');if(!box)return;var im=[].slice.call(box.querySelectorAll('img')),k=0;
     if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     setInterval(function(){im[k].classList.remove('on');k=(k+1)%im.length;im[k].classList.add('on');},5000);})();
+  // Hänge-Girlande über dem Advent-Event (wie im Pop-up)
+  (function(){var box=document.getElementById('event-garland');if(!box)return;
+    var g='<svg viewBox="0 0 860 90" preserveAspectRatio="none"><path d="M0 8 Q 107 70 215 18 T 430 18 T 645 18 T 860 8" fill="none" stroke="#674B40" stroke-width="2.5"></path>';
+    var cols=['#8C2C1D','#DDBFA8','#FBF1EA','#8C2C1D','#674B40','#DDBFA8','#8C2C1D','#FBF1EA','#8C2C1D','#DDBFA8','#674B40','#8C2C1D'];
+    for(var i=0;i<12;i++){var x=36+i*68,t=(x%215)/215,y=8+Math.sin(t*Math.PI)*(x<215?30:22)+4;
+      if(i%3===1){g+='<g transform="translate('+(x-9)+' '+(y+2)+') scale(.75)"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" fill="'+cols[i]+'"></path></g>';}
+      else{g+='<line x1="'+x+'" y1="'+y+'" x2="'+x+'" y2="'+(y+8)+'" stroke="#674B40" stroke-width="1.5"></line><circle cx="'+x+'" cy="'+(y+16)+'" r="8" fill="'+cols[i]+'" stroke="rgba(51,33,27,.25)"></circle>';}}
+    box.innerHTML=g+'</svg>';})();
   // Ausklappen (am Handy): Knopf zeigt/verbirgt den folgenden Bereich
   document.querySelectorAll('.more-btn').forEach(function(b){
     var w=b.nextElementSibling,label=b.textContent;
