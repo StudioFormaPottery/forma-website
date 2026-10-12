@@ -387,6 +387,26 @@ section{scroll-margin-top:96px}
 @keyframes sealspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.maker-seal svg{animation:none}}
 @media (max-width:780px){.maker-seal{width:84px;height:84px;right:14px;top:14px}.maker-seal b{font-size:21px}.maker .kicker,.maker h3{padding-right:86px}}
+/* Aktuelle Events & Workshops */
+.events-sec .section-head{margin-bottom:clamp(18px,3vw,32px)}
+.event-card{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr);gap:clamp(20px,4vw,52px);align-items:start;padding:clamp(22px,4vw,44px);border-radius:32px;background:var(--paper-2);border:1px solid var(--line)}
+@media (max-width:780px){.event-card{grid-template-columns:1fr}}
+.event-pic img{display:block;width:100%;max-width:380px;margin:0 auto;aspect-ratio:4/5;object-fit:cover;border-radius:999px 999px 26px 26px;box-shadow:0 18px 40px rgba(51,33,27,.18)}
+.event-body h3{font-family:var(--display);font-weight:650;font-size:clamp(28px,3.2vw,42px);line-height:1.05;letter-spacing:-.02em;color:var(--clay);margin:6px 0 10px}
+.event-body .kicker{color:var(--clay)}
+.event-lead{color:var(--ink-soft);margin:0 0 14px}
+.event-facts{display:grid;gap:8px;margin:0 0 12px}
+.event-facts div{display:grid;grid-template-columns:96px 1fr;gap:12px}
+.event-facts dt{font-weight:600;color:var(--clay)}
+.event-facts dd{margin:0}
+.event-pieces{list-style:none;margin:0 0 16px;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.event-pieces li{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:16px;background:var(--paper);border:1px solid var(--line);font-size:15px;line-height:1.25}
+.event-pieces li svg{width:38px;height:32px;flex:0 0 auto}
+.event-pieces li i{font-style:normal;color:var(--ink-soft);display:block;font-size:14px}
+.event-how p{margin:0 0 8px}
+.event-start{padding:10px 14px;border-radius:14px;background:var(--blush)}
+.event-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+@media (max-width:600px){.event-facts div{grid-template-columns:78px 1fr;gap:8px}.event-pieces{grid-template-columns:1fr 1fr;gap:6px}.event-pieces li{padding:7px 9px;gap:7px;font-size:13.5px;overflow-wrap:anywhere}.event-pieces li svg{width:28px;height:24px}}
 /* Templates & Maker Club */
 .maker{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:clamp(20px,4vw,48px);align-items:center;padding:clamp(26px,4vw,48px);border-radius:32px;background:var(--clay);color:var(--on-clay);position:relative;overflow:hidden;margin-bottom:clamp(32px,4vw,48px)}
 @media (max-width:780px){.maker{grid-template-columns:1fr}}
@@ -536,6 +556,32 @@ section{scroll-margin-top:96px}
 .season-close{position:absolute;top:14px;right:14px;z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:var(--paper);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px rgba(51,33,27,.12)}
 @media (max-width:700px){.season-inner{grid-template-columns:1fr;overflow:auto}.season-img{padding:14px 14px 0;min-height:0}.season-img img{width:auto;height:230px;border-radius:999px 999px 20px 20px}.season-body{padding:24px 22px 24px;overflow:visible}.season h3:focus{outline:none}
 .season h3{padding-right:0}.season.theme-advent .season-body{padding-top:22px}}
+/* Pop-up kompakt: FORMA Post oben über die ganze Breite, großes Foto, kurz und klar */
+.season[open]{display:flex;flex-direction:column}
+.season-top{position:relative;z-index:2;margin:0;padding:30px 70px 18px 34px;text-align:center;border-bottom:1.5px dashed var(--line)}
+.season.theme-advent .season-top{padding-top:62px}
+.season-top .post-big{justify-content:center;font-size:clamp(26px,3vw,36px)}
+.season-top .post-sub{max-width:52ch;margin:6px auto 0}
+.season-inner{flex:1 1 auto;min-height:0;overflow:auto;grid-template-columns:auto minmax(0,1fr);align-items:center}
+.season-img{padding:22px;min-height:0;background:transparent!important}
+.season-img img{width:auto;height:min(46vh,400px);aspect-ratio:4/5;border-radius:999px 999px 24px 24px;box-shadow:0 14px 30px rgba(51,33,27,.18)}
+.season-body{padding:24px 30px 26px 8px;gap:12px}
+.season.theme-advent .season-body{padding-top:24px}
+.season-body::before{display:none}
+.season-event{padding:0;border:0;background:none;gap:8px}
+.season .season-text{display:none}
+.season .season-event h3{font-size:clamp(26px,2.8vw,34px)}
+@media (max-width:700px){
+  .season-top{padding:22px 54px 14px 20px}
+  .season.theme-advent .season-top{padding-top:50px}
+  .season-top .post-big{font-size:23px;gap:8px}
+  .season-top .post-sub{font-size:15px}
+  .season-inner{grid-template-columns:1fr}
+  .season-img{padding:14px 14px 0}
+  .season-img img{height:200px}
+  .season-body{padding:14px 20px 22px}
+  .season.theme-advent .season-body{padding-top:14px}
+}
 
 /* Studio */
 .studio{background:var(--lilac)}
@@ -718,6 +764,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <div class="nav-head"><img src="img/forma-logo.png" alt=""><button class="nav-close" type="button" id="nav-close" aria-label="Menü schließen"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
       <a href="#angebote">Kurse</a>
       <a href="#studio">Studio</a>
+      <a href="#events">Aktuelle Events</a>
       <a href="#templates">The Maker Club &amp; Templates</a>
       <a href="#shop">Shop</a>
       <a href="#gutschein" data-voucher="">Gutscheine</a>
@@ -1123,13 +1170,13 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     <button class="season-close" type="button" id="season-close" aria-label="Schließen">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
     </button>
+    <div class="season-top post-head">
+      <p class="post-big"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M4 7l8 6 8-6"></path></svg>FORMA Post · Newsletter!</p>
+      <p class="post-sub">Ich sag dir Bescheid, wenn es neue Events im Atelier gibt, damit du immer auf dem Laufenden bist.</p>
+    </div>
     <div class="season-inner" id="season-inner">
       <div class="season-img" id="season-img" hidden><img id="season-pic" alt=""></div>
       <div class="season-body">
-        <div class="post-head">
-          <p class="post-big"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M4 7l8 6 8-6"></path></svg>FORMA Post · Newsletter!</p>
-          <p class="post-sub">Ich sag dir Bescheid, wenn es neue Events im Atelier gibt, damit du immer auf dem Laufenden bist.</p>
-        </div>
         <div class="season-event">
           <p class="season-next">Als Nächstes im Atelier</p>
           <p class="eyebrow" id="season-eyebrow"></p>
@@ -1148,7 +1195,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
             <input id="season-email" name="email" type="email" autocomplete="email" placeholder="Deine E-Mail-Adresse" required>
             <button class="btn btn-solid" type="submit" id="season-submit">FORMA Post abonnieren</button>
           </div>
-          <label class="consent"><input type="checkbox" name="consent" id="season-consent" value="1"> <span>Ja, ich möchte die FORMA Post bekommen: ab und zu Neuigkeiten, neue Kurse und Events aus dem Atelier. Kein Spam, abmelden geht jederzeit. <a href="#datenschutz" id="season-privacy">Datenschutz</a></span></label>
+          <label class="consent"><input type="checkbox" name="consent" id="season-consent" value="1"> <span>Ja, ich möchte die FORMA Post bekommen. Kein Spam, abmelden jederzeit. <a href="#datenschutz" id="season-privacy">Datenschutz</a></span></label>
           <p class="book-error" id="season-error" role="alert" hidden></p>
         </form>
         <p id="season-done" hidden></p>
@@ -1181,16 +1228,39 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <figure class="film"><video src="video/details.mp4" poster="img/details-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Ein handgemachter Becher mit kleinen Details"></video><figcaption>Liebe zum Detail</figcaption></figure>
         <figure class="film"><video src="video/stempel.mp4" poster="img/stempel-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Becher mit dem FORMA-Stempel am Boden"></video><figcaption>Mit FORMA-Stempel</figcaption></figure>
       </div>
-      <div class="gallery">
-        <figure style="grid-area:a"><img src="img/studio-scheiben.jpg" alt="Das helle Studio mit Töpferscheiben und blauen Hockern" loading="lazy"></figure>
-        <figure style="grid-area:b"><img src="img/studio.jpg" alt="Langer Holztisch mit Vasen, Tassen und Trockenblumen im Studio" loading="lazy"></figure>
-        <figure style="grid-area:c"><img src="img/drehen.jpg" alt="Vivien dreht einen Becher an der Töpferscheibe" loading="lazy" style="object-position:50% 60%"></figure>
-        <figure style="grid-area:d"><img src="img/tonkugeln.jpg" alt="Vorbereitete Tonkugeln auf dem Werktisch" loading="lazy"></figure>
-        <figure style="grid-area:e"><img src="img/schlicker.jpg" alt="Frisch gedrehte Becher in einem Eimer mit Tonschlicker" loading="lazy" style="object-position:50% 45%"></figure>
-        <figure style="grid-area:f"><img src="img/abdrehen.jpg" alt="Ein frisch abgedrehter Becher" loading="lazy" style="object-position:50% 35%"></figure>
-      </div>
     </div>
     <svg class="wave" style="--to:var(--paper);background:var(--lilac)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40c160 44 330 66 520 50s320-72 500-70 290 44 420 40v60H0z"></path></svg>
+  </section>
+
+  <section class="section events-sec" id="events">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Aktuelle Events &amp; Workshops</p>
+        <h2 class="display">Was gerade im Atelier los ist</h2>
+      </div>
+      <article class="event-card" id="event-bemalen">
+        <div class="event-pic"><img src="img/popup-advent.jpg?v=4" alt="Handbemalte Wal-Tasse unter einem Weihnachtskranz" loading="lazy"></div>
+        <div class="event-body">
+          <p class="kicker">Special im Advent</p>
+          <h3>Pottery bemalen im Advent</h3>
+          <p class="event-lead">Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Teller und Mugs bemalen, ganz entspannt bei Kerzenlicht und einer Tasse Tee im Atelier.</p>
+          <dl class="event-facts">
+            <div><dt>Wann</dt><dd>Ab November, jeden Mittwoch &amp; Donnerstag, 15–18 Uhr</dd></div>
+            <div><dt>Plätze</dt><dd>Höchstens 6 Personen pro Nachmittag</dd></div>
+            <div><dt>Abholung</dt><dd>Am Montag darauf im Atelier</dd></div>
+            <div><dt>Preis</dt><dd>€ 15 Atelierbeitrag pro Person, damit ist dein Platz reserviert. Dazu dein Stück zum Bemalen:</dd></div>
+          </dl>
+          <ul class="event-pieces" id="event-pieces"></ul>
+          <div class="event-how">
+            <p><b>So meldest du dich an:</b> Tag aussuchen, Atelierbeitrag online bezahlen und dein Stück gleich mitbuchen. Gefällt dir vor Ort noch mehr, rechnen wir es im Atelier ab.</p>
+            <p class="event-start" id="event-start">Die Anmeldung startet am <b>19. Oktober</b>. Trag dich in die FORMA Post ein, dann sag ich dir Bescheid, sobald es losgeht.</p>
+          </div>
+          <div class="event-actions">
+            <a class="btn btn-solid" href="#forma-post" id="event-btn">An die Anmeldung erinnern</a>
+          </div>
+        </div>
+      </article>
+    </div>
   </section>
 
   <section class="section about" id="ueber-mich">
@@ -1618,6 +1688,10 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     ['daumen','Mug mit Daumendruck',1800,'',ic('<path d="M18 10h28v30a8 8 0 01-8 8H26a8 8 0 01-8-8z" fill="'+cR+'"/><ellipse cx="38" cy="26" rx="5.5" ry="7" fill="'+cB+'"/><path d="M35 22c2-1 4-1 6 1M34 26c2-1 5-1 7 1M35 30c2-1 4-1 6 0" stroke="'+cR+'" stroke-width="1.4" fill="none" stroke-linecap="round"/>')],
     ['formamug','FORMA Mug',2200,'ohne Henkel, mit Wellen, Schraffur oder Kerben',ic('<path d="M17 8h30v32a9 9 0 01-9 9H26a9 9 0 01-9-9z" fill="'+cR+'"/><path d="M17 20c5-4 10 4 15 0s10-4 15 0M17 30c5-4 10 4 15 0s10-4 15 0" stroke="'+cP+'" stroke-width="2.4" fill="none"/><path d="M22 40l3-4M28 40l3-4M34 40l3-4" stroke="'+cB+'" stroke-width="2" stroke-linecap="round"/>')]
   ];
+  (function(){var ul=$('event-pieces');if(ul)BEMALEN_ITEMS.forEach(function(it){var li=document.createElement('li');li.innerHTML=it[4];var t=el('span',null,it[1]);t.appendChild(el('i',null,euro(it[2])));li.appendChild(t);ul.appendChild(li);});
+    var open=new Date()>=new Date('2026-10-19T00:00:00+02:00'),btn=$('event-btn'),st=$('event-start');
+    if(open&&btn){btn.textContent='Platz reservieren';btn.href='#angebote';btn.setAttribute('data-book','Pottery bemalen');if(st)st.innerHTML='Die Anmeldung ist offen. Die Plätze sind begrenzt, such dir gleich deinen Nachmittag aus.';}
+  })();
   var piecesBox=$('book-pieces'),piecesGrid=$('pieces-grid'),pieceQty={};
   BEMALEN_ITEMS.forEach(function(it){
     var d=el('div','piece');d.innerHTML=it[4];d.appendChild(el('b',null,it[1]));if(it[3])d.appendChild(el('small',null,it[3]));d.appendChild(el('i',null,euro(it[2])+' / Stk.'));
