@@ -335,6 +335,13 @@ function forma_migrate(PDO $pdo): void
         forma_set_setting($pdo, 'invoice_numbers_v21', '1');
     }
 
+    // 12.10.2026: Rechnungen 16–18 (Pottery Pause) wurden nie ausgestellt → die Website macht mit 16 weiter.
+    if (forma_setting($pdo, 'invoice_numbers_v22') === null) {
+        $max = (int)$pdo->query('SELECT COALESCE(MAX(seq), 0) FROM invoices WHERE year = 2026')->fetchColumn();
+        if ($max < 16) forma_set_setting($pdo, 'invoice_start_2026', '16');
+        forma_set_setting($pdo, 'invoice_numbers_v22', '1');
+    }
+
     // 11.10.2026: Pottery bemalen im Advent, Mi & Do 15–18 Uhr, 4.11.–17.12.2026. Erst ab 19.10. sichtbar.
     if (forma_setting($pdo, 'bemalen_v16') === null) {
         forma_create_series($pdo, FORMA_SERIES['bemalen'], [3, 4], '2026-11-04', '2026-12-17');
