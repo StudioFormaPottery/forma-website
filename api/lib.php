@@ -320,7 +320,7 @@ function forma_migrate(PDO $pdo): void
                 $has->execute([(string)$w['title']]);
                 if ((int)$has->fetchColumn() === 0) {
                     $pdo->prepare('INSERT INTO templates (title, description, season, age, level, price_cents, file, file_en, image, visible, sort, created_at) VALUES (?,?,?,?,?,?,?,?,?,1,?,?)')
-                        ->execute([(string)$w['title'], (string)($w['description'] ?? ''), (string)($w['season'] ?? 'ganzjaehrig'), 'erwachsene', (int)($w['level'] ?? 1),
+                        ->execute([(string)$w['title'], (string)($w['description'] ?? ''), (string)($w['season'] ?? 'ganzjaehrig'), array_key_exists((string)($w['age'] ?? ''), FORMA_AGES) ? (string)$w['age'] : 'erwachsene', (int)($w['level'] ?? 1),
                             (int)($w['price_cents'] ?? 399), "seed-$key-de.pdf", "seed-$key-en.pdf", "seed-$key.jpg", (int)($w['sort'] ?? 0), date('c')]);
                 }
                 forma_set_setting($pdo, 'weekly_' . $key, '1');

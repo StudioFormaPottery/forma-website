@@ -1,1 +1,24 @@
-[]
+[
+ {
+  "key": "kids-anhaenger",
+  "publish_at": "2026-11-01T08:00:00",
+  "title": "Weihnachtsanhänger für Kinder",
+  "season": "winter",
+  "age": "kinder710",
+  "level": 1,
+  "price_cents": 299,
+  "sort": 0,
+  "description": "8 große, runde Motive für Kinderhände: Kugel, Stern, Mond, Glocke, Herz, Fäustling, Stiefel und Lebkuchenmann. Mit stabiler Aufhänge-Lasche, für lufttrocknenden Ton, Salzteig oder Brennton, Salzteig-Rezept inklusive."
+ },
+ {
+  "key": "kids-3d-anhaenger",
+  "publish_at": "2026-11-01T08:00:00",
+  "title": "3D-Anhänger für Kinder",
+  "season": "winter",
+  "age": "kinder710",
+  "level": 1,
+  "price_cents": 299,
+  "sort": 0,
+  "description": "Zwei Teile zusammenstecken und der Anhänger wird räumlich: Kugel in 10 und 8 cm, Stern und Baum zum Hinstellen. Einfache Bild-Anleitung für Kinder von 7 bis 10 Jahren."
+ }
+]

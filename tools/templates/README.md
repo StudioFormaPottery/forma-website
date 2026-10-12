@@ -64,6 +64,11 @@ Dinge für ein gemütliches Zuhause, die man wirklich benutzt. Inspiration: Pint
 Stil von Pottery by Denise (klare, alltagstaugliche Schablonen), aber nie nachmachen: eigene Formen,
 eigene Illustrationen, eigene Texte. Keine niedlichen Tierfiguren, keine Kitsch-Motive.
 
+## Geplant: Christmas for Kids (1.11.2026, 8 Uhr)
+
+`kids-anhaenger` (Weihnachtsanhänger für Kinder) und `kids-3d-anhaenger` (3D-Anhänger für Kinder), je € 2,99,
+Kategorie Weihnachten & Winter, Alter Kinder 7–10. Stehen schon in `api/seed/weekly.json` und gehen automatisch online.
+
 ## Plan Oktober 2026
 
 | Freitag 8 Uhr | Template | Level | Saison |
