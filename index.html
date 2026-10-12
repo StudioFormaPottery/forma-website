@@ -915,6 +915,24 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .team-seal{left:-30px;bottom:30px}
 
 @media (max-width:700px){.maker-art{display:none!important}}
+
+/* Gutschein: mittig, eingerahmte Karte */
+.gift .wrap{display:block}
+.gift-card{position:relative;overflow:hidden;max-width:860px;margin:0 auto;padding:clamp(32px,5vw,60px) clamp(22px,5vw,64px);border-radius:32px;background:var(--paper);text-align:center;display:flex;flex-direction:column;align-items:center;gap:22px;box-shadow:0 18px 40px rgba(51,33,27,.1)}
+.gift-card>*:not(.maker-wave){position:relative;z-index:1}
+.gift-card .maker-wave path{stroke:var(--clay);opacity:.45}
+.gift-card .gift-text{align-items:center;max-width:620px}
+.gift-card p{font-size:19px}
+.gift-card .btn{font-size:19px;min-height:56px;padding:12px 34px}
+.gift-ic{width:74px;height:74px;animation:sway 7s ease-in-out infinite alternate}
+.gift-ic svg{width:100%;height:100%;display:block}
+@media (min-width:900px){.gift-card p{font-size:21px}.gift-card .btn{font-size:21px}.gift-ic{width:90px;height:90px}}
+/* Teambuilding-Siegel groß und lesbar */
+.team-seal{width:190px;height:190px;left:-46px;bottom:26px}
+.team-seal text{font-size:10.5px}
+.team-seal b{font-size:46px}
+.team-seal i{font-size:18px}
+@media (max-width:760px){.team-seal{width:128px;height:128px;left:-18px;bottom:18px}.team-seal b{font-size:31px}.team-seal i{font-size:13px}}
 </style>
 </head>
 <body>
@@ -1438,12 +1456,16 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     <svg class="wave" style="--to:var(--blush);background:var(--paper)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60c140-30 300-50 470-32s300 66 480 62 330-54 490-58v88H0z"></path></svg>
     <svg class="float f2" viewBox="0 0 200 200" aria-hidden="true" style="top:30%"><path d="M100 8c38 2 66 22 80 56s6 80-26 104-82 30-112 2S2 98 22 58 62 6 100 8z"></path></svg>
     <div class="wrap">
+      <div class="gift-card" id="gift-card">
+        <svg class="maker-wave" aria-hidden="true"><path></path></svg>
+        <span class="gift-ic" aria-hidden="true"><svg viewBox="0 0 64 64"><rect x="10" y="26" width="44" height="30" rx="5" fill="#8C2C1D"/><rect x="7" y="18" width="50" height="11" rx="4" fill="#A63A27"/><path d="M32 18v38" stroke="#FBF1EA" stroke-width="5"/><path d="M32 18c-4-9-15-11-15-4s10 5 15 4zm0 0c4-9 15-11 15-4s-10 5-15 4z" fill="none" stroke="#FBF1EA" stroke-width="3.5" stroke-linejoin="round"/></svg></span>
       <div class="gift-text">
         <p class="eyebrow">Gutscheine</p>
         <h2 class="display" id="gutschein-titel">Ein Geschenk aus Ton</h2>
         <p>Ein Platz an der Töpferscheibe, eine Einzelstunde oder Zeit im offenen Atelier: ein Geschenk, das in Erinnerung bleibt. Du kaufst den Gutschein hier online und kannst ihn sofort als PDF ausdrucken.</p>
       </div>
       <a class="btn btn-solid" href="#gutschein" data-voucher="">Gutschein kaufen</a>
+      </div>
     </div>
     <svg class="wave" style="--to:var(--paper);background:var(--blush)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70c150 28 310 40 480 22s310-70 490-66 310 56 470 50v44H0z"></path></svg>
   </section>

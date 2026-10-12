@@ -24,6 +24,12 @@ Ablauf für die automatische Wochen-Session (läuft freitags früh, vor 8 Uhr):
      Italiana (Kicker). Anhänger: Loch immer innerhalb des Motivs.
    - Materialliste klein halten: Ton, Nudelholz, 2 Holzleisten, Messer, Schwamm, ggf. Trinkhalm.
    - Das Wort „Keramik“ nie verwenden (lieber Ton, Pottery, Werkstück).
+   - Für Laien schreiben: Fachbegriffe nie allein verwenden, sondern erst einfach erklären und den
+     Fachbegriff in Klammern dahinter, z. B. „das erste Mal brennen (Schrühbrand)“ oder
+     „leicht angetrocknet (lederhart)“. Wer nicht aus der Töpferwelt kommt, soll alles verstehen.
+   - Zeit und Tonart nennen statt Zielgruppe: z. B. „in 30–40 Minuten selbst gemacht, aus
+     Steinzeugton oder Paperclay“. Nicht „auch schön mit Kindern“ dazuschreiben (Kinder-Templates
+     sind eine eigene Kategorie).
    - Fußzeile: „<Titel> · FORMA Template-Shop“. Rechte: „Nur für den privaten Gebrauch.
      Weitergabe und Verkauf der Datei sind nicht erlaubt.“
 3. Vorschaubild 1200 × 900 px (JPG) mit der Titel-Illustration auf Sand-Hintergrund,

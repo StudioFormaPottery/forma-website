@@ -355,6 +355,18 @@ function forma_migrate(PDO $pdo): void
         if ($max < 16) forma_set_setting($pdo, 'invoice_start_2026', '16');
         forma_set_setting($pdo, 'invoice_numbers_v22', '1');
     }
+    // 12.10.2026: Text zum Template des Monats ohne „schön mit Kindern“, dafür Zeit und Tonart.
+    if (forma_setting($pdo, 'maker_text_v23') === null) {
+        $fix = function ($x) use (&$fix) {
+            if (is_array($x)) return array_map($fix, $x);
+            return is_string($x) ? str_replace('Ganz einfach, in 30 Minuten gemacht und auch schön mit Kindern.', 'Ganz einfach in 30–40 Minuten selbst gemacht, aus Steinzeugton oder Paperclay.', $x) : $x;
+        };
+        foreach (['maker', 'maker_schedule'] as $key) {
+            $v = json_decode(forma_setting($pdo, $key) ?? '', true);
+            if (is_array($v)) forma_set_setting($pdo, $key, json_encode($fix($v), JSON_UNESCAPED_UNICODE));
+        }
+        forma_set_setting($pdo, 'maker_text_v23', '1');
+    }
 
     // 11.10.2026: Pottery bemalen im Advent, Mi & Do 15–18 Uhr, 4.11.–17.12.2026. Erst ab 19.10. sichtbar.
     if (forma_setting($pdo, 'bemalen_v16') === null) {
@@ -498,7 +510,7 @@ function forma_migrate(PDO $pdo): void
             }
             if ($ok) {
                 $m['title'] = 'Blatt-Schälchen';
-                $m['text'] = 'Ein kleines Schälchen in Blattform für Ringe, Teebeutel oder Herbstdeko. Ganz einfach, in 30 Minuten gemacht und auch schön mit Kindern.';
+                $m['text'] = 'Ein kleines Schälchen in Blattform für Ringe, Teebeutel oder Herbstdeko. Ganz einfach in 30–40 Minuten selbst gemacht, aus Steinzeugton oder Paperclay.';
                 $m['file'] = 'seed-maker-blatt-de.pdf';
                 $m['file_en'] = 'seed-maker-blatt-en.pdf';
                 $m['image'] = 'seed-maker-blatt.jpg';
