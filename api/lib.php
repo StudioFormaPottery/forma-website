@@ -815,8 +815,20 @@ function forma_mail_html(string $text): string
         return 'Link öffnen';
     };
     $out = '';
+    $calRow = false;
     foreach (preg_split("/\r?\n/", rtrim($text)) as $line) {
         $t = trim($line);
+        // Kalender-Links als kleine Buttons nebeneinander
+        if (preg_match('~^(Apple Kalender[^:]*|Google Kalender[^:]*): (https?://\S+)$~u', $t, $cm)) {
+            $isApple = str_starts_with($cm[1], 'Apple');
+            $lbl = '+ ' . ($isApple ? 'Apple Kalender' : (str_contains($cm[1], ',') ? 'Google · ' . trim(explode(',', $cm[1], 2)[1]) : 'Google Kalender'));
+            if (!$calRow) { $out .= '<div style="margin:8px 0 2px">'; $calRow = true; }
+            $out .= '<a href="' . htmlspecialchars($cm[2], ENT_QUOTES, 'UTF-8') . '" style="display:inline-block;margin:0 8px 8px 0;padding:10px 18px;border-radius:999px;font-size:15px;text-decoration:none;'
+                . ($isApple ? 'background:#8C2C1D;color:#FBF1EA' : 'background:#FFFFFF;color:#8C2C1D;border:1.5px solid #8C2C1D') . '">'
+                . htmlspecialchars($lbl, ENT_QUOTES, 'UTF-8') . '</a>';
+            continue;
+        }
+        if ($calRow) { $out .= '</div>'; $calRow = false; }
         if (preg_match('~^https?://\S+$~', $t)) {
             $u = htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
             $out .= '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:6px 0 4px"><tr><td style="border-radius:999px;background:#8C2C1D">'
@@ -830,6 +842,7 @@ function forma_mail_html(string $text): string
         $h = preg_replace('~([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})~', '<a href="mailto:$1" style="color:#8C2C1D">$1</a>', $h);
         $out .= $t === '' ? '<div style="height:12px"></div>' : '<div>' . $h . '</div>';
     }
+    if ($calRow) $out .= '</div>';
     return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>'
         . '<body style="margin:0;padding:0;background:#EEE2D4"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#EEE2D4"><tr><td align="center" style="padding:24px 12px">'
         . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FBF1EA;border-radius:22px;overflow:hidden">'
@@ -1189,9 +1202,12 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
     $piecesLine = is_array($pieces) && $pieces ? ($isAtelier ? 'Deine Zeiten: ' . implode(', ', array_map(fn($i) => preg_replace('/^Offenes Atelier /', '', $i['name']), $pieces)) . ' (' . count($pieces) . ($pieces && count($pieces) === 1 ? ' Stunde' : ' Stunden') . ")\n" : 'Deine Stücke: ' . forma_bemalen_text($pieces) . "\n") : '';
     $unsub = '';
     try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Kursbuchung: ' . $b['title']); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
+    $calTxt = ''; $calAtt = [];
+    try { [$calTxt, $calAtt] = forma_cal_block($pdo, 'b', $bookingId); } catch (Throwable $e) { error_log('FORMA cal: ' . $e->getMessage()); }
     $customer = "Hallo $first,\n\n$intro\n\nHier noch einmal alles auf einen Blick:\n\n"
         . "Kurs: {$b['title']}\nTermin: $termin\nPersonen: $personsText\n$piecesLine$payLine\nOrt: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
         . $minNote
+        . $calTxt
         . "\nBitte komm in Kleidung, die schmutzig werden darf. Schürzen und Werkzeug habe ich im Studio.\n"
         . "\nFalls doch etwas dazwischenkommt: Bis 48 Stunden vor Kursbeginn kannst du kostenlos stornieren. Danach werden 50 % der Kursgebühr fällig, wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit bei mir, gemeinsam finden wir bestimmt eine Lösung.\n"
         . "\nFalls du Fragen hast oder doch verhindert bist, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n"
@@ -1203,7 +1219,7 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
         . "\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nNachricht: {$b['message']}\n\n"
         . "Freie Plätze danach: $free\n\nAlle Buchungen: $site/verwaltung/\n";
 
-    forma_mail($b['email'], ($paid ? 'Dein Platz ist fix: ' : 'Deine Anmeldung: ') . $b['title'], $customer);
+    forma_mail($b['email'], ($paid ? 'Dein Platz ist fix: ' : 'Deine Anmeldung: ') . $b['title'], $customer, null, $calAtt);
     forma_mail(FORMA_NOTIFY_EMAIL, ($paid ? 'Bezahlt: ' : 'Neue Anmeldung: ') . $b['title'] . ' (' . $b['name'] . ')', $admin, $b['email']);
     if ($paid) forma_invoice_for($pdo, 'kurs', $bookingId);
 }
@@ -1808,6 +1824,114 @@ function forma_ics(array $events): string
     return $out . "END:VCALENDAR\r\n";
 }
 
+/** Geheimer Schlüssel für Kalender-Links (wird beim ersten Mal zufällig erzeugt, liegt nur in der Datenbank). */
+function forma_cal_sig(PDO $pdo, string $kind, int $id): string
+{
+    $secret = forma_setting($pdo, 'ics_secret');
+    if ($secret === null || strlen($secret) < 32) {
+        $secret = bin2hex(random_bytes(24));
+        forma_set_setting($pdo, 'ics_secret', $secret);
+    }
+    return substr(hash_hmac('sha256', "$kind:$id", $secret), 0, 24);
+}
+
+/** Alle Termine einer Buchung als Liste: kind 'b' = Kursbuchung, 'p' = Private Pottery. */
+function forma_booking_events(PDO $pdo, string $kind, int $id): array
+{
+    $events = [];
+    if ($kind === 'p') {
+        $st = $pdo->prepare('SELECT * FROM private_bookings WHERE id = ?');
+        $st->execute([$id]);
+        $b = $st->fetch();
+        if (!$b) return [];
+        foreach (forma_private_sessions($pdo, $id) as $x) {
+            $events[] = ['uid' => 'private-' . $x['id'], 'date' => $x['date'], 'start' => $x['start'], 'hours' => (float)$x['hours'],
+                'summary' => 'Private Pottery im Atelier FORMA', 'desc' => 'Dein Projekt: ' . $b['project'] . "\nBei Fragen: " . FORMA_PHONE];
+        }
+        return $events;
+    }
+    $st = $pdo->prepare('SELECT b.*, c.title, c.date_text, c.start_date FROM bookings b JOIN courses c ON c.id = b.course_id WHERE b.id = ?');
+    $st->execute([$id]);
+    $b = $st->fetch();
+    if (!$b) return [];
+    $title = preg_replace('/\s*·.*$/u', '', (string)$b['title']);
+    $summary = $title . ' im Atelier FORMA';
+    $desc = 'Deine Buchung bei FORMA Earth & Art. Bitte komm in Kleidung, die schmutzig werden darf.' . "\nBei Fragen: " . FORMA_PHONE;
+    $blocks = [];
+    if (forma_is_atelier($b)) {
+        $x = json_decode((string)($b['extras'] ?? ''), true);
+        $slots = [];
+        foreach ((is_array($x) ? $x : []) as $it) {
+            if (is_array($it) && preg_match('/^slot(\d{1,2})$/', (string)($it['key'] ?? ''), $mm)) $slots[] = (int)$mm[1];
+        }
+        sort($slots);
+        foreach ($slots as $h) {
+            $n = count($blocks);
+            if ($n && $blocks[$n - 1][1] === $h) $blocks[$n - 1][1] = $h + 1;
+            else $blocks[] = [$h, $h + 1];
+        }
+        $blocks = array_map(fn($bl) => [sprintf('%02d:00', $bl[0]), (float)($bl[1] - $bl[0])], $blocks);
+    }
+    if (!$blocks && preg_match('/(\d{1,2})(?:[:.](\d{2}))?\s*[–-]\s*(\d{1,2})(?:[:.](\d{2}))?\s*Uhr/u', (string)$b['date_text'], $m)) {
+        $from = (int)$m[1] * 60 + (int)($m[2] ?? 0);
+        $to = (int)$m[3] * 60 + (int)($m[4] ?? 0);
+        if ($to > $from) $blocks[] = [sprintf('%02d:%02d', intdiv($from, 60), $from % 60), ($to - $from) / 60];
+    }
+    if (!$blocks) return [];
+    // Mehrwöchige Kurse (z. B. „Freitags, 6. 11. – 4. 12. 2026“): jede Woche ein Termin bis zum Enddatum
+    $dates = [(string)$b['start_date']];
+    if (preg_match('/[–-]\s*(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})/u', (string)$b['date_text'], $e)) {
+        $end = sprintf('%04d-%02d-%02d', $e[3], $e[2], $e[1]);
+        $d = (string)$b['start_date'];
+        while (($d = date('Y-m-d', strtotime($d . ' +7 days'))) <= $end && count($dates) < 20) $dates[] = $d;
+    }
+    foreach ($dates as $k => $d) {
+        foreach ($blocks as $j => [$start, $hours]) {
+            $events[] = ['uid' => 'booking-' . $id . '-' . $k . '-' . $j, 'date' => $d, 'start' => $start, 'hours' => $hours,
+                'summary' => $summary . (count($dates) > 1 ? ' (' . ($k + 1) . '/' . count($dates) . ')' : ''), 'desc' => $desc];
+        }
+    }
+    return $events;
+}
+
+/** Google-Kalender-Link für einen Termin. */
+function forma_google_cal_url(array $e): string
+{
+    $tz = new DateTimeZone('Europe/Vienna');
+    $from = new DateTime($e['date'] . ' ' . $e['start'], $tz);
+    $to = (clone $from)->modify('+' . (int)round($e['hours'] * 60) . ' minutes');
+    $f = fn(DateTime $d) => (clone $d)->setTimezone(new DateTimeZone('UTC'))->format('Ymd\THis\Z');
+    return 'https://calendar.google.com/calendar/render?' . http_build_query([
+        'action' => 'TEMPLATE', 'text' => $e['summary'], 'dates' => $f($from) . '/' . $f($to),
+        'details' => $e['desc'], 'location' => 'FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon', 'ctz' => 'Europe/Vienna',
+    ], '', '&', PHP_QUERY_RFC3986);
+}
+
+/** Textblock mit „In deinen Kalender“-Links (wird in der HTML-Mail zu Buttons) und der .ics-Anhang. */
+function forma_cal_block(PDO $pdo, string $kind, int $id): array
+{
+    $events = forma_booking_events($pdo, $kind, $id);
+    if (!$events) return ['', []];
+    $apple = forma_site_url() . '/api/kalender.php?k=' . $kind . '&id=' . $id . '&s=' . forma_cal_sig($pdo, $kind, $id);
+    $txt = "\n" . (count($events) === 1 ? 'Termin mit einem Klick in deinen Kalender übernehmen:' : 'Alle ' . count($events) . ' Termine mit einem Klick in deinen Kalender übernehmen:') . "\n";
+    $txt .= 'Apple Kalender (iPhone, iPad, Mac): ' . $apple . "\n";
+    $weekly = count($events) > 1;
+    foreach ($events as $k => $e) {
+        if ($k > 0 && ($e['start'] !== $events[0]['start'] || $e['hours'] != $events[0]['hours'] || $e['date'] !== date('Y-m-d', strtotime($events[$k - 1]['date'] . ' +7 days')))) $weekly = false;
+    }
+    if (count($events) === 1) {
+        $txt .= 'Google Kalender: ' . forma_google_cal_url($events[0]) . "\n";
+    } elseif ($weekly) {
+        $first = $events[0];
+        $first['summary'] = preg_replace('/ \(\d+\/\d+\)$/', '', (string)$first['summary']);
+        $txt .= 'Google Kalender: ' . forma_google_cal_url($first) . '&recur=' . rawurlencode('RRULE:FREQ=WEEKLY;COUNT=' . count($events)) . "\n";
+    } else {
+        foreach ($events as $e) $txt .= 'Google Kalender, ' . forma_de_date((string)$e['date'], false) . ': ' . forma_google_cal_url($e) . "\n";
+    }
+    $txt .= '(Für andere Kalender-Apps ' . (count($events) === 1 ? 'hängt der Termin' : 'hängen die Termine') . " auch als Datei an dieser E-Mail.)\n";
+    return [$txt, [['FORMA-Termin' . (count($events) > 1 ? 'e' : '') . '.ics', forma_ics($events), 'text/calendar']]];
+}
+
 /** Eine gesammelte Bestätigung mit allen eingeplanten Private-Pottery-Terminen einer Buchung. */
 function forma_private_confirm_mail(PDO $pdo, int $pid, string $note = ''): bool
 {
@@ -1829,21 +1953,21 @@ function forma_private_confirm_mail(PDO $pdo, int $pid, string $note = ''): bool
         ? "juhu, dein Private-Pottery-Termin steht! Ich freue mich schon sehr auf dich."
         : "juhu, deine Private-Pottery-Termine stehen! Hier sind alle " . count($sessions) . " Termine auf einen Blick, damit du genau weißt, wann wir uns sehen. Ich freue mich schon sehr auf dich.";
     $rest = $paid ? max(0, (float)$b['hours'] - $planned) : 0;
+    [$calTxt, $calAtt] = forma_cal_block($pdo, 'p', $pid);
     $body = "Hallo $first,\n\n$intro\n\n"
         . ($one ? 'Wann: ' . $lines[0] . "\n" : implode("\n", $lines) . "\n")
         . ($paid ? 'Gebucht und bezahlt: ' . forma_hours_text((float)$b['hours']) . " Private Pottery\n" : '')
         . "Dein Projekt: {$b['project']}\nWo: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
         . ($rest > 0 ? "\nDu hast dann noch " . forma_hours_text($rest) . " offen, die planen wir gemeinsam ein, wann es dir passt.\n" : '')
         . (trim($note) !== '' ? "\n" . trim($note) . "\n" : '')
-        . "\nIm Anhang findest du " . ($one ? 'den Termin' : 'alle Termine') . " für deinen Kalender. Bitte komm in Kleidung, die schmutzig werden darf. Schürzen, Werkzeug und Ton habe ich alles im Studio.\n"
+        . $calTxt
+        . "\nBitte komm in Kleidung, die schmutzig werden darf. Schürzen, Werkzeug und Ton habe ich alles im Studio.\n"
         . "\nFalls doch etwas dazwischenkommt: Bis 48 Stunden vorher kannst du kostenlos verschieben oder stornieren. Melde dich einfach, antworte auf diese E-Mail oder ruf mich an: $phone\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n";
     $unsub = '';
     try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Buchung: Private Pottery'); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
     $body .= forma_newsletter_note($unsub);
-    $ics = forma_ics(array_map(fn($x) => ['uid' => 'private-' . $x['id'], 'date' => $x['date'], 'start' => $x['start'], 'hours' => (float)$x['hours'],
-        'summary' => 'Private Pottery im Atelier FORMA', 'desc' => 'Dein Projekt: ' . $b['project'] . "\nBei Fragen: $phone"], $sessions));
     $subject = $one ? 'Dein Termin: ' . forma_de_date((string)$sessions[0]['date'], false) . ' um ' . forma_de_time((string)$sessions[0]['start']) : 'Deine ' . count($sessions) . ' Private-Pottery-Termine';
-    $ok = forma_mail((string)$b['email'], $subject, $body, null, [['FORMA-Termine.ics', $ics, 'text/calendar']]);
+    $ok = forma_mail((string)$b['email'], $subject, $body, null, $calAtt);
     if ($ok) $pdo->prepare('UPDATE private_sessions SET mailed_at = ? WHERE private_id = ?')->execute([date('c'), $pid]);
     return $ok;
 }
