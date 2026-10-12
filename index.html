@@ -961,6 +961,12 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .review cite span{font-weight:400;color:var(--ink-soft)}
 .reviews-more{text-align:center;margin-top:18px;font-size:18px}
 @media (min-width:900px){.review blockquote{font-size:21px}}
+
+/* Kopfbereich: Wellenrand unten und minimalistische Wimpel-Girlande */
+.top::after{content:"";position:absolute;left:0;right:0;top:100%;height:14px;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2264%22%20height%3D%2214%22%20viewBox%3D%220%200%2064%2014%22%3E%3Cpath%20d%3D%22M0%200h64v3c-8%200-8%209-16%209S40%203%2032%203%2024%2012%2016%2012%208%203%200%203z%22%20fill%3D%22%23DDBFA8%22/%3E%3C/svg%3E") repeat-x;background-size:64px 14px;pointer-events:none}
+.top::before{content:"";position:absolute;left:0;right:0;top:0;height:26px;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22132%22%20height%3D%2226%22%20viewBox%3D%220%200%20132%2026%22%3E%3Cpath%20d%3D%22M0%203Q33%2013%2066%203T132%203%22%20fill%3D%22none%22%20stroke%3D%22%23674B40%22%20stroke-width%3D%221.2%22%20opacity%3D%22.55%22/%3E%3Cpath%20d%3D%22M17%207.6l8%201.4-5%209z%22%20fill%3D%22%238C2C1D%22%20opacity%3D%22.85%22/%3E%3Ccircle%20cx%3D%2244%22%20cy%3D%229.4%22%20r%3D%222.2%22%20fill%3D%22%23FBF1EA%22/%3E%3Cpath%20d%3D%22M82%207.6l8%20-1.4-1.6%2010z%22%20fill%3D%22%23FBF1EA%22/%3E%3Cpath%20d%3D%22M108%205.6l7%201-4%207.4z%22%20fill%3D%22%23674B40%22%20opacity%3D%22.7%22/%3E%3C/svg%3E") repeat-x;background-size:132px 26px;pointer-events:none;z-index:0;opacity:.95}
+.top .wrap{position:relative;z-index:1}
+@media (max-width:700px){.top::before{height:20px;background-size:100px 20px}}
 </style>
 </head>
 <body>
