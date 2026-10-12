@@ -12,6 +12,11 @@ Options -Indexes
 # Interne Dateien für die Gutscheine
 <IfModule mod_rewrite.c>
 RewriteEngine On
+# Ohne www → mit www (nur Seitenaufrufe, API/Webhooks bleiben unberührt)
+RewriteCond %{HTTP_HOST} ^forma-pottery\.com$ [NC]
+RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+RewriteCond %{REQUEST_URI} !^/(api|verwaltung)/
+RewriteRule ^(.*)$ https://www.forma-pottery.com/$1 [R=301,L]
 RewriteRule ^api/(fpdf|gutschein|seed)/ - [F,L]
 RewriteRule ^tools/ - [F,L]
 </IfModule>
