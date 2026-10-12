@@ -940,6 +940,15 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .gift-ic{animation:giftwiggle 2.8s ease-in-out infinite;transform-origin:50% 90%}
 @keyframes giftwiggle{0%,100%{transform:rotate(0)}10%{transform:rotate(-10deg) translateY(-3px)}20%{transform:rotate(9deg) translateY(-5px)}30%{transform:rotate(-6deg) translateY(-2px)}40%{transform:rotate(3deg)}50%{transform:rotate(0)}}
 @media (prefers-reduced-motion:reduce){.gift-ic{animation:none}}
+
+/* Private Pottery: beliebteste Option hervorheben */
+.vchoice label.popular span{position:relative;overflow:visible;border-color:transparent;background:#F6E2D6;padding-top:22px}
+.vchoice label.popular .maker-wave{position:absolute;inset:3px;width:calc(100% - 6px);height:calc(100% - 6px);pointer-events:none}
+.vchoice label.popular .maker-wave path{stroke:var(--clay);opacity:.55}
+.vchoice label.popular input:checked+span{box-shadow:none;background:var(--blush)}
+.vchoice label.popular input:checked+span .maker-wave path{opacity:1;stroke-width:2.5}
+.pop-badge{position:absolute;top:-12px;right:14px;z-index:1;font-style:normal;font-size:13.5px;font-weight:600;padding:4px 12px;border-radius:999px;background:var(--clay);color:var(--on-clay);box-shadow:0 4px 10px rgba(51,33,27,.18);white-space:nowrap}
+.vchoice.hours{padding-top:6px}
 </style>
 </head>
 <body>
@@ -1212,7 +1221,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <fieldset class="vgroup" id="p-hours-set"><legend id="p-hours-legend">1 · Wie lange brauchen wir?</legend>
           <div class="vchoice hours">
             <label><input type="radio" name="hours" value="1"><span><b>1 Stunde</b><i>€ 65</i><small>Ganz kleine Projekte, z. B. Kühlschrankmagnete oder zwei Espressotassen</small></span></label>
-            <label><input type="radio" name="hours" value="2" checked><span><b>2 Stunden</b><i>€ 130</i><small>Kleine Projekte, z. B. zwei Kaffeetassen oder Becher, ein kleines Espresso-Set mit Untertellern, Frühstücksteller oder eine große Schale (mindestens 2 Std.)</small></span></label>
+            <label class="popular"><input type="radio" name="hours" value="2" checked><span><svg class="maker-wave" aria-hidden="true"><path></path></svg><em class="pop-badge">♥ Am beliebtesten</em><b>2 Stunden</b><i>€ 130</i><small>Kleine Projekte, z. B. zwei Kaffeetassen oder Becher, ein kleines Espresso-Set mit Untertellern, Frühstücksteller oder eine große Schale (mindestens 2 Std.)</small></span></label>
             <label><input type="radio" name="hours" value="3"><span><b>3 Stunden</b><i>€ 195</i><small>Größere Projekte, z. B. eine große Salatschüssel oder mehrere Teile</small></span></label>
             <label><input type="radio" name="hours" value="4"><span><b>4 Stunden</b><i>€ 260</i><small>Ein Service oder etwas ganz Besonderes. Gern auf mehrere Termine verteilt</small></span></label>
           </div>
