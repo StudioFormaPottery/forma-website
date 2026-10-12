@@ -410,6 +410,17 @@ section{scroll-margin-top:96px}
 .tpl{display:flex;flex-direction:column;border-radius:26px;background:var(--paper-2);border:1px solid var(--line);overflow:hidden;min-width:0}
 .tpl-img{aspect-ratio:4/3;background:var(--blush);display:grid;place-items:center;overflow:hidden}
 .tpl-img img{width:100%;height:100%;object-fit:cover}
+.tpl-img.slides{position:relative;display:block}
+.tpl-track{display:flex;width:100%;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tpl-track::-webkit-scrollbar{display:none}
+.tpl-track img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:start}
+.tpl-dots{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;gap:7px}
+.tpl-dots button{width:8px;height:8px;padding:0;border:0;border-radius:50%;background:rgba(251,241,234,.75);box-shadow:0 0 0 1px rgba(103,75,64,.35);cursor:pointer}
+.tpl-dots button.on{background:var(--clay);box-shadow:none;width:20px;border-radius:99px}
+.tpl-nav{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;border:0;background:rgba(251,241,234,.92);color:var(--clay);font-size:24px;line-height:1;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 8px rgba(51,33,27,.15);opacity:0;transition:opacity .2s}
+.tpl-nav.prev{left:10px}.tpl-nav.next{right:10px}.tpl-nav:disabled{visibility:hidden}
+.tpl-img.slides:hover .tpl-nav,.tpl-nav:focus-visible{opacity:1}
+@media (hover:none){.tpl-nav{display:none}}
 .tpl-body{display:flex;flex-direction:column;gap:8px;padding:18px 20px 20px;flex:1}
 .tpl-tags{display:flex;flex-wrap:wrap;gap:6px}
 .tpl-tags span{font-size:12.5px;padding:3px 10px;border-radius:999px;background:var(--paper);color:var(--ink-soft)}
@@ -1728,7 +1739,18 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     if(!list.length){grid.appendChild(el('p','slots-note','Für diese Auswahl gibt es gerade noch kein Template.'));return;}
     list.forEach(function(t){
       var c=el('article','tpl'),im=el('div','tpl-img');
-      var i=document.createElement('img');i.src=t.image||('img/tpl-'+t.season+'.jpg');i.alt=t.image?'Vorschau: '+t.title:'';i.loading='lazy';im.appendChild(i);
+      var srcs=[t.image||('img/tpl-'+t.season+'.jpg')].concat(t.slides||[]);
+      if(srcs.length>1){
+        var tr=el('div','tpl-track');tr.tabIndex=0;tr.setAttribute('aria-label','Bilder zu '+t.title);
+        srcs.forEach(function(src,n){var i=document.createElement('img');i.src=src;i.loading='lazy';i.alt=n===0?'Vorschau: '+t.title:(n===1?'Blick in die Anleitung':'Blick in die Schablonen');tr.appendChild(i);});
+        var dots=el('div','tpl-dots');srcs.forEach(function(_,n){var d=document.createElement('button');d.type='button';d.setAttribute('aria-label','Bild '+(n+1));if(!n)d.className='on';d.onclick=function(){tr.scrollTo({left:n*tr.clientWidth,behavior:'smooth'});};dots.appendChild(d);});
+        var prev=el('button','tpl-nav prev','‹'),next=el('button','tpl-nav next','›');prev.type=next.type='button';prev.setAttribute('aria-label','Vorheriges Bild');next.setAttribute('aria-label','Nächstes Bild');
+        prev.onclick=function(){tr.scrollBy({left:-tr.clientWidth,behavior:'smooth'});};next.onclick=function(){tr.scrollBy({left:tr.clientWidth,behavior:'smooth'});};
+        tr.addEventListener('scroll',function(){var k=Math.round(tr.scrollLeft/tr.clientWidth);[].forEach.call(dots.children,function(d,n){d.className=n===k?'on':'';});prev.disabled=k===0;next.disabled=k===srcs.length-1;},{passive:true});
+        prev.disabled=true;im.classList.add('slides');im.appendChild(tr);im.appendChild(prev);im.appendChild(next);im.appendChild(dots);
+      }else{
+        var i=document.createElement('img');i.src=srcs[0];i.alt=t.image?'Vorschau: '+t.title:'';i.loading='lazy';im.appendChild(i);
+      }
       c.appendChild(im);
       var b=el('div','tpl-body'),tags=el('div','tpl-tags');
       tags.appendChild(el('span',null,t.season_label));if(t.age&&t.age.indexOf('kinder')===0&&t.age_label)tags.appendChild(el('span',null,t.age_label));if(t.langs)tags.appendChild(el('span',null,t.langs));b.appendChild(tags);

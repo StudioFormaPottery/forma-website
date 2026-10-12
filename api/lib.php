@@ -1736,4 +1736,16 @@ function forma_review_private(PDO $pdo, int $id): bool
     return true;
 }
 
+/** Zusätzliche Shop-Slides (Blick in die Anleitung und die Schablonen): img/shop/<key>-2.jpg, -3.jpg */
+function forma_template_slides(string $file): array
+{
+    if (!preg_match('/^seed-(.+)-de\.pdf$/', $file, $m)) return [];
+    $out = [];
+    foreach ([2, 3] as $n) {
+        $f = "img/shop/{$m[1]}-$n.jpg";
+        if (is_file(__DIR__ . '/../' . $f)) $out[] = $f . '?v=' . filemtime(__DIR__ . '/../' . $f);
+    }
+    return $out;
+}
+
 require_once __DIR__ . '/invoices.php';
