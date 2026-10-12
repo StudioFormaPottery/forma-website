@@ -864,6 +864,25 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 
 .post-copy .post-badge .letter svg{width:100%!important;height:100%!important}
 .post-copy .post-badge b{color:var(--clay)}
+
+/* Kurs-Felder: Icons, zwei mit Wellenrahmen */
+.offer{position:relative}
+.offer-ic{position:absolute;top:22px;right:22px;width:62px;height:62px;pointer-events:none;animation:sway 7s ease-in-out infinite alternate}
+.offer-ic svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 8px rgba(51,33,27,.15))}
+.offer .kicker,.offer h3{padding-right:74px}
+.offer.wavy-card{overflow:hidden;border-color:transparent}
+.offer.wavy-card>*:not(.maker-wave){position:relative;z-index:1}
+.offer.wavy-card .offer-ic{position:absolute}
+.offer.wavy-card .maker-wave path{stroke:var(--clay);opacity:.45}
+@media (min-width:900px){.offer-ic{width:76px;height:76px;top:26px;right:26px}.offer .kicker,.offer h3{padding-right:90px}}
+/* Teambuilding: wechselnde Fotos */
+.team-photos{position:relative;aspect-ratio:4/5;width:100%;max-width:420px;justify-self:center;border-radius:999px 999px 28px 28px;overflow:hidden;box-shadow:0 18px 40px rgba(51,33,27,.3);border:6px solid #FBF1EA}
+.team-photos img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.6s ease}
+.team-photos img.on{opacity:1}
+@media (max-width:780px){.team-photos{max-width:300px}}
+
+.team-card{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+@media (max-width:760px){.team-card{grid-template-columns:1fr}.team-photos{order:-1}}
 </style>
 </head>
 <body>
@@ -893,6 +912,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <a href="#fragen">Q&amp;A</a>
       <a href="#kontakt">Kontakt</a>
       <a href="#forma-post">FORMA Post (Newsletter)</a>
+      <a href="#storno">Gut zu wissen</a>
       <a class="btn btn-solid" href="#angebote" data-book="">Kurs buchen</a>
     </nav>
   </div>
@@ -952,18 +972,19 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <p>Wähle das Format, das zu dir passt: im mehrwöchigen Kurs, als kurzer Einstieg an der Scheibe, ganz persönlich in der Einzelstunde oder selbstständig im offenen Atelier.</p>
       </div>
       <div class="offers">
-        <article class="offer is-featured">
+        <article class="offer is-featured"><span class="offer-ic" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M44 10a14 14 0 1 0 10 24 16 16 0 0 1-10-24z" fill="#FBF1EA"/><path d="M18 34h22v14a8 8 0 0 1-8 8h-6a8 8 0 0 1-8-8z" fill="#DDBFA8"/><path d="M40 38h3a5 5 0 0 1 0 10h-3" stroke="#DDBFA8" stroke-width="3.5" fill="none"/><path d="M24 22c-2 3 2 5 0 8M31 22c-2 3 2 5 0 8" stroke="#FBF1EA" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M12 14l1 3 3 1-3 1-1 3-1-3-3-1 3-1z" fill="#FBF1EA"/></svg></span>
           <p class="kicker">Kurs · 5 Wochen</p>
           <h3>Pottery Pause</h3>
-          <p>An fünf Freitagabenden lernst du Schritt für Schritt das Arbeiten an der Töpferscheibe und gestaltest acht individuelle Werkstücke.</p>
+          <p>Deine kleine Auszeit zum Start ins Wochenende: Handy weg, Hände in den Ton. An fünf Freitagabenden lernst du in gemütlicher Runde Schritt für Schritt das Arbeiten an der Töpferscheibe, vom Zentrieren über das Hochziehen bis zum Abdrehen, ganz in deinem Tempo.</p>
           <dl class="facts">
             <dt>Termine</dt><dd>6. 11. – 4. 12. 2026<br>freitags, 18–20 Uhr</dd>
+            <dt>Werkstücke</dt><dd>acht eigene Stücke, z. B. Becher, Schalen oder kleine Teller</dd>
             <dt>Für</dt><dd>Einsteiger und Fortgeschrittene</dd>
           </dl>
           <p class="price">€ 295<small>für alle fünf Termine</small></p>
           <a class="btn" href="#angebote" data-book="Pottery Pause">Platz buchen</a>
         </article>
-        <article class="offer is-blush">
+        <article class="offer is-blush wavy-card"><svg class="maker-wave" aria-hidden="true"><path></path></svg><span class="offer-ic" aria-hidden="true"><svg viewBox="0 0 64 64"><ellipse cx="32" cy="48" rx="24" ry="7" fill="#674B40"/><ellipse cx="32" cy="45" rx="24" ry="7" fill="#DDBFA8"/><path d="M22 44c0-14 4-22 10-26 6 4 10 12 10 26z" fill="#8C2C1D"/><path d="M26 30c4 2 8 2 12 0" stroke="#FBF1EA" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M10 26a22 22 0 0 1 8-12M54 26a22 22 0 0 0-8-12" stroke="#8C2C1D" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="3 4"/></svg></span>
           <p class="kicker">Drehscheibe · 2 Stunden</p>
           <h3>Spin &amp; Go</h3>
           <p>Zwei Stunden an der Töpferscheibe, begleitet von Anfang an: Ich zeige dir Schritt für Schritt, wie du an der Scheibe arbeitest, und du gestaltest dein eigenes Werkstück.</p>
@@ -976,7 +997,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="price">€ 70<small>pro Person, inkl. eines Werkstücks</small></p>
           <a class="btn btn-solid" href="#angebote" data-book="Spin &amp; Go">Termin buchen</a>
         </article>
-        <article class="offer">
+        <article class="offer wavy-card"><svg class="maker-wave" aria-hidden="true"><path></path></svg><span class="offer-ic" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 52C18 43 10 36 10 26c0-6 5-11 11-11 5 0 8 3 11 7 3-4 6-7 11-7 6 0 11 5 11 11 0 10-8 17-22 26z" fill="#8C2C1D"/><path d="M22 28c2-4 6-5 9-3" stroke="#FBF1EA" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></span>
           <p class="kicker">Einzelstunde · Handbuilding</p>
           <h3>Private Pottery</h3>
           <p>Dein Projekt, gemeinsam umgesetzt: Wir gestalten dein Werkstück von Anfang bis Ende mit den Händen, formen, ritzen, beschriften, verzieren und bemalen. Du machst es selbst, und ich unterstütze dich Schritt für Schritt, damit es wirklich schön wird.</p>
@@ -990,7 +1011,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="price">€ 65<small>pro Stunde</small></p>
           <div class="offer-btns"><a class="btn btn-solid" href="#angebote" data-private="buchung">Projekt buchen</a><a class="btn btn-ask" href="#angebote" data-private="anfrage">Erst mal anfragen</a></div>
         </article>
-        <article class="offer is-brown">
+        <article class="offer is-brown"><span class="offer-ic" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="22" cy="24" r="12" fill="none" stroke="#674B40" stroke-width="5"/><path d="M31 31l22 22M44 44l6-6M49 49l5-5" stroke="#674B40" stroke-width="5" stroke-linecap="round"/><path d="M50 10l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z" fill="#FBF1EA"/></svg></span>
           <p class="kicker">Für Töpfernde mit Erfahrung</p>
           <h3>Offenes Atelier</h3>
           <p>Für alle, die selbstständig an eigenen Projekten arbeiten möchten. Während deiner Zeit im Atelier kannst du Ton, Werkzeuge und Maschinen im Studio nutzen, um deine Techniken anzuwenden.</p>
@@ -1484,15 +1505,12 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="team-facts">4 bis 8 Personen · Halbtages-Event über 4 Stunden oder Töpfer-Wochenende mit Übernachtung im Heindalishof</p>
           <div class="team-btns"><a class="btn btn-team" href="#teambuilding" data-private="team">Event anfragen</a><a class="btn btn-team-ghost" href="downloads/FORMA_Teambuilding.pdf?v=7" target="_blank" rel="noopener">Infos &amp; Preise (PDF)</a></div>
         </div>
-        <svg class="team-art" viewBox="0 0 240 200" fill="none" aria-hidden="true">
-            <ellipse cx="120" cy="176" rx="104" ry="12" fill="#7A2417" opacity=".45"/>
-            <path d="M34 92h46l-5 70c-.6 7-6 12-13 12H52c-7 0-12.4-5-13-12z" fill="#F1D9C6"/><path d="M80 108c14 0 16 26 0 28" stroke="#F1D9C6" stroke-width="6" stroke-linecap="round"/>
-            <path d="M98 70h52l-6 92c-.5 7-6 12-13 12h-14c-7 0-12.5-5-13-12z" fill="#FBF1EA"/><path d="M106 96c10 6 26 6 36 0" stroke="#B08E7A" stroke-width="3" stroke-linecap="round"/>
-            <path d="M164 100h44l-4 62c-.5 7-6 12-13 12h-10c-7 0-12.5-5-13-12z" fill="#DDBFA8"/><path d="M164 116c-14 0-15 24 0 26" stroke="#DDBFA8" stroke-width="6" stroke-linecap="round"/>
-            <path d="M116 20c.7 5 4.3 8.6 9.3 9.3-5 .7-8.6 4.3-9.3 9.3-.7-5-4.3-8.6-9.3-9.3 5-.7 8.6-4.3 9.3-9.3z" fill="#FBF1EA"/>
-            <path d="M60 52c.5 3.6 3 6 6.6 6.6-3.6.5-6 3-6.6 6.6-.5-3.6-3-6-6.6-6.6 3.6-.5 6-3 6.6-6.6z" fill="#F1D9C6"/>
-            <path d="M190 58c.5 3.6 3 6 6.6 6.6-3.6.5-6 3-6.6 6.6-.5-3.6-3-6-6.6-6.6 3.6-.5 6-3 6.6-6.6z" fill="#F1D9C6"/>
-          </svg>
+        <div class="team-photos" aria-hidden="true">
+          <img class="on" src="img/toepferscheiben.jpg" alt="" loading="lazy">
+          <img src="img/scheiben-abend.jpg" alt="" loading="lazy">
+          <img src="img/atelier-ecke.jpg" alt="" loading="lazy">
+          <img src="img/scheiben-studio.jpg" alt="" loading="lazy">
+        </div>
       </div>
     </div>
     <svg class="wave" style="--to:var(--paper);background:var(--paper-2)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40c160 44 330 66 520 50s320-72 500-70 290 44 420 40v60H0z"></path></svg>
@@ -2432,6 +2450,10 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       if(v&&v.readyState<1){v.addEventListener('loadedmetadata',go,{once:true});setTimeout(go,4000);}else go();
     });
   })();
+  // Teambuilding: Fotos wechseln ruhig alle 5 Sekunden
+  (function(){var box=document.querySelector('.team-photos');if(!box)return;var im=[].slice.call(box.querySelectorAll('img')),k=0;
+    if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    setInterval(function(){im[k].classList.remove('on');k=(k+1)%im.length;im[k].classList.add('on');},5000);})();
   // Ausklappen (am Handy): Knopf zeigt/verbirgt den folgenden Bereich
   document.querySelectorAll('.more-btn').forEach(function(b){
     var w=b.nextElementSibling,label=b.textContent;
