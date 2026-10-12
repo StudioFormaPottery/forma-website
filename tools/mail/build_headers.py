@@ -43,6 +43,22 @@ def banner(name, items):
 <rect width="1200" height="300" fill="{B}"/>{dots}{''.join(parts)}
 <circle cx="600" cy="140" r="96" fill="{B}"/>
 <path d="M0 270c150-36 300 30 450 0s300-36 450 0 225 24 300 6V300H0z" fill="{P}"/></svg>'''
+def review_card(name, items):
+    """Bewertungs-Karte für die Google-Bewertungs-Mail: 5 Sterne, ringsum Saison-Motive."""
+    rnd = random.Random(name + 'review')
+    spots = [(90,90),(60,250),(150,350),(230,62),(1110,90),(1140,250),(1050,350),(970,62)]
+    parts = []
+    for i, (x, y) in enumerate(spots):
+        it = items[i % len(items)]
+        parts.append(f'<g transform="translate({x} {y}) rotate({rnd.randint(-30,30)}) scale({rnd.uniform(1.3,1.8):.2f})">{it()}</g>')
+    dots = ''.join(f'<circle cx="{rnd.randint(30,1170)}" cy="{rnd.randint(30,390)}" r="{rnd.uniform(2,4):.1f}" fill="{P}" opacity=".8"/>' for _ in range(20))
+    big = ''.join(f'<g transform="translate({420 + i*90} 225)"><path d="M0-38l11 23 25 3-18 18 5 25-23-12-23 12 5-25-18-18 25-3z" fill="{R}" stroke="{R}" stroke-width="6" stroke-linejoin="round"/></g>' for i in range(5))
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420">
+<rect width="1200" height="420" rx="44" fill="{B}"/>{dots}{''.join(parts)}
+<text x="600" y="140" text-anchor="middle" font-family="Bricolage, sans-serif" font-weight="650" font-size="58" fill="{R}">Wie war's bei FORMA?</text>
+{big}
+<text x="600" y="330" text-anchor="middle" font-family="Outfit, sans-serif" font-size="30" fill="{K}">Ein, zwei Sätze auf Google · dauert nur eine Minute</text></svg>'''
+
 async def main():
     os.makedirs(os.path.join(ROOT, 'img', 'mail'), exist_ok=True)
     logo = 'data:image/png;base64,' + base64.b64encode(open(os.path.join(ROOT, 'img', 'forma-logo.png'), 'rb').read()).decode()
@@ -53,5 +69,11 @@ async def main():
             html = f'<html><body style="margin:0">{banner(name, items)}<img src="{logo}" style="position:absolute;left:520px;top:58px;width:160px;height:160px;object-fit:contain"></body></html>'
             await pg.set_content(html); await pg.wait_for_timeout(250)
             await pg.screenshot(path=os.path.join(ROOT, 'img', 'mail', name + '.png'), clip={'x': 0, 'y': 0, 'width': 1200, 'height': 300})
+        f64 = lambda n: 'data:font/woff;base64,' + base64.b64encode(open(os.path.join(ROOT, 'fonts', n), 'rb').read()).decode()
+        css = f"<style>@font-face{{font-family:Bricolage;font-weight:600 800;src:url({f64('BricolageGrotesque-Bold.woff')})}}@font-face{{font-family:Outfit;src:url({f64('Outfit-Regular.woff')})}}</style>"
+        pg2 = await b.new_page(viewport={'width': 1200, 'height': 420})
+        for name, items in THEMES.items():
+            await pg2.set_content(f'<html><head>{css}</head><body style="margin:0;background:{P}">{review_card(name, items)}</body></html>'); await pg2.evaluate('document.fonts.ready'); await pg2.wait_for_timeout(400)
+            await pg2.screenshot(path=os.path.join(ROOT, 'img', 'mail', 'bewertung-' + name + '.png'), clip={'x': 0, 'y': 0, 'width': 1200, 'height': 420})
         await b.close()
 asyncio.run(main())

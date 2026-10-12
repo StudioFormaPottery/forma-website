@@ -818,7 +818,7 @@ function forma_mail_mime(string $body, array $attachments = []): array
     $b = 'forma' . bin2hex(random_bytes(10));
     $enc = fn(string $s) => rtrim(chunk_split(base64_encode($s), 76, "\r\n"));
     $mime = "--$b\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . $enc($body) . "\r\n"
-        . "--$b\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . $enc(forma_mail_html($body)) . "\r\n"
+        . "--$b\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . $enc($GLOBALS['FORMA_MAIL_HTML'] ?? forma_mail_html($body)) . "\r\n"
         . "--$b--";
     if (!$attachments) {
         return ['multipart/alternative; boundary="' . $b . '"', $mime];
@@ -1596,6 +1596,51 @@ function forma_review_text(string $name, string $what): string
         . "Bis bald,\nVivien\n";
 }
 
+/** Schön gestaltete HTML-Fassung der Bewertungs-Mail (Saison-Kopfbild und Saison-Bewertungskarte). */
+function forma_review_html(string $name, string $what, string $url): string
+{
+    $e = fn($x) => htmlspecialchars($x, ENT_QUOTES, 'UTF-8');
+    $theme = forma_mail_theme(); $img = FORMA_SITE_URL . '/img/mail/';
+    $u = $e($url); $first = $name !== '' ? forma_first_name($name) : '';
+    $f = 'font-family:Arial,Helvetica,sans-serif;';
+    $p = fn($t, $st = '') => '<p style="margin:0 0 16px;' . $f . 'font-size:16px;line-height:1.65;color:#33211B;' . $st . '">' . $t . '</p>';
+    return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Danke für deinen Besuch</title></head>'
+        . '<body style="margin:0;padding:0;background:#EEE2D4">'
+        . '<div style="display:none;max-height:0;overflow:hidden">Danke für deinen Besuch im Atelier FORMA! Magst du mir eine kurze Google-Bewertung schenken?</div>'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#EEE2D4"><tr><td align="center" style="padding:24px 12px">'
+        . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FBF1EA;border-radius:26px;overflow:hidden">'
+        . '<tr><td style="background:#DDBFA8;padding:0;line-height:0"><img src="' . $img . $theme . '.png" width="600" alt="FORMA Earth &amp; Art" style="display:block;width:100%;max-width:600px;height:auto"></td></tr>'
+        . '<tr><td style="padding:26px 34px 6px">'
+        . '<p style="margin:0 0 6px;font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-size:19px;color:#674B40">Schön, dass du da warst</p>'
+        . '<h1 style="margin:0 0 18px;font-family:Georgia,\'Times New Roman\',serif;font-weight:normal;font-size:34px;line-height:1.15;color:#8C2C1D">Danke' . ($first !== '' ? ', ' . $e($first) : '') . '!</h1>'
+        . $p('Danke für deinen Besuch bei <b>„' . $e($what) . '“</b> im Atelier FORMA! Ich hoffe, du hattest eine sehr schöne und gemütliche Zeit.')
+        . $p('Magst du mir einen kleinen Gefallen tun? Eine kurze Bewertung auf Google hilft mir sehr, weil andere so das Atelier finden.')
+        . '</td></tr>'
+        . '<tr><td style="padding:4px 26px 0"><a href="' . $u . '" style="text-decoration:none"><img src="' . $img . 'bewertung-' . $theme . '.png" width="548" alt="Wie war\'s bei FORMA? ★★★★★ Jetzt auf Google bewerten" style="display:block;width:100%;max-width:548px;height:auto;border-radius:20px"></a></td></tr>'
+        . '<tr><td align="center" style="padding:20px 34px 6px">'
+        . '<table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="border-radius:999px;background:#8C2C1D"><a href="' . $u . '" style="display:inline-block;padding:15px 34px;' . $f . 'font-size:16px;color:#FBF1EA;text-decoration:none;border-radius:999px">Jetzt auf Google bewerten ★</a></td></tr></table>'
+                . '</td></tr>'
+        . '<tr><td style="padding:22px 34px 8px">'
+        . $p('Wenn etwas nicht gepasst hat, schreib mir bitte direkt zurück, dann kümmere ich mich darum.')
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F3E6DA;border-radius:16px"><tr><td style="padding:14px 18px;' . $f . 'font-size:14px;line-height:1.6;color:#674B40;font-style:italic">Thank you for visiting the FORMA studio! If you enjoyed it, a short Google review would mean a lot to me.</td></tr></table>'
+        . '<p style="margin:20px 0 0;' . $f . 'font-size:16px;line-height:1.6;color:#33211B">Bis bald,<br>Vivien</p>'
+        . '<img src="https://www.forma-pottery.com/img/signatur-liebe-zum-ton.png" width="240" alt="Mit ganz viel Liebe zum Ton" style="display:block;width:240px;max-width:80%;height:auto;margin:10px 0 18px -6px">'
+        . '</td></tr>'
+        . '<tr><td align="center" style="background:#E4D2BF;padding:18px 24px;' . $f . 'font-size:12.5px;line-height:1.7;color:#674B40">FORMA Earth &amp; Art · Silvrettastraße 58 · 6562 Mathon<br><a href="https://www.forma-pottery.com" style="color:#674B40">www.forma-pottery.com</a> · <a href="https://www.instagram.com/forma.potteryartcraft" style="color:#674B40">Instagram</a></td></tr>'
+        . '</table></td></tr></table></body></html>';
+}
+
+function forma_review_send(PDO $pdo, string $to, string $name, string $what): bool
+{
+    $url = forma_review_url($pdo);
+    $GLOBALS['FORMA_MAIL_HTML'] = forma_review_html($name, $what, $url);
+    try {
+        return forma_mail($to, 'Danke für deinen Besuch bei FORMA', str_replace('%URL%', $url, forma_review_text($name, $what)));
+    } finally {
+        unset($GLOBALS['FORMA_MAIL_HTML']);
+    }
+}
+
 /** Bewertungs-Mail ca. 1 Stunde nach Kursende (läuft höchstens alle 15 Minuten). */
 function forma_review_mails(PDO $pdo, bool $force = false): int
 {
@@ -1603,7 +1648,6 @@ function forma_review_mails(PDO $pdo, bool $force = false): int
     $last = (int)(forma_setting($pdo, 'review_last') ?? 0);
     if (!$force && time() - $last < 900) return 0;
     forma_set_setting($pdo, 'review_last', (string)time());
-    $url = forma_review_url($pdo);
     $stmt = $pdo->prepare("SELECT b.id, b.name, b.email, b.extras, b.course_id, c.title, c.date_text, c.start_date
         FROM bookings b JOIN courses c ON c.id = b.course_id
         WHERE b.status = 'bestaetigt' AND b.review_sent IS NULL AND c.start_date BETWEEN ? AND ?");
@@ -1618,8 +1662,7 @@ function forma_review_mails(PDO $pdo, bool $force = false): int
         if (isset($seen[$key]) || !filter_var($b['email'], FILTER_VALIDATE_EMAIL)) continue;
         $seen[$key] = true;
         $title = preg_replace('/\s*·.*$/u', '', (string)$b['title']);
-        $body = str_replace('%URL%', $url, forma_review_text((string)$b['name'], $title));
-        forma_mail((string)$b['email'], 'Danke für deinen Besuch bei FORMA', $body);
+        forma_review_send($pdo, (string)$b['email'], (string)$b['name'], $title);
         $sent++;
     }
     return $sent;
@@ -1634,7 +1677,7 @@ function forma_review_private(PDO $pdo, int $id): bool
     $b = $stmt->fetch();
     if (!$b || !filter_var($b['email'], FILTER_VALIDATE_EMAIL)) return false;
     $pdo->prepare('UPDATE private_bookings SET review_sent = ? WHERE id = ?')->execute([date('c'), $id]);
-    forma_mail((string)$b['email'], 'Danke für deinen Besuch bei FORMA', str_replace('%URL%', forma_review_url($pdo), forma_review_text((string)$b['name'], 'Private Pottery')));
+    forma_review_send($pdo, (string)$b['email'], (string)$b['name'], 'Private Pottery');
     return true;
 }
 
