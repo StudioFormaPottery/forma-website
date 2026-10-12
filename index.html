@@ -430,6 +430,24 @@ section{scroll-margin-top:96px}
 .qty output{min-width:18px;font-weight:600}
 @media (min-width:861px){.pieces-title{font-size:23px}.pieces-sub{font-size:16.5px}.piece b{font-size:16px}.piece small{font-size:14px}.piece i{font-size:18px}}
 .maker-art{position:relative;min-height:220px;display:grid;place-items:center}
+/* Maker Club hell (warmer Sandton statt Dunkelrot) */
+.maker{background:var(--blush);color:var(--ink)}
+.maker p,.maker .consent{color:var(--ink)}
+.maker .kicker{color:var(--clay)}
+.maker h3{color:var(--clay)}
+.maker-how li,.maker-now{color:var(--ink)!important}
+.maker-how b{background:var(--clay);color:var(--on-clay)}
+.maker .btn,.maker-done .maker-dl{background:var(--clay);color:var(--on-clay);border-color:var(--clay)}
+.maker .consent a{color:var(--clay)}
+.maker-done{color:var(--ink)!important;background:rgba(251,241,234,.6)}
+.maker-perks li{background:rgba(251,241,234,.55);border-color:rgba(140,44,29,.35)}
+.maker-perks b{color:var(--clay)}
+.maker-perks span{color:var(--ink)}
+.maker-wave path{stroke:var(--clay);opacity:.45}
+.maker-seal{background:var(--clay);color:var(--on-clay)}
+.maker-seal text{fill:var(--on-clay)}
+.maker-art::before{background:var(--paper)}
+
 .maker-art::before{content:"";position:absolute;width:78%;aspect-ratio:1;border-radius:var(--blob);background:var(--blush);opacity:.9;animation:morph 14s ease-in-out infinite alternate}
 .maker-art img{position:relative;width:78%;aspect-ratio:4/5;object-fit:cover;border-radius:999px 999px 24px 24px;box-shadow:0 18px 40px rgba(51,33,27,.25)}
 .shop-head{scroll-margin-top:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);align-items:center;gap:18px 40px;margin:0 0 22px;padding-bottom:22px;border-bottom:1px solid var(--line);scroll-margin-top:110px}
@@ -499,7 +517,8 @@ section{scroll-margin-top:96px}
 .season-inner{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);max-height:calc(100dvh - 32px)}
 .season-inner.no-img{grid-template-columns:1fr}
 .season-img{position:relative;background:var(--blush);padding:22px;min-height:100%}
-.season-img img{width:100%;height:100%;min-height:300px;object-fit:cover;border-radius:999px 999px 24px 24px}
+.season-img{display:flex;align-items:center;justify-content:center}
+.season-img img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:999px 999px 24px 24px}
 .season-body{position:relative;display:flex;flex-direction:column;gap:14px;padding:40px 36px 32px;overflow:auto}
 .season-body::before{content:"";position:absolute;width:150px;height:150px;right:-50px;top:-50px;border-radius:var(--blob);background:var(--blush);opacity:.55}
 .season-body > *{position:relative}
@@ -515,7 +534,7 @@ section{scroll-margin-top:96px}
 .season-row input:focus{outline:3px solid var(--focus);outline-offset:1px}
 .season .consent{font-size:13.5px}
 .season-close{position:absolute;top:14px;right:14px;z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:var(--paper);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px rgba(51,33,27,.12)}
-@media (max-width:700px){.season-inner{grid-template-columns:1fr;overflow:auto}.season-img{padding:14px 14px 0;min-height:0}.season-img img{min-height:0;height:190px;border-radius:24px;object-position:50% 50%}.season-body{padding:24px 22px 24px;overflow:visible}.season h3:focus{outline:none}
+@media (max-width:700px){.season-inner{grid-template-columns:1fr;overflow:auto}.season-img{padding:14px 14px 0;min-height:0}.season-img img{width:auto;height:230px;border-radius:999px 999px 20px 20px}.season-body{padding:24px 22px 24px;overflow:visible}.season h3:focus{outline:none}
 .season h3{padding-right:0}.season.theme-advent .season-body{padding-top:22px}}
 
 /* Studio */

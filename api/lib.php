@@ -1670,7 +1670,7 @@ function forma_confirm_reminders(PDO $pdo): void
         $pdo->prepare('UPDATE subscribers SET reminded_at = ? WHERE id = ?')->execute([date('c'), $s['id']]);
         $maker = str_contains((string)$s['source'], 'Maker');
         $hello = $s['name'] !== '' ? 'Hallo ' . forma_first_name($s['name']) . ',' : 'Hallo,';
-        $body = "$hello\n\nschön, dass du dich " . ($maker ? 'für den FORMA Maker Club' : 'für meinen Newsletter') . " eingetragen hast! "
+        $body = "$hello\n\nschön, dass du dich " . ($maker ? 'für den FORMA Maker Club' : 'für die FORMA Post') . " eingetragen hast! "
             . "Deine E-Mail-Adresse ist aber noch nicht bestätigt.\n\n"
             . "Magst du kurz auf den Button klicken? Dann darf ich dich über alles Neue im Atelier informieren"
             . ($maker ? ' und du bekommst gleich dein Gratis-Template' : '') . ".\n\n"
