@@ -171,6 +171,8 @@ function forma_migrate(PDO $pdo): void
     forma_add_column($pdo, 'bookings', 'mailed', 'INTEGER NOT NULL DEFAULT 0');
     forma_add_column($pdo, 'templates', 'file_en', "TEXT NOT NULL DEFAULT ''");
     forma_add_column($pdo, 'private_bookings', 'contact', "TEXT NOT NULL DEFAULT 'email'");
+    forma_add_column($pdo, 'bookings', 'review_sent', 'TEXT');
+    forma_add_column($pdo, 'private_bookings', 'review_sent', 'TEXT');
 
     // Startinhalt beim allerersten Aufruf: der laufende Pottery-Pause-Kurs.
     if (forma_setting($pdo, 'seeded') === null) {
@@ -782,6 +784,7 @@ function forma_mail_html(string $text): string
         if (str_contains($url, 'gutschein-pdf')) return 'Gutschein herunterladen';
         if (str_contains($url, 'cancel.php')) return 'Buchung ansehen';
         if (str_contains($url, '/verwaltung')) return 'Zur Verwaltung';
+        if (str_contains($url, 'g.page/r/') || str_contains($url, 'writereview')) return 'Jetzt bewerten ★';
         return 'Link öffnen';
     };
     $out = '';
@@ -1547,6 +1550,92 @@ function forma_confirm_reminders(PDO $pdo): void
             . "Bis bald,\nVivien\n";
         forma_mail((string)$s['email'], 'Kurze Erinnerung: Bitte bestätige deine E-Mail-Adresse', $body);
     }
+}
+
+const FORMA_REVIEW_URL = 'https://g.page/r/CQ-fySEcCogPEBM/review';
+
+function forma_review_url(PDO $pdo): string
+{
+    $u = trim((string)(forma_setting($pdo, 'review_url') ?? ''));
+    return $u !== '' ? $u : FORMA_REVIEW_URL;
+}
+
+/** Ende eines Termins als Zeitstempel (Atelier: letzte gebuchte Stunde), oder null wenn unklar. */
+function forma_course_end(array $row): ?int
+{
+    $date = (string)($row['start_date'] ?? '');
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) return null;
+    if (str_contains(mb_strtolower((string)$row['title']), 'woche')) return null; // mehrwöchige Kurse: kein Einzeltermin
+    $end = null;
+    if (forma_is_atelier($row)) {
+        $x = json_decode((string)($row['extras'] ?? ''), true);
+        $slots = [];
+        foreach ((is_array($x) ? $x : []) as $it) {
+            if (is_array($it) && preg_match('/^slot(\d{1,2})$/', (string)($it['key'] ?? ''), $mm)) $slots[] = (int)$mm[1];
+        }
+        if ($slots) $end = sprintf('%02d:00', max($slots) + 1);
+    }
+    if ($end === null && preg_match('/(\d{1,2})(?:[:.](\d{2}))?\s*[–-]\s*(\d{1,2})(?:[:.](\d{2}))?\s*Uhr/u', (string)$row['date_text'], $m)) {
+        $end = sprintf('%02d:%02d', (int)$m[3], (int)($m[4] ?? 0));
+    }
+    if ($end === null) return null;
+    $ts = strtotime("$date $end");
+    return $ts === false ? null : $ts;
+}
+
+function forma_review_text(string $name, string $what): string
+{
+    $hello = $name !== '' ? 'Hallo ' . forma_first_name($name) . ',' : 'Hallo,';
+    return "$hello\n\n"
+        . "danke für deinen Besuch bei „{$what}“ im FORMA Atelier! Ich hoffe, du hattest eine schöne Zeit mit dem Ton.\n\n"
+        . "Magst du mir einen kleinen Gefallen tun? Eine kurze Bewertung auf Google hilft mir sehr, weil andere so das Atelier finden. "
+        . "Ein, zwei Sätze reichen völlig und es dauert nur eine Minute.\n\n"
+        . "%URL%\n\n"
+        . "Wenn etwas nicht gepasst hat, schreib mir bitte direkt zurück, dann kümmere ich mich darum.\n\n"
+        . "Thank you for visiting the FORMA studio! If you enjoyed it, a short Google review would mean a lot to me.\n\n"
+        . "Bis bald,\nVivien\n";
+}
+
+/** Bewertungs-Mail ca. 1 Stunde nach Kursende (läuft höchstens alle 15 Minuten). */
+function forma_review_mails(PDO $pdo, bool $force = false): int
+{
+    if (forma_setting($pdo, 'review_off') === '1') return 0;
+    $last = (int)(forma_setting($pdo, 'review_last') ?? 0);
+    if (!$force && time() - $last < 900) return 0;
+    forma_set_setting($pdo, 'review_last', (string)time());
+    $url = forma_review_url($pdo);
+    $stmt = $pdo->prepare("SELECT b.id, b.name, b.email, b.extras, b.course_id, c.title, c.date_text, c.start_date
+        FROM bookings b JOIN courses c ON c.id = b.course_id
+        WHERE b.status = 'bestaetigt' AND b.review_sent IS NULL AND c.start_date BETWEEN ? AND ?");
+    $stmt->execute([date('Y-m-d', time() - 2 * 86400), date('Y-m-d')]);
+    $sent = 0; $seen = [];
+    foreach ($stmt->fetchAll() as $b) {
+        $end = forma_course_end($b);
+        if ($end === null) { $pdo->prepare("UPDATE bookings SET review_sent = 'uebersprungen' WHERE id = ?")->execute([$b['id']]); continue; }
+        if (time() < $end + 3600) continue;
+        $pdo->prepare('UPDATE bookings SET review_sent = ? WHERE id = ?')->execute([date('c'), $b['id']]);
+        $key = mb_strtolower(trim((string)$b['email'])) . '#' . $b['start_date'];
+        if (isset($seen[$key]) || !filter_var($b['email'], FILTER_VALIDATE_EMAIL)) continue;
+        $seen[$key] = true;
+        $title = preg_replace('/\s*·.*$/u', '', (string)$b['title']);
+        $body = str_replace('%URL%', $url, forma_review_text((string)$b['name'], $title));
+        forma_mail((string)$b['email'], 'Danke für deinen Besuch bei FORMA', $body);
+        $sent++;
+    }
+    return $sent;
+}
+
+/** Private Pottery: Bewertungs-Mail, sobald der Termin in der Verwaltung als erledigt markiert wird. */
+function forma_review_private(PDO $pdo, int $id): bool
+{
+    if (forma_setting($pdo, 'review_off') === '1') return false;
+    $stmt = $pdo->prepare('SELECT * FROM private_bookings WHERE id = ? AND done = 1 AND review_sent IS NULL');
+    $stmt->execute([$id]);
+    $b = $stmt->fetch();
+    if (!$b || !filter_var($b['email'], FILTER_VALIDATE_EMAIL)) return false;
+    $pdo->prepare('UPDATE private_bookings SET review_sent = ? WHERE id = ?')->execute([date('c'), $id]);
+    forma_mail((string)$b['email'], 'Danke für deinen Besuch bei FORMA', str_replace('%URL%', forma_review_url($pdo), forma_review_text((string)$b['name'], 'Private Pottery')));
+    return true;
 }
 
 require_once __DIR__ . '/invoices.php';

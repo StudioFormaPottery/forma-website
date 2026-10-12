@@ -395,6 +395,14 @@ if ($action === 'remove_mailerlite') {
     go($self . '?view=einstellungen', 'MailerLite ist getrennt. Neue Adressen sammeln sich nur noch hier in deiner Liste.');
 }
 
+if ($action === 'save_review') {
+    $u = trim((string)($_POST['review_url'] ?? ''));
+    if ($u !== '' && !preg_match('~^https://~', $u)) go($self . '?view=einstellungen', 'Der Link muss mit https:// beginnen.');
+    forma_set_setting($pdo, 'review_url', $u === '' ? null : $u);
+    forma_set_setting($pdo, 'review_off', isset($_POST['review_on']) ? null : '1');
+    go($self . '?view=einstellungen', isset($_POST['review_on']) ? 'Gespeichert. Gäste bekommen eine Stunde nach dem Kurs die Bitte um eine Google-Bewertung.' : 'Gespeichert. Die Bewertungs-Mails sind ausgeschaltet.');
+}
+
 if ($action === 'save_community') {
     $link = trim((string)($_POST['community'] ?? ''));
     if ($link !== '' && !preg_match('~^https://(chat\.whatsapp\.com|whatsapp\.com|www\.whatsapp\.com)/~', $link)) {
@@ -516,8 +524,11 @@ if ($action === 'delete_template') {
 }
 
 if ($action === 'private_done') {
-    $pdo->prepare('UPDATE private_bookings SET done = 1 - done WHERE id = ?')->execute([(int)($_POST['pid'] ?? 0)]);
-    go($self . '?view=private', 'Gespeichert.');
+    $pid = (int)($_POST['pid'] ?? 0);
+    $pdo->prepare('UPDATE private_bookings SET done = 1 - done WHERE id = ?')->execute([$pid]);
+    $rv = false;
+    try { $rv = forma_review_private($pdo, $pid); } catch (Throwable $e) { error_log('FORMA review private: ' . $e->getMessage()); }
+    go($self . '?view=private', $rv ? 'Gespeichert. Die Bitte um eine Google-Bewertung ist an den Gast verschickt.' : 'Gespeichert.');
 }
 
 if ($action === 'delete_subscriber') {
@@ -883,6 +894,15 @@ if ($view === 'einstellungen') {
             <input id="stripe_key" name="stripe_key" type="password" autocomplete="off" required>
             <button class="btn" type="submit">Prüfen und speichern</button>
             <p class="muted small">Der Schlüssel wird nur auf deinem Server gespeichert und nie angezeigt. Bitte gib ihn niemandem weiter, auch nicht per Chat oder Mail.</p>
+        </form>
+        <h2>Google-Bewertungen</h2>
+        <form method="post" class="card stack">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="save_review">
+            <p class="muted small">Eine Stunde nach jedem Kurs bekommt jeder Gast, der online gebucht hat, automatisch eine kurze Mail mit der Bitte um eine Google-Bewertung. Bei Private Pottery geht sie raus, sobald du den Termin als erledigt markierst.</p>
+            <label><input type="checkbox" name="review_on" value="1" <?= forma_setting($GLOBALS['pdo'], 'review_off') === '1' ? '' : 'checked' ?>> Bewertungs-Mails verschicken</label>
+            <label for="review_url">Link zur Google-Bewertung</label>
+            <input id="review_url" name="review_url" value="<?= forma_h(forma_review_url($GLOBALS['pdo'])) ?>">
+            <button class="btn" type="submit">Speichern</button>
         </form>
         <h2>WhatsApp-Community</h2>
         <form method="post" class="card stack">
