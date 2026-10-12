@@ -961,6 +961,14 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
               <label><input type="radio" name="contact" value="telefon"><span><b>Per Telefon</b></span></label>
             </div>
           </div>
+          <div class="field" id="p-call" hidden><span class="flabel">Wann erreiche ich dich am besten? <span class="opt">(gern auch mehrere)</span></span>
+            <div class="vchoice contact when">
+              <label><input type="checkbox" name="call_time[]" value="vormittags"><span><b>Vormittags</b></span></label>
+              <label><input type="checkbox" name="call_time[]" value="mittags"><span><b>Mittags</b></span></label>
+              <label><input type="checkbox" name="call_time[]" value="nachmittags"><span><b>Nachmittags</b></span></label>
+              <label><input type="checkbox" name="call_time[]" value="abends"><span><b>Abends</b></span></label>
+            </div>
+          </div>
         </fieldset>
         <p class="book-storno" id="p-storno">Deinen fixen Termin bestätige ich dir nach der Buchung per E-Mail. Kostenlos stornieren bis 48 Stunden vorher, danach 50&nbsp;%, bei Nichterscheinen der volle Betrag. Wenn etwas dazwischenkommt, melde dich einfach.</p>
         <label class="consent"><input type="checkbox" name="consent" id="p-consent" value="1"> <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Buchung gespeichert werden. Mehr dazu in der <a href="#datenschutz" class="p-privacy">Datenschutzerklärung</a>.</span></label>
@@ -1686,6 +1694,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     if(ask)$('p-date').classList.remove('missing');
     $('p-phone-opt').textContent=pPhone()?'(damit ich dich anrufen kann)':'(optional)';
     $('p-phone').required=pPhone();
+    $('p-call').hidden=!pPhone();
     if(!pPhone())$('p-phone').classList.remove('missing');
     $('p-topic').value=pTeam?'team':'';
     $('p-eyebrow').textContent=pTeam?'Teambuilding & Events':'Private Pottery';

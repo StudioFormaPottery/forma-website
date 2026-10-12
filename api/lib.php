@@ -175,6 +175,7 @@ function forma_migrate(PDO $pdo): void
     forma_add_column($pdo, 'private_bookings', 'review_sent', 'TEXT');
     forma_add_column($pdo, 'private_bookings', 'wish_date', "TEXT NOT NULL DEFAULT ''");
     forma_add_column($pdo, 'private_bookings', 'wish_time', "TEXT NOT NULL DEFAULT ''");
+    forma_add_column($pdo, 'private_bookings', 'call_time', "TEXT NOT NULL DEFAULT ''");
     $pdo->exec('CREATE TABLE IF NOT EXISTS private_sessions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         private_id INTEGER NOT NULL,
@@ -1433,12 +1434,13 @@ function forma_private_mails(PDO $pdo, int $id): void
     $hours = (int)$b['hours'] === 1 ? '1 Stunde' : $b['hours'] . ' Stunden';
     $persons = (int)$b['persons'] === 1 ? '1 Person' : $b['persons'] . ' Personen';
     $viaPhone = ($b['contact'] ?? 'email') === 'telefon';
-    $contactLine = $viaPhone ? "Bitte melden per: TELEFON ({$b['phone']})" : 'Bitte melden per: E-Mail';
+    $callTime = trim((string)($b['call_time'] ?? ''));
+    $contactLine = $viaPhone ? "Bitte melden per: TELEFON ({$b['phone']})" . ($callTime !== '' ? ", am besten $callTime" : '') : 'Bitte melden per: E-Mail';
     $isTeam = str_starts_with((string)$b['project'], 'Teambuilding/Event:');
     $wish = forma_wish_text($b) ?: 'noch offen';
     $planUrl = $site . '/verwaltung/?view=kalender&assign=' . (int)$b['id'];
     if ($b['kind'] === 'anfrage') {
-        forma_mail($b['email'], $isTeam ? 'Deine Anfrage für ein Teambuilding-Event' : 'Deine Anfrage für Private Pottery', "Hallo $first,\n\nvielen Dank für deine Nachricht! Ich sehe mir " . ($isTeam ? 'eure Idee' : 'dein Projekt') . " an und melde mich so bald wie möglich " . ($viaPhone ? 'telefonisch' : 'per E-Mail') . " bei dir.\n\n"
+        forma_mail($b['email'], $isTeam ? 'Deine Anfrage für ein Teambuilding-Event' : 'Deine Anfrage für Private Pottery', "Hallo $first,\n\nvielen Dank für deine Nachricht! Ich sehe mir " . ($isTeam ? 'eure Idee' : 'dein Projekt') . " an und melde mich so bald wie möglich " . ($viaPhone ? 'telefonisch' . ($callTime !== '' ? " ($callTime)" : '') : 'per E-Mail') . " bei dir.\n\n"
             . "Dein Projekt: {$b['project']}\nWunschtermin: $wish\n\nWenn dir noch etwas einfällt, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nBis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
         forma_mail(FORMA_NOTIFY_EMAIL, ($isTeam ? 'Anfrage Teambuilding/Event (' : 'Anfrage Private Pottery (') . $b['name'] . ')', "Neue Anfrage für " . ($isTeam ? 'Teambuilding/Event' : 'Private Pottery (noch nicht gebucht)') . "\n$contactLine\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nPersonen: $persons\n\nProjekt:\n{$b['project']}\n\nWunschtermin: $wish\n\nIm Kalender einplanen: $planUrl\n", $b['email']);
         return;

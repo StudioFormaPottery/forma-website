@@ -897,6 +897,7 @@ if ($view === 'kalender') {
                 ? forma_h(forma_hours_text((float)$assign['hours']) . ' bezahlt' . ($assign['planned'] > 0 ? ($assign['rest'] > 0 ? ' · noch ' . forma_hours_text((float)$assign['rest']) . ' offen' : ' · alle eingeplant') : ''))
                 : 'Anfrage, noch nicht bezahlt' ?></span></div>
             <div><?= nl2br(forma_h($assign['project'])) ?></div>
+            <div class="small">📞 <?= ($assign['contact'] ?? 'email') === 'telefon' ? '<strong>Möchte angerufen werden</strong>' . (($assign['call_time'] ?? '') !== '' ? ', am besten ' . forma_h($assign['call_time']) : '') . ': <a href="tel:' . forma_h(preg_replace('/[^\d+]/', '', (string)$assign['phone'])) . '">' . forma_h($assign['phone']) . '</a>' : 'Melden per E-Mail: ' . forma_h($assign['email']) . ($assign['phone'] ? ' · ' . forma_h($assign['phone']) : '') ?></div>
             <?php $w = forma_wish_text($assign); if ($w): ?><div><span class="wish-dot"></span> Wunsch: <strong><?= forma_h($w) ?></strong></div><?php endif; ?>
             <?php $pending = array_filter($assign['sessions'], fn($s) => !$s['mailed_at']); $fn = forma_h(forma_first_name((string)$assign['name'])); ?>
             <?php if ($assign['sessions']): ?>
@@ -1007,6 +1008,7 @@ if ($view === 'kalender') {
                     <span class="pill<?= $b['status'] === 'bezahlt' ? ' pill-ok' : '' ?>"><?= $b['status'] === 'bezahlt' ? forma_h('noch ' . forma_hours_text((float)$b['rest']) . ' · bezahlt') : 'Anfrage' ?></span>
                     <?php if ($w): ?><span class="small"><span class="wish-dot"></span> <?= forma_h($w) ?></span><?php endif; ?>
                     <span class="small muted"><?= forma_h(mb_strimwidth((string)$b['project'], 0, 90, ' …')) ?></span>
+                    <?php if (($b['contact'] ?? '') === 'telefon'): ?><span class="small">📞 anrufen<?= ($b['call_time'] ?? '') !== '' ? ', am besten ' . forma_h($b['call_time']) : '' ?></span><?php endif; ?>
                 </a>
             <?php endforeach; ?>
             </div>
@@ -1033,7 +1035,7 @@ if ($view === 'private') {
                 <?php $ss = forma_private_sessions($pdo, (int)$b['id']); if ($ss): ?><ul class="sess small"><?php foreach ($ss as $s): ?><li><?= forma_h(forma_de_date((string)$s['date']) . ', ' . forma_de_time((string)$s['start']) . ' · ' . forma_hours_text((float)$s['hours'])) ?> <span class="pill<?= $s['mailed_at'] ? ' pill-ok' : ' pill-wait' ?>"><?= $s['mailed_at'] ? 'bestätigt' : 'vorgemerkt' ?></span></li><?php endforeach; ?></ul><?php endif; ?>
                 <?php if (!$b['done']): ?><a class="btn btn-ghost btn-sm" href="<?= forma_h($self) ?>?view=kalender&amp;assign=<?= (int)$b['id'] ?>">📅 <?= $ss ? 'Termine im Kalender ansehen' : 'Im Kalender einplanen' ?></a><?php endif; ?>
                 <div class="sel small"><?= forma_h($b['email']) ?><?= $b['phone'] ? ' · ' . forma_h($b['phone']) : '' ?></div>
-                <div><strong>Melden per <?= ($b['contact'] ?? 'email') === 'telefon' ? 'Telefon' : 'E-Mail' ?></strong><?= (int)$b['hours'] > 0 && !$paid ? ' · geschätzt ' . ((int)$b['hours'] === 1 ? '1 Stunde' : (int)$b['hours'] . ' Stunden') : '' ?></div>
+                <div><strong>Melden per <?= ($b['contact'] ?? 'email') === 'telefon' ? 'Telefon' . (($b['call_time'] ?? '') !== '' ? ', am besten ' . forma_h($b['call_time']) : '') : 'E-Mail' ?></strong><?= (int)$b['hours'] > 0 && !$paid ? ' · geschätzt ' . ((int)$b['hours'] === 1 ? '1 Stunde' : (int)$b['hours'] . ' Stunden') : '' ?></div>
                 <div class="muted small"><?= $paid ? 'Gebucht' : 'Angefragt' ?> am <?= forma_h(date('d. m. Y, H:i', strtotime($b['created_at']))) ?></div>
                 <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="private_done"><input type="hidden" name="pid" value="<?= (int)$b['id'] ?>">
                 <button class="link" type="submit"><?= $b['done'] ? 'Wieder als offen markieren' : 'Als erledigt abhaken' ?></button></form>

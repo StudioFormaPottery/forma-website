@@ -28,6 +28,10 @@ $ref = forma_clean((string)($in['ref'] ?? ''), 60);
 if ($ref !== '' && mb_strlen($project) >= 5) $project = mb_substr('[Empfohlen von: ' . $ref . '] ' . $project, 0, 1600);
 $wish = forma_clean((string)($in['wish'] ?? ''), 300);
 $contact = ($in['contact'] ?? '') === 'telefon' ? 'telefon' : 'email';
+$callTime = '';
+if ($contact === 'telefon' && is_array($in['call_time'] ?? null)) {
+    $callTime = implode(', ', array_values(array_intersect(['vormittags', 'mittags', 'nachmittags', 'abends'], array_map('strval', $in['call_time']))));
+}
 $wishDate = (string)($in['wish_date'] ?? '');
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $wishDate) || strtotime($wishDate) === false || $wishDate < date('Y-m-d')) $wishDate = '';
 $wishTime = array_key_exists((string)($in['wish_time'] ?? ''), FORMA_WISH_TIMES) ? (string)$in['wish_time'] : '';
@@ -57,9 +61,9 @@ try {
     if ((int)$stmt->fetchColumn() >= 6) {
         forma_json(['ok' => false, 'error' => 'Bitte versuch es später noch einmal oder ruf mich an: ' . FORMA_PHONE], 429);
     }
-    $pdo->prepare('INSERT INTO private_bookings (kind, hours, amount_cents, name, email, phone, persons, project, wish, status, token, ip_hash, created_at, contact, wish_date, wish_time)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-        ->execute([$kind, $kind === 'buchung' ? $hours : max(0, min(8, $hours)), $amount, $name, $email, $phone, $persons, $project, $wish, $kind === 'anfrage' ? 'anfrage' : 'offen', $token, $ipHash, date('c'), $contact, $wishDate, $wishTime]);
+    $pdo->prepare('INSERT INTO private_bookings (kind, hours, amount_cents, name, email, phone, persons, project, wish, status, token, ip_hash, created_at, contact, wish_date, wish_time, call_time)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        ->execute([$kind, $kind === 'buchung' ? $hours : max(0, min(8, $hours)), $amount, $name, $email, $phone, $persons, $project, $wish, $kind === 'anfrage' ? 'anfrage' : 'offen', $token, $ipHash, date('c'), $contact, $wishDate, $wishTime, $callTime]);
     $id = (int)$pdo->lastInsertId();
 } catch (Throwable $e) {
     error_log('FORMA private: ' . $e->getMessage());
