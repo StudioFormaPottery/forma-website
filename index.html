@@ -825,6 +825,23 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 @media (max-width:700px){.shop-badge{white-space:normal;width:auto}.shop-head{grid-template-columns:minmax(0,1fr)}}
 
 .season-close{z-index:6}
+
+/* Fragen & Antworten: kompakter, weiter unten */
+.faq-sec{padding-bottom:clamp(8px,2vw,24px)}
+.faq-sec .section-head{margin-bottom:clamp(18px,2.5vw,28px)}
+.faq-sec .section-head h2{font-size:clamp(30px,3.6vw,46px)}
+.faq-sec .faq{margin-bottom:0}
+.faq-sec .faq-item summary{padding:14px 20px}
+
+/* Shop als Schaufenster: kurzer Text, ganze Karte klickbar */
+.tpl.clickable{cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}
+.tpl.clickable:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(51,33,27,.12)}
+.tpl-body p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tpl-more{grid-column:1/-1;display:flex;justify-content:center;padding-top:6px}
+.tpl-more .btn{font-size:19px;min-height:56px;padding:12px 30px}
+
+.shop-head .shop-badge{color:var(--on-clay)!important;font-size:17px!important}
+@media (min-width:900px){.shop-head .shop-badge{font-size:20px!important}}
 </style>
 </head>
 <body>
@@ -846,11 +863,11 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <a href="#angebote">Kurse</a>
       <a href="#studio">Studio</a>
       <a href="#events">Aktuelle Events</a>
+      <a href="#ueber-mich">Hallo!</a>
+      <a href="#gutschein" data-voucher="">Gutscheine</a>
       <a href="#templates">The Maker Club &amp; Templates</a>
       <a href="#shop">Shop</a>
-      <a href="#gutschein" data-voucher="">Gutscheine</a>
       <a class="nav-hl" href="#teambuilding">Teambuilding &amp; Events</a>
-      <a href="#ueber-mich">Hallo!</a>
       <a href="#fragen">Q&amp;A</a>
       <a href="#kontakt">Kontakt</a>
       <a href="#forma-post">FORMA Post (Newsletter)</a>
@@ -968,28 +985,6 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     </div>
   </section>
 
-  <section class="section booking" id="fragen">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">Häufige Fragen</p>
-        <h2 class="display">Fragen &amp; Antworten</h2>
-        <p>Hier findest du das Wichtigste auf einen Blick. Und wenn deine Frage nicht dabei ist, schreib mir einfach.</p>
-      </div>
-      <div class="faq">
-        <details class="faq-item"><summary>Brauche ich Vorkenntnisse?</summary><p>Für Spin &amp; Go, die Pottery Pause und Private Pottery nicht, ich begleite dich von Anfang an. Das offene Atelier ist für alle, die schon Erfahrung haben und selbstständig arbeiten möchten.</p></details>
-        <details class="faq-item"><summary>Wie buche ich einen Kurs?</summary><p>Tipp oben bei „Kurse &amp; Workshops“ auf den Kurs, such dir im Kalender einen Tag aus und bezahl bequem online. Die Bestätigung kommt sofort per E-Mail. Im offenen Atelier wählst du dazu, welche Stunden du bleiben möchtest, und zahlst ebenfalls online. Anmeldeschluss ist immer am Vorabend um 17 Uhr.</p></details>
-        <details class="faq-item"><summary>Ab wie vielen Personen findet Spin &amp; Go statt?</summary><p>Spin &amp; Go findet ab 2 Personen statt. Am schönsten ist es, wenn du gleich eine Freundin mitbringst.</p></details>
-        <details class="faq-item"><summary>Was ist im Preis enthalten?</summary><p>Bei Spin &amp; Go ist ein Werkstück inklusive. Bei Private Pottery ist dein komplettes Werkstück enthalten, Aufwand und Umfang besprechen wir vorher gemeinsam. Im offenen Atelier nutzt du das Studio vor Ort als deinen kreativen Workspace. Für die Fertigstellung deiner Werkstücke wird eine Gebühr von € 25 pro Kilo erhoben, die bei Abholung abgerechnet wird.</p></details>
-        <details class="faq-item"><summary>Was soll ich anziehen?</summary><p>Am besten bequeme Kleidung, die ruhig etwas Ton abbekommen darf. Kurze Fingernägel machen das Arbeiten an der Töpferscheibe leichter.</p></details>
-        <details class="faq-item"><summary>Wann kann ich meine Stücke mitnehmen?</summary><p>Deine Werkstücke brauchen nach dem Kurs noch Zeit zum Trocknen und für die Fertigstellung, das dauert meist 3–4 Wochen. Ich melde mich bei dir, sobald deine Stücke fertig zum Abholen sind.</p></details>
-        <details class="faq-item"><summary>Ich bin nur im Urlaub hier. Was passiert mit meinem Werkstück?</summary><p>Deine Werkstücke holst du nach 3–4 Wochen bei mir im Atelier ab, verschicken kann ich sie leider nicht. Wenn du nicht noch einmal vorbeikommen kannst, darfst du dir nach deinem Spin &amp; Go stattdessen ein kleines Accessoire aus meiner aktuellen Saisonkollektion aussuchen, als Andenken an deine Zeit im FORMA.</p></details>
-        <details class="faq-item"><summary>Ich weiß noch nicht genau, was ich machen möchte.</summary><p>Dann schick mir bei Private Pottery einfach eine unverbindliche Anfrage. Ich sehe mir deine Idee an und melde mich mit einem Vorschlag, wie lange wir brauchen.</p></details>
-        <details class="faq-item"><summary>Kann ich mit einer Gruppe kommen?</summary><p>Gern! Für Geburtstage, Freundinnen-Abende oder Teamevents schreib mir einfach, dann finden wir gemeinsam das Passende.</p></details>
-        <details class="faq-item"><summary>Wie funktionieren die Gutscheine?</summary><p>Du wählst Kurs und Menge, schreibst eine persönliche Nachricht dazu und bezahlst online. Den Gutschein bekommst du sofort als PDF zum Ausdrucken oder Verschicken.</p></details>
-        <details class="faq-item"><summary>Wie bekomme ich ein Template aus dem Shop?</summary><p>Nach dem Bezahlen lädst du dein Template direkt als PDF herunter, den Link bekommst du zusätzlich per E-Mail. Im Maker Club gibt es außerdem jeden Monat ein Template gratis.</p></details>
-      </div>
-    </div>
-  </section>
 
   <dialog class="book-dialog" id="book-dialog" aria-labelledby="book-heading">
     <div class="book-inner">
@@ -1479,6 +1474,29 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       </div>
     </div>
     <svg class="wave" style="--to:var(--paper);background:var(--paper-2)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40c160 44 330 66 520 50s320-72 500-70 290 44 420 40v60H0z"></path></svg>
+  </section>
+
+  <section class="section booking faq-sec" id="fragen">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Häufige Fragen</p>
+        <h2 class="display">Fragen &amp; Antworten</h2>
+        <p>Hier findest du das Wichtigste auf einen Blick. Und wenn deine Frage nicht dabei ist, schreib mir einfach.</p>
+      </div>
+      <div class="faq">
+        <details class="faq-item"><summary>Brauche ich Vorkenntnisse?</summary><p>Für Spin &amp; Go, die Pottery Pause und Private Pottery nicht, ich begleite dich von Anfang an. Das offene Atelier ist für alle, die schon Erfahrung haben und selbstständig arbeiten möchten.</p></details>
+        <details class="faq-item"><summary>Wie buche ich einen Kurs?</summary><p>Tipp oben bei „Kurse &amp; Workshops“ auf den Kurs, such dir im Kalender einen Tag aus und bezahl bequem online. Die Bestätigung kommt sofort per E-Mail. Im offenen Atelier wählst du dazu, welche Stunden du bleiben möchtest, und zahlst ebenfalls online. Anmeldeschluss ist immer am Vorabend um 17 Uhr.</p></details>
+        <details class="faq-item"><summary>Ab wie vielen Personen findet Spin &amp; Go statt?</summary><p>Spin &amp; Go findet ab 2 Personen statt. Am schönsten ist es, wenn du gleich eine Freundin mitbringst.</p></details>
+        <details class="faq-item"><summary>Was ist im Preis enthalten?</summary><p>Bei Spin &amp; Go ist ein Werkstück inklusive. Bei Private Pottery ist dein komplettes Werkstück enthalten, Aufwand und Umfang besprechen wir vorher gemeinsam. Im offenen Atelier nutzt du das Studio vor Ort als deinen kreativen Workspace. Für die Fertigstellung deiner Werkstücke wird eine Gebühr von € 25 pro Kilo erhoben, die bei Abholung abgerechnet wird.</p></details>
+        <details class="faq-item"><summary>Was soll ich anziehen?</summary><p>Am besten bequeme Kleidung, die ruhig etwas Ton abbekommen darf. Kurze Fingernägel machen das Arbeiten an der Töpferscheibe leichter.</p></details>
+        <details class="faq-item"><summary>Wann kann ich meine Stücke mitnehmen?</summary><p>Deine Werkstücke brauchen nach dem Kurs noch Zeit zum Trocknen und für die Fertigstellung, das dauert meist 3–4 Wochen. Ich melde mich bei dir, sobald deine Stücke fertig zum Abholen sind.</p></details>
+        <details class="faq-item"><summary>Ich bin nur im Urlaub hier. Was passiert mit meinem Werkstück?</summary><p>Deine Werkstücke holst du nach 3–4 Wochen bei mir im Atelier ab, verschicken kann ich sie leider nicht. Wenn du nicht noch einmal vorbeikommen kannst, darfst du dir nach deinem Spin &amp; Go stattdessen ein kleines Accessoire aus meiner aktuellen Saisonkollektion aussuchen, als Andenken an deine Zeit im FORMA.</p></details>
+        <details class="faq-item"><summary>Ich weiß noch nicht genau, was ich machen möchte.</summary><p>Dann schick mir bei Private Pottery einfach eine unverbindliche Anfrage. Ich sehe mir deine Idee an und melde mich mit einem Vorschlag, wie lange wir brauchen.</p></details>
+        <details class="faq-item"><summary>Kann ich mit einer Gruppe kommen?</summary><p>Gern! Für Geburtstage, Freundinnen-Abende oder Teamevents schreib mir einfach, dann finden wir gemeinsam das Passende.</p></details>
+        <details class="faq-item"><summary>Wie funktionieren die Gutscheine?</summary><p>Du wählst Kurs und Menge, schreibst eine persönliche Nachricht dazu und bezahlst online. Den Gutschein bekommst du sofort als PDF zum Ausdrucken oder Verschicken.</p></details>
+        <details class="faq-item"><summary>Wie bekomme ich ein Template aus dem Shop?</summary><p>Nach dem Bezahlen lädst du dein Template direkt als PDF herunter, den Link bekommst du zusätzlich per E-Mail. Im Maker Club gibt es außerdem jeden Monat ein Template gratis.</p></details>
+      </div>
+    </div>
   </section>
 
   <section class="section" id="kontakt">
@@ -2021,6 +2039,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   var SEASONS_L={alle:'Alle',herbst:'Herbst',winter:'Weihnachten & Winter',fruehling:'Frühling',sommer:'Sommer',ganzjaehrig:'Ganzjährig'};
   var AGES_L={alle:'Für alle',kinder46:'Kinder 4–6',kinder710:'Kinder 7–10',erwachsene:'Ab 11 & Erwachsene',erfahren:'Mit Erfahrung'};
   function chips(box,map,present,cur,cb){box.innerHTML='';Object.keys(map).forEach(function(k){if(k!=='alle'&&present.indexOf(k)<0)return;var b=el('button',null,map[k]);b.type='button';b.setAttribute('aria-pressed',k===cur?'true':'false');b.addEventListener('click',function(){cb(k);});box.appendChild(b);});}
+  var tplShowAll=false;
   function renderTpl(){
     var grid=$('tpl-grid');grid.innerHTML='';
     if(!tplData.length){
@@ -2059,7 +2078,15 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       var btn=el('button','btn btn-solid',t.buyable?'Kaufen':'Bald erhältlich');btn.type='button';
       if(t.buyable)btn.addEventListener('click',function(){tplOpen(t);});else{btn.disabled=true;btn.style.opacity='.55';}
       f.appendChild(btn);b.appendChild(f);c.appendChild(b);grid.appendChild(c);
+      if(t.buyable){c.classList.add('clickable');c.addEventListener('click',function(e){if(e.target.closest('button,a,.tpl-track'))return;tplOpen(t);});}
     });
+    // Schaufenster: erst 3 Templates, der Rest auf Klick
+    var SHOW=3;
+    if(!tplShowAll&&list.length>SHOW){
+      [].slice.call(grid.querySelectorAll('article.tpl')).slice(SHOW).forEach(function(c){c.hidden=true;});
+      var more=el('div','tpl-more'),mb=el('button','btn btn-ghost','Alle '+list.length+' Templates im Shop ansehen');mb.type='button';
+      mb.addEventListener('click',function(){tplShowAll=true;renderTpl();});more.appendChild(mb);grid.appendChild(more);
+    }
   }
   $('shop-title').textContent='Der '+SHOP_L[curSeason];
   if(curSeason!=='herbst'){var sa=$('shop-art');sa.src='img/tpl-'+curSeason+'.jpg';sa.style.borderRadius='999px 999px 28px 28px';sa.style.maxWidth='380px';}
