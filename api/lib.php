@@ -1479,12 +1479,13 @@ function forma_private_mails(PDO $pdo, int $id): void
     $amount = forma_euro((int)$b['amount_cents']);
     $unsub = '';
     try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Buchung: Private Pottery'); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
-    forma_mail($b['email'], 'Deine Private Pottery Stunden sind gebucht', "Hallo $first,\n\nwie schön, dass wir dein Projekt gemeinsam umsetzen! Deine Zahlung ist angekommen.\n\n"
-        . "Gebucht: $hours Private Pottery ($persons)\nBezahlt: $amount\nDein Projekt: {$b['project']}\nWunschtermin: $wish\n\n"
+    $what = $isTeam ? preg_replace('/^Teambuilding\/Event:\s*/', '', (string)$b['project']) : "$hours Private Pottery ($persons)";
+    forma_mail($b['email'], $isTeam ? 'Euer Teambuilding-Event ist gebucht' : 'Deine Private Pottery Stunden sind gebucht', "Hallo $first,\n\n" . ($isTeam ? 'wie schön, dass ihr gemeinsam töpfern kommt!' : 'wie schön, dass wir dein Projekt gemeinsam umsetzen!') . " Deine Zahlung ist angekommen.\n\n"
+        . "Gebucht: $what\nBezahlt: $amount\n" . ($isTeam ? '' : "Dein Projekt: {$b['project']}\n") . "Wunschtermin: $wish\n\n"
         . "Ich schaue mir deinen Wunschtermin an und schicke dir eine eigene Bestätigung, sobald dein Termin fix ist. Deine Stunden können wir auch gern auf mehrere Tage aufteilen, du bekommst dann für jeden Termin eine Bestätigung.\n"
         . "Falls doch etwas dazwischenkommt: Bis 48 Stunden vor unserem Termin kannst du kostenlos stornieren, danach werden 50 % fällig, wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit, gemeinsam finden wir eine Lösung.\n\n"
         . "Bis bald im Studio!\nVivien\nFORMA Earth & Art\n$phone\nwww.forma-pottery.com\n" . forma_newsletter_note($unsub));
-    forma_mail(FORMA_NOTIFY_EMAIL, 'Private Pottery gebucht: ' . $hours . ' (' . $b['name'] . ')', "Neue bezahlte Buchung Private Pottery\n$contactLine\n\n$hours · $amount bezahlt über Stripe\nPersonen: $persons\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\n\nProjekt:\n{$b['project']}\n\nWunschtermin: $wish\n\nJetzt im Kalender einplanen (Gast bekommt automatisch die Bestätigung): $planUrl\n", $b['email']);
+    forma_mail(FORMA_NOTIFY_EMAIL, ($isTeam ? 'Teambuilding gebucht: ' . $persons : 'Private Pottery gebucht: ' . $hours) . ' (' . $b['name'] . ')', ($isTeam ? "Neue bezahlte Buchung Teambuilding\n" : "Neue bezahlte Buchung Private Pottery\n") . "$contactLine\n\n$hours · $amount bezahlt über Stripe\nPersonen: $persons\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\n\nProjekt:\n{$b['project']}\n\nWunschtermin: $wish\n\nJetzt im Kalender einplanen (Gast bekommt automatisch die Bestätigung): $planUrl\n", $b['email']);
     forma_invoice_for($pdo, 'private', $id);
 }
 
@@ -2023,7 +2024,7 @@ function forma_private_confirm_mail(PDO $pdo, int $pid, string $note = ''): bool
     $rest = $paid ? max(0, (float)$b['hours'] - $planned) : 0;
     [$calTxt, $calAtt] = forma_cal_block($pdo, 'p', $pid);
     $payTxt = '';
-    if (!$paid && $planned > 0 && forma_stripe_key()) {
+    if (!$paid && $planned > 0 && forma_stripe_key() && !str_starts_with((string)$b['project'], 'Teambuilding/Event:')) {
         $payTxt = "\nDamit dein Termin fix für dich reserviert ist, bezahl bitte die " . forma_hours_text($planned) . ' (' . forma_euro((int)round($planned * FORMA_PRIVATE_HOUR)) . ") ganz bequem online, mit Karte, Apple Pay oder Google Pay:\n"
             . forma_private_pay_url($b) . "\n";
     }

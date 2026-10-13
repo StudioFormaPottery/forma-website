@@ -17,7 +17,7 @@ try {
     $b = $st->fetch();
     if (!$b || $token === '' || !hash_equals((string)$b['token'], $token)) $go('fehler');
     if ($b['status'] === 'bezahlt') $go('termin');
-    if ($b['status'] !== 'anfrage' || !forma_stripe_key()) $go('fehler');
+    if ($b['status'] !== 'anfrage' || !forma_stripe_key() || str_starts_with((string)$b['project'], 'Teambuilding/Event:')) $go('fehler');
     // Läuft schon eine Bezahlung? Dann zuerst nachsehen, ob sie inzwischen durch ist.
     if ($b['stripe_session'] !== '' && forma_private_check($pdo, $b) === 'bezahlt') $go('termin');
     $sessions = forma_private_sessions($pdo, $id);

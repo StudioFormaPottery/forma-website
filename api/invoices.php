@@ -110,7 +110,7 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
         $ss = function_exists('forma_private_sessions') ? forma_private_sessions($pdo, (int)$b['id']) : [];
         $service = $ss ? implode(', ', array_map(fn($x) => date('d.m.Y', strtotime((string)$x['date'])), $ss)) : 'nach Vereinbarung';
         return ['name' => $b['name'], 'email' => $b['email'], 'session' => $b['stripe_session'], 'service' => $service,
-            'items' => [floor((float)$b['hours']) == (float)$b['hours']
+            'items' => $team ? [['text' => 'Teambuilding Halbtages-Event (4 Stunden)', 'detail' => 'inkl. Material, Fertigstellung und ein Werkstück pro Person', 'qty' => max(1, (int)$b['persons']), 'unit' => (int)round((int)$b['amount_cents'] / max(1, (int)$b['persons']))]] : [floor((float)$b['hours']) == (float)$b['hours']
                 ? ['text' => ($team ? 'Teambuilding/Event' : 'Private Pottery – Handbuilding') . ' (Stunden)', 'detail' => (int)$b['persons'] > 1 ? $b['persons'] . ' Personen, inkl. Material und Fertigstellung' : 'inkl. Material und Fertigstellung', 'qty' => (int)$b['hours'] * max(1, (int)$b['persons']), 'unit' => FORMA_PRIVATE_HOUR]
                 : ['text' => ($team ? 'Teambuilding/Event' : 'Private Pottery – Handbuilding') . ' (' . forma_hours_text((float)$b['hours']) . ')', 'detail' => 'inkl. Material und Fertigstellung', 'qty' => 1, 'unit' => (int)$b['amount_cents']]],
             'gross' => (int)$b['amount_cents'], 'paid' => $b['paid_at'], 'type' => 'Private Pottery'];

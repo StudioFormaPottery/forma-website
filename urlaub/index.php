@@ -42,62 +42,27 @@ $tomorrow = date('Y-m-d', strtotime('+1 day'));
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
 <title><?= $h($T['title']) ?> · FORMA</title><link rel="icon" type="image/png" href="../img/forma-logo.png">
-<style>
-@font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(../fonts/Outfit-Regular.woff) format("woff")}
-@font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(../fonts/Outfit-Bold.woff) format("woff")}
-@font-face{font-family:"Bricolage Grotesque";font-weight:600 800;font-display:swap;src:url(../fonts/BricolageGrotesque-Bold.woff) format("woff")}
-@font-face{font-family:"Italiana";font-display:swap;src:url(../fonts/Italiana-Regular.woff) format("woff")}
-:root{--sand:#EEE2D4;--card:#FBF1EA;--blush:#DDBFA8;--line:#D9C5B2;--ink:#33211B;--soft:#674B40;--clay:#8C2C1D}
-*{box-sizing:border-box}body{margin:0;background:var(--sand);color:var(--ink);font:19px/1.6 "Outfit",system-ui,sans-serif}
-.head{background:var(--blush);padding:28px 20px 48px;border-radius:0 0 50% 50%/0 0 40px 40px;position:relative;overflow:hidden}
-.wrap{max-width:1100px;margin:0 auto}
-.top{display:flex;justify-content:space-between;align-items:center}.top img{width:64px}.top a{color:var(--clay);font-weight:500}
-.kick{font-family:"Italiana",serif;font-size:22px;color:var(--soft);margin:18px 0 0}
-h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:650;font-size:clamp(40px,7vw,68px);line-height:1;color:var(--clay);margin:8px 0 14px;letter-spacing:-.02em}
-.lead{max-width:640px;margin:0}
-.snow{position:absolute;opacity:.8;pointer-events:none}
-main{padding:28px 20px 60px}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:22px}@media (max-width:820px){.cards{grid-template-columns:1fr}}
-.card{background:var(--card);border-radius:30px;padding:28px;border:2px dashed var(--clay)}
-.card.dark{background:var(--clay);color:var(--card);border-color:var(--blush)}
-.ok{font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin:0}.dark .ok{color:var(--blush)}
-h2{font-family:"Bricolage Grotesque",sans-serif;font-weight:650;font-size:36px;color:var(--clay);margin:4px 0 8px}.dark h2{color:var(--card)}
-.price{font-family:"Bricolage Grotesque",sans-serif;font-size:40px;font-weight:650;margin:10px 0 4px}.price small{font-family:"Outfit";font-size:16px;font-weight:400;margin-left:8px}
-.dates{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:10px}
-.dates li{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--sand);border-radius:16px;padding:12px 14px;flex-wrap:wrap}
-.dates b{font-weight:600}.dates span{color:var(--soft);font-size:16px}
-.btn{display:inline-block;background:var(--clay);color:var(--card);border:0;border-radius:999px;padding:12px 22px;font:inherit;font-size:17px;font-weight:500;text-decoration:none;cursor:pointer}
-.dark .btn{background:var(--card);color:var(--clay)}
-form{display:grid;gap:12px;margin-top:16px}
-label{font-size:16px;font-weight:500}
-input{width:100%;font:inherit;font-size:18px;padding:12px 16px;border-radius:14px;border:1px solid var(--line);background:#fff;color:var(--ink)}
-.two{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}
-.consent{display:flex;gap:10px;align-items:flex-start;font-size:15px;font-weight:400}.consent input{width:auto;margin-top:5px}
-.consent a{color:var(--blush)}
-.err{background:var(--card);color:var(--clay);border-radius:12px;padding:10px 14px;margin:0}
-.gut{margin-top:24px;background:#E4D2BF;border-radius:24px;padding:22px 26px;display:flex;gap:18px;align-items:center}
-.gut b{font-family:"Bricolage Grotesque",sans-serif;font-size:22px;color:var(--clay)}.gut p{margin:4px 0 0}
-.gut svg{flex:0 0 56px}
-.foot{text-align:center;color:var(--soft);font-size:16px;margin-top:28px}.foot a{color:var(--clay)}
-</style>
+<link rel="stylesheet" href="../assets/gast.css?v=3">
 </head>
 <body>
 <div class="head"><div class="wrap">
- <svg class="snow" style="right:6%;top:30px;width:40px" viewBox="0 0 64 64"><g stroke="#8C2C1D" stroke-width="3" stroke-linecap="round" fill="none"><path d="M32 6v52M9 19l46 26M9 45l46-26"/></g></svg>
- <svg class="snow" style="right:22%;top:90px;width:26px" viewBox="0 0 24 24"><path fill="#FBF1EA" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg>
+ <span class="ic" style="right:7%;top:40px;width:38px"><svg viewBox="0 0 64 64"><g stroke="#8C2C1D" stroke-width="3" stroke-linecap="round" fill="none"><path d="M32 6v52M9 19l46 26M9 45l46-26"/><path d="M26 10l6 6 6-6M26 54l6-6 6 6"/></g></svg></span>
+ <span class="ic" style="left:45%;top:60px;width:22px;animation-delay:-2s"><svg viewBox="0 0 24 24"><path fill="#FBF1EA" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg></span>
+ <span class="ic" style="left:52%;bottom:26px;width:46px;animation-delay:-3s"><svg viewBox="0 0 64 64"><path d="M2 54l20-32 10 14 8-10 22 28z" fill="#674B40"/><path d="M22 22l6 9-4-2-4 4-4-2z" fill="#FBF1EA"/><path d="M40 26l6 8-3-1-3 3-3-2z" fill="#FBF1EA"/></svg></span>
  <div class="top"><img src="../img/forma-logo.png" alt="FORMA Earth &amp; Art"><a href="<?= $h($T['langurl']) ?>"><?= $h($T['lang']) ?></a></div>
- <p class="kick"><?= $h($T['kick']) ?></p><h1><?= $h($T['title']) ?></h1><p class="lead"><?= $h($T['lead']) ?></p>
+ <div class="hero"><div><p class="kick"><?= $h($T['kick']) ?></p><h1><?= $h($T['title']) ?></h1><p class="lead"><?= $h($T['lead']) ?></p></div>
+ <div class="arch"><img src="../img/drehen.jpg" alt=""></div></div>
 </div></div>
 <main><div class="wrap">
  <div class="cards">
-  <section class="card">
+  <section class="card"><svg class="wv" aria-hidden="true"><path></path></svg><span class="cic"><svg viewBox="0 0 64 64"><ellipse cx="32" cy="48" rx="24" ry="7" fill="#674B40"/><ellipse cx="32" cy="45" rx="24" ry="7" fill="#DDBFA8"/><path d="M22 44c0-14 4-22 10-26 6 4 10 12 10 26z" fill="#8C2C1D"/><path d="M26 30c4 2 8 2 12 0" stroke="#FBF1EA" stroke-width="2" fill="none" stroke-linecap="round"/></svg></span>
    <p class="ok"><?= $h($T['s_k']) ?></p><h2><?= $h($T['s_t']) ?></h2><p><?= $h($T['s_d']) ?></p>
    <p class="price"><?= $h($T['s_p']) ?><small><?= $h($T['s_ps']) ?></small></p>
    <?php if ($spin): ?><ul class="dates">
     <?php foreach ($spin as $c): ?><li><div><b><?= $h(preg_replace('/\s*·.*$/u', '', (string)$c['date_text'])) ?></b><br><span>9–11 · <?= (int)$c['free'] ?> <?= $h($T['s_free']) ?></span></div><a class="btn" href="../#spin-and-go"><?= $h($T['s_btn']) ?></a></li><?php endforeach; ?>
    </ul><?php else: ?><p><?= $h($T['s_none']) ?><a href="https://wa.me/4367763907080">+43 677 63 90 70 80</a></p><?php endif; ?>
   </section>
-  <section class="card dark">
+  <section class="card dark"><svg class="wv" aria-hidden="true"><path></path></svg><span class="cic"><svg viewBox="0 0 64 64"><path d="M32 54C18 45 10 38 10 28c0-6 5-11 11-11 5 0 8 3 11 7 3-4 6-7 11-7 6 0 11 5 11 11 0 10-8 17-22 26z" fill="#FBF1EA"/></svg></span>
    <p class="ok"><?= $h($T['p_k']) ?></p><h2><?= $h($T['p_t']) ?></h2><p><?= $h($T['p_d']) ?></p>
    <p class="price"><?= $h($T['p_p']) ?><small><?= $h($T['p_ps']) ?></small></p><p><?= $h($T['p_how']) ?></p>
    <form id="pf" novalidate>
@@ -116,10 +81,11 @@ input{width:100%;font:inherit;font-size:18px;padding:12px 16px;border-radius:14p
    </form>
   </section>
  </div>
- <div class="gut"><svg viewBox="0 0 64 64"><rect x="10" y="26" width="44" height="28" rx="4" fill="#8C2C1D"/><rect x="7" y="19" width="50" height="10" rx="3" fill="#674B40"/><path d="M32 19v35" stroke="#FBF1EA" stroke-width="4"/><path d="M32 19c-4-9-14-10-13-4s9 5 13 4zm0 0c4-9 14-10 13-4s-9 5-13 4z" fill="none" stroke="#FBF1EA" stroke-width="3"/></svg>
+ <div class="gut"><svg class="wv" aria-hidden="true"><path></path></svg><span class="gi"><svg viewBox="0 0 64 64"><rect x="10" y="26" width="44" height="28" rx="4" fill="#8C2C1D"/><rect x="7" y="19" width="50" height="10" rx="3" fill="#674B40"/><path d="M32 19v35" stroke="#FBF1EA" stroke-width="4"/><path d="M32 19c-4-9-14-10-13-4s9 5 13 4zm0 0c4-9 14-10 13-4s-9 5-13 4z" fill="none" stroke="#FBF1EA" stroke-width="3"/></svg></span>
   <div><b><?= $h($T['gut']) ?></b><p><?= $h($T['gut_t']) ?></p></div></div>
  <p class="foot">FORMA Earth &amp; Art · Silvrettastraße 58 · 6562 Mathon · <a href="https://wa.me/4367763907080">+43 677 63 90 70 80</a> · <a href="../">forma-pottery.com</a></p>
 </div></main>
+<script src="../assets/gast.js?v=1"></script>
 <script>
 (function(){
   var f=document.getElementById('pf'),err=document.getElementById('err'),go=document.getElementById('go');
