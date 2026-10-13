@@ -1851,6 +1851,7 @@ function forma_hours_text(float $h): string
 /** Wunschtermin lesbar: „Donnerstag, 19. November 2026, abends · auch möglich: …“ */
 function forma_wish_text(array $b): string
 {
+    if (str_starts_with(trim((string)($b['wish'] ?? '')), '1. Wunsch:')) return trim((string)$b['wish']);
     $parts = [];
     if (!empty($b['wish_date'])) {
         $parts[] = forma_de_date((string)$b['wish_date']) . (!empty($b['wish_time']) && isset(FORMA_WISH_TIMES[$b['wish_time']]) ? ', ' . FORMA_WISH_TIMES[$b['wish_time']] : '');

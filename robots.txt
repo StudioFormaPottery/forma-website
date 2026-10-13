@@ -1,5 +1,6 @@
 User-agent: *
 Disallow: /verwaltung/
 Disallow: /api/
+Disallow: /urlaub/
 
 Sitemap: https://www.forma-pottery.com/sitemap.xml
