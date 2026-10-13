@@ -22,7 +22,7 @@ $I = [
 <html lang="de"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
 <title>Teambuilding buchen · FORMA</title><link rel="icon" type="image/png" href="../img/forma-logo.png">
-<link rel="stylesheet" href="../assets/gast.css?v=3">
+<link rel="stylesheet" href="../assets/gast.css?v=5">
 </head><body>
 <div class="head"><div class="wrap">
  <span class="ic" style="right:8%;top:40px;width:34px"><?= $I['star'] ?></span>
@@ -51,6 +51,8 @@ $I = [
      <li>Samstag ab 14 Uhr und Sonntag: 2 × 3 Stunden töpfern</li><li>Übernachtung mit Frühstück im Heindalishof (€ 219 Töpfern + € 65 Übernachtung)</li><li>Gemeinsam kochen in der Gemeinschaftsküche, Abendessen optional</li><li>4 bis 8 Personen</li>
     <?php endif; ?>
    </ul>
+   <button class="btn fold-btn" type="button" aria-expanded="<?= count($show) === 1 ? 'true' : 'false' ?>"<?= count($show) === 1 ? ' hidden' : '' ?>><?= ($half && $canPay) ? 'Jetzt buchen' : 'Jetzt anfragen' ?></button>
+   <div class="fold<?= count($show) === 1 ? ' open' : '' ?>">
    <form class="tf" data-offer="<?= $o ?>" novalidate>
     <input type="hidden" name="offer" value="<?= $o ?>"><input type="hidden" name="t" class="t"><input type="hidden" name="wish_date" class="wd"><input type="hidden" name="wish" class="ws">
     <div style="position:absolute;left:-9999px" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
@@ -69,6 +71,7 @@ $I = [
     <button class="btn go" type="submit"><?= ($half && $canPay) ? 'Weiter zur Bezahlung' : 'Verbindlich anfragen' ?></button>
     <p class="hint" style="font-size:16px;margin:0"><?= ($half && $canPay) ? 'Ihr bezahlt jetzt online, die Rechnung kommt sofort per E-Mail. Den Termin bestätige ich euch persönlich per E-Mail.' : 'Ich melde mich mit der Bestätigung eures Wunschtermins und allen Details bei euch.' ?></p>
    </form>
+   </div>
    <div class="done" hidden><b>Danke für eure Anfrage!</b>Ich sehe mir eure Wunschtermine an und melde mich so bald wie möglich mit der Bestätigung. Eine Kopie eurer Anfrage ist schon in deinem Postfach.</div>
   </section>
  <?php endforeach; ?>
@@ -78,6 +81,7 @@ $I = [
  <p class="foot">FORMA Earth &amp; Art · Silvrettastraße 58 · 6562 Mathon · <a href="tel:+4367763907080">+43 677 63 90 70 80</a> · <a href="mailto:hello@forma-pottery.com">hello@forma-pottery.com</a></p>
 </div></main>
 <script src="../assets/gast.js?v=1"></script>
+<script>document.querySelectorAll('.fold-btn').forEach(function(b){b.addEventListener('click',function(){var f=b.nextElementSibling;f.classList.add('open');b.hidden=true;var s=f.querySelector('select');if(s)s.focus();});});</script>
 <script>
 document.querySelectorAll('.tf').forEach(function(f){
   var q=function(c){return f.querySelector(c);},err=q('.err'),go=q('.go'),label=go.textContent,half=f.dataset.offer==='halbtag';

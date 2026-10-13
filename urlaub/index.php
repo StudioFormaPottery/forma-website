@@ -42,7 +42,7 @@ $tomorrow = date('Y-m-d', strtotime('+1 day'));
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
 <title><?= $h($T['title']) ?> · FORMA</title><link rel="icon" type="image/png" href="../img/forma-logo.png">
-<link rel="stylesheet" href="../assets/gast.css?v=3">
+<link rel="stylesheet" href="../assets/gast.css?v=5">
 </head>
 <body>
 <div class="head"><div class="wrap">

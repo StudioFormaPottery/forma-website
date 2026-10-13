@@ -57,3 +57,6 @@ input,select,textarea{min-width:0;max-width:100%;box-sizing:border-box}
 .foot{text-align:center;color:var(--soft);font-size:16px;margin-top:30px}.foot a{color:var(--clay)}
 @media (min-width:900px){body{font-size:20px}}
 .card>.cic{position:absolute;right:26px;top:26px;width:64px;height:64px;z-index:2}
+
+.fold{display:none}.fold.open{display:block;animation:gfade .3s ease}.fold-btn{margin-top:6px}@keyframes gfade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.fold-btn[hidden]{display:none!important}
