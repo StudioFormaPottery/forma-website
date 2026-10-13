@@ -158,6 +158,13 @@ function forma_invoice_for(PDO $pdo, string $kind, int $refId): void
         $net = (int)round($gross / (1 + $rate / 100));
         $vat = $gross - $net;
         $year = (int)date('Y');
+        if (!empty($GLOBALS['FORMA_TEST'])) {
+            // Testbuchung: Rechnung nur zeigen und mailen, keine Nummer verbrauchen, nichts speichern.
+            forma_invoice_deliver(['nr' => 'TEST-' . $year . '-000', 'issued_at' => date('Y-m-d'), 'service_date' => $src['service'], 'name' => $name, 'email' => $src['email'],
+                'address' => $address, 'country' => $country, 'items' => json_encode($src['items'], JSON_UNESCAPED_UNICODE), 'vat_rate' => $rate,
+                'vat_note' => trim($note . ' TESTBUCHUNG – keine gültige Rechnung.'), 'net_cents' => $net, 'vat_cents' => $vat, 'gross_cents' => $gross]);
+            return;
+        }
 
         $pdo->exec('BEGIN IMMEDIATE');
         [$seq, $nr] = forma_invoice_next($pdo, $year);
@@ -300,6 +307,12 @@ function forma_invoice_send(PDO $pdo, int $id): void
     $inv = forma_invoice_get($pdo, $id);
     if (!$inv || (int)$inv['mailed'] === 1) return;
     $pdo->prepare('UPDATE invoices SET mailed = 1 WHERE id = ?')->execute([$id]);
+    forma_invoice_deliver($inv);
+}
+
+/** Schickt die Rechnung als PDF an die Kundin und an Vivien. */
+function forma_invoice_deliver(array $inv): void
+{
     $pdf = forma_invoice_pdf($inv);
     $file = 'Rechnung_' . $inv['nr'] . '.pdf';
     forma_mail($inv['email'], 'Deine Rechnung ' . $inv['nr'] . ' von FORMA', forma_invoice_mailtext($inv), null, [[$file, $pdf, 'application/pdf']]);

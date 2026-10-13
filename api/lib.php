@@ -734,7 +734,7 @@ function forma_atelier_free(PDO $pdo, int $courseId, int $seats = FORMA_ATELIER_
         $hit = false;
         foreach (is_array($items) ? $items : [] as $it) {
             if (preg_match('/^slot(\d+)$/', (string)($it['key'] ?? ''), $m) && isset($used[(int)$m[1]])) {
-                $used[(int)$m[1]] += (int)$it['qty'];
+                $used[(int)$m[1]] += (int)($it['qty'] ?? $b['persons']);
                 $hit = true;
             }
         }
@@ -899,6 +899,15 @@ function forma_mail_mime(string $body, array $attachments = []): array
 
 function forma_mail(string $to, string $subject, string $body, ?string $replyTo = null, array $attachments = []): bool
 {
+    if (!empty($GLOBALS['FORMA_TEST'])) {
+        // Testbuchung aus der Verwaltung: Mails nur an Vivien, mit [TEST] im Betreff, und für die Vorschau merken.
+        $toAdmin = strcasecmp(trim($to), FORMA_NOTIFY_EMAIL) === 0;
+        $GLOBALS['FORMA_TEST_MAILS'][] = ['an' => $toAdmin ? 'An dich' : 'An den Gast', 'subject' => $subject, 'html' => $GLOBALS['FORMA_MAIL_HTML'] ?? forma_mail_html($body), 'files' => array_column($attachments, 0)];
+        if (empty($GLOBALS['FORMA_TEST_SEND'])) return true;
+        $subject = '[TEST] ' . ($toAdmin ? '' : '(an den Gast) ') . $subject;
+        $to = FORMA_NOTIFY_EMAIL;
+        $replyTo = null;
+    }
     if (getenv('FORMA_MAIL_LOG')) {
         // Testbetrieb: Mails zusätzlich in eine Datei schreiben.
         file_put_contents(getenv('FORMA_MAIL_LOG'), "TO: $to\nSUBJECT: $subject\n$body" . ($attachments ? 'ANHANG: ' . implode(', ', array_column($attachments, 0)) . "\n" : '') . "-----\n", FILE_APPEND);
@@ -1165,6 +1174,7 @@ function forma_reconcile_payments(PDO $pdo, bool $force = false): void
  */
 function forma_auto_subscribe(PDO $pdo, string $email, string $name, string $source): string
 {
+    if (!empty($GLOBALS['FORMA_TEST'])) return forma_site_url() . '/api/unsubscribe.php?t=TEST';
     $email = mb_strtolower(trim($email));
     if (!filter_var($email, FILTER_VALIDATE_EMAIL) || forma_setting($pdo, 'auto_newsletter_off') === '1') return '';
     $st = $pdo->prepare('SELECT * FROM subscribers WHERE email = ?');
@@ -1915,7 +1925,8 @@ function forma_booking_events(PDO $pdo, string $kind, int $id): array
         if (!$b) return [];
         foreach (forma_private_sessions($pdo, $id) as $x) {
             $events[] = ['uid' => 'private-' . $x['id'], 'date' => $x['date'], 'start' => $x['start'], 'hours' => (float)$x['hours'],
-                'summary' => 'Private Pottery im Atelier FORMA', 'desc' => 'Dein Projekt: ' . $b['project'] . "\nBei Fragen: " . FORMA_PHONE];
+                'summary' => str_starts_with((string)$b['project'], 'Teambuilding/Event:') ? 'Teambuilding im Atelier FORMA' : 'Private Pottery im Atelier FORMA',
+                'desc' => (str_starts_with((string)$b['project'], 'Teambuilding/Event:') ? preg_replace('/^Teambuilding\/Event:\s*/', '', (string)$b['project']) : 'Dein Projekt: ' . $b['project']) . "\nBei Fragen: " . FORMA_PHONE];
         }
         return $events;
     }
@@ -2018,10 +2029,13 @@ function forma_private_confirm_mail(PDO $pdo, int $pid, string $note = ''): bool
         $lines[] = ($one ? '' : ($k + 1) . '. Termin: ') . forma_de_date((string)$x['date']) . ' um ' . forma_de_time((string)$x['start']) . ' (' . forma_hours_text((float)$x['hours']) . ')';
     }
     $paid = $b['status'] === 'bezahlt';
-    $intro = $one
+    $team = str_starts_with((string)$b['project'], 'Teambuilding/Event:');
+    $intro = $team
+        ? ($one ? 'juhu, euer Teambuilding-Termin steht! Ich freue mich schon sehr auf euch.' : 'juhu, eure Teambuilding-Termine stehen! Hier sind alle ' . count($sessions) . ' Termine auf einen Blick. Ich freue mich schon sehr auf euch.')
+        : ($one
         ? "juhu, dein Private-Pottery-Termin steht! Ich freue mich schon sehr auf dich."
-        : "juhu, deine Private-Pottery-Termine stehen! Hier sind alle " . count($sessions) . " Termine auf einen Blick, damit du genau weißt, wann wir uns sehen. Ich freue mich schon sehr auf dich.";
-    $rest = $paid ? max(0, (float)$b['hours'] - $planned) : 0;
+        : "juhu, deine Private-Pottery-Termine stehen! Hier sind alle " . count($sessions) . " Termine auf einen Blick, damit du genau weißt, wann wir uns sehen. Ich freue mich schon sehr auf dich.");
+    $rest = $paid && !$team ? max(0, (float)$b['hours'] - $planned) : 0;
     [$calTxt, $calAtt] = forma_cal_block($pdo, 'p', $pid);
     $payTxt = '';
     if (!$paid && $planned > 0 && forma_stripe_key() && !str_starts_with((string)$b['project'], 'Teambuilding/Event:')) {
@@ -2030,8 +2044,8 @@ function forma_private_confirm_mail(PDO $pdo, int $pid, string $note = ''): bool
     }
     $body = "Hallo $first,\n\n$intro\n\n"
         . ($one ? 'Wann: ' . $lines[0] . "\n" : implode("\n", $lines) . "\n")
-        . ($paid ? 'Gebucht und bezahlt: ' . forma_hours_text((float)$b['hours']) . " Private Pottery\n" : '')
-        . "Dein Projekt: {$b['project']}\nWo: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
+        . ($paid ? ($team ? 'Gebucht und bezahlt: ' . preg_replace('/^Teambuilding\/Event:\s*/', '', (string)$b['project']) . "\n" : 'Gebucht und bezahlt: ' . forma_hours_text((float)$b['hours']) . " Private Pottery\n") : '')
+        . ($team ? ($paid ? '' : 'Euer Event: ' . preg_replace('/^Teambuilding\/Event:\s*/', '', (string)$b['project']) . "\n") : "Dein Projekt: {$b['project']}\n") . "Wo: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
         . $payTxt
         . ($rest > 0 ? "\nDu hast dann noch " . forma_hours_text($rest) . " offen, die planen wir gemeinsam ein, wann es dir passt.\n" : '')
         . (trim($note) !== '' ? "\n" . trim($note) . "\n" : '')
@@ -2076,7 +2090,7 @@ function forma_review_private(PDO $pdo, int $id): bool
     $b = $stmt->fetch();
     if (!$b || !filter_var($b['email'], FILTER_VALIDATE_EMAIL)) return false;
     $pdo->prepare('UPDATE private_bookings SET review_sent = ? WHERE id = ?')->execute([date('c'), $id]);
-    forma_review_send($pdo, (string)$b['email'], (string)$b['name'], 'Private Pottery');
+    forma_review_send($pdo, (string)$b['email'], (string)$b['name'], str_starts_with((string)$b['project'], 'Teambuilding/Event:') ? 'Teambuilding' : 'Private Pottery');
     return true;
 }
 

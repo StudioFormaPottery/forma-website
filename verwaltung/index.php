@@ -667,6 +667,44 @@ if ($view === 'rechnungen_export') {
     exit;
 }
 
+if ($view === 'tests' || $action === 'test_run') {
+    require_once dirname(__DIR__) . '/api/testbuchung.php';
+    $result = null;
+    if ($action === 'test_run') {
+        $offer = (string)($_POST['offer'] ?? '');
+        if (isset(FORMA_TEST_OFFERS[$offer])) $result = forma_test_run($pdo, $offer, isset($_POST['send']));
+    }
+    render_page('Testbuchungen', function () use ($self, $result) { ?>
+        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
+        <h1>Testbuchungen</h1>
+        <p class="muted">Ein Klick spielt eine Buchung komplett durch: freier Termin, Stripe-Bezahlseite, alle E-Mails, Rechnung, Terminbestätigung und Bewertungs-Mail. Danach wird alles wieder gelöscht. Die Testbuchung taucht nirgends auf, es wird nichts abgebucht und keine Rechnungsnummer verbraucht.</p>
+        <?php if ($result): ?>
+        <div class="card tres">
+            <h2 style="margin-top:0">Ergebnis: <?= forma_h($result['title']) ?></h2>
+            <ul class="tsteps">
+            <?php foreach ($result['steps'] as [$st, $txt]): ?><li class="ts-<?= forma_h($st) ?>"><span><?= $st === 'ok' ? '✓' : ($st === 'fail' ? '✗' : 'i') ?></span><?= forma_h($txt) ?></li><?php endforeach; ?>
+            </ul>
+            <?php foreach ($result['mails'] as $k => $m): ?>
+            <details class="tmail"<?= $k === 0 ? ' open' : '' ?>><summary><span class="pill"><?= forma_h($m['an']) ?></span> <?= forma_h($m['subject']) ?><?= $m['files'] ? ' <span class="muted small">· Anhang: ' . forma_h(implode(', ', $m['files'])) . '</span>' : '' ?></summary>
+                <iframe sandbox="" loading="lazy" srcdoc="<?= forma_h($m['html']) ?>"></iframe></details>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+        <div class="tgrid">
+        <?php foreach (FORMA_TEST_OFFERS as $key => [$title, $sub, $ic]): ?>
+            <form method="post" class="card ttile"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="test_run"><input type="hidden" name="offer" value="<?= forma_h($key) ?>">
+                <span class="ic"><?= admin_icon(['kurs' => 'kalender', 'private' => 'private', 'team' => 'team', 'gutschein' => 'gutschein', 'template' => 'template'][$ic] ?? 'test') ?></span>
+                <strong><?= forma_h($title) ?></strong><span class="muted small"><?= forma_h($sub) ?></span>
+                <label class="check small"><input type="checkbox" name="send" value="1" checked> Mails an mich schicken</label>
+                <button class="btn" type="submit">Testbuchung starten</button>
+            </form>
+        <?php endforeach; ?>
+        </div>
+        <p class="muted small">Ohne Häkchen siehst du die Mails nur hier als Vorschau. Mit Häkchen kommen sie mit „[TEST]“ im Betreff an <?= forma_h(FORMA_NOTIFY_EMAIL) ?>, so wie sie auch der Gast bekommen würde.</p>
+    <?php });
+    exit;
+}
+
 if ($view === 'rechnungen') {
     forma_invoice_schema($pdo);
     forma_sheet_sync($pdo);
@@ -1497,6 +1535,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
             <a class="tile" href="<?= forma_h($self) ?>?view=rechnungen"><span class="ic"><?= admin_icon('rechnung') ?></span><strong>Rechnungen</strong><span class="muted small">automatisch nach Zahlung</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=liste"><span class="ic"><?= admin_icon('mail') ?></span><strong>E-Mail-Liste</strong><span class="muted small"><?= $subCount ?> <?= $subCount === 1 ? 'Kontakt' : 'Kontakte' ?></span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=popup"><span class="ic"><?= admin_icon('popup') ?></span><strong>Pop-up &amp; Deko</strong><span class="muted small"><?= $popupLive ? 'gerade sichtbar' : 'ausgeschaltet' ?> · Deko</span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=tests"><span class="ic"><?= admin_icon('test') ?></span><strong>Testbuchungen</strong><span class="muted small">jedes Angebot ausprobieren</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=einstellungen"><span class="ic"><?= admin_icon('settings') ?></span><strong>Einstellungen</strong><span class="muted small">Stripe, MailerLite, E-Mail</span></a>
         </nav>
     </div>
@@ -1550,6 +1589,8 @@ function admin_icon(string $k): string
         'rechnung' => '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
         'mail' => '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/>',
         'popup' => '<path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8zM6 16l.6 1.4L8 18l-1.4.6L6 20l-.6-1.4L4 18l1.4-.6z"/>',
+        'test' => '<path d="M9 3h6M10 3v6l-5 9a2 2 0 001.8 3h10.4a2 2 0 001.8-3l-5-9V3"/><path d="M7.5 14h9"/>',
+        'team' => '<circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 20c.5-3.5 2.8-5.5 5.5-5.5s5 2 5.5 5.5M10.5 20c.5-3.5 2.8-5.5 5.5-5.5s5 2 5.5 5.5"/>',
         'settings' => '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
     ][$k] ?? '';
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $p . '</svg>';
@@ -1598,6 +1639,12 @@ input:focus,textarea:focus{outline:3px solid #B05A38;outline-offset:1px}
 .course{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
 .course-link{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink);min-width:0;flex:1 1 260px}
 .booking{display:flex;flex-direction:column;gap:4px}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:18px 0}
+.ttile{display:flex;flex-direction:column;gap:6px}.ttile .ic{width:40px;height:40px;color:var(--clay)}.ttile .ic svg{width:100%;height:100%}.ttile input{accent-color:var(--clay)}.ttile .btn{margin-top:auto;padding:9px 14px;font-size:16px}
+.tres{margin:16px 0}.tsteps{list-style:none;padding:0;margin:0 0 14px;display:flex;flex-direction:column;gap:6px}
+.tsteps li{display:flex;gap:10px;align-items:flex-start;font-size:16px}.tsteps li span{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;color:#fff;background:#5E7B4E}
+.tsteps .ts-fail span{background:#9b1c1c}.tsteps .ts-info span{background:#B8956F}
+.tmail{border-top:1px solid var(--line);padding:8px 0}.tmail summary{cursor:pointer;font-weight:500}.tmail iframe{width:100%;height:520px;border:1px solid var(--line);border-radius:12px;background:#fff;margin-top:8px}
 .booking-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .is-cancelled{opacity:.6}
 .sel{user-select:all;overflow-wrap:anywhere}
