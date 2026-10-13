@@ -99,6 +99,7 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
                 : ['text' => $p['name'] . ' zum Bemalen', 'detail' => '', 'qty' => (int)$p['qty'], 'unit' => (int)$p['cents']];
         }
         if (!$atelier && count($items) > 1) $items[0]['text'] .= ' · Atelierbeitrag';
+        if ($vi = forma_invoice_voucher_item($pdo, $b)) $items[] = $vi;
         return ['name' => $b['name'], 'email' => $b['email'], 'session' => $b['stripe_session'], 'service' => date('d.m.Y', strtotime($b['start_date'])), 'items' => $items, 'gross' => (int)$b['amount_cents'], 'paid' => $b['paid_at'], 'type' => 'Kurs'];
     }
     if ($kind === 'private') {
@@ -109,11 +110,29 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
         $team = str_starts_with((string)$b['project'], 'Teambuilding/Event:');
         $ss = function_exists('forma_private_sessions') ? forma_private_sessions($pdo, (int)$b['id']) : [];
         $service = $ss ? implode(', ', array_map(fn($x) => date('d.m.Y', strtotime((string)$x['date'])), $ss)) : 'nach Vereinbarung';
-        return ['name' => $b['name'], 'email' => $b['email'], 'session' => $b['stripe_session'], 'service' => $service,
-            'items' => $team ? [['text' => 'Teambuilding Halbtages-Event (4 Stunden)', 'detail' => 'inkl. Material, Fertigstellung und ein Werkstück pro Person', 'qty' => max(1, (int)$b['persons']), 'unit' => (int)round((int)$b['amount_cents'] / max(1, (int)$b['persons']))]] : [floor((float)$b['hours']) == (float)$b['hours']
+        $src = ['name' => $b['name'], 'email' => $b['email'], 'session' => $b['stripe_session'], 'service' => $service,
+            'items' => $team ? [['text' => str_contains((string)$b['project'], 'Wochenende') ? 'Teambuilding Töpfer-Wochenende (2 × 3 Stunden Töpfern)' : 'Teambuilding Halbtages-Event (4 Stunden)', 'detail' => 'inkl. Material, Fertigstellung und ein Werkstück pro Person' . (str_contains((string)$b['project'], 'Wochenende') ? ' · ohne Übernachtung (separate Rechnung Heindalishof)' : ''), 'qty' => max(1, (int)$b['persons']), 'unit' => (int)round((int)$b['amount_cents'] / max(1, (int)$b['persons']))]] : [floor((float)$b['hours']) == (float)$b['hours']
                 ? ['text' => ($team ? 'Teambuilding/Event' : 'Private Pottery – Handbuilding') . ' (Stunden)', 'detail' => (int)$b['persons'] > 1 ? $b['persons'] . ' Personen, inkl. Material und Fertigstellung' : 'inkl. Material und Fertigstellung', 'qty' => (int)$b['hours'] * max(1, (int)$b['persons']), 'unit' => FORMA_PRIVATE_HOUR]
                 : ['text' => ($team ? 'Teambuilding/Event' : 'Private Pottery – Handbuilding') . ' (' . forma_hours_text((float)$b['hours']) . ')', 'detail' => 'inkl. Material und Fertigstellung', 'qty' => 1, 'unit' => (int)$b['amount_cents']]],
             'gross' => (int)$b['amount_cents'], 'paid' => $b['paid_at'], 'type' => 'Private Pottery'];
+        if ($vi = forma_invoice_voucher_item($pdo, $b)) {
+            $src['items'][] = $vi;
+            if (count($src['items']) === 2 && (int)$src['items'][0]['qty'] > 0) {
+                // Positionen müssen den Rechnungsbetrag ergeben: Preis vor Gutschein = Betrag + Gutschein
+                $full = (int)$b['amount_cents'] + (int)$b['voucher_cents'];
+                $src['items'][0]['unit'] = (int)round($full / (int)$src['items'][0]['qty']);
+            }
+        }
+        return $src;
+    }
+    if ($kind === 'gutschein') {
+        $st = $pdo->prepare("SELECT * FROM vouchers WHERE id = ? AND status IN ('bezahlt','eingeloest') AND kind = 'kauf'");
+        $st->execute([$refId]);
+        $v = $st->fetch();
+        if (!$v || (int)$v['amount_cents'] <= 0) return null;
+        return ['name' => $v['buyer_name'], 'email' => $v['buyer_email'], 'session' => $v['stripe_session'], 'service' => date('d.m.Y', strtotime((string)$v['paid_at'])),
+            'items' => [['text' => 'Gutschein ' . $v['nr'] . ' · ' . forma_voucher_title($v), 'detail' => 'Wertgutschein, einlösbar für alle Kurse im FORMA Atelier', 'qty' => 1, 'unit' => (int)$v['amount_cents']]],
+            'gross' => (int)$v['amount_cents'], 'paid' => $v['paid_at'], 'type' => 'Gutschein'];
     }
     if ($kind === 'template') {
         $st = $pdo->prepare("SELECT * FROM template_orders WHERE id = ? AND status = 'bezahlt'");
@@ -128,6 +147,49 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
 }
 
 /** Legt die Rechnung an (einmalig pro Buchung), erzeugt das PDF und verschickt es. Fehler stören die Buchung nie. */
+/** Storno-Rechnung (Gutschrift) zu einer bereits ausgestellten Rechnung, z. B. wenn ein Kurs nicht stattfindet. */
+function forma_invoice_storno(PDO $pdo, string $kind, int $refId, int $cents): void
+{
+    forma_invoice_schema($pdo);
+    $st = $pdo->prepare('SELECT * FROM invoices WHERE kind = ? AND ref_id = ? ORDER BY id LIMIT 1');
+    $st->execute([$kind, $refId]);
+    $orig = $st->fetch();
+    if (!$orig || $cents <= 0) return;
+    $ex = $pdo->prepare('SELECT id FROM invoices WHERE kind = ? AND ref_id = ?');
+    $ex->execute([$kind . '_storno', $refId]);
+    if ($ex->fetchColumn()) return;
+    $rate = (float)$orig['vat_rate'];
+    $gross = -$cents;
+    $net = (int)round($gross / (1 + $rate / 100));
+    $vat = $gross - $net;
+    $items = json_decode((string)$orig['items'], true) ?: [];
+    $first = $items[0]['text'] ?? 'Leistung';
+    $year = (int)date('Y');
+    $pdo->exec('BEGIN IMMEDIATE');
+    [$seq, $nr] = forma_invoice_next($pdo, $year);
+    $pdo->prepare('INSERT INTO invoices (nr, year, seq, kind, ref_id, issued_at, service_date, name, email, address, country, items, vat_rate, vat_note, net_cents, vat_cents, gross_cents, token, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        ->execute([$nr, $year, $seq, $kind . '_storno', $refId, date('Y-m-d'), $orig['service_date'], $orig['name'], $orig['email'], $orig['address'], $orig['country'],
+            json_encode([['text' => 'Storno zu Rechnung ' . $orig['nr'], 'detail' => $first . ' · Kurs hat nicht stattgefunden, Betrag erstattet', 'qty' => 1, 'unit' => $gross]], JSON_UNESCAPED_UNICODE),
+            $rate, trim('Stornorechnung zu Rechnung ' . $orig['nr'] . ' vom ' . date('d.m.Y', strtotime((string)$orig['issued_at'])) . '. ' . (string)$orig['vat_note']), $net, $vat, $gross, bin2hex(random_bytes(16)), date('c')]);
+    $id = (int)$pdo->lastInsertId();
+    $pdo->exec('COMMIT');
+    forma_invoice_send($pdo, $id);
+    forma_sheet_sync($pdo);
+}
+
+/** Rechnungsposition für einen eingelösten Gutschein (negativ), damit die Summe den bezahlten Betrag ergibt. */
+function forma_invoice_voucher_item(PDO $pdo, array $b): ?array
+{
+    $vc = (int)($b['voucher_cents'] ?? 0);
+    if ($vc <= 0 || empty($b['voucher_id'])) return null;
+    $st = $pdo->prepare('SELECT nr, kind FROM vouchers WHERE id = ?');
+    $st->execute([(int)$b['voucher_id']]);
+    $v = $st->fetch() ?: ['nr' => '', 'kind' => 'kauf'];
+    return ['text' => ($v['kind'] === 'kauf' ? 'Gutschein ' : 'Gutschrift ') . $v['nr'] . ' eingelöst',
+        'detail' => $v['kind'] === 'kauf' ? 'bereits beim Gutscheinkauf bezahlt und verrechnet' : 'Preisnachlass', 'qty' => 1, 'unit' => -$vc];
+}
+
 function forma_invoice_for(PDO $pdo, string $kind, int $refId): void
 {
     try {
@@ -228,7 +290,7 @@ function forma_invoice_pdf(array $inv): string
     $logo = dirname(__DIR__) . '/img/forma-logo.png';
     if (is_file($logo)) $pdf->Image($logo, 92, 14, 26);
     $pdf->SetTextColor(...$clay); $pdf->SetFont('Brico', 'B', 20);
-    $pdf->SetXY(122, 18); $pdf->Cell(70, 9, 'RECHNUNG', 0, 2, 'R');
+    $pdf->SetXY(122, 18); $pdf->Cell(70, 9, (int)$inv['gross_cents'] < 0 ? 'STORNORECHNUNG' : 'RECHNUNG', 0, 2, 'R');
     $meta = [['Rechnungsnr.', $inv['nr']], ['Rechnungsdatum', date('d.m.Y', strtotime($inv['issued_at']))], ['Leistungsdatum', $inv['service_date']]];
     $y = 30;
     foreach ($meta as [$k, $v]) {
@@ -277,7 +339,9 @@ function forma_invoice_pdf(array $inv): string
 
     // Hinweis
     $pdf->SetTextColor(...$soft); $pdf->SetFont('Outfit', '', 9.5);
-    $paidLine = 'Der Betrag wurde am ' . date('d.m.Y', strtotime($inv['issued_at'])) . ' online bezahlt (Kartenzahlung über Stripe).';
+    $paidLine = (int)$inv['gross_cents'] < 0
+        ? 'Der Betrag wurde am ' . date('d.m.Y', strtotime($inv['issued_at'])) . ' auf das Zahlungsmittel zurückerstattet, mit dem bezahlt wurde.'
+        : 'Der Betrag wurde am ' . date('d.m.Y', strtotime($inv['issued_at'])) . ' online bezahlt (Kartenzahlung über Stripe).';
     if ($inv['vat_note'] !== '') $paidLine .= "\n" . $inv['vat_note'];
     $pdf->SetXY(30, $y); $pdf->MultiCell(150, 5, $t($paidLine), 0, 'C');
     $pdf->SetTextColor(...$clay); $pdf->SetFont('Outfit', 'B', 10.5); $pdf->SetX(30); $pdf->Cell(150, 7, $t('Vielen Dank!'), 0, 1, 'C');
@@ -297,6 +361,9 @@ function forma_invoice_pdf(array $inv): string
 function forma_invoice_mailtext(array $inv): string
 {
     $first = forma_first_name($inv['name']);
+    if ((int)$inv['gross_cents'] < 0) {
+        return "Hallo $first,\n\nim Anhang findest du die Stornorechnung {$inv['nr']} für deine Unterlagen. Der Betrag von " . forma_cents_de(-(int)$inv['gross_cents']) . " wird dir zurückerstattet.\n\nBis bald,\nVivien\n";
+    }
     return "Hallo $first,\n\nvielen Dank für deine Zahlung! Im Anhang findest du deine Rechnung {$inv['nr']} als PDF.\n\n"
         . 'Rechnungsbetrag: ' . forma_cents_de((int)$inv['gross_cents']) . " (bereits bezahlt)\n\n"
         . "Bewahre sie gern für deine Unterlagen auf. Bei Fragen antworte einfach auf diese E-Mail.\n\nBis bald,\nVivien\n";
@@ -315,8 +382,8 @@ function forma_invoice_deliver(array $inv): void
 {
     $pdf = forma_invoice_pdf($inv);
     $file = 'Rechnung_' . $inv['nr'] . '.pdf';
-    forma_mail($inv['email'], 'Deine Rechnung ' . $inv['nr'] . ' von FORMA', forma_invoice_mailtext($inv), null, [[$file, $pdf, 'application/pdf']]);
-    forma_mail(FORMA_NOTIFY_EMAIL, 'Rechnung ' . $inv['nr'] . ': ' . $inv['name'] . ' (' . forma_cents_de((int)$inv['gross_cents']) . ')',
+    forma_mail($inv['email'], ((int)$inv['gross_cents'] < 0 ? 'Deine Stornorechnung ' : 'Deine Rechnung ') . $inv['nr'] . ' von FORMA', forma_invoice_mailtext($inv), null, [[$file, $pdf, 'application/pdf']]);
+    forma_mail(FORMA_NOTIFY_EMAIL, ((int)$inv['gross_cents'] < 0 ? 'Stornorechnung ' : 'Rechnung ') . $inv['nr'] . ': ' . $inv['name'] . ' (' . forma_cents_de((int)$inv['gross_cents']) . ')',
         "Neue Online-Rechnung für deine Buchhaltung.\n\nNummer: {$inv['nr']}\nDatum: " . date('d.m.Y', strtotime($inv['issued_at'])) . "\nKunde: {$inv['name']} ({$inv['email']}, {$inv['country']})\n"
         . 'Brutto: ' . forma_cents_de((int)$inv['gross_cents']) . "\nNetto: " . forma_cents_de((int)$inv['net_cents']) . "\nUSt. {$inv['vat_rate']} %: " . forma_cents_de((int)$inv['vat_cents']) . "\n\n"
         . 'Alle Rechnungen: ' . forma_site_url() . "/verwaltung/?view=rechnungen\n", null, [[$file, $pdf, 'application/pdf']]);

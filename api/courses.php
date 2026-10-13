@@ -25,6 +25,7 @@ try {
     register_shutdown_function(function () use ($pdo) {
         if (function_exists('fastcgi_finish_request')) fastcgi_finish_request();
         try { forma_confirm_reminders($pdo); } catch (Throwable $e) { error_log('FORMA reminders: ' . $e->getMessage()); }
+        try { forma_min_check($pdo); } catch (Throwable $e) { error_log('FORMA min: ' . $e->getMessage()); }
         try { forma_review_mails($pdo); } catch (Throwable $e) { error_log('FORMA reviews: ' . $e->getMessage()); }
     });
     forma_json(['ok' => true, 'courses' => $out]);

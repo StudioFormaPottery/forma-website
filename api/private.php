@@ -36,6 +36,8 @@ $wishDate = (string)($in['wish_date'] ?? '');
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $wishDate) || strtotime($wishDate) === false || $wishDate < date('Y-m-d')) $wishDate = '';
 $wishTime = array_key_exists((string)($in['wish_time'] ?? ''), FORMA_WISH_TIMES) ? (string)$in['wish_time'] : '';
 
+$noPost = !empty($in['no_post']) ? 1 : 0;
+$voucherCode = forma_clean((string)($in['voucher'] ?? ''), 40);
 $errors = [];
 if (mb_strlen($name) < 2) $errors[] = 'Bitte gib deinen Namen an.';
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Bitte gib eine gültige E-Mail-Adresse an.';
@@ -61,15 +63,32 @@ try {
     if ((int)$stmt->fetchColumn() >= 6) {
         forma_json(['ok' => false, 'error' => 'Bitte versuch es später noch einmal oder ruf mich an: ' . FORMA_PHONE], 429);
     }
-    $pdo->prepare('INSERT INTO private_bookings (kind, hours, amount_cents, name, email, phone, persons, project, wish, status, token, ip_hash, created_at, contact, wish_date, wish_time, call_time)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-        ->execute([$kind, $kind === 'buchung' ? $hours : max(0, min(8, $hours)), $amount, $name, $email, $phone, $persons, $project, $wish, $kind === 'anfrage' ? 'anfrage' : 'offen', $token, $ipHash, date('c'), $contact, $wishDate, $wishTime, $callTime]);
+    $voucher = null;
+    if ($kind === 'buchung' && $voucherCode !== '') {
+        $lk = forma_voucher_lookup($pdo, $voucherCode);
+        if (!$lk['ok']) forma_json(['ok' => false, 'error' => $lk['error']], 422);
+        $voucher = $lk['voucher'];
+    }
+    $pdo->exec('BEGIN IMMEDIATE');
+    $vUse = $voucher ? min(forma_voucher_balance($pdo, $voucher), $amount) : 0;
+    $cash = $amount - $vUse;
+    $pdo->prepare('INSERT INTO private_bookings (kind, hours, amount_cents, name, email, phone, persons, project, wish, status, token, ip_hash, created_at, contact, wish_date, wish_time, call_time, voucher_id, voucher_cents, no_post, paid_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        ->execute([$kind, $kind === 'buchung' ? $hours : max(0, min(8, $hours)), $cash, $name, $email, $phone, $persons, $project, $wish, $kind === 'anfrage' ? 'anfrage' : ($cash > 0 ? 'offen' : 'bezahlt'), $token, $ipHash, date('c'), $contact, $wishDate, $wishTime, $callTime,
+            $voucher ? (int)$voucher['id'] : null, $vUse, $noPost, ($kind === 'buchung' && $cash <= 0) ? date('c') : null]);
     $id = (int)$pdo->lastInsertId();
+    if ($voucher) forma_voucher_use($pdo, (int)$voucher['id'], 'private', $id, $vUse, $cash <= 0);
+    $pdo->exec('COMMIT');
 } catch (Throwable $e) {
+    if (isset($pdo) && $pdo->inTransaction()) $pdo->exec('ROLLBACK');
     error_log('FORMA private: ' . $e->getMessage());
     forma_json(['ok' => false, 'error' => 'Das hat gerade nicht geklappt. Bitte ruf mich an: ' . FORMA_PHONE], 500);
 }
 
+if ($kind === 'buchung' && $cash <= 0) {
+    forma_private_mails($pdo, $id);
+    forma_json(['ok' => true, 'redirect' => forma_site_url() . '/api/private-bezahlt.php?b=' . $id . '&k=' . $token]);
+}
 if ($kind === 'anfrage') {
     forma_private_mails($pdo, $id);
     forma_json(['ok' => true, 'kind' => 'anfrage']);
@@ -84,7 +103,8 @@ try {
         'customer_email' => $email,
         'client_reference_id' => 'private-' . $id,
         'metadata' => ['private_id' => (string)$id],
-        'line_items' => [[
+        'line_items' => $vUse > 0 ? [['quantity' => 1, 'price_data' => ['currency' => 'eur', 'unit_amount' => $cash,
+            'product_data' => ['name' => 'Private Pottery · Restbetrag', 'description' => $label . ' · Gesamt ' . forma_euro($amount) . ', davon ' . forma_euro($vUse) . ' mit Gutschein bezahlt']]]] : [[
             'quantity' => $hours * $persons,
             'price_data' => [
                 'currency' => 'eur',

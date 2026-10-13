@@ -569,6 +569,36 @@ function forma_migrate(PDO $pdo): void
         }
         forma_set_setting($pdo, 'community_v8', '1');
     }
+
+    // 13.10.2026: Gutscheincodes zum Online-Einlösen, Einlöse-Buchungen, Newsletter-Ablehnung bei Buchungen.
+    if (forma_setting($pdo, 'voucher_codes_v25') === null) {
+        forma_add_column($pdo, 'vouchers', 'code', 'TEXT');
+        forma_add_column($pdo, 'vouchers', 'kind', "TEXT NOT NULL DEFAULT 'kauf'");
+        forma_add_column($pdo, 'bookings', 'voucher_id', 'INTEGER');
+        forma_add_column($pdo, 'bookings', 'voucher_cents', 'INTEGER NOT NULL DEFAULT 0');
+        forma_add_column($pdo, 'private_bookings', 'voucher_id', 'INTEGER');
+        forma_add_column($pdo, 'private_bookings', 'voucher_cents', 'INTEGER NOT NULL DEFAULT 0');
+        forma_add_column($pdo, 'bookings', 'no_post', 'INTEGER NOT NULL DEFAULT 0');
+        forma_add_column($pdo, 'private_bookings', 'no_post', 'INTEGER NOT NULL DEFAULT 0');
+        forma_add_column($pdo, 'vouchers', 'no_post', 'INTEGER NOT NULL DEFAULT 0');
+        forma_add_column($pdo, 'template_orders', 'no_post', 'INTEGER NOT NULL DEFAULT 0');
+        $pdo->exec('CREATE UNIQUE INDEX IF NOT EXISTS vouchers_code ON vouchers(code)');
+        $pdo->exec('CREATE TABLE IF NOT EXISTS voucher_uses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            voucher_id INTEGER NOT NULL,
+            ref_kind TEXT NOT NULL,
+            ref_id INTEGER NOT NULL DEFAULT 0,
+            cents INTEGER NOT NULL,
+            status TEXT NOT NULL DEFAULT \'reserviert\',
+            note TEXT NOT NULL DEFAULT \'\',
+            created_at TEXT NOT NULL
+        )');
+        $pdo->exec('CREATE TABLE IF NOT EXISTS voucher_tries (ip_hash TEXT NOT NULL, at INTEGER NOT NULL)');
+        foreach ($pdo->query("SELECT id FROM vouchers WHERE status IN ('bezahlt','eingeloest') AND (code IS NULL OR code = '')")->fetchAll() as $r) {
+            $pdo->prepare('UPDATE vouchers SET code = ? WHERE id = ?')->execute([forma_voucher_new_code(), $r['id']]);
+        }
+        forma_set_setting($pdo, 'voucher_codes_v25', '1');
+    }
 }
 
 /** Vorlagen für Serientermine. */
@@ -835,6 +865,7 @@ function forma_mail_html(string $text): string
         if (str_contains($url, 'gutschein-pdf')) return 'Gutschein herunterladen';
         if (str_contains($url, 'cancel.php')) return 'Buchung ansehen';
         if (str_contains($url, 'private-zahlen.php')) return 'Jetzt online bezahlen';
+        if (str_contains($url, 'kurs-aendern.php')) return 'Neuen Termin wählen oder stornieren';
         if (str_contains($url, '/verwaltung')) return 'Zur Verwaltung';
         if (str_contains($url, 'g.page/r/') || str_contains($url, 'writereview')) return 'Jetzt bewerten ★';
         return 'Link öffnen';
@@ -1108,6 +1139,7 @@ function forma_confirm_paid(PDO $pdo, int $bookingId, int $amountCents): void
 {
     $stmt = $pdo->prepare("UPDATE bookings SET status = 'bestaetigt', paid_at = ?, amount_cents = ? WHERE id = ? AND status IN ('offen', 'abgebrochen')");
     $stmt->execute([date('c'), $amountCents, $bookingId]);
+    try { forma_voucher_sweep($pdo); } catch (Throwable $e) {}
     forma_send_booking_mails($pdo, $bookingId);
 }
 
@@ -1156,6 +1188,7 @@ function forma_reconcile_payments(PDO $pdo, bool $force = false): void
             error_log('FORMA reconcile private later: ' . $e->getMessage());
         }
     }
+    try { forma_voucher_sweep($pdo); } catch (Throwable $e) { error_log('FORMA voucher sweep: ' . $e->getMessage()); }
     $stmt = $pdo->prepare("SELECT * FROM vouchers WHERE status = 'offen' AND stripe_session != '' AND created_at >= ?");
     $stmt->execute([date('c', time() - 3 * 86400)]);
     foreach ($stmt->fetchAll() as $v) {
@@ -1221,14 +1254,15 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
     $first = forma_first_name($b['name']);
     $persons = (int)$b['persons'];
     $personsText = $persons === 1 ? '1 Person' : "$persons Personen";
-    $paid = (int)$b['amount_cents'] > 0 && $b['paid_at'];
+    $vc = (int)($b['voucher_cents'] ?? 0);
+    $paid = ((int)$b['amount_cents'] > 0 || $vc > 0) && $b['paid_at'];
     $free = max(0, (int)$b['capacity'] - forma_booked($pdo, (int)$b['course_id']));
     $phone = FORMA_PHONE;
     $site = forma_site_url();
 
     $payLine = $paid
-        ? 'Bezahlt: ' . forma_euro((int)$b['amount_cents']) . ' (online, danke!)'
-        : 'Preis: ' . $b['price_text'];
+        ? 'Bezahlt: ' . forma_paid_text((int)$b['amount_cents'], $vc)
+        : 'Preis: ' . $b['price_text'] . ($vc > 0 ? ' (davon ' . forma_euro($vc) . ' mit Gutschein bezahlt, den Rest bitte vor Ort)' : '');
     $intro = $paid
         ? "danke für deine Buchung! Deine Zahlung ist angekommen und dein Platz für „{$b['title']}“ ist fix. Ich freue mich schon sehr auf dich."
         : "danke, dass du dich für „{$b['title']}“ angemeldet hast! Deine Anmeldung ist verbindlich bei mir eingegangen, und ich freue mich schon sehr auf dich.";
@@ -1243,7 +1277,7 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
     $termin = $isAtelier ? preg_replace('/ · .*$/u', '', (string)$b['date_text']) : $b['date_text'];
     $piecesLine = is_array($pieces) && $pieces ? ($isAtelier ? 'Deine Zeiten: ' . implode(', ', array_map(fn($i) => preg_replace('/^Offenes Atelier /', '', $i['name']), $pieces)) . ' (' . count($pieces) . ($pieces && count($pieces) === 1 ? ' Stunde' : ' Stunden') . ")\n" : 'Deine Stücke: ' . forma_bemalen_text($pieces) . "\n") : '';
     $unsub = '';
-    try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Kursbuchung: ' . $b['title']); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
+    if (empty($b['no_post'])) try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Kursbuchung: ' . $b['title']); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
     $calTxt = ''; $calAtt = [];
     try { [$calTxt, $calAtt] = forma_cal_block($pdo, 'b', $bookingId); } catch (Throwable $e) { error_log('FORMA cal: ' . $e->getMessage()); }
     $customer = "Hallo $first,\n\n$intro\n\nHier noch einmal alles auf einen Blick:\n\n"
@@ -1257,7 +1291,8 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
 
     $admin = ($paid ? 'Neue bezahlte Buchung über die Website' : 'Neue Kursanmeldung über die Website') . "\n\n"
         . "Kurs: {$b['title']}\nTermin: $termin\nPersonen: $personsText\n" . $piecesLine
-        . ($paid ? 'Bezahlt: ' . forma_euro((int)$b['amount_cents']) . " über Stripe\n" : "Bezahlung: vor Ort\n")
+        . ($paid ? ((int)$b['amount_cents'] > 0 ? 'Bezahlt: ' . forma_euro((int)$b['amount_cents']) . ' über Stripe' . ($vc > 0 ? ' + ' . forma_euro($vc) . ' Gutschein' : '') : 'Bezahlt mit Gutschein: ' . forma_euro($vc)) . "\n" : 'Bezahlung: vor Ort' . ($vc > 0 ? ' (' . forma_euro($vc) . ' schon mit Gutschein bezahlt)' : '') . "\n")
+        . (!empty($b['no_post']) ? "Möchte keine FORMA Post bekommen.\n" : '')
         . "\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nNachricht: {$b['message']}\n\n"
         . "Freie Plätze danach: $free\n\nAlle Buchungen: $site/verwaltung/\n";
 
@@ -1384,6 +1419,7 @@ function forma_voucher_qty(array $v): string
 
 function forma_voucher_title(array $v): string
 {
+    if (($v['kind'] ?? 'kauf') !== 'kauf') return 'Wertgutschein über ' . forma_euro((int)$v['amount_cents']);
     return forma_voucher_qty($v) . ' ' . FORMA_VOUCHERS[$v['product']]['small'];
 }
 
@@ -1397,10 +1433,137 @@ function forma_voucher_paid(PDO $pdo, int $id): void
         $year = date('Y');
         $n = (int)$pdo->query("SELECT COUNT(*) FROM vouchers WHERE nr LIKE 'FORMA-$year-%'")->fetchColumn() + 1;
         $nr = sprintf('FORMA-%s-%04d', $year, $n);
-        $pdo->prepare("UPDATE vouchers SET status = 'bezahlt', paid_at = ?, nr = ? WHERE id = ?")->execute([date('c'), $nr, $id]);
+        $pdo->prepare("UPDATE vouchers SET status = 'bezahlt', paid_at = ?, nr = ?, code = ? WHERE id = ?")->execute([date('c'), $nr, forma_voucher_new_code(), $id]);
     }
     $pdo->exec('COMMIT');
     forma_voucher_mails($pdo, $id);
+}
+
+// --- Gutscheincodes: online bei jeder Buchung einlösbar ------------------------------------------
+// Der Code ist zufällig (12 Zeichen aus 32 = 60 Bit) und wird erst nach bestätigter Zahlung vergeben.
+// Wertgutschein: der Euro-Betrag wird angerechnet, ein Restwert bleibt auf dem Gutschein.
+
+const FORMA_TEMPLATE_LINK_DAYS = 30;
+const FORMA_CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const FORMA_VOUCHER_TERMS = 'Wertgutschein ohne Ablaufdatum. Einlösbar für alle Kurse, Workshops und Private Pottery im FORMA Atelier, online mit dem Gutscheincode oder direkt im Atelier. Ein Restwert bleibt auf dem Gutschein erhalten. Keine Barauszahlung. Bitte gut aufbewahren: Wer den Code kennt, kann ihn einlösen.';
+
+function forma_voucher_new_code(): string
+{
+    $c = '';
+    for ($i = 0; $i < 12; $i++) $c .= FORMA_CODE_CHARS[random_int(0, 31)];
+    return 'FORMA-' . substr($c, 0, 4) . '-' . substr($c, 4, 4) . '-' . substr($c, 8, 4);
+}
+
+function forma_voucher_norm(string $code): string
+{
+    $c = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $code) ?? '');
+    if (str_starts_with($c, 'FORMA')) $c = substr($c, 5);
+    $c = strtr($c, ['0' => 'O', '1' => 'I']);
+    return strlen($c) === 12 ? 'FORMA-' . substr($c, 0, 4) . '-' . substr($c, 4, 4) . '-' . substr($c, 8, 4) : '';
+}
+
+/** Restwert: Betrag minus alle reservierten und eingelösten Beträge. */
+function forma_voucher_balance(PDO $pdo, array $v): int
+{
+    if ($v['status'] === 'eingeloest') return 0;
+    if ($v['status'] !== 'bezahlt') return 0;
+    $st = $pdo->prepare("SELECT COALESCE(SUM(cents), 0) FROM voucher_uses WHERE voucher_id = ? AND status IN ('reserviert','eingeloest')");
+    $st->execute([$v['id']]);
+    return max(0, (int)$v['amount_cents'] - (int)$st->fetchColumn());
+}
+
+/** Sucht einen Gutschein per Code, mit Bremse gegen Durchprobieren (max. 8 Fehlversuche pro Stunde und Gerät). */
+function forma_voucher_lookup(PDO $pdo, string $code): array
+{
+    $ip = hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? '') . 'forma-gs');
+    $pdo->prepare('DELETE FROM voucher_tries WHERE at < ?')->execute([time() - 3600]);
+    $st = $pdo->prepare('SELECT COUNT(*) FROM voucher_tries WHERE ip_hash = ?');
+    $st->execute([$ip]);
+    if ((int)$st->fetchColumn() >= 8) return ['ok' => false, 'error' => 'Zu viele Versuche. Bitte probier es in einer Stunde noch einmal oder ruf mich an: ' . FORMA_PHONE];
+    $norm = forma_voucher_norm($code);
+    $v = null;
+    if ($norm !== '') {
+        $st = $pdo->prepare('SELECT * FROM vouchers WHERE code = ?');
+        $st->execute([$norm]);
+        $v = $st->fetch() ?: null;
+    }
+    if (!$v) {
+        $pdo->prepare('INSERT INTO voucher_tries (ip_hash, at) VALUES (?, ?)')->execute([$ip, time()]);
+        return ['ok' => false, 'error' => 'Diesen Gutscheincode kenne ich leider nicht. Bitte prüf ihn noch einmal (er steht auf deinem Gutschein, z. B. FORMA-AB12-CD34-EF56).'];
+    }
+    $bal = forma_voucher_balance($pdo, $v);
+    if ($bal <= 0) return ['ok' => false, 'error' => 'Dieser Gutschein ist schon vollständig eingelöst.'];
+    return ['ok' => true, 'voucher' => $v, 'balance' => $bal];
+}
+
+/** Rechnet einen Gutschein auf eine Buchung an. Muss innerhalb einer Transaktion laufen. */
+function forma_voucher_use(PDO $pdo, int $voucherId, string $refKind, int $refId, int $cents, bool $final): void
+{
+    if ($cents <= 0) return;
+    $pdo->prepare('INSERT INTO voucher_uses (voucher_id, ref_kind, ref_id, cents, status, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+        ->execute([$voucherId, $refKind, $refId, $cents, $final ? 'eingeloest' : 'reserviert', date('c')]);
+    if ($final) forma_voucher_after_use($pdo, $voucherId);
+}
+
+function forma_voucher_after_use(PDO $pdo, int $voucherId): void
+{
+    $st = $pdo->prepare('SELECT * FROM vouchers WHERE id = ?');
+    $st->execute([$voucherId]);
+    $v = $st->fetch();
+    if (!$v || $v['status'] !== 'bezahlt') return;
+    $open = $pdo->prepare("SELECT COUNT(*) FROM voucher_uses WHERE voucher_id = ? AND status = 'reserviert'");
+    $open->execute([$voucherId]);
+    if (forma_voucher_balance($pdo, $v) <= 0 && (int)$open->fetchColumn() === 0) {
+        $pdo->prepare("UPDATE vouchers SET status = 'eingeloest', redeemed_at = ? WHERE id = ?")->execute([date('c'), $voucherId]);
+    }
+}
+
+/** Reservierte Beträge: bezahlt → eingelöst, nicht bezahlt (nach 40 Min.) → wieder frei. */
+function forma_voucher_sweep(PDO $pdo): void
+{
+    foreach ($pdo->query("SELECT * FROM voucher_uses WHERE status = 'reserviert'")->fetchAll() as $u) {
+        $paid = false;
+        if ($u['ref_kind'] === 'kurs') {
+            $st = $pdo->prepare("SELECT status FROM bookings WHERE id = ?");
+            $st->execute([$u['ref_id']]);
+            $s = $st->fetchColumn();
+            $paid = $s === 'bestaetigt';
+        } elseif ($u['ref_kind'] === 'private') {
+            $st = $pdo->prepare("SELECT status FROM private_bookings WHERE id = ?");
+            $st->execute([$u['ref_id']]);
+            $s = $st->fetchColumn();
+            $paid = $s === 'bezahlt';
+        } else {
+            $s = false;
+        }
+        if ($paid) {
+            $pdo->prepare("UPDATE voucher_uses SET status = 'eingeloest' WHERE id = ?")->execute([$u['id']]);
+            forma_voucher_after_use($pdo, (int)$u['voucher_id']);
+        } elseif ($s === false || strtotime((string)$u['created_at']) < time() - 40 * 60) {
+            $pdo->prepare("UPDATE voucher_uses SET status = 'frei' WHERE id = ?")->execute([$u['id']]);
+        }
+    }
+}
+
+/** Für die Mails: „€ 30 online + Gutschein € 40“ */
+function forma_paid_text(int $cash, int $voucher): string
+{
+    if ($voucher <= 0) return forma_euro($cash) . ' (online, danke!)';
+    if ($cash <= 0) return forma_euro($voucher) . ' mit deinem Gutschein';
+    return forma_euro($cash) . ' online + ' . forma_euro($voucher) . ' mit Gutschein';
+}
+
+/** Ein Gutschein als Entschuldigung, z. B. wenn ein Kurs nicht stattfinden kann. Gibt den Code zurück. */
+function forma_voucher_gift(PDO $pdo, int $cents, string $name, string $email, string $note): array
+{
+    $year = date('Y');
+    $n = (int)$pdo->query("SELECT COUNT(*) FROM vouchers WHERE nr LIKE 'FORMA-$year-%'")->fetchColumn() + 1;
+    $nr = sprintf('FORMA-%s-%04d', $year, $n);
+    $code = forma_voucher_new_code();
+    $pdo->prepare("INSERT INTO vouchers (nr, product, qty, amount_cents, recipient, sender, message, design, buyer_name, buyer_email, status, token, mailed, note, created_at, paid_at, code, kind)
+        VALUES (?, 'spin', 1, ?, ?, 'Vivien', '', 1, ?, ?, 'bezahlt', ?, 1, ?, ?, ?, ?, 'geschenk')")
+        ->execute([$nr, $cents, $name, $name, $email, bin2hex(random_bytes(16)), $note, date('c'), date('c'), $code]);
+    return ['id' => (int)$pdo->lastInsertId(), 'nr' => $nr, 'code' => $code];
 }
 
 function forma_voucher_link(array $v): string
@@ -1427,13 +1590,15 @@ function forma_voucher_mails(PDO $pdo, int $id): void
     $phone = FORMA_PHONE;
     $site = forma_site_url();
     forma_mail($v['buyer_email'], 'Dein FORMA Gutschein ' . $v['nr'], "Hallo $first,\n\nvielen Dank für deinen Gutschein-Kauf! Was für ein schönes Geschenk.\n\n"
-        . "Gutschein: $title\nWert: $amount\nGutschein-Nr.: {$v['nr']}\n" . ($v['recipient'] ? "Für: {$v['recipient']}\n" : '')
+        . "Gutschein: $title\nWert: $amount\nGutschein-Nr.: {$v['nr']}\nGutscheincode: {$v['code']}\n" . ($v['recipient'] ? "Für: {$v['recipient']}\n" : '')
         . "\nHier kannst du den Gutschein jederzeit als PDF herunterladen und ausdrucken:\n$link\n\n"
-        . "Zum Einlösen meldet sich die beschenkte Person einfach bei mir, telefonisch oder per WhatsApp unter $phone oder per E-Mail an hello@forma-pottery.com, und wir finden gemeinsam einen Termin.\n\n"
+        . "So wird er eingelöst: Die beschenkte Person bucht ihren Kurs ganz normal auf www.forma-pottery.com und gibt vor dem Bezahlen den Gutscheincode ein. Der Wert wird sofort abgezogen. Oder sie meldet sich bei mir, telefonisch oder per WhatsApp unter $phone, und wir finden gemeinsam einen Termin.\n\n"
+        . "Gut zu wissen: " . FORMA_VOUCHER_TERMS . "\n\n"
         . "Bis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
     forma_mail(FORMA_NOTIFY_EMAIL, 'Gutschein verkauft: ' . $v['nr'] . ' (' . $amount . ')', "Ein Gutschein wurde online gekauft und bezahlt.\n\n"
-        . "Nr.: {$v['nr']}\nInhalt: $title\nBetrag: $amount\nFür: {$v['recipient']}\nVon: {$v['sender']}\n\n"
+        . "Nr.: {$v['nr']}\nCode: {$v['code']}\nInhalt: $title\nBetrag: $amount\nFür: {$v['recipient']}\nVon: {$v['sender']}\n\n"
         . "Käufer:in: {$v['buyer_name']}\nE-Mail: {$v['buyer_email']}\n\nPDF: $link\nAlle Gutscheine: $site/verwaltung/?view=gutscheine\n", $v['buyer_email']);
+    if ((int)$v['amount_cents'] > 0 && ($v['kind'] ?? 'kauf') === 'kauf') forma_invoice_for($pdo, 'gutschein', $id);
 }
 
 function forma_voucher_check(PDO $pdo, array $v): string
@@ -1486,9 +1651,10 @@ function forma_private_mails(PDO $pdo, int $id): void
         forma_mail(FORMA_NOTIFY_EMAIL, ($isTeam ? 'Anfrage Teambuilding/Event (' : 'Anfrage Private Pottery (') . $b['name'] . ')', "Neue Anfrage für " . ($isTeam ? 'Teambuilding/Event' : 'Private Pottery (noch nicht gebucht)') . "\n$contactLine\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nPersonen: $persons\n\nProjekt:\n{$b['project']}\n\nWunschtermin: $wish\n\nIm Kalender einplanen: $planUrl\n", $b['email']);
         return;
     }
-    $amount = forma_euro((int)$b['amount_cents']);
+    $vc = (int)($b['voucher_cents'] ?? 0);
+    $amount = $vc > 0 ? forma_paid_text((int)$b['amount_cents'], $vc) : forma_euro((int)$b['amount_cents']);
     $unsub = '';
-    try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Buchung: Private Pottery'); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
+    if (empty($b['no_post'])) try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Buchung: Private Pottery'); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
     $what = $isTeam ? preg_replace('/^Teambuilding\/Event:\s*/', '', (string)$b['project']) : "$hours Private Pottery ($persons)";
     forma_mail($b['email'], $isTeam ? 'Euer Teambuilding-Event ist gebucht' : 'Deine Private Pottery Stunden sind gebucht', "Hallo $first,\n\n" . ($isTeam ? 'wie schön, dass ihr gemeinsam töpfern kommt!' : 'wie schön, dass wir dein Projekt gemeinsam umsetzen!') . " Deine Zahlung ist angekommen.\n\n"
         . "Gebucht: $what\nBezahlt: $amount\n" . ($isTeam ? '' : "Dein Projekt: {$b['project']}\n") . "Wunschtermin: $wish\n\n"
@@ -1509,6 +1675,7 @@ function forma_private_check(PDO $pdo, array $b): string
     if (($session['payment_status'] ?? '') === 'paid') {
         $st = $pdo->prepare("UPDATE private_bookings SET status = 'bezahlt', paid_at = ? WHERE id = ? AND status = ?");
         $st->execute([date('c'), (int)$b['id'], $later ? 'anfrage' : 'offen']);
+        try { forma_voucher_sweep($pdo); } catch (Throwable $e) {}
         if ($later) {
             if ($st->rowCount() > 0) forma_private_paid_later($pdo, (int)$b['id']);
         } else {
@@ -1622,8 +1789,21 @@ function forma_template_order_paid(PDO $pdo, int $id): void
     $first = forma_first_name($o['name']);
     $link = forma_site_url() . '/api/template-download.php?o=' . $o['id'] . '&k=' . $o['token'];
     $amount = forma_euro((int)$o['amount_cents']);
-    forma_mail($o['email'], 'Dein FORMA Template: ' . $o['title'], "Hallo $first,\n\nvielen Dank für deinen Kauf! Hier kannst du dein Template jederzeit herunterladen" . (($o['file_en'] ?? '') !== '' ? ' (auf Deutsch und auf Englisch)' : '') . ":\n\n$link\n\n"
-        . "Template: {$o['title']}\nBezahlt: $amount\n\nViel Freude beim Töpfern! Ich freu mich, wenn du mir dein Ergebnis auf Instagram zeigst: @forma.potteryartcraft\n\nBis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
+    // Die PDFs kommen direkt als Anhang mit, der Download-Link gilt zusätzlich FORMA_TEMPLATE_LINK_DAYS Tage.
+    $att = [];
+    $tp = $pdo->prepare('SELECT file, file_en FROM templates WHERE id = ?');
+    $tp->execute([(int)$o['template_id']]);
+    $tf = $tp->fetch() ?: ['file' => '', 'file_en' => ''];
+    $slug = preg_replace('/[^A-Za-z0-9-]+/', '-', strtr((string)$o['title'], ['ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue', 'Ä' => 'Ae', 'Ö' => 'Oe', 'Ü' => 'Ue', 'ß' => 'ss']));
+    $size = 0;
+    foreach (['' => $tf['file'], '-EN' => $tf['file_en']] as $suf => $fn) {
+        $path = forma_template_dir() . '/' . basename((string)$fn);
+        if ((string)$fn !== '' && is_file($path) && ($size += filesize($path)) < 15 * 1024 * 1024) $att[] = ['FORMA-Template-' . $slug . $suf . '.pdf', (string)file_get_contents($path), 'application/pdf'];
+    }
+    forma_mail($o['email'], 'Dein FORMA Template: ' . $o['title'], "Hallo $first,\n\nvielen Dank für deinen Kauf! "
+        . ($att ? 'Dein Template hängt direkt an dieser E-Mail' . (count($att) > 1 ? ' (auf Deutsch und auf Englisch)' : '') . ". Speicher es dir am besten gleich ab.\n\nZusätzlich kannst du es " . FORMA_TEMPLATE_LINK_DAYS . " Tage lang hier herunterladen:\n$link\n\n"
+            : "Hier kannst du dein Template " . FORMA_TEMPLATE_LINK_DAYS . " Tage lang herunterladen" . (($o['file_en'] ?? '') !== '' ? ' (auf Deutsch und auf Englisch)' : '') . ":\n\n$link\n\n")
+        . "Template: {$o['title']}\nBezahlt: $amount\n\nViel Freude beim Töpfern! Ich freu mich, wenn du mir dein Ergebnis auf Instagram zeigst: @forma.potteryartcraft\n\nBis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n", null, $att);
     forma_mail(FORMA_NOTIFY_EMAIL, 'Template verkauft: ' . $o['title'] . ' (' . $amount . ')', "Ein Template wurde verkauft.\n\nTemplate: {$o['title']}\nBetrag: $amount\nKäufer:in: {$o['name']}\nE-Mail: {$o['email']}\n\nAlle Verkäufe: " . forma_site_url() . "/verwaltung/?view=templates\n", $o['email']);
     forma_invoice_for($pdo, 'template', $id);
 }
@@ -2053,7 +2233,7 @@ function forma_private_confirm_mail(PDO $pdo, int $pid, string $note = ''): bool
         . "\nBitte komm in Kleidung, die schmutzig werden darf. Schürzen, Werkzeug und Ton habe ich alles im Studio.\n"
         . "\nFalls doch etwas dazwischenkommt: Bis 48 Stunden vorher kannst du kostenlos verschieben oder stornieren. Melde dich einfach, antworte auf diese E-Mail oder ruf mich an: $phone\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n";
     $unsub = '';
-    try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Buchung: Private Pottery'); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
+    if (empty($b['no_post'])) try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Buchung: Private Pottery'); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
     $body .= forma_newsletter_note($unsub);
     $subject = $one ? 'Dein Termin: ' . forma_de_date((string)$sessions[0]['date'], false) . ' um ' . forma_de_time((string)$sessions[0]['start']) : 'Deine ' . count($sessions) . ' Private-Pottery-Termine';
     $ok = forma_mail((string)$b['email'], $subject, $body, null, $calAtt);
@@ -2107,3 +2287,4 @@ function forma_template_slides(string $file): array
 }
 
 require_once __DIR__ . '/invoices.php';
+require_once __DIR__ . '/minimum.php';

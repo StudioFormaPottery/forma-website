@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Töpferkurs in Ischgl &amp; Paznaun | Studio Forma Töpferstudio Mathon</title>
+<title>Studio FORMA · Töpferkurse im Paznaun</title>
 <meta name="description" content="Töpfern im Urlaub und zuhause im Paznaun: Töpferkurse an der Drehscheibe, Pottery bemalen, Private Pottery und offenes Atelier im Studio Forma in Mathon bei Ischgl und Galtür. Jetzt online buchen.">
 <link rel="canonical" href="https://www.forma-pottery.com/">
 <meta name="google-site-verification" content="0_5zCGjk6YGEp4klINpUDArIt4XCvLH1vE-_iCskn-E"/>
 <meta name="p:domain_verify" content="a91b2b874278c5d64bd7d9570e6b570d">
-<meta property="og:title" content="Töpferkurs in Ischgl &amp; Paznaun | Studio Forma Mathon">
+<meta property="og:title" content="Studio FORMA · Töpferkurse im Paznaun">
 <meta property="og:description" content="Töpferkurse an der Drehscheibe, Pottery bemalen, Private Pottery und offenes Atelier in Mathon bei Ischgl. Online buchbar.">
 <meta property="og:image" content="https://www.forma-pottery.com/img/scheiben-studio.jpg">
 <meta property="og:url" content="https://www.forma-pottery.com/">
@@ -411,6 +411,7 @@ section{scroll-margin-top:96px}
 .event-facts div{display:grid;grid-template-columns:96px 1fr;gap:12px}
 .event-facts dt{font-weight:600;color:var(--clay)}
 .event-facts dd{margin:0}
+.event-sort{font-family:var(--display);font-weight:650;color:var(--clay);font-size:1.05em;margin:4px 0 10px}
 .event-pieces{list-style:none;margin:0 0 18px;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
 .event-pieces li{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:18px;background:var(--paper);border:1px solid var(--line);font-size:19px;font-weight:500;line-height:1.25}
 .event-pieces li svg{width:50px;height:42px;flex:0 0 auto}
@@ -515,6 +516,14 @@ section{scroll-margin-top:96px}
 .shop-soon p{color:var(--ink-soft);margin:0 0 18px}
 @media (max-width:700px){.shop-soon{grid-template-columns:1fr}.shop-soon img{min-height:0;aspect-ratio:4/3}}
 .news-note{font-size:13.5px;line-height:1.5;color:var(--ink-soft);margin:6px 0 0}
+.nopost{margin-top:4px;font-size:14px}
+.gs-box{border:1.5px dashed var(--line,#D9C5B2);border-radius:18px;padding:10px 14px;margin:6px 0 10px;background:rgba(255,255,255,.45)}
+.gs-box summary{cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:500;color:var(--clay);list-style:none}
+.gs-box summary::-webkit-details-marker{display:none}
+.gs-box summary svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.gs-row{display:flex;gap:8px;margin-top:10px}.gs-row input{flex:1;min-width:0;text-transform:uppercase;letter-spacing:.06em}
+.gs-row .btn{padding:10px 18px;white-space:nowrap}
+.gs-msg{margin:8px 0 2px;font-size:15px}.gs-msg.ok{color:#4F6B3F}.gs-msg.err{color:#9b1c1c}
 .tpl-filters{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips button{font:inherit;font-size:15px;padding:8px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
@@ -1001,6 +1010,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .tpl-gets{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .tpl-gets li{position:relative;padding-left:26px;font-size:16.5px;line-height:1.4}
 .tpl-gets li::before{content:"";position:absolute;left:0;top:3px;width:16px;height:16px;border-radius:50%;background:var(--clay);box-shadow:inset 0 0 0 4px var(--blush)}
+.v-terms{font-size:14.5px;line-height:1.5;color:var(--soft);background:var(--paper);border-radius:14px;padding:10px 14px;margin:6px 0 10px}
+.tpl-soon{margin:16px 0 4px;padding:16px 18px;border-radius:18px;background:var(--blush);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}.tpl-soon p{margin:0;flex:1 1 260px}
 .tpl-buy-k{margin:14px 0 4px;padding-top:14px;border-top:1px dashed var(--line);font-family:var(--display);font-weight:650;font-size:21px;color:var(--clay)}
 @media (min-width:900px){.tpl-desc{font-size:20px}.tpl-gets li{font-size:18px}}
 #tpl-dialog .book-inner{max-width:880px}
@@ -1209,8 +1220,13 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         </div>
         <div class="field"><label for="book-message">Nachricht <span class="opt">(optional)</span></label><textarea id="book-message" name="message" rows="2"></textarea></div>
         <p class="book-storno">Anmeldeschluss ist am Vorabend um 17 Uhr. Kostenlos stornieren bis 48 Stunden vor Kursbeginn. Danach werden 50&nbsp;% fällig, bei Nichterscheinen der volle Betrag. Wenn etwas dazwischenkommt, melde dich einfach, wir finden gemeinsam eine Lösung. <a href="#storno" id="book-storno-link">Mehr dazu</a></p>
+        <details class="gs-box"><summary><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-1-3-5-4-5-1.5S10 8 12 8zm0 0c1-3 5-4 5-1.5S14 8 12 8z"/></svg>Du hast einen Gutschein?</summary>
+          <div class="gs-row"><input name="voucher" class="gs-code" id="book-voucher" placeholder="FORMA-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Gutscheincode"><button type="button" class="btn gs-check">Prüfen</button></div>
+          <p class="gs-msg" role="status" hidden></p>
+        </details>
         <label class="consent"><input type="checkbox" name="consent" id="book-consent" value="1" required> <span>Ich habe die Stornobedingungen gelesen und bin einverstanden, dass meine Angaben zur Bearbeitung meiner Anmeldung gespeichert werden. Mehr dazu in der <a href="#datenschutz" id="book-privacy">Datenschutzerklärung</a>.</span></label>
-        <p class="news-note">Mit deiner Buchung bekommst du ab und zu meinen Atelier-Newsletter mit neuen Kursen und Specials. Kein Spam, versprochen, und abmelden geht jederzeit mit einem Klick.</p>
+        <p class="news-note">Mit deiner Buchung bekommst du ab und zu die FORMA Post mit neuen Kursen und Events aus dem Atelier. Kein Spam, abmelden geht jederzeit mit einem Klick.</p>
+        <label class="consent nopost"><input type="checkbox" name="no_post" value="1"> <span>Nein danke, ich möchte keine FORMA Post bekommen.</span></label>
         <p class="book-error" id="book-error" role="alert" hidden></p>
         <button class="btn btn-solid" type="submit" id="book-submit">Verbindlich anmelden</button>
         <p class="pay-note" id="book-paynote" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>Du bezahlst sicher über Stripe, z. B. mit Karte, Apple Pay oder Google Pay.</p>
@@ -1247,6 +1263,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
             </ul>
           </div>
         </div>
+        <div id="tpl-buy">
         <p class="tpl-buy-k">Template kaufen</p>
         <input type="hidden" name="template_id" id="tpl-id">
         <div class="hp" aria-hidden="true"><label for="tpl-website">Bitte leer lassen</label><input id="tpl-website" name="website" tabindex="-1" autocomplete="off"></div>
@@ -1256,6 +1273,11 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <label class="consent"><input type="checkbox" name="consent" id="tpl-consent" value="1"> <span>Ich bin einverstanden, dass meine Angaben zur Abwicklung des Kaufs gespeichert werden. <a href="#datenschutz" class="tpl-privacy">Datenschutz</a></span></label>
         <p class="book-error" id="tpl-error" role="alert" hidden></p>
         <button class="btn btn-solid" type="submit" id="tpl-submit">Weiter zur Bezahlung</button>
+        </div>
+        <div class="tpl-soon" id="tpl-soon" hidden>
+          <p><b>Bald im Shop erhältlich.</b> Der Template-Shop startet in Kürze. Im Maker Club erfährst du als Erste, wann es losgeht.</p>
+          <a class="btn btn-ghost" href="#templates">Zum Maker Club</a>
+        </div>
       </form>
       <div class="book-done" id="tpl-done" hidden>
         <p class="eyebrow">Danke!</p>
@@ -1334,8 +1356,13 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           </div>
         </fieldset>
         <p class="book-storno" id="p-storno">Deinen fixen Termin bestätige ich dir nach der Buchung per E-Mail. Kostenlos stornieren bis 48 Stunden vorher, danach 50&nbsp;%, bei Nichterscheinen der volle Betrag. Wenn etwas dazwischenkommt, melde dich einfach.</p>
+        <details class="gs-box" id="p-gs"><summary><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-1-3-5-4-5-1.5S10 8 12 8zm0 0c1-3 5-4 5-1.5S14 8 12 8z"/></svg>Du hast einen Gutschein?</summary>
+          <div class="gs-row"><input name="voucher" class="gs-code" id="p-voucher" placeholder="FORMA-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Gutscheincode"><button type="button" class="btn gs-check">Prüfen</button></div>
+          <p class="gs-msg" role="status" hidden></p>
+        </details>
         <label class="consent"><input type="checkbox" name="consent" id="p-consent" value="1"> <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Buchung gespeichert werden. Mehr dazu in der <a href="#datenschutz" class="p-privacy">Datenschutzerklärung</a>.</span></label>
-        <p class="news-note">Mit deiner Buchung bekommst du ab und zu meinen Atelier-Newsletter mit neuen Kursen und Specials. Kein Spam, versprochen, und abmelden geht jederzeit mit einem Klick.</p>
+        <p class="news-note">Mit deiner Buchung bekommst du ab und zu die FORMA Post mit neuen Kursen und Events aus dem Atelier. Kein Spam, abmelden geht jederzeit mit einem Klick.</p>
+        <label class="consent nopost"><input type="checkbox" name="no_post" value="1"> <span>Nein danke, ich möchte keine FORMA Post bekommen.</span></label>
         <p class="book-error" id="p-error" role="alert" hidden></p>
         <div class="p-actions">
           <button class="btn btn-solid" type="submit" id="p-submit">Weiter zur Bezahlung · € 130</button>
@@ -1404,6 +1431,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <div class="field"><label for="v-name">Dein Name</label><input id="v-name" name="buyer_name" autocomplete="name" required></div>
           <div class="field"><label for="v-email">Deine E-Mail <span class="opt">(dorthin schicke ich den Gutschein)</span></label><input id="v-email" name="buyer_email" type="email" autocomplete="email" required></div>
         </fieldset>
+        <p class="v-terms"><b>Gut zu wissen:</b> Der Gutschein hat kein Ablaufdatum und gilt als Wertgutschein für alle Kurse, Workshops und Private Pottery. Mit dem Gutscheincode löst man ihn ganz einfach online bei der Buchung ein, ein Restwert bleibt erhalten. Keine Barauszahlung. Geht er verloren, sperre ich ihn und stelle ihn neu aus.</p>
         <label class="consent"><input type="checkbox" name="consent" id="v-consent" value="1"> <span>Ich bin einverstanden, dass meine Angaben zur Abwicklung des Gutscheins gespeichert werden. Mehr dazu in der <a href="#datenschutz" id="v-privacy">Datenschutzerklärung</a>.</span></label>
         <p class="book-error" id="v-error" role="alert" hidden></p>
         <button class="btn btn-solid" type="submit" id="v-submit">Weiter zur Bezahlung · € 70</button>
@@ -1429,7 +1457,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <p class="post-sub">Ich sag dir Bescheid, wenn es neue Events im Atelier gibt, damit du immer auf dem Laufenden bist.</p>
     </div>
     <div class="season-inner" id="season-inner">
-      <div class="season-img" id="season-img" hidden><img id="season-pic" alt=""></div>
+      <div class="season-img" id="season-img" hidden><img id="season-pic" alt="Bild zum aktuellen Event im Atelier"></div>
       <div class="season-body">
         <div class="season-event">
           <p class="season-next">Als Nächstes im Atelier</p>
@@ -1500,17 +1528,18 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <h3>Pottery bemalen</h3>
           <p class="event-when">Ab November · Mi &amp; Do 15–18 Uhr · max. 6 Personen</p>
           <p class="event-lead">Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Teller und Mugs bemalen, ganz entspannt bei Kerzenlicht und einer Tasse Tee im Atelier.</p>
-          <button class="more-btn" type="button" aria-expanded="false">Alle Infos &amp; Preise</button>
+          <button class="more-btn" type="button" aria-expanded="false">Alle Infos</button>
           <div class="more-wrap">
           <dl class="event-facts">
             <div><dt>Wann</dt><dd>Ab November, jeden Mittwoch &amp; Donnerstag, 15–18 Uhr</dd></div>
             <div><dt>Plätze</dt><dd>Höchstens 6 Personen pro Nachmittag</dd></div>
             <div><dt>Abholung</dt><dd>Am Montag darauf im Atelier</dd></div>
-            <div><dt>Preis</dt><dd>€ 15 Atelierbeitrag pro Person, damit ist dein Platz reserviert. Dazu dein Stück zum Bemalen:</dd></div>
+            <div><dt>Anmeldung</dt><dd>ab 19. Oktober online, mit kleinem Atelierbeitrag für deinen Platz</dd></div>
           </dl>
+          <p class="event-sort">Das Pottery-bemalen-Sortiment</p>
           <ul class="event-pieces" id="event-pieces"></ul>
           <div class="event-how">
-            <p><b>So meldest du dich an:</b> Tag aussuchen, Atelierbeitrag online bezahlen und dein Stück gleich mitbuchen. Gefällt dir vor Ort noch mehr, rechnen wir es im Atelier ab.</p>
+            <p><b>So meldest du dich an:</b> Tag aussuchen und dein Stück gleich mitbuchen, alle Preise siehst du bei der Anmeldung. Gefällt dir vor Ort noch mehr, rechnen wir es im Atelier ab.</p>
             <p class="event-start" id="event-start">Die Anmeldung startet am <b>19. Oktober</b>. Trag dich in die FORMA Post ein, dann sag ich dir Bescheid, sobald es losgeht.</p>
           </div>
           </div>
@@ -1601,7 +1630,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="maker-done" id="maker-done" hidden></p>
         </div>
         <div class="maker-art" id="maker-art" aria-hidden="true">
-          <img id="maker-img" alt="" hidden>
+          <img id="maker-img" alt="Vorschau: Template des Monats im Maker Club" hidden>
         </div>
       </div>
     </div>
@@ -1623,7 +1652,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <li><b>3</b><span>PDF herunterladen</span></li>
         </ol>
         </div>
-        <img class="shop-art" id="shop-art" src="img/shop-herbst.svg" alt="">
+        <img class="shop-art" id="shop-art" src="img/shop-herbst.svg" alt="Illustration: Templates im Herbst-Shop">
       </div>
       <div class="tpl-filters" id="tpl-filters" hidden>
         <div class="chips" id="tpl-season" role="group" aria-label="Jahreszeit"></div>
@@ -1658,11 +1687,11 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <span class="team-ic t4" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 4c2 15 12 25 28 28-16 3-26 13-28 28-2-15-12-25-28-28 16-3 26-13 28-28z" fill="#F1D9C6"/></svg></span>
         <div class="team-photo-wrap">
           <span class="team-seal" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><path id="team-c" d="M60 60m-42 0a42 42 0 1 1 84 0a42 42 0 1 1-84 0"></path></defs><text><textPath href="#team-c" textLength="258" lengthAdjust="spacingAndGlyphs">Teamevent · Feiern · Vereine · Teamevent ·</textPath></text></svg><b>4–8</b><i>Personen</i></span>
-        <div class="team-photos" aria-hidden="true">
-          <img class="on" src="img/toepferscheiben.jpg" alt="" loading="lazy">
-          <img src="img/scheiben-abend.jpg" alt="" loading="lazy">
-          <img src="img/atelier-ecke.jpg" alt="" loading="lazy">
-          <img src="img/scheiben-studio.jpg" alt="" loading="lazy">
+        <div class="team-photos">
+          <img class="on" src="img/toepferscheiben.jpg" alt="Töpferscheiben im FORMA Studio" loading="lazy">
+          <img src="img/scheiben-abend.jpg" alt="Das Studio am Abend mit warmem Licht" loading="lazy">
+          <img src="img/atelier-ecke.jpg" alt="Gemütliche Ecke im Atelier" loading="lazy">
+          <img src="img/scheiben-studio.jpg" alt="Arbeitsplätze an den Drehscheiben" loading="lazy">
         </div>
         </div>
       </div>
@@ -1680,14 +1709,14 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <div class="faq">
         <details class="faq-item"><summary>Brauche ich Vorkenntnisse?</summary><p>Für Spin &amp; Go, die Pottery Pause und Private Pottery nicht, ich begleite dich von Anfang an. Das offene Atelier ist für alle, die schon Erfahrung haben und selbstständig arbeiten möchten.</p></details>
         <details class="faq-item"><summary>Wie buche ich einen Kurs?</summary><p>Tipp oben bei „Kurse &amp; Workshops“ auf den Kurs, such dir im Kalender einen Tag aus und bezahl bequem online. Die Bestätigung kommt sofort per E-Mail. Im offenen Atelier wählst du dazu, welche Stunden du bleiben möchtest, und zahlst ebenfalls online. Anmeldeschluss ist immer am Vorabend um 17 Uhr.</p></details>
-        <details class="faq-item"><summary>Ab wie vielen Personen findet Spin &amp; Go statt?</summary><p>Spin &amp; Go findet ab 2 Personen statt. Am schönsten ist es, wenn du gleich eine Freundin mitbringst.</p></details>
+        <details class="faq-item"><summary>Ab wie vielen Personen findet Spin &amp; Go statt?</summary><p>Spin &amp; Go findet ab 2 Personen statt. Am schönsten ist es, wenn du gleich eine Freundin mitbringst. Sind bis zum Vorabend um 17 Uhr zu wenige angemeldet, melde ich mich bei dir: Du kannst dann mit einem Klick kostenlos auf einen anderen Termin wechseln oder stornieren. Beim Stornieren bekommst du dein Geld zurück und als Dankeschön einen kleinen Gutschein für deine nächste Buchung.</p></details>
         <details class="faq-item"><summary>Was ist im Preis enthalten?</summary><p>Bei Spin &amp; Go ist ein Werkstück inklusive. Bei Private Pottery ist dein komplettes Werkstück enthalten, Aufwand und Umfang besprechen wir vorher gemeinsam. Im offenen Atelier nutzt du das Studio vor Ort als deinen kreativen Workspace. Für die Fertigstellung deiner Werkstücke wird eine Gebühr von € 25 pro Kilo erhoben, die bei Abholung abgerechnet wird.</p></details>
         <details class="faq-item"><summary>Was soll ich anziehen?</summary><p>Am besten bequeme Kleidung, die ruhig etwas Ton abbekommen darf. Kurze Fingernägel machen das Arbeiten an der Töpferscheibe leichter.</p></details>
         <details class="faq-item"><summary>Wann kann ich meine Stücke mitnehmen?</summary><p>Deine Werkstücke brauchen nach dem Kurs noch Zeit zum Trocknen und für die Fertigstellung, das dauert meist 3–4 Wochen. Ich melde mich bei dir, sobald deine Stücke fertig zum Abholen sind.</p></details>
         <details class="faq-item"><summary>Ich bin nur im Urlaub hier. Was passiert mit meinem Werkstück?</summary><p>Deine Werkstücke holst du nach 3–4 Wochen bei mir im Atelier ab, verschicken kann ich sie leider nicht. Wenn du nicht noch einmal vorbeikommen kannst, darfst du dir nach deinem Spin &amp; Go stattdessen ein kleines Accessoire aus meiner aktuellen Saisonkollektion aussuchen, als Andenken an deine Zeit im FORMA.</p></details>
         <details class="faq-item"><summary>Ich weiß noch nicht genau, was ich machen möchte.</summary><p>Dann schick mir bei Private Pottery einfach eine unverbindliche Anfrage. Ich sehe mir deine Idee an und melde mich mit einem Vorschlag, wie lange wir brauchen.</p></details>
         <details class="faq-item"><summary>Kann ich mit einer Gruppe kommen?</summary><p>Gern! Für Geburtstage, Freundinnen-Abende oder Teamevents schreib mir einfach, dann finden wir gemeinsam das Passende.</p></details>
-        <details class="faq-item"><summary>Wie funktionieren die Gutscheine?</summary><p>Du wählst Kurs und Menge, schreibst eine persönliche Nachricht dazu und bezahlst online. Den Gutschein bekommst du sofort als PDF zum Ausdrucken oder Verschicken.</p></details>
+        <details class="faq-item"><summary>Wie funktionieren die Gutscheine?</summary><p>Du wählst Kurs und Menge, schreibst eine persönliche Nachricht dazu und bezahlst online. Den Gutschein bekommst du sofort als PDF zum Ausdrucken oder Verschicken. Darauf steht ein persönlicher Gutscheincode: Bei der Online-Buchung gibst du ihn vor dem Bezahlen ein, und der Wert wird gleich abgezogen. Ist alles gedeckt, ist deine Buchung sofort fix. Die Gutscheine haben kein Ablaufdatum, ein Restwert bleibt erhalten, eine Barauszahlung ist nicht möglich.</p></details>
         <details class="faq-item"><summary>Wie bekomme ich ein Template aus dem Shop?</summary><p>Nach dem Bezahlen lädst du dein Template direkt als PDF herunter, den Link bekommst du zusätzlich per E-Mail. Im Maker Club gibt es außerdem jeden Monat ein Template gratis.</p></details>
       </div>
     </div>
@@ -1711,17 +1740,21 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       </div>
       <div class="week">
         <div class="week-hours">
-          <p class="eyebrow">Öffnungszeiten</p>
+          <p class="eyebrow">Atelier-Öffnungszeiten</p>
           <p class="big">Mittwoch bis Freitag<br>8–11:30 Uhr</p>
-          <p class="hours-note" style="margin:10px 0 0;font-size:.9em;opacity:.85">An Wochenenden und Feiertagen bleibt das Studio geschlossen.</p>
+          <p class="hours-note" style="margin:10px 0 0;font-size:.9em;opacity:.85">Alle Kurse finden laut Kursplan statt. An Wochenenden und Feiertagen bleibt das Studio geschlossen.</p>
         </div>
-        <p class="week-label" style="margin-bottom:6px">Kurse &amp; Atelier</p>
+        <p class="week-label" style="margin-bottom:6px">Kurse laut Plan</p>
         <ul class="week-plan">
           <li><span class="day">Mittwoch</span><span class="what">Spin &amp; Go</span><span class="when">9–11 Uhr</span></li>
           <li><span class="day">Donnerstag</span><span class="what">Offenes Atelier</span><span class="when">8–11 Uhr</span></li>
           <li><span class="day">Freitag</span><span class="what">Spin &amp; Go</span><span class="when">9–11 Uhr</span></li>
-          <li><span class="day">Freitagabend</span><span class="what">Pottery Pause</span><span class="when">18–20 Uhr</span></li>
           <li><span class="day">Individuell</span><span class="what">Private Pottery</span><span class="when">nach Vereinbarung</span></li>
+        </ul>
+        <p class="week-label" style="margin:14px 0 6px">Specials</p>
+        <ul class="week-plan">
+          <li><span class="day">6. 11. – 4. 12.</span><span class="what">Pottery Pause · 5-Wochen-Special</span><span class="when">Fr 18–20 Uhr</span></li>
+          <li><span class="day">Advent</span><span class="what">Pottery bemalen</span><span class="when">Mi &amp; Do 15–18 Uhr</span></li>
         </ul>
       </div>
     </div>
@@ -2006,7 +2039,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     ['daumen','Mug mit Daumendruck',1800,'',ic('<path d="M18 10h28v30a8 8 0 01-8 8H26a8 8 0 01-8-8z" fill="'+cR+'"/><ellipse cx="38" cy="26" rx="5.5" ry="7" fill="'+cB+'"/><path d="M35 22c2-1 4-1 6 1M34 26c2-1 5-1 7 1M35 30c2-1 4-1 6 0" stroke="'+cR+'" stroke-width="1.4" fill="none" stroke-linecap="round"/>')],
     ['formamug','FORMA Mug',2200,'ohne Henkel, mit Wellen, Schraffur oder Kerben',ic('<path d="M17 8h30v32a9 9 0 01-9 9H26a9 9 0 01-9-9z" fill="'+cR+'"/><path d="M17 20c5-4 10 4 15 0s10-4 15 0M17 30c5-4 10 4 15 0s10-4 15 0" stroke="'+cP+'" stroke-width="2.4" fill="none"/><path d="M22 40l3-4M28 40l3-4M34 40l3-4" stroke="'+cB+'" stroke-width="2" stroke-linecap="round"/>')]
   ];
-  (function(){var ul=$('event-pieces');if(ul)BEMALEN_ITEMS.forEach(function(it){var li=document.createElement('li');li.innerHTML=it[4];var t=el('span',null,it[1]);t.appendChild(el('i',null,euro(it[2])));li.appendChild(t);ul.appendChild(li);});
+  (function(){var ul=$('event-pieces');if(ul)BEMALEN_ITEMS.forEach(function(it){var li=document.createElement('li');li.innerHTML=it[4];var t=el('span',null,it[1]);li.appendChild(t);ul.appendChild(li);});
     var open=new Date()>=new Date('2026-10-19T00:00:00+02:00'),btn=$('event-btn'),st=$('event-start');
     if(open&&btn){btn.textContent='Platz reservieren';btn.href='#angebote';btn.setAttribute('data-book','Pottery bemalen');if(st)st.innerHTML='Die Anmeldung ist offen. Die Plätze sind begrenzt, such dir gleich deinen Nachmittag aus.';}
   })();
@@ -2179,7 +2212,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     pSub.textContent=ask?'Anfrage senden':'Weiter zur Bezahlung · '+euro(6500*pHours());
     $('p-title').textContent=ask?'Erzähl mir von deinem Projekt':'Dein Projekt, gemeinsam umgesetzt';
     $('p-meta').textContent=ask?'Beschreib mir kurz, was du gestalten möchtest. Ich sehe es mir an und melde mich mit einem Vorschlag, wie lange wir brauchen und wann wir loslegen. Kostenlos und unverbindlich.':'Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inklusive deinem fix fertigen Werkstück, Material und Fertigstellung.';
-    $('p-hours-set').hidden=ask;$('p-switch').hidden=!ask;$('p-storno').hidden=ask;
+    $('p-hours-set').hidden=ask;$('p-switch').hidden=!ask;$('p-storno').hidden=ask;$('p-gs').hidden=ask;
     $('p-leg-proj').textContent=(ask?'1':'2')+' · Was möchtest du gestalten?';
     $('p-leg-when').textContent=(ask?'2':'3')+' · Wann passt es '+(pTeam?'euch':'dir')+'?';
     $('p-leg-you').textContent=(ask?'3':'4')+' · Deine Angaben';
@@ -2283,10 +2316,10 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       if(t.description)b.appendChild(el('p',null,t.description));
       var lv=el('span','tpl-level'),bars=el('span','bars');lv.title='Schwierigkeit';for(var n=1;n<=3;n++)bars.appendChild(el('i',n<=t.level?'on':null));lv.appendChild(bars);lv.appendChild(document.createTextNode(['Einfach','Mittel','Anspruchsvoll'][t.level-1]));b.appendChild(lv);
       var f=el('div','tpl-foot');f.appendChild(el('b',null,euro(t.price_cents)));
-      var btn=el('button','btn btn-solid',t.buyable?'Kaufen':'Bald erhältlich');btn.type='button';
-      if(t.buyable)btn.addEventListener('click',function(){tplOpen(t);});else{btn.disabled=true;btn.style.opacity='.55';}
+      var btn=el('button',t.buyable?'btn btn-solid':'btn btn-ghost',t.buyable?'Kaufen':'Ansehen');btn.type='button';
+      btn.addEventListener('click',function(){tplOpen(t);});
       f.appendChild(btn);b.appendChild(f);c.appendChild(b);grid.appendChild(c);
-      if(t.buyable){c.classList.add('clickable');c.addEventListener('click',function(e){if(e.target.closest('button,a,.tpl-track'))return;tplOpen(t);});}
+      c.classList.add('clickable');c.addEventListener('click',function(e){if(e.target.closest('button,a,.tpl-track'))return;tplOpen(t);});
     });
     // Schaufenster: erst 3 Templates, der Rest auf Klick
     var SHOW=3;
@@ -2327,8 +2360,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   var infoD=$('info-dialog');function infoOpen(t,x){$('info-title').textContent=t;$('info-text').textContent=x;show(infoD);}
   $('info-close').addEventListener('click',function(){hide(infoD);});infoD.addEventListener('click',function(e){if(e.target===infoD)hide(infoD);});
   var td=$('tpl-dialog'),tf=$('tpl-form');
-  function tplOpen(t){tplCur=t;tf.hidden=false;
-    var srcs=[t.image||('img/tpl-'+t.season+'.jpg')].concat(t.slides||[]),main=$('tpl-main'),th=$('tpl-thumbs');main.src=srcs[0];main.alt='Vorschau: '+t.title;th.innerHTML='';
+  function tplOpen(t){tplCur=t;tf.hidden=false;$('tpl-buy').hidden=!t.buyable;$('tpl-soon').hidden=!!t.buyable;
+    var srcs=[t.image||('img/tpl-'+t.season+'.jpg')].concat(t.slides||[]),main=$('tpl-main'),th=$('tpl-thumbs');main.onerror=function(){main.onerror=null;main.src='img/tpl-'+(t.season||'ganzjaehrig')+'.jpg';};main.src=srcs[0];main.alt='Vorschau: '+t.title;th.innerHTML='';
     if(srcs.length>1)srcs.forEach(function(src,n){var b=document.createElement('button');b.type='button';b.className=n?'':'on';b.setAttribute('aria-label','Bild '+(n+1));var i=document.createElement('img');i.src=src;i.alt='';b.appendChild(i);b.onclick=function(){main.src=src;[].forEach.call(th.children,function(x){x.className='';});b.className='on';};th.appendChild(b);});
     $('tpl-desc').textContent=t.description||'';
     var lvT=['','Einfach','Mittel','Für Fortgeschrittene'];$('tpl-lv').textContent='Schwierigkeit: '+(lvT[t.level]||'Einfach')+(t.age_label&&t.age&&t.age.indexOf('kinder')===0?' · '+t.age_label:'');$('tpl-done').hidden=true;$('tpl-error').hidden=true;$('tpl-id').value=t.id;$('tpl-title').textContent=t.title;$('tpl-meta').textContent=t.season_label+(t.langs?' · '+t.langs:'')+' · digitaler Download (PDF) · '+euro(t.price_cents);$('tpl-submit').textContent='Weiter zur Bezahlung · '+euro(t.price_cents);show(td);}
@@ -2642,6 +2675,22 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       var q=document.createElement('blockquote');q.textContent='„'+r.text+'“';c.appendChild(q);
       var f=document.createElement('figcaption');var ci=document.createElement('cite');ci.textContent=r.name;if(r.date){var sp=document.createElement('span');sp.textContent=' · '+r.date+' auf Google';ci.appendChild(sp);}f.appendChild(ci);c.appendChild(f);box.appendChild(c);});
     document.getElementById('stimmen').hidden=false;})();
+
+  // Gutscheincode prüfen (angerechnet wird erst beim Buchen am Server)
+  document.querySelectorAll('.gs-box').forEach(function(box){
+    var inp=box.querySelector('.gs-code'),btn=box.querySelector('.gs-check'),msg=box.querySelector('.gs-msg');
+    function show(ok,txt){msg.hidden=false;msg.className='gs-msg '+(ok?'ok':'err');msg.textContent=txt;}
+    inp.addEventListener('input',function(){msg.hidden=true;});
+    btn.addEventListener('click',function(){
+      var c=inp.value.trim();if(!c){show(false,'Bitte gib deinen Gutscheincode ein.');return;}
+      btn.disabled=true;var fd=new FormData();fd.append('code',c);
+      fetch('api/gutschein-check.php',{method:'POST',body:fd}).then(function(r){return r.json().catch(function(){return {ok:false};});}).then(function(d){
+        btn.disabled=false;
+        if(d&&d.ok)show(true,'✓ Gutschein gefunden: '+d.balance+' werden bei deiner Buchung abgezogen. Ist der Betrag damit gedeckt, brauchst du gar nicht zu bezahlen.');
+        else show(false,(d&&d.error)||'Das hat leider nicht geklappt.');
+      }).catch(function(){btn.disabled=false;show(false,'Das hat leider nicht geklappt.');});
+    });
+  });
   // Ausklappen (am Handy): Knopf zeigt/verbirgt den folgenden Bereich
   document.querySelectorAll('.more-btn').forEach(function(b){
     var w=b.nextElementSibling,label=b.textContent;

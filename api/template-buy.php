@@ -25,7 +25,7 @@ $pdo = forma_db();
 $stmt = $pdo->prepare("SELECT * FROM templates WHERE id = ? AND visible = 1 AND file != ''");
 $stmt->execute([$id]);
 $t = $stmt->fetch();
-if (!$t || !forma_stripe_key() || (int)$t['price_cents'] <= 0) {
+if (!$t || !forma_stripe_key() || (int)$t['price_cents'] <= 0 || forma_setting($pdo, 'shop_open') !== '1') {
     forma_json(['ok' => false, 'error' => 'Dieses Template kann gerade nicht gekauft werden.'], 404);
 }
 $token = bin2hex(random_bytes(16));

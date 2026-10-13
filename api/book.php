@@ -31,6 +31,8 @@ $message  = forma_clean((string)($in['message'] ?? ''), 1000);
 $ref = forma_clean((string)($in['ref'] ?? ''), 60);
 if ($ref !== '') $message = mb_substr('Empfohlen von: ' . $ref . ($message !== '' ? ' · ' . $message : ''), 0, 1000);
 $consent  = !empty($in['consent']);
+$noPost   = !empty($in['no_post']) ? 1 : 0;
+$voucherCode = forma_clean((string)($in['voucher'] ?? ''), 40);
 
 $errors = [];
 if ($courseId <= 0) $errors[] = 'Bitte wähle einen Kurs.';
@@ -50,6 +52,14 @@ try {
     $stmt->execute([$ipHash, date('c', time() - 3600)]);
     if ((int)$stmt->fetchColumn() >= 6) {
         forma_json(['ok' => false, 'error' => 'Es sind gerade sehr viele Anmeldungen eingegangen. Bitte melde dich telefonisch unter ' . FORMA_PHONE . '.'], 429);
+    }
+
+    // Gutscheincode vorab prüfen (außerhalb der Transaktion, damit die Bremse gegen Durchprobieren greift)
+    $voucher = null;
+    if ($voucherCode !== '') {
+        $lk = forma_voucher_lookup($pdo, $voucherCode);
+        if (!$lk['ok']) forma_json(['ok' => false, 'error' => $lk['error']], 422);
+        $voucher = $lk['voucher'];
     }
 
     $pdo->exec('BEGIN IMMEDIATE');
@@ -104,13 +114,22 @@ try {
         $priceCents = 0;
     }
     $piecesCents = array_sum(array_map(fn($i) => $i['qty'] * $i['cents'], $pieces));
-    $online = ($priceCents > 0 || $piecesCents > 0) && forma_stripe_key() !== null;
+    $total = $priceCents * $persons + $piecesCents;   // Preis wird immer hier am Server berechnet
+    $vUse = $voucher ? min(forma_voucher_balance($pdo, $voucher), $total) : 0;
+    if ($voucher && $vUse <= 0) {
+        $pdo->exec('ROLLBACK');
+        forma_json(['ok' => false, 'error' => $total > 0 ? 'Dieser Gutschein ist schon vollständig eingelöst.' : 'Für diesen Termin ist kein Betrag zu bezahlen, der Gutschein bleibt dir erhalten.'], 422);
+    }
+    $cash = $total - $vUse;
+    $online = $cash > 0 && forma_stripe_key() !== null;
     $payToken = bin2hex(random_bytes(16));
-    $pdo->prepare('INSERT INTO bookings (course_id, name, email, phone, persons, message, status, ip_hash, created_at, amount_cents, pay_token, extras)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    $pdo->prepare('INSERT INTO bookings (course_id, name, email, phone, persons, message, status, ip_hash, created_at, amount_cents, pay_token, extras, voucher_id, voucher_cents, no_post, paid_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
         ->execute([$courseId, $name, $email, $phone, $persons, $message, $online ? 'offen' : 'bestaetigt', $ipHash, date('c'),
-            $online ? $priceCents * $persons + $piecesCents : 0, $payToken, $pieces ? json_encode($pieces, JSON_UNESCAPED_UNICODE) : '']);
+            $online ? $cash : 0, $payToken, $pieces ? json_encode($pieces, JSON_UNESCAPED_UNICODE) : '', $voucher ? (int)$voucher['id'] : null, $vUse, $noPost,
+            (!$online && $vUse > 0) ? date('c') : null]);
     $bookingId = (int)$pdo->lastInsertId();
+    if ($voucher) forma_voucher_use($pdo, (int)$voucher['id'], 'kurs', $bookingId, $vUse, !$online);
     $pdo->exec('COMMIT');
 } catch (Throwable $e) {
     if (isset($pdo) && $pdo->inTransaction()) {
@@ -134,7 +153,10 @@ try {
         'customer_email' => $email,
         'client_reference_id' => (string)$bookingId,
         'metadata' => ['booking_id' => (string)$bookingId, 'kurs' => $course['title'], 'termin' => $course['date_text']],
-        'line_items' => array_merge($priceCents <= 0 ? [] : [[
+        'line_items' => $vUse > 0 ? [[
+            'quantity' => 1,
+            'price_data' => ['currency' => 'eur', 'unit_amount' => $cash, 'product_data' => ['name' => $course['title'] . ' · Restbetrag', 'description' => $course['date_text'] . ' · Gesamt ' . forma_euro($total) . ', davon ' . forma_euro($vUse) . ' mit Gutschein bezahlt']],
+        ]] : array_merge($priceCents <= 0 ? [] : [[
             'quantity' => $persons,
             'price_data' => [
                 'currency' => 'eur',

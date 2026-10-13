@@ -60,3 +60,22 @@ input,select,textarea{min-width:0;max-width:100%;box-sizing:border-box}
 
 .fold{display:none}.fold.open{display:block;animation:gfade .3s ease}.fold-btn{margin-top:6px}@keyframes gfade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 .fold-btn[hidden]{display:none!important}
+.post-note{font-size:15px;color:var(--soft,#674B40);margin:10px 0 0;line-height:1.5}
+.gs-box{border:1.5px dashed #D9C5B2;border-radius:18px;padding:10px 14px;margin:14px 0 4px;background:rgba(255,255,255,.5)}
+.gs-box summary{cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:500;color:#8C2C1D;list-style:none}
+.gs-box summary::-webkit-details-marker{display:none}
+.gs-box summary svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.gs-row{display:flex;gap:8px;margin-top:10px}.gs-row input{flex:1;min-width:0;text-transform:uppercase;letter-spacing:.05em}
+.gs-row .btn{padding:10px 18px;white-space:nowrap;margin:0}
+.gs-msg{margin:8px 0 2px;font-size:15px}.gs-msg.ok{color:#4F6B3F}.gs-msg.err{color:#9b1c1c}
+.cal{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;margin:14px 0 6px}
+.cal-m{background:#fff;border-radius:20px;padding:14px 14px 12px;box-shadow:0 1px 0 #E4D2BF}
+.cal-t{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;color:#8C2C1D;margin:0 0 8px;text-align:center;font-size:18px}
+.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal-h{font-size:12.5px;color:#674B40;letter-spacing:.04em;padding-bottom:2px}
+.cal-d{font-size:15px;color:#B8A090;padding:7px 0;border-radius:50%}.cal-d.past{opacity:.45}
+.cal-on{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1;border-radius:50%;background:#8C2C1D;color:#FBF1EA!important;font-weight:600;font-size:15px;text-decoration:none;border:0;cursor:pointer;font-family:inherit;padding:0;width:100%}
+.cal-on small{display:block;font-size:9.5px;font-weight:400;line-height:1;opacity:.9;margin-top:1px}
+.cal-on:hover,.cal-on:focus-visible{background:#33211B;outline:none}
+.cal-on.few{background:#674B40}
+.cal-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:#674B40;margin:6px 0 0}.cal-legend i{display:inline-block;width:12px;height:12px;border-radius:50%;background:#8C2C1D;margin-right:6px;vertical-align:-1px}

@@ -14,6 +14,9 @@ if (!$o || $token === '' || !hash_equals((string)$o['token'], $token)) {
 if ($o['status'] === 'offen') {
     try { forma_template_check($pdo, $o); $stmt->execute([$id]); $o = $stmt->fetch(); } catch (Throwable $e) {}
 }
+if ($o['status'] === 'bezahlt' && $o['paid_at'] && strtotime((string)$o['paid_at']) < time() - FORMA_TEMPLATE_LINK_DAYS * 86400) {
+    forma_message_page('Dieser Link ist abgelaufen', "Download-Links gelten " . FORMA_TEMPLATE_LINK_DAYS . " Tage. Dein Template „{$o['title']}“ findest du aber als PDF im Anhang deiner Kauf-Mail.\n\nDu findest die Mail nicht mehr? Schreib mir an hello@forma-pottery.com, dann schicke ich es dir gern noch einmal.");
+}
 $lang = (string)($_GET['lang'] ?? '');
 if ($o['status'] === 'bezahlt' && (string)$o['file_en'] !== '' && $lang === '') {
     $base = '/api/template-download.php?o=' . $id . '&k=' . rawurlencode($token);

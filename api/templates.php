@@ -4,7 +4,7 @@ declare(strict_types=1);
 require __DIR__ . '/lib.php';
 try {
     $pdo = forma_db();
-    $online = forma_stripe_key() !== null;
+    $online = forma_stripe_key() !== null && forma_setting($pdo, 'shop_open') === '1';
     $out = [];
     foreach ($pdo->query('SELECT * FROM templates WHERE visible = 1 ORDER BY sort, id DESC')->fetchAll() as $t) {
         $out[] = ['id' => (int)$t['id'], 'title' => $t['title'], 'description' => $t['description'], 'season' => $t['season'],

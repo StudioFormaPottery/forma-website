@@ -462,6 +462,34 @@ if ($action === 'save_popup') {
     go($self . '?view=popup', $p['active'] ? (forma_popup_live($p) ? 'Gespeichert. Das Pop-up ist jetzt auf der Website zu sehen.' : 'Gespeichert. Das Pop-up erscheint im eingestellten Zeitraum.') : 'Gespeichert. Das Pop-up ist ausgeschaltet.');
 }
 
+if ($action === 'min_decide') {
+    $cid = (int)($_POST['id'] ?? 0);
+    forma_min_schema($pdo);
+    if (($_POST['to'] ?? '') === 'statt') {
+        $pdo->prepare("UPDATE courses SET min_status = 'findet_statt', min_at = ? WHERE id = ?")->execute([date('c'), $cid]);
+        go($self . '?view=course&id=' . $cid, 'Gespeichert: Der Kurs findet statt. Die Gäste bekommen keine Nachricht.');
+    }
+    $n = forma_min_inform($pdo, $cid);
+    go($self . '?view=course&id=' . $cid, $n === 1 ? 'Der Gast ist informiert und kann jetzt selbst umbuchen oder stornieren.' : "$n Gäste sind informiert und können jetzt selbst umbuchen oder stornieren.");
+}
+
+if ($action === 'voucher_partial') {
+    $vid = (int)($_POST['vid'] ?? 0);
+    $cents = (int)round((float)str_replace(',', '.', (string)($_POST['eur'] ?? '0')) * 100);
+    $st = $pdo->prepare("SELECT * FROM vouchers WHERE id = ? AND status = 'bezahlt'");
+    $st->execute([$vid]);
+    $v = $st->fetch();
+    if (!$v || $cents <= 0) go($self . '?view=gutscheine', 'Bitte gib einen Betrag ein.');
+    $bal = forma_voucher_balance($pdo, $v);
+    if ($cents > $bal) go($self . '?view=gutscheine', 'Auf diesem Gutschein sind nur noch ' . forma_euro($bal) . ' offen.');
+    $pdo->exec('BEGIN IMMEDIATE');
+    $pdo->prepare("INSERT INTO voucher_uses (voucher_id, ref_kind, ref_id, cents, status, note, created_at) VALUES (?, 'atelier', 0, ?, 'eingeloest', ?, ?)")
+        ->execute([$vid, $cents, forma_clean((string)($_POST['note'] ?? ''), 120), date('c')]);
+    forma_voucher_after_use($pdo, $vid);
+    $pdo->exec('COMMIT');
+    go($self . '?view=gutscheine', forma_euro($cents) . ' abgezogen. Restwert: ' . forma_euro($bal - $cents) . '.');
+}
+
 if ($action === 'voucher_status') {
     $vid = (int)($_POST['vid'] ?? 0);
     $redeem = ($_POST['to'] ?? '') === 'eingeloest';
@@ -488,6 +516,12 @@ if ($action === 'save_maker') {
     $m['month'] = date('Y-m');
     forma_set_setting($pdo, 'maker', json_encode($m, JSON_UNESCAPED_UNICODE));
     go($self . '?view=templates', 'Das Template des Monats ist gespeichert' . ($m['file'] ? ' und auf der Website verfügbar.' : '. Lade noch die PDF hoch, damit man es herunterladen kann.'));
+}
+
+if ($action === 'shop_toggle') {
+    $open = forma_setting($pdo, 'shop_open') === '1';
+    forma_set_setting($pdo, 'shop_open', $open ? '0' : '1');
+    go($self . '?view=templates', $open ? 'Der Shop ist geschlossen. Das Kauffenster ist ausgeblendet.' : 'Der Shop ist geöffnet. Templates können jetzt online gekauft werden.');
 }
 
 if ($action === 'save_template') {
@@ -831,6 +865,11 @@ if ($view === 'templates') {
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Templates &amp; Maker Club</h1>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <form method="post" class="card" style="display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="shop_toggle">
+            <span><strong>Template-Shop: <?= forma_setting($pdo, 'shop_open') === '1' ? 'geöffnet' : 'noch geschlossen' ?></strong><br><span class="muted small"><?= forma_setting($pdo, 'shop_open') === '1' ? 'Gäste können Templates online kaufen.' : 'Gäste sehen die Templates, aber noch kein Kauffenster („Bald im Shop“).' ?></span></span>
+            <button class="btn<?= forma_setting($pdo, 'shop_open') === '1' ? ' btn-ghost' : '' ?>" type="submit"><?= forma_setting($pdo, 'shop_open') === '1' ? 'Shop wieder schließen' : 'Shop jetzt öffnen' ?></button>
+        </form>
         <h2>FORMA Maker Club · Template des Monats</h2>
         <form method="post" enctype="multipart/form-data" class="card stack">
             <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="save_maker">
@@ -1088,29 +1127,35 @@ if ($view === 'private') {
 if ($view === 'gutscheine') {
     forma_reconcile_payments($pdo, true);
     $vs = $pdo->query("SELECT * FROM vouchers WHERE status IN ('bezahlt','eingeloest') ORDER BY id DESC")->fetchAll();
-    $sum = array_sum(array_column($vs, 'amount_cents'));
+    $sold = array_filter($vs, fn($x) => ($x['kind'] ?? 'kauf') === 'kauf');
+    $sum = array_sum(array_column($sold, 'amount_cents'));
     render_page('Gutscheine', function () use ($self, $flash, $vs, $sum) { ?>
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Gutscheine</h1>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <div class="card stack">
-            <p><strong><?= count($vs) ?></strong> verkaufte Gutscheine · zusammen <strong><?= forma_h(forma_euro((int)$sum)) ?></strong></p>
-            <p class="muted small">Jeder online gekaufte Gutschein bekommt automatisch eine fortlaufende Nummer. Wenn jemand einen Gutschein einlöst, markierst du ihn hier als eingelöst. Die Liste kannst du für die Buchhaltung herunterladen.</p>
+            <p><strong><?= count(array_filter($vs, fn($x) => ($x['kind'] ?? 'kauf') === 'kauf')) ?></strong> verkaufte Gutscheine · zusammen <strong><?= forma_h(forma_euro((int)$sum)) ?></strong></p>
+            <p class="muted small">Jeder bezahlte Gutschein bekommt automatisch eine fortlaufende Nummer und einen geheimen Code. Mit dem Code lösen Gäste ihn online bei der Buchung ein, das wird hier automatisch abgezogen. Löst jemand im Atelier ein, ziehst du den Betrag hier selbst ab. Der Restwert bleibt auf dem Gutschein.</p>
             <p><a class="btn" href="<?= forma_h($self) ?>?view=gutscheine_export">Liste herunterladen (CSV)</a></p>
         </div>
         <div class="list" style="margin-top:16px">
         <?php foreach ($vs as $v): $done = $v['status'] === 'eingeloest'; ?>
             <div class="card booking<?= $done ? ' is-cancelled' : '' ?>">
-                <div class="booking-head"><strong><?= forma_h($v['nr']) ?></strong><span class="pill<?= $done ? '' : ' pill-ok' ?>"><?= $done ? 'eingelöst am ' . forma_h(date('d. m. Y', strtotime($v['redeemed_at']))) : 'offen' ?></span></div>
+                <?php $bal = forma_voucher_balance($GLOBALS['pdo'], $v); $uses = $GLOBALS['pdo']->prepare("SELECT * FROM voucher_uses WHERE voucher_id = ? AND status != 'frei' ORDER BY id"); $uses->execute([$v['id']]); $uses = $uses->fetchAll(); ?>
+                <div class="booking-head"><strong><?= forma_h($v['nr']) ?><?= ($v['kind'] ?? 'kauf') !== 'kauf' ? ' · Geschenk von dir' : '' ?></strong><span class="pill<?= $done ? '' : ' pill-ok' ?>"><?= $done ? 'eingelöst' . ($v['redeemed_at'] ? ' am ' . forma_h(date('d. m. Y', strtotime($v['redeemed_at']))) : '') : ($bal < (int)$v['amount_cents'] ? 'Restwert ' . forma_h(forma_euro($bal)) : 'offen') ?></span></div>
                 <div><?= forma_h(forma_voucher_title($v)) ?> · <?= forma_h(forma_euro((int)$v['amount_cents'])) ?></div>
+                <div class="small">Code: <span class="sel" style="font-weight:600;letter-spacing:.04em"><?= forma_h((string)$v['code']) ?></span></div>
+                <?php foreach ($uses as $u): ?><div class="muted small">− <?= forma_h(forma_euro((int)$u['cents'])) ?> <?= $u['ref_kind'] === 'atelier' ? 'im Atelier eingelöst' : 'online eingelöst' ?><?= $u['status'] === 'reserviert' ? ' (Zahlung läuft gerade)' : '' ?> · <?= forma_h(date('d. m. Y', strtotime($u['created_at']))) ?><?= $u['note'] !== '' ? ' · ' . forma_h($u['note']) : '' ?></div><?php endforeach; ?>
                 <?php if ($v['recipient'] || $v['sender']): ?><div class="muted small"><?= $v['recipient'] ? 'Für ' . forma_h($v['recipient']) : '' ?><?= $v['recipient'] && $v['sender'] ? ' · ' : '' ?><?= $v['sender'] ? 'von ' . forma_h($v['sender']) : '' ?></div><?php endif; ?>
                 <div class="muted small">Gekauft am <?= forma_h(date('d. m. Y', strtotime($v['paid_at']))) ?> von <?= forma_h($v['buyer_name']) ?></div>
                 <div class="sel small"><?= forma_h($v['buyer_email']) ?></div>
                 <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
                     <a href="<?= forma_h(forma_voucher_link($v)) ?>" target="_blank" rel="noopener">PDF ansehen</a>
                     <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="voucher_status"><input type="hidden" name="vid" value="<?= (int)$v['id'] ?>"><input type="hidden" name="to" value="<?= $done ? 'bezahlt' : 'eingeloest' ?>">
-                    <button class="link" type="submit"><?= $done ? 'Doch nicht eingelöst' : 'Als eingelöst markieren' ?></button></form>
+                    <button class="link" type="submit"><?= $done ? 'Doch nicht eingelöst' : 'Ganz als eingelöst markieren' ?></button></form>
                 </div>
+                <?php if (!$done && $bal > 0): ?><form method="post" class="vredeem"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="voucher_partial"><input type="hidden" name="vid" value="<?= (int)$v['id'] ?>">
+                    <label class="small">Im Atelier einlösen: Betrag in €<input name="eur" inputmode="decimal" placeholder="z. B. 30" style="max-width:120px"></label><input name="note" placeholder="wofür? (optional)" class="small" style="max-width:220px"><button class="btn btn-ghost" type="submit" style="padding:7px 16px">Abziehen</button></form><?php endif; ?>
             </div>
         <?php endforeach; ?>
         <?php if (!$vs): ?><p class="muted">Noch keine Gutscheine verkauft.</p><?php endif; ?>
@@ -1414,6 +1459,24 @@ if ($view === 'course') {
         <p class="muted"><?= forma_h($c['date_text']) ?> · <?= $booked ?> von <?= (int)$c['capacity'] ?> Plätzen belegt<?= $c['visible'] ? '' : ' · <strong>auf der Website ausgeblendet</strong>' ?></p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <p><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=edit&amp;id=<?= (int)$c['id'] ?>">Termin bearbeiten</a></p>
+        <?php $ms = (string)($c['min_status'] ?? ''); if ((int)$c['min_participants'] > 1 && $booked > 0 && $booked < (int)$c['min_participants'] && in_array($ms, ['', 'gemeldet', 'gast_informiert'], true) && $c['start_date'] >= date('Y-m-d')): ?>
+        <div class="card notice minbox">
+            <span class="ic"><?= admin_icon('kalender') ?></span>
+            <div class="stack">
+            <?php if ($ms === 'gast_informiert'): ?>
+                <strong>Die Gäste sind informiert.</strong>
+                <span class="muted small">Sie wählen gerade selbst: anderer Termin oder stornieren (Geld zurück + <?= FORMA_MIN_GIFT_PERCENT ?>-%-Gutschein). Was sie gewählt haben, siehst du unten bei der Anmeldung und per Mail.</span>
+            <?php else: ?>
+                <strong>Nur <?= $booked ?> von mindestens <?= (int)$c['min_participants'] ?> Personen angemeldet.</strong>
+                <span class="muted small">Du entscheidest. Hat sich noch jemand telefonisch angemeldet? Dann trag die Person unten ein oder klick einfach auf „Findet statt“.</span>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+                    <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="min_decide"><input type="hidden" name="id" value="<?= (int)$c['id'] ?>"><input type="hidden" name="to" value="statt"><button class="btn" type="submit">Kurs findet statt</button></form>
+                    <form method="post" onsubmit="return confirm('Gäste jetzt informieren? Sie bekommen eine Mail und können selbst umbuchen oder stornieren.')"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="min_decide"><input type="hidden" name="id" value="<?= (int)$c['id'] ?>"><input type="hidden" name="to" value="info"><button class="btn btn-ghost" type="submit">Gäste informieren</button></form>
+                </div>
+            <?php endif; ?>
+            </div>
+        </div>
+        <?php elseif ($ms === 'findet_statt'): ?><p class="muted small">✓ Du hast entschieden: Der Kurs findet statt.</p><?php endif; ?>
         <h2>Anmeldungen</h2>
         <?php if (!$bookings): ?><p class="muted">Noch keine Anmeldungen.</p><?php endif; ?>
         <div class="list">
@@ -1427,7 +1490,10 @@ if ($view === 'course') {
                 <?php if ($b['phone']): ?><div class="sel"><?= forma_h($b['phone']) ?></div><?php endif; ?>
                 <?php if ($b['message']): ?><div class="muted">„<?= forma_h($b['message']) ?>“</div><?php endif; ?>
                 <div class="muted small">Angemeldet am <?= forma_h(date('d. m. Y, H:i', strtotime($b['created_at']))) ?></div>
-                <?php if ($cancel && $b['paid_at']): ?><div class="muted small">Online bezahlt. Die Rückerstattung machst du im Stripe-Dashboard unter Zahlungen.</div><?php endif; ?>
+                <?php if (($b['min_state'] ?? '') === 'gefragt'): ?><div class="small" style="color:var(--clay)">Informiert, Antwort steht noch aus</div><?php elseif (($b['min_state'] ?? '') === 'storniert'): ?><div class="small" style="color:var(--clay)">Hat wegen zu weniger Anmeldungen storniert<?= (int)($b['refund_cents'] ?? 0) > 0 ? ' · ' . forma_h(forma_euro((int)$b['refund_cents'])) . ' automatisch erstattet' : '' ?></div><?php endif; ?>
+                <?php if ((int)($b['voucher_cents'] ?? 0) > 0): ?><div class="muted small"><?= forma_h(forma_euro((int)$b['voucher_cents'])) ?> mit Gutschein bezahlt</div><?php endif; ?>
+                <?php if (!empty($b['no_post'])): ?><div class="muted small">Möchte keine FORMA Post</div><?php endif; ?>
+                <?php if ($cancel && $b['paid_at'] && (int)($b['refund_cents'] ?? 0) === 0): ?><div class="muted small">Online bezahlt. Die Rückerstattung machst du im Stripe-Dashboard unter Zahlungen.</div><?php endif; ?>
                 <?php if (!$open): ?>
                 <form method="post">
                     <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
@@ -1495,7 +1561,9 @@ foreach ($pdo->query("SELECT id, hours, status FROM private_bookings WHERE statu
     if ($pb['status'] === 'bezahlt' ? $pl + 0.01 < (float)$pb['hours'] : $pl == 0.0) $toPlan++;
 }
 $newBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE status = 'bestaetigt' AND created_at >= '" . date('c', strtotime('-7 days')) . "'")->fetchColumn();
-render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive, $voucherOpen, $privateOpen, $agenda, $toPlan, $newBookings) {
+try { forma_min_check($pdo); } catch (Throwable $e) { error_log('FORMA min: ' . $e->getMessage()); }
+$minCourses = $pdo->query("SELECT * FROM courses WHERE min_status = 'gemeldet' AND start_date >= '" . date('Y-m-d') . "' ORDER BY start_date")->fetchAll();
+render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive, $voucherOpen, $privateOpen, $agenda, $toPlan, $newBookings, $minCourses) {
     $h = (int)date('G');
     $hello = $h < 11 ? 'Guten Morgen' : ($h < 17 ? 'Hallo' : 'Guten Abend'); ?>
     <section class="hero">
@@ -1514,6 +1582,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
     </section>
     <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
     <?php if (!forma_stripe_key()): ?><p class="alert">Die Online-Bezahlung ist noch nicht eingerichtet. Bis dahin werden alle Kurse ohne Bezahlung reserviert. <a href="<?= forma_h($self) ?>?view=einstellungen">Jetzt Stripe verbinden</a></p><?php endif; ?>
+    <?php foreach ($minCourses as $mc): ?><a class="card notice" href="<?= forma_h($self) ?>?view=course&amp;id=<?= (int)$mc['id'] ?>"><span class="ic"><?= admin_icon('kalender') ?></span><span><strong>Zu wenige Anmeldungen: <?= forma_h($mc['title']) ?>, <?= forma_h(preg_replace('/\s*·.*$/u', '', (string)$mc['date_text'])) ?></strong><br><span class="muted small">Entscheide: findet statt oder Gäste informieren →</span></span></a><?php endforeach; ?>
     <?php if ($toPlan > 0): ?><a class="card notice" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('private') ?></span><span><strong><?= $toPlan === 1 ? '1 Private-Pottery-Buchung wartet' : $toPlan . ' Private-Pottery-Buchungen warten' ?> auf ihren Termin.</strong><br><span class="muted small">Im Kalender einplanen und Bestätigung schicken →</span></span></a><?php endif; ?>
     <div class="dash">
         <section class="agenda card">

@@ -20,7 +20,7 @@ $T = $en ? [
     'p_k' => '1:1 at the wheel · 2 hours', 'p_t' => 'Private Pottery', 'p_d' => 'I take two hours just for you and your wishes: at your own pace at the pottery wheel, cosy with coffee or tea. Afterwards you pick your favourite piece from my current collection.',
     'p_p' => '€ 130', 'p_ps' => 'for 2 hours', 'p_how' => 'Pay online now, tell me two preferred dates and times, and I will confirm your appointment by email.',
     'w1' => '1st preferred date', 'w2' => '2nd preferred date', 'time' => 'Time', 'name' => 'First and last name', 'email' => 'Email', 'phone' => 'Phone / WhatsApp', 'opt' => '(optional)',
-    'hotel' => 'Your hotel', 'consent' => 'I agree that my details are stored to process my booking.', 'privacy' => 'Privacy', 'pay' => 'Continue to payment · € 130',
+    'hotel' => 'Your hotel', 'consent' => 'I agree that my details are stored to process my booking.', 'privacy' => 'Privacy', 'gs' => 'Do you have a gift voucher?', 'gs_btn' => 'Check', 'gs_ok' => '✓ Voucher found: %s will be deducted from your booking.', 'post' => 'With your booking you will occasionally receive the FORMA Post (in German) with news from the studio. Unsubscribe anytime with one click.', 'nopost' => 'No thanks, I don’t want the FORMA Post.', 'pay' => 'Continue to payment · € 130',
     'gut' => 'A little souvenir for you', 'gut_t' => 'Pottery takes time: it takes a few weeks until a piece is truly finished, which sadly doesn’t fit into your holiday. That’s why my classes are all about the experience at the wheel. And so you still take something lovely home, you get to choose a finished piece from my current collection.',
     'err_d' => 'Please choose your 1st preferred date and time.', 'err_n' => 'Please enter your name.', 'err_e' => 'Please enter a valid email address.', 'err_c' => 'Please tick the privacy box.', 'wait' => 'One moment …', 'lang' => 'Deutsch', 'langurl' => '?',
 ] : [
@@ -31,7 +31,7 @@ $T = $en ? [
     'p_k' => '1:1 an der Drehscheibe · 2 Stunden', 'p_t' => 'Private Pottery', 'p_d' => 'Ich nehme mir zwei Stunden Zeit nur für dich und deine Wünsche: ganz in deinem Tempo an der Drehscheibe, gemütlich bei Kaffee oder Tee. Danach suchst du dir dein Lieblingsstück aus meiner aktuellen Kollektion aus.',
     'p_p' => '€ 130', 'p_ps' => 'für 2 Stunden', 'p_how' => 'Du bezahlst gleich online, gibst mir zwei Wunschtermine mit Uhrzeit, und ich bestätige dir deinen Termin per E-Mail.',
     'w1' => '1. Wunschtermin', 'w2' => '2. Wunschtermin', 'time' => 'Uhrzeit', 'name' => 'Vor- und Nachname', 'email' => 'E-Mail', 'phone' => 'Telefon / WhatsApp', 'opt' => '(optional)',
-    'hotel' => 'Dein Hotel', 'consent' => 'Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Buchung gespeichert werden.', 'privacy' => 'Datenschutz', 'pay' => 'Weiter zur Bezahlung · € 130',
+    'hotel' => 'Dein Hotel', 'consent' => 'Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Buchung gespeichert werden.', 'privacy' => 'Datenschutz', 'gs' => 'Du hast einen Gutschein?', 'gs_btn' => 'Prüfen', 'gs_ok' => '✓ Gutschein gefunden: %s werden bei deiner Buchung abgezogen.', 'post' => 'Mit deiner Buchung bekommst du ab und zu die FORMA Post mit Neuem aus dem Atelier. Abmelden geht jederzeit mit einem Klick.', 'nopost' => 'Nein danke, ich möchte keine FORMA Post bekommen.', 'pay' => 'Weiter zur Bezahlung · € 130',
     'gut' => 'Ein kleines Andenken für dich', 'gut_t' => 'Töpfern braucht Zeit: Bis ein Stück wirklich fertig ist, vergehen einige Wochen, und das geht sich während deines Urlaubs leider nicht aus. Deshalb geht es bei mir ganz ums Erlebnis an der Drehscheibe. Und damit du trotzdem etwas Schönes mit nach Hause nimmst, darfst du dir ein fertiges Stück aus meiner aktuellen Kollektion aussuchen.',
     'err_d' => 'Bitte wähl deinen 1. Wunschtermin mit Uhrzeit.', 'err_n' => 'Bitte gib deinen Namen an.', 'err_e' => 'Bitte gib eine gültige E-Mail-Adresse an.', 'err_c' => 'Bitte bestätige noch den Datenschutz.', 'wait' => 'Einen Moment …', 'lang' => 'English', 'langurl' => '?lang=en',
 ];
@@ -42,7 +42,7 @@ $tomorrow = date('Y-m-d', strtotime('+1 day'));
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
 <title><?= $h($T['title']) ?> · FORMA</title><link rel="icon" type="image/png" href="../img/forma-logo.png">
-<link rel="stylesheet" href="../assets/gast.css?v=5">
+<link rel="stylesheet" href="../assets/gast.css?v=7">
 </head>
 <body>
 <div class="head"><div class="wrap">
@@ -75,7 +75,9 @@ $tomorrow = date('Y-m-d', strtotime('+1 day'));
     <label for="email"><?= $h($T['email']) ?></label><input id="email" name="email" type="email" autocomplete="email">
     <label for="phone"><?= $h($T['phone']) ?> <span style="font-weight:400"><?= $h($T['opt']) ?></span></label><input id="phone" name="phone" type="tel" autocomplete="tel">
     <label for="hotel"><?= $h($T['hotel']) ?> <span style="font-weight:400"><?= $h($T['opt']) ?></span></label><input id="hotel">
+    <details class="gs-box"><summary><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-1-3-5-4-5-1.5S10 8 12 8zm0 0c1-3 5-4 5-1.5S14 8 12 8z"/></svg><?= $h($T['gs']) ?></summary><div class="gs-row"><input name="voucher" class="gs-code" placeholder="FORMA-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Code"><button type="button" class="btn gs-check" data-ok="<?= $h($T['gs_ok']) ?>"><?= $h($T['gs_btn']) ?></button></div><p class="gs-msg" role="status" hidden></p></details>
     <label class="consent"><input type="checkbox" name="consent" id="consent" value="1"><span><?= $h($T['consent']) ?> <a href="../#datenschutz"><?= $h($T['privacy']) ?></a></span></label>
+    <p class="post-note"><?= $h($T['post']) ?></p><label class="consent"><input type="checkbox" name="no_post" value="1"><span><?= $h($T['nopost']) ?></span></label>
     <p class="err" id="err" hidden></p>
     <button class="btn" type="submit" id="go"><?= $h($T['pay']) ?></button>
    </form>
@@ -85,7 +87,7 @@ $tomorrow = date('Y-m-d', strtotime('+1 day'));
   <div><b><?= $h($T['gut']) ?></b><p><?= $h($T['gut_t']) ?></p></div></div>
  <p class="foot">FORMA Earth &amp; Art · Silvrettastraße 58 · 6562 Mathon · <a href="https://wa.me/4367763907080">+43 677 63 90 70 80</a> · <a href="../">forma-pottery.com</a></p>
 </div></main>
-<script src="../assets/gast.js?v=1"></script>
+<script src="../assets/gast.js?v=3"></script>
 <script>
 (function(){
   var f=document.getElementById('pf'),err=document.getElementById('err'),go=document.getElementById('go');
