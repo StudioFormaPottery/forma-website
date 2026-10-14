@@ -1402,7 +1402,7 @@ const FORMA_VOUCHERS = [
     ],
     'private' => [
         'name' => 'Private Pottery', 'price' => 6500, 'one' => 'Stunde', 'many' => 'Stunden', 'small' => 'Private Pottery',
-        'desc' => 'Persönliche Einzelstunde Handbuilding, inkl. deinem handgefertigten Werkstück, Material und Fertigstellung. Zum Schluss wird bemalt.',
+        'desc' => 'Persönliche Einzelstunde Handbuilding, inkl. Ton und Fertigstellung bis 5 kg, das Projekt besprechen wir vorher gemeinsam. Zum Schluss wird bemalt.',
     ],
     'atelier' => [
         'name' => 'Offenes Atelier', 'price' => 3000, 'one' => 'Stunde', 'many' => 'Stunden', 'small' => 'im Offenen Atelier',

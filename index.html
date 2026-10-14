@@ -1015,6 +1015,70 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .tpl-buy-k{margin:14px 0 4px;padding-top:14px;border-top:1px dashed var(--line);font-family:var(--display);font-weight:650;font-size:21px;color:var(--clay)}
 @media (min-width:900px){.tpl-desc{font-size:20px}.tpl-gets li{font-size:18px}}
 #tpl-dialog .book-inner{max-width:880px}
+
+/* Pottery Pause Special */
+.pp-special{position:relative;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(20px,4vw,48px);align-items:center;padding:clamp(18px,3vw,28px);margin:0 0 clamp(30px,4vw,44px);border-radius:36px;background:var(--clay);color:var(--on-clay);scroll-margin-top:120px}
+.pp-pic{align-self:stretch;min-height:280px;border-radius:999px 999px 26px 26px;overflow:hidden;background:var(--blush)}
+.pp-pic img{width:100%;height:100%;object-fit:cover;object-position:50% 78%;display:block}
+.pp-body{display:flex;flex-direction:column;gap:14px;padding:clamp(4px,2vw,20px) clamp(4px,2vw,24px) clamp(4px,2vw,20px) 0}
+.pp-tag{display:inline-flex;align-items:center;gap:10px;margin:0;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#F3E2D6}
+.pp-tag span{padding:5px 14px;border-radius:999px;background:var(--on-clay);color:var(--clay);font-weight:600}
+.pp-special h3{margin:0;font-family:var(--display);font-weight:650;font-size:clamp(38px,5vw,64px);line-height:1;letter-spacing:-.02em;color:var(--on-clay)}
+.pp-when{margin:0;font-family:var(--display);font-weight:600;font-size:clamp(19px,2vw,24px);color:var(--blush)}
+.pp-body > p:not(.pp-tag):not(.pp-when){margin:0;color:#F6E6DA;max-width:58ch}
+.pp-facts{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.pp-facts li{padding:6px 14px;border-radius:999px;border:1px solid rgba(251,241,234,.5);font-size:.9em}
+.pp-foot{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px;margin-top:6px}
+.pp-foot .price{margin:0;color:var(--on-clay)}
+.pp-foot .btn{background:var(--on-clay);color:var(--clay);border-color:var(--on-clay)}
+.pp-seal{position:absolute;left:clamp(14px,3vw,30px);top:clamp(14px,3vw,30px);width:104px;height:104px;border-radius:50%;background:var(--blush);color:var(--clay);display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-10deg);box-shadow:0 8px 20px rgba(51,33,27,.25)}
+.pp-seal b{font-family:var(--display);font-size:40px;line-height:1}
+.pp-seal i{font-style:normal;font-size:14px;letter-spacing:.06em}
+.offers-label{margin:0 0 14px;font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+@media (max-width:780px){.pp-special{grid-template-columns:1fr}.pp-pic{min-height:0;aspect-ratio:4/3;border-radius:200px 200px 22px 22px}.pp-body{padding:4px 6px 10px}.pp-seal{width:86px;height:86px}.pp-seal b{font-size:32px}}
+@media (min-width:900px){.pp-body > p:not(.pp-tag):not(.pp-when){font-size:20px}.pp-facts li{font-size:17px}}
+@media (min-width:1100px){.offers{grid-template-columns:repeat(3,minmax(0,1fr))}.offers .facts{grid-template-columns:1fr;gap:2px 0}.offers .facts dd{margin-bottom:10px}}
+@media (min-width:781px) and (max-width:1099px){.offers > .offer:last-child:nth-child(odd){grid-column:1/-1}}
+
+/* Teambuilding hell */
+.team-card{background:var(--blush);color:var(--ink)}
+.team-card .eyebrow{color:var(--clay)}
+.team-card h2{color:var(--clay)}
+.team-card p{color:var(--ink)}
+.team-tags li{border-color:color-mix(in srgb,var(--clay) 40%,transparent);color:var(--clay);background:color-mix(in srgb,var(--paper) 55%,transparent)}
+.team-facts{color:var(--ink-soft)!important}
+.team-offer{background:color-mix(in srgb,var(--paper) 70%,transparent);border-color:color-mix(in srgb,var(--clay) 30%,transparent);color:var(--ink)}
+.team-offer:hover{background:var(--paper)}
+.to-ic{display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:var(--clay)}
+.to-ic svg{width:40px;height:40px}
+.team-card .more-btn{color:var(--clay);border-color:var(--clay)}
+.team-card .btn-team-ghost{color:var(--clay);border-color:var(--clay)}
+.team-card .btn-team-ghost:hover{background:color-mix(in srgb,var(--paper) 60%,transparent)}
+.team-photos{border-color:var(--paper)}
+.team-seal{background:var(--clay);color:var(--on-clay)}
+.team-seal text{fill:var(--on-clay)}
+.team-ic{border-radius:50%;background:var(--clay);padding:8px}
+.team-ic svg path,.team-ic svg rect{fill:#F1D9C6}
+.to-t small{color:var(--ink-soft)}
+.to-t b{color:var(--clay)}
+.to-go{background:var(--clay);color:var(--on-clay)}
+.to-ic{background:var(--clay)}
+.to-ic svg [stroke="#8C2C1D"]{stroke:#F1D9C6}
+.to-ic svg rect[fill="#8C2C1D"]{fill:var(--clay-soft,#674B40)}
+.team-ic.t4{display:none}
+@media (max-width:520px){.to-ic{width:46px;height:46px}.to-ic svg{width:32px;height:32px}}
+
+/* Menü mit Untermenüs */
+.nav a.nav-post{display:flex;align-items:center;gap:10px;margin:4px 0 10px;padding:12px 16px;border:0;border-radius:18px;background:var(--paper);font-size:18px!important}
+.nav-sub{border-bottom:1px solid color-mix(in srgb,var(--clay) 18%,transparent)}
+.nav-sub summary{list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-family:var(--display);font-weight:600;font-size:clamp(22px,2.2vw,26px);letter-spacing:-.01em;padding:12px 0;color:var(--clay)}
+.nav-sub summary::-webkit-details-marker{display:none}
+.nav-chev{transition:transform .2s ease}
+.nav-sub[open] .nav-chev{transform:rotate(90deg)}
+.nav-sub a:not(.btn){display:flex;align-items:center;gap:8px;margin-left:14px;padding:9px 0 9px 14px!important;font-size:19px!important;border-bottom:0!important;border-left:2px solid color-mix(in srgb,var(--clay) 30%,transparent)}
+.nav-sub a:last-child{margin-bottom:12px}
+.nav-pill{padding:2px 10px;border-radius:999px;background:var(--clay);color:var(--on-clay);font-family:var(--body);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.offer,.pp-special{scroll-margin-top:130px}
 </style>
 </head>
 <body>
@@ -1033,19 +1097,22 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     <div class="nav-backdrop" id="nav-backdrop" hidden></div>
     <nav class="nav" id="nav" aria-label="Hauptnavigation">
       <div class="nav-head"><img src="img/forma-logo.png" alt=""><button class="nav-close" type="button" id="nav-close" aria-label="Menü schließen"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
-      <a href="#angebote">Kurse</a>
-      <a href="#studio">Studio</a>
-      <a href="#events">Aktuelle Events</a>
-      <a href="#ueber-mich">Hallo!</a>
+      <a class="nav-post" href="#forma-post"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M4 7l8 6 8-6"></path></svg>FORMA Post · Newsletter</a>
+      <details class="nav-sub"><summary>Kurse<svg class="nav-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></summary>
+        <a href="#kurs-spin">Spin &amp; Go</a>
+        <a href="#kurs-private">Private Pottery</a>
+        <a href="#pottery-pause">Pottery Pause <span class="nav-pill">Special</span></a>
+        <a href="#events">Events</a>
+      </details>
+      <a href="#teambuilding">Teambuilding</a>
       <a href="#gutschein" data-voucher="">Gutscheine</a>
-      <a href="#templates">The Maker Club &amp; Templates</a>
-      <a href="#shop">Shop</a>
-      <a class="nav-hl" href="#teambuilding">Teambuilding &amp; Events</a>
-      <a href="#fragen">Q&amp;A</a>
-      <a href="#kontakt">Kontakt</a>
-      <a href="#forma-post">FORMA Post (Newsletter)</a>
-      <a href="#storno">Gut zu wissen</a>
-      <a class="btn btn-solid" href="#angebote" data-book="">Kurs buchen</a>
+      <a href="#shop">Shop &amp; Maker Club</a>
+      <a href="#ueber-mich">Hallo!</a>
+      <details class="nav-sub"><summary>Infos<svg class="nav-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></summary>
+        <a href="#fragen">FAQ</a>
+        <a href="#storno">Gut zu wissen</a>
+        <a href="#kontakt">Kontakt</a>
+      </details>
     </nav>
   </div>
 </header>
@@ -1101,22 +1168,23 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <div class="section-head">
         <p class="eyebrow">Angebote</p>
         <h2 class="display">Kurse &amp; Workshops</h2>
-        <p>Wähle das Format, das zu dir passt: im mehrwöchigen Kurs, als kurzer Einstieg an der Scheibe, ganz persönlich in der Einzelstunde oder selbstständig im offenen Atelier.</p>
+        <p>Wähle das Format, das zu dir passt: als kurzer Einstieg an der Scheibe, ganz persönlich in der Einzelstunde oder selbstständig im offenen Atelier. Und diesen Herbst gibt es die Pottery Pause als besonderes 5-Wochen-Special.</p>
       </div>
-      <div class="offers">
-        <article class="offer is-featured"><span class="offer-ic" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M44 10a14 14 0 1 0 10 24 16 16 0 0 1-10-24z" fill="#FBF1EA"/><path d="M18 34h22v14a8 8 0 0 1-8 8h-6a8 8 0 0 1-8-8z" fill="#DDBFA8"/><path d="M40 38h3a5 5 0 0 1 0 10h-3" stroke="#DDBFA8" stroke-width="3.5" fill="none"/><path d="M24 22c-2 3 2 5 0 8M31 22c-2 3 2 5 0 8" stroke="#FBF1EA" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M12 14l1 3 3 1-3 1-1 3-1-3-3-1 3-1z" fill="#FBF1EA"/></svg></span>
-          <p class="kicker">Kurs · 5 Wochen</p>
+      <article class="pp-special" id="pottery-pause">
+        <div class="pp-pic"><img src="img/drehen.jpg" alt="Hände formen Ton an der Töpferscheibe" loading="lazy"></div>
+        <div class="pp-body">
+          <p class="pp-tag"><span>Special</span> nur diesen Herbst</p>
           <h3>Pottery Pause</h3>
+          <p class="pp-when">5 Wochen · nur 6. 11. – 4. 12. · freitags 18–20 Uhr</p>
           <p>Deine kleine Auszeit zum Start ins Wochenende: Handy weg, Hände in den Ton. An fünf Freitagabenden lernst du in gemütlicher Runde Schritt für Schritt das Arbeiten an der Töpferscheibe, vom Zentrieren über das Hochziehen bis zum Abdrehen, ganz in deinem Tempo.</p>
-          <dl class="facts">
-            <dt>Termine</dt><dd>6. 11. – 4. 12. 2026<br>freitags, 18–20 Uhr</dd>
-            <dt>Werkstücke</dt><dd>acht eigene Stücke, z. B. Becher, Schalen oder kleine Teller</dd>
-            <dt>Für</dt><dd>Einsteiger und Fortgeschrittene</dd>
-          </dl>
-          <p class="price">€ 295<small>für alle fünf Termine</small></p>
-          <a class="btn" href="#angebote" data-book="Pottery Pause">Platz buchen</a>
-        </article>
-        <article class="offer is-blush wavy-card"><svg class="maker-wave" aria-hidden="true"><path></path></svg><span class="offer-ic" aria-hidden="true"><svg viewBox="0 0 64 64"><ellipse cx="32" cy="48" rx="24" ry="7" fill="#674B40"/><ellipse cx="32" cy="45" rx="24" ry="7" fill="#DDBFA8"/><path d="M22 44c0-14 4-22 10-26 6 4 10 12 10 26z" fill="#8C2C1D"/><path d="M26 30c4 2 8 2 12 0" stroke="#FBF1EA" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M10 26a22 22 0 0 1 8-12M54 26a22 22 0 0 0-8-12" stroke="#8C2C1D" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="3 4"/></svg></span>
+          <ul class="pp-facts"><li>acht eigene Stücke, z. B. Becher, Schalen oder kleine Teller</li><li>für Einsteiger und Fortgeschrittene</li></ul>
+          <div class="pp-foot"><p class="price">€ 295<small>für alle fünf Termine</small></p><a class="btn btn-solid" href="#angebote" data-book="Pottery Pause">Platz buchen</a></div>
+        </div>
+        <span class="pp-seal" aria-hidden="true"><b>5</b><i>Wochen</i></span>
+      </article>
+      <p class="offers-label">Das ganze Jahr über</p>
+      <div class="offers">
+        <article class="offer is-blush wavy-card" id="kurs-spin"><svg class="maker-wave" aria-hidden="true"><path></path></svg><span class="offer-ic" aria-hidden="true"><svg viewBox="0 0 64 64"><ellipse cx="32" cy="48" rx="24" ry="7" fill="#674B40"/><ellipse cx="32" cy="45" rx="24" ry="7" fill="#DDBFA8"/><path d="M22 44c0-14 4-22 10-26 6 4 10 12 10 26z" fill="#8C2C1D"/><path d="M26 30c4 2 8 2 12 0" stroke="#FBF1EA" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M10 26a22 22 0 0 1 8-12M54 26a22 22 0 0 0-8-12" stroke="#8C2C1D" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="3 4"/></svg></span>
           <p class="kicker">Drehscheibe · 2 Stunden</p>
           <h3>Spin &amp; Go</h3>
           <p>Zwei Stunden an der Töpferscheibe, begleitet von Anfang an: Ich zeige dir Schritt für Schritt, wie du an der Scheibe arbeitest, und du gestaltest dein eigenes Werkstück.</p>
@@ -1129,7 +1197,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="price">€ 70<small>pro Person, inkl. eines Werkstücks</small></p>
           <a class="btn btn-solid" href="#angebote" data-book="Spin &amp; Go">Termin buchen</a>
         </article>
-        <article class="offer wavy-card"><svg class="maker-wave" aria-hidden="true"><path></path></svg><span class="offer-ic" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 52C18 43 10 36 10 26c0-6 5-11 11-11 5 0 8 3 11 7 3-4 6-7 11-7 6 0 11 5 11 11 0 10-8 17-22 26z" fill="#8C2C1D"/><path d="M22 28c2-4 6-5 9-3" stroke="#FBF1EA" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></span>
+        <article class="offer wavy-card" id="kurs-private"><svg class="maker-wave" aria-hidden="true"><path></path></svg><span class="offer-ic" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 52C18 43 10 36 10 26c0-6 5-11 11-11 5 0 8 3 11 7 3-4 6-7 11-7 6 0 11 5 11 11 0 10-8 17-22 26z" fill="#8C2C1D"/><path d="M22 28c2-4 6-5 9-3" stroke="#FBF1EA" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></span>
           <p class="kicker">Einzelstunde · Handbuilding</p>
           <h3>Private Pottery</h3>
           <p>Dein Projekt, gemeinsam umgesetzt: Wir gestalten dein Werkstück von Anfang bis Ende mit den Händen, formen, ritzen, beschriften, verzieren und bemalen. Du machst es selbst, und ich unterstütze dich Schritt für Schritt, damit es wirklich schön wird.</p>
@@ -1138,7 +1206,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
             <dt>Für</dt><dd>dich allein, auf Wunsch auch zu zweit</dd>
             <dt>Dauer</dt><dd>je nach Projekt 1–4 Std., im Buchungsfenster siehst du, was wie lange dauert</dd>
             <dt>Termine</dt><dd>individuell, gern auf mehrere Abende verteilt</dd>
-            <dt>Inklusive</dt><dd>dein fix fertiges Werkstück, Material und Fertigstellung</dd>
+            <dt>Inklusive</dt><dd>Ton und Fertigstellung bis 5 kg, dein Projekt besprechen wir vorher gemeinsam</dd>
           </dl>
           <p class="price">€ 65<small>pro Stunde</small></p>
           <div class="offer-btns"><a class="btn btn-solid" href="#angebote" data-private="buchung">Projekt buchen</a><a class="btn btn-ask" href="#angebote" data-private="anfrage">Erst mal anfragen</a></div>
@@ -1297,7 +1365,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <form id="p-form" class="step" novalidate><input type="hidden" name="ref" class="ref-hotel">
         <p class="eyebrow" id="p-eyebrow">Private Pottery</p>
         <h3 class="step-title" id="p-title" tabindex="-1">Dein Projekt, gemeinsam umgesetzt</h3>
-        <p class="step-meta" id="p-meta">Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inklusive deinem fix fertigen Werkstück, Material und Fertigstellung.</p>
+        <p class="step-meta" id="p-meta">Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inkl. Ton und Fertigstellung bis 5 kg, dein Projekt besprechen wir vorher gemeinsam.</p>
         <input type="hidden" name="t" id="p-t">
         <input type="hidden" name="kind" id="p-kind" value="buchung">
         <input type="hidden" name="topic" id="p-topic" value="">
@@ -1710,7 +1778,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <details class="faq-item"><summary>Brauche ich Vorkenntnisse?</summary><p>Für Spin &amp; Go, die Pottery Pause und Private Pottery nicht, ich begleite dich von Anfang an. Das offene Atelier ist für alle, die schon Erfahrung haben und selbstständig arbeiten möchten.</p></details>
         <details class="faq-item"><summary>Wie buche ich einen Kurs?</summary><p>Tipp oben bei „Kurse &amp; Workshops“ auf den Kurs, such dir im Kalender einen Tag aus und bezahl bequem online. Die Bestätigung kommt sofort per E-Mail. Im offenen Atelier wählst du dazu, welche Stunden du bleiben möchtest, und zahlst ebenfalls online. Anmeldeschluss ist immer am Vorabend um 17 Uhr.</p></details>
         <details class="faq-item"><summary>Ab wie vielen Personen findet Spin &amp; Go statt?</summary><p>Spin &amp; Go findet ab 2 Personen statt. Am schönsten ist es, wenn du gleich eine Freundin mitbringst. Sind bis zum Vorabend um 17 Uhr zu wenige angemeldet, melde ich mich bei dir: Du kannst dann mit einem Klick kostenlos auf einen anderen Termin wechseln oder stornieren. Beim Stornieren bekommst du dein Geld zurück und als Dankeschön einen kleinen Gutschein für deine nächste Buchung.</p></details>
-        <details class="faq-item"><summary>Was ist im Preis enthalten?</summary><p>Bei Spin &amp; Go ist ein Werkstück inklusive. Bei Private Pottery ist dein komplettes Werkstück enthalten, Aufwand und Umfang besprechen wir vorher gemeinsam. Im offenen Atelier nutzt du das Studio vor Ort als deinen kreativen Workspace. Für die Fertigstellung deiner Werkstücke wird eine Gebühr von € 25 pro Kilo erhoben, die bei Abholung abgerechnet wird.</p></details>
+        <details class="faq-item"><summary>Was ist im Preis enthalten?</summary><p>Bei Spin &amp; Go ist ein Werkstück inklusive. Bei Private Pottery sind Ton und Fertigstellung bis 5 kg inklusive, dein Projekt besprechen wir vorher gemeinsam. Im offenen Atelier nutzt du das Studio vor Ort als deinen kreativen Workspace. Für die Fertigstellung deiner Werkstücke wird eine Gebühr von € 25 pro Kilo erhoben, die bei Abholung abgerechnet wird.</p></details>
         <details class="faq-item"><summary>Was soll ich anziehen?</summary><p>Am besten bequeme Kleidung, die ruhig etwas Ton abbekommen darf. Kurze Fingernägel machen das Arbeiten an der Töpferscheibe leichter.</p></details>
         <details class="faq-item"><summary>Wann kann ich meine Stücke mitnehmen?</summary><p>Deine Werkstücke brauchen nach dem Kurs noch Zeit zum Trocknen und für die Fertigstellung, das dauert meist 3–4 Wochen. Ich melde mich bei dir, sobald deine Stücke fertig zum Abholen sind.</p></details>
         <details class="faq-item"><summary>Ich bin nur im Urlaub hier. Was passiert mit meinem Werkstück?</summary><p>Deine Werkstücke holst du nach 3–4 Wochen bei mir im Atelier ab, verschicken kann ich sie leider nicht. Wenn du nicht noch einmal vorbeikommen kannst, darfst du dir nach deinem Spin &amp; Go stattdessen ein kleines Accessoire aus meiner aktuellen Saisonkollektion aussuchen, als Andenken an deine Zeit im FORMA.</p></details>
@@ -2211,7 +2279,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     var ask=pMode()==='anfrage';
     pSub.textContent=ask?'Anfrage senden':'Weiter zur Bezahlung · '+euro(6500*pHours());
     $('p-title').textContent=ask?'Erzähl mir von deinem Projekt':'Dein Projekt, gemeinsam umgesetzt';
-    $('p-meta').textContent=ask?'Beschreib mir kurz, was du gestalten möchtest. Ich sehe es mir an und melde mich mit einem Vorschlag, wie lange wir brauchen und wann wir loslegen. Kostenlos und unverbindlich.':'Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inklusive deinem fix fertigen Werkstück, Material und Fertigstellung.';
+    $('p-meta').textContent=ask?'Beschreib mir kurz, was du gestalten möchtest. Ich sehe es mir an und melde mich mit einem Vorschlag, wie lange wir brauchen und wann wir loslegen. Kostenlos und unverbindlich.':'Wir setzen dein Werkstück zu zweit um: formen, ritzen, beschriften, verzieren und zum Schluss bemalen. Du machst es selbst, ich helfe dir dabei. € 65 pro Stunde, inkl. Ton und Fertigstellung bis 5 kg, dein Projekt besprechen wir vorher gemeinsam.';
     $('p-hours-set').hidden=ask;$('p-switch').hidden=!ask;$('p-storno').hidden=ask;$('p-gs').hidden=ask;
     $('p-leg-proj').textContent=(ask?'1':'2')+' · Was möchtest du gestalten?';
     $('p-leg-when').textContent=(ask?'2':'3')+' · Wann passt es '+(pTeam?'euch':'dir')+'?';
