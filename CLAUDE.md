@@ -93,3 +93,7 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Steuer: Kurse immer AT 20 %; Templates EU → AT 20 % solange nicht OSS-registriert (Schwelle 10.000 €), mit Häkchen „OSS“ der Satz des Wohnsitzlandes (`FORMA_EU_VAT`); Drittland → 0 % mit Hinweis.
 - Google Tabelle: optional per Google-Dienstkonto (JSON-Schlüssel in der Verwaltung hochladen, liegt nur im Datenordner) → trägt in „Rechnungen“ und „Kurse & Leistungen“ ein.
 - Gutscheine bekommen keine Rechnung (Mehrzweckgutschein, USt. erst bei Einlösung).
+
+## Hotelseite /urlaub/ (Monatskalender seit 14.10.2026)
+- Spin & Go als Monatskalender (`.mcal` in `assets/gast.css`), Daten serverseitig aus `forma_upcoming_courses`, ausgebuchte Tage gestrichelt.
+- „Platz buchen“ führt zu `/?termin=ID`: die Startseite öffnet dann direkt das Buchungsformular für genau diesen Termin.

@@ -2185,6 +2185,17 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     (loaded||load()).then(function(){openWizard(findGroup(key));});
   });
 
+  // Direkt zu einem bestimmten Termin (z. B. aus dem Monatskalender der Hotelseite: ?termin=ID)
+  (function(){
+    var tid=parseInt(new URLSearchParams(location.search).get('termin')||'',10);if(!tid)return;
+    try{var u=new URL(location.href);u.searchParams.delete('termin');history.replaceState(null,'',u.pathname+u.search+u.hash);}catch(e){}
+    (loaded||load()).then(function(){
+      for(var i=0;i<groups.length;i++){for(var j=0;j<groups[i].list.length;j++){var c=groups[i].list[j];
+        if(c.id===tid){openWizard(groups[i]);if(c.free>0){pickDate(c);openForm(c);}else{pickDate(c);}return;}}}
+      openWizard();
+    });
+  })();
+
   form.addEventListener('submit',function(e){
     e.preventDefault();
     err.hidden=true;

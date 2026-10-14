@@ -8,15 +8,15 @@ $spin = [];
 try {
     $pdo = forma_db();
     foreach (forma_upcoming_courses($pdo) as $c) {
-        if ($c['title'] === 'Spin & Go' && $c['free'] > 0) $spin[] = $c;
-        if (count($spin) >= 6) break;
+        if ($c['title'] === 'Spin & Go') $spin[] = ['id' => (int)$c['id'], 'd' => (string)$c['start_date'], 'free' => (int)$c['free']];
+        if (count($spin) >= 120) break;
     }
 } catch (Throwable $e) { error_log('FORMA urlaub: ' . $e->getMessage()); }
 $T = $en ? [
     'title' => 'Pottery on holiday', 'kick' => 'Winter in Paznaun · FORMA studio in Mathon',
     'lead' => 'A creative break between your ski day and dinner: sit down at the pottery wheel in my small studio in Mathon, just a few minutes from Ischgl, and enjoy your time with the clay. No experience needed.',
     's_k' => 'Wheel class · 2 hours', 's_t' => 'Spin & Go', 's_d' => 'Two hours at the pottery wheel, guided from start to finish. Wednesday & Friday, 9–11 am, takes place from 2 people.',
-    's_p' => '€ 70', 's_ps' => 'per person', 's_free' => 'places free', 's_btn' => 'Book a place', 's_none' => 'No free dates at the moment. Message me on WhatsApp and we will find a time: ',
+    's_p' => '€ 70', 's_ps' => 'per person', 's_free' => 'places free', 's_btn' => 'Book a place', 'cal_hint' => 'Tap a highlighted day to see free places.', 'cal_full' => 'fully booked', 'cal_one' => '1 place free', 'cal_many' => '%d places free', 'months' => ['January','February','March','April','May','June','July','August','September','October','November','December'], 'wd' => ['Mo','Tu','We','Th','Fr','Sa','Su'], 'prev' => 'Previous month', 'next' => 'Next month', 'free_l' => 'free', 'full_l' => 'booked out', 's_none' => 'No free dates at the moment. Message me on WhatsApp and we will find a time: ',
     'p_k' => '1:1 at the wheel · 2 hours', 'p_t' => 'Private Pottery', 'p_d' => 'I take two hours just for you and your wishes: at your own pace at the pottery wheel, cosy with coffee or tea. Afterwards you pick your favourite piece from my current collection.',
     'p_p' => '€ 130', 'p_ps' => 'for 2 hours', 'p_how' => 'Pay online now, tell me two preferred dates and times, and I will confirm your appointment by email.',
     'w1' => '1st preferred date', 'w2' => '2nd preferred date', 'time' => 'Time', 'name' => 'First and last name', 'email' => 'Email', 'phone' => 'Phone / WhatsApp', 'opt' => '(optional)',
@@ -27,7 +27,7 @@ $T = $en ? [
     'title' => 'Töpfern im Urlaub', 'kick' => 'Winter im Paznaun · FORMA Atelier in Mathon',
     'lead' => 'Eine kreative Auszeit zwischen Skitag und Abendessen: In meinem kleinen Atelier in Mathon, nur wenige Minuten von Ischgl, setzt du dich an die Töpferscheibe und genießt die Zeit am Ton. Ganz ohne Vorkenntnisse.',
     's_k' => 'Kurs an der Drehscheibe · 2 Stunden', 's_t' => 'Spin & Go', 's_d' => 'Zwei Stunden an der Töpferscheibe, begleitet von Anfang an. Mittwoch & Freitag, 9–11 Uhr, findet ab 2 Personen statt.',
-    's_p' => '€ 70', 's_ps' => 'pro Person', 's_free' => 'Plätze frei', 's_btn' => 'Platz buchen', 's_none' => 'Gerade sind keine Termine frei. Schreib mir per WhatsApp, dann finden wir einen: ',
+    's_p' => '€ 70', 's_ps' => 'pro Person', 's_free' => 'Plätze frei', 's_btn' => 'Platz buchen', 'cal_hint' => 'Tipp auf einen markierten Tag, dann siehst du die freien Plätze.', 'cal_full' => 'ausgebucht', 'cal_one' => 'noch 1 Platz frei', 'cal_many' => 'noch %d Plätze frei', 'months' => ['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'], 'wd' => ['Mo','Di','Mi','Do','Fr','Sa','So'], 'prev' => 'Vorheriger Monat', 'next' => 'Nächster Monat', 'free_l' => 'frei', 'full_l' => 'ausgebucht', 's_none' => 'Gerade sind keine Termine frei. Schreib mir per WhatsApp, dann finden wir einen: ',
     'p_k' => '1:1 an der Drehscheibe · 2 Stunden', 'p_t' => 'Private Pottery', 'p_d' => 'Ich nehme mir zwei Stunden Zeit nur für dich und deine Wünsche: ganz in deinem Tempo an der Drehscheibe, gemütlich bei Kaffee oder Tee. Danach suchst du dir dein Lieblingsstück aus meiner aktuellen Kollektion aus.',
     'p_p' => '€ 130', 'p_ps' => 'für 2 Stunden', 'p_how' => 'Du bezahlst gleich online, gibst mir zwei Wunschtermine mit Uhrzeit, und ich bestätige dir deinen Termin per E-Mail.',
     'w1' => '1. Wunschtermin', 'w2' => '2. Wunschtermin', 'time' => 'Uhrzeit', 'name' => 'Vor- und Nachname', 'email' => 'E-Mail', 'phone' => 'Telefon / WhatsApp', 'opt' => '(optional)',
@@ -42,7 +42,7 @@ $tomorrow = date('Y-m-d', strtotime('+1 day'));
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
 <title><?= $h($T['title']) ?> · FORMA</title><link rel="icon" type="image/png" href="../img/forma-logo.png">
-<link rel="stylesheet" href="../assets/gast.css?v=7">
+<link rel="stylesheet" href="../assets/gast.css?v=8">
 </head>
 <body>
 <div class="head"><div class="wrap">
@@ -58,9 +58,14 @@ $tomorrow = date('Y-m-d', strtotime('+1 day'));
   <section class="card"><svg class="wv" aria-hidden="true"><path></path></svg><span class="cic"><svg viewBox="0 0 64 64"><ellipse cx="32" cy="48" rx="24" ry="7" fill="#674B40"/><ellipse cx="32" cy="45" rx="24" ry="7" fill="#DDBFA8"/><path d="M22 44c0-14 4-22 10-26 6 4 10 12 10 26z" fill="#8C2C1D"/><path d="M26 30c4 2 8 2 12 0" stroke="#FBF1EA" stroke-width="2" fill="none" stroke-linecap="round"/></svg></span>
    <p class="ok"><?= $h($T['s_k']) ?></p><h2><?= $h($T['s_t']) ?></h2><p><?= $h($T['s_d']) ?></p>
    <p class="price"><?= $h($T['s_p']) ?><small><?= $h($T['s_ps']) ?></small></p>
-   <?php if ($spin): ?><ul class="dates">
-    <?php foreach ($spin as $c): ?><li><div><b><?= $h(preg_replace('/\s*·.*$/u', '', (string)$c['date_text'])) ?></b><br><span>9–11 · <?= (int)$c['free'] ?> <?= $h($T['s_free']) ?></span></div><a class="btn" href="../#spin-and-go"><?= $h($T['s_btn']) ?></a></li><?php endforeach; ?>
-   </ul><?php else: ?><p><?= $h($T['s_none']) ?><a href="https://wa.me/4367763907080">+43 677 63 90 70 80</a></p><?php endif; ?>
+   <?php if (array_filter($spin, fn($c) => $c['free'] > 0)): ?>
+   <div class="mcal" id="mcal" data-dates="<?= $h(json_encode($spin)) ?>">
+    <div class="mcal-head"><button type="button" class="mcal-nav" id="mc-prev" aria-label="<?= $h($T['prev']) ?>">‹</button><b id="mc-month"></b><button type="button" class="mcal-nav" id="mc-next" aria-label="<?= $h($T['next']) ?>">›</button></div>
+    <div class="mcal-grid" id="mc-grid"></div>
+    <p class="mcal-legend"><span class="lg free"></span><?= $h($T['free_l']) ?> <span class="lg full"></span><?= $h($T['full_l']) ?></p>
+    <div class="mcal-pick" id="mc-pick"><p id="mc-text"><?= $h($T['cal_hint']) ?></p><a class="btn" id="mc-btn" href="../#spin-and-go" hidden><?= $h($T['s_btn']) ?></a></div>
+   </div>
+   <?php else: ?><p><?= $h($T['s_none']) ?><a href="https://wa.me/4367763907080">+43 677 63 90 70 80</a></p><?php endif; ?>
   </section>
   <section class="card dark"><svg class="wv" aria-hidden="true"><path></path></svg><span class="cic"><svg viewBox="0 0 64 64"><path d="M32 54C18 45 10 38 10 28c0-6 5-11 11-11 5 0 8 3 11 7 3-4 6-7 11-7 6 0 11 5 11 11 0 10-8 17-22 26z" fill="#FBF1EA"/></svg></span>
    <p class="ok"><?= $h($T['p_k']) ?></p><h2><?= $h($T['p_t']) ?></h2><p><?= $h($T['p_d']) ?></p>
@@ -88,6 +93,40 @@ $tomorrow = date('Y-m-d', strtotime('+1 day'));
  <p class="foot">FORMA Earth &amp; Art · Silvrettastraße 58 · 6562 Mathon · <a href="https://wa.me/4367763907080">+43 677 63 90 70 80</a> · <a href="../">forma-pottery.com</a></p>
 </div></main>
 <script src="../assets/gast.js?v=3"></script>
+<script>
+(function(){
+  var box=document.getElementById('mcal');if(!box)return;
+  var list=JSON.parse(box.getAttribute('data-dates')||'[]'),by={},months=[];
+  list.forEach(function(c){by[c.d]=c;var m=c.d.slice(0,7);if(months.indexOf(m)<0)months.push(m);});
+  months.sort();
+  var MN=<?= json_encode($T['months']) ?>,WD=<?= json_encode($T['wd']) ?>,lang=<?= json_encode($en ? 'en' : 'de') ?>;
+  var tFull=<?= json_encode($T['cal_full']) ?>,tOne=<?= json_encode($T['cal_one']) ?>,tMany=<?= json_encode($T['cal_many']) ?>;
+  var first=list.filter(function(c){return c.free>0;})[0],cur=first?first.d.slice(0,7):months[0],sel=null;
+  var grid=document.getElementById('mc-grid'),btn=document.getElementById('mc-btn'),txt=document.getElementById('mc-text');
+  function freeT(n){return n<=0?tFull:(n===1?tOne:tMany.replace('%d',n));}
+  function nice(d){var x=new Date(d+'T12:00:00');return x.toLocaleDateString(lang==='en'?'en-GB':'de-AT',{weekday:'long',day:'numeric',month:'long'});}
+  function pick(c){sel=c;txt.innerHTML='<b>'+nice(c.d)+'</b> · 9–11 · '+freeT(c.free);btn.href='../?termin='+c.id;btn.hidden=false;render();}
+  function render(){
+    var p=cur.split('-'),y=+p[0],mo=+p[1]-1;
+    document.getElementById('mc-month').textContent=MN[mo]+' '+y;
+    var i=months.indexOf(cur);document.getElementById('mc-prev').disabled=i<=0;document.getElementById('mc-next').disabled=i>=months.length-1;
+    grid.innerHTML='';WD.forEach(function(w){var s=document.createElement('span');s.className='wd';s.textContent=w;grid.appendChild(s);});
+    var lead=(new Date(y,mo,1).getDay()+6)%7,days=new Date(y,mo+1,0).getDate();
+    for(var k=0;k<lead;k++)grid.appendChild(document.createElement('span'));
+    for(var d=1;d<=days;d++){
+      var key=y+'-'+String(mo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'),c=by[key],e;
+      if(!c){e=document.createElement('span');e.className='d';e.textContent=d;grid.appendChild(e);continue;}
+      e=document.createElement('button');e.type='button';e.textContent=d;e.className='d on'+(c.free<=0?' full':'')+(sel&&sel.id===c.id?' sel':'');
+      e.setAttribute('aria-label',nice(c.d)+', '+freeT(c.free));
+      if(c.free<=0)e.disabled=true;else(function(c){e.addEventListener('click',function(){pick(c);});})(c);
+      grid.appendChild(e);
+    }
+  }
+  document.getElementById('mc-prev').addEventListener('click',function(){var i=months.indexOf(cur);if(i>0){cur=months[i-1];render();}});
+  document.getElementById('mc-next').addEventListener('click',function(){var i=months.indexOf(cur);if(i<months.length-1){cur=months[i+1];render();}});
+  render();if(first)pick(first);
+})();
+</script>
 <script>
 (function(){
   var f=document.getElementById('pf'),err=document.getElementById('err'),go=document.getElementById('go');
