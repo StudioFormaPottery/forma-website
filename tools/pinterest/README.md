@@ -12,6 +12,9 @@ ID 1130333275167605357), „Pottery Templates & DIY“ (Adventkalender, Template
 
 ## Ablauf pro Lauf
 
+0. **Warteschlange zuerst:** Gibt es in `log.json` Einträge mit `"status": "bereit"`, den ältesten davon
+   veröffentlichen (Bild, Titel, Beschreibung, Board und Link stehen schon drin) und Schritte 1–5 überspringen.
+
 1. **Was ist gerade aktuell?** `index.html` (Angebote, Events, Shop), `api/lib.php` und
    `api/seed/*.json` lesen. Nur echte, aktuelle Angebote verwenden, nichts erfinden.
    Abgelaufenes weglassen (z. B. Pottery Pause nach dem 4. 12. 2026).
@@ -31,6 +34,9 @@ ID 1130333275167605357), „Pottery Templates & DIY“ (Adventkalender, Template
    | Template-Shop (nur wenn geöffnet) | https://www.forma-pottery.com/#shop |
 3. **Foto wählen**: aus `img/` ein Foto, das in `log.json` noch nicht (oder am längsten nicht)
    verwendet wurde. Ansehen, bevor es genommen wird.
+   Neue Fotos vom 16. 10. 2026 (alle farblich angeglichen): `tassen-henkel.jpg`, `baum-3d.jpg`,
+   `anhaenger-advent.jpg`, `vivien-spiegel.jpg`, `vivien-spiegel-2.jpg` (Spiegel-Selfies hat Vivien ausdrücklich
+   für Pins und Posts freigegeben), Video-Standbild `ergebnisse-poster.jpg`.
    **Nie verwenden:** `vivien-toepfern.jpg`, `drehen.jpg`, `vivien.jpg`, `vivien-mit-tochter.jpg`
    (Vivien ist darauf zu sehen) und das Brennofen-Foto. `make_pin.py` blockiert diese Dateien.
 4. **Pin bauen**: kleine JSON-Datei schreiben und `python3 tools/pinterest/make_pin.py pin.json`
