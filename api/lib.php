@@ -230,7 +230,7 @@ function forma_migrate(PDO $pdo): void
                 'active' => false,
                 'eyebrow' => 'Special im Advent',
                 'title' => 'Pottery bemalen im Advent',
-                'text' => "Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Schalen und kleine Teller bemalen, ganz entspannt bei Kerzenlicht im Studio.\nDie Termine kommen bald. Trag dich ein, dann erfährst du als Erste davon.",
+                'text' => "Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Bowls und Mugs bemalen, ganz entspannt bei Kerzenlicht im Studio.\nDie Termine kommen bald. Trag dich ein, dann erfährst du als Erste davon.",
                 'date_line' => 'Ab November · Mi & Do 15–18 Uhr',
                 'start' => date('Y-m-d'),
                 'end' => '2026-12-20',
@@ -396,7 +396,7 @@ function forma_migrate(PDO $pdo): void
             $p['eyebrow'] = 'Special im Advent · jetzt buchbar';
             $p['title'] = 'Pottery bemalen';
             $p['date_line'] = 'Ab 4. November · Mi & Do 15–18 Uhr';
-            $p['text'] = "Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Schalen und kleine Teller bemalen, ganz entspannt bei Kerzenlicht im Studio.\nJeden Mittwoch und Donnerstag von 15 bis 18 Uhr, abholen kannst du deine Stücke am Montag darauf. Die Plätze sind begrenzt, such dir gleich deinen Termin aus.";
+            $p['text'] = "Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Bowls und Mugs bemalen, ganz entspannt bei Kerzenlicht im Studio.\nJeden Mittwoch und Donnerstag von 15 bis 18 Uhr, abholen kannst du deine Stücke am Montag darauf. Die Plätze sind begrenzt, such dir gleich deinen Termin aus.";
             $p['signup'] = false;
             $p['button_text'] = 'Jetzt Termin buchen';
             $p['button_link'] = '#pottery-bemalen';
@@ -486,7 +486,7 @@ function forma_migrate(PDO $pdo): void
         $p = json_decode(forma_setting($pdo, 'popup') ?? '', true);
         if (is_array($p) && str_contains((string)($p['date_line'] ?? ''), 'Ende Oktober')) {
             $p['date_line'] = 'Ab November · Mi & Do 15–18 Uhr';
-            $p['text'] = "Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Schalen und kleine Teller bemalen, ganz entspannt bei Kerzenlicht im Studio.\nJeden Mittwoch und Donnerstag von 15 bis 18 Uhr, abholen kannst du deine Stücke am Montag darauf. Trag dich ein, dann erfährst du als Erste, wann die Anmeldung startet.";
+            $p['text'] = "Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Bowls und Mugs bemalen, ganz entspannt bei Kerzenlicht im Studio.\nJeden Mittwoch und Donnerstag von 15 bis 18 Uhr, abholen kannst du deine Stücke am Montag darauf. Trag dich ein, dann erfährst du als Erste, wann die Anmeldung startet.";
             $p['version'] = (int)($p['version'] ?? 1) + 1;
             forma_set_setting($pdo, 'popup', json_encode($p, JSON_UNESCAPED_UNICODE));
         }
@@ -641,6 +641,18 @@ function forma_migrate(PDO $pdo): void
         }
         forma_set_setting($pdo, 'voucher_codes_v25', '1');
     }
+    // 16.10.2026: Pottery bemalen ohne Teller, Untersetzer und Unterteller, dafür kleine und große Bowls.
+    if (forma_setting($pdo, 'bemalen_sortiment_v26') === null) {
+        $b = FORMA_SERIES['bemalen'];
+        $pdo->prepare('UPDATE courses SET description = ?, price_text = ? WHERE title = ?')
+            ->execute([$b['description'], $b['price_text'], $b['title']]);
+        $p = json_decode((string)forma_setting($pdo, 'popup'), true);
+        if (is_array($p) && isset($p['text'])) {
+            $p['text'] = str_replace(['Tassen, Schalen und kleine Teller', 'Tassen, Teller und Mugs'], 'Tassen, Bowls und Mugs', (string)$p['text']);
+            forma_set_setting($pdo, 'popup', json_encode($p, JSON_UNESCAPED_UNICODE));
+        }
+        forma_set_setting($pdo, 'bemalen_sortiment_v26', '1');
+    }
 }
 
 /** Vorlagen für Serientermine. */
@@ -665,9 +677,9 @@ const FORMA_SERIES = [
         'title' => 'Pottery bemalen',
         'from' => '15', 'to' => '18',
         'capacity' => 6, 'min' => 1,
-        'price_text' => '€ 15 Atelierbeitrag pro Person, vorab online. Dein Stück wählst du gleich mit aus (ab € 5)',
+        'price_text' => '€ 15 Atelierbeitrag pro Person, vorab online. Dein Stück wählst du gleich mit aus (ab € 15)',
         'price_cents' => 1500,
-        'description' => 'Tassen, Teller und Mugs bemalen, ganz entspannt bei Kerzenlicht. Mit dem Atelierbeitrag ist dein Platz reserviert, dein Stück kannst du gleich mitbuchen. Gefällt dir vor Ort noch mehr, rechnen wir es im Atelier ab. Abholung am Montag darauf.',
+        'description' => 'Tassen, Bowls und Mugs bemalen, ganz entspannt bei Kerzenlicht. Mit dem Atelierbeitrag ist dein Platz reserviert, dein Stück kannst du gleich mitbuchen. Gefällt dir vor Ort noch mehr, rechnen wir es im Atelier ab. Abholung am Montag darauf.',
     ],
 ];
 
@@ -675,9 +687,8 @@ const FORMA_SERIES = [
 const FORMA_BEMALEN_ITEMS = [
     'tasse' => ['Tasse mit Henkel', 1800],
     'espresso' => ['Espressotasse', 1500],
-    'teller' => ['Frühstücksteller', 1500],
-    'untersetzer' => ['Untersetzer', 500],
-    'unterteller' => ['Unterteller für Tasse', 900],
+    'bowlklein' => ['Kleine Bowl', 1500],
+    'bowlgross' => ['Große Bowl', 2200],
     'daumen' => ['Mug mit Daumendruck', 1800],
     'formamug' => ['FORMA Mug', 2200],
 ];
