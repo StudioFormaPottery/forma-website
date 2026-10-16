@@ -2229,11 +2229,20 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     slotRow.innerHTML='';slotOn={};
     [8,9,10].forEach(function(h){
       var free=c.slots&&c.slots[h]!=null?c.slots[h]:c.free,bt=el('button','slot');bt.type='button';
-      bt.appendChild(el('b',null,h+'–'+(h+1)+' Uhr'));bt.appendChild(el('small',null,free<=0?'ausgebucht':'frei'));
+      bt.appendChild(el('b',null,h+'–'+(h+1)+' Uhr'));bt.appendChild(el('small',null,free<=0?'ausgebucht':'frei'));bt.dataset.free=free;
       var hid=document.createElement('input');hid.type='hidden';hid.name='slots[]';hid.value=h;hid.disabled=true;
       if(free<=0)bt.disabled=true;
       bt.addEventListener('click',function(){slotOn[h]=!slotOn[h];bt.classList.toggle('on',slotOn[h]);hid.disabled=!slotOn[h];submitLabel();});
+      bt._hid=hid;bt._h=h;
       slotRow.appendChild(bt);slotRow.appendChild(hid);
+    });
+  }
+  // Offenes Atelier: Stunden, in denen nicht genug Plätze für die gewählte Personenzahl frei sind, sind nicht wählbar
+  function syncSlots(){
+    if(slotsBox.hidden)return;var n=+persons.value||1;
+    slotRow.querySelectorAll('button.slot').forEach(function(bt){
+      var f=+bt.dataset.free,off=f<n;bt.disabled=off;
+      if(off&&slotOn[bt._h]){slotOn[bt._h]=false;bt.classList.remove('on');bt._hid.disabled=true;}
     });
   }
   function slotCount(){return Object.keys(slotOn).filter(function(h){return slotOn[h];}).length;}
@@ -2253,7 +2262,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     $('book-date').textContent=c.date_text;
     $('book-price').textContent=c.price_text||'';
     persons.innerHTML='';
-    var max=8;
+    var max=Math.max(1,c.free);// nur so viele Personen wählbar, wie Plätze frei sind
     for(var i=1;i<=max;i++){var o=el('option',null,i===1?'1 Person':i+' Personen');o.value=i;persons.appendChild(o);}
     payNote.hidden=!(c.price_cents>0);
     piecesBox.hidden=c.title!=='Pottery bemalen';
@@ -2270,7 +2279,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   dlg.querySelectorAll('[data-back]').forEach(function(b){b.addEventListener('click',function(){
     if(b.getAttribute('data-back')==='kurs'){renderTiles($('pick-list'),false);setStep('kurs');}else setStep('datum');
   });});
-  persons.addEventListener('change',submitLabel);
+  persons.addEventListener('change',function(){syncSlots();submitLabel();});
   $('book-close').addEventListener('click',function(){hide(dlg);});
   $('book-done-close').addEventListener('click',function(){hide(dlg);});
   $('to-contact').addEventListener('click',function(){hide(dlg);});
