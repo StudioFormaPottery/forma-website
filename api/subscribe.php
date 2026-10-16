@@ -49,6 +49,9 @@ try {
             forma_mail($email, 'Dein Template des Monats von FORMA', "Hallo,\n\nschön, dass du im FORMA Maker Club bist! Hier ist dein Gratis-Template des Monats" . ($m['title'] ? " („{$m['title']}“)" : '') . ":\n\n" . forma_maker_link($row) . "\n\nViel Freude beim Töpfern!\nVivien\nFORMA Earth & Art\n");
             forma_json(['ok' => true, 'already' => true, 'maker' => true]);
         }
+        if ($source !== '' && !str_contains($row['source'], $source) && !str_contains($source, 'FORMA Post')) {
+            $pdo->prepare('UPDATE subscribers SET source = ? WHERE id = ?')->execute([trim($row['source'] . ', ' . $source, ', '), $row['id']]);
+        }
         forma_json(['ok' => true, 'already' => true]);
     }
     $token = bin2hex(random_bytes(20));

@@ -1079,6 +1079,26 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .nav-sub a:last-child{margin-bottom:12px}
 .nav-pill{padding:2px 10px;border-radius:999px;background:var(--clay);color:var(--on-clay);font-family:var(--body);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
 .offer,.pp-special{scroll-margin-top:130px}
+
+/* Adventkalender-Teaser */
+.advent{position:relative;display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:clamp(18px,4vw,44px);align-items:center;margin-top:clamp(24px,4vw,40px);padding:clamp(22px,4vw,40px);border-radius:32px;background:var(--paper-2);border:1px solid var(--line)}
+.ad-doors{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:18px;border-radius:26px;background:var(--clay);max-width:300px;width:100%;justify-self:center}
+.ad-d{aspect-ratio:1;display:grid;place-items:center;border-radius:14px;background:var(--blush);color:var(--clay);font-family:var(--display);font-weight:600;font-size:clamp(18px,2vw,24px);box-shadow:inset 0 0 0 2px rgba(251,241,234,.5)}
+.ad-d.ad-open{background:var(--paper);transform:perspective(300px) rotateY(-28deg);transform-origin:left center;box-shadow:6px 4px 0 rgba(51,33,27,.25)}
+.ad-star{position:absolute;right:-12px;top:-14px;width:34px;height:34px;fill:var(--blush);animation:sway 6s ease-in-out infinite alternate}
+.ad-body{display:flex;flex-direction:column;gap:10px;min-width:0}
+.ad-tag{margin:0}.ad-tag span{display:inline-block;padding:5px 14px;border-radius:999px;background:var(--clay);color:var(--on-clay);font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.advent h3{margin:0;font-family:var(--display);font-weight:650;font-size:clamp(28px,3.4vw,42px);line-height:1.05;letter-spacing:-.02em;color:var(--clay)}
+.ad-sub{margin:0;font-family:var(--display);font-weight:600;font-size:clamp(18px,1.8vw,22px);color:var(--ink-soft)}
+.ad-body > p:not(.ad-tag):not(.ad-sub){margin:0;max-width:56ch}
+.ad-form{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.ad-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) auto;gap:8px}
+.ad-row input{font:inherit;font-size:17px;padding:12px 16px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink);min-width:0}
+.ad-form .consent{font-size:14.5px;line-height:1.5}
+.ad-done{margin:6px 0 0;padding:14px 16px;border-radius:16px;background:var(--blush);font-weight:500}
+@media (max-width:860px){.ad-row{grid-template-columns:1fr}}
+@media (max-width:780px){.advent{grid-template-columns:1fr}.ad-doors{max-width:220px;gap:8px;padding:14px}}
+@media (min-width:900px){.ad-body > p:not(.ad-tag):not(.ad-sub){font-size:20px}}
 </style>
 </head>
 <body>
@@ -1616,6 +1636,23 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           </div>
         </div>
       </article>
+      <article class="advent" aria-labelledby="ad-ev-t">
+        <div class="ad-doors" aria-hidden="true"><span class="ad-d">3</span><span class="ad-d">17</span><span class="ad-d">9</span><span class="ad-d ad-open">24</span><span class="ad-d">12</span><span class="ad-d">6</span><span class="ad-d">21</span><span class="ad-d">1</span><span class="ad-d">14</span><svg class="ad-star" viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg></div>
+        <div class="ad-body">
+          <p class="ad-tag"><span>Bald im Shop</span></p>
+          <h3 id="ad-ev-t">Der FORMA Adventkalender</h3>
+          <p class="ad-sub">24 Templates zum Herunterladen</p>
+          <p>Jeden Tag ein Türchen und eine kleine Pottery-Idee für die Weihnachtszeit. Trag dich ein, dann sag ich dir Bescheid, sobald der Adventkalender im Shop ist.</p>
+          <form class="ad-form" novalidate>
+            <input type="hidden" name="t" class="ad-time"><input type="hidden" name="source" value="Adventkalender">
+            <div class="hp" aria-hidden="true"><label>Bitte leer lassen</label><input name="website" tabindex="-1" autocomplete="off"></div>
+            <div class="ad-row"><input name="name" type="text" autocomplete="given-name" placeholder="Dein Vorname" maxlength="80" aria-label="Vorname"><input name="email" type="email" autocomplete="email" placeholder="Deine E-Mail-Adresse" aria-label="E-Mail"><button class="btn btn-solid" type="submit">Benachrichtige mich</button></div>
+            <label class="consent"><input type="checkbox" name="consent" value="1"> <span>Ja, schreib mir, wenn der Adventkalender da ist, und schick mir ab und zu die FORMA Post. Abmelden geht jederzeit. <a href="#datenschutz">Datenschutz</a></span></label>
+            <p class="book-error ad-err" role="alert" hidden></p>
+          </form>
+          <p class="ad-done" hidden></p>
+        </div>
+      </article>
     </div>
   </section>
 
@@ -1727,6 +1764,23 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <div class="chips" id="tpl-age" role="group" aria-label="Für wen"></div>
       </div>
       <div class="tpl-grid" id="tpl-grid"><p class="slots-note">Die ersten Templates kommen bald. Im Maker Club erfährst du es zuerst.</p></div>
+      <article class="advent" aria-labelledby="ad-shop-t">
+        <div class="ad-doors" aria-hidden="true"><span class="ad-d">3</span><span class="ad-d">17</span><span class="ad-d">9</span><span class="ad-d ad-open">24</span><span class="ad-d">12</span><span class="ad-d">6</span><span class="ad-d">21</span><span class="ad-d">1</span><span class="ad-d">14</span><svg class="ad-star" viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg></div>
+        <div class="ad-body">
+          <p class="ad-tag"><span>Bald im Shop</span></p>
+          <h3 id="ad-shop-t">Der FORMA Adventkalender</h3>
+          <p class="ad-sub">24 Templates zum Herunterladen</p>
+          <p>Jeden Tag ein Türchen und eine kleine Pottery-Idee für die Weihnachtszeit. Trag dich ein, dann sag ich dir Bescheid, sobald der Adventkalender im Shop ist.</p>
+          <form class="ad-form" novalidate>
+            <input type="hidden" name="t" class="ad-time"><input type="hidden" name="source" value="Adventkalender">
+            <div class="hp" aria-hidden="true"><label>Bitte leer lassen</label><input name="website" tabindex="-1" autocomplete="off"></div>
+            <div class="ad-row"><input name="name" type="text" autocomplete="given-name" placeholder="Dein Vorname" maxlength="80" aria-label="Vorname"><input name="email" type="email" autocomplete="email" placeholder="Deine E-Mail-Adresse" aria-label="E-Mail"><button class="btn btn-solid" type="submit">Benachrichtige mich</button></div>
+            <label class="consent"><input type="checkbox" name="consent" value="1"> <span>Ja, schreib mir, wenn der Adventkalender da ist, und schick mir ab und zu die FORMA Post. Abmelden geht jederzeit. <a href="#datenschutz">Datenschutz</a></span></label>
+            <p class="book-error ad-err" role="alert" hidden></p>
+          </form>
+          <p class="ad-done" hidden></p>
+        </div>
+      </article>
     </div>
     <svg class="wave" style="--to:var(--paper-2);background:var(--lilac)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40c160 44 330 66 520 50s320-72 500-70 290 44 420 40v60H0z"></path></svg>
   </section>
@@ -2185,6 +2239,25 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     (loaded||load()).then(function(){openWizard(findGroup(key));});
   });
 
+
+  // Adventkalender-Teaser: „Benachrichtige mich“
+  document.querySelectorAll('.ad-form').forEach(function(f){
+    f.querySelector('.ad-time').value=Date.now();
+    var err=f.querySelector('.ad-err'),done=f.parentNode.querySelector('.ad-done'),btn=f.querySelector('button[type="submit"]');
+    f.addEventListener('submit',function(e){
+      e.preventDefault();err.hidden=true;
+      var n=f.name.value.trim(),m=f.email.value.trim(),msg='';
+      if(n.length<2)msg='Bitte gib deinen Vornamen an.';else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m))msg='Bitte gib eine gültige E-Mail-Adresse an.';else if(!f.consent.checked)msg='Bitte bestätige noch, dass ich dir schreiben darf.';
+      if(msg){err.textContent=msg;err.hidden=false;return;}
+      btn.disabled=true;
+      fetch('api/subscribe.php',{method:'POST',body:new FormData(f)}).then(function(r){return r.json().catch(function(){return {ok:false};});}).then(function(d){
+        btn.disabled=false;
+        if(!d||!d.ok){err.textContent=(d&&d.error)||'Das hat leider nicht geklappt. Bitte versuch es noch einmal.';err.hidden=false;return;}
+        f.hidden=true;done.hidden=false;
+        done.textContent=d.already?'Danke! Du bist schon in der FORMA Post, ich sag dir Bescheid, sobald der Adventkalender da ist.':'Fast geschafft! Bitte bestätige noch kurz deine E-Mail-Adresse in deinem Postfach, dann sag ich dir Bescheid, sobald der Adventkalender da ist.';
+      }).catch(function(){btn.disabled=false;err.textContent='Keine Verbindung. Bitte versuch es noch einmal.';err.hidden=false;});
+    });
+  });
   // Direkt zu einem bestimmten Termin (z. B. aus dem Monatskalender der Hotelseite: ?termin=ID)
   (function(){
     var tid=parseInt(new URLSearchParams(location.search).get('termin')||'',10);if(!tid)return;
