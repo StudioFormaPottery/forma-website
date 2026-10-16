@@ -731,6 +731,46 @@ if ($action === 'invoice_resend') {
 }
 
 // --- Ansichten -------------------------------------------------------------
+// --- Atelier-Kasse (Pottery bemalen) ------------------------------------------
+if ($action === 'kasse_new') {
+    $cid = (int)($_POST['c'] ?? 0);
+    $back = $self . '?view=kasse' . ($cid ? '&c=' . $cid : '');
+    $name = trim((string)($_POST['name'] ?? ''));
+    $email = trim((string)($_POST['email'] ?? ''));
+    $method = ($_POST['method'] ?? '') === 'bar' ? 'bar' : 'link';
+    $items = forma_kasse_pick($_POST['qty'] ?? []);
+    if (!$items) go($back, 'Tipp zuerst an, was sie bemalt hat.');
+    if ($name === '') go($back, 'Bitte gib noch den Namen ein, er steht auf der Rechnung.');
+    if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) go($back, 'Die E-Mail-Adresse stimmt noch nicht ganz.');
+    if ($method === 'link' && !forma_stripe_key()) go($back, 'Für Bezahl-Links muss Stripe unter Einstellungen verbunden sein. Bar geht trotzdem.');
+    $kid = forma_kasse_create($pdo, mb_substr($name, 0, 120), mb_substr($email, 0, 190), $items, $method, $cid);
+    $sum = forma_euro(forma_kasse_sum($items));
+    $first = forma_first_name($name);
+    go($back . '&neu=' . $kid . '#neu', $method === 'bar'
+        ? "Bar bezahlt: $sum. " . ($email !== '' ? "$first hat die Rechnung per E-Mail bekommen, du auch." : 'Die Rechnung ist bei dir im Postfach, ohne E-Mail-Adresse kannst du sie ausdrucken.')
+        : ($email !== '' ? "Der Bezahl-Link über $sum ist per E-Mail an $first unterwegs. Du kannst ihn unten auch per WhatsApp schicken." : "Der Bezahl-Link über $sum ist fertig. Schick ihn unten per WhatsApp an $first."));
+}
+
+if ($action === 'kasse_remind' || $action === 'kasse_cash' || $action === 'kasse_cancel') {
+    $kid = (int)($_POST['kid'] ?? 0);
+    $s = forma_kasse_get($pdo, $kid);
+    $back = $self . '?view=kasse' . ((int)($_POST['c'] ?? 0) ? '&c=' . (int)$_POST['c'] : '');
+    if (!$s) go($back, 'Diesen Verkauf gibt es nicht mehr.');
+    if ($s['status'] === 'offen' && $s['stripe_session'] !== '') {
+        try { if (forma_kasse_check($pdo, $s) === 'bezahlt') go($back, 'Der Link ist inzwischen online bezahlt, die Rechnung ist schon raus.'); } catch (Throwable $e) { error_log('FORMA kasse check: ' . $e->getMessage()); }
+    }
+    if ($s['status'] !== 'offen') go($back, 'Dieser Verkauf ist nicht mehr offen.');
+    if ($action === 'kasse_remind') {
+        go($back, forma_kasse_link_mail($pdo, $kid, true) ? 'Die Erinnerung ist per E-Mail unterwegs.' : 'Ohne E-Mail-Adresse geht keine Erinnerung per Mail. Kopier die Nachricht und schick sie per WhatsApp.');
+    }
+    if ($action === 'kasse_cash') {
+        forma_kasse_mark_cash($pdo, $kid);
+        go($back, 'Als bar bezahlt gespeichert. Die Rechnung ist raus, der Link funktioniert nicht mehr.');
+    }
+    $pdo->prepare("UPDATE kasse_sales SET status = 'zurueckgezogen' WHERE id = ? AND status = 'offen'")->execute([$kid]);
+    go($back, 'Zurückgezogen. Der Bezahl-Link funktioniert nicht mehr.');
+}
+
 if ($view === 'rechnung_pdf') {
     forma_invoice_schema($pdo);
     $inv = forma_invoice_get($pdo, (int)($_GET['id'] ?? 0));
@@ -753,7 +793,7 @@ if ($view === 'rechnungen_export') {
     foreach ($rows as $r) {
         $items = implode(' + ', array_map(fn($i) => $i['qty'] . '× ' . $i['text'], json_decode($r['items'], true)));
         fputcsv($out, ['Forma', $r['nr'], date('d.m.Y', strtotime($r['issued_at'])), $r['service_date'], $r['name'], $r['email'], $r['country'], $items,
-            $de((int)$r['gross_cents']), $de((int)$r['net_cents']), rtrim(rtrim(number_format((float)$r['vat_rate'], 1, ',', ''), '0'), ',') . ' %', $de((int)$r['vat_cents']), 'online (Stripe)'], ';');
+            $de((int)$r['gross_cents']), $de((int)$r['net_cents']), rtrim(rtrim(number_format((float)$r['vat_rate'], 1, ',', ''), '0'), ',') . ' %', $de((int)$r['vat_cents']), forma_invoice_is_cash($r) ? 'bar (Atelier-Kasse)' : (forma_invoice_is_voucher($r) ? 'alter Gutschein' : 'online (Stripe)')], ';');
     }
     exit;
 }
@@ -796,6 +836,121 @@ if ($view === 'tests' || $action === 'test_run') {
     exit;
 }
 
+if ($view === 'kasse') {
+    forma_reconcile_payments($pdo, true);
+    $courses = $pdo->prepare("SELECT * FROM courses WHERE title = ? AND start_date BETWEEN ? AND ? ORDER BY start_date");
+    $courses->execute([FORMA_SERIES['bemalen']['title'], date('Y-m-d', strtotime('-14 days')), date('Y-m-d', strtotime('+45 days'))]);
+    $courses = $courses->fetchAll();
+    $cid = (int)($_GET['c'] ?? 0);
+    if (!$cid) foreach ($courses as $c) if (substr((string)$c['start_date'], 0, 10) === date('Y-m-d')) $cid = (int)$c['id'];
+    $guests = [];
+    if ($cid) {
+        $st = $pdo->prepare("SELECT name, email FROM bookings WHERE course_id = ? AND status = 'bestaetigt' ORDER BY name");
+        $st->execute([$cid]);
+        $guests = $st->fetchAll();
+    }
+    $open = $pdo->query("SELECT * FROM kasse_sales WHERE status = 'offen' ORDER BY id DESC")->fetchAll();
+    $done = $pdo->query("SELECT * FROM kasse_sales WHERE status != 'offen' ORDER BY id DESC LIMIT 60")->fetchAll();
+    forma_invoice_schema($pdo);
+    $inv = [];
+    foreach ($pdo->query("SELECT id, ref_id, nr FROM invoices WHERE kind = 'kasse'")->fetchAll() as $r) $inv[(int)$r['ref_id']] = $r;
+    $new = (int)($_GET['neu'] ?? 0);
+    $stripe = (bool)forma_stripe_key();
+    render_page('Kasse', function () use ($self, $flash, $courses, $cid, $guests, $open, $done, $inv, $new, $stripe) {
+        $products = forma_kasse_products();
+        $sale = function (array $s) use ($self, $cid, $inv, $new) {
+            $items = json_decode((string)$s['items'], true) ?: [];
+            $st = $s['status'];
+            $pill = $st === 'offen' ? '<span class="pill pill-wait">wartet auf Zahlung</span>'
+                : ($st === 'bezahlt' ? '<span class="pill pill-ok">' . ($s['method'] === 'bar' ? 'bar bezahlt' : 'online bezahlt') . '</span>' : '<span class="pill">zurückgezogen</span>');
+            $hidden = '<input type="hidden" name="csrf" value="' . forma_h(csrf()) . '"><input type="hidden" name="kid" value="' . (int)$s['id'] . '"><input type="hidden" name="c" value="' . (int)$cid . '">'; ?>
+            <div class="card booking k-sale<?= (int)$s['id'] === $new ? ' is-new' : '' ?><?= $st === 'zurueckgezogen' ? ' is-cancelled' : '' ?>"<?= (int)$s['id'] === $new ? ' id="neu"' : '' ?>>
+                <div class="booking-head"><strong><?= forma_h($s['name']) ?> · <?= forma_h(forma_euro((int)$s['amount_cents'])) ?></strong><?= $pill ?></div>
+                <div class="small"><?= forma_h(implode(' · ', array_map(fn($i) => $i['qty'] . '× ' . $i['name'], $items))) ?></div>
+                <div class="muted small"><?= forma_h(date('d. m. Y, H:i', strtotime((string)$s['created_at']))) ?><?= $s['email'] !== '' ? ' · ' . forma_h($s['email']) : ' · ohne E-Mail' ?></div>
+                <?php if ($st === 'offen'): $msg = forma_kasse_whatsapp($s); ?>
+                    <textarea class="link-msg" rows="5" readonly><?= forma_h($msg) ?></textarea>
+                    <div class="row-actions">
+                        <button class="btn btn-sm" type="button" data-copy="<?= forma_h($msg) ?>">Nachricht kopieren</button>
+                        <a class="btn btn-ghost btn-sm" href="https://wa.me/?text=<?= rawurlencode($msg) ?>" target="_blank" rel="noopener">In WhatsApp öffnen</a>
+                    </div>
+                    <form method="post" class="row-actions"><?= $hidden ?>
+                        <?php if ($s['email'] !== ''): ?><button class="link small" name="action" value="kasse_remind">Erinnerung per E-Mail</button><?php endif; ?>
+                        <button class="link small" name="action" value="kasse_cash" onclick="return confirm('Hat sie doch bar bezahlt? Dann geht jetzt die Rechnung raus und der Link funktioniert nicht mehr.')">Doch bar bezahlt</button>
+                        <button class="link small" name="action" value="kasse_cancel" onclick="return confirm('Wirklich zurückziehen? Der Bezahl-Link funktioniert dann nicht mehr.')">zurückziehen</button>
+                    </form>
+                <?php elseif (isset($inv[(int)$s['id']])): ?>
+                    <div><a href="<?= forma_h($self) ?>?view=rechnung_pdf&amp;id=<?= (int)$inv[(int)$s['id']]['id'] ?>" target="_blank">Rechnung <?= forma_h($inv[(int)$s['id']]['nr']) ?> ansehen</a></div>
+                <?php endif; ?>
+            </div>
+        <?php }; ?>
+        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
+        <p class="eyebrow">Pottery bemalen</p>
+        <h1>Kasse</h1>
+        <p class="muted">Tipp an, was sie bemalt hat, dann bar kassieren oder einen Bezahl-Link schicken. Die Rechnung kommt automatisch, als Workshop-Leistung mit Fertigstellung.</p>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <?php if ($courses): ?>
+        <form class="k-course" method="get"><input type="hidden" name="view" value="kasse">
+            <label for="k-c">Termin</label>
+            <select id="k-c" name="c" onchange="this.form.submit()">
+                <option value="0">ohne Termin (z. B. spontan)</option>
+                <?php foreach ($courses as $c): ?><option value="<?= (int)$c['id'] ?>"<?= (int)$c['id'] === $cid ? ' selected' : '' ?>><?= forma_h($c['date_text']) ?><?= substr((string)$c['start_date'], 0, 10) === date('Y-m-d') ? ' · heute' : '' ?></option><?php endforeach; ?>
+            </select>
+        </form>
+        <?php endif; ?>
+        <?php if ($guests): ?>
+        <div class="k-guests"><span class="muted small">Angemeldet, antippen zum Übernehmen:</span>
+            <?php foreach ($guests as $g): ?><button type="button" class="k-guest" data-name="<?= forma_h($g['name']) ?>" data-email="<?= forma_h($g['email']) ?>"><?= forma_h($g['name']) ?></button><?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+        <form method="post" id="kasse" class="k-form">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="kasse_new"><input type="hidden" name="c" value="<?= (int)$cid ?>">
+            <div class="k-grid">
+            <?php foreach ($products as $key => [$label, $cents]): ?>
+                <div class="k-item" data-cents="<?= (int)$cents ?>">
+                    <button type="button" class="k-add" aria-label="<?= forma_h($label) ?> dazu">
+                        <span class="k-ic"><?= kasse_icon($key) ?></span>
+                        <strong><?= forma_h($label) ?></strong>
+                        <span class="k-price"><?= forma_h(forma_euro((int)$cents)) ?></span>
+                        <span class="k-qty" aria-live="polite">0</span>
+                    </button>
+                    <button type="button" class="k-minus" aria-label="<?= forma_h($label) ?> weniger">−</button>
+                    <input type="hidden" name="qty[<?= forma_h($key) ?>]" value="0">
+                </div>
+            <?php endforeach; ?>
+            </div>
+            <div class="k-who">
+                <label>Name <span class="muted small">(steht auf der Rechnung)</span><input name="name" id="k-name" maxlength="120" autocomplete="off" required></label>
+                <label>E-Mail <span class="muted small">(für Rechnung und Bezahl-Link)</span><input name="email" id="k-email" type="email" maxlength="190" autocomplete="off" inputmode="email"></label>
+            </div>
+            <div class="k-bar">
+                <div class="k-total"><span class="muted small">Summe</span><b id="k-sum">€ 0</b></div>
+                <button class="btn" type="submit" name="method" value="bar" id="k-bar-btn" disabled>Bar bezahlt</button>
+                <button class="btn btn-ghost" type="submit" name="method" value="link" id="k-link-btn" disabled<?= $stripe ? '' : ' title="Stripe ist noch nicht verbunden"' ?>>Bezahl-Link</button>
+            </div>
+            <button type="button" class="link small k-reset">Alles zurücksetzen</button>
+        </form>
+        <?php if ($open): ?><h2>Offene Bezahl-Links</h2><div class="list"><?php foreach ($open as $s) $sale($s); ?></div><?php endif; ?>
+        <?php if ($done): ?><details class="past"<?= $new && !in_array($new, array_map('intval', array_column($open, 'id')), true) ? ' open' : '' ?>><summary>Kassiert</summary><div class="list"><?php foreach ($done as $s) $sale($s); ?></div></details><?php endif; ?>
+        <script>
+        (function(){
+          var form=document.getElementById('kasse'),sumEl=document.getElementById('k-sum'),bar=document.getElementById('k-bar-btn'),link=document.getElementById('k-link-btn');
+          function euro(c){return '€ '+(c%100===0?String(c/100):(c/100).toFixed(2).replace('.',','));}
+          function update(){var t=0;form.querySelectorAll('.k-item').forEach(function(it){var q=+it.querySelector('input').value;t+=q*(+it.dataset.cents);it.classList.toggle('on',q>0);it.querySelector('.k-qty').textContent=q;});sumEl.textContent=euro(t);bar.disabled=link.disabled=t===0;bar.textContent=t?'Bar bezahlt · '+euro(t):'Bar bezahlt';}
+          form.querySelectorAll('.k-item').forEach(function(it){var inp=it.querySelector('input');
+            it.querySelector('.k-add').addEventListener('click',function(){inp.value=Math.min(50,+inp.value+1);update();});
+            it.querySelector('.k-minus').addEventListener('click',function(){inp.value=Math.max(0,+inp.value-1);update();});});
+          form.querySelector('.k-reset').addEventListener('click',function(){form.querySelectorAll('.k-item input').forEach(function(i){i.value=0;});document.getElementById('k-name').value='';document.getElementById('k-email').value='';update();});
+          document.querySelectorAll('.k-guest').forEach(function(b){b.addEventListener('click',function(){document.getElementById('k-name').value=b.dataset.name;document.getElementById('k-email').value=b.dataset.email;document.querySelectorAll('.k-guest').forEach(function(x){x.classList.toggle('on',x===b);});});});
+          form.addEventListener('submit',function(e){var m=e.submitter&&e.submitter.value,mail=document.getElementById('k-email').value.trim();
+            if(m==='bar'&&!confirm('Bar erhalten: '+sumEl.textContent+'?\n'+(mail?'Die Rechnung geht an '+mail+'.':'Ohne E-Mail bekommst nur du die Rechnung.')))e.preventDefault();});
+          document.querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){var t=b.dataset.copy;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){b.textContent='Kopiert ✓';},function(){var ta=b.closest('.k-sale').querySelector('textarea');ta.select();document.execCommand('copy');b.textContent='Kopiert ✓';});});});
+          update();
+        })();
+        </script>
+    <?php });
+}
+
 if ($view === 'rechnungen') {
     forma_invoice_schema($pdo);
     forma_sheet_sync($pdo);
@@ -806,7 +961,7 @@ if ($view === 'rechnungen') {
     render_page('Rechnungen', function () use ($self, $flash, $rows, $sum, $gkey, $cfg) { ?>
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Rechnungen</h1>
-        <p class="muted">Nach jeder Online-Zahlung (Kurs, Private Pottery, Template) wird automatisch eine Rechnung erstellt und als PDF an die Kundin und an dich geschickt. Eigener Nummernkreis für Online-Verkäufe, lückenlos pro Jahr.</p>
+        <p class="muted">Nach jeder Online-Zahlung (Kurs, Private Pottery, Template) und jedem Verkauf an der Atelier-Kasse wird automatisch eine Rechnung erstellt und als PDF an die Kundin und an dich geschickt. Eigener Nummernkreis für Online-Verkäufe, lückenlos pro Jahr.</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <p><a class="btn" href="<?= forma_h($self) ?>?view=rechnungen_export">Liste herunterladen (CSV für die Buchhaltung)</a></p>
         <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="invoice_sample"><button class="link" type="submit">Testmail mit Muster-Rechnung an mich schicken</button></form>
@@ -814,7 +969,7 @@ if ($view === 'rechnungen') {
         <div class="list">
         <?php foreach ($rows as $r): ?>
             <div class="card booking">
-                <div class="booking-head"><strong><?= forma_h($r['nr']) ?> · <?= forma_h($r['name']) ?></strong><span class="pill pill-ok"><?= forma_h(forma_euro((int)$r['gross_cents'])) ?> bezahlt</span></div>
+                <div class="booking-head"><strong><?= forma_h($r['nr']) ?> · <?= forma_h($r['name']) ?></strong><span class="pill pill-ok"><?= forma_h(forma_euro((int)$r['gross_cents'])) ?> <?= forma_invoice_is_cash($r) ? 'bar bezahlt' : 'bezahlt' ?></span></div>
                 <div class="muted small"><?= forma_h(date('d.m.Y', strtotime($r['issued_at']))) ?> · <?= forma_h($r['country']) ?> · USt. <?= forma_h((string)(float)$r['vat_rate']) ?> % · <?= $r['synced'] ? 'in Google Tabelle eingetragen' : 'noch nicht in Google Tabelle' ?></div>
                 <div><a href="<?= forma_h($self) ?>?view=rechnung_pdf&amp;id=<?= (int)$r['id'] ?>" target="_blank">PDF ansehen</a></div>
                 <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="invoice_resend"><input type="hidden" name="iid" value="<?= (int)$r['id'] ?>"><button class="link" type="submit">Noch einmal an die Kundin schicken</button></form>
@@ -1672,7 +1827,7 @@ if ($view === 'course') {
         <h1><?= forma_h($c['title']) ?></h1>
         <p class="muted"><?= forma_h($c['date_text']) ?> · <?= $booked ?> von <?= (int)$c['capacity'] ?> Plätzen belegt<?= $c['visible'] ? '' : ' · <strong>auf der Website ausgeblendet</strong>' ?></p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
-        <p><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=edit&amp;id=<?= (int)$c['id'] ?>">Termin bearbeiten</a></p>
+        <p class="row-actions"><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=edit&amp;id=<?= (int)$c['id'] ?>">Termin bearbeiten</a><?php if ($c['title'] === FORMA_SERIES['bemalen']['title']): ?> <a class="btn" href="<?= forma_h($self) ?>?view=kasse&amp;c=<?= (int)$c['id'] ?>">Kasse öffnen</a><?php endif; ?></p>
         <?php $ms = (string)($c['min_status'] ?? ''); if ((int)$c['min_participants'] > 1 && $booked > 0 && $booked < (int)$c['min_participants'] && in_array($ms, ['', 'gemeldet', 'gast_informiert'], true) && $c['start_date'] >= date('Y-m-d')): ?>
         <div class="card notice minbox">
             <span class="ic"><?= admin_icon('kalender') ?></span>
@@ -1810,6 +1965,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
         </section>
         <nav class="tiles">
             <a class="tile hl" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('kalender') ?></span><strong>Kalender</strong><span class="muted small">Kurse &amp; Private Pottery</span></a>
+            <a class="tile hl" href="<?= forma_h($self) ?>?view=kasse"><span class="ic"><?= admin_icon('kasse') ?></span><strong>Kasse</strong><span class="muted small">Pottery bemalen · bar oder Link</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=private"><span class="ic"><?= admin_icon('private') ?></span><strong>Private Pottery</strong><span class="muted small"><?= $privateOpen ?> offen</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=edit"><span class="ic"><?= admin_icon('plus') ?></span><strong>Einzeltermin</strong><span class="muted small">z. B. ein Special-Kurs</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=series"><span class="ic"><?= admin_icon('serie') ?></span><strong>Serientermine</strong><span class="muted small">z. B. jeden Mi &amp; Fr</span></a>
@@ -1860,6 +2016,21 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
     <?php endif; ?>
 <?php });
 
+/** Bilder für die Kasse, dieselben wie auf der Website (Pottery bemalen). */
+function kasse_icon(string $k): string
+{
+    $p = [
+        'beitrag' => '<circle cx="30" cy="28" r="20" fill="#DDBFA8"/><circle cx="22" cy="20" r="4" fill="#8C2C1D"/><circle cx="34" cy="17" r="3.5" fill="#674B40"/><circle cx="42" cy="26" r="3.5" fill="#FBF1EA"/><circle cx="24" cy="34" r="5" fill="#FBF1EA"/><path d="M40 50l14-20" stroke="#674B40" stroke-width="3.5" stroke-linecap="round"/><path d="M52 28l4-5 2 2-4 5z" fill="#8C2C1D"/>',
+        'tasse' => '<path d="M16 12h26v26a8 8 0 01-8 8H24a8 8 0 01-8-8z" fill="#8C2C1D"/><path d="M42 18h4a7 7 0 010 14h-4" fill="none" stroke="#8C2C1D" stroke-width="4"/><path d="M20 26c4-3 8 3 12 0s6-2 8 0" stroke="#FBF1EA" stroke-width="2.4" fill="none" stroke-linecap="round"/>',
+        'espresso' => '<ellipse cx="30" cy="44" rx="20" ry="4" fill="#DDBFA8"/><path d="M19 20h22v14a7 7 0 01-7 7h-8a7 7 0 01-7-7z" fill="#8C2C1D"/><path d="M41 24h3a5 5 0 010 10h-3" fill="none" stroke="#8C2C1D" stroke-width="3.5"/><path d="M27 8c2 3-2 5 0 8M33 8c2 3-2 5 0 8" stroke="#674B40" stroke-width="2" fill="none" stroke-linecap="round"/>',
+        'bowlklein' => '<path d="M14 24h36a18 16 0 01-36 0z" fill="#8C2C1D"/><ellipse cx="32" cy="24" rx="18" ry="4.5" fill="#DDBFA8"/><path d="M20 32c4-2 8 2 12 0s8-2 12 0" stroke="#FBF1EA" stroke-width="2" fill="none" stroke-linecap="round"/>',
+        'bowlgross' => '<path d="M6 20h52a26 22 0 01-52 0z" fill="#8C2C1D"/><ellipse cx="32" cy="20" rx="26" ry="6" fill="#DDBFA8"/><path d="M14 30c6-3 12 3 18 0s12-3 18 0M18 38c5-2 9 2 14 0s9-2 14 0" stroke="#FBF1EA" stroke-width="2" fill="none" stroke-linecap="round"/>',
+        'daumen' => '<path d="M18 10h28v30a8 8 0 01-8 8H26a8 8 0 01-8-8z" fill="#8C2C1D"/><ellipse cx="38" cy="26" rx="5.5" ry="7" fill="#DDBFA8"/><path d="M35 22c2-1 4-1 6 1M34 26c2-1 5-1 7 1M35 30c2-1 4-1 6 0" stroke="#8C2C1D" stroke-width="1.4" fill="none" stroke-linecap="round"/>',
+        'formamug' => '<path d="M17 8h30v32a9 9 0 01-9 9H26a9 9 0 01-9-9z" fill="#8C2C1D"/><path d="M17 20c5-4 10 4 15 0s10-4 15 0M17 30c5-4 10 4 15 0s10-4 15 0" stroke="#FBF1EA" stroke-width="2.4" fill="none"/><path d="M22 40l3-4M28 40l3-4M34 40l3-4" stroke="#DDBFA8" stroke-width="2" stroke-linecap="round"/>',
+    ][$k] ?? '';
+    return '<svg viewBox="0 0 64 54" aria-hidden="true">' . $p . '</svg>';
+}
+
 function admin_icon(string $k): string
 {
     $p = [
@@ -1874,6 +2045,7 @@ function admin_icon(string $k): string
         'popup' => '<path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8zM6 16l.6 1.4L8 18l-1.4.6L6 20l-.6-1.4L4 18l1.4-.6z"/>',
         'test' => '<path d="M9 3h6M10 3v6l-5 9a2 2 0 001.8 3h10.4a2 2 0 001.8-3l-5-9V3"/><path d="M7.5 14h9"/>',
         'team' => '<circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 20c.5-3.5 2.8-5.5 5.5-5.5s5 2 5.5 5.5M10.5 20c.5-3.5 2.8-5.5 5.5-5.5s5 2 5.5 5.5"/>',
+        'kasse' => '<rect x="3" y="10" width="18" height="11" rx="2"/><path d="M6 10V5h9v5M8 14h2M12 14h2M16 14h2M8 17h2M12 17h2M16 17h2"/>',
         'settings' => '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
     ][$k] ?? '';
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $p . '</svg>';
@@ -2040,6 +2212,34 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .side-list{display:flex!important;flex-direction:column;gap:8px}
 .side-item{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink);padding:12px 14px}
 .side-item.active{border:2px solid var(--clay)}
+/* Kasse */
+.k-course{display:flex;gap:10px;align-items:center;margin:4px 0 10px;max-width:640px}.k-course label{flex:0 0 auto;font-weight:500}
+.k-guests{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px}
+.k-guest{font:inherit;font-size:15px;border:1px solid var(--line);background:#FFFAF5;color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer}
+.k-guest.on{background:var(--clay);border-color:var(--clay);color:#FBF1EA}
+.k-form{display:grid;gap:14px}
+.k-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.k-item{position:relative}
+.k-add{font:inherit;width:100%;display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 8px 12px;border:1.5px solid var(--line);border-radius:20px;background:#FFFAF5;color:var(--ink);cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent;transition:transform .08s,border-color .15s,background .15s}
+.k-add:active{transform:scale(.97)}
+.k-add strong{font-weight:500;font-size:16px;line-height:1.2}
+.k-ic svg{width:78px;height:66px;display:block}
+.k-price{font-size:14px;color:var(--soft)}
+.k-qty{position:absolute;top:8px;right:8px;min-width:30px;height:30px;padding:0 8px;border-radius:999px;background:var(--clay);color:#FBF1EA;font-weight:600;font-size:16px;display:none;align-items:center;justify-content:center}
+.k-minus{position:absolute;top:8px;left:8px;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--clay);background:#fff;color:var(--clay);font:500 20px/1 inherit;display:none;align-items:center;justify-content:center;cursor:pointer}
+.k-item.on .k-add{border-color:var(--clay);background:#F6E6DA}
+.k-item.on .k-qty,.k-item.on .k-minus{display:flex}
+.k-who{display:grid;gap:10px}
+.k-bar{position:sticky;bottom:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:#FBF6F0;border:1px solid var(--line);border-radius:20px;padding:12px 14px;box-shadow:0 -6px 18px rgba(103,48,30,.08)}
+.k-total{display:flex;align-items:baseline;gap:10px;flex:1 0 100%;line-height:1.1}
+.k-bar .btn{flex:1 1 40%;margin:0}
+.k-total b{font-family:"Bricolage Grotesque","Outfit",sans-serif;font-size:30px;color:var(--clay)}
+.k-bar .btn{min-height:48px}
+.k-bar .btn:disabled{opacity:.45;cursor:default}
+.k-reset{justify-self:start}
+.k-sale.is-new{outline:2px solid var(--clay)}
+@media (min-width:640px){.k-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.k-who{grid-template-columns:1fr 1fr}.k-total{flex:1 1 auto}.k-bar .btn{flex:0 0 auto}}
+@media (min-width:900px){.k-ic svg{width:100px;height:84px}.k-add strong{font-size:20px}.k-price{font-size:17px}.k-total b{font-size:38px}.k-guest{font-size:18px}}
 .cal-side h2{margin-top:0}
 @media (max-width:640px){
   .stats{grid-template-columns:1fr 1fr 1fr;gap:6px}.stat{padding:10px}.stat b{font-size:24px}.stat span{font-size:12px}

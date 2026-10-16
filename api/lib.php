@@ -200,6 +200,21 @@ function forma_migrate(PDO $pdo): void
         created_at TEXT NOT NULL,
         paid_at TEXT
     )');
+    // Atelier-Kasse (Pottery bemalen): Vivien tippt die Stücke ein, der Gast zahlt bar oder über einen Bezahl-Link.
+    $pdo->exec('CREATE TABLE IF NOT EXISTS kasse_sales (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        course_id INTEGER NOT NULL DEFAULT 0,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL DEFAULT \'\',
+        items TEXT NOT NULL,
+        amount_cents INTEGER NOT NULL,
+        method TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT \'offen\',
+        token TEXT NOT NULL,
+        stripe_session TEXT NOT NULL DEFAULT \'\',
+        created_at TEXT NOT NULL,
+        paid_at TEXT
+    )');
 
     // Startinhalt beim allerersten Aufruf: der laufende Pottery-Pause-Kurs.
     if (forma_setting($pdo, 'seeded') === null) {
@@ -1246,6 +1261,13 @@ function forma_reconcile_payments(PDO $pdo, bool $force = false): void
             forma_private_plus_check($pdo, $px);
         } catch (Throwable $e) {
             error_log('FORMA reconcile private plus: ' . $e->getMessage());
+        }
+    }
+    foreach ($pdo->query("SELECT * FROM kasse_sales WHERE status = 'offen' AND stripe_session != '' ORDER BY id DESC LIMIT 20")->fetchAll() as $ks) {
+        try {
+            forma_kasse_check($pdo, $ks);
+        } catch (Throwable $e) {
+            error_log('FORMA reconcile kasse: ' . $e->getMessage());
         }
     }
     try { forma_voucher_sweep($pdo); } catch (Throwable $e) { error_log('FORMA voucher sweep: ' . $e->getMessage()); }
@@ -2579,4 +2601,5 @@ function forma_template_slides(string $file): array
 }
 
 require_once __DIR__ . '/invoices.php';
+require_once __DIR__ . '/kasse.php';
 require_once __DIR__ . '/minimum.php';
