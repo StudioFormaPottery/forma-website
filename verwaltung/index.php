@@ -746,9 +746,24 @@ if ($action === 'kasse_new') {
     $kid = forma_kasse_create($pdo, mb_substr($name, 0, 120), mb_substr($email, 0, 190), $items, $method, $cid);
     $sum = forma_euro(forma_kasse_sum($items));
     $first = forma_first_name($name);
-    go($back . '&neu=' . $kid . '#neu', $method === 'bar'
+    // Spontan dazugekommen: als Platz im Termin eintragen (bezahlt wird über die Kasse, deshalb keine zweite Rechnung).
+    $booked = '';
+    if ($cid && !empty($_POST['einbuchen'])) {
+        $cs = $pdo->prepare('SELECT * FROM courses WHERE id = ?');
+        $cs->execute([$cid]);
+        if ($course = $cs->fetch()) {
+            $persons = 1;
+            foreach ($items as $i) if ($i['key'] === 'beitrag') $persons = max(1, (int)$i['qty']);
+            $pdo->prepare('INSERT INTO bookings (course_id, name, email, phone, persons, message, status, created_at) VALUES (?,?,?,?,?,?,\'bestaetigt\',?)')
+                ->execute([$cid, mb_substr($name, 0, 120), mb_substr($email, 0, 160), '', $persons, 'Spontan im Atelier, über die Kasse ' . ($method === 'bar' ? 'bar bezahlt' : 'per Bezahl-Link') . ' (Kasse #' . $kid . ')', date('c')]);
+            $now = forma_booked($pdo, $cid);
+            $booked = ' ' . $first . ' ist im Termin eingetragen' . ($persons > 1 ? " ($persons Personen)" : '') . '.'
+                . ($now > (int)$course['capacity'] ? ' Achtung: Der Termin ist jetzt mit ' . $now . ' von ' . (int)$course['capacity'] . ' Plätzen überbucht.' : '');
+        }
+    }
+    go($back . '&neu=' . $kid . '#neu', ($method === 'bar'
         ? "Bar bezahlt: $sum. " . ($email !== '' ? "$first hat die Rechnung per E-Mail bekommen, du auch." : 'Die Rechnung ist bei dir im Postfach, ohne E-Mail-Adresse kannst du sie ausdrucken.')
-        : ($email !== '' ? "Der Bezahl-Link über $sum ist per E-Mail an $first unterwegs. Du kannst ihn unten auch per WhatsApp schicken." : "Der Bezahl-Link über $sum ist fertig. Schick ihn unten per WhatsApp an $first."));
+        : ($email !== '' ? "Der Bezahl-Link über $sum ist per E-Mail an $first unterwegs. Du kannst ihn unten auch per WhatsApp schicken." : "Der Bezahl-Link über $sum ist fertig. Schick ihn unten per WhatsApp an $first.")) . $booked);
 }
 
 if ($action === 'kasse_remind' || $action === 'kasse_cash' || $action === 'kasse_cancel') {
@@ -887,7 +902,7 @@ if ($view === 'kasse') {
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <p class="eyebrow">Pottery bemalen</p>
         <h1>Kasse</h1>
-        <p class="muted">Tipp an, was sie bemalt hat, dann bar kassieren oder einen Bezahl-Link schicken. Die Rechnung kommt automatisch, als Workshop-Leistung mit Fertigstellung.</p>
+        <p class="muted">Tipp an, was sie bemalt hat, dann bar kassieren oder einen Bezahl-Link schicken. Die Rechnung kommt automatisch, als Workshop-Leistung mit Fertigstellung. Wer spontan ohne Anmeldung kommt: Atelierbeitrag mit antippen, Name und E-Mail eingeben, dann wird sie gleich im Termin eingetragen.</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <?php if ($courses): ?>
         <form class="k-course" method="get"><input type="hidden" name="view" value="kasse">
@@ -919,10 +934,14 @@ if ($view === 'kasse') {
                 </div>
             <?php endforeach; ?>
             </div>
+            <input type="hidden" name="known" id="k-known" value="0">
             <div class="k-who">
                 <label>Name <span class="muted small">(steht auf der Rechnung)</span><input name="name" id="k-name" maxlength="120" autocomplete="off" required></label>
                 <label>E-Mail <span class="muted small">(für Rechnung und Bezahl-Link)</span><input name="email" id="k-email" type="email" maxlength="190" autocomplete="off" inputmode="email"></label>
             </div>
+            <?php if ($cid): ?>
+            <label class="check k-walkin"><input type="checkbox" name="einbuchen" value="1" id="k-einbuchen"> <span><strong>Spontan dazugekommen:</strong> im Termin eintragen <span class="muted small">(zählt als Platz, Personenzahl = Anzahl Atelierbeiträge)</span></span></label>
+            <?php endif; ?>
             <div class="k-bar">
                 <div class="k-total"><span class="muted small">Summe</span><b id="k-sum">€ 0</b></div>
                 <button class="btn" type="submit" name="method" value="bar" id="k-bar-btn" disabled>Bar bezahlt</button>
@@ -936,12 +955,16 @@ if ($view === 'kasse') {
         (function(){
           var form=document.getElementById('kasse'),sumEl=document.getElementById('k-sum'),bar=document.getElementById('k-bar-btn'),link=document.getElementById('k-link-btn');
           function euro(c){return '€ '+(c%100===0?String(c/100):(c/100).toFixed(2).replace('.',','));}
-          function update(){var t=0;form.querySelectorAll('.k-item').forEach(function(it){var q=+it.querySelector('input').value;t+=q*(+it.dataset.cents);it.classList.toggle('on',q>0);it.querySelector('.k-qty').textContent=q;});sumEl.textContent=euro(t);bar.disabled=link.disabled=t===0;bar.textContent=t?'Bar bezahlt · '+euro(t):'Bar bezahlt';}
+          var ein=document.getElementById('k-einbuchen'),known=document.getElementById('k-known'),touched=false;
+          if(ein)ein.addEventListener('change',function(){touched=true;});
+          function walkin(){if(!ein||touched)return;var b=+form.querySelector('input[name="qty[beitrag]"]').value;ein.checked=b>0&&known.value!=='1';}
+          function update(){walkin();var t=0;form.querySelectorAll('.k-item').forEach(function(it){var q=+it.querySelector('input').value;t+=q*(+it.dataset.cents);it.classList.toggle('on',q>0);it.querySelector('.k-qty').textContent=q;});sumEl.textContent=euro(t);bar.disabled=link.disabled=t===0;bar.textContent='Bar bezahlt';}
           form.querySelectorAll('.k-item').forEach(function(it){var inp=it.querySelector('input');
             it.querySelector('.k-add').addEventListener('click',function(){inp.value=Math.min(50,+inp.value+1);update();});
             it.querySelector('.k-minus').addEventListener('click',function(){inp.value=Math.max(0,+inp.value-1);update();});});
-          form.querySelector('.k-reset').addEventListener('click',function(){form.querySelectorAll('.k-item input').forEach(function(i){i.value=0;});document.getElementById('k-name').value='';document.getElementById('k-email').value='';update();});
-          document.querySelectorAll('.k-guest').forEach(function(b){b.addEventListener('click',function(){document.getElementById('k-name').value=b.dataset.name;document.getElementById('k-email').value=b.dataset.email;document.querySelectorAll('.k-guest').forEach(function(x){x.classList.toggle('on',x===b);});});});
+          document.getElementById('k-name').addEventListener('input',function(){known.value='0';document.querySelectorAll('.k-guest').forEach(function(x){x.classList.remove('on');});update();});
+          form.querySelector('.k-reset').addEventListener('click',function(){touched=false;known.value='0';form.querySelectorAll('.k-item input').forEach(function(i){i.value=0;});document.getElementById('k-name').value='';document.getElementById('k-email').value='';update();});
+          document.querySelectorAll('.k-guest').forEach(function(b){b.addEventListener('click',function(){document.getElementById('k-name').value=b.dataset.name;document.getElementById('k-email').value=b.dataset.email;known.value='1';if(ein&&!touched)ein.checked=false;document.querySelectorAll('.k-guest').forEach(function(x){x.classList.toggle('on',x===b);});});});
           form.addEventListener('submit',function(e){var m=e.submitter&&e.submitter.value,mail=document.getElementById('k-email').value.trim();
             if(m==='bar'&&!confirm('Bar erhalten: '+sumEl.textContent+'?\n'+(mail?'Die Rechnung geht an '+mail+'.':'Ohne E-Mail bekommst nur du die Rechnung.')))e.preventDefault();});
           document.querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){var t=b.dataset.copy;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){b.textContent='Kopiert ✓';},function(){var ta=b.closest('.k-sale').querySelector('textarea');ta.select();document.execCommand('copy');b.textContent='Kopiert ✓';});});});
@@ -2237,6 +2260,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .k-bar .btn{min-height:48px}
 .k-bar .btn:disabled{opacity:.45;cursor:default}
 .k-reset{justify-self:start}
+.k-walkin{display:flex;gap:10px;align-items:flex-start;background:#FFFAF5;border:1.5px dashed var(--clay);border-radius:16px;padding:12px 14px}.k-walkin input{accent-color:var(--clay);width:22px;height:22px;flex:0 0 22px;margin-top:2px}
 .k-sale.is-new{outline:2px solid var(--clay)}
 @media (min-width:640px){.k-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.k-who{grid-template-columns:1fr 1fr}.k-total{flex:1 1 auto}.k-bar .btn{flex:0 0 auto}}
 @media (min-width:900px){.k-ic svg{width:100px;height:84px}.k-add strong{font-size:20px}.k-price{font-size:17px}.k-total b{font-size:38px}.k-guest{font-size:18px}}
