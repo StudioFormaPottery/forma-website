@@ -42,7 +42,7 @@ $errors = [];
 if (mb_strlen($name) < 2) $errors[] = 'Bitte gib deinen Namen an.';
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Bitte gib eine gültige E-Mail-Adresse an.';
 if (mb_strlen($project) < 5) $errors[] = 'Beschreib bitte kurz, was du gestalten möchtest.';
-if ($kind === 'buchung' && ($hours < 1 || $hours > 8)) $errors[] = 'Bitte wähle, wie viele Stunden du buchen möchtest.';
+if ($kind === 'buchung' && ($hours < 1 || $hours > 4)) $errors[] = 'Bitte wähle zwischen 1 und 4 Stunden. Für ein größeres Projekt schick mir einfach eine Anfrage.';
 if ($contact === 'telefon' && mb_strlen(preg_replace('/\D/', '', $phone)) < 6) $errors[] = 'Bitte gib deine Telefonnummer an, damit ich dich anrufen kann.';
 if ($kind === 'buchung' && $wishDate === '') $errors[] = 'Bitte wähl deinen Wunschtermin aus.';
 if (empty($in['consent'])) $errors[] = 'Bitte bestätige noch die Hinweise zum Datenschutz.';
