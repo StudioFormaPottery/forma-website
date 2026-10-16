@@ -1145,6 +1145,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .gd4{left:22%;bottom:-11px;animation-delay:-1s}.gd5{left:12%;top:-9px;width:16px;height:16px;fill:var(--clay)}.gd6{right:-9px;bottom:16%;width:18px;height:18px;animation-delay:-4s}
 @media (max-width:700px){.atelier-gal .gallery{grid-template-areas:"a b" "a c" "d c" "e f"}}
 @media (prefers-reduced-motion:reduce){.gd{animation:none}}
+.atelier-gal .gallery figure{position:relative}
+.atelier-gal .gallery img,.atelier-gal .gallery video{position:absolute;inset:0;transition:opacity 1.4s ease,transform .6s ease}
+.atelier-gal .gallery .fade{opacity:0}
 </style>
 </head>
 <body>
@@ -1648,12 +1651,6 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <h2 class="display">Ein Ort zum Ankommen</h2>
         <p>Helles Licht, ein langer Holztisch und Töpferscheiben: Das Studio FORMA ist ein kleines, feines Atelier, in dem du dich kreativ austoben und ausleben kannst.</p>
       </div>
-      <div class="films">
-        <figure class="film"><video src="video/krug.mp4" poster="img/krug-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Ein Krug wird Schritt für Schritt von Hand aufgebaut"></video><figcaption>Ein Krug entsteht</figcaption></figure>
-        <figure class="film"><video src="video/regal.mp4" poster="img/regal-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Handgemachte Becher im Regal"></video><figcaption>Kleine Schätze im Regal</figcaption></figure>
-        <figure class="film"><video src="video/details.mp4" poster="img/details-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Ein handgemachter Becher mit kleinen Details"></video><figcaption>Liebe zum Detail</figcaption></figure>
-        <figure class="film"><video src="video/stempel.mp4" poster="img/stempel-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Becher mit dem FORMA-Stempel am Boden"></video><figcaption>Mit FORMA-Stempel</figcaption></figure>
-      </div>
       <div class="atelier-gal" id="galerie">
         <svg class="maker-wave" aria-hidden="true"><path></path></svg>
         <svg class="gd gd1" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z"/></svg><svg class="gd gd2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg><svg class="gd gd3" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z"/></svg><svg class="gd gd4" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg><svg class="gd gd5" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg><svg class="gd gd6" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z"/></svg>
@@ -1661,7 +1658,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <div class="gallery">
           <figure class="g-a"><video src="video/ergebnisse.mp4" poster="img/ergebnisse-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Fertige Becher und Vasen im Regal des Ateliers"></video></figure>
           <figure class="g-b"><img src="img/tassen-henkel.jpg" alt="Zwei frisch geformte Tassen mit runden Henkeln auf dem Werktisch" loading="lazy" style="object-position:50% 70%"></figure>
-          <figure class="g-c"><img src="img/anhaenger-advent.jpg" alt="Weihnachtsanhänger aus Ton: Stern, Mond, Kugel, Tannenbaum und Stiefel" loading="lazy" style="object-position:50% 45%"></figure>
+          <figure class="g-c"><img src="img/vivien-spiegel.jpg" alt="Vivien lächelt in den Spiegel, mit einer Vase voller Eukalyptus im Arm" loading="lazy" style="object-position:50% 30%"></figure>
           <figure class="g-d"><img src="img/baum-3d.jpg" alt="Ein Tannenbaum aus Ton zum Zusammenstecken" loading="lazy" style="object-position:35% 55%"></figure>
           <figure class="g-e"><img src="img/becher-tonkugeln.jpg" alt="Becher und vorbereitete Tonkugeln auf dem Werktisch" loading="lazy" style="object-position:50% 40%"></figure>
           <figure class="g-f"><img src="img/schalen.jpg" alt="Viele kleine Schalen und Becher aus dem Atelier" loading="lazy" style="object-position:50% 50%"></figure>
@@ -1732,7 +1729,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   <section class="section about" id="ueber-mich">
     <div class="wrap">
       <div class="about-photo">
-        <img src="img/vivien-spiegel.jpg" alt="Vivien lächelt in den Spiegel, mit einer Vase voller Eukalyptus im Arm" loading="lazy" style="object-position:50% 30%">
+        <img src="img/vivien-mit-tochter.jpg" alt="Vivien mit ihrer Tochter beim gemeinsamen Bemalen eines Bechers" loading="lazy" style="object-position:45% 40%">
       </div>
       <div class="about-copy">
         <p class="eyebrow">Über mich</p>
@@ -2867,31 +2864,44 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     draw();if(window.ResizeObserver)new ResizeObserver(draw).observe(box);else window.addEventListener('resize',draw);
     });
   })();
-  // Studio: Videos und Fotos wechseln sich ruhig ab (alle 5 Sekunden, versetzt)
+  // Galerie „Frisch aus dem Atelier“: im großen Bogen wechseln die Videos, in den anderen Feldern die Fotos (ruhig, versetzt)
   (function(){
-    var films=[].slice.call(document.querySelectorAll('.films .film'));if(!films.length)return;
-    var PICS=[[['studio-scheiben.jpg','50% 50%','Das helle Studio mit Töpferscheiben'],['tonkugeln.jpg','50% 50%','Vorbereitete Tonkugeln auf dem Werktisch']],
-      [['studio.jpg','50% 50%','Langer Holztisch mit Vasen und Tassen'],['schlicker.jpg','50% 45%','Frisch gedrehte Becher im Tonschlicker']],
-      [['drehen.jpg','50% 60%','Vivien dreht einen Becher an der Töpferscheibe']],
-      [['abdrehen.jpg','50% 35%','Ein frisch abgedrehter Becher']]];
-    var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
-    films.forEach(function(f,i){
-      var list=(PICS[i]||[]).map(function(p){var im=document.createElement('img');im.className='film-pic';im.alt=p[2];im.loading='lazy';im.src='img/'+p[0];im.style.objectPosition=p[1];f.insertBefore(im,f.querySelector('figcaption'));return im;});
-      if(!list.length||reduce)return;
-      var v=f.querySelector('video'),step=0,n=list.length+1;
-      function videoMs(){var d=v&&isFinite(v.duration)&&v.duration>0?v.duration:6;return Math.max(5000,d*1000);}
-      function tick(){
-        step=(step+1)%n;
-        list.forEach(function(im,k){im.classList.toggle('on',step===k+1);});
-        f.classList.toggle('pic-on',step>0);
-        if(step===0&&v){try{v.currentTime=0;var pr=v.play();if(pr&&pr.catch)pr.catch(function(){});}catch(e){}}
-        setTimeout(tick,step===0?videoMs():5000);
+    var gal=document.querySelector('.atelier-gal .gallery');if(!gal)return;
+    if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    var VIDS=[['ergebnisse','Fertige Becher und Vasen im Regal des Ateliers'],['krug','Ein Krug wird Schritt für Schritt von Hand aufgebaut'],['regal','Handgemachte Becher im Regal'],['details','Ein handgemachter Becher mit kleinen Details'],['stempel','Becher mit dem FORMA-Stempel am Boden']];
+    var v=gal.querySelector('.g-a video');
+    if(v){
+      var vi=0,busy=false,safety;v.removeAttribute('loop');v.loop=false;
+      function nextVid(){
+        if(busy)return;busy=true;clearTimeout(safety);v.classList.add('fade');
+        setTimeout(function(){
+          vi=(vi+1)%VIDS.length;var n=VIDS[vi];
+          v.poster='img/'+n[0]+'-poster.jpg';v.src='video/'+n[0]+'.mp4';v.setAttribute('aria-label','Video: '+n[1]);
+          var shown=false;function show(){if(shown)return;shown=true;v.classList.remove('fade');busy=false;arm();var pr=v.play();if(pr&&pr.catch)pr.catch(function(){});}
+          v.addEventListener('loadeddata',show,{once:true});setTimeout(show,2500);v.load();
+        },1400);
       }
-      // erst das Video einmal ganz durchlaufen lassen, dann Foto
-      function start(){if(v){try{v.currentTime=0;}catch(e){}}setTimeout(tick,videoMs()+i*900);}
-      var started=false;function go(){if(!started){started=true;start();}}
-      if(v&&v.readyState<1){v.addEventListener('loadedmetadata',go,{once:true});setTimeout(go,4000);}else go();
-    });
+      function arm(){clearTimeout(safety);safety=setTimeout(nextVid,25000);}
+      v.addEventListener('ended',nextVid);arm();
+    }
+    var PICS=[['tassen-henkel','50% 70%','Zwei frisch geformte Tassen mit runden Henkeln auf dem Werktisch'],['vivien-spiegel','50% 30%','Vivien lächelt in den Spiegel, mit einer Vase voller Eukalyptus im Arm'],
+      ['baum-3d','35% 55%','Ein Tannenbaum aus Ton zum Zusammenstecken'],['becher-tonkugeln','50% 40%','Becher und vorbereitete Tonkugeln auf dem Werktisch'],['schalen','50% 50%','Viele kleine Schalen und Becher aus dem Atelier'],
+      ['anhaenger-advent','50% 45%','Weihnachtsanhänger aus Ton: Stern, Mond, Kugel, Tannenbaum und Stiefel'],['studio-scheiben','50% 50%','Das helle Studio mit Töpferscheiben'],['drehen','50% 60%','Vivien dreht einen Becher an der Töpferscheibe'],
+      ['studio','50% 50%','Langer Holztisch mit Vasen und Tassen'],['schlicker','50% 45%','Frisch gedrehte Becher im Tonschlicker'],['abdrehen','50% 35%','Ein frisch abgedrehter Becher'],
+      ['tonkugeln','50% 50%','Vorbereitete Tonkugeln auf dem Werktisch'],['werktisch','50% 50%','Der Werktisch mit Bechern, Pinseln und Werkzeug']];
+    var slots=['g-b','g-c','g-d','g-e','g-f'].map(function(c){return gal.querySelector('.'+c);}).filter(Boolean);
+    var shownNow=function(){return slots.map(function(f){var im=f.querySelector('img:not(.fade)');return im?im.getAttribute('src'):'';});};
+    var queue=PICS.filter(function(p){return shownNow().indexOf('img/'+p[0]+'.jpg')<0;}),si=0,order=[0,3,1,4,2];
+    setInterval(function(){
+      if(document.hidden||!queue.length)return;
+      var f=slots[order[si%order.length]%slots.length];si++;
+      var cur=f.querySelector('img:not(.fade)'),p=queue.shift();
+      var im=document.createElement('img');im.className='fade';im.alt=p[2];im.src='img/'+p[0]+'.jpg';im.style.objectPosition=p[1];
+      f.appendChild(im);
+      function swap(){requestAnimationFrame(function(){im.classList.remove('fade');if(cur){cur.classList.add('fade');setTimeout(function(){if(cur.parentNode)cur.parentNode.removeChild(cur);},1500);}});}
+      if(im.complete)swap();else{im.onload=swap;im.onerror=function(){f.removeChild(im);};}
+      if(cur){var src=cur.getAttribute('src').replace(/^img\/|\.jpg$/g,''),back=PICS.filter(function(q){return q[0]===src;})[0];if(back)queue.push(back);}
+    },4200);
   })();
   // Teambuilding: Fotos wechseln ruhig alle 5 Sekunden
   (function(){var box=document.querySelector('.team-photos');if(!box)return;var im=[].slice.call(box.querySelectorAll('img')),k=0;

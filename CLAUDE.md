@@ -19,6 +19,7 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Überschriften in Bricolage Grotesque, kräftig, aber nicht zu fett. Vivien mag keine sehr fetten Schriften.
 - Wellen-Übergänge zwischen den Bereichen, schwebende Tonformen im Kopfbereich.
 - Das Brennofen-Foto (Keramik im Kreis auf dem Ofen) nicht verwenden.
+- Studio-Bereich (16.10.2026): nur die Galerie „Frisch aus dem Atelier“, keine extra Videoreihe darüber. Im großen Bogen links wechseln die Videos (ergebnisse, krug, regal, details, stempel), in den anderen Feldern wechseln die Fotos ruhig (Liste `PICS` im Skript). Über mich bleibt `vivien-mit-tochter.jpg`, das Spiegel-Foto gehört in die Galerie.
 
 ## Wortwahl
 - Nie „Keramik“, nie Brennen, Glasieren, Brennkosten o. Ä. auf der Website oder in Mails. Stattdessen „Fertigstellung“: „Für die Fertigstellung wird eine Gebühr von € 25 pro Kilo erhoben, abgerechnet bei Abholung deiner Werkstücke.“
