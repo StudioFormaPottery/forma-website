@@ -12,6 +12,7 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - `fonts/`: selbst gehostete Schriften (Bricolage Grotesque, Italiana, Outfit; SIL OFL). Kein Google Fonts, damit die Datenschutzerklärung stimmt.
 - `img/`: Fotos im natürlichen, hellen Look wie das Über-mich-Bild (kein Sepia mehr!): nur Helligkeit und Wärme sanft an `vivien-toepfern.jpg` angeglichen, max. 1400 px. Videos genauso (leicht heller, minimal wärmer).
 - `video/`: Studio-Videos als H.264-MP4, 720 px breit, ohne Ton, mit Poster-Bild in `img/`.
+- Galerie `#galerie` im Studio-Bereich (seit 16.10.2026): zarter Wellenrahmen mit Herzchen/Sternchen, 6 Kacheln (Video `ergebnisse.mp4`, Tassen, Anhänger, 3D-Baum, Becher, Schalen). „Hallo!“-Foto: `vivien-spiegel.jpg` (Vivien hat die Spiegel-Selfies ausdrücklich für Website, Pinterest und Posts freigegeben).
 
 ## Design
 - Farben: Sand `#EEE2D4`, Hafer `#E4D2BF`, Ton `#DDBFA8`, FORMA-Rot `#8C2C1D`, Terracotta `#B05A38`, Text `#33211B`.

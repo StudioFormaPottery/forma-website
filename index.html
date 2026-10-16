@@ -1128,6 +1128,23 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 @media (max-width:780px){.advent{grid-template-columns:1fr;padding-top:66px}.adv-house{max-width:230px}.xm-garland{height:52px}}
 @media (min-width:900px){.ad-body > p:not(.ad-tag):not(.ad-sub):not(.ad-done){font-size:20px}.ad-chips li{font-size:16.5px}}
 @media (prefers-reduced-motion:reduce){.adv-topstar,.adv-tw,.adv-smoke{animation:none}}
+
+/* Galerie im Studio: zarter Wellenrahmen mit Herzchen und Sternchen */
+.atelier-gal{position:relative;margin-top:clamp(26px,4vw,44px);padding:clamp(22px,3.5vw,40px);border-radius:34px;background:color-mix(in srgb,var(--paper) 55%,transparent)}
+.atelier-gal>*:not(.maker-wave):not(.gd){position:relative;z-index:1}
+.atelier-gal .maker-wave path{stroke:var(--clay);opacity:.4}
+.gal-kicker{margin:0 0 16px;text-align:center;font-family:var(--script);font-size:clamp(26px,3vw,34px);color:var(--clay)}
+.atelier-gal .gallery{grid-template-areas:"a b c d" "a e c f"}
+.gallery .g-a{grid-area:a}.gallery .g-b{grid-area:b}.gallery .g-c{grid-area:c}.gallery .g-d{grid-area:d}.gallery .g-e{grid-area:e}.gallery .g-f{grid-area:f}
+.atelier-gal .gallery figure{border:6px solid #FBF1EA;box-shadow:0 10px 24px rgba(51,33,27,.12);background:var(--paper-2)}
+.atelier-gal .gallery figure.g-a,.atelier-gal .gallery figure.g-c{border-radius:999px 999px 24px 24px}
+.gallery video{width:100%;height:100%;object-fit:cover;display:block}
+.gd{position:absolute;z-index:2;width:22px;height:22px;fill:var(--clay);opacity:.8;animation:sway 7s ease-in-out infinite alternate;pointer-events:none}
+.gd2,.gd4{fill:#FBF1EA;opacity:1}
+.gd1{left:-8px;top:18%}.gd2{right:-10px;top:30%;width:26px;height:26px;animation-delay:-2s}.gd3{right:14%;top:-10px;animation-delay:-3s}
+.gd4{left:22%;bottom:-11px;animation-delay:-1s}.gd5{left:12%;top:-9px;width:16px;height:16px;fill:var(--clay)}.gd6{right:-9px;bottom:16%;width:18px;height:18px;animation-delay:-4s}
+@media (max-width:700px){.atelier-gal .gallery{grid-template-areas:"a b" "a c" "d c" "e f"}}
+@media (prefers-reduced-motion:reduce){.gd{animation:none}}
 </style>
 </head>
 <body>
@@ -1637,6 +1654,19 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <figure class="film"><video src="video/details.mp4" poster="img/details-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Ein handgemachter Becher mit kleinen Details"></video><figcaption>Liebe zum Detail</figcaption></figure>
         <figure class="film"><video src="video/stempel.mp4" poster="img/stempel-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Becher mit dem FORMA-Stempel am Boden"></video><figcaption>Mit FORMA-Stempel</figcaption></figure>
       </div>
+      <div class="atelier-gal" id="galerie">
+        <svg class="maker-wave" aria-hidden="true"><path></path></svg>
+        <svg class="gd gd1" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z"/></svg><svg class="gd gd2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg><svg class="gd gd3" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z"/></svg><svg class="gd gd4" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg><svg class="gd gd5" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg><svg class="gd gd6" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z"/></svg>
+        <p class="gal-kicker">Frisch aus dem Atelier</p>
+        <div class="gallery">
+          <figure class="g-a"><video src="video/ergebnisse.mp4" poster="img/ergebnisse-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Video: Fertige Becher und Vasen im Regal des Ateliers"></video></figure>
+          <figure class="g-b"><img src="img/tassen-henkel.jpg" alt="Zwei frisch geformte Tassen mit runden Henkeln auf dem Werktisch" loading="lazy" style="object-position:50% 70%"></figure>
+          <figure class="g-c"><img src="img/anhaenger-advent.jpg" alt="Weihnachtsanhänger aus Ton: Stern, Mond, Kugel, Tannenbaum und Stiefel" loading="lazy" style="object-position:50% 45%"></figure>
+          <figure class="g-d"><img src="img/baum-3d.jpg" alt="Ein Tannenbaum aus Ton zum Zusammenstecken" loading="lazy" style="object-position:35% 55%"></figure>
+          <figure class="g-e"><img src="img/becher-tonkugeln.jpg" alt="Becher und vorbereitete Tonkugeln auf dem Werktisch" loading="lazy" style="object-position:50% 40%"></figure>
+          <figure class="g-f"><img src="img/schalen.jpg" alt="Viele kleine Schalen und Becher aus dem Atelier" loading="lazy" style="object-position:50% 50%"></figure>
+        </div>
+      </div>
     </div>
     <svg class="wave" style="--to:var(--paper);background:var(--lilac)" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40c160 44 330 66 520 50s320-72 500-70 290 44 420 40v60H0z"></path></svg>
   </section>
@@ -1702,7 +1732,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   <section class="section about" id="ueber-mich">
     <div class="wrap">
       <div class="about-photo">
-        <img src="img/vivien-mit-tochter.jpg" alt="Vivien mit ihrer Tochter beim gemeinsamen Bemalen eines Bechers" loading="lazy" style="object-position:45% 40%">
+        <img src="img/vivien-spiegel.jpg" alt="Vivien lächelt in den Spiegel, mit einer Vase voller Eukalyptus im Arm" loading="lazy" style="object-position:50% 30%">
       </div>
       <div class="about-copy">
         <p class="eyebrow">Über mich</p>
