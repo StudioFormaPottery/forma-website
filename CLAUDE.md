@@ -77,6 +77,12 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 ## Private Pottery (seit 10.10.2026)
 - „Projekt buchen“ (`data-private`) öffnet ein Fenster: Stunden 1–4 mit Projektbeispielen (1 Std. Magnete/2 Espressotassen, 2 Std. Tassen, Espresso-Set, Teller, große Schale, 3–4 Std. Salatschüssel, Service), Projektbeschreibung, Wunschtermin. Direkt bezahlen (€ 65 × Stunden) oder „Erst mal anfragen“ ohne Zahlung. `api/private.php`, Tabelle `private_bookings`, Verwaltung → Private Pottery.
 
+## Private Pottery verlängern (seit 16.10.2026)
+- Online buchbar sind nur 1–4 Stunden (`api/private.php`). Mehr Stunden schaltet Vivien in der Verwaltung frei: bei jeder bezahlten Buchung (Liste Private Pottery und Kalender-Karte) „+ Stunden verlängern“ (0,5–8 Std.).
+- Tabelle `private_extensions` (offen / bezahlt / zurueckgezogen). Gast bekommt Mail mit Link `api/private-plus.php?e=ID&k=TOKEN` → Stripe (Betrag = Stunden × FORMA_PRIVATE_HOUR, am Server). Erst nach Zahlung werden Stunden und Betrag der Buchung gutgeschrieben (`forma_private_plus_check`), dann lassen sie sich im Kalender einplanen.
+- Nach Zahlung: Danke-Mail, Info an hello@, eigene Rechnung (Rechnungsart `private_plus`). Erinnerung erneut schicken oder zurückziehen geht in der Verwaltung.
+- Bewertungs-Mail wartet, solange eine Verlängerung offen ist oder bezahlte Stunden noch nicht eingeplant sind.
+
 ## Templates & FORMA Maker Club (seit 10.10.2026)
 - Bereich `#templates` (Menü „Templates“): oben der Maker Club (Gratis-Template des Monats per E-Mail, Double-Opt-in über `api/subscribe.php` mit source „Maker Club“, Download `api/maker-download.php?t=TOKEN`, MailerLite-Gruppe „Maker Club“), darunter bezahlte Templates mit Filtern Jahreszeit/Alter.
 - Kauf: `api/template-buy.php` (Stripe, Häkchen zum Verzicht auf das Rücktrittsrecht bei digitalen Inhalten), `api/template-bezahlt.php`, Download `api/template-download.php`. Tabellen `templates`, `template_orders`. Dateien in `../forma-data/templates/`.

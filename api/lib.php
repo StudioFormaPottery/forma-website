@@ -187,6 +187,19 @@ function forma_migrate(PDO $pdo): void
         mailed_at TEXT,
         created_at TEXT NOT NULL
     )');
+    // Verlängerungen: Vivien schaltet zusätzliche Stunden frei, der Gast bezahlt sie über einen eigenen Link.
+    $pdo->exec('CREATE TABLE IF NOT EXISTS private_extensions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        private_id INTEGER NOT NULL,
+        hours REAL NOT NULL,
+        amount_cents INTEGER NOT NULL,
+        note TEXT NOT NULL DEFAULT \'\',
+        status TEXT NOT NULL DEFAULT \'offen\',
+        token TEXT NOT NULL,
+        stripe_session TEXT NOT NULL DEFAULT \'\',
+        created_at TEXT NOT NULL,
+        paid_at TEXT
+    )');
 
     // Startinhalt beim allerersten Aufruf: der laufende Pottery-Pause-Kurs.
     if (forma_setting($pdo, 'seeded') === null) {
@@ -865,7 +878,7 @@ function forma_mail_html(string $text): string
         if (str_contains($url, 'maker-download') || str_contains($url, 'template-download') || str_contains($url, 'maker-mail')) return 'Template herunterladen';
         if (str_contains($url, 'gutschein-pdf')) return 'Gutschein herunterladen';
         if (str_contains($url, 'cancel.php')) return 'Buchung ansehen';
-        if (str_contains($url, 'private-zahlen.php')) return 'Jetzt online bezahlen';
+        if (str_contains($url, 'private-zahlen.php') || str_contains($url, 'private-plus.php')) return 'Jetzt online bezahlen';
         if (str_contains($url, 'kurs-aendern.php')) return 'Neuen Termin wählen oder stornieren';
         if (str_contains($url, '/verwaltung')) return 'Zur Verwaltung';
         if (str_contains($url, 'g.page/r/') || str_contains($url, 'writereview')) return 'Jetzt bewerten ★';
@@ -1187,6 +1200,13 @@ function forma_reconcile_payments(PDO $pdo, bool $force = false): void
             forma_private_check($pdo, $pb);
         } catch (Throwable $e) {
             error_log('FORMA reconcile private later: ' . $e->getMessage());
+        }
+    }
+    foreach ($pdo->query("SELECT * FROM private_extensions WHERE status = 'offen' AND stripe_session != '' ORDER BY id DESC LIMIT 20")->fetchAll() as $px) {
+        try {
+            forma_private_plus_check($pdo, $px);
+        } catch (Throwable $e) {
+            error_log('FORMA reconcile private plus: ' . $e->getMessage());
         }
     }
     try { forma_voucher_sweep($pdo); } catch (Throwable $e) { error_log('FORMA voucher sweep: ' . $e->getMessage()); }
@@ -2363,6 +2383,116 @@ function forma_private_confirm_mail(PDO $pdo, int $pid, string $note = ''): bool
     return $ok;
 }
 
+
+// --- Private Pottery verlängern ---------------------------------------------------
+
+/** Alle Verlängerungen einer Buchung (ohne zurückgezogene). */
+function forma_private_plus_list(PDO $pdo, int $pid): array
+{
+    $st = $pdo->prepare("SELECT * FROM private_extensions WHERE private_id = ? AND status != 'zurueckgezogen' ORDER BY id");
+    $st->execute([$pid]);
+    return $st->fetchAll();
+}
+
+/** Gibt es eine angebotene, noch nicht bezahlte Verlängerung (der letzten 21 Tage)? Dann wartet die Bewertungs-Mail. */
+function forma_private_plus_open(PDO $pdo, int $pid): bool
+{
+    $st = $pdo->prepare("SELECT COUNT(*) FROM private_extensions WHERE private_id = ? AND status = 'offen' AND created_at >= ?");
+    $st->execute([$pid, date('c', time() - 21 * 86400)]);
+    return (int)$st->fetchColumn() > 0;
+}
+
+function forma_private_plus_url(array $x): string
+{
+    return forma_site_url() . '/api/private-plus.php?e=' . (int)$x['id'] . '&k=' . rawurlencode((string)$x['token']);
+}
+
+/** Mail mit Bezahl-Link für die zusätzlichen Stunden an den Gast. */
+function forma_private_plus_mail(PDO $pdo, array $x, bool $again = false): bool
+{
+    $st = $pdo->prepare('SELECT * FROM private_bookings WHERE id = ?');
+    $st->execute([(int)$x['private_id']]);
+    $b = $st->fetch();
+    if (!$b || !filter_var($b['email'], FILTER_VALIDATE_EMAIL)) return false;
+    $first = forma_first_name((string)$b['name']);
+    $hours = forma_hours_text((float)$x['hours']);
+    $note = trim((string)$x['note']);
+    $body = "Hallo $first,\n\n"
+        . ($again ? "kleine Erinnerung: " : "wie schön, dass du an deinem Projekt weiterarbeiten möchtest! ")
+        . "Ich habe dir $hours Private Pottery zusätzlich freigeschaltet.\n\n"
+        . "Zusätzlich: $hours Private Pottery\nBetrag: " . forma_euro((int)$x['amount_cents']) . " (€ 65 pro Stunde, inkl. Ton und Fertigstellung)\n"
+        . (trim((string)$b['project']) !== '' ? "Dein Projekt: {$b['project']}\n" : '')
+        . ($note !== '' ? "\n$note\n" : '')
+        . "\nHier kannst du die Stunden ganz bequem online bezahlen, mit Karte, Apple Pay oder Google Pay:\n"
+        . forma_private_plus_url($x) . "\n\n"
+        . "Sobald die Zahlung angekommen ist, bekommst du eine Bestätigung und die Rechnung. Danach plane ich die neuen Termine mit dir ein und schicke dir alle Termine gesammelt per E-Mail.\n\n"
+        . "Hast du Fragen? Antworte einfach auf diese E-Mail oder ruf mich an: " . FORMA_PHONE . "\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n";
+    return forma_mail((string)$b['email'], ($again ? 'Erinnerung: ' : '') . "Noch $hours Private Pottery: dein Bezahl-Link", $body);
+}
+
+/** Vivien schaltet zusätzliche Stunden frei: Eintrag anlegen und Bezahl-Link an den Gast schicken. */
+function forma_private_plus_offer(PDO $pdo, int $pid, float $hours, string $note = ''): ?array
+{
+    $hours = round($hours * 2) / 2;
+    if ($hours < 0.5 || $hours > 8) return null;
+    $st = $pdo->prepare("SELECT * FROM private_bookings WHERE id = ? AND status = 'bezahlt'");
+    $st->execute([$pid]);
+    $b = $st->fetch();
+    if (!$b || str_starts_with((string)$b['project'], 'Teambuilding/Event:')) return null;
+    $amount = (int)round($hours * FORMA_PRIVATE_HOUR);   // Preis immer hier am Server berechnet
+    $pdo->prepare('INSERT INTO private_extensions (private_id, hours, amount_cents, note, status, token, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+        ->execute([$pid, $hours, $amount, trim(mb_substr($note, 0, 800)), 'offen', bin2hex(random_bytes(16)), date('c')]);
+    $x = $pdo->query('SELECT * FROM private_extensions WHERE id = ' . (int)$pdo->lastInsertId())->fetch();
+    $x['mailed'] = forma_private_plus_mail($pdo, $x);
+    return $x;
+}
+
+/** Prüft eine Verlängerung bei Stripe. Bezahlt: Stunden gutschreiben, Mails, Rechnung. */
+function forma_private_plus_check(PDO $pdo, array $x): string
+{
+    if ($x['status'] !== 'offen' || $x['stripe_session'] === '') return (string)$x['status'];
+    $session = forma_stripe('GET', '/v1/checkout/sessions/' . rawurlencode($x['stripe_session']));
+    if (($session['payment_status'] ?? '') === 'paid') {
+        $pdo->exec('BEGIN IMMEDIATE');
+        $st = $pdo->prepare("UPDATE private_extensions SET status = 'bezahlt', paid_at = ? WHERE id = ? AND status = 'offen'");
+        $st->execute([date('c'), (int)$x['id']]);
+        $fresh = $st->rowCount() > 0;
+        if ($fresh) {
+            // Die Stunden kommen erst jetzt zur Buchung dazu: Erst dann lassen sie sich im Kalender einplanen.
+            $pdo->prepare('UPDATE private_bookings SET hours = hours + ?, amount_cents = amount_cents + ?, done = 0 WHERE id = ?')
+                ->execute([(float)$x['hours'], (int)$x['amount_cents'], (int)$x['private_id']]);
+        }
+        $pdo->exec('COMMIT');
+        if ($fresh) forma_private_plus_paid($pdo, (int)$x['id']);
+        return 'bezahlt';
+    }
+    if (($session['status'] ?? '') === 'expired') {
+        // Link bleibt gültig, beim nächsten Klick gibt es eine neue Bezahlseite.
+        $pdo->prepare("UPDATE private_extensions SET stripe_session = '' WHERE id = ? AND status = 'offen'")->execute([(int)$x['id']]);
+    }
+    return 'offen';
+}
+
+/** Verlängerung bezahlt: Danke an den Gast, Info an Vivien, Rechnung. */
+function forma_private_plus_paid(PDO $pdo, int $xid): void
+{
+    $st = $pdo->prepare("SELECT x.*, p.name, p.email, p.hours AS total_hours FROM private_extensions x JOIN private_bookings p ON p.id = x.private_id WHERE x.id = ? AND x.status = 'bezahlt'");
+    $st->execute([$xid]);
+    $x = $st->fetch();
+    if (!$x) return;
+    $first = forma_first_name((string)$x['name']);
+    $hours = forma_hours_text((float)$x['hours']);
+    $amount = forma_euro((int)$x['amount_cents']);
+    $rest = max(0, (float)$x['total_hours'] - forma_private_planned($pdo, (int)$x['private_id']));
+    forma_mail((string)$x['email'], 'Danke, deine zusätzlichen Stunden sind gebucht', "Hallo $first,\n\ndanke! Deine Zahlung für $hours Private Pottery ($amount) ist angekommen, damit sind die zusätzlichen Stunden fix für dich reserviert.\n\n"
+        . "Ich melde mich bei dir, damit wir die neuen Termine ausmachen. Danach bekommst du alle Termine gesammelt per E-Mail, mit Kalendereintrag. Die Rechnung kommt in einer eigenen E-Mail.\n\n"
+        . "Ich freue mich, dass wir dein Projekt gemeinsam weitermachen!\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\n" . FORMA_PHONE . "\nwww.forma-pottery.com\n");
+    forma_mail(FORMA_NOTIFY_EMAIL, 'Verlängerung bezahlt: ' . $hours . ' Private Pottery (' . $x['name'] . ')',
+        "{$x['name']} hat die Verlängerung bezahlt.\n\n$hours · $amount über Stripe\nNoch nicht eingeplant: " . forma_hours_text($rest) . "\n\nJetzt im Kalender einplanen und danach die Bestätigung schicken:\n"
+        . forma_site_url() . '/verwaltung/?view=kalender&assign=' . (int)$x['private_id'] . "\n", (string)$x['email']);
+    forma_invoice_for($pdo, 'private_plus', $xid);
+}
+
 /** Bewertungs-Mail ca. 1 Stunde nach dem letzten eingeplanten Private-Pottery-Termin. */
 function forma_review_private_sessions(PDO $pdo): int
 {
@@ -2373,6 +2503,7 @@ function forma_review_private_sessions(PDO $pdo): int
     foreach ($rows as $r) {
         $planned = forma_private_planned($pdo, (int)$r['id']);
         if ($r['status'] === 'bezahlt' && $planned + 0.01 < (float)$r['hours']) continue; // es fehlen noch Stunden
+        if (forma_private_plus_open($pdo, (int)$r['id'])) continue; // Verlängerung angeboten, aber noch nicht bezahlt
         $st = $pdo->prepare("SELECT hours FROM private_sessions WHERE private_id = ? AND (date || ' ' || start) = ?");
         $st->execute([$r['id'], $r['last_start']]);
         $end = strtotime((string)$r['last_start']) + (int)round((float)$st->fetchColumn() * 3600);

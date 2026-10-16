@@ -142,6 +142,19 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
         }
         return $src;
     }
+    if ($kind === 'private_plus') {
+        // Verlängerung einer Private-Pottery-Buchung: eigene Rechnung über die zusätzlichen Stunden
+        $st = $pdo->prepare("SELECT x.*, p.name, p.email, p.persons FROM private_extensions x JOIN private_bookings p ON p.id = x.private_id WHERE x.id = ? AND x.status = 'bezahlt'");
+        $st->execute([$refId]);
+        $x = $st->fetch();
+        if (!$x || (int)$x['amount_cents'] <= 0) return null;
+        $whole = floor((float)$x['hours']) == (float)$x['hours'];
+        return ['name' => $x['name'], 'email' => $x['email'], 'session' => $x['stripe_session'], 'service' => 'nach Vereinbarung',
+            'items' => [$whole
+                ? ['text' => 'Private Pottery – Handbuilding (Stunden, Verlängerung)', 'detail' => 'zusätzliche Stunden zu deinem Projekt, inkl. Ton und Fertigstellung', 'qty' => (int)$x['hours'], 'unit' => FORMA_PRIVATE_HOUR]
+                : ['text' => 'Private Pottery – Handbuilding (' . forma_hours_text((float)$x['hours']) . ', Verlängerung)', 'detail' => 'zusätzliche Stunden zu deinem Projekt, inkl. Ton und Fertigstellung', 'qty' => 1, 'unit' => (int)$x['amount_cents']]],
+            'gross' => (int)$x['amount_cents'], 'paid' => $x['paid_at'], 'type' => 'Private Pottery'];
+    }
     if ($kind === 'gutschein') {
         $st = $pdo->prepare("SELECT * FROM vouchers WHERE id = ? AND status IN ('bezahlt','eingeloest') AND kind = 'kauf'");
         $st->execute([$refId]);

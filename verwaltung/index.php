@@ -1050,6 +1050,7 @@ if ($view === 'kalender') {
                 <span class="muted small">Geht an <?= forma_h($assign['email']) ?>, mit Kalendereintrag im Anhang<?= $assign['rest'] !== null && $assign['rest'] > 0 ? '. Achtung: es sind noch ' . forma_h(forma_hours_text((float)$assign['rest'])) . ' nicht eingeplant' : '' ?>.</span>
             </form>
             <?php elseif ($assign['sessions']): ?><p class="small"><strong>Alles bestätigt.</strong> <?= $fn ?> hat ihre Termine per E-Mail. Die Bitte um eine Google-Bewertung geht automatisch ca. 1 Stunde nach dem letzten Termin raus.</p><?php endif; ?>
+            <?= plus_block($pdo, $assign, 'kalender') ?>
             <a class="link small" href="<?= $q(['m' => $month, 'd' => $sel]) ?>"><?= $pending ? 'Später weitermachen' : 'Schließen' ?></a>
         </div>
         <?php endif; ?>
@@ -1191,6 +1192,80 @@ if ($view === 'kalender') {
     <?php });
 }
 
+// --- Private Pottery verlängern ----------------------------------------------
+function plus_back(string $self): string
+{
+    $pid = (int)($_POST['pid'] ?? 0);
+    return ($_POST['back'] ?? '') === 'kalender' ? $self . '?view=kalender&assign=' . $pid : $self . '?view=private#p' . $pid;
+}
+
+if ($action === 'private_plus') {
+    $pid = (int)($_POST['pid'] ?? 0);
+    $hours = (float)str_replace(',', '.', (string)($_POST['hours'] ?? '0'));
+    $x = null;
+    try { $x = forma_private_plus_offer($pdo, $pid, $hours, (string)($_POST['note'] ?? '')); } catch (Throwable $e) { error_log('FORMA private plus offer: ' . $e->getMessage()); }
+    if (!$x) go(plus_back($self), 'Die Verlängerung ging leider nicht. Bitte wähle 0,5 bis 8 Stunden (nur bei bezahlten Private-Pottery-Buchungen).');
+    $st = $pdo->prepare('SELECT name FROM private_bookings WHERE id = ?'); $st->execute([$pid]);
+    $first = forma_first_name((string)$st->fetchColumn());
+    go(plus_back($self), $x['mailed']
+        ? 'Freigeschaltet! ' . $first . ' hat den Bezahl-Link über ' . forma_hours_text((float)$x['hours']) . ' (' . forma_euro((int)$x['amount_cents']) . ') per E-Mail bekommen. Sobald bezahlt ist, kannst du die Stunden im Kalender einplanen.'
+        : 'Die Verlängerung ist angelegt, aber die E-Mail an ' . $first . ' ging nicht raus. Tipp auf „Erinnerung schicken“, um es nochmal zu versuchen.');
+}
+
+if ($action === 'private_plus_remind' || $action === 'private_plus_cancel') {
+    $xid = (int)($_POST['xid'] ?? 0);
+    $st = $pdo->prepare("SELECT * FROM private_extensions WHERE id = ? AND status = 'offen'");
+    $st->execute([$xid]);
+    $x = $st->fetch();
+    if (!$x) go(plus_back($self), 'Diese Verlängerung ist nicht mehr offen.');
+    // Vor jeder Änderung bei Stripe nachsehen, ob nicht gerade bezahlt wurde
+    if ($x['stripe_session'] !== '' && forma_stripe_key()) {
+        try { if (forma_private_plus_check($pdo, $x) === 'bezahlt') go(plus_back($self), 'Diese Verlängerung ist inzwischen bezahlt.'); } catch (Throwable $e) { error_log('FORMA private plus check: ' . $e->getMessage()); }
+    }
+    if ($action === 'private_plus_cancel') {
+        $pdo->prepare("UPDATE private_extensions SET status = 'zurueckgezogen' WHERE id = ? AND status = 'offen'")->execute([$xid]);
+        if ($x['stripe_session'] !== '' && forma_stripe_key()) {
+            try { forma_stripe('POST', '/v1/checkout/sessions/' . rawurlencode($x['stripe_session']) . '/expire'); } catch (Throwable $e) {}
+        }
+        go(plus_back($self), 'Die Verlängerung ist zurückgezogen, der Bezahl-Link funktioniert nicht mehr.');
+    }
+    $ok = false;
+    try { $ok = forma_private_plus_mail($pdo, $x, true); } catch (Throwable $e) { error_log('FORMA private plus remind: ' . $e->getMessage()); }
+    go(plus_back($self), $ok ? 'Die Erinnerung mit dem Bezahl-Link ist verschickt.' : 'Die E-Mail konnte leider nicht verschickt werden.');
+}
+
+/** Baustein „Stunden verlängern“ für eine bezahlte Private-Pottery-Buchung. */
+function plus_block(PDO $pdo, array $b, string $back): string
+{
+    if ($b['status'] !== 'bezahlt' || str_starts_with((string)$b['project'], 'Teambuilding/Event:')) return '';
+    $pid = (int)$b['id'];
+    $first = forma_h(forma_first_name((string)$b['name']));
+    $csrf = '<input type="hidden" name="csrf" value="' . forma_h(csrf()) . '"><input type="hidden" name="pid" value="' . $pid . '"><input type="hidden" name="back" value="' . forma_h($back) . '">';
+    $out = '<div class="plus">';
+    foreach (forma_private_plus_list($pdo, $pid) as $x) {
+        $paid = $x['status'] === 'bezahlt';
+        $out .= '<div class="plus-row"><span><span class="plus-ic">+</span> <strong>' . forma_h(forma_hours_text((float)$x['hours'])) . '</strong> · ' . forma_h(forma_euro((int)$x['amount_cents'])) . '</span> '
+            . '<span class="pill' . ($paid ? ' pill-ok' : ' pill-wait') . '">' . ($paid ? 'bezahlt am ' . forma_h(date('d. m.', strtotime((string)$x['paid_at']))) : 'wartet auf Zahlung') . '</span>';
+        if (!$paid) {
+            $out .= '<form method="post" class="inline">' . $csrf . '<input type="hidden" name="xid" value="' . (int)$x['id'] . '"><button class="link small" name="action" value="private_plus_remind">Erinnerung schicken</button> · '
+                . '<button class="link small" name="action" value="private_plus_cancel" onclick="return confirm(\'Verlängerung wirklich zurückziehen? Der Bezahl-Link funktioniert dann nicht mehr.\')">zurückziehen</button></form>';
+        }
+        $out .= '</div>';
+    }
+    $opts = '';
+    for ($h = 0.5; $h <= 8.001; $h += 0.5) {
+        $opts .= '<option value="' . $h . '"' . (abs($h - 2) < 0.01 ? ' selected' : '') . '>' . forma_h(forma_hours_text($h) . ' · ' . forma_euro((int)round($h * FORMA_PRIVATE_HOUR))) . '</option>';
+    }
+    $out .= '<details class="plus-new"><summary><span class="plus-ic">+</span> Stunden verlängern</summary><form method="post" class="stack">' . $csrf . '<input type="hidden" name="action" value="private_plus">'
+        . '<label for="ph' . $pid . '">Wie viele Stunden kommen dazu?</label><select id="ph' . $pid . '" name="hours">' . $opts . '</select>'
+        . '<label for="pn' . $pid . '">Persönliche Nachricht <span class="muted small">(optional, steht in der E-Mail)</span></label>'
+        . '<textarea id="pn' . $pid . '" name="note" rows="2" maxlength="800" placeholder="z. B. Lass uns deine Schüssel fertig machen!"></textarea>'
+        . '<button class="btn" type="submit">Bezahl-Link an ' . $first . ' schicken</button>'
+        . '<span class="muted small">' . $first . ' bekommt eine E-Mail mit Bezahl-Link. Erst wenn bezahlt ist, kommen die Stunden dazu und du kannst sie im Kalender einplanen. Danach bekommt ' . $first . ' wie gewohnt die Bestätigung und die Rechnung. Die Bitte um eine Google-Bewertung wartet, bis alle Stunden vorbei sind.</span>'
+        . '</form></details></div>';
+    return $out;
+}
+
 if ($view === 'private') {
     forma_reconcile_payments($pdo, true);
     $rows = $pdo->query("SELECT * FROM private_bookings WHERE status IN ('bezahlt','anfrage') ORDER BY done, id DESC")->fetchAll();
@@ -1201,7 +1276,7 @@ if ($view === 'private') {
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <div class="list">
         <?php foreach ($rows as $b): $paid = $b['status'] === 'bezahlt'; ?>
-            <div class="card booking<?= $b['done'] ? ' is-cancelled' : '' ?>">
+            <div class="card booking<?= $b['done'] ? ' is-cancelled' : '' ?>" id="p<?= (int)$b['id'] ?>">
                 <div class="booking-head"><strong><?= forma_h($b['name']) ?></strong>
                     <span class="pill<?= $paid ? ' pill-ok' : '' ?>"><?= $paid ? forma_h(((int)$b['hours'] === 1 ? '1 Stunde' : $b['hours'] . ' Stunden') . ' · ' . forma_euro((int)$b['amount_cents']) . ' bezahlt') : 'Anfrage, noch nicht gebucht' ?></span></div>
                 <div><?= nl2br(forma_h($b['project'])) ?></div>
@@ -1211,6 +1286,7 @@ if ($view === 'private') {
                 <div class="sel small"><?= forma_h($b['email']) ?><?= $b['phone'] ? ' · ' . forma_h($b['phone']) : '' ?></div>
                 <div><strong>Melden per <?= ($b['contact'] ?? 'email') === 'telefon' ? 'Telefon' . (($b['call_time'] ?? '') !== '' ? ', am besten ' . forma_h($b['call_time']) : '') : 'E-Mail' ?></strong><?= (int)$b['hours'] > 0 && !$paid ? ' · geschätzt ' . ((int)$b['hours'] === 1 ? '1 Stunde' : (int)$b['hours'] . ' Stunden') : '' ?></div>
                 <div class="muted small"><?= $paid ? 'Gebucht' : 'Angefragt' ?> am <?= forma_h(date('d. m. Y, H:i', strtotime($b['created_at']))) ?></div>
+                <?= plus_block($pdo, $b, 'private') ?>
                 <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="private_done"><input type="hidden" name="pid" value="<?= (int)$b['id'] ?>">
                 <button class="link" type="submit"><?= $b['done'] ? 'Wieder als offen markieren' : 'Als erledigt abhaken' ?></button></form>
             </div>
@@ -1954,6 +2030,12 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .confirm-form{margin-top:6px;padding:12px;border-radius:14px;background:#FFF7F0}
 .sess{margin:4px 0;padding-left:18px;display:grid;gap:4px}
 .pill-wait{background:#fff;border:1.5px dashed var(--clay);color:var(--clay)}
+.plus{display:grid;gap:8px;margin:8px 0 2px;padding:12px 14px;border-radius:16px;background:var(--paper,#F6EEE6);border:1px dashed var(--line)}
+.plus-ic{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--clay);color:#FBF1EA;font-weight:500;font-size:16px;line-height:1;vertical-align:-3px}
+.plus-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.plus form.inline{display:inline}
+.plus-new summary{cursor:pointer;font-weight:600;color:var(--clay);list-style:none}.plus-new summary::-webkit-details-marker{display:none}
+.plus-new[open] summary{margin-bottom:10px}
 .btn-sm{min-height:38px;padding:6px 14px;font-size:15px;width:max-content;margin-top:4px}
 .side-list{display:flex!important;flex-direction:column;gap:8px}
 .side-item{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink);padding:12px 14px}
