@@ -6,8 +6,9 @@ Immer mit den **neuesten Infos** (aktuelle Kurse, Specials, Events, Newsletter, 
 und **immer mit einem anderen Foto**. Aus jeder neuen Werbung (Instagram/WhatsApp-Bild, Flyer)
 werden außerdem sofort Pins gemacht.
 
-Konto: pinterest.at/formapottery (Business). Board für Kurse: „Töpferkurse im Paznaun“
-(ID 1130333275167605357). Passende andere Boards des Kontos dürfen genutzt werden (z. B. für Templates).
+Konto: pinterest.at/formapottery (Business). Pinnwände: „Töpferkurse im Paznaun“ (Kurse, Specials,
+ID 1130333275167605357), „Pottery Templates & DIY“ (Adventkalender, Templates, Maker Club),
+„Teambuilding & Events“, „Geschenkideen aus Ton“ (Gutscheine).
 
 ## Ablauf pro Lauf
 
@@ -41,10 +42,15 @@ Konto: pinterest.at/formapottery (Business). Board für Kurse: „Töpferkurse i
    stattdessen „Fertigstellung“.
 5. **Veröffentlichen**: Bild committen und auf `main` pushen, ca. 1–2 Minuten warten, bis
    `https://www.forma-pottery.com/img/pins/<datei>` erreichbar ist.
-6. **Pin anlegen** im Browser auf Viviens Computer (dort ist sie bei Pinterest angemeldet;
-   nie Passwörter eingeben). Am einfachsten über den Pin-Builder:
-   `https://www.pinterest.at/pin/create/button/?url=<Link>&media=<Bild-URL>&description=<Text>`
-   (alles URL-codiert), dann Board wählen, Titel ergänzen, speichern.
+6. **Pin anlegen** in **Chrome** auf Viviens Computer (Claude in Chrome; dort ist sie bei Pinterest
+   angemeldet, im Browser der Claude-App nicht; nie Passwörter eingeben). So hat es am 16. 10. 2026 geklappt:
+   - Pin-Builder öffnen: `https://www.pinterest.at/pin/create/button/?url=<Link>&media=<Bild-URL>&description=<Text>`
+     (alles URL-codiert). Es erscheint die Pinnwand-Liste; die Reihenfolge wechselt, darum per Bildschirmfoto
+     prüfen, über die richtige Pinnwand fahren (hover) und auf deren roten Knopf „Merken“ klicken.
+   - „Gemerkt auf …“ bestätigt das Speichern. Die Pin-ID steht danach oben unter
+     `https://www.pinterest.at/formapottery/_created/` (neuester zuerst).
+   - Der Pin-Builder setzt keinen Titel: Pin-Seite öffnen → „Mehr Aktionen“ → „Pin bearbeiten“ →
+     Felder „Titel“ und „Alternativtext“ ausfüllen → „Merken“. Nie auf „Löschen“ klicken.
    Titel max. 100 Zeichen, Beschreibung 2–4 Sätze mit Suchbegriffen wie Töpferkurs, Töpfern,
    Pottery, Paznaun, Ischgl, Tirol, Advent, DIY, plus 3–5 Hashtags.
 7. **Logbuch**: Eintrag in `log.json` ergänzen (Datum, Thema, Foto, Bild, Link, Board, Pin-URL),
