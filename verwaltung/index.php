@@ -1238,6 +1238,7 @@ if ($view === 'gutscheine') {
         <div class="card stack links-card" id="links">
             <h2>🎟 Link für alten Gutschein</h2>
             <p class="muted small">Für Gäste mit einem alten Gutschein ohne Nummer. Du schickst ihnen einen persönlichen Link, sie suchen sich selbst einen Spin &amp; Go Termin aus und geben ihre Daten ein. Der Gutschein bekommt dabei automatisch eine Nummer, der Gast bekommt Bestätigung und Rechnung (bezahlt mit Gutschein), du eine Info-Mail. Jeder Link funktioniert nur einmal.</p>
+            <p><a class="btn btn-ghost btn-sm" href="../einloesen/?t=vorschau" target="_blank" rel="noopener">👀 Vorschau: So sieht die Seite für deine Gäste aus</a></p>
             <form method="post" class="stack">
                 <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="link_create">
                 <div class="row">

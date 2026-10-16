@@ -9,9 +9,10 @@ header('Referrer-Policy: no-referrer');
 $h = fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 $token = (string)($_GET['t'] ?? '');
 $link = null; $spin = [];
+$preview = $token === 'vorschau';
 try {
     $pdo = forma_db();
-    $link = forma_old_link_get($pdo, $token);
+    $link = $preview ? ['label' => 'Anna Muster', 'persons' => 2, 'status' => 'offen', 'value_cents' => 14000] : forma_old_link_get($pdo, $token);
     if ($link && $link['status'] === 'offen') {
         foreach (forma_upcoming_courses($pdo) as $c) {
             if ($c['title'] !== FORMA_SERIES['spin']['title']) continue;
@@ -33,6 +34,15 @@ $what = $persons === 1 ? '1 Platz im Spin & Go Workshop' : $persons . ' Plätze 
 <title>Gutschein einlösen · Studio FORMA</title><link rel="icon" type="image/png" href="../img/forma-logo.png">
 <link rel="stylesheet" href="../assets/gast.css?v=8">
 <style>
+.deco-slot{display:inline-block;width:40px;height:40px;transform:rotate(var(--r,0deg));animation:sway 7s ease-in-out infinite alternate;vertical-align:middle}
+.deco-slot svg{width:100%;height:100%;display:block;filter:drop-shadow(0 3px 6px rgba(103,48,30,.14))}
+.no-deco .deco-slot{display:none}
+.head .deco-slot{position:absolute;z-index:0;pointer-events:none}
+.head .h1{right:6%;top:38px;width:46px;height:46px}.head .h2{left:4%;bottom:34px;width:38px;height:38px}.head .h3{right:38%;top:26px;width:34px;height:34px}.head .h4{right:4%;bottom:40px;width:52px;height:52px}
+@media (max-width:760px){.head .h1{right:30px;top:120px}.head .h3{left:24px;right:auto;top:130px}.head .h4{display:none}}
+.deco-slot.in{width:32px;height:32px;margin-left:6px}
+.foot-deco{display:flex;justify-content:center;gap:22px;margin:30px 0 0}
+.pv{position:sticky;top:0;z-index:50;background:var(--clay);color:var(--card);text-align:center;padding:10px 16px;font-size:16px}
 .gpill{display:inline-flex;align-items:center;gap:10px;background:var(--sand);border-radius:999px;padding:8px 18px 8px 10px;font-weight:500;margin:6px 0 4px}
 .gpill svg{width:30px;height:30px;flex:0 0 30px}
 .steps{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0;padding:0;list-style:none;font-size:16px;color:var(--soft)}
@@ -53,9 +63,9 @@ $what = $persons === 1 ? '1 Platz im Spin & Go Workshop' : $persons . ' Plätze 
 </style>
 </head>
 <body>
+<?php if ($preview): ?><div class="pv">👀 Vorschau: So sieht die Seite für deine Gäste aus. Hier wird nichts gebucht.</div><?php endif; ?>
 <div class="head"><div class="wrap">
- <span class="ic" style="right:8%;top:46px;width:30px"><svg viewBox="0 0 24 24"><path fill="#FBF1EA" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg></span>
- <span class="ic" style="left:48%;bottom:30px;width:40px;animation-delay:-3s"><svg viewBox="0 0 64 64"><path d="M32 54C18 45 10 38 10 28c0-6 5-11 11-11 5 0 8 3 11 7 3-4 6-7 11-7 6 0 11 5 11 11 0 10-8 17-22 26z" fill="#8C2C1D" opacity=".8"/></svg></span>
+ <span class="deco-slot h1"></span><span class="deco-slot h2"></span><span class="deco-slot h3"></span><span class="deco-slot h4"></span>
  <div class="top"><img src="../img/forma-logo.png" alt="FORMA Earth &amp; Art"><a href="../">forma-pottery.com</a></div>
  <div class="hero"><div>
   <p class="kick">Studio FORMA · Atelier in Mathon</p>
@@ -81,7 +91,7 @@ $what = $persons === 1 ? '1 Platz im Spin & Go Workshop' : $persons . ' Plätze 
 
    <div id="form-wrap">
    <?php if (array_filter($spin, fn($c) => $c['free'] > 0)): ?>
-   <p class="sec">1 · Such dir deinen Tag aus</p>
+   <p class="sec">1 · Such dir deinen Tag aus <span class="deco-slot in"></span></p>
    <div class="mcal" id="mcal" data-dates="<?= $h(json_encode($spin)) ?>">
     <div class="mcal-head"><button type="button" class="mcal-nav" id="mc-prev" aria-label="Vorheriger Monat">‹</button><b id="mc-month"></b><button type="button" class="mcal-nav" id="mc-next" aria-label="Nächster Monat">›</button></div>
     <div class="mcal-grid" id="mc-grid"></div>
@@ -92,7 +102,7 @@ $what = $persons === 1 ? '1 Platz im Spin & Go Workshop' : $persons . ' Plätze 
     <input type="hidden" name="t" value="<?= $h($token) ?>"><input type="hidden" name="course" id="course">
     <div style="position:absolute;left:-9999px" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
     <p class="chosen empty" id="chosen">Tipp oben im Kalender auf einen markierten Tag.</p>
-    <p class="sec">2 · Deine Angaben</p>
+    <p class="sec">2 · Deine Angaben <span class="deco-slot in"></span></p>
     <label for="name">Vor- und Nachname</label><input id="name" name="name" autocomplete="name" value="<?= $h($link['label']) ?>">
     <label for="email">E-Mail</label><input id="email" name="email" type="email" autocomplete="email" inputmode="email">
     <label for="phone">Telefon / WhatsApp</label><input id="phone" name="phone" type="tel" autocomplete="tel">
@@ -111,16 +121,19 @@ $what = $persons === 1 ? '1 Platz im Spin & Go Workshop' : $persons . ' Plätze 
    <p class="err">Gerade sind leider keine Spin &amp; Go Termine frei. Schreib mir kurz per WhatsApp, dann finden wir gemeinsam einen Tag: <a href="https://wa.me/4367763907080">+43 677 63 90 70 80</a></p>
    <?php endif; ?>
    </div>
-   <div class="done" id="done" hidden><b>Juhu, dein Termin ist fix!</b><p id="done-text"></p><p>Bitte komm in Kleidung, die schmutzig werden darf. Schürzen und Werkzeug habe ich im Atelier. Ich freu mich schon sehr auf dich!</p><p>Bis bald,<br>Vivien</p></div>
+   <div class="done" id="done" hidden><b>Juhu, dein Termin ist fix! <span class="deco-slot in"></span></b><p id="done-text"></p><p>Bitte komm in Kleidung, die schmutzig werden darf. Schürzen und Werkzeug habe ich im Atelier. Ich freu mich schon sehr auf dich!</p><p>Bis bald,<br>Vivien</p></div>
   </section>
  </div>
 <?php endif; ?>
+ <p class="foot-deco"><span class="deco-slot"></span><span class="deco-slot"></span><span class="deco-slot"></span></p>
  <p class="foot">FORMA Earth &amp; Art · Silvrettastraße 58 · 6562 Mathon · <a href="https://wa.me/4367763907080">+43 677 63 90 70 80</a> · <a href="../">forma-pottery.com</a></p>
 </div></main>
 <script src="../assets/gast.js?v=3"></script>
+<script src="../verwaltung/deko.js?v=1" defer></script>
 <?php if ($valid && array_filter($spin, fn($c) => $c['free'] > 0)): ?>
 <script>
 (function(){
+  var PREVIEW=<?= $preview ? 'true' : 'false' ?>;
   var box=document.getElementById('mcal'),list=JSON.parse(box.getAttribute('data-dates')||'[]'),by={},months=[];
   list.forEach(function(c){by[c.d]=c;var m=c.d.slice(0,7);if(months.indexOf(m)<0)months.push(m);});months.sort();
   var MN=['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],WD=['Mo','Di','Mi','Do','Fr','Sa','So'];
@@ -160,6 +173,10 @@ $what = $persons === 1 ? '1 Platz im Spin & Go Workshop' : $persons . ' Plätze 
     else if(!document.getElementById('consent').checked)msg='Bitte bestätige noch den Datenschutz.';
     if(msg){err.textContent=msg;err.hidden=false;if(!course.value)box.scrollIntoView({behavior:'smooth',block:'center'});return;}
     go.disabled=true;go.textContent='Einen Moment …';
+    if(PREVIEW){setTimeout(function(){
+        document.getElementById('form-wrap').hidden=true;document.querySelector('.steps').hidden=true;
+        document.getElementById('done-text').textContent='Dein Spin & Go Termin: '+chosen.textContent.replace('Dein Termin: ','')+'. Die Bestätigung mit Kalendereintrag und deine Rechnung (bezahlt mit Gutschein ALT-2026-001) sind unterwegs an '+v('email')+'. (Vorschau: es wurde nichts gebucht und keine Mail verschickt.)';
+        var dn=document.getElementById('done');dn.hidden=false;dn.scrollIntoView({behavior:'smooth',block:'center'});},600);return;}
     fetch('../api/einloesen.php',{method:'POST',body:new FormData(f)}).then(function(r){return r.json().catch(function(){return {ok:false};});}).then(function(d){
       if(d&&d.ok){
         document.getElementById('form-wrap').hidden=true;document.querySelector('.steps').hidden=true;
