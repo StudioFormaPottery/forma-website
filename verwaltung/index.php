@@ -309,7 +309,7 @@ if ($action === 'link_create') {
     $value = euro_to_cents((string)($_POST['value'] ?? ''));
     if ($value <= 0) $value = $units * (int)FORMA_SERIES['spin']['price_cents'];
     $pdo->prepare('INSERT INTO voucher_links (token, label, persons, value_cents, note, created_at) VALUES (?, ?, ?, ?, ?, ?)')
-        ->execute([bin2hex(random_bytes(16)), forma_clean((string)($_POST['label'] ?? ''), 120), 1, $value, forma_clean((string)($_POST['note'] ?? ''), 300), date('c')]);
+        ->execute([bin2hex(random_bytes(16)), (($ln = forma_clean((string)($_POST['label'] ?? ''), 120)) !== '' && in_array($_POST['salut'] ?? '', ['liebe', 'lieber'], true) ? $_POST['salut'] . '|' : '') . $ln, 1, $value, forma_clean((string)($_POST['note'] ?? ''), 300), date('c')]);
     go($self . '?view=gutscheine&neu=' . (int)$pdo->lastInsertId() . '#links', 'Der Link ist fertig. Kopier ihn und schick ihn per WhatsApp oder E-Mail weiter.');
 }
 
@@ -1243,7 +1243,7 @@ if ($view === 'gutscheine') {
             <form method="post" class="stack">
                 <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="link_create">
                 <div class="row">
-                    <div class="stack"><label for="l-label">Für wen? <span class="muted small">(Name zur Begrüßung)</span></label><input id="l-label" name="label" maxlength="120" placeholder="z. B. Anna Huber" autocomplete="off"></div>
+                    <div class="stack"><label for="l-label">Für wen? <span class="muted small">(Name zur Begrüßung)</span></label><div class="salut-row"><select name="salut" aria-label="Anrede"><option value="liebe">liebe</option><option value="lieber">lieber</option><option value="">ohne</option></select><input id="l-label" name="label" maxlength="120" placeholder="z. B. Claudia Huber" autocomplete="off"></div></div>
                     <div class="stack"><label for="l-pers">Einheiten auf dem Gutschein</label><select id="l-pers" name="units" onchange="var v=document.getElementById('l-val');if(!v.dataset.touched)v.value=this.value*70"><?php for ($i = 1; $i <= 8; $i++): ?><option value="<?= $i ?>"><?= $i ?> × Spin &amp; Go</option><?php endfor; ?></select></div>
                 </div>
                 <div class="row">
@@ -1255,14 +1255,18 @@ if ($view === 'gutscheine') {
             <?php if ($links): ?>
             <div class="list">
             <?php foreach ($links as $l): $url = forma_old_link_url($l); $open = $l['status'] === 'offen';
-                $who = $l['label'] !== '' ? $l['label'] : 'Gast'; $wa = 'https://wa.me/?text=' . rawurlencode('Hallo ' . ($l['label'] !== '' ? forma_first_name($l['label']) : '') . "! Schön, dass du deinen FORMA Gutschein einlöst. Hier kannst du dir ganz einfach deinen Spin & Go Termin aussuchen: $url\nBis bald, Vivien"); ?>
+                [$sal, $nm] = forma_old_link_name((string)$l['label']); $who = $nm !== '' ? $nm : 'Gast';
+                $msg = 'Hallo' . ($nm !== '' ? ' ' . ($sal !== '' ? $sal . ' ' : '') . forma_first_name($nm) : '') . "! 🤎\n\nSchön, dass du deinen FORMA Gutschein einlöst und zum Töpfern ins Atelier kommst. Das ist dein persönlicher Link für deinen Töpfertermin. Dort suchst du dir ganz einfach deinen Spin & Go Termin aus, dein Gutschein ist schon bezahlt:\n\n$url\n\nDer Link ist nur für dich und gilt, bis du deinen Termin gebucht hast. Bestätigung und Rechnung bekommst du danach per E-Mail.\n\nIch freu mich auf dich!\nBis bald, Vivien\nStudio FORMA"; ?>
                 <div class="card booking link-item<?= $open ? '' : ' is-cancelled' ?><?= (int)$l['id'] === $neu ? ' is-new' : '' ?>">
                     <div class="booking-head"><strong><?= forma_h($who) ?></strong><span class="pill<?= $open ? '' : ' pill-ok' ?>"><?= $open ? 'wartet auf Buchung' : 'eingelöst' . ($l['used_at'] ? ' am ' . forma_h(date('d. m.', strtotime($l['used_at']))) : '') ?></span></div>
                     <div class="small">Gutschein <?= forma_h(forma_euro((int)$l['value_cents'])) ?> · bucht 1 Platz<?= (int)$l['value_cents'] > (int)FORMA_SERIES['spin']['price_cents'] ? ', Rest ' . forma_h(forma_euro((int)$l['value_cents'] - (int)FORMA_SERIES['spin']['price_cents'])) . ' bleibt als Guthaben' : '' ?><?= $l['note'] !== '' ? ' · ' . forma_h($l['note']) : '' ?></div>
                     <?php if ($open): ?>
-                    <div class="link-row"><input class="link-url" value="<?= forma_h($url) ?>" readonly onclick="this.select()"><button class="btn btn-ghost btn-sm" type="button" onclick="var i=this.previousElementSibling;i.select();(navigator.clipboard?navigator.clipboard.writeText(i.value):Promise.reject()).then(()=>{this.textContent='Kopiert ✓'}).catch(()=>{document.execCommand('copy');this.textContent='Kopiert ✓'})">Kopieren</button></div>
+                    <label class="small muted" for="lm-<?= (int)$l['id'] ?>">Nachricht (kannst du hier noch ändern)</label>
+                    <textarea class="link-msg" id="lm-<?= (int)$l['id'] ?>" rows="9"><?= forma_h($msg) ?></textarea>
                     <div class="row-actions">
-                        <a class="btn btn-sm" href="<?= forma_h($wa) ?>" target="_blank" rel="noopener">Per WhatsApp schicken</a>
+                        <button class="btn btn-sm" type="button" onclick="var t=document.getElementById('lm-<?= (int)$l['id'] ?>'),b=this;t.select();(navigator.clipboard?navigator.clipboard.writeText(t.value):Promise.reject()).then(function(){b.textContent='Nachricht kopiert ✓'}).catch(function(){document.execCommand('copy');b.textContent='Nachricht kopiert ✓'})">Nachricht kopieren</button>
+                        <a class="btn btn-ghost btn-sm" href="#" onclick="this.href='https://wa.me/?text='+encodeURIComponent(document.getElementById('lm-<?= (int)$l['id'] ?>').value)" target="_blank" rel="noopener">Per WhatsApp schicken</a>
+                        <button class="link small" type="button" onclick="var b=this;(navigator.clipboard?navigator.clipboard.writeText('<?= forma_h($url) ?>'):Promise.reject()).then(function(){b.textContent='Link kopiert ✓'})">nur Link kopieren</button>
                         <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="link_renew"><input type="hidden" name="lid" value="<?= (int)$l['id'] ?>"><button class="link small" type="submit">Neuen Link erzeugen</button></form>
                         <form method="post" onsubmit="return confirm('Link wirklich löschen?')"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="link_delete"><input type="hidden" name="lid" value="<?= (int)$l['id'] ?>"><button class="link small" type="submit">Löschen</button></form>
                     </div>
@@ -1940,7 +1944,8 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .oldv summary{cursor:pointer;font-weight:600;color:var(--clay);font-size:17px;list-style-position:inside}
 .oldv-form{margin-top:12px}
 .links-card{margin-top:16px}.links-card h2{margin:0}
-.link-row{display:flex;gap:8px;align-items:center}.link-row .link-url{flex:1;min-width:0;font-size:14px}
+.salut-row{display:flex;gap:8px}.salut-row select{flex:0 0 auto;width:auto}.salut-row input{flex:1;min-width:0}
+.link-msg{width:100%;font-size:15px;line-height:1.5}
 .link-item .row-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
 .link-item.is-new{outline:2px solid var(--clay)}
 .oldv-form [hidden]{display:none!important}

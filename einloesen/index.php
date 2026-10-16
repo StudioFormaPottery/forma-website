@@ -24,7 +24,8 @@ try {
 } catch (Throwable $e) { error_log('FORMA einloesen: ' . $e->getMessage()); }
 
 $valid = $link && $link['status'] === 'offen';
-$first = $valid && $link['label'] !== '' ? forma_first_name((string)$link['label']) : '';
+$plainName = $valid ? forma_old_link_name((string)$link['label'])[1] : '';
+$first = $plainName !== '' ? forma_first_name($plainName) : '';
 $persons = 1;
 $what = '1 Platz im Spin & Go Workshop';
 $rest = $valid ? max(0, (int)$link['value_cents'] - (int)FORMA_SERIES['spin']['price_cents']) : 0;
@@ -104,7 +105,7 @@ $rest = $valid ? max(0, (int)$link['value_cents'] - (int)FORMA_SERIES['spin']['p
     <div style="position:absolute;left:-9999px" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
     <p class="chosen empty" id="chosen">Tipp oben im Kalender auf einen markierten Tag.</p>
     <p class="sec">2 · Deine Angaben <span class="deco-slot in"></span></p>
-    <label for="name">Vor- und Nachname</label><input id="name" name="name" autocomplete="name" value="<?= $h($link['label']) ?>">
+    <label for="name">Vor- und Nachname</label><input id="name" name="name" autocomplete="name" value="<?= $h($plainName) ?>">
     <label for="email">E-Mail</label><input id="email" name="email" type="email" autocomplete="email" inputmode="email">
     <label for="phone">Telefon / WhatsApp</label><input id="phone" name="phone" type="tel" autocomplete="tel">
     <label for="street">Rechnungsadresse: Straße und Hausnummer</label><input id="street" name="street" autocomplete="street-address">

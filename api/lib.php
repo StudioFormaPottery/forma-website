@@ -1667,6 +1667,13 @@ function forma_old_links_schema(PDO $pdo): void
     $done = true;
 }
 
+/** Label „liebe|Claudia Huber“ → ['liebe', 'Claudia Huber'] (Anrede für die WhatsApp-Nachricht). */
+function forma_old_link_name(string $label): array
+{
+    if (preg_match('/^(liebe|lieber)\|(.*)$/u', $label, $m)) return [$m[1], trim($m[2])];
+    return ['', trim($label)];
+}
+
 function forma_old_link_url(array $l): string
 {
     return forma_site_url() . '/einloesen/?t=' . $l['token'];
