@@ -97,3 +97,8 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 ## Hotelseite /urlaub/ (Monatskalender seit 14.10.2026)
 - Spin & Go als Monatskalender (`.mcal` in `assets/gast.css`), Daten serverseitig aus `forma_upcoming_courses`, ausgebuchte Tage gestrichelt.
 - „Platz buchen“ führt zu `/?termin=ID`: die Startseite öffnet dann direkt das Buchungsformular für genau diesen Termin.
+
+## Alte Gutscheine einlösen (seit 16.10.2026)
+- Für Papier-Gutscheine, die schon bezahlt sind, aber keine Nummer haben: Verwaltung → Kalender → Tag antippen → „Gast mit altem Gutschein eintragen“ (auch Knopf unter Gutscheine). Spin & Go am Tag wählen oder neuen Termin anlegen (standardmäßig nicht auf der Website).
+- `forma_old_voucher_booking()` in lib.php: legt den Gutschein nach (`kind = 'alt'`, Nummer `ALT-JJJJ-001` oder die vom Papier mit Präfix ALT-), bucht den Platz als bestätigt (amount_cents 0, voucher_cents), löst ein, schickt Bestätigung + Kalender + Rechnung. Bewertungs-Mail und FORMA Post laufen wie bei jeder Buchung. Restwert → Code steht in der Mail.
+- Rechnung: Leistung wird bei der Einlösung mit 20 % verrechnet, Spalte `invoices.pay_note` statt Stripe-Hinweis („bereits bezahlt: eingelöst mit Gutschein …“), in der Google-Tabelle „bezahlt (alter Gutschein)“ / „Gutschein-Einlösung“. Deckt der Gutschein nicht alles, keine Rechnung (Rest vor Ort).

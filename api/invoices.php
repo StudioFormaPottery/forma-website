@@ -49,6 +49,7 @@ function forma_invoice_schema(PDO $pdo): void
         created_at TEXT NOT NULL,
         UNIQUE(kind, ref_id)
     )');
+    forma_add_column($pdo, 'invoices', 'pay_note', "TEXT NOT NULL DEFAULT ''");
 }
 
 /** Nummernformat: Präfix + Jahr + laufende Nummer, z. B. „FO-2026-001“. Präfix und Startnummer in den Einstellungen. */
@@ -88,7 +89,23 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
         $st = $pdo->prepare('SELECT b.*, c.title, c.date_text, c.start_date, c.price_cents AS unit FROM bookings b JOIN courses c ON c.id = b.course_id WHERE b.id = ?');
         $st->execute([$refId]);
         $b = $st->fetch();
-        if (!$b || !$b['paid_at'] || (int)$b['amount_cents'] <= 0) return null;
+        if (!$b || !$b['paid_at']) return null;
+        // Alter Gutschein (Papier, schon früher bezahlt, nicht über das System verrechnet): Die Leistung wird
+        // jetzt bei der Einlösung verrechnet (Mehrzweckgutschein, USt. bei Einlösung), bezahlt mit dem Gutschein.
+        $old = null;
+        if ((int)$b['amount_cents'] <= 0 && (int)$b['voucher_cents'] > 0 && !empty($b['voucher_id'])) {
+            $vs = $pdo->prepare("SELECT nr, kind, paid_at FROM vouchers WHERE id = ? AND kind = 'alt'");
+            $vs->execute([(int)$b['voucher_id']]);
+            $old = $vs->fetch() ?: null;
+        }
+        if ((int)$b['amount_cents'] <= 0 && !$old) return null;
+        if ($old) {
+            $vc = (int)$b['voucher_cents'];
+            return ['name' => $b['name'], 'email' => $b['email'], 'session' => '', 'service' => date('d.m.Y', strtotime($b['start_date'])),
+                'items' => [['text' => $b['title'], 'detail' => $b['date_text'] . ' · FORMA Studio, Mathon', 'qty' => (int)$b['persons'], 'unit' => (int)round($vc / max(1, (int)$b['persons']))]],
+                'gross' => $vc, 'paid' => $b['paid_at'], 'type' => 'Kurs',
+                'pay_note' => 'Der Betrag ist bereits bezahlt: eingelöst mit deinem FORMA Gutschein Nr. ' . $old['nr'] . '.'];
+        }
         $items = [['text' => $b['title'], 'detail' => $b['date_text'] . ' · FORMA Studio, Mathon', 'qty' => (int)$b['persons'], 'unit' => (int)$b['unit']]];
         $pieces = json_decode((string)($b['extras'] ?? ''), true);
         $atelier = forma_is_atelier($b);
@@ -224,16 +241,16 @@ function forma_invoice_for(PDO $pdo, string $kind, int $refId): void
             // Testbuchung: Rechnung nur zeigen und mailen, keine Nummer verbrauchen, nichts speichern.
             forma_invoice_deliver(['nr' => 'TEST-' . $year . '-000', 'issued_at' => date('Y-m-d'), 'service_date' => $src['service'], 'name' => $name, 'email' => $src['email'],
                 'address' => $address, 'country' => $country, 'items' => json_encode($src['items'], JSON_UNESCAPED_UNICODE), 'vat_rate' => $rate,
-                'vat_note' => trim($note . ' TESTBUCHUNG – keine gültige Rechnung.'), 'net_cents' => $net, 'vat_cents' => $vat, 'gross_cents' => $gross]);
+                'vat_note' => trim($note . ' TESTBUCHUNG – keine gültige Rechnung.'), 'pay_note' => (string)($src['pay_note'] ?? ''), 'net_cents' => $net, 'vat_cents' => $vat, 'gross_cents' => $gross]);
             return;
         }
 
         $pdo->exec('BEGIN IMMEDIATE');
         [$seq, $nr] = forma_invoice_next($pdo, $year);
-        $pdo->prepare('INSERT INTO invoices (nr, year, seq, kind, ref_id, issued_at, service_date, name, email, address, country, items, vat_rate, vat_note, net_cents, vat_cents, gross_cents, token, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        $pdo->prepare('INSERT INTO invoices (nr, year, seq, kind, ref_id, issued_at, service_date, name, email, address, country, items, vat_rate, vat_note, net_cents, vat_cents, gross_cents, token, created_at, pay_note)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
             ->execute([$nr, $year, $seq, $kind, $refId, date('Y-m-d'), $src['service'], $name, $src['email'], $address, $country,
-                json_encode($src['items'], JSON_UNESCAPED_UNICODE), $rate, $note, $net, $vat, $gross, bin2hex(random_bytes(16)), date('c')]);
+                json_encode($src['items'], JSON_UNESCAPED_UNICODE), $rate, $note, $net, $vat, $gross, bin2hex(random_bytes(16)), date('c'), (string)($src['pay_note'] ?? '')]);
         $id = (int)$pdo->lastInsertId();
         $pdo->exec('COMMIT');
 
@@ -341,7 +358,7 @@ function forma_invoice_pdf(array $inv): string
     $pdf->SetTextColor(...$soft); $pdf->SetFont('Outfit', '', 9.5);
     $paidLine = (int)$inv['gross_cents'] < 0
         ? 'Der Betrag wurde am ' . date('d.m.Y', strtotime($inv['issued_at'])) . ' auf das Zahlungsmittel zurückerstattet, mit dem bezahlt wurde.'
-        : 'Der Betrag wurde am ' . date('d.m.Y', strtotime($inv['issued_at'])) . ' online bezahlt (Kartenzahlung über Stripe).';
+        : (($inv['pay_note'] ?? '') !== '' ? (string)$inv['pay_note'] : 'Der Betrag wurde am ' . date('d.m.Y', strtotime($inv['issued_at'])) . ' online bezahlt (Kartenzahlung über Stripe).');
     if ($inv['vat_note'] !== '') $paidLine .= "\n" . $inv['vat_note'];
     $pdf->SetXY(30, $y); $pdf->MultiCell(150, 5, $t($paidLine), 0, 'C');
     $pdf->SetTextColor(...$clay); $pdf->SetFont('Outfit', 'B', 10.5); $pdf->SetX(30); $pdf->Cell(150, 7, $t('Vielen Dank!'), 0, 1, 'C');
@@ -364,8 +381,9 @@ function forma_invoice_mailtext(array $inv): string
     if ((int)$inv['gross_cents'] < 0) {
         return "Hallo $first,\n\nim Anhang findest du die Stornorechnung {$inv['nr']} für deine Unterlagen. Der Betrag von " . forma_cents_de(-(int)$inv['gross_cents']) . " wird dir zurückerstattet.\n\nBis bald,\nVivien\n";
     }
-    return "Hallo $first,\n\nvielen Dank für deine Zahlung! Im Anhang findest du deine Rechnung {$inv['nr']} als PDF.\n\n"
-        . 'Rechnungsbetrag: ' . forma_cents_de((int)$inv['gross_cents']) . " (bereits bezahlt)\n\n"
+    $vg = ($inv['pay_note'] ?? '') !== '';
+    return "Hallo $first,\n\n" . ($vg ? 'für deine Unterlagen findest du im Anhang die Rechnung' : 'vielen Dank für deine Zahlung! Im Anhang findest du deine Rechnung') . " {$inv['nr']} als PDF.\n\n"
+        . 'Rechnungsbetrag: ' . forma_cents_de((int)$inv['gross_cents']) . ($vg ? " (bereits mit deinem Gutschein bezahlt, du musst nichts mehr überweisen)\n\n" : " (bereits bezahlt)\n\n")
         . "Bewahre sie gern für deine Unterlagen auf. Bei Fragen antworte einfach auf diese E-Mail.\n\nBis bald,\nVivien\n";
 }
 
@@ -385,6 +403,7 @@ function forma_invoice_deliver(array $inv): void
     forma_mail($inv['email'], ((int)$inv['gross_cents'] < 0 ? 'Deine Stornorechnung ' : 'Deine Rechnung ') . $inv['nr'] . ' von FORMA', forma_invoice_mailtext($inv), null, [[$file, $pdf, 'application/pdf']]);
     forma_mail(FORMA_NOTIFY_EMAIL, ((int)$inv['gross_cents'] < 0 ? 'Stornorechnung ' : 'Rechnung ') . $inv['nr'] . ': ' . $inv['name'] . ' (' . forma_cents_de((int)$inv['gross_cents']) . ')',
         "Neue Online-Rechnung für deine Buchhaltung.\n\nNummer: {$inv['nr']}\nDatum: " . date('d.m.Y', strtotime($inv['issued_at'])) . "\nKunde: {$inv['name']} ({$inv['email']}, {$inv['country']})\n"
+        . (($inv['pay_note'] ?? '') !== '' ? "Bezahlt mit altem Gutschein: kein neuer Zahlungseingang am Konto (das Geld kam schon beim Gutscheinkauf).\n" : '')
         . 'Brutto: ' . forma_cents_de((int)$inv['gross_cents']) . "\nNetto: " . forma_cents_de((int)$inv['net_cents']) . "\nUSt. {$inv['vat_rate']} %: " . forma_cents_de((int)$inv['vat_cents']) . "\n\n"
         . 'Alle Rechnungen: ' . forma_site_url() . "/verwaltung/?view=rechnungen\n", null, [[$file, $pdf, 'application/pdf']]);
 }
@@ -443,13 +462,13 @@ function forma_sheet_sync(PDO $pdo): void
         foreach ($list as $inv) {
             $date = date('d.m.Y', strtotime($inv['issued_at']));
             $rate = (float)$inv['vat_rate'];
-            $rowsInv = [['Forma', $inv['nr'], '', $date, $inv['name'], $eur((int)$inv['gross_cents']), $eur((int)$inv['net_cents']), $eur((int)$inv['vat_cents']), 'bezahlt (online)']];
+            $rowsInv = [['Forma', $inv['nr'], '', $date, $inv['name'], $eur((int)$inv['gross_cents']), $eur((int)$inv['net_cents']), $eur((int)$inv['vat_cents']), ($inv['pay_note'] ?? '') !== '' ? 'bezahlt (alter Gutschein)' : 'bezahlt (online)']];
             $rowsPos = [];
             foreach (json_decode($inv['items'], true) as $it) {
                 $g = (int)$it['unit'] * (int)$it['qty'];
                 $n = (int)round($g / (1 + $rate / 100));
                 $svc = preg_match('/^\d\d\.\d\d\.\d{4}$/', $inv['service_date']) ? $inv['service_date'] : $date;
-                $rowsPos[] = ['Forma', $inv['nr'], '', $date, $svc, (int)substr($svc, 3, 2), $inv['kind'] === 'template' ? 'Template (online)' : 'Online-Buchung',
+                $rowsPos[] = ['Forma', $inv['nr'], '', $date, $svc, (int)substr($svc, 3, 2), $inv['kind'] === 'template' ? 'Template (online)' : (($inv['pay_note'] ?? '') !== '' ? 'Gutschein-Einlösung' : 'Online-Buchung'),
                     trim($it['text']), $inv['name'], $inv['country'], (int)$it['qty'], $eur((int)$it['unit']),
                     $inv['kind'] === 'template' || str_contains($it['text'], 'zum Bemalen') ? 0 : (int)$it['qty'], $eur($g), $eur($n), $eur($g - $n)];
             }

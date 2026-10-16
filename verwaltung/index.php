@@ -303,6 +303,43 @@ if ($action === 'add_booking') {
     go($self . '?view=course&id=' . $cid, 'Die Person ist eingetragen.');
 }
 
+if ($action === 'old_voucher') {
+    $date = (string)($_POST['date'] ?? '');
+    $back = $self . '?view=kalender&m=' . substr($date, 0, 7) . '&d=' . rawurlencode($date) . '&alt=1';
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) go($self . '?view=kalender', 'Bitte tipp zuerst im Kalender auf einen Tag.');
+    $name = forma_clean((string)($_POST['name'] ?? ''), 120);
+    $email = mb_strtolower(forma_clean((string)($_POST['email'] ?? ''), 160));
+    if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) go($back, 'Bitte gib Name und eine gültige E-Mail-Adresse an, damit die Bestätigung ankommt.');
+    $persons = max(1, min(8, (int)($_POST['persons'] ?? 1)));
+    $cid = (string)($_POST['course'] ?? '');
+    if ($cid === 'neu') {
+        $from = (string)($_POST['from'] ?? '09:00'); $to = (string)($_POST['to'] ?? '11:00');
+        if (!preg_match('/^\d{2}:\d{2}$/', $from) || !preg_match('/^\d{2}:\d{2}$/', $to) || $to <= $from) go($back, 'Bitte gib eine gültige Uhrzeit an (z. B. 9:00 bis 11:00).');
+        $tpl = FORMA_SERIES['spin'];
+        $hm = fn($t) => (int)substr($t, 0, 2) . (substr($t, 3, 2) !== '00' ? ':' . substr($t, 3, 2) : '');
+        $pdo->prepare('INSERT INTO courses (title, date_text, start_date, capacity, min_participants, price_text, price_cents, description, visible, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+            ->execute([$tpl['title'], forma_date_text($date, $hm($from), $hm($to)), $date, max((int)$tpl['capacity'], $persons), 1, $tpl['price_text'], (int)$tpl['price_cents'], $tpl['description'], isset($_POST['public']) ? 1 : 0, date('c')]);
+        $cid = (int)$pdo->lastInsertId();
+    }
+    try {
+        $r = forma_old_voucher_booking($pdo, [
+            'course_id' => (int)$cid, 'name' => $name, 'email' => $email, 'phone' => forma_clean((string)($_POST['phone'] ?? ''), 40),
+            'persons' => $persons, 'value_cents' => euro_to_cents((string)($_POST['value'] ?? '')), 'nr' => forma_clean((string)($_POST['nr'] ?? ''), 40),
+            'no_post' => !isset($_POST['post']), 'note' => forma_clean((string)($_POST['note'] ?? ''), 300),
+        ]);
+    } catch (Throwable $e) {
+        go($back, $e->getMessage());
+    }
+    $first = forma_first_name($name);
+    $msg = "Fertig! $first ist eingetragen, der Gutschein hat die Nummer {$r['nr']} und ist eingelöst. "
+        . ($r['rest_pay'] > 0
+            ? "$first hat die Bestätigung bekommen. Der Gutschein deckt nicht alles ab, " . forma_euro($r['rest_pay']) . ' zahlt sie vor Ort (dafür geht keine Rechnung raus).'
+            : "$first hat die Bestätigung mit Kalendereintrag und die Rechnung per E-Mail bekommen.")
+        . ($r['rest_value'] > 0 ? ' Auf dem Gutschein bleiben ' . forma_euro($r['rest_value']) . ' Restwert (siehe Gutscheine).' : '')
+        . ' Die Bitte um eine Google-Bewertung geht automatisch nach dem Kurs raus.';
+    go($self . '?view=kalender&m=' . substr($date, 0, 7) . '&d=' . rawurlencode($date), $msg);
+}
+
 if ($action === 'save_mail') {
     $pw = (string)($_POST['mail_password'] ?? '');
     if ($pw === '') {
@@ -1021,6 +1058,7 @@ if ($view === 'kalender') {
                 <?php endfor; ?>
             </div>
             <p class="legend small muted"><span class="ev ev-kurs">Kurs</span> <span class="ev ev-private">Private Pottery</span> <span class="ev ev-private pending">vorgemerkt</span> <span class="ev ev-wish">Wunschtermin</span></p>
+            <?php if ($sel === ''): ?><p class="small muted">Gast mit altem Gutschein? Tipp auf den Tag, an dem sie kommen möchte, dann findest du unten „Gast mit altem Gutschein eintragen“.</p><?php endif; ?>
 
             <?php if ($sel !== ''): $ev = $events[$sel] ?? []; ?>
             <div class="card day-panel" id="tag">
@@ -1073,6 +1111,44 @@ if ($view === 'kalender') {
                     </select><noscript><button class="btn btn-ghost" type="submit">Auswählen</button></noscript>
                 </form>
                 <?php endif; ?>
+
+                <?php $spins = array_values(array_filter($ev, fn($e) => $e['type'] === 'kurs' && str_starts_with((string)$e['title'], 'Spin'))); ?>
+                <details class="oldv"<?= isset($_GET['alt']) ? ' open' : '' ?>>
+                    <summary>🎟 Gast mit altem Gutschein eintragen</summary>
+                    <form method="post" class="stack oldv-form">
+                        <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="old_voucher"><input type="hidden" name="date" value="<?= forma_h($sel) ?>">
+                        <p class="small muted">Für Gutscheine, die schon bezahlt sind, aber noch keine Nummer haben. Der Gast bekommt die Terminbestätigung mit Kalendereintrag und die Rechnung, nach dem Kurs die Bitte um eine Google-Bewertung.</p>
+                        <label for="o-course">Spin & Go am <?= forma_h(forma_de_date($sel, false)) ?></label>
+                        <select id="o-course" name="course" onchange="document.getElementById('o-new').hidden=this.value!=='neu'">
+                            <?php foreach ($spins as $e): ?><option value="<?= (int)$e['id'] ?>"><?= forma_h(trim(($e['time'] ? $e['time'] . ' Uhr ' : '') . $e['title'])) ?> · <?= (int)$e['booked'] ?>/<?= (int)$e['cap'] ?> belegt</option><?php endforeach; ?>
+                            <option value="neu"<?= $spins ? '' : ' selected' ?>>Neuer Spin & Go Termin an diesem Tag</option>
+                        </select>
+                        <div id="o-new" class="stack"<?= $spins ? ' hidden' : '' ?>>
+                            <div class="row">
+                                <div class="stack"><label for="o-from">Von</label><input id="o-from" name="from" type="time" step="900" value="09:00"></div>
+                                <div class="stack"><label for="o-to">Bis</label><input id="o-to" name="to" type="time" step="900" value="11:00"></div>
+                            </div>
+                            <label class="check small"><input type="checkbox" name="public" value="1"> Termin auch auf der Website buchbar machen (sonst nur für diesen Gast)</label>
+                        </div>
+                        <div class="row">
+                            <div class="stack"><label for="o-name">Name</label><input id="o-name" name="name" required maxlength="120" autocomplete="off"></div>
+                            <div class="stack"><label for="o-mail">E-Mail</label><input id="o-mail" name="email" type="email" required maxlength="160" autocomplete="off"></div>
+                        </div>
+                        <div class="row">
+                            <div class="stack"><label for="o-phone">Telefon <span class="muted small">(optional)</span></label><input id="o-phone" name="phone" type="tel" maxlength="40" autocomplete="off"></div>
+                            <div class="stack"><label for="o-pers">Personen</label><select id="o-pers" name="persons" onchange="var v=document.getElementById('o-val');if(!v.dataset.touched)v.value=this.value*70"><?php for ($i = 1; $i <= 8; $i++): ?><option value="<?= $i ?>"><?= $i ?></option><?php endfor; ?></select></div>
+                        </div>
+                        <div class="row">
+                            <div class="stack"><label for="o-val">Wert des Gutscheins in €</label><input id="o-val" name="value" inputmode="decimal" value="70" required oninput="this.dataset.touched=1"></div>
+                            <div class="stack"><label for="o-nr">Gutscheinnummer <span class="muted small">(leer = wird vergeben)</span></label><input id="o-nr" name="nr" maxlength="40" placeholder="z. B. ALT-<?= date('Y') ?>-001" autocomplete="off"></div>
+                        </div>
+                        <label for="o-note">Notiz <span class="muted small">(nur für dich, optional)</span></label>
+                        <input id="o-note" name="note" maxlength="300" placeholder="z. B. Weihnachtsgutschein 2025 von der Oma">
+                        <label class="check small"><input type="checkbox" name="post" value="1" checked> Bekommt die FORMA Post (Abmeldelink steht in jeder Mail)</label>
+                        <button class="btn" type="submit">Eintragen &amp; Bestätigung mit Rechnung schicken</button>
+                        <span class="muted small">Der Gutschein wird mit dem Kurspreis verrechnet (€ 70 pro Person) und als eingelöst gespeichert. Bleibt Wert übrig, steht der Restwert unter Gutscheine.</span>
+                    </form>
+                </details>
             </div>
             <?php endif; ?>
         </div>
@@ -1136,18 +1212,18 @@ if ($view === 'gutscheine') {
         <div class="card stack">
             <p><strong><?= count(array_filter($vs, fn($x) => ($x['kind'] ?? 'kauf') === 'kauf')) ?></strong> verkaufte Gutscheine · zusammen <strong><?= forma_h(forma_euro((int)$sum)) ?></strong></p>
             <p class="muted small">Jeder bezahlte Gutschein bekommt automatisch eine fortlaufende Nummer und einen geheimen Code. Mit dem Code lösen Gäste ihn online bei der Buchung ein, das wird hier automatisch abgezogen. Löst jemand im Atelier ein, ziehst du den Betrag hier selbst ab. Der Restwert bleibt auf dem Gutschein.</p>
-            <p><a class="btn" href="<?= forma_h($self) ?>?view=gutscheine_export">Liste herunterladen (CSV)</a></p>
+            <p style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn" href="<?= forma_h($self) ?>?view=kalender&amp;d=<?= date('Y-m-d') ?>&amp;alt=1#tag">🎟 Alten Gutschein einlösen</a><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=gutscheine_export">Liste herunterladen (CSV)</a></p>
         </div>
         <div class="list" style="margin-top:16px">
         <?php foreach ($vs as $v): $done = $v['status'] === 'eingeloest'; ?>
             <div class="card booking<?= $done ? ' is-cancelled' : '' ?>">
                 <?php $bal = forma_voucher_balance($GLOBALS['pdo'], $v); $uses = $GLOBALS['pdo']->prepare("SELECT * FROM voucher_uses WHERE voucher_id = ? AND status != 'frei' ORDER BY id"); $uses->execute([$v['id']]); $uses = $uses->fetchAll(); ?>
-                <div class="booking-head"><strong><?= forma_h($v['nr']) ?><?= ($v['kind'] ?? 'kauf') !== 'kauf' ? ' · Geschenk von dir' : '' ?></strong><span class="pill<?= $done ? '' : ' pill-ok' ?>"><?= $done ? 'eingelöst' . ($v['redeemed_at'] ? ' am ' . forma_h(date('d. m. Y', strtotime($v['redeemed_at']))) : '') : ($bal < (int)$v['amount_cents'] ? 'Restwert ' . forma_h(forma_euro($bal)) : 'offen') ?></span></div>
+                <div class="booking-head"><strong><?= forma_h($v['nr']) ?><?= ($v['kind'] ?? 'kauf') === 'alt' ? ' · alter Gutschein, nachgetragen' : (($v['kind'] ?? 'kauf') !== 'kauf' ? ' · Geschenk von dir' : '') ?></strong><span class="pill<?= $done ? '' : ' pill-ok' ?>"><?= $done ? 'eingelöst' . ($v['redeemed_at'] ? ' am ' . forma_h(date('d. m. Y', strtotime($v['redeemed_at']))) : '') : ($bal < (int)$v['amount_cents'] ? 'Restwert ' . forma_h(forma_euro($bal)) : 'offen') ?></span></div>
                 <div><?= forma_h(forma_voucher_title($v)) ?> · <?= forma_h(forma_euro((int)$v['amount_cents'])) ?></div>
                 <div class="small">Code: <span class="sel" style="font-weight:600;letter-spacing:.04em"><?= forma_h((string)$v['code']) ?></span></div>
-                <?php foreach ($uses as $u): ?><div class="muted small">− <?= forma_h(forma_euro((int)$u['cents'])) ?> <?= $u['ref_kind'] === 'atelier' ? 'im Atelier eingelöst' : 'online eingelöst' ?><?= $u['status'] === 'reserviert' ? ' (Zahlung läuft gerade)' : '' ?> · <?= forma_h(date('d. m. Y', strtotime($u['created_at']))) ?><?= $u['note'] !== '' ? ' · ' . forma_h($u['note']) : '' ?></div><?php endforeach; ?>
+                <?php foreach ($uses as $u): ?><div class="muted small">− <?= forma_h(forma_euro((int)$u['cents'])) ?> <?= $u['ref_kind'] === 'atelier' ? 'im Atelier eingelöst' : (($v['kind'] ?? '') === 'alt' ? 'für einen Kurstermin eingelöst' : 'online eingelöst') ?><?= $u['status'] === 'reserviert' ? ' (Zahlung läuft gerade)' : '' ?> · <?= forma_h(date('d. m. Y', strtotime($u['created_at']))) ?><?= $u['note'] !== '' ? ' · ' . forma_h($u['note']) : '' ?></div><?php endforeach; ?>
                 <?php if ($v['recipient'] || $v['sender']): ?><div class="muted small"><?= $v['recipient'] ? 'Für ' . forma_h($v['recipient']) : '' ?><?= $v['recipient'] && $v['sender'] ? ' · ' : '' ?><?= $v['sender'] ? 'von ' . forma_h($v['sender']) : '' ?></div><?php endif; ?>
-                <div class="muted small">Gekauft am <?= forma_h(date('d. m. Y', strtotime($v['paid_at']))) ?> von <?= forma_h($v['buyer_name']) ?></div>
+                <div class="muted small"><?= ($v['kind'] ?? '') === 'alt' ? 'Nachgetragen am' : 'Gekauft am' ?> <?= forma_h(date('d. m. Y', strtotime($v['paid_at']))) ?> von <?= forma_h($v['buyer_name']) ?></div>
                 <div class="sel small"><?= forma_h($v['buyer_email']) ?></div>
                 <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
                     <a href="<?= forma_h(forma_voucher_link($v)) ?>" target="_blank" rel="noopener">PDF ansehen</a>
@@ -1802,6 +1878,11 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .del form{margin-top:8px}
 .assign-form,.assign-pick{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
 .assign-form h3{margin:0;font-size:20px;color:var(--clay)}
+.oldv{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.oldv summary{cursor:pointer;font-weight:600;color:var(--clay);font-size:17px;list-style-position:inside}
+.oldv-form{margin-top:12px}
+.oldv-form [hidden]{display:none!important}
+.oldv-form p{margin:0}
 .assign{border:2px solid var(--clay);display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .confirm-form{margin-top:6px;padding:12px;border-radius:14px;background:#FFF7F0}
 .sess{margin:4px 0;padding-left:18px;display:grid;gap:4px}
