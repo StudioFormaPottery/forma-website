@@ -91,7 +91,7 @@ try {
         foreach ($slots as $h) {
             if ($slotFree[$h] < $persons) {
                 $pdo->exec('ROLLBACK');
-                forma_json(['ok' => false, 'error' => 'Von ' . forma_atelier_slot_label($h) . ' ist leider ' . ($slotFree[$h] === 0 ? 'kein Platz mehr frei.' : 'nur noch ' . ($slotFree[$h] === 1 ? '1 Platz' : $slotFree[$h] . ' Plätze') . ' frei.')], 409);
+                forma_json(['ok' => false, 'error' => 'Von ' . forma_atelier_slot_label($h) . ' ist ' . ($slotFree[$h] === 0 ? 'leider schon alles ausgebucht.' : 'die Buchung leider nur noch für ' . ($slotFree[$h] === 1 ? '1 Person' : $slotFree[$h] . ' Personen') . ' möglich. Bitte passe die Anzahl an.')], 409);
             }
         }
         $free = max($slotFree);
@@ -104,7 +104,7 @@ try {
     }
     if (!$isAtelier && $persons > $free) {
         $pdo->exec('ROLLBACK');
-        $msg = $free === 1 ? 'Es ist nur noch 1 Platz frei.' : "Es sind nur noch $free Plätze frei.";
+        $msg = 'Für diesen Termin ist die Buchung leider nur noch für ' . ($free === 1 ? '1 Person' : "$free Personen") . ' möglich. Bitte passe die Anzahl an.';
         forma_json(['ok' => false, 'error' => $msg, 'free' => $free], 409);
     }
     $priceCents = (int)$course['price_cents'];

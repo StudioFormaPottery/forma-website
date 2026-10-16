@@ -163,7 +163,7 @@ h1{font-family:var(--display);font-weight:650;font-size:38px;line-height:1.02;le
   // Nächster freier Termin
   get('../api/courses.php').then(function(d){
     var all=d&&d.courses||[],pp=all.filter(function(c){return /Pottery Pause/.test(c.title)&&c.free>0;})[0];
-    if(pp){var dt=pp.date_text.split('·')[0].replace(/^[A-Za-zÄÖÜäöü]+,\s*/,'').split(',')[0].trim();document.getElementById('sp-date').textContent=dt+(pp.free===1?' · nur noch 1 Platz frei':' · noch '+pp.free+' Plätze frei');document.getElementById('sp-go').textContent=pp.free===1?'Letzten Platz sichern':'Platz sichern';}
+    if(pp){var dt=pp.date_text.split('·')[0].replace(/^[A-Za-zÄÖÜäöü]+,\s*/,'').split(',')[0].trim();document.getElementById('sp-date').textContent=dt+' · Plätze frei';document.getElementById('sp-go').textContent='Platz sichern';}
     var c=all.filter(function(c){return !c.full&&(c.free===undefined||c.free>0);});
     if(c.length)document.getElementById('next').textContent='Nächster freier Termin: '+c[0].title+', '+c[0].date_text;
   }).catch(function(){});

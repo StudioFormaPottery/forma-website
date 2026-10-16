@@ -45,7 +45,7 @@ foreach ($alts as $c) {
     if (isset($days[$ymd])) continue;
     $time = preg_match('/(\d{1,2}(?::\d{2})?–\d{1,2}(?::\d{2})?)/u', (string)$c['date_text'], $m) ? $m[1] : '';
     $days[$ymd] = '<form method="post" style="margin:0"><input type="hidden" name="b" value="' . $id . '"><input type="hidden" name="k" value="' . $h($token) . '"><input type="hidden" name="do" value="move"><input type="hidden" name="course" value="' . (int)$c['id'] . '">'
-        . '<button class="cal-on' . ((int)$c['free'] <= 1 ? ' few' : '') . '" type="submit" title="' . $h($c['date_text']) . ' · ' . (int)$c['free'] . ' frei" onclick="return confirm(\'Auf ' . $h(addslashes((string)$c['date_text'])) . ' umbuchen?\')">' . (int)substr($ymd, 8) . ($time ? '<small>' . $h($time) . '</small>' : '') . '</button></form>';
+        . '<button class="cal-on" type="submit" title="' . $h($c['date_text']) . ' · frei" onclick="return confirm(\'Auf ' . $h(addslashes((string)$c['date_text'])) . ' umbuchen?\')">' . (int)substr($ymd, 8) . ($time ? '<small>' . $h($time) . '</small>' : '') . '</button></form>';
 }
 $paid = (int)$b['amount_cents'] > 0 || (int)($b['voucher_cents'] ?? 0) > 0;
 ?><!doctype html>

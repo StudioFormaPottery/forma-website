@@ -25,6 +25,7 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 
 ## Eigenes Buchungssystem (seit 10.10.2026, ersetzt Zenamu)
 - `api/courses.php` liefert die kommenden, sichtbaren Termine mit freien Plätzen; `api/book.php` nimmt Anmeldungen an (Platzprüfung in einer Transaktion, Honeypot-Feld `website`, Mindestzeit 3 s, max. 6 Anmeldungen pro Stunde und IP-Hash).
+- Restplätze sind nur intern (Verwaltung). Gäste sehen nie „noch X Plätze frei“, nur „Plätze frei“ oder „ausgebucht“; Personen-Auswahl immer 1–8. Wählt jemand mehr als frei ist, kommt erst dann: „Für diesen Termin ist die Buchung leider nur noch für N Personen möglich.“ Gilt für Startseite, /urlaub/, /links/ und Umbuchen.
 - `api/lib.php`: gemeinsame Funktionen, Absender/Empfänger der Mails, Startinhalt (Pottery Pause mit 1 Platz).
 - Daten: SQLite unter `../forma-data/buchungen.sqlite`, also außerhalb von `public_html`. Bleibt bei Deployments erhalten. Nie ins Repository legen.
 - Mails: Bestätigung an die Kundin, Benachrichtigung an hello@forma-pottery.com. Versand per SMTP über das Hostinger-Postfach hello@forma-pottery.com (ssl://smtp.hostinger.com:465), sobald Vivien in der Verwaltung unter „E-Mail-Versand“ das Postfach-Passwort hinterlegt hat (liegt in `../forma-data/mail.json`, nie ins Repo). Ohne Passwort Rückfall auf PHP `mail()`, das oft im Spam landet.

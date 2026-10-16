@@ -8,7 +8,7 @@ $spin = [];
 try {
     $pdo = forma_db();
     foreach (forma_upcoming_courses($pdo) as $c) {
-        if ($c['title'] === 'Spin & Go') $spin[] = ['id' => (int)$c['id'], 'd' => (string)$c['start_date'], 'free' => (int)$c['free']];
+        if ($c['title'] === 'Spin & Go') $spin[] = ['id' => (int)$c['id'], 'd' => (string)$c['start_date'], 'free' => (int)$c['free'] > 0 ? 1 : 0];
         if (count($spin) >= 120) break;
     }
 } catch (Throwable $e) { error_log('FORMA urlaub: ' . $e->getMessage()); }
@@ -16,7 +16,7 @@ $T = $en ? [
     'title' => 'Pottery on holiday', 'kick' => 'Winter in Paznaun · FORMA studio in Mathon',
     'lead' => 'A creative break between your ski day and dinner: sit down at the pottery wheel in my small studio in Mathon, just a few minutes from Ischgl, and enjoy your time with the clay. No experience needed.',
     's_k' => 'Wheel class · 2 hours', 's_t' => 'Spin & Go', 's_d' => 'Two hours at the pottery wheel, guided from start to finish. Wednesday & Friday, 9–11 am, takes place from 2 people.',
-    's_p' => '€ 70', 's_ps' => 'per person', 's_free' => 'places free', 's_btn' => 'Book a place', 'cal_hint' => 'Tap a highlighted day to see free places.', 'cal_full' => 'fully booked', 'cal_one' => '1 place free', 'cal_many' => '%d places free', 'months' => ['January','February','March','April','May','June','July','August','September','October','November','December'], 'wd' => ['Mo','Tu','We','Th','Fr','Sa','Su'], 'prev' => 'Previous month', 'next' => 'Next month', 'free_l' => 'free', 'full_l' => 'booked out', 's_none' => 'No free dates at the moment. Message me on WhatsApp and we will find a time: ',
+    's_p' => '€ 70', 's_ps' => 'per person', 's_free' => 'places free', 's_btn' => 'Book a place', 'cal_hint' => 'Tap a highlighted day to choose it.', 'cal_full' => 'fully booked', 'cal_one' => 'places available', 'cal_many' => 'places available', 'months' => ['January','February','March','April','May','June','July','August','September','October','November','December'], 'wd' => ['Mo','Tu','We','Th','Fr','Sa','Su'], 'prev' => 'Previous month', 'next' => 'Next month', 'free_l' => 'free', 'full_l' => 'booked out', 's_none' => 'No free dates at the moment. Message me on WhatsApp and we will find a time: ',
     'p_k' => '1:1 at the wheel · 2 hours', 'p_t' => 'Private Pottery', 'p_d' => 'I take two hours just for you and your wishes: at your own pace at the pottery wheel, cosy with coffee or tea. Afterwards you pick your favourite piece from my current collection.',
     'p_p' => '€ 130', 'p_ps' => 'for 2 hours', 'p_how' => 'Pay online now, tell me two preferred dates and times, and I will confirm your appointment by email.',
     'w1' => '1st preferred date', 'w2' => '2nd preferred date', 'time' => 'Time', 'name' => 'First and last name', 'email' => 'Email', 'phone' => 'Phone / WhatsApp', 'opt' => '(optional)',
@@ -27,7 +27,7 @@ $T = $en ? [
     'title' => 'Töpfern im Urlaub', 'kick' => 'Winter im Paznaun · FORMA Atelier in Mathon',
     'lead' => 'Eine kreative Auszeit zwischen Skitag und Abendessen: In meinem kleinen Atelier in Mathon, nur wenige Minuten von Ischgl, setzt du dich an die Töpferscheibe und genießt die Zeit am Ton. Ganz ohne Vorkenntnisse.',
     's_k' => 'Kurs an der Drehscheibe · 2 Stunden', 's_t' => 'Spin & Go', 's_d' => 'Zwei Stunden an der Töpferscheibe, begleitet von Anfang an. Mittwoch & Freitag, 9–11 Uhr, findet ab 2 Personen statt.',
-    's_p' => '€ 70', 's_ps' => 'pro Person', 's_free' => 'Plätze frei', 's_btn' => 'Platz buchen', 'cal_hint' => 'Tipp auf einen markierten Tag, dann siehst du die freien Plätze.', 'cal_full' => 'ausgebucht', 'cal_one' => 'noch 1 Platz frei', 'cal_many' => 'noch %d Plätze frei', 'months' => ['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'], 'wd' => ['Mo','Di','Mi','Do','Fr','Sa','So'], 'prev' => 'Vorheriger Monat', 'next' => 'Nächster Monat', 'free_l' => 'frei', 'full_l' => 'ausgebucht', 's_none' => 'Gerade sind keine Termine frei. Schreib mir per WhatsApp, dann finden wir einen: ',
+    's_p' => '€ 70', 's_ps' => 'pro Person', 's_free' => 'Plätze frei', 's_btn' => 'Platz buchen', 'cal_hint' => 'Tipp auf einen markierten Tag, um ihn auszuwählen.', 'cal_full' => 'ausgebucht', 'cal_one' => 'Plätze frei', 'cal_many' => 'Plätze frei', 'months' => ['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'], 'wd' => ['Mo','Di','Mi','Do','Fr','Sa','So'], 'prev' => 'Vorheriger Monat', 'next' => 'Nächster Monat', 'free_l' => 'frei', 'full_l' => 'ausgebucht', 's_none' => 'Gerade sind keine Termine frei. Schreib mir per WhatsApp, dann finden wir einen: ',
     'p_k' => '1:1 an der Drehscheibe · 2 Stunden', 'p_t' => 'Private Pottery', 'p_d' => 'Ich nehme mir zwei Stunden Zeit nur für dich und deine Wünsche: ganz in deinem Tempo an der Drehscheibe, gemütlich bei Kaffee oder Tee. Danach suchst du dir dein Lieblingsstück aus meiner aktuellen Kollektion aus.',
     'p_p' => '€ 130', 'p_ps' => 'für 2 Stunden', 'p_how' => 'Du bezahlst gleich online, gibst mir zwei Wunschtermine mit Uhrzeit, und ich bestätige dir deinen Termin per E-Mail.',
     'w1' => '1. Wunschtermin', 'w2' => '2. Wunschtermin', 'time' => 'Uhrzeit', 'name' => 'Vor- und Nachname', 'email' => 'E-Mail', 'phone' => 'Telefon / WhatsApp', 'opt' => '(optional)',

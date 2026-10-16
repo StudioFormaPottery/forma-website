@@ -2092,7 +2092,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   function $(id){return document.getElementById(id);}
   function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
   function euro(c){return '€ '+(c%100===0?String(c/100):(c/100).toFixed(2).replace('.',','));}
-  function freeText(n){return n<=0?'ausgebucht':(n===1?'noch 1 Platz frei':'noch '+n+' Plätze frei');}
+  function freeText(n){return n<=0?'ausgebucht':'Plätze frei';}
+  // Restplätze sehen nur Vivien in der Verwaltung; Gäste erfahren die Grenze erst, wenn sie mehr Personen wählen als möglich
+  function limitText(n){return 'Für diesen Termin ist die Buchung leider nur noch für '+(n===1?'1 Person':n+' Personen')+' möglich. Bitte passe die Anzahl an.';}
   function show(d){if(typeof d.showModal==='function'){if(!d.open)d.showModal();}else d.setAttribute('open','');}
   function hide(d){if(typeof d.close==='function')d.close();else d.removeAttribute('open');}
   function norm(t){return String(t||'').toLowerCase().replace(/&amp;/g,'&').trim();}
@@ -2227,7 +2229,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     slotRow.innerHTML='';slotOn={};
     [8,9,10].forEach(function(h){
       var free=c.slots&&c.slots[h]!=null?c.slots[h]:c.free,bt=el('button','slot');bt.type='button';
-      bt.appendChild(el('b',null,h+'–'+(h+1)+' Uhr'));bt.appendChild(el('small',null,free<=0?'ausgebucht':(free===1?'1 Platz frei':free+' Plätze frei')));
+      bt.appendChild(el('b',null,h+'–'+(h+1)+' Uhr'));bt.appendChild(el('small',null,free<=0?'ausgebucht':'frei'));
       var hid=document.createElement('input');hid.type='hidden';hid.name='slots[]';hid.value=h;hid.disabled=true;
       if(free<=0)bt.disabled=true;
       bt.addEventListener('click',function(){slotOn[h]=!slotOn[h];bt.classList.toggle('on',slotOn[h]);hid.disabled=!slotOn[h];submitLabel();});
@@ -2251,7 +2253,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     $('book-date').textContent=c.date_text;
     $('book-price').textContent=c.price_text||'';
     persons.innerHTML='';
-    var max=Math.min(c.free,10);
+    var max=8;
     for(var i=1;i<=max;i++){var o=el('option',null,i===1?'1 Person':i+' Personen');o.value=i;persons.appendChild(o);}
     payNote.hidden=!(c.price_cents>0);
     piecesBox.hidden=c.title!=='Pottery bemalen';
@@ -2325,6 +2327,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     else if(name.length<2)msg='Bitte gib deinen Namen an.';
     else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))msg='Bitte gib eine gültige E-Mail-Adresse an.';
     else if(!$('book-consent').checked)msg='Bitte bestätige noch die Hinweise zum Datenschutz.';
+    else if(slotsBox.hidden&&current&&typeof current.free==='number'&&current.free>0&&(+persons.value||1)>current.free)msg=limitText(current.free);
     if(msg){err.textContent=msg;err.hidden=false;return;}
     submit.disabled=true;submit.textContent=current&&current.price_cents>0?'Einen Moment …':'Wird gesendet …';
     var redirecting=false;
