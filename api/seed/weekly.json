@@ -50,5 +50,15 @@
   "price_cents": 399,
   "sort": 0,
   "description": "Ein freundliches kleines Gespenst mit Zipfelmütze und Ärmchen. Über ein Teelicht gestellt, leuchten Augen und Mund in der Dunkelheit."
+ },
+ {
+  "key": "wollknaeuel-schale",
+  "publish_at": "2026-10-16T08:00:00",
+  "title": "Wollknäuel-Schale",
+  "season": "herbst",
+  "level": 2,
+  "price_cents": 399,
+  "sort": 0,
+  "description": "Eine Schale für dein Wollknäuel, mit gewelltem Rand und geschwungenem Schlitz, durch den der Faden läuft. Das Knäuel bleibt liegen, während du strickst oder häkelst. Aus zwei Wandteilen und einem Boden in ca. 2 Stunden selbst gemacht."
  }
 ]
