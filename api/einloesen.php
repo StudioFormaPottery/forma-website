@@ -31,7 +31,7 @@ if (empty($_POST['consent'])) forma_json(['ok' => false, 'error' => 'Bitte best�
 // Nur echte, sichtbare Spin & Go Termine ab dem nächsten buchbaren Tag
 $ok = false;
 foreach (forma_upcoming_courses($pdo) as $c) {
-    if ((int)$c['id'] === $courseId && $c['title'] === FORMA_SERIES['spin']['title']) { $ok = $c['free'] >= (int)$link['persons']; break; }
+    if ((int)$c['id'] === $courseId && $c['title'] === FORMA_SERIES['spin']['title']) { $ok = $c['free'] >= 1; break; }
 }
 if (!$ok) forma_json(['ok' => false, 'error' => 'Dieser Termin ist leider nicht mehr frei. Bitte such dir einen anderen Tag aus.']);
 
@@ -45,7 +45,7 @@ if ($st->rowCount() !== 1) forma_json(['ok' => false, 'error' => 'Dieser Link wu
 try {
     $r = forma_old_voucher_booking($pdo, [
         'course_id' => $courseId, 'name' => $name, 'email' => $email, 'phone' => $phone,
-        'persons' => (int)$link['persons'], 'value_cents' => (int)$link['value_cents'], 'nr' => '',
+        'persons' => 1, 'value_cents' => (int)$link['value_cents'], 'nr' => '',
         'no_post' => !empty($_POST['no_post']), 'note' => (string)$link['note'], 'via_link' => true,
         'address' => implode("\n", array_filter([$street, trim("$zip $city"), $country !== 'Österreich' ? $country : ''])),
     ]);

@@ -12,12 +12,12 @@ $link = null; $spin = [];
 $preview = $token === 'vorschau';
 try {
     $pdo = forma_db();
-    $link = $preview ? ['label' => 'Anna Muster', 'persons' => 2, 'status' => 'offen', 'value_cents' => 14000] : forma_old_link_get($pdo, $token);
+    $link = $preview ? ['label' => 'Anna Muster', 'persons' => 1, 'status' => 'offen', 'value_cents' => 14000] : forma_old_link_get($pdo, $token);
     if ($link && $link['status'] === 'offen') {
         foreach (forma_upcoming_courses($pdo) as $c) {
             if ($c['title'] !== FORMA_SERIES['spin']['title']) continue;
             $time = preg_match('/(\d{1,2}(?::\d{2})?\s*[–-]\s*\d{1,2}(?::\d{2})?)\s*Uhr/u', (string)$c['date_text'], $m) ? str_replace(' ', '', $m[1]) . ' Uhr' : '';
-            $spin[] = ['id' => (int)$c['id'], 'd' => (string)$c['start_date'], 'free' => (int)$c['free'] >= (int)$link['persons'] ? (int)$c['free'] : 0, 'time' => $time];
+            $spin[] = ['id' => (int)$c['id'], 'd' => (string)$c['start_date'], 'free' => (int)$c['free'], 'time' => $time];
             if (count($spin) >= 120) break;
         }
     }
@@ -25,8 +25,9 @@ try {
 
 $valid = $link && $link['status'] === 'offen';
 $first = $valid && $link['label'] !== '' ? forma_first_name((string)$link['label']) : '';
-$persons = $valid ? (int)$link['persons'] : 1;
-$what = $persons === 1 ? '1 Platz im Spin & Go Workshop' : $persons . ' Plätze im Spin & Go Workshop';
+$persons = 1;
+$what = '1 Platz im Spin & Go Workshop';
+$rest = $valid ? max(0, (int)$link['value_cents'] - (int)FORMA_SERIES['spin']['price_cents']) : 0;
 ?><!doctype html>
 <html lang="de">
 <head>
@@ -110,6 +111,7 @@ $what = $persons === 1 ? '1 Platz im Spin & Go Workshop' : $persons . ' Plätze 
     <div class="two plz"><div style="display:grid;gap:12px"><label for="zip">PLZ</label><input id="zip" name="zip" autocomplete="postal-code" inputmode="numeric"></div><div style="display:grid;gap:12px"><label for="city">Ort</label><input id="city" name="city" autocomplete="address-level2"></div></div>
     <label for="country">Land</label><input id="country" name="country" autocomplete="country-name" value="Österreich">
     <div class="sum"><span>Zu bezahlen</span><span><s><?= $h(forma_euro($persons * (int)FORMA_SERIES['spin']['price_cents'])) ?></s><span class="total">€ 0</span></span></div>
+    <?php if ($rest > 0): ?><p class="chosen" style="margin:0">🎁 Auf deinem Gutschein bleiben danach noch <?= $h(forma_euro($rest)) ?> übrig. Dafür bekommst du mit der Bestätigung einen eigenen Gutscheincode, den du jederzeit bei einer nächsten Buchung einlösen kannst.</p><?php endif; ?>
     <p class="post-note" style="margin:0">Dein Gutschein wird automatisch eingelöst. Du bekommst die Terminbestätigung und die Rechnung (bezahlt mit Gutschein) per E-Mail.</p>
     <label class="consent"><input type="checkbox" name="consent" id="consent" value="1"><span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Buchung gespeichert werden. <a href="../#datenschutz">Datenschutz</a></span></label>
     <p class="post-note">Mit deiner Buchung bekommst du ab und zu die FORMA Post mit Neuem aus dem Atelier. Abmelden geht jederzeit mit einem Klick.</p>

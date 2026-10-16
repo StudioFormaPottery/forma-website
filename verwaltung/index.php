@@ -304,11 +304,12 @@ if ($action === 'add_booking') {
 }
 
 if ($action === 'link_create') {
-    $persons = max(1, min(8, (int)($_POST['persons'] ?? 1)));
+    // Ein Link = ein Gutschein = ein Platz. Mehr Wert bleibt als Restguthaben auf dem Gutschein.
+    $units = max(1, min(8, (int)($_POST['units'] ?? 1)));
     $value = euro_to_cents((string)($_POST['value'] ?? ''));
-    if ($value <= 0) $value = $persons * (int)FORMA_SERIES['spin']['price_cents'];
+    if ($value <= 0) $value = $units * (int)FORMA_SERIES['spin']['price_cents'];
     $pdo->prepare('INSERT INTO voucher_links (token, label, persons, value_cents, note, created_at) VALUES (?, ?, ?, ?, ?, ?)')
-        ->execute([bin2hex(random_bytes(16)), forma_clean((string)($_POST['label'] ?? ''), 120), $persons, $value, forma_clean((string)($_POST['note'] ?? ''), 300), date('c')]);
+        ->execute([bin2hex(random_bytes(16)), forma_clean((string)($_POST['label'] ?? ''), 120), 1, $value, forma_clean((string)($_POST['note'] ?? ''), 300), date('c')]);
     go($self . '?view=gutscheine&neu=' . (int)$pdo->lastInsertId() . '#links', 'Der Link ist fertig. Kopier ihn und schick ihn per WhatsApp oder E-Mail weiter.');
 }
 
@@ -1237,13 +1238,13 @@ if ($view === 'gutscheine') {
         </div>
         <div class="card stack links-card" id="links">
             <h2>🎟 Link für alten Gutschein</h2>
-            <p class="muted small">Für Gäste mit einem alten Gutschein ohne Nummer. Du schickst ihnen einen persönlichen Link, sie suchen sich selbst einen Spin &amp; Go Termin aus und geben ihre Daten ein. Der Gutschein bekommt dabei automatisch eine Nummer, der Gast bekommt Bestätigung und Rechnung (bezahlt mit Gutschein), du eine Info-Mail. Jeder Link funktioniert nur einmal.</p>
+            <p class="muted small">Für Gäste mit einem alten Gutschein ohne Nummer. Du schickst ihnen einen persönlichen Link, sie suchen sich selbst einen Spin &amp; Go Termin aus und geben ihre Daten ein. Der Gutschein bekommt dabei automatisch eine Nummer, der Gast bekommt Bestätigung und Rechnung (bezahlt mit Gutschein), du eine Info-Mail. Jeder Link löst genau einen Gutschein ein und bucht einen Platz. Steht mehr auf dem Gutschein, bleibt der Rest als Guthaben mit Code erhalten. Kommt eine Freundin mit eigenem Gutschein mit, erstellst du ihr einfach einen eigenen Link.</p>
             <p><a class="btn btn-ghost btn-sm" href="../einloesen/?t=vorschau" target="_blank" rel="noopener">👀 Vorschau: So sieht die Seite für deine Gäste aus</a></p>
             <form method="post" class="stack">
                 <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="link_create">
                 <div class="row">
                     <div class="stack"><label for="l-label">Für wen? <span class="muted small">(Name zur Begrüßung)</span></label><input id="l-label" name="label" maxlength="120" placeholder="z. B. Anna Huber" autocomplete="off"></div>
-                    <div class="stack"><label for="l-pers">Personen auf dem Gutschein</label><select id="l-pers" name="persons" onchange="var v=document.getElementById('l-val');if(!v.dataset.touched)v.value=this.value*70"><?php for ($i = 1; $i <= 8; $i++): ?><option value="<?= $i ?>"><?= $i ?></option><?php endfor; ?></select></div>
+                    <div class="stack"><label for="l-pers">Einheiten auf dem Gutschein</label><select id="l-pers" name="units" onchange="var v=document.getElementById('l-val');if(!v.dataset.touched)v.value=this.value*70"><?php for ($i = 1; $i <= 8; $i++): ?><option value="<?= $i ?>"><?= $i ?> × Spin &amp; Go</option><?php endfor; ?></select></div>
                 </div>
                 <div class="row">
                     <div class="stack"><label for="l-val">Wert in €</label><input id="l-val" name="value" inputmode="decimal" value="70" oninput="this.dataset.touched=1"></div>
@@ -1257,7 +1258,7 @@ if ($view === 'gutscheine') {
                 $who = $l['label'] !== '' ? $l['label'] : 'Gast'; $wa = 'https://wa.me/?text=' . rawurlencode('Hallo ' . ($l['label'] !== '' ? forma_first_name($l['label']) : '') . "! Schön, dass du deinen FORMA Gutschein einlöst. Hier kannst du dir ganz einfach deinen Spin & Go Termin aussuchen: $url\nBis bald, Vivien"); ?>
                 <div class="card booking link-item<?= $open ? '' : ' is-cancelled' ?><?= (int)$l['id'] === $neu ? ' is-new' : '' ?>">
                     <div class="booking-head"><strong><?= forma_h($who) ?></strong><span class="pill<?= $open ? '' : ' pill-ok' ?>"><?= $open ? 'wartet auf Buchung' : 'eingelöst' . ($l['used_at'] ? ' am ' . forma_h(date('d. m.', strtotime($l['used_at']))) : '') ?></span></div>
-                    <div class="small"><?= (int)$l['persons'] ?> <?= (int)$l['persons'] === 1 ? 'Person' : 'Personen' ?> · <?= forma_h(forma_euro((int)$l['value_cents'])) ?><?= $l['note'] !== '' ? ' · ' . forma_h($l['note']) : '' ?></div>
+                    <div class="small">Gutschein <?= forma_h(forma_euro((int)$l['value_cents'])) ?> · bucht 1 Platz<?= (int)$l['value_cents'] > (int)FORMA_SERIES['spin']['price_cents'] ? ', Rest ' . forma_h(forma_euro((int)$l['value_cents'] - (int)FORMA_SERIES['spin']['price_cents'])) . ' bleibt als Guthaben' : '' ?><?= $l['note'] !== '' ? ' · ' . forma_h($l['note']) : '' ?></div>
                     <?php if ($open): ?>
                     <div class="link-row"><input class="link-url" value="<?= forma_h($url) ?>" readonly onclick="this.select()"><button class="btn btn-ghost btn-sm" type="button" onclick="var i=this.previousElementSibling;i.select();(navigator.clipboard?navigator.clipboard.writeText(i.value):Promise.reject()).then(()=>{this.textContent='Kopiert ✓'}).catch(()=>{document.execCommand('copy');this.textContent='Kopiert ✓'})">Kopieren</button></div>
                     <div class="row-actions">
