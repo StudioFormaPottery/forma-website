@@ -431,6 +431,19 @@ function forma_migrate(PDO $pdo): void
         $pdo->prepare('UPDATE courses SET description = ? WHERE title = ?')->execute([FORMA_SERIES['atelier']['description'], FORMA_SERIES['atelier']['title']]);
         forma_set_setting($pdo, 'capacity_v25', '1');
     }
+    // 16.10.2026 (Korrektur): Offenes Atelier 5 pro Stunde (5 Scheiben), Pottery bemalen 6. Nie unter die schon gebuchte Anzahl.
+    if (forma_setting($pdo, 'capacity_v26') === null) {
+        foreach (['atelier', 'bemalen'] as $k) {
+            $t = FORMA_SERIES[$k];
+            $ids = $pdo->prepare('SELECT id FROM courses WHERE title = ? AND start_date >= ? AND capacity > ?');
+            $ids->execute([$t['title'], date('Y-m-d'), $t['capacity']]);
+            foreach ($ids->fetchAll(PDO::FETCH_COLUMN) as $cid) {
+                $used = forma_is_atelier($t) ? max(array_map(fn($f) => 8 - $f, forma_atelier_free($pdo, (int)$cid, 8))) : forma_booked($pdo, (int)$cid);
+                $pdo->prepare('UPDATE courses SET capacity = ? WHERE id = ?')->execute([max($t['capacity'], $used), $cid]);
+            }
+        }
+        forma_set_setting($pdo, 'capacity_v26', '1');
+    }
     // 12.10.2026: Offenes Atelier online buchbar, stundenweise, 5 Plätze pro Stunde, € 30 pro Stunde.
     if (forma_setting($pdo, 'atelier_online_v20') === null) {
         $t = FORMA_SERIES['atelier'];
@@ -643,7 +656,7 @@ const FORMA_SERIES = [
     'atelier' => [
         'title' => 'Offenes Atelier',
         'from' => '8', 'to' => '11',
-        'capacity' => 8, 'min' => 1,
+        'capacity' => 5, 'min' => 1,
         'price_text' => '€ 30 pro Stunde, du wählst 1 bis 3 Stunden · Fertigstellung € 25/kg bei Abholung',
         'price_cents' => 3000,
         'description' => 'Selbstständig an eigenen Projekten arbeiten. Such dir aus, welche Stunden du bleiben möchtest. Kein betreuter Kurs, für alle mit Vorerfahrung.',
@@ -651,7 +664,7 @@ const FORMA_SERIES = [
     'bemalen' => [
         'title' => 'Pottery bemalen',
         'from' => '15', 'to' => '18',
-        'capacity' => 8, 'min' => 1,
+        'capacity' => 6, 'min' => 1,
         'price_text' => '€ 15 Atelierbeitrag pro Person, vorab online. Dein Stück wählst du gleich mit aus (ab € 5)',
         'price_cents' => 1500,
         'description' => 'Tassen, Teller und Mugs bemalen, ganz entspannt bei Kerzenlicht. Mit dem Atelierbeitrag ist dein Platz reserviert, dein Stück kannst du gleich mitbuchen. Gefällt dir vor Ort noch mehr, rechnen wir es im Atelier ab. Abholung am Montag darauf.',
@@ -770,7 +783,7 @@ function forma_first_bookable_date(?int $now = null): string
 
 /** Offenes Atelier: stundenweise buchbar, 5 Plätze pro Stunde. */
 const FORMA_ATELIER_SLOTS = [8, 9, 10];
-const FORMA_ATELIER_SEATS = 8;
+const FORMA_ATELIER_SEATS = 5;
 
 function forma_is_atelier(array $course): bool
 {
