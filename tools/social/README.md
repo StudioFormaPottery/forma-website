@@ -11,10 +11,17 @@ mit Texten hat. Jeden Samstag früh kommt deshalb ein Paket für die kommende Wo
 - Alles zusätzlich als **ZIP**, damit Vivien es auf einmal aufs iPhone speichern kann.
 
 ## Bauen
-`python3 tools/social/make_story.py <stories.json> <ausgabeordner>` (Felder: `file`, `photo`, `pos`, `pill`,
-`title` mit `|` für Zeilenumbruch, `text`, `cta`, optional `seal` {ring, big, small}, `house: true` für das
-Adventkalender-Haus). Beispiel-Woche: 17.–23. 10. 2026 (Tassen, Pottery bemalen ab 19. 10., Adventkalender,
-Spin & Go, Gutschein, Pottery Pause).
+`python3 tools/social/make_story.py <stories.json> <ausgabeordner>`
+
+Look seit 16.10.2026 (Vivien: „cuter, more eye-catchy, so richtig BAM“): Scrapbook-Stil mit schrägem Polaroid
+und Washi-Tape, Zacken-Sticker, große Überschrift plus handgeschriebenes Akzentwort (Homemade Apple),
+Herzchen/Sterne, gekritzelter Pfeil zum Link-Sticker. Hintergründe wechseln ab: `rot` / `creme` / `ton`.
+
+Felder: `file`, `theme`, `photo` (oder `house: true` für das Adventkalender-Haus), `pos`, `note`
+(Polaroid-Unterschrift, kurz), `hand` (kleiner Einstieg oben links), `burst` („NEU|im Atelier“, oben kurz),
+`title` (`|` = Umbruch, max. ~16 Zeichen pro Zeile), `script` (max. ~16 Zeichen), `text` (1–2 kurze Sätze),
+`cta`. Beispiel-Woche: 17.–23. 10. 2026 (Tassen, Pottery bemalen ab 19. 10., Adventkalender, Spin & Go,
+Gutschein, Pottery Pause).
 
 ## Inhalt
 - Was in der Woche wirklich ansteht: aus `index.html`, `api/lib.php`, `api/seed/*.json` und
