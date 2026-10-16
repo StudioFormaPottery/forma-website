@@ -3,5 +3,6 @@ Disallow: /verwaltung/
 Disallow: /api/
 Disallow: /urlaub/
 Disallow: /team/
+Disallow: /einloesen/
 
 Sitemap: https://www.forma-pottery.com/sitemap.xml

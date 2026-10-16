@@ -49,6 +49,7 @@ function forma_db(): PDO
     $pdo->exec('PRAGMA foreign_keys = ON');
     $pdo->exec('PRAGMA busy_timeout = 5000');
     forma_migrate($pdo);
+    forma_old_links_schema($pdo);
     return $pdo;
 }
 
@@ -1301,15 +1302,16 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
         . forma_newsletter_note($unsub);
 
     $byVivien = str_starts_with((string)$b['message'], 'Von Vivien eingetragen');
-    $admin = ($byVivien ? 'Von dir in der Verwaltung eingetragen (' . preg_replace('/^Von Vivien eingetragen · /u', '', (string)$b['message']) . ')' : ($paid ? 'Neue bezahlte Buchung über die Website' : 'Neue Kursanmeldung über die Website')) . "\n\n"
+    $byLink = str_starts_with((string)$b['message'], 'Über deinen Gutschein-Link gebucht');
+    $admin = ($byLink ? 'Gutschein eingelöst! ' . forma_first_name((string)$b['name']) . ' hat über deinen Gutschein-Link selbst einen Termin gebucht (' . preg_replace('/^Über deinen Gutschein-Link gebucht · /u', '', (string)$b['message']) . ').' : ($byVivien ? 'Von dir in der Verwaltung eingetragen (' . preg_replace('/^Von Vivien eingetragen · /u', '', (string)$b['message']) . ')' : ($paid ? 'Neue bezahlte Buchung über die Website' : 'Neue Kursanmeldung über die Website'))) . "\n\n"
         . "Kurs: {$b['title']}\nTermin: $termin\nPersonen: $personsText\n" . $piecesLine
         . ($paid ? ((int)$b['amount_cents'] > 0 ? 'Bezahlt: ' . forma_euro((int)$b['amount_cents']) . ' über Stripe' . ($vc > 0 ? ' + ' . forma_euro($vc) . ' Gutschein' : '') : 'Bezahlt mit Gutschein: ' . forma_euro($vc)) . "\n" : 'Bezahlung: vor Ort' . ($vc > 0 ? ' (' . forma_euro($vc) . ' schon mit Gutschein bezahlt)' : '') . "\n")
         . (!empty($b['no_post']) ? "Möchte keine FORMA Post bekommen.\n" : '')
-        . "\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nNachricht: {$b['message']}\n\n"
+        . "\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\n" . (($b['bill_address'] ?? '') !== '' ? "Rechnungsadresse: " . str_replace("\n", ', ', (string)$b['bill_address']) . "\n" : '') . "Nachricht: {$b['message']}\n\n"
         . "Freie Plätze danach: $free\n\nAlle Buchungen: $site/verwaltung/\n";
 
     forma_mail($b['email'], ($paid ? 'Dein Platz ist fix: ' : 'Deine Anmeldung: ') . $b['title'], $customer, null, $calAtt);
-    forma_mail(FORMA_NOTIFY_EMAIL, ($paid ? 'Bezahlt: ' : 'Neue Anmeldung: ') . $b['title'] . ' (' . $b['name'] . ')', $admin, $b['email']);
+    forma_mail(FORMA_NOTIFY_EMAIL, ($byLink ? 'Gutschein-Link eingelöst: ' : ($paid ? 'Bezahlt: ' : 'Neue Anmeldung: ')) . $b['title'] . ' (' . $b['name'] . ')', $admin, $b['email']);
     if ($paid) forma_invoice_for($pdo, 'kurs', $bookingId);
 }
 
@@ -1601,7 +1603,9 @@ function forma_old_voucher_booking(PDO $pdo, array $d): array
     $pdo->exec('BEGIN IMMEDIATE');
     try {
         if (forma_booked($pdo, (int)$c['id']) + $persons > (int)$c['capacity']) {
-            throw new RuntimeException('An diesem Termin sind nicht mehr genug Plätze frei (' . max(0, (int)$c['capacity'] - forma_booked($pdo, (int)$c['id'])) . ' frei). Du kannst die Platzanzahl beim Termin erhöhen.');
+            throw new RuntimeException(!empty($d['via_link'])
+                ? 'An diesem Termin sind leider nicht mehr genug Plätze frei. Bitte such dir einen anderen Tag aus.'
+                : 'An diesem Termin sind nicht mehr genug Plätze frei (' . max(0, (int)$c['capacity'] - forma_booked($pdo, (int)$c['id'])) . ' frei). Du kannst die Platzanzahl beim Termin erhöhen.');
         }
         $nr = trim((string)($d['nr'] ?? ''));
         if ($nr !== '') {
@@ -1622,11 +1626,12 @@ function forma_old_voucher_booking(PDO $pdo, array $d): array
                 trim('Alter Gutschein, schon bezahlt, von Vivien nachgetragen. ' . (string)($d['note'] ?? '')), $now, $now, forma_voucher_new_code(), (int)!empty($d['no_post'])]);
         $vid = (int)$pdo->lastInsertId();
         $fully = $use >= $full;
-        $pdo->prepare("INSERT INTO bookings (course_id, name, email, phone, persons, message, status, created_at, amount_cents, paid_at, voucher_id, voucher_cents, no_post)
-            VALUES (?, ?, ?, ?, ?, ?, 'bestaetigt', ?, 0, ?, ?, ?, ?)")
+        forma_old_links_schema($pdo);
+        $pdo->prepare("INSERT INTO bookings (course_id, name, email, phone, persons, message, status, created_at, amount_cents, paid_at, voucher_id, voucher_cents, no_post, bill_address)
+            VALUES (?, ?, ?, ?, ?, ?, 'bestaetigt', ?, 0, ?, ?, ?, ?, ?)")
             ->execute([(int)$c['id'], $d['name'], $d['email'], (string)($d['phone'] ?? ''), $persons,
-                'Von Vivien eingetragen · alter Gutschein ' . $nr . (trim((string)($d['note'] ?? '')) !== '' ? ' · ' . trim((string)$d['note']) : ''),
-                $now, $fully ? $now : null, $vid, $use, (int)!empty($d['no_post'])]);
+                (!empty($d['via_link']) ? 'Über deinen Gutschein-Link gebucht' : 'Von Vivien eingetragen') . ' · alter Gutschein ' . $nr . (trim((string)($d['note'] ?? '')) !== '' ? ' · ' . trim((string)$d['note']) : ''),
+                $now, $fully ? $now : null, $vid, $use, (int)!empty($d['no_post']), (string)($d['address'] ?? '')]);
         $bid = (int)$pdo->lastInsertId();
         forma_voucher_use($pdo, $vid, 'kurs', $bid, $use, true);
         $pdo->exec('COMMIT');
@@ -1636,6 +1641,44 @@ function forma_old_voucher_booking(PDO $pdo, array $d): array
     }
     forma_send_booking_mails($pdo, $bid);
     return ['booking' => $bid, 'voucher' => $vid, 'nr' => $nr, 'used' => $use, 'rest_value' => $value - $use, 'rest_pay' => $full - $use];
+}
+
+// --- Gutschein-Links: Einmal-Link für Gäste mit altem Gutschein ---------------------------------
+// Vivien erstellt in der Verwaltung pro Gast einen Link (/einloesen/?t=…), der Gast wählt selbst einen Spin & Go Termin.
+// Der Link funktioniert genau einmal. Neu erzeugen macht den alten Link ungültig.
+
+function forma_old_links_schema(PDO $pdo): void
+{
+    static $done = false;
+    if ($done) return;
+    $pdo->exec("CREATE TABLE IF NOT EXISTS voucher_links (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        token TEXT NOT NULL UNIQUE,
+        label TEXT NOT NULL DEFAULT '',
+        persons INTEGER NOT NULL DEFAULT 1,
+        value_cents INTEGER NOT NULL,
+        note TEXT NOT NULL DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'offen',
+        booking_id INTEGER,
+        created_at TEXT NOT NULL,
+        used_at TEXT
+    )");
+    forma_add_column($pdo, 'bookings', 'bill_address', "TEXT NOT NULL DEFAULT ''");
+    $done = true;
+}
+
+function forma_old_link_url(array $l): string
+{
+    return forma_site_url() . '/einloesen/?t=' . $l['token'];
+}
+
+function forma_old_link_get(PDO $pdo, string $token): ?array
+{
+    forma_old_links_schema($pdo);
+    if (!preg_match('/^[a-f0-9]{32}$/', $token)) return null;
+    $st = $pdo->prepare('SELECT * FROM voucher_links WHERE token = ?');
+    $st->execute([$token]);
+    return $st->fetch() ?: null;
 }
 
 function forma_voucher_link(array $v): string

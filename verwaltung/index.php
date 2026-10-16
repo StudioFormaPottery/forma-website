@@ -303,6 +303,25 @@ if ($action === 'add_booking') {
     go($self . '?view=course&id=' . $cid, 'Die Person ist eingetragen.');
 }
 
+if ($action === 'link_create') {
+    $persons = max(1, min(8, (int)($_POST['persons'] ?? 1)));
+    $value = euro_to_cents((string)($_POST['value'] ?? ''));
+    if ($value <= 0) $value = $persons * (int)FORMA_SERIES['spin']['price_cents'];
+    $pdo->prepare('INSERT INTO voucher_links (token, label, persons, value_cents, note, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+        ->execute([bin2hex(random_bytes(16)), forma_clean((string)($_POST['label'] ?? ''), 120), $persons, $value, forma_clean((string)($_POST['note'] ?? ''), 300), date('c')]);
+    go($self . '?view=gutscheine&neu=' . (int)$pdo->lastInsertId() . '#links', 'Der Link ist fertig. Kopier ihn und schick ihn per WhatsApp oder E-Mail weiter.');
+}
+
+if ($action === 'link_renew' || $action === 'link_delete') {
+    $lid = (int)($_POST['lid'] ?? 0);
+    if ($action === 'link_renew') {
+        $pdo->prepare("UPDATE voucher_links SET token = ?, created_at = ? WHERE id = ? AND status = 'offen'")->execute([bin2hex(random_bytes(16)), date('c'), $lid]);
+        go($self . '?view=gutscheine&neu=' . $lid . '#links', 'Neuer Link erzeugt. Der alte Link funktioniert ab jetzt nicht mehr.');
+    }
+    $pdo->prepare("UPDATE voucher_links SET status = 'geloescht' WHERE id = ? AND status = 'offen'")->execute([$lid]);
+    go($self . '?view=gutscheine#links', 'Der Link ist gelöscht und funktioniert nicht mehr.');
+}
+
 if ($action === 'old_voucher') {
     $date = (string)($_POST['date'] ?? '');
     $back = $self . '?view=kalender&m=' . substr($date, 0, 7) . '&d=' . rawurlencode($date) . '&alt=1';
@@ -1205,7 +1224,9 @@ if ($view === 'gutscheine') {
     $vs = $pdo->query("SELECT * FROM vouchers WHERE status IN ('bezahlt','eingeloest') ORDER BY id DESC")->fetchAll();
     $sold = array_filter($vs, fn($x) => ($x['kind'] ?? 'kauf') === 'kauf');
     $sum = array_sum(array_column($sold, 'amount_cents'));
-    render_page('Gutscheine', function () use ($self, $flash, $vs, $sum) { ?>
+    $links = $pdo->query("SELECT l.*, c.date_text FROM voucher_links l LEFT JOIN bookings b ON b.id = l.booking_id LEFT JOIN courses c ON c.id = b.course_id WHERE l.status != 'geloescht' ORDER BY l.status = 'offen' DESC, l.id DESC LIMIT 40")->fetchAll();
+    $neu = (int)($_GET['neu'] ?? 0);
+    render_page('Gutscheine', function () use ($self, $flash, $vs, $sum, $links, $neu) { ?>
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Gutscheine</h1>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
@@ -1213,6 +1234,41 @@ if ($view === 'gutscheine') {
             <p><strong><?= count(array_filter($vs, fn($x) => ($x['kind'] ?? 'kauf') === 'kauf')) ?></strong> verkaufte Gutscheine · zusammen <strong><?= forma_h(forma_euro((int)$sum)) ?></strong></p>
             <p class="muted small">Jeder bezahlte Gutschein bekommt automatisch eine fortlaufende Nummer und einen geheimen Code. Mit dem Code lösen Gäste ihn online bei der Buchung ein, das wird hier automatisch abgezogen. Löst jemand im Atelier ein, ziehst du den Betrag hier selbst ab. Der Restwert bleibt auf dem Gutschein.</p>
             <p style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn" href="<?= forma_h($self) ?>?view=kalender&amp;d=<?= date('Y-m-d') ?>&amp;alt=1#tag">🎟 Alten Gutschein einlösen</a><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=gutscheine_export">Liste herunterladen (CSV)</a></p>
+        </div>
+        <div class="card stack links-card" id="links">
+            <h2>🎟 Link für alten Gutschein</h2>
+            <p class="muted small">Für Gäste mit einem alten Gutschein ohne Nummer. Du schickst ihnen einen persönlichen Link, sie suchen sich selbst einen Spin &amp; Go Termin aus und geben ihre Daten ein. Der Gutschein bekommt dabei automatisch eine Nummer, der Gast bekommt Bestätigung und Rechnung (bezahlt mit Gutschein), du eine Info-Mail. Jeder Link funktioniert nur einmal.</p>
+            <form method="post" class="stack">
+                <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="link_create">
+                <div class="row">
+                    <div class="stack"><label for="l-label">Für wen? <span class="muted small">(Name zur Begrüßung)</span></label><input id="l-label" name="label" maxlength="120" placeholder="z. B. Anna Huber" autocomplete="off"></div>
+                    <div class="stack"><label for="l-pers">Personen auf dem Gutschein</label><select id="l-pers" name="persons" onchange="var v=document.getElementById('l-val');if(!v.dataset.touched)v.value=this.value*70"><?php for ($i = 1; $i <= 8; $i++): ?><option value="<?= $i ?>"><?= $i ?></option><?php endfor; ?></select></div>
+                </div>
+                <div class="row">
+                    <div class="stack"><label for="l-val">Wert in €</label><input id="l-val" name="value" inputmode="decimal" value="70" oninput="this.dataset.touched=1"></div>
+                    <div class="stack"><label for="l-note">Notiz <span class="muted small">(nur für dich)</span></label><input id="l-note" name="note" maxlength="300" placeholder="z. B. Weihnachtsgutschein 2025" autocomplete="off"></div>
+                </div>
+                <button class="btn" type="submit">Link erstellen</button>
+            </form>
+            <?php if ($links): ?>
+            <div class="list">
+            <?php foreach ($links as $l): $url = forma_old_link_url($l); $open = $l['status'] === 'offen';
+                $who = $l['label'] !== '' ? $l['label'] : 'Gast'; $wa = 'https://wa.me/?text=' . rawurlencode('Hallo ' . ($l['label'] !== '' ? forma_first_name($l['label']) : '') . "! Schön, dass du deinen FORMA Gutschein einlöst. Hier kannst du dir ganz einfach deinen Spin & Go Termin aussuchen: $url\nBis bald, Vivien"); ?>
+                <div class="card booking link-item<?= $open ? '' : ' is-cancelled' ?><?= (int)$l['id'] === $neu ? ' is-new' : '' ?>">
+                    <div class="booking-head"><strong><?= forma_h($who) ?></strong><span class="pill<?= $open ? '' : ' pill-ok' ?>"><?= $open ? 'wartet auf Buchung' : 'eingelöst' . ($l['used_at'] ? ' am ' . forma_h(date('d. m.', strtotime($l['used_at']))) : '') ?></span></div>
+                    <div class="small"><?= (int)$l['persons'] ?> <?= (int)$l['persons'] === 1 ? 'Person' : 'Personen' ?> · <?= forma_h(forma_euro((int)$l['value_cents'])) ?><?= $l['note'] !== '' ? ' · ' . forma_h($l['note']) : '' ?></div>
+                    <?php if ($open): ?>
+                    <div class="link-row"><input class="link-url" value="<?= forma_h($url) ?>" readonly onclick="this.select()"><button class="btn btn-ghost btn-sm" type="button" onclick="var i=this.previousElementSibling;i.select();(navigator.clipboard?navigator.clipboard.writeText(i.value):Promise.reject()).then(()=>{this.textContent='Kopiert ✓'}).catch(()=>{document.execCommand('copy');this.textContent='Kopiert ✓'})">Kopieren</button></div>
+                    <div class="row-actions">
+                        <a class="btn btn-sm" href="<?= forma_h($wa) ?>" target="_blank" rel="noopener">Per WhatsApp schicken</a>
+                        <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="link_renew"><input type="hidden" name="lid" value="<?= (int)$l['id'] ?>"><button class="link small" type="submit">Neuen Link erzeugen</button></form>
+                        <form method="post" onsubmit="return confirm('Link wirklich löschen?')"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="link_delete"><input type="hidden" name="lid" value="<?= (int)$l['id'] ?>"><button class="link small" type="submit">Löschen</button></form>
+                    </div>
+                    <?php else: ?><div class="muted small">Gebucht: <?= forma_h((string)$l['date_text']) ?></div><?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
         </div>
         <div class="list" style="margin-top:16px">
         <?php foreach ($vs as $v): $done = $v['status'] === 'eingeloest'; ?>
@@ -1881,6 +1937,10 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .oldv{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
 .oldv summary{cursor:pointer;font-weight:600;color:var(--clay);font-size:17px;list-style-position:inside}
 .oldv-form{margin-top:12px}
+.links-card{margin-top:16px}.links-card h2{margin:0}
+.link-row{display:flex;gap:8px;align-items:center}.link-row .link-url{flex:1;min-width:0;font-size:14px}
+.link-item .row-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.link-item.is-new{outline:2px solid var(--clay)}
 .oldv-form [hidden]{display:none!important}
 .oldv-form p{margin:0}
 .assign{border:2px solid var(--clay);display:flex;flex-direction:column;gap:6px;margin-bottom:12px}

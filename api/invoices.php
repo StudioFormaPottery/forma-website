@@ -101,7 +101,7 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
         if ((int)$b['amount_cents'] <= 0 && !$old) return null;
         if ($old) {
             $vc = (int)$b['voucher_cents'];
-            return ['name' => $b['name'], 'email' => $b['email'], 'session' => '', 'service' => date('d.m.Y', strtotime($b['start_date'])),
+            return ['name' => $b['name'], 'email' => $b['email'], 'session' => '', 'address' => (string)($b['bill_address'] ?? ''), 'service' => date('d.m.Y', strtotime($b['start_date'])),
                 'items' => [['text' => $b['title'], 'detail' => $b['date_text'] . ' · FORMA Studio, Mathon', 'qty' => (int)$b['persons'], 'unit' => (int)round($vc / max(1, (int)$b['persons']))]],
                 'gross' => $vc, 'paid' => $b['paid_at'], 'type' => 'Kurs',
                 'pay_note' => 'Der Betrag ist bereits bezahlt: eingelöst mit deinem FORMA Gutschein Nr. ' . $old['nr'] . '.'];
@@ -218,7 +218,7 @@ function forma_invoice_for(PDO $pdo, string $kind, int $refId): void
         if (!$src) return;
 
         // Rechnungsadresse und Land aus Stripe (Checkout fragt die Adresse ab)
-        $address = ''; $country = 'AT'; $name = $src['name'];
+        $address = (string)($src['address'] ?? ''); $country = 'AT'; $name = $src['name'];
         if ($src['session'] !== '' && forma_stripe_key()) {
             try {
                 $s = forma_stripe('GET', '/v1/checkout/sessions/' . rawurlencode($src['session']));
