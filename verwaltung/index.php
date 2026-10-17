@@ -2082,7 +2082,14 @@ function render_page(string $title, callable $body): void
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title><?= forma_h($title) ?> · FORMA</title>
-<link rel="icon" type="image/png" href="../img/forma-logo.png">
+<link rel="icon" type="image/png" href="/img/app/verwaltung-favicon.png">
+<link rel="manifest" href="/verwaltung/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/img/app/verwaltung-180.png">
+<meta name="theme-color" content="#EEE2D4">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Verwaltung">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 @font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(../fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(../fonts/Outfit-Bold.woff) format("woff")}

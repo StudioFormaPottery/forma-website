@@ -20,3 +20,11 @@ RewriteRule ^(.*)$ https://www.forma-pottery.com/$1 [R=301,L]
 RewriteRule ^api/(fpdf|gutschein|seed)/ - [F,L]
 RewriteRule ^tools/ - [F,L]
 </IfModule>
+
+# Web-App: Manifest richtig ausliefern, sw.js nie lange zwischenspeichern
+AddType application/manifest+json .webmanifest
+<IfModule mod_headers.c>
+<Files "sw.js">
+  Header set Cache-Control "no-cache"
+</Files>
+</IfModule>

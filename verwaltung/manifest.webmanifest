@@ -1,0 +1,19 @@
+{
+  "id": "/verwaltung/",
+  "name": "FORMA Verwaltung",
+  "short_name": "Verwaltung",
+  "lang": "de-AT",
+  "start_url": "/verwaltung/",
+  "scope": "/verwaltung/",
+  "display": "standalone",
+  "background_color": "#EEE2D4",
+  "theme_color": "#EEE2D4",
+  "icons": [
+    { "src": "/img/app/verwaltung-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/img/app/verwaltung-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/img/app/verwaltung-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Kasse", "url": "/verwaltung/?view=kasse", "icons": [{ "src": "/img/app/verwaltung-192.png", "sizes": "192x192" }] }
+  ]
+}
