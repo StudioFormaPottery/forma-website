@@ -123,5 +123,5 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 
 ## Web-App (seit 17.10.2026, einfache Version; richtige App erst 2027, kein App Store)
 - Startseite installierbar: `manifest.webmanifest` (Name „Studio FORMA“, Icons `img/app/forma-*.png` = Logo auf Sand), `sw.js` (Seiten immer frisch aus dem Netz, nur offline die letzte Startseite; fonts/img/assets zwischengespeichert; api/, verwaltung/, video/ nie). Bei größeren Bild-Austauschen `VERSION` in sw.js hochzählen.
-- Verwaltung eigene App: `verwaltung/manifest.webmanifest` („FORMA Verwaltung“, Scope /verwaltung/), Icon `img/app/verwaltung-*.png` = FORMA-Kreis mit V und „VERWALTUNG“ (Quelle 1024 px: `verwaltung-1024.png`).
+- Verwaltung eigene App: `verwaltung/manifest.webmanifest` („FORMA Verwaltung“, Scope /verwaltung/), Icon `img/app/verwaltung-*.png` = FORMA-Kreis mit F (wie im Logo) und „VERWALTUNG“ (Quelle 1024 px: `verwaltung-1024.png`).
 - iPhone: Safari → Teilen → „Zum Home-Bildschirm“. Android: Chrome → „App installieren“.
