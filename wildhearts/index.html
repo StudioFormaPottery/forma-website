@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Wild Hearts Collective · Viv</title>
+<meta name="description" content="For women who want more than just functioning. Movement, rituals, honest circles and a community of women who get it, with Viv from the Austrian mountains.">
+<meta name="theme-color" content="#EEE2D4">
+<link rel="canonical" href="https://moveciamovement.com/">
+<link rel="icon" href="/img/wildhearts/viv.jpg">
+<link rel="apple-touch-icon" href="/img/wildhearts/viv.jpg">
+<meta property="og:title" content="The Wild Hearts Collective">
+<meta property="og:description" content="For women who want more than just functioning. Come back to yourself, together.">
+<meta property="og:image" content="https://moveciamovement.com/img/wildhearts/og.jpg">
+<meta property="og:url" content="https://moveciamovement.com/">
+<style>
+@font-face{font-family:"Italiana";font-weight:400;font-display:swap;src:url(/fonts/Italiana-Regular.woff) format("woff")}
+@font-face{font-family:"Bricolage Grotesque";font-weight:600 800;font-display:swap;src:url(/fonts/BricolageGrotesque-Bold.woff) format("woff")}
+@font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}
+@font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(/fonts/Outfit-Bold.woff) format("woff")}
+:root{
+  /* FORMA-Farben, das Rot etwas weicher */
+  --paper:#EEE2D4;--oat:#E4D2BF;--blush:#DDBFA8;--card:#FBF4EC;
+  --wine:#93402F;--wine-deep:#7A3122;--brown:#674B40;--ink:#33211B;--ink-soft:#674B40;--sage:#9DA58F;
+  --line:#D6BEA8;
+  --blob:58% 42% 47% 53% / 52% 46% 54% 48%;
+  --serif:"Italiana",Georgia,"Times New Roman",serif;
+  --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --sans:"Outfit",ui-sans-serif,system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+[hidden]{display:none!important}
+html{background:var(--paper)}
+body{min-height:100dvh;font-family:var(--sans);color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased;overflow-x:hidden;font-size:17px;line-height:1.55;position:relative}
+a{color:inherit}
+
+/* Hintergrund: weiche Tonformen wie bei FORMA */
+.bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg span{position:absolute;border-radius:var(--blob);animation:morph 18s ease-in-out infinite alternate}
+.bg .a{width:440px;height:440px;right:-200px;top:-150px;background:var(--oat)}
+.bg .b{width:320px;height:320px;left:-190px;top:42%;background:var(--blush);opacity:.75;animation-duration:22s}
+.bg .c{width:120px;height:120px;right:7%;bottom:12%;background:var(--brown);opacity:.12;animation-duration:15s}
+@keyframes morph{0%{border-radius:58% 42% 47% 53% / 52% 46% 54% 48%;transform:rotate(0)}100%{border-radius:42% 58% 60% 40% / 45% 58% 42% 55%;transform:rotate(16deg)}}
+
+/* Wirbelnde Jahreszeiten-Icons */
+.swirl{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.swirl span{position:absolute;display:block;animation:swirl var(--d,22s) ease-in-out infinite;animation-delay:var(--delay,0s);opacity:.9}
+.swirl svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 8px rgba(103,48,30,.14))}
+@keyframes swirl{
+  0%{transform:translate(0,0) rotate(var(--r,0deg))}
+  25%{transform:translate(var(--x1,14px),18px) rotate(calc(var(--r,0deg) + 28deg))}
+  50%{transform:translate(0,34px) rotate(calc(var(--r,0deg) + 8deg))}
+  75%{transform:translate(calc(var(--x1,14px) * -1),14px) rotate(calc(var(--r,0deg) - 22deg))}
+  100%{transform:translate(0,0) rotate(var(--r,0deg))}
+}
+
+.page{position:relative;z-index:1;width:100%;max-width:640px;margin:0 auto;padding:max(34px,env(safe-area-inset-top)) 16px 30px}
+
+/* Kopf: Bogenfoto wie bei FORMA */
+.head{display:flex;flex-direction:column;align-items:center;text-align:center}
+.arch{width:176px;height:214px;border-radius:999px 999px 28px 28px;overflow:hidden;box-shadow:0 22px 44px rgba(103,48,30,.24);position:relative;background:var(--blush)}
+.arch img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block}
+.moon{width:58px;height:58px;margin-top:-30px;border-radius:50%;background:var(--card);display:grid;place-items:center;box-shadow:0 10px 22px rgba(103,48,30,.2);position:relative}
+.moon svg{width:28px;height:28px;color:var(--wine)}
+.by{font-family:var(--serif);font-size:23px;color:var(--ink-soft);margin-top:12px}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10vw,58px);line-height:1.02;letter-spacing:.015em;color:var(--wine-deep);margin-top:4px}
+.lead{font-size:18px;line-height:1.55;color:var(--ink-soft);margin-top:12px;max-width:33ch}
+.lead em{font-style:normal;color:var(--ink)}
+
+/* Links */
+.links{display:flex;flex-direction:column;gap:14px;margin-top:30px}
+.btn{display:flex;align-items:center;gap:14px;width:100%;padding:16px 20px;border-radius:999px;text-decoration:none;font-family:var(--sans);font-size:17px;font-weight:500;border:1.5px solid var(--line);background:rgba(251,244,236,.92);color:var(--ink);cursor:pointer;text-align:left;transition:transform .2s ease,box-shadow .2s ease}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(103,48,30,.14)}
+.btn:focus-visible{outline:2px solid var(--wine);outline-offset:3px}
+.btn .ic{flex:0 0 auto;width:42px;height:42px;border-radius:var(--blob);display:grid;place-items:center;background:var(--blush);color:var(--wine-deep)}
+.btn .ic svg{width:21px;height:21px}
+.btn .tx{flex:1;display:flex;flex-direction:column;line-height:1.3}
+.btn .tx small{font-size:13.5px;font-weight:400;color:var(--ink-soft);margin-top:3px}
+.btn .ar{opacity:.55;font-size:18px}
+.btn.main{background:var(--wine);color:#FBF1EA;border-color:var(--wine);box-shadow:0 18px 36px rgba(122,49,34,.28)}
+.btn.main .ic{background:rgba(251,241,234,.18);color:#FBF1EA}
+.btn.main small{color:rgba(251,241,234,.82)}
+.tag{display:inline-block;margin-left:6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--oat);color:var(--brown);vertical-align:2px;font-weight:500}
+
+/* Anmeldung */
+.join{position:relative;margin-top:34px;padding:30px 24px 24px;border-radius:34px;background:rgba(251,244,236,.95);border:1.5px solid var(--line);box-shadow:0 18px 40px rgba(103,48,30,.1);scroll-margin-top:24px;overflow:hidden}
+.join::before{content:"";position:absolute;width:150px;height:150px;right:-56px;top:-56px;border-radius:var(--blob);background:var(--blush);opacity:.55}
+.join>*{position:relative}
+.join h2{font-family:var(--serif);font-weight:400;font-size:33px;line-height:1.1;color:var(--wine-deep);text-align:center}
+.join p.intro{text-align:center;color:var(--ink-soft);margin-top:10px;font-size:16.5px}
+.join form{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.join label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-soft)}
+.join input[type=text],.join input[type=email]{font:inherit;font-size:17px;padding:14px 18px;border-radius:18px;border:1.5px solid var(--line);background:#FFFBF7;color:var(--ink)}
+.join input:focus{outline:2px solid var(--blush);outline-offset:1px;border-color:var(--wine)}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;color:var(--ink-soft)}
+.consent input{margin-top:3px;width:18px;height:18px;accent-color:var(--wine);flex:0 0 auto}
+.join button{font:inherit;font-weight:500;font-size:17px;padding:16px 22px;border-radius:999px;border:0;background:var(--wine);color:#FBF1EA;cursor:pointer;margin-top:4px}
+.join button:disabled{opacity:.6;cursor:wait}
+.msg{text-align:center;font-size:15.5px;line-height:1.5;color:var(--ink);padding:6px 0 0}
+.msg.err{color:var(--wine)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+/* Fuß mit Welle */
+.wave{position:relative;z-index:1;margin-top:34px;line-height:0}
+.wave svg{display:block;width:100%;height:70px}
+.foot{position:relative;z-index:1;background:var(--oat);text-align:center;font-size:13px;line-height:1.7;color:var(--ink-soft);padding:6px 16px max(26px,env(safe-area-inset-bottom))}
+.foot a{color:var(--ink-soft)}
+.foot .in{max-width:640px;margin:0 auto}
+.foot details{margin-top:12px;text-align:left;background:rgba(251,244,236,.7);border-radius:18px;padding:10px 16px}
+.foot summary{cursor:pointer;text-align:center;list-style:none}
+.foot summary::-webkit-details-marker{display:none}
+.foot details p{margin-top:8px}
+
+@media (max-width:640px){.swirl .desk{display:none}.by{font-size:20px}}
+@media (min-width:900px){
+  body{font-size:18px}
+  .page{max-width:720px;padding-top:60px}
+  .arch{width:200px;height:244px}
+  .btn{font-size:18.5px;padding:18px 24px}
+  .lead{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){.bg span,.swirl span{animation:none}.btn{transition:none}.btn:hover{transform:none}}
+</style>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+<div class="swirl" id="swirl" aria-hidden="true"></div>
+
+<main class="page">
+  <header class="head">
+    <div class="arch"><img src="/img/wildhearts/viv.jpg" alt="Viv, founder of the Wild Hearts Collective" width="320" height="320"></div>
+    <div class="moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></div>
+    <p class="by">with Viv, from the Austrian Alps</p>
+    <h1>The Wild Hearts Collective</h1>
+    <p class="lead">For women who want more than just functioning. <em>Move your body, your life, your ideas</em>, and come back to yourself, together.</p>
+  </header>
+
+  <nav class="links" aria-label="Links">
+    <a class="btn main" href="https://www.instagram.com/channel/wrOyV88oT-GAwNiR/" target="_blank" rel="noopener">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span>
+      <span class="tx">Join the Wild Hearts Collective<small>Our free community channel on Instagram</small></span>
+      <span class="ar" aria-hidden="true">→</span>
+    </a>
+    <button class="btn" type="button" data-join="reset">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></span>
+      <span class="tx"><span>Reset Routine for Tired Days <span class="tag">soon</span></span><small>Be the first to get it, free</small></span>
+      <span class="ar" aria-hidden="true">→</span>
+    </button>
+    <button class="btn" type="button" data-join="circle">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/></svg></span>
+      <span class="tx"><span>The Inner Circle <span class="tag">2027</span></span><small>Circles, guidance and 1:1 mentoring · join the waitlist</small></span>
+      <span class="ar" aria-hidden="true">→</span>
+    </button>
+    <a class="btn" href="https://www.instagram.com/movementwithviv/" target="_blank" rel="noopener">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".8" fill="currentColor"/></svg></span>
+      <span class="tx">@movementwithviv<small>Movement, honest talks and life in the mountains</small></span>
+      <span class="ar" aria-hidden="true">→</span>
+    </a>
+  </nav>
+
+  <section class="join" id="join" aria-labelledby="join-title">
+    <h2 id="join-title">Be the first to know</h2>
+    <p class="intro" id="join-intro">Get the Reset Routine for Tired Days as soon as it's ready, plus invitations to our live Wild Hearts Gatherings and first news about the Inner Circle.</p>
+    <form id="join-form" novalidate>
+      <label class="f">First name<input type="text" name="name" autocomplete="given-name" required maxlength="80"></label>
+      <label class="f">Email<input type="email" name="email" autocomplete="email" required maxlength="160"></label>
+      <div class="hp" aria-hidden="true"><label>Leave empty<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+      <label class="consent"><input type="checkbox" name="consent" required><span>Yes, Viv may email me about the Wild Hearts Collective. I can unsubscribe anytime.</span></label>
+      <button type="submit">Count me in</button>
+      <p class="msg" id="join-msg" role="status" aria-live="polite" hidden></p>
+    </form>
+  </section>
+</main>
+
+<div class="wave" aria-hidden="true"><svg viewBox="0 0 1200 70" preserveAspectRatio="none"><path d="M0 40C150 10 300 10 450 32S750 68 900 44 1100 14 1200 26V70H0Z" fill="#E4D2BF"/></svg></div>
+<footer class="foot">
+  <div class="in">
+    <p>The Wild Hearts Collective · by Movecia · Vivien Malonga<br><a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a></p>
+    <details>
+      <summary>Imprint &amp; privacy</summary>
+      <p><strong>Imprint:</strong> Vivien Malonga, Movecia – Personal Fitness, Silvrettastraße 58, 6562 Mathon, Austria. Email: hello@moveciamovement.com. VAT ID: ATU83602825.</p>
+      <p><strong>Privacy:</strong> If you sign up, your first name and email address are stored with our newsletter service MailerLite (MailerLite Limited, Ireland) and used only to send you emails about the Wild Hearts Collective. You will receive a confirmation email first. You can unsubscribe at any time with the link in every email or by writing to hello@moveciamovement.com. This page uses no tracking cookies.</p>
+    </details>
+  </div>
+</footer>
+
+<script>
+(() => {
+  // Wirbelnde Icons: passend zur Jahreszeit, in FORMA-Farben
+  const C = {r: '#93402F', b: '#DDBFA8', k: '#674B40', p: '#FBF1EA', s: '#E4D2BF', g: '#9DA58F'};
+  const I = {
+    leaf: `<path d="M32 6c14 8 22 20 20 34-1 8-8 14-16 15-1-12 2-24 8-34-8 9-13 21-14 34C17 52 11 44 12 34 14 21 22 12 32 6z" fill="${C.r}"/><path d="M30 55c1-14 6-27 14-37" stroke="${C.p}" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>`,
+    leaf2: `<path d="M10 46C9 28 22 12 44 10c6-1 10 0 10 0s1 4 0 10C52 42 36 55 18 54l-6 6-3-3 6-6c-3-2-5-3-5-5z" fill="${C.b}"/><path d="M14 52L44 20" stroke="${C.k}" stroke-width="2" stroke-linecap="round" opacity=".55"/>`,
+    leaf3: `<path d="M32 4l6 12 12-4-4 12 12 6-12 6 4 12-12-4-6 12-6-12-12 4 4-12-12-6 12-6-4-12 12 4z" fill="${C.k}" opacity=".85"/><path d="M32 58V30" stroke="${C.p}" stroke-width="2" stroke-linecap="round" opacity=".6"/>`,
+    acorn: `<path d="M32 6v6" stroke="${C.k}" stroke-width="3" stroke-linecap="round"/><path d="M14 22c0-7 8-11 18-11s18 4 18 11v3H14z" fill="${C.k}"/><path d="M17 25h30c0 17-7 30-15 33-8-3-15-16-15-33z" fill="${C.b}"/>`,
+    mushroom: `<path d="M8 32C8 18 20 10 32 10s24 8 24 22z" fill="${C.r}"/><circle cx="22" cy="22" r="3" fill="${C.p}"/><circle cx="36" cy="18" r="2.5" fill="${C.p}"/><circle cx="44" cy="26" r="2" fill="${C.p}"/><path d="M24 32h16l-2 20a4 4 0 01-4 4h-4a4 4 0 01-4-4z" fill="${C.s}"/>`,
+    moon: `<path d="M44 8a26 26 0 1 0 12 34A20 20 0 0 1 44 8z" fill="${C.b}"/><circle cx="26" cy="30" r="3" fill="${C.s}"/><circle cx="34" cy="44" r="2" fill="${C.s}"/>`,
+    star: `<path d="M32 4c2 15 12 25 28 28-16 3-26 13-28 28-2-15-12-25-28-28 16-3 26-13 28-28z" fill="${C.r}"/>`,
+    sparkle: `<path d="M32 10c1.5 10 8 16.5 18 18-10 1.5-16.5 8-18 18-1.5-10-8-16.5-18-18 10-1.5 16.5-8 18-18z" fill="${C.k}" opacity=".7"/>`,
+    snow: `<g stroke="${C.k}" stroke-width="3" stroke-linecap="round"><path d="M32 6v52M9 19l46 26M9 45l46-26"/></g>`,
+    tree: `<path d="M32 4l14 18h-7l11 14h-7l11 14H10l11-14h-7l11-14h-7z" fill="${C.g}"/><rect x="28" y="50" width="8" height="10" fill="${C.k}"/>`,
+    sprout: `<path d="M32 58V30" stroke="${C.k}" stroke-width="3" stroke-linecap="round"/><path d="M32 32C30 18 20 12 8 14c1 12 11 19 24 18zM32 26c2-12 12-18 24-16-1 12-11 18-24 16z" fill="${C.g}"/>`,
+    flower: `<path d="M32 30v28" stroke="${C.k}" stroke-width="3"/><g fill="${C.b}"><circle cx="32" cy="12" r="8"/><circle cx="22" cy="22" r="8"/><circle cx="42" cy="22" r="8"/><circle cx="26" cy="32" r="8"/><circle cx="38" cy="32" r="8"/></g><circle cx="32" cy="24" r="6" fill="${C.r}"/>`,
+    sun: `<circle cx="32" cy="32" r="12" fill="${C.r}"/><g stroke="${C.b}" stroke-width="4" stroke-linecap="round"><path d="M32 4v8M32 52v8M4 32h8M52 32h8M12 12l6 6M46 46l6 6M12 52l6-6M46 18l6-6"/></g>`
+  };
+  const m = new Date().getMonth() + 1;
+  const season = m >= 3 && m <= 5 ? ['sprout', 'flower', 'moon', 'sparkle', 'leaf2'] : m >= 6 && m <= 8 ? ['sun', 'flower', 'moon', 'sparkle', 'leaf2'] : m >= 9 && m <= 11 ? ['leaf', 'leaf2', 'leaf3', 'acorn', 'mushroom', 'moon', 'star', 'sparkle'] : ['snow', 'tree', 'moon', 'star', 'sparkle'];
+  // Plätze nur am Rand, damit nie Text verdeckt wird; „desk“ nur auf großen Bildschirmen
+  const spots = [
+    [3, 6, 54, ''], [86, 4, 46, ''], [6, 30, 40, 'desk'], [90, 24, 58, 'desk'], [2, 52, 48, ''], [88, 46, 42, ''],
+    [12, 70, 56, 'desk'], [84, 66, 50, 'desk'], [4, 86, 38, ''], [90, 84, 46, ''], [20, 14, 34, 'desk'], [76, 90, 36, 'desk']
+  ];
+  const box = document.getElementById('swirl');
+  spots.forEach(([x, y, size, cls], i) => {
+    const s = document.createElement('span');
+    if (cls) s.className = cls;
+    const small = window.innerWidth < 640;
+    if (small) { if (x < 50) s.style.left = '-14px'; else s.style.right = '-14px'; s.style.opacity = '.75'; }
+    else s.style.left = x + '%';
+    s.style.top = y + '%';
+    s.style.width = s.style.height = (small ? Math.round(size * 0.72) : size) + 'px';
+    s.style.setProperty('--r', ((i * 47) % 60 - 30) + 'deg');
+    s.style.setProperty('--d', (18 + (i * 7) % 14) + 's');
+    s.style.setProperty('--x1', ((i % 2 ? -1 : 1) * (10 + (i * 5) % 16)) + 'px');
+    s.style.setProperty('--delay', (-i * 2.1) + 's');
+    s.innerHTML = '<svg viewBox="0 0 64 64">' + I[season[i % season.length]] + '</svg>';
+    box.appendChild(s);
+  });
+
+  // Anmeldung: direkt in die MailerLite-Gruppe „Wild Hearts“ (mit Bestätigungsmail)
+  const ML_URL = 'https://assets.mailerlite.com/jsonp/1194035/forms/201697023469029136/subscribe';
+  const form = document.getElementById('join-form');
+  const msg = document.getElementById('join-msg');
+  const title = document.getElementById('join-title');
+  const intro = document.getElementById('join-intro');
+  const loaded = Date.now();
+  const texts = {
+    reset: ['Get the Reset Routine first', 'The Reset Routine for Tired Days is almost ready. Leave your name and email and it lands in your inbox the moment it is, together with invitations to our live Wild Hearts Gatherings.'],
+    circle: ['Join the Inner Circle waitlist', 'The Inner Circle opens in early 2027: monthly circles, guidance for the ideas you carry around, and 1:1 mentoring with me. Join the waitlist and you will hear about it before anyone else.']
+  };
+  document.querySelectorAll('[data-join]').forEach(b => b.addEventListener('click', () => {
+    const t = texts[b.dataset.join];
+    if (t) { title.textContent = t[0]; intro.textContent = t[1]; }
+    document.getElementById('join').scrollIntoView({behavior: 'smooth', block: 'start'});
+    setTimeout(() => form.elements.name.focus({preventScroll: true}), 500);
+  }));
+  const show = (text, err) => { msg.hidden = false; msg.textContent = text; msg.classList.toggle('err', !!err); };
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const name = form.elements.name.value.trim();
+    const email = form.elements.email.value.trim();
+    if (form.elements.website.value) return;
+    if (name.length < 2) return show('Please add your first name.', true);
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return show('Please check your email address.', true);
+    if (!form.elements.consent.checked) return show('Please tick the box so I am allowed to email you.', true);
+    if (Date.now() - loaded < 2000) return show('One moment please, then try again.', true);
+    const btn = form.querySelector('button');
+    btn.disabled = true;
+    const data = new FormData();
+    data.append('fields[name]', name);
+    data.append('fields[email]', email);
+    data.append('ml-submit', '1');
+    data.append('anticsrf', 'true');
+    try {
+      const r = await fetch(ML_URL, {method: 'POST', body: data});
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || j.success === false) throw new Error('signup');
+      form.querySelectorAll('label, button').forEach(el => el.hidden = true);
+      show('Thank you, ' + name + '! Please check your inbox and confirm your email address. Only then you are on the list. 🤍');
+    } catch (err) {
+      btn.disabled = false;
+      show('That did not work just now. Please try again in a moment or write to hello@moveciamovement.com.', true);
+    }
+  });
+})();
+</script>
+</body>
+</html>
