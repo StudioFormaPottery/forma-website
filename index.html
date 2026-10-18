@@ -1066,6 +1066,36 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .pp-next-title{font-family:var(--display);font-weight:600;font-size:clamp(24px,2.6vw,32px);line-height:1.1;color:var(--clay);padding-right:34px}
 .pp-next p{margin:0}.pp-next strong{color:var(--clay);font-weight:600}
 @media (prefers-reduced-motion:reduce){.pp-stamp,.pp-next::before{animation:none}}
+/* Pop-up Pottery Pause Warteliste: öffnet nur über den Knopf */
+.ppw{border:0;padding:44px 34px 30px;border-radius:34px;width:min(480px,calc(100vw - 28px));max-height:calc(100dvh - 28px);overflow:auto;background:radial-gradient(circle at 20% 30%,rgba(251,241,234,.6) 0 2px,transparent 3px) 0 0/46px 46px,var(--blush);color:var(--ink);box-shadow:0 30px 80px rgba(51,33,27,.35);text-align:center}
+.ppw::backdrop{background:rgba(51,33,27,.5)}
+.ppw[open]{animation:pop .45s cubic-bezier(.2,.9,.3,1.2)}
+.ppw>*:not(.ppw-float){position:relative;z-index:1}
+.ppw-x{position:absolute!important;top:14px;right:14px;z-index:3!important;width:42px;height:42px;border-radius:50%;border:0;background:#FBF1EA;color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px rgba(51,33,27,.12)}
+.ppw-float{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:inherit}
+.ppw-float i{position:absolute;width:26px;height:26px;opacity:.75;animation:ppwfloat 6s ease-in-out infinite alternate}
+.ppw-float i svg{width:100%;height:100%;display:block}
+.ppw-float .f1{left:16px;top:22px}.ppw-float .f2{right:70px;top:30px;width:20px;height:20px;animation-delay:-2s}
+.ppw-float .f3{left:26px;top:130px;width:22px;height:22px;animation-delay:-3s}.ppw-float .f4{right:30px;top:140px;width:24px;height:24px;animation-delay:-1s}
+.ppw-form input:focus{outline:3px solid color-mix(in srgb,var(--clay) 45%,transparent);outline-offset:1px;border-color:var(--clay)}
+.ppw-float .f5{left:46%;top:14px;width:14px;height:14px;color:#FBF1EA;animation-delay:-4s}.ppw-float .f6{right:36px;bottom:30px;width:16px;height:16px;color:var(--clay);animation-delay:-2.5s}
+@keyframes ppwfloat{from{transform:translateY(0) rotate(-8deg)}to{transform:translateY(-10px) rotate(10deg)}}
+.ppw-badge{width:96px;height:96px;margin:0 auto 12px;border-radius:50%;background:#FBF1EA;border:2px dashed color-mix(in srgb,var(--clay) 55%,transparent);display:grid;place-items:center;box-shadow:0 10px 24px rgba(51,33,27,.15)}
+.ppw-season{position:relative;width:52px;height:52px;display:block}
+.ppw-s{position:absolute;inset:0;opacity:0;transform:scale(.6) rotate(-30deg);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.9,.3,1.3)}
+.ppw-s.on{opacity:1;transform:none}
+.ppw-s svg{width:100%;height:100%;display:block}
+.ppw-kick{margin:0;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);font-weight:500}
+.ppw h3{margin:6px 0 10px;font-family:var(--display);font-weight:600;font-size:clamp(30px,6vw,38px);line-height:1.05;letter-spacing:-.02em;color:var(--clay)}
+.ppw-lead{margin:0 auto 18px;max-width:38ch;line-height:1.5}
+.ppw-lead b{color:var(--clay);font-weight:600}
+.ppw-form{display:flex;flex-direction:column;gap:10px;text-align:left}
+.ppw-form input[type=text],.ppw-form input[type=email]{width:100%;min-width:0;font:inherit;font-size:18px;padding:13px 18px;border-radius:999px;border:1px solid var(--line);background:#FFFBF7;color:var(--ink)}
+.ppw-form .btn{align-self:center;margin-top:4px}
+.ppw .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.ppw-done{margin:8px 0 0;padding:16px 18px;border-radius:20px;background:#FBF1EA;line-height:1.5}
+@media (max-width:520px){.ppw{padding:40px 20px 24px}.ppw-badge{width:80px;height:80px}.ppw-season{width:44px;height:44px}}
+@media (prefers-reduced-motion:reduce){.ppw-float i{animation:none}.ppw-s{transition:none}}
 .offers-label{margin:0 0 14px;font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
 @media (max-width:780px){.pp-special{grid-template-columns:1fr;padding-top:64px}.pp-art{max-width:190px;margin:0 auto 26px}.pp-seal{width:94px;height:94px;right:-30px;bottom:-18px}.pp-seal b{font-size:28px}.pp-seal i{font-size:11.5px}.pp-dates li{width:54px;height:54px}.pp-dates b{font-size:17px}.pp-dates i{font-size:11px}}
 @media (min-width:900px){.pp-body > p:not(.pp-tag):not(.pp-when):not(.pp-time){font-size:20px}.pp-facts li{font-size:16.5px}.pp-time{font-size:19px}}
@@ -1281,7 +1311,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
             <span class="pp-next-kick">Psst … es geht weiter!</span>
             <b class="pp-next-title">Frühjahr 2027: neue Termine</b>
             <p>Nur <strong>4 Plätze</strong> pro Kurs, die sind schnell weg. Schreib dich in die FORMA Post ein, dann erfährst du als Erste, wann du buchen kannst.</p>
-            <a class="btn btn-solid" href="#forma-post">Ich will Bescheid&nbsp;bekommen&nbsp;♡</a>
+            <button type="button" class="btn btn-solid" id="pp-wait-open" aria-haspopup="dialog">Ich will Bescheid&nbsp;bekommen&nbsp;♡</button>
           </div>
         </div>
       </article>
@@ -2007,6 +2037,26 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       </div>
     </div>
   </section>
+  <dialog class="ppw" id="pp-wait" aria-labelledby="ppw-title">
+    <button type="button" class="ppw-x" id="pp-wait-close" aria-label="Schließen"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="ppw-float" aria-hidden="true"><i class="f1"><svg viewBox="0 0 24 24"><path d="M5 19C5 10 11 4 20 4c0 9-6 15-15 15z" fill="#B05A38"/><path d="M5 19L14 10" stroke="#FBF1EA" stroke-width="1.6" stroke-linecap="round"/></svg></i><i class="f2"><svg viewBox="0 0 24 24"><g stroke="#8C2C1D" stroke-width="1.8" stroke-linecap="round" fill="none"><path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7"/><path d="M9.5 3.8L12 6l2.5-2.2M9.5 20.2L12 18l2.5 2.2"/></g></svg></i><i class="f3"><svg viewBox="0 0 24 24"><g fill="#DDBFA8" stroke="#8C2C1D" stroke-width="1.2"><circle cx="12" cy="6.5" r="4"/><circle cx="17.5" cy="12" r="4"/><circle cx="12" cy="17.5" r="4"/><circle cx="6.5" cy="12" r="4"/></g><circle cx="12" cy="12" r="3" fill="#8C2C1D"/></svg></i><i class="f4"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="#B05A38"/><g stroke="#8C2C1D" stroke-width="1.8" stroke-linecap="round"><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/></g></svg></i><i class="f5"><svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" fill="currentColor"/></svg></i><i class="f6"><svg viewBox="0 0 24 24"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" fill="currentColor"/></svg></i></div>
+    <div class="ppw-badge" aria-hidden="true"><span class="ppw-season"><span class="ppw-s on" title="Herbst"><svg viewBox="0 0 24 24"><path d="M5 19C5 10 11 4 20 4c0 9-6 15-15 15z" fill="#B05A38"/><path d="M5 19L14 10" stroke="#FBF1EA" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="ppw-s" title="Winter"><svg viewBox="0 0 24 24"><g stroke="#8C2C1D" stroke-width="1.8" stroke-linecap="round" fill="none"><path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7"/><path d="M9.5 3.8L12 6l2.5-2.2M9.5 20.2L12 18l2.5 2.2"/></g></svg></span><span class="ppw-s" title="Frühling"><svg viewBox="0 0 24 24"><g fill="#DDBFA8" stroke="#8C2C1D" stroke-width="1.2"><circle cx="12" cy="6.5" r="4"/><circle cx="17.5" cy="12" r="4"/><circle cx="12" cy="17.5" r="4"/><circle cx="6.5" cy="12" r="4"/></g><circle cx="12" cy="12" r="3" fill="#8C2C1D"/></svg></span><span class="ppw-s" title="Sommer"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="#B05A38"/><g stroke="#8C2C1D" stroke-width="1.8" stroke-linecap="round"><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/></g></svg></span></span></div>
+    <p class="ppw-kick">FORMA Post · kein Spam, versprochen</p>
+    <h3 id="ppw-title">Sei als Erste dabei!</h3>
+    <p class="ppw-lead">Ich informiere dich über aktuelle Termine im Atelier, über die <b>Pottery Pause im Frühjahr 2027</b> und über neue Events. Nur 4 Plätze pro Kurs, du erfährst es zuerst.</p>
+    <form class="ppw-form" id="ppw-form" novalidate>
+      <input type="hidden" name="t" class="ppw-t">
+      <input type="hidden" name="source" value="Pottery Pause Frühjahr 2027">
+      <div class="hp" aria-hidden="true"><label for="ppw-website">Bitte leer lassen</label><input id="ppw-website" name="website" tabindex="-1" autocomplete="off"></div>
+      <label class="sr" for="ppw-name">Vorname</label><input id="ppw-name" name="name" type="text" autocomplete="given-name" placeholder="Dein Vorname" maxlength="80">
+      <label class="sr" for="ppw-email">E-Mail</label><input id="ppw-email" name="email" type="email" autocomplete="email" placeholder="Deine E-Mail-Adresse">
+      <label class="consent"><input type="checkbox" name="consent" value="1"> <span>Ja, ich möchte die FORMA Post mit Terminen, der Pottery Pause und Events bekommen. Abmelden geht jederzeit. <a href="#datenschutz" class="ppw-priv">Datenschutz</a></span></label>
+      <button class="btn btn-solid" type="submit">Ja, sag mir Bescheid ♡</button>
+      <p class="book-error ppw-err" role="alert" hidden></p>
+    </form>
+    <p class="ppw-done" hidden></p>
+  </dialog>
+
 
   <section class="reviews-sec" id="stimmen" hidden>
     <div class="wrap">
@@ -2349,6 +2399,38 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   });
 
 
+  // Pottery Pause Warteliste: Pop-up nur über den Knopf, nie von selbst
+  (function(){
+    var dlg=document.getElementById('pp-wait'),open=document.getElementById('pp-wait-open');if(!dlg||!open)return;
+    var f=document.getElementById('ppw-form'),err=f.querySelector('.ppw-err'),done=dlg.querySelector('.ppw-done'),btn=f.querySelector('button[type="submit"]');
+    var sl=[].slice.call(dlg.querySelectorAll('.ppw-s')),k=0,tm=null,m=new Date().getMonth();
+    k=m>=8&&m<=10?0:(m==11||m<=1?1:(m<=4?2:3));sl.forEach(function(e,i){e.classList.toggle('on',i===k);});
+    function spin(){sl[k].classList.remove('on');k=(k+1)%sl.length;sl[k].classList.add('on');}
+    open.addEventListener('click',function(){
+      f.querySelector('.ppw-t').value=Date.now();
+      if(typeof dlg.showModal==='function')dlg.showModal();else dlg.setAttribute('open','');
+      if(!tm&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))tm=setInterval(spin,2200);
+      setTimeout(function(){var n=document.getElementById('ppw-name');if(n&&!f.hidden)n.focus();},350);
+    });
+    function close(){if(dlg.open&&typeof dlg.close==='function')dlg.close();else dlg.removeAttribute('open');}
+    dlg.addEventListener('close',function(){clearInterval(tm);tm=null;});
+    document.getElementById('pp-wait-close').addEventListener('click',close);
+    dlg.addEventListener('click',function(e){if(e.target===dlg)close();});
+    dlg.querySelector('.ppw-priv').addEventListener('click',function(){close();});
+    f.addEventListener('submit',function(e){
+      e.preventDefault();err.hidden=true;
+      var n=f.name.value.trim(),em=f.email.value.trim(),msg='';
+      if(n.length<2)msg='Bitte gib deinen Vornamen an.';else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em))msg='Bitte gib eine gültige E-Mail-Adresse an.';else if(!f.consent.checked)msg='Bitte bestätige noch, dass ich dir schreiben darf.';
+      if(msg){err.textContent=msg;err.hidden=false;return;}
+      btn.disabled=true;
+      fetch('api/subscribe.php',{method:'POST',body:new FormData(f)}).then(function(r){return r.json().catch(function(){return {ok:false};});}).then(function(d){
+        btn.disabled=false;
+        if(!d||!d.ok){err.textContent=(d&&d.error)||'Das hat leider nicht geklappt. Bitte versuch es noch einmal.';err.hidden=false;return;}
+        f.hidden=true;done.hidden=false;
+        done.textContent=d.already?'Wie schön, du bist schon in der FORMA Post! Ich sag dir Bescheid, sobald die Pottery Pause im Frühjahr 2027 buchbar ist. ♡':'Fast geschafft! Bitte bestätige noch kurz deine E-Mail-Adresse in deinem Postfach, dann sag ich dir als Erste Bescheid, wenn die neuen Termine da sind. ♡';
+      }).catch(function(){btn.disabled=false;err.textContent='Keine Verbindung. Bitte versuch es noch einmal.';err.hidden=false;});
+    });
+  })();
   // Adventkalender-Teaser: „Benachrichtige mich“
   document.querySelectorAll('.ad-form').forEach(function(f){
     f.querySelector('.ad-time').value=Date.now();
