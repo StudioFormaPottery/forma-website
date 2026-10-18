@@ -1,0 +1,358 @@
+<?php
+// Movecia Movement / Wild Hearts Collective: eigene Daten, eigene Mails, getrennt von FORMA.
+// Gemeinsam genutzt wird nur die Datenbank-Datei und der MailerLite-Schlüssel des Kontos.
+declare(strict_types=1);
+require_once __DIR__ . '/lib.php';
+
+const MM_FROM_EMAIL = 'hello@moveciamovement.com';
+const MM_FROM_NAME = 'Viv · Wild Hearts Collective';
+const MM_SITE = 'https://moveciamovement.com';
+const MM_ML_GROUP = 'Wild Hearts';
+const MM_CHANNEL = 'https://www.instagram.com/channel/wrOyV88oT-GAwNiR/';
+
+function mm_site(): string
+{
+    return rtrim(getenv('MM_SITE_URL') ?: MM_SITE, '/');
+}
+
+function mm_schema(PDO $pdo): void
+{
+    static $done = false;
+    if ($done) return;
+    $done = true;
+    $pdo->exec('CREATE TABLE IF NOT EXISTS mm_gatherings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        starts_at TEXT NOT NULL,
+        minutes INTEGER NOT NULL DEFAULT 60,
+        description TEXT NOT NULL DEFAULT \'\',
+        room_url TEXT NOT NULL DEFAULT \'\',
+        host_url TEXT NOT NULL DEFAULT \'\',
+        meeting_id TEXT NOT NULL DEFAULT \'\',
+        visible INTEGER NOT NULL DEFAULT 1,
+        reminded_day INTEGER NOT NULL DEFAULT 0,
+        reminded_hour INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL
+    )');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS mm_signups (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        gathering_id INTEGER NOT NULL REFERENCES mm_gatherings(id) ON DELETE CASCADE,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        token TEXT NOT NULL,
+        ip_hash TEXT NOT NULL DEFAULT \'\',
+        status TEXT NOT NULL DEFAULT \'angemeldet\',
+        joined_at TEXT,
+        last_seen TEXT,
+        created_at TEXT NOT NULL,
+        UNIQUE(gathering_id, email)
+    )');
+}
+
+// --- Einstellungen (liegen nur im Datenordner, nie im Repo) ---------------------------
+
+function mm_cfg(string $name): ?array
+{
+    $file = forma_data_dir() . '/movecia-' . $name . '.json';
+    $cfg = is_file($file) ? json_decode((string)file_get_contents($file), true) : null;
+    return is_array($cfg) ? $cfg : null;
+}
+
+function mm_save_cfg(string $name, ?array $cfg): void
+{
+    $file = forma_data_dir() . '/movecia-' . $name . '.json';
+    if ($cfg === null) { @unlink($file); return; }
+    file_put_contents($file, json_encode($cfg));
+    @chmod($file, 0600);
+}
+
+function mm_whereby_key(): string
+{
+    return (string)(mm_cfg('whereby')['api_key'] ?? '');
+}
+
+// --- Whereby ----------------------------------------------------------------------------
+
+function mm_whereby_request(string $method, string $path, ?array $body, string $key): array
+{
+    $base = rtrim(getenv('MM_WHEREBY_API') ?: 'https://api.whereby.dev/v1', '/');
+    $ch = curl_init($base . $path);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST => $method,
+        CURLOPT_TIMEOUT => 15,
+        CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $key, 'Content-Type: application/json', 'Accept: application/json'],
+    ]);
+    if ($body !== null) curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+    $raw = curl_exec($ch);
+    $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    $data = json_decode((string)$raw, true);
+    if ($raw === false || $status >= 400) {
+        throw new RuntimeException('Whereby: ' . (is_array($data) ? ($data['error'] ?? $data['message'] ?? 'HTTP ' . $status) : 'nicht erreichbar'));
+    }
+    return is_array($data) ? $data : [];
+}
+
+/** Prüft den Schlüssel, indem die Liste der Räume abgefragt wird. */
+function mm_whereby_check(string $key): bool
+{
+    try { mm_whereby_request('GET', '/meetings?limit=1', null, $key); return true; } catch (Throwable $e) { error_log('MM whereby check: ' . $e->getMessage()); return false; }
+}
+
+/** Legt den Videoraum für ein Gathering an (Gruppenraum, offen bis eine Stunde nach Ende). */
+function mm_whereby_room(PDO $pdo, int $gid): bool
+{
+    $key = mm_whereby_key();
+    $g = mm_gathering($pdo, $gid);
+    if ($key === '' || !$g) return false;
+    $end = strtotime($g['starts_at']) + ((int)$g['minutes'] + 120) * 60;
+    $r = mm_whereby_request('POST', '/meetings', [
+        'endDate' => gmdate('Y-m-d\TH:i:s.000\Z', $end),
+        'roomMode' => 'group',
+        'roomNamePrefix' => 'wildhearts',
+        'fields' => ['hostRoomUrl'],
+    ], $key);
+    if (empty($r['roomUrl'])) return false;
+    $pdo->prepare('UPDATE mm_gatherings SET room_url = ?, host_url = ?, meeting_id = ? WHERE id = ?')
+        ->execute([(string)$r['roomUrl'], (string)($r['hostRoomUrl'] ?? ''), (string)($r['meetingId'] ?? ''), $gid]);
+    return true;
+}
+
+// --- Gatherings -------------------------------------------------------------------------
+
+function mm_gathering(PDO $pdo, int $id): ?array
+{
+    mm_schema($pdo);
+    $s = $pdo->prepare('SELECT * FROM mm_gatherings WHERE id = ?');
+    $s->execute([$id]);
+    return $s->fetch() ?: null;
+}
+
+/** Das nächste sichtbare Gathering (läuft gerade oder kommt noch). */
+function mm_next_gathering(PDO $pdo): ?array
+{
+    mm_schema($pdo);
+    $all = $pdo->query('SELECT * FROM mm_gatherings WHERE visible = 1 ORDER BY starts_at')->fetchAll();
+    foreach ($all as $g) {
+        if (strtotime($g['starts_at']) + (int)$g['minutes'] * 60 > time()) return $g;
+    }
+    return null;
+}
+
+function mm_signup_count(PDO $pdo, int $gid): int
+{
+    $s = $pdo->prepare("SELECT COUNT(*) FROM mm_signups WHERE gathering_id = ? AND status = 'angemeldet'");
+    $s->execute([$gid]);
+    return (int)$s->fetchColumn();
+}
+
+/** Wer in den letzten 2 Minuten im Raum war (die Seite meldet sich jede Minute). */
+function mm_live_count(PDO $pdo, int $gid): int
+{
+    $s = $pdo->prepare('SELECT COUNT(*) FROM mm_signups WHERE gathering_id = ? AND last_seen >= ?');
+    $s->execute([$gid, date('c', time() - 120)]);
+    return (int)$s->fetchColumn();
+}
+
+function mm_joined_count(PDO $pdo, int $gid): int
+{
+    $s = $pdo->prepare('SELECT COUNT(*) FROM mm_signups WHERE gathering_id = ? AND joined_at IS NOT NULL');
+    $s->execute([$gid]);
+    return (int)$s->fetchColumn();
+}
+
+/** Englische Zeitangabe für die Gäste, z. B. „Wednesday, 3 December · 7:00 pm (Vienna time)“. */
+function mm_when(array $g): string
+{
+    $t = strtotime($g['starts_at']);
+    return date('l, j F', $t) . ' · ' . date('g:i a', $t) . ' (Vienna time)';
+}
+
+function mm_when_de(array $g): string
+{
+    $t = strtotime($g['starts_at']);
+    return forma_de_date(date('Y-m-d', $t)) . ', ' . date('H:i', $t) . ' Uhr';
+}
+
+function mm_room_link(array $s): string
+{
+    return mm_site() . '/gathering/?k=' . rawurlencode($s['token']);
+}
+
+/** Raum ist offen: 15 Minuten vor Beginn bis eine Stunde nach dem geplanten Ende. */
+function mm_room_open(array $g): bool
+{
+    $t = strtotime($g['starts_at']);
+    return time() >= $t - 15 * 60 && time() <= $t + ((int)$g['minutes'] + 60) * 60;
+}
+
+// --- Mails von hello@moveciamovement.com --------------------------------------------------
+
+function mm_mail_html(string $title, string $html): string
+{
+    return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . forma_h($title) . '</title></head>'
+        . '<body style="margin:0;padding:0;background:#F2E6D8;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2E6D8;"><tr><td align="center" style="padding:26px 12px;">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#F8F1E8;border-radius:24px;font-family:Helvetica,Arial,sans-serif;color:#33211B;">'
+        . '<tr><td style="padding:30px 30px 26px;font-size:16px;line-height:1.65;">' . $html
+        . '<p style="margin:22px 0 0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:24px;color:#93402F;">with love, Viv</p></td></tr></table>'
+        . '<p style="max-width:560px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#674B40;margin:16px auto 0;">Vivien Malonga · Movecia – Personal Fitness · Silvrettastraße 58 · 6562 Mathon · Austria · ' . MM_FROM_EMAIL . '</p>'
+        . '</td></tr></table></body></html>';
+}
+
+function mm_button(string $href, string $label): string
+{
+    return '<p style="margin:22px 0 4px;text-align:center;"><a href="' . forma_h($href) . '" style="display:inline-block;padding:15px 30px;border-radius:999px;background:#93402F;color:#FBF1EA;text-decoration:none;font-weight:bold;">' . forma_h($label) . '</a></p>';
+}
+
+/** Verschickt eine Mail als Viv. Mit hinterlegtem Postfach-Passwort per SMTP, sonst per mail(). */
+function mm_mail(string $to, string $subject, string $text, string $html): bool
+{
+    $b = 'mm' . bin2hex(random_bytes(10));
+    $enc = fn(string $s) => rtrim(chunk_split(base64_encode($s), 76, "\r\n"));
+    $mime = "--$b\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . $enc($text) . "\r\n"
+        . "--$b\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . $enc($html) . "\r\n--$b--";
+    $ctype = 'multipart/alternative; boundary="' . $b . '"';
+    $from = mb_encode_mimeheader(MM_FROM_NAME, 'UTF-8') . ' <' . MM_FROM_EMAIL . '>';
+    if (getenv('FORMA_MAIL_LOG')) {
+        file_put_contents(getenv('FORMA_MAIL_LOG'), "FROM: " . MM_FROM_EMAIL . "\nTO: $to\nSUBJECT: $subject\n$text\n-----\n", FILE_APPEND);
+        if (!getenv('FORMA_SMTP_HOST')) return true;
+    }
+    $pw = (string)(mm_cfg('mail')['password'] ?? '');
+    if ($pw !== '') {
+        try {
+            mm_smtp($pw, $to, $subject, $ctype, $mime, $from);
+            return true;
+        } catch (Throwable $e) {
+            error_log('MM SMTP: ' . $e->getMessage());
+        }
+    }
+    $headers = ['From' => $from, 'Reply-To' => MM_FROM_EMAIL, 'MIME-Version' => '1.0', 'Content-Type' => $ctype];
+    return @mail($to, mb_encode_mimeheader($subject, 'UTF-8'), $mime, $headers, '-f' . MM_FROM_EMAIL);
+}
+
+function mm_smtp(string $password, string $to, string $subject, string $ctype, string $mime, string $from): void
+{
+    $host = getenv('FORMA_SMTP_HOST') ?: 'ssl://smtp.hostinger.com:465';
+    $ctx = stream_context_create(['ssl' => ['verify_peer' => true, 'verify_peer_name' => true]]);
+    $fp = @stream_socket_client($host, $errno, $errstr, 15, STREAM_CLIENT_CONNECT, $ctx);
+    if (!$fp) throw new RuntimeException("Verbindung fehlgeschlagen: $errstr");
+    stream_set_timeout($fp, 15);
+    $read = function () use ($fp): string {
+        $out = '';
+        while (($line = fgets($fp, 1024)) !== false) {
+            $out .= $line;
+            if (strlen($line) < 4 || $line[3] === ' ') break;
+        }
+        return $out;
+    };
+    $cmd = function (?string $line, array $ok) use ($fp, $read): string {
+        if ($line !== null) fwrite($fp, $line . "\r\n");
+        $resp = $read();
+        if (!in_array((int)substr($resp, 0, 3), $ok, true)) throw new RuntimeException('SMTP-Antwort: ' . trim($resp));
+        return $resp;
+    };
+    try {
+        $cmd(null, [220]);
+        $cmd('EHLO moveciamovement.com', [250]);
+        $cmd('AUTH LOGIN', [334]);
+        $cmd(base64_encode(MM_FROM_EMAIL), [334]);
+        $cmd(base64_encode($password), [235]);
+        $cmd('MAIL FROM:<' . MM_FROM_EMAIL . '>', [250]);
+        $cmd('RCPT TO:<' . $to . '>', [250, 251]);
+        $cmd('DATA', [354]);
+        $headers = [
+            'Date: ' . date('r'),
+            'Message-ID: <' . bin2hex(random_bytes(12)) . '@moveciamovement.com>',
+            'From: ' . $from,
+            'To: <' . $to . '>',
+            'Reply-To: ' . MM_FROM_EMAIL,
+            'Subject: ' . mb_encode_mimeheader($subject, 'UTF-8'),
+            'MIME-Version: 1.0',
+            'Content-Type: ' . $ctype,
+        ];
+        $cmd(implode("\r\n", $headers) . "\r\n\r\n" . $mime . "\r\n.", [250]);
+        fwrite($fp, "QUIT\r\n");
+    } finally {
+        fclose($fp);
+    }
+}
+
+/** Bestätigung mit persönlichem Raum-Link. */
+function mm_mail_signup(array $g, array $s): bool
+{
+    $first = forma_first_name($s['name']);
+    $link = mm_room_link($s);
+    $when = mm_when($g);
+    $text = "Hey $first,\n\nyou're in! I've saved your spot for our Wild Hearts Gathering:\n\n{$g['title']}\n$when\n\nThis is your personal link to the room. It opens 15 minutes before we start, right on my website, no app or Zoom needed:\n$link\n\nI'll send you a little reminder the day before and one hour before we start.\n\nWith love, Viv\n\nYou get this email because you signed up for this Gathering on moveciamovement.com.\nVivien Malonga, Movecia – Personal Fitness, Silvrettastraße 58, 6562 Mathon, Austria";
+    $html = '<p style="margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#93402F;">Hey ' . forma_h($first) . ',</p>'
+        . '<p style="margin:14px 0 0;">you\'re in! I\'ve saved your spot for our Wild Hearts Gathering.</p>'
+        . '<p style="margin:16px 0 0;padding:16px 18px;background:#DCE0D2;border-radius:16px;"><strong>' . forma_h($g['title']) . '</strong><br>' . forma_h($when) . '</p>'
+        . '<p style="margin:16px 0 0;">This is your personal link to the room. It opens 15 minutes before we start, right on my website, no app or Zoom needed.</p>'
+        . mm_button($link, 'My room link') . '<p style="margin:14px 0 0;">I\'ll send you a little reminder the day before and one hour before we start.</p>';
+    return mm_mail($s['email'], 'Your spot is saved: ' . $g['title'] . ' 🌙', $text, mm_mail_html($g['title'], $html));
+}
+
+function mm_mail_reminder(array $g, array $s, bool $soon): bool
+{
+    $first = forma_first_name($s['name']);
+    $link = mm_room_link($s);
+    $intro = $soon ? 'we start in one hour. Grab something warm to drink, find a cosy spot and come as you are.' : 'tomorrow is our Wild Hearts Gathering, and I am so looking forward to seeing you.';
+    $text = "Hey $first,\n\n$intro\n\n{$g['title']}\n" . mm_when($g) . "\n\nYour room link (opens 15 minutes before):\n$link\n\nWith love, Viv";
+    $html = '<p style="margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#93402F;">Hey ' . forma_h($first) . ',</p>'
+        . '<p style="margin:14px 0 0;">' . forma_h($intro) . '</p>'
+        . '<p style="margin:16px 0 0;padding:16px 18px;background:#DCE0D2;border-radius:16px;"><strong>' . forma_h($g['title']) . '</strong><br>' . forma_h(mm_when($g)) . '</p>'
+        . mm_button($link, 'Open my room') . '<p style="margin:10px 0 0;font-size:14px;color:#674B40;text-align:center;">The room opens 15 minutes before we start.</p>';
+    return mm_mail($s['email'], ($soon ? 'In one hour: ' : 'Tomorrow: ') . $g['title'] . ' 🌙', $text, mm_mail_html($g['title'], $html));
+}
+
+/** Erinnerungen automatisch: 24 Std. und 1 Std. vorher. Wird bei Seitenaufrufen angestoßen. */
+function mm_send_reminders(PDO $pdo): void
+{
+    mm_schema($pdo);
+    $now = time();
+    foreach ($pdo->query('SELECT * FROM mm_gatherings WHERE visible = 1')->fetchAll() as $g) {
+        $t = strtotime($g['starts_at']);
+        if ($t < $now) continue;
+        foreach ([['reminded_day', 86400, false], ['reminded_hour', 3600, true]] as [$col, $before, $soon]) {
+            if ((int)$g[$col] || $t - $now > $before) continue;
+            if ($col === 'reminded_day' && $t - $now < 3 * 3600) { $pdo->prepare("UPDATE mm_gatherings SET reminded_day = 1 WHERE id = ?")->execute([$g['id']]); continue; }
+            // erst sperren, dann verschicken, damit nichts doppelt rausgeht
+            $u = $pdo->prepare("UPDATE mm_gatherings SET $col = 1 WHERE id = ? AND $col = 0");
+            $u->execute([$g['id']]);
+            if ($u->rowCount() !== 1) continue;
+            $s = $pdo->prepare("SELECT * FROM mm_signups WHERE gathering_id = ? AND status = 'angemeldet'");
+            $s->execute([$g['id']]);
+            foreach ($s->fetchAll() as $row) {
+                try { mm_mail_reminder($g, $row, $soon); } catch (Throwable $e) { error_log('MM reminder: ' . $e->getMessage()); }
+            }
+        }
+    }
+}
+
+// --- MailerLite: Zahlen der Gruppe „Wild Hearts“ -----------------------------------------
+
+/** Liefert active/unconfirmed/unsubscribed der Gruppe oder null, wenn MailerLite nicht verbunden ist. */
+function mm_ml_stats(string $name = MM_ML_GROUP): ?array
+{
+    $cfg = forma_mailerlite();
+    if (!$cfg) return null;
+    try {
+        $list = forma_ml_request('GET', '/api/groups?limit=100&filter%5Bname%5D=' . rawurlencode($name), null, $cfg['api_key']);
+        foreach ($list['data'] ?? [] as $g) {
+            if (($g['name'] ?? '') === $name) {
+                return [
+                    'active' => (int)($g['active_count'] ?? 0),
+                    'unconfirmed' => (int)($g['unconfirmed_count'] ?? 0),
+                    'unsubscribed' => (int)($g['unsubscribed_count'] ?? 0),
+                    'open_rate' => (string)($g['open_rate']['string'] ?? ''),
+                    'id' => (string)$g['id'],
+                ];
+            }
+        }
+        return ['active' => 0, 'unconfirmed' => 0, 'unsubscribed' => 0, 'open_rate' => '', 'id' => ''];
+    } catch (Throwable $e) {
+        error_log('MM ML stats: ' . $e->getMessage());
+        return ['error' => true];
+    }
+}

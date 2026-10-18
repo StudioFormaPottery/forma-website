@@ -5,9 +5,9 @@ Options -Indexes
 <FilesMatch "\.(md|sqlite|log)$">
   Require all denied
 </FilesMatch>
-<Files "lib.php">
+<FilesMatch "^(lib|movecia-lib|movecia)\.php$">
   Require all denied
-</Files>
+</FilesMatch>
 
 # Interne Dateien für die Gutscheine
 <IfModule mod_rewrite.c>
@@ -17,6 +17,8 @@ RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^$ wildhearts/ [L]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^reset/?$ wildhearts/reset/ [L]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^gathering/?$ wildhearts/gathering/ [L,QSA]
 # Ohne www → mit www (nur Seitenaufrufe, API/Webhooks bleiben unberührt)
 RewriteCond %{HTTP_HOST} ^forma-pottery\.com$ [NC]
 RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$

@@ -242,6 +242,11 @@ if ($action === 'logout') {
     go($self);
 }
 
+// Movecia Movement / Wild Hearts: eigener Bereich (verwaltung/movecia.php)
+if (str_starts_with((string)$action, 'mm_') || $view === 'movecia') {
+    require __DIR__ . '/movecia.php';
+}
+
 if ($action === 'save_course') {
     $id = (int)($_POST['id'] ?? 0);
     $data = [
@@ -1974,6 +1979,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
     </section>
     <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
     <?php if (!forma_stripe_key()): ?><p class="alert">Die Online-Bezahlung ist noch nicht eingerichtet. Bis dahin werden alle Kurse ohne Bezahlung reserviert. <a href="<?= forma_h($self) ?>?view=einstellungen">Jetzt Stripe verbinden</a></p><?php endif; ?>
+    <a class="mm-door" href="<?= forma_h($self) ?>?view=movecia"><span class="mm-dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span><span><small>Getrennt von FORMA</small><strong>Movecia Movement</strong><span>Wild Hearts · E-Mail-Liste · Gatherings · Videochat</span></span><span class="mm-arrow" aria-hidden="true">→</span></a>
     <?php foreach ($minCourses as $mc): ?><a class="card notice" href="<?= forma_h($self) ?>?view=course&amp;id=<?= (int)$mc['id'] ?>"><span class="ic"><?= admin_icon('kalender') ?></span><span><strong>Zu wenige Anmeldungen: <?= forma_h($mc['title']) ?>, <?= forma_h(preg_replace('/\s*·.*$/u', '', (string)$mc['date_text'])) ?></strong><br><span class="muted small">Entscheide: findet statt oder Gäste informieren →</span></span></a><?php endforeach; ?>
     <?php if ($toPlan > 0): ?><a class="card notice" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('private') ?></span><span><strong><?= $toPlan === 1 ? '1 Private-Pottery-Buchung wartet' : $toPlan . ' Private-Pottery-Buchungen warten' ?> auf ihren Termin.</strong><br><span class="muted small">Im Kalender einplanen und Bestätigung schicken →</span></span></a><?php endif; ?>
     <div class="dash">
@@ -2175,6 +2181,14 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .tiles{margin:0}
 .tile{gap:4px}.tile .ic{margin-bottom:6px}
 .tile.hl{background:#F6E6DA;border-color:#C98F72}
+.mm-door{display:flex;align-items:center;gap:16px;margin:6px 0 18px;padding:18px 20px;border-radius:22px;background:#3E4A36;color:#F3F1E7;text-decoration:none;box-shadow:0 12px 26px rgba(40,50,35,.22)}
+.mm-door:hover{background:#4E5E44}
+.mm-door .mm-dot{flex:0 0 48px;width:48px;height:48px;border-radius:58% 42% 47% 53%/52% 46% 54% 48%;background:#C98B78;color:#fff;display:grid;place-items:center}
+.mm-door .mm-dot svg{width:24px;height:24px}
+.mm-door small{display:block;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#E7C4AE}
+.mm-door strong{display:block;font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:26px;line-height:1.15}
+.mm-door span span,.mm-door>span:nth-child(2)>span{display:block;font-size:14.5px;color:#DCE0D2}
+.mm-door .mm-arrow{margin-left:auto;font-size:22px;color:#E7C4AE}
 .agenda h2{margin-top:0}
 .ag-day{display:flex;gap:14px;padding:10px 0;border-top:1px solid var(--line)}
 .ag-date{flex:0 0 46px;display:flex;flex-direction:column;align-items:center;line-height:1.1}
