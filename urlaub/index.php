@@ -22,7 +22,7 @@ $T = $en ? [
     'w1' => '1st preferred date', 'w2' => '2nd preferred date', 'time' => 'Time', 'name' => 'First and last name', 'email' => 'Email', 'phone' => 'Phone / WhatsApp', 'opt' => '(optional)',
     'hotel' => 'Your hotel', 'consent' => 'I agree that my details are stored to process my booking.', 'privacy' => 'Privacy', 'gs' => 'Do you have a gift voucher?', 'gs_btn' => 'Check', 'gs_ok' => '✓ Voucher found: %s will be deducted from your booking.', 'post' => 'With your booking you will occasionally receive the FORMA Post (in German) with news from the studio. Unsubscribe anytime with one click.', 'nopost' => 'No thanks, I don’t want the FORMA Post.', 'pay' => 'Continue to payment · € 130',
     'gut' => 'Good to know', 'gut_t' => 'Spin & Go is a purely hands-on workshop: the pieces you make can’t be taken home, as the focus is entirely on the experience and on learning the technique. If you’d like a keepsake to take home, you’ll find a small selection of handmade pieces from our studio available on site.',
-    'err_d' => 'Please choose your 1st preferred date and time.', 'err_n' => 'Please enter your name.', 'err_e' => 'Please enter a valid email address.', 'err_c' => 'Please tick the privacy box.', 'wait' => 'One moment …', 'lang' => 'Deutsch', 'langurl' => '?',
+    'err_d' => 'Please choose your 1st preferred date and time.', 'err_n' => 'Please enter your name.', 'err_e' => 'Please enter a valid email address.', 'err_c' => 'Please tick the privacy box.', 'wait' => 'One moment …', 'lang' => 'Deutsch', 'langurl' => '?', 'more' => 'Details & book', 'less' => 'Close',
 ] : [
     'title' => 'Töpfern im Urlaub', 'kick' => 'Winter im Paznaun · FORMA Atelier in Mathon',
     'lead' => 'Erlebe die Kunst des Töpferns an der Drehscheibe im Studio FORMA, eingebettet in die wunderschöne Bergwelt Tirols. Mein kleines Atelier in Mathon liegt nur wenige Minuten von Ischgl entfernt. Ganz ohne Vorkenntnisse.',
@@ -33,7 +33,7 @@ $T = $en ? [
     'w1' => '1. Wunschtermin', 'w2' => '2. Wunschtermin', 'time' => 'Uhrzeit', 'name' => 'Vor- und Nachname', 'email' => 'E-Mail', 'phone' => 'Telefon / WhatsApp', 'opt' => '(optional)',
     'hotel' => 'Dein Hotel', 'consent' => 'Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Buchung gespeichert werden.', 'privacy' => 'Datenschutz', 'gs' => 'Du hast einen Gutschein?', 'gs_btn' => 'Prüfen', 'gs_ok' => '✓ Gutschein gefunden: %s werden bei deiner Buchung abgezogen.', 'post' => 'Mit deiner Buchung bekommst du ab und zu die FORMA Post mit Neuem aus dem Atelier. Abmelden geht jederzeit mit einem Klick.', 'nopost' => 'Nein danke, ich möchte keine FORMA Post bekommen.', 'pay' => 'Weiter zur Bezahlung · € 130',
     'gut' => 'Gut zu wissen', 'gut_t' => 'Spin & Go ist ein reiner Praxisworkshop: Die Stücke, die dabei entstehen, können nicht mitgenommen werden, denn der Fokus liegt ganz auf dem Erlebnis und dem Erlernen der Technik. Wer sich ein Erinnerungsstück mit nach Hause nehmen möchte, findet vor Ort eine kleine Auswahl handgefertigter Stücke aus unserem Atelier zum Erwerben.',
-    'err_d' => 'Bitte wähl deinen 1. Wunschtermin mit Uhrzeit.', 'err_n' => 'Bitte gib deinen Namen an.', 'err_e' => 'Bitte gib eine gültige E-Mail-Adresse an.', 'err_c' => 'Bitte bestätige noch den Datenschutz.', 'wait' => 'Einen Moment …', 'lang' => 'English', 'langurl' => '?lang=en',
+    'err_d' => 'Bitte wähl deinen 1. Wunschtermin mit Uhrzeit.', 'err_n' => 'Bitte gib deinen Namen an.', 'err_e' => 'Bitte gib eine gültige E-Mail-Adresse an.', 'err_c' => 'Bitte bestätige noch den Datenschutz.', 'wait' => 'Einen Moment …', 'lang' => 'English', 'langurl' => '?lang=en', 'more' => 'Details & buchen', 'less' => 'Schließen',
 ];
 $h = fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 $tomorrow = date('Y-m-d', strtotime('+1 day'));
@@ -43,6 +43,24 @@ $tomorrow = date('Y-m-d', strtotime('+1 day'));
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
 <title><?= $h($T['title']) ?> · FORMA</title><link rel="icon" type="image/png" href="../img/forma-logo.png">
 <link rel="stylesheet" href="../assets/gast.css?v=8">
+<style>
+.slides{position:relative}.slides img{position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease}.slides img.on{opacity:1}
+.acc-btn{display:none}
+.two{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;display:block;width:100%;min-width:0;max-width:100%;min-height:52px;text-align:left}
+input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and-time-value{text-align:left;margin:0}
+@media (max-width:820px){
+ .acc-btn{display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:16px;padding:14px 20px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:inherit;font:inherit;font-weight:600;cursor:pointer}
+ .card:not(.dark) .acc-btn{color:#8C2C1D}
+ .acc-btn i{width:10px;height:10px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin:-4px 4px 0 12px;transition:transform .25s}
+ .acc-btn .l{display:none}
+ .card.open .acc-btn .m{display:none}.card.open .acc-btn .l{display:inline}.card.open .acc-btn i{transform:rotate(-135deg);margin-top:4px}
+ .acc-body{display:none;margin-top:18px}.card.open .acc-body{display:block}
+}
+@media (max-width:420px){.two{grid-template-columns:1fr}}
+.card.dark .post-note{color:#F3DCCD}
+@media (max-width:600px){.gut{flex-direction:column;align-items:flex-start;gap:10px}.gut .gi{flex:0 0 auto;width:52px}}
+</style>
 </head>
 <body>
 <div class="head"><div class="wrap">
@@ -51,13 +69,15 @@ $tomorrow = date('Y-m-d', strtotime('+1 day'));
  <span class="ic" style="left:52%;bottom:26px;width:46px;animation-delay:-3s"><svg viewBox="0 0 64 64"><path d="M2 54l20-32 10 14 8-10 22 28z" fill="#674B40"/><path d="M22 22l6 9-4-2-4 4-4-2z" fill="#FBF1EA"/><path d="M40 26l6 8-3-1-3 3-3-2z" fill="#FBF1EA"/></svg></span>
  <div class="top"><img src="../img/forma-logo.png" alt="FORMA Earth &amp; Art"><a href="<?= $h($T['langurl']) ?>"><?= $h($T['lang']) ?></a></div>
  <div class="hero"><div><p class="kick"><?= $h($T['kick']) ?></p><h1><?= $h($T['title']) ?></h1><p class="lead"><?= $h($T['lead']) ?></p></div>
- <div class="arch"><img src="../img/drehen.jpg" alt=""></div></div>
+ <div class="arch slides" id="slides"><img src="../img/scheiben-abend.jpg" alt="" class="on"><img src="../img/tonkugeln.jpg" alt="" loading="lazy"><img src="../img/toepferscheiben.jpg" alt="" loading="lazy"><img src="../img/becher-tonkugeln.jpg" alt="" loading="lazy"></div></div>
 </div></div>
 <main><div class="wrap">
  <div class="cards">
   <section class="card"><svg class="wv" aria-hidden="true"><path></path></svg><span class="cic"><svg viewBox="0 0 64 64"><ellipse cx="32" cy="48" rx="24" ry="7" fill="#674B40"/><ellipse cx="32" cy="45" rx="24" ry="7" fill="#DDBFA8"/><path d="M22 44c0-14 4-22 10-26 6 4 10 12 10 26z" fill="#8C2C1D"/><path d="M26 30c4 2 8 2 12 0" stroke="#FBF1EA" stroke-width="2" fill="none" stroke-linecap="round"/></svg></span>
-   <p class="ok"><?= $h($T['s_k']) ?></p><h2><?= $h($T['s_t']) ?></h2><p><?= $h($T['s_d']) ?></p>
+   <p class="ok"><?= $h($T['s_k']) ?></p><h2><?= $h($T['s_t']) ?></h2>
    <p class="price"><?= $h($T['s_p']) ?><small><?= $h($T['s_ps']) ?></small></p>
+   <button type="button" class="acc-btn" aria-expanded="false"><span class="m"><?= $h($T['more']) ?></span><span class="l"><?= $h($T['less']) ?></span><i aria-hidden="true"></i></button>
+   <div class="acc-body"><p><?= $h($T['s_d']) ?></p>
    <?php if (array_filter($spin, fn($c) => $c['free'] > 0)): ?>
    <div class="mcal" id="mcal" data-dates="<?= $h(json_encode($spin)) ?>">
     <div class="mcal-head"><button type="button" class="mcal-nav" id="mc-prev" aria-label="<?= $h($T['prev']) ?>">‹</button><b id="mc-month"></b><button type="button" class="mcal-nav" id="mc-next" aria-label="<?= $h($T['next']) ?>">›</button></div>
@@ -66,10 +86,13 @@ $tomorrow = date('Y-m-d', strtotime('+1 day'));
     <div class="mcal-pick" id="mc-pick"><p id="mc-text"><?= $h($T['cal_hint']) ?></p><a class="btn" id="mc-btn" href="../#spin-and-go" hidden><?= $h($T['s_btn']) ?></a></div>
    </div>
    <?php else: ?><p><?= $h($T['s_none']) ?><a href="https://wa.me/4367763907080">+43 677 63 90 70 80</a></p><?php endif; ?>
+   </div>
   </section>
   <section class="card dark"><svg class="wv" aria-hidden="true"><path></path></svg><span class="cic"><svg viewBox="0 0 64 64"><path d="M32 54C18 45 10 38 10 28c0-6 5-11 11-11 5 0 8 3 11 7 3-4 6-7 11-7 6 0 11 5 11 11 0 10-8 17-22 26z" fill="#FBF1EA"/></svg></span>
-   <p class="ok"><?= $h($T['p_k']) ?></p><h2><?= $h($T['p_t']) ?></h2><p><?= $h($T['p_d']) ?></p>
-   <p class="price"><?= $h($T['p_p']) ?><small><?= $h($T['p_ps']) ?></small></p><p><?= $h($T['p_how']) ?></p>
+   <p class="ok"><?= $h($T['p_k']) ?></p><h2><?= $h($T['p_t']) ?></h2>
+   <p class="price"><?= $h($T['p_p']) ?><small><?= $h($T['p_ps']) ?></small></p>
+   <button type="button" class="acc-btn" aria-expanded="false"><span class="m"><?= $h($T['more']) ?></span><span class="l"><?= $h($T['less']) ?></span><i aria-hidden="true"></i></button>
+   <div class="acc-body"><p><?= $h($T['p_d']) ?></p><p><?= $h($T['p_how']) ?></p>
    <form id="pf" novalidate>
     <input type="hidden" name="kind" value="buchung"><input type="hidden" name="hours" value="2"><input type="hidden" name="contact" value="email">
     <input type="hidden" name="t" id="t"><input type="hidden" name="project" id="project"><input type="hidden" name="wish_date" id="wish_date"><input type="hidden" name="wish" id="wish">
@@ -86,6 +109,7 @@ $tomorrow = date('Y-m-d', strtotime('+1 day'));
     <p class="err" id="err" hidden></p>
     <button class="btn" type="submit" id="go"><?= $h($T['pay']) ?></button>
    </form>
+   </div>
   </section>
  </div>
  <div class="gut"><svg class="wv" aria-hidden="true"><path></path></svg><span class="gi"><svg viewBox="0 0 64 64"><rect x="10" y="26" width="44" height="28" rx="4" fill="#8C2C1D"/><rect x="7" y="19" width="50" height="10" rx="3" fill="#674B40"/><path d="M32 19v35" stroke="#FBF1EA" stroke-width="4"/><path d="M32 19c-4-9-14-10-13-4s9 5 13 4zm0 0c4-9 14-10 13-4s-9 5-13 4z" fill="none" stroke="#FBF1EA" stroke-width="3"/></svg></span>
@@ -93,6 +117,13 @@ $tomorrow = date('Y-m-d', strtotime('+1 day'));
  <p class="foot">FORMA Earth &amp; Art · Silvrettastraße 58 · 6562 Mathon · <a href="https://wa.me/4367763907080">+43 677 63 90 70 80</a> · <a href="../">forma-pottery.com</a></p>
 </div></main>
 <script src="../assets/gast.js?v=3"></script>
+<script>
+(function(){
+  var im=document.querySelectorAll('#slides img'),i=0;
+  if(im.length>1&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))setInterval(function(){im[i].classList.remove('on');i=(i+1)%im.length;im[i].classList.add('on');},5000);
+  document.querySelectorAll('.acc-btn').forEach(function(b){b.addEventListener('click',function(){var c=b.closest('.card'),o=c.classList.toggle('open');b.setAttribute('aria-expanded',o?'true':'false');if(o&&typeof window.dispatchEvent==='function')window.dispatchEvent(new Event('resize'));});});
+})();
+</script>
 <script>
 (function(){
   var box=document.getElementById('mcal');if(!box)return;

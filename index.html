@@ -621,8 +621,10 @@ section{scroll-margin-top:96px}
   .season.theme-advent .season-top{padding-top:50px}
   .season-top .post-big{font-size:23px;gap:8px}
   .season-top .post-sub{font-size:15px}
-  .season-inner{grid-template-columns:1fr}
-  .season-img{padding:14px 14px 0}
+  .season-inner{display:block;grid-template-columns:1fr;-webkit-overflow-scrolling:touch}
+  .season-img{padding:14px 14px 0;min-height:auto;flex:none}
+  .season-img img{flex:none}
+  .season-body{min-height:auto}
   .season-img img{height:200px}
   .season-body{padding:14px 20px 22px}
   .season.theme-advent .season-body{padding-top:14px}
@@ -1055,6 +1057,15 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .pp-facts li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--clay)}
 .pp-foot{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px;margin-top:6px}
 .pp-foot .price{margin:0;color:var(--clay)}
+.pp-gone li{opacity:.55;position:relative}.pp-gone li::after{content:"";position:absolute;left:12%;right:12%;top:50%;height:2px;background:var(--clay);transform:rotate(-28deg);border-radius:2px}
+.pp-stamp{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%) rotate(-12deg);padding:10px 22px;border:3px dashed #FBF1EA;border-radius:999px;background:color-mix(in srgb,var(--clay) 88%,transparent);color:#FBF1EA;font-family:var(--display);font-weight:600;font-size:clamp(22px,2.4vw,30px);letter-spacing:.01em;white-space:nowrap;box-shadow:0 10px 24px rgba(51,33,27,.3);animation:ppwiggle 3.6s ease-in-out infinite}
+@keyframes ppwiggle{0%,100%{transform:translate(-50%,-50%) rotate(-12deg)}50%{transform:translate(-50%,-50%) rotate(-7deg) scale(1.04)}}
+.pp-next{position:relative;margin-top:8px;padding:20px 22px 22px;border-radius:26px;background:#FBF1EA;border:2px dashed color-mix(in srgb,var(--clay) 55%,transparent);display:flex;flex-direction:column;gap:8px;align-items:flex-start;max-width:560px}
+.pp-next::before{content:"♡";position:absolute;right:18px;top:12px;font-size:30px;color:var(--clay);animation:sway 3s ease-in-out infinite alternate}
+.pp-next-kick{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);font-weight:500}
+.pp-next-title{font-family:var(--display);font-weight:600;font-size:clamp(24px,2.6vw,32px);line-height:1.1;color:var(--clay);padding-right:34px}
+.pp-next p{margin:0}.pp-next strong{color:var(--clay);font-weight:600}
+@media (prefers-reduced-motion:reduce){.pp-stamp,.pp-next::before{animation:none}}
 .offers-label{margin:0 0 14px;font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
 @media (max-width:780px){.pp-special{grid-template-columns:1fr;padding-top:64px}.pp-art{max-width:190px;margin:0 auto 26px}.pp-seal{width:94px;height:94px;right:-30px;bottom:-18px}.pp-seal b{font-size:28px}.pp-seal i{font-size:11.5px}.pp-dates li{width:54px;height:54px}.pp-dates b{font-size:17px}.pp-dates i{font-size:11px}}
 @media (min-width:900px){.pp-body > p:not(.pp-tag):not(.pp-when):not(.pp-time){font-size:20px}.pp-facts li{font-size:16.5px}.pp-time{font-size:19px}}
@@ -1209,7 +1220,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <ul class="hero-week" aria-label="Jede Woche im Studio">
           <li><span class="day">Mi &amp; Fr</span><span class="name">Spin &amp; Go</span><span class="sub">9–11 Uhr</span></li>
           <li><span class="day">Donnerstag</span><span class="name">Offenes Atelier</span><span class="sub">8–11 Uhr</span></li>
-          <li><span class="day">Fr abends</span><span class="name">Pottery Pause</span><span class="sub">5-Wochen-Kurs</span></li>
+          <li><span class="day">Fr abends</span><span class="name">Pottery Pause</span><span class="sub">ausgebucht · Frühjahr 2027</span></li>
         </ul>
       </div>
       <div class="collage">
@@ -1251,21 +1262,27 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <svg class="xm-garland" viewBox="0 0 860 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 6 Q 108 46 215 14 T 430 14 T 645 14 T 860 6" fill="none" stroke="#674B40" stroke-width="2"/><line x1="30.0" y1="22.0" x2="30.0" y2="28.0" stroke="#674B40" stroke-width="1.4"/><circle cx="30.0" cy="35.0" r="7" fill="#FBF1EA" stroke="rgba(51,33,27,.22)"/><circle cx="27.6" cy="32.6" r="1.8" fill="#FBF1EA" opacity=".7"/><path transform="translate(88.7 37.7) scale(0.68)" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" fill="#674B40"/><path transform="translate(156.3 30.8) scale(.6)" d="M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z" fill="#8C2C1D"/><line x1="230.0" y1="14.9" x2="230.0" y2="20.9" stroke="#674B40" stroke-width="1.4"/><circle cx="230.0" cy="27.9" r="7" fill="#DDBFA8" stroke="rgba(51,33,27,.22)"/><circle cx="227.6" cy="25.5" r="1.8" fill="#FBF1EA" opacity=".7"/><path transform="translate(288.7 28.7) scale(0.68)" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" fill="#FBF1EA"/><path transform="translate(356.3 27.9) scale(.6)" d="M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z" fill="#674B40"/><line x1="430.0" y1="11.0" x2="430.0" y2="17.0" stroke="#674B40" stroke-width="1.4"/><circle cx="430.0" cy="24.0" r="7" fill="#8C2C1D" stroke="rgba(51,33,27,.22)"/><circle cx="427.6" cy="21.6" r="1.8" fill="#FBF1EA" opacity=".7"/><path transform="translate(488.7 26.9) scale(0.68)" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" fill="#DDBFA8"/><path transform="translate(556.3 29.7) scale(.6)" d="M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z" fill="#FBF1EA"/><line x1="630.0" y1="14.9" x2="630.0" y2="20.9" stroke="#674B40" stroke-width="1.4"/><circle cx="630.0" cy="27.9" r="7" fill="#674B40" stroke="rgba(51,33,27,.22)"/><circle cx="627.6" cy="25.5" r="1.8" fill="#FBF1EA" opacity=".7"/><path transform="translate(688.7 24.3) scale(0.68)" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" fill="#8C2C1D"/><path transform="translate(756.3 30.8) scale(.6)" d="M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z" fill="#DDBFA8"/><line x1="830.0" y1="18.6" x2="830.0" y2="24.6" stroke="#674B40" stroke-width="1.4"/><circle cx="830.0" cy="31.6" r="7" fill="#FBF1EA" stroke="rgba(51,33,27,.22)"/><circle cx="827.6" cy="29.2" r="1.8" fill="#FBF1EA" opacity=".7"/></svg>
         <div class="pp-art">
           <div class="pp-pic"><img src="img/drehen.jpg" alt="Hände formen Ton an der Töpferscheibe" loading="lazy"></div>
-          <span class="pp-seal" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><path id="pp-c" d="M60 60m-42 0a42 42 0 1 1 84 0a42 42 0 1 1-84 0"></path></defs><text><textPath href="#pp-c" textLength="258" lengthAdjust="spacingAndGlyphs">Pottery Pause · 5 Freitagabende ·</textPath></text></svg><b>5</b><i>Wochen</i></span>
+          <span class="pp-stamp" aria-hidden="true">Ausgebucht!</span>
+          <span class="pp-seal" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><path id="pp-c" d="M60 60m-42 0a42 42 0 1 1 84 0a42 42 0 1 1-84 0"></path></defs><text><textPath href="#pp-c" textLength="258" lengthAdjust="spacingAndGlyphs">Pottery Pause · Frühjahr 2027 ·</textPath></text></svg><b>4</b><i>Plätze</i></span>
           <svg class="pp-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2a10 10 0 1 0 7 15.5A8.5 8.5 0 0 1 15 2z"/></svg>
           <svg class="pp-tw" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg>
         </div>
         <div class="pp-body">
-          <p class="pp-tag"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg>Special</span> nur diesen Herbst</p>
+          <p class="pp-tag"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg>Special</span> Herbst 2026 · ausgebucht</p>
           <h3>Pottery Pause</h3>
           <p class="pp-when">Fünf gemütliche Freitagabende an der Töpferscheibe</p>
-          <ol class="pp-dates" aria-label="Die fünf Termine, jeweils 18 bis 20 Uhr">
+          <ol class="pp-dates pp-gone" aria-label="Die fünf Herbsttermine sind ausgebucht">
             <li><b>6.</b><i>Nov</i></li><li><b>13.</b><i>Nov</i></li><li><b>20.</b><i>Nov</i></li><li><b>27.</b><i>Nov</i></li><li><b>4.</b><i>Dez</i></li>
           </ol>
-          <p class="pp-time">jeweils freitags, 18–20 Uhr</p>
+          <p class="pp-time">Alle Herbsttermine sind vergeben, danke für eure Liebe! ♡</p>
           <p>Deine kleine Auszeit zum Start ins Wochenende: Handy weg, Hände in den Ton. In gemütlicher Runde lernst du Schritt für Schritt das Arbeiten an der Töpferscheibe, vom Zentrieren über das Hochziehen bis zum Abdrehen, ganz in deinem Tempo.</p>
           <ul class="pp-facts"><li>acht eigene Stücke, z. B. Becher, Schalen oder kleine Teller</li><li>für Einsteiger und Fortgeschrittene</li></ul>
-          <div class="pp-foot"><p class="price">€ 295<small>für alle fünf Termine</small></p><a class="btn btn-solid" href="#angebote" data-book="Pottery Pause">Platz buchen</a></div>
+          <div class="pp-next">
+            <span class="pp-next-kick">Psst … es geht weiter!</span>
+            <b class="pp-next-title">Frühjahr 2027: neue Termine</b>
+            <p>Nur <strong>4 Plätze</strong> pro Kurs, die sind schnell weg. Schreib dich in die FORMA Post ein, dann erfährst du als Erste, wann du buchen kannst.</p>
+            <a class="btn btn-solid" href="#forma-post">Ich will Bescheid&nbsp;bekommen&nbsp;♡</a>
+          </div>
         </div>
       </article>
       <p class="offers-label">Das ganze Jahr über</p>
@@ -1957,7 +1974,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         </ul>
         <p class="week-label" style="margin:14px 0 6px">Specials</p>
         <ul class="week-plan">
-          <li><span class="day">6. 11. – 4. 12.</span><span class="what">Pottery Pause · 5-Wochen-Special</span><span class="when">Fr 18–20 Uhr</span></li>
+          <li><span class="day">6. 11. – 4. 12.</span><span class="what">Pottery Pause · ausgebucht, neue Termine im Frühjahr 2027</span><span class="when">Fr 18–20 Uhr</span></li>
           <li><span class="day">Advent</span><span class="what">Pottery bemalen</span><span class="when">Mi &amp; Do 15–18 Uhr</span></li>
         </ul>
       </div>
@@ -2984,7 +3001,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   var wantSpecial=location.hash==='#special';
   if(wantSpecial)try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
   (function(){
-    var h=location.hash,f={'#jetzt-buchen':function(){openWizard();},'#gutschein-kaufen':vOpen,'#private-pottery':pOpen,'#pottery-bemalen':function(){var a=document.createElement('a');a.href='#angebote';a.setAttribute('data-book','Pottery bemalen');a.hidden=true;document.body.appendChild(a);a.click();a.remove();},'#pottery-pause':function(){var b=document.querySelector('[data-book="Pottery Pause"]');if(b)b.click();else openWizard();},'#spin-and-go':function(){var b=document.querySelector('[data-book="Spin &amp; Go"],[data-book="Spin & Go"]');if(b)b.click();else openWizard();}}[h];
+    var h=location.hash,f={'#jetzt-buchen':function(){openWizard();},'#gutschein-kaufen':vOpen,'#private-pottery':pOpen,'#pottery-bemalen':function(){var a=document.createElement('a');a.href='#angebote';a.setAttribute('data-book','Pottery bemalen');a.hidden=true;document.body.appendChild(a);a.click();a.remove();},'#pottery-pause':function(){var a=document.getElementById('pottery-pause');if(a)a.scrollIntoView({behavior:'smooth'});},'#spin-and-go':function(){var b=document.querySelector('[data-book="Spin &amp; Go"],[data-book="Spin & Go"]');if(b)b.click();else openWizard();}}[h];
     if(!f)return;
     try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
     setTimeout(f,500);
