@@ -125,3 +125,9 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Startseite installierbar: `manifest.webmanifest` (Name „Studio FORMA“, Icons `img/app/forma-*.png` = Logo auf Sand), `sw.js` (Seiten immer frisch aus dem Netz, nur offline die letzte Startseite; fonts/img/assets zwischengespeichert; api/, verwaltung/, video/ nie). Bei größeren Bild-Austauschen `VERSION` in sw.js hochzählen.
 - Verwaltung eigene App: `verwaltung/manifest.webmanifest` („FORMA Verwaltung“, Scope /verwaltung/), Icon `img/app/verwaltung-*.png` = FORMA-Kreis mit F (wie im Logo) und „VERWALTUNG“ (Quelle 1024 px: `verwaltung-1024.png`).
 - iPhone: Safari → Teilen → „Zum Home-Bildschirm“. Android: Chrome → „App installieren“.
+
+## Wild Hearts Collective (seit 18.10.2026)
+- `wildhearts/index.html` = englische Link-in-Bio-Seite für Viviens Community (Movecia, nicht FORMA). moveciamovement.com ist bei Hostinger als geparkte Domain an diese Website gehängt; `.htaccess` zeigt dort auf der Startseite `wildhearts/` (Adresse bleibt stehen).
+- Design im FORMA-Stil (Bogenfoto, Tonformen, Welle), Rot weicher (`#93402F`), Italiana-Titel, wirbelnde Jahreszeiten-Icons nur am Rand.
+- Anmeldung geht direkt an das MailerLite-Formular „Wild Hearts – Link in Bio“ (Gruppe „Wild Hearts“, Double-Opt-in), nicht über `api/subscribe.php` – so landen die Frauen nie in der FORMA Post.
+- Noch nirgends Retreats erwähnen (Vivien, 18.10.2026). Inner Circle mit Mentoring ab 2027 als Warteliste.
