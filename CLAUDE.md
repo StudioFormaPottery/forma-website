@@ -131,3 +131,6 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Design im FORMA-Stil (Bogenfoto, Tonformen, Welle), Rot weicher (`#93402F`), Italiana-Titel, wirbelnde Jahreszeiten-Icons nur am Rand.
 - Anmeldung geht direkt an das MailerLite-Formular „Wild Hearts – Link in Bio“ (Gruppe „Wild Hearts“, Double-Opt-in), nicht über `api/subscribe.php` – so landen die Frauen nie in der FORMA Post.
 - Noch nirgends Retreats erwähnen (Vivien, 18.10.2026). Inner Circle mit Mentoring ab 2027 als Warteliste.
+- Link-Seite seit 18.10.2026 im Stil des Reset-PDFs: Polaroid mit Klebeband (`img/wildhearts/viv-stretch.jpg`), Handschrift „Hand“ (`fonts/HomemadeApple-Regular.woff`), Geschenk-Karte Reset Routine (Salbei), Brief (Weinrot), Affirmation (Dunkelbraun). Fensterfotos: `cover.jpg`, `fenster-quadrat.jpg`.
+- Reset Routine: PDFs in `wildhearts/files/` (EN `Reset-Routine-for-Tired-Days.pdf`, DE `Reset-Routine-fuer-muede-Tage.pdf`, Quellen außerhalb des Repos). Download-Seite mit Sprachwahl: moveciamovement.com/reset/ (= `wildhearts/reset/`, noindex). Link steht in der MailerLite-Automation „Wild Hearts – Willkommen + Reset Routine“ (Auslöser: tritt Gruppe „Wild Hearts“ bei).
+- Erstes Gathering: Anfang Dezember 2026. Videochat über Whereby (Vivien hat ein Konto, Schlüssel nur in der Verwaltung, nie im Chat/Repo).

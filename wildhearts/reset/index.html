@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your Reset Routine · Wild Hearts</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#F6EDE3">
+<link rel="icon" href="/img/wildhearts/viv.jpg">
+<style>
+@font-face{font-family:"Italiana";font-weight:400;font-display:swap;src:url(/fonts/Italiana-Regular.woff) format("woff")}
+@font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}
+@font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(/fonts/Outfit-Bold.woff) format("woff")}
+@font-face{font-family:"Hand";font-weight:400;font-display:swap;src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
+:root{--cream:#F8F1E8;--oat:#E8D7C4;--blush:#E7C4AE;--rose:#C98B78;--wine:#93402F;--wine-deep:#6E2A1F;--earth:#3A2620;--brown:#674B40;--ink:#33211B;--sage-soft:#DCE0D2;--line:#DCC5B0;--blob:58% 42% 47% 53% / 52% 46% 54% 48%;--hand:"Hand","Bradley Hand",cursive}
+*{box-sizing:border-box;margin:0}
+html,body{background:var(--cream)}
+body{min-height:100dvh;font-family:"Outfit",system-ui,sans-serif;color:var(--ink);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative}
+.bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg span{position:absolute;border-radius:var(--blob)}
+.bg .a{width:420px;height:420px;right:-200px;top:-150px;background:var(--oat);opacity:.8}
+.bg .b{width:300px;height:300px;left:-190px;bottom:-60px;background:var(--blush);opacity:.5}
+main{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:max(40px,env(safe-area-inset-top)) 16px 40px;text-align:center}
+.hand{font-family:var(--hand);font-weight:400;line-height:1.5}
+.hi{font-size:26px;color:var(--wine);transform:rotate(-2deg)}
+h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(38px,9vw,56px);line-height:1.05;color:var(--wine-deep);margin-top:8px}
+.lead{color:var(--brown);margin:14px auto 0;max-width:36ch}
+.choose{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:34px}
+.pick{display:flex;flex-direction:column;align-items:center;gap:12px;padding:22px 14px 20px;border-radius:28px;background:#FFFBF6;border:1.5px solid var(--line);text-decoration:none;color:var(--ink);box-shadow:0 14px 30px rgba(58,38,32,.1);transition:transform .2s ease}
+.pick:nth-child(2){background:var(--sage-soft);border-color:transparent}
+.pick:hover{transform:translateY(-3px)}
+.pick:focus-visible{outline:2px solid var(--wine);outline-offset:3px}
+.pick .cov{width:min(150px,100%);border:5px solid #fff;box-shadow:0 10px 22px rgba(58,38,32,.25);position:relative}
+.pick:nth-child(1) .cov{transform:rotate(-4deg)}.pick:nth-child(2) .cov{transform:rotate(3deg)}
+.pick .cov::before{content:"";position:absolute;width:56px;height:17px;background:rgba(231,196,174,.85);top:-10px;left:50%;margin-left:-28px;transform:rotate(-5deg)}
+.pick img{display:block;width:100%;height:auto}
+.pick .lang{font-family:"Italiana",Georgia,serif;font-size:27px;color:var(--earth);margin-top:6px}
+.pick .btn{display:inline-block;padding:11px 20px;border-radius:999px;background:var(--wine);color:#FBF1EA;font-weight:500;font-size:15.5px}
+.next{margin-top:40px;padding:30px 22px;border-radius:30px;background:var(--wine);color:#F5E8DD}
+.next .hand{font-size:21px;color:var(--blush)}
+.next p{margin-top:10px}
+.next a.c{display:inline-block;margin-top:16px;padding:14px 24px;border-radius:999px;background:var(--cream);color:var(--wine-deep);text-decoration:none;font-weight:500}
+.sig{margin-top:28px;font-size:20px;color:var(--wine)}
+.foot{margin-top:30px;font-size:13px;color:var(--brown)}
+.foot a{color:var(--brown)}
+@media (max-width:420px){.choose{gap:12px}.pick{padding:18px 10px 16px}.pick .lang{font-size:23px}.pick .btn{font-size:14px;padding:10px 14px}}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><span class="a"></span><span class="b"></span></div>
+<main>
+  <p class="hand hi">you're in, wild heart ♡</p>
+  <h1>Your Reset Routine<br>for Tired Days</h1>
+  <p class="lead">Thank you for confirming. Choose your language and save it on your phone, so it's there on the next tired evening.</p>
+  <p class="lead" lang="de" style="margin-top:6px;font-size:15px">Danke fürs Bestätigen. Wähle deine Sprache und speichere sie dir am Handy.</p>
+
+  <div class="choose">
+    <a class="pick" href="/wildhearts/files/Reset-Routine-for-Tired-Days.pdf" download>
+      <span class="cov"><img src="/img/wildhearts/reset-cover-en.jpg" alt="" width="440" height="624"></span>
+      <span class="lang">English</span>
+      <span class="btn">Download PDF</span>
+    </a>
+    <a class="pick" href="/wildhearts/files/Reset-Routine-fuer-muede-Tage.pdf" download lang="de">
+      <span class="cov"><img src="/img/wildhearts/reset-cover-de.jpg" alt="" width="440" height="624"></span>
+      <span class="lang">Deutsch</span>
+      <span class="btn">PDF herunterladen</span>
+    </a>
+  </div>
+
+  <section class="next">
+    <p class="hand">and now, come a little closer</p>
+    <p>Our free community channel on Instagram is where we meet every day: little check-ins, honest questions and women who get it. Our first live Wild Hearts Gathering is in December.</p>
+    <a class="c" href="https://www.instagram.com/channel/wrOyV88oT-GAwNiR/" target="_blank" rel="noopener">Join the Wild Hearts Collective →</a>
+  </section>
+
+  <p class="hand sig">with love, Viv</p>
+  <p class="foot"><a href="/">moveciamovement.com</a> · Vivien Malonga, Movecia · <a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a></p>
+</main>
+</body>
+</html>

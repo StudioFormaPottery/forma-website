@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Wild Hearts Collective · Viv</title>
-<meta name="description" content="For women who want more than just functioning. Movement, rituals, honest circles and a community of women who get it, with Viv from the Austrian mountains.">
-<meta name="theme-color" content="#EEE2D4">
+<meta name="description" content="For women who want more than just functioning. A free community, a little reset for tired days and live Gatherings, with Viv from the Austrian mountains.">
+<meta name="theme-color" content="#F6EDE3">
 <link rel="canonical" href="https://moveciamovement.com/">
 <link rel="icon" href="/img/wildhearts/viv.jpg">
 <link rel="apple-touch-icon" href="/img/wildhearts/viv.jpg">
@@ -15,84 +15,108 @@
 <meta property="og:url" content="https://moveciamovement.com/">
 <style>
 @font-face{font-family:"Italiana";font-weight:400;font-display:swap;src:url(/fonts/Italiana-Regular.woff) format("woff")}
-@font-face{font-family:"Bricolage Grotesque";font-weight:600 800;font-display:swap;src:url(/fonts/BricolageGrotesque-Bold.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(/fonts/Outfit-Bold.woff) format("woff")}
+@font-face{font-family:"Hand";font-weight:400;font-display:swap;src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
 :root{
-  /* FORMA-Farben, das Rot etwas weicher */
-  --paper:#EEE2D4;--oat:#E4D2BF;--blush:#DDBFA8;--card:#FBF4EC;
-  --wine:#93402F;--wine-deep:#7A3122;--brown:#674B40;--ink:#33211B;--ink-soft:#674B40;--sage:#9DA58F;
-  --line:#D6BEA8;
+  --cream:#F8F1E8;--paper:#F2E6D8;--oat:#E8D7C4;--blush:#E7C4AE;--rose:#C98B78;
+  --wine:#93402F;--wine-deep:#6E2A1F;--earth:#3A2620;--brown:#674B40;--ink:#33211B;
+  --sage:#8E9A82;--sage-soft:#DCE0D2;--line:#DCC5B0;
   --blob:58% 42% 47% 53% / 52% 46% 54% 48%;
-  --serif:"Italiana",Georgia,"Times New Roman",serif;
-  --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --serif:"Italiana",Georgia,serif;--hand:"Hand","Bradley Hand",cursive;
   --sans:"Outfit",ui-sans-serif,system-ui,-apple-system,sans-serif;
 }
 *{box-sizing:border-box;margin:0}
 [hidden]{display:none!important}
-html{background:var(--paper)}
-body{min-height:100dvh;font-family:var(--sans);color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased;overflow-x:hidden;font-size:17px;line-height:1.55;position:relative}
+html{background:var(--cream)}
+body{min-height:100dvh;font-family:var(--sans);color:var(--ink);background:var(--cream);-webkit-font-smoothing:antialiased;overflow-x:hidden;font-size:17px;line-height:1.6;position:relative}
 a{color:inherit}
+.hand{font-family:var(--hand);font-weight:400;line-height:1.55}
 
-/* Hintergrund: weiche Tonformen wie bei FORMA */
+/* Hintergrund */
 .bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 .bg span{position:absolute;border-radius:var(--blob);animation:morph 18s ease-in-out infinite alternate}
-.bg .a{width:440px;height:440px;right:-200px;top:-150px;background:var(--oat)}
-.bg .b{width:320px;height:320px;left:-190px;top:42%;background:var(--blush);opacity:.75;animation-duration:22s}
-.bg .c{width:120px;height:120px;right:7%;bottom:12%;background:var(--brown);opacity:.12;animation-duration:15s}
+.bg .a{width:440px;height:440px;right:-210px;top:-160px;background:var(--oat);opacity:.8}
+.bg .b{width:320px;height:320px;left:-200px;top:44%;background:var(--blush);opacity:.5;animation-duration:22s}
 @keyframes morph{0%{border-radius:58% 42% 47% 53% / 52% 46% 54% 48%;transform:rotate(0)}100%{border-radius:42% 58% 60% 40% / 45% 58% 42% 55%;transform:rotate(16deg)}}
-
-/* Wirbelnde Jahreszeiten-Icons */
 .swirl{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 .swirl span{position:absolute;display:block;animation:swirl var(--d,22s) ease-in-out infinite;animation-delay:var(--delay,0s);opacity:.9}
 .swirl svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 8px rgba(103,48,30,.14))}
-@keyframes swirl{
-  0%{transform:translate(0,0) rotate(var(--r,0deg))}
-  25%{transform:translate(var(--x1,14px),18px) rotate(calc(var(--r,0deg) + 28deg))}
-  50%{transform:translate(0,34px) rotate(calc(var(--r,0deg) + 8deg))}
-  75%{transform:translate(calc(var(--x1,14px) * -1),14px) rotate(calc(var(--r,0deg) - 22deg))}
-  100%{transform:translate(0,0) rotate(var(--r,0deg))}
-}
+@keyframes swirl{0%{transform:translate(0,0) rotate(var(--r,0deg))}25%{transform:translate(var(--x1,14px),18px) rotate(calc(var(--r,0deg) + 28deg))}50%{transform:translate(0,34px) rotate(calc(var(--r,0deg) + 8deg))}75%{transform:translate(calc(var(--x1,14px) * -1),14px) rotate(calc(var(--r,0deg) - 22deg))}100%{transform:translate(0,0) rotate(var(--r,0deg))}}
 
-.page{position:relative;z-index:1;width:100%;max-width:640px;margin:0 auto;padding:max(34px,env(safe-area-inset-top)) 16px 30px}
+.page{position:relative;z-index:1;width:100%;max-width:640px;margin:0 auto;padding:max(30px,env(safe-area-inset-top)) 16px 10px}
 
-/* Kopf: Bogenfoto wie bei FORMA */
+/* Polaroid mit Klebeband */
+.polaroid{position:relative;background:#fff;padding:10px 10px 40px;box-shadow:0 16px 34px rgba(58,38,32,.22)}
+.polaroid img{display:block;width:100%;height:100%;object-fit:cover}
+.polaroid .cap{white-space:nowrap;line-height:1.2;position:absolute;left:0;right:0;bottom:9px;text-align:center;font-family:var(--hand);font-size:15px;color:var(--brown)}
+.tape{position:absolute;width:86px;height:26px;background:rgba(231,196,174,.82);top:-12px;left:50%;margin-left:-43px;transform:rotate(-6deg)}
+
+/* Kopf */
 .head{display:flex;flex-direction:column;align-items:center;text-align:center}
-.arch{width:176px;height:214px;border-radius:999px 999px 28px 28px;overflow:hidden;box-shadow:0 22px 44px rgba(103,48,30,.24);position:relative;background:var(--blush)}
-.arch img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block}
-.moon{width:58px;height:58px;margin-top:-30px;border-radius:50%;background:var(--card);display:grid;place-items:center;box-shadow:0 10px 22px rgba(103,48,30,.2);position:relative}
-.moon svg{width:28px;height:28px;color:var(--wine)}
-.by{font-family:var(--serif);font-size:23px;color:var(--ink-soft);margin-top:12px}
-h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10vw,58px);line-height:1.02;letter-spacing:.015em;color:var(--wine-deep);margin-top:4px}
-.lead{font-size:18px;line-height:1.55;color:var(--ink-soft);margin-top:12px;max-width:33ch}
+.head .polaroid{width:220px;transform:rotate(-3deg);margin-top:6px}
+.head .polaroid .ph{height:220px;overflow:hidden}
+.hey{font-family:var(--hand);font-size:26px;color:var(--wine);margin-top:22px;transform:rotate(-2deg)}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);line-height:1.02;letter-spacing:.012em;color:var(--wine-deep);margin-top:6px}
+.by{font-size:12.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--brown);margin-top:12px}
+.lead{font-size:18px;line-height:1.6;color:var(--brown);margin-top:14px;max-width:34ch}
 .lead em{font-style:normal;color:var(--ink)}
 
-/* Links */
-.links{display:flex;flex-direction:column;gap:14px;margin-top:30px}
-.btn{display:flex;align-items:center;gap:14px;width:100%;padding:16px 20px;border-radius:999px;text-decoration:none;font-family:var(--sans);font-size:17px;font-weight:500;border:1.5px solid var(--line);background:rgba(251,244,236,.92);color:var(--ink);cursor:pointer;text-align:left;transition:transform .2s ease,box-shadow .2s ease}
+/* Knöpfe */
+.links{display:flex;flex-direction:column;gap:14px;margin-top:28px}
+.btn{display:flex;align-items:center;gap:14px;width:100%;padding:16px 20px;border-radius:999px;text-decoration:none;font-family:var(--sans);font-size:17px;font-weight:500;border:1.5px solid var(--line);background:rgba(255,251,246,.94);color:var(--ink);cursor:pointer;text-align:left;transition:transform .2s ease,box-shadow .2s ease}
 .btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(103,48,30,.14)}
-.btn:focus-visible{outline:2px solid var(--wine);outline-offset:3px}
+.btn:focus-visible,.gift:focus-visible{outline:2px solid var(--wine);outline-offset:3px}
 .btn .ic{flex:0 0 auto;width:42px;height:42px;border-radius:var(--blob);display:grid;place-items:center;background:var(--blush);color:var(--wine-deep)}
 .btn .ic svg{width:21px;height:21px}
 .btn .tx{flex:1;display:flex;flex-direction:column;line-height:1.3}
-.btn .tx small{font-size:13.5px;font-weight:400;color:var(--ink-soft);margin-top:3px}
+.btn .tx small{font-size:13.5px;font-weight:400;color:var(--brown);margin-top:3px}
 .btn .ar{opacity:.55;font-size:18px}
 .btn.main{background:var(--wine);color:#FBF1EA;border-color:var(--wine);box-shadow:0 18px 36px rgba(122,49,34,.28)}
 .btn.main .ic{background:rgba(251,241,234,.18);color:#FBF1EA}
-.btn.main small{color:rgba(251,241,234,.82)}
+.btn.main small{color:rgba(251,241,234,.85)}
 .tag{display:inline-block;margin-left:6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--oat);color:var(--brown);vertical-align:2px;font-weight:500}
 
+/* Geschenk: Reset Routine */
+.gift{position:relative;display:flex;gap:18px;align-items:center;width:100%;margin-top:8px;padding:22px 20px 22px 18px;border-radius:30px;border:0;background:var(--sage-soft);color:var(--ink);text-align:left;font:inherit;cursor:pointer;box-shadow:0 14px 30px rgba(58,38,32,.1);transform:rotate(-.6deg);transition:transform .2s ease}
+.gift:hover{transform:rotate(0) translateY(-2px)}
+.gift .cov{flex:0 0 auto;width:92px;transform:rotate(-5deg);box-shadow:0 10px 20px rgba(58,38,32,.25);border:4px solid #fff;position:relative}
+.gift .cov img{display:block;width:100%;height:auto}
+.gift .cov::before{content:"";position:absolute;width:46px;height:15px;background:rgba(231,196,174,.85);top:-9px;left:50%;margin-left:-23px;transform:rotate(4deg)}
+.gift .note{font-family:var(--hand);font-size:14.5px;color:var(--wine)}
+.gift strong{display:block;font-family:var(--serif);font-weight:400;font-size:27px;line-height:1.08;color:var(--earth);margin-top:4px}
+.gift small{display:block;font-size:14px;color:var(--brown);margin-top:6px;line-height:1.45}
+.gift .go{display:inline-block;margin-top:10px;font-size:14.5px;font-weight:500;color:var(--wine-deep);border-bottom:1.5px solid var(--rose)}
+
+/* Brief */
+.letter{position:relative;margin-top:44px;padding:34px 24px 30px;border-radius:30px;background:var(--wine);color:var(--cream);overflow:hidden}
+.letter::after{content:"";position:absolute;width:180px;height:180px;right:-70px;bottom:-80px;border-radius:var(--blob);background:rgba(231,196,174,.16)}
+.letter>*{position:relative;z-index:1}
+.letter .hello{font-family:var(--hand);font-size:24px;color:var(--blush)}
+.letter p{margin-top:12px;font-size:16.5px;line-height:1.65;color:#F5E8DD}
+.letter .sig{font-family:var(--hand);font-size:17px;color:var(--blush);margin-top:16px;transform:rotate(-1.5deg)}
+.letter .mini{float:right;width:110px;margin:4px 0 10px 16px;padding:6px 6px 26px;transform:rotate(4deg)}
+.letter .mini .ph{height:110px;overflow:hidden}
+.letter .mini .cap{font-size:12px;bottom:5px}
+
+/* Affirmation */
+.affirm{margin-top:18px;padding:30px 22px;border-radius:30px;background:var(--earth);color:var(--cream);text-align:center;position:relative;overflow:hidden}
+.affirm .k{font-size:11.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--rose)}
+.affirm .big{font-family:var(--serif);font-size:32px;line-height:1.15;margin-top:10px}
+.affirm .hand{font-size:19px;color:var(--blush);margin-top:8px;transform:rotate(-2deg)}
+.affirm svg{position:absolute;opacity:.9}
+
 /* Anmeldung */
-.join{position:relative;margin-top:34px;padding:30px 24px 24px;border-radius:34px;background:rgba(251,244,236,.95);border:1.5px solid var(--line);box-shadow:0 18px 40px rgba(103,48,30,.1);scroll-margin-top:24px;overflow:hidden}
-.join::before{content:"";position:absolute;width:150px;height:150px;right:-56px;top:-56px;border-radius:var(--blob);background:var(--blush);opacity:.55}
-.join>*{position:relative}
+.join{position:relative;margin-top:44px;padding:34px 22px 24px;border-radius:30px;background:#FFFBF6;border:1.5px solid var(--line);box-shadow:0 18px 40px rgba(103,48,30,.1);scroll-margin-top:20px}
+.join .tape{top:-13px}
 .join h2{font-family:var(--serif);font-weight:400;font-size:33px;line-height:1.1;color:var(--wine-deep);text-align:center}
-.join p.intro{text-align:center;color:var(--ink-soft);margin-top:10px;font-size:16.5px}
+.join p.intro{text-align:center;color:var(--brown);margin-top:10px;font-size:16.5px}
+.join .psst{text-align:center;font-family:var(--hand);font-size:14.5px;color:var(--wine);margin-top:10px}
 .join form{display:flex;flex-direction:column;gap:12px;margin-top:20px}
-.join label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-soft)}
-.join input[type=text],.join input[type=email]{font:inherit;font-size:17px;padding:14px 18px;border-radius:18px;border:1.5px solid var(--line);background:#FFFBF7;color:var(--ink)}
+.join label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--brown)}
+.join input[type=text],.join input[type=email]{font:inherit;font-size:17px;padding:14px 18px;border-radius:18px;border:1.5px solid var(--line);background:var(--cream);color:var(--ink)}
 .join input:focus{outline:2px solid var(--blush);outline-offset:1px;border-color:var(--wine)}
-.consent{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;color:var(--ink-soft)}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;color:var(--brown)}
 .consent input{margin-top:3px;width:18px;height:18px;accent-color:var(--wine);flex:0 0 auto}
 .join button{font:inherit;font-weight:500;font-size:17px;padding:16px 22px;border-radius:999px;border:0;background:var(--wine);color:#FBF1EA;cursor:pointer;margin-top:4px}
 .join button:disabled{opacity:.6;cursor:wait}
@@ -100,39 +124,46 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10vw,58px);line
 .msg.err{color:var(--wine)}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 
-/* Fuß mit Welle */
-.wave{position:relative;z-index:1;margin-top:34px;line-height:0}
+/* Fuß */
+.wave{position:relative;z-index:1;margin-top:40px;line-height:0}
 .wave svg{display:block;width:100%;height:70px}
-.foot{position:relative;z-index:1;background:var(--oat);text-align:center;font-size:13px;line-height:1.7;color:var(--ink-soft);padding:6px 16px max(26px,env(safe-area-inset-bottom))}
-.foot a{color:var(--ink-soft)}
+.foot{position:relative;z-index:1;background:var(--oat);text-align:center;font-size:13px;line-height:1.7;color:var(--brown);padding:6px 16px max(26px,env(safe-area-inset-bottom))}
+.foot a{color:var(--brown)}
 .foot .in{max-width:640px;margin:0 auto}
+.foot .bye{font-family:var(--hand);font-size:16px;color:var(--wine);margin-bottom:8px}
 .foot details{margin-top:12px;text-align:left;background:rgba(251,244,236,.7);border-radius:18px;padding:10px 16px}
 .foot summary{cursor:pointer;text-align:center;list-style:none}
 .foot summary::-webkit-details-marker{display:none}
 .foot details p{margin-top:8px}
 
-@media (max-width:640px){.swirl .desk{display:none}.by{font-size:20px}}
+@media (max-width:640px){.swirl .desk{display:none}}
 @media (min-width:900px){
   body{font-size:18px}
-  .page{max-width:720px;padding-top:60px}
-  .arch{width:200px;height:244px}
+  .page{max-width:720px;padding-top:56px}
+  .head .polaroid{width:250px}.head .polaroid .ph{height:250px}
   .btn{font-size:18.5px;padding:18px 24px}
   .lead{font-size:20px}
+  .gift{padding:26px 28px}.gift .cov{width:110px}.gift strong{font-size:31px}
+  .letter{padding:44px 40px 38px}.letter p{font-size:18px}.letter .mini{width:140px}.letter .mini .ph{height:140px}
 }
-@media (prefers-reduced-motion:reduce){.bg span,.swirl span{animation:none}.btn{transition:none}.btn:hover{transform:none}}
+@media (prefers-reduced-motion:reduce){.bg span,.swirl span{animation:none}.btn,.gift{transition:none}}
 </style>
 </head>
 <body>
 
-<div class="bg" aria-hidden="true"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+<div class="bg" aria-hidden="true"><span class="a"></span><span class="b"></span></div>
 <div class="swirl" id="swirl" aria-hidden="true"></div>
 
 <main class="page">
   <header class="head">
-    <div class="arch"><img src="/img/wildhearts/viv-stretch.jpg" alt="Viv, founder of the Wild Hearts Collective" width="320" height="320"></div>
-    <div class="moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></div>
-    <p class="by">with Viv, from the Austrian Alps</p>
+    <figure class="polaroid">
+      <span class="tape" aria-hidden="true"></span>
+      <div class="ph"><img src="/img/wildhearts/viv-stretch.jpg" alt="Viv stretching on her mat at home" width="534" height="534"></div>
+      <figcaption class="cap">hi, I'm Viv ♡</figcaption>
+    </figure>
+    <p class="hey">hey you, come in ♡</p>
     <h1>The Wild Hearts Collective</h1>
+    <p class="by">a circle for women</p>
     <p class="lead">For women who want more than just functioning. <em>Move your body, your life, your ideas</em>, and come back to yourself, together.</p>
   </header>
 
@@ -142,11 +173,17 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10vw,58px);line
       <span class="tx">Join the Wild Hearts Collective<small>Our free community channel on Instagram</small></span>
       <span class="ar" aria-hidden="true">→</span>
     </a>
-    <button class="btn" type="button" data-join="reset">
-      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></span>
-      <span class="tx"><span>Reset Routine for Tired Days <span class="tag">soon</span></span><small>Be the first to get it, free</small></span>
-      <span class="ar" aria-hidden="true">→</span>
+
+    <button class="gift" type="button" data-join="reset">
+      <span class="cov"><img src="/img/wildhearts/reset-cover-en.jpg" alt="" width="440" height="624"></span>
+      <span>
+        <span class="note">my little gift for you</span>
+        <strong>Reset Routine for Tired Days</strong>
+        <small>Ten quiet minutes for the evenings you gave everything away. Free, in English and Deutsch.</small>
+        <span class="go">Send it to me →</span>
+      </span>
     </button>
+
     <button class="btn" type="button" data-join="circle">
       <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/></svg></span>
       <span class="tx"><span>The Inner Circle <span class="tag">2027</span></span><small>Circles, guidance and 1:1 mentoring · join the waitlist</small></span>
@@ -159,9 +196,27 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10vw,58px);line
     </a>
   </nav>
 
+  <section class="letter" aria-label="A few words from Viv">
+    <figure class="polaroid mini"><div class="ph"><img src="/img/wildhearts/fenster-quadrat.jpg" alt="Viv stretching at her window" width="1284" height="1284" loading="lazy"></div><figcaption class="cap">my spot</figcaption></figure>
+    <p class="hello">Dear wild heart,</p>
+    <p>you are always there for everyone else. You hold it all together, you manage, you remember everything, and somewhere along the way it's easy to forget yourself.</p>
+    <p>That's exactly why the Wild Hearts Collective exists. So you never forget that you are a whole person too. This is your place, a place where you don't get lost.</p>
+    <p class="sig">we matter. we are here. and we are seen. ♡ Viv</p>
+  </section>
+
+  <section class="affirm" aria-label="Affirmation">
+    <svg style="left:18px;top:16px" width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4c2 15 12 25 28 28-16 3-26 13-28 28-2-15-12-25-28-28 16-3 26-13 28-28z" fill="#C98B78"/></svg>
+    <svg style="right:20px;top:18px" width="34" height="34" viewBox="0 0 120 120" aria-hidden="true"><path d="M80 18a42 42 0 1 0 22 62A34 34 0 0 1 80 18z" fill="#E7C4AE"/></svg>
+    <p class="k">for tonight</p>
+    <p class="big">I am allowed to rest.</p>
+    <p class="hand">and I'm allowed to want more.</p>
+  </section>
+
   <section class="join" id="join" aria-labelledby="join-title">
-    <h2 id="join-title">Be the first to know</h2>
-    <p class="intro" id="join-intro">Get the Reset Routine for Tired Days as soon as it's ready, plus invitations to our live Wild Hearts Gatherings and first news about the Inner Circle.</p>
+    <span class="tape" aria-hidden="true"></span>
+    <h2 id="join-title">Come a little closer</h2>
+    <p class="intro" id="join-intro">Get the Reset Routine for Tired Days for free, plus invitations to our live Wild Hearts Gatherings and first news about the Inner Circle.</p>
+    <p class="psst">psst… our first live Gathering is in December, in the dark, cosy time of the year.</p>
     <form id="join-form" novalidate>
       <label class="f">First name<input type="text" name="name" autocomplete="given-name" required maxlength="80"></label>
       <label class="f">Email<input type="email" name="email" autocomplete="email" required maxlength="160"></label>
@@ -173,9 +228,10 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10vw,58px);line
   </section>
 </main>
 
-<div class="wave" aria-hidden="true"><svg viewBox="0 0 1200 70" preserveAspectRatio="none"><path d="M0 40C150 10 300 10 450 32S750 68 900 44 1100 14 1200 26V70H0Z" fill="#E4D2BF"/></svg></div>
+<div class="wave" aria-hidden="true"><svg viewBox="0 0 1200 70" preserveAspectRatio="none"><path d="M0 40C150 10 300 10 450 32S750 68 900 44 1100 14 1200 26V70H0Z" fill="#E8D7C4"/></svg></div>
 <footer class="foot">
   <div class="in">
+    <p class="bye">with love from the mountains ♡</p>
     <p>The Wild Hearts Collective · by Movecia · Vivien Malonga<br><a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a></p>
     <details>
       <summary>Imprint &amp; privacy</summary>
@@ -198,6 +254,7 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10vw,58px);line
     moon: `<path d="M44 8a26 26 0 1 0 12 34A20 20 0 0 1 44 8z" fill="${C.b}"/><circle cx="26" cy="30" r="3" fill="${C.s}"/><circle cx="34" cy="44" r="2" fill="${C.s}"/>`,
     star: `<path d="M32 4c2 15 12 25 28 28-16 3-26 13-28 28-2-15-12-25-28-28 16-3 26-13 28-28z" fill="${C.r}"/>`,
     sparkle: `<path d="M32 10c1.5 10 8 16.5 18 18-10 1.5-16.5 8-18 18-1.5-10-8-16.5-18-18 10-1.5 16.5-8 18-18z" fill="${C.k}" opacity=".7"/>`,
+    heart: `<path d="M32 54S10 40 10 24a11 11 0 0 1 22-4 11 11 0 0 1 22 4c0 16-22 30-22 30z" fill="${C.r}" opacity=".85"/>`,
     snow: `<g stroke="${C.k}" stroke-width="3" stroke-linecap="round"><path d="M32 6v52M9 19l46 26M9 45l46-26"/></g>`,
     tree: `<path d="M32 4l14 18h-7l11 14h-7l11 14H10l11-14h-7l11-14h-7z" fill="${C.g}"/><rect x="28" y="50" width="8" height="10" fill="${C.k}"/>`,
     sprout: `<path d="M32 58V30" stroke="${C.k}" stroke-width="3" stroke-linecap="round"/><path d="M32 32C30 18 20 12 8 14c1 12 11 19 24 18zM32 26c2-12 12-18 24-16-1 12-11 18-24 16z" fill="${C.g}"/>`,
@@ -205,18 +262,17 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10vw,58px);line
     sun: `<circle cx="32" cy="32" r="12" fill="${C.r}"/><g stroke="${C.b}" stroke-width="4" stroke-linecap="round"><path d="M32 4v8M32 52v8M4 32h8M52 32h8M12 12l6 6M46 46l6 6M12 52l6-6M46 18l6-6"/></g>`
   };
   const m = new Date().getMonth() + 1;
-  const season = m >= 3 && m <= 5 ? ['sprout', 'flower', 'moon', 'sparkle', 'leaf2'] : m >= 6 && m <= 8 ? ['sun', 'flower', 'moon', 'sparkle', 'leaf2'] : m >= 9 && m <= 11 ? ['leaf', 'leaf2', 'leaf3', 'acorn', 'mushroom', 'moon', 'star', 'sparkle'] : ['snow', 'tree', 'moon', 'star', 'sparkle'];
-  // Plätze nur am Rand, damit nie Text verdeckt wird; „desk“ nur auf großen Bildschirmen
+  const season = m >= 3 && m <= 5 ? ['sprout', 'flower', 'moon', 'heart', 'leaf2'] : m >= 6 && m <= 8 ? ['sun', 'flower', 'moon', 'heart', 'leaf2'] : m >= 9 && m <= 11 ? ['leaf', 'leaf2', 'heart', 'acorn', 'mushroom', 'moon', 'star', 'leaf3'] : ['snow', 'tree', 'moon', 'heart', 'star', 'sparkle'];
   const spots = [
-    [3, 6, 54, ''], [86, 4, 46, ''], [6, 30, 40, 'desk'], [90, 24, 58, 'desk'], [2, 52, 48, ''], [88, 46, 42, ''],
-    [12, 70, 56, 'desk'], [84, 66, 50, 'desk'], [4, 86, 38, ''], [90, 84, 46, ''], [20, 14, 34, 'desk'], [76, 90, 36, 'desk']
+    [3, 6, 50, ''], [86, 4, 44, ''], [6, 30, 40, 'desk'], [90, 24, 54, 'desk'], [2, 52, 44, ''], [88, 46, 40, ''],
+    [12, 70, 52, 'desk'], [84, 66, 46, 'desk'], [4, 86, 36, ''], [90, 84, 42, ''], [20, 14, 32, 'desk'], [76, 90, 34, 'desk']
   ];
   const box = document.getElementById('swirl');
+  const small = window.innerWidth < 640;
   spots.forEach(([x, y, size, cls], i) => {
     const s = document.createElement('span');
     if (cls) s.className = cls;
-    const small = window.innerWidth < 640;
-    if (small) { if (x < 50) s.style.left = '-14px'; else s.style.right = '-14px'; s.style.opacity = '.75'; }
+    if (small) { if (x < 50) s.style.left = '-14px'; else s.style.right = '-14px'; s.style.opacity = '.7'; }
     else s.style.left = x + '%';
     s.style.top = y + '%';
     s.style.width = s.style.height = (small ? Math.round(size * 0.72) : size) + 'px';
@@ -236,8 +292,8 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10vw,58px);line
   const intro = document.getElementById('join-intro');
   const loaded = Date.now();
   const texts = {
-    reset: ['Get the Reset Routine first', 'The Reset Routine for Tired Days is almost ready. Leave your name and email and it lands in your inbox the moment it is, together with invitations to our live Wild Hearts Gatherings.'],
-    circle: ['Join the Inner Circle waitlist', 'The Inner Circle opens in early 2027: monthly circles, guidance for the ideas you carry around, and 1:1 mentoring with me. Join the waitlist and you will hear about it before anyone else.']
+    reset: ['Your Reset Routine', 'Leave your first name and email. Once you have confirmed your address, the Reset Routine for Tired Days lands in your inbox, and you choose English or Deutsch.'],
+    circle: ['Join the Inner Circle waitlist', 'The Inner Circle opens in 2027: monthly circles, guidance for the ideas you carry around, and 1:1 mentoring with me. Join the waitlist and you will hear about it before anyone else.']
   };
   document.querySelectorAll('[data-join]').forEach(b => b.addEventListener('click', () => {
     const t = texts[b.dataset.join];
@@ -245,6 +301,7 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10vw,58px);line
     document.getElementById('join').scrollIntoView({behavior: 'smooth', block: 'start'});
     setTimeout(() => form.elements.name.focus({preventScroll: true}), 500);
   }));
+  if (location.hash === '#reset') document.querySelector('[data-join="reset"]').click();
   const show = (text, err) => { msg.hidden = false; msg.textContent = text; msg.classList.toggle('err', !!err); };
   form.addEventListener('submit', async e => {
     e.preventDefault();
@@ -267,7 +324,8 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10vw,58px);line
       const j = await r.json().catch(() => ({}));
       if (!r.ok || j.success === false) throw new Error('signup');
       form.querySelectorAll('label, button').forEach(el => el.hidden = true);
-      show('Thank you, ' + name + '! Please check your inbox and confirm your email address. Only then you are on the list. 🤍');
+      document.querySelector('.psst').hidden = true;
+      show('Thank you, ' + name + '! Please check your inbox now and confirm your email address with one click. Right after that, your Reset Routine is on its way. 🤍');
     } catch (err) {
       btn.disabled = false;
       show('That did not work just now. Please try again in a moment or write to hello@moveciamovement.com.', true);
