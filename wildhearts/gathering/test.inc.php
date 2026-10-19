@@ -161,6 +161,13 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     <div class="ublist" id="ublist"></div>
     <div class="row"><button type="button" class="ghost" id="ubadd">+ Fenster</button></div>
     <label class="f" style="margin-top:16px">Name des Calls (steht oben im Raum und im Dateinamen der Aufnahme)<input id="ubtitle" type="text" maxlength="80" placeholder="z. B. Wild Hearts Gathering · Dezember" style="font:inherit;font-size:16px;padding:11px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--cream)"></label>
+    <h3 style="font-size:18px;font-weight:500;margin-top:18px;color:var(--wine-deep)">Angebot üben</h3>
+    <p class="tip">Mit „✦ Angebot zeigen“ in der Übung erscheint die Angebotskarte wie im echten Raum. Danach kommen so viele Buchungen in den Chat, wie du hier einstellst, damit du üben kannst, dich zu bedanken. Das gibt es nur in der Übung.</p>
+    <div class="row">
+      <label class="f" style="flex:1 1 220px">Angebot<select id="ubsale"><?php foreach ($offers as $k => $o): ?><option value="<?= $h($k) ?>"><?= $h($o['title']) ?></option><?php endforeach; ?></select></label>
+      <label class="f" style="flex:0 1 150px">Wie viele buchen?<select id="ubsalen"><?php foreach ([0, 1, 2, 3, 4, 5, 6] as $n): ?><option<?= $n === 2 ? ' selected' : '' ?>><?= $n ?></option><?php endforeach; ?></select></label>
+      <label class="f" style="flex:0 1 150px">innerhalb von<select id="ubsalet"><option value="60">1 Minute</option><option value="180" selected>3 Minuten</option><option value="300">5 Minuten</option></select></label>
+    </div>
     <h3 style="font-size:18px;font-weight:500;margin-top:18px;color:var(--wine-deep)">Übungsfragen</h3>
     <p class="tip">Eine Frage pro Zeile. Die Fragen kommen während der Übung wie Nachrichten in den Chat rechts, und das fragende Fenster hebt die Hand. Es können mehrere Fragen gleichzeitig offen sein, „Beantwortet ✓“ hakt immer die älteste ab. Schreibst du „Anna: …“ davor, fragt genau dieses Fenster, sonst ein zufälliges.</p>
     <p class="tip"><strong>Feste Zeitpunkte:</strong> Mit „10 Min:“ am Anfang kommt die Frage genau 10 Minuten nach Beginn der Übung, zum Beispiel „10 Min: Sophie: How do you find time for yourself?“. So kannst du dein Gathering durchplanen. Fragen ohne Zeit kommen zwischendurch, wenn du „Nächste Frage“ tippst oder wie unten eingestellt. Die Liste wird automatisch gespeichert, auch für deine anderen Geräte.</p>
@@ -240,7 +247,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 <?php endif; ?>
 <?php if (!$guest && !$gath): ?>
 <div class="practice" id="practice" hidden>
-  <div class="pbar"><span>Übung · <span id="ubttl"></span> · <span id="ubclock"></span></span><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="ubnext">Nächste Frage</button><button type="button" id="ubdone" hidden>Beantwortet ✓</button><button type="button" id="ubrec">● Übung aufnehmen</button><button type="button" id="ubprompt">Teleprompter</button><button type="button" id="ubclose">Schließen</button></span></div>
+  <div class="pbar"><span>Übung · <span id="ubttl"></span> · <span id="ubclock"></span></span><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="uboffer">✦ Angebot zeigen</button><button type="button" id="ubnext">Nächste Frage</button><button type="button" id="ubdone" hidden>Beantwortet ✓</button><button type="button" id="ubrec">● Übung aufnehmen</button><button type="button" id="ubprompt">Teleprompter</button><button type="button" id="ubclose">Schließen</button></span></div>
   <canvas id="ubcv" width="1920" height="1080"></canvas>
   <form class="pask" id="ubask"><select id="ubwho" aria-label="Wer fragt"></select><input id="ubtxt" type="text" placeholder="Neue Frage, die dir gerade einfällt …" maxlength="300" autocomplete="off"><button type="submit">Jetzt senden</button><button type="button" id="ublater" class="ghost">Für später</button></form>
 </div>
@@ -543,6 +550,52 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
         o.connect(gn).connect(c.destination); o.start(t); o.stop(t + 0.4); setTimeout(() => c.close(), 600);
       } catch (e) {}
     };
+    // --- Angebot und Buchungen in der Übung (nur lokal) ---
+    const OFFERS = <?= json_encode(array_map(fn($o) => ['title' => $o['title'], 'text' => $o['text'], 'reg' => $o['price_cents'], 'sp' => $o['special_cents'], 'min' => $o['minutes'], 'mon' => $o['billing'] === 'monthly'], $offers), JSON_UNESCAPED_UNICODE) ?>;
+    let uOffer = null, saleTimers = [];
+    const eur = c => '€' + (c / 100).toLocaleString('en-US', {maximumFractionDigits: 2});
+    const showOffer = () => {
+      saleTimers.forEach(clearTimeout); saleTimers = [];
+      if (uOffer) { uOffer = null; $('uboffer').textContent = '✦ Angebot zeigen'; return; }
+      const k = $('ubsale').value, o = OFFERS[k]; if (!o) return;
+      uOffer = Object.assign({key: k, at: performance.now()}, o);
+      $('uboffer').textContent = '✦ Angebot ausblenden';
+      const n = +$('ubsalen').value, span = +$('ubsalet').value * 1000;
+      const pool = rows.map((r, i) => i).sort(() => Math.random() - 0.5).slice(0, n);
+      pool.forEach((who, j) => saleTimers.push(setTimeout(() => {
+        const nm = rows[who] ? rows[who].name.trim() || 'Someone' : 'Someone';
+        const verb = k === 'year' ? 'applied for' : 'booked';
+        const now = new Date(), time = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        qMsgs.push({who: -2, sale: true, text: '🎉 ' + nm + ' ' + verb + ' ' + o.title, at: performance.now(), time, done: true});
+        pling(); setTimeout(pling, 160);
+      }, 6000 + (span - 6000) * (j + Math.random() * 0.8) / Math.max(1, n))));
+    };
+    const drawOffer = (GW, H) => {
+      if (!uOffer) return;
+      const o = uOffer, w = 470, x = GW - w - 22, now = performance.now(), age = Math.min(1, (now - o.at) / 450), ease = 1 - Math.pow(1 - age, 3);
+      const live = o.sp > 0 && o.sp < o.reg, leftMs = Math.max(0, o.min * 60000 - (now - o.at)), sec = Math.ceil(leftMs / 1000);
+      g.font = '400 18px Outfit, system-ui, sans-serif'; const ls = wrap(o.text, w - 48).slice(0, 4);
+      const h = 120 + ls.length * 26 + 70 + (live ? 46 : 0) + 64, y = H - h - 22 + (1 - ease) * 30;
+      g.save(); g.globalAlpha = ease; g.shadowColor = 'rgba(20,18,12,.4)'; g.shadowBlur = 30; g.shadowOffsetY = 12;
+      g.fillStyle = '#F6F3EA'; rr(x, y, w, h, 26); g.fill(); g.shadowColor = 'transparent';
+      g.fillStyle = '#5E6B35'; g.font = '400 19px Hand, cursive'; g.fillText(live ? 'just for you tonight ♡' : 'when you are ready ♡', x + 24, y + 40);
+      g.fillStyle = '#3F4A26'; g.font = '400 36px Italiana, Georgia, serif'; g.fillText(o.title, x + 24, y + 86);
+      g.fillStyle = '#6B5D4C'; g.font = '400 18px Outfit, system-ui, sans-serif'; ls.forEach((l, i) => g.fillText(l, x + 24, y + 120 + i * 26));
+      let yy = y + 120 + ls.length * 26 + 30;
+      const per = o.mon ? ' / month' : '';
+      if (live && sec > 0) {
+        g.fillStyle = '#9A9282'; g.font = '400 20px Outfit, system-ui, sans-serif'; const rt = eur(o.reg) + per; g.fillText(rt, x + 24, yy); const rw = g.measureText(rt).width;
+        g.strokeStyle = '#9A9282'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x + 24, yy - 7); g.lineTo(x + 24 + rw, yy - 7); g.stroke();
+        g.fillStyle = '#3F4A26'; g.font = '500 34px Outfit, system-ui, sans-serif'; g.fillText(eur(o.sp) + per, x + 36 + rw, yy + 2);
+        yy += 30; g.fillStyle = '#DCE0D2'; rr(x + 24, yy, 300, 36, 18); g.fill();
+        g.fillStyle = '#3F4A26'; g.font = '500 17px Outfit, system-ui, sans-serif'; g.fillText('Gathering price ends in ' + Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'), x + 40, yy + 24); yy += 46;
+      } else {
+        g.fillStyle = '#3F4A26'; g.font = '500 34px Outfit, system-ui, sans-serif'; g.fillText(eur(o.reg) + per, x + 24, yy + 2); yy += 16;
+      }
+      g.fillStyle = '#5E6B35'; rr(x + 24, yy + 8, w - 48, 50, 25); g.fill();
+      g.fillStyle = '#F6F3EA'; g.font = '500 19px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('Book now · ' + eur(live && sec > 0 ? o.sp : o.reg), x + w / 2, yy + 40); g.textAlign = 'start';
+      g.restore();
+    };
     const openCount = () => qMsgs.filter(m => !m.done && m.who >= 0).length;
     const qSync = () => { const n = openCount(); $('ubdone').hidden = !n; $('ubdone').textContent = n > 1 ? 'Beantwortet ✓ (' + n + ' offen)' : 'Beantwortet ✓'; };
     const qPush = q => {
@@ -570,6 +623,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       }, t * 1000 * (0.7 + Math.random() * 0.6));
     };
     $('ubnext').onclick = qNext;
+    $('uboffer').onclick = showOffer;
     const askAdd = later => {
       const t = $('ubtxt').value.trim(); if (!t) return;
       const q = {who: +$('ubwho').value, text: t, at: -1};
@@ -616,6 +670,13 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       let yb = H - 14;
       for (let i = qMsgs.length - 1; i >= 0 && yb > 64; i--) {
         const m = qMsgs[i], age = now - m.at, k = Math.min(1, age / 260), ease = 1 - Math.pow(1 - k, 3);
+        if (m.sale) {
+          g.font = '500 18px Outfit, system-ui, sans-serif';
+          const ls2 = wrap(m.text, pw - 90), bw2 = Math.min(pw - 40, Math.max(...ls2.map(l => g.measureText(l).width)) + 36), bh2 = 22 + ls2.length * 24, bx2 = x0 + (pw - bw2) / 2; yb -= bh2;
+          g.save(); g.globalAlpha = ease; g.translate(bx2 + bw2 / 2, yb + bh2 / 2); g.scale(0.8 + 0.2 * ease, 0.8 + 0.2 * ease); g.translate(-(bx2 + bw2 / 2), -(yb + bh2 / 2));
+          g.fillStyle = '#5E6B35'; rr(bx2, yb, bw2, bh2, 16); g.fill(); g.fillStyle = '#F6F3EA';
+          ls2.forEach((l, j) => g.fillText(l, bx2 + 18, yb + 28 + j * 24)); g.restore(); yb -= 12; continue;
+        }
         if (m.who < 0) {
           g.font = '400 16px Outfit, system-ui, sans-serif';
           const tw2 = g.measureText(m.text).width + 28, bx = x0 + (pw - tw2) / 2, bh = 32; yb -= bh;
@@ -721,6 +782,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
           }
         }
       }
+      drawOffer(GW, H);
       drawChat(GW, W, H);
       g.restore();
       uRaf = requestAnimationFrame(frame);
@@ -733,7 +795,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       catch (e) { alert('Kein Zugriff auf Kamera oder Mikro. Bitte im Browser erlauben.'); return; }
       cam.srcObject = uStream; cam.play().catch(() => {});
       PR.hidden = false; document.body.style.overflow = 'hidden'; frame(); $('ubttl').textContent = callTitle();
-      qPrep(); qMsgs = []; qSync(); qLoop();
+      qPrep(); qMsgs = []; qSync(); qLoop(); uOffer = null; $('uboffer').textContent = '✦ Angebot zeigen';
       qStart = performance.now(); clearInterval(qClock);
       qClock = setInterval(() => {
         const el = performance.now() - qStart;
@@ -747,7 +809,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       cancelAnimationFrame(uRaf);
       if (uStream) uStream.getTracks().forEach(t => t.stop());
       uStream = null; PR.hidden = true; document.body.style.overflow = '';
-      clearTimeout(qTimer); clearInterval(qClock); qMsgs = [];
+      clearTimeout(qTimer); clearInterval(qClock); qMsgs = []; saleTimers.forEach(clearTimeout); uOffer = null;
       if (P) { window.hidePrompter(); document.body.appendChild(P); }
     };
     $('ubclose').onclick = closeU;
