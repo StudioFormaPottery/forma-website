@@ -121,7 +121,15 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     <h2><span class="step">✦</span>Übungsansicht</h2>
     <p class="tip">Zum Üben vor einem vollen Kreis: dein echtes Kamerabild und dazu Fenster mit Namen, als hätten die Frauen ihre Kamera aus. Diese Fenster gibt es nur hier auf deinem Bildschirm, im echten Raum tauchen sie nie auf. Mit der Aufnahme kannst du dir danach ansehen, wie du wirkst. Hintergrundbilder wählst du von deinem Gerät, hochgeladen wird nichts.</p>
     <div class="ublist" id="ublist"></div>
-    <div class="row"><button type="button" class="ghost" id="ubadd">+ Fenster</button><button type="button" id="ubopen">Übungsansicht öffnen</button></div>
+    <div class="row"><button type="button" class="ghost" id="ubadd">+ Fenster</button></div>
+    <h3 style="font-size:18px;font-weight:500;margin-top:18px;color:var(--wine-deep)">Übungsfragen</h3>
+    <p class="tip">Eine Frage pro Zeile. Die Fragen kommen während der Übung aus den Fenstern: Das fragende Fenster leuchtet auf und die Frage steht groß bei dir. Schreibst du „Anna: …“ davor, fragt genau dieses Fenster, sonst ein zufälliges.</p>
+    <textarea id="ubq" style="min-height:160px"></textarea>
+    <div class="row">
+      <label class="f" style="flex:0 1 260px">Fragen kommen<select id="ubqmode"><option value="0">wenn ich auf „Nächste Frage“ tippe</option><option value="60">etwa jede Minute</option><option value="120">etwa alle 2 Minuten</option><option value="180">etwa alle 3 Minuten</option></select></label>
+      <label class="chk" style="align-self:flex-end;display:flex;gap:8px;align-items:center;font-size:15px;color:var(--brown)"><input type="checkbox" id="ubqmix" checked style="width:18px;height:18px;accent-color:var(--wine)"> zufällige Reihenfolge</label>
+    </div>
+    <div class="row"><button type="button" id="ubopen">Übungsansicht öffnen</button></div>
   </section>
 <?php endif; ?>
 <?php if (!$guest): ?>
@@ -153,7 +161,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 <?php endif; ?>
 <?php if (!$guest && !$gath): ?>
 <div class="practice" id="practice" hidden>
-  <div class="pbar"><span>Übungsansicht · nur auf deinem Bildschirm</span><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="ubrec">● Übung aufnehmen</button><button type="button" id="ubprompt">Teleprompter</button><button type="button" id="ubclose">Schließen</button></span></div>
+  <div class="pbar"><span>Übungsansicht · nur auf deinem Bildschirm</span><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="ubnext">Nächste Frage</button><button type="button" id="ubdone" hidden>Beantwortet ✓</button><button type="button" id="ubrec">● Übung aufnehmen</button><button type="button" id="ubprompt">Teleprompter</button><button type="button" id="ubclose">Schließen</button></span></div>
   <canvas id="ubcv" width="1280" height="720"></canvas>
 </div>
 <?php endif; ?>
@@ -379,6 +387,35 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     $('ubadd').onclick = () => { if (rows.length >= 11) return; rows.push({name: DEF[rows.length % DEF.length], color: SW[rows.length % SW.length]}); store(); draw(); };
     draw();
 
+    const QDEF = ["Hi Viv! Where are you joining from today?", "How do you find time for yourself with four kids?", "What do you do on days when you feel you got nothing done?", "I always feel guilty when I take time for myself. How do I stop that?", "Is this circle also for women without children?", "How long have you been doing this?", "What exactly happens in The Inner Circle, and what does it cost?", "Can I join the Alpine Retreat with my partner?", "I'm new here and a bit shy. Do I have to turn my camera on?", "What is one small thing I can do tomorrow morning?", "Do you ever feel like giving up?", "Will there be a recording of today?"];
+    const ta2 = $('ubq'), qm = $('ubqmode'), qx = $('ubqmix');
+    try { ta2.value = localStorage.getItem('wh-fragen') ?? QDEF.join('\n'); qm.value = localStorage.getItem('wh-fragen-takt') || '0'; } catch (e) { ta2.value = QDEF.join('\n'); }
+    ta2.oninput = () => { try { localStorage.setItem('wh-fragen', ta2.value); } catch (e) {} };
+    qm.onchange = () => { try { localStorage.setItem('wh-fragen-takt', qm.value); } catch (e) {} };
+    let qList = [], qAct = null, qTimer = 0, qAt = 0;
+    const qPrep = () => {
+      qList = ta2.value.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+        const m = l.match(/^([^:?!.]{1,30}):\s*(.+)$/);
+        const who = m ? rows.findIndex(r => r.name.trim().toLowerCase() === m[1].trim().toLowerCase()) : -1;
+        return {who, text: m && who >= 0 ? m[2] : l};
+      });
+      if (qx.checked) for (let i = qList.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [qList[i], qList[j]] = [qList[j], qList[i]]; }
+    };
+    const qNext = () => {
+      if (!rows.length) return;
+      if (!qList.length) { qAct = {who: -1, text: 'Das waren alle Übungsfragen ♡'}; }
+      else { const q = qList.shift(); qAct = {who: q.who >= 0 ? q.who : Math.floor(Math.random() * rows.length), text: q.text}; }
+      qAt = performance.now(); $('ubdone').hidden = false;
+    };
+    const qDone = () => {
+      qAct = null; $('ubdone').hidden = true;
+      clearTimeout(qTimer);
+      const t = +qm.value; if (t && !PR.hidden) qTimer = setTimeout(() => { qNext(); }, t * 1000 * (0.75 + Math.random() * 0.5));
+    };
+    $('ubnext').onclick = () => { clearTimeout(qTimer); qNext(); };
+    $('ubdone').onclick = qDone;
+    const wrap = (t, maxW) => { const out = []; let line = ''; t.split(' ').forEach(w => { const tryL = line ? line + ' ' + w : w; if (g.measureText(tryL).width > maxW && line) { out.push(line); line = w; } else line = tryL; }); if (line) out.push(line); return out; };
+
     const PR = $('practice'), cv = $('ubcv'), g = cv.getContext('2d');
     const cam = document.createElement('video'); cam.muted = true; cam.playsInline = true;
     let uStream = null, uRaf = 0, uRec = null, uChunks = [], uT0 = 0;
@@ -399,12 +436,13 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     const frame = () => {
       const n = rows.length + 1, W = cv.width, H = cv.height, gap = 12;
       const c = n <= 2 ? n : n <= 4 ? 2 : n <= 9 ? 3 : 4, rws = Math.ceil(n / c);
-      const tw = Math.min((W - gap * (c + 1)) / c, ((H - gap * (rws + 1)) / rws) * 16 / 9), th = tw * 9 / 16;
+      const AH = qAct ? H - 190 : H;
+      const tw = Math.min((W - gap * (c + 1)) / c, ((AH - gap * (rws + 1)) / rws) * 16 / 9), th = tw * 9 / 16;
       g.fillStyle = '#1F1C16'; g.fillRect(0, 0, W, H);
       for (let k = 0; k < n; k++) {
         const row = Math.floor(k / c), inRow = row === rws - 1 ? n - row * c : c;
         const x = (W - (inRow * tw + (inRow - 1) * gap)) / 2 + (k - row * c) * (tw + gap);
-        const y = (H - (rws * th + (rws - 1) * gap)) / 2 + row * (th + gap);
+        const y = (AH - (rws * th + (rws - 1) * gap)) / 2 + row * (th + gap);
         if (k === 0) {
           if (cam.videoWidth) cover(cam, cam.videoWidth, cam.videoHeight, x, y, tw, th, true);
           else { g.fillStyle = '#3E372C'; rr(x, y, tw, th, 14); g.fill(); }
@@ -418,7 +456,23 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
           g.fillStyle = '#3F4A26'; g.font = '500 ' + Math.round(rad * 0.9) + 'px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
           g.fillText((r.name.trim()[0] || '?').toUpperCase(), x + tw / 2, y + th / 2 - 6); g.textAlign = 'start'; g.textBaseline = 'alphabetic';
           label(r.name.trim() || 'Gast', x, y, th);
+          if (qAct && qAct.who === k - 1) {
+            const pulse = 4 + 2 * Math.sin((performance.now() - qAt) / 180);
+            g.strokeStyle = '#B9C77A'; g.lineWidth = pulse; rr(x + 2, y + 2, tw - 4, th - 4, 13); g.stroke();
+            g.fillStyle = '#B9C77A'; g.font = '500 18px Outfit, system-ui, sans-serif'; g.fillText('✋', x + tw - 38, y + 32);
+          }
         }
+      }
+      if (qAct) {
+        const who = qAct.who >= 0 && rows[qAct.who] ? rows[qAct.who].name.trim() || 'Gast' : '';
+        g.font = '400 30px Outfit, system-ui, sans-serif';
+        const lines = wrap(qAct.text, W * 0.72 - 48).slice(0, 3);
+        const bh = 44 + (who ? 30 : 0) + lines.length * 40, bw = W * 0.72, bx = (W - bw) / 2, by = H - bh - 16;
+        g.fillStyle = 'rgba(246,243,234,.96)'; rr(bx, by, bw, bh, 22); g.fill();
+        let ty = by + 24;
+        if (who) { g.fillStyle = '#5E6B35'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.fillText(who + ' fragt:', bx + 24, ty + 18); ty += 30; }
+        g.fillStyle = '#2F2B22'; g.font = '400 30px Outfit, system-ui, sans-serif';
+        lines.forEach((l, i) => g.fillText(l, bx + 24, ty + 28 + i * 40));
       }
       uRaf = requestAnimationFrame(frame);
     };
@@ -430,12 +484,15 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       catch (e) { alert('Kein Zugriff auf Kamera oder Mikro. Bitte im Browser erlauben.'); return; }
       cam.srcObject = uStream; cam.play().catch(() => {});
       PR.hidden = false; document.body.style.overflow = 'hidden'; frame();
+      qPrep(); qAct = null; $('ubdone').hidden = true; clearTimeout(qTimer);
+      if (+qm.value) qTimer = setTimeout(qNext, 20000);
     };
     const closeU = () => {
       if (uRec) uRec.stop();
       cancelAnimationFrame(uRaf);
       if (uStream) uStream.getTracks().forEach(t => t.stop());
       uStream = null; PR.hidden = true; document.body.style.overflow = '';
+      clearTimeout(qTimer); qAct = null;
       if (P) { window.hidePrompter(); document.body.appendChild(P); }
     };
     $('ubclose').onclick = closeU;
