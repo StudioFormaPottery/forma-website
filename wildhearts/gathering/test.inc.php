@@ -14,6 +14,8 @@ if (!$guest) {
     foreach ((require __DIR__ . '/skripte.inc.php') as [$st, $sx]) if (!in_array($st, $prompter['hidden'] ?? [], true)) $pLib[$st] = $sx;
     foreach (($prompter['library'] ?? []) as $st => $sx) $pLib[(string)$st] = (string)$sx;
 }
+$pPick = '';
+if ($gath && ($gath['script'] ?? '') !== '' && isset($pLib[$gath['script']])) { $pPick = $gath['script']; $pText = $pLib[$pPick]; }
 $offers = $guest ? [] : mm_offers();
 ?><!doctype html>
 <html lang="de">
@@ -177,7 +179,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     <h2><span class="step">3</span>Teleprompter</h2>
     <p class="tip">Schreib oder kopier hier deinen Text hinein. Er wird automatisch gespeichert und läuft im Raum oben über dem Video, nah an der Kamera, damit dein Blick bei den Frauen bleibt. Nur du siehst ihn, er wird nicht übertragen. Leere Zeilen machen Absätze, so findest du leichter wieder hinein.</p>
     <div class="row" style="align-items:flex-end">
-      <label class="f" style="flex:1 1 260px">Skript<select id="plib"><option value="">Skript wählen …</option><?php foreach ($pLib as $st => $sx): ?><option value="<?= $h($st) ?>"><?= $h($st) ?></option><?php endforeach; ?></select></label>
+      <label class="f" style="flex:1 1 260px">Skript<select id="plib"><option value="">Skript wählen …</option><?php foreach ($pLib as $st => $sx): ?><option value="<?= $h($st) ?>"<?= $st === $pPick ? ' selected' : '' ?>><?= $h($st) ?></option><?php endforeach; ?></select></label>
       <button type="button" class="ghost" id="plibsave">Speichern unter …</button>
       <button type="button" class="ghost" id="plibdel">Löschen</button>
     </div>
@@ -222,12 +224,14 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
   <button class="cl" type="button" id="offcl" aria-label="Schließen">×</button>
   <h3>Angebot einblenden</h3>
   <?php $anyPrice = array_filter($offers, fn($o) => $o['price_cents'] > 0); ?>
-  <?php if (!$anyPrice): ?><p class="warn">Trag zuerst in der Verwaltung unter Movecia Movement → Angebote die regulären Preise ein.</p><?php endif; ?>
-  <label>Angebot<select id="offsel"><?php foreach ($offers as $k => $o): ?><option value="<?= $h($k) ?>" data-reg="<?= (int)$o['price_cents'] ?>" data-sp="<?= (int)$o['special_cents'] ?>" data-min="<?= (int)$o['minutes'] ?>" data-mon="<?= $o['billing'] === 'monthly' ? 1 : 0 ?>"<?= $o['price_cents'] ? '' : ' disabled' ?>><?= $h($o['title']) ?><?= $o['price_cents'] ? ' · regulär ' . $h(forma_euro($o['price_cents'])) . ($o['billing'] === 'monthly' ? '/Monat' : '') : ' · noch kein Preis' ?></option><?php endforeach; ?></select></label>
+  
+  <label>Angebot<select id="offsel"><?php foreach ($offers as $k => $o): ?><option value="<?= $h($k) ?>" data-reg="<?= (int)$o['price_cents'] ?>" data-sp="<?= (int)$o['special_cents'] ?>" data-min="<?= (int)$o['minutes'] ?>" data-mon="<?= $o['billing'] === 'monthly' ? 1 : 0 ?>"><?= $h($o['title']) ?><?= $o['billing'] === 'monthly' ? ' · monatlich' : '' ?></option><?php endforeach; ?></select></label>
+  <label>1 · Regulärer Preis in €<input id="offreg" inputmode="decimal" placeholder="z. B. 1490"></label>
   <div class="two">
-    <label>Gathering-Preis in €<input id="offsp" inputmode="decimal" placeholder="z. B. 290"></label>
+    <label>2 · Gathering-Preis in €<input id="offsp" inputmode="decimal" placeholder="z. B. 1190"></label>
     <label>gilt für Minuten<input id="offmin" type="number" min="1" max="180" value="25"></label>
   </div>
+  <p class="hint" id="offsave" style="font-size:13px;color:var(--brown);margin-top:6px"></p>
   <div class="acts"><button type="button" id="offshow">Jetzt einblenden</button><button type="button" class="ghost" id="offhide" hidden>Ausblenden</button></div>
   <div class="st" id="offst" hidden></div>
   <p class="warn" id="offerr" hidden></p>
@@ -255,7 +259,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 </div>
 <?php endif; ?>
 
-<script src="/wildhearts/gathering/offer.js?v=2"></script>
+<script src="/wildhearts/gathering/offer.js?v=3"></script>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
@@ -829,7 +833,10 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
   if (OD) {
     setInterval(offPaint, 1000);
     const sel = $('offsel');
-    const fill = () => { const op = sel.selectedOptions[0]; if (!op) return; $('offsp').value = +op.dataset.sp ? (op.dataset.sp / 100).toString().replace('.', ',') : ''; $('offmin').value = op.dataset.min || 25; };
+    const eu = c => +c ? (c / 100).toString().replace('.', ',') : '';
+    const calc = () => { const r = parseFloat($('offreg').value.replace(/\./g, '').replace(',', '.')), sp = parseFloat($('offsp').value.replace(/\./g, '').replace(',', '.')); $('offsave').textContent = r > 0 && sp > 0 && sp < r ? 'Die Frauen sparen € ' + (r - sp).toLocaleString('de-AT') + ' (' + Math.round((1 - sp / r) * 100) + ' %).' : ''; };
+    $('offreg').oninput = calc; $('offsp').oninput = calc;
+    const fill = () => { const op = sel.selectedOptions[0]; if (!op) return; $('offreg').value = eu(op.dataset.reg); calc(); $('offsp').value = +op.dataset.sp ? (op.dataset.sp / 100).toString().replace('.', ',') : ''; $('offmin').value = op.dataset.min || 25; calc(); };
     const firstOk = [...sel.options].find(o => !o.disabled); if (firstOk) firstOk.selected = true;
     fill(); sel.onchange = fill;
     $('offbtn').onclick = () => { OD.hidden = !OD.hidden; };
@@ -843,7 +850,8 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     };
     $('offshow').onclick = () => {
       if (offOn && !confirm('Es ist schon ein Angebot eingeblendet. Durch das neue ersetzen? Der Countdown startet dann neu.')) return;
-      call({action: 'show', offer: sel.value, special: $('offsp').value, minutes: +$('offmin').value || 25});
+      call({action: 'show', offer: sel.value, regular: $('offreg').value, special: $('offsp').value, minutes: +$('offmin').value || 25});
+      const op = sel.selectedOptions[0]; if (op) { op.dataset.reg = Math.round(parseFloat($('offreg').value.replace(/\./g, '').replace(',', '.')) * 100) || op.dataset.reg; op.dataset.sp = Math.round(parseFloat($('offsp').value.replace(/\./g, '').replace(',', '.')) * 100) || op.dataset.sp; }
     };
     $('offhide').onclick = () => call({action: 'hide'});
   }

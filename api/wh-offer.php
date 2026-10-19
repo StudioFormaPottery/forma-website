@@ -62,10 +62,10 @@ if ($act === 'show' || $act === 'hide') {
     if (!$host) $out(['ok' => false], 403);
     if ($act === 'hide') { mm_spotlight_hide($pdo, $scope); $out(['ok' => true, 'offer' => null]); }
     try {
-        $sp = mm_spotlight_show($pdo, $scope, (string)($in['offer'] ?? ''), mm_euro_in((string)($in['special'] ?? '')), (int)($in['minutes'] ?? 25));
+        $sp = mm_spotlight_show($pdo, $scope, (string)($in['offer'] ?? ''), mm_euro_in((string)($in['special'] ?? '')), (int)($in['minutes'] ?? 25), mm_euro_in((string)($in['regular'] ?? '')));
         // Eingaben als Vorschlag fürs nächste Mal merken
         $cfg = mm_cfg('offers') ?? [];
-        $cfg[$sp['offer']] = array_merge(is_array($cfg[$sp['offer']] ?? null) ? $cfg[$sp['offer']] : [], ['special_cents' => (int)$sp['special_cents'], 'minutes' => max(1, (int)round(((int)$sp['until'] - (int)$sp['shown_at']) / 60))]);
+        $cfg[$sp['offer']] = array_merge(is_array($cfg[$sp['offer']] ?? null) ? $cfg[$sp['offer']] : [], ['price_cents' => (int)$sp['regular_cents'], 'special_cents' => (int)$sp['special_cents'], 'minutes' => max(1, (int)round(((int)$sp['until'] - (int)$sp['shown_at']) / 60))]);
         mm_save_cfg('offers', $cfg);
         $out(['ok' => true, 'offer' => mm_spotlight_public($sp)]);
     } catch (Throwable $e) {

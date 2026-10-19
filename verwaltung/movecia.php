@@ -12,14 +12,16 @@ if ($action === 'mm_save_gathering') {
     $title = forma_clean((string)($_POST['title'] ?? ''), 120);
     $date = (string)($_POST['date'] ?? '');
     $time = (string)($_POST['time'] ?? '');
-    $min = max(15, min(240, (int)($_POST['minutes'] ?? 60)));
+    $min = max(10, min(240, (int)($_POST['minutes'] ?? 60)));
     $desc = mb_substr(trim((string)($_POST['description'] ?? '')), 0, 1200);
+    $script = mb_substr(trim((string)($_POST['script'] ?? '')), 0, 120);
     if ($title === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !preg_match('/^\d{2}:\d{2}$/', $time)) {
         go($mmBack . ($gid ? '&edit=' . $gid : '') . '#neu', 'Bitte gib Titel, Datum und Uhrzeit an.');
     }
     $starts = $date . 'T' . $time;
     if ($gid) {
         $old = mm_gathering($pdo, $gid);
+        $pdo->prepare('UPDATE mm_gatherings SET script = ? WHERE id = ?')->execute([$script, $gid]);
         $pdo->prepare('UPDATE mm_gatherings SET title = ?, starts_at = ?, minutes = ?, description = ?, reminded_day = CASE WHEN starts_at = ? THEN reminded_day ELSE 0 END, reminded_hour = CASE WHEN starts_at = ? THEN reminded_hour ELSE 0 END WHERE id = ?')
             ->execute([$title, $starts, $min, $desc, $starts, $starts, $gid]);
         $msg = 'Gespeichert.';
@@ -28,7 +30,7 @@ if ($action === 'mm_save_gathering') {
             try { mm_whereby_room($pdo, $gid); $msg .= ' Der Videoraum ist für die neue Zeit neu angelegt.'; } catch (Throwable $e) { $msg .= ' Den Videoraum bitte unten neu anlegen.'; }
         }
     } else {
-        $pdo->prepare('INSERT INTO mm_gatherings (title, starts_at, minutes, description, created_at) VALUES (?,?,?,?,?)')->execute([$title, $starts, $min, $desc, date('c')]);
+        $pdo->prepare('INSERT INTO mm_gatherings (title, starts_at, minutes, description, script, created_at) VALUES (?,?,?,?,?,?)')->execute([$title, $starts, $min, $desc, $script, date('c')]);
         $gid = (int)$pdo->lastInsertId();
         $msg = 'Das Gathering ist angelegt und auf moveciamovement.com/gathering zu sehen.';
         if (mm_whereby_key() !== '') {
@@ -203,7 +205,7 @@ if ($view === 'movecia') {
         $srcName = ['reset' => 'Reset Routine', 'circle' => 'Interesse Inner Circle', 'mentoring' => 'Interesse Mentoring', 'year' => 'Interesse Jahreskreis', 'retreat' => 'Interesse Alpine Retreat', 'link' => 'Link in Bio'];
         $live = $next ? mm_live_count($pdo, (int)$next['id']) : 0;
         $joinedAll = (int)$pdo->query('SELECT COUNT(*) FROM mm_signups WHERE joined_at IS NOT NULL')->fetchColumn();
-        $d = $edit ?: ['id' => 0, 'title' => 'Wild Hearts Gathering', 'starts_at' => '', 'minutes' => 60, 'description' => ''];
+        $d = $edit ?: ['id' => 0, 'title' => 'Wild Hearts Gathering', 'starts_at' => '', 'minutes' => 30, 'description' => '', 'script' => ''];
         $dDate = $d['starts_at'] ? substr($d['starts_at'], 0, 10) : '';
         $dTime = $d['starts_at'] ? substr($d['starts_at'], 11, 5) : '19:00'; ?>
 <style>
@@ -379,6 +381,23 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         <h2 id="neu"><?= $edit ? 'Gathering bearbeiten' : 'Neues Gathering' ?></h2>
         <form method="post" class="card stack">
             <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_save_gathering"><input type="hidden" name="gid" value="<?= (int)$d['id'] ?>">
+            <?php if (!$edit): ?>
+            <p class="small"><strong>Vorlage wählen</strong> · ein Tipp füllt Titel, Dauer, Uhrzeit, Text und das passende Teleprompter-Skript aus. Danach nur noch das Datum prüfen.</p>
+            <div class="mm-links" style="margin-top:0"><?php foreach (mm_gathering_presets() as $i => $pr): ?><a href="#neu" data-preset="<?= $i ?>"><?= forma_h($pr['label']) ?></a><?php endforeach; ?></div>
+            <script>
+            (() => {
+              const P = <?= json_encode(mm_gathering_presets(), JSON_UNESCAPED_UNICODE) ?>;
+              document.querySelectorAll('[data-preset]').forEach(a => a.addEventListener('click', e => {
+                e.preventDefault();
+                const p = P[+a.dataset.preset], f = a.closest('form');
+                const E = f.elements; E.title.value = p.title; E.minutes.value = p.minutes; E.time.value = p.time; E.description.value = p.text; E.script.value = p.script;
+                if (p.date) E.date.value = p.date;
+                else if (!E.date.value && p.time === '08:00') { const d = new Date(); d.setDate(d.getDate() + ((7 - d.getDay()) % 7 || 7)); E.date.value = d.toISOString().slice(0, 10); }
+                document.querySelectorAll('[data-preset]').forEach(x => x.style.background = x === a ? '#DCE0D2' : '');
+              }));
+            })();
+            </script>
+            <?php endif; ?>
             <label for="mt">Titel (Englisch, so sehen ihn die Frauen)</label>
             <input id="mt" name="title" value="<?= forma_h($d['title']) ?>" required maxlength="120">
             <div class="row">
@@ -386,9 +405,11 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                 <div class="stack"><label for="mz">Uhrzeit (Wien)</label><input id="mz" type="time" name="time" value="<?= forma_h($dTime) ?>" required></div>
             </div>
             <label for="mm">Dauer</label>
-            <select id="mm" name="minutes"><?php foreach ([35, 45, 60, 75, 90] as $m): ?><option value="<?= $m ?>" <?= (int)$d['minutes'] === $m ? 'selected' : '' ?>><?= $m ?> Minuten</option><?php endforeach; ?></select>
+            <select id="mm" name="minutes"><?php foreach (array_unique(array_merge([15, 20, 30, 35, 45, 60, 75, 90], [(int)$d['minutes']])) as $m): ?><option value="<?= $m ?>" <?= (int)$d['minutes'] === $m ? 'selected' : '' ?>><?= $m ?> Minuten</option><?php endforeach; ?></select>
             <label for="mx">Kurzer Text für die Anmeldeseite (Englisch, darf leer bleiben)</label>
             <textarea id="mx" name="description" rows="4" maxlength="1200"><?= forma_h($d['description']) ?></textarea>
+            <label for="msc">Teleprompter-Skript (öffnet sich automatisch in deinem Gastgeberinnen-Fenster)</label>
+            <select id="msc" name="script"><option value="">kein Skript, den letzten Text behalten</option><?php foreach (mm_script_titles() as $st): ?><option value="<?= forma_h($st) ?>" <?= ($d['script'] ?? '') === $st ? 'selected' : '' ?>><?= forma_h($st) ?></option><?php endforeach; ?></select>
             <p class="muted small">Gäste melden sich auf moveciamovement.com/gathering an, bekommen ihren persönlichen Raum-Link per Mail und eine Erinnerung am Vortag und eine Stunde vorher. Der Raum öffnet 15 Minuten vor Beginn direkt auf deiner Website, ohne Zeitlimit.</p>
             <button class="btn" type="submit"><?= $edit ? 'Speichern' : 'Gathering anlegen' ?></button>
             <?php if ($edit): ?><a class="link" href="<?= forma_h($self) ?>?view=movecia">Abbrechen</a><?php endif; ?>

@@ -59,6 +59,8 @@ function mm_schema(PDO $pdo): void
         created_at TEXT NOT NULL,
         confirmed_at TEXT
     )');
+    $gc = array_column($pdo->query('PRAGMA table_info(mm_gatherings)')->fetchAll(), 'name');
+    if (!in_array('script', $gc, true)) $pdo->exec("ALTER TABLE mm_gatherings ADD COLUMN script TEXT NOT NULL DEFAULT ''");
     $cols = array_column($pdo->query('PRAGMA table_info(mm_subscribers)')->fetchAll(), 'name');
     if (!in_array('lang', $cols, true)) $pdo->exec("ALTER TABLE mm_subscribers ADD COLUMN lang TEXT NOT NULL DEFAULT 'en'");
 }
@@ -633,12 +635,13 @@ function mm_spotlight_public(?array $sp): ?array
     ];
 }
 
-function mm_spotlight_show(PDO $pdo, string $scope, string $offer, int $special, int $minutes): array
+function mm_spotlight_show(PDO $pdo, string $scope, string $offer, int $special, int $minutes, int $regular = 0): array
 {
     mm_offer_schema($pdo);
     $o = mm_offers()[$offer] ?? null;
     if (!$o) throw new RuntimeException('Unbekanntes Angebot.');
-    if ($o['price_cents'] <= 0) throw new RuntimeException('Für „' . $o['title'] . '“ ist noch kein regulärer Preis eingetragen (Verwaltung → Movecia → Angebote).');
+    if ($regular > 0) $o['price_cents'] = $regular;
+    if ($o['price_cents'] <= 0) throw new RuntimeException('Bitte gib zuerst den regulären Preis ein.');
     if ($special >= $o['price_cents']) throw new RuntimeException('Der Gathering-Preis muss unter dem regulären Preis liegen.');
     $minutes = max(1, min(180, $minutes));
     $pdo->prepare('UPDATE mm_spotlights SET active = 0 WHERE scope = ?')->execute([$scope]);
@@ -746,4 +749,33 @@ function mm_q_current(PDO $pdo, string $scope): ?array
     $s->execute([$scope]);
     $q = $s->fetch();
     return $q ? ['id' => (int)$q['id'], 'label' => mm_q_label($q), 'text' => $q['text']] : null;
+}
+
+
+// --- Gathering-Vorlagen (ein Klick füllt Titel, Dauer, Text und Teleprompter-Skript) -----------
+
+/** Alle Teleprompter-Skripte: Vorlagen aus wildhearts/gathering/skripte.inc.php plus eigene aus der Bibliothek. */
+function mm_script_titles(): array
+{
+    $p = mm_cfg('prompter') ?? [];
+    $out = [];
+    foreach ((require dirname(__DIR__) . '/wildhearts/gathering/skripte.inc.php') as $row) if (!in_array($row[0], $p['hidden'] ?? [], true)) $out[] = $row[0];
+    foreach (array_keys($p['library'] ?? []) as $t) if (!in_array((string)$t, $out, true)) $out[] = (string)$t;
+    return $out;
+}
+
+function mm_gathering_presets(): array
+{
+    return [
+        ['label' => 'Morgen · 15 Min', 'title' => 'Sunday Morning Gathering · Breathwork', 'minutes' => 15, 'time' => '08:00', 'script' => 'Morning · 15 min · Breathwork',
+         'text' => "Start your Sunday with 15 quiet minutes just for you. We breathe together, gently and slowly, and set one word for the day. Bring a cup of tea, come in your pyjamas, camera on or off."],
+        ['label' => 'Morgen · 30 Min', 'title' => 'Morning Gathering · Breathwork & Intention', 'minutes' => 30, 'time' => '08:00', 'script' => 'Morning · 30 min · Breathwork & intention',
+         'text' => "Thirty minutes to begin your day softly: calming breathwork, a humming breath, gentle movement and an intention for the day. No experience needed. Have a pen and paper ready."],
+        ['label' => 'Abend · 15 Min', 'title' => 'Evening Gathering · Smoke & Release', 'minutes' => 15, 'time' => '19:00', 'script' => 'Evening · 15 min · Smoke & release ritual',
+         'text' => "Close your day with a small cleansing ritual. Bring a candle, or herbs or incense if you like, and we let go of the day together. Fifteen minutes, then off to rest."],
+        ['label' => 'Abend · 30 Min', 'title' => 'Evening Gathering · Ritual & Deep Rest', 'minutes' => 30, 'time' => '19:30', 'script' => 'Evening · 30 min · Ritual & deep rest',
+         'text' => "Thirty minutes to end your day: a candle ritual to clear the day, gentle stretches and a deep guided rest. Have a blanket, a pillow and a pen ready. You can fall asleep right after."],
+        ['label' => 'Samhain · 20 Min', 'title' => 'Samhain Gathering · The Old New Year', 'minutes' => 20, 'time' => '19:00', 'date' => '2026-10-31', 'script' => 'Samhain · 20 min · Free gathering',
+         'text' => "On the 31st of October we celebrate Samhain, the old New Year in the Wheel of the Year. A free 20-minute circle by candlelight: we honour the women before us, let go of what is finished and choose a seed to carry through winter. Bring a candle, a pen and paper."],
+    ];
 }

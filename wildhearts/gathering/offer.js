@@ -41,7 +41,8 @@ window.whOffer = function (opts) {
 .whf .r{display:flex;gap:8px;margin-top:12px}
 .whf button{font:inherit;font-weight:500;font-size:15px;padding:10px 18px;border-radius:999px;border:0;background:#5E6B35;color:#F6F3EA;cursor:pointer}
 .whf button.g{background:transparent;color:#3F4A26;border:1.5px solid #CFC9B5}
-.whf .m{font-size:14px;margin-top:8px;color:#5E6B35}`;
+.whf .m{font-size:14px;margin-top:8px;color:#5E6B35}
+@media (max-width:600px){.who{left:12px;right:12px;width:auto;bottom:70px;padding:16px 18px 14px;max-height:calc(100% - 140px)}.who h3{font-size:25px;margin:4px 0 6px}.who p{font-size:14px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.who .pr{margin-top:10px}.who .sp{font-size:26px}.who .go{padding:12px 18px;margin-top:10px}.whp{bottom:70px;right:12px}.whq{top:60px}.whq div{font-size:18px}}`;
   document.head.appendChild(css);
 
   const card = document.createElement('div'); card.className = 'who'; card.hidden = true;
