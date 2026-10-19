@@ -18,6 +18,9 @@ if ($testTok !== '') {
         $in = json_decode((string)file_get_contents('php://input'), true);
         $p = mm_cfg('prompter') ?? [];
         if (isset($in['text'])) $p['text'] = mb_substr((string)$in['text'], 0, 20000);
+        // Skript-Bibliothek: eigene Skripte speichern/löschen (Vorlagen bleiben, ausgeblendete werden gemerkt)
+        if (isset($in['lib_save']['title'])) { $t = mb_substr(trim((string)$in['lib_save']['title']), 0, 80); if ($t !== '') { $p['library'][$t] = mb_substr((string)($in['lib_save']['text'] ?? ''), 0, 20000); $p['hidden'] = array_values(array_diff($p['hidden'] ?? [], [$t])); } }
+        if (isset($in['lib_delete'])) { $t = (string)$in['lib_delete']; unset($p['library'][$t]); $p['hidden'][] = $t; $p['hidden'] = array_values(array_unique($p['hidden'])); }
         if (isset($in['fragen'])) { $u = mm_cfg('uebung') ?? []; $u['fragen'] = mb_substr((string)$in['fragen'], 0, 20000); mm_save_cfg('uebung', $u); }
         if (isset($in['titel'])) { $u = mm_cfg('uebung') ?? []; $u['titel'] = mb_substr(trim((string)$in['titel']), 0, 80); mm_save_cfg('uebung', $u); }
         foreach (['speed' => [5, 200], 'size' => [18, 72]] as $k => [$lo, $hi]) if (isset($in[$k])) $p[$k] = max($lo, min($hi, (int)$in[$k]));

@@ -9,6 +9,11 @@ $pText = (string)($prompter['text'] ?? '');
 $uFragen = $guest ? null : ((mm_cfg('uebung') ?? [])['fragen'] ?? null);
 $pSpeed = (int)($prompter['speed'] ?? 40);
 $pSize = (int)($prompter['size'] ?? 34);
+$pLib = [];
+if (!$guest) {
+    foreach ((require __DIR__ . '/skripte.inc.php') as [$st, $sx]) if (!in_array($st, $prompter['hidden'] ?? [], true)) $pLib[$st] = $sx;
+    foreach (($prompter['library'] ?? []) as $st => $sx) $pLib[(string)$st] = (string)$sx;
+}
 $offers = $guest ? [] : mm_offers();
 ?><!doctype html>
 <html lang="de">
@@ -64,6 +69,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 .prompter .scroll{position:absolute;inset:0;overflow-y:auto;padding:18px 7vw 60vh;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .prompter .scroll::-webkit-scrollbar{display:none}
 .prompter .txt{white-space:pre-wrap;line-height:1.45;max-width:900px;margin:0 auto}
+.prompter .txt .dir{color:#9DA58F;font-size:.62em;font-style:italic}
 .prompter .mark{position:absolute;left:8px;top:24px;width:0;height:0;border:8px solid transparent;border-left:12px solid #9DA58F;pointer-events:none}
 .prompter .fade{position:absolute;left:0;right:0;bottom:0;height:46px;background:linear-gradient(transparent,#1F1C16);pointer-events:none}
 .pctl{position:absolute;right:10px;bottom:8px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;z-index:2}
@@ -170,6 +176,12 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
   <section class="card">
     <h2><span class="step">3</span>Teleprompter</h2>
     <p class="tip">Schreib oder kopier hier deinen Text hinein. Er wird automatisch gespeichert und läuft im Raum oben über dem Video, nah an der Kamera, damit dein Blick bei den Frauen bleibt. Nur du siehst ihn, er wird nicht übertragen. Leere Zeilen machen Absätze, so findest du leichter wieder hinein.</p>
+    <div class="row" style="align-items:flex-end">
+      <label class="f" style="flex:1 1 260px">Skript<select id="plib"><option value="">Skript wählen …</option><?php foreach ($pLib as $st => $sx): ?><option value="<?= $h($st) ?>"><?= $h($st) ?></option><?php endforeach; ?></select></label>
+      <button type="button" class="ghost" id="plibsave">Speichern unter …</button>
+      <button type="button" class="ghost" id="plibdel">Löschen</button>
+    </div>
+    <p class="tip" style="margin-top:8px">Wo <b>{names}</b> steht, setzt der Teleprompter die Namen ein: beim Üben die Namen deiner Übungsfenster, live eine Erinnerung, die Namen aus dem Raum vorzulesen. <b>{title}</b> wird zum Namen des Calls. Alles in [eckigen Klammern] sind Hinweise für dich, nicht zum Vorlesen.</p>
     <textarea id="ptext" placeholder="Zum Beispiel: Willkommen, schön, dass du heute da bist …"><?= $h($pText) ?></textarea>
     <p class="saved" id="psaved"></p>
     <div class="row"><button id="ptry" type="button" class="ghost">Teleprompter ausprobieren</button></div>
@@ -360,7 +372,33 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     const save = data => fetch(location.href, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)})
       .then(r => { if ('text' in data) sv.textContent = r.ok ? 'Gespeichert ✓' : 'Konnte nicht speichern, bitte nochmal versuchen.'; })
       .catch(() => { if ('text' in data) sv.textContent = 'Keine Verbindung, der Text bleibt hier im Feld.'; });
-    const paint = () => { txt.textContent = ta.value.trim() || 'Noch kein Text. Schreib ihn in das Feld „Teleprompter“.'; txt.style.fontSize = pSize + 'px'; $('pspd').textContent = 'Tempo ' + pSpeed; };
+    const fillIn = t => {
+      const names = window.whNames ? window.whNames() : [];
+      const list = names.length ? (names.length > 1 ? names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1] : names[0]) : '[read the names you see in the room]';
+      const title = <?= json_encode($gath['title'] ?? null) ?> || (window.whCallTitle ? window.whCallTitle() : 'Wild Hearts Gathering');
+      return t.replace(/\{names\}/g, list).replace(/\{title\}/g, title);
+    };
+    const escT = t => t.replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
+    const paint = () => { const raw = fillIn(ta.value.trim()) || 'Noch kein Text. Schreib ihn in das Feld „Teleprompter“.'; txt.innerHTML = escT(raw).replace(/\[([^\]]*)\]/g, '<span class="dir">[$1]</span>'); txt.style.fontSize = pSize + 'px'; $('pspd').textContent = 'Tempo ' + pSpeed; };
+    // Skript-Bibliothek
+    const LIB = <?= json_encode($pLib, JSON_UNESCAPED_UNICODE) ?>;
+    const lib = $('plib');
+    lib.onchange = () => {
+      const k = lib.value; if (!k || !(k in LIB)) return;
+      if (ta.value.trim() && ta.value !== LIB[k] && !Object.values(LIB).includes(ta.value) && !confirm('Dein aktueller Text ist nicht gespeichert. Trotzdem „' + k + '“ laden?')) { lib.value = ''; return; }
+      ta.value = LIB[k]; ta.dispatchEvent(new Event('input')); paint();
+    };
+    $('plibsave').onclick = () => {
+      const k = prompt('Unter welchem Namen speichern?', lib.value || 'Mein Skript'); if (!k) return;
+      LIB[k] = ta.value; save({lib_save: {title: k, text: ta.value}});
+      if (![...lib.options].some(o => o.value === k)) { const o = document.createElement('option'); o.value = o.textContent = k; lib.appendChild(o); }
+      lib.value = k; sv.textContent = 'Als „' + k + '“ gespeichert ✓';
+    };
+    $('plibdel').onclick = () => {
+      const k = lib.value; if (!k) return;
+      if (!confirm('„' + k + '“ aus der Liste löschen?')) return;
+      delete LIB[k]; save({lib_delete: k}); [...lib.options].find(o => o.value === k)?.remove(); lib.value = '';
+    };
     const pref = () => { clearTimeout(tPref); tPref = setTimeout(() => save({speed: pSpeed, size: pSize}), 600); };
     ta.addEventListener('input', () => { sv.textContent = ''; clearTimeout(tSave); tSave = setTimeout(() => save({text: ta.value}), 800); });
     const step = t => {
@@ -467,6 +505,8 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     let tSave2 = 0;
     tIn.oninput = () => { try { localStorage.setItem('wh-call-titel', tIn.value); } catch (e) {} clearTimeout(tSave2); tSave2 = setTimeout(() => fetch(location.href, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({titel: tIn.value})}).catch(() => {}), 800); };
     const callTitle = () => tIn.value.trim() || 'Wild Hearts Gathering';
+    window.whCallTitle = callTitle;
+    window.whNames = () => rows.map(r => r.name.trim()).filter(Boolean);
     try { ta2.value = SRV ?? localStorage.getItem('wh-fragen') ?? QDEF.join('\n'); qm.value = localStorage.getItem('wh-fragen-takt') || '0'; } catch (e) { ta2.value = SRV ?? QDEF.join('\n'); }
     let qSave = 0;
     ta2.oninput = () => {
