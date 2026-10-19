@@ -50,6 +50,16 @@ if ($action === 'mm_room') {
     }
 }
 
+if ($action === 'mm_testroom') {
+    try {
+        $t = mm_testroom(!empty($_POST['renew']));
+    } catch (Throwable $e) {
+        go($mmBack . '#technik', 'Der Testraum konnte nicht angelegt werden: ' . $e->getMessage());
+    }
+    header('Location: ' . mm_testroom_link($t));
+    exit;
+}
+
 if ($action === 'mm_toggle') {
     $gid = (int)($_POST['gid'] ?? 0);
     $pdo->prepare('UPDATE mm_gatherings SET visible = 1 - visible WHERE id = ?')->execute([$gid]);
@@ -229,6 +239,17 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                     <?php if ($x['status'] !== 'abgemeldet'): ?><form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_resend_confirm"><input type="hidden" name="sid" value="<?= (int)$x['id'] ?>"><button class="link small" type="submit">Mail nochmal schicken</button></form><?php endif; ?></span>
                 </div>
             <?php endforeach; ?>
+        </div>
+
+        <h2 id="technik">Technik-Test</h2>
+        <?php $tr = mm_cfg('testroom') ?? []; $trReady = !empty($tr['room_url']) && (int)($tr['ends'] ?? 0) > time(); ?>
+        <div class="card stack">
+            <p class="small">Probier Mikro, Kamera und Lautsprecher in Ruhe aus, bevor die Frauen kommen. Erst siehst du dein Kamerabild und einen Pegel, der beim Sprechen ausschlägt, dann kannst du direkt in einen eigenen Whereby-Testraum auf moveciamovement.com gehen, genau so, wie die Gäste ihn später sehen.<?= $hasWhereby ? '' : ' Ohne Whereby-Schlüssel klappt erst einmal nur der Geräte-Check.' ?></p>
+            <form method="post" target="_blank"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_testroom"><button class="btn" type="submit">Testraum öffnen</button></form>
+            <?php if ($trReady): ?>
+                <p class="muted small">Zum Testen mit einem zweiten Gerät oder einer Freundin (sie sieht und hört dich dann, wie eine Teilnehmerin): <span class="sel"><?= forma_h(mm_testroom_link($tr, true)) ?></span><br>Der Testraum gilt bis <?= forma_h(date('d. m. Y', (int)$tr['ends'])) ?> und entsteht danach automatisch neu.</p>
+                <form method="post" target="_blank"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_testroom"><input type="hidden" name="renew" value="1"><button class="link small" type="submit">Neuen Testraum anlegen</button></form>
+            <?php endif; ?>
         </div>
 
         <h2>Gatherings</h2>

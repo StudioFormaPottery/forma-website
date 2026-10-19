@@ -133,6 +133,40 @@ function mm_whereby_room(PDO $pdo, int $gid): bool
     return true;
 }
 
+/**
+ * Testraum zum Ausprobieren von Mikro, Kamera und Ton (unabhängig von den Gatherings).
+ * Bleibt eine Woche bestehen und wird bei Bedarf neu angelegt. Die Testseite ist nur mit
+ * dem geheimen Token erreichbar: moveciamovement.com/gathering/?test=TOKEN
+ */
+function mm_testroom(bool $renew = false): array
+{
+    $t = mm_cfg('testroom') ?? [];
+    if (empty($t['token'])) $t['token'] = bin2hex(random_bytes(12));
+    $valid = !empty($t['room_url']) && (int)($t['ends'] ?? 0) > time() + 3600;
+    $key = mm_whereby_key();
+    if (($renew || !$valid) && $key !== '') {
+        $end = time() + 7 * 86400;
+        $r = mm_whereby_request('POST', '/meetings', [
+            'endDate' => gmdate('Y-m-d\TH:i:s.000\Z', $end),
+            'roomMode' => 'group',
+            'roomNamePrefix' => 'wildhearts-test',
+            'fields' => ['hostRoomUrl'],
+        ], $key);
+        if (!empty($r['roomUrl'])) {
+            $t['room_url'] = (string)$r['roomUrl'];
+            $t['host_url'] = (string)($r['hostRoomUrl'] ?? $r['roomUrl']);
+            $t['ends'] = $end;
+        }
+    }
+    mm_save_cfg('testroom', $t);
+    return $t;
+}
+
+function mm_testroom_link(array $t, bool $guest = false): string
+{
+    return mm_site() . '/gathering/?test=' . rawurlencode((string)$t['token']) . ($guest ? '&gast=1' : '');
+}
+
 // --- Gatherings -------------------------------------------------------------------------
 
 function mm_gathering(PDO $pdo, int $id): ?array

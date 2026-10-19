@@ -5,7 +5,7 @@ Options -Indexes
 <FilesMatch "\.(md|sqlite|log)$">
   Require all denied
 </FilesMatch>
-<FilesMatch "^(lib|movecia-lib|movecia)\.php$">
+<FilesMatch "^(lib|movecia-lib|movecia)\.php$|\.inc\.php$">
   Require all denied
 </FilesMatch>
 

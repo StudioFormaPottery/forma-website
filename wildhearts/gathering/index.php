@@ -7,6 +7,25 @@ $pdo = forma_db();
 mm_schema($pdo);
 try { mm_send_reminders($pdo); } catch (Throwable $e) { error_log('MM reminders: ' . $e->getMessage()); }
 
+// Technik-Test: nur mit dem geheimen Token aus der Verwaltung
+$testTok = (string)($_GET['test'] ?? '');
+if ($testTok !== '') {
+    $tr = mm_cfg('testroom') ?? [];
+    if (empty($tr['token']) || !hash_equals((string)$tr['token'], $testTok)) { http_response_code(404); exit('Not found'); }
+    $guest = !empty($_GET['gast']);
+    if (!$guest && (empty($tr['room_url']) || (int)($tr['ends'] ?? 0) < time() + 3600)) {
+        try { $tr = mm_testroom(); } catch (Throwable $e) { error_log('MM testroom: ' . $e->getMessage()); }
+    }
+    $ready = !empty($tr['room_url']) && (int)($tr['ends'] ?? 0) > time();
+    $src = '';
+    if ($ready) {
+        $base = $guest ? $tr['room_url'] : ($tr['host_url'] ?: $tr['room_url']);
+        $src = $base . (str_contains($base, '?') ? '&' : '?') . 'displayName=' . rawurlencode($guest ? 'Testgast' : 'Viv');
+    }
+    require __DIR__ . '/test.inc.php';
+    exit;
+}
+
 $tok = (string)($_GET['k'] ?? '');
 $me = null;
 $g = null;
