@@ -161,6 +161,8 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
 .step ul{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
 .step li{position:relative;padding-left:24px;font-size:16px;line-height:1.5}
 .step li::before{content:"";position:absolute;left:2px;top:.5em;width:10px;height:10px;border-radius:var(--blob);background:currentColor;opacity:.5}
+.step .price{font-family:var(--hand);font-size:14px;line-height:1.55;margin-top:16px;opacity:.9}
+.step .fam{margin-top:14px;font-size:15px;font-style:italic;opacity:.9}
 .step .go{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:12px 20px;border-radius:999px;border:0;font:inherit;font-weight:500;font-size:15.5px;text-decoration:none;cursor:pointer}
 .s1 .no{background:#FFFBF6;color:var(--wine)}.s1 .card{background:#FFFBF6;border:1.5px solid var(--line)}.s1 .kick{color:var(--brown)}.s1 h3{color:var(--wine-deep)}.s1 .note{color:var(--wine)}.s1 .go{background:var(--wine);color:#FBF1EA}
 .s2 .no{background:var(--sage-soft);color:var(--earth)}.s2 .card{background:var(--sage-soft)}.s2 .kick{color:#55604C}.s2 h3{color:var(--earth)}.s2 .note{color:var(--wine)}.s2 .go{background:var(--earth);color:var(--cream)}
@@ -239,7 +241,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
 
     <a class="btn" href="#angebot">
       <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/></svg></span>
-      <span class="tx"><span><span class="en">Ways to walk with me</span><span class="de">So begleite ich dich</span></span><small><span class="en">Collective, Inner Circle, Alpine Retreat and the Year Journey</span><span class="de">Collective, Inner Circle, Alpine Retreat und die Jahresreise</span></small></span>
+      <span class="tx"><span><span class="en">Ways to walk with me</span><span class="de">So begleite ich dich</span></span><small><span class="en">Collective, Inner Circle, Alpine Retreat and the Year Circle</span><span class="de">Collective, Inner Circle, Alpine Retreat und der Jahreskreis</span></small></span>
       <span class="ar" aria-hidden="true">↓</span>
     </a>
     <a class="btn" href="https://www.instagram.com/movementwithviv/" target="_blank" rel="noopener">
@@ -284,14 +286,16 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
         <div class="card">
           <p class="kick"><span class="en">Membership · opens in 2027</span><span class="de">Mitgliedschaft · ab 2027</span></p>
           <h3>The Inner Circle</h3>
-          <p class="note"><span class="en">your circle, month after month</span><span class="de">dein Kreis, Monat für Monat</span></p>
+          <p class="note"><span class="en">back to yourself, month after month</span><span class="de">zurück zu dir, Monat für Monat</span></p>
           <button class="more-t" type="button" aria-expanded="false"><span class="en">Read more</span><span class="de">Mehr lesen</span></button>
           <div class="more">
-          <p class="en">For women who want to go deeper and stay close. A warm, quiet place of your own, away from the noise of social media.</p>
-          <p class="de">Für Frauen, die tiefer gehen und dranbleiben möchten. Ein warmer, ruhiger Ort nur für dich, weit weg vom Lärm der sozialen Medien.</p>
-          <ul class="en"><li>Monthly live circles in the rhythm of the moon and the seasons</li><li>A members' area with rituals, affirmations and short, gentle movement</li><li>Honest talks about exhaustion, relationships and friendships that no longer fit you</li><li>Space for what lights you up and for the ideas you have been carrying around</li><li>Women around you who truly get it</li></ul>
-          <ul class="de"><li>Monatliche Live-Kreise im Rhythmus von Mond und Jahreszeiten</li><li>Ein Mitgliederbereich mit Ritualen, Affirmationen und kurzen, sanften Bewegungseinheiten</li><li>Ehrliche Gespräche über Erschöpfung, Beziehungen und Freundschaften, die nicht mehr zu dir passen</li><li>Raum für das, was dich zum Leuchten bringt, und für die Ideen, die du schon lange mit dir trägst</li><li>Frauen an deiner Seite, die dich wirklich verstehen</li></ul>
-          <button class="go" type="button" data-join="circle"><span class="en">Join the waitlist →</span><span class="de">Auf die Warteliste →</span></button></div>
+          <p class="en">For mamas and every woman worn out by the mental load who wants to come back to herself. The Inner Circle is your circle of the month: you can simply be there, breathe out and feel your nervous system settle. Here we women support each other and work on ourselves together, step by step, back to you.</p>
+          <p class="de">Für Mamas und alle Frauen, die vom Mental Load erschöpft sind und wieder bei sich ankommen möchten. Der Inner Circle ist dein Kreis des Monats: Du darfst einfach dabei sein, durchatmen und spüren, wie dein Nervensystem zur Ruhe kommt. Hier unterstützen wir Frauen uns gegenseitig und arbeiten gemeinsam an uns, Schritt für Schritt zurück zu dir.</p>
+          <ul class="en"><li>A monthly live circle where you can simply be</li><li>Breathwork and gentle movement together to calm your nervous system</li><li>Talks on the topics that truly move you</li><li>Women who lift each other up and support each other</li><li>A members' area with rituals, affirmations and short movement sessions</li><li>A holistic system that gives you space, wherever you are right now</li></ul>
+          <ul class="de"><li>Ein monatlicher Live-Kreis, in dem du einfach dabei sein darfst</li><li>Gemeinsame Breathwork- und Bewegungseinheiten, die dein Nervensystem beruhigen</li><li>Impulsvorträge zu Themen, die dich wirklich bewegen</li><li>Frauen, die sich gegenseitig stärken und unterstützen</li><li>Ein Mitgliederbereich mit Ritualen, Affirmationen und kurzen Bewegungseinheiten</li><li>Ein ganzheitliches System, das dir Raum gibt, egal wo du gerade stehst</li></ul>
+          <p class="price"><span class="en">Prices and details follow. Leave your email and I'll send you everything personally.</span><span class="de">Preise und Details folgen. Trag dich ein, dann schicke ich dir alles persönlich.</span></p>
+          <button class="go" type="button" data-join="circle"><span class="en">Keep me posted →</span><span class="de">Informiere mich →</span></button>
+          </div>
         </div>
       </li>
       <li class="step s3">
@@ -302,11 +306,13 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
           <p class="note"><span class="en">a weekend that awakens your creative potential</span><span class="de">ein Wochenende, das dein kreatives Potenzial weckt</span></p>
           <button class="more-t" type="button" aria-expanded="false"><span class="en">Read more</span><span class="de">Mehr lesen</span></button>
           <div class="more">
-          <p class="en">A weekend in the nature of the Austrian Alps, just for you. We move, we breathe, we cook together, sit in circle and get our hands into clay. And right in the middle of it all, we talk about your ideas and how to bring them to life.</p>
-          <p class="de">Ein Wochenende in der Natur der österreichischen Alpen, nur für dich. Wir bewegen uns, atmen, kochen gemeinsam, sitzen im Kreis und töpfern. Und mittendrin sprechen wir über deine Ideen und darüber, wie du sie zum Leben erweckst.</p>
+          <p class="en">A weekend in the nature of the Austrian Alps, with plenty of calm and time to find your way back to yourself. We move, we breathe, we cook together, sit in circle and get our hands into clay. And right in the middle of it all, we talk about your ideas and how to bring them to life.</p>
+          <p class="de">Ein Wochenende in der Natur der österreichischen Alpen, mit ganz viel Ruhe und Zeit, um zu dir zurückzufinden. Wir bewegen uns, atmen, kochen gemeinsam, sitzen im Kreis und töpfern. Und mittendrin sprechen wir über deine Ideen und darüber, wie du sie zum Leben erweckst.</p>
           <ul class="en"><li>Yoga, Pilates and gentle movement</li><li>Forest bathing and time in nature</li><li>Meditation and breathwork</li><li>Pottery in my studio</li><li>Cooking and sharing meals together</li><li>A women's circle and mentoring for your ideas</li></ul>
           <ul class="de"><li>Yoga, Pilates und sanfte Bewegung</li><li>Waldbaden und Zeit in der Natur</li><li>Meditation und Breathwork</li><li>Töpfern in meinem Atelier</li><li>Gemeinsam kochen und essen</li><li>Ein Frauenkreis und Mentoring für deine Ideen</li></ul>
-          <button class="go" type="button" data-join="retreat"><span class="en">I'd love to come →</span><span class="de">Ich möchte dabei sein →</span></button>
+          <p class="fam"><span class="en">Depending on planning and the group, your partner and children are welcome to join the retreat too. A private retreat is also possible, just for you or for you and your family.</span><span class="de">Je nach Planung und Gruppe können auch dein Partner und deine Kinder beim Retreat dabei sein. Auf Wunsch ist auch ein Einzelretreat möglich, nur für dich oder für dich und deine Familie.</span></p>
+          <p class="price"><span class="en">Prices and details follow. Leave your email and I'll send you everything personally.</span><span class="de">Preise und Details folgen. Trag dich ein, dann schicke ich dir alles persönlich.</span></p>
+          <button class="go" type="button" data-join="retreat"><span class="en">Keep me posted →</span><span class="de">Informiere mich →</span></button>
           </div>
         </div>
       </li>
@@ -314,13 +320,17 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
         <span class="no" aria-hidden="true">4</span>
         <div class="card">
           <p class="kick"><span class="en">12 months · by application</span><span class="de">12 Monate · mit Bewerbung</span></p>
-          <h3><span class="en">The Year Journey</span><span class="de">Die Jahresreise</span></h3>
+          <h3><span class="en">The Year Circle</span><span class="de">Der Jahreskreis</span></h3>
           <p class="note"><span class="en">a whole year, side by side</span><span class="de">ein ganzes Jahr, Seite an Seite</span></p>
           <button class="more-t" type="button" aria-expanded="false"><span class="en">Read more</span><span class="de">Mehr lesen</span></button>
           <div class="more">
-          <p class="en">For women who are ready to truly change something. We walk through your year together: the Inner Circle, regular 1:1 time with me and a clear path for your life and your ideas. Only a few places each year.</p>
-          <p class="de">Für Frauen, die bereit sind, wirklich etwas zu verändern. Wir gehen gemeinsam durch dein Jahr: mit dem Inner Circle, regelmäßiger Zeit mit mir allein und einem klaren Weg für dein Leben und deine Ideen. Pro Jahr gibt es nur wenige Plätze.</p>
-          <button class="go" type="button" data-join="year"><span class="en">Tell me more →</span><span class="de">Erzähl mir mehr →</span></button></div>
+          <p class="en">For you if you don't just want to make better use of your time for yourself, but also want to bring your heart idea to life. Whether you have just finished your yoga teacher training, are at the start of your own creative business or heart project, or want to publish a book and don't know where to begin: whatever your idea is, we'll bring it to life together, and I'm happy to support you along the way.</p>
+          <p class="de">Für dich, wenn du nicht nur deine Zeit für dich besser nutzen, sondern auch deine Herzensidee verwirklichen möchtest. Ganz egal, ob du gerade deine Yogalehrerausbildung abgeschlossen hast, am Anfang deiner Selbstständigkeit, deines Kreativbusiness oder deines Herzensprojekts stehst oder ein Buch veröffentlichen möchtest und nicht weißt, wo du anfangen sollst: Welche Idee du auch hast, wir bringen sie gemeinsam ins Leben, und ich unterstütze dich gern dabei.</p>
+          <ul class="en"><li>Everything in the Inner Circle</li><li>1:1 mentoring for your heart idea</li><li>Movement and breathwork through the cycle of the year</li><li>A members' area that walks with you all year, with reminders and nudges like a best friend who has your back</li><li>Only a few places each year</li></ul>
+          <ul class="de"><li>Alles aus dem Inner Circle</li><li>1:1 Mentoring für deine Herzensidee</li><li>Bewegung und Breathwork im Rhythmus des Jahreskreises</li><li>Ein Mitgliederbereich, der dich das ganze Jahr begleitet, mit Erinnerungen und Impulsen wie von deiner besten Freundin</li><li>Nur wenige Plätze pro Jahr</li></ul>
+          <p class="price"><span class="en">Prices and details follow. Leave your email and I'll send you everything personally.</span><span class="de">Preise und Details folgen. Trag dich ein, dann schicke ich dir alles persönlich.</span></p>
+          <button class="go" type="button" data-join="year"><span class="en">Keep me posted →</span><span class="de">Informiere mich →</span></button>
+          </div>
         </div>
       </li>
     </ol>
@@ -433,10 +443,10 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
     en: {
       link: ['Come a little closer', 'Get the Reset Routine for Tired Days for free, plus invitations to our live Wild Hearts Gatherings and first news about the Inner Circle.'],
       reset: ['Your Reset Routine', 'Leave your first name and email. Once you have confirmed your address, the Reset Routine for Tired Days lands in your inbox, and you choose English or Deutsch.'],
-      circle: ['Join the Inner Circle waitlist', 'The Inner Circle opens in 2027. Join the waitlist and you will hear about it before anyone else, together with the Reset Routine as a little gift.'],
-      retreat: ['Wild Hearts Alpine Retreat', 'Leave your name and email and you will be the first to know when the dates are set. The Reset Routine comes as a little gift.'],
+      circle: ['The Inner Circle', 'Leave your name and email and I will send you all the details and prices personally as soon as the Inner Circle opens. The Reset Routine comes as a little gift.'],
+      retreat: ['Wild Hearts Alpine Retreat', 'Leave your name and email and I will send you dates, prices and all the details personally as soon as they are ready. The Reset Routine comes as a little gift.'],
       mentoring: ['Mentoring for your heart business', 'Leave your name and email and I will tell you personally how the mentoring works and when we can start. The Reset Routine comes as a little gift.'],
-      year: ['The Year Journey', 'Leave your name and email. As soon as applications open, you will be the first to know. The Reset Routine comes as a little gift.'],
+      year: ['The Year Circle', 'Leave your name and email and I will send you all the details and prices personally as soon as applications open. The Reset Routine comes as a little gift.'],
       name: 'Please add your first name.', mail: 'Please check your email address.', box: 'Please tick the box so I am allowed to email you.', wait: 'One moment please, then try again.',
       ok: n => 'Thank you, ' + n + '! Please check your inbox now and confirm your email address with one click. Right after that, your Reset Routine is on its way. 🤍',
       fail: 'That did not work just now. Please try again in a moment or write to hello@moveciamovement.com.'
@@ -444,10 +454,10 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
     de: {
       link: ['Komm ein bisschen näher', 'Hol dir die Reset-Routine für müde Tage kostenlos, dazu Einladungen zu unseren Live-Gatherings und die ersten Neuigkeiten zum Inner Circle.'],
       reset: ['Deine Reset-Routine', 'Trag deinen Vornamen und deine E-Mail ein. Sobald du deine Adresse bestätigt hast, kommt die Reset-Routine für müde Tage zu dir, und du wählst Deutsch oder Englisch.'],
-      circle: ['Warteliste für den Inner Circle', 'Der Inner Circle öffnet 2027. Trag dich auf die Warteliste ein, dann erfährst du als Erste davon. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
-      retreat: ['Wild Hearts Alpine Retreat', 'Trag deinen Namen und deine E-Mail ein, dann erfährst du als Erste, wann die Termine feststehen. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
+      circle: ['The Inner Circle', 'Trag deinen Namen und deine E-Mail ein, dann schicke ich dir alle Details und Preise persönlich, sobald der Inner Circle öffnet. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
+      retreat: ['Wild Hearts Alpine Retreat', 'Trag deinen Namen und deine E-Mail ein, dann schicke ich dir Termine, Preise und alle Details persönlich, sobald sie feststehen. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
       mentoring: ['Mentoring für dein Herzensbusiness', 'Trag deinen Namen und deine E-Mail ein, dann erzähle ich dir persönlich, wie das Mentoring abläuft und wann wir starten können. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
-      year: ['Die Jahresreise', 'Trag deinen Namen und deine E-Mail ein. Sobald die Bewerbung startet, erfährst du es als Erste. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
+      year: ['Der Jahreskreis', 'Trag deinen Namen und deine E-Mail ein, dann schicke ich dir alle Details und Preise persönlich, sobald die Bewerbung startet. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
       name: 'Bitte gib deinen Vornamen ein.', mail: 'Bitte prüf deine E-Mail-Adresse.', box: 'Bitte setz das Häkchen, damit ich dir schreiben darf.', wait: 'Einen Moment bitte, dann versuch es noch einmal.',
       ok: n => 'Danke, ' + n + '! Schau jetzt in dein Postfach und bestätige deine E-Mail-Adresse mit einem Klick. Gleich danach ist deine Reset-Routine unterwegs. 🤍',
       fail: 'Das hat gerade nicht geklappt. Bitte versuch es gleich noch einmal oder schreib an hello@moveciamovement.com.'
