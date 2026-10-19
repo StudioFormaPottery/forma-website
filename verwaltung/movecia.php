@@ -133,6 +133,7 @@ if ($action === 'mm_remove_mail') {
 
 if ($view === 'movecia') {
     try { mm_send_reminders($pdo); } catch (Throwable $e) { error_log('MM reminders: ' . $e->getMessage()); }
+    try { mm_ml_retry($pdo); } catch (Throwable $e) { error_log('MM ML retry: ' . $e->getMessage()); }
     $ml = mm_ml_stats();
     $gatherings = $pdo->query('SELECT * FROM mm_gatherings ORDER BY starts_at DESC')->fetchAll();
     $next = mm_next_gathering($pdo);
@@ -143,6 +144,10 @@ if ($view === 'movecia') {
     $hasMail = !empty(mm_cfg('mail')['password']);
     render_page('Movecia Movement', function () use ($self, $flash, $pdo, $ml, $gatherings, $next, $edit, $openG, $hasWhereby, $hasMail) {
         $nextSign = $next ? mm_signup_count($pdo, (int)$next['id']) : 0;
+        $subs = $pdo->query("SELECT * FROM mm_subscribers ORDER BY created_at DESC")->fetchAll();
+        $subOk = count(array_filter($subs, fn($x) => $x['status'] === 'bestaetigt'));
+        $subOpen = count(array_filter($subs, fn($x) => $x['status'] === 'offen'));
+        $srcName = ['reset' => 'Reset Routine', 'circle' => 'Inner-Circle-Warteliste', 'link' => 'Link in Bio'];
         $live = $next ? mm_live_count($pdo, (int)$next['id']) : 0;
         $joinedAll = (int)$pdo->query('SELECT COUNT(*) FROM mm_signups WHERE joined_at IS NOT NULL')->fetchColumn();
         $d = $edit ?: ['id' => 0, 'title' => 'Wild Hearts Gathering', 'starts_at' => '', 'minutes' => 60, 'description' => ''];
@@ -182,19 +187,30 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         </section>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <div class="mm-stats">
-            <a class="mm-stat" href="https://dashboard.mailerlite.com/subscribers" target="_blank" rel="noopener"><b><?= $ml && empty($ml['error']) ? (int)$ml['active'] : '–' ?></b><span>auf der E-Mail-Liste<?= $ml && empty($ml['error']) && $ml['unconfirmed'] ? ' · ' . (int)$ml['unconfirmed'] . ' noch nicht bestätigt' : '' ?></span></a>
+            <a class="mm-stat" href="#liste"><b><?= $subOk ?></b><span>auf der E-Mail-Liste<?= $subOpen ? ' · ' . $subOpen . ' noch nicht bestätigt' : '' ?></span></a>
             <a class="mm-stat" href="#g<?= (int)($next['id'] ?? 0) ?>"><b><?= $nextSign ?></b><span>fürs nächste Gathering angemeldet</span></a>
             <a class="mm-stat live" href="#g<?= (int)($next['id'] ?? 0) ?>"><b><?= $live ?></b><span>gerade im Videochat</span></a>
             <span class="mm-stat"><b><?= $joinedAll ?></b><span>waren schon bei einem Gathering dabei</span></span>
         </div>
-        <?php if (!$ml): ?><p class="muted small">Die Zahl der E-Mail-Liste kommt direkt aus MailerLite (Gruppe „Wild Hearts“). Dafür muss MailerLite unter FORMA → Einstellungen verbunden sein. Die Kontakte bleiben dort getrennt von der FORMA Post.</p>
-        <?php elseif (!empty($ml['error'])): ?><p class="muted small">MailerLite ist gerade nicht erreichbar, die Zahl kommt beim nächsten Laden.</p><?php endif; ?>
         <div class="mm-links">
             <a href="https://moveciamovement.com/" target="_blank" rel="noopener">Link in Bio</a>
             <a href="https://moveciamovement.com/gathering/" target="_blank" rel="noopener">Gathering-Seite</a>
             <a href="https://moveciamovement.com/reset/" target="_blank" rel="noopener">Reset Routine Download</a>
             <a href="https://dashboard.mailerlite.com/automations" target="_blank" rel="noopener">MailerLite</a>
             <a href="https://whereby.com/information/embedded/" target="_blank" rel="noopener">Whereby</a>
+        </div>
+
+        <h2 id="liste">E-Mail-Liste Wild Hearts</h2>
+        <div class="card stack">
+            <p class="small muted">Die Frauen melden sich auf moveciamovement.com an und bekommen eine Bestätigungsmail von hello@moveciamovement.com. Erst nach dem Klick sind sie auf der Liste, bekommen die Reset Routine und landen automatisch in MailerLite in der Gruppe „Wild Hearts“ (getrennt von der FORMA Post).<?= $ml && empty($ml['error']) ? ' MailerLite zählt dort gerade ' . (int)$ml['active'] . ' aktive Kontakte.' : '' ?></p>
+            <?php if (!$subs): ?><p class="muted small">Noch niemand. Teste es einmal selbst mit deiner eigenen Adresse.</p><?php endif; ?>
+            <?php foreach (array_slice($subs, 0, 60) as $x): ?>
+                <div class="mm-signup<?= $x['status'] === 'abgemeldet' ? ' is-cancelled' : '' ?>">
+                    <span><strong><?= forma_h($x['name']) ?></strong> <span class="muted small sel"><?= forma_h($x['email']) ?></span><br>
+                    <span class="muted small"><?= forma_h(date('d. m. Y', strtotime($x['created_at']))) ?> · über <?= forma_h($srcName[$x['source']] ?? $x['source']) ?></span></span>
+                    <span><span class="mm-badge<?= $x['status'] === 'offen' ? ' on' : '' ?>"><?= ['bestaetigt' => 'bestätigt', 'offen' => 'noch nicht bestätigt', 'abgemeldet' => 'abgemeldet'][$x['status']] ?? forma_h($x['status']) ?></span></span>
+                </div>
+            <?php endforeach; ?>
         </div>
 
         <h2>Gatherings</h2>

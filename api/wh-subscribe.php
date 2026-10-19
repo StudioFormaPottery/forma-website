@@ -1,0 +1,45 @@
+<?php
+// Wild Hearts: Anmeldung zur E-Mail-Liste (Reset Routine, Inner-Circle-Warteliste). Double-Opt-in, Mails von hello@moveciamovement.com.
+declare(strict_types=1);
+require __DIR__ . '/movecia-lib.php';
+header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-store');
+$out = function (array $d, int $code = 200): void { http_response_code($code); echo json_encode($d, JSON_UNESCAPED_UNICODE); exit; };
+if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') $out(['ok' => false], 405);
+
+$pdo = forma_db();
+mm_schema($pdo);
+$in = json_decode((string)file_get_contents('php://input'), true);
+if (!is_array($in)) $in = $_POST;
+$name = trim((string)($in['name'] ?? ''));
+$email = strtolower(trim((string)($in['email'] ?? '')));
+$source = in_array($in['source'] ?? '', ['reset', 'circle'], true) ? $in['source'] : 'link';
+if (!empty($in['website'])) $out(['ok' => true]); // Honeypot
+if ((int)($in['elapsed'] ?? 0) < 2000) $out(['ok' => false, 'error' => 'One moment please, then try again.'], 400);
+if (mb_strlen($name) < 2) $out(['ok' => false, 'error' => 'Please add your first name.'], 400);
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $out(['ok' => false, 'error' => 'Please check your email address.'], 400);
+if (empty($in['consent'])) $out(['ok' => false, 'error' => 'Please tick the box so I am allowed to email you.'], 400);
+
+$ip = hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? '') . date('Y-m-d'));
+$c = $pdo->prepare('SELECT COUNT(*) FROM mm_subscribers WHERE ip_hash = ? AND created_at >= ?');
+$c->execute([$ip, date('c', time() - 3600)]);
+if ((int)$c->fetchColumn() >= 6) $out(['ok' => false, 'error' => 'Too many sign-ups from here. Please try again later.'], 429);
+
+$s = $pdo->prepare('SELECT * FROM mm_subscribers WHERE email = ?');
+$s->execute([$email]);
+$sub = $s->fetch();
+if ($sub && $sub['status'] === 'bestaetigt') {
+    // schon dabei: Willkommensmail mit dem Download einfach noch einmal schicken
+    mm_mail_welcome($sub);
+    $out(['ok' => true, 'already' => true]);
+}
+if ($sub) {
+    $pdo->prepare("UPDATE mm_subscribers SET name = ?, source = ?, status = 'offen', ip_hash = ? WHERE id = ?")->execute([mb_substr($name, 0, 80), $source, $ip, $sub['id']]);
+    $sub['name'] = mb_substr($name, 0, 80);
+} else {
+    $tok = bin2hex(random_bytes(16));
+    $pdo->prepare('INSERT INTO mm_subscribers (name, email, source, token, ip_hash, created_at) VALUES (?,?,?,?,?,?)')
+        ->execute([mb_substr($name, 0, 80), mb_substr($email, 0, 160), $source, $tok, $ip, date('c')]);
+    $sub = ['id' => (int)$pdo->lastInsertId(), 'name' => mb_substr($name, 0, 80), 'email' => $email, 'token' => $tok];
+}
+$out(['ok' => mm_mail_confirm($sub)]);

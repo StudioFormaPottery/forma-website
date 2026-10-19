@@ -236,7 +236,7 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
     <details>
       <summary>Imprint &amp; privacy</summary>
       <p><strong>Imprint:</strong> Vivien Malonga, Movecia – Personal Fitness, Silvrettastraße 58, 6562 Mathon, Austria. Email: hello@moveciamovement.com. VAT ID: ATU83602825.</p>
-      <p><strong>Privacy:</strong> If you sign up, your first name and email address are stored with our newsletter service MailerLite (MailerLite Limited, Ireland) and used only to send you emails about the Wild Hearts Collective. You will receive a confirmation email first. You can unsubscribe at any time with the link in every email or by writing to hello@moveciamovement.com. This page uses no tracking cookies.</p>
+      <p><strong>Privacy:</strong> If you sign up, your first name and email address are stored on this website and, once you have confirmed them, with our newsletter service MailerLite (MailerLite Limited, Ireland). They are used only to send you emails about the Wild Hearts Collective. You will receive a confirmation email first. You can unsubscribe at any time with the link in every email or by writing to hello@moveciamovement.com. This page uses no tracking cookies.</p>
     </details>
   </div>
 </footer>
@@ -284,8 +284,8 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
     box.appendChild(s);
   });
 
-  // Anmeldung: direkt in die MailerLite-Gruppe „Wild Hearts“ (mit Bestätigungsmail)
-  const ML_URL = 'https://assets.mailerlite.com/jsonp/1194035/forms/201697023469029136/subscribe';
+  // Anmeldung über die eigene Website (api/wh-subscribe.php): Bestätigungsmail, danach Download + MailerLite-Gruppe „Wild Hearts“
+  let source = 'link';
   const form = document.getElementById('join-form');
   const msg = document.getElementById('join-msg');
   const title = document.getElementById('join-title');
@@ -297,7 +297,7 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
   };
   document.querySelectorAll('[data-join]').forEach(b => b.addEventListener('click', () => {
     const t = texts[b.dataset.join];
-    if (t) { title.textContent = t[0]; intro.textContent = t[1]; }
+    if (t) { title.textContent = t[0]; intro.textContent = t[1]; source = b.dataset.join; }
     document.getElementById('join').scrollIntoView({behavior: 'smooth', block: 'start'});
     setTimeout(() => form.elements.name.focus({preventScroll: true}), 500);
   }));
@@ -314,21 +314,16 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
     if (Date.now() - loaded < 2000) return show('One moment please, then try again.', true);
     const btn = form.querySelector('button');
     btn.disabled = true;
-    const data = new FormData();
-    data.append('fields[name]', name);
-    data.append('fields[email]', email);
-    data.append('ml-submit', '1');
-    data.append('anticsrf', 'true');
     try {
-      const r = await fetch(ML_URL, {method: 'POST', body: data});
+      const r = await fetch('/api/wh-subscribe.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, email, consent: true, website: '', source, elapsed: Date.now() - loaded})});
       const j = await r.json().catch(() => ({}));
-      if (!r.ok || j.success === false) throw new Error('signup');
+      if (!r.ok || !j.ok) throw new Error(j.error || 'signup');
       form.querySelectorAll('label, button').forEach(el => el.hidden = true);
       document.querySelector('.psst').hidden = true;
       show('Thank you, ' + name + '! Please check your inbox now and confirm your email address with one click. Right after that, your Reset Routine is on its way. 🤍');
     } catch (err) {
       btn.disabled = false;
-      show('That did not work just now. Please try again in a moment or write to hello@moveciamovement.com.', true);
+      show(err.message && err.message !== 'signup' ? err.message : 'That did not work just now. Please try again in a moment or write to hello@moveciamovement.com.', true);
     }
   });
 })();

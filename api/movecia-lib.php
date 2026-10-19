@@ -47,6 +47,18 @@ function mm_schema(PDO $pdo): void
         created_at TEXT NOT NULL,
         UNIQUE(gathering_id, email)
     )');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS mm_subscribers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        source TEXT NOT NULL DEFAULT \'\',
+        status TEXT NOT NULL DEFAULT \'offen\',
+        token TEXT NOT NULL,
+        ip_hash TEXT NOT NULL DEFAULT \'\',
+        ml_synced INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL,
+        confirmed_at TEXT
+    )');
 }
 
 // --- Einstellungen (liegen nur im Datenordner, nie im Repo) ---------------------------
@@ -356,3 +368,84 @@ function mm_ml_stats(string $name = MM_ML_GROUP): ?array
         return ['error' => true];
     }
 }
+
+// --- Eigene E-Mail-Liste Wild Hearts (Double-Opt-in über die Website) -------------------
+
+function mm_sub_by_token(PDO $pdo, string $tok): ?array
+{
+    mm_schema($pdo);
+    if (!preg_match('/^[0-9a-f]{32}$/', $tok)) return null;
+    $s = $pdo->prepare('SELECT * FROM mm_subscribers WHERE token = ?');
+    $s->execute([$tok]);
+    return $s->fetch() ?: null;
+}
+
+function mm_mail_confirm(array $sub): bool
+{
+    $first = forma_first_name($sub['name']);
+    $link = mm_site() . '/api/wh-confirm.php?t=' . $sub['token'];
+    $text = "Hey $first,\n\none click and you're in. Please confirm your email address here:\n$link\n\nRight after that your Reset Routine for Tired Days is ready for you, in English and Deutsch.\n\nIf you didn't sign up, simply ignore this email and you won't hear from me again.\n\nWith love, Viv";
+    $html = '<p style="margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#93402F;">Hey ' . forma_h($first) . ',</p>'
+        . '<p style="margin:14px 0 0;">one click and you\'re in. Please confirm your email address, and right after that your <strong>Reset Routine for Tired Days</strong> is ready for you, in English and Deutsch.</p>'
+        . mm_button($link, 'Yes, confirm my email')
+        . '<p style="margin:16px 0 0;font-size:14px;color:#674B40;">If you didn\'t sign up, simply ignore this email and you won\'t hear from me again.</p>';
+    return mm_mail($sub['email'], "One click and you're in 🌙", $text, mm_mail_html('Confirm your email', $html));
+}
+
+function mm_mail_welcome(array $sub): bool
+{
+    $first = forma_first_name($sub['name']);
+    $dl = mm_site() . '/reset/';
+    $out = mm_site() . '/api/wh-unsubscribe.php?t=' . $sub['token'];
+    $text = "Hey $first,\n\nyou did it, you're in. Welcome to the Wild Hearts Collective.\n\nHere is my little gift for you: the Reset Routine for Tired Days. Ten quiet minutes for the evenings you gave everything away.\n\nDownload (English or Deutsch): $dl\n\nThe Wild Hearts Collective exists so you never forget that you are a whole person too, even when you're always there for everyone else. We matter. We are here. And we are seen.\n\nCome and say hi in our free community channel on Instagram: " . MM_CHANNEL . "\nOur first live Wild Hearts Gathering is in December.\n\nWith love, Viv\n\nUnsubscribe: $out";
+    $html = '<img src="' . mm_site() . '/img/wildhearts/cover.jpg" width="500" alt="" style="display:block;width:100%;max-width:500px;height:auto;max-height:360px;object-fit:cover;border-radius:16px;margin:0 0 20px;">'
+        . '<p style="margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#93402F;">Hey ' . forma_h($first) . ',</p>'
+        . '<p style="margin:14px 0 0;">you did it, you\'re in. Welcome to the Wild Hearts Collective.</p>'
+        . '<p style="margin:14px 0 0;">Here is my little gift for you: the <strong>Reset Routine for Tired Days</strong>. Ten quiet minutes for the evenings you gave everything away. A breath, a small ritual to let go, a warm cup of Golden Moon Milk and a few honest lines, just for you.</p>'
+        . mm_button($dl, 'Get my Reset Routine')
+        . '<p style="margin:8px 0 0;font-size:14px;color:#674B40;text-align:center;">English or Deutsch, you choose on the page.</p>'
+        . '<p style="margin:20px 0 0;">The Wild Hearts Collective exists so you never forget that you are a whole person too, even when you\'re always there for everyone else. We matter. We are here. And we are seen.</p>'
+        . '<p style="margin:14px 0 0;">Come and say hi in our free <a href="' . MM_CHANNEL . '" style="color:#93402F;">community channel on Instagram</a>. Our first live Wild Hearts Gathering is in December.</p>'
+        . '<p style="margin:22px 0 0;font-size:12px;color:#674B40;">You get this email because you signed up on moveciamovement.com. <a href="' . forma_h($out) . '" style="color:#674B40;">Unsubscribe</a></p>';
+    return mm_mail($sub['email'], 'Your Reset Routine for Tired Days 🌙', $text, mm_mail_html('Your Reset Routine', $html));
+}
+
+/** Bestätigte Adresse in die MailerLite-Gruppe „Wild Hearts“ übertragen (oder abmelden). */
+function mm_ml_push(PDO $pdo, array $sub, bool $active = true): bool
+{
+    $cfg = forma_mailerlite();
+    if (!$cfg) return false;
+    try {
+        $body = ['email' => $sub['email'], 'fields' => ['name' => $sub['name']], 'status' => $active ? 'active' : 'unsubscribed'];
+        if ($active) $body['groups'] = [forma_ml_group($cfg['api_key'], MM_ML_GROUP)];
+        forma_ml_request('POST', '/api/subscribers', $body, $cfg['api_key']);
+        $pdo->prepare('UPDATE mm_subscribers SET ml_synced = 1 WHERE id = ?')->execute([$sub['id']]);
+        return true;
+    } catch (Throwable $e) {
+        error_log('MM ML push: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/** Liste nachziehen, falls MailerLite beim Bestätigen nicht erreichbar war. */
+function mm_ml_retry(PDO $pdo): void
+{
+    mm_schema($pdo);
+    foreach ($pdo->query("SELECT * FROM mm_subscribers WHERE status = 'bestaetigt' AND ml_synced = 0 LIMIT 20")->fetchAll() as $s) mm_ml_push($pdo, $s);
+}
+
+/** Seite für Bestätigung/Abmeldung im Wild-Hearts-Look. */
+function mm_page(string $hi, string $title, string $text, string $btnHref = '', string $btnLabel = ''): void
+{
+    header('Content-Type: text/html; charset=utf-8');
+    echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>' . forma_h($title) . ' · Wild Hearts</title>'
+        . '<style>@font-face{font-family:"Italiana";src:url(/fonts/Italiana-Regular.woff) format("woff")}@font-face{font-family:"Outfit";src:url(/fonts/Outfit-Regular.woff) format("woff")}@font-face{font-family:"Hand";src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}'
+        . 'body{margin:0;min-height:100vh;display:grid;place-items:center;background:#F8F1E8;color:#33211B;font:17px/1.6 Outfit,system-ui,sans-serif;text-align:center;padding:24px 16px}main{max-width:520px}'
+        . '.hi{font-family:Hand,cursive;color:#93402F;font-size:22px;transform:rotate(-2deg)}h1{font-family:Italiana,Georgia,serif;font-weight:400;font-size:44px;line-height:1.05;color:#6E2A1F;margin:8px 0 12px}p{color:#674B40}'
+        . 'a.b{display:inline-block;margin-top:18px;padding:14px 26px;border-radius:999px;background:#93402F;color:#FBF1EA;text-decoration:none}</style></head><body><main>'
+        . '<p class="hi">' . forma_h($hi) . '</p><h1>' . forma_h($title) . '</h1><p>' . forma_h($text) . '</p>'
+        . ($btnHref ? '<a class="b" href="' . forma_h($btnHref) . '">' . forma_h($btnLabel) . '</a>' : '')
+        . '</main></body></html>';
+    exit;
+}
+
