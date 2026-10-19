@@ -162,10 +162,9 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     <div class="row"><button type="button" class="ghost" id="ubadd">+ Fenster</button></div>
     <label class="f" style="margin-top:16px">Name des Calls (steht oben im Raum und im Dateinamen der Aufnahme)<input id="ubtitle" type="text" maxlength="80" placeholder="z. B. Wild Hearts Gathering · Dezember" style="font:inherit;font-size:16px;padding:11px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--cream)"></label>
     <h3 style="font-size:18px;font-weight:500;margin-top:18px;color:var(--wine-deep)">Angebot üben</h3>
-    <p class="tip">Mit „✦ Angebot zeigen“ in der Übung erscheint die Angebotskarte wie im echten Raum. Danach kommen so viele Buchungen in den Chat, wie du hier einstellst, damit du üben kannst, dich zu bedanken. Das gibt es nur in der Übung.</p>
+    <p class="tip">Mit „✦ Angebot zeigen“ in der Übung erscheint die Angebotskarte wie im echten Raum. Bei jedem Übungsfenster oben stellst du ein, was diese Frau bucht. Zeigst du das passende Angebot (oder alle zusammen), kommen ihre Buchungen als Nachricht in den Chat, damit du üben kannst, dich zu bedanken. Das gibt es nur in der Übung.</p>
     <div class="row">
-      <label class="f" style="flex:1 1 220px">Angebot<select id="ubsale"><?php foreach ($offers as $k => $o): ?><option value="<?= $h($k) ?>"><?= $h($o['title']) ?></option><?php endforeach; ?></select></label>
-      <label class="f" style="flex:0 1 150px">Wie viele buchen?<select id="ubsalen"><?php foreach ([0, 1, 2, 3, 4, 5, 6] as $n): ?><option<?= $n === 2 ? ' selected' : '' ?>><?= $n ?></option><?php endforeach; ?></select></label>
+      <label class="f" style="flex:1 1 220px">Angebot<select id="ubsale"><?php foreach ($offers as $k => $o): ?><option value="<?= $h($k) ?>"><?= $h($o['title']) ?></option><?php endforeach; ?><option value="all">Alle Angebote zusammen</option></select></label>
       <label class="f" style="flex:0 1 150px">innerhalb von<select id="ubsalet"><option value="60">1 Minute</option><option value="180" selected>3 Minuten</option><option value="300">5 Minuten</option></select></label>
     </div>
     <h3 style="font-size:18px;font-weight:500;margin-top:18px;color:var(--wine-deep)">Übungsfragen</h3>
@@ -232,10 +231,11 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
   <h3>Angebot einblenden</h3>
   <?php $anyPrice = array_filter($offers, fn($o) => $o['price_cents'] > 0); ?>
   
-  <label>Angebot<select id="offsel"><?php foreach ($offers as $k => $o): ?><option value="<?= $h($k) ?>" data-reg="<?= (int)$o['price_cents'] ?>" data-sp="<?= (int)$o['special_cents'] ?>" data-min="<?= (int)$o['minutes'] ?>" data-mon="<?= $o['billing'] === 'monthly' ? 1 : 0 ?>"><?= $h($o['title']) ?><?= $o['billing'] === 'monthly' ? ' · monatlich' : '' ?></option><?php endforeach; ?></select></label>
-  <label>1 · Regulärer Preis in €<input id="offreg" inputmode="decimal" placeholder="z. B. 1490"></label>
+  <label>Angebot<select id="offsel"><?php foreach ($offers as $k => $o): ?><option value="<?= $h($k) ?>" data-reg="<?= (int)$o['price_cents'] ?>" data-sp="<?= (int)$o['special_cents'] ?>" data-min="<?= (int)$o['minutes'] ?>" data-mon="<?= $o['billing'] === 'monthly' ? 1 : 0 ?>"><?= $h($o['title']) ?><?= $o['billing'] === 'monthly' ? ' · monatlich' : '' ?></option><?php endforeach; ?><option value="all" data-min="25">Alle Angebote zusammen (zum Schluss)</option></select></label>
+  <p class="hint" id="offallhint" hidden style="font-size:13.5px;color:var(--brown);margin-top:8px">Zeigt alle Angebote untereinander, jedes mit eigenem Knopf. Es gelten die Preise, die du bei den einzelnen Angeboten eingegeben hast.</p>
+  <label id="offreglab">1 · Regulärer Preis in €<input id="offreg" inputmode="decimal" placeholder="z. B. 1490"></label>
   <div class="two">
-    <label>2 · Gathering-Preis in €<input id="offsp" inputmode="decimal" placeholder="z. B. 1190"></label>
+    <label id="offsplab">2 · Gathering-Preis in €<input id="offsp" inputmode="decimal" placeholder="z. B. 1190"></label>
     <label>gilt für Minuten<input id="offmin" type="number" min="1" max="180" value="25"></label>
   </div>
   <p class="hint" id="offsave" style="font-size:13px;color:var(--brown);margin-top:6px"></p>
@@ -266,7 +266,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 </div>
 <?php endif; ?>
 
-<script src="/wildhearts/gathering/offer.js?v=3"></script>
+<script src="/wildhearts/gathering/offer.js?v=4"></script>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
@@ -486,9 +486,10 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     const DEF = ['Anna', 'Sophie', 'Lena', 'Emily', 'Julia', 'Katrin', 'Sarah', 'Clara', 'Hannah', 'Jessica', 'Maria', 'Theresa', 'Olivia', 'Nina', 'Rachel'];
     let rows = [];
     try { rows = JSON.parse(localStorage.getItem('wh-uebung') || 'null') || []; } catch (e) {}
+    const BUY = [['', 'bucht nichts'], ['circle', 'bucht Inner Circle'], ['year', 'bewirbt sich: Jahreskreis'], ['retreat', 'bucht Alpine Retreat']];
     if (!rows.length) rows = DEF.slice(0, 5).map((n, i) => ({name: n, color: SW[i % SW.length]}));
     const imgs = new Map();
-    const store = () => { try { localStorage.setItem('wh-uebung', JSON.stringify(rows.map(r => ({name: r.name, color: r.color})))); } catch (e) {} };
+    const store = () => { try { localStorage.setItem('wh-uebung', JSON.stringify(rows.map(r => ({name: r.name, color: r.color, buys: r.buys || ''})))); } catch (e) {} };
     const draw = () => {
       UL.innerHTML = '';
       rows.forEach((r, i) => {
@@ -502,7 +503,11 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
         col.onclick = () => { imgs.delete(i); r.color = SW[(SW.indexOf(r.color) + 1) % SW.length]; store(); draw(); };
         const del = document.createElement('button'); del.type = 'button'; del.className = 'ghost'; del.textContent = '✕';
         del.onclick = () => { rows.splice(i, 1); const m = new Map(); imgs.forEach((v, k) => { if (k < i) m.set(k, v); else if (k > i) m.set(k - 1, v); }); imgs.clear(); m.forEach((v, k) => imgs.set(k, v)); store(); draw(); };
-        d.append(sw, n, pick, col, del); UL.appendChild(d);
+        const by = document.createElement('select'); by.title = 'Was bucht sie in der Übung?';
+        by.style.cssText = 'font:inherit;font-size:14px;padding:8px 10px;border-radius:12px;border:1.5px solid var(--line);background:var(--cream);max-width:210px';
+        BUY.forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; if ((r.buys || '') === v) o.selected = true; by.appendChild(o); });
+        by.onchange = () => { r.buys = by.value; store(); };
+        d.append(sw, n, by, pick, col, del); UL.appendChild(d);
       });
     };
     $('ubadd').onclick = () => { if (rows.length >= 15) return; rows.push({name: DEF.find(d => !rows.some(r => r.name.trim() === d)) || 'Gast ' + (rows.length + 1), color: SW[rows.length % SW.length]}); store(); draw(); };
@@ -557,21 +562,45 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     const showOffer = () => {
       saleTimers.forEach(clearTimeout); saleTimers = [];
       if (uOffer) { uOffer = null; $('uboffer').textContent = '✦ Angebot zeigen'; return; }
-      const k = $('ubsale').value, o = OFFERS[k]; if (!o) return;
+      const k = $('ubsale').value, o = k === 'all' ? {title: 'Ways to walk with me', all: true, min: 25} : OFFERS[k]; if (!o) return;
       uOffer = Object.assign({key: k, at: performance.now()}, o);
       $('uboffer').textContent = '✦ Angebot ausblenden';
-      const n = +$('ubsalen').value, span = +$('ubsalet').value * 1000;
-      const pool = rows.map((r, i) => i).sort(() => Math.random() - 0.5).slice(0, n);
+      const span = +$('ubsalet').value * 1000;
+      const pool = rows.map((r, i) => i).filter(i => rows[i].buys && (k === 'all' || rows[i].buys === k)).sort(() => Math.random() - 0.5), n = pool.length;
       pool.forEach((who, j) => saleTimers.push(setTimeout(() => {
-        const nm = rows[who] ? rows[who].name.trim() || 'Someone' : 'Someone';
-        const verb = k === 'year' ? 'applied for' : 'booked';
+        const nm = rows[who] ? rows[who].name.trim() || 'Someone' : 'Someone', bk = rows[who].buys, bo = OFFERS[bk] || o;
+        const verb = bk === 'year' ? 'applied for' : 'booked';
         const now = new Date(), time = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-        qMsgs.push({who: -2, sale: true, text: '🎉 ' + nm + ' ' + verb + ' ' + o.title, at: performance.now(), time, done: true});
+        qMsgs.push({who: -2, sale: true, text: '🎉 ' + nm + ' ' + verb + ' ' + bo.title, at: performance.now(), time, done: true});
         pling(); setTimeout(pling, 160);
       }, 6000 + (span - 6000) * (j + Math.random() * 0.8) / Math.max(1, n))));
     };
+    const drawAll = (GW, H) => {
+      const now = performance.now(), age = Math.min(1, (now - uOffer.at) / 450), ease = 1 - Math.pow(1 - age, 3);
+      const list = Object.entries(OFFERS).filter(([, x]) => x.reg > 0), w = 480, ih = 118, x = GW - w - 22;
+      const sec = Math.ceil(Math.max(0, 25 * 60000 - (now - uOffer.at)) / 1000), live = sec > 0;
+      const h = 120 + list.length * ih + 20, y = H - h - 22 + (1 - ease) * 30;
+      g.save(); g.globalAlpha = ease; g.shadowColor = 'rgba(20,18,12,.4)'; g.shadowBlur = 30; g.shadowOffsetY = 12;
+      g.fillStyle = '#F6F3EA'; rr(x, y, w, h, 26); g.fill(); g.shadowColor = 'transparent';
+      g.fillStyle = '#5E6B35'; g.font = '400 19px Hand, cursive'; g.fillText('just for you tonight ♡', x + 24, y + 40);
+      g.fillStyle = '#3F4A26'; g.font = '400 34px Italiana, Georgia, serif'; g.fillText('Ways to walk with me', x + 24, y + 82);
+      g.fillStyle = '#DCE0D2'; rr(x + w - 210, y + 22, 186, 32, 16); g.fill(); g.fillStyle = '#3F4A26'; g.font = '500 15px Outfit, system-ui, sans-serif';
+      g.fillText('Gathering prices · ' + Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'), x + w - 198, y + 43);
+      list.forEach(([kk, o], i) => {
+        const yy = y + 110 + i * ih, lv = live && o.sp > 0 && o.sp < o.reg, per = o.mon ? '/mo' : '';
+        g.strokeStyle = '#DED8C8'; g.lineWidth = 1; g.beginPath(); g.moveTo(x + 24, yy); g.lineTo(x + w - 24, yy); g.stroke();
+        g.fillStyle = '#3F4A26'; g.font = '400 26px Italiana, Georgia, serif'; g.fillText(o.title, x + 24, yy + 34);
+        g.font = '400 15px Outfit, system-ui, sans-serif'; g.fillStyle = '#6B5D4C'; g.fillText((wrap(o.text, w - 48)[0] || '') + ' …', x + 24, yy + 58);
+        if (lv) { g.fillStyle = '#9A9282'; g.font = '400 16px Outfit, system-ui, sans-serif'; const rt = eur(o.reg) + per; g.fillText(rt, x + 24, yy + 94); const rw = g.measureText(rt).width; g.strokeStyle = '#9A9282'; g.beginPath(); g.moveTo(x + 24, yy + 88); g.lineTo(x + 24 + rw, yy + 88); g.stroke(); g.fillStyle = '#3F4A26'; g.font = '500 24px Outfit, system-ui, sans-serif'; g.fillText(eur(o.sp) + per, x + 34 + rw, yy + 95); }
+        else { g.fillStyle = '#3F4A26'; g.font = '500 24px Outfit, system-ui, sans-serif'; g.fillText(eur(o.reg) + per, x + 24, yy + 95); }
+        g.fillStyle = '#5E6B35'; rr(x + w - 174, yy + 70, 150, 38, 19); g.fill(); g.fillStyle = '#F6F3EA'; g.font = '500 16px Outfit, system-ui, sans-serif'; g.textAlign = 'center';
+        g.fillText((kk === 'year' ? 'Apply · ' : 'Book · ') + eur(lv ? o.sp : o.reg), x + w - 99, yy + 95); g.textAlign = 'start';
+      });
+      g.restore();
+    };
     const drawOffer = (GW, H) => {
       if (!uOffer) return;
+      if (uOffer.all) return drawAll(GW, H);
       const o = uOffer, w = 470, x = GW - w - 22, now = performance.now(), age = Math.min(1, (now - o.at) / 450), ease = 1 - Math.pow(1 - age, 3);
       const live = o.sp > 0 && o.sp < o.reg, leftMs = Math.max(0, o.min * 60000 - (now - o.at)), sec = Math.ceil(leftMs / 1000);
       g.font = '400 18px Outfit, system-ui, sans-serif'; const ls = wrap(o.text, w - 48).slice(0, 4);
@@ -898,7 +927,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     const eu = c => +c ? (c / 100).toString().replace('.', ',') : '';
     const calc = () => { const r = parseFloat($('offreg').value.replace(/\./g, '').replace(',', '.')), sp = parseFloat($('offsp').value.replace(/\./g, '').replace(',', '.')); $('offsave').textContent = r > 0 && sp > 0 && sp < r ? 'Die Frauen sparen € ' + (r - sp).toLocaleString('de-AT') + ' (' + Math.round((1 - sp / r) * 100) + ' %).' : ''; };
     $('offreg').oninput = calc; $('offsp').oninput = calc;
-    const fill = () => { const op = sel.selectedOptions[0]; if (!op) return; $('offreg').value = eu(op.dataset.reg); calc(); $('offsp').value = +op.dataset.sp ? (op.dataset.sp / 100).toString().replace('.', ',') : ''; $('offmin').value = op.dataset.min || 25; calc(); };
+    const fill = () => { const op = sel.selectedOptions[0]; if (!op) return; const all = op.value === 'all'; $('offreglab').hidden = $('offsplab').hidden = all; $('offallhint').hidden = !all; if (all) { $('offsave').textContent = ''; $('offmin').value = op.dataset.min || 25; return; } $('offreg').value = eu(op.dataset.reg); calc(); $('offsp').value = +op.dataset.sp ? (op.dataset.sp / 100).toString().replace('.', ',') : ''; $('offmin').value = op.dataset.min || 25; calc(); };
     const firstOk = [...sel.options].find(o => !o.disabled); if (firstOk) firstOk.selected = true;
     fill(); sel.onchange = fill;
     $('offbtn').onclick = () => { OD.hidden = !OD.hidden; };

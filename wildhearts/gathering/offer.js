@@ -28,6 +28,12 @@ window.whOffer = function (opts) {
 .who .err{color:#8A3B2E;font-size:14px;margin-top:8px}
 .whp{position:fixed;right:16px;bottom:16px;z-index:20;border:0;border-radius:999px;padding:11px 18px;background:#F6F3EA;color:#3F4A26;font:500 15px "Outfit",system-ui,sans-serif;box-shadow:0 10px 30px rgba(20,18,12,.35);cursor:pointer}
 .whp b{font-variant-numeric:tabular-nums}
+.who .it{border-top:1px solid #DED8C8;padding:12px 0 2px}
+.who .it:first-of-type{border-top:0}
+.who .it h4{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:24px;color:#3F4A26;margin:0}
+.who .it p{font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.who .it .pr{margin-top:6px}.who .it .sp{font-size:22px}.who .it .reg{font-size:15px}
+.who .it .go{margin-top:8px;padding:11px 18px;font-size:16px}
 .whq{position:fixed;left:50%;top:70px;transform:translate(-50%,-14px);opacity:0;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .45s;z-index:19;width:min(640px,calc(100% - 32px));background:#F6F3EA;border-radius:22px;padding:16px 22px 18px;box-shadow:0 18px 40px rgba(20,18,12,.35);font-family:"Outfit",system-ui,sans-serif}
 .whq.in{transform:translate(-50%,0);opacity:1}
 .whq small{display:block;color:#5E6B35;font-size:14px;font-weight:500;margin-bottom:4px}
@@ -94,6 +100,20 @@ window.whOffer = function (opts) {
       return;
     }
     pill.hidden = true;
+    if (cur.items) {
+      const anyLive = cur.live && left() > 0;
+      card.innerHTML = '<button class="x" type="button" aria-label="Minimise">–</button>'
+        + '<span class="hi">' + (anyLive ? 'just for you tonight ♡' : 'when you are ready ♡') + '</span><h3>Ways to walk with me</h3>'
+        + (anyLive ? '<div class="cd">Gathering prices end in <b>' + mmss(left()) + '</b></div>' : '')
+        + cur.items.map(it => { const lv = anyLive && it.live; return '<div class="it"><h4>' + esc(it.title) + '</h4><p>' + esc(it.text) + '</p><div class="pr">' + (lv ? '<span class="reg">' + esc(it.regular) + '</span><span class="sp">' + esc(it.special) + '</span>' : '<span class="sp">' + esc(it.regular) + '</span>') + '</div>'
+          + '<button class="go" type="button" data-item="' + esc(it.offer) + '"' + (preview ? ' disabled' : '') + '>' + (preview ? 'Vorschau' : (it.offer === 'year' ? 'Apply · ' : 'Book · ') + esc(lv ? it.special : it.regular)) + '</button></div>'; }).join('')
+        + '<span class="sm">Secure payment with Stripe · opens in a new tab, you stay in the room</span><div class="err" hidden></div>';
+      card.hidden = false;
+      requestAnimationFrame(() => card.classList.add('in'));
+      card.querySelector('.x').onclick = () => { small = true; render(); };
+      if (!preview) card.querySelectorAll('.go').forEach(go => go.onclick = () => buy(go, go.dataset.item));
+      return;
+    }
     card.innerHTML = '<button class="x" type="button" aria-label="Minimise">–</button>'
       + '<span class="hi">' + (live ? 'just for you tonight ♡' : 'when you are ready ♡') + '</span>'
       + '<h3>' + esc(cur.title) + '</h3><p>' + esc(cur.text) + '</p>'
@@ -105,11 +125,13 @@ window.whOffer = function (opts) {
     requestAnimationFrame(() => card.classList.add('in'));
     card.querySelector('.x').onclick = () => { small = true; render(); };
     const go = card.querySelector('.go');
-    if (!preview) go.onclick = async () => {
+    if (!preview) go.onclick = () => buy(go, '');
+  };
+  const buy = async (go, item) => {
       go.disabled = true;
       const w = window.open('', '_blank');
       try {
-        const r = await fetch('/api/wh-offer.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'buy', id: cur.id, k: opts.k || '', t: opts.t || '', g: opts.g || 0, gast: opts.gast ? 1 : 0})});
+        const r = await fetch('/api/wh-offer.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'buy', id: cur.id, item, k: opts.k || '', t: opts.t || '', g: opts.g || 0, gast: opts.gast ? 1 : 0})});
         const j = await r.json();
         if (!j.ok) throw new Error(j.error || '');
         if (w) w.location = j.redirect; else location.href = j.redirect;
@@ -118,7 +140,6 @@ window.whOffer = function (opts) {
         const er = card.querySelector('.err'); er.hidden = false; er.textContent = e.message || 'That did not work just now. Please try again.';
       }
       go.disabled = false;
-    };
   };
   pill.onclick = () => { small = false; render(); };
 

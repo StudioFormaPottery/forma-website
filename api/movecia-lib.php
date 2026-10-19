@@ -555,6 +555,8 @@ function mm_offer_schema(PDO $pdo): void
         until INTEGER NOT NULL,
         active INTEGER NOT NULL DEFAULT 1
     )');
+    $sc = array_column($pdo->query('PRAGMA table_info(mm_spotlights)')->fetchAll(), 'name');
+    if (!in_array('items', $sc, true)) $pdo->exec("ALTER TABLE mm_spotlights ADD COLUMN items TEXT NOT NULL DEFAULT ''");
     $pdo->exec('CREATE TABLE IF NOT EXISTS mm_orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         spotlight_id INTEGER NOT NULL DEFAULT 0,
@@ -626,6 +628,17 @@ function mm_spotlight(PDO $pdo, string $scope): ?array
 function mm_spotlight_public(?array $sp): ?array
 {
     if (!$sp) return null;
+    if ($sp['offer'] === 'all') {
+        $items = [];
+        $open = time() <= (int)$sp['until'];
+        foreach (json_decode((string)$sp['items'], true) ?: [] as $it) {
+            $live = $open && (int)$it['special_cents'] > 0 && (int)$it['special_cents'] < (int)$it['regular_cents'];
+            $items[] = ['offer' => $it['offer'], 'title' => $it['title'], 'text' => $it['text'], 'billing' => $it['billing'],
+                'regular' => mm_price_en((int)$it['regular_cents'], $it['billing']), 'special' => $live ? mm_price_en((int)$it['special_cents'], $it['billing']) : null, 'live' => $live];
+        }
+        $any = (bool)array_filter($items, fn($i) => $i['live']);
+        return ['id' => (int)$sp['id'], 'offer' => 'all', 'title' => 'Ways to walk with me', 'items' => $items, 'until' => (int)$sp['until'], 'now' => time(), 'live' => $any];
+    }
     $live = time() <= (int)$sp['until'] && (int)$sp['special_cents'] > 0 && (int)$sp['special_cents'] < (int)$sp['regular_cents'];
     return [
         'id' => (int)$sp['id'], 'offer' => $sp['offer'], 'title' => $sp['title'], 'text' => $sp['text'], 'billing' => $sp['billing'],
@@ -638,6 +651,19 @@ function mm_spotlight_public(?array $sp): ?array
 function mm_spotlight_show(PDO $pdo, string $scope, string $offer, int $special, int $minutes, int $regular = 0): array
 {
     mm_offer_schema($pdo);
+    if ($offer === 'all') {
+        $items = [];
+        foreach (mm_offers() as $k => $x) {
+            if ($x['price_cents'] <= 0) continue;
+            $items[] = ['offer' => $k, 'title' => $x['title'], 'text' => $x['text'], 'billing' => $x['billing'], 'regular_cents' => $x['price_cents'], 'special_cents' => $x['special_cents'] < $x['price_cents'] ? $x['special_cents'] : 0];
+        }
+        if (!$items) throw new RuntimeException('Blende zuerst die einzelnen Angebote mit ihren Preisen ein, dann kennt die Übersicht alle Preise.');
+        $minutes = max(1, min(180, $minutes));
+        $pdo->prepare('UPDATE mm_spotlights SET active = 0 WHERE scope = ?')->execute([$scope]);
+        $pdo->prepare('INSERT INTO mm_spotlights (scope, offer, title, text, billing, regular_cents, special_cents, shown_at, until, items) VALUES (?,?,?,?,?,?,?,?,?,?)')
+            ->execute([$scope, 'all', 'Ways to walk with me', '', 'once', 0, 0, time(), time() + $minutes * 60, json_encode($items, JSON_UNESCAPED_UNICODE)]);
+        return mm_spotlight($pdo, $scope);
+    }
     $o = mm_offers()[$offer] ?? null;
     if (!$o) throw new RuntimeException('Unbekanntes Angebot.');
     if ($regular > 0) $o['price_cents'] = $regular;
@@ -657,9 +683,15 @@ function mm_spotlight_hide(PDO $pdo, string $scope): void
 }
 
 /** Legt eine Bestellung an und gibt die Stripe-Bezahlseite zurück. Preis wird hier am Server bestimmt. */
-function mm_order_checkout(PDO $pdo, array $sp, string $name, string $email): string
+function mm_order_checkout(PDO $pdo, array $sp, string $name, string $email, string $item = ''): string
 {
     mm_offer_schema($pdo);
+    if ($sp['offer'] === 'all') {
+        $pick = null;
+        foreach (json_decode((string)$sp['items'], true) ?: [] as $it) if ($it['offer'] === $item) $pick = $it;
+        if (!$pick) throw new RuntimeException('Unknown offer.');
+        $sp = array_merge($sp, ['offer' => $pick['offer'], 'title' => $pick['title'], 'text' => $pick['text'], 'billing' => $pick['billing'], 'regular_cents' => $pick['regular_cents'], 'special_cents' => $pick['special_cents'], 'items' => '']);
+    }
     $pub = mm_spotlight_public($sp);
     $special = $pub['live'];
     $amount = $special ? (int)$sp['special_cents'] : (int)$sp['regular_cents'];
