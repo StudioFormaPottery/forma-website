@@ -12,9 +12,9 @@ if ($sub['status'] !== 'bestaetigt') {
     if ($u->rowCount() === 1) {
         mm_mail_welcome($sub);
         mm_ml_push($pdo, $sub);
-        if (in_array($sub['source'], ['mentoring', 'year', 'circle'], true)) {
+        if (in_array($sub['source'], ['mentoring', 'year', 'circle', 'retreat'], true)) {
             // Viv bekommt Bescheid, wenn jemand Interesse an einem bezahlten Angebot zeigt
-            $what = ['mentoring' => 'Mentoring für ihr Herzensbusiness', 'year' => 'die Jahresreise', 'circle' => 'den Inner Circle (Warteliste)'][$sub['source']];
+            $what = ['mentoring' => 'Mentoring für ihr Herzensbusiness', 'year' => 'die Jahresreise', 'circle' => 'den Inner Circle (Warteliste)', 'retreat' => 'das Alpine Retreat'][$sub['source']];
             $t = "Hallo Viv,\n\n{$sub['name']} ({$sub['email']}) interessiert sich für $what und hat ihre E-Mail-Adresse gerade bestätigt.\nSprache: " . ($sub['lang'] === 'de' ? 'Deutsch' : 'Englisch') . "\n\nDu siehst sie in der Verwaltung unter Movecia Movement → E-Mail-Liste.\n";
             mm_mail(MM_FROM_EMAIL, 'Neue Interessentin: ' . $sub['name'] . ' · ' . $what, $t, mm_mail_html('Neue Interessentin', nl2br(forma_h($t)), 'de'));
         }

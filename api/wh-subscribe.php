@@ -13,7 +13,7 @@ $in = json_decode((string)file_get_contents('php://input'), true);
 if (!is_array($in)) $in = $_POST;
 $name = trim((string)($in['name'] ?? ''));
 $email = strtolower(trim((string)($in['email'] ?? '')));
-$source = in_array($in['source'] ?? '', ['reset', 'circle', 'mentoring', 'year'], true) ? $in['source'] : 'link';
+$source = in_array($in['source'] ?? '', ['reset', 'circle', 'mentoring', 'year', 'retreat'], true) ? $in['source'] : 'link';
 $lang = ($in['lang'] ?? '') === 'de' ? 'de' : 'en';
 $de = $lang === 'de';
 if (!empty($in['website'])) $out(['ok' => true]); // Honeypot
