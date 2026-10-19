@@ -13,6 +13,28 @@ if ($testTok !== '') {
     $tr = mm_cfg('testroom') ?? [];
     if (empty($tr['token']) || !hash_equals((string)$tr['token'], $testTok)) { http_response_code(404); exit('Not found'); }
     $guest = !empty($_GET['gast']);
+    // Teleprompter-Text speichern (nur Gastgeberin, liegt im Datenordner)
+    if (!$guest && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $in = json_decode((string)file_get_contents('php://input'), true);
+        $p = mm_cfg('prompter') ?? [];
+        if (isset($in['text'])) $p['text'] = mb_substr((string)$in['text'], 0, 20000);
+        foreach (['speed' => [5, 200], 'size' => [18, 72]] as $k => [$lo, $hi]) if (isset($in[$k])) $p[$k] = max($lo, min($hi, (int)$in[$k]));
+        mm_save_cfg('prompter', $p);
+        header('Content-Type: application/json');
+        exit('{"ok":true}');
+    }
+    $prompter = $guest ? [] : (mm_cfg('prompter') ?? []);
+    // Video-Bühne: eigener Tab mit einem Video vom eigenen Gerät, wird in Whereby als Tab geteilt
+    if (!$guest && !empty($_GET['buehne'])) { require __DIR__ . '/buehne.inc.php'; exit; }
+    // Echtes Gathering als Gastgeberin mit Teleprompter: ?test=TOKEN&g=ID
+    $gath = !$guest && !empty($_GET['g']) ? mm_gathering($pdo, (int)$_GET['g']) : null;
+    if ($gath && $gath['host_url'] !== '') {
+        $ready = true;
+        $src = $gath['host_url'] . (str_contains($gath['host_url'], '?') ? '&' : '?') . 'displayName=Viv';
+        require __DIR__ . '/test.inc.php';
+        exit;
+    }
+    $gath = null;
     if (!$guest && (empty($tr['room_url']) || (int)($tr['ends'] ?? 0) < time() + 3600)) {
         try { $tr = mm_testroom(); } catch (Throwable $e) { error_log('MM testroom: ' . $e->getMessage()); }
     }

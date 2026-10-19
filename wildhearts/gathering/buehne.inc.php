@@ -1,0 +1,100 @@
+<?php
+// Video-Bühne: Viv wählt Videos von ihrem eigenen Gerät (nichts wird hochgeladen) und teilt
+// diesen Tab in Whereby. Die Frauen sehen das Video groß, Viv spricht live das Voice-over.
+if (!isset($testTok)) { http_response_code(404); exit; }
+?><!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Video-Bühne · Wild Hearts</title>
+<link rel="icon" href="/img/wildhearts/viv.jpg">
+<style>
+@font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}
+@font-face{font-family:"Italiana";font-weight:400;font-display:swap;src:url(/fonts/Italiana-Regular.woff) format("woff")}
+*{box-sizing:border-box;margin:0}
+[hidden]{display:none!important}
+html,body{height:100%;background:#1F1C16;color:#F6F3EA;font-family:"Outfit",system-ui,sans-serif;font-size:17px;line-height:1.55}
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
+.stage video{width:100%;height:100%;object-fit:contain;background:#000}
+.idle{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#3E372C;text-align:center;padding:24px}
+.idle h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(36px,6vw,60px);color:#DCE0D2}
+.idle p{color:#B3A78F}
+.panel{position:fixed;left:16px;top:16px;width:min(420px,calc(100% - 32px));max-height:calc(100% - 32px);overflow:auto;background:rgba(31,28,22,.94);border:1px solid #4a4337;border-radius:20px;padding:16px;z-index:3}
+.panel h2{font-size:18px;font-weight:500;color:#DCE0D2;margin-bottom:6px}
+.panel ol{padding-left:20px;font-size:15px;color:#E3DED0}
+.panel li{margin:4px 0}
+.panel small{display:block;color:#B3A78F;font-size:13.5px;margin-top:8px}
+.list{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.list button{text-align:left;background:#2c2820;color:#F6F3EA;border:1px solid #4a4337}
+.list button.on{background:#5E6B35;border-color:#5E6B35}
+button,label.btn{font:inherit;font-size:16px;padding:10px 16px;border-radius:999px;border:0;background:#9DA58F;color:#1F1C16;cursor:pointer;display:inline-block}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.chk{display:flex;gap:8px;align-items:center;font-size:15px;color:#E3DED0}
+.chk input{width:18px;height:18px;accent-color:#9DA58F}
+.ghost{background:transparent;color:#DCE0D2;border:1px solid #6B5D4C}
+.show{position:fixed;left:16px;top:16px;z-index:3;padding:6px 12px;font-size:14px;background:rgba(31,28,22,.7);color:#B3A78F;border:1px solid #4a4337}
+</style>
+</head>
+<body>
+<div class="idle" id="idle"><h1>Wild Hearts</h1><p>Gleich geht es weiter ♡</p></div>
+<div class="stage" id="stage" hidden><video id="vid" playsinline></video></div>
+
+<div class="panel" id="panel">
+  <h2>Video-Bühne</h2>
+  <ol>
+    <li>Wähl unten ein oder mehrere Videos von deinem Gerät. Hochgeladen wird nichts, sie laufen nur hier.</li>
+    <li>Geh zurück in den Raum, tipp in Whereby auf <b>Bildschirm teilen</b> und wähl diesen Tab <b>„Video-Bühne“</b>.</li>
+    <li>Schalt in Whereby deine <b>Kamera aus</b>, das Mikro bleibt an. Die Frauen sehen dann nur das Video groß und hören dich live.</li>
+    <li>Hier auf <b>Abspielen</b> tippen und dazu sprechen. Danach Teilen beenden und Kamera wieder an.</li>
+  </ol>
+  <label class="btn" style="margin-top:12px">Videos auswählen<input id="file" type="file" accept="video/*" multiple hidden></label>
+  <div class="list" id="list"></div>
+  <div class="row">
+    <button id="play" type="button" disabled>▶ Abspielen</button>
+    <button id="stop" type="button" class="ghost" disabled>Pause</button>
+  </div>
+  <div class="row">
+    <label class="chk"><input type="checkbox" id="snd"> Ton vom Video mit übertragen (z. B. Musik)</label>
+  </div>
+  <div class="row">
+    <label class="chk"><input type="checkbox" id="loop"> In Schleife abspielen</label>
+  </div>
+  <small>Ohne Häkchen läuft das Video stumm und die Frauen hören nur dich. Mit Ton: beim Teilen in Whereby „Tab-Audio teilen“ anhaken. Am besten am Computer mit Chrome oder Edge, vom Handy aus lässt sich kein Tab teilen. Die Hilfe hier blendet sich beim Abspielen aus, damit die Frauen nur das Video sehen.</small>
+</div>
+<button class="show" id="show" type="button" hidden>Bedienung</button>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id), v = $('vid');
+  let files = [], cur = -1;
+  const sel = i => {
+    cur = i; v.src = URL.createObjectURL(files[i]); v.load();
+    [...$('list').children].forEach((b, k) => b.classList.toggle('on', k === i));
+    $('play').disabled = $('stop').disabled = false;
+  };
+  $('file').addEventListener('change', e => {
+    files = [...e.target.files]; $('list').innerHTML = '';
+    files.forEach((f, i) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = f.name.replace(/\.[^.]+$/, ''); b.onclick = () => sel(i); $('list').appendChild(b); });
+    if (files.length) sel(0);
+  });
+  const hidePanel = () => { $('panel').hidden = true; $('show').hidden = false; };
+  $('show').onclick = () => { $('panel').hidden = false; $('show').hidden = true; };
+  $('play').onclick = () => {
+    if (cur < 0) return;
+    v.muted = !$('snd').checked; v.loop = $('loop').checked;
+    $('idle').hidden = true; $('stage').hidden = false; v.play(); hidePanel();
+  };
+  $('stop').onclick = () => v.pause();
+  $('snd').onchange = () => { v.muted = !$('snd').checked; };
+  $('loop').onchange = () => { v.loop = $('loop').checked; };
+  v.addEventListener('ended', () => {
+    if (cur + 1 < files.length) { sel(cur + 1); v.muted = !$('snd').checked; v.play(); }
+    else { $('stage').hidden = true; $('idle').hidden = false; $('show').click(); }
+  });
+  document.addEventListener('keydown', e => { if (e.code === 'Space' && cur >= 0) { e.preventDefault(); v.paused ? $('play').click() : v.pause(); } });
+})();
+</script>
+</body>
+</html>

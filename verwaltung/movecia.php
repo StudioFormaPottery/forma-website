@@ -168,6 +168,9 @@ if ($view === 'movecia') {
     $edit = $editId ? mm_gathering($pdo, $editId) : null;
     $openG = (int)($_GET['g'] ?? ($next['id'] ?? 0));
     $hasWhereby = mm_whereby_key() !== '';
+    $trTok = (string)((mm_cfg('testroom') ?? [])['token'] ?? '');
+    if ($trTok === '') { $tmp = mm_cfg('testroom') ?? []; $tmp['token'] = $trTok = bin2hex(random_bytes(12)); mm_save_cfg('testroom', $tmp); }
+    $GLOBALS['mmHostLink'] = fn(int $gid) => mm_site() . '/gathering/?test=' . rawurlencode($trTok) . '&g=' . $gid;
     $hasMail = !empty(mm_cfg('mail')['password']);
     render_page('Movecia Movement', function () use ($self, $flash, $pdo, $ml, $gatherings, $next, $edit, $openG, $hasWhereby, $hasMail) {
         $nextSign = $next ? mm_signup_count($pdo, (int)$next['id']) : 0;
@@ -244,7 +247,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         <h2 id="technik">Technik-Test</h2>
         <?php $tr = mm_cfg('testroom') ?? []; $trReady = !empty($tr['room_url']) && (int)($tr['ends'] ?? 0) > time(); ?>
         <div class="card stack">
-            <p class="small">Probier Mikro, Kamera und Lautsprecher in Ruhe aus, bevor die Frauen kommen. Erst siehst du dein Kamerabild und einen Pegel, der beim Sprechen ausschlägt, dann kannst du direkt in einen eigenen Whereby-Testraum auf moveciamovement.com gehen, genau so, wie die Gäste ihn später sehen.<?= $hasWhereby ? '' : ' Ohne Whereby-Schlüssel klappt erst einmal nur der Geräte-Check.' ?></p>
+            <p class="small">Probier Mikro, Kamera, Lautsprecher und Teleprompter in Ruhe aus, bevor die Frauen kommen. Erst siehst du dein Kamerabild und einen Pegel, der beim Sprechen ausschlägt, dann kannst du direkt in einen eigenen Whereby-Testraum auf moveciamovement.com gehen, genau so, wie die Gäste ihn später sehen.<?= $hasWhereby ? '' : ' Ohne Whereby-Schlüssel klappt erst einmal nur der Geräte-Check.' ?></p>
             <form method="post" target="_blank"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_testroom"><button class="btn" type="submit">Testraum öffnen</button></form>
             <?php if ($trReady): ?>
                 <p class="muted small">Zum Testen mit einem zweiten Gerät oder einer Freundin (sie sieht und hört dich dann, wie eine Teilnehmerin): <span class="sel"><?= forma_h(mm_testroom_link($tr, true)) ?></span><br>Der Testraum gilt bis <?= forma_h(date('d. m. Y', (int)$tr['ends'])) ?> und entsteht danach automatisch neu.</p>
@@ -254,7 +257,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 
         <h2>Gatherings</h2>
         <?php if ($next && $next['room_url'] !== ''): ?>
-            <a class="card notice" href="<?= forma_h($next['host_url'] ?: $next['room_url']) ?>" target="_blank" rel="noopener" style="border-color:#4E5E44;background:#F7F7F1"><span class="ic" style="background:#DCE0D2;color:#4E5E44"><?= admin_icon('kalender') ?></span><span><strong>Als Gastgeberin in den Raum: <?= forma_h($next['title']) ?></strong><br><span class="muted small"><?= forma_h(mm_when_de($next)) ?> · öffnet deinen Raum mit Gastgeber-Rechten →</span></span></a>
+            <a class="card notice" href="<?= forma_h($GLOBALS['mmHostLink']((int)$next['id'])) ?>" target="_blank" rel="noopener" style="border-color:#4E5E44;background:#F7F7F1"><span class="ic" style="background:#DCE0D2;color:#4E5E44"><?= admin_icon('kalender') ?></span><span><strong>Als Gastgeberin in den Raum: <?= forma_h($next['title']) ?></strong><br><span class="muted small"><?= forma_h(mm_when_de($next)) ?> · dein Fenster mit Teleprompter, Aufnahme und Video-Bühne →</span></span></a>
         <?php endif; ?>
         <?php if (!$gatherings): ?><p class="muted">Noch kein Gathering geplant. Leg unten das erste an, zum Beispiel Anfang Dezember.</p><?php endif; ?>
         <div class="list">
@@ -275,7 +278,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                         <p class="small">Videoraum: noch nicht angelegt.</p>
                     <?php endif; ?>
                     <div class="row3">
-                        <?php if ($g['host_url'] !== '' && !$past): ?><a class="btn" href="<?= forma_h($g['host_url']) ?>" target="_blank" rel="noopener">Als Gastgeberin öffnen</a><?php endif; ?>
+                        <?php if ($g['host_url'] !== '' && !$past): ?><a class="btn" href="<?= forma_h($GLOBALS['mmHostLink']($gid)) ?>" target="_blank" rel="noopener">Als Gastgeberin öffnen</a><?php endif; ?>
                         <?php if (!$past): ?><form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_room"><input type="hidden" name="gid" value="<?= $gid ?>"><button class="btn btn-ghost" type="submit"><?= $g['room_url'] !== '' ? 'Raum neu anlegen' : 'Videoraum anlegen' ?></button></form><?php endif; ?>
                         <a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=movecia&amp;edit=<?= $gid ?>#neu">Bearbeiten</a>
                         <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_toggle"><input type="hidden" name="gid" value="<?= $gid ?>"><button class="link" type="submit"><?= $g['visible'] ? 'Auf der Website ausblenden' : 'Auf der Website zeigen' ?></button></form>
