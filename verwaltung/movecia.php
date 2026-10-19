@@ -126,6 +126,23 @@ if ($action === 'mm_save_mail') {
     go($mmBack . '#einstellungen', 'Geschafft! Gathering-Mails gehen jetzt von hello@moveciamovement.com raus. Eine Test-Mail liegt in diesem Postfach.');
 }
 
+if ($action === 'mm_test_mail') {
+    $to = strtolower(trim((string)($_POST['to'] ?? '')));
+    if (!filter_var($to, FILTER_VALIDATE_EMAIL)) go($mmBack . '#mails', 'Bitte gib eine gültige E-Mail-Adresse ein.');
+    $ok = mm_mail($to, 'Test from the Wild Hearts Collective 🌙', "Hey Viv,\n\nthis is a test. If you can read this, emails from hello@moveciamovement.com arrive.\n", mm_mail_html('Test', '<p style="margin:0;">Hey Viv,</p><p>this is a test. If you can read this, emails from hello@moveciamovement.com arrive. 🤍</p>'));
+    go($mmBack . '#mails', $ok ? 'Die Test-Mail ist raus an ' . $to . '. Schau auch im Spam nach. Unten siehst du, auf welchem Weg sie verschickt wurde.' : 'Die Test-Mail konnte nicht verschickt werden. Unten steht der Grund.');
+}
+
+if ($action === 'mm_resend_confirm') {
+    $sid = (int)($_POST['sid'] ?? 0);
+    $st = $pdo->prepare('SELECT * FROM mm_subscribers WHERE id = ?');
+    $st->execute([$sid]);
+    $x = $st->fetch();
+    if (!$x) go($mmBack . '#liste', 'Diesen Kontakt gibt es nicht mehr.');
+    $ok = $x['status'] === 'bestaetigt' ? mm_mail_welcome($x) : mm_mail_confirm($x);
+    go($mmBack . '#liste', $ok ? 'Die Mail ist noch einmal an ' . $x['email'] . ' unterwegs.' : 'Die Mail konnte nicht verschickt werden, siehe „Letzte Mails“.');
+}
+
 if ($action === 'mm_remove_mail') {
     mm_save_cfg('mail', null);
     go($mmBack . '#einstellungen', 'Das Postfach ist getrennt.');
@@ -208,7 +225,8 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                 <div class="mm-signup<?= $x['status'] === 'abgemeldet' ? ' is-cancelled' : '' ?>">
                     <span><strong><?= forma_h($x['name']) ?></strong> <span class="muted small sel"><?= forma_h($x['email']) ?></span><br>
                     <span class="muted small"><?= forma_h(date('d. m. Y', strtotime($x['created_at']))) ?> · über <?= forma_h($srcName[$x['source']] ?? $x['source']) ?></span></span>
-                    <span><span class="mm-badge<?= $x['status'] === 'offen' ? ' on' : '' ?>"><?= ['bestaetigt' => 'bestätigt', 'offen' => 'noch nicht bestätigt', 'abgemeldet' => 'abgemeldet'][$x['status']] ?? forma_h($x['status']) ?></span></span>
+                    <span style="display:flex;gap:10px;align-items:center"><span class="mm-badge<?= $x['status'] === 'offen' ? ' on' : '' ?>"><?= ['bestaetigt' => 'bestätigt', 'offen' => 'noch nicht bestätigt', 'abgemeldet' => 'abgemeldet'][$x['status']] ?? forma_h($x['status']) ?></span>
+                    <?php if ($x['status'] !== 'abgemeldet'): ?><form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_resend_confirm"><input type="hidden" name="sid" value="<?= (int)$x['id'] ?>"><button class="link small" type="submit">Mail nochmal schicken</button></form><?php endif; ?></span>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -312,6 +330,21 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                 <input name="mail_password" type="password" autocomplete="off" placeholder="Passwort von hello@moveciamovement.com">
                 <button class="btn" type="submit">Postfach verbinden</button></form>
             <?php if ($hasMail): ?><form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_remove_mail"><button class="link small" type="submit">Postfach trennen</button></form><?php endif; ?>
+        </div>
+        <h2 id="mails">Letzte Mails</h2>
+        <div class="card stack">
+            <form method="post" class="row" style="align-items:end"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_test_mail">
+                <div class="stack"><label for="mtm">Test-Mail an</label><input id="mtm" name="to" type="email" required placeholder="deine@adresse.at"></div>
+                <button class="btn" type="submit">Test-Mail schicken</button></form>
+            <?php
+            $pdo->exec('CREATE TABLE IF NOT EXISTS mm_mail_log (id INTEGER PRIMARY KEY AUTOINCREMENT, at TEXT NOT NULL, to_addr TEXT NOT NULL, subject TEXT NOT NULL, method TEXT NOT NULL, ok INTEGER NOT NULL, error TEXT NOT NULL DEFAULT \'\')');
+            $logs = $pdo->query('SELECT * FROM mm_mail_log ORDER BY id DESC LIMIT 12')->fetchAll(); ?>
+            <?php if (!$logs): ?><p class="muted small">Noch keine Mail verschickt.</p><?php endif; ?>
+            <?php foreach ($logs as $l): ?>
+                <div class="mm-signup"><span><strong><?= forma_h($l['subject']) ?></strong><br><span class="muted small"><?= forma_h(date('d. m., H:i', strtotime($l['at']))) ?> · an <?= forma_h($l['to_addr']) ?> · <?= forma_h($l['method']) ?></span>
+                <?php if ($l['error'] !== ''): ?><br><span class="small" style="color:#93402F"><?= forma_h($l['error']) ?></span><?php endif; ?></span>
+                <span><span class="mm-badge<?= $l['ok'] ? '' : ' on' ?>"><?= $l['ok'] ? 'verschickt' : 'fehlgeschlagen' ?></span></span></div>
+            <?php endforeach; ?>
         </div>
     <?php });
 }

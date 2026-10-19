@@ -231,16 +231,36 @@ function mm_mail(string $to, string $subject, string $text, string $html): bool
         if (!getenv('FORMA_SMTP_HOST')) return true;
     }
     $pw = (string)(mm_cfg('mail')['password'] ?? '');
+    $err = '';
     if ($pw !== '') {
         try {
             mm_smtp($pw, $to, $subject, $ctype, $mime, $from);
+            mm_mail_log($to, $subject, 'Postfach (SMTP)', true, '');
             return true;
         } catch (Throwable $e) {
-            error_log('MM SMTP: ' . $e->getMessage());
+            $err = $e->getMessage();
+            error_log('MM SMTP: ' . $err);
         }
+    } else {
+        $err = 'Kein Postfach-Passwort hinterlegt';
     }
     $headers = ['From' => $from, 'Reply-To' => MM_FROM_EMAIL, 'MIME-Version' => '1.0', 'Content-Type' => $ctype];
-    return @mail($to, mb_encode_mimeheader($subject, 'UTF-8'), $mime, $headers, '-f' . MM_FROM_EMAIL);
+    $ok = @mail($to, mb_encode_mimeheader($subject, 'UTF-8'), $mime, $headers, '-f' . MM_FROM_EMAIL);
+    mm_mail_log($to, $subject, 'Ersatzweg mail()', $ok, $err);
+    return $ok;
+}
+
+/** Protokoll der letzten Movecia-Mails, damit man in der Verwaltung sieht, ob etwas rausging. */
+function mm_mail_log(string $to, string $subject, string $method, bool $ok, string $err): void
+{
+    try {
+        $pdo = forma_db();
+        $pdo->exec('CREATE TABLE IF NOT EXISTS mm_mail_log (id INTEGER PRIMARY KEY AUTOINCREMENT, at TEXT NOT NULL, to_addr TEXT NOT NULL, subject TEXT NOT NULL, method TEXT NOT NULL, ok INTEGER NOT NULL, error TEXT NOT NULL DEFAULT \'\')');
+        $pdo->prepare('INSERT INTO mm_mail_log (at, to_addr, subject, method, ok, error) VALUES (?,?,?,?,?,?)')->execute([date('c'), $to, mb_substr($subject, 0, 160), $method, $ok ? 1 : 0, mb_substr($err, 0, 300)]);
+        $pdo->exec('DELETE FROM mm_mail_log WHERE id NOT IN (SELECT id FROM mm_mail_log ORDER BY id DESC LIMIT 200)');
+    } catch (Throwable $e) {
+        error_log('MM mail log: ' . $e->getMessage());
+    }
 }
 
 function mm_smtp(string $password, string $to, string $subject, string $ctype, string $mime, string $from): void
