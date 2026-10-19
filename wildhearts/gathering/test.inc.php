@@ -4,6 +4,7 @@
 if (!isset($testTok, $ready, $src, $guest)) { http_response_code(404); exit; }
 $h = 'forma_h';
 $gath = $gath ?? null;
+$probe = $gath ? null : ($probe ?? null);
 $prompter = $prompter ?? [];
 $pText = (string)($prompter['text'] ?? '');
 $uFragen = $guest ? null : ((mm_cfg('uebung') ?? [])['fragen'] ?? null);
@@ -14,8 +15,12 @@ if (!$guest) {
     foreach ((require __DIR__ . '/skripte.inc.php') as [$st, $sx]) if (!in_array($st, $prompter['hidden'] ?? [], true)) $pLib[$st] = $sx;
     foreach (($prompter['library'] ?? []) as $st => $sx) $pLib[(string)$st] = (string)$sx;
 }
+$pLang = ($prompter['lang'] ?? 'en') === 'de' ? 'de' : 'en';
+$pDe = [];
+if (!$guest) foreach ((require __DIR__ . '/skripte-de.inc.php') as $st => $sx) if (isset($pLib[$st])) $pDe[$st] = $sx;
 $pPick = '';
-if ($gath && ($gath['script'] ?? '') !== '' && isset($pLib[$gath['script']])) { $pPick = $gath['script']; $pText = $pLib[$pPick]; }
+$sg = $gath ?: $probe;
+if ($sg && ($sg['script'] ?? '') !== '' && isset($pLib[$sg['script']])) { $pPick = $sg['script']; $pText = $pLang === 'de' && isset($pDe[$pPick]) ? $pDe[$pPick] : $pLib[$pPick]; }
 $offers = $guest ? [] : mm_offers();
 ?><!doctype html>
 <html lang="de">
@@ -127,7 +132,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 <div class="bg" aria-hidden="true"><span class="a"></span><span class="b"></span></div>
 <main>
   <p class="hand"><?= $guest ? 'schön, dass du testest ♡' : 'kurz durchatmen, dann testen ♡' ?></p>
-  <h1><?= $gath ? $h($gath['title']) : 'Technik-Test' ?></h1>
+  <h1><?= $gath ? $h($gath['title']) : ($probe ? 'Probelauf: ' . $h($probe['title']) : 'Technik-Test') ?></h1>
   <p class="lead"><?= $gath ? 'Dein Fenster als Gastgeberin: kurz Kamera und Mikro prüfen, deinen Text in den Teleprompter legen und dann in den Raum. Den Teleprompter siehst nur du, er wird nicht übertragen.' : ($guest ? 'Hier prüfst du Kamera und Mikro und gehst dann in den Testraum zu Viv.' : 'Hier prüfst du Kamera, Mikro und Ton, ganz ohne dass jemand zusieht. Danach kannst du in deinen eigenen Testraum gehen.') ?></p>
 
   <section class="card">
@@ -159,7 +164,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     <h2><span class="step">✦</span>Übungsansicht</h2>
     <p class="tip">Zum Üben vor einem vollen Kreis: dein echtes Kamerabild und dazu bis zu 15 Fenster mit Namen, als hätten die Frauen ihre Kamera aus. Diese Fenster gibt es nur hier auf deinem Bildschirm, im echten Raum tauchen sie nie auf. Mit der Aufnahme kannst du dir danach ansehen, wie du wirkst. Hintergrundbilder wählst du von deinem Gerät, hochgeladen wird nichts.</p>
     <div class="ublist" id="ublist"></div>
-    <div class="row"><button type="button" class="ghost" id="ubadd">+ Fenster</button></div>
+    <div class="row"><button type="button" class="ghost" id="ubadd">+ Fenster</button><button type="button" class="ghost" id="ubmix">🎲 Neue Namen aus aller Welt</button></div>
     <label class="f" style="margin-top:16px">Name des Calls (steht oben im Raum und im Dateinamen der Aufnahme)<input id="ubtitle" type="text" maxlength="80" placeholder="z. B. Wild Hearts Gathering · Dezember" style="font:inherit;font-size:16px;padding:11px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--cream)"></label>
     <h3 style="font-size:18px;font-weight:500;margin-top:18px;color:var(--wine-deep)">Angebot üben</h3>
     <p class="tip">Mit „✦ Angebot zeigen“ in der Übung erscheint die Angebotskarte wie im echten Raum. Bei jedem Übungsfenster oben stellst du ein, was diese Frau bucht. Zeigst du das passende Angebot (oder alle zusammen), kommen ihre Buchungen als Nachricht in den Chat, damit du üben kannst, dich zu bedanken. Das gibt es nur in der Übung.</p>
@@ -185,11 +190,12 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     <h2><span class="step">3</span>Teleprompter</h2>
     <p class="tip">Schreib oder kopier hier deinen Text hinein. Er wird automatisch gespeichert und läuft im Raum oben über dem Video, nah an der Kamera, damit dein Blick bei den Frauen bleibt. Nur du siehst ihn, er wird nicht übertragen. Leere Zeilen machen Absätze, so findest du leichter wieder hinein.</p>
     <div class="row" style="align-items:flex-end">
-      <label class="f" style="flex:1 1 260px">Skript<select id="plib"><option value="">Skript wählen …</option><?php foreach ($pLib as $st => $sx): ?><option value="<?= $h($st) ?>"<?= $st === $pPick ? ' selected' : '' ?>><?= $h($st) ?></option><?php endforeach; ?></select></label>
+      <label class="f" style="flex:1 1 260px">Skript<select id="plib"><option value="">Skript wählen …</option><?php foreach ($pLib as $st => $sx): ?><option value="<?= $h($st) ?>"<?= $st === $pPick ? ' selected' : '' ?>><?= $h($st) ?><?= isset($pDe[$st]) ? ' · DE' : '' ?></option><?php endforeach; ?></select></label>
+      <label class="f" style="flex:0 0 auto">Sprache<select id="plang"><option value="en"<?= $pLang === 'en' ? ' selected' : '' ?>>English</option><option value="de"<?= $pLang === 'de' ? ' selected' : '' ?>>Deutsch</option></select></label>
       <button type="button" class="ghost" id="plibsave">Speichern unter …</button>
       <button type="button" class="ghost" id="plibdel">Löschen</button>
     </div>
-    <p class="tip" style="margin-top:8px">Wo <b>{names}</b> steht, setzt der Teleprompter die Namen ein: beim Üben die Namen deiner Übungsfenster, live eine Erinnerung, die Namen aus dem Raum vorzulesen. <b>{title}</b> wird zum Namen des Calls. Alles in [eckigen Klammern] sind Hinweise für dich, nicht zum Vorlesen.</p>
+    <p class="tip" style="margin-top:8px">Wo <b>{names}</b> steht, setzt der Teleprompter die Namen ein: beim Üben die Namen deiner Übungsfenster, live eine Erinnerung, die Namen aus dem Raum vorzulesen. <b>{title}</b> wird zum Namen des Calls. Skripte mit „· DE“ in der Liste gibt es auch auf Deutsch: Sprache umstellen, dann lädt der Teleprompter die deutsche Fassung. Alles in [eckigen Klammern] sind Hinweise für dich, nicht zum Vorlesen.</p>
     <textarea id="ptext" placeholder="Zum Beispiel: Willkommen, schön, dass du heute da bist …"><?= $h($pText) ?></textarea>
     <p class="saved" id="psaved"></p>
     <div class="row"><button id="ptry" type="button" class="ghost">Teleprompter ausprobieren</button></div>
@@ -266,7 +272,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 </div>
 <?php endif; ?>
 
-<script src="/wildhearts/gathering/offer.js?v=7"></script>
+<script src="/wildhearts/gathering/offer.js?v=8"></script>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
@@ -385,7 +391,8 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       .catch(() => { if ('text' in data) sv.textContent = 'Keine Verbindung, der Text bleibt hier im Feld.'; });
     const fillIn = t => {
       const names = window.whNames ? window.whNames() : [];
-      const list = names.length ? (names.length > 1 ? names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1] : names[0]) : '[read the names you see in the room]';
+      const de = $('plang').value === 'de';
+      const list = names.length ? (names.length > 1 ? names.slice(0, -1).join(', ') + (de ? ' und ' : ' and ') + names[names.length - 1] : names[0]) : (de ? '[lies die Namen vor, die du im Raum siehst]' : '[read the names you see in the room]');
       const title = <?= json_encode($gath['title'] ?? null) ?> || (window.whCallTitle ? window.whCallTitle() : 'Wild Hearts Gathering');
       return t.replace(/\{names\}/g, list).replace(/\{title\}/g, title);
     };
@@ -393,11 +400,24 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     const paint = () => { const raw = fillIn(ta.value.trim()) || 'Noch kein Text. Schreib ihn in das Feld „Teleprompter“.'; txt.innerHTML = escT(raw).replace(/\[([^\]]*)\]/g, '<span class="dir">[$1]</span>'); txt.style.fontSize = pSize + 'px'; $('pspd').textContent = 'Tempo ' + pSpeed; };
     // Skript-Bibliothek
     const LIB = <?= json_encode($pLib, JSON_UNESCAPED_UNICODE) ?>;
-    const lib = $('plib');
+    const LIBDE = <?= json_encode($pDe, JSON_UNESCAPED_UNICODE) ?>;
+    const lib = $('plib'), lang = $('plang');
+    const pickText = k => lang.value === 'de' && LIBDE[k] ? LIBDE[k] : LIB[k];
+    const known = t => Object.values(LIB).includes(t) || Object.values(LIBDE).includes(t);
     lib.onchange = () => {
       const k = lib.value; if (!k || !(k in LIB)) return;
-      if (ta.value.trim() && ta.value !== LIB[k] && !Object.values(LIB).includes(ta.value) && !confirm('Dein aktueller Text ist nicht gespeichert. Trotzdem „' + k + '“ laden?')) { lib.value = ''; return; }
-      ta.value = LIB[k]; ta.dispatchEvent(new Event('input')); paint();
+      const t = pickText(k);
+      if (ta.value.trim() && ta.value !== t && !known(ta.value) && !confirm('Dein aktueller Text ist nicht gespeichert. Trotzdem „' + k + '“ laden?')) { lib.value = ''; return; }
+      ta.value = t; ta.dispatchEvent(new Event('input')); paint();
+    };
+    lang.onchange = () => {
+      save({lang: lang.value});
+      const k = lib.value;
+      if (k && k in LIB && known(ta.value)) {
+        if (lang.value === 'de' && !LIBDE[k]) sv.textContent = 'Dieses Skript gibt es noch nicht auf Deutsch, es bleibt Englisch.';
+        else { ta.value = pickText(k); ta.dispatchEvent(new Event('input')); }
+      }
+      paint();
     };
     $('plibsave').onclick = () => {
       const k = prompt('Unter welchem Namen speichern?', lib.value || 'Mein Skript'); if (!k) return;
@@ -483,7 +503,10 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
   const UL = $('ublist');
   if (UL) {
     const SW = ['#5E6B35', '#9DA58F', '#6B5D4C', '#B3A78F', '#3F4A26', '#8A8F6E'];
-    const DEF = ['Anna', 'Sophie', 'Lena', 'Emily', 'Julia', 'Katrin', 'Sarah', 'Clara', 'Hannah', 'Jessica', 'Maria', 'Theresa', 'Olivia', 'Nina', 'Rachel'];
+    // Namen aus aller Welt: Europa, USA, Lateinamerika, Asien, Afrika, Naher Osten
+    const WORLD = ['Anna', 'Sophie', 'Lena', 'Emily', 'Olivia', 'Chloé', 'Giulia', 'Lucía', 'Inês', 'Freya', 'Saoirse', 'Ingrid', 'Zofia', 'Eleni', 'Katarina', 'Madison', 'Ashley', 'Brooke', 'Jasmine', 'Valentina', 'Camila', 'Mariana', 'Yuki', 'Hana', 'Mei', 'Ji-woo', 'Priya', 'Ananya', 'Linh', 'Mai', 'Aiko', 'Siti', 'Leila', 'Yasmin', 'Noa', 'Amara', 'Zara', 'Nia', 'Aisha', 'Ayşe', 'Elif', 'Isla', 'Mia', 'Tamara', 'Rosa'];
+    const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    const DEF = shuffle(WORLD);
     let rows = [];
     try { rows = JSON.parse(localStorage.getItem('wh-uebung') || 'null') || []; } catch (e) {}
     const BUY = [['', 'bucht nichts'], ['circle', 'bucht Inner Circle'], ['year', 'bewirbt sich: Jahreskreis'], ['retreat', 'bucht Alpine Retreat']];
@@ -510,12 +533,13 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
         d.append(sw, n, by, pick, col, del); UL.appendChild(d);
       });
     };
+    if ($('ubmix')) $('ubmix').onclick = () => { const pool = shuffle(WORLD); rows.forEach((r, i) => { r.name = pool[i % pool.length]; }); store(); draw(); };
     $('ubadd').onclick = () => { if (rows.length >= 15) return; rows.push({name: DEF.find(d => !rows.some(r => r.name.trim() === d)) || 'Gast ' + (rows.length + 1), color: SW[rows.length % SW.length]}); store(); draw(); };
     draw();
 
     const QDEF = ["Hi Viv! Where are you joining from today?", "How do you find time for yourself with four kids?", "What do you do on days when you feel you got nothing done?", "I always feel guilty when I take time for myself. How do I stop that?", "Is this circle also for women without children?", "How long have you been doing this?", "What exactly happens in The Inner Circle, and what does it cost?", "Can I join the Alpine Retreat with my partner?", "I'm new here and a bit shy. Do I have to turn my camera on?", "What is one small thing I can do tomorrow morning?", "Do you ever feel like giving up?", "Will there be a recording of today?"];
     const ta2 = $('ubq'), qm = $('ubqmode'), qx = $('ubqmix');
-    const SRV = <?= json_encode($uFragen) ?>, SRVT = <?= json_encode($guest ? null : ((mm_cfg('uebung') ?? [])['titel'] ?? null)) ?>;
+    const SRV = <?= json_encode($uFragen) ?>, SRVT = <?= json_encode($guest ? null : ($probe ? $probe['title'] : ((mm_cfg('uebung') ?? [])['titel'] ?? null))) ?>;
     const tIn = $('ubtitle');
     try { tIn.value = SRVT ?? localStorage.getItem('wh-call-titel') ?? 'Wild Hearts Gathering'; } catch (e) { tIn.value = SRVT ?? 'Wild Hearts Gathering'; }
     let tSave2 = 0;

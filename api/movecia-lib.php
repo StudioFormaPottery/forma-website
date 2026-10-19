@@ -578,13 +578,27 @@ function mm_offer_schema(PDO $pdo): void
     $oc = array_column($pdo->query("SELECT name FROM pragma_table_info('mm_orders')")->fetchAll(), 'name');
     if (!in_array('plan', $oc, true)) { $pdo->exec("ALTER TABLE mm_orders ADD COLUMN plan TEXT NOT NULL DEFAULT 'full'"); $pdo->exec("ALTER TABLE mm_orders ADD COLUMN consent INTEGER NOT NULL DEFAULT 0"); $pdo->exec("ALTER TABLE mm_orders ADD COLUMN sub_id TEXT NOT NULL DEFAULT ''"); }
     if (!in_array('consent_digital', $oc, true)) $pdo->exec("ALTER TABLE mm_orders ADD COLUMN consent_digital INTEGER NOT NULL DEFAULT 0");
+    if (!in_array('ref_code', $oc, true)) {
+        // Empfehlungen (Inner Circle): eigener Einladungslink, wer wen eingeladen hat, wie viele Monate zum Vorteilspreis
+        $pdo->exec("ALTER TABLE mm_orders ADD COLUMN ref_code TEXT NOT NULL DEFAULT ''");
+        $pdo->exec("ALTER TABLE mm_orders ADD COLUMN referred_by INTEGER NOT NULL DEFAULT 0");
+        $pdo->exec("ALTER TABLE mm_orders ADD COLUMN ref_mail_sent INTEGER NOT NULL DEFAULT 0");
+        $pdo->exec("ALTER TABLE mm_orders ADD COLUMN special_months INTEGER NOT NULL DEFAULT 0");
+        $pdo->exec("ALTER TABLE mm_orders ADD COLUMN ref_bonus INTEGER NOT NULL DEFAULT 0");
+    }
+    if (!in_array('stay_code', $oc, true)) {
+        // Letzte Chance nach den Einführungsmonaten: persönlicher Code für weitere Monate zum Vorteilspreis
+        $pdo->exec("ALTER TABLE mm_orders ADD COLUMN stay_code TEXT NOT NULL DEFAULT ''");
+        $pdo->exec("ALTER TABLE mm_orders ADD COLUMN stay_until INTEGER NOT NULL DEFAULT 0");
+        $pdo->exec("ALTER TABLE mm_orders ADD COLUMN stay_used INTEGER NOT NULL DEFAULT 0");
+    }
 }
 
 /** Die drei Angebote mit Viv's Einstellungen (Titel, Text auf Englisch, regulärer Preis, Zahlungsart). */
 function mm_offers(): array
 {
     $def = [
-        'circle' => ['price' => 3900, 'special' => 2900, 'title' => 'The Inner Circle', 'billing' => 'monthly', 'text' => 'Your monthly circle: live gatherings, breathwork, gentle movement and a members area with rituals and affirmations. A space where women support each other and come back to themselves.'],
+        'circle' => ['price' => 3900, 'special' => 2900, 'periods' => [[6, 17400], [12, 31200]], 'title' => 'The Inner Circle', 'billing' => 'monthly', 'text' => 'Your monthly circle: live gatherings, breathwork, gentle movement and a members area with rituals and affirmations. A space where women support each other and come back to themselves.'],
         'year' => ['price' => 240000, 'special' => 199000, 'plans' => [[3, 80000, 66400], [6, 40000, 33200]], 'title' => 'The Year Circle', 'billing' => 'once', 'text' => 'Twelve months together: The Inner Circle plus 1:1 mentoring for the idea that is close to your heart. Like a best friend who walks the whole year with you.'],
         'retreat' => ['price' => 79000, 'special' => 69000, 'title' => 'Wild Hearts Alpine Retreat', 'billing' => 'once', 'text' => 'A weekend in the Austrian Alps: yoga, Pilates, forest walks, breathwork, pottery, cooking together and a women\'s circle. Lots of quiet, lots of nature, back to you.'],
     ];
@@ -600,7 +614,13 @@ function mm_offers(): array
             'special_cents' => max(0, (int)($c['special_cents'] ?? 0)) ?: $def[$k]['special'],
             // Ratenpläne (nur Jahreskreis): [Anzahl Raten, Rate regulär, Rate zum Gathering-Preis], z. B. 3 oder 6 Raten
             'plans' => array_values(array_filter(array_map(fn($x) => [max(0, (int)($x[0] ?? 0)), max(0, (int)($x[1] ?? 0)), max(0, (int)($x[2] ?? 0))], is_array($c['plans'] ?? null) ? $c['plans'] : ($def[$k]['plans'] ?? [])), fn($x) => $x[0] >= 2 && $x[1] > 0)),
+            // Inner Circle im Voraus: [Monate, Preis für den ganzen Zeitraum], verlängert sich, kündbar zum Ende des Zeitraums
+            'periods' => array_values(array_filter(array_map(fn($x) => [(int)($x[0] ?? 0), max(0, (int)($x[1] ?? 0))], is_array($c['periods'] ?? null) ? $c['periods'] : ($def[$k]['periods'] ?? [])), fn($x) => in_array($x[0], [6, 12], true) && $x[1] > 0)),
             'minutes' => max(5, min(180, (int)($c['minutes'] ?? 25))),
+            // Inner Circle: Vorteilspreis gilt nur für die ersten Monate, Empfehlung verlängert ihn, mit Obergrenze
+            'intro_months' => max(1, (int)($c['intro_months'] ?? 3)),
+            'ref_months' => max(1, (int)($c['ref_months'] ?? 3)),
+            'max_months' => max(1, (int)($c['max_months'] ?? 6)),
         ];
     }
     return $out;
@@ -625,12 +645,56 @@ function mm_price_en(int $cents, string $billing): string
 function mm_inst_public(string $offer, bool $live): ?array
 {
     $o = mm_offers()[$offer] ?? null;
+    if ($o && $o['periods']) return array_map(fn($p) => ['plan' => 'p' . $p[0], 'count' => $p[0], 'regular' => mm_price_en($p[1], 'once'), 'special' => null, 'label' => mm_period_label($p)], $o['periods']);
     if (!$o || !$o['plans']) return null;
     return array_map(fn($p) => ['plan' => 'inst' . $p[0], 'count' => $p[0], 'regular' => mm_price_en($p[1], 'once'),
         'special' => $live && $p[2] > 0 && $p[2] < $p[1] ? mm_price_en($p[2], 'once') : null], $o['plans']);
 }
 
+/** „for your first 3 months, then €39 / month“ beim Inner Circle (Monats-Abo mit Vorteilspreis). */
+function mm_intro_note(string $offer, int $regular, string $billing): ?string
+{
+    if ($billing !== 'monthly') return null;
+    $o = mm_offers()[$offer] ?? null;
+    return $o ? 'for your first ' . $o['intro_months'] . ' months, then ' . mm_price_en($regular, 'monthly') : null;
+}
+
+/** Stripe-Gutschein „X € weniger für N Monate“, einmal angelegt und gemerkt. */
+function mm_coupon(int $amountOff, int $months): string
+{
+    $cfg = mm_cfg('coupons') ?? [];
+    $key = $amountOff . 'x' . $months . (forma_stripe_test_mode() ? 't' : 'l');
+    if (!empty($cfg[$key])) return (string)$cfg[$key];
+    $c = forma_stripe('POST', '/v1/coupons', ['amount_off' => $amountOff, 'currency' => 'eur', 'duration' => 'repeating', 'duration_in_months' => $months, 'name' => 'Wild Hearts · ' . $months . ' months']);
+    $cfg[$key] = (string)$c['id'];
+    mm_save_cfg('coupons', $cfg);
+    return (string)$c['id'];
+}
+
+/** Bestellung zu einem Einladungscode (nur bezahlte Inner-Circle-Mitgliedschaften). */
+function mm_ref_order(PDO $pdo, string $code): ?array
+{
+    if ($code === '' || !preg_match('/^[a-z0-9]{6,16}$/', $code)) return null;
+    mm_offer_schema($pdo);
+    $s = $pdo->prepare("SELECT * FROM mm_orders WHERE ref_code = ? AND status = 'bezahlt' LIMIT 1");
+    $s->execute([$code]);
+    return $s->fetch() ?: null;
+}
+
 /** Ratenplan zu einem Plan-Kürzel wie „inst3“, oder null. */
+/** „or €312 per year (€26 / month)“ */
+function mm_period_label(array $p): string
+{
+    $per = mm_price_en((int)round($p[1] / $p[0]), 'monthly');
+    return 'or ' . mm_price_en($p[1], 'once') . ($p[0] === 12 ? ' per year' : ' every ' . $p[0] . ' months') . ' (' . $per . ')';
+}
+
+function mm_period_pick(string $offer, string $plan): ?array
+{
+    foreach (mm_offers()[$offer]['periods'] ?? [] as $p) if ('p' . $p[0] === $plan) return $p;
+    return null;
+}
+
 function mm_plan_pick(string $offer, string $plan): ?array
 {
     foreach (mm_offers()[$offer]['plans'] ?? [] as $p) if ('inst' . $p[0] === $plan) return $p;
@@ -656,7 +720,7 @@ function mm_spotlight_public(?array $sp): ?array
             $live = $open && (int)$it['special_cents'] > 0 && (int)$it['special_cents'] < (int)$it['regular_cents'];
             $items[] = ['offer' => $it['offer'], 'title' => $it['title'], 'text' => $it['text'], 'billing' => $it['billing'],
                 'regular' => mm_price_en((int)$it['regular_cents'], $it['billing']), 'special' => $live ? mm_price_en((int)$it['special_cents'], $it['billing']) : null, 'live' => $live,
-                'inst' => mm_inst_public($it['offer'], $live)];
+                'inst' => mm_inst_public($it['offer'], $live), 'note' => $live ? mm_intro_note($it['offer'], (int)$it['regular_cents'], $it['billing']) : null];
         }
         $any = (bool)array_filter($items, fn($i) => $i['live']);
         return ['id' => (int)$sp['id'], 'offer' => 'all', 'title' => 'Ways to walk with me', 'items' => $items, 'until' => (int)$sp['until'], 'now' => time(), 'live' => $any];
@@ -668,6 +732,7 @@ function mm_spotlight_public(?array $sp): ?array
         'special' => $live ? mm_price_en((int)$sp['special_cents'], $sp['billing']) : null,
         'until' => (int)$sp['until'], 'now' => time(), 'live' => $live,
         'inst' => mm_inst_public($sp['offer'], $live),
+        'note' => $live ? mm_intro_note($sp['offer'], (int)$sp['regular_cents'], $sp['billing']) : null,
     ];
 }
 
@@ -726,20 +791,32 @@ function mm_order_checkout(PDO $pdo, array $sp, string $name, string $email, str
         $amount = $special && $pp[2] > 0 && $pp[2] < $pp[1] ? $pp[2] : $pp[1];
         $sp['billing'] = 'monthly';
     }
+    // Inner Circle im Voraus (6 Monate / 1 Jahr): fester Preis, kein Gathering-Rabatt, keine Empfehlung
+    $per = (!$inst && $off) ? mm_period_pick($sp['offer'], $plan) : null;
+    if ($per) { $amount = $per[1]; $special = false; $sp['billing'] = 'monthly'; $sp['referred_by'] = 0; unset($sp['force_intro']); }
+    // Inner Circle (Monats-Abo): immer der reguläre Preis, der Vorteilspreis kommt als Gutschein für die ersten Monate
+    $coupon = '';
+    $refBy = (int)($sp['referred_by'] ?? 0);
+    if ($sp['billing'] === 'monthly' && !$inst && !$per && $off && ($special || $refBy || !empty($sp['force_intro'])) && (int)$sp['special_cents'] > 0 && (int)$sp['special_cents'] < (int)$sp['regular_cents']) {
+        $coupon = mm_coupon((int)$sp['regular_cents'] - (int)$sp['special_cents'], (int)($sp['force_intro'] ?? 0) ?: $off['intro_months']);
+        $amount = (int)$sp['special_cents'];
+        $special = true;
+    }
     $tok = bin2hex(random_bytes(16));
     $test = $sp['scope'] === 'test' ? 1 : 0;
     $pdo->prepare('INSERT INTO mm_orders (spotlight_id, scope, offer, title, billing, name, email, amount_cents, special, token, test, created_at, plan, consent, consent_digital) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
-        ->execute([(int)$sp['id'], $sp['scope'], $sp['offer'], $sp['title'], $sp['billing'], mb_substr($name, 0, 80), mb_substr($email, 0, 160), $amount, $special ? 1 : 0, $tok, $test, date('c'), $inst ? 'inst' . $pp[0] : 'full', $consent ? 1 : 0, $digital ? 1 : 0]);
+        ->execute([(int)$sp['id'], $sp['scope'], $sp['offer'], $sp['title'], $sp['billing'], mb_substr($name, 0, 80), mb_substr($email, 0, 160), $amount, $special ? 1 : 0, $tok, $test, date('c'), $inst ? 'inst' . $pp[0] : ($per ? 'p' . $per[0] : 'full'), $consent ? 1 : 0, $digital ? 1 : 0]);
     $oid = (int)$pdo->lastInsertId();
+    if ($refBy) $pdo->prepare('UPDATE mm_orders SET referred_by = ? WHERE id = ?')->execute([$refBy, $oid]);
     $site = mm_site();
-    $price = ['currency' => 'eur', 'unit_amount' => $amount, 'product_data' => ['name' => $sp['title'] . ($inst ? ' · ' . $pp[0] . ' monthly payments' : '') . ($special ? ' · Gathering price' : ''), 'description' => 'Wild Hearts Collective · Movecia, Vivien Malonga']];
-    if ($sp['billing'] === 'monthly') $price['recurring'] = ['interval' => 'month'];
+    $price = ['currency' => 'eur', 'unit_amount' => $coupon ? (int)$sp['regular_cents'] : $amount, 'product_data' => ['name' => $sp['title'] . ($inst ? ' · ' . $pp[0] . ' monthly payments' : '') . ($per ? ($per[0] === 12 ? ' · yearly' : ' · every 6 months') : '') . ($special && !$coupon ? ' · Gathering price' : ''), 'description' => 'Wild Hearts Collective · Movecia, Vivien Malonga']];
+    if ($sp['billing'] === 'monthly') $price['recurring'] = $per ? ($per[0] === 12 ? ['interval' => 'year'] : ['interval' => 'month', 'interval_count' => $per[0]]) : ['interval' => 'month'];
     $params = [
         'mode' => $sp['billing'] === 'monthly' ? 'subscription' : 'payment',
         'locale' => 'en',
         'billing_address_collection' => 'required',
         'client_reference_id' => 'wh-order-' . $oid,
-        'metadata' => ['wh_order_id' => (string)$oid, 'plan' => $inst ? 'inst' . $pp[0] : 'full'],
+        'metadata' => ['wh_order_id' => (string)$oid, 'plan' => $inst ? 'inst' . $pp[0] : ($per ? 'p' . $per[0] : 'full')],
         'custom_text' => ['submit' => ['message' => 'By paying you accept the terms and cancellation policy: ' . $site . '/terms' . ($sp['offer'] !== 'retreat' && $consent ? ' · You asked for your access to start right away.' : '')]],
         'line_items' => [['quantity' => 1, 'price_data' => $price]],
         'expires_at' => time() + 31 * 60,
@@ -747,6 +824,9 @@ function mm_order_checkout(PDO $pdo, array $sp, string $name, string $email, str
         'cancel_url' => $site . '/api/wh-order.php?o=' . $oid . '&k=' . $tok . '&cancel=1',
     ];
     if ($email !== '') $params['customer_email'] = $email;
+    // Gutscheincode-Feld im Bezahlfenster (geht bei Stripe nur, wenn nicht schon ein Rabatt drin ist)
+    if ($coupon) $params['discounts'] = [['coupon' => $coupon]];
+    else $params['allow_promotion_codes'] = 'true';
     $session = forma_stripe('POST', '/v1/checkout/sessions', $params);
     $pdo->prepare('UPDATE mm_orders SET stripe_session = ? WHERE id = ?')->execute([(string)$session['id'], $oid]);
     return (string)$session['url'];
@@ -771,12 +851,20 @@ function mm_order_check(PDO $pdo, array $o): string
         } catch (Throwable $e) { error_log('MM inst cancel_at: ' . $e->getMessage()); }
         $pdo->prepare('UPDATE mm_orders SET sub_id = ? WHERE id = ?')->execute([(string)$s['subscription'], $o['id']]);
     }
+    if ($o['billing'] === 'monthly' && (string)($o['plan'] ?? 'full') === 'full' && ($o['ref_code'] ?? '') === '') {
+        $off = mm_offers()[$o['offer']] ?? null;
+        $pdo->prepare('UPDATE mm_orders SET ref_code = ?, sub_id = CASE WHEN sub_id = \'\' THEN ? ELSE sub_id END, special_months = ? WHERE id = ?')
+            ->execute([substr(bin2hex(random_bytes(8)), 0, 10), (string)($s['subscription'] ?? ''), $o['special'] ? ($off['intro_months'] ?? 3) : 0, $o['id']]);
+    }
+    if (str_starts_with((string)($o['plan'] ?? ''), 'p') && !empty($s['subscription']) && ($o['sub_id'] ?? '') === '') $pdo->prepare('UPDATE mm_orders SET sub_id = ? WHERE id = ?')->execute([(string)$s['subscription'], $o['id']]);
     $u = $pdo->prepare("UPDATE mm_orders SET status = 'bezahlt', paid_at = ?, email = ?, name = CASE WHEN name = '' THEN ? ELSE name END WHERE id = ? AND status = 'offen'");
     $u->execute([date('c'), $email, $name, $o['id']]);
     if ($u->rowCount() === 1) {
         $first = forma_first_name($name ?: 'love');
         $cnt = max(2, (int)substr((string)($o['plan'] ?? 'inst0'), 4));
-        $price = str_starts_with((string)($o['plan'] ?? 'full'), 'inst') ? $cnt . ' monthly payments of ' . mm_price_en((int)$o['amount_cents'], 'once') : mm_price_en((int)$o['amount_cents'], $o['billing']);
+        $pl = (string)($o['plan'] ?? 'full');
+        $price = str_starts_with($pl, 'inst') ? $cnt . ' monthly payments of ' . mm_price_en((int)$o['amount_cents'], 'once')
+            : ($pl === 'p12' ? mm_price_en((int)$o['amount_cents'], 'once') . ' per year' : ($pl === 'p6' ? mm_price_en((int)$o['amount_cents'], 'once') . ' every 6 months' : mm_price_en((int)$o['amount_cents'], $o['billing'])));
         $site = mm_site();
         $legal = $o['offer'] === 'retreat'
             ? "Retreats take place on fixed dates, so there is no statutory right of withdrawal (§ 18 (1) 10 FAGG). Our cancellation policy applies: $site/terms"
@@ -792,6 +880,7 @@ function mm_order_check(PDO $pdo, array $o): string
         if ($email !== '') mm_mail($email, ($o['test'] ? '[TEST] ' : '') . 'You are in: ' . $o['title'], $t, mm_mail_html('You are in', $html));
         $v = "Hallo Viv,\n\n" . ($name ?: 'Jemand') . " ($email) hat gerade {$o['title']} gebucht und bezahlt: $price" . ($o['special'] ? ' (Gathering-Preis)' : ' (regulärer Preis)') . ".\n" . ($o['test'] ? "\nDas war eine Testbuchung aus dem Testraum.\n" : '') . "\nDu siehst alle Buchungen in der Verwaltung unter Movecia Movement → Angebote.\n";
         mm_mail(MM_FROM_EMAIL, ($o['test'] ? '[TEST] ' : '') . 'Neue Buchung: ' . $o['title'] . ' · ' . ($name ?: $email), $v, mm_mail_html('Neue Buchung', nl2br(forma_h($v)), 'de'));
+        if ((int)($o['referred_by'] ?? 0)) { try { mm_ref_reward($pdo, (int)$o['referred_by'], $name ?: 'a friend'); } catch (Throwable $e) { error_log('MM ref reward: ' . $e->getMessage()); } }
     }
     return 'bezahlt';
 }
@@ -860,4 +949,218 @@ function mm_gathering_presets(): array
         ['label' => 'Samhain · 20 Min', 'title' => 'Samhain Gathering · The Old New Year', 'minutes' => 20, 'time' => '19:00', 'date' => '2026-10-31', 'script' => 'Samhain · 20 min · Free gathering',
          'text' => "On the 31st of October we celebrate Samhain, the old New Year in the Wheel of the Year. A free 20-minute circle by candlelight: we honour the women before us, let go of what is finished and choose a seed to carry through winter. Bring a candle, a pen and paper."],
     ];
+}
+
+
+// --- Empfehlungen im Inner Circle -----------------------------------------------------------
+
+/** Die Einladende bekommt weitere Monate zum Vorteilspreis, höchstens bis zur Obergrenze. */
+function mm_ref_reward(PDO $pdo, int $refId, string $friend): void
+{
+    $s = $pdo->prepare("SELECT * FROM mm_orders WHERE id = ? AND status = 'bezahlt'");
+    $s->execute([$refId]);
+    $r = $s->fetch();
+    if (!$r) return;
+    $o = mm_offers()[$r['offer']] ?? null;
+    if (!$o) return;
+    $used = (int)$r['special_months'];
+    $add = min($o['ref_months'], max(0, $o['max_months'] - $used));
+    $first = forma_first_name((string)$r['name'] ?: 'love');
+    $friend = forma_first_name($friend);
+    $pdo->prepare('UPDATE mm_orders SET ref_bonus = ref_bonus + 1 WHERE id = ?')->execute([$refId]);
+    if ($add > 0 && $r['sub_id'] !== '') {
+        $sub = forma_stripe('GET', '/v1/subscriptions/' . rawurlencode((string)$r['sub_id']));
+        $left = 0;
+        $end = (int)($sub['discount']['end'] ?? 0);
+        if ($end > time()) $left = (int)round(($end - time()) / (30.44 * 86400));
+        $coupon = mm_coupon((int)$o['price_cents'] - (int)$o['special_cents'], $left + $add);
+        forma_stripe('POST', '/v1/subscriptions/' . rawurlencode((string)$r['sub_id']), ['discounts' => [['coupon' => $coupon]]]);
+        $pdo->prepare('UPDATE mm_orders SET special_months = special_months + ? WHERE id = ?')->execute([$add, $refId]);
+        $price = mm_price_en((int)$o['special_cents'], 'monthly');
+        $t = "Dear $first,\n\n$friend just joined The Inner Circle with your invitation. Thank you so much for sharing our circle! 🤍\n\nAs a thank you, you keep your price of $price for $add more months.\n\nWith love\nViv";
+    } else {
+        $t = "Dear $first,\n\n$friend just joined The Inner Circle with your invitation. Thank you so much for sharing our circle! 🤍\n\nYou have already received the full thank-you of " . $o['max_months'] . " months at the circle price, but your friend still gets her first months at the circle price thanks to you.\n\nWith love\nViv";
+    }
+    if ($r['email'] !== '') mm_mail((string)$r['email'], ($r['test'] ? '[TEST] ' : '') . $friend . ' joined thanks to you', $t, mm_mail_html('Thank you', nl2br(forma_h($t))));
+}
+
+/** Zu Beginn des 3. Monats: Mail mit dem persönlichen Einladungslink (läuft bei Seitenaufrufen mit). */
+function mm_send_ref_mails(PDO $pdo): void
+{
+    mm_offer_schema($pdo);
+    $chk = mm_cfg('refmail') ?? [];
+    if (time() - (int)($chk['at'] ?? 0) < 900) return;
+    mm_save_cfg('refmail', ['at' => time()]);
+    $q = $pdo->prepare("SELECT * FROM mm_orders WHERE status = 'bezahlt' AND billing = 'monthly' AND ref_code <> '' AND ref_mail_sent = 0 AND paid_at <= ? LIMIT 20");
+    $q->execute([date('c', strtotime('-2 months'))]);
+    foreach ($q->fetchAll() as $r) {
+        $pdo->prepare('UPDATE mm_orders SET ref_mail_sent = 1 WHERE id = ?')->execute([$r['id']]);
+        if ($r['sub_id'] !== '' && forma_stripe_key()) {
+            try { $sub = forma_stripe('GET', '/v1/subscriptions/' . rawurlencode((string)$r['sub_id'])); if (!in_array($sub['status'] ?? '', ['active', 'trialing', 'past_due'], true)) continue; }
+            catch (Throwable $e) { error_log('MM ref mail sub: ' . $e->getMessage()); }
+        }
+        $o = mm_offers()[$r['offer']] ?? null;
+        if (!$o || $r['email'] === '') continue;
+        $first = forma_first_name((string)$r['name'] ?: 'love');
+        $link = mm_site() . '/circle/?ref=' . $r['ref_code'];
+        $sp = mm_price_en((int)$o['special_cents'], 'monthly');
+        $more = ((int)$r['special_months'] < $o['max_months']) ? "and you get {$o['ref_months']} more months at $sp yourself" : 'as a little gift from you';
+        $t = "Dear $first,\n\nyou have been part of The Inner Circle for two months now, and I am so grateful you are here.\n\nIs there a friend who would love this circle too? Here is your personal invitation link:\n$link\n\nWith your link, your friend gets her first {$o['intro_months']} months at $sp, $more.\n\nWith love\nViv";
+        $html = '<p>Dear ' . forma_h($first) . ',</p><p>you have been part of The Inner Circle for two months now, and I am so grateful you are here.</p><p>Is there a friend who would love this circle too? Share your personal invitation link with her:</p>'
+            . mm_button($link, 'Your invitation link') . '<p style="font-size:14px;word-break:break-all;color:#6B5D4C;">' . forma_h($link) . '</p>'
+            . '<p>With your link, your friend gets her first ' . (int)$o['intro_months'] . ' months at ' . forma_h($sp) . ', ' . forma_h($more) . '.</p>';
+        mm_mail((string)$r['email'], ($r['test'] ? '[TEST] ' : '') . 'Invite a friend to The Inner Circle', $t, mm_mail_html('Invite a friend', $html));
+    }
+}
+
+// --- Einmalige Einrichtung durch die Website selbst (läuft beim ersten Seitenaufruf nach dem Update) ---
+
+/**
+ * Legt Dinge an, die Viv nicht selbst anlegen möchte:
+ * - das Samhain-Gathering am 31.10.2026 aus der Vorlage (mit Skript und Videoraum), genau einmal;
+ * Wird ein Eintrag später gelöscht, legt die Website ihn nicht wieder an.
+ */
+function mm_auto_setup(PDO $pdo): void
+{
+    $st = mm_cfg('setup') ?? [];
+    $changed = false;
+    // Samhain-Gathering
+    if (empty($st['samhain']) && time() < strtotime('2026-11-01')) {
+        $pr = null;
+        foreach (mm_gathering_presets() as $x) if (($x['date'] ?? '') === '2026-10-31') $pr = $x;
+        if ($pr) {
+            $q = $pdo->prepare("SELECT id FROM mm_gatherings WHERE starts_at LIKE '2026-10-31%' LIMIT 1");
+            $q->execute();
+            $gid = (int)($q->fetchColumn() ?: 0);
+            if (!$gid) {
+                $pdo->prepare('INSERT INTO mm_gatherings (title, starts_at, minutes, description, script, created_at) VALUES (?,?,?,?,?,?)')
+                    ->execute([$pr['title'], $pr['date'] . 'T' . $pr['time'], $pr['minutes'], $pr['text'], $pr['script'], date('c')]);
+                $gid = (int)$pdo->lastInsertId();
+            }
+            $st['samhain'] = $gid;
+            $changed = true;
+        }
+    }
+    // Videoraum fürs Samhain-Gathering nachholen, falls er fehlt (höchstens stündlich versuchen)
+    if (!empty($st['samhain']) && mm_whereby_key() !== '' && time() - (int)($st['room_try'] ?? 0) > 3600) {
+        $g = mm_gathering($pdo, (int)$st['samhain']);
+        if ($g && $g['room_url'] === '' && strtotime($g['starts_at']) > time() - 3600) {
+            $st['room_try'] = time();
+            $changed = true;
+            try { mm_whereby_room($pdo, (int)$g['id']); } catch (Throwable $e) { error_log('MM samhain room: ' . $e->getMessage()); }
+        }
+    }
+    if ($changed) mm_save_cfg('setup', $st);
+}
+
+/**
+ * 100-%-Gutscheincode für Vivs eigene Testbuchungen. Wird nur aus der Verwaltung (nach dem Login) angelegt,
+ * zufällig erzeugt, nirgends öffentlich und nicht per Mail. Höchstens 3 Mal, 30 Tage gültig.
+ */
+function mm_test_promo(): ?array
+{
+    $st = mm_cfg('setup') ?? [];
+    $changed = false;
+    if (empty($st['testpromo']) && forma_stripe_key() && time() - (int)($st['promo_try'] ?? 0) > 3600) {
+        $st['promo_try'] = time();
+        $changed = true;
+        try {
+            $until = time() + 30 * 86400;
+            $c = forma_stripe('POST', '/v1/coupons', ['percent_off' => 100, 'duration' => 'forever', 'max_redemptions' => 3, 'redeem_by' => $until, 'name' => 'Testbuchung Viv 100 %', 'metadata' => ['wild_hearts' => 'testbuchung']]);
+            $code = 'VIVTEST' . strtoupper(bin2hex(random_bytes(4)));
+            $p = forma_stripe('POST', '/v1/promotion_codes', ['coupon' => (string)$c['id'], 'code' => $code, 'max_redemptions' => 3, 'expires_at' => $until]);
+            $st['testpromo'] = ['code' => (string)($p['code'] ?? $code), 'id' => (string)($p['id'] ?? ''), 'coupon' => (string)$c['id'], 'until' => $until, 'live' => !forma_stripe_test_mode()];
+        } catch (Throwable $e) { error_log('MM test promo: ' . $e->getMessage()); }
+    }
+    if ($changed) mm_save_cfg('setup', $st);
+    return $st['testpromo'] ?? null;
+}
+
+
+// --- Letzte Chance: nach den Einführungsmonaten ohne Empfehlung noch einmal Monate zum Vorteilspreis ---
+
+/**
+ * Kurz bevor die Einführungsmonate enden (und die Frau niemanden eingeladen hat), kommt eine Mail mit
+ * einem persönlichen Code: noch einmal ref_months Monate zum Vorteilspreis, direkt im Anschluss.
+ * Der Code gilt nur bis 7 Tage nach Ende der Einführungsmonate, danach gilt der reguläre Preis.
+ * Die Obergrenze max_months gilt auch hier. Läuft bei Seitenaufrufen mit (höchstens alle 15 Min.).
+ */
+function mm_send_stay_mails(PDO $pdo): void
+{
+    mm_offer_schema($pdo);
+    if (!forma_stripe_key()) return;
+    $chk = mm_cfg('staymail') ?? [];
+    if (time() - (int)($chk['at'] ?? 0) < 900) return;
+    mm_save_cfg('staymail', ['at' => time()]);
+    $o = mm_offers()['circle'];
+    $q = $pdo->prepare("SELECT * FROM mm_orders WHERE status = 'bezahlt' AND offer = 'circle' AND billing = 'monthly' AND plan = 'full' AND sub_id <> '' AND stay_code = '' AND ref_bonus = 0 AND special_months > 0 AND special_months < ? AND paid_at <= ? LIMIT 20");
+    $q->execute([$o['max_months'], date('c', strtotime('-' . max(1, $o['intro_months'] - 1) . ' months'))]);
+    foreach ($q->fetchAll() as $r) {
+        try { $sub = forma_stripe('GET', '/v1/subscriptions/' . rawurlencode((string)$r['sub_id'])); } catch (Throwable $e) { error_log('MM stay sub: ' . $e->getMessage()); continue; }
+        $end = (int)($sub['discount']['end'] ?? 0);
+        if (!$end) $end = strtotime((string)$r['paid_at'] . ' +' . (int)$r['special_months'] . ' months');
+        if ($end > time() + 7 * 86400) continue; // noch zu früh
+        $code = 'STAY-' . strtoupper(bin2hex(random_bytes(4)));
+        $until = max($end, time()) + 7 * 86400;
+        $pdo->prepare('UPDATE mm_orders SET stay_code = ?, stay_until = ? WHERE id = ?')->execute([$code, $until, $r['id']]);
+        if ($end < time() - 7 * 86400 || !in_array($sub['status'] ?? '', ['active', 'trialing', 'past_due', 'canceled'], true) || $r['email'] === '') continue;
+        $first = forma_first_name((string)$r['name'] ?: 'love');
+        $months = min($o['ref_months'], $o['max_months'] - (int)$r['special_months']);
+        $sp = mm_price_en((int)$o['special_cents'], 'monthly');
+        $reg = mm_price_en((int)$o['price_cents'], 'monthly');
+        $link = mm_site() . '/circle/?stay=' . $code;
+        $ref = $r['ref_code'] !== '' ? mm_site() . '/circle/?ref=' . $r['ref_code'] : '';
+        $date = date('j F Y', $until);
+        $t = "Dear $first,\n\nI really hope you have enjoyed your first months in The Inner Circle. It means so much to me that you are part of it.\n\nYour circle price is coming to an end now. If you would like to stay, here is a little gift for you: $months more months at $sp, right after your first ones.\n\nYour personal code: $code\nKeep your circle price: $link\n\nThe code is only valid if you use it straight away, until $date. After that, the regular price of $reg applies.\n"
+            . ($ref ? "\nAnd if a friend would love the circle too, your invitation link still works: $ref\nShe gets her first {$o['intro_months']} months at $sp.\n" : '') . "\nWith love\nViv";
+        $html = '<p>Dear ' . forma_h($first) . ',</p><p>I really hope you have enjoyed your first months in The Inner Circle. It means so much to me that you are part of it.</p>'
+            . '<p>Your circle price is coming to an end now. If you would like to stay, here is a little gift for you: <strong>' . $months . ' more months at ' . forma_h($sp) . '</strong>, right after your first ones.</p>'
+            . '<p style="font-size:22px;letter-spacing:.08em;color:#3F4A26;margin:18px 0 6px;">' . forma_h($code) . '</p>'
+            . mm_button($link, 'Keep my circle price')
+            . '<p style="font-size:14px;color:#6B5D4C;">The code is only valid if you use it straight away, until ' . forma_h($date) . '. After that, the regular price of ' . forma_h($reg) . ' applies.</p>'
+            . ($ref ? '<p>And if a friend would love the circle too, your invitation link still works. She gets her first ' . (int)$o['intro_months'] . ' months at ' . forma_h($sp) . ':</p>' . mm_button($ref, 'Invite a friend') : '');
+        mm_mail((string)$r['email'], ($r['test'] ? '[TEST] ' : '') . 'A little gift, if you would like to stay', $t, mm_mail_html('Stay with us', $html));
+    }
+}
+
+/** Bestellung zu einem gültigen Bleibe-Code. */
+function mm_stay_order(PDO $pdo, string $code): ?array
+{
+    $code = strtoupper(trim($code));
+    if (!preg_match('/^STAY-[0-9A-F]{8}$/', $code)) return null;
+    mm_offer_schema($pdo);
+    $s = $pdo->prepare("SELECT * FROM mm_orders WHERE stay_code = ? AND status = 'bezahlt' AND stay_used = 0 AND stay_until >= ? LIMIT 1");
+    $s->execute([$code, time()]);
+    return $s->fetch() ?: null;
+}
+
+/**
+ * Löst den Bleibe-Code ein. Läuft das Abo noch (auch gekündigt zum Monatsende), bekommt es den Rabatt
+ * für die nächsten Monate und läuft weiter. Ist es schon beendet, entsteht ein neuer Checkout mit dem Rabatt.
+ * Gibt ['done' => true] oder ['redirect' => URL] zurück.
+ */
+function mm_stay_redeem(PDO $pdo, array $r, int $consent, int $digital): array
+{
+    $o = mm_offers()['circle'];
+    $months = max(1, min($o['ref_months'], $o['max_months'] - (int)$r['special_months']));
+    $sub = $r['sub_id'] !== '' ? forma_stripe('GET', '/v1/subscriptions/' . rawurlencode((string)$r['sub_id'])) : [];
+    if (in_array($sub['status'] ?? '', ['active', 'trialing', 'past_due'], true)) {
+        $left = 0;
+        $end = (int)($sub['discount']['end'] ?? 0);
+        if ($end > time()) $left = (int)round(($end - time()) / (30.44 * 86400));
+        $coupon = mm_coupon((int)$o['price_cents'] - (int)$o['special_cents'], $left + $months);
+        forma_stripe('POST', '/v1/subscriptions/' . rawurlencode((string)$r['sub_id']), ['discounts' => [['coupon' => $coupon]], 'cancel_at_period_end' => 'false']);
+        $pdo->prepare('UPDATE mm_orders SET stay_used = 1, special_months = special_months + ? WHERE id = ?')->execute([$months, $r['id']]);
+        $first = forma_first_name((string)$r['name'] ?: 'love');
+        $t = "Dear $first,\n\nhow lovely that you are staying! Your circle price of " . mm_price_en((int)$o['special_cents'], 'monthly') . " continues for $months more months, then the regular price of " . mm_price_en((int)$o['price_cents'], 'monthly') . " applies. You can still cancel at any time, effective at the end of the month you have paid.\n\nWith love\nViv";
+        mm_mail((string)$r['email'], ($r['test'] ? '[TEST] ' : '') . 'You are staying in The Inner Circle', $t, mm_mail_html('You are staying', nl2br(forma_h($t))));
+        mm_mail(MM_FROM_EMAIL, 'Bleibt im Inner Circle: ' . ($r['name'] ?: $r['email']), "Hallo Viv,\n\n" . ($r['name'] ?: 'Jemand') . " ({$r['email']}) hat ihren Bleibe-Code eingelöst und zahlt $months weitere Monate den Gathering-Preis.\n", mm_mail_html('Bleibt im Inner Circle', nl2br(forma_h(($r['name'] ?: 'Jemand') . " ({$r['email']}) hat ihren Bleibe-Code eingelöst und zahlt $months weitere Monate den Gathering-Preis.")), 'de'));
+        return ['done' => true];
+    }
+    // Abo schon beendet: neue Mitgliedschaft mit dem Rabatt für die Monate
+    $pdo->prepare('UPDATE mm_orders SET stay_used = 1 WHERE id = ?')->execute([$r['id']]);
+    $sp = ['id' => 0, 'scope' => 'circle', 'offer' => 'circle', 'title' => $o['title'], 'text' => $o['text'], 'billing' => 'monthly',
+        'regular_cents' => $o['price_cents'], 'special_cents' => $o['special_cents'], 'until' => 0, 'items' => '', 'force_intro' => $months];
+    $url = mm_order_checkout($pdo, $sp, (string)$r['name'], (string)$r['email'], '', 'full', $consent, $digital);
+    return ['redirect' => $url];
 }

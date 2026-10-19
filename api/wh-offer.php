@@ -9,6 +9,7 @@ $pdo = forma_db();
 mm_schema($pdo);
 mm_offer_schema($pdo);
 mm_q_schema($pdo);
+try { mm_send_ref_mails($pdo); mm_send_stay_mails($pdo); } catch (Throwable $e) { error_log('MM ref mails: ' . $e->getMessage()); }
 $out = function (array $d, int $code = 200): void { http_response_code($code); echo json_encode($d, JSON_UNESCAPED_UNICODE); exit; };
 
 $in = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' ? (json_decode((string)file_get_contents('php://input'), true) ?: []) : $_GET;

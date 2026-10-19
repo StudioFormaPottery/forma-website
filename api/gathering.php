@@ -7,6 +7,7 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 $pdo = forma_db();
 mm_schema($pdo);
+try { mm_auto_setup($pdo); } catch (Throwable $e) { error_log('MM setup: ' . $e->getMessage()); }
 $out = function (array $d, int $code = 200): void { http_response_code($code); echo json_encode($d, JSON_UNESCAPED_UNICODE); exit; };
 
 try { mm_send_reminders($pdo); } catch (Throwable $e) { error_log('MM reminders: ' . $e->getMessage()); }

@@ -5,6 +5,7 @@ require dirname(__DIR__, 2) . '/api/movecia-lib.php';
 header('Cache-Control: no-store');
 $pdo = forma_db();
 mm_schema($pdo);
+try { mm_auto_setup($pdo); } catch (Throwable $e) { error_log('MM setup: ' . $e->getMessage()); }
 try { mm_send_reminders($pdo); } catch (Throwable $e) { error_log('MM reminders: ' . $e->getMessage()); }
 
 // Technik-Test: nur mit dem geheimen Token aus der Verwaltung
@@ -23,6 +24,7 @@ if ($testTok !== '') {
         if (isset($in['lib_delete'])) { $t = (string)$in['lib_delete']; unset($p['library'][$t]); $p['hidden'][] = $t; $p['hidden'] = array_values(array_unique($p['hidden'])); }
         if (isset($in['fragen'])) { $u = mm_cfg('uebung') ?? []; $u['fragen'] = mb_substr((string)$in['fragen'], 0, 20000); mm_save_cfg('uebung', $u); }
         if (isset($in['titel'])) { $u = mm_cfg('uebung') ?? []; $u['titel'] = mb_substr(trim((string)$in['titel']), 0, 80); mm_save_cfg('uebung', $u); }
+        if (isset($in['lang'])) $p['lang'] = $in['lang'] === 'de' ? 'de' : 'en';
         foreach (['speed' => [5, 200], 'size' => [18, 72]] as $k => [$lo, $hi]) if (isset($in[$k])) $p[$k] = max($lo, min($hi, (int)$in[$k]));
         mm_save_cfg('prompter', $p);
         header('Content-Type: application/json');
@@ -40,6 +42,8 @@ if ($testTok !== '') {
         exit;
     }
     $gath = null;
+    // Probelauf für ein bestimmtes Gathering im Testraum (Übungsfenster, Skript und Call-Name dieses Gatherings): ?test=TOKEN&probe=ID
+    $probe = !$guest && !empty($_GET['probe']) ? mm_gathering($pdo, (int)$_GET['probe']) : null;
     if (!$guest && (empty($tr['room_url']) || (int)($tr['ends'] ?? 0) < time() + 3600)) {
         try { $tr = mm_testroom(); } catch (Throwable $e) { error_log('MM testroom: ' . $e->getMessage()); }
     }
@@ -137,7 +141,7 @@ body.room{background:var(--earth)}
   ping(); setInterval(ping, 60000);
 })();
 </script>
-<script src="/wildhearts/gathering/offer.js?v=7"></script>
+<script src="/wildhearts/gathering/offer.js?v=8"></script>
 <script>whOffer({k: <?= json_encode($tok) ?>});</script>
 </body>
 <?php else: ?>
