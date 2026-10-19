@@ -6,6 +6,7 @@ $h = 'forma_h';
 $gath = $gath ?? null;
 $prompter = $prompter ?? [];
 $pText = (string)($prompter['text'] ?? '');
+$uFragen = $guest ? null : ((mm_cfg('uebung') ?? [])['fragen'] ?? null);
 $pSpeed = (int)($prompter['speed'] ?? 40);
 $pSize = (int)($prompter['size'] ?? 34);
 $offers = $guest ? [] : mm_offers();
@@ -76,6 +77,11 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 .practice .pbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 16px;color:#B3A78F;font-size:14px}
 .practice .pbar button{padding:7px 16px;font-size:15px;background:#DCE0D2;color:#3F4A26}
 .practice .pbar .recon{background:#93402F;color:#FBF1EA}
+.pask{display:flex;gap:8px;flex-wrap:wrap;padding:10px 16px;background:#1F1C16;border-top:1px solid #4a4337}
+.pask select,.pask input{font:inherit;font-size:16px;padding:9px 12px;border-radius:12px;border:1px solid #4a4337;background:#2c2820;color:#F6F3EA}
+.pask input{flex:1 1 260px;min-width:0}
+.pask button{padding:9px 16px;font-size:15px;background:#DCE0D2;color:#3F4A26}
+.pask button.ghost{background:transparent;color:#DCE0D2;border:1px solid #6B5D4C}
 .ublist{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .ubrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .ubrow input[type=text]{font:inherit;font-size:16px;padding:10px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--cream);flex:1 1 160px;min-width:0}
@@ -135,7 +141,9 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     <div class="row"><button type="button" class="ghost" id="ubadd">+ Fenster</button></div>
     <h3 style="font-size:18px;font-weight:500;margin-top:18px;color:var(--wine-deep)">Übungsfragen</h3>
     <p class="tip">Eine Frage pro Zeile. Die Fragen kommen während der Übung wie Nachrichten in den Chat rechts, und das fragende Fenster hebt die Hand. Es können mehrere Fragen gleichzeitig offen sein, „Beantwortet ✓“ hakt immer die älteste ab. Schreibst du „Anna: …“ davor, fragt genau dieses Fenster, sonst ein zufälliges.</p>
-    <textarea id="ubq" style="min-height:160px"></textarea>
+    <p class="tip"><strong>Feste Zeitpunkte:</strong> Mit „10 Min:“ am Anfang kommt die Frage genau 10 Minuten nach Beginn der Übung, zum Beispiel „10 Min: Sophie: How do you find time for yourself?“. So kannst du dein Gathering durchplanen. Fragen ohne Zeit kommen zwischendurch, wenn du „Nächste Frage“ tippst oder wie unten eingestellt. Die Liste wird automatisch gespeichert, auch für deine anderen Geräte.</p>
+    <textarea id="ubq" style="min-height:200px"></textarea>
+    <p class="saved" id="ubqsaved"></p>
     <div class="row">
       <label class="f" style="flex:0 1 260px">Fragen kommen<select id="ubqmode"><option value="0">wenn ich auf „Nächste Frage“ tippe</option><option value="30">etwa alle 30 Sekunden</option><option value="60">etwa jede Minute</option><option value="120">etwa alle 2 Minuten</option><option value="180">etwa alle 3 Minuten</option></select></label>
       <label class="chk" style="align-self:flex-end;display:flex;gap:8px;align-items:center;font-size:15px;color:var(--brown)"><input type="checkbox" id="ubqmix" checked style="width:18px;height:18px;accent-color:var(--wine)"> zufällige Reihenfolge</label>
@@ -190,8 +198,9 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 <?php endif; ?>
 <?php if (!$guest && !$gath): ?>
 <div class="practice" id="practice" hidden>
-  <div class="pbar"><span>Übungsansicht · nur auf deinem Bildschirm</span><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="ubnext">Nächste Frage</button><button type="button" id="ubdone" hidden>Beantwortet ✓</button><button type="button" id="ubrec">● Übung aufnehmen</button><button type="button" id="ubprompt">Teleprompter</button><button type="button" id="ubclose">Schließen</button></span></div>
+  <div class="pbar"><span>Übungsansicht · nur auf deinem Bildschirm · <span id="ubclock"></span></span><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="ubnext">Nächste Frage</button><button type="button" id="ubdone" hidden>Beantwortet ✓</button><button type="button" id="ubrec">● Übung aufnehmen</button><button type="button" id="ubprompt">Teleprompter</button><button type="button" id="ubclose">Schließen</button></span></div>
   <canvas id="ubcv" width="1920" height="1080"></canvas>
+  <form class="pask" id="ubask"><select id="ubwho" aria-label="Wer fragt"></select><input id="ubtxt" type="text" placeholder="Neue Frage, die dir gerade einfällt …" maxlength="300" autocomplete="off"><button type="submit">Jetzt senden</button><button type="button" id="ublater" class="ghost">Für später</button></form>
 </div>
 <?php endif; ?>
 <?php if (!$guest): ?>
@@ -340,7 +349,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       paint(); if (a !== 'top') pref();
     }));
     document.addEventListener('keydown', e => {
-      if (P.hidden || e.target === ta) return;
+      if (P.hidden || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
       if (e.code === 'Space') { e.preventDefault(); pOn ? pause() : play(); }
       if (e.code === 'ArrowUp') { e.preventDefault(); pSpeed = Math.min(200, pSpeed + 5); paint(); pref(); }
       if (e.code === 'ArrowDown') { e.preventDefault(); pSpeed = Math.max(5, pSpeed - 5); paint(); pref(); }
@@ -419,17 +428,29 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 
     const QDEF = ["Hi Viv! Where are you joining from today?", "How do you find time for yourself with four kids?", "What do you do on days when you feel you got nothing done?", "I always feel guilty when I take time for myself. How do I stop that?", "Is this circle also for women without children?", "How long have you been doing this?", "What exactly happens in The Inner Circle, and what does it cost?", "Can I join the Alpine Retreat with my partner?", "I'm new here and a bit shy. Do I have to turn my camera on?", "What is one small thing I can do tomorrow morning?", "Do you ever feel like giving up?", "Will there be a recording of today?"];
     const ta2 = $('ubq'), qm = $('ubqmode'), qx = $('ubqmix');
-    try { ta2.value = localStorage.getItem('wh-fragen') ?? QDEF.join('\n'); qm.value = localStorage.getItem('wh-fragen-takt') || '0'; } catch (e) { ta2.value = QDEF.join('\n'); }
-    ta2.oninput = () => { try { localStorage.setItem('wh-fragen', ta2.value); } catch (e) {} };
+    const SRV = <?= json_encode($uFragen) ?>;
+    try { ta2.value = SRV ?? localStorage.getItem('wh-fragen') ?? QDEF.join('\n'); qm.value = localStorage.getItem('wh-fragen-takt') || '0'; } catch (e) { ta2.value = SRV ?? QDEF.join('\n'); }
+    let qSave = 0;
+    ta2.oninput = () => {
+      try { localStorage.setItem('wh-fragen', ta2.value); } catch (e) {}
+      $('ubqsaved').textContent = ''; clearTimeout(qSave);
+      qSave = setTimeout(() => fetch(location.href, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({fragen: ta2.value})}).then(r => { $('ubqsaved').textContent = r.ok ? 'Gespeichert ✓' : ''; }).catch(() => {}), 800);
+    };
     qm.onchange = () => { try { localStorage.setItem('wh-fragen-takt', qm.value); } catch (e) {} if (!PR.hidden) qLoop(); };
-    let qList = [], qMsgs = [], qTimer = 0;
+    let qList = [], qTimed = [], qMsgs = [], qTimer = 0, qStart = 0, qClock = 0;
     const NAMECOL = ['#5E6B35', '#8A5A44', '#3F6B6B', '#7A5C8A', '#A0703A', '#4E6E3A', '#9A4F5F', '#3F5A82', '#6B5D4C', '#7C7A2F'];
+    const parseQ = l => {
+      let at = -1;
+      const tm = l.match(/^(\d{1,3}(?:[.,]\d{1,2})?)\s*(?:min\.?|minute[n]?|m)\s*:?\s*/i);
+      if (tm) { at = parseFloat(tm[1].replace(',', '.')) * 60000; l = l.slice(tm[0].length); }
+      const m = l.match(/^([^:?!.]{1,30}):\s*(.+)$/);
+      const who = m ? rows.findIndex(r => r.name.trim().toLowerCase() === m[1].trim().toLowerCase()) : -1;
+      return {who, text: m && who >= 0 ? m[2] : l, at};
+    };
     const qPrep = () => {
-      qList = ta2.value.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
-        const m = l.match(/^([^:?!.]{1,30}):\s*(.+)$/);
-        const who = m ? rows.findIndex(r => r.name.trim().toLowerCase() === m[1].trim().toLowerCase()) : -1;
-        return {who, text: m && who >= 0 ? m[2] : l};
-      });
+      const all = ta2.value.split('\n').map(l => l.trim()).filter(Boolean).map(parseQ);
+      qTimed = all.filter(q => q.at >= 0).sort((a, b) => a.at - b.at);
+      qList = all.filter(q => q.at < 0);
       if (qx.checked) for (let i = qList.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [qList[i], qList[j]] = [qList[j], qList[i]]; }
     };
     const pling = () => {
@@ -442,10 +463,16 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     };
     const openCount = () => qMsgs.filter(m => !m.done && m.who >= 0).length;
     const qSync = () => { const n = openCount(); $('ubdone').hidden = !n; $('ubdone').textContent = n > 1 ? 'Beantwortet ✓ (' + n + ' offen)' : 'Beantwortet ✓'; };
+    const qPush = q => {
+      const now = new Date(), time = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+      qMsgs.push({who: q.who >= 0 && q.who < rows.length ? q.who : Math.floor(Math.random() * rows.length), text: q.text, at: performance.now(), time, done: false});
+      if (qMsgs.length > 40) qMsgs.shift();
+      pling(); qSync();
+    };
     const qNext = () => {
       if (!rows.length) return;
       const now = new Date(), time = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-      if (!qList.length) { if (!qMsgs.some(m => m.who < 0)) qMsgs.push({who: -1, text: 'Das waren alle Übungsfragen ♡', at: performance.now(), time, done: true}); qSync(); return; }
+      if (!qList.length) { if (!qMsgs.some(m => m.who < 0)) qMsgs.push({who: -1, text: qTimed.length ? 'Die freien Fragen sind durch, die geplanten kommen noch ♡' : 'Das waren alle Übungsfragen ♡', at: performance.now(), time, done: true}); qSync(); return; }
       const q = qList.shift();
       qMsgs.push({who: q.who >= 0 && q.who < rows.length ? q.who : Math.floor(Math.random() * rows.length), text: q.text, at: performance.now(), time, done: false});
       if (qMsgs.length > 40) qMsgs.shift();
@@ -461,6 +488,17 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       }, t * 1000 * (0.7 + Math.random() * 0.6));
     };
     $('ubnext').onclick = qNext;
+    const askAdd = later => {
+      const t = $('ubtxt').value.trim(); if (!t) return;
+      const q = {who: +$('ubwho').value, text: t, at: -1};
+      if (later) { qList.push(q); $('ubtxt').placeholder = 'Gemerkt, kommt später ♡'; } else qPush(q);
+      // auch in die gespeicherte Liste übernehmen, damit sie beim nächsten Üben wieder da ist
+      const name = q.who >= 0 && rows[q.who] ? rows[q.who].name.trim() + ': ' : '';
+      ta2.value = ta2.value.replace(/\s*$/, '') + '\n' + name + t; ta2.oninput();
+      $('ubtxt').value = ''; $('ubtxt').focus();
+    };
+    $('ubask').onsubmit = e => { e.preventDefault(); askAdd(false); };
+    $('ublater').onclick = () => askAdd(true);
     $('ubdone').onclick = () => { const m = qMsgs.find(x => !x.done && x.who >= 0); if (m) { m.done = true; m.doneAt = performance.now(); } qSync(); };
     const wrap = (t, maxW) => { const out = []; let line = ''; t.split(' ').forEach(w => { const tryL = line ? line + ' ' + w : w; if (g.measureText(tryL).width > maxW && line) { out.push(line); line = w; } else line = tryL; }); if (line) out.push(line); return out; };
 
@@ -569,13 +607,20 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       cam.srcObject = uStream; cam.play().catch(() => {});
       PR.hidden = false; document.body.style.overflow = 'hidden'; frame();
       qPrep(); qMsgs = []; qSync(); qLoop();
+      qStart = performance.now(); clearInterval(qClock);
+      qClock = setInterval(() => {
+        const el = performance.now() - qStart;
+        while (qTimed.length && qTimed[0].at <= el) qPush(qTimed.shift());
+        const s = Math.floor(el / 1000); $('ubclock').textContent = 'Übung läuft ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') + (qTimed.length ? ' · nächste geplante Frage bei ' + (qTimed[0].at / 60000).toLocaleString('de-AT', {maximumFractionDigits: 2}) + ' Min.' : '');
+      }, 500);
+      $('ubwho').innerHTML = '<option value="-1">zufälliges Fenster</option>' + rows.map((r, i) => '<option value="' + i + '">' + (r.name.trim() || 'Gast').replace(/[<&]/g, '') + '</option>').join('');
     };
     const closeU = () => {
       if (uRec) uRec.stop();
       cancelAnimationFrame(uRaf);
       if (uStream) uStream.getTracks().forEach(t => t.stop());
       uStream = null; PR.hidden = true; document.body.style.overflow = '';
-      clearTimeout(qTimer); qMsgs = [];
+      clearTimeout(qTimer); clearInterval(qClock); qMsgs = [];
       if (P) { window.hidePrompter(); document.body.appendChild(P); }
     };
     $('ubclose').onclick = closeU;

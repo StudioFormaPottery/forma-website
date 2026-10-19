@@ -18,6 +18,7 @@ if ($testTok !== '') {
         $in = json_decode((string)file_get_contents('php://input'), true);
         $p = mm_cfg('prompter') ?? [];
         if (isset($in['text'])) $p['text'] = mb_substr((string)$in['text'], 0, 20000);
+        if (isset($in['fragen'])) { $u = mm_cfg('uebung') ?? []; $u['fragen'] = mb_substr((string)$in['fragen'], 0, 20000); mm_save_cfg('uebung', $u); }
         foreach (['speed' => [5, 200], 'size' => [18, 72]] as $k => [$lo, $hi]) if (isset($in[$k])) $p[$k] = max($lo, min($hi, (int)$in[$k]));
         mm_save_cfg('prompter', $p);
         header('Content-Type: application/json');
