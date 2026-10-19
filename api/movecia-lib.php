@@ -710,3 +710,40 @@ function mm_order_check(PDO $pdo, array $o): string
     }
     return 'bezahlt';
 }
+
+// --- Fragen im Live-Gathering: anonym von Teilnehmerinnen oder offen von Viv ----------------
+
+function mm_q_schema(PDO $pdo): void
+{
+    static $done = false;
+    if ($done) return;
+    $done = true;
+    $pdo->exec('CREATE TABLE IF NOT EXISTS mm_questions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        scope TEXT NOT NULL,
+        text TEXT NOT NULL,
+        name TEXT NOT NULL DEFAULT \'\',
+        source TEXT NOT NULL DEFAULT \'anon\',
+        asker TEXT NOT NULL DEFAULT \'\',
+        status TEXT NOT NULL DEFAULT \'neu\',
+        created_at TEXT NOT NULL,
+        shown_at TEXT
+    )');
+}
+
+/** Ehrliche Beschriftung, die alle sehen: anonym, mit Namen (nur wenn die Frau das will) oder von Viv. */
+function mm_q_label(array $q): string
+{
+    if ($q['source'] === 'viv') return 'A question I often get';
+    if ($q['source'] === 'named' && $q['name'] !== '') return 'A question from ' . forma_first_name($q['name']);
+    return 'An anonymous question from the circle';
+}
+
+function mm_q_current(PDO $pdo, string $scope): ?array
+{
+    mm_q_schema($pdo);
+    $s = $pdo->prepare("SELECT * FROM mm_questions WHERE scope = ? AND status = 'gezeigt' ORDER BY shown_at DESC LIMIT 1");
+    $s->execute([$scope]);
+    $q = $s->fetch();
+    return $q ? ['id' => (int)$q['id'], 'label' => mm_q_label($q), 'text' => $q['text']] : null;
+}

@@ -27,12 +27,57 @@ window.whOffer = function (opts) {
 .who .x{position:absolute;right:12px;top:10px;border:0;background:transparent;color:#9A9282;font-size:22px;cursor:pointer;line-height:1;padding:6px}
 .who .err{color:#8A3B2E;font-size:14px;margin-top:8px}
 .whp{position:fixed;right:16px;bottom:16px;z-index:20;border:0;border-radius:999px;padding:11px 18px;background:#F6F3EA;color:#3F4A26;font:500 15px "Outfit",system-ui,sans-serif;box-shadow:0 10px 30px rgba(20,18,12,.35);cursor:pointer}
-.whp b{font-variant-numeric:tabular-nums}`;
+.whp b{font-variant-numeric:tabular-nums}
+.whq{position:fixed;left:50%;top:70px;transform:translate(-50%,-14px);opacity:0;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .45s;z-index:19;width:min(640px,calc(100% - 32px));background:#F6F3EA;border-radius:22px;padding:16px 22px 18px;box-shadow:0 18px 40px rgba(20,18,12,.35);font-family:"Outfit",system-ui,sans-serif}
+.whq.in{transform:translate(-50%,0);opacity:1}
+.whq small{display:block;color:#5E6B35;font-size:14px;font-weight:500;margin-bottom:4px}
+.whq div{color:#2F2B22;font-size:21px;line-height:1.4}
+.wha{position:fixed;left:16px;bottom:16px;z-index:18;border:0;border-radius:999px;padding:11px 18px;background:rgba(246,243,234,.94);color:#3F4A26;font:500 15px "Outfit",system-ui,sans-serif;box-shadow:0 10px 30px rgba(20,18,12,.3);cursor:pointer}
+.whf{position:fixed;left:16px;bottom:16px;z-index:22;width:min(380px,calc(100% - 32px));background:#F6F3EA;border-radius:22px;padding:18px;box-shadow:0 18px 44px rgba(20,18,12,.4);font-family:"Outfit",system-ui,sans-serif;color:#2F2B22}
+.whf b{display:block;font-weight:500;font-size:17px;color:#3F4A26}
+.whf p{font-size:14px;color:#6B5D4C;margin:4px 0 10px}
+.whf textarea{width:100%;box-sizing:border-box;min-height:96px;font:inherit;font-size:16px;padding:10px 12px;border-radius:14px;border:1.5px solid #CFC9B5;background:#FCFBF6;resize:vertical}
+.whf label{display:flex;gap:8px;align-items:center;font-size:14px;color:#6B5D4C;margin-top:8px}
+.whf .r{display:flex;gap:8px;margin-top:12px}
+.whf button{font:inherit;font-weight:500;font-size:15px;padding:10px 18px;border-radius:999px;border:0;background:#5E6B35;color:#F6F3EA;cursor:pointer}
+.whf button.g{background:transparent;color:#3F4A26;border:1.5px solid #CFC9B5}
+.whf .m{font-size:14px;margin-top:8px;color:#5E6B35}`;
   document.head.appendChild(css);
 
   const card = document.createElement('div'); card.className = 'who'; card.hidden = true;
   const pill = document.createElement('button'); pill.className = 'whp'; pill.type = 'button'; pill.hidden = true;
   document.body.append(card, pill);
+
+  // Eingeblendete Frage (oben) und „Ask anonymously“ (nur echte Teilnehmerinnen)
+  const qb = document.createElement('div'); qb.className = 'whq'; qb.hidden = true; document.body.appendChild(qb);
+  let qCur = 0;
+  const showQ = qq => {
+    if (!qq) { qCur = 0; qb.classList.remove('in'); setTimeout(() => { if (!qCur) qb.hidden = true; }, 450); return; }
+    if (qq.id === qCur) return;
+    qCur = qq.id; qb.innerHTML = '<small>' + esc(qq.label) + '</small><div>' + esc(qq.text) + '</div>';
+    qb.hidden = false; requestAnimationFrame(() => qb.classList.add('in'));
+  };
+  if (!preview) {
+    const ab = document.createElement('button'); ab.type = 'button'; ab.className = 'wha'; ab.textContent = '♡ Ask anonymously';
+    const af = document.createElement('form'); af.className = 'whf'; af.hidden = true;
+    af.innerHTML = '<b>Ask a question</b><p>Viv will see it without your name and can answer it for everyone. Nobody knows it was you.</p><textarea maxlength="500" required placeholder="Your question …"></textarea>'
+      + (opts.k ? '<label><input type="checkbox"> I am happy to show my first name</label>' : '')
+      + '<div class="r"><button type="submit">Send</button><button type="button" class="g">Close</button></div><div class="m" hidden></div>';
+    document.body.append(ab, af);
+    ab.onclick = () => { af.hidden = false; ab.hidden = true; af.querySelector('textarea').focus(); };
+    af.querySelector('.g').onclick = () => { af.hidden = true; ab.hidden = false; };
+    af.onsubmit = async e => {
+      e.preventDefault();
+      const ta = af.querySelector('textarea'), m = af.querySelector('.m'), cb = af.querySelector('input[type=checkbox]');
+      try {
+        const r = await fetch('/api/wh-offer.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'ask', text: ta.value, named: cb && cb.checked ? 1 : 0, k: opts.k || '', t: opts.t || '', gast: opts.gast ? 1 : 0})});
+        const j = await r.json();
+        if (!j.ok) throw new Error(j.error || '');
+        ta.value = ''; m.hidden = false; m.textContent = 'Thank you ♡ Your question is with Viv.';
+        setTimeout(() => { m.hidden = true; af.hidden = true; ab.hidden = false; }, 2200);
+      } catch (err) { m.hidden = false; m.textContent = err.message || 'That did not work just now. Please try again.'; }
+    };
+  }
 
   let cur = null, skew = 0, small = false, shownId = 0, tick = 0;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
@@ -92,6 +137,7 @@ window.whOffer = function (opts) {
     try {
       const r = await fetch('/api/wh-offer.php?' + q.toString(), {cache: 'no-store'});
       const j = await r.json();
+      showQ(j.question || null);
       const o = j.offer || null;
       if (o) skew = Date.now() - o.now * 1000;
       if (!o) { cur = null; shownId = 0; render(); }

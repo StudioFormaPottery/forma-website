@@ -8,6 +8,7 @@ header('Cache-Control: no-store');
 $pdo = forma_db();
 mm_schema($pdo);
 mm_offer_schema($pdo);
+mm_q_schema($pdo);
 $out = function (array $d, int $code = 200): void { http_response_code($code); echo json_encode($d, JSON_UNESCAPED_UNICODE); exit; };
 
 $in = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' ? (json_decode((string)file_get_contents('php://input'), true) ?: []) : $_GET;
@@ -36,7 +37,7 @@ if ($k !== '') {
 
 if ($act === 'get') {
     $sp = mm_spotlight($pdo, $scope);
-    $r = ['ok' => true, 'offer' => mm_spotlight_public($sp)];
+    $r = ['ok' => true, 'offer' => mm_spotlight_public($sp), 'question' => mm_q_current($pdo, $scope)];
     if ($host) {
         // offene Zahlungen dieses Raums ab und zu bei Stripe nachfragen (falls jemand das Fenster nach dem Bezahlen schließt)
         $chk = mm_cfg('ordercheck') ?? [];
@@ -49,6 +50,9 @@ if ($act === 'get') {
         $c = $pdo->prepare("SELECT COUNT(*) AS n, COALESCE(SUM(amount_cents),0) AS sum FROM mm_orders WHERE scope = ? AND status = 'bezahlt'");
         $c->execute([$scope]);
         $r['booked'] = $c->fetch();
+        $qs = $pdo->prepare('SELECT id, text, name, source, status, created_at FROM mm_questions WHERE scope = ? ORDER BY id DESC LIMIT 60');
+        $qs->execute([$scope]);
+        $r['questions'] = array_map(fn($q) => $q + ['label' => mm_q_label($q)], $qs->fetchAll());
         $r['stripe'] = forma_stripe_key() ? (forma_stripe_test_mode() ? 'test' : 'live') : 'none';
     }
     $out($r);
@@ -67,6 +71,38 @@ if ($act === 'show' || $act === 'hide') {
     } catch (Throwable $e) {
         $out(['ok' => false, 'error' => $e->getMessage()], 400);
     }
+}
+
+// Frage aus dem Raum (anonym, außer die Frau möchte ihren Namen zeigen)
+if ($act === 'ask') {
+    if ($host) $out(['ok' => false], 403);
+    $text = trim(preg_replace('/\s+/u', ' ', (string)($in['text'] ?? '')));
+    if (mb_strlen($text) < 3) $out(['ok' => false, 'error' => 'Please write your question first.'], 400);
+    $asker = $me ? 's' . (int)$me['id'] : 'gast';
+    $c = $pdo->prepare('SELECT COUNT(*) FROM mm_questions WHERE asker = ? AND created_at >= ?');
+    $c->execute([$asker, date('c', time() - 600)]);
+    if ((int)$c->fetchColumn() >= 6) $out(['ok' => false, 'error' => 'Thank you! Please wait a little before sending more.'], 429);
+    $named = !empty($in['named']) && $me;
+    $pdo->prepare('INSERT INTO mm_questions (scope, text, name, source, asker, created_at) VALUES (?,?,?,?,?,?)')
+        ->execute([$scope, mb_substr($text, 0, 500), $named ? forma_first_name((string)$me['name']) : '', $named ? 'named' : 'anon', $asker, date('c')]);
+    $out(['ok' => true]);
+}
+
+// Viv: Frage einblenden, ausblenden, abhaken
+if (in_array($act, ['qshow', 'qhide', 'qdone', 'qown'], true)) {
+    if (!$host) $out(['ok' => false], 403);
+    if ($act === 'qown') {
+        $text = trim((string)($in['text'] ?? ''));
+        if (mb_strlen($text) < 3) $out(['ok' => false, 'error' => 'Bitte zuerst die Frage eintippen.'], 400);
+        $pdo->prepare('INSERT INTO mm_questions (scope, text, source, asker, created_at) VALUES (?,?,?,?,?)')->execute([$scope, mb_substr($text, 0, 500), 'viv', 'viv', date('c')]);
+        $in['id'] = (int)$pdo->lastInsertId();
+        $act = 'qshow';
+    }
+    $pdo->prepare("UPDATE mm_questions SET status = 'beantwortet' WHERE scope = ? AND status = 'gezeigt'")->execute([$scope]);
+    $id = (int)($in['id'] ?? 0);
+    if ($act === 'qshow') $pdo->prepare("UPDATE mm_questions SET status = 'gezeigt', shown_at = ? WHERE id = ? AND scope = ?")->execute([date('c'), $id, $scope]);
+    if ($act === 'qdone') $pdo->prepare("UPDATE mm_questions SET status = 'beantwortet' WHERE id = ? AND scope = ?")->execute([$id, $scope]);
+    $out(['ok' => true, 'question' => mm_q_current($pdo, $scope)]);
 }
 
 if ($act === 'buy') {

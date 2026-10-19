@@ -98,6 +98,19 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 .offd .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .offd .acts button{padding:10px 16px;font-size:15px}
 .offd .cl{position:absolute;right:10px;top:8px;background:transparent;color:var(--brown);font-size:22px;padding:4px 8px}
+.qd{position:fixed;right:16px;top:70px;z-index:21;width:min(400px,calc(100% - 32px));max-height:calc(100% - 90px);overflow:auto;background:#FCFBF6;color:var(--ink);border-radius:22px;padding:18px;box-shadow:0 18px 44px rgba(20,18,12,.4);font-size:16px}
+.qd h3{font-size:19px;font-weight:500;color:var(--wine-deep);margin-bottom:4px}
+.qd .hint{font-size:13.5px;color:var(--brown);margin-bottom:10px}
+.qd .q{border-top:1px solid var(--line);padding:10px 0}
+.qd .q small{display:block;font-size:12.5px;color:var(--brown)}
+.qd .q p{margin:2px 0 8px;font-size:16px;line-height:1.45}
+.qd .q.on{background:var(--sage-soft);border-radius:12px;padding:10px;border-top:0}
+.qd .q.done p{color:#9A9282}
+.qd .q button{padding:6px 12px;font-size:14px}
+.qd .own{display:flex;flex-direction:column;gap:8px;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.qd .own select,.qd .own input{font:inherit;font-size:15px;padding:9px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--cream);color:var(--ink);width:100%}
+.qd .cl{position:absolute;right:10px;top:8px;background:transparent;color:var(--brown);font-size:22px;padding:4px 8px}
+#qbadge:not(:empty){display:inline-block;min-width:20px;padding:0 6px;border-radius:999px;background:#B9C77A;color:#1F1C16;font-size:12px;margin-left:4px}
 .roombar .recon{background:#93402F;color:#FBF1EA;border-color:#93402F}
 .roombar .ghostbtn{background:transparent;color:var(--blush);border:1px solid #6B5D4C}
 </style>
@@ -175,11 +188,23 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 
 <?php if ($ready): ?>
 <div class="roomwrap" id="room" hidden>
-  <div class="roombar"><span><?= $gath ? $h($gath['title']) : 'Testraum · Wild Hearts' ?></span><span class="rb"><?php if (!$guest): ?><button id="offbtn" type="button" class="ghostbtn">✦ Angebot</button><button id="rec2" type="button" class="ghostbtn">● Aufnahme</button><button id="ptoggle" type="button" class="ghostbtn">Teleprompter</button><a class="btn ghostbtn" style="padding:7px 16px;font-size:15px" href="?test=<?= $h(rawurlencode($testTok)) ?>&amp;buehne=1" target="_blank" rel="noopener">Video &amp; Musik</a><?php endif; ?><button id="leave" type="button">Raum verlassen</button></span></div>
+  <div class="roombar"><span><?= $gath ? $h($gath['title']) : 'Testraum · Wild Hearts' ?></span><span class="rb"><?php if (!$guest): ?><button id="qbtn" type="button" class="ghostbtn">? Fragen <span id="qbadge"></span></button><button id="offbtn" type="button" class="ghostbtn">✦ Angebot</button><button id="rec2" type="button" class="ghostbtn">● Aufnahme</button><button id="ptoggle" type="button" class="ghostbtn">Teleprompter</button><a class="btn ghostbtn" style="padding:7px 16px;font-size:15px" href="?test=<?= $h(rawurlencode($testTok)) ?>&amp;buehne=1" target="_blank" rel="noopener">Video &amp; Musik</a><?php endif; ?><button id="leave" type="button">Raum verlassen</button></span></div>
   <iframe id="frame" title="Whereby Testraum" allow="camera; microphone; fullscreen; speaker; display-capture; autoplay; compute-pressure"></iframe>
 </div>
 <?php endif; ?>
 <?php if (!$guest && $ready): ?>
+<?php $pre = array_values(array_filter(array_map(fn($l) => trim(preg_replace('/^\d{1,3}(?:[.,]\d{1,2})?\s*(?:min\.?|minute[n]?|m)\s*:?\s*/i', '', preg_replace('/^[^:?!.]{1,30}:\s*(?=\S)/u', '', trim($l)))), explode("\n", (string)((mm_cfg('uebung') ?? [])['fragen'] ?? ''))))); ?>
+<div class="qd" id="qd" hidden>
+  <button class="cl" type="button" id="qcl" aria-label="Schließen">×</button>
+  <h3>Fragen</h3>
+  <p class="hint">Fragen, die Frauen anonym über „Ask anonymously“ schicken, landen hier. „Einblenden“ zeigt sie allen groß oben im Raum, ohne Namen. Deine eigenen Fragen erscheinen offen als „A question I often get“.</p>
+  <div id="qlist"><p class="hint">Noch keine Fragen.</p></div>
+  <div class="own">
+    <?php if ($pre): ?><select id="qpre"><option value="">Aus deiner vorbereiteten Liste wählen …</option><?php foreach (array_unique($pre) as $q): ?><option><?= $h($q) ?></option><?php endforeach; ?></select><?php endif; ?>
+    <input id="qown" type="text" maxlength="500" placeholder="Eigene Frage eintippen …">
+    <button type="button" id="qownbtn">Als meine Frage einblenden</button>
+  </div>
+</div>
 <div class="offd" id="offd" hidden>
   <button class="cl" type="button" id="offcl" aria-label="Schließen">×</button>
   <h3>Angebot einblenden</h3>
@@ -217,7 +242,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 </div>
 <?php endif; ?>
 
-<script src="/wildhearts/gathering/offer.js?v=1"></script>
+<script src="/wildhearts/gathering/offer.js?v=2"></script>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
@@ -659,6 +684,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
   };
   let offUntil = 0, offSkew = 0, offOn = false;
   function offStatus(j) {
+    qStatus(j);
     const o = j.offer, st = $('offst');
     offOn = !!o; $('offhide').hidden = !o;
     $('offstripe').hidden = j.stripe === 'live';
@@ -669,6 +695,31 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     st.hidden = false;
     st.dataset.base = '„' + o.title + '“ ist eingeblendet. ' + (+b.n ? b.n + (b.n == 1 ? ' Buchung' : ' Buchungen') + ' · € ' + (b.sum / 100).toLocaleString('de-AT') : 'Noch keine Buchung.');
     offPaint();
+  }
+  let qSeen = -1;
+  function qStatus(j) {
+    const L = $('qlist'); if (!L || !j.questions) return;
+    const qs = j.questions, cur = j.question ? j.question.id : 0;
+    const fresh = qs.filter(q => q.status === 'neu' && q.source !== 'viv').length;
+    $('qbadge').textContent = fresh || '';
+    if (qSeen >= 0 && fresh > qSeen && $('qd').hidden) { $('qbtn').animate([{transform: 'scale(1)'}, {transform: 'scale(1.12)'}, {transform: 'scale(1)'}], {duration: 500, iterations: 2}); }
+    qSeen = fresh;
+    const esc = t => String(t).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+    const ord = [...qs].sort((a, b) => (a.status === 'neu' ? 0 : 1) - (b.status === 'neu' ? 0 : 1) || a.id - b.id);
+    L.innerHTML = ord.length ? ord.map(q => '<div class="q' + (+q.id === cur ? ' on' : '') + (q.status === 'beantwortet' ? ' done' : '') + '"><small>' + esc(q.label) + ' · ' + esc(q.created_at.slice(11, 16)) + (+q.id === cur ? ' · wird gerade gezeigt' : q.status === 'beantwortet' ? ' · beantwortet' : '') + '</small><p>' + esc(q.text) + '</p>'
+      + (+q.id === cur ? '<button type="button" data-q="qhide" data-id="' + q.id + '">Ausblenden ✓</button>' : '<button type="button" data-q="qshow" data-id="' + q.id + '">Einblenden</button> ' + (q.status === 'neu' ? '<button type="button" class="ghost" data-q="qdone" data-id="' + q.id + '">Erledigt</button>' : '')) + '</div>').join('') : '<p class="hint">Noch keine Fragen.</p>';
+    L.querySelectorAll('[data-q]').forEach(b => b.onclick = () => qCall({action: b.dataset.q, id: +b.dataset.id}));
+  }
+  const qCall = async body => {
+    const r = await fetch('/api/wh-offer.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(Object.assign({t: <?= json_encode($testTok) ?>, g: <?= (int)($gath['id'] ?? 0) ?>}, body))});
+    const j = await r.json(); if (!j.ok && j.error) alert(j.error);
+    if (offApi) offApi.refresh();
+  };
+  if ($('qd')) {
+    $('qbtn').onclick = () => { $('qd').hidden = !$('qd').hidden; };
+    $('qcl').onclick = () => { $('qd').hidden = true; };
+    if ($('qpre')) $('qpre').onchange = () => { $('qown').value = $('qpre').value; };
+    $('qownbtn').onclick = () => { const t = $('qown').value.trim(); if (!t) return; qCall({action: 'qown', text: t}); $('qown').value = ''; if ($('qpre')) $('qpre').value = ''; };
   }
   const offPaint = () => {
     const st = $('offst'); if (!st || st.hidden) return;
