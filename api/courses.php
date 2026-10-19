@@ -28,7 +28,10 @@ try {
         try { forma_min_check($pdo); } catch (Throwable $e) { error_log('FORMA min: ' . $e->getMessage()); }
         try { forma_review_mails($pdo); } catch (Throwable $e) { error_log('FORMA reviews: ' . $e->getMessage()); }
     });
-    forma_json(['ok' => true, 'courses' => $out]);
+    // Pottery bemalen: wie viele Stücke je Sorte gerade buchbar sind (null = unbegrenzt)
+    $stock = null;
+    try { $stock = (object)forma_bemalen_free_map($pdo); } catch (Throwable $e) { error_log('FORMA stock: ' . $e->getMessage()); }
+    forma_json(['ok' => true, 'courses' => $out, 'stock' => $stock]);
 } catch (Throwable $e) {
     error_log('FORMA courses: ' . $e->getMessage());
     forma_json(['ok' => false, 'error' => 'Die Termine konnten gerade nicht geladen werden.'], 500);

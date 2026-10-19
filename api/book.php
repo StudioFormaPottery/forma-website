@@ -110,6 +110,19 @@ try {
     }
     $priceCents = (int)$course['price_cents'];
     $pieces = $course['title'] === FORMA_SERIES['bemalen']['title'] ? forma_bemalen_pick($in['items'] ?? []) : [];
+    if ($pieces) {
+        // Nur so viele Stücke, wie gerade im Atelier frei sind (Bestand in der Verwaltung).
+        $stock = forma_bemalen_free_map($pdo);
+        foreach ($pieces as $pc) {
+            $f = $stock[$pc['key']] ?? null;
+            if ($f !== null && $pc['qty'] > $f) {
+                $pdo->exec('ROLLBACK');
+                forma_json(['ok' => false, 'error' => $f === 0
+                    ? $pc['name'] . ' ist gerade leider vergriffen. Bitte nimm das Stück aus deiner Auswahl oder such dir ein anderes aus.'
+                    : 'Von „' . $pc['name'] . '“ sind gerade nur noch ' . $f . ' Stück verfügbar. Bitte passe die Anzahl an.', 'stock' => $stock], 409);
+            }
+        }
+    }
     if ($isAtelier) {
         $pieces = array_map(fn($h) => ['key' => 'slot' . $h, 'name' => 'Offenes Atelier ' . forma_atelier_slot_label($h), 'qty' => $persons, 'cents' => $priceCents], $slots);
         $priceCents = 0;

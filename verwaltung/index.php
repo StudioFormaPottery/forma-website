@@ -856,6 +856,53 @@ if ($view === 'tests' || $action === 'test_run') {
     exit;
 }
 
+// --- Bestand Pottery bemalen (19.10.2026) ---------------------------------------
+if ($action === 'bestand_save') {
+    forma_bemalen_stock_set($pdo, (array)($_POST['stock'] ?? []));
+    go($self . '?view=bestand', 'Gespeichert. Auf der Website kann jetzt nur noch gebucht werden, was frei ist.');
+}
+if ($view === 'bestand') {
+    $stock = forma_bemalen_stock($pdo);
+    render_page('Bestand', function () use ($self, $flash, $stock) { ?>
+        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
+        <p class="eyebrow">Pottery bemalen</p>
+        <h1>Bestand im Atelier</h1>
+        <p class="muted">Trag ein, wie viele Stücke du gerade im Atelier hast. Auf der Website kann dann nur gebucht werden, was noch frei ist. Online gebuchte Stücke für kommende Termine sind dafür reserviert. Ist ein Termin vorbei oder verkaufst du etwas über die Kasse, ziehe ich es automatisch ab. Zählst du nach, trag einfach die neue Zahl ein. Feld leer lassen heißt: keine Grenze.</p>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <form method="post" class="bs-form">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="bestand_save">
+            <div class="bs-grid">
+            <?php foreach ($stock as $key => $o): $low = $o['tracked'] && $o['free'] <= 2; ?>
+                <div class="card bs-item<?= $o['tracked'] && $o['free'] === 0 ? ' is-out' : ($low ? ' is-low' : '') ?>">
+                    <span class="k-ic"><?= kasse_icon($key) ?></span>
+                    <strong><?= forma_h($o['name']) ?></strong>
+                    <label class="bs-in">Im Atelier<input type="number" name="stock[<?= forma_h($key) ?>]" min="0" max="9999" inputmode="numeric" value="<?= $o['tracked'] ? (int)$o['count'] : '' ?>" placeholder="unbegrenzt"></label>
+                    <div class="bs-meta">
+                        <span>reserviert <b><?= (int)$o['reserved'] ?></b></span>
+                        <span>frei buchbar <b><?= $o['tracked'] ? (int)$o['free'] : '∞' ?></b></span>
+                    </div>
+                    <?php if ($o['tracked'] && $o['free'] === 0): ?><span class="pill">online vergriffen</span><?php elseif ($low): ?><span class="pill pill-wait">fast weg</span><?php endif; ?>
+                    <?php if ($o['tracked']): ?><span class="muted small">zuletzt gezählt <?= forma_h(date('d. m., H:i', $o['at'])) ?></span><?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+            </div>
+            <p><button class="btn" type="submit">Bestand speichern</button> <a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=kasse">Zur Kasse</a></p>
+        </form>
+        <style>
+        .bs-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}
+        @media (max-width:700px){.bs-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
+        .bs-in input::placeholder{font-size:16px}
+        .bs-item{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+        .bs-item strong{font-size:18px}
+        .bs-in{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted,#674B40);width:100%}
+        .bs-in input{font-size:26px;text-align:center;padding:10px;border-radius:14px}
+        .bs-meta{display:flex;gap:14px;font-size:14px;color:#674B40}.bs-meta b{color:var(--clay,#8C2C1D);font-size:16px}
+        .bs-item.is-out{border-color:#8C2C1D}.bs-item.is-low{border-color:#B05A38}
+        </style>
+    <?php });
+    exit;
+}
+
 if ($view === 'kasse') {
     forma_reconcile_payments($pdo, true);
     $courses = $pdo->prepare("SELECT * FROM courses WHERE title = ? AND start_date BETWEEN ? AND ? ORDER BY start_date");
@@ -878,6 +925,7 @@ if ($view === 'kasse') {
     $stripe = (bool)forma_stripe_key();
     render_page('Kasse', function () use ($self, $flash, $courses, $cid, $guests, $open, $done, $inv, $new, $stripe) {
         $products = forma_kasse_products();
+        $stockNow = forma_bemalen_stock($GLOBALS['pdo']);
         $sale = function (array $s) use ($self, $cid, $inv, $new) {
             $items = json_decode((string)$s['items'], true) ?: [];
             $st = $s['status'];
@@ -907,6 +955,7 @@ if ($view === 'kasse') {
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <p class="eyebrow">Pottery bemalen</p>
         <h1>Kasse</h1>
+        <p><a class="link small" href="<?= forma_h($self) ?>?view=bestand">Bestand ansehen und nachtragen →</a></p>
         <p class="muted">Tipp an, was sie bemalt hat, dann bar kassieren oder einen Bezahl-Link schicken. Die Rechnung kommt automatisch, als Workshop-Leistung mit Fertigstellung. Wer spontan ohne Anmeldung kommt: Atelierbeitrag mit antippen, Name und E-Mail eingeben, dann wird sie gleich im Termin eingetragen.</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <?php if ($courses): ?>
@@ -932,6 +981,7 @@ if ($view === 'kasse') {
                         <span class="k-ic"><?= kasse_icon($key) ?></span>
                         <strong><?= forma_h($label) ?></strong>
                         <span class="k-price"><?= forma_h(forma_euro((int)$cents)) ?></span>
+                        <?php if (!empty($stockNow[$key]['tracked'])): ?><span class="k-stock<?= (int)$stockNow[$key]['count'] <= 2 ? ' low' : '' ?>">noch <?= (int)$stockNow[$key]['count'] ?> da</span><?php endif; ?>
                         <span class="k-qty" aria-live="polite">0</span>
                     </button>
                     <button type="button" class="k-minus" aria-label="<?= forma_h($label) ?> weniger">−</button>
@@ -1999,6 +2049,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
         <nav class="tiles">
             <a class="tile hl" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('kalender') ?></span><strong>Kalender</strong><span class="muted small">Kurse &amp; Private Pottery</span></a>
             <a class="tile hl" href="<?= forma_h($self) ?>?view=kasse"><span class="ic"><?= admin_icon('kasse') ?></span><strong>Kasse</strong><span class="muted small">Pottery bemalen · bar oder Link</span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=bestand"><span class="ic"><?= admin_icon('bestand') ?></span><strong>Bestand</strong><span class="muted small">Pottery bemalen · was ist da?</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=private"><span class="ic"><?= admin_icon('private') ?></span><strong>Private Pottery</strong><span class="muted small"><?= $privateOpen ?> offen</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=edit"><span class="ic"><?= admin_icon('plus') ?></span><strong>Einzeltermin</strong><span class="muted small">z. B. ein Special-Kurs</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=series"><span class="ic"><?= admin_icon('serie') ?></span><strong>Serientermine</strong><span class="muted small">z. B. jeden Mi &amp; Fr</span></a>
@@ -2078,6 +2129,7 @@ function admin_icon(string $k): string
         'popup' => '<path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8zM6 16l.6 1.4L8 18l-1.4.6L6 20l-.6-1.4L4 18l1.4-.6z"/>',
         'test' => '<path d="M9 3h6M10 3v6l-5 9a2 2 0 001.8 3h10.4a2 2 0 001.8-3l-5-9V3"/><path d="M7.5 14h9"/>',
         'team' => '<circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 20c.5-3.5 2.8-5.5 5.5-5.5s5 2 5.5 5.5M10.5 20c.5-3.5 2.8-5.5 5.5-5.5s5 2 5.5 5.5"/>',
+        'bestand' => '<path d="M4 8l8-4 8 4v10l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v10"/>',
         'kasse' => '<rect x="3" y="10" width="18" height="11" rx="2"/><path d="M6 10V5h9v5M8 14h2M12 14h2M16 14h2M8 17h2M12 17h2M16 17h2"/>',
         'settings' => '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
     ][$k] ?? '';
@@ -2272,6 +2324,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .k-add:active{transform:scale(.97)}
 .k-add strong{font-weight:500;font-size:16px;line-height:1.2}
 .k-ic svg{width:78px;height:66px;display:block}
+.k-stock{font-size:13px;color:#674B40}.k-stock.low{color:#8C2C1D;font-weight:600}
 .k-price{font-size:14px;color:var(--soft)}
 .k-qty{position:absolute;top:8px;right:8px;min-width:30px;height:30px;padding:0 8px;border-radius:999px;background:var(--clay);color:#FBF1EA;font-weight:600;font-size:16px;display:none;align-items:center;justify-content:center}
 .k-minus{position:absolute;top:8px;left:8px;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--clay);background:#fff;color:var(--clay);font:500 20px/1 inherit;display:none;align-items:center;justify-content:center;cursor:pointer}

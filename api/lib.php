@@ -708,6 +708,80 @@ const FORMA_BEMALEN_ITEMS = [
     'formamug' => ['FORMA Mug', 2200],
 ];
 
+/**
+ * Bestand Pottery bemalen (19.10.2026): Vivien trägt in der Verwaltung ein, wie viele Stücke gerade im Atelier sind.
+ * Gespeichert je Stück als Zahl + Zeitpunkt (Setting bemalen_stock). Nicht eingetragene Stücke sind unbegrenzt buchbar.
+ * Seit dem Eintragen wird automatisch abgezogen: Stücke aus Online-Buchungen, sobald der Termin vorbei ist, und Stücke
+ * aus der Atelier-Kasse (außer zurückgezogene). Stücke aus Buchungen für kommende Termine sind reserviert.
+ * Frei buchbar = im Atelier − reserviert.
+ */
+function forma_bemalen_stock_raw(PDO $pdo): array
+{
+    $x = json_decode((string)(forma_setting($pdo, 'bemalen_stock') ?? ''), true);
+    return is_array($x) ? $x : [];
+}
+
+function forma_bemalen_stock_set(PDO $pdo, array $qtys): void
+{
+    $raw = forma_bemalen_stock_raw($pdo);
+    foreach (FORMA_BEMALEN_ITEMS as $key => $_) {
+        if (!array_key_exists($key, $qtys)) continue;
+        $v = trim((string)$qtys[$key]);
+        if ($v === '') { unset($raw[$key]); continue; }
+        $n = max(0, min(9999, (int)$v));
+        $raw[$key] = ['qty' => $n, 'at' => time()];
+    }
+    forma_set_setting($pdo, 'bemalen_stock', json_encode($raw));
+}
+
+/** Je Stück: tracked, count (gerade im Atelier), reserved (kommende Buchungen), free (frei buchbar). */
+function forma_bemalen_stock(PDO $pdo, int $skipBooking = 0): array
+{
+    $raw = forma_bemalen_stock_raw($pdo);
+    $out = [];
+    foreach (FORMA_BEMALEN_ITEMS as $key => [$label]) {
+        $t = isset($raw[$key]['qty']);
+        $out[$key] = ['name' => $label, 'tracked' => $t, 'count' => $t ? (int)$raw[$key]['qty'] : null, 'at' => $t ? (int)$raw[$key]['at'] : 0, 'reserved' => 0, 'used' => 0, 'free' => null];
+    }
+    $now = time();
+    $st = $pdo->prepare("SELECT b.id, b.extras, b.status, b.created_at, c.title, c.date_text, c.start_date FROM bookings b JOIN courses c ON c.id = b.course_id
+        WHERE c.title = ? AND c.start_date >= ? AND (b.status = 'bestaetigt' OR (b.status = 'offen' AND b.created_at >= ?))");
+    $st->execute([FORMA_SERIES['bemalen']['title'], date('Y-m-d', $now - 120 * 86400), date('c', $now - FORMA_HOLD_SECONDS)]);
+    foreach ($st->fetchAll() as $b) {
+        if ((int)$b['id'] === $skipBooking) continue;
+        $end = forma_course_end($b) ?? strtotime($b['start_date'] . ' 23:59');
+        foreach (forma_extras_pieces($b['extras'], $b) as $it) {
+            $k = (string)($it['key'] ?? '');
+            if (!isset($out[$k])) continue;
+            $q = (int)($it['qty'] ?? 0);
+            if ($end > $now) $out[$k]['reserved'] += $q;
+            elseif ($out[$k]['tracked'] && $end > $out[$k]['at']) $out[$k]['used'] += $q;
+        }
+    }
+    try {
+        foreach ($pdo->query("SELECT items, created_at FROM kasse_sales WHERE status != 'zurueckgezogen'")->fetchAll() as $k) {
+            $ts = strtotime((string)$k['created_at']) ?: 0;
+            foreach ((json_decode((string)$k['items'], true) ?: []) as $it) {
+                $key = (string)($it['key'] ?? '');
+                if (isset($out[$key]) && $out[$key]['tracked'] && $ts > $out[$key]['at']) $out[$key]['used'] += (int)($it['qty'] ?? 0);
+            }
+        }
+    } catch (Throwable $e) { /* Tabelle kasse_sales gibt es evtl. noch nicht */ }
+    foreach ($out as $key => &$o) {
+        if (!$o['tracked']) continue;
+        $o['count'] = max(0, $o['count'] - $o['used']);
+        $o['free'] = max(0, $o['count'] - $o['reserved']);
+    }
+    unset($o);
+    return $out;
+}
+
+/** Für die Website: je Stück frei buchbare Anzahl, null = unbegrenzt. */
+function forma_bemalen_free_map(PDO $pdo): array
+{
+    return array_map(fn($o) => $o['free'], forma_bemalen_stock($pdo));
+}
+
 /** Aus einer Eingabe wie ['tasse' => 2] eine geprüfte Liste machen. */
 function forma_bemalen_pick($raw): array
 {

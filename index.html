@@ -478,6 +478,9 @@ section{scroll-margin-top:96px}
 .piece{background:#FFFBF7;border:1.5px solid #E4D2BF;border-radius:18px;padding:10px 10px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;transition:border-color .2s ease}
 .piece.on{border-color:var(--clay);box-shadow:0 0 0 2px rgba(140,44,29,.12)}
 .piece svg{width:74px;height:60px}
+.piece-note{font-size:12.5px;color:var(--clay);min-height:0}
+.piece.soldout{opacity:.5}.piece.soldout .qty button{cursor:not-allowed}
+.qty button:disabled{opacity:.35;cursor:not-allowed}
 @media (max-width:600px){.pieces{padding:12px}.pieces-grid{grid-template-columns:1fr 1fr;gap:8px}.piece{padding:8px 6px 10px}.piece b{font-size:14px}.piece small{font-size:12px}}
 .piece b{font-size:14.5px;line-height:1.25;font-weight:600;color:var(--ink)}
 .piece small{font-size:12.5px;line-height:1.3;color:#674B40}
@@ -2222,6 +2225,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       .then(function(r){if(!r.ok)throw new Error();return r.json();})
       .then(function(d){
         if(!d.ok)throw new Error();
+        if(d.stock)applyStock(d.stock);
         var by={};groups=[];
         (d.courses||[]).forEach(function(c){if(!by[c.title]){by[c.title]={title:c.title,list:[]};groups.push(by[c.title]);}by[c.title].list.push(c);});
         groups.forEach(function(g){var f=g.list[0];g.description=f.description;g.price_cents=f.price_cents;g.price_text=f.price_text;g.min=f.min_participants;g.nextFree=null;g.list.some(function(c){if(c.free>0){g.nextFree=c;return true;}return false;});});
@@ -2329,16 +2333,20 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     var open=new Date()>=new Date('2026-10-19T00:00:00+02:00'),btn=$('event-btn'),st=$('event-start');
     if(open&&btn){btn.textContent='Platz reservieren';btn.href='#angebote';btn.setAttribute('data-book','Pottery bemalen');if(st)st.innerHTML='Die Anmeldung ist offen. Die Plätze sind begrenzt, such dir gleich deinen Nachmittag aus.';}
   })();
-  var piecesBox=$('book-pieces'),piecesGrid=$('pieces-grid'),pieceQty={};
+  var piecesBox=$('book-pieces'),piecesGrid=$('pieces-grid'),pieceQty={},pieceMax={};
   BEMALEN_ITEMS.forEach(function(it){
     var d=el('div','piece');d.innerHTML=it[4];d.appendChild(el('b',null,it[1]));if(it[3])d.appendChild(el('small',null,it[3]));d.appendChild(el('i',null,euro(it[2])+' / Stk.'));
     var q=el('div','qty'),m=el('button',null,'−'),o=el('output',null,'0'),pl=el('button',null,'+'),h=document.createElement('input');
     m.type=pl.type='button';m.setAttribute('aria-label',it[1]+' weniger');pl.setAttribute('aria-label',it[1]+' mehr');h.type='hidden';h.name='items['+it[0]+']';h.value='0';
-    function set(v){v=Math.max(0,Math.min(10,v));pieceQty[it[0]]=v;o.textContent=v;h.value=v;d.classList.toggle('on',v>0);submitLabel();}
+    var note=el('span','piece-note','');d.appendChild(note);
+    function set(v){var mx=pieceMax[it[0]]==null?10:Math.min(10,pieceMax[it[0]]);v=Math.max(0,Math.min(mx,v));pieceQty[it[0]]=v;o.textContent=v;h.value=v;d.classList.toggle('on',v>0);pl.disabled=v>=mx;note.textContent=mx===0?'gerade vergriffen':(v>=mx&&mx<10?'mehr haben wir gerade nicht da':'');submitLabel();}
+    it.limit=function(){var mx=pieceMax[it[0]];d.classList.toggle('soldout',mx===0);m.disabled=pl.disabled=mx===0;set(pieceQty[it[0]]||0);};
     m.addEventListener('click',function(){set((pieceQty[it[0]]||0)-1);});pl.addEventListener('click',function(){set((pieceQty[it[0]]||0)+1);});
     it.reset=function(){set(0);};
     q.appendChild(m);q.appendChild(o);q.appendChild(pl);d.appendChild(q);d.appendChild(h);piecesGrid.appendChild(d);
   });
+  // Bestand aus der Verwaltung: nur so viele Stücke wählbar, wie gerade im Atelier frei sind
+  function applyStock(st){BEMALEN_ITEMS.forEach(function(it){var v=st[it[0]];pieceMax[it[0]]=(v===null||v===undefined)?null:Math.max(0,+v);if(it.limit)it.limit();});}
   var slotsBox=$('book-slots'),slotRow=$('slot-row'),slotOn={};
   function slotHours(c){return c.title==='Offenes Atelier'?[8,9,10]:c.title==='Pottery bemalen'?[15,16,17]:null;}
   function renderSlots(c){
@@ -2499,6 +2507,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           showDone('Danke, '+name.split(/\s+/)[0]+'!','Deine Anmeldung für „'+current.title+'“ am '+current.date_text+' ist bei mir eingegangen. Die Bestätigung ist unterwegs an '+email+'. Ich freue mich auf dich!');
           load();
         }else{
+          if(d&&d.stock)applyStock(d.stock);
           err.textContent=(d&&d.error)||('Das hat leider nicht geklappt. Bitte melde dich telefonisch unter '+phone+'.');
           err.hidden=false;
           if(d&&typeof d.free==='number')load();
