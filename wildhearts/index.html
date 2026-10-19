@@ -136,6 +136,44 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
 .foot summary::-webkit-details-marker{display:none}
 .foot details p{margin-top:8px}
 
+
+/* Sprache EN/DE */
+html[lang=de] .en,html[lang=en] .de{display:none!important}
+.langsw{position:absolute;right:16px;top:max(14px,env(safe-area-inset-top));z-index:3;display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(255,251,246,.92);border:1.5px solid var(--line);font-size:13px;letter-spacing:.06em}
+.langsw button{font:inherit;border:0;background:transparent;color:var(--brown);padding:6px 11px;border-radius:999px;cursor:pointer}
+.langsw button[aria-pressed=true]{background:var(--wine);color:#FBF1EA}
+
+/* Angebote: die Stufen */
+.offer{position:relative;margin-top:52px;scroll-margin-top:20px}
+.offer-head{text-align:center}
+.offer-head .hand{font-size:21px;color:var(--wine);transform:rotate(-2deg)}
+.offer-head h2{font-family:var(--serif);font-weight:400;font-size:clamp(34px,8.5vw,48px);line-height:1.06;color:var(--wine-deep);margin-top:6px}
+.offer-head p.sub{color:var(--brown);margin:10px auto 0;max-width:36ch}
+.steps{list-style:none;padding:0;margin:28px 0 0;display:flex;flex-direction:column;gap:18px;position:relative}
+.steps::before{content:"";position:absolute;left:27px;top:30px;bottom:30px;border-left:2px dashed var(--rose);opacity:.6}
+.step{position:relative;display:flex;gap:16px;align-items:flex-start}
+.step .no{flex:0 0 56px;width:56px;height:56px;border-radius:var(--blob);display:grid;place-items:center;font-family:var(--serif);font-size:26px;position:relative;z-index:1;box-shadow:0 10px 20px rgba(58,38,32,.16)}
+.step .card{flex:1;min-width:0;border-radius:28px;padding:22px 20px 20px;box-shadow:0 14px 30px rgba(58,38,32,.1)}
+.step .kick{font-size:11.5px;letter-spacing:.24em;text-transform:uppercase}
+.step h3{font-family:var(--serif);font-weight:400;font-size:29px;line-height:1.08;margin-top:4px}
+.step .note{font-family:var(--hand);font-size:15px;margin-top:4px}
+.step p{margin-top:10px;font-size:16.5px;line-height:1.6}
+.step ul{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+.step li{position:relative;padding-left:24px;font-size:16px;line-height:1.5}
+.step li::before{content:"";position:absolute;left:2px;top:.5em;width:10px;height:10px;border-radius:var(--blob);background:currentColor;opacity:.5}
+.step .go{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:12px 20px;border-radius:999px;border:0;font:inherit;font-weight:500;font-size:15.5px;text-decoration:none;cursor:pointer}
+.s1 .no{background:#FFFBF6;color:var(--wine)}.s1 .card{background:#FFFBF6;border:1.5px solid var(--line)}.s1 .kick{color:var(--brown)}.s1 h3{color:var(--wine-deep)}.s1 .note{color:var(--wine)}.s1 .go{background:var(--wine);color:#FBF1EA}
+.s2 .no{background:var(--sage-soft);color:var(--earth)}.s2 .card{background:var(--sage-soft)}.s2 .kick{color:#55604C}.s2 h3{color:var(--earth)}.s2 .note{color:var(--wine)}.s2 .go{background:var(--earth);color:var(--cream)}
+.s3 .no{background:var(--wine);color:var(--cream)}.s3 .card{background:var(--wine);color:#F5E8DD}.s3 .kick{color:var(--blush)}.s3 h3{color:var(--cream)}.s3 .note{color:var(--blush)}.s3 .go{background:var(--cream);color:var(--wine-deep)}
+.s4 .no{background:var(--earth);color:var(--blush)}.s4 .card{background:var(--earth);color:#EADFD3}.s4 .kick{color:var(--rose)}.s4 h3{color:var(--cream)}.s4 .note{color:var(--blush)}.s4 .go{background:var(--blush);color:var(--earth)}
+.offer .tag{margin-left:0}
+@media (min-width:900px){
+  .offer{width:min(1120px,calc(100vw - 64px));margin-left:50%;transform:translateX(-50%)}
+  .steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+  .steps::before{display:none}
+  .step .card{padding:28px 28px 26px}.step h3{font-size:33px}.step p,.step li{font-size:18px}
+}
+
 @media (max-width:640px){.swirl .desk{display:none}}
 @media (min-width:900px){
   body{font-size:18px}
@@ -155,74 +193,135 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
 <div class="swirl" id="swirl" aria-hidden="true"></div>
 
 <main class="page">
+  <div class="langsw" role="group" aria-label="Language / Sprache"><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="de" aria-pressed="false">DE</button></div>
   <header class="head">
     <figure class="polaroid">
       <span class="tape" aria-hidden="true"></span>
-      <div class="ph"><img src="/img/wildhearts/viv-stretch.jpg" alt="Viv stretching on her mat at home" width="534" height="534"></div>
-      <figcaption class="cap">hi, I'm Viv ♡</figcaption>
+      <div class="ph"><img src="/img/wildhearts/viv-stretch.jpg" alt="Viv" width="534" height="534"></div>
+      <figcaption class="cap"><span class="en">hi, I'm Viv ♡</span><span class="de">hallo, ich bin Viv ♡</span></figcaption>
     </figure>
-    <p class="hey">hey you, come in ♡</p>
+    <p class="hey"><span class="en">hey you, come in ♡</span><span class="de">hey du, komm rein ♡</span></p>
     <h1>The Wild Hearts Collective</h1>
-    <p class="by">a circle for women</p>
-    <p class="lead">For women who want more than just functioning. <em>Move your body, your life, your ideas</em>, and come back to yourself, together.</p>
+    <p class="by"><span class="en">a circle for women</span><span class="de">ein Kreis für Frauen</span></p>
+    <p class="lead"><span class="en">For women who want more than just functioning. <em>Move your body, your life, your ideas</em>, and come back to yourself, together.</span><span class="de">Für Frauen, die mehr wollen als nur funktionieren. <em>Bewege deinen Körper, dein Leben, deine Ideen</em> und finde gemeinsam mit uns zu dir zurück.</span></p>
   </header>
 
   <nav class="links" aria-label="Links">
     <a class="btn main" href="https://www.instagram.com/channel/wrOyV88oT-GAwNiR/" target="_blank" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span>
-      <span class="tx">Join the Wild Hearts Collective<small>Our free community channel on Instagram</small></span>
+      <span class="tx"><span class="en">Join the Wild Hearts Collective</span><span class="de">Komm ins Wild Hearts Collective</span><small><span class="en">Our free community channel on Instagram</span><span class="de">Unser kostenloser Community-Kanal auf Instagram</span></small></span>
       <span class="ar" aria-hidden="true">→</span>
     </a>
 
     <button class="gift" type="button" data-join="reset">
-      <span class="cov"><img src="/img/wildhearts/reset-cover-en.jpg" alt="" width="440" height="624"></span>
+      <span class="cov"><img class="en" src="/img/wildhearts/reset-cover-en.jpg" alt="" width="440" height="624"><img class="de" src="/img/wildhearts/reset-cover-de.jpg" alt="" width="440" height="624" loading="lazy"></span>
       <span>
-        <span class="note">my little gift for you</span>
-        <strong>Reset Routine for Tired Days</strong>
-        <small>Ten quiet minutes for the evenings you gave everything away. Free, in English and Deutsch.</small>
-        <span class="go">Send it to me →</span>
+        <span class="note"><span class="en">my little gift for you</span><span class="de">mein kleines Geschenk für dich</span></span>
+        <strong><span class="en">Reset Routine for Tired Days</span><span class="de">Reset-Routine für müde Tage</span></strong>
+        <small><span class="en">Ten quiet minutes for the evenings you gave everything away. Free, in English and Deutsch.</span><span class="de">Zehn stille Minuten für die Abende, an denen du alles gegeben hast. Kostenlos, auf Deutsch und Englisch.</span></small>
+        <span class="go"><span class="en">Send it to me →</span><span class="de">Schick sie mir →</span></span>
       </span>
     </button>
 
-    <button class="btn" type="button" data-join="circle">
+    <a class="btn" href="#angebot">
       <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/></svg></span>
-      <span class="tx"><span>The Inner Circle <span class="tag">2027</span></span><small>Circles, guidance and 1:1 mentoring · join the waitlist</small></span>
-      <span class="ar" aria-hidden="true">→</span>
-    </button>
+      <span class="tx"><span><span class="en">Ways to walk with me</span><span class="de">So begleite ich dich</span></span><small><span class="en">Collective, Inner Circle, mentoring and the Year Journey</span><span class="de">Collective, Inner Circle, Mentoring und die Jahresreise</span></small></span>
+      <span class="ar" aria-hidden="true">↓</span>
+    </a>
     <a class="btn" href="https://www.instagram.com/movementwithviv/" target="_blank" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".8" fill="currentColor"/></svg></span>
-      <span class="tx">@movementwithviv<small>Movement, honest talks and life in the mountains</small></span>
+      <span class="tx">@movementwithviv<small><span class="en">Movement, honest talks and life in the mountains</span><span class="de">Bewegung, ehrliche Gespräche und das Leben in den Bergen</span></small></span>
       <span class="ar" aria-hidden="true">→</span>
     </a>
   </nav>
 
-  <section class="letter" aria-label="A few words from Viv">
-    <figure class="polaroid mini"><div class="ph"><img src="/img/wildhearts/fenster-quadrat.jpg" alt="Viv stretching at her window" width="1284" height="1284" loading="lazy"></div><figcaption class="cap">my spot</figcaption></figure>
-    <p class="hello">Dear wild heart,</p>
-    <p>you are always there for everyone else. You hold it all together, you manage, you remember everything, and somewhere along the way it's easy to forget yourself.</p>
-    <p>That's exactly why the Wild Hearts Collective exists. So you never forget that you are a whole person too. This is your place, a place where you don't get lost.</p>
-    <p class="sig">we matter. we are here. and we are seen. ♡ Viv</p>
+  <section class="letter" aria-label="Viv">
+    <figure class="polaroid mini"><div class="ph"><img src="/img/wildhearts/fenster-quadrat.jpg" alt="" width="1284" height="1284" loading="lazy"></div><figcaption class="cap"><span class="en">my spot</span><span class="de">mein Platz</span></figcaption></figure>
+    <p class="hello"><span class="en">Dear wild heart,</span><span class="de">Liebes wildes Herz,</span></p>
+    <p class="en">you are always there for everyone else. You hold it all together, you manage, you remember everything, and somewhere along the way it's easy to forget yourself.</p>
+    <p class="de">du bist immer für alle anderen da. Du hältst alles zusammen, organisierst, denkst an alles, und irgendwo auf dem Weg vergisst du dabei leicht dich selbst.</p>
+    <p class="en">That's exactly why the Wild Hearts Collective exists. So you never forget that you are a whole person too. This is your place, a place where you don't get lost.</p>
+    <p class="de">Genau deshalb gibt es das Wild Hearts Collective. Damit du nie vergisst, dass auch du ein ganzer Mensch bist. Das hier ist dein Ort, ein Ort, an dem du dich nicht verlierst.</p>
+    <p class="sig"><span class="en">we matter. we are here. and we are seen. ♡ Viv</span><span class="de">wir sind wichtig. wir sind da. und wir werden gesehen. ♡ Viv</span></p>
+  </section>
+
+  <section class="offer" id="angebot" aria-labelledby="offer-title">
+    <div class="offer-head">
+      <p class="hand"><span class="en">one step at a time ♡</span><span class="de">Schritt für Schritt ♡</span></p>
+      <h2 id="offer-title"><span class="en">Ways to walk with me</span><span class="de">So begleite ich dich</span></h2>
+      <p class="sub"><span class="en">Start where you are. Every step is an invitation, never a must.</span><span class="de">Fang dort an, wo du gerade stehst. Jeder Schritt ist eine Einladung, nie ein Muss.</span></p>
+    </div>
+    <ol class="steps">
+      <li class="step s1">
+        <span class="no" aria-hidden="true">1</span>
+        <div class="card">
+          <p class="kick"><span class="en">Free · open to everyone</span><span class="de">Kostenlos · offen für alle</span></p>
+          <h3>The Wild Hearts Collective</h3>
+          <p class="note"><span class="en">where it all begins</span><span class="de">hier beginnt alles</span></p>
+          <ul class="en"><li>Our community channel on Instagram with daily check-ins, little polls and honest questions</li><li>The Reset Routine for Tired Days as my welcome gift</li><li>Live Wild Hearts Gatherings: free video circles where we really meet, the first one in December</li></ul>
+          <ul class="de"><li>Unser Community-Kanal auf Instagram mit täglichen Impulsen, kleinen Umfragen und ehrlichen Fragen</li><li>Die Reset-Routine für müde Tage als mein Willkommensgeschenk</li><li>Live-Gatherings: kostenlose Video-Kreise, in denen wir uns wirklich begegnen, das erste im Dezember</li></ul>
+          <a class="go" href="https://www.instagram.com/channel/wrOyV88oT-GAwNiR/" target="_blank" rel="noopener"><span class="en">Join for free →</span><span class="de">Kostenlos dabei sein →</span></a>
+        </div>
+      </li>
+      <li class="step s2">
+        <span class="no" aria-hidden="true">2</span>
+        <div class="card">
+          <p class="kick"><span class="en">Membership · opens in 2027</span><span class="de">Mitgliedschaft · ab 2027</span></p>
+          <h3>The Inner Circle</h3>
+          <p class="note"><span class="en">your circle, month after month</span><span class="de">dein Kreis, Monat für Monat</span></p>
+          <p class="en">For women who want to go deeper and stay close. A warm, quiet place of your own, away from the noise of social media.</p>
+          <p class="de">Für Frauen, die tiefer gehen und dranbleiben möchten. Ein warmer, ruhiger Ort nur für dich, weit weg vom Lärm der sozialen Medien.</p>
+          <ul class="en"><li>Monthly live circles in the rhythm of the moon and the seasons</li><li>A members' area with rituals, affirmations and short, gentle movement</li><li>Honest talks about exhaustion, relationships and friendships that no longer fit you</li><li>Space for what lights you up and for the ideas you have been carrying around</li><li>Women around you who truly get it</li></ul>
+          <ul class="de"><li>Monatliche Live-Kreise im Rhythmus von Mond und Jahreszeiten</li><li>Ein Mitgliederbereich mit Ritualen, Affirmationen und kurzen, sanften Bewegungseinheiten</li><li>Ehrliche Gespräche über Erschöpfung, Beziehungen und Freundschaften, die nicht mehr zu dir passen</li><li>Raum für das, was dich zum Leuchten bringt, und für die Ideen, die du schon lange mit dir trägst</li><li>Frauen an deiner Seite, die dich wirklich verstehen</li></ul>
+          <button class="go" type="button" data-join="circle"><span class="en">Join the waitlist →</span><span class="de">Auf die Warteliste →</span></button>
+        </div>
+      </li>
+      <li class="step s3">
+        <span class="no" aria-hidden="true">3</span>
+        <div class="card">
+          <p class="kick"><span class="en">1:1 mentoring · for your heart business</span><span class="de">1:1 Mentoring · für dein Herzensbusiness</span></p>
+          <h3><span class="en">Be seen with what you love</span><span class="de">Sichtbar mit dem, was du liebst</span></h3>
+          <p class="note"><span class="en">from idea to something real</span><span class="de">von der Idee zu etwas Echtem</span></p>
+          <p class="en">You carry an idea that won't let you go? I'll help you turn it into something real, step by step and in a way that feels like you. I have built my own businesses from scratch, and I'll share everything I learned along the way.</p>
+          <p class="de">Du trägst eine Idee in dir, die dich nicht loslässt? Ich helfe dir, Schritt für Schritt etwas Echtes daraus zu machen, und zwar so, dass es sich nach dir anfühlt. Ich habe meine eigenen Unternehmen von Grund auf aufgebaut und teile mit dir alles, was ich dabei gelernt habe.</p>
+          <ul class="en"><li>Finding your niche and the people you are meant to serve</li><li>Your personality and style: how you want to come across</li><li>Your website, simple, beautiful and truly yours</li><li>Flyers and print design</li><li>Social media that feels like you, not like pressure</li><li>Getting seen and finding the courage to show up</li></ul>
+          <ul class="de"><li>Deine Nische finden und die Menschen, für die du da sein möchtest</li><li>Deine Persönlichkeit und dein Stil: wie du wirken möchtest</li><li>Deine Website, einfach, schön und ganz deine</li><li>Flyer und Printdesign</li><li>Social Media, das sich nach dir anfühlt und nicht nach Druck</li><li>Sichtbar werden und den Mut finden, dich zu zeigen</li></ul>
+          <button class="go" type="button" data-join="mentoring"><span class="en">I'm interested →</span><span class="de">Ich bin interessiert →</span></button>
+        </div>
+      </li>
+      <li class="step s4">
+        <span class="no" aria-hidden="true">4</span>
+        <div class="card">
+          <p class="kick"><span class="en">12 months · by application</span><span class="de">12 Monate · mit Bewerbung</span></p>
+          <h3><span class="en">The Year Journey</span><span class="de">Die Jahresreise</span></h3>
+          <p class="note"><span class="en">a whole year, side by side</span><span class="de">ein ganzes Jahr, Seite an Seite</span></p>
+          <p class="en">For women who are ready to truly change something. We walk through your year together: the Inner Circle, regular 1:1 time with me and a clear path for your life and your heart business. Only a few places each year.</p>
+          <p class="de">Für Frauen, die bereit sind, wirklich etwas zu verändern. Wir gehen gemeinsam durch dein Jahr: mit dem Inner Circle, regelmäßiger Zeit mit mir allein und einem klaren Weg für dein Leben und dein Herzensbusiness. Pro Jahr gibt es nur wenige Plätze.</p>
+          <button class="go" type="button" data-join="year"><span class="en">Tell me more →</span><span class="de">Erzähl mir mehr →</span></button>
+        </div>
+      </li>
+    </ol>
   </section>
 
   <section class="affirm" aria-label="Affirmation">
     <svg style="left:18px;top:16px" width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4c2 15 12 25 28 28-16 3-26 13-28 28-2-15-12-25-28-28 16-3 26-13 28-28z" fill="#C98B78"/></svg>
     <svg style="right:20px;top:18px" width="34" height="34" viewBox="0 0 120 120" aria-hidden="true"><path d="M80 18a42 42 0 1 0 22 62A34 34 0 0 1 80 18z" fill="#E7C4AE"/></svg>
-    <p class="k">for tonight</p>
-    <p class="big">I am allowed to rest.</p>
-    <p class="hand">and I'm allowed to want more.</p>
+    <p class="k"><span class="en">for tonight</span><span class="de">für heute Abend</span></p>
+    <p class="big"><span class="en">I am allowed to rest.</span><span class="de">Ich darf ruhen.</span></p>
+    <p class="hand"><span class="en">and I'm allowed to want more.</span><span class="de">und ich darf mehr wollen.</span></p>
   </section>
 
   <section class="join" id="join" aria-labelledby="join-title">
     <span class="tape" aria-hidden="true"></span>
-    <h2 id="join-title">Come a little closer</h2>
-    <p class="intro" id="join-intro">Get the Reset Routine for Tired Days for free, plus invitations to our live Wild Hearts Gatherings and first news about the Inner Circle.</p>
-    <p class="psst">psst… our first live Gathering is in December, in the dark, cosy time of the year.</p>
+    <h2 id="join-title"></h2>
+    <p class="intro" id="join-intro"></p>
+    <p class="psst"><span class="en">psst… our first live Gathering is in December, in the dark, cosy time of the year.</span><span class="de">psst… unser erstes Live-Gathering ist im Dezember, in der dunklen, gemütlichen Zeit des Jahres.</span></p>
     <form id="join-form" novalidate>
-      <label class="f">First name<input type="text" name="name" autocomplete="given-name" required maxlength="80"></label>
-      <label class="f">Email<input type="email" name="email" autocomplete="email" required maxlength="160"></label>
+      <label class="f"><span class="en">First name</span><span class="de">Vorname</span><input type="text" name="name" autocomplete="given-name" required maxlength="80"></label>
+      <label class="f"><span class="en">Email</span><span class="de">E-Mail</span><input type="email" name="email" autocomplete="email" required maxlength="160"></label>
       <div class="hp" aria-hidden="true"><label>Leave empty<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
-      <label class="consent"><input type="checkbox" name="consent" required><span>Yes, Viv may email me about the Wild Hearts Collective. I can unsubscribe anytime.</span></label>
-      <button type="submit">Count me in</button>
+      <label class="consent"><input type="checkbox" name="consent" required><span><span class="en">Yes, Viv may email me about the Wild Hearts Collective. I can unsubscribe anytime.</span><span class="de">Ja, Viv darf mir E-Mails zum Wild Hearts Collective schicken. Ich kann mich jederzeit abmelden.</span></span></label>
+      <button type="submit"><span class="en">Count me in</span><span class="de">Ich bin dabei</span></button>
       <p class="msg" id="join-msg" role="status" aria-live="polite" hidden></p>
     </form>
   </section>
@@ -231,12 +330,14 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
 <div class="wave" aria-hidden="true"><svg viewBox="0 0 1200 70" preserveAspectRatio="none"><path d="M0 40C150 10 300 10 450 32S750 68 900 44 1100 14 1200 26V70H0Z" fill="#E8D7C4"/></svg></div>
 <footer class="foot">
   <div class="in">
-    <p class="bye">with love from the mountains ♡</p>
+    <p class="bye"><span class="en">with love from the mountains ♡</span><span class="de">mit Liebe aus den Bergen ♡</span></p>
     <p>The Wild Hearts Collective · by Movecia · Vivien Malonga<br><a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a></p>
     <details>
-      <summary>Imprint &amp; privacy</summary>
-      <p><strong>Imprint:</strong> Vivien Malonga, Movecia – Personal Fitness, Silvrettastraße 58, 6562 Mathon, Austria. Email: hello@moveciamovement.com. VAT ID: ATU83602825.</p>
-      <p><strong>Privacy:</strong> If you sign up, your first name and email address are stored on this website and, once you have confirmed them, with our newsletter service MailerLite (MailerLite Limited, Ireland). They are used only to send you emails about the Wild Hearts Collective. You will receive a confirmation email first. You can unsubscribe at any time with the link in every email or by writing to hello@moveciamovement.com. This page uses no tracking cookies.</p>
+      <summary><span class="en">Imprint &amp; privacy</span><span class="de">Impressum &amp; Datenschutz</span></summary>
+      <p class="en"><strong>Imprint:</strong> Vivien Malonga, Movecia – Personal Fitness, Silvrettastraße 58, 6562 Mathon, Austria. Email: hello@moveciamovement.com. VAT ID: ATU83602825.</p>
+      <p class="de"><strong>Impressum:</strong> Vivien Malonga, Movecia – Personal Fitness, Silvrettastraße 58, 6562 Mathon, Österreich. E-Mail: hello@moveciamovement.com. UID: ATU83602825.</p>
+      <p class="en"><strong>Privacy:</strong> If you sign up, your first name and email address are stored on this website and, once you have confirmed them, with our newsletter service MailerLite (MailerLite Limited, Ireland). They are used only to send you emails about the Wild Hearts Collective. You will receive a confirmation email first. You can unsubscribe at any time with the link in every email or by writing to hello@moveciamovement.com. This page uses no tracking cookies.</p>
+      <p class="de"><strong>Datenschutz:</strong> Wenn du dich anmeldest, werden dein Vorname und deine E-Mail-Adresse auf dieser Website gespeichert und nach deiner Bestätigung bei unserem Newsletter-Dienst MailerLite (MailerLite Limited, Irland). Wir verwenden sie nur, um dir E-Mails zum Wild Hearts Collective zu schicken. Zuerst bekommst du eine Bestätigungsmail. Abmelden kannst du dich jederzeit über den Link in jeder E-Mail oder mit einer Nachricht an hello@moveciamovement.com. Diese Seite verwendet keine Tracking-Cookies.</p>
     </details>
   </div>
 </footer>
@@ -284,20 +385,52 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
     box.appendChild(s);
   });
 
-  // Anmeldung über die eigene Website (api/wh-subscribe.php): Bestätigungsmail, danach Download + MailerLite-Gruppe „Wild Hearts“
+  // Sprache: EN/DE umschaltbar, gemerkt im Browser, ?lang=de für direkte Links
+  const root = document.documentElement;
+  const pick = l => {
+    root.lang = l === 'de' ? 'de' : 'en';
+    document.querySelectorAll('.langsw button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === root.lang)));
+    try { localStorage.setItem('wh-lang', root.lang); } catch (e) {}
+    setJoin(source);
+  };
   let source = 'link';
   const form = document.getElementById('join-form');
   const msg = document.getElementById('join-msg');
   const title = document.getElementById('join-title');
   const intro = document.getElementById('join-intro');
   const loaded = Date.now();
-  const texts = {
-    reset: ['Your Reset Routine', 'Leave your first name and email. Once you have confirmed your address, the Reset Routine for Tired Days lands in your inbox, and you choose English or Deutsch.'],
-    circle: ['Join the Inner Circle waitlist', 'The Inner Circle opens in 2027: monthly circles, guidance for the ideas you carry around, and 1:1 mentoring with me. Join the waitlist and you will hear about it before anyone else.']
+  const T = {
+    en: {
+      link: ['Come a little closer', 'Get the Reset Routine for Tired Days for free, plus invitations to our live Wild Hearts Gatherings and first news about the Inner Circle.'],
+      reset: ['Your Reset Routine', 'Leave your first name and email. Once you have confirmed your address, the Reset Routine for Tired Days lands in your inbox, and you choose English or Deutsch.'],
+      circle: ['Join the Inner Circle waitlist', 'The Inner Circle opens in 2027. Join the waitlist and you will hear about it before anyone else, together with the Reset Routine as a little gift.'],
+      mentoring: ['Mentoring for your heart business', 'Leave your name and email and I will tell you personally how the mentoring works and when we can start. The Reset Routine comes as a little gift.'],
+      year: ['The Year Journey', 'Leave your name and email. As soon as applications open, you will be the first to know. The Reset Routine comes as a little gift.'],
+      name: 'Please add your first name.', mail: 'Please check your email address.', box: 'Please tick the box so I am allowed to email you.', wait: 'One moment please, then try again.',
+      ok: n => 'Thank you, ' + n + '! Please check your inbox now and confirm your email address with one click. Right after that, your Reset Routine is on its way. 🤍',
+      fail: 'That did not work just now. Please try again in a moment or write to hello@moveciamovement.com.'
+    },
+    de: {
+      link: ['Komm ein bisschen näher', 'Hol dir die Reset-Routine für müde Tage kostenlos, dazu Einladungen zu unseren Live-Gatherings und die ersten Neuigkeiten zum Inner Circle.'],
+      reset: ['Deine Reset-Routine', 'Trag deinen Vornamen und deine E-Mail ein. Sobald du deine Adresse bestätigt hast, kommt die Reset-Routine für müde Tage zu dir, und du wählst Deutsch oder Englisch.'],
+      circle: ['Warteliste für den Inner Circle', 'Der Inner Circle öffnet 2027. Trag dich auf die Warteliste ein, dann erfährst du als Erste davon. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
+      mentoring: ['Mentoring für dein Herzensbusiness', 'Trag deinen Namen und deine E-Mail ein, dann erzähle ich dir persönlich, wie das Mentoring abläuft und wann wir starten können. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
+      year: ['Die Jahresreise', 'Trag deinen Namen und deine E-Mail ein. Sobald die Bewerbung startet, erfährst du es als Erste. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
+      name: 'Bitte gib deinen Vornamen ein.', mail: 'Bitte prüf deine E-Mail-Adresse.', box: 'Bitte setz das Häkchen, damit ich dir schreiben darf.', wait: 'Einen Moment bitte, dann versuch es noch einmal.',
+      ok: n => 'Danke, ' + n + '! Schau jetzt in dein Postfach und bestätige deine E-Mail-Adresse mit einem Klick. Gleich danach ist deine Reset-Routine unterwegs. 🤍',
+      fail: 'Das hat gerade nicht geklappt. Bitte versuch es gleich noch einmal oder schreib an hello@moveciamovement.com.'
+    }
   };
+  const L = () => T[root.lang === 'de' ? 'de' : 'en'];
+  function setJoin(src) { const t = L()[src] || L().link; title.textContent = t[0]; intro.textContent = t[1]; }
+  document.querySelectorAll('.langsw button').forEach(b => b.addEventListener('click', () => pick(b.dataset.lang)));
+  let start = new URLSearchParams(location.search).get('lang');
+  if (!start) { try { start = localStorage.getItem('wh-lang'); } catch (e) {} }
+  if (!start) start = (navigator.language || '').toLowerCase().startsWith('de') ? 'de' : 'en';
+  pick(start);
   document.querySelectorAll('[data-join]').forEach(b => b.addEventListener('click', () => {
-    const t = texts[b.dataset.join];
-    if (t) { title.textContent = t[0]; intro.textContent = t[1]; source = b.dataset.join; }
+    source = b.dataset.join;
+    setJoin(source);
     document.getElementById('join').scrollIntoView({behavior: 'smooth', block: 'start'});
     setTimeout(() => form.elements.name.focus({preventScroll: true}), 500);
   }));
@@ -308,22 +441,22 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
     const name = form.elements.name.value.trim();
     const email = form.elements.email.value.trim();
     if (form.elements.website.value) return;
-    if (name.length < 2) return show('Please add your first name.', true);
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return show('Please check your email address.', true);
-    if (!form.elements.consent.checked) return show('Please tick the box so I am allowed to email you.', true);
-    if (Date.now() - loaded < 2000) return show('One moment please, then try again.', true);
+    if (name.length < 2) return show(L().name, true);
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return show(L().mail, true);
+    if (!form.elements.consent.checked) return show(L().box, true);
+    if (Date.now() - loaded < 2000) return show(L().wait, true);
     const btn = form.querySelector('button');
     btn.disabled = true;
     try {
-      const r = await fetch('/api/wh-subscribe.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, email, consent: true, website: '', source, elapsed: Date.now() - loaded})});
+      const r = await fetch('/api/wh-subscribe.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, email, consent: true, website: '', source, lang: root.lang, elapsed: Date.now() - loaded})});
       const j = await r.json().catch(() => ({}));
       if (!r.ok || !j.ok) throw new Error(j.error || 'signup');
       form.querySelectorAll('label, button').forEach(el => el.hidden = true);
       document.querySelector('.psst').hidden = true;
-      show('Thank you, ' + name + '! Please check your inbox now and confirm your email address with one click. Right after that, your Reset Routine is on its way. 🤍');
+      show(L().ok(name));
     } catch (err) {
       btn.disabled = false;
-      show(err.message && err.message !== 'signup' ? err.message : 'That did not work just now. Please try again in a moment or write to hello@moveciamovement.com.', true);
+      show(err.message && err.message !== 'signup' ? err.message : L().fail, true);
     }
   });
 })();

@@ -59,6 +59,8 @@ function mm_schema(PDO $pdo): void
         created_at TEXT NOT NULL,
         confirmed_at TEXT
     )');
+    $cols = array_column($pdo->query('PRAGMA table_info(mm_subscribers)')->fetchAll(), 'name');
+    if (!in_array('lang', $cols, true)) $pdo->exec("ALTER TABLE mm_subscribers ADD COLUMN lang TEXT NOT NULL DEFAULT 'en'");
 }
 
 // --- Einstellungen (liegen nur im Datenordner, nie im Repo) ---------------------------
@@ -201,13 +203,13 @@ function mm_room_open(array $g): bool
 
 // --- Mails von hello@moveciamovement.com --------------------------------------------------
 
-function mm_mail_html(string $title, string $html): string
+function mm_mail_html(string $title, string $html, string $lang = 'en'): string
 {
-    return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . forma_h($title) . '</title></head>'
+    return '<!DOCTYPE html><html lang="' . ($lang === 'de' ? 'de' : 'en') . '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . forma_h($title) . '</title></head>'
         . '<body style="margin:0;padding:0;background:#F2E6D8;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2E6D8;"><tr><td align="center" style="padding:26px 12px;">'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#F8F1E8;border-radius:24px;font-family:Helvetica,Arial,sans-serif;color:#33211B;">'
         . '<tr><td style="padding:30px 30px 26px;font-size:16px;line-height:1.65;">' . $html
-        . '<p style="margin:22px 0 0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:24px;color:#93402F;">with love, Viv</p></td></tr></table>'
+        . '<p style="margin:22px 0 0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:24px;color:#93402F;">' . ($lang === 'de' ? 'alles Liebe, Viv' : 'with love, Viv') . '</p></td></tr></table>'
         . '<p style="max-width:560px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#674B40;margin:16px auto 0;">Vivien Malonga · Movecia – Personal Fitness · Silvrettastraße 58 · 6562 Mathon · Austria · ' . MM_FROM_EMAIL . '</p>'
         . '</td></tr></table></body></html>';
 }
@@ -402,10 +404,20 @@ function mm_sub_by_token(PDO $pdo, string $tok): ?array
 
 function mm_mail_confirm(array $sub): bool
 {
+    $de = ($sub['lang'] ?? 'en') === 'de';
     $first = forma_first_name($sub['name']);
     $link = mm_site() . '/api/wh-confirm.php?t=' . $sub['token'];
+    $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#93402F;';
+    if ($de) {
+        $text = "Hey $first,\n\nnur noch ein Klick, dann bist du dabei. Bitte bestätige hier deine E-Mail-Adresse:\n$link\n\nGleich danach wartet deine Reset-Routine für müde Tage auf dich, auf Deutsch und Englisch.\n\nFalls du dich nicht angemeldet hast, ignoriere diese Mail einfach. Dann hörst du nichts mehr von mir.\n\nAlles Liebe, Viv";
+        $html = '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
+            . '<p style="margin:14px 0 0;">nur noch ein Klick, dann bist du dabei. Bitte bestätige deine E-Mail-Adresse. Gleich danach wartet deine <strong>Reset-Routine für müde Tage</strong> auf dich, auf Deutsch und Englisch.</p>'
+            . mm_button($link, 'Ja, ich bestätige meine E-Mail')
+            . '<p style="margin:16px 0 0;font-size:14px;color:#674B40;">Falls du dich nicht angemeldet hast, ignoriere diese Mail einfach. Dann hörst du nichts mehr von mir.</p>';
+        return mm_mail($sub['email'], 'Ein Klick, und du bist dabei 🌙', $text, mm_mail_html('E-Mail bestätigen', $html, 'de'));
+    }
     $text = "Hey $first,\n\none click and you're in. Please confirm your email address here:\n$link\n\nRight after that your Reset Routine for Tired Days is ready for you, in English and Deutsch.\n\nIf you didn't sign up, simply ignore this email and you won't hear from me again.\n\nWith love, Viv";
-    $html = '<p style="margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#93402F;">Hey ' . forma_h($first) . ',</p>'
+    $html = '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
         . '<p style="margin:14px 0 0;">one click and you\'re in. Please confirm your email address, and right after that your <strong>Reset Routine for Tired Days</strong> is ready for you, in English and Deutsch.</p>'
         . mm_button($link, 'Yes, confirm my email')
         . '<p style="margin:16px 0 0;font-size:14px;color:#674B40;">If you didn\'t sign up, simply ignore this email and you won\'t hear from me again.</p>';
@@ -414,12 +426,26 @@ function mm_mail_confirm(array $sub): bool
 
 function mm_mail_welcome(array $sub): bool
 {
+    $de = ($sub['lang'] ?? 'en') === 'de';
     $first = forma_first_name($sub['name']);
     $dl = mm_site() . '/reset/';
     $out = mm_site() . '/api/wh-unsubscribe.php?t=' . $sub['token'];
+    $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#93402F;';
+    $img = '<img src="' . mm_site() . '/img/wildhearts/cover.jpg" width="500" alt="" style="display:block;width:100%;max-width:500px;height:auto;max-height:360px;object-fit:cover;border-radius:16px;margin:0 0 20px;">';
+    if ($de) {
+        $text = "Hey $first,\n\ndu hast es geschafft, du bist dabei. Willkommen im Wild Hearts Collective.\n\nHier ist mein kleines Geschenk für dich: die Reset-Routine für müde Tage. Zehn stille Minuten für die Abende, an denen du alles gegeben hast.\n\nDownload (Deutsch oder Englisch): $dl\n\nDas Wild Hearts Collective gibt es, damit du nie vergisst, dass auch du ein ganzer Mensch bist, selbst wenn du immer für alle anderen da bist. Wir sind wichtig. Wir sind da. Und wir werden gesehen.\n\nKomm in unseren kostenlosen Community-Kanal auf Instagram: " . MM_CHANNEL . "\nDort schreiben wir auf Englisch, aber du bist von Herzen willkommen. Unser erstes Live-Gathering findet im Dezember statt.\n\nAlles Liebe, Viv\n\nAbmelden: $out";
+        $html = $img . '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
+            . '<p style="margin:14px 0 0;">du hast es geschafft, du bist dabei. Willkommen im Wild Hearts Collective.</p>'
+            . '<p style="margin:14px 0 0;">Hier ist mein kleines Geschenk für dich: die <strong>Reset-Routine für müde Tage</strong>. Zehn stille Minuten für die Abende, an denen du alles gegeben hast. Ein bewusster Atemzug, ein kleines Ritual zum Loslassen, eine warme Tasse Goldene Mondmilch und ein paar ehrliche Zeilen, nur für dich.</p>'
+            . mm_button($dl, 'Zu meiner Reset-Routine')
+            . '<p style="margin:8px 0 0;font-size:14px;color:#674B40;text-align:center;">Auf der Seite wählst du Deutsch oder Englisch.</p>'
+            . '<p style="margin:20px 0 0;">Das Wild Hearts Collective gibt es, damit du nie vergisst, dass auch du ein ganzer Mensch bist, selbst wenn du immer für alle anderen da bist. Wir sind wichtig. Wir sind da. Und wir werden gesehen.</p>'
+            . '<p style="margin:14px 0 0;">Komm und sag Hallo in unserem kostenlosen <a href="' . MM_CHANNEL . '" style="color:#93402F;">Community-Kanal auf Instagram</a>. Dort schreiben wir auf Englisch, aber du bist von Herzen willkommen. Unser erstes Live-Gathering findet im Dezember statt.</p>'
+            . '<p style="margin:22px 0 0;font-size:12px;color:#674B40;">Du bekommst diese E-Mail, weil du dich auf moveciamovement.com angemeldet hast. <a href="' . forma_h($out) . '" style="color:#674B40;">Abmelden</a></p>';
+        return mm_mail($sub['email'], 'Deine Reset-Routine für müde Tage 🌙', $text, mm_mail_html('Deine Reset-Routine', $html, 'de'));
+    }
     $text = "Hey $first,\n\nyou did it, you're in. Welcome to the Wild Hearts Collective.\n\nHere is my little gift for you: the Reset Routine for Tired Days. Ten quiet minutes for the evenings you gave everything away.\n\nDownload (English or Deutsch): $dl\n\nThe Wild Hearts Collective exists so you never forget that you are a whole person too, even when you're always there for everyone else. We matter. We are here. And we are seen.\n\nCome and say hi in our free community channel on Instagram: " . MM_CHANNEL . "\nOur first live Wild Hearts Gathering is in December.\n\nWith love, Viv\n\nUnsubscribe: $out";
-    $html = '<img src="' . mm_site() . '/img/wildhearts/cover.jpg" width="500" alt="" style="display:block;width:100%;max-width:500px;height:auto;max-height:360px;object-fit:cover;border-radius:16px;margin:0 0 20px;">'
-        . '<p style="margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#93402F;">Hey ' . forma_h($first) . ',</p>'
+    $html = $img . '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
         . '<p style="margin:14px 0 0;">you did it, you\'re in. Welcome to the Wild Hearts Collective.</p>'
         . '<p style="margin:14px 0 0;">Here is my little gift for you: the <strong>Reset Routine for Tired Days</strong>. Ten quiet minutes for the evenings you gave everything away. A breath, a small ritual to let go, a warm cup of Golden Moon Milk and a few honest lines, just for you.</p>'
         . mm_button($dl, 'Get my Reset Routine')
