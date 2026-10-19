@@ -119,15 +119,16 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 <?php if (!$guest && !$gath): ?>
   <section class="card">
     <h2><span class="step">✦</span>Übungsansicht</h2>
-    <p class="tip">Zum Üben vor einem vollen Kreis: dein echtes Kamerabild und dazu Fenster mit Namen, als hätten die Frauen ihre Kamera aus. Diese Fenster gibt es nur hier auf deinem Bildschirm, im echten Raum tauchen sie nie auf. Mit der Aufnahme kannst du dir danach ansehen, wie du wirkst. Hintergrundbilder wählst du von deinem Gerät, hochgeladen wird nichts.</p>
+    <p class="tip">Zum Üben vor einem vollen Kreis: dein echtes Kamerabild und dazu bis zu 15 Fenster mit Namen, als hätten die Frauen ihre Kamera aus. Diese Fenster gibt es nur hier auf deinem Bildschirm, im echten Raum tauchen sie nie auf. Mit der Aufnahme kannst du dir danach ansehen, wie du wirkst. Hintergrundbilder wählst du von deinem Gerät, hochgeladen wird nichts.</p>
     <div class="ublist" id="ublist"></div>
     <div class="row"><button type="button" class="ghost" id="ubadd">+ Fenster</button></div>
     <h3 style="font-size:18px;font-weight:500;margin-top:18px;color:var(--wine-deep)">Übungsfragen</h3>
-    <p class="tip">Eine Frage pro Zeile. Die Fragen kommen während der Übung aus den Fenstern: Das fragende Fenster leuchtet auf und die Frage steht groß bei dir. Schreibst du „Anna: …“ davor, fragt genau dieses Fenster, sonst ein zufälliges.</p>
+    <p class="tip">Eine Frage pro Zeile. Die Fragen kommen während der Übung wie Nachrichten in den Chat rechts, und das fragende Fenster hebt die Hand. Es können mehrere Fragen gleichzeitig offen sein, „Beantwortet ✓“ hakt immer die älteste ab. Schreibst du „Anna: …“ davor, fragt genau dieses Fenster, sonst ein zufälliges.</p>
     <textarea id="ubq" style="min-height:160px"></textarea>
     <div class="row">
-      <label class="f" style="flex:0 1 260px">Fragen kommen<select id="ubqmode"><option value="0">wenn ich auf „Nächste Frage“ tippe</option><option value="60">etwa jede Minute</option><option value="120">etwa alle 2 Minuten</option><option value="180">etwa alle 3 Minuten</option></select></label>
+      <label class="f" style="flex:0 1 260px">Fragen kommen<select id="ubqmode"><option value="0">wenn ich auf „Nächste Frage“ tippe</option><option value="30">etwa alle 30 Sekunden</option><option value="60">etwa jede Minute</option><option value="120">etwa alle 2 Minuten</option><option value="180">etwa alle 3 Minuten</option></select></label>
       <label class="chk" style="align-self:flex-end;display:flex;gap:8px;align-items:center;font-size:15px;color:var(--brown)"><input type="checkbox" id="ubqmix" checked style="width:18px;height:18px;accent-color:var(--wine)"> zufällige Reihenfolge</label>
+      <label class="chk" style="align-self:flex-end;display:flex;gap:8px;align-items:center;font-size:15px;color:var(--brown)"><input type="checkbox" id="ubqburst" style="width:18px;height:18px;accent-color:var(--wine)"> manchmal mehrere Fragen kurz hintereinander</label>
     </div>
     <div class="row"><button type="button" id="ubopen">Übungsansicht öffnen</button></div>
   </section>
@@ -155,14 +156,14 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 
 <?php if ($ready): ?>
 <div class="roomwrap" id="room" hidden>
-  <div class="roombar"><span><?= $gath ? $h($gath['title']) : 'Testraum · Wild Hearts' ?></span><span class="rb"><?php if (!$guest): ?><button id="rec2" type="button" class="ghostbtn">● Aufnahme</button><button id="ptoggle" type="button" class="ghostbtn">Teleprompter</button><a class="btn ghostbtn" style="padding:7px 16px;font-size:15px" href="?test=<?= $h(rawurlencode($testTok)) ?>&amp;buehne=1" target="_blank" rel="noopener">Video einspielen</a><?php endif; ?><button id="leave" type="button">Raum verlassen</button></span></div>
+  <div class="roombar"><span><?= $gath ? $h($gath['title']) : 'Testraum · Wild Hearts' ?></span><span class="rb"><?php if (!$guest): ?><button id="rec2" type="button" class="ghostbtn">● Aufnahme</button><button id="ptoggle" type="button" class="ghostbtn">Teleprompter</button><a class="btn ghostbtn" style="padding:7px 16px;font-size:15px" href="?test=<?= $h(rawurlencode($testTok)) ?>&amp;buehne=1" target="_blank" rel="noopener">Video &amp; Musik</a><?php endif; ?><button id="leave" type="button">Raum verlassen</button></span></div>
   <iframe id="frame" title="Whereby Testraum" allow="camera; microphone; fullscreen; speaker; display-capture; autoplay; compute-pressure"></iframe>
 </div>
 <?php endif; ?>
 <?php if (!$guest && !$gath): ?>
 <div class="practice" id="practice" hidden>
   <div class="pbar"><span>Übungsansicht · nur auf deinem Bildschirm</span><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="ubnext">Nächste Frage</button><button type="button" id="ubdone" hidden>Beantwortet ✓</button><button type="button" id="ubrec">● Übung aufnehmen</button><button type="button" id="ubprompt">Teleprompter</button><button type="button" id="ubclose">Schließen</button></span></div>
-  <canvas id="ubcv" width="1280" height="720"></canvas>
+  <canvas id="ubcv" width="1920" height="1080"></canvas>
 </div>
 <?php endif; ?>
 <?php if (!$guest): ?>
@@ -362,7 +363,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
   const UL = $('ublist');
   if (UL) {
     const SW = ['#5E6B35', '#9DA58F', '#6B5D4C', '#B3A78F', '#3F4A26', '#8A8F6E'];
-    const DEF = ['Anna', 'Sophie', 'Lena', 'Maria', 'Julia', 'Katrin', 'Eva'];
+    const DEF = ['Anna', 'Sophie', 'Lena', 'Emily', 'Julia', 'Katrin', 'Sarah', 'Clara', 'Hannah', 'Jessica', 'Maria', 'Theresa', 'Olivia', 'Nina', 'Rachel'];
     let rows = [];
     try { rows = JSON.parse(localStorage.getItem('wh-uebung') || 'null') || []; } catch (e) {}
     if (!rows.length) rows = DEF.slice(0, 5).map((n, i) => ({name: n, color: SW[i % SW.length]}));
@@ -384,15 +385,16 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
         d.append(sw, n, pick, col, del); UL.appendChild(d);
       });
     };
-    $('ubadd').onclick = () => { if (rows.length >= 11) return; rows.push({name: DEF[rows.length % DEF.length], color: SW[rows.length % SW.length]}); store(); draw(); };
+    $('ubadd').onclick = () => { if (rows.length >= 15) return; rows.push({name: DEF.find(d => !rows.some(r => r.name.trim() === d)) || 'Gast ' + (rows.length + 1), color: SW[rows.length % SW.length]}); store(); draw(); };
     draw();
 
     const QDEF = ["Hi Viv! Where are you joining from today?", "How do you find time for yourself with four kids?", "What do you do on days when you feel you got nothing done?", "I always feel guilty when I take time for myself. How do I stop that?", "Is this circle also for women without children?", "How long have you been doing this?", "What exactly happens in The Inner Circle, and what does it cost?", "Can I join the Alpine Retreat with my partner?", "I'm new here and a bit shy. Do I have to turn my camera on?", "What is one small thing I can do tomorrow morning?", "Do you ever feel like giving up?", "Will there be a recording of today?"];
     const ta2 = $('ubq'), qm = $('ubqmode'), qx = $('ubqmix');
     try { ta2.value = localStorage.getItem('wh-fragen') ?? QDEF.join('\n'); qm.value = localStorage.getItem('wh-fragen-takt') || '0'; } catch (e) { ta2.value = QDEF.join('\n'); }
     ta2.oninput = () => { try { localStorage.setItem('wh-fragen', ta2.value); } catch (e) {} };
-    qm.onchange = () => { try { localStorage.setItem('wh-fragen-takt', qm.value); } catch (e) {} };
-    let qList = [], qAct = null, qTimer = 0, qAt = 0;
+    qm.onchange = () => { try { localStorage.setItem('wh-fragen-takt', qm.value); } catch (e) {} if (!PR.hidden) qLoop(); };
+    let qList = [], qMsgs = [], qTimer = 0;
+    const NAMECOL = ['#5E6B35', '#8A5A44', '#3F6B6B', '#7A5C8A', '#A0703A', '#4E6E3A', '#9A4F5F', '#3F5A82', '#6B5D4C', '#7C7A2F'];
     const qPrep = () => {
       qList = ta2.value.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
         const m = l.match(/^([^:?!.]{1,30}):\s*(.+)$/);
@@ -401,19 +403,36 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       });
       if (qx.checked) for (let i = qList.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [qList[i], qList[j]] = [qList[j], qList[i]]; }
     };
+    const pling = () => {
+      try {
+        const c = new (window.AudioContext || window.webkitAudioContext)(), o = c.createOscillator(), gn = c.createGain(), t = c.currentTime;
+        o.type = 'sine'; o.frequency.setValueAtTime(880, t); o.frequency.setValueAtTime(1320, t + 0.09);
+        gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(0.12, t + 0.02); gn.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+        o.connect(gn).connect(c.destination); o.start(t); o.stop(t + 0.4); setTimeout(() => c.close(), 600);
+      } catch (e) {}
+    };
+    const openCount = () => qMsgs.filter(m => !m.done && m.who >= 0).length;
+    const qSync = () => { const n = openCount(); $('ubdone').hidden = !n; $('ubdone').textContent = n > 1 ? 'Beantwortet ✓ (' + n + ' offen)' : 'Beantwortet ✓'; };
     const qNext = () => {
       if (!rows.length) return;
-      if (!qList.length) { qAct = {who: -1, text: 'Das waren alle Übungsfragen ♡'}; }
-      else { const q = qList.shift(); qAct = {who: q.who >= 0 ? q.who : Math.floor(Math.random() * rows.length), text: q.text}; }
-      qAt = performance.now(); $('ubdone').hidden = false;
+      const now = new Date(), time = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+      if (!qList.length) { if (!qMsgs.some(m => m.who < 0)) qMsgs.push({who: -1, text: 'Das waren alle Übungsfragen ♡', at: performance.now(), time, done: true}); qSync(); return; }
+      const q = qList.shift();
+      qMsgs.push({who: q.who >= 0 && q.who < rows.length ? q.who : Math.floor(Math.random() * rows.length), text: q.text, at: performance.now(), time, done: false});
+      if (qMsgs.length > 40) qMsgs.shift();
+      pling(); qSync();
     };
-    const qDone = () => {
-      qAct = null; $('ubdone').hidden = true;
+    const qLoop = () => {
       clearTimeout(qTimer);
-      const t = +qm.value; if (t && !PR.hidden) qTimer = setTimeout(() => { qNext(); }, t * 1000 * (0.75 + Math.random() * 0.5));
+      const t = +qm.value; if (!t || PR.hidden) return;
+      qTimer = setTimeout(() => {
+        const burst = $('ubqburst').checked ? 1 + Math.floor(Math.random() * 3) : 1;
+        for (let i = 0; i < burst; i++) setTimeout(qNext, i * (2500 + Math.random() * 4000));
+        qLoop();
+      }, t * 1000 * (0.7 + Math.random() * 0.6));
     };
-    $('ubnext').onclick = () => { clearTimeout(qTimer); qNext(); };
-    $('ubdone').onclick = qDone;
+    $('ubnext').onclick = qNext;
+    $('ubdone').onclick = () => { const m = qMsgs.find(x => !x.done && x.who >= 0); if (m) { m.done = true; m.doneAt = performance.now(); } qSync(); };
     const wrap = (t, maxW) => { const out = []; let line = ''; t.split(' ').forEach(w => { const tryL = line ? line + ' ' + w : w; if (g.measureText(tryL).width > maxW && line) { out.push(line); line = w; } else line = tryL; }); if (line) out.push(line); return out; };
 
     const PR = $('practice'), cv = $('ubcv'), g = cv.getContext('2d');
@@ -427,53 +446,89 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       else g.drawImage(src, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
       g.restore();
     };
-    const label = (t, x, y, h) => {
-      g.font = '500 20px Outfit, system-ui, sans-serif';
-      const w = g.measureText(t).width + 24;
-      g.fillStyle = 'rgba(31,28,22,.62)'; rr(x + 10, y + h - 42, w, 32, 10); g.fill();
-      g.fillStyle = '#F6F3EA'; g.fillText(t, x + 22, y + h - 20);
+    const label = (t, x, y, h, small) => {
+      g.font = '500 ' + (small ? 16 : 20) + 'px Outfit, system-ui, sans-serif';
+      const w = g.measureText(t).width + 20, lh = small ? 26 : 32;
+      g.fillStyle = 'rgba(31,28,22,.62)'; rr(x + 8, y + h - lh - 8, w, lh, 9); g.fill();
+      g.fillStyle = '#F6F3EA'; g.fillText(t, x + 18, y + h - (small ? 15 : 18));
+    };
+    const drawChat = (x0, W, H) => {
+      const pw = W - x0, now = performance.now();
+      g.fillStyle = '#EFE9DC'; g.fillRect(x0, 0, pw, H);
+      g.fillStyle = 'rgba(94,107,53,.07)';
+      for (let yy = 70; yy < H; yy += 34) for (let xx = x0 + ((yy / 34) % 2 ? 10 : 27); xx < W; xx += 34) { g.beginPath(); g.arc(xx, yy, 2.2, 0, Math.PI * 2); g.fill(); }
+      g.fillStyle = '#3F4A26'; g.fillRect(x0, 0, pw, 64);
+      g.fillStyle = '#DCE0D2'; g.beginPath(); g.arc(x0 + 34, 32, 18, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#3F4A26'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('♡', x0 + 34, 39); g.textAlign = 'start';
+      g.fillStyle = '#F6F3EA'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.fillText('Wild Hearts Chat', x0 + 62, 28);
+      const oc = openCount();
+      g.fillStyle = '#C9D0B8'; g.font = '400 15px Outfit, system-ui, sans-serif'; g.fillText(oc ? oc + (oc === 1 ? ' Frage offen' : ' Fragen offen') : (rows.length + 1) + ' im Kreis', x0 + 62, 50);
+      g.save(); g.beginPath(); g.rect(x0, 64, pw, H - 64); g.clip();
+      let yb = H - 14;
+      for (let i = qMsgs.length - 1; i >= 0 && yb > 64; i--) {
+        const m = qMsgs[i], age = now - m.at, k = Math.min(1, age / 260), ease = 1 - Math.pow(1 - k, 3);
+        if (m.who < 0) {
+          g.font = '400 16px Outfit, system-ui, sans-serif';
+          const tw2 = g.measureText(m.text).width + 28, bx = x0 + (pw - tw2) / 2, bh = 32; yb -= bh;
+          g.fillStyle = '#E1EAC9'; rr(bx, yb, tw2, bh, 10); g.fill(); g.fillStyle = '#3F4A26'; g.fillText(m.text, bx + 14, yb + 21); yb -= 10; continue;
+        }
+        const name = rows[m.who] ? rows[m.who].name.trim() || 'Gast' : 'Gast', nc = NAMECOL[m.who % NAMECOL.length];
+        g.font = '400 20px Outfit, system-ui, sans-serif';
+        const maxW = pw - 72, ls = wrap(m.text, maxW - 28);
+        g.font = '500 16px Outfit, system-ui, sans-serif'; const nw = g.measureText(name).width;
+        g.font = '400 20px Outfit, system-ui, sans-serif';
+        const bw = Math.min(maxW, Math.max(nw + 28, ...ls.map(l => g.measureText(l).width + 28), 130));
+        const bh = 12 + 20 + ls.length * 27 + 24, bx = x0 + 22;
+        yb -= bh;
+        g.save(); g.globalAlpha = ease; g.translate(bx, yb + bh); g.scale(0.85 + 0.15 * ease, 0.85 + 0.15 * ease); g.translate(-bx, -(yb + bh)) ;
+        g.shadowColor = 'rgba(62,55,44,.14)'; g.shadowBlur = 6; g.shadowOffsetY = 2;
+        g.fillStyle = m.done ? '#F4F6EE' : '#FFFFFF'; rr(bx, yb, bw, bh, 14); g.fill();
+        g.beginPath(); g.moveTo(bx + 2, yb); g.lineTo(bx - 10, yb); g.lineTo(bx + 2, yb + 14); g.closePath(); g.fill();
+        g.shadowColor = 'transparent';
+        g.fillStyle = nc; g.font = '500 16px Outfit, system-ui, sans-serif'; g.fillText(name, bx + 14, yb + 26);
+        g.fillStyle = '#2F2B22'; g.font = '400 20px Outfit, system-ui, sans-serif';
+        ls.forEach((l, j) => g.fillText(l, bx + 14, yb + 53 + j * 27));
+        g.fillStyle = '#9A9282'; g.font = '400 13px Outfit, system-ui, sans-serif';
+        const tt = m.done ? m.time + '  ✓✓' : m.time; const tw3 = g.measureText(tt).width;
+        if (m.done) { g.fillText(m.time, bx + bw - tw3 - 12, yb + bh - 9); g.fillStyle = '#6E9A3A'; g.fillText('✓✓', bx + bw - 26, yb + bh - 9); }
+        else g.fillText(tt, bx + bw - tw3 - 12, yb + bh - 9);
+        g.restore();
+        yb -= 12;
+      }
+      g.restore();
     };
     const frame = () => {
-      const n = rows.length + 1, W = cv.width, H = cv.height, gap = 12;
-      const c = n <= 2 ? n : n <= 4 ? 2 : n <= 9 ? 3 : 4, rws = Math.ceil(n / c);
-      const AH = qAct ? H - 190 : H;
-      const tw = Math.min((W - gap * (c + 1)) / c, ((AH - gap * (rws + 1)) / rws) * 16 / 9), th = tw * 9 / 16;
-      g.fillStyle = '#1F1C16'; g.fillRect(0, 0, W, H);
+      const n = rows.length + 1, W = cv.width, H = cv.height, gap = 10, CW = 440, GW = W - CW;
+      const c = n <= 2 ? n : n <= 4 ? 2 : n <= 9 ? 3 : 4, rws = Math.ceil(n / c), small = n > 9;
+      const tw = Math.min((GW - gap * (c + 1)) / c, ((H - gap * (rws + 1)) / rws) * 16 / 9), th = tw * 9 / 16;
+      const open = new Set(qMsgs.filter(m => !m.done && m.who >= 0).map(m => m.who));
+      g.fillStyle = '#1F1C16'; g.fillRect(0, 0, GW, H);
       for (let k = 0; k < n; k++) {
         const row = Math.floor(k / c), inRow = row === rws - 1 ? n - row * c : c;
-        const x = (W - (inRow * tw + (inRow - 1) * gap)) / 2 + (k - row * c) * (tw + gap);
-        const y = (AH - (rws * th + (rws - 1) * gap)) / 2 + row * (th + gap);
+        const x = (GW - (inRow * tw + (inRow - 1) * gap)) / 2 + (k - row * c) * (tw + gap);
+        const y = (H - (rws * th + (rws - 1) * gap)) / 2 + row * (th + gap);
         if (k === 0) {
           if (cam.videoWidth) cover(cam, cam.videoWidth, cam.videoHeight, x, y, tw, th, true);
           else { g.fillStyle = '#3E372C'; rr(x, y, tw, th, 14); g.fill(); }
-          label('Viv', x, y, th);
+          label('Viv', x, y, th, small);
         } else {
           const r = rows[k - 1], im = imgs.get(k - 1);
           if (im) cover(im, im.naturalWidth, im.naturalHeight, x, y, tw, th, false);
           else { g.fillStyle = r.color; rr(x, y, tw, th, 14); g.fill(); }
-          const rad = Math.min(tw, th) * 0.17;
+          const rad = Math.min(tw, th) * 0.19;
           g.fillStyle = 'rgba(246,243,234,.9)'; g.beginPath(); g.arc(x + tw / 2, y + th / 2 - 8, rad, 0, Math.PI * 2); g.fill();
           g.fillStyle = '#3F4A26'; g.font = '500 ' + Math.round(rad * 0.9) + 'px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
           g.fillText((r.name.trim()[0] || '?').toUpperCase(), x + tw / 2, y + th / 2 - 6); g.textAlign = 'start'; g.textBaseline = 'alphabetic';
-          label(r.name.trim() || 'Gast', x, y, th);
-          if (qAct && qAct.who === k - 1) {
-            const pulse = 4 + 2 * Math.sin((performance.now() - qAt) / 180);
+          label(r.name.trim() || 'Gast', x, y, th, small);
+          if (open.has(k - 1)) {
+            const pulse = 3 + 2 * Math.sin(performance.now() / 180);
             g.strokeStyle = '#B9C77A'; g.lineWidth = pulse; rr(x + 2, y + 2, tw - 4, th - 4, 13); g.stroke();
-            g.fillStyle = '#B9C77A'; g.font = '500 18px Outfit, system-ui, sans-serif'; g.fillText('✋', x + tw - 38, y + 32);
+            g.fillStyle = '#F6F3EA'; g.beginPath(); g.arc(x + tw - 24, y + 24, small ? 14 : 17, 0, Math.PI * 2); g.fill();
+            g.font = (small ? 15 : 18) + 'px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('✋', x + tw - 24, y + 25); g.textAlign = 'start'; g.textBaseline = 'alphabetic';
           }
         }
       }
-      if (qAct) {
-        const who = qAct.who >= 0 && rows[qAct.who] ? rows[qAct.who].name.trim() || 'Gast' : '';
-        g.font = '400 30px Outfit, system-ui, sans-serif';
-        const lines = wrap(qAct.text, W * 0.72 - 48).slice(0, 3);
-        const bh = 44 + (who ? 30 : 0) + lines.length * 40, bw = W * 0.72, bx = (W - bw) / 2, by = H - bh - 16;
-        g.fillStyle = 'rgba(246,243,234,.96)'; rr(bx, by, bw, bh, 22); g.fill();
-        let ty = by + 24;
-        if (who) { g.fillStyle = '#5E6B35'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.fillText(who + ' fragt:', bx + 24, ty + 18); ty += 30; }
-        g.fillStyle = '#2F2B22'; g.font = '400 30px Outfit, system-ui, sans-serif';
-        lines.forEach((l, i) => g.fillText(l, bx + 24, ty + 28 + i * 40));
-      }
+      drawChat(GW, W, H);
       uRaf = requestAnimationFrame(frame);
     };
     const fmtU = () => { const s = Math.floor((Date.now() - uT0) / 1000); return '■ Stopp ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
@@ -484,15 +539,14 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       catch (e) { alert('Kein Zugriff auf Kamera oder Mikro. Bitte im Browser erlauben.'); return; }
       cam.srcObject = uStream; cam.play().catch(() => {});
       PR.hidden = false; document.body.style.overflow = 'hidden'; frame();
-      qPrep(); qAct = null; $('ubdone').hidden = true; clearTimeout(qTimer);
-      if (+qm.value) qTimer = setTimeout(qNext, 20000);
+      qPrep(); qMsgs = []; qSync(); qLoop();
     };
     const closeU = () => {
       if (uRec) uRec.stop();
       cancelAnimationFrame(uRaf);
       if (uStream) uStream.getTracks().forEach(t => t.stop());
       uStream = null; PR.hidden = true; document.body.style.overflow = '';
-      clearTimeout(qTimer); qAct = null;
+      clearTimeout(qTimer); qMsgs = [];
       if (P) { window.hidePrompter(); document.body.appendChild(P); }
     };
     $('ubclose').onclick = closeU;
