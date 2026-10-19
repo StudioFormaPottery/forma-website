@@ -60,6 +60,29 @@ if ($action === 'mm_testroom') {
     exit;
 }
 
+if ($action === 'mm_save_offers') {
+    $cfg = mm_cfg('offers') ?? [];
+    foreach (MM_OFFER_KEYS as $k) {
+        $c = is_array($cfg[$k] ?? null) ? $cfg[$k] : [];
+        $c['title'] = forma_clean((string)($_POST['title'][$k] ?? ''), 80) ?: (mm_offers()[$k]['title']);
+        $c['text'] = mb_substr(trim((string)($_POST['text'][$k] ?? '')), 0, 600);
+        $c['price_cents'] = mm_euro_in((string)($_POST['price'][$k] ?? ''));
+        $c['billing'] = ($_POST['billing'][$k] ?? '') === 'monthly' ? 'monthly' : 'once';
+        $cfg[$k] = $c;
+    }
+    mm_save_cfg('offers', $cfg);
+    go($mmBack . '#angebote', 'Die Angebote sind gespeichert.');
+}
+
+if ($action === 'mm_order_recheck') {
+    mm_offer_schema($pdo);
+    $n = 0;
+    foreach ($pdo->query("SELECT * FROM mm_orders WHERE status = 'offen'")->fetchAll() as $o) {
+        try { if (mm_order_check($pdo, $o) === 'bezahlt') $n++; } catch (Throwable $e) { error_log('MM order recheck: ' . $e->getMessage()); }
+    }
+    go($mmBack . '#angebote', $n ? "$n Zahlung(en) nachträglich bestätigt." : 'Keine neuen Zahlungen gefunden.');
+}
+
 if ($action === 'mm_toggle') {
     $gid = (int)($_POST['gid'] ?? 0);
     $pdo->prepare('UPDATE mm_gatherings SET visible = 1 - visible WHERE id = ?')->execute([$gid]);
@@ -242,6 +265,39 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                     <?php if ($x['status'] !== 'abgemeldet'): ?><form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_resend_confirm"><input type="hidden" name="sid" value="<?= (int)$x['id'] ?>"><button class="link small" type="submit">Mail nochmal schicken</button></form><?php endif; ?></span>
                 </div>
             <?php endforeach; ?>
+        </div>
+
+        <?php mm_offer_schema($pdo); $offs = mm_offers(); $orders = $pdo->query('SELECT * FROM mm_orders ORDER BY id DESC LIMIT 60')->fetchAll(); $openOrd = count(array_filter($orders, fn($o) => $o['status'] === 'offen')); ?>
+        <h2 id="angebote">Angebote</h2>
+        <form method="post" class="card stack">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_save_offers">
+            <p class="small">Diese Angebote kannst du am Ende eines Gatherings aus deinem Gastgeberinnen-Fenster einblenden („✦ Angebot“). Hier trägst du den regulären Preis ein. Den günstigeren Gathering-Preis und wie viele Minuten er gilt, gibst du beim Einblenden ein. Läuft der Countdown ab, gilt automatisch wieder der reguläre Preis, auch beim Bezahlen. Titel und Text sehen die Frauen, deshalb auf Englisch.</p>
+            <?php foreach ($offs as $k => $o): ?>
+                <div class="stack" style="border-top:1px solid var(--line);padding-top:12px">
+                    <label for="ot<?= $k ?>"><strong><?= ['circle' => 'Inner Circle', 'year' => 'Jahreskreis', 'retreat' => 'Alpine Retreat'][$k] ?></strong> · Titel</label>
+                    <input id="ot<?= $k ?>" name="title[<?= $k ?>]" value="<?= forma_h($o['title']) ?>" maxlength="80">
+                    <label for="ox<?= $k ?>">Kurzer Text</label>
+                    <textarea id="ox<?= $k ?>" name="text[<?= $k ?>]" rows="3" maxlength="600"><?= forma_h($o['text']) ?></textarea>
+                    <div class="row">
+                        <div class="stack"><label for="op<?= $k ?>">Regulärer Preis in €</label><input id="op<?= $k ?>" name="price[<?= $k ?>]" inputmode="decimal" value="<?= $o['price_cents'] ? forma_h(rtrim(rtrim(number_format($o['price_cents'] / 100, 2, ',', ''), '0'), ',')) : '' ?>" placeholder="noch offen"></div>
+                        <div class="stack"><label for="ob<?= $k ?>">Zahlung</label><select id="ob<?= $k ?>" name="billing[<?= $k ?>]"><option value="once"<?= $o['billing'] === 'once' ? ' selected' : '' ?>>einmalig</option><option value="monthly"<?= $o['billing'] === 'monthly' ? ' selected' : '' ?>>monatlich (Abo)</option></select></div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+            <p class="muted small">Bei „monatlich“ wird ein Abo über Stripe abgeschlossen. Der Gathering-Preis gilt dann jeden Monat, solange das Abo läuft.</p>
+            <button class="btn" type="submit">Angebote speichern</button>
+        </form>
+        <div class="card stack" style="margin-top:12px">
+            <p><strong>Buchungen</strong></p>
+            <?php if (!$orders): ?><p class="muted small">Noch keine. Probier es im Testraum aus: Angebot einblenden und mit dem Gast-Link (zweites Gerät) „buchen“. Im Stripe-Testmodus geht das mit der Testkarte 4242 4242 4242 4242.</p><?php endif; ?>
+            <?php foreach ($orders as $o): ?>
+                <div class="mm-signup<?= $o['status'] === 'abgebrochen' ? ' is-cancelled' : '' ?>">
+                    <span><strong><?= forma_h($o['name'] ?: '–') ?></strong> <span class="muted small sel"><?= forma_h($o['email']) ?></span><br>
+                    <span class="muted small"><?= forma_h(date('d. m. Y, H:i', strtotime($o['created_at']))) ?> · <?= forma_h($o['title']) ?> · <?= forma_h(forma_euro((int)$o['amount_cents'])) ?><?= $o['billing'] === 'monthly' ? '/Monat' : '' ?> · <?= $o['special'] ? 'Gathering-Preis' : 'regulär' ?><?= $o['test'] ? ' · Test' : '' ?></span></span>
+                    <span class="mm-badge<?= $o['status'] === 'offen' ? ' on' : '' ?>"><?= ['bezahlt' => 'bezahlt', 'offen' => 'Zahlung offen', 'abgebrochen' => 'abgebrochen'][$o['status']] ?? forma_h($o['status']) ?></span>
+                </div>
+            <?php endforeach; ?>
+            <?php if ($openOrd): ?><form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_order_recheck"><button class="link small" type="submit">Offene Zahlungen bei Stripe prüfen</button></form><?php endif; ?>
         </div>
 
         <h2 id="technik">Technik-Test</h2>

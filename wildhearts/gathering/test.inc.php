@@ -8,6 +8,7 @@ $prompter = $prompter ?? [];
 $pText = (string)($prompter['text'] ?? '');
 $pSpeed = (int)($prompter['speed'] ?? 40);
 $pSize = (int)($prompter['size'] ?? 34);
+$offers = $guest ? [] : mm_offers();
 ?><!doctype html>
 <html lang="de">
 <head>
@@ -81,6 +82,16 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 .ubrow label.pick{font-size:14px;padding:8px 12px;border-radius:999px;border:1.5px solid var(--line);cursor:pointer;color:var(--wine-deep);background:var(--cream)}
 .ubrow .sw{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--line);background-size:cover;background-position:center;flex:0 0 auto}
 .ubrow button{padding:8px 12px;font-size:14px}
+.offd{position:fixed;left:16px;bottom:16px;z-index:21;width:min(380px,calc(100% - 32px));max-height:calc(100% - 90px);overflow:auto;background:#FCFBF6;color:var(--ink);border-radius:22px;padding:18px;box-shadow:0 18px 44px rgba(20,18,12,.4);font-size:16px}
+.offd h3{font-size:19px;font-weight:500;color:var(--wine-deep);margin-bottom:8px}
+.offd label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--brown);margin-top:10px}
+.offd select,.offd input{font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--cream);color:var(--ink)}
+.offd .two{display:flex;gap:10px}.offd .two label{flex:1;min-width:0}.offd .two input{width:100%;min-width:0}
+.offd .st{margin-top:12px;padding:10px 12px;border-radius:14px;background:var(--sage-soft);font-size:15px;color:var(--wine-deep)}
+.offd .warn{margin-top:10px;font-size:13.5px;color:#8A3B2E}
+.offd .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.offd .acts button{padding:10px 16px;font-size:15px}
+.offd .cl{position:absolute;right:10px;top:8px;background:transparent;color:var(--brown);font-size:22px;padding:4px 8px}
 .roombar .recon{background:#93402F;color:#FBF1EA;border-color:#93402F}
 .roombar .ghostbtn{background:transparent;color:var(--blush);border:1px solid #6B5D4C}
 </style>
@@ -156,8 +167,25 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 
 <?php if ($ready): ?>
 <div class="roomwrap" id="room" hidden>
-  <div class="roombar"><span><?= $gath ? $h($gath['title']) : 'Testraum · Wild Hearts' ?></span><span class="rb"><?php if (!$guest): ?><button id="rec2" type="button" class="ghostbtn">● Aufnahme</button><button id="ptoggle" type="button" class="ghostbtn">Teleprompter</button><a class="btn ghostbtn" style="padding:7px 16px;font-size:15px" href="?test=<?= $h(rawurlencode($testTok)) ?>&amp;buehne=1" target="_blank" rel="noopener">Video &amp; Musik</a><?php endif; ?><button id="leave" type="button">Raum verlassen</button></span></div>
+  <div class="roombar"><span><?= $gath ? $h($gath['title']) : 'Testraum · Wild Hearts' ?></span><span class="rb"><?php if (!$guest): ?><button id="offbtn" type="button" class="ghostbtn">✦ Angebot</button><button id="rec2" type="button" class="ghostbtn">● Aufnahme</button><button id="ptoggle" type="button" class="ghostbtn">Teleprompter</button><a class="btn ghostbtn" style="padding:7px 16px;font-size:15px" href="?test=<?= $h(rawurlencode($testTok)) ?>&amp;buehne=1" target="_blank" rel="noopener">Video &amp; Musik</a><?php endif; ?><button id="leave" type="button">Raum verlassen</button></span></div>
   <iframe id="frame" title="Whereby Testraum" allow="camera; microphone; fullscreen; speaker; display-capture; autoplay; compute-pressure"></iframe>
+</div>
+<?php endif; ?>
+<?php if (!$guest && $ready): ?>
+<div class="offd" id="offd" hidden>
+  <button class="cl" type="button" id="offcl" aria-label="Schließen">×</button>
+  <h3>Angebot einblenden</h3>
+  <?php $anyPrice = array_filter($offers, fn($o) => $o['price_cents'] > 0); ?>
+  <?php if (!$anyPrice): ?><p class="warn">Trag zuerst in der Verwaltung unter Movecia Movement → Angebote die regulären Preise ein.</p><?php endif; ?>
+  <label>Angebot<select id="offsel"><?php foreach ($offers as $k => $o): ?><option value="<?= $h($k) ?>" data-reg="<?= (int)$o['price_cents'] ?>" data-sp="<?= (int)$o['special_cents'] ?>" data-min="<?= (int)$o['minutes'] ?>" data-mon="<?= $o['billing'] === 'monthly' ? 1 : 0 ?>"<?= $o['price_cents'] ? '' : ' disabled' ?>><?= $h($o['title']) ?><?= $o['price_cents'] ? ' · regulär ' . $h(forma_euro($o['price_cents'])) . ($o['billing'] === 'monthly' ? '/Monat' : '') : ' · noch kein Preis' ?></option><?php endforeach; ?></select></label>
+  <div class="two">
+    <label>Gathering-Preis in €<input id="offsp" inputmode="decimal" placeholder="z. B. 290"></label>
+    <label>gilt für Minuten<input id="offmin" type="number" min="1" max="180" value="25"></label>
+  </div>
+  <div class="acts"><button type="button" id="offshow">Jetzt einblenden</button><button type="button" class="ghost" id="offhide" hidden>Ausblenden</button></div>
+  <div class="st" id="offst" hidden></div>
+  <p class="warn" id="offerr" hidden></p>
+  <p class="warn" id="offstripe" hidden></p>
 </div>
 <?php endif; ?>
 <?php if (!$guest && !$gath): ?>
@@ -180,6 +208,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 </div>
 <?php endif; ?>
 
+<script src="/wildhearts/gathering/offer.js?v=1"></script>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
@@ -576,6 +605,53 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     };
   }
 
+  // --- Angebot einblenden (Viv) / Angebotskarte (alle) ---
+  const OD = $('offd');
+  let offApi = null;
+  const startOffer = () => {
+    if (offApi || !window.whOffer) return;
+    offApi = whOffer({t: <?= json_encode($testTok) ?>, g: <?= (int)($gath['id'] ?? 0) ?>, gast: <?= $guest ? 'true' : 'false' ?>, preview: <?= $guest ? 'false' : 'true' ?>, interval: <?= $guest ? 6000 : 4000 ?>, onStatus: OD ? offStatus : null});
+  };
+  let offUntil = 0, offSkew = 0, offOn = false;
+  function offStatus(j) {
+    const o = j.offer, st = $('offst');
+    offOn = !!o; $('offhide').hidden = !o;
+    $('offstripe').hidden = j.stripe === 'live';
+    $('offstripe').textContent = j.stripe === 'none' ? 'Stripe ist noch nicht verbunden: Die Frauen sehen das Angebot, können aber noch nicht bezahlen.' : 'Stripe ist im Testmodus: Bezahlt wird nur mit Testkarten (4242 4242 4242 4242).';
+    if (!o) { st.hidden = true; return; }
+    offSkew = Date.now() - o.now * 1000; offUntil = o.until * 1000;
+    const b = j.booked || {n: 0, sum: 0};
+    st.hidden = false;
+    st.dataset.base = '„' + o.title + '“ ist eingeblendet. ' + (+b.n ? b.n + (b.n == 1 ? ' Buchung' : ' Buchungen') + ' · € ' + (b.sum / 100).toLocaleString('de-AT') : 'Noch keine Buchung.');
+    offPaint();
+  }
+  const offPaint = () => {
+    const st = $('offst'); if (!st || st.hidden) return;
+    const ms = offUntil - (Date.now() - offSkew), s = Math.ceil(ms / 1000);
+    st.textContent = st.dataset.base + ' ' + (ms > 0 ? 'Gathering-Preis noch ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') + '.' : 'Jetzt gilt der reguläre Preis.');
+  };
+  if (OD) {
+    setInterval(offPaint, 1000);
+    const sel = $('offsel');
+    const fill = () => { const op = sel.selectedOptions[0]; if (!op) return; $('offsp').value = +op.dataset.sp ? (op.dataset.sp / 100).toString().replace('.', ',') : ''; $('offmin').value = op.dataset.min || 25; };
+    const firstOk = [...sel.options].find(o => !o.disabled); if (firstOk) firstOk.selected = true;
+    fill(); sel.onchange = fill;
+    $('offbtn').onclick = () => { OD.hidden = !OD.hidden; };
+    $('offcl').onclick = () => { OD.hidden = true; };
+    const call = async body => {
+      $('offerr').hidden = true;
+      const r = await fetch('/api/wh-offer.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(Object.assign({t: <?= json_encode($testTok) ?>, g: <?= (int)($gath['id'] ?? 0) ?>}, body))});
+      const j = await r.json();
+      if (!j.ok) { $('offerr').hidden = false; $('offerr').textContent = j.error || 'Das hat nicht geklappt.'; return; }
+      if (offApi) offApi.refresh();
+    };
+    $('offshow').onclick = () => {
+      if (offOn && !confirm('Es ist schon ein Angebot eingeblendet. Durch das neue ersetzen? Der Countdown startet dann neu.')) return;
+      call({action: 'show', offer: sel.value, special: $('offsp').value, minutes: +$('offmin').value || 25});
+    };
+    $('offhide').onclick = () => call({action: 'hide'});
+  }
+
   const enter = $('enter');
   if (enter) {
     enter.addEventListener('click', () => {
@@ -583,6 +659,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       $('frame').src = <?= json_encode($src) ?>;
       $('room').hidden = false;
       document.body.style.overflow = 'hidden';
+      startOffer();
       if (P) {
         $('room').insertBefore(P, $('frame'));
         if ($('ptext').value.trim()) window.showPrompter(true); else P.hidden = true;

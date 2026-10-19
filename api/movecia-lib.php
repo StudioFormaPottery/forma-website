@@ -529,3 +529,184 @@ function mm_page(string $hi, string $title, string $text, string $btnHref = '', 
     exit;
 }
 
+
+// --- Angebote am Ende eines Gatherings (Inner Circle, Jahreskreis, Alpine Retreat) ----------
+
+const MM_OFFER_KEYS = ['circle', 'year', 'retreat'];
+
+function mm_offer_schema(PDO $pdo): void
+{
+    static $done = false;
+    if ($done) return;
+    $done = true;
+    // Eine Einblendung pro Gathering bzw. Testraum: Preis fürs Gathering gilt bis „until“ (Server-Zeit)
+    $pdo->exec('CREATE TABLE IF NOT EXISTS mm_spotlights (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        scope TEXT NOT NULL,
+        offer TEXT NOT NULL,
+        title TEXT NOT NULL,
+        text TEXT NOT NULL DEFAULT \'\',
+        billing TEXT NOT NULL DEFAULT \'once\',
+        regular_cents INTEGER NOT NULL,
+        special_cents INTEGER NOT NULL,
+        shown_at INTEGER NOT NULL,
+        until INTEGER NOT NULL,
+        active INTEGER NOT NULL DEFAULT 1
+    )');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS mm_orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        spotlight_id INTEGER NOT NULL DEFAULT 0,
+        scope TEXT NOT NULL DEFAULT \'\',
+        offer TEXT NOT NULL,
+        title TEXT NOT NULL,
+        billing TEXT NOT NULL DEFAULT \'once\',
+        name TEXT NOT NULL DEFAULT \'\',
+        email TEXT NOT NULL DEFAULT \'\',
+        amount_cents INTEGER NOT NULL,
+        special INTEGER NOT NULL DEFAULT 0,
+        status TEXT NOT NULL DEFAULT \'offen\',
+        stripe_session TEXT NOT NULL DEFAULT \'\',
+        token TEXT NOT NULL,
+        test INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL,
+        paid_at TEXT
+    )');
+}
+
+/** Die drei Angebote mit Viv's Einstellungen (Titel, Text auf Englisch, regulärer Preis, Zahlungsart). */
+function mm_offers(): array
+{
+    $def = [
+        'circle' => ['title' => 'The Inner Circle', 'billing' => 'monthly', 'text' => 'Your monthly circle: live gatherings, breathwork, gentle movement and a members area with rituals and affirmations. A space where women support each other and come back to themselves.'],
+        'year' => ['title' => 'The Year Circle', 'billing' => 'once', 'text' => 'Twelve months together: The Inner Circle plus 1:1 mentoring for the idea that is close to your heart. Like a best friend who walks the whole year with you.'],
+        'retreat' => ['title' => 'Wild Hearts Alpine Retreat', 'billing' => 'once', 'text' => 'A weekend in the Austrian Alps: yoga, Pilates, forest walks, breathwork, pottery, cooking together and a women\'s circle. Lots of quiet, lots of nature, back to you.'],
+    ];
+    $cfg = mm_cfg('offers') ?? [];
+    $out = [];
+    foreach (MM_OFFER_KEYS as $k) {
+        $c = is_array($cfg[$k] ?? null) ? $cfg[$k] : [];
+        $out[$k] = [
+            'title' => (string)($c['title'] ?? $def[$k]['title']),
+            'text' => (string)($c['text'] ?? $def[$k]['text']),
+            'billing' => in_array($c['billing'] ?? '', ['once', 'monthly'], true) ? $c['billing'] : $def[$k]['billing'],
+            'price_cents' => max(0, (int)($c['price_cents'] ?? 0)),
+            'special_cents' => max(0, (int)($c['special_cents'] ?? 0)),
+            'minutes' => max(5, min(180, (int)($c['minutes'] ?? 25))),
+        ];
+    }
+    return $out;
+}
+
+function mm_euro_in(string $v): int
+{
+    $v = str_replace([' ', '€'], '', trim($v));
+    if ($v === '') return 0;
+    if (str_contains($v, ',')) $v = str_replace(['.', ','], ['', '.'], $v);
+    return max(0, (int)round((float)$v * 100));
+}
+
+function mm_price_en(int $cents, string $billing): string
+{
+    $p = '€' . ($cents % 100 === 0 ? number_format($cents / 100, 0, '.', ',') : number_format($cents / 100, 2, '.', ','));
+    return $billing === 'monthly' ? $p . ' / month' : $p;
+}
+
+/** Die gerade eingeblendete Einblendung eines Raums (Gathering „g:ID“ oder „test“), oder null. */
+function mm_spotlight(PDO $pdo, string $scope): ?array
+{
+    mm_offer_schema($pdo);
+    $s = $pdo->prepare('SELECT * FROM mm_spotlights WHERE scope = ? AND active = 1 ORDER BY id DESC LIMIT 1');
+    $s->execute([$scope]);
+    return $s->fetch() ?: null;
+}
+
+/** Was die Teilnehmerinnen sehen. Der Gathering-Preis gilt nur bis „until“, danach der reguläre Preis. */
+function mm_spotlight_public(?array $sp): ?array
+{
+    if (!$sp) return null;
+    $live = time() <= (int)$sp['until'] && (int)$sp['special_cents'] > 0 && (int)$sp['special_cents'] < (int)$sp['regular_cents'];
+    return [
+        'id' => (int)$sp['id'], 'offer' => $sp['offer'], 'title' => $sp['title'], 'text' => $sp['text'], 'billing' => $sp['billing'],
+        'regular' => mm_price_en((int)$sp['regular_cents'], $sp['billing']),
+        'special' => $live ? mm_price_en((int)$sp['special_cents'], $sp['billing']) : null,
+        'until' => (int)$sp['until'], 'now' => time(), 'live' => $live,
+    ];
+}
+
+function mm_spotlight_show(PDO $pdo, string $scope, string $offer, int $special, int $minutes): array
+{
+    mm_offer_schema($pdo);
+    $o = mm_offers()[$offer] ?? null;
+    if (!$o) throw new RuntimeException('Unbekanntes Angebot.');
+    if ($o['price_cents'] <= 0) throw new RuntimeException('Für „' . $o['title'] . '“ ist noch kein regulärer Preis eingetragen (Verwaltung → Movecia → Angebote).');
+    if ($special >= $o['price_cents']) throw new RuntimeException('Der Gathering-Preis muss unter dem regulären Preis liegen.');
+    $minutes = max(1, min(180, $minutes));
+    $pdo->prepare('UPDATE mm_spotlights SET active = 0 WHERE scope = ?')->execute([$scope]);
+    $pdo->prepare('INSERT INTO mm_spotlights (scope, offer, title, text, billing, regular_cents, special_cents, shown_at, until) VALUES (?,?,?,?,?,?,?,?,?)')
+        ->execute([$scope, $offer, $o['title'], $o['text'], $o['billing'], $o['price_cents'], $special, time(), time() + $minutes * 60]);
+    return mm_spotlight($pdo, $scope);
+}
+
+function mm_spotlight_hide(PDO $pdo, string $scope): void
+{
+    mm_offer_schema($pdo);
+    $pdo->prepare('UPDATE mm_spotlights SET active = 0 WHERE scope = ?')->execute([$scope]);
+}
+
+/** Legt eine Bestellung an und gibt die Stripe-Bezahlseite zurück. Preis wird hier am Server bestimmt. */
+function mm_order_checkout(PDO $pdo, array $sp, string $name, string $email): string
+{
+    mm_offer_schema($pdo);
+    $pub = mm_spotlight_public($sp);
+    $special = $pub['live'];
+    $amount = $special ? (int)$sp['special_cents'] : (int)$sp['regular_cents'];
+    $tok = bin2hex(random_bytes(16));
+    $test = $sp['scope'] === 'test' ? 1 : 0;
+    $pdo->prepare('INSERT INTO mm_orders (spotlight_id, scope, offer, title, billing, name, email, amount_cents, special, token, test, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)')
+        ->execute([(int)$sp['id'], $sp['scope'], $sp['offer'], $sp['title'], $sp['billing'], mb_substr($name, 0, 80), mb_substr($email, 0, 160), $amount, $special ? 1 : 0, $tok, $test, date('c')]);
+    $oid = (int)$pdo->lastInsertId();
+    $site = mm_site();
+    $price = ['currency' => 'eur', 'unit_amount' => $amount, 'product_data' => ['name' => $sp['title'] . ($special ? ' · Gathering price' : ''), 'description' => 'Wild Hearts Collective · Movecia, Vivien Malonga']];
+    if ($sp['billing'] === 'monthly') $price['recurring'] = ['interval' => 'month'];
+    $params = [
+        'mode' => $sp['billing'] === 'monthly' ? 'subscription' : 'payment',
+        'locale' => 'en',
+        'billing_address_collection' => 'required',
+        'client_reference_id' => 'wh-order-' . $oid,
+        'metadata' => ['wh_order_id' => (string)$oid],
+        'line_items' => [['quantity' => 1, 'price_data' => $price]],
+        'expires_at' => time() + 31 * 60,
+        'success_url' => $site . '/api/wh-order.php?o=' . $oid . '&k=' . $tok,
+        'cancel_url' => $site . '/api/wh-order.php?o=' . $oid . '&k=' . $tok . '&cancel=1',
+    ];
+    if ($email !== '') $params['customer_email'] = $email;
+    $session = forma_stripe('POST', '/v1/checkout/sessions', $params);
+    $pdo->prepare('UPDATE mm_orders SET stripe_session = ? WHERE id = ?')->execute([(string)$session['id'], $oid]);
+    return (string)$session['url'];
+}
+
+/** Prüft eine Bestellung bei Stripe. Bei Zahlung: Danke-Mail an die Käuferin, Info an Viv (genau einmal). */
+function mm_order_check(PDO $pdo, array $o): string
+{
+    if ($o['status'] !== 'offen' || $o['stripe_session'] === '') return (string)$o['status'];
+    $s = forma_stripe('GET', '/v1/checkout/sessions/' . rawurlencode($o['stripe_session']));
+    if (($s['payment_status'] ?? '') !== 'paid' && ($s['status'] ?? '') !== 'complete') {
+        if (($s['status'] ?? '') === 'expired') { $pdo->prepare("UPDATE mm_orders SET status = 'abgebrochen' WHERE id = ?")->execute([$o['id']]); return 'abgebrochen'; }
+        return 'offen';
+    }
+    $email = (string)($s['customer_details']['email'] ?? $o['email']);
+    $name = (string)($s['customer_details']['name'] ?? $o['name']);
+    $u = $pdo->prepare("UPDATE mm_orders SET status = 'bezahlt', paid_at = ?, email = ?, name = CASE WHEN name = '' THEN ? ELSE name END WHERE id = ? AND status = 'offen'");
+    $u->execute([date('c'), $email, $name, $o['id']]);
+    if ($u->rowCount() === 1) {
+        $first = forma_first_name($name ?: 'love');
+        $price = mm_price_en((int)$o['amount_cents'], $o['billing']);
+        $t = "Dear $first,\n\nthank you so much, you are in! Your booking for {$o['title']} ($price) is confirmed.\n\nI will write to you personally in the next days with everything you need for the start. If you have any questions, simply reply to this email.\n\nI am so happy to walk this way with you.";
+        $html = '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#5E6B35;">you are in ♡</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:30px;color:#3F4A26;margin:0 0 14px;">' . forma_h($o['title']) . '</h1>'
+            . '<p>Dear ' . forma_h($first) . ',</p><p>thank you so much, your booking for <strong>' . forma_h($o['title']) . '</strong> (' . forma_h($price) . ') is confirmed.</p><p>I will write to you personally in the next days with everything you need for the start. If you have any questions, simply reply to this email.</p><p>I am so happy to walk this way with you.</p>';
+        if ($email !== '') mm_mail($email, ($o['test'] ? '[TEST] ' : '') . 'You are in: ' . $o['title'], $t, mm_mail_html('You are in', $html));
+        $v = "Hallo Viv,\n\n" . ($name ?: 'Jemand') . " ($email) hat gerade {$o['title']} gebucht und bezahlt: $price" . ($o['special'] ? ' (Gathering-Preis)' : ' (regulärer Preis)') . ".\n" . ($o['test'] ? "\nDas war eine Testbuchung aus dem Testraum.\n" : '') . "\nDu siehst alle Buchungen in der Verwaltung unter Movecia Movement → Angebote.\n";
+        mm_mail(MM_FROM_EMAIL, ($o['test'] ? '[TEST] ' : '') . 'Neue Buchung: ' . $o['title'] . ' · ' . ($name ?: $email), $v, mm_mail_html('Neue Buchung', nl2br(forma_h($v)), 'de'));
+    }
+    return 'bezahlt';
+}
