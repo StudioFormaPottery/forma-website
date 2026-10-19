@@ -1142,14 +1142,25 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .nav-sub a:last-child{margin-bottom:12px}
 .nav-pill{padding:2px 10px;border-radius:999px;background:var(--clay);color:var(--on-clay);font-family:var(--body);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
 .offer,.pp-special{scroll-margin-top:130px}
-.bm-special{align-items:start}
-.bm-special .pp-art{max-width:220px;margin-top:8px}
-.bm-special .pp-seal i{font-size:12px}
+.bm-special{align-items:start;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)}
+@media (max-width:780px){.bm-special{grid-template-columns:1fr}}
+.bm-art{position:relative;justify-self:center;width:100%;max-width:440px;aspect-ratio:1/1.15;margin:4px 0 10px}
+.bm-blob{position:absolute;margin:0;aspect-ratio:1;filter:drop-shadow(0 12px 20px rgba(51,33,27,.18))}
+.bm-blob img,.bm-paint{position:absolute;inset:0;width:100%;height:100%;display:block}
+.bm-blob img{object-fit:cover}
+.b1{width:70%;left:0;top:0}.b1 img,.b1 .bm-paint{clip-path:url(#bm-k1)}.b1 img{object-position:50% 60%}
+.b2{width:52%;right:0;top:34%}.b2 img,.b2 .bm-paint{clip-path:url(#bm-k2)}.b2 img{object-position:40% 55%}
+.b3{width:50%;left:8%;bottom:0}.b3 img,.b3 .bm-paint{clip-path:url(#bm-k3)}.b3 img{object-position:55% 45%}
+.bm-paint{opacity:.9}
+.b1 .bm-paint{background:var(--clay);transform:translate(7%,5%) rotate(25deg) scale(1.02)}
+.b2 .bm-paint{background:#FBF1EA;transform:translate(-5%,6%) rotate(-30deg) scale(1.03)}
+.b3 .bm-paint{background:#674B40;transform:translate(6%,-4%) rotate(40deg) scale(1.03)}
+.bm-tw{left:auto;right:6%;top:4%;bottom:auto;width:26px;height:26px;fill:var(--clay)}
+@media (max-width:780px){.bm-art{max-width:330px;margin:0 auto 18px}}
 .bm-special .event-facts,.bm-special .event-how{font-size:18px}
 .bm-special .event-pieces li{background:#FBF1EA}
 .bm-special .event-start{background:#FBF1EA}
 @media (min-width:701px){.bm-special .more-wrap{display:block}}
-@media (max-width:780px){.bm-special .pp-art{max-width:170px}}
 .pp-compact{grid-template-columns:minmax(0,.5fr) minmax(0,1.5fr);margin:0}
 @media (max-width:780px){.pp-compact{grid-template-columns:1fr}}
 
@@ -1301,22 +1312,23 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       <article class="pp-special bm-special" id="event-bemalen">
         <svg class="maker-wave" aria-hidden="true"><path></path></svg>
         <svg class="xm-garland" viewBox="0 0 860 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 6 Q 108 46 215 14 T 430 14 T 645 14 T 860 6" fill="none" stroke="#674B40" stroke-width="2"/><line x1="30.0" y1="22.0" x2="30.0" y2="28.0" stroke="#674B40" stroke-width="1.4"/><circle cx="30.0" cy="35.0" r="7" fill="#FBF1EA" stroke="rgba(51,33,27,.22)"/><circle cx="27.6" cy="32.6" r="1.8" fill="#FBF1EA" opacity=".7"/><path transform="translate(88.7 37.7) scale(0.68)" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" fill="#674B40"/><path transform="translate(156.3 30.8) scale(.6)" d="M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z" fill="#8C2C1D"/><line x1="230.0" y1="14.9" x2="230.0" y2="20.9" stroke="#674B40" stroke-width="1.4"/><circle cx="230.0" cy="27.9" r="7" fill="#DDBFA8" stroke="rgba(51,33,27,.22)"/><circle cx="227.6" cy="25.5" r="1.8" fill="#FBF1EA" opacity=".7"/><path transform="translate(288.7 28.7) scale(0.68)" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" fill="#FBF1EA"/><path transform="translate(356.3 27.9) scale(.6)" d="M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z" fill="#674B40"/><line x1="430.0" y1="11.0" x2="430.0" y2="17.0" stroke="#674B40" stroke-width="1.4"/><circle cx="430.0" cy="24.0" r="7" fill="#8C2C1D" stroke="rgba(51,33,27,.22)"/><circle cx="427.6" cy="21.6" r="1.8" fill="#FBF1EA" opacity=".7"/><path transform="translate(488.7 26.9) scale(0.68)" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" fill="#DDBFA8"/><path transform="translate(556.3 29.7) scale(.6)" d="M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z" fill="#FBF1EA"/><line x1="630.0" y1="14.9" x2="630.0" y2="20.9" stroke="#674B40" stroke-width="1.4"/><circle cx="630.0" cy="27.9" r="7" fill="#674B40" stroke="rgba(51,33,27,.22)"/><circle cx="627.6" cy="25.5" r="1.8" fill="#FBF1EA" opacity=".7"/><path transform="translate(688.7 24.3) scale(0.68)" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" fill="#8C2C1D"/><path transform="translate(756.3 30.8) scale(.6)" d="M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z" fill="#DDBFA8"/><line x1="830.0" y1="18.6" x2="830.0" y2="24.6" stroke="#674B40" stroke-width="1.4"/><circle cx="830.0" cy="31.6" r="7" fill="#FBF1EA" stroke="rgba(51,33,27,.22)"/><circle cx="827.6" cy="29.2" r="1.8" fill="#FBF1EA" opacity=".7"/></svg>
-        <div class="pp-art">
-          <div class="pp-pic"><img src="img/popup-advent.jpg?v=4" alt="Handbemalte Wal-Tasse unter einem Weihnachtskranz" loading="lazy" style="object-position:50% 55%"></div>
-          <span class="pp-seal" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><path id="bm-c" d="M60 60m-42 0a42 42 0 1 1 84 0a42 42 0 1 1-84 0"></path></defs><text><textPath href="#bm-c" textLength="258" lengthAdjust="spacingAndGlyphs">Pottery bemalen · im Advent ·</textPath></text></svg><b>6</b><i>pro Stunde</i></span>
-          <svg class="pp-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2a10 10 0 1 0 7 15.5A8.5 8.5 0 0 1 15 2z"/></svg>
-          <svg class="pp-tw" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg>
+        <div class="bm-art">
+          <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><clipPath id="bm-k1" clipPathUnits="objectBoundingBox"><path d="M0.876 0.500C0.871 0.523 0.874 0.543 0.876 0.566C0.878 0.590 0.889 0.616 0.890 0.642C0.890 0.667 0.888 0.696 0.880 0.719C0.871 0.743 0.854 0.764 0.838 0.783C0.822 0.803 0.802 0.819 0.783 0.838C0.765 0.856 0.748 0.877 0.728 0.895C0.708 0.912 0.686 0.933 0.661 0.943C0.637 0.953 0.607 0.957 0.580 0.954C0.553 0.950 0.525 0.934 0.500 0.922C0.475 0.910 0.455 0.892 0.432 0.884C0.410 0.876 0.389 0.874 0.364 0.873C0.339 0.872 0.310 0.879 0.283 0.876C0.256 0.873 0.225 0.868 0.203 0.855C0.180 0.841 0.163 0.817 0.150 0.794C0.137 0.770 0.133 0.741 0.126 0.716C0.119 0.691 0.113 0.667 0.106 0.643C0.099 0.620 0.088 0.597 0.084 0.573C0.080 0.549 0.077 0.524 0.080 0.500C0.084 0.476 0.097 0.452 0.107 0.431C0.117 0.409 0.133 0.391 0.141 0.369C0.149 0.347 0.151 0.326 0.154 0.300C0.157 0.274 0.152 0.242 0.158 0.213C0.164 0.185 0.172 0.151 0.189 0.129C0.206 0.108 0.234 0.093 0.260 0.085C0.287 0.077 0.320 0.081 0.348 0.082C0.376 0.082 0.402 0.088 0.427 0.088C0.453 0.087 0.475 0.082 0.500 0.081C0.525 0.079 0.550 0.073 0.575 0.076C0.599 0.079 0.624 0.088 0.646 0.099C0.668 0.110 0.687 0.128 0.707 0.141C0.728 0.154 0.747 0.167 0.769 0.179C0.792 0.191 0.819 0.198 0.842 0.213C0.865 0.227 0.892 0.244 0.906 0.266C0.920 0.288 0.927 0.317 0.927 0.345C0.926 0.372 0.912 0.403 0.903 0.429C0.895 0.455 0.880 0.477 0.876 0.500ZM0.890 0.880a0.03 0.03 0 1 0 0.060 0a0.03 0.03 0 1 0 -0.060 0Z"/></clipPath><clipPath id="bm-k2" clipPathUnits="objectBoundingBox"><path d="M0.918 0.500C0.920 0.525 0.926 0.549 0.928 0.575C0.930 0.601 0.935 0.631 0.929 0.656C0.923 0.681 0.910 0.707 0.891 0.726C0.873 0.744 0.842 0.756 0.818 0.767C0.793 0.777 0.765 0.780 0.744 0.791C0.723 0.802 0.708 0.814 0.692 0.832C0.675 0.849 0.663 0.876 0.644 0.896C0.626 0.916 0.604 0.940 0.580 0.951C0.555 0.962 0.526 0.966 0.500 0.965C0.474 0.964 0.447 0.954 0.421 0.947C0.396 0.940 0.371 0.931 0.346 0.923C0.321 0.914 0.294 0.908 0.272 0.896C0.249 0.883 0.226 0.866 0.210 0.845C0.195 0.824 0.186 0.795 0.179 0.770C0.171 0.744 0.172 0.716 0.165 0.693C0.158 0.670 0.150 0.652 0.137 0.632C0.123 0.612 0.099 0.596 0.083 0.574C0.067 0.551 0.046 0.526 0.040 0.500C0.034 0.474 0.037 0.445 0.046 0.420C0.055 0.395 0.077 0.373 0.094 0.352C0.110 0.331 0.131 0.315 0.146 0.296C0.162 0.276 0.172 0.256 0.187 0.237C0.201 0.218 0.213 0.195 0.231 0.179C0.248 0.163 0.271 0.150 0.292 0.140C0.314 0.130 0.339 0.128 0.362 0.120C0.384 0.112 0.405 0.104 0.428 0.092C0.451 0.080 0.474 0.060 0.500 0.048C0.526 0.036 0.557 0.020 0.585 0.019C0.613 0.018 0.643 0.027 0.667 0.043C0.690 0.058 0.708 0.089 0.724 0.113C0.739 0.137 0.748 0.166 0.762 0.188C0.776 0.210 0.790 0.226 0.806 0.243C0.823 0.260 0.845 0.273 0.861 0.292C0.877 0.310 0.893 0.331 0.902 0.354C0.911 0.376 0.912 0.402 0.915 0.427C0.918 0.451 0.916 0.475 0.918 0.500ZM0.042 0.860a0.028 0.028 0 1 0 0.056 0a0.028 0.028 0 1 0 -0.056 0Z"/></clipPath><clipPath id="bm-k3" clipPathUnits="objectBoundingBox"><path d="M0.954 0.500C0.965 0.526 0.972 0.556 0.968 0.583C0.964 0.609 0.948 0.635 0.932 0.657C0.916 0.679 0.891 0.696 0.872 0.715C0.853 0.733 0.836 0.750 0.819 0.767C0.802 0.785 0.788 0.805 0.769 0.820C0.750 0.835 0.729 0.849 0.706 0.857C0.684 0.866 0.658 0.866 0.634 0.869C0.611 0.872 0.589 0.871 0.567 0.877C0.544 0.884 0.524 0.896 0.500 0.908C0.476 0.920 0.449 0.940 0.421 0.948C0.394 0.955 0.361 0.960 0.335 0.953C0.309 0.946 0.285 0.925 0.267 0.904C0.248 0.883 0.238 0.852 0.224 0.829C0.211 0.805 0.201 0.783 0.187 0.763C0.172 0.743 0.153 0.728 0.137 0.709C0.122 0.690 0.103 0.671 0.092 0.649C0.081 0.626 0.076 0.600 0.073 0.575C0.070 0.551 0.075 0.525 0.074 0.500C0.074 0.475 0.073 0.451 0.072 0.425C0.071 0.398 0.065 0.369 0.068 0.343C0.071 0.316 0.077 0.286 0.092 0.264C0.107 0.243 0.134 0.226 0.160 0.215C0.185 0.203 0.220 0.202 0.246 0.197C0.271 0.191 0.295 0.190 0.315 0.180C0.336 0.170 0.350 0.154 0.368 0.138C0.387 0.122 0.405 0.098 0.427 0.085C0.449 0.072 0.475 0.061 0.500 0.058C0.525 0.055 0.551 0.062 0.576 0.067C0.601 0.072 0.625 0.081 0.650 0.088C0.675 0.095 0.701 0.099 0.726 0.109C0.750 0.118 0.778 0.128 0.798 0.145C0.817 0.163 0.833 0.188 0.842 0.213C0.852 0.237 0.852 0.269 0.856 0.295C0.860 0.320 0.859 0.344 0.867 0.366C0.876 0.389 0.891 0.406 0.906 0.428C0.920 0.451 0.944 0.474 0.954 0.500ZM0.905 0.120a0.025 0.025 0 1 0 0.050 0a0.025 0.025 0 1 0 -0.050 0Z"/></clipPath></defs></svg>
+          <figure class="bm-blob b1"><span class="bm-paint"></span><img src="img/popup-advent.jpg?v=4" alt="Handbemalte Wal-Tasse in Hellblau" loading="lazy"></figure>
+          <figure class="bm-blob b2"><span class="bm-paint"></span><img src="img/bemalen-blau.jpg" alt="Zwei Becher in tiefem Blau auf kleinen Untertellern" loading="lazy"></figure>
+          <figure class="bm-blob b3"><span class="bm-paint"></span><img src="img/bemalen-sand.jpg" alt="Gesprenkelter Becher in Sand und Creme" loading="lazy"></figure>
+          <svg class="pp-tw bm-tw" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg>
         </div>
         <div class="pp-body event-body">
           <p class="pp-tag"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg>Special</span> im Advent · Anmeldung offen</p>
           <h3>Pottery bemalen</h3>
           <p class="pp-when">Ab November · Mi &amp; Do 15–18 Uhr</p>
           <p>Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Bowls und Mugs bemalen, ganz entspannt bei Kerzenlicht und einer Tasse Tee im Atelier.</p>
-          <ul class="pp-facts"><li>stundenweise: 15, 16 oder 17 Uhr</li><li>höchstens 6 Personen pro Stunde</li><li>Abholung am Montag darauf</li></ul>
+          <ul class="pp-facts"><li>1, 2 oder 3 Stunden, wie du magst</li><li>höchstens 6 Personen pro Stunde</li><li>Abholung am Montag darauf</li></ul>
           <button class="more-btn" type="button" aria-expanded="false">Alle Infos</button>
           <div class="more-wrap">
           <dl class="event-facts">
-            <div><dt>Wann</dt><dd>Ab November, jeden Mittwoch &amp; Donnerstag, 15–18 Uhr. Du wählst bei der Anmeldung, ob du um 15, 16 oder 17 Uhr kommst, meist reicht eine Stunde.</dd></div>
+            <div><dt>Wann</dt><dd>Ab November, jeden Mittwoch &amp; Donnerstag, 15–18 Uhr. Bei der Anmeldung wählst du einfach die Stunden, die du nutzen möchtest: 15–16, 16–17 und/oder 17–18 Uhr, also eine, zwei oder alle drei.</dd></div>
             <div><dt>Plätze</dt><dd>Höchstens 6 Personen pro Stunde</dd></div>
             <div><dt>Abholung</dt><dd>Am Montag darauf im Atelier</dd></div>
             <div><dt>Atelier&shy;beitrag</dt><dd>€ 15 pro Person, vorab bei der Anmeldung. Damit ist dein Platz reserviert, Pinsel und Farben sind dabei. Dazu kommen die Stücke, die du bemalst.</dd></div>
@@ -1324,7 +1336,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="event-sort">Das Pottery-bemalen-Sortiment</p>
           <ul class="event-pieces" id="event-pieces"></ul>
           <div class="event-how">
-            <p><b>So meldest du dich an:</b> Tag und Uhrzeit aussuchen und dein Stück gleich mitbuchen, alle Preise siehst du bei der Anmeldung. Gefällt dir vor Ort noch mehr, rechnen wir es im Atelier ab.</p>
+            <p><b>So meldest du dich an:</b> Tag und Stunden aussuchen (1 bis 3) und dein Stück gleich mitbuchen, alle Preise siehst du bei der Anmeldung. Gefällt dir vor Ort noch mehr, rechnen wir es im Atelier ab.</p>
             <p class="event-start" id="event-start">Die Anmeldung ist offen. Die Plätze sind begrenzt, such dir gleich deinen Nachmittag aus.</p>
           </div>
           </div>
@@ -2321,8 +2333,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   function renderSlots(c){
     slotRow.innerHTML='';slotOn={};
     var paint=c.title==='Pottery bemalen';
-    $('slots-title').textContent=paint?'Wann kommst du ungefähr?':'Welche Stunden möchtest du bleiben?';
-    $('slots-sub').textContent=paint?'Meist reicht eine Stunde zum Bemalen. Brauchst du länger, wähl einfach zwei oder drei Stunden. Der Atelierbeitrag bleibt gleich.':'Wähl eine, zwei oder alle drei Stunden. € 30 pro Stunde, 5 Plätze pro Stunde.';
+    $('slots-title').textContent=paint?'Welche Stunden möchtest du nutzen?':'Welche Stunden möchtest du bleiben?';
+    $('slots-sub').textContent=paint?'Wähl einfach die Stunden, in denen du bemalen möchtest: eine, zwei oder alle drei. Der Atelierbeitrag bleibt gleich, egal wie lange du bleibst.':'Wähl eine, zwei oder alle drei Stunden. € 30 pro Stunde, 5 Plätze pro Stunde.';
     slotHours(c).forEach(function(h){
       var free=c.slots&&c.slots[h]!=null?c.slots[h]:c.free,bt=el('button','slot');bt.type='button';
       bt.appendChild(el('b',null,h+'–'+(h+1)+' Uhr'));bt.appendChild(el('small',null,free<=0?'ausgebucht':'frei'));bt.dataset.free=free;
