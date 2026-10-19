@@ -17,13 +17,15 @@ ID 1130333275167605357), „Pottery Templates & DIY“ (Adventkalender, Template
 
 1. **Was ist gerade aktuell?** `index.html` (Angebote, Events, Shop), `api/lib.php` und
    `api/seed/*.json` lesen. Nur echte, aktuelle Angebote verwenden, nichts erfinden.
-   Abgelaufenes weglassen (z. B. Pottery Pause nach dem 4. 12. 2026).
+   Abgelaufenes oder Ausgebuchtes nie bewerben (Pottery Pause Herbst 2026 ist ausgebucht).
+   Preise und Details immer genau so wie gerade auf der Website, nie aus älteren Pins, Mails oder Flyern
+   (siehe Abschnitt „Werbematerial“ in `CLAUDE.md`).
 2. **Thema wählen** mit `log.json`: nicht dasselbe Thema wie in den letzten 3 Pins.
    Themen und Links:
    | Thema | Link |
    |---|---|
-   | Pottery Pause (5 Freitagabende, 6. 11. – 4. 12. 2026, € 295) | https://www.forma-pottery.com/#pottery-pause |
-   | Pottery bemalen im Advent (ab Nov., Mi & Do 15–18 Uhr) | https://www.forma-pottery.com/#pottery-bemalen |
+   | Pottery Pause: Herbst ausgebucht, nur als Teaser „Neue Termine im Frühjahr 2027, nur 4 Plätze, FORMA Post abonnieren“ | https://www.forma-pottery.com/#pottery-pause |
+   | Pottery bemalen im Advent (ab Nov., Mi & Do 15–18 Uhr, stundenweise, Stücke ab € 15, keine Teller) | https://www.forma-pottery.com/#pottery-bemalen |
    | FORMA Adventkalender (24 Templates, bald im Shop, ohne Preis) | https://www.forma-pottery.com/#adventkalender |
    | Spin & Go (Mi & Fr 9–11 Uhr, € 70 inkl. Werkstück) | https://www.forma-pottery.com/#kurs-spin |
    | Private Pottery (Handbuilding, € 65/Std., inkl. Ton und Fertigstellung bis 5 kg) | https://www.forma-pottery.com/#kurs-private |

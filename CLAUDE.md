@@ -38,13 +38,20 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Lokal testen: im Repo-Ordner `FORMA_DATA_DIR=/tmp/x FORMA_MAIL_LOG=/tmp/mail.log php -S 127.0.0.1:8765`.
 - `.htaccess` sperrt `.md`, `.sqlite` und `api/lib.php` für Web-Zugriffe.
 
-## Zeiten (Stand Oktober 2026)
-- Öffnungszeiten Studio: Mo–Fr 8–10 Uhr.
-- Spin & Go: Mi + Fr 9–11 Uhr, findet ab 2 Personen statt, € 70 p. P., online bezahlt.
-- Offenes Atelier: Do 8–11 Uhr, € 30/Std., Brennen & Glasieren € 22/kg, Bezahlung vor Ort.
-- Pottery Pause: freitags 18–20 Uhr, 5 Termine, € 295, online bezahlt.
-- Private Pottery: nach Vereinbarung, € 65/Std.
-- Diese Zeiten stehen in `index.html` an drei Stellen: Kopfbereich (`.hero-week`), Angebotskarten, Kontakt (`.week-plan`).
+## Zeiten (Stand 19.10.2026)
+- Öffnungszeiten Studio: Mi–Fr 8–11:30 Uhr, an Feiertagen geschlossen.
+- Spin & Go: Mi + Fr 9–11 Uhr, findet ab 2 Personen statt, € 70 p. P. inkl. eines Werkstücks, online bezahlt.
+- Offenes Atelier: Do 8–11 Uhr, € 30/Std., Fertigstellung € 25/kg bei Abholung.
+- Pottery Pause: Herbst 2026 (Fr 18–20 Uhr, 6.11.–4.12., € 295) ausgebucht; Frühjahr 2027 nur 4 Plätze, Teaser mit FORMA Post.
+- Private Pottery: nach Vereinbarung, € 65/Std., Handbuilding, inkl. Ton und Fertigstellung bis 5 kg.
+- Pottery bemalen im Advent: Mi & Do 15–18 Uhr, stundenweise, € 15 Atelierbeitrag, Stücke ab € 15 (Liste unter „Atelier-Kasse“), keine Teller.
+
+## Werbematerial (Vivien, 19.10.2026)
+- Alle Mails, Newsletter, Flyer, Pins, Storys und Hotel-Unterlagen zeigen immer denselben Stand wie die Website. Preise und Details vor jedem neuen Material aus `index.html` und `api/lib.php` nehmen, nie aus älteren Mails, Flyern oder Pins kopieren.
+- Ändert sich ein Angebot auf der Website, die betroffenen Materialien mit ändern oder Vivien sagen, welche neu gebaut werden müssen (Ateliermappe, Flyer, MailerLite-Entwürfe).
+
+## Seitenaufbau
+- Die Zeiten stehen in `index.html` an drei Stellen: Kopfbereich (`.hero-week`), Angebotskarten, Kontakt (`.week-plan`).
 - Farben: nur Sand/Ton, FORMA-Rot und Braun. Keine dritte Akzentfarbe (Vivien mag das Orange nicht), `--clay-soft` ist deshalb Braun.
 - Buchen: Jeder Knopf mit `data-book="Kursname"` öffnet direkt das Buchungsfenster (Schritt 1 Kurs, 2 Kalender, 3 Angaben), ohne zu scrollen. Keine langen Terminlisten.
 - Menü (Seitenleiste über `#nav-toggle`, seit 14.10.2026): oben FORMA Post, dann Kurse ▸ (Spin & Go `#kurs-spin`, Private Pottery `#kurs-private`, Pottery Pause `#pottery-pause`, Events) · Teambuilding · Gutscheine · Shop & Maker Club · Hallo! · Infos ▸ (FAQ, Gut zu wissen, Kontakt). „Kurs buchen“ nur oben in der Leiste.

@@ -21,11 +21,14 @@ Felder: `file`, `theme`, `photo` (oder `house: true` für das Adventkalender-Hau
 (Polaroid-Unterschrift, kurz), `hand` (kleiner Einstieg oben links), `burst` („NEU|im Atelier“, oben kurz),
 `title` (`|` = Umbruch, max. ~16 Zeichen pro Zeile), `script` (max. ~16 Zeichen), `text` (1–2 kurze Sätze),
 `cta`. Beispiel-Woche: 17.–23. 10. 2026 (Tassen, Pottery bemalen ab 19. 10., Adventkalender, Spin & Go,
-Gutschein, Pottery Pause).
+Gutschein, Pottery Pause). Seit 18. 10. ist die Pottery Pause im Herbst ausgebucht: nur noch als Teaser
+für Frühjahr 2027 (4 Plätze, FORMA Post abonnieren), nicht mehr als buchbar bewerben.
 
 ## Inhalt
 - Was in der Woche wirklich ansteht: aus `index.html`, `api/lib.php`, `api/seed/*.json` und
-  `tools/pinterest/log.json` ablesen. Nichts erfinden, keine Platzzahlen nennen.
+  `tools/pinterest/log.json` ablesen. Nichts erfinden, keine Platzzahlen nennen. Preise und Details
+  immer genau wie gerade auf der Website, nie aus älteren Storys, Mails oder Flyern übernehmen
+  (Abschnitt „Werbematerial“ in `CLAUDE.md`).
 - Mischung: Einblick ins Atelier (Fotos), ein Angebot pro Tag, ab und zu FORMA Post / Maker Club / Gutscheine.
 - Fotos abwechseln, farblich zusammenpassend (Website-Fotos aus `img/`). Nie: `vivien-toepfern.jpg`,
   `drehen.jpg`, `vivien.jpg`, `vivien-mit-tochter.jpg`. Spiegel-Selfies `vivien-spiegel*.jpg` sind erlaubt.
