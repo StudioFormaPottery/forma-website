@@ -731,7 +731,10 @@ function mm_spotlight(PDO $pdo, string $scope): ?array
     mm_offer_schema($pdo);
     $s = $pdo->prepare('SELECT * FROM mm_spotlights WHERE scope = ? AND active = 1 ORDER BY id DESC LIMIT 1');
     $s->execute([$scope]);
-    return $s->fetch() ?: null;
+    $r = $s->fetch() ?: null;
+    // Im Testraum bleibt ein altes Angebot nicht ewig stehen: nach 3 Stunden ist es weg
+    if ($r && $scope === 'test' && (int)$r['shown_at'] < time() - 3 * 3600) { mm_spotlight_hide($pdo, $scope); return null; }
+    return $r;
 }
 
 /** Was die Teilnehmerinnen sehen. Der Gathering-Preis gilt nur bis „until“, danach der reguläre Preis. */
@@ -906,11 +909,12 @@ function mm_order_check(PDO $pdo, array $o): string
         $site = mm_site();
         $legal = $o['offer'] === 'retreat'
             ? "Retreats take place on fixed dates, so there is no statutory right of withdrawal (§ 18 (1) 10 FAGG). Our cancellation policy applies: $site/terms"
-            : "You have a 14-day right of withdrawal for the live parts (gatherings, circles, mentoring). " . (($o['consent'] ?? 0) ? 'You asked for them to start right away, so if you withdraw within 14 days you pay only for the part already used. ' : '')
+            : ((int)($o['bill_start'] ?? 0) > time() ? 'You have a 14-day right of withdrawal from today. Nothing is charged before the opening day, so you can withdraw free of charge. Terms, cancellation policy and the withdrawal form: ' . $site . '/terms' : '')
+            . ((int)($o['bill_start'] ?? 0) > time() ? '' : "You have a 14-day right of withdrawal for the live parts (gatherings, circles, mentoring). " . (($o['consent'] ?? 0) ? 'You asked for them to start right away, so if you withdraw within 14 days you pay only for the part already used. ' : '')
               . (($o['consent_digital'] ?? 0)
                   ? 'Confirmation: you expressly agreed that the course area and downloads (digital content) are unlocked immediately, and you acknowledged that you thereby lose your right of withdrawal for this digital content (§ 18 (1) 11 FAGG). '
                   : 'You did not choose immediate access to the course area: you start with the starter section, and the full course area and downloads unlock 14 days after your booking. ')
-              . "Terms, cancellation policy and the withdrawal form: $site/terms";
+              . "Terms, cancellation policy and the withdrawal form: $site/terms");
         $startNote = (int)($o['bill_start'] ?? 0) > time() ? 'The Inner Circle opens on ' . mm_start_en((int)$o['bill_start']) . '. Nothing has been charged yet, your first payment is taken on that day.' : '';
         $t = "Dear $first,\n\nthank you so much, you are in! Your booking for {$o['title']} ($price) is confirmed." . ($startNote ? "\n\n$startNote" : '') . "\n\nI will write to you personally in the next days with everything you need for the start. If you have any questions, simply reply to this email.\n\nI am so happy to walk this way with you.\n\n$legal\nWithdraw from the contract: $site/withdraw";
         $html = '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#5E6B35;">you are in ♡</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:30px;color:#3F4A26;margin:0 0 14px;">' . forma_h($o['title']) . '</h1>'
