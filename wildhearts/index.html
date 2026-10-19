@@ -174,6 +174,20 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
   .step .card{padding:28px 28px 26px}.step h3{font-size:33px}.step p,.step li{font-size:18px}
 }
 
+/* Handy: Stufen zum Aufklappen */
+.more-t{display:none}
+@media (max-width:899px){
+  .step .more{display:none}
+  .step.open .more{display:block}
+  .step .card{cursor:pointer}
+  .more-t{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:0;border:0;background:none;font:inherit;font-size:15px;font-weight:500;color:inherit;opacity:.85;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+  .more-t::after{content:"▾";text-decoration:none;display:inline-block;transition:transform .2s}
+  .step.open .more-t::after{transform:rotate(180deg)}
+  .step.open .more-t .en,.step.open .more-t .de{font-size:0}
+  html[lang=en] .step.open .more-t .en::before{content:"Show less";font-size:15px}
+  html[lang=de] .step.open .more-t .de::before{content:"Weniger";font-size:15px}
+}
+
 @media (max-width:640px){.swirl .desk{display:none}}
 @media (min-width:900px){
   body{font-size:18px}
@@ -258,9 +272,11 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
           <p class="kick"><span class="en">Free · open to everyone</span><span class="de">Kostenlos · offen für alle</span></p>
           <h3>The Wild Hearts Collective</h3>
           <p class="note"><span class="en">where it all begins</span><span class="de">hier beginnt alles</span></p>
+          <button class="more-t" type="button" aria-expanded="false"><span class="en">Read more</span><span class="de">Mehr lesen</span></button>
+          <div class="more">
           <ul class="en"><li>Our community channel on Instagram with daily check-ins, little polls and honest questions</li><li>The Reset Routine for Tired Days as my welcome gift</li><li>Live Wild Hearts Gatherings: free video circles where we really meet, the first one in December</li></ul>
           <ul class="de"><li>Unser Community-Kanal auf Instagram mit täglichen Impulsen, kleinen Umfragen und ehrlichen Fragen</li><li>Die Reset-Routine für müde Tage als mein Willkommensgeschenk</li><li>Live-Gatherings: kostenlose Video-Kreise, in denen wir uns wirklich begegnen, das erste im Dezember</li></ul>
-          <a class="go" href="https://www.instagram.com/channel/wrOyV88oT-GAwNiR/" target="_blank" rel="noopener"><span class="en">Join for free →</span><span class="de">Kostenlos dabei sein →</span></a>
+          <a class="go" href="https://www.instagram.com/channel/wrOyV88oT-GAwNiR/" target="_blank" rel="noopener"><span class="en">Join for free →</span><span class="de">Kostenlos dabei sein →</span></a></div>
         </div>
       </li>
       <li class="step s2">
@@ -269,11 +285,13 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
           <p class="kick"><span class="en">Membership · opens in 2027</span><span class="de">Mitgliedschaft · ab 2027</span></p>
           <h3>The Inner Circle</h3>
           <p class="note"><span class="en">your circle, month after month</span><span class="de">dein Kreis, Monat für Monat</span></p>
+          <button class="more-t" type="button" aria-expanded="false"><span class="en">Read more</span><span class="de">Mehr lesen</span></button>
+          <div class="more">
           <p class="en">For women who want to go deeper and stay close. A warm, quiet place of your own, away from the noise of social media.</p>
           <p class="de">Für Frauen, die tiefer gehen und dranbleiben möchten. Ein warmer, ruhiger Ort nur für dich, weit weg vom Lärm der sozialen Medien.</p>
           <ul class="en"><li>Monthly live circles in the rhythm of the moon and the seasons</li><li>A members' area with rituals, affirmations and short, gentle movement</li><li>Honest talks about exhaustion, relationships and friendships that no longer fit you</li><li>Space for what lights you up and for the ideas you have been carrying around</li><li>Women around you who truly get it</li></ul>
           <ul class="de"><li>Monatliche Live-Kreise im Rhythmus von Mond und Jahreszeiten</li><li>Ein Mitgliederbereich mit Ritualen, Affirmationen und kurzen, sanften Bewegungseinheiten</li><li>Ehrliche Gespräche über Erschöpfung, Beziehungen und Freundschaften, die nicht mehr zu dir passen</li><li>Raum für das, was dich zum Leuchten bringt, und für die Ideen, die du schon lange mit dir trägst</li><li>Frauen an deiner Seite, die dich wirklich verstehen</li></ul>
-          <button class="go" type="button" data-join="circle"><span class="en">Join the waitlist →</span><span class="de">Auf die Warteliste →</span></button>
+          <button class="go" type="button" data-join="circle"><span class="en">Join the waitlist →</span><span class="de">Auf die Warteliste →</span></button></div>
         </div>
       </li>
       <li class="step s3">
@@ -282,11 +300,13 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
           <p class="kick"><span class="en">1:1 mentoring · for your heart business</span><span class="de">1:1 Mentoring · für dein Herzensbusiness</span></p>
           <h3><span class="en">Be seen with what you love</span><span class="de">Sichtbar mit dem, was du liebst</span></h3>
           <p class="note"><span class="en">from idea to something real</span><span class="de">von der Idee zu etwas Echtem</span></p>
+          <button class="more-t" type="button" aria-expanded="false"><span class="en">Read more</span><span class="de">Mehr lesen</span></button>
+          <div class="more">
           <p class="en">You carry an idea that won't let you go? I'll help you turn it into something real, step by step and in a way that feels like you. I have built my own businesses from scratch, and I'll share everything I learned along the way.</p>
           <p class="de">Du trägst eine Idee in dir, die dich nicht loslässt? Ich helfe dir, Schritt für Schritt etwas Echtes daraus zu machen, und zwar so, dass es sich nach dir anfühlt. Ich habe meine eigenen Unternehmen von Grund auf aufgebaut und teile mit dir alles, was ich dabei gelernt habe.</p>
           <ul class="en"><li>Finding your niche and the people you are meant to serve</li><li>Your personality and style: how you want to come across</li><li>Your website, simple, beautiful and truly yours</li><li>Flyers and print design</li><li>Social media that feels like you, not like pressure</li><li>Getting seen and finding the courage to show up</li></ul>
           <ul class="de"><li>Deine Nische finden und die Menschen, für die du da sein möchtest</li><li>Deine Persönlichkeit und dein Stil: wie du wirken möchtest</li><li>Deine Website, einfach, schön und ganz deine</li><li>Flyer und Printdesign</li><li>Social Media, das sich nach dir anfühlt und nicht nach Druck</li><li>Sichtbar werden und den Mut finden, dich zu zeigen</li></ul>
-          <button class="go" type="button" data-join="mentoring"><span class="en">I'm interested →</span><span class="de">Ich bin interessiert →</span></button>
+          <button class="go" type="button" data-join="mentoring"><span class="en">I'm interested →</span><span class="de">Ich bin interessiert →</span></button></div>
         </div>
       </li>
       <li class="step s4">
@@ -295,9 +315,11 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
           <p class="kick"><span class="en">12 months · by application</span><span class="de">12 Monate · mit Bewerbung</span></p>
           <h3><span class="en">The Year Journey</span><span class="de">Die Jahresreise</span></h3>
           <p class="note"><span class="en">a whole year, side by side</span><span class="de">ein ganzes Jahr, Seite an Seite</span></p>
+          <button class="more-t" type="button" aria-expanded="false"><span class="en">Read more</span><span class="de">Mehr lesen</span></button>
+          <div class="more">
           <p class="en">For women who are ready to truly change something. We walk through your year together: the Inner Circle, regular 1:1 time with me and a clear path for your life and your heart business. Only a few places each year.</p>
           <p class="de">Für Frauen, die bereit sind, wirklich etwas zu verändern. Wir gehen gemeinsam durch dein Jahr: mit dem Inner Circle, regelmäßiger Zeit mit mir allein und einem klaren Weg für dein Leben und dein Herzensbusiness. Pro Jahr gibt es nur wenige Plätze.</p>
-          <button class="go" type="button" data-join="year"><span class="en">Tell me more →</span><span class="de">Erzähl mir mehr →</span></button>
+          <button class="go" type="button" data-join="year"><span class="en">Tell me more →</span><span class="de">Erzähl mir mehr →</span></button></div>
         </div>
       </li>
     </ol>
@@ -385,6 +407,13 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
     box.appendChild(s);
   });
 
+  // Angebote am Handy: antippen zum Auf- und Zuklappen
+  document.querySelectorAll('.step').forEach(st => {
+    const t = st.querySelector('.more-t');
+    const toggle = () => { const o = st.classList.toggle('open'); t.setAttribute('aria-expanded', String(o)); };
+    t.addEventListener('click', e => { e.stopPropagation(); toggle(); });
+    st.querySelector('.card').addEventListener('click', e => { if (window.innerWidth < 900 && !e.target.closest('a,button')) toggle(); });
+  });
   // Sprache: EN/DE umschaltbar, gemerkt im Browser, ?lang=de für direkte Links
   const root = document.documentElement;
   const pick = l => {
