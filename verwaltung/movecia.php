@@ -164,7 +164,7 @@ if ($view === 'movecia') {
         $subs = $pdo->query("SELECT * FROM mm_subscribers ORDER BY created_at DESC")->fetchAll();
         $subOk = count(array_filter($subs, fn($x) => $x['status'] === 'bestaetigt'));
         $subOpen = count(array_filter($subs, fn($x) => $x['status'] === 'offen'));
-        $srcName = ['reset' => 'Reset Routine', 'circle' => 'Inner-Circle-Warteliste', 'link' => 'Link in Bio'];
+        $srcName = ['reset' => 'Reset Routine', 'circle' => 'Inner-Circle-Warteliste', 'mentoring' => 'Interesse Mentoring', 'year' => 'Interesse Jahresreise', 'link' => 'Link in Bio'];
         $live = $next ? mm_live_count($pdo, (int)$next['id']) : 0;
         $joinedAll = (int)$pdo->query('SELECT COUNT(*) FROM mm_signups WHERE joined_at IS NOT NULL')->fetchColumn();
         $d = $edit ?: ['id' => 0, 'title' => 'Wild Hearts Gathering', 'starts_at' => '', 'minutes' => 60, 'description' => ''];
@@ -224,7 +224,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <?php foreach (array_slice($subs, 0, 60) as $x): ?>
                 <div class="mm-signup<?= $x['status'] === 'abgemeldet' ? ' is-cancelled' : '' ?>">
                     <span><strong><?= forma_h($x['name']) ?></strong> <span class="muted small sel"><?= forma_h($x['email']) ?></span><br>
-                    <span class="muted small"><?= forma_h(date('d. m. Y', strtotime($x['created_at']))) ?> · über <?= forma_h($srcName[$x['source']] ?? $x['source']) ?></span></span>
+                    <span class="muted small"><?= forma_h(date('d. m. Y', strtotime($x['created_at']))) ?> · über <?= forma_h($srcName[$x['source']] ?? $x['source']) ?> · <?= ($x['lang'] ?? 'en') === 'de' ? 'Deutsch' : 'Englisch' ?></span></span>
                     <span style="display:flex;gap:10px;align-items:center"><span class="mm-badge<?= $x['status'] === 'offen' ? ' on' : '' ?>"><?= ['bestaetigt' => 'bestätigt', 'offen' => 'noch nicht bestätigt', 'abgemeldet' => 'abgemeldet'][$x['status']] ?? forma_h($x['status']) ?></span>
                     <?php if ($x['status'] !== 'abgemeldet'): ?><form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_resend_confirm"><input type="hidden" name="sid" value="<?= (int)$x['id'] ?>"><button class="link small" type="submit">Mail nochmal schicken</button></form><?php endif; ?></span>
                 </div>
