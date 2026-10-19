@@ -79,11 +79,12 @@ try {
         forma_json(['ok' => false, 'error' => 'Für diesen Termin ist die Anmeldung schon geschlossen. Anmeldeschluss ist immer am Vorabend um 17 Uhr. Ruf mich gern an: ' . FORMA_PHONE], 409);
     }
     $isAtelier = forma_is_atelier($course);
+    $hours = forma_slot_hours($course);
     $slots = [];
-    if ($isAtelier) {
-        $slotFree = forma_atelier_free($pdo, $courseId, (int)$course['capacity']);
+    if ($hours) {
+        $slotFree = forma_slots_free($pdo, $course);
         $want = array_values(array_unique(array_map('intval', (array)($in['slots'] ?? []))));
-        $slots = array_values(array_filter(FORMA_ATELIER_SLOTS, fn($h) => in_array($h, $want, true)));
+        $slots = array_values(array_filter($hours, fn($h) => in_array($h, $want, true)));
         if (!$slots) {
             $pdo->exec('ROLLBACK');
             forma_json(['ok' => false, 'error' => 'Bitte wähle mindestens eine Stunde aus.'], 422);
@@ -98,11 +99,11 @@ try {
     } else {
     $free = (int)$course['capacity'] - forma_booked($pdo, $courseId);
     }
-    if (!$isAtelier && $free <= 0) {
+    if (!$hours && $free <= 0) {
         $pdo->exec('ROLLBACK');
         forma_json(['ok' => false, 'error' => 'Dieser Kurs ist leider gerade ausgebucht. Schreib mir gern, dann melde ich mich, falls ein Platz frei wird.', 'free' => 0], 409);
     }
-    if (!$isAtelier && $persons > $free) {
+    if (!$hours && $persons > $free) {
         $pdo->exec('ROLLBACK');
         $msg = 'Für diesen Termin ist die Buchung leider nur noch für ' . ($free === 1 ? '1 Person' : "$free Personen") . ' möglich. Bitte passe die Anzahl an.';
         forma_json(['ok' => false, 'error' => $msg, 'free' => $free], 409);
@@ -112,6 +113,9 @@ try {
     if ($isAtelier) {
         $pieces = array_map(fn($h) => ['key' => 'slot' . $h, 'name' => 'Offenes Atelier ' . forma_atelier_slot_label($h), 'qty' => $persons, 'cents' => $priceCents], $slots);
         $priceCents = 0;
+    } elseif ($slots) {
+        // Pottery bemalen: die gewählten Stunden kosten nichts extra, sie reservieren nur den Platz in dieser Stunde.
+        foreach ($slots as $h) $pieces[] = ['key' => 'slot' . $h, 'name' => 'Pottery bemalen ' . forma_atelier_slot_label($h), 'qty' => $persons, 'cents' => 0];
     }
     $piecesCents = array_sum(array_map(fn($i) => $i['qty'] * $i['cents'], $pieces));
     $total = $priceCents * $persons + $piecesCents;   // Preis wird immer hier am Server berechnet
@@ -161,12 +165,12 @@ try {
             'price_data' => [
                 'currency' => 'eur',
                 'unit_amount' => $priceCents,
-                'product_data' => ['name' => $course['title'] . ($pieces ? ' · Atelierbeitrag' : ''), 'description' => $course['date_text'] . ' · FORMA Studio, Mathon'],
+                'product_data' => ['name' => $course['title'] . ($pieces ? ' · Atelierbeitrag' : ''), 'description' => ($slots && !$isAtelier ? preg_replace('/\s*·?\s*\d{1,2}\s*[–-]\s*\d{1,2}\s*Uhr.*$/u', '', $course['date_text']) . ' · ' . forma_slots_text($slots) : $course['date_text']) . ' · FORMA Studio, Mathon'],
             ],
         ]], array_map(fn($i) => [
             'quantity' => $i['qty'],
             'price_data' => ['currency' => 'eur', 'unit_amount' => $i['cents'], 'product_data' => ['name' => $isAtelier ? $i['name'] . ' · ' . $course['date_text'] : $i['name'] . ' zum Bemalen']],
-        ], $pieces)),
+        ], array_values(array_filter($pieces, fn($i) => (int)$i['cents'] > 0)))),
         'payment_intent_data' => ['description' => $course['title'] . ' · ' . $course['date_text'] . ' · ' . $name],
         'expires_at' => time() + 31 * 60,
         'success_url' => $site . '/api/paid.php?b=' . $bookingId . '&k=' . $payToken,

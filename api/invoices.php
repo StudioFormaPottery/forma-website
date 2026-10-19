@@ -106,8 +106,10 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
                 'gross' => $vc, 'paid' => $b['paid_at'], 'type' => 'Kurs',
                 'pay_note' => 'Der Betrag ist bereits bezahlt: eingelöst mit deinem FORMA Gutschein Nr. ' . $old['nr'] . '.'];
         }
-        $items = [['text' => $b['title'], 'detail' => $b['date_text'] . ' · FORMA Studio, Mathon', 'qty' => (int)$b['persons'], 'unit' => (int)$b['unit']]];
-        $pieces = json_decode((string)($b['extras'] ?? ''), true);
+        $bSlots = forma_is_bemalen($b) ? forma_extras_slots($b['extras'] ?? '') : [];
+        $when = $bSlots ? forma_date_without_time((string)$b['date_text']) . ' · ' . forma_slots_text($bSlots) : $b['date_text'];
+        $items = [['text' => $b['title'], 'detail' => $when . ' · FORMA Studio, Mathon', 'qty' => (int)$b['persons'], 'unit' => (int)$b['unit']]];
+        $pieces = forma_extras_pieces($b['extras'] ?? '', $b);
         $atelier = forma_is_atelier($b);
         if ($atelier) $items = [];
         if (is_array($pieces)) {

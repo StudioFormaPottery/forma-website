@@ -810,10 +810,25 @@ function forma_first_bookable_date(?int $now = null): string
 /** Offenes Atelier: stundenweise buchbar, 5 Plätze pro Stunde. */
 const FORMA_ATELIER_SLOTS = [8, 9, 10];
 const FORMA_ATELIER_SEATS = 5;
+/** Pottery bemalen (19.10.2026): Gäste wählen 15–16, 16–17 und/oder 17–18 Uhr, die Plätze gelten pro Stunde. */
+const FORMA_BEMALEN_SLOTS = [15, 16, 17];
 
 function forma_is_atelier(array $course): bool
 {
     return ($course['title'] ?? '') === FORMA_SERIES['atelier']['title'];
+}
+
+function forma_is_bemalen(array $course): bool
+{
+    return ($course['title'] ?? '') === FORMA_SERIES['bemalen']['title'];
+}
+
+/** Stunden, in die ein Termin aufgeteilt ist (Offenes Atelier, Pottery bemalen), sonst leer. */
+function forma_slot_hours(array $course): array
+{
+    if (forma_is_atelier($course)) return FORMA_ATELIER_SLOTS;
+    if (forma_is_bemalen($course)) return FORMA_BEMALEN_SLOTS;
+    return [];
 }
 
 function forma_atelier_slot_label(int $h): string
@@ -821,24 +836,83 @@ function forma_atelier_slot_label(int $h): string
     return $h . '–' . ($h + 1) . ' Uhr';
 }
 
-/** Freie Plätze je Stunde. Ältere Reservierungen ohne Stundenangabe belegen alle Stunden. */
-function forma_atelier_free(PDO $pdo, int $courseId, int $seats = FORMA_ATELIER_SEATS): array
+/** Gebuchte Stunden aus den Extras einer Buchung (Einträge mit key slotN). */
+function forma_extras_slots($extras): array
 {
-    $used = array_fill_keys(FORMA_ATELIER_SLOTS, 0);
+    $x = is_array($extras) ? $extras : json_decode((string)$extras, true);
+    $out = [];
+    foreach ((is_array($x) ? $x : []) as $it) {
+        if (is_array($it) && preg_match('/^slot(\d{1,2})$/', (string)($it['key'] ?? ''), $m)) $out[] = (int)$m[1];
+    }
+    sort($out);
+    return array_values(array_unique($out));
+}
+
+/** Stücke/Positionen aus den Extras ohne reine Zeit-Einträge von Pottery bemalen (die kosten nichts). */
+function forma_extras_pieces($extras, array $course): array
+{
+    $x = is_array($extras) ? $extras : json_decode((string)$extras, true);
+    if (!is_array($x)) return [];
+    if (forma_is_atelier($course)) return $x;
+    return array_values(array_filter($x, fn($it) => is_array($it) && !preg_match('/^slot\d+$/', (string)($it['key'] ?? ''))));
+}
+
+/** „15–16 und 16–17 Uhr“ → zusammenhängende Stunden als „15–17 Uhr“. */
+function forma_slots_text(array $hours): string
+{
+    sort($hours);
+    $blocks = [];
+    foreach ($hours as $h) {
+        $n = count($blocks);
+        if ($n && $blocks[$n - 1][1] === $h) $blocks[$n - 1][1] = $h + 1;
+        else $blocks[] = [$h, $h + 1];
+    }
+    return implode(' und ', array_map(fn($b) => $b[0] . '–' . $b[1], $blocks)) . ' Uhr';
+}
+
+/** Freie Plätze je Stunde. Ältere Reservierungen ohne Stundenangabe belegen alle Stunden. */
+function forma_atelier_free(PDO $pdo, int $courseId, int $seats = FORMA_ATELIER_SEATS, array $hours = FORMA_ATELIER_SLOTS): array
+{
+    $used = array_fill_keys($hours, 0);
     $stmt = $pdo->prepare("SELECT persons, extras FROM bookings WHERE course_id = ? AND (status = 'bestaetigt' OR (status = 'offen' AND created_at >= ?))");
     $stmt->execute([$courseId, date('c', time() - FORMA_HOLD_SECONDS)]);
     foreach ($stmt->fetchAll() as $b) {
-        $items = json_decode((string)$b['extras'], true);
         $hit = false;
-        foreach (is_array($items) ? $items : [] as $it) {
-            if (preg_match('/^slot(\d+)$/', (string)($it['key'] ?? ''), $m) && isset($used[(int)$m[1]])) {
-                $used[(int)$m[1]] += (int)($it['qty'] ?? $b['persons']);
-                $hit = true;
-            }
+        foreach (forma_extras_slots($b['extras']) as $h) {
+            if (isset($used[$h])) { $used[$h] += (int)$b['persons']; $hit = true; }
         }
         if (!$hit) foreach ($used as $h => $_) $used[$h] += (int)$b['persons'];
     }
     return array_map(fn($u) => max(0, $seats - $u), $used);
+}
+
+/** Datum ohne Uhrzeit: „Mi, 4. 11. 2026 · 15–18 Uhr“ → „Mi, 4. 11. 2026“. */
+function forma_date_without_time(string $dateText): string
+{
+    return trim(preg_replace('/\s*·?\s*\d{1,2}(?:[:.]\d{2})?\s*[–-]\s*\d{1,2}(?:[:.]\d{2})?\s*Uhr.*$/u', '', $dateText));
+}
+
+/** Freie Plätze eines Termins (bei Stunden-Aufteilung: die Stunde mit den meisten freien Plätzen). */
+function forma_course_free(PDO $pdo, array $course): int
+{
+    if (forma_slot_hours($course)) { $f = forma_slots_free($pdo, $course); return $f ? max($f) : 0; }
+    return max(0, (int)$course['capacity'] - forma_booked($pdo, (int)$course['id']));
+}
+
+/** Belegung je Stunde als Text für die Verwaltung, z. B. „15–16 Uhr 4/6 · 16–17 Uhr 2/6“. */
+function forma_slots_overview(PDO $pdo, array $course): string
+{
+    $cap = (int)$course['capacity'];
+    $out = [];
+    foreach (forma_slots_free($pdo, $course) as $h => $f) $out[] = forma_atelier_slot_label($h) . ' ' . ($cap - $f) . '/' . $cap;
+    return implode(' · ', $out);
+}
+
+/** Freie Plätze je Stunde für einen Termin mit Stunden-Aufteilung. */
+function forma_slots_free(PDO $pdo, array $course): array
+{
+    $hours = forma_slot_hours($course);
+    return $hours ? forma_atelier_free($pdo, (int)$course['id'], (int)$course['capacity'], $hours) : [];
 }
 
 function forma_upcoming_courses(PDO $pdo, bool $onlyVisible = true): array
@@ -854,8 +928,8 @@ function forma_upcoming_courses(PDO $pdo, bool $onlyVisible = true): array
     foreach ($rows as &$r) {
         $r['booked'] = forma_booked($pdo, (int)$r['id']);
         $r['free'] = max(0, (int)$r['capacity'] - $r['booked']);
-        if (forma_is_atelier($r)) {
-            $r['slots'] = forma_atelier_free($pdo, (int)$r['id'], (int)$r['capacity']);
+        if (forma_slot_hours($r)) {
+            $r['slots'] = forma_slots_free($pdo, $r);
             $r['free'] = max($r['slots']);
         }
     }
@@ -1338,7 +1412,7 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
     $personsText = $persons === 1 ? '1 Person' : "$persons Personen";
     $vc = (int)($b['voucher_cents'] ?? 0);
     $paid = ((int)$b['amount_cents'] > 0 || $vc > 0) && $b['paid_at'];
-    $free = max(0, (int)$b['capacity'] - forma_booked($pdo, (int)$b['course_id']));
+    $free = forma_course_free($pdo, ['id' => $b['course_id'], 'title' => $b['title'], 'capacity' => $b['capacity']]);
     $phone = FORMA_PHONE;
     $site = forma_site_url();
 
@@ -1359,6 +1433,11 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
     $pieces = json_decode((string)($b['extras'] ?? ''), true);
     $isAtelier = $b['title'] === FORMA_SERIES['atelier']['title'];
     $termin = $isAtelier ? preg_replace('/ · .*$/u', '', (string)$b['date_text']) : $b['date_text'];
+    $bSlots = forma_is_bemalen($b) ? forma_extras_slots($pieces) : [];
+    if ($bSlots) {
+        $termin = forma_date_without_time((string)$b['date_text']) . ' · ' . forma_slots_text($bSlots);
+        $pieces = forma_extras_pieces($pieces, $b);
+    }
     $piecesLine = is_array($pieces) && $pieces ? ($isAtelier ? 'Deine Zeiten: ' . implode(', ', array_map(fn($i) => preg_replace('/^Offenes Atelier /', '', $i['name']), $pieces)) . ' (' . count($pieces) . ($pieces && count($pieces) === 1 ? ' Stunde' : ' Stunden') . ")\n" : 'Deine Stücke: ' . forma_bemalen_text($pieces) . "\n") : '';
     $unsub = '';
     if (empty($b['no_post'])) try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Kursbuchung: ' . $b['title']); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }
@@ -2113,12 +2192,8 @@ function forma_course_end(array $row): ?int
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) return null;
     if (str_contains(mb_strtolower((string)$row['title']), 'woche')) return null; // mehrwöchige Kurse: kein Einzeltermin
     $end = null;
-    if (forma_is_atelier($row)) {
-        $x = json_decode((string)($row['extras'] ?? ''), true);
-        $slots = [];
-        foreach ((is_array($x) ? $x : []) as $it) {
-            if (is_array($it) && preg_match('/^slot(\d{1,2})$/', (string)($it['key'] ?? ''), $mm)) $slots[] = (int)$mm[1];
-        }
+    if (forma_slot_hours($row)) {
+        $slots = forma_extras_slots($row['extras'] ?? '');
         if ($slots) $end = sprintf('%02d:00', max($slots) + 1);
     }
     if ($end === null && preg_match('/(\d{1,2})(?:[:.](\d{2}))?\s*[–-]\s*(\d{1,2})(?:[:.](\d{2}))?\s*Uhr/u', (string)$row['date_text'], $m)) {
@@ -2321,13 +2396,8 @@ function forma_booking_events(PDO $pdo, string $kind, int $id): array
     $summary = $title . ' im Atelier FORMA';
     $desc = 'Deine Buchung bei FORMA Earth & Art. Bitte komm in Kleidung, die schmutzig werden darf.' . "\nBei Fragen: " . FORMA_PHONE;
     $blocks = [];
-    if (forma_is_atelier($b)) {
-        $x = json_decode((string)($b['extras'] ?? ''), true);
-        $slots = [];
-        foreach ((is_array($x) ? $x : []) as $it) {
-            if (is_array($it) && preg_match('/^slot(\d{1,2})$/', (string)($it['key'] ?? ''), $mm)) $slots[] = (int)$mm[1];
-        }
-        sort($slots);
+    if (forma_slot_hours($b)) {
+        $slots = forma_extras_slots($b['extras'] ?? '');
         foreach ($slots as $h) {
             $n = count($blocks);
             if ($n && $blocks[$n - 1][1] === $h) $blocks[$n - 1][1] = $h + 1;

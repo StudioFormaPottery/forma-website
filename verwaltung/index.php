@@ -1853,7 +1853,7 @@ if ($view === 'course') {
     render_page($c['title'], function () use ($c, $bookings, $booked, $self, $flash) { ?>
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1><?= forma_h($c['title']) ?></h1>
-        <p class="muted"><?= forma_h($c['date_text']) ?> · <?= $booked ?> von <?= (int)$c['capacity'] ?> Plätzen belegt<?= $c['visible'] ? '' : ' · <strong>auf der Website ausgeblendet</strong>' ?></p>
+        <p class="muted"><?= forma_h($c['date_text']) ?> · <?= forma_slot_hours($c) ? 'Belegt pro Stunde: ' . forma_h(forma_slots_overview($GLOBALS['pdo'], $c)) : $booked . ' von ' . (int)$c['capacity'] . ' Plätzen belegt' ?><?= $c['visible'] ? '' : ' · <strong>auf der Website ausgeblendet</strong>' ?></p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <p class="row-actions"><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=edit&amp;id=<?= (int)$c['id'] ?>">Termin bearbeiten</a><?php if ($c['title'] === FORMA_SERIES['bemalen']['title']): ?> <a class="btn" href="<?= forma_h($self) ?>?view=kasse&amp;c=<?= (int)$c['id'] ?>">Kasse öffnen</a><?php endif; ?></p>
         <?php $ms = (string)($c['min_status'] ?? ''); if ((int)$c['min_participants'] > 1 && $booked > 0 && $booked < (int)$c['min_participants'] && in_array($ms, ['', 'gemeldet', 'gast_informiert'], true) && $c['start_date'] >= date('Y-m-d')): ?>
@@ -1885,6 +1885,9 @@ if ($view === 'course') {
                 </div>
                 <?php if ($b['email']): ?><div class="sel"><?= forma_h($b['email']) ?></div><?php endif; ?>
                 <?php if ($b['phone']): ?><div class="sel"><?= forma_h($b['phone']) ?></div><?php endif; ?>
+                <?php $bh = forma_extras_slots($b['extras'] ?? ''); $bp = forma_is_bemalen($c) ? forma_extras_pieces($b['extras'] ?? '', $c) : []; ?>
+                <?php if ($bh): ?><div class="small"><strong>Kommt: <?= forma_h(forma_slots_text($bh)) ?></strong></div><?php endif; ?>
+                <?php if ($bp): ?><div class="small">Stücke: <?= forma_h(forma_bemalen_text($bp)) ?></div><?php endif; ?>
                 <?php if ($b['message']): ?><div class="muted">„<?= forma_h($b['message']) ?>“</div><?php endif; ?>
                 <div class="muted small">Angemeldet am <?= forma_h(date('d. m. Y, H:i', strtotime($b['created_at']))) ?></div>
                 <?php if (($b['min_state'] ?? '') === 'gefragt'): ?><div class="small" style="color:var(--clay)">Informiert, Antwort steht noch aus</div><?php elseif (($b['min_state'] ?? '') === 'storniert'): ?><div class="small" style="color:var(--clay)">Hat wegen zu weniger Anmeldungen storniert<?= (int)($b['refund_cents'] ?? 0) > 0 ? ' · ' . forma_h(forma_euro((int)$b['refund_cents'])) . ' automatisch erstattet' : '' ?></div><?php endif; ?>
@@ -1941,6 +1944,7 @@ $st = $pdo->prepare('SELECT * FROM courses WHERE start_date BETWEEN ? AND ? ORDE
 $st->execute([date('Y-m-d'), date('Y-m-d', strtotime('+6 days'))]);
 foreach ($st->fetchAll() as $c) {
     $bk = forma_booked($pdo, (int)$c['id']);
+    if (forma_slot_hours($c)) $bk = (int)$c['capacity'] - forma_course_free($pdo, $c) . '';
     $time = preg_match('/(\d{1,2}(?::\d{2})?)\s*[–-]\s*\d{1,2}(?::\d{2})?\s*Uhr/u', (string)$c['date_text'], $m) ? $m[1] : '';
     $agenda[$c['start_date']][] = ['sort' => sprintf('%05s', strlen($time) <= 2 ? $time . ':00' : $time), 'time' => $time !== '' ? forma_de_time($time) : '', 'title' => preg_replace('/\s*·.*$/u', '', (string)$c['title']), 'sub' => $bk . ' / ' . $c['capacity'] . ' angemeldet', 'href' => '?view=course&id=' . $c['id'], 'kind' => $bk > 0 ? 'kurs' : 'kurs leer'];
 }
