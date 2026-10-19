@@ -70,6 +70,17 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 .pctl span{align-self:center;color:#B3A78F;font-size:13px;padding:0 4px}
 .pmin{position:absolute;left:10px;bottom:8px;z-index:2;padding:6px 12px;font-size:14px;background:transparent;color:#B3A78F;border:1px solid #4a4337}
 .roombar .rb{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.practice{position:fixed;inset:0;z-index:7;background:#1F1C16;display:flex;flex-direction:column}
+.practice canvas{flex:1;width:100%;min-height:0;object-fit:contain;background:#1F1C16}
+.practice .pbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 16px;color:#B3A78F;font-size:14px}
+.practice .pbar button{padding:7px 16px;font-size:15px;background:#DCE0D2;color:#3F4A26}
+.practice .pbar .recon{background:#93402F;color:#FBF1EA}
+.ublist{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.ubrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ubrow input[type=text]{font:inherit;font-size:16px;padding:10px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--cream);flex:1 1 160px;min-width:0}
+.ubrow label.pick{font-size:14px;padding:8px 12px;border-radius:999px;border:1.5px solid var(--line);cursor:pointer;color:var(--wine-deep);background:var(--cream)}
+.ubrow .sw{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--line);background-size:cover;background-position:center;flex:0 0 auto}
+.ubrow button{padding:8px 12px;font-size:14px}
 .roombar .recon{background:#93402F;color:#FBF1EA;border-color:#93402F}
 .roombar .ghostbtn{background:transparent;color:var(--blush);border:1px solid #6B5D4C}
 </style>
@@ -105,6 +116,14 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     <audio id="play" controls hidden style="width:100%;margin-top:14px"></audio>
   </section>
 
+<?php if (!$guest && !$gath): ?>
+  <section class="card">
+    <h2><span class="step">✦</span>Übungsansicht</h2>
+    <p class="tip">Zum Üben vor einem vollen Kreis: dein echtes Kamerabild und dazu Fenster mit Namen, als hätten die Frauen ihre Kamera aus. Diese Fenster gibt es nur hier auf deinem Bildschirm, im echten Raum tauchen sie nie auf. Mit der Aufnahme kannst du dir danach ansehen, wie du wirkst. Hintergrundbilder wählst du von deinem Gerät, hochgeladen wird nichts.</p>
+    <div class="ublist" id="ublist"></div>
+    <div class="row"><button type="button" class="ghost" id="ubadd">+ Fenster</button><button type="button" id="ubopen">Übungsansicht öffnen</button></div>
+  </section>
+<?php endif; ?>
 <?php if (!$guest): ?>
   <section class="card">
     <h2><span class="step">3</span>Teleprompter</h2>
@@ -130,6 +149,12 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 <div class="roomwrap" id="room" hidden>
   <div class="roombar"><span><?= $gath ? $h($gath['title']) : 'Testraum · Wild Hearts' ?></span><span class="rb"><?php if (!$guest): ?><button id="rec2" type="button" class="ghostbtn">● Aufnahme</button><button id="ptoggle" type="button" class="ghostbtn">Teleprompter</button><a class="btn ghostbtn" style="padding:7px 16px;font-size:15px" href="?test=<?= $h(rawurlencode($testTok)) ?>&amp;buehne=1" target="_blank" rel="noopener">Video einspielen</a><?php endif; ?><button id="leave" type="button">Raum verlassen</button></span></div>
   <iframe id="frame" title="Whereby Testraum" allow="camera; microphone; fullscreen; speaker; display-capture; autoplay; compute-pressure"></iframe>
+</div>
+<?php endif; ?>
+<?php if (!$guest && !$gath): ?>
+<div class="practice" id="practice" hidden>
+  <div class="pbar"><span>Übungsansicht · nur auf deinem Bildschirm</span><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="ubrec">● Übung aufnehmen</button><button type="button" id="ubprompt">Teleprompter</button><button type="button" id="ubclose">Schließen</button></span></div>
+  <canvas id="ubcv" width="1280" height="720"></canvas>
 </div>
 <?php endif; ?>
 <?php if (!$guest): ?>
@@ -323,6 +348,121 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       R.classList.add('recon'); R.textContent = fmt(); rTimer = setInterval(() => R.textContent = fmt(), 1000);
     });
     window.addEventListener('beforeunload', e => { if (rRec) { e.preventDefault(); e.returnValue = ''; } });
+  }
+
+  // --- Übungsansicht: nur lokal gezeichnet, nichts davon geht in den Whereby-Raum ---
+  const UL = $('ublist');
+  if (UL) {
+    const SW = ['#5E6B35', '#9DA58F', '#6B5D4C', '#B3A78F', '#3F4A26', '#8A8F6E'];
+    const DEF = ['Anna', 'Sophie', 'Lena', 'Maria', 'Julia', 'Katrin', 'Eva'];
+    let rows = [];
+    try { rows = JSON.parse(localStorage.getItem('wh-uebung') || 'null') || []; } catch (e) {}
+    if (!rows.length) rows = DEF.slice(0, 5).map((n, i) => ({name: n, color: SW[i % SW.length]}));
+    const imgs = new Map();
+    const store = () => { try { localStorage.setItem('wh-uebung', JSON.stringify(rows.map(r => ({name: r.name, color: r.color})))); } catch (e) {} };
+    const draw = () => {
+      UL.innerHTML = '';
+      rows.forEach((r, i) => {
+        const d = document.createElement('div'); d.className = 'ubrow';
+        const sw = document.createElement('span'); sw.className = 'sw'; sw.style.background = imgs.get(i) ? 'url(' + imgs.get(i).src + ') center/cover' : r.color;
+        const n = document.createElement('input'); n.type = 'text'; n.value = r.name; n.maxLength = 30; n.oninput = () => { r.name = n.value; store(); };
+        const pick = document.createElement('label'); pick.className = 'pick'; pick.textContent = 'Bild';
+        const f = document.createElement('input'); f.type = 'file'; f.accept = 'image/*'; f.hidden = true; pick.appendChild(f);
+        f.onchange = () => { if (!f.files[0]) return; const im = new Image(); im.onload = () => { imgs.set(i, im); draw(); }; im.src = URL.createObjectURL(f.files[0]); };
+        const col = document.createElement('button'); col.type = 'button'; col.className = 'ghost'; col.textContent = 'Farbe';
+        col.onclick = () => { imgs.delete(i); r.color = SW[(SW.indexOf(r.color) + 1) % SW.length]; store(); draw(); };
+        const del = document.createElement('button'); del.type = 'button'; del.className = 'ghost'; del.textContent = '✕';
+        del.onclick = () => { rows.splice(i, 1); const m = new Map(); imgs.forEach((v, k) => { if (k < i) m.set(k, v); else if (k > i) m.set(k - 1, v); }); imgs.clear(); m.forEach((v, k) => imgs.set(k, v)); store(); draw(); };
+        d.append(sw, n, pick, col, del); UL.appendChild(d);
+      });
+    };
+    $('ubadd').onclick = () => { if (rows.length >= 11) return; rows.push({name: DEF[rows.length % DEF.length], color: SW[rows.length % SW.length]}); store(); draw(); };
+    draw();
+
+    const PR = $('practice'), cv = $('ubcv'), g = cv.getContext('2d');
+    const cam = document.createElement('video'); cam.muted = true; cam.playsInline = true;
+    let uStream = null, uRaf = 0, uRec = null, uChunks = [], uT0 = 0;
+    const rr = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
+    const cover = (src, sw, sh, x, y, w, h, mirror) => {
+      const s = Math.max(w / sw, h / sh), dw = sw * s, dh = sh * s;
+      g.save(); rr(x, y, w, h, 14); g.clip();
+      if (mirror) { g.translate(x + w, 0); g.scale(-1, 1); g.drawImage(src, (w - dw) / 2, y + (h - dh) / 2, dw, dh); }
+      else g.drawImage(src, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+      g.restore();
+    };
+    const label = (t, x, y, h) => {
+      g.font = '500 20px Outfit, system-ui, sans-serif';
+      const w = g.measureText(t).width + 24;
+      g.fillStyle = 'rgba(31,28,22,.62)'; rr(x + 10, y + h - 42, w, 32, 10); g.fill();
+      g.fillStyle = '#F6F3EA'; g.fillText(t, x + 22, y + h - 20);
+    };
+    const frame = () => {
+      const n = rows.length + 1, W = cv.width, H = cv.height, gap = 12;
+      const c = n <= 2 ? n : n <= 4 ? 2 : n <= 9 ? 3 : 4, rws = Math.ceil(n / c);
+      const tw = Math.min((W - gap * (c + 1)) / c, ((H - gap * (rws + 1)) / rws) * 16 / 9), th = tw * 9 / 16;
+      g.fillStyle = '#1F1C16'; g.fillRect(0, 0, W, H);
+      for (let k = 0; k < n; k++) {
+        const row = Math.floor(k / c), inRow = row === rws - 1 ? n - row * c : c;
+        const x = (W - (inRow * tw + (inRow - 1) * gap)) / 2 + (k - row * c) * (tw + gap);
+        const y = (H - (rws * th + (rws - 1) * gap)) / 2 + row * (th + gap);
+        if (k === 0) {
+          if (cam.videoWidth) cover(cam, cam.videoWidth, cam.videoHeight, x, y, tw, th, true);
+          else { g.fillStyle = '#3E372C'; rr(x, y, tw, th, 14); g.fill(); }
+          label('Viv', x, y, th);
+        } else {
+          const r = rows[k - 1], im = imgs.get(k - 1);
+          if (im) cover(im, im.naturalWidth, im.naturalHeight, x, y, tw, th, false);
+          else { g.fillStyle = r.color; rr(x, y, tw, th, 14); g.fill(); }
+          const rad = Math.min(tw, th) * 0.17;
+          g.fillStyle = 'rgba(246,243,234,.9)'; g.beginPath(); g.arc(x + tw / 2, y + th / 2 - 8, rad, 0, Math.PI * 2); g.fill();
+          g.fillStyle = '#3F4A26'; g.font = '500 ' + Math.round(rad * 0.9) + 'px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+          g.fillText((r.name.trim()[0] || '?').toUpperCase(), x + tw / 2, y + th / 2 - 6); g.textAlign = 'start'; g.textBaseline = 'alphabetic';
+          label(r.name.trim() || 'Gast', x, y, th);
+        }
+      }
+      uRaf = requestAnimationFrame(frame);
+    };
+    const fmtU = () => { const s = Math.floor((Date.now() - uT0) / 1000); return '■ Stopp ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+    let uTimer = 0;
+    $('ubopen').onclick = async () => {
+      stop();
+      try { uStream = await navigator.mediaDevices.getUserMedia({video: {width: {ideal: 1280}, height: {ideal: 720}}, audio: {echoCancellation: true, noiseSuppression: true}}); }
+      catch (e) { alert('Kein Zugriff auf Kamera oder Mikro. Bitte im Browser erlauben.'); return; }
+      cam.srcObject = uStream; cam.play().catch(() => {});
+      PR.hidden = false; document.body.style.overflow = 'hidden'; frame();
+    };
+    const closeU = () => {
+      if (uRec) uRec.stop();
+      cancelAnimationFrame(uRaf);
+      if (uStream) uStream.getTracks().forEach(t => t.stop());
+      uStream = null; PR.hidden = true; document.body.style.overflow = '';
+      if (P) { window.hidePrompter(); document.body.appendChild(P); }
+    };
+    $('ubclose').onclick = closeU;
+    $('ubprompt').onclick = () => {
+      if (!P) return;
+      if (P.hidden) { PR.insertBefore(P, cv); window.showPrompter(true); } else window.hidePrompter();
+    };
+    $('ubrec').onclick = () => {
+      const b = $('ubrec');
+      if (uRec) { uRec.stop(); return; }
+      if (!window.MediaRecorder || !cv.captureStream) { alert('Dieser Browser kann die Übung nicht aufnehmen. Bitte nimm Chrome oder Edge am Computer.'); return; }
+      const st = new MediaStream([...cv.captureStream(30).getVideoTracks(), ...uStream.getAudioTracks()]);
+      const types = ['video/mp4;codecs=avc1,mp4a', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+      const mimeType = types.find(t => MediaRecorder.isTypeSupported(t)) || '';
+      uRec = new MediaRecorder(st, mimeType ? {mimeType, videoBitsPerSecond: 2500000} : {});
+      uChunks = [];
+      uRec.ondataavailable = e => e.data.size && uChunks.push(e.data);
+      uRec.onstop = () => {
+        clearInterval(uTimer);
+        const type = uRec.mimeType || 'video/webm', a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob(uChunks, {type}));
+        a.download = 'Wild-Hearts-Uebung-' + new Date().toISOString().slice(0, 10) + '.' + (type.includes('mp4') ? 'mp4' : 'webm');
+        document.body.appendChild(a); a.click(); a.remove();
+        uRec = null; b.textContent = '● Übung aufnehmen'; b.classList.remove('recon');
+      };
+      uRec.start(5000); uT0 = Date.now(); b.classList.add('recon'); b.textContent = fmtU(); uTimer = setInterval(() => b.textContent = fmtU(), 1000);
+    };
   }
 
   const enter = $('enter');
