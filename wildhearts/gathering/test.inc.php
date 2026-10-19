@@ -152,6 +152,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     <p class="tip">Zum Üben vor einem vollen Kreis: dein echtes Kamerabild und dazu bis zu 15 Fenster mit Namen, als hätten die Frauen ihre Kamera aus. Diese Fenster gibt es nur hier auf deinem Bildschirm, im echten Raum tauchen sie nie auf. Mit der Aufnahme kannst du dir danach ansehen, wie du wirkst. Hintergrundbilder wählst du von deinem Gerät, hochgeladen wird nichts.</p>
     <div class="ublist" id="ublist"></div>
     <div class="row"><button type="button" class="ghost" id="ubadd">+ Fenster</button></div>
+    <label class="f" style="margin-top:16px">Name des Calls (steht oben im Raum und im Dateinamen der Aufnahme)<input id="ubtitle" type="text" maxlength="80" placeholder="z. B. Wild Hearts Gathering · Dezember" style="font:inherit;font-size:16px;padding:11px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--cream)"></label>
     <h3 style="font-size:18px;font-weight:500;margin-top:18px;color:var(--wine-deep)">Übungsfragen</h3>
     <p class="tip">Eine Frage pro Zeile. Die Fragen kommen während der Übung wie Nachrichten in den Chat rechts, und das fragende Fenster hebt die Hand. Es können mehrere Fragen gleichzeitig offen sein, „Beantwortet ✓“ hakt immer die älteste ab. Schreibst du „Anna: …“ davor, fragt genau dieses Fenster, sonst ein zufälliges.</p>
     <p class="tip"><strong>Feste Zeitpunkte:</strong> Mit „10 Min:“ am Anfang kommt die Frage genau 10 Minuten nach Beginn der Übung, zum Beispiel „10 Min: Sophie: How do you find time for yourself?“. So kannst du dein Gathering durchplanen. Fragen ohne Zeit kommen zwischendurch, wenn du „Nächste Frage“ tippst oder wie unten eingestellt. Die Liste wird automatisch gespeichert, auch für deine anderen Geräte.</p>
@@ -223,7 +224,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 <?php endif; ?>
 <?php if (!$guest && !$gath): ?>
 <div class="practice" id="practice" hidden>
-  <div class="pbar"><span>Übungsansicht · nur auf deinem Bildschirm · <span id="ubclock"></span></span><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="ubnext">Nächste Frage</button><button type="button" id="ubdone" hidden>Beantwortet ✓</button><button type="button" id="ubrec">● Übung aufnehmen</button><button type="button" id="ubprompt">Teleprompter</button><button type="button" id="ubclose">Schließen</button></span></div>
+  <div class="pbar"><span>Übung · <span id="ubttl"></span> · <span id="ubclock"></span></span><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="ubnext">Nächste Frage</button><button type="button" id="ubdone" hidden>Beantwortet ✓</button><button type="button" id="ubrec">● Übung aufnehmen</button><button type="button" id="ubprompt">Teleprompter</button><button type="button" id="ubclose">Schließen</button></span></div>
   <canvas id="ubcv" width="1920" height="1080"></canvas>
   <form class="pask" id="ubask"><select id="ubwho" aria-label="Wer fragt"></select><input id="ubtxt" type="text" placeholder="Neue Frage, die dir gerade einfällt …" maxlength="300" autocomplete="off"><button type="submit">Jetzt senden</button><button type="button" id="ublater" class="ghost">Für später</button></form>
 </div>
@@ -276,6 +277,10 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 
   const start = async () => {
     stop();
+    // Am iPhone muss die Tonauswertung direkt beim Antippen starten, sonst bleibt sie stumm
+    const AC = window.AudioContext || window.webkitAudioContext;
+    const ac = AC ? new AC() : null;
+    if (ac && ac.state !== 'running') ac.resume().catch(() => {});
     st.className = 'status'; st.textContent = 'Einen Moment …';
     const audio = mic.value ? {deviceId: {exact: mic.value}, echoCancellation: true, noiseSuppression: true} : {echoCancellation: true, noiseSuppression: true};
     const video = cam.value ? {deviceId: {exact: cam.value}} : {facingMode: 'user'};
@@ -284,13 +289,16 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     } catch (e) {
       try { stream = await navigator.mediaDevices.getUserMedia({audio}); }
       catch (e2) {
+        if (ac) ac.close().catch(() => {});
         st.textContent = 'Der Browser hat keinen Zugriff bekommen. Erlaube Kamera und Mikrofon (am iPhone: Einstellungen › Safari › Kamera/Mikrofon › Fragen) und tippe noch einmal auf Starten.';
         return;
       }
       ph.textContent = 'Keine Kamera gefunden oder nicht erlaubt. Das Mikro läuft aber.';
     }
     if (stream.getVideoTracks().length) { v.srcObject = stream; ph.hidden = true; } else { ph.hidden = false; }
-    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    ctx = ac;
+    if (!ctx) { st.textContent = 'Dieser Browser kann den Mikro-Pegel nicht anzeigen. Nimm die 5-Sekunden-Aufnahme unten, um dein Mikro zu prüfen.'; $('rec').disabled = !window.MediaRecorder; fill().catch(() => {}); return; }
+    if (ctx.state !== 'running') { await ctx.resume().catch(() => {}); }
     const an = ctx.createAnalyser(); an.fftSize = 1024;
     ctx.createMediaStreamSource(stream).connect(an);
     const buf = new Float32Array(an.fftSize);
@@ -299,13 +307,13 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     const loop = () => {
       an.getFloatTimeDomainData(buf);
       let s = 0; for (const x of buf) s += x * x;
-      const pct = Math.min(100, Math.sqrt(s / buf.length) * 400);
+      const pct = Math.min(100, Math.sqrt(s / buf.length) * 700);
       lvl.style.width = pct + '%';
-      if (pct > 12 && !heard) { heard = true; st.className = 'status ok'; st.textContent = 'Dein Mikro funktioniert ♡'; }
+      if (pct > 6 && !heard) { heard = true; st.className = 'status ok'; st.textContent = 'Dein Mikro funktioniert ♡'; }
       raf = requestAnimationFrame(loop);
     };
     loop();
-    setTimeout(() => { if (!heard && stream) st.textContent = 'Noch nichts gehört. Sprich etwas lauter oder wähl unten ein anderes Mikrofon.'; }, 6000);
+    setTimeout(() => { if (!heard && stream) st.textContent = ctx && ctx.state !== 'running' ? 'Tippe einmal hier auf „Neu starten“, dann zeigt der Balken deine Stimme.' : 'Noch nichts gehört. Sprich etwas lauter, wähl unten ein anderes Mikrofon oder prüf es mit der 5-Sekunden-Aufnahme.'; }, 6000);
     $('go').textContent = 'Neu starten';
     $('rec').disabled = !window.MediaRecorder;
     fill().catch(() => {});
@@ -453,7 +461,12 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 
     const QDEF = ["Hi Viv! Where are you joining from today?", "How do you find time for yourself with four kids?", "What do you do on days when you feel you got nothing done?", "I always feel guilty when I take time for myself. How do I stop that?", "Is this circle also for women without children?", "How long have you been doing this?", "What exactly happens in The Inner Circle, and what does it cost?", "Can I join the Alpine Retreat with my partner?", "I'm new here and a bit shy. Do I have to turn my camera on?", "What is one small thing I can do tomorrow morning?", "Do you ever feel like giving up?", "Will there be a recording of today?"];
     const ta2 = $('ubq'), qm = $('ubqmode'), qx = $('ubqmix');
-    const SRV = <?= json_encode($uFragen) ?>;
+    const SRV = <?= json_encode($uFragen) ?>, SRVT = <?= json_encode($guest ? null : ((mm_cfg('uebung') ?? [])['titel'] ?? null)) ?>;
+    const tIn = $('ubtitle');
+    try { tIn.value = SRVT ?? localStorage.getItem('wh-call-titel') ?? 'Wild Hearts Gathering'; } catch (e) { tIn.value = SRVT ?? 'Wild Hearts Gathering'; }
+    let tSave2 = 0;
+    tIn.oninput = () => { try { localStorage.setItem('wh-call-titel', tIn.value); } catch (e) {} clearTimeout(tSave2); tSave2 = setTimeout(() => fetch(location.href, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({titel: tIn.value})}).catch(() => {}), 800); };
+    const callTitle = () => tIn.value.trim() || 'Wild Hearts Gathering';
     try { ta2.value = SRV ?? localStorage.getItem('wh-fragen') ?? QDEF.join('\n'); qm.value = localStorage.getItem('wh-fragen-takt') || '0'; } catch (e) { ta2.value = SRV ?? QDEF.join('\n'); }
     let qSave = 0;
     ta2.oninput = () => {
@@ -589,12 +602,56 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       }
       g.restore();
     };
+    const nowHM = () => { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+    const drawTop = (W, TOP, n) => {
+      g.fillStyle = '#3E372C'; g.fillRect(0, 0, W, TOP);
+      g.fillStyle = '#D8DCC6'; g.font = '400 24px Hand, "Bradley Hand", cursive'; g.fillText('welcome, wild heart ♡', 28, 47);
+      g.font = '500 26px Outfit, system-ui, sans-serif'; g.fillStyle = '#F6F3EA'; g.textAlign = 'center';
+      g.fillText(callTitle(), W / 2, 36);
+      g.font = '400 17px Outfit, system-ui, sans-serif'; g.fillStyle = '#B3A78F';
+      g.fillText(new Date().toLocaleDateString('de-AT', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'}) + ' · ' + nowHM() + ' · moveciamovement.com', W / 2, 60);
+      g.textAlign = 'end';
+      let xr = W - 28;
+      // kleiner, unaufdringlicher Hinweis, dass es eine Übung ist
+      g.font = '500 15px Outfit, system-ui, sans-serif'; const tag = 'Übung', tw2 = g.measureText(tag).width + 22;
+      g.fillStyle = 'rgba(220,224,210,.16)'; rr(xr - tw2, 24, tw2, 28, 14); g.fill(); g.fillStyle = '#B3A78F'; g.fillText(tag, xr - 11, 43); xr -= tw2 + 16;
+      g.fillStyle = '#DCE0D2'; g.font = '500 18px Outfit, system-ui, sans-serif'; g.fillText(n + ' im Raum', xr, 44); xr -= g.measureText(n + ' im Raum').width + 12;
+      g.beginPath(); g.arc(xr - 8, 37, 7, 0, Math.PI * 2); g.fill(); g.beginPath(); g.arc(xr - 8, 54, 12, Math.PI, 0); g.fill();
+      if (uRec) { const s2 = Math.floor((Date.now() - uT0) / 1000); xr -= 40; g.fillStyle = '#C0533F'; g.beginPath(); g.arc(xr - 6, 38, 7, 0, Math.PI * 2); g.fill(); g.fillStyle = '#F6F3EA'; g.textAlign = 'end'; g.fillText(Math.floor(s2 / 60) + ':' + String(s2 % 60).padStart(2, '0'), xr - 20, 44); }
+      g.textAlign = 'start';
+    };
+    const icon = (kind, cx, cy, col) => {
+      g.strokeStyle = col; g.fillStyle = col; g.lineWidth = 3; g.lineCap = 'round'; g.lineJoin = 'round';
+      if (kind === 'mic') { rr(cx - 7, cy - 16, 14, 22, 7); g.stroke(); g.beginPath(); g.arc(cx, cy - 2, 13, 0.15 * Math.PI, 0.85 * Math.PI); g.stroke(); g.beginPath(); g.moveTo(cx, cy + 11); g.lineTo(cx, cy + 17); g.stroke(); }
+      if (kind === 'cam') { rr(cx - 17, cy - 11, 24, 22, 5); g.stroke(); g.beginPath(); g.moveTo(cx + 9, cy - 4); g.lineTo(cx + 18, cy - 9); g.lineTo(cx + 18, cy + 9); g.lineTo(cx + 9, cy + 4); g.closePath(); g.stroke(); }
+      if (kind === 'share') { rr(cx - 17, cy - 13, 34, 22, 4); g.stroke(); g.beginPath(); g.moveTo(cx, cy + 4); g.lineTo(cx, cy - 7); g.moveTo(cx - 5, cy - 2); g.lineTo(cx, cy - 7); g.lineTo(cx + 5, cy - 2); g.moveTo(cx - 8, cy + 16); g.lineTo(cx + 8, cy + 16); g.stroke(); }
+      if (kind === 'chat') { rr(cx - 16, cy - 13, 32, 22, 8); g.stroke(); g.beginPath(); g.moveTo(cx - 6, cy + 9); g.lineTo(cx - 10, cy + 16); g.lineTo(cx + 2, cy + 9); g.stroke(); }
+      if (kind === 'hand') { g.font = '22px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('✋', cx, cy + 1); g.textAlign = 'start'; g.textBaseline = 'alphabetic'; }
+      if (kind === 'more') { [-10, 0, 10].forEach(d => { g.beginPath(); g.arc(cx + d, cy, 3, 0, Math.PI * 2); g.fill(); }); }
+    };
+    const drawBottom = (W, FH, BOT) => {
+      const y = FH - BOT;
+      g.fillStyle = '#3E372C'; g.fillRect(0, y, W, BOT);
+      const btns = [['mic', 'Mikro'], ['cam', 'Kamera'], ['share', 'Teilen'], ['chat', 'Chat'], ['hand', 'Melden'], ['more', 'Mehr']];
+      const bw = 92, total = btns.length * bw + 140, x0 = (W - total) / 2;
+      btns.forEach(([k, lab], i) => {
+        const cx = x0 + i * bw + bw / 2, cy = y + 38, active = k === 'chat';
+        g.fillStyle = active ? '#5E6B35' : 'rgba(246,243,234,.1)'; g.beginPath(); g.arc(cx, cy, 26, 0, Math.PI * 2); g.fill();
+        icon(k, cx, cy, '#F6F3EA');
+        g.fillStyle = '#B3A78F'; g.font = '400 14px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText(lab, cx, y + 86); g.textAlign = 'start';
+      });
+      const lx = x0 + btns.length * bw + 20;
+      g.fillStyle = '#6B5D4C'; rr(lx, y + 18, 120, 42, 21); g.fill();
+      g.fillStyle = '#FBF1EA'; g.font = '500 17px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('Verlassen', lx + 60, y + 45); g.textAlign = 'start';
+    };
     const frame = () => {
-      const n = rows.length + 1, W = cv.width, H = cv.height, gap = 10, CW = 440, GW = W - CW;
+      const n = rows.length + 1, W = cv.width, FH = cv.height, gap = 10, CW = 440, GW = W - CW, TOP = 76, BOT = 104, H = FH - TOP - BOT;
       const c = n <= 2 ? n : n <= 4 ? 2 : n <= 9 ? 3 : 4, rws = Math.ceil(n / c), small = n > 9;
       const tw = Math.min((GW - gap * (c + 1)) / c, ((H - gap * (rws + 1)) / rws) * 16 / 9), th = tw * 9 / 16;
       const open = new Set(qMsgs.filter(m => !m.done && m.who >= 0).map(m => m.who));
-      g.fillStyle = '#1F1C16'; g.fillRect(0, 0, GW, H);
+      g.fillStyle = '#2A1B16'; g.fillRect(0, 0, W, FH);
+      drawTop(W, TOP, n); drawBottom(W, FH, BOT);
+      g.save(); g.translate(0, TOP);
       for (let k = 0; k < n; k++) {
         const row = Math.floor(k / c), inRow = row === rws - 1 ? n - row * c : c;
         const x = (GW - (inRow * tw + (inRow - 1) * gap)) / 2 + (k - row * c) * (tw + gap);
@@ -621,6 +678,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
         }
       }
       drawChat(GW, W, H);
+      g.restore();
       uRaf = requestAnimationFrame(frame);
     };
     const fmtU = () => { const s = Math.floor((Date.now() - uT0) / 1000); return '■ Stopp ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
@@ -630,7 +688,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       try { uStream = await navigator.mediaDevices.getUserMedia({video: {width: {ideal: 1280}, height: {ideal: 720}}, audio: {echoCancellation: true, noiseSuppression: true}}); }
       catch (e) { alert('Kein Zugriff auf Kamera oder Mikro. Bitte im Browser erlauben.'); return; }
       cam.srcObject = uStream; cam.play().catch(() => {});
-      PR.hidden = false; document.body.style.overflow = 'hidden'; frame();
+      PR.hidden = false; document.body.style.overflow = 'hidden'; frame(); $('ubttl').textContent = callTitle();
       qPrep(); qMsgs = []; qSync(); qLoop();
       qStart = performance.now(); clearInterval(qClock);
       qClock = setInterval(() => {
@@ -667,7 +725,9 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
         clearInterval(uTimer);
         const type = uRec.mimeType || 'video/webm', a = document.createElement('a');
         a.href = URL.createObjectURL(new Blob(uChunks, {type}));
-        a.download = 'Wild-Hearts-Uebung-' + new Date().toISOString().slice(0, 10) + '.' + (type.includes('mp4') ? 'mp4' : 'webm');
+        const d = new Date(), stamp = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') + '_' + String(d.getHours()).padStart(2, '0') + '-' + String(d.getMinutes()).padStart(2, '0');
+        const slug = callTitle().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/ß/g, 'ss').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'Gathering';
+        a.download = 'Uebung_' + slug + '_' + stamp + '.' + (type.includes('mp4') ? 'mp4' : 'webm');
         document.body.appendChild(a); a.click(); a.remove();
         uRec = null; b.textContent = '● Übung aufnehmen'; b.classList.remove('recon');
       };
