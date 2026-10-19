@@ -575,15 +575,17 @@ function mm_offer_schema(PDO $pdo): void
         created_at TEXT NOT NULL,
         paid_at TEXT
     )');
+    $oc = array_column($pdo->query("SELECT name FROM pragma_table_info('mm_orders')")->fetchAll(), 'name');
+    if (!in_array('plan', $oc, true)) { $pdo->exec("ALTER TABLE mm_orders ADD COLUMN plan TEXT NOT NULL DEFAULT 'full'"); $pdo->exec("ALTER TABLE mm_orders ADD COLUMN consent INTEGER NOT NULL DEFAULT 0"); $pdo->exec("ALTER TABLE mm_orders ADD COLUMN sub_id TEXT NOT NULL DEFAULT ''"); }
 }
 
 /** Die drei Angebote mit Viv's Einstellungen (Titel, Text auf Englisch, regulärer Preis, Zahlungsart). */
 function mm_offers(): array
 {
     $def = [
-        'circle' => ['title' => 'The Inner Circle', 'billing' => 'monthly', 'text' => 'Your monthly circle: live gatherings, breathwork, gentle movement and a members area with rituals and affirmations. A space where women support each other and come back to themselves.'],
-        'year' => ['title' => 'The Year Circle', 'billing' => 'once', 'text' => 'Twelve months together: The Inner Circle plus 1:1 mentoring for the idea that is close to your heart. Like a best friend who walks the whole year with you.'],
-        'retreat' => ['title' => 'Wild Hearts Alpine Retreat', 'billing' => 'once', 'text' => 'A weekend in the Austrian Alps: yoga, Pilates, forest walks, breathwork, pottery, cooking together and a women\'s circle. Lots of quiet, lots of nature, back to you.'],
+        'circle' => ['price' => 3900, 'special' => 2900, 'title' => 'The Inner Circle', 'billing' => 'monthly', 'text' => 'Your monthly circle: live gatherings, breathwork, gentle movement and a members area with rituals and affirmations. A space where women support each other and come back to themselves.'],
+        'year' => ['price' => 240000, 'special' => 199000, 'inst_count' => 12, 'inst' => 21000, 'inst_special' => 17500, 'title' => 'The Year Circle', 'billing' => 'once', 'text' => 'Twelve months together: The Inner Circle plus 1:1 mentoring for the idea that is close to your heart. Like a best friend who walks the whole year with you.'],
+        'retreat' => ['price' => 79000, 'special' => 69000, 'title' => 'Wild Hearts Alpine Retreat', 'billing' => 'once', 'text' => 'A weekend in the Austrian Alps: yoga, Pilates, forest walks, breathwork, pottery, cooking together and a women\'s circle. Lots of quiet, lots of nature, back to you.'],
     ];
     $cfg = mm_cfg('offers') ?? [];
     $out = [];
@@ -593,8 +595,12 @@ function mm_offers(): array
             'title' => (string)($c['title'] ?? $def[$k]['title']),
             'text' => (string)($c['text'] ?? $def[$k]['text']),
             'billing' => in_array($c['billing'] ?? '', ['once', 'monthly'], true) ? $c['billing'] : $def[$k]['billing'],
-            'price_cents' => max(0, (int)($c['price_cents'] ?? 0)),
-            'special_cents' => max(0, (int)($c['special_cents'] ?? 0)),
+            'price_cents' => max(0, (int)($c['price_cents'] ?? 0)) ?: $def[$k]['price'],
+            'special_cents' => max(0, (int)($c['special_cents'] ?? 0)) ?: $def[$k]['special'],
+            // Ratenzahlung (nur Jahreskreis): Anzahl Raten, Rate regulär, Rate zum Gathering-Preis
+            'inst_count' => max(0, (int)($c['inst_count'] ?? ($def[$k]['inst_count'] ?? 0))),
+            'inst_cents' => max(0, (int)($c['inst_cents'] ?? 0)) ?: ($def[$k]['inst'] ?? 0),
+            'inst_special_cents' => max(0, (int)($c['inst_special_cents'] ?? 0)) ?: ($def[$k]['inst_special'] ?? 0),
             'minutes' => max(5, min(180, (int)($c['minutes'] ?? 25))),
         ];
     }
@@ -616,6 +622,15 @@ function mm_price_en(int $cents, string $billing): string
 }
 
 /** Die gerade eingeblendete Einblendung eines Raums (Gathering „g:ID“ oder „test“), oder null. */
+/** Ratenplan eines Angebots für die Anzeige (Preis bestimmt beim Bezahlen immer der Server). */
+function mm_inst_public(string $offer, bool $live): ?array
+{
+    $o = mm_offers()[$offer] ?? null;
+    if (!$o || $o['inst_count'] < 2 || $o['inst_cents'] <= 0) return null;
+    $sp = $live && $o['inst_special_cents'] > 0 && $o['inst_special_cents'] < $o['inst_cents'];
+    return ['count' => $o['inst_count'], 'regular' => mm_price_en($o['inst_cents'], 'once'), 'special' => $sp ? mm_price_en($o['inst_special_cents'], 'once') : null];
+}
+
 function mm_spotlight(PDO $pdo, string $scope): ?array
 {
     mm_offer_schema($pdo);
@@ -634,7 +649,8 @@ function mm_spotlight_public(?array $sp): ?array
         foreach (json_decode((string)$sp['items'], true) ?: [] as $it) {
             $live = $open && (int)$it['special_cents'] > 0 && (int)$it['special_cents'] < (int)$it['regular_cents'];
             $items[] = ['offer' => $it['offer'], 'title' => $it['title'], 'text' => $it['text'], 'billing' => $it['billing'],
-                'regular' => mm_price_en((int)$it['regular_cents'], $it['billing']), 'special' => $live ? mm_price_en((int)$it['special_cents'], $it['billing']) : null, 'live' => $live];
+                'regular' => mm_price_en((int)$it['regular_cents'], $it['billing']), 'special' => $live ? mm_price_en((int)$it['special_cents'], $it['billing']) : null, 'live' => $live,
+                'inst' => mm_inst_public($it['offer'], $live)];
         }
         $any = (bool)array_filter($items, fn($i) => $i['live']);
         return ['id' => (int)$sp['id'], 'offer' => 'all', 'title' => 'Ways to walk with me', 'items' => $items, 'until' => (int)$sp['until'], 'now' => time(), 'live' => $any];
@@ -645,6 +661,7 @@ function mm_spotlight_public(?array $sp): ?array
         'regular' => mm_price_en((int)$sp['regular_cents'], $sp['billing']),
         'special' => $live ? mm_price_en((int)$sp['special_cents'], $sp['billing']) : null,
         'until' => (int)$sp['until'], 'now' => time(), 'live' => $live,
+        'inst' => mm_inst_public($sp['offer'], $live),
     ];
 }
 
@@ -683,7 +700,7 @@ function mm_spotlight_hide(PDO $pdo, string $scope): void
 }
 
 /** Legt eine Bestellung an und gibt die Stripe-Bezahlseite zurück. Preis wird hier am Server bestimmt. */
-function mm_order_checkout(PDO $pdo, array $sp, string $name, string $email, string $item = ''): string
+function mm_order_checkout(PDO $pdo, array $sp, string $name, string $email, string $item = '', string $plan = 'full', int $consent = 0): string
 {
     mm_offer_schema($pdo);
     if ($sp['offer'] === 'all') {
@@ -695,20 +712,28 @@ function mm_order_checkout(PDO $pdo, array $sp, string $name, string $email, str
     $pub = mm_spotlight_public($sp);
     $special = $pub['live'];
     $amount = $special ? (int)$sp['special_cents'] : (int)$sp['regular_cents'];
+    // Ratenzahlung: Rate am Server aus den Einstellungen, als Monats-Abo, das nach der letzten Rate endet
+    $off = mm_offers()[$sp['offer']] ?? null;
+    $inst = $plan === 'inst' && $off && $off['inst_count'] >= 2 && $off['inst_cents'] > 0;
+    if ($inst) {
+        $amount = $special && $off['inst_special_cents'] > 0 ? (int)$off['inst_special_cents'] : (int)$off['inst_cents'];
+        $sp['billing'] = 'monthly';
+    }
     $tok = bin2hex(random_bytes(16));
     $test = $sp['scope'] === 'test' ? 1 : 0;
-    $pdo->prepare('INSERT INTO mm_orders (spotlight_id, scope, offer, title, billing, name, email, amount_cents, special, token, test, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)')
-        ->execute([(int)$sp['id'], $sp['scope'], $sp['offer'], $sp['title'], $sp['billing'], mb_substr($name, 0, 80), mb_substr($email, 0, 160), $amount, $special ? 1 : 0, $tok, $test, date('c')]);
+    $pdo->prepare('INSERT INTO mm_orders (spotlight_id, scope, offer, title, billing, name, email, amount_cents, special, token, test, created_at, plan, consent) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
+        ->execute([(int)$sp['id'], $sp['scope'], $sp['offer'], $sp['title'], $sp['billing'], mb_substr($name, 0, 80), mb_substr($email, 0, 160), $amount, $special ? 1 : 0, $tok, $test, date('c'), $inst ? 'inst' : 'full', $consent ? 1 : 0]);
     $oid = (int)$pdo->lastInsertId();
     $site = mm_site();
-    $price = ['currency' => 'eur', 'unit_amount' => $amount, 'product_data' => ['name' => $sp['title'] . ($special ? ' · Gathering price' : ''), 'description' => 'Wild Hearts Collective · Movecia, Vivien Malonga']];
+    $price = ['currency' => 'eur', 'unit_amount' => $amount, 'product_data' => ['name' => $sp['title'] . ($inst ? ' · ' . $off['inst_count'] . ' monthly payments' : '') . ($special ? ' · Gathering price' : ''), 'description' => 'Wild Hearts Collective · Movecia, Vivien Malonga']];
     if ($sp['billing'] === 'monthly') $price['recurring'] = ['interval' => 'month'];
     $params = [
         'mode' => $sp['billing'] === 'monthly' ? 'subscription' : 'payment',
         'locale' => 'en',
         'billing_address_collection' => 'required',
         'client_reference_id' => 'wh-order-' . $oid,
-        'metadata' => ['wh_order_id' => (string)$oid],
+        'metadata' => ['wh_order_id' => (string)$oid, 'plan' => $inst ? 'inst' : 'full'],
+        'custom_text' => ['submit' => ['message' => 'By paying you accept the terms and cancellation policy: ' . $site . '/terms' . ($sp['offer'] !== 'retreat' && $consent ? ' · You asked for your access to start right away.' : '')]],
         'line_items' => [['quantity' => 1, 'price_data' => $price]],
         'expires_at' => time() + 31 * 60,
         'success_url' => $site . '/api/wh-order.php?o=' . $oid . '&k=' . $tok,
@@ -731,14 +756,28 @@ function mm_order_check(PDO $pdo, array $o): string
     }
     $email = (string)($s['customer_details']['email'] ?? $o['email']);
     $name = (string)($s['customer_details']['name'] ?? $o['name']);
+    if (($o['plan'] ?? 'full') === 'inst' && !empty($s['subscription']) && ($o['sub_id'] ?? '') === '') {
+        $cnt = (int)(mm_offers()[$o['offer']]['inst_count'] ?? 12);
+        try {
+            // endet kurz nach der Fälligkeit der letzten Rate, dann wird nichts mehr abgebucht
+            forma_stripe('POST', '/v1/subscriptions/' . rawurlencode((string)$s['subscription']), ['cancel_at' => strtotime('+' . ($cnt - 1) . ' months +10 days')]);
+        } catch (Throwable $e) { error_log('MM inst cancel_at: ' . $e->getMessage()); }
+        $pdo->prepare('UPDATE mm_orders SET sub_id = ? WHERE id = ?')->execute([(string)$s['subscription'], $o['id']]);
+    }
     $u = $pdo->prepare("UPDATE mm_orders SET status = 'bezahlt', paid_at = ?, email = ?, name = CASE WHEN name = '' THEN ? ELSE name END WHERE id = ? AND status = 'offen'");
     $u->execute([date('c'), $email, $name, $o['id']]);
     if ($u->rowCount() === 1) {
         $first = forma_first_name($name ?: 'love');
-        $price = mm_price_en((int)$o['amount_cents'], $o['billing']);
-        $t = "Dear $first,\n\nthank you so much, you are in! Your booking for {$o['title']} ($price) is confirmed.\n\nI will write to you personally in the next days with everything you need for the start. If you have any questions, simply reply to this email.\n\nI am so happy to walk this way with you.";
+        $cnt = (int)(mm_offers()[$o['offer']]['inst_count'] ?? 12);
+        $price = ($o['plan'] ?? 'full') === 'inst' ? $cnt . ' monthly payments of ' . mm_price_en((int)$o['amount_cents'], 'once') : mm_price_en((int)$o['amount_cents'], $o['billing']);
+        $site = mm_site();
+        $legal = $o['offer'] === 'retreat'
+            ? "Retreats take place on fixed dates, so there is no statutory right of withdrawal (§ 18 (1) 10 FAGG). Our cancellation policy applies: $site/terms"
+            : "You have a 14-day right of withdrawal. " . (($o['consent'] ?? 0) ? 'You asked for your access to start right away, so if you withdraw within 14 days you pay only for the part already used. ' : '') . "Terms, cancellation policy and the withdrawal form: $site/terms";
+        $t = "Dear $first,\n\nthank you so much, you are in! Your booking for {$o['title']} ($price) is confirmed.\n\nI will write to you personally in the next days with everything you need for the start. If you have any questions, simply reply to this email.\n\nI am so happy to walk this way with you.\n\n$legal\nWithdraw from the contract: $site/withdraw";
         $html = '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#5E6B35;">you are in ♡</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:30px;color:#3F4A26;margin:0 0 14px;">' . forma_h($o['title']) . '</h1>'
-            . '<p>Dear ' . forma_h($first) . ',</p><p>thank you so much, your booking for <strong>' . forma_h($o['title']) . '</strong> (' . forma_h($price) . ') is confirmed.</p><p>I will write to you personally in the next days with everything you need for the start. If you have any questions, simply reply to this email.</p><p>I am so happy to walk this way with you.</p>';
+            . '<p>Dear ' . forma_h($first) . ',</p><p>thank you so much, your booking for <strong>' . forma_h($o['title']) . '</strong> (' . forma_h($price) . ') is confirmed.</p><p>I will write to you personally in the next days with everything you need for the start. If you have any questions, simply reply to this email.</p><p>I am so happy to walk this way with you.</p>'
+            . '<p style="font-size:13px;color:#6B5D4C;border-top:1px solid #DED8C8;padding-top:12px;margin-top:22px;">' . forma_h($legal) . '<br><a href="' . forma_h($site . '/withdraw') . '" style="color:#5E6B35;">Withdraw from the contract</a></p>';
         if ($email !== '') mm_mail($email, ($o['test'] ? '[TEST] ' : '') . 'You are in: ' . $o['title'], $t, mm_mail_html('You are in', $html));
         $v = "Hallo Viv,\n\n" . ($name ?: 'Jemand') . " ($email) hat gerade {$o['title']} gebucht und bezahlt: $price" . ($o['special'] ? ' (Gathering-Preis)' : ' (regulärer Preis)') . ".\n" . ($o['test'] ? "\nDas war eine Testbuchung aus dem Testraum.\n" : '') . "\nDu siehst alle Buchungen in der Verwaltung unter Movecia Movement → Angebote.\n";
         mm_mail(MM_FROM_EMAIL, ($o['test'] ? '[TEST] ' : '') . 'Neue Buchung: ' . $o['title'] . ' · ' . ($name ?: $email), $v, mm_mail_html('Neue Buchung', nl2br(forma_h($v)), 'de'));

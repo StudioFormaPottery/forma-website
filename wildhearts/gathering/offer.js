@@ -34,6 +34,11 @@ window.whOffer = function (opts) {
 .who .it p{font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .who .it .pr{margin-top:6px}.who .it .sp{font-size:22px}.who .it .reg{font-size:15px}
 .who .it .go{margin-top:8px;padding:11px 18px;font-size:16px}
+.who .go2{display:block;width:100%;margin-top:8px;font:inherit;font-size:15px;padding:10px 18px;border-radius:999px;border:1.5px solid #CFC9B5;background:transparent;color:#3F4A26;cursor:pointer}
+.who .cons{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.45;color:#6B5D4C;margin-top:12px}
+.who .cons input{margin-top:2px;width:16px;height:16px;flex:0 0 auto;accent-color:#5E6B35}
+.who .cons a,.who .sm a{color:#5E6B35}
+.who .note{font-size:12.5px;color:#6B5D4C;margin-top:8px}
 .whq{position:fixed;left:50%;top:70px;transform:translate(-50%,-14px);opacity:0;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .45s;z-index:19;width:min(640px,calc(100% - 32px));background:#F6F3EA;border-radius:22px;padding:16px 22px 18px;box-shadow:0 18px 40px rgba(20,18,12,.35);font-family:"Outfit",system-ui,sans-serif}
 .whq.in{transform:translate(-50%,0);opacity:1}
 .whq small{display:block;color:#5E6B35;font-size:14px;font-weight:500;margin-bottom:4px}
@@ -105,13 +110,16 @@ window.whOffer = function (opts) {
       card.innerHTML = '<button class="x" type="button" aria-label="Minimise">–</button>'
         + '<span class="hi">' + (anyLive ? 'just for you tonight ♡' : 'when you are ready ♡') + '</span><h3>Ways to walk with me</h3>'
         + (anyLive ? '<div class="cd">Gathering prices end in <b>' + mmss(left()) + '</b></div>' : '')
+        + (cur.items.some(it => it.offer !== 'retreat') ? '<label class="cons"><input type="checkbox" class="cb"><span>' + (opts.k || opts.t ? '' : '') + 'For the Inner Circle and Year Circle: I would like my access to start right away. I know that if I withdraw within 14 days, I pay only for the part already used. <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation</a></span></label>' : '')
         + cur.items.map(it => { const lv = anyLive && it.live; return '<div class="it"><h4>' + esc(it.title) + '</h4><p>' + esc(it.text) + '</p><div class="pr">' + (lv ? '<span class="reg">' + esc(it.regular) + '</span><span class="sp">' + esc(it.special) + '</span>' : '<span class="sp">' + esc(it.regular) + '</span>') + '</div>'
-          + '<button class="go" type="button" data-item="' + esc(it.offer) + '"' + (preview ? ' disabled' : '') + '>' + (preview ? 'Vorschau' : (it.offer === 'year' ? 'Apply · ' : 'Book · ') + esc(lv ? it.special : it.regular)) + '</button></div>'; }).join('')
+          + '<button class="go" type="button" data-item="' + esc(it.offer) + '"' + (preview ? ' disabled' : '') + '>' + (preview ? 'Vorschau' : (it.offer === 'year' ? 'Apply · ' : 'Book · ') + esc(lv ? it.special : it.regular)) + '</button>'
+          + (it.inst ? '<button class="go2" type="button" data-item="' + esc(it.offer) + '" data-plan="inst"' + (preview ? ' disabled' : '') + '>or ' + it.inst.count + ' monthly payments of ' + esc(lv && it.inst.special ? it.inst.special : it.inst.regular) + '</button>' : '')
+          + (it.offer === 'retreat' ? '<p class="note">Fixed dates, so no statutory right of withdrawal. <a href="/terms" target="_blank" rel="noopener">Cancellation policy</a></p>' : '') + '</div>'; }).join('')
         + '<span class="sm">Secure payment with Stripe · opens in a new tab, you stay in the room</span><div class="err" hidden></div>';
       card.hidden = false;
       requestAnimationFrame(() => card.classList.add('in'));
       card.querySelector('.x').onclick = () => { small = true; render(); };
-      if (!preview) card.querySelectorAll('.go').forEach(go => go.onclick = () => buy(go, go.dataset.item));
+      if (!preview) card.querySelectorAll('.go, .go2').forEach(go => go.onclick = () => buy(go, go.dataset.item, go.dataset.plan || 'full'));
       return;
     }
     card.innerHTML = '<button class="x" type="button" aria-label="Minimise">–</button>'
@@ -119,29 +127,34 @@ window.whOffer = function (opts) {
       + '<h3>' + esc(cur.title) + '</h3><p>' + esc(cur.text) + '</p>'
       + '<div class="pr">' + (live ? '<span class="reg">' + esc(cur.regular) + '</span><span class="sp">' + esc(cur.special) + '</span><span class="only">Gathering price, only for women who joined tonight</span>' : '<span class="sp">' + esc(cur.regular) + '</span>') + '</div>'
       + (live ? '<div class="cd">Gathering price ends in <b>' + mmss(left()) + '</b></div>' : '')
-      + '<button class="go" type="button"' + (preview ? ' disabled' : '') + '>' + (preview ? 'Vorschau: so sehen es die Frauen' : 'Book now · ' + esc(live ? cur.special : cur.regular)) + '</button>'
+      + (cur.offer !== 'retreat' ? '<label class="cons"><input type="checkbox" class="cb"><span>' + (opts.k || opts.t ? '' : '') + 'I would like my access to start right away. I know that if I withdraw within 14 days, I pay only for the part already used. <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation</a></span></label>' : '<p class="note">Retreats take place on fixed dates, so there is no statutory right of withdrawal. <a href="/terms" target="_blank" rel="noopener">Cancellation policy</a></p>')
+      + '<button class="go" type="button"' + (preview ? ' disabled' : '') + '>' + (preview ? 'Vorschau: so sehen es die Frauen' : (cur.offer === 'year' ? 'Apply · ' : 'Book now · ') + esc(live ? cur.special : cur.regular)) + '</button>'
+      + (cur.inst ? '<button class="go2" type="button" data-plan="inst"' + (preview ? ' disabled' : '') + '>or ' + cur.inst.count + ' monthly payments of ' + esc(live && cur.inst.special ? cur.inst.special : cur.inst.regular) + '</button>' : '')
       + '<span class="sm">Secure payment with Stripe · opens in a new tab, you stay in the room</span><div class="err" hidden></div>';
     card.hidden = false;
     requestAnimationFrame(() => card.classList.add('in'));
     card.querySelector('.x').onclick = () => { small = true; render(); };
     const go = card.querySelector('.go');
-    if (!preview) go.onclick = () => buy(go, '');
+    if (!preview) { go.onclick = () => buy(go, '', 'full'); const g2 = card.querySelector('.go2'); if (g2) g2.onclick = () => buy(g2, '', 'inst'); }
   };
-  const buy = async (go, item) => {
+  const buy = async (go, item, plan) => {
+      const which = item || cur.offer, cb = card.querySelector('.cb'), er = card.querySelector('.err');
+      if (which !== 'retreat' && cb && !cb.checked) { er.hidden = false; er.textContent = 'Please tick the box above first.'; cb.focus(); return; }
       go.disabled = true;
       const w = window.open('', '_blank');
       try {
-        const r = await fetch('/api/wh-offer.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'buy', id: cur.id, item, k: opts.k || '', t: opts.t || '', g: opts.g || 0, gast: opts.gast ? 1 : 0})});
+        const r = await fetch('/api/wh-offer.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'buy', id: cur.id, item, plan, consent: cb && cb.checked ? 1 : 0, k: opts.k || '', t: opts.t || '', g: opts.g || 0, gast: opts.gast ? 1 : 0})});
         const j = await r.json();
         if (!j.ok) throw new Error(j.error || '');
         if (w) w.location = j.redirect; else location.href = j.redirect;
       } catch (e) {
         if (w) w.close();
-        const er = card.querySelector('.err'); er.hidden = false; er.textContent = e.message || 'That did not work just now. Please try again.';
+        er.hidden = false; er.textContent = e.message || 'That did not work just now. Please try again.';
       }
       go.disabled = false;
   };
   pill.onclick = () => { small = false; render(); };
+  card.addEventListener('change', e => { if (e.target.classList.contains('cb') && e.target.checked) { const er = card.querySelector('.err'); if (er) er.hidden = true; } });
 
   // Countdown nur neu zeichnen, wenn sich die Anzeige ändert
   setInterval(() => {

@@ -110,7 +110,10 @@ if ($act === 'buy') {
     if (!$sp || (int)$sp['id'] !== (int)($in['id'] ?? 0)) $out(['ok' => false, 'error' => 'This offer is not available right now.'], 400);
     if (!forma_stripe_key()) $out(['ok' => false, 'error' => 'Online payment is not set up yet. Please write to ' . MM_FROM_EMAIL . ' and Viv will send you a payment link.'], 400);
     try {
-        $url = mm_order_checkout($pdo, $sp, $me ? (string)$me['name'] : '', $me ? (string)$me['email'] : '', (string)($in['item'] ?? ''));
+        $item = (string)($in['item'] ?? '');
+        $which = $sp['offer'] === 'all' ? $item : $sp['offer'];
+        if ($which !== 'retreat' && empty($in['consent'])) $out(['ok' => false, 'error' => 'Please tick the box first, so your access can start right away.'], 400);
+        $url = mm_order_checkout($pdo, $sp, $me ? (string)$me['name'] : '', $me ? (string)$me['email'] : '', $item, (string)($in['plan'] ?? 'full'), empty($in['consent']) ? 0 : 1);
         $out(['ok' => true, 'redirect' => $url]);
     } catch (Throwable $e) {
         error_log('MM order Stripe: ' . $e->getMessage());
