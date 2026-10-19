@@ -110,10 +110,10 @@ window.whOffer = function (opts) {
       card.innerHTML = '<button class="x" type="button" aria-label="Minimise">–</button>'
         + '<span class="hi">' + (anyLive ? 'just for you tonight ♡' : 'when you are ready ♡') + '</span><h3>Ways to walk with me</h3>'
         + (anyLive ? '<div class="cd">Gathering prices end in <b>' + mmss(left()) + '</b></div>' : '')
-        + (cur.items.some(it => it.offer !== 'retreat') ? '<label class="cons"><input type="checkbox" class="cb"><span>' + (opts.k || opts.t ? '' : '') + 'For the Inner Circle and Year Circle: I would like my access to start right away. I know that if I withdraw within 14 days, I pay only for the part already used. <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation</a></span></label>' : '')
+        + (cur.items.some(it => it.offer !== 'retreat') ? '<label class="cons"><input type="checkbox" class="cb"><span>' + (opts.k || opts.t ? '' : '') + 'For the Inner Circle and Year Circle: I would like my access to start right away. I know that if I withdraw within 14 days, I pay only for the part already used. <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation</a></span></label>' + '<label class="cons"><input type="checkbox" class="cb2"><span>Optional: please unlock the course area and downloads right away. I understand that I lose my right of withdrawal for this digital content. Without this tick, I start with the starter section and everything unlocks after 14 days.</span></label>' : '')
         + cur.items.map(it => { const lv = anyLive && it.live; return '<div class="it"><h4>' + esc(it.title) + '</h4><p>' + esc(it.text) + '</p><div class="pr">' + (lv ? '<span class="reg">' + esc(it.regular) + '</span><span class="sp">' + esc(it.special) + '</span>' : '<span class="sp">' + esc(it.regular) + '</span>') + '</div>'
           + '<button class="go" type="button" data-item="' + esc(it.offer) + '"' + (preview ? ' disabled' : '') + '>' + (preview ? 'Vorschau' : (it.offer === 'year' ? 'Apply · ' : 'Book · ') + esc(lv ? it.special : it.regular)) + '</button>'
-          + (it.inst ? '<button class="go2" type="button" data-item="' + esc(it.offer) + '" data-plan="inst"' + (preview ? ' disabled' : '') + '>or ' + it.inst.count + ' monthly payments of ' + esc(lv && it.inst.special ? it.inst.special : it.inst.regular) + '</button>' : '')
+          + (it.inst || []).map(pl => '<button class="go2" type="button" data-item="' + esc(it.offer) + '" data-plan="' + esc(pl.plan) + '"' + (preview ? ' disabled' : '') + '>or ' + pl.count + ' monthly payments of ' + esc(lv && pl.special ? pl.special : pl.regular) + '</button>').join('')
           + (it.offer === 'retreat' ? '<p class="note">Fixed dates, so no statutory right of withdrawal. <a href="/terms" target="_blank" rel="noopener">Cancellation policy</a></p>' : '') + '</div>'; }).join('')
         + '<span class="sm">Secure payment with Stripe · opens in a new tab, you stay in the room</span><div class="err" hidden></div>';
       card.hidden = false;
@@ -127,15 +127,15 @@ window.whOffer = function (opts) {
       + '<h3>' + esc(cur.title) + '</h3><p>' + esc(cur.text) + '</p>'
       + '<div class="pr">' + (live ? '<span class="reg">' + esc(cur.regular) + '</span><span class="sp">' + esc(cur.special) + '</span><span class="only">Gathering price, only for women who joined tonight</span>' : '<span class="sp">' + esc(cur.regular) + '</span>') + '</div>'
       + (live ? '<div class="cd">Gathering price ends in <b>' + mmss(left()) + '</b></div>' : '')
-      + (cur.offer !== 'retreat' ? '<label class="cons"><input type="checkbox" class="cb"><span>' + (opts.k || opts.t ? '' : '') + 'I would like my access to start right away. I know that if I withdraw within 14 days, I pay only for the part already used. <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation</a></span></label>' : '<p class="note">Retreats take place on fixed dates, so there is no statutory right of withdrawal. <a href="/terms" target="_blank" rel="noopener">Cancellation policy</a></p>')
+      + (cur.offer !== 'retreat' ? '<label class="cons"><input type="checkbox" class="cb"><span>' + (opts.k || opts.t ? '' : '') + 'I would like my access to start right away. I know that if I withdraw within 14 days, I pay only for the part already used. <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation</a></span></label>' + '<label class="cons"><input type="checkbox" class="cb2"><span>Optional: please unlock the course area and downloads right away. I understand that I lose my right of withdrawal for this digital content. Without this tick, I start with the starter section and everything unlocks after 14 days.</span></label>' : '<p class="note">Retreats take place on fixed dates, so there is no statutory right of withdrawal. <a href="/terms" target="_blank" rel="noopener">Cancellation policy</a></p>')
       + '<button class="go" type="button"' + (preview ? ' disabled' : '') + '>' + (preview ? 'Vorschau: so sehen es die Frauen' : (cur.offer === 'year' ? 'Apply · ' : 'Book now · ') + esc(live ? cur.special : cur.regular)) + '</button>'
-      + (cur.inst ? '<button class="go2" type="button" data-plan="inst"' + (preview ? ' disabled' : '') + '>or ' + cur.inst.count + ' monthly payments of ' + esc(live && cur.inst.special ? cur.inst.special : cur.inst.regular) + '</button>' : '')
+      + (cur.inst || []).map(pl => '<button class="go2" type="button" data-plan="' + esc(pl.plan) + '"' + (preview ? ' disabled' : '') + '>or ' + pl.count + ' monthly payments of ' + esc(live && pl.special ? pl.special : pl.regular) + '</button>').join('')
       + '<span class="sm">Secure payment with Stripe · opens in a new tab, you stay in the room</span><div class="err" hidden></div>';
     card.hidden = false;
     requestAnimationFrame(() => card.classList.add('in'));
     card.querySelector('.x').onclick = () => { small = true; render(); };
     const go = card.querySelector('.go');
-    if (!preview) { go.onclick = () => buy(go, '', 'full'); const g2 = card.querySelector('.go2'); if (g2) g2.onclick = () => buy(g2, '', 'inst'); }
+    if (!preview) { go.onclick = () => buy(go, '', 'full'); card.querySelectorAll('.go2').forEach(g2 => g2.onclick = () => buy(g2, '', g2.dataset.plan)); }
   };
   const buy = async (go, item, plan) => {
       const which = item || cur.offer, cb = card.querySelector('.cb'), er = card.querySelector('.err');
@@ -143,7 +143,7 @@ window.whOffer = function (opts) {
       go.disabled = true;
       const w = window.open('', '_blank');
       try {
-        const r = await fetch('/api/wh-offer.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'buy', id: cur.id, item, plan, consent: cb && cb.checked ? 1 : 0, k: opts.k || '', t: opts.t || '', g: opts.g || 0, gast: opts.gast ? 1 : 0})});
+        const r = await fetch('/api/wh-offer.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'buy', id: cur.id, item, plan, consent: cb && cb.checked ? 1 : 0, digital: which !== 'retreat' && card.querySelector('.cb2') && card.querySelector('.cb2').checked ? 1 : 0, k: opts.k || '', t: opts.t || '', g: opts.g || 0, gast: opts.gast ? 1 : 0})});
         const j = await r.json();
         if (!j.ok) throw new Error(j.error || '');
         if (w) w.location = j.redirect; else location.href = j.redirect;

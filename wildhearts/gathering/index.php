@@ -137,7 +137,7 @@ body.room{background:var(--earth)}
   ping(); setInterval(ping, 60000);
 })();
 </script>
-<script src="/wildhearts/gathering/offer.js?v=6"></script>
+<script src="/wildhearts/gathering/offer.js?v=7"></script>
 <script>whOffer({k: <?= json_encode($tok) ?>});</script>
 </body>
 <?php else: ?>

@@ -113,7 +113,7 @@ if ($act === 'buy') {
         $item = (string)($in['item'] ?? '');
         $which = $sp['offer'] === 'all' ? $item : $sp['offer'];
         if ($which !== 'retreat' && empty($in['consent'])) $out(['ok' => false, 'error' => 'Please tick the box first, so your access can start right away.'], 400);
-        $url = mm_order_checkout($pdo, $sp, $me ? (string)$me['name'] : '', $me ? (string)$me['email'] : '', $item, (string)($in['plan'] ?? 'full'), empty($in['consent']) ? 0 : 1);
+        $url = mm_order_checkout($pdo, $sp, $me ? (string)$me['name'] : '', $me ? (string)$me['email'] : '', $item, (string)($in['plan'] ?? 'full'), empty($in['consent']) ? 0 : 1, $which !== 'retreat' && !empty($in['digital']) ? 1 : 0);
         $out(['ok' => true, 'redirect' => $url]);
     } catch (Throwable $e) {
         error_log('MM order Stripe: ' . $e->getMessage());

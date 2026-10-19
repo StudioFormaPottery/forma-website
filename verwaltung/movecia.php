@@ -72,9 +72,8 @@ if ($action === 'mm_save_offers') {
         $c['billing'] = ($_POST['billing'][$k] ?? '') === 'monthly' ? 'monthly' : 'once';
         if (isset($_POST['special'][$k])) $c['special_cents'] = mm_euro_in((string)$_POST['special'][$k]);
         if ($k === 'year') {
-            $c['inst_count'] = max(0, min(24, (int)($_POST['inst_count'] ?? 12)));
-            $c['inst_cents'] = mm_euro_in((string)($_POST['inst'] ?? ''));
-            $c['inst_special_cents'] = mm_euro_in((string)($_POST['inst_special'] ?? ''));
+            $c['plans'] = [];
+            foreach ([3, 6] as $n) $c['plans'][] = [$n, mm_euro_in((string)($_POST['plan_reg'][$n] ?? '')), mm_euro_in((string)($_POST['plan_sp'][$n] ?? ''))];
         }
         $cfg[$k] = $c;
     }
@@ -293,12 +292,14 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                     </div>
                 </div>
                 <?php if ($k === 'year'): $eu = fn($c) => $c ? forma_h(rtrim(rtrim(number_format($c / 100, 2, ',', ''), '0'), ',')) : ''; ?>
+                    <?php $pl = []; foreach ($o['plans'] as $pp) $pl[$pp[0]] = $pp; ?>
+                    <?php foreach ([3, 6] as $n): ?>
                     <div class="row">
-                        <div class="stack"><label for="oic">Ratenzahlung: Anzahl Raten</label><input id="oic" name="inst_count" type="number" min="0" max="24" value="<?= (int)$o['inst_count'] ?>"></div>
-                        <div class="stack"><label for="oi">Rate regulär in €</label><input id="oi" name="inst" inputmode="decimal" value="<?= $eu($o['inst_cents']) ?>"></div>
-                        <div class="stack"><label for="ois">Rate zum Gathering-Preis in €</label><input id="ois" name="inst_special" inputmode="decimal" value="<?= $eu($o['inst_special_cents']) ?>"></div>
+                        <div class="stack"><label for="pr<?= $n ?>"><?= $n ?> Raten: Rate regulär in €</label><input id="pr<?= $n ?>" name="plan_reg[<?= $n ?>]" inputmode="decimal" value="<?= $eu($pl[$n][1] ?? 0) ?>" placeholder="leer = keine <?= $n ?> Raten"></div>
+                        <div class="stack"><label for="ps<?= $n ?>"><?= $n ?> Raten: Rate zum Gathering-Preis in €</label><input id="ps<?= $n ?>" name="plan_sp[<?= $n ?>]" inputmode="decimal" value="<?= $eu($pl[$n][2] ?? 0) ?>"></div>
                     </div>
-                    <p class="muted small">Die Frauen sehen dann zusätzlich „or <?= (int)$o['inst_count'] ?> monthly payments of …“. Stripe bucht die Raten monatlich ab und hört nach der letzten Rate von selbst auf. 0 Raten = keine Ratenzahlung.</p>
+                    <?php endforeach; ?>
+                    <p class="muted small">Die Frauen können dann auf einmal, in 3 oder in 6 Monatsraten zahlen. Stripe bucht monatlich ab und hört nach der letzten Rate von selbst auf. Ein leeres Feld schaltet diese Variante aus.</p>
                 <?php endif; ?>
             <?php endforeach; ?>
             <p class="muted small">Bei „monatlich“ wird ein Abo über Stripe abgeschlossen. Der Gathering-Preis gilt dann jeden Monat, solange das Abo läuft.</p>
@@ -310,7 +311,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <?php foreach ($orders as $o): ?>
                 <div class="mm-signup<?= $o['status'] === 'abgebrochen' ? ' is-cancelled' : '' ?>">
                     <span><strong><?= forma_h($o['name'] ?: '–') ?></strong> <span class="muted small sel"><?= forma_h($o['email']) ?></span><br>
-                    <span class="muted small"><?= forma_h(date('d. m. Y, H:i', strtotime($o['created_at']))) ?> · <?= forma_h($o['title']) ?> · <?= forma_h(forma_euro((int)$o['amount_cents'])) ?><?= $o['billing'] === 'monthly' ? '/Monat' : '' ?><?= ($o['plan'] ?? '') === 'inst' ? ' · Ratenzahlung' : '' ?> · <?= $o['special'] ? 'Gathering-Preis' : 'regulär' ?><?= ($o['consent'] ?? 0) ? ' · Sofortstart bestätigt' : '' ?><?= $o['test'] ? ' · Test' : '' ?></span></span>
+                    <span class="muted small"><?= forma_h(date('d. m. Y, H:i', strtotime($o['created_at']))) ?> · <?= forma_h($o['title']) ?> · <?= forma_h(forma_euro((int)$o['amount_cents'])) ?><?= $o['billing'] === 'monthly' ? '/Monat' : '' ?><?= str_starts_with((string)($o['plan'] ?? ''), 'inst') ? ' · ' . (int)substr((string)$o['plan'], 4) . ' Raten' : '' ?><?= ($o['consent_digital'] ?? 0) ? ' · Kursbereich sofort (Verzicht bestätigt)' : '' ?> · <?= $o['special'] ? 'Gathering-Preis' : 'regulär' ?><?= ($o['consent'] ?? 0) ? ' · Sofortstart bestätigt' : '' ?><?= $o['test'] ? ' · Test' : '' ?></span></span>
                     <span class="mm-badge<?= $o['status'] === 'offen' ? ' on' : '' ?>"><?= ['bezahlt' => 'bezahlt', 'offen' => 'Zahlung offen', 'abgebrochen' => 'abgebrochen'][$o['status']] ?? forma_h($o['status']) ?></span>
                 </div>
             <?php endforeach; ?>
