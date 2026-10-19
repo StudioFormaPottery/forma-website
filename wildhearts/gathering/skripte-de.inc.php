@@ -376,7 +376,7 @@ Manchmal schon. Es gibt Tage zum Pushen, und das kann sich großartig anfühlen.
 
 Diesen Kreis gibt es, weil sich so viele Frauen mit ihrer Erschöpfung allein fühlen. Und wenn eine andere Frau sagt „mir geht es genauso“, kann das einen ganzen Tag verändern.
 
-Wenn dir der heutige Abend auch nur ein bisschen gutgetan hat, komm zum nächsten Gathering wieder. Und wenn du das jeden Monat möchtest, mit Ritualen, Atemarbeit, kurzen Bewegungseinheiten und einem Kreis von Frauen, die einander halten, dann ist The Inner Circle für dich. Er öffnet 2027, und du kannst dich schon jetzt auf die Warteliste setzen.
+Wenn dir der heutige Abend auch nur ein bisschen gutgetan hat, komm zum nächsten Gathering wieder. Und wenn du das jeden Monat möchtest, mit Ritualen, Atemarbeit, kurzen Bewegungseinheiten und einem Kreis von Frauen, die einander halten, dann ist The Inner Circle für dich. Er öffnet am 1. Dezember, und du kannst dir deinen Platz schon jetzt sichern.
 
 [Wenn du heute ein Angebot zeigst: jetzt einblenden und sagen:] Ich habe es dir auf den Bildschirm gelegt, damit du es dir anschauen kannst, während wir zum Abschluss kommen.
 
@@ -634,7 +634,11 @@ Unser nächstes Gathering kommt bald, und natürlich ist es kostenlos. Das Datum
 
 Und für die Frauen, die den ganzen Jahreskreis gemeinsam gehen möchten, jede Jahreszeit und jedes Fest mit eigenen Gatherings feiern und dabei eine Herzensidee mit dem Jahr wachsen lassen, gibt es den Jahreskreis. Es gibt nur vier Plätze im Jahr.
 
-[Wenn du heute ein Angebot zeigst: jetzt einblenden und sagen:] Ich habe es dir auf den Bildschirm gelegt. Lies es in Ruhe, und nur, wenn es sich richtig anfühlt.
+Und jetzt verrate ich euch noch etwas, weil ihr heute Abend da seid: The Inner Circle öffnet am 1. Dezember. Jeden Monat ein Live-Kreis, Atemarbeit, sanfte Bewegung und ein Mitgliederbereich mit Ritualen, der mit dem Jahreskreis wächst und immer aktuell ist. Genau rechtzeitig zum neuen Jahr, damit deine Vorsätze nicht allein bleiben.
+
+Heute Abend kannst du dir deinen Platz schon zum Gathering-Preis von 29 Euro im Monat für deine ersten drei Monate sichern. Heute wird nichts abgebucht. Die erste Zahlung kommt erst am 1. Dezember, wenn der Kreis öffnet.
+
+[jetzt das Inner-Circle-Angebot einblenden und sagen:] Ich habe es dir auf den Bildschirm gelegt. Lies es in Ruhe, und nur, wenn es sich richtig anfühlt.
 
 [18:30 · ABSCHLUSS]
 

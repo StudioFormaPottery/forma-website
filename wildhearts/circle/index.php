@@ -16,6 +16,7 @@ if ($stay) $ref = null;
 $h = 'forma_h';
 $reg = mm_price_en($o['price_cents'], 'monthly');
 $sp = mm_price_en($o['special_cents'], 'monthly');
+$startTs = mm_circle_start();
 ?><!doctype html>
 <html lang="en">
 <head>
@@ -73,6 +74,7 @@ a{color:var(--wine)}
     <?php elseif ($ref): ?><span class="reg"><?= $h($reg) ?></span><b><?= $h($sp) ?></b><small>for your first <?= (int)$o['intro_months'] ?> months, then <?= $h($reg) ?> · cancel anytime</small>
     <?php else: ?><b><?= $h($reg) ?></b><small>cancel anytime</small><?php endif; ?>
   </div>
+  <?php if ($startTs): ?><p class="invite" style="margin-top:18px">Opens on <?= $h(mm_start_en($startTs)) ?> · book now, nothing is charged before then</p><?php endif; ?>
   <ul>
     <li>a live circle every month with Viv and the other women</li>
     <li>breathwork and gentle movement for tired days</li>
@@ -103,7 +105,7 @@ a{color:var(--wine)}
     <label class="cons"><input type="checkbox" name="digital"><span>Optional: please unlock the course area and downloads right away. I understand that I lose my right of withdrawal for this digital content. Without this tick, I start with the starter section and everything unlocks after 14 days.</span></label>
     <button type="submit" id="jb">Join The Inner Circle · <?= $h($ref ? $sp : $reg) ?></button>
     <p class="msg" id="m" hidden></p>
-    <p class="small">Secure payment with Stripe. You can cancel at any time, effective at the end of the month you have paid.</p>
+    <p class="small">Secure payment with Stripe.<?= $startTs ? ' Today you only save your card. Your first payment is taken on ' . $h(mm_start_en($startTs)) . ', when The Inner Circle opens.' : '' ?> You can cancel at any time, effective at the end of the period you have paid.</p>
   </form>
   <?php endif; ?>
   <p class="small" style="margin-top:26px"><a href="/">moveciamovement.com</a> · <a href="/terms">Terms</a> · <a href="/withdraw">Withdraw from the contract</a></p>

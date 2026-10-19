@@ -586,6 +586,7 @@ function mm_offer_schema(PDO $pdo): void
         $pdo->exec("ALTER TABLE mm_orders ADD COLUMN special_months INTEGER NOT NULL DEFAULT 0");
         $pdo->exec("ALTER TABLE mm_orders ADD COLUMN ref_bonus INTEGER NOT NULL DEFAULT 0");
     }
+    if (!in_array('bill_start', $oc, true)) $pdo->exec("ALTER TABLE mm_orders ADD COLUMN bill_start INTEGER NOT NULL DEFAULT 0");
     if (!in_array('stay_code', $oc, true)) {
         // Letzte Chance nach den Einführungsmonaten: persönlicher Code für weitere Monate zum Vorteilspreis
         $pdo->exec("ALTER TABLE mm_orders ADD COLUMN stay_code TEXT NOT NULL DEFAULT ''");
@@ -621,6 +622,8 @@ function mm_offers(): array
             'intro_months' => max(1, (int)($c['intro_months'] ?? 3)),
             'ref_months' => max(1, (int)($c['ref_months'] ?? 3)),
             'max_months' => max(1, (int)($c['max_months'] ?? 6)),
+            // Inner Circle: Start der Mitgliedschaft; bis dahin buchbar, abgebucht wird erst ab diesem Tag
+            'start' => preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($c['start'] ?? '')) ? (string)$c['start'] : ($k === 'circle' ? '2026-12-01' : ''),
         ];
     }
     return $out;
@@ -682,6 +685,21 @@ function mm_ref_order(PDO $pdo, string $code): ?array
 }
 
 /** Ratenplan zu einem Plan-Kürzel wie „inst3“, oder null. */
+/** Zeitpunkt der ersten Abbuchung, solange der Inner Circle noch nicht gestartet ist (sonst 0). Stripe braucht mind. 48 Std. Vorlauf. */
+function mm_circle_start(string $offer = 'circle'): int
+{
+    $o = mm_offers()[$offer] ?? null;
+    if (!$o || $o['start'] === '') return 0;
+    $t = (new DateTimeImmutable($o['start'] . ' 09:00', new DateTimeZone('Europe/Vienna')))->getTimestamp();
+    return $t > time() + 50 * 3600 ? $t : 0;
+}
+
+/** „1 December 2026“ */
+function mm_start_en(int $t): string
+{
+    return (new DateTimeImmutable('@' . $t))->setTimezone(new DateTimeZone('Europe/Vienna'))->format('j F Y');
+}
+
 /** „or €312 per year (€26 / month)“ */
 function mm_period_label(array $p): string
 {
@@ -798,7 +816,11 @@ function mm_order_checkout(PDO $pdo, array $sp, string $name, string $email, str
     $coupon = '';
     $refBy = (int)($sp['referred_by'] ?? 0);
     if ($sp['billing'] === 'monthly' && !$inst && !$per && $off && ($special || $refBy || !empty($sp['force_intro'])) && (int)$sp['special_cents'] > 0 && (int)$sp['special_cents'] < (int)$sp['regular_cents']) {
-        $coupon = mm_coupon((int)$sp['regular_cents'] - (int)$sp['special_cents'], (int)($sp['force_intro'] ?? 0) ?: $off['intro_months']);
+        $months = (int)($sp['force_intro'] ?? 0) ?: $off['intro_months'];
+        // Vor dem Start: der Gutschein läuft ab der Buchung, soll aber genau die ersten N Abbuchungen ab dem Start treffen
+        $st0 = mm_circle_start($sp['offer']);
+        if ($st0) { $need = strtotime('+' . ($months - 1) . ' months', $st0); $m = $months; while (strtotime('+' . $m . ' months') <= $need && $m < 24) $m++; $months = $m; }
+        $coupon = mm_coupon((int)$sp['regular_cents'] - (int)$sp['special_cents'], $months);
         $amount = (int)$sp['special_cents'];
         $special = true;
     }
@@ -817,7 +839,7 @@ function mm_order_checkout(PDO $pdo, array $sp, string $name, string $email, str
         'billing_address_collection' => 'required',
         'client_reference_id' => 'wh-order-' . $oid,
         'metadata' => ['wh_order_id' => (string)$oid, 'plan' => $inst ? 'inst' . $pp[0] : ($per ? 'p' . $per[0] : 'full')],
-        'custom_text' => ['submit' => ['message' => 'By paying you accept the terms and cancellation policy: ' . $site . '/terms' . ($sp['offer'] !== 'retreat' && $consent ? ' · You asked for your access to start right away.' : '')]],
+        'custom_text' => ['submit' => ['message' => 'By booking you accept the terms and cancellation policy: ' . $site . '/terms' . ($sp['offer'] !== 'retreat' && $consent ? ' · You asked for your access to start right away.' : '')]],
         'line_items' => [['quantity' => 1, 'price_data' => $price]],
         'expires_at' => time() + 31 * 60,
         'success_url' => $site . '/api/wh-order.php?o=' . $oid . '&k=' . $tok,
@@ -825,6 +847,14 @@ function mm_order_checkout(PDO $pdo, array $sp, string $name, string $email, str
     ];
     if ($email !== '') $params['customer_email'] = $email;
     // Gutscheincode-Feld im Bezahlfenster (geht bei Stripe nur, wenn nicht schon ein Rabatt drin ist)
+    // Inner Circle vor dem Start: jetzt buchen, Karte hinterlegen, erste Abbuchung am Starttag
+    $start = ($params['mode'] === 'subscription' && !$inst) ? mm_circle_start($sp['offer']) : 0;
+    if ($start) {
+        $params['subscription_data'] = ['trial_end' => $start, 'metadata' => ['wh_order_id' => (string)$oid]];
+        $params['payment_method_collection'] = 'always';
+        $params['custom_text']['submit']['message'] = 'Nothing is charged today. The Inner Circle opens on ' . mm_start_en($start) . ', your first payment is taken then. ' . $params['custom_text']['submit']['message'];
+        $pdo->prepare('UPDATE mm_orders SET bill_start = ? WHERE id = ?')->execute([$start, $oid]);
+    }
     if ($coupon) $params['discounts'] = [['coupon' => $coupon]];
     else $params['allow_promotion_codes'] = 'true';
     $session = forma_stripe('POST', '/v1/checkout/sessions', $params);
@@ -873,12 +903,13 @@ function mm_order_check(PDO $pdo, array $o): string
                   ? 'Confirmation: you expressly agreed that the course area and downloads (digital content) are unlocked immediately, and you acknowledged that you thereby lose your right of withdrawal for this digital content (§ 18 (1) 11 FAGG). '
                   : 'You did not choose immediate access to the course area: you start with the starter section, and the full course area and downloads unlock 14 days after your booking. ')
               . "Terms, cancellation policy and the withdrawal form: $site/terms";
-        $t = "Dear $first,\n\nthank you so much, you are in! Your booking for {$o['title']} ($price) is confirmed.\n\nI will write to you personally in the next days with everything you need for the start. If you have any questions, simply reply to this email.\n\nI am so happy to walk this way with you.\n\n$legal\nWithdraw from the contract: $site/withdraw";
+        $startNote = (int)($o['bill_start'] ?? 0) > time() ? 'The Inner Circle opens on ' . mm_start_en((int)$o['bill_start']) . '. Nothing has been charged yet, your first payment is taken on that day.' : '';
+        $t = "Dear $first,\n\nthank you so much, you are in! Your booking for {$o['title']} ($price) is confirmed." . ($startNote ? "\n\n$startNote" : '') . "\n\nI will write to you personally in the next days with everything you need for the start. If you have any questions, simply reply to this email.\n\nI am so happy to walk this way with you.\n\n$legal\nWithdraw from the contract: $site/withdraw";
         $html = '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#5E6B35;">you are in ♡</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:30px;color:#3F4A26;margin:0 0 14px;">' . forma_h($o['title']) . '</h1>'
-            . '<p>Dear ' . forma_h($first) . ',</p><p>thank you so much, your booking for <strong>' . forma_h($o['title']) . '</strong> (' . forma_h($price) . ') is confirmed.</p><p>I will write to you personally in the next days with everything you need for the start. If you have any questions, simply reply to this email.</p><p>I am so happy to walk this way with you.</p>'
+            . '<p>Dear ' . forma_h($first) . ',</p><p>thank you so much, your booking for <strong>' . forma_h($o['title']) . '</strong> (' . forma_h($price) . ') is confirmed.</p>' . ($startNote ? '<p>' . forma_h($startNote) . '</p>' : '') . '<p>I will write to you personally in the next days with everything you need for the start. If you have any questions, simply reply to this email.</p><p>I am so happy to walk this way with you.</p>'
             . '<p style="font-size:13px;color:#6B5D4C;border-top:1px solid #DED8C8;padding-top:12px;margin-top:22px;">' . forma_h($legal) . '<br><a href="' . forma_h($site . '/withdraw') . '" style="color:#5E6B35;">Withdraw from the contract</a></p>';
         if ($email !== '') mm_mail($email, ($o['test'] ? '[TEST] ' : '') . 'You are in: ' . $o['title'], $t, mm_mail_html('You are in', $html));
-        $v = "Hallo Viv,\n\n" . ($name ?: 'Jemand') . " ($email) hat gerade {$o['title']} gebucht und bezahlt: $price" . ($o['special'] ? ' (Gathering-Preis)' : ' (regulärer Preis)') . ".\n" . ($o['test'] ? "\nDas war eine Testbuchung aus dem Testraum.\n" : '') . "\nDu siehst alle Buchungen in der Verwaltung unter Movecia Movement → Angebote.\n";
+        $v = "Hallo Viv,\n\n" . ($name ?: 'Jemand') . " ($email) hat gerade {$o['title']} gebucht" . ((int)($o['bill_start'] ?? 0) > time() ? ' (Abbuchung ab ' . date('d.m.Y', (int)$o['bill_start']) . ')' : ' und bezahlt') . ": $price" . ($o['special'] ? ' (Gathering-Preis)' : ' (regulärer Preis)') . ".\n" . ($o['test'] ? "\nDas war eine Testbuchung aus dem Testraum.\n" : '') . "\nDu siehst alle Buchungen in der Verwaltung unter Movecia Movement → Angebote.\n";
         mm_mail(MM_FROM_EMAIL, ($o['test'] ? '[TEST] ' : '') . 'Neue Buchung: ' . $o['title'] . ' · ' . ($name ?: $email), $v, mm_mail_html('Neue Buchung', nl2br(forma_h($v)), 'de'));
         if ((int)($o['referred_by'] ?? 0)) { try { mm_ref_reward($pdo, (int)$o['referred_by'], $name ?: 'a friend'); } catch (Throwable $e) { error_log('MM ref reward: ' . $e->getMessage()); } }
     }
@@ -991,8 +1022,8 @@ function mm_send_ref_mails(PDO $pdo): void
     $chk = mm_cfg('refmail') ?? [];
     if (time() - (int)($chk['at'] ?? 0) < 900) return;
     mm_save_cfg('refmail', ['at' => time()]);
-    $q = $pdo->prepare("SELECT * FROM mm_orders WHERE status = 'bezahlt' AND billing = 'monthly' AND ref_code <> '' AND ref_mail_sent = 0 AND paid_at <= ? LIMIT 20");
-    $q->execute([date('c', strtotime('-2 months'))]);
+    $q = $pdo->prepare("SELECT * FROM mm_orders WHERE status = 'bezahlt' AND billing = 'monthly' AND ref_code <> '' AND ref_mail_sent = 0 AND paid_at <= ? AND bill_start <= ? LIMIT 20");
+    $q->execute([date('c', strtotime('-2 months')), strtotime('-2 months')]);
     foreach ($q->fetchAll() as $r) {
         $pdo->prepare('UPDATE mm_orders SET ref_mail_sent = 1 WHERE id = ?')->execute([$r['id']]);
         if ($r['sub_id'] !== '' && forma_stripe_key()) {

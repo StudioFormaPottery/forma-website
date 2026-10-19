@@ -100,7 +100,7 @@ Then take one minute. Four rounds of box breathing take about one minute. That\'
 
 If this morning felt good, come back next time. We\'ll breathe together again.
 
-And if you want a little support for every day, my Reset Routine for Tired Days is free on moveciamovement.com, and The Inner Circle opens in 2027 with short morning rituals just like this one.
+And if you want a little support for every day, my Reset Routine for Tired Days is free on moveciamovement.com, and The Inner Circle opens on the 1st of December with short morning rituals just like this one. You can already book your place.
 
 [If you show an offer this morning: show it now, and say:] I\'ve put something on your screen for you. Have a look whenever it suits you.
 
@@ -271,7 +271,7 @@ That\'s what I want these mornings to be for you. A place where someone is waiti
 
 If you\'d like to keep coming back to mornings like this, join the next Gathering. They\'re free, and you\'ll always find the date on moveciamovement.com.
 
-And if you want this as part of your life, with rituals, breathwork, short movement sessions and a circle of women who walk with you every month, The Inner Circle opens in 2027. You can join the waitlist already.
+And if you want this as part of your life, with rituals, breathwork, short movement sessions and a circle of women who walk with you every month, The Inner Circle opens on the 1st of December, and you can already book your place.
 
 [If you show an offer this morning: show it now, and say:] I\'ve put something on your screen for you now. Take a look in your own time.
 
@@ -382,7 +382,7 @@ It\'s lovely to choose something you like the smell of. Rosemary, lavender, a li
 
 If tonight helped you to close your day, come back next time. We\'ll do this together again.
 
-And if you\'d like rituals like this every month, for the mornings, the evenings and the hard days in between, The Inner Circle opens in 2027, and you can join the waitlist already.
+And if you\'d like rituals like this every month, for the mornings, the evenings and the hard days in between, The Inner Circle opens on the 1st of December, and you can already book your place.
 
 [If you show an offer tonight: show it now, and say:] I\'ve put something on your screen for you. Read it in peace, there\'s no rush.
 
@@ -571,7 +571,7 @@ And if you need to get up again, roll onto your side first, rest there for a bre
 
 If tonight did you good, come back to the next Gathering. They\'re free, and you\'ll find the date on moveciamovement.com.
 
-And if you want evenings like this as part of your life, with rituals, deep rest and a circle of women who hold each other, The Inner Circle opens in 2027. You can join the waitlist already.
+And if you want evenings like this as part of your life, with rituals, deep rest and a circle of women who hold each other, The Inner Circle opens on the 1st of December, and you can already book your place.
 
 [If you show an offer tonight: show it now, and say:] I\'ve put something on your screen. Look at it tomorrow, when you\'re rested. There\'s no rush.
 
@@ -696,7 +696,11 @@ Our next Gathering is coming up soon, and of course it\'s free. You\'ll always f
 
 And for the women who want to walk the whole Wheel of the Year together, celebrating each season, each festival, with their own gatherings and a heart project that grows with the year, that\'s what The Year Circle is for. There are only four places each year.
 
-[If you show an offer tonight: show it now, and say:] I\'ve put it on your screen for you. Take your time with it, and only if it feels right.
+And now a little secret, because you are here tonight: The Inner Circle opens on the 1st of December. Every month a live circle, breathwork, gentle movement, and a members area with rituals that grows with the Wheel of the Year, always updated. Just in time for the new year, so your intentions don\'t stay alone.
+
+Tonight you can already book your place at the Gathering price of 29 euros a month for your first three months. Nothing is charged today. Your first payment is only taken on the 1st of December, when the circle opens.
+
+[show the Inner Circle offer now, and say:] I\'ve put it on your screen for you. Take your time with it, and only if it feels right.
 
 [18:30 · CLOSING]
 
@@ -1071,7 +1075,7 @@ Sometimes, yes. There are days for pushing, and it can feel amazing. But if you 
 
 This circle exists because so many women feel alone with their exhaustion. And hearing another woman say "me too" can change a whole day.
 
-If tonight helped you even a little, come back to the next Gathering. And if you want this every month, with rituals, breathwork, short movement sessions and a circle of women who hold each other up, then The Inner Circle is for you. It opens in 2027, and you can join the waitlist already.
+If tonight helped you even a little, come back to the next Gathering. And if you want this every month, with rituals, breathwork, short movement sessions and a circle of women who hold each other up, then The Inner Circle is for you. It opens on the 1st of December, and you can already book your place.
 
 [If you show an offer tonight: show it now, and say:] I\'ve put it on your screen, so you can take a look while we close.
 
