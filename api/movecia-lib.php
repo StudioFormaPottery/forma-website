@@ -694,6 +694,13 @@ function mm_circle_start(string $offer = 'circle'): int
     return $t > time() + 50 * 3600 ? $t : 0;
 }
 
+/** „Opens on 1 December 2026 · book now, your first payment is taken then“ (nur vor dem Start). */
+function mm_start_note(string $offer): ?string
+{
+    $t = mm_circle_start($offer);
+    return $t ? 'Opens on ' . mm_start_en($t) . ' · book now, nothing is charged before then' : null;
+}
+
 /** „1 December 2026“ */
 function mm_start_en(int $t): string
 {
@@ -738,7 +745,7 @@ function mm_spotlight_public(?array $sp): ?array
             $live = $open && (int)$it['special_cents'] > 0 && (int)$it['special_cents'] < (int)$it['regular_cents'];
             $items[] = ['offer' => $it['offer'], 'title' => $it['title'], 'text' => $it['text'], 'billing' => $it['billing'],
                 'regular' => mm_price_en((int)$it['regular_cents'], $it['billing']), 'special' => $live ? mm_price_en((int)$it['special_cents'], $it['billing']) : null, 'live' => $live,
-                'inst' => mm_inst_public($it['offer'], $live), 'note' => $live ? mm_intro_note($it['offer'], (int)$it['regular_cents'], $it['billing']) : null];
+                'inst' => mm_inst_public($it['offer'], $live), 'note' => $live ? mm_intro_note($it['offer'], (int)$it['regular_cents'], $it['billing']) : null, 'start' => mm_start_note($it['offer'])];
         }
         $any = (bool)array_filter($items, fn($i) => $i['live']);
         return ['id' => (int)$sp['id'], 'offer' => 'all', 'title' => 'Ways to walk with me', 'items' => $items, 'until' => (int)$sp['until'], 'now' => time(), 'live' => $any];
@@ -751,6 +758,7 @@ function mm_spotlight_public(?array $sp): ?array
         'until' => (int)$sp['until'], 'now' => time(), 'live' => $live,
         'inst' => mm_inst_public($sp['offer'], $live),
         'note' => $live ? mm_intro_note($sp['offer'], (int)$sp['regular_cents'], $sp['billing']) : null,
+        'start' => mm_start_note($sp['offer']),
     ];
 }
 

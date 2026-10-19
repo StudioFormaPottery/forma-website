@@ -38,7 +38,7 @@ window.whOffer = function (opts) {
 .who .cons{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.45;color:#6B5D4C;margin-top:12px}
 .who .cons input{margin-top:2px;width:16px;height:16px;flex:0 0 auto;accent-color:#5E6B35}
 .who .cons a,.who .sm a{color:#5E6B35}
-.who .note{font-size:12.5px;color:#6B5D4C;margin-top:8px}
+.who .note.start{color:#3F4A26;background:#DCE0D2;border-radius:10px;padding:6px 10px;font-size:13px}.who .note{font-size:12.5px;color:#6B5D4C;margin-top:8px}
 .whq{position:fixed;left:50%;top:70px;transform:translate(-50%,-14px);opacity:0;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .45s;z-index:19;width:min(640px,calc(100% - 32px));background:#F6F3EA;border-radius:22px;padding:16px 22px 18px;box-shadow:0 18px 40px rgba(20,18,12,.35);font-family:"Outfit",system-ui,sans-serif}
 .whq.in{transform:translate(-50%,0);opacity:1}
 .whq small{display:block;color:#5E6B35;font-size:14px;font-weight:500;margin-bottom:4px}
@@ -113,6 +113,7 @@ window.whOffer = function (opts) {
         + (cur.items.some(it => it.offer !== 'retreat') ? '<label class="cons"><input type="checkbox" class="cb"><span>' + (opts.k || opts.t ? '' : '') + 'For the Inner Circle and Year Circle: I would like my access to start right away. I know that if I withdraw within 14 days, I pay only for the part already used. <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation</a></span></label>' + '<label class="cons"><input type="checkbox" class="cb2"><span>Optional: please unlock the course area and downloads right away. I understand that I lose my right of withdrawal for this digital content. Without this tick, I start with the starter section and everything unlocks after 14 days.</span></label>' : '')
         + cur.items.map(it => { const lv = anyLive && it.live; return '<div class="it"><h4>' + esc(it.title) + '</h4><p>' + esc(it.text) + '</p><div class="pr">' + (lv ? '<span class="reg">' + esc(it.regular) + '</span><span class="sp">' + esc(it.special) + '</span>' : '<span class="sp">' + esc(it.regular) + '</span>') + '</div>'
           + (lv && it.note ? '<p class="note" style="margin-top:2px">' + esc(it.note) + '</p>' : '')
+          + (it.start ? '<p class="note start">' + esc(it.start) + '</p>' : '')
           + '<button class="go" type="button" data-item="' + esc(it.offer) + '"' + (preview ? ' disabled' : '') + '>' + (preview ? 'Vorschau' : (it.offer === 'year' ? 'Apply · ' : 'Book · ') + esc(lv ? it.special : it.regular)) + '</button>'
           + (it.inst || []).map(pl => '<button class="go2" type="button" data-item="' + esc(it.offer) + '" data-plan="' + esc(pl.plan) + '"' + (preview ? ' disabled' : '') + '>' + (pl.label ? esc(pl.label) : 'or ' + pl.count + ' monthly payments of ' + esc(lv && pl.special ? pl.special : pl.regular)) + '</button>').join('')
           + (it.offer === 'retreat' ? '<p class="note">Fixed dates, so no statutory right of withdrawal. <a href="/terms" target="_blank" rel="noopener">Cancellation policy</a></p>' : '') + '</div>'; }).join('')
@@ -128,6 +129,7 @@ window.whOffer = function (opts) {
       + '<h3>' + esc(cur.title) + '</h3><p>' + esc(cur.text) + '</p>'
       + '<div class="pr">' + (live ? '<span class="reg">' + esc(cur.regular) + '</span><span class="sp">' + esc(cur.special) + '</span><span class="only">Gathering price, only for women who joined tonight</span>' : '<span class="sp">' + esc(cur.regular) + '</span>') + '</div>'
       + (live && cur.note ? '<p class="note" style="margin-top:2px">' + esc(cur.note) + '</p>' : '')
+      + (cur.start ? '<p class="note start">' + esc(cur.start) + '</p>' : '')
       + (live ? '<div class="cd">Gathering price ends in <b>' + mmss(left()) + '</b></div>' : '')
       + (cur.offer !== 'retreat' ? '<label class="cons"><input type="checkbox" class="cb"><span>' + (opts.k || opts.t ? '' : '') + 'I would like my access to start right away. I know that if I withdraw within 14 days, I pay only for the part already used. <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation</a></span></label>' + '<label class="cons"><input type="checkbox" class="cb2"><span>Optional: please unlock the course area and downloads right away. I understand that I lose my right of withdrawal for this digital content. Without this tick, I start with the starter section and everything unlocks after 14 days.</span></label>' : '<p class="note">Retreats take place on fixed dates, so there is no statutory right of withdrawal. <a href="/terms" target="_blank" rel="noopener">Cancellation policy</a></p>')
       + '<button class="go" type="button"' + (preview ? ' disabled' : '') + '>' + (preview ? 'Vorschau: so sehen es die Frauen' : (cur.offer === 'year' ? 'Apply · ' : 'Book now · ') + esc(live ? cur.special : cur.regular)) + '</button>'

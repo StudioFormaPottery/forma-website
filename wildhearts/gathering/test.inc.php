@@ -272,7 +272,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 </div>
 <?php endif; ?>
 
-<script src="/wildhearts/gathering/offer.js?v=8"></script>
+<script src="/wildhearts/gathering/offer.js?v=9"></script>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
