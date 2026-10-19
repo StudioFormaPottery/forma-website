@@ -1142,25 +1142,36 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 .nav-sub a:last-child{margin-bottom:12px}
 .nav-pill{padding:2px 10px;border-radius:999px;background:var(--clay);color:var(--on-clay);font-family:var(--body);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
 .offer,.pp-special{scroll-margin-top:130px}
-.bm-special{align-items:start;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)}
-@media (max-width:780px){.bm-special{grid-template-columns:1fr}}
-.bm-art{position:relative;justify-self:center;width:100%;max-width:440px;aspect-ratio:1/1.15;margin:4px 0 10px}
-.bm-blob{position:absolute;margin:0;aspect-ratio:1;filter:drop-shadow(0 12px 20px rgba(51,33,27,.18))}
+.bm-special{align-items:start;grid-template-columns:230px minmax(0,1fr);gap:clamp(20px,3vw,44px);padding:clamp(64px,6vw,78px) clamp(22px,4vw,48px) clamp(26px,3vw,40px)}
+.bm-special .pp-body{gap:10px}
+.bm-special h3{font-size:clamp(34px,3.6vw,48px)}
+.bm-art{position:relative;display:flex;flex-direction:column;align-items:center;width:100%;padding:6px 0 0 14px;box-sizing:border-box}
+.bm-blob{position:relative;margin:0;width:150px;aspect-ratio:1;filter:drop-shadow(0 10px 16px rgba(51,33,27,.16))}
+.bm-blob+.bm-blob{margin-top:-14px}
+.b1{transform:translateX(-16px)}.b2{transform:translateX(18px)}.b3{transform:translateX(-10px)}
 .bm-blob img,.bm-paint{position:absolute;inset:0;width:100%;height:100%;display:block}
 .bm-blob img{object-fit:cover}
-.b1{width:70%;left:0;top:0}.b1 img,.b1 .bm-paint{clip-path:url(#bm-k1)}.b1 img{object-position:50% 60%}
-.b2{width:52%;right:0;top:34%}.b2 img,.b2 .bm-paint{clip-path:url(#bm-k2)}.b2 img{object-position:40% 55%}
-.b3{width:50%;left:8%;bottom:0}.b3 img,.b3 .bm-paint{clip-path:url(#bm-k3)}.b3 img{object-position:55% 45%}
+.b1 img,.b1 .bm-paint{clip-path:url(#bm-k1)}.b1 img{object-position:50% 60%}
+.b2 img,.b2 .bm-paint{clip-path:url(#bm-k2)}.b2 img{object-position:40% 55%}
+.b3 img,.b3 .bm-paint{clip-path:url(#bm-k3)}.b3 img{object-position:55% 45%}
 .bm-paint{opacity:.9}
 .b1 .bm-paint{background:var(--clay);transform:translate(7%,5%) rotate(25deg) scale(1.02)}
 .b2 .bm-paint{background:#FBF1EA;transform:translate(-5%,6%) rotate(-30deg) scale(1.03)}
 .b3 .bm-paint{background:#674B40;transform:translate(6%,-4%) rotate(40deg) scale(1.03)}
-.bm-tw{left:auto;right:6%;top:4%;bottom:auto;width:26px;height:26px;fill:var(--clay)}
-@media (max-width:780px){.bm-art{max-width:330px;margin:0 auto 18px}}
+.bm-tw{position:absolute;left:auto;right:-4px;top:-6px;bottom:auto;width:22px;height:22px;fill:var(--clay)}
+.bm-special .more-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:999px;border:1.5px solid var(--clay);background:transparent;color:var(--clay);font:inherit;font-size:16px;font-weight:500;cursor:pointer;vertical-align:middle}
+.bm-special .more-btn::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .2s}
+.bm-special .more-btn[aria-expanded="true"]::after{transform:rotate(-135deg) translateY(-2px)}
+.bm-special .more-wrap{display:none;margin-top:6px}
+.bm-special .more-wrap.open{display:block;animation:fadein .3s ease}
+.bm-actions{display:inline-flex;margin:6px 10px 0 0;vertical-align:middle}
+.bm-special .pp-body > .bm-actions,.bm-special .pp-body > .more-btn{align-self:flex-start}
+.bm-special .pp-body{flex-direction:row;flex-wrap:wrap;align-items:center;column-gap:10px}
+.bm-special .pp-body > *:not(.bm-actions):not(.more-btn){flex:0 0 100%}
+@media (max-width:780px){.bm-special{grid-template-columns:1fr;align-items:start}.bm-art{flex-direction:row;justify-content:center;margin:0 auto 6px}.bm-blob{width:31%;max-width:120px}.bm-blob+.bm-blob{margin:0 0 0 -8px}.b1,.b3{transform:translateY(-6px)}.b2{transform:translateY(10px)}}
 .bm-special .event-facts,.bm-special .event-how{font-size:18px}
 .bm-special .event-pieces li{background:#FBF1EA}
 .bm-special .event-start{background:#FBF1EA}
-@media (min-width:701px){.bm-special .more-wrap{display:block}}
 .pp-compact{grid-template-columns:minmax(0,.5fr) minmax(0,1.5fr);margin:0}
 @media (max-width:780px){.pp-compact{grid-template-columns:1fr}}
 
@@ -1325,6 +1336,9 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
           <p class="pp-when">Ab November · Mi &amp; Do 15–18 Uhr</p>
           <p>Gestalte deine Weihnachtsgeschenke dieses Jahr selbst: Tassen, Bowls und Mugs bemalen, ganz entspannt bei Kerzenlicht und einer Tasse Tee im Atelier.</p>
           <ul class="pp-facts"><li>1, 2 oder 3 Stunden, wie du magst</li><li>höchstens 6 Personen pro Stunde</li><li>Abholung am Montag darauf</li></ul>
+          <div class="event-actions bm-actions">
+            <a class="btn btn-solid" href="#angebote" id="event-btn" data-book="Pottery bemalen">Platz reservieren</a>
+          </div>
           <button class="more-btn" type="button" aria-expanded="false">Alle Infos</button>
           <div class="more-wrap">
           <dl class="event-facts">
@@ -1339,9 +1353,6 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
             <p><b>So meldest du dich an:</b> Tag und Stunden aussuchen (1 bis 3) und dein Stück gleich mitbuchen, alle Preise siehst du bei der Anmeldung. Gefällt dir vor Ort noch mehr, rechnen wir es im Atelier ab.</p>
             <p class="event-start" id="event-start">Die Anmeldung ist offen. Die Plätze sind begrenzt, such dir gleich deinen Nachmittag aus.</p>
           </div>
-          </div>
-          <div class="event-actions">
-            <a class="btn btn-solid" href="#angebote" id="event-btn" data-book="Pottery bemalen">Platz reservieren</a>
           </div>
         </div>
       </article>
