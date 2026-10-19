@@ -171,7 +171,8 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
 .offer .tag{margin-left:0}
 @media (min-width:900px){
   .offer{width:min(1120px,calc(100vw - 64px));margin-left:50%;transform:translateX(-50%)}
-  .steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+  .steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:8px;column-gap:22px;row-gap:0;align-items:start}
+  .steps .step{align-self:start}
   .steps::before{display:none}
   .step .card{padding:28px 28px 26px}.step h3{font-size:33px}.step p,.step li{font-size:18px}
 }
@@ -425,6 +426,18 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
     t.addEventListener('click', e => { e.stopPropagation(); toggle(); });
     st.querySelector('.card').addEventListener('click', e => { if (window.innerWidth < 900 && !e.target.closest('a,button')) toggle(); });
   });
+  // Angebote am Computer: Kacheln wie ein Mauerwerk, damit Nr. 3 direkt unter Nr. 1 sitzt
+  const steps = [...document.querySelectorAll('.step')];
+  const masonry = () => {
+    const wide = window.innerWidth >= 900;
+    steps.forEach(st => {
+      st.style.gridRowEnd = '';
+      if (wide) st.style.gridRowEnd = 'span ' + Math.ceil((st.getBoundingClientRect().height + 22) / 8);
+    });
+  };
+  window.addEventListener('resize', masonry);
+  window.addEventListener('load', masonry);
+  if (document.fonts) document.fonts.ready.then(masonry);
   // Sprache: EN/DE umschaltbar, gemerkt im Browser, ?lang=de für direkte Links
   const root = document.documentElement;
   const pick = l => {
@@ -432,6 +445,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
     document.querySelectorAll('.langsw button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === root.lang)));
     try { localStorage.setItem('wh-lang', root.lang); } catch (e) {}
     setJoin(source);
+    if (typeof masonry === 'function') masonry();
   };
   let source = 'link';
   const form = document.getElementById('join-form');
