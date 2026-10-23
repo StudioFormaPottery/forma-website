@@ -928,6 +928,7 @@ if ($view === 'bestand') {
 // --- Gutschein in der Atelier-Kasse ausstellen ---------------------------------------------------------
 if ($action === 'kv_new') {
     $method = ($_POST['method'] ?? '') === 'bar' ? 'bar' : 'qr';
+    $asLink = ($_POST['method'] ?? '') === 'link';
     try {
         $vid = forma_kasse_voucher_create($pdo, (string)($_POST['product'] ?? ''), (int)($_POST['qty'] ?? 1), euro_to_cents((string)($_POST['value'] ?? '')),
             forma_clean((string)($_POST['name'] ?? ''), 120), mb_strtolower(forma_clean((string)($_POST['email'] ?? ''), 160)), forma_clean((string)($_POST['recipient'] ?? ''), 40), $method);
@@ -935,7 +936,7 @@ if ($action === 'kv_new') {
         $_SESSION['kv_form'] = $_POST;
         go($self . '?view=gutschein_kasse', $e->getMessage());
     }
-    go($self . '?view=gutschein_kasse&v=' . $vid);
+    go($self . '?view=gutschein_kasse&v=' . $vid . ($asLink ? '&link=1' : ''));
 }
 if ($action === 'kv_cash' || $action === 'kv_cancel') {
     $v = forma_kasse_voucher_get($pdo, (int)($_POST['vid'] ?? 0));
@@ -979,14 +980,25 @@ if ($view === 'gutschein_kasse') {
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <?php if ($cur): $paid = in_array($cur['status'], ['bezahlt', 'eingeloest'], true); ?>
         <div class="card stack kv-result" id="kv-result" data-id="<?= (int)$cur['id'] ?>" data-status="<?= forma_h($cur['status']) ?>">
-            <div class="kv-what"><strong><?= forma_h(forma_voucher_title($cur)) ?></strong> · <?= forma_h(forma_euro((int)$cur['amount_cents'])) ?><br><span class="muted small">für <?= forma_h($cur['buyer_name']) ?> · <?= forma_h($cur['buyer_email']) ?><?= $cur['recipient'] !== '' ? ' · Geschenk für ' . forma_h($cur['recipient']) : '' ?></span></div>
+            <div class="kv-what"><strong><?= forma_h(forma_voucher_title($cur)) ?></strong><?= isset(FORMA_VOUCHERS[$cur['product']]) ? ' · ' . forma_h(forma_euro((int)$cur['amount_cents'])) : '' ?><br><span class="muted small">für <?= forma_h($cur['buyer_name']) ?> · <?= forma_h($cur['buyer_email']) ?><?= $cur['recipient'] !== '' ? ' · Geschenk für ' . forma_h($cur['recipient']) : '' ?></span></div>
             <div id="kv-wait"<?= $paid ? ' hidden' : '' ?>>
                 <?php if ($cur['status'] === 'offen'): ?>
+                <?php $share = !empty($_GET['link']); $wmsg = forma_kasse_voucher_whatsapp($cur); ?>
+                <?php if (!$share): ?>
                 <div class="kv-qr" id="kv-qr" data-url="<?= forma_h(forma_kasse_voucher_pay_url($cur)) ?>"></div>
                 <p class="kv-hint">Mit der Handykamera scannen und bezahlen.</p>
+                <?php endif; ?>
+                <div class="kv-share">
+                    <label class="small muted" for="kv-msg"><?= $share ? 'Deine Nachricht mit Bezahl-Link (kannst du hier noch ändern)' : 'Oder per Link schicken (Nachricht kannst du hier noch ändern)' ?></label>
+                    <textarea id="kv-msg" class="link-msg" rows="9"><?= forma_h($wmsg) ?></textarea>
+                    <div class="row-actions">
+                        <button class="btn btn-sm" type="button" data-copy-from="kv-msg">Nachricht kopieren</button>
+                        <a class="btn btn-ghost btn-sm" href="#" data-wa-from="kv-msg" target="_blank" rel="noopener">Per WhatsApp schicken</a>
+                        <button class="link small" type="button" data-copy="<?= forma_h(forma_kasse_voucher_pay_url($cur)) ?>">nur Link kopieren</button>
+                    </div>
+                </div>
                 <p class="muted small kv-pulse">Wartet auf die Zahlung … sobald sie da ist, erscheint hier die Gutscheinnummer.</p>
                 <div class="row-actions">
-                    <button class="btn btn-ghost btn-sm" type="button" data-copy="<?= forma_h(forma_kasse_voucher_pay_url($cur)) ?>">Bezahl-Link kopieren</button>
                     <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="vid" value="<?= (int)$cur['id'] ?>"><button class="link small" name="action" value="kv_cash" onclick="return confirm('Doch bar bezahlt? Dann bekommt der Gutschein jetzt seine Nummer und die Mail geht raus.')">Doch bar bezahlt</button> <button class="link small" name="action" value="kv_cancel" onclick="return confirm('Wirklich zurückziehen? Der QR-Code funktioniert dann nicht mehr.')">zurückziehen</button></form>
                 </div>
                 <?php else: ?><p class="muted">Dieser Gutschein wurde zurückgezogen.</p><?php endif; ?>
@@ -1022,6 +1034,7 @@ if ($view === 'gutschein_kasse') {
             <label for="kv-rec">Für wen ist er? <span class="muted small">(optional, steht auf dem PDF)</span></label><input id="kv-rec" name="recipient" maxlength="40" autocomplete="off" value="<?= $fv('recipient') ?>">
             <div class="row-actions">
                 <button class="btn" type="submit" name="method" value="qr"<?= $stripe ? '' : ' disabled title="Stripe-Schlüssel fehlt"' ?>>QR-Code zum Bezahlen</button>
+                <button class="btn btn-ghost" type="submit" name="method" value="link"<?= $stripe ? '' : ' disabled title="Stripe-Schlüssel fehlt"' ?>>Link zum Verschicken</button>
                 <button class="btn btn-ghost" type="submit" name="method" value="bar" onclick="return confirm('Bar bezahlt? Dann bekommt der Gutschein sofort seine Nummer und die Mail geht raus.')">Bar bezahlt</button>
             </div>
             <p class="muted small">Die Gutscheinnummer gibt es erst, wenn bezahlt ist. Gäste können solche Gutscheine nicht selbst anlegen: Der QR-Code gehört genau zu diesem Gutschein.</p>
@@ -1033,7 +1046,7 @@ if ($view === 'gutschein_kasse') {
         <?php foreach ($openList as $o): ?>
             <div class="card booking"><div class="booking-head"><strong><?= forma_h($o['buyer_name']) ?> · <?= forma_h(forma_euro((int)$o['amount_cents'])) ?></strong><span class="pill pill-wait">wartet auf Zahlung</span></div>
             <div class="small"><?= forma_h(forma_voucher_title($o)) ?> · <?= forma_h(date('d. m. Y, H:i', strtotime((string)$o['created_at']))) ?></div>
-            <p><a class="link small" href="<?= forma_h($self) ?>?view=gutschein_kasse&amp;v=<?= (int)$o['id'] ?>">QR-Code zeigen</a></p></div>
+            <p class="row-actions"><a class="link small" href="<?= forma_h($self) ?>?view=gutschein_kasse&amp;v=<?= (int)$o['id'] ?>">QR-Code zeigen</a> <a class="link small" href="<?= forma_h($self) ?>?view=gutschein_kasse&amp;v=<?= (int)$o['id'] ?>&amp;link=1">Nachricht mit Link</a></p></div>
         <?php endforeach; ?>
         </div>
         <?php endif; ?>
@@ -1058,6 +1071,8 @@ if ($view === 'gutschein_kasse') {
             .kv-qr{background:#fff;border-radius:18px;padding:14px;display:inline-block;line-height:0}
             .kv-qr svg,.kv-qr img{width:min(300px,72vw);height:auto}
             .kv-hint{font-size:1.15rem;margin:6px 0 0}
+            .kv-share{width:100%;text-align:left;display:flex;flex-direction:column;gap:8px;margin-top:6px}
+            .kv-share textarea{width:100%;box-sizing:border-box;font:inherit;font-size:.95rem;border-radius:14px;border:1.5px solid #E4D2BF;padding:12px;background:#fff}
             .kv-nr{font-size:clamp(1.8rem,7vw,2.6rem);letter-spacing:.04em;color:#8C2C1D;margin:4px 0;font-weight:600}
             .kv-pulse{animation:kvp 1.6s ease-in-out infinite}@keyframes kvp{50%{opacity:.45}}
         </style>
@@ -1067,6 +1082,8 @@ if ($view === 'gutschein_kasse') {
             var box=document.getElementById('kv-qr');
             if(box&&window.qrcode){var q=qrcode(0,'M');q.addData(box.dataset.url);q.make();box.innerHTML=q.createSvgTag(6,2);}
             document.querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){var t=b.dataset.copy;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){b.textContent='Kopiert ✓';}).catch(function(){prompt('Link kopieren:',t);});});});
+            document.querySelectorAll('[data-copy-from]').forEach(function(b){b.addEventListener('click',function(){var t=document.getElementById(b.dataset.copyFrom);t.select();(navigator.clipboard?navigator.clipboard.writeText(t.value):Promise.reject()).then(function(){b.textContent='Nachricht kopiert ✓';}).catch(function(){document.execCommand('copy');b.textContent='Nachricht kopiert ✓';});});});
+            document.querySelectorAll('[data-wa-from]').forEach(function(a){a.addEventListener('click',function(){a.href='https://wa.me/?text='+encodeURIComponent(document.getElementById(a.dataset.waFrom).value);});});
             var r=document.getElementById('kv-result');
             if(r&&r.dataset.status==='offen'){var tries=0,timer=setInterval(function(){if(++tries>400){clearInterval(timer);return;}
                 fetch('?view=kv_status&id='+r.dataset.id,{cache:'no-store'}).then(function(x){return x.json();}).then(function(d){

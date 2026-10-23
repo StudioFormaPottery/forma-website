@@ -219,3 +219,15 @@ function forma_customers(PDO $pdo): array
     usort($rows, fn($a, $b) => strcasecmp($a['name'], $b['name']));
     return $rows;
 }
+
+/** Fertige Nachricht mit Bezahl-Link zum Kopieren (WhatsApp, SMS, E-Mail). */
+function forma_kasse_voucher_whatsapp(array $v): string
+{
+    $first = forma_first_name((string)$v['buyer_name']);
+    return 'Hallo' . ($first !== '' ? ' ' . $first : '') . "! 🤎\n\n"
+        . 'Hier ist dein FORMA Gutschein: ' . forma_voucher_title($v) . (isset(FORMA_VOUCHERS[$v['product']]) ? ' (' . forma_euro((int)$v['amount_cents']) . ')' : '')
+        . ((string)$v['recipient'] !== '' ? ' für ' . $v['recipient'] : '') . ".\n\n"
+        . "Über diesen Link kannst du ihn ganz einfach online bezahlen:\n" . forma_kasse_voucher_pay_url($v) . "\n\n"
+        . "Gleich danach bekommst du den Gutschein mit deinem persönlichen Code per E-Mail, und mit einem Klick suchst du dir deinen Termin aus.\n\n"
+        . "Bis bald, Vivien\nStudio FORMA";
+}
