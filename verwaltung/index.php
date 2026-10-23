@@ -944,10 +944,14 @@ if ($action === 'kv_cash' || $action === 'kv_cancel') {
     try { if (forma_kasse_voucher_status($pdo, $v) === 'bezahlt') go($self . '?view=gutschein_kasse&v=' . (int)$v['id'], 'Der Gutschein ist inzwischen online bezahlt.'); } catch (Throwable $e) {}
     if ($action === 'kv_cancel') {
         $pdo->prepare("UPDATE vouchers SET status = 'zurueckgezogen' WHERE id = ? AND status = 'offen'")->execute([(int)$v['id']]);
-        go($self . '?view=gutschein_kasse', 'Zurückgezogen. Der QR-Code funktioniert nicht mehr.');
+        go($self . (($_POST['back'] ?? '') === 'gutscheine' ? '?view=gutscheine' : '?view=gutschein_kasse'), 'Zurückgezogen. Der Bezahl-Link funktioniert nicht mehr.');
     }
     $pdo->prepare("UPDATE vouchers SET pay_method = 'bar' WHERE id = ?")->execute([(int)$v['id']]);
     forma_voucher_paid($pdo, (int)$v['id']);
+    if (($_POST['back'] ?? '') === 'gutscheine') {
+        $nr = (string)(forma_kasse_voucher_get($pdo, (int)$v['id'])['nr'] ?? '');
+        go($self . '?view=gutscheine', "Bar bezahlt. Der Gutschein hat jetzt die Nummer $nr, die Mail mit Code ist unterwegs.");
+    }
     go($self . '?view=gutschein_kasse&v=' . (int)$v['id']);
 }
 if ($view === 'kv_status') {
@@ -1205,7 +1209,7 @@ if ($view === 'kasse') {
             </div>
             <button type="button" class="link small k-reset">Alles zurücksetzen</button>
         </form>
-        <?php if ($open): ?><h2>Offene Bezahl-Links</h2><div class="list"><?php foreach ($open as $s) $sale($s); ?></div><?php endif; ?>
+        <?php if ($open): ?><h2 id="offen">Offene Bezahl-Links</h2><div class="list"><?php foreach ($open as $s) $sale($s); ?></div><?php endif; ?>
         <?php if ($done): ?><details class="past"<?= $new && !in_array($new, array_map('intval', array_column($open, 'id')), true) ? ' open' : '' ?>><summary>Kassiert</summary><div class="list"><?php foreach ($done as $s) $sale($s); ?></div></details><?php endif; ?>
         <script>
         (function(){
@@ -1737,7 +1741,14 @@ if ($view === 'gutscheine') {
     $sum = array_sum(array_column($sold, 'amount_cents'));
     $links = $pdo->query("SELECT l.*, c.date_text FROM voucher_links l LEFT JOIN bookings b ON b.id = l.booking_id LEFT JOIN courses c ON c.id = b.course_id WHERE l.status != 'geloescht' ORDER BY l.status = 'offen' DESC, l.id DESC LIMIT 40")->fetchAll();
     $neu = (int)($_GET['neu'] ?? 0);
-    render_page('Gutscheine', function () use ($self, $flash, $vs, $sum, $links, $neu) { ?>
+    $unpaid = $pdo->query("SELECT * FROM vouchers WHERE via = 'kasse' AND status = 'offen' ORDER BY id DESC")->fetchAll();
+    foreach ($unpaid as $i => $u) {
+        try { if (forma_kasse_voucher_status($pdo, $u) !== 'offen') unset($unpaid[$i]); } catch (Throwable $e) {}
+    }
+    if (count($unpaid) !== count($pdo->query("SELECT id FROM vouchers WHERE via = 'kasse' AND status = 'offen'")->fetchAll())) {
+        $vs = $pdo->query("SELECT * FROM vouchers WHERE status IN ('bezahlt','eingeloest') ORDER BY id DESC")->fetchAll();
+    }
+    render_page('Gutscheine', function () use ($self, $flash, $vs, $sum, $links, $neu, $unpaid) { ?>
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Gutscheine</h1>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
@@ -1746,6 +1757,27 @@ if ($view === 'gutscheine') {
             <p class="muted small">Jeder bezahlte Gutschein bekommt automatisch eine fortlaufende Nummer und einen geheimen Code. Mit dem Code lösen Gäste ihn online bei der Buchung ein, das wird hier automatisch abgezogen. Löst jemand im Atelier ein, ziehst du den Betrag hier selbst ab. Der Restwert bleibt auf dem Gutschein.</p>
             <p style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn" href="<?= forma_h($self) ?>?view=gutschein_kasse">🎟 Gutschein ausstellen</a><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=kalender&amp;d=<?= date('Y-m-d') ?>&amp;alt=1#tag">Alten Gutschein einlösen</a><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=gutscheine_export">Liste herunterladen (CSV)</a></p>
         </div>
+        <?php if ($unpaid): ?>
+        <h2 id="offen">⏳ Noch nicht bezahlt</h2>
+        <p class="muted small">Gutscheine aus der Kasse, bei denen die Zahlung noch fehlt. Sobald bezahlt ist, rutschen sie von selbst nach unten zu den fertigen Gutscheinen und bekommen ihre Nummer.</p>
+        <div class="list">
+        <?php foreach ($unpaid as $u): $hid = '<input type="hidden" name="csrf" value="' . forma_h(csrf()) . '"><input type="hidden" name="vid" value="' . (int)$u['id'] . '"><input type="hidden" name="back" value="gutscheine">'; ?>
+            <div class="card booking">
+                <div class="booking-head"><strong><?= forma_h($u['buyer_name']) ?> · <?= forma_h(forma_euro((int)$u['amount_cents'])) ?></strong><span class="pill pill-wait">wartet auf Zahlung</span></div>
+                <div class="small"><?= forma_h(forma_voucher_title($u)) ?><?= $u['recipient'] !== '' ? ' · für ' . forma_h($u['recipient']) : '' ?></div>
+                <div class="muted small">Ausgestellt am <?= forma_h(date('d. m. Y, H:i', strtotime((string)$u['created_at']))) ?> · <?= forma_h($u['buyer_email']) ?></div>
+                <div class="row-actions">
+                    <a class="btn btn-sm" href="<?= forma_h($self) ?>?view=gutschein_kasse&amp;v=<?= (int)$u['id'] ?>&amp;link=1">Nachricht mit Link</a>
+                    <a class="btn btn-ghost btn-sm" href="<?= forma_h($self) ?>?view=gutschein_kasse&amp;v=<?= (int)$u['id'] ?>">QR-Code zeigen</a>
+                </div>
+                <form method="post" class="row-actions"><?= $hid ?>
+                    <button class="link small" name="action" value="kv_cash" onclick="return confirm('Doch bar bezahlt? Dann bekommt der Gutschein jetzt seine Nummer und die Mail geht raus.')">Doch bar bezahlt</button>
+                    <button class="link small" name="action" value="kv_cancel" onclick="return confirm('Wirklich zurückziehen? Der Bezahl-Link funktioniert dann nicht mehr.')">zurückziehen</button>
+                </form>
+            </div>
+        <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
         <div class="card stack links-card" id="links">
             <h2>🎟 Link für alten Gutschein</h2>
             <p class="muted small">Für Gäste mit einem alten Gutschein ohne Nummer. Du schickst ihnen einen persönlichen Link, sie suchen sich selbst einen Spin &amp; Go Termin aus und geben ihre Daten ein. Der Gutschein bekommt dabei automatisch eine Nummer, der Gast bekommt Bestätigung und Rechnung (bezahlt mit Gutschein), du eine Info-Mail. Jeder Link löst genau einen Gutschein ein und bucht einen Platz. Steht mehr auf dem Gutschein, bleibt der Rest als Guthaben mit Code erhalten. Kommt eine Freundin mit eigenem Gutschein mit, erstellst du ihr einfach einen eigenen Link.</p>
@@ -2101,7 +2133,10 @@ if ($view === 'course') {
     $stmt->execute([$id]);
     $bookings = $stmt->fetchAll();
     $booked = forma_booked($pdo, $id);
-    render_page($c['title'], function () use ($c, $bookings, $booked, $self, $flash) { ?>
+    $st = $pdo->prepare("SELECT * FROM kasse_sales WHERE course_id = ? AND status = 'offen' ORDER BY id DESC");
+    $st->execute([$id]);
+    $kOpen = $st->fetchAll();
+    render_page($c['title'], function () use ($c, $bookings, $booked, $self, $flash, $kOpen) { ?>
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1><?= forma_h($c['title']) ?></h1>
         <p class="muted"><?= forma_h($c['date_text']) ?> · <?= forma_slot_hours($c) ? 'Belegt pro Stunde: ' . forma_h(forma_slots_overview($GLOBALS['pdo'], $c)) : $booked . ' von ' . (int)$c['capacity'] . ' Plätzen belegt' ?><?= $c['visible'] ? '' : ' · <strong>auf der Website ausgeblendet</strong>' ?></p>
@@ -2125,6 +2160,16 @@ if ($view === 'course') {
             </div>
         </div>
         <?php elseif ($ms === 'findet_statt'): ?><p class="muted small">✓ Du hast entschieden: Der Kurs findet statt.</p><?php endif; ?>
+        <?php if ($kOpen): ?>
+        <h2>⏳ Noch nicht bezahlt</h2>
+        <div class="list">
+        <?php foreach ($kOpen as $k): $items = json_decode((string)$k['items'], true) ?: []; ?>
+            <div class="card booking"><div class="booking-head"><strong><?= forma_h($k['name']) ?> · <?= forma_h(forma_euro((int)$k['amount_cents'])) ?></strong><span class="pill pill-wait">Bezahl-Link offen</span></div>
+            <div class="small"><?= forma_h(implode(' · ', array_map(fn($i) => $i['qty'] . '× ' . $i['name'], $items))) ?></div>
+            <p><a class="link small" href="<?= forma_h($self) ?>?view=kasse&amp;c=<?= (int)$c['id'] ?>#offen">In der Kasse ansehen (Erinnerung, bar bezahlt, zurückziehen)</a></p></div>
+        <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
         <h2>Anmeldungen</h2>
         <?php if (!$bookings): ?><p class="muted">Noch keine Anmeldungen.</p><?php endif; ?>
         <div class="list">
@@ -2263,6 +2308,8 @@ $past = $stmt->fetchAll();
 $subCount = (int)$pdo->query("SELECT COUNT(*) FROM subscribers WHERE status = 'bestaetigt'")->fetchColumn();
 $popupLive = forma_popup_live(forma_popup($pdo));
 $voucherOpen = (int)$pdo->query("SELECT COUNT(*) FROM vouchers WHERE status = 'bezahlt'")->fetchColumn();
+$voucherUnpaid = (int)$pdo->query("SELECT COUNT(*) FROM vouchers WHERE via = 'kasse' AND status = 'offen'")->fetchColumn();
+$kasseUnpaid = (int)$pdo->query("SELECT COUNT(*) FROM kasse_sales WHERE status = 'offen'")->fetchColumn();
 $privateOpen = (int)$pdo->query("SELECT COUNT(*) FROM private_bookings WHERE status IN ('bezahlt','anfrage') AND done = 0")->fetchColumn();
 // Agenda für die nächsten 7 Tage: Kurse mit Anmeldungen und Private-Pottery-Termine
 $agenda = [];
@@ -2290,7 +2337,7 @@ foreach ($pdo->query("SELECT id, hours, status FROM private_bookings WHERE statu
 $newBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE status = 'bestaetigt' AND created_at >= '" . date('c', strtotime('-7 days')) . "'")->fetchColumn();
 try { forma_min_check($pdo); } catch (Throwable $e) { error_log('FORMA min: ' . $e->getMessage()); }
 $minCourses = $pdo->query("SELECT * FROM courses WHERE min_status = 'gemeldet' AND start_date >= '" . date('Y-m-d') . "' ORDER BY start_date")->fetchAll();
-render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive, $voucherOpen, $privateOpen, $agenda, $toPlan, $newBookings, $minCourses) {
+render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive, $voucherOpen, $voucherUnpaid, $kasseUnpaid, $privateOpen, $agenda, $toPlan, $newBookings, $minCourses) {
     $h = (int)date('G');
     $hello = $h < 11 ? 'Guten Morgen' : ($h < 17 ? 'Hallo' : 'Guten Abend'); ?>
     <section class="hero">
@@ -2324,13 +2371,13 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
         </section>
         <nav class="tiles">
             <a class="tile hl" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('kalender') ?></span><strong>Kalender</strong><span class="muted small">Kurse &amp; Private Pottery</span></a>
-            <a class="tile hl" href="<?= forma_h($self) ?>?view=kasse"><span class="ic"><?= admin_icon('kasse') ?></span><strong>Kasse</strong><span class="muted small">Pottery bemalen & Gutscheine</span></a>
+            <a class="tile hl" href="<?= forma_h($self) ?>?view=kasse"><span class="ic"><?= admin_icon('kasse') ?></span><strong>Kasse</strong><span class="muted small">Pottery bemalen & Gutscheine<?= $kasseUnpaid ? ' · <b style="color:#8C2C1D">' . $kasseUnpaid . ' Bezahl-Link' . ($kasseUnpaid === 1 ? '' : 's') . ' offen</b>' : '' ?></span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=bestand"><span class="ic"><?= admin_icon('bestand') ?></span><strong>Bestand</strong><span class="muted small">Pottery bemalen · was ist da?</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=private"><span class="ic"><?= admin_icon('private') ?></span><strong>Private Pottery</strong><span class="muted small"><?= $privateOpen ?> offen</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=edit"><span class="ic"><?= admin_icon('plus') ?></span><strong>Einzeltermin</strong><span class="muted small">z. B. ein Special-Kurs</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=series"><span class="ic"><?= admin_icon('serie') ?></span><strong>Serientermine</strong><span class="muted small">z. B. jeden Mi &amp; Fr</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=templates"><span class="ic"><?= admin_icon('template') ?></span><strong>Templates</strong><span class="muted small">&amp; Maker Club</span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=gutscheine"><span class="ic"><?= admin_icon('gutschein') ?></span><strong>Gutscheine</strong><span class="muted small"><?= $voucherOpen ?> offen</span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=gutscheine"><span class="ic"><?= admin_icon('gutschein') ?></span><strong>Gutscheine</strong><span class="muted small"><?= $voucherOpen ?> offen<?= $voucherUnpaid ? ' · <b style="color:#8C2C1D">' . $voucherUnpaid . ' noch nicht bezahlt</b>' : '' ?></span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=rechnungen"><span class="ic"><?= admin_icon('rechnung') ?></span><strong>Rechnungen</strong><span class="muted small">automatisch nach Zahlung</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=liste"><span class="ic"><?= admin_icon('mail') ?></span><strong>E-Mail-Liste</strong><span class="muted small"><?= $subCount ?> <?= $subCount === 1 ? 'Kontakt' : 'Kontakte' ?></span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=popup"><span class="ic"><?= admin_icon('popup') ?></span><strong>Pop-up &amp; Deko</strong><span class="muted small"><?= $popupLive ? 'gerade sichtbar' : 'ausgeschaltet' ?> · Deko</span></a>
