@@ -594,7 +594,7 @@ function natal_invoice_pdf(array $inv): string
     $colsF = [
         [18, 'Vivien Malonga', $co['firma'] . "\n" . $co['street'] . "\n" . $co['city']],
         [78, 'Kontakt', 'Tel. ' . $co['phone'] . "\n" . $co['email'] . "\n" . $co['web']],
-        [138, 'Bankverbindung', trim(($bank !== '' ? $bank . "\n" : '') . ($iban !== '' ? 'IBAN ' . $iban . "\n" : '') . ($bic !== '' ? 'BIC ' . $bic . "\n" : '') . 'UID ' . $co['uid'])],
+        [138, 'Zahlung', ($iban !== '' ? trim(($bank !== '' ? $bank . "\n" : '') . 'IBAN ' . $iban . ($bic !== '' ? "\nBIC " . $bic : '')) : "Online bezahlt per Karte\nüber Stripe") . "\nUID " . $co['uid']],
     ];
     foreach ($colsF as [$cx, $head, $body]) {
         $pdf->SetTextColor(...$ink); $pdf->SetFont('Inter', 'B', 8); $pdf->SetXY($cx, $fy + 4); $pdf->Cell(56, 4.4, $t($head));

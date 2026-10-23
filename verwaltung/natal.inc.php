@@ -70,7 +70,6 @@ if ($action === 'mm_natal_settings') {
     if (!$cfg['weekdays']) $cfg['weekdays'] = [1, 2, 3, 4, 5];
     $n = trim((string)($_POST['notify'] ?? ''));
     $cfg['notify'] = filter_var($n, FILTER_VALIDATE_EMAIL) ? $n : '';
-    foreach (['bank' => 60, 'iban' => 40, 'bic' => 15] as $f => $max) $cfg[$f] = forma_clean((string)($_POST[$f] ?? ''), $max);
     $room = trim((string)($_POST['room'] ?? ''));
     $cfg['room'] = preg_match('#^https://\S+$#', $room) ? mb_substr($room, 0, 300) : '';
     mm_save_cfg('natal', $cfg);
@@ -252,9 +251,6 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <fieldset class="days"><legend>An diesen Tagen dürfen Wunschtermine gewählt werden</legend><div class="wdays"><?php foreach (NATAL_WEEKDAYS as $n => $l): ?><label class="check"><input type="checkbox" name="weekdays[]" value="<?= $n ?>"<?= in_array($n, natal_weekdays(), true) ? ' checked' : '' ?>> <?= $l ?></label><?php endforeach; ?></div></fieldset>
             <label for="nrm">Link zu deinem Online-Videoraum (z. B. dein Whereby-Raum), steht in jeder Online-Terminbestätigung</label><input id="nrm" name="room" type="url" value="<?= forma_h((string)($cfg['room'] ?? '')) ?>" placeholder="https://whereby.com/…">
             <label for="nno">Benachrichtigungen an</label><input id="nno" name="notify" type="email" value="<?= forma_h((string)($cfg['notify'] ?? '')) ?>" placeholder="<?= forma_h(MM_FROM_EMAIL) ?>">
-            <p class="small muted" style="margin-top:6px">Bankverbindung in der Fußzeile der Rechnung (bleibt nur hier gespeichert, nicht auf der Website):</p>
-            <div class="row"><div class="stack"><label for="nbk">Bank</label><input id="nbk" name="bank" value="<?= forma_h((string)($cfg['bank'] ?? '')) ?>" placeholder="BAWAG"></div><div class="stack"><label for="nbi">BIC</label><input id="nbi" name="bic" value="<?= forma_h((string)($cfg['bic'] ?? '')) ?>"></div></div>
-            <label for="nib">IBAN</label><input id="nib" name="iban" value="<?= forma_h((string)($cfg['iban'] ?? '')) ?>" placeholder="AT..">
             <button class="btn" type="submit">Speichern</button>
         </form>
         <form method="post" style="margin-top:10px"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_sample"><button class="link" type="submit">Muster-Rechnung an mich schicken</button></form>
