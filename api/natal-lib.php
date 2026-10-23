@@ -80,6 +80,11 @@ function natal_schema(PDO $pdo): void
         created_at TEXT NOT NULL,
         confirmed_at TEXT
     )');
+    $sc = array_column($pdo->query('PRAGMA table_info(mm_natal_sessions)')->fetchAll(), 'name');
+    if ($sc && !in_array('room_url', $sc, true)) {
+        $pdo->exec("ALTER TABLE mm_natal_sessions ADD COLUMN room_url TEXT NOT NULL DEFAULT ''");
+        $pdo->exec("ALTER TABLE mm_natal_sessions ADD COLUMN host_url TEXT NOT NULL DEFAULT ''");
+    }
 }
 
 // --- Einstellungen (Preise, Wochentage, Bankverbindung für die Rechnung) -------------------
@@ -121,12 +126,80 @@ function natal_is_online(array $o): bool
     return str_starts_with((string)($o['package'] ?? ''), 'o_');
 }
 
-/** Wo die Einheit stattfindet: Studio-Adresse oder Videoraum. */
-function natal_place(bool $online): string
+/** Wo die Einheit stattfindet: Studio-Adresse oder der persönliche Movecia-Videoraum. */
+function natal_place(bool $online, ?array $s = null): string
 {
     if (!$online) return 'Movecia Studio, ' . NATAL_COMPANY['street'] . ', ' . NATAL_COMPANY['city'];
-    $room = trim((string)(natal_cfg()['room'] ?? ''));
-    return $room !== '' ? 'Online per Video: ' . $room : 'Online per Video (den Link bekommst du vor dem Termin)';
+    return $s && !empty($s['id']) ? 'Online per Video: ' . natal_room_link('s', (int)$s['id']) : 'Online per Video (dein Link zum Videoraum steht in der Terminbestätigung)';
+}
+
+// --- Movecia-Videoraum (moveciamovement.com/natal/raum) -------------------------------------
+// Jede Online-Einheit und jedes Kennenlerngespräch hat automatisch einen eigenen Link.
+// Der Whereby-Raum dahinter wird erst beim Öffnen angelegt. Die Schlüssel kommen aus einem
+// geheimen Wert im Datenordner (nie im Repo), damit niemand Links erraten kann.
+
+function natal_secret(): string
+{
+    $f = forma_data_dir() . '/movecia-natal-secret';
+    $v = is_file($f) ? trim((string)file_get_contents($f)) : '';
+    if (strlen($v) < 32) { $v = bin2hex(random_bytes(24)); @file_put_contents($f, $v); @chmod($f, 0600); }
+    return $v;
+}
+
+function natal_room_key(string $kind, int $id, bool $host = false): string
+{
+    return substr(hash_hmac('sha256', ($host ? 'host:' : 'guest:') . $kind . $id, natal_secret()), 0, 24);
+}
+
+/** Link zum Raum: $kind 's' = Training, 'c' = Kennenlerngespräch. Mit $host der Link für Vivien. */
+function natal_room_link(string $kind, int $id, bool $host = false): string
+{
+    return mm_site() . '/natal/raum/?r=' . $kind . $id . '&k=' . natal_room_key($kind, $id, $host);
+}
+
+/** Raum zu Link-Parametern finden. Liefert Termin, Titel, Zeiten, Rolle oder null. */
+function natal_room_resolve(PDO $pdo, string $r, string $k): ?array
+{
+    if (!preg_match('/^([sc])(\d+)$/', $r, $m) || $k === '') return null;
+    [$kind, $id] = [$m[1], (int)$m[2]];
+    $host = hash_equals(natal_room_key($kind, $id, true), $k);
+    if (!$host && !hash_equals(natal_room_key($kind, $id), $k)) return null;
+    if ($kind === 's') {
+        $s = natal_session($pdo, $id);
+        if (!$s) return null;
+        $o = natal_order($pdo, (int)$s['order_id']);
+        if (!$o) return null;
+        $start = (string)$s['start'] !== '' ? strtotime($s['date'] . ' ' . $s['start']) : 0;
+        return ['kind' => 's', 'id' => $id, 'host' => $host, 'row' => $s, 'name' => (string)$o['name'], 'title' => 'Prä-/Postnatal Training', 'sub' => '60 Minuten, 1:1 live per Video',
+            'start' => $start, 'end' => $start ? $start + (int)$s['minutes'] * 60 : 0, 'ok' => $s['status'] === 'bestaetigt' && $start > 0, 'cancelled' => $s['status'] === 'abgesagt', 'back' => natal_link($o)];
+    }
+    natal_call_schema($pdo);
+    $c = $pdo->query('SELECT * FROM mm_natal_calls WHERE id = ' . $id)->fetch();
+    if (!$c) return null;
+    $start = strtotime($c['date'] . ' ' . $c['slot']);
+    return ['kind' => 'c', 'id' => $id, 'host' => $host, 'row' => $c, 'name' => (string)$c['name'], 'title' => 'Kennenlerngespräch', 'sub' => '30 Minuten, kostenlos und unverbindlich',
+        'start' => $start, 'end' => $start + NATAL_CALL_MINUTES * 60, 'ok' => $c['status'] === 'gebucht', 'cancelled' => $c['status'] === 'abgesagt', 'back' => ''];
+}
+
+/** Whereby-Raum anlegen, falls noch keiner da ist. Liefert [Gast-URL, Gastgeberin-URL] oder leere Werte. */
+function natal_room_ensure(PDO $pdo, array &$room): array
+{
+    $row = $room['row'];
+    if ((string)($row['room_url'] ?? '') !== '' && str_contains((string)$row['room_url'], 'whereby')) return [(string)$row['room_url'], (string)($row['host_url'] ?: $row['room_url'])];
+    $key = function_exists('mm_whereby_key') ? mm_whereby_key() : '';
+    if ($key === '') return ['', ''];
+    try {
+        $r = mm_whereby_request('POST', '/meetings', ['endDate' => gmdate('Y-m-d\TH:i:s.000\Z', $room['end'] + 2 * 3600), 'roomMode' => 'normal', 'roomNamePrefix' => 'movecia', 'fields' => ['hostRoomUrl']], $key);
+    } catch (Throwable $e) {
+        error_log('Natal room: ' . $e->getMessage());
+        return ['', ''];
+    }
+    $url = (string)($r['roomUrl'] ?? '');
+    $hostUrl = (string)($r['hostRoomUrl'] ?? $url);
+    if ($url === '') return ['', ''];
+    $pdo->prepare('UPDATE ' . ($room['kind'] === 's' ? 'mm_natal_sessions' : 'mm_natal_calls') . ' SET room_url = ?, host_url = ? WHERE id = ?')->execute([$url, $hostUrl, $room['id']]);
+    $room['row']['room_url'] = $url; $room['row']['host_url'] = $hostUrl;
+    return [$url, $hostUrl];
 }
 
 function natal_weekdays(): array
@@ -292,7 +365,7 @@ function natal_ics(array $sessions, string $who = '', bool $online = false): str
         $from = new DateTime($s['date'] . ' ' . $s['start'], $tz);
         $to = (clone $from)->modify('+' . (int)$s['minutes'] . ' minutes');
         $out .= "BEGIN:VEVENT\r\nUID:natal-{$s['id']}@moveciamovement.com\r\nDTSTAMP:" . $f(new DateTime('now', $tz)) . "\r\nDTSTART:" . $f($from) . "\r\nDTEND:" . $f($to) . "\r\n"
-            . 'SUMMARY:' . $esc('Movecia · Prä-/Postnatal Training' . ($online ? ' online' : '') . ($who !== '' ? ' · ' . $who : '')) . "\r\nLOCATION:" . $esc(natal_place($online))
+            . 'SUMMARY:' . $esc('Movecia · Prä-/Postnatal Training' . ($online ? ' online' : '') . ($who !== '' ? ' · ' . $who : '')) . "\r\nLOCATION:" . $esc(natal_place($online, $s))
             . "\r\nDESCRIPTION:" . $esc(($online ? '1:1 live per Video mit Vivien. Matte, etwas Platz und Handy oder Laptop bereitlegen.' : '1:1 mit Vivien. Bequeme Kleidung, eine Flasche Wasser und gern ein Handtuch mitbringen.') . ' Bei Fragen: ' . NATAL_COMPANY['phone']) . "\r\nEND:VEVENT\r\n";
     }
     return $out . "END:VCALENDAR\r\n";
@@ -305,7 +378,7 @@ function natal_gcal(array $s, bool $online = false): string
     $to = (clone $from)->modify('+' . (int)$s['minutes'] . ' minutes');
     $f = fn(DateTime $d) => (clone $d)->setTimezone(new DateTimeZone('UTC'))->format('Ymd\THis\Z');
     return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' . rawurlencode('Movecia · Prä-/Postnatal Training') . '&dates=' . $f($from) . '/' . $f($to)
-        . '&location=' . rawurlencode(natal_place($online)) . '&details=' . rawurlencode('1:1 mit Vivien');
+        . '&location=' . rawurlencode(natal_place($online, $s)) . '&details=' . rawurlencode('1:1 mit Vivien');
 }
 
 // --- Stripe --------------------------------------------------------------------------------
@@ -450,11 +523,12 @@ function natal_confirm(PDO $pdo, int $sid, string $date, string $time, bool $mai
         $first = forma_first_name((string)$o['name']);
         $left = natal_left($pdo, $o);
         $p = ["Hallo $first,", $moved ? 'an deinem Wunschtag ging es sich leider nicht aus, deshalb habe ich dir diesen Termin eingetragen. Passt er dir nicht, antworte einfach auf diese E-Mail, dann finden wir einen anderen.' : 'dein Termin ist bestätigt. Ich freue mich auf dich!',
-            natal_is_online($o) ? [natal_when($s), '60 Minuten, 1:1 live per Video', natal_place(true)] : [natal_when($s), '60 Minuten, 1:1 im Movecia Studio', NATAL_COMPANY['street'] . ', ' . NATAL_COMPANY['city']],
+            natal_is_online($o) ? [natal_when($s), '60 Minuten, 1:1 live per Video'] : [natal_when($s), '60 Minuten, 1:1 im Movecia Studio', NATAL_COMPANY['street'] . ', ' . NATAL_COMPANY['city']],
             'Mit der angehängten Kalenderdatei übernimmst du den Termin mit einem Tipp in deinen Kalender. Auf deiner persönlichen Seite findest du ihn auch für Google Kalender.',
             'Musst du einen Termin verschieben, gib mir bitte so bald wie möglich Bescheid, am besten bis 24 Stunden vorher. Wenn das Baby dazwischenkommt, finden wir natürlich immer eine Lösung.'];
         if ($left > 0) $p[] = 'Du hast noch ' . ($left === 1 ? '1 Einheit' : "$left Einheiten") . ', die du jederzeit über deine Seite anfragen kannst.';
-        natal_mail((string)$o['email'], 'Dein Termin ist bestätigt: ' . natal_when($s), 'Dein Termin steht', $p, [natal_link($o), 'Meine Termine'],
+        if (natal_is_online($o)) array_splice($p, 3, 0, ['Zum Training tippst du einfach auf den Knopf unten. Der Raum öffnet 15 Minuten vor Beginn, du brauchst keine App und kein Konto. Leg dir am besten eine Matte und etwas Platz bereit und stell Handy oder Laptop so auf, dass ich dich gut sehe.']);
+        natal_mail((string)$o['email'], 'Dein Termin ist bestätigt: ' . natal_when($s), 'Dein Termin steht', $p, natal_is_online($o) ? [natal_room_link('s', (int)$s['id']), 'Zum Videoraum'] : [natal_link($o), 'Meine Termine'],
             [['Movecia-Termin.ics', natal_ics([$s], '', natal_is_online($o)), 'text/calendar; charset=utf-8; method=PUBLISH']]);
     }
     return $s;
@@ -759,23 +833,6 @@ function natal_call_when(array $c): string
     return natal_date_de((string)$c['date']) . ' um ' . ltrim((string)$c['slot'], '0') . ' Uhr';
 }
 
-/** Eigener Videoraum je Gespräch (Whereby, wenn eingerichtet), sonst der allgemeine Raum-Link. */
-function natal_call_room(array $c): array
-{
-    $key = function_exists('mm_whereby_key') ? mm_whereby_key() : '';
-    if ($key !== '') {
-        try {
-            $end = strtotime($c['date'] . ' ' . $c['slot']) + (NATAL_CALL_MINUTES + 60) * 60;
-            $r = mm_whereby_request('POST', '/meetings', ['endDate' => gmdate('Y-m-d\TH:i:s.000\Z', $end), 'roomMode' => 'normal', 'roomNamePrefix' => 'movecia', 'fields' => ['hostRoomUrl']], $key);
-            if (!empty($r['roomUrl'])) return [(string)$r['roomUrl'], (string)($r['hostRoomUrl'] ?? $r['roomUrl'])];
-        } catch (Throwable $e) {
-            error_log('Natal call room: ' . $e->getMessage());
-        }
-    }
-    $room = trim((string)(natal_cfg()['room'] ?? ''));
-    return [$room, $room];
-}
-
 function natal_call_ics(array $c): string
 {
     $tz = new DateTimeZone('Europe/Vienna');
@@ -807,20 +864,20 @@ function natal_book_call(PDO $pdo, array $in): array
         throw $e;
     }
     $c = $pdo->query('SELECT * FROM mm_natal_calls WHERE id = ' . $id)->fetch();
-    [$room, $host] = natal_call_room($c);
-    $pdo->prepare('UPDATE mm_natal_calls SET room_url = ?, host_url = ? WHERE id = ?')->execute([$room, $host, $id]);
-    $c['room_url'] = $room; $c['host_url'] = $host;
+    $room = natal_room_link('c', $id);
+    $host = natal_room_link('c', $id, true);
+    $c['room_url'] = $room;
     $first = forma_first_name((string)$c['name']);
     $p = ["Hallo $first,", 'schön, dass wir uns kennenlernen! Dein kostenloses Gespräch ist eingetragen:',
         [natal_call_when($c), '30 Minuten, online per Video'],
-        $room !== '' ? 'Zum Gespräch tippst du einfach auf den Knopf unten, du brauchst keine App und kein Konto. Am besten mit Handy oder Laptop an einem ruhigen Platz.' : 'Den Link zum Videogespräch schicke ich dir rechtzeitig vor dem Termin.',
+        'Zum Gespräch tippst du einfach auf den Knopf unten. Der Raum öffnet 15 Minuten vorher, du brauchst keine App und kein Konto. Am besten mit Handy oder Laptop an einem ruhigen Platz.',
         'Wir sprechen darüber, wie es dir gerade geht, was du dir wünschst und welches Paket zu dir passt. Es ist ganz unverbindlich. Die angehängte Kalenderdatei übernimmt den Termin in deinen Kalender.',
         'Kommt etwas dazwischen, antworte einfach auf diese E-Mail.'];
-    natal_mail((string)$c['email'], 'Dein Kennenlerngespräch: ' . natal_call_when($c), 'Wir lernen uns kennen', $p, $room !== '' ? [$room, 'Zum Videogespräch'] : null,
+    natal_mail((string)$c['email'], 'Dein Kennenlerngespräch: ' . natal_call_when($c), 'Wir lernen uns kennen', $p, [$room, 'Zum Videogespräch'],
         [['Kennenlerngespraech-Movecia.ics', natal_call_ics($c), 'text/calendar; charset=utf-8; method=PUBLISH']]);
     $v = ['Neues Kennenlerngespräch (' . ($c['mode'] === 'online' ? 'Interesse online' : 'Interesse Studio') . '):', [natal_call_when($c), $c['name'] . ' · ' . $c['email'] . ($c['phone'] !== '' ? ' · ' . $c['phone'] : '')]];
     if ($c['note'] !== '') $v[] = 'Ihre Nachricht: ' . $c['note'];
-    $v[] = $host !== '' ? 'Dein Link als Gastgeberin: ' . $host : 'Es gibt noch keinen Videoraum. Schick ihr bitte vor dem Termin einen Link.';
+    $v[] = 'Dein Link als Gastgeberin (nur für dich): ' . $host;
     $hostIcs = $c; $hostIcs['room_url'] = $host;
     natal_mail(natal_notify_email(), 'Kennenlerngespräch: ' . $c['name'] . ' · ' . natal_call_when($c), 'Neues Kennenlerngespräch', $v, [natal_admin_link(), 'In der Verwaltung'],
         [['Kennenlerngespraech-' . preg_replace('/[^A-Za-z0-9]+/', '-', (string)$c['name']) . '.ics', natal_call_ics($hostIcs), 'text/calendar; charset=utf-8; method=PUBLISH']]);

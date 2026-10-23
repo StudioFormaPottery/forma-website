@@ -258,10 +258,9 @@ footer summary{cursor:pointer}
       <div class="sl" style="margin-top:.8rem">
         <?php foreach ($sessions as $s): ?>
           <div class="si"><span><b><?= $h(natal_when($s)) ?></b><?php $ph = natal_phase($order, (string)$s['date']); if ($ph): ?><br><span class="mut" style="font-size:.84rem"><?= $h($ph) ?></span><?php endif; ?></span>
-            <span style="display:flex;gap:.6rem;align-items:center"><?php if ($s['status'] === 'bestaetigt' && $s['start'] !== ''): ?><a href="<?= $h(natal_gcal($s, $online)) ?>" target="_blank" rel="noopener" style="font-size:.84rem">Google Kalender</a><?php endif; ?><span class="chip <?= $h($s['status']) ?>"><?= $h(natal_status_label((string)$s['status'])) ?></span></span></div>
+            <span style="display:flex;gap:.6rem;align-items:center"><?php if ($online && $s['status'] === 'bestaetigt' && $s['start'] !== '' && $s['date'] >= date('Y-m-d')): ?><a class="btn" style="padding:.45em 1em;font-size:.82rem" href="<?= $h(natal_room_link('s', (int)$s['id'])) ?>">Videoraum</a><?php endif; ?><?php if ($s['status'] === 'bestaetigt' && $s['start'] !== ''): ?><a href="<?= $h(natal_gcal($s, $online)) ?>" target="_blank" rel="noopener" style="font-size:.84rem">Google Kalender</a><?php endif; ?><span class="chip <?= $h($s['status']) ?>"><?= $h(natal_status_label((string)$s['status'])) ?></span></span></div>
         <?php endforeach; ?>
       </div>
-      <?php if ($online && $conf && trim((string)(natal_cfg()['room'] ?? '')) !== ''): ?><p style="margin-top:1rem"><a class="btn" href="<?= $h(trim((string)natal_cfg()['room'])) ?>" target="_blank" rel="noopener">Zum Videoraum</a></p><?php endif; ?>
       <?php if ($conf): ?><p style="margin-top:1rem"><a class="btn line" href="/api/natal.php?ics=1&amp;o=<?= (int)$order['id'] ?>&amp;k=<?= $h($order['token']) ?>">Alle Termine in meinen Kalender</a></p><?php endif; ?>
     </div>
   </div>

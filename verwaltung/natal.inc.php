@@ -95,8 +95,6 @@ if ($action === 'mm_natal_settings') {
     if (!$cfg['weekdays']) $cfg['weekdays'] = [1, 2, 3, 4, 5];
     $n = trim((string)($_POST['notify'] ?? ''));
     $cfg['notify'] = filter_var($n, FILTER_VALIDATE_EMAIL) ? $n : '';
-    $room = trim((string)($_POST['room'] ?? ''));
-    $cfg['room'] = preg_match('#^https://\S+$#', $room) ? mb_substr($room, 0, 300) : '';
     mm_save_cfg('natal', $cfg);
     go($nBack . '#einstellungen', 'Gespeichert.');
 }
@@ -126,7 +124,7 @@ if ($view === 'natal') {
     $byId = [];
     foreach ($orders as $o) $byId[(int)$o['id']] = $o;
     $reqs = $pdo->query("SELECT s.*, o.name, o.title, o.phone, o.email, o.due_date, o.units FROM mm_natal_sessions s JOIN mm_natal_orders o ON o.id = s.order_id WHERE s.status = 'angefragt' ORDER BY s.date, s.id")->fetchAll();
-    $upcoming = $pdo->query("SELECT s.*, o.name, o.title, o.phone, o.email FROM mm_natal_sessions s JOIN mm_natal_orders o ON o.id = s.order_id WHERE s.status = 'bestaetigt' ORDER BY s.date, s.start")->fetchAll();
+    $upcoming = $pdo->query("SELECT s.*, o.name, o.title, o.phone, o.email, o.package FROM mm_natal_sessions s JOIN mm_natal_orders o ON o.id = s.order_id WHERE s.status = 'bestaetigt' ORDER BY s.date, s.start")->fetchAll();
     $offers = $pdo->query('SELECT a.*, (SELECT COUNT(*) FROM mm_natal_orders o WHERE o.offer_id = a.id AND o.status = \'bezahlt\') AS booked FROM mm_natal_offers a ORDER BY a.id DESC LIMIT 30')->fetchAll();
     $revenue = (int)$pdo->query("SELECT COALESCE(SUM(amount_cents),0) FROM mm_natal_orders WHERE status = 'bezahlt'")->fetchColumn();
     natal_call_schema($pdo);
@@ -199,7 +197,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
                 <div class="ln"><span><strong><?= forma_h(natal_call_when($c)) ?></strong> <span class="chip"><?= $c['mode'] === 'online' ? 'Interesse online' : 'Interesse Studio' ?></span><br>
                     <span class="small"><?= forma_h($c['name']) ?> · <a href="mailto:<?= forma_h($c['email']) ?>"><?= forma_h($c['email']) ?></a><?php if ($c['phone'] !== ''): ?> · <a href="<?= forma_h(natal_wa((string)$c['phone'])) ?>" target="_blank" rel="noopener">WhatsApp</a><?php endif; ?></span>
                     <?php if ($c['note'] !== ''): ?><br><span class="small muted">„<?= forma_h($c['note']) ?>“</span><?php endif; ?></span>
-                    <span class="acts small"><?php if ($c['host_url'] !== ''): ?><a class="btn btn-sm" href="<?= forma_h($c['host_url']) ?>" target="_blank" rel="noopener">Zum Gespräch</a><?php endif; ?>
+                    <span class="acts small"><a class="btn btn-sm" href="<?= forma_h(natal_room_link('c', (int)$c['id'], true)) ?>" target="_blank" rel="noopener">Zum Gespräch</a>
                     <details class="more"><summary>absagen</summary>
                         <form method="post" class="stack" style="margin-top:6px"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_call_cancel"><input type="hidden" name="cid" value="<?= (int)$c['id'] ?>"><textarea name="reason" rows="2" placeholder="Nachricht (optional)"></textarea>
                             <label class="check"><input type="checkbox" name="mail" value="1" checked> Mail mit Link für neuen Termin</label><button class="btn btn-ghost btn-sm" type="submit">Gespräch absagen</button></form></details></span></div>
@@ -233,7 +231,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
         <?php if ($future): ?><div class="card">
             <?php foreach ($future as $s): ?>
                 <div class="ln"><span><strong><?= forma_h(natal_when($s)) ?></strong><br><span class="muted small"><?= forma_h($s['name']) ?> · <?= forma_h($s['title']) ?></span></span>
-                    <span class="acts small"><?php if ($s['phone'] !== ''): ?><a href="<?= forma_h(natal_wa((string)$s['phone'])) ?>" target="_blank" rel="noopener">WhatsApp</a><?php endif; ?>
+                    <span class="acts small"><?php if (natal_is_online($s)): ?><a class="btn btn-sm" href="<?= forma_h(natal_room_link('s', (int)$s['id'], true)) ?>" target="_blank" rel="noopener">Zum Videoraum</a><?php endif; ?><?php if ($s['phone'] !== ''): ?><a href="<?= forma_h(natal_wa((string)$s['phone'])) ?>" target="_blank" rel="noopener">WhatsApp</a><?php endif; ?>
                     <details class="more"><summary>ändern / absagen</summary>
                         <form method="post" class="stack" style="margin-top:6px"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_confirm"><input type="hidden" name="sid" value="<?= (int)$s['id'] ?>">
                             <div class="tm" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><input type="date" name="date" value="<?= forma_h($s['date']) ?>"><input type="time" name="time" value="<?= forma_h($s['start']) ?>" step="900"></div>
@@ -315,7 +313,6 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <p class="small muted">Preise brutto inkl. 20 % USt. Gilt für neue Buchungen, bereits bezahlte Pakete bleiben, wie sie sind.</p>
             <div class="row"><?php foreach ($packs as $k => $p): ?><div class="stack"><label for="np<?= $k ?>"><?= forma_h($p['title']) ?> (<?= (int)$p['units'] ?> × 60 Min.) in €</label><input id="np<?= $k ?>" name="price[<?= $k ?>]" inputmode="decimal" value="<?= $eu($p['cents']) ?>"><span class="small muted">= <?= forma_h(forma_euro($p['unit_cents'])) ?> pro Einheit</span></div><?php endforeach; ?></div>
             <fieldset class="days"><legend>An diesen Tagen dürfen Wunschtermine gewählt werden</legend><div class="wdays"><?php foreach (NATAL_WEEKDAYS as $n => $l): ?><label class="check"><input type="checkbox" name="weekdays[]" value="<?= $n ?>"<?= in_array($n, natal_weekdays(), true) ? ' checked' : '' ?>> <?= $l ?></label><?php endforeach; ?></div></fieldset>
-            <label for="nrm">Link zu deinem Online-Videoraum (z. B. dein Whereby-Raum), steht in jeder Online-Terminbestätigung</label><input id="nrm" name="room" type="url" value="<?= forma_h((string)($cfg['room'] ?? '')) ?>" placeholder="https://whereby.com/…">
             <label for="nno">Benachrichtigungen an</label><input id="nno" name="notify" type="email" value="<?= forma_h((string)($cfg['notify'] ?? '')) ?>" placeholder="<?= forma_h(MM_FROM_EMAIL) ?>">
             <button class="btn" type="submit">Speichern</button>
         </form>
