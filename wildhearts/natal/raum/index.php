@@ -35,6 +35,52 @@ if ($room) {
     }
 }
 $first = $room ? forma_first_name($room['name']) : '';
+// Kleine Nachrichten für die Wartezeit, im Wechsel: Tipp, Affirmation, Baby (Vivien, 23.10.2026)
+$tips = $room && $room['kind'] === 's' ? [
+    'Hol dir noch einen Tee oder ein Glas warmes Wasser.',
+    'Stell dir eine Wasserflasche griffbereit neben die Matte.',
+    'Zieh dir warme Socken an, kalte Füße lenken nur ab.',
+    'Leg eine weiche Decke auf deine Matte, dann liegst du gemütlicher.',
+    'Ein Polster unter dem Kopf oder unter den Knien tut gut.',
+    'Leg dir eine zweite Decke bereit, für die Entspannung am Schluss.',
+    'Mach kurz das Fenster auf und lass frische Luft herein.',
+    'Wenn du magst, räuchere ein wenig oder zünde eine Kerze an.',
+    'Schalte dein Handy auf lautlos. Diese Stunde gehört dir.',
+    'Geh vorher noch einmal kurz auf die Toilette.',
+] : [
+    'Hol dir noch einen Tee oder ein Glas Wasser.',
+    'Such dir einen ruhigen Platz, an dem dich niemand stört.',
+    'Mach es dir gemütlich, gern mit einer Decke und warmen Socken.',
+    'Schreib dir kurz auf, was du mich fragen möchtest.',
+    'Schalte dein Handy auf lautlos. Diese halbe Stunde gehört dir.',
+];
+$affirm = [
+    'Mein Körper weiß, was er tut.',
+    'Ich darf mir Zeit nehmen, für mich und für mein Baby.',
+    'Mit jedem Atemzug komme ich mehr bei mir an.',
+    'Ich bin stark, auch an weichen Tagen.',
+    'Ich vertraue meinem Körper und meinem Gefühl.',
+    'Ich bin genau richtig, so wie ich gerade bin.',
+    'Ich muss nichts leisten. Ich darf einfach da sein.',
+    'Ich atme Ruhe ein und Anspannung aus.',
+];
+$baby = [
+    'Ich spüre es, wenn du ruhig atmest, Mama.',
+    'Bei dir bin ich gut aufgehoben.',
+    'Wir wachsen zusammen, du und ich.',
+    'Deine Bewegung schaukelt mich ganz sanft.',
+    'Wenn du dich entspannst, werde ich auch ganz ruhig.',
+    'Danke, dass du dir Zeit für uns nimmst.',
+];
+$notes = [];
+if ($room && !$room['host']) {
+    shuffle($tips); shuffle($affirm); shuffle($baby);
+    for ($i = 0; $i < max(count($tips), count($affirm)); $i++) {
+        if (isset($tips[$i])) $notes[] = ['Kleiner Tipp', $tips[$i]];
+        if (isset($affirm[$i])) $notes[] = ['Für dich', $affirm[$i]];
+        if (isset($baby[$i]) && $i % 2 === 0) $notes[] = ['Von deinem Baby', '„' . $baby[$i] . '“'];
+    }
+}
 $when = $room && $room['start'] ? natal_date_de(date('Y-m-d', $room['start'])) . ' um ' . date('G:i', $room['start']) . ' Uhr' : '';
 ?><!DOCTYPE html>
 <html lang="de">
@@ -79,6 +125,19 @@ a{color:var(--plum)}
 .lvl{height:8px;border-radius:9px;background:var(--line);max-width:340px;margin-top:.6rem;overflow:hidden;display:none}
 .lvl i{display:block;height:100%;width:0;background:var(--plum);transition:width .08s}
 .host{margin-top:1.2rem;font-size:.9rem;padding:.8rem 1rem;border-radius:14px;background:var(--blush)}
+/* Kleine Nachrichten */
+.pop{margin-top:1.4rem;min-height:7.2rem;padding:1.1rem 1.3rem;border-radius:20px;background:var(--blush);position:relative;overflow:hidden}
+.pop .l{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--plum);font-weight:500}
+.pop p{font-family:var(--serif);font-size:clamp(1.35rem,3.4vw,1.7rem);line-height:1.25;margin:.35rem 0 0}
+.pop .in{transition:opacity .9s ease,transform .9s ease}
+.pop .in.out{opacity:0;transform:translateY(8px)}
+.float{position:fixed;z-index:0;max-width:240px;padding:.8rem 1.05rem;border-radius:18px;background:rgba(251,248,244,.85);box-shadow:0 18px 40px -28px rgba(74,58,65,.5);font-family:var(--serif);font-size:1.15rem;line-height:1.3;color:var(--ink);opacity:0;transform:translateY(14px);transition:opacity 1.4s ease,transform 6s ease;pointer-events:none}
+.float small{display:block;font-family:var(--sans);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--plum);margin-bottom:.2rem}
+.float.on{opacity:1;transform:translateY(-14px)}
+.card{z-index:1}
+@media(max-width:1099px){.float{display:none}}
+.bar .tick{flex:1;text-align:center;font-family:var(--serif);font-size:1.1rem;color:var(--plum);transition:opacity .8s;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:820px){.bar .tick{display:none}}
 /* Raum */
 .room{height:100%;display:flex;flex-direction:column;background:var(--deep)}
 .bar{display:flex;align-items:center;gap:14px;padding:10px clamp(12px,3vw,24px);background:var(--bg);border-bottom:1px solid var(--line)}
@@ -96,13 +155,17 @@ a{color:var(--plum)}
 <div class="room">
   <div class="bar"><span class="brand">Movecia<i></i></span>
     <span class="t"><b><?= $h($room['title']) ?><?= $room['host'] ? ' · ' . $h($first) : '' ?></b><span><?= $h($when) ?> · <?= $h($room['sub']) ?></span></span>
+    <span class="tick" id="tick" aria-live="polite"></span>
     <span class="clock" id="clock"></span></div>
   <div class="frame"><iframe src="<?= $h($src) ?>" allow="camera; microphone; fullscreen; speaker; display-capture; autoplay; compute-pressure" title="Movecia Videoraum"></iframe></div>
 </div>
 <script>
 (function(){const s=<?= (int)$room['start'] ?>*1000,e=<?= (int)$room['end'] ?>*1000,el=document.getElementById('clock');
 function t(){const n=Date.now();let m;if(n<s){m=Math.ceil((s-n)/60000);el.textContent='Beginn in '+m+' Min.';}else if(n<e){m=Math.ceil((e-n)/60000);el.textContent='noch '+m+' Min.';}else el.textContent='Zeit ist um';}
-t();setInterval(t,15000);})();
+t();setInterval(t,15000);
+const N=<?= json_encode($notes, JSON_UNESCAPED_UNICODE) ?>,k=document.getElementById('tick');let i=0;
+function nx(){if(!N.length||Date.now()>=s){k.style.opacity=0;return;}k.style.opacity=0;setTimeout(()=>{k.textContent=N[i%N.length][1];k.style.opacity=1;i++;},800);}
+nx();setInterval(nx,9000);})();
 </script>
 <?php else: ?>
 <div class="wait"><span class="blob b1"></span><span class="blob b2"></span>
@@ -133,6 +196,7 @@ t();setInterval(t,15000);})();
       <div class="when"><b><?= $h($when) ?></b><span class="mut"><?= $h($room['sub']) ?></span></div>
       <p class="mut" style="margin:0">Der Raum öffnet <?= $room['host'] ? '60' : '15' ?> Minuten vor Beginn, diese Seite geht dann von selbst auf.</p>
       <p class="count" id="count"></p>
+      <?php if ($notes): ?><div class="pop" aria-live="polite"><div class="in" id="pop"><span class="l"></span><p></p></div></div><?php endif; ?>
       <ul class="tips">
         <?php if ($room['kind'] === 's'): ?>
         <li>Leg dir eine Matte, ein Kissen und etwas Wasser bereit.</li>
@@ -157,6 +221,19 @@ t();setInterval(t,15000);})();
 function t(){const d=o-Date.now();if(d<=0){location.reload();return;}const m=Math.floor(d/60000),hh=Math.floor(m/60),dd=Math.floor(hh/24);
 el.textContent=dd>=1?'noch '+dd+(dd===1?' Tag':' Tage'):hh>=1?'noch '+hh+' Std. '+(m%60)+' Min.':'noch '+(m+1)+' Min.';}
 t();setInterval(t,20000);
+const N=<?= json_encode($notes, JSON_UNESCAPED_UNICODE) ?>;
+if(N.length){const box=document.getElementById('pop');let i=0;
+ const show=()=>{box.classList.add('out');setTimeout(()=>{box.querySelector('.l').textContent=N[i%N.length][0];box.querySelector('p').textContent=N[i%N.length][1];box.classList.remove('out');i++;},900);};
+ show();setInterval(show,8000);
+ // auf großen Bildschirmen schweben zusätzlich kleine Nachrichten links und rechts neben der Karte
+ let j=Math.floor(N.length/2);
+ const fl=()=>{if(innerWidth<1100)return;const c=document.querySelector('.card').getBoundingClientRect(),side=j%2?'r':'l',el=document.createElement('div');
+  const n=N[j++%N.length];el.className='float';el.innerHTML='<small></small>';el.querySelector('small').textContent=n[0];el.append(n[1]);
+  const room=side==='l'?c.left:innerWidth-c.right;if(room<200){return;}
+  el.style.left=(side==='l'?Math.max(16,c.left-room/2-120):c.right+room/2-120)+'px';el.style.top=(80+Math.random()*(innerHeight-260))+'px';
+  document.body.append(el);requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('on')));
+  setTimeout(()=>{el.classList.remove('on');setTimeout(()=>el.remove(),1500);},6500);};
+ setTimeout(fl,2500);setInterval(fl,4200);}
 document.getElementById('test').addEventListener('click',async function(){const v=document.getElementById('cam'),l=document.getElementById('lvl'),msg=document.getElementById('msg');
  try{const ac=new (window.AudioContext||window.webkitAudioContext)();ac.resume();
   const st=await navigator.mediaDevices.getUserMedia({video:true,audio:true});v.srcObject=st;v.style.display='block';l.style.display='block';
