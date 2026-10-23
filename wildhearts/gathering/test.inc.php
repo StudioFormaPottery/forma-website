@@ -30,7 +30,8 @@ $offers = $guest ? [] : mm_offers();
 <meta name="robots" content="noindex, nofollow">
 <title><?= $gath ? 'Gathering · Gastgeberin' : 'Technik-Test' ?> · Wild Hearts</title>
 <meta name="theme-color" content="#F2ECE4">
-<link rel="icon" href="/img/wildhearts/viv.jpg">
+<link rel="icon" href="/img/movecia/movecia-favicon-64.png">
+<link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
 <style>
 @font-face{font-family:"Italiana";font-weight:400;font-display:swap;src:url(/fonts/Italiana-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}

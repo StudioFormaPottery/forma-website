@@ -56,7 +56,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Withdraw from the contract · Movecia</title>
-<link rel="icon" href="/img/wildhearts/viv.jpg">
+<link rel="icon" href="/img/movecia/movecia-favicon-64.png">
+<link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
 <style>
 @font-face{font-family:"Italiana";src:url(/fonts/Italiana-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:300 500;src:url(/fonts/Outfit-Regular.woff) format("woff")}

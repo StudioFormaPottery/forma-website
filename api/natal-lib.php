@@ -333,7 +333,7 @@ function natal_mail_html(string $title, string $inner, string $foot = ''): strin
     return '<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . forma_h($title) . '</title></head>'
         . '<body style="margin:0;padding:0;background:#F2ECE4;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2ECE4;"><tr><td align="center" style="padding:26px 12px;">'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FBF8F4;border-radius:24px;font-family:Helvetica,Arial,sans-serif;color:#2E2529;">'
-        . '<tr><td style="padding:26px 30px 0;font-family:Georgia,\'Times New Roman\',serif;font-size:26px;color:#2E2529;">Movecia<span style="color:#7D5E68;">.</span></td></tr>'
+        . '<tr><td style="padding:24px 30px 0;"><img src="' . forma_h(mm_site()) . '/img/movecia/movecia-mail.png" width="180" height="40" alt="Movecia." style="display:block;border:0;width:180px;height:auto;"></td></tr>'
         . '<tr><td style="padding:14px 30px 28px;font-size:16px;line-height:1.65;">' . $inner
         . '<p style="margin:24px 0 0;">Bis bald,<br>Vivien</p></td></tr></table>'
         . '<p style="max-width:560px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#7D7076;margin:16px auto 0;">Vivien Malonga · Movecia – Personal Fitness · ' . NATAL_COMPANY['street'] . ' · ' . NATAL_COMPANY['city'] . ' · ' . NATAL_COMPANY['email'] . '</p>' . $foot
@@ -700,12 +700,13 @@ function natal_invoice_pdf(array $inv): string
     $pdf->SetAutoPageBreak(false);
     $pdf->SetMargins(18, 16, 18);
     $pdf->AddPage();
-    $ink = [46, 59, 52]; $text = [58, 63, 59]; $soft = [122, 132, 124]; $sage = [125, 145, 127]; $mist = [238, 242, 236]; $line = [213, 220, 211];
+    // Movecia-Farben Pflaume (Logo seit 24.10.2026)
+    $ink = [74, 58, 65]; $text = [46, 37, 41]; $soft = [125, 112, 118]; $sage = [125, 94, 104]; $mist = [242, 236, 228]; $line = [221, 210, 198];
     $storno = (int)$inv['gross_cents'] < 0;
 
     $img = dirname(__DIR__) . '/img/movecia/';
     if (is_file($img . 'Movecia_Ecke.png')) $pdf->Image($img . 'Movecia_Ecke.png', 142, 0, 68);
-    if (is_file($img . 'Movecia_Logo.png')) $pdf->Image($img . 'Movecia_Logo.png', 18, 16, 66);
+    if (is_file($img . 'Movecia_Logo.png')) $pdf->Image($img . 'Movecia_Logo.png', 16, 14, 80);
 
     // „RECHNUNG“ gesperrt
     $word = $storno ? 'STORNORECHNUNG' : 'RECHNUNG';

@@ -80,7 +80,8 @@ $h = 'forma_h';
 <meta name="description" content="A free live circle for women who want more than just functioning. With Viv, from the Austrian mountains.">
 <?php if ($me): ?><meta name="robots" content="noindex, nofollow"><?php endif; ?>
 <meta name="theme-color" content="#F2ECE4">
-<link rel="icon" href="/img/wildhearts/viv.jpg">
+<link rel="icon" href="/img/movecia/movecia-favicon-64.png">
+<link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
 <meta property="og:title" content="Wild Hearts Gathering">
 <meta property="og:image" content="https://moveciamovement.com/img/wildhearts/og.jpg">
 <style>

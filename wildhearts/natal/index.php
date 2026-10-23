@@ -79,6 +79,8 @@ $wa = 'https://wa.me/' . preg_replace('/\D/', '', NATAL_COMPANY['phone']);
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="/img/movecia/movecia-favicon-64.png">
+<link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title><?= $order ? 'Deine Termine · Movecia' : 'Prä- & Postnatal Training' . ($online ? ' online' : '') . ' · Movecia' ?></title>
 <meta name="description" content="Prä- und postnatales Training 1:1 bei Vivien<?= $online ? ', live per Video' : ' im Movecia Studio' ?>: sanft, kräftigend und ganz auf dich abgestimmt.">
@@ -115,6 +117,7 @@ section{padding-block:clamp(3.5rem,8vw,7rem)}
 .top{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding-block:1rem;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .brand{font-family:var(--serif);font-size:1.9rem;font-weight:500;color:var(--ink);text-decoration:none;line-height:1;display:flex;align-items:baseline}
 .brand i{width:.3em;height:.3em;border-radius:50%;background:var(--plum);display:inline-block;margin-left:.08em}
+.brand .mk{width:1.35em;height:1.35em;margin-right:.32em;align-self:center;flex:none}
 .top .tag{font-size:.8rem;color:var(--muted);letter-spacing:.06em}
 .blob{border-radius:62% 38% 46% 54%/55% 45% 55% 45%;animation:morph 14s ease-in-out infinite alternate}
 @keyframes morph{50%{border-radius:40% 60% 58% 42%/44% 58% 42% 56%}100%{border-radius:45% 55% 60% 40%/40% 60% 45% 55%}}
@@ -306,7 +309,7 @@ footer summary{cursor:pointer}
 </style>
 </head>
 <body data-mode="<?= $online ? 'online' : 'studio' ?>">
-<header class="top w"><a class="brand" href="<?= $order ? $h(natal_link($order)) : '#' ?>">Movecia<i></i></a><span class="tag">1:1 <?= $order ? ($online ? 'online' : 'im Studio') : 'im Studio &amp; online' ?> · Prä- &amp; Postnatal</span></header>
+<header class="top w"><a class="brand" href="<?= $order ? $h(natal_link($order)) : '#' ?>"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia<i></i></a><span class="tag">1:1 <?= $order ? ($online ? 'online' : 'im Studio') : 'im Studio &amp; online' ?> · Prä- &amp; Postnatal</span></header>
 <div class="w"><?php if ($bonus): $bc = natal_bonus_cfg(); ?><p class="bonusbox"><b>Dein Kennenlern-Bonus, <?= $h(forma_first_name((string)$bonus['name'])) ?></b>Danke für unser Gespräch! Jedes Paket ist für dich <?= (int)$bc['percent'] ?> % günstiger, im Studio und online. Der Bonus gilt bis <?= $h(natal_date_de((string)$bonus['bonus_until'])) ?> und ist unten schon eingerechnet.</p>
     <?php elseif ($bonusGone): ?><p class="bonusbox gone"><b>Dieser Bonus ist leider nicht mehr gültig</b>Er ist abgelaufen oder wurde schon eingelöst. Die Pakete kannst du unten natürlich trotzdem buchen, und bei Fragen schreib mir einfach.</p><?php endif; ?></div>
 

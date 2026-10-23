@@ -103,6 +103,8 @@ $when = $room && $room['start'] ? natal_date_de(date('Y-m-d', $room['start'])) .
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="/img/movecia/movecia-favicon-64.png">
+<link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <title><?= $room ? $h($room['title']) . ' · ' : '' ?>Movecia Videoraum</title>
@@ -119,6 +121,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font
 a{color:var(--plum)}
 .brand{font-family:var(--serif);font-size:1.8rem;font-weight:500;color:var(--ink);text-decoration:none;line-height:1;display:inline-flex;align-items:baseline}
 .brand i{width:.3em;height:.3em;border-radius:50%;background:var(--plum);display:inline-block;margin-left:.08em}
+.brand .mk{width:1.35em;height:1.35em;margin-right:.32em;align-self:center;flex:none}
 .k{font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:var(--plum)}
 .mut{color:var(--muted)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.6em;padding:.95em 1.6em;border-radius:999px;background:var(--plum);color:var(--on);font:inherit;font-size:.95rem;font-weight:500;text-decoration:none;border:1px solid var(--plum);cursor:pointer}
@@ -189,7 +192,7 @@ a{color:var(--plum)}
 <body>
 <?php if ($state === 'open'): ?>
 <div class="room">
-  <div class="bar"><span class="brand">Movecia<i></i></span>
+  <div class="bar"><span class="brand"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia<i></i></span>
     <span class="t"><b><?= $h($room['title']) ?><?= $room['host'] ? ' · ' . $h($first) : '' ?></b><span><?= $h($when) ?> · <?= $h($room['sub']) ?></span></span>
     <span class="tick" id="tick" aria-live="polite"></span>
     <span class="clock" id="clock"></span></div>
@@ -249,7 +252,7 @@ addEventListener('resize',place);render();requestAnimationFrame(loop);
 <?php else: ?>
 <div class="wait"><span class="blob b1"></span><span class="blob b2"></span>
   <div class="card">
-    <span class="brand">Movecia<i></i></span>
+    <span class="brand"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia<i></i></span>
     <?php if ($state === 'invalid'): ?>
       <h1>Dieser Link <em>passt leider nicht</em></h1>
       <p class="mut">Bitte öffne den Link direkt aus deiner E-Mail. Wenn es trotzdem nicht klappt, antworte einfach auf die Mail.</p>

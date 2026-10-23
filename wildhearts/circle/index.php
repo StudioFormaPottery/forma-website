@@ -25,7 +25,8 @@ $startTs = mm_circle_start();
 <title>The Inner Circle · Wild Hearts</title>
 <meta name="description" content="Your monthly circle with Viv: live gatherings, breathwork, gentle movement and a members area with rituals.">
 <?php if ($ref || $stay || isset($_GET['stay'])): ?><meta name="robots" content="noindex"><?php endif; ?>
-<link rel="icon" href="/img/wildhearts/viv.jpg">
+<link rel="icon" href="/img/movecia/movecia-favicon-64.png">
+<link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
 <meta property="og:image" content="https://moveciamovement.com/img/wildhearts/og.jpg">
 <style>
 @font-face{font-family:"Italiana";src:url(/fonts/Italiana-Regular.woff) format("woff")}

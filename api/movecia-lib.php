@@ -244,7 +244,8 @@ function mm_mail_html(string $title, string $html, string $lang = 'en'): string
     return '<!DOCTYPE html><html lang="' . ($lang === 'de' ? 'de' : 'en') . '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . forma_h($title) . '</title></head>'
         . '<body style="margin:0;padding:0;background:#E8DED2;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#E8DED2;"><tr><td align="center" style="padding:26px 12px;">'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#F2ECE4;border-radius:24px;font-family:Helvetica,Arial,sans-serif;color:#2E2529;">'
-        . '<tr><td style="padding:30px 30px 26px;font-size:16px;line-height:1.65;">' . $html
+        . '<tr><td style="padding:24px 30px 0;"><img src="' . forma_h(mm_site()) . '/img/movecia/movecia-mail.png" width="160" height="36" alt="Movecia." style="display:block;border:0;width:160px;height:auto;"></td></tr>'
+        . '<tr><td style="padding:18px 30px 26px;font-size:16px;line-height:1.65;">' . $html
         . '<p style="margin:22px 0 0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:24px;color:#7D5E68;">' . ($lang === 'de' ? 'alles Liebe, Viv' : 'with love, Viv') . '</p></td></tr></table>'
         . '<p style="max-width:560px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#7D7076;margin:16px auto 0;">Vivien Malonga · Movecia – Personal Fitness · Silvrettastraße 58 · 6562 Mathon · Austria · ' . MM_FROM_EMAIL . '</p>'
         . '</td></tr></table></body></html>';
