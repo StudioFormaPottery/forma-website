@@ -23,6 +23,27 @@ if (!$order && ($_GET['a'] ?? '') !== '') {
 }
 $online = $order ? natal_is_online($order) : (in_array($_GET['m'] ?? '', ['studio', 'online'], true) ? $_GET['m'] === 'online' : ($offer && ($offer['mode'] ?? 'studio') === 'online'));
 $packs = natal_packages_for($online ? 'online' : 'studio');
+// Was in den einzelnen Einheiten passiert (aus dem Curriculum, Vivien 23.10.2026)
+$units = [
+    'prae' => [
+        ['Ankommen im Körper', 'Was sich gerade in dir verändert, eine gute Haltung und die 360°-Atmung.', ['Mobilisation', 'Atmung', 'Body-Scan']],
+        ['Beckenboden: anspannen und loslassen', 'Kraft aufbauen und weich werden lernen, beides brauchst du für die Geburt.', ['Beckenboden', 'Atmung', 'Visualisierung']],
+        ['Rücken entlasten, Kraft für den Alltag', 'Gegen Rücken- und Ischiasschmerz, richtig heben, tragen und gut schlafen.', ['Kräftigung', 'Haltung', 'Entspannung']],
+        ['Der Atem als Werkzeug für die Wehen', 'Die Phasen der Geburt einfach erklärt, Wellenatmung und Tönen.', ['Geburtsvorbereitung', 'Breathwork']],
+        ['Geburtspositionen und Loslassen', 'Positionen und Griffe üben, gern gemeinsam mit deiner Begleitperson.', ['Geburtsvorbereitung', 'Affirmationen']],
+        ['Gut ins Wochenbett', 'Ruhe, Hilfe organisieren und dein eigenes kleines Programm zum Mitnehmen.', ['Vorbereitung', 'Yoga Nidra']],
+    ],
+    'post' => [
+        ['Ankommen nach der Geburt', 'Raum für deine Geburtsgeschichte und ein ganz sanfter Start.', ['Heilung', 'Atmung', 'Body-Scan']],
+        ['Den Beckenboden neu spüren', 'Den Beckenboden wieder aktivieren und im Alltag schützen.', ['Beckenboden', 'Rückbildung']],
+        ['Tiefe Bauchmuskeln und Rektusdiastase', 'Die Bauchmitte sanft und Schritt für Schritt wieder schließen.', ['Rückbildung', 'Kräftigung']],
+        ['Haltung, Tragen und Stillen', 'Nacken und Schultern entlasten und ergonomisch heben.', ['Haltung', 'Mobilisation']],
+        ['Kraft für den Alltag mit Baby', 'Die Belastung behutsam steigern und spüren, was dir guttut.', ['Kräftigung', 'Ausdauer']],
+        ['Nervensystem, Schlafmangel und Mental Load', 'Bewusst ruhig, mit viel Zeit für Entspannung.', ['Breathwork', 'Yoga Nidra']],
+        ['Zurück zur Lieblingsbewegung', 'Wann Laufen und Sport wieder gehen und wie du gut zurückfindest.', ['Belastungs-Check', 'Ganzkörper']],
+        ['Dein Programm für zu Hause', 'Ein Rückblick und dein persönliches 15-Minuten-Programm.', ['Abschluss', 'Ritual']],
+    ],
+];
 $modeInfo = [];
 foreach (['studio', 'online'] as $md) {
     $ps = natal_packages_for($md);
@@ -101,6 +122,34 @@ section{padding-block:clamp(3.5rem,8vw,7rem)}
 .modes button[aria-pressed=true]{background:var(--plum);color:var(--on)}
 .modes button[aria-pressed=true] span{color:var(--on);opacity:.85}
 .modes.sm{margin-top:1.4rem}
+.flow{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.4rem}
+.flow span{display:inline-flex;align-items:center;gap:.45rem;padding:.5rem .95rem;border-radius:999px;background:var(--card);font-size:.9rem}
+.flow span i{font-style:normal;font-family:var(--serif);font-size:1.05rem;color:var(--plum)}
+.etabs{display:flex;gap:6px;margin-top:2rem;padding:6px;background:var(--card);border-radius:999px;width:max-content;max-width:100%;overflow-x:auto}
+.etabs button{font:inherit;font-size:.95rem;border:0;border-radius:999px;padding:.6rem 1.2rem;background:transparent;color:var(--ink);cursor:pointer;white-space:nowrap}
+@media(max-width:420px){.etabs button{padding:.55rem .85rem;font-size:.9rem}}
+.etabs button[aria-selected=true]{background:var(--plum);color:var(--on)}
+.epanel{margin-top:1.4rem}
+.epanel .intro{color:var(--muted);max-width:44em;margin:0 0 1.2rem}
+.ulist{display:grid;gap:10px}
+@media(min-width:700px){.ulist{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}}
+@media(min-width:1200px){.ulist{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.unit{background:var(--card);border-radius:20px;padding:1.1rem 1.25rem}
+.unit summary{list-style:none;cursor:pointer;display:flex;gap:.9rem;align-items:baseline}
+.unit summary::-webkit-details-marker{display:none}
+.unit .n{font-family:var(--serif);font-size:2rem;line-height:1;color:var(--plum);width:2.2rem;flex:none}
+.unit h4{margin:0;font-family:var(--serif);font-weight:500;font-size:1.35rem;line-height:1.15}
+.unit p{margin:.6rem 0 0 3.1rem;color:var(--muted);font-size:.95rem}
+.unit .tags{display:flex;flex-wrap:wrap;gap:.35rem;margin:.7rem 0 0 3.1rem}
+.unit .tags span{font-size:.74rem;letter-spacing:.04em;padding:.25rem .65rem;border-radius:999px;background:var(--blush);color:var(--plumdeep)}
+@media(max-width:699px){.unit summary:after{content:"+";margin-left:auto;font-size:1.3rem;color:var(--plum)}.unit[open] summary:after{content:"–"}.unit p,.unit .tags{margin-left:0}}
+.ktl{display:grid;gap:10px}
+@media(min-width:800px){.ktl{grid-template-columns:1fr auto 1fr;align-items:stretch}}
+.ktl .seg{background:var(--card);border-radius:20px;padding:1.2rem 1.3rem}
+.ktl .seg h4{margin:0 0 .5rem;font-family:var(--serif);font-weight:500;font-size:1.4rem}
+.ktl .seg ol{margin:0;padding-left:1.2rem;color:var(--muted);font-size:.93rem;display:grid;gap:.15rem}
+.ktl .gap{display:grid;place-items:center;text-align:center;padding:1rem;border-radius:20px;background:var(--blush);font-size:.88rem;color:var(--plumdeep);max-width:none}
+@media(min-width:800px){.ktl .gap{max-width:11rem}}
 .modes button .pr{margin-top:.35rem;color:var(--ink);font-size:.88rem}
 .modes button[aria-pressed=true] .pr{color:var(--on);opacity:1}
 @media(max-width:560px){.top .tag{display:none}.modes button{padding:.75rem .8rem}.modes button b{font-size:1.3rem}}
@@ -377,6 +426,38 @@ footer summary{cursor:pointer}
   </div>
 </section>
 
+<section class="w" id="einheiten" style="padding-top:0">
+  <p class="k">Deine Einheiten</p>
+  <h2 style="margin-top:.6rem">Was wir in den <em>einzelnen Terminen</em> machen</h2>
+  <p class="mut" style="margin-top:.8rem;max-width:44em">Jede Einheit dauert 60 Minuten und hat ein eigenes Thema. Sie folgt immer demselben ruhigen Rhythmus, im Studio genauso wie online.</p>
+  <div class="flow" aria-label="Ablauf einer Einheit"><span><i>1</i>Ankommen</span><span><i>2</i>Impuls zum Thema</span><span><i>3</i>Bewegung</span><span><i>4</i>Breathwork</span><span><i>5</i>Meditation &amp; Entspannung</span><span><i>6</i>Übung für zu Hause</span></div>
+  <div class="etabs" role="tablist" aria-label="Pakete">
+    <button type="button" role="tab" aria-selected="true" data-tab="prae">Pränatal · 6</button>
+    <button type="button" role="tab" aria-selected="false" data-tab="post">Postnatal · 8</button>
+    <button type="button" role="tab" aria-selected="false" data-tab="kombi">Kombi · 14</button>
+  </div>
+  <?php foreach (['prae' => 'Ideal einmal pro Woche, gern ab der 28. bis 32. Schwangerschaftswoche.', 'post' => 'Nach der ärztlichen Freigabe, meist 6 bis 8 Wochen nach der Geburt. Die ersten vier Einheiten wöchentlich, danach alle ein bis zwei Wochen. Dein Baby darf immer dabei sein.'] as $tk => $intro): ?>
+  <div class="epanel" role="tabpanel" data-panel="<?= $tk ?>"<?= $tk === 'prae' ? '' : ' hidden' ?>>
+    <p class="intro"><?= $h($intro) ?></p>
+    <div class="ulist">
+      <?php foreach ($units[$tk] as $i => [$tt, $tx, $tags]): ?>
+      <details class="unit" open><summary><span class="n"><?= $i + 1 ?></span><h4><?= $h($tt) ?></h4></summary>
+        <p><?= $h($tx) ?></p><div class="tags"><?php foreach ($tags as $tg) echo '<span>' . $h($tg) . '</span>'; ?></div></details>
+      <?php endforeach; ?>
+    </div>
+  </div>
+  <?php endforeach; ?>
+  <div class="epanel" role="tabpanel" data-panel="kombi" hidden>
+    <p class="intro">Die 6 Pränatal- und die 8 Postnatal-Einheiten in dieser Reihenfolge, mit einer Pause rund um die Geburt. Der Vorteil: Ich kenne deinen Körper und deine Geschichte schon, und du kennst die Atemübungen, bevor dein Baby kommt. Kommt dein Baby früher, rutschen offene Einheiten einfach nach hinten.</p>
+    <div class="ktl">
+      <div class="seg"><p class="k">Vor der Geburt · wöchentlich</p><h4>6 Einheiten Pränatal</h4><ol><?php foreach ($units['prae'] as [$tt]) echo '<li>' . $h($tt) . '</li>'; ?></ol></div>
+      <div class="gap">Geburt &amp; Wochenbett<br>Pause bis zur Freigabe,<br>wir bleiben in Kontakt</div>
+      <div class="seg"><p class="k">Nach der Geburt</p><h4>8 Einheiten Postnatal</h4><ol><?php foreach ($units['post'] as [$tt]) echo '<li>' . $h($tt) . '</li>'; ?></ol></div>
+    </div>
+  </div>
+  <p class="mut" style="margin-top:1.2rem;font-size:.92rem"><b style="font-weight:500;color:var(--ink)">Einzelstunde:</b> Wir wählen gemeinsam das Thema, das du gerade am meisten brauchst.</p>
+</section>
+
 <section class="w" id="pakete" style="padding-top:0">
   <p class="k">Preise &amp; Pakete</p>
   <h2 style="margin-top:.6rem">Je mehr Einheiten, desto <em>günstiger</em></h2>
@@ -473,6 +554,12 @@ footer summary{cursor:pointer}
   const WD = ['So','Mo','Di','Mi','Do','Fr','Sa'];
   const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   const nice = s => { const d = new Date(s + 'T12:00:00'); return WD[d.getDay()] + ', ' + d.getDate() + '. ' + MON[d.getMonth()]; };
+  // Einheiten: Reiter Pränatal / Postnatal / Kombi, am Handy zugeklappt
+  document.querySelectorAll('.etabs button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.etabs button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    document.querySelectorAll('.epanel').forEach(p => { p.hidden = p.dataset.panel !== b.dataset.tab; });
+  }));
+  if (innerWidth < 700) document.querySelectorAll('details.unit').forEach(d => { d.open = false; });
 
   // --- Kalender mit Mehrfachauswahl und Tageszeit -------------------------------------------
   function Calendar(box, getMax, onChange) {

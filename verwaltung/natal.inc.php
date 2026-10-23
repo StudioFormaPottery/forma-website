@@ -182,8 +182,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <span class="st"><b><?= forma_h(forma_euro($revenue)) ?></b><span>Umsatz brutto</span></span>
         </div>
         <div class="nl">
-            <a href="<?= forma_h(mm_site()) ?>/natal/" target="_blank" rel="noopener">Seite Studio</a>
-            <a href="<?= forma_h(mm_site()) ?>/natal/online/" target="_blank" rel="noopener">Seite Online</a>
+            <a href="<?= forma_h(mm_site()) ?>/natal/" target="_blank" rel="noopener">Seite ansehen</a>
             <a href="#angebot">Angebot verschicken</a>
             <a href="<?= forma_h($self) ?>?view=rechnungen">Rechnungen</a>
             <a href="#einstellungen">Preise &amp; Einstellungen</a>
@@ -282,7 +281,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <label for="nnt">Persönliche Zeile auf der Seite (optional)</label><textarea id="nnt" name="note" rows="2" maxlength="600" placeholder="z. B. Wie besprochen starten wir mit einer Einheit pro Woche bis zur Geburt."></textarea>
             <button class="btn" type="submit">Angebot erstellen</button>
         </form>
-        <p class="small muted" style="margin:10px 0">Allgemeine Links ohne Namen (nicht verlinkt, nur wer den Link hat, sieht die Seite):<br>Studio: <span class="sel"><?= forma_h(mm_site()) ?>/natal/</span> <button type="button" class="link small" data-copy="<?= forma_h(mm_site()) ?>/natal/">kopieren</button><br>Online: <span class="sel"><?= forma_h(mm_site()) ?>/natal/online/</span> <button type="button" class="link small" data-copy="<?= forma_h(mm_site()) ?>/natal/online/">kopieren</button></p>
+        <p class="small muted" style="margin:10px 0">Allgemeiner Link ohne Namen (Studio und Online auf einer Seite, nicht verlinkt, nur wer den Link hat, sieht die Seite): <span class="sel"><?= forma_h(mm_site()) ?>/natal/</span> <button type="button" class="link small" data-copy="<?= forma_h(mm_site()) ?>/natal/">kopieren</button></p>
         <div class="list">
         <?php $seenGrp = []; foreach ($offers as $a):
             if ((string)($a['grp'] ?? '') !== '') { if (isset($seenGrp[$a['grp']])) continue; $seenGrp[$a['grp']] = 1; }
