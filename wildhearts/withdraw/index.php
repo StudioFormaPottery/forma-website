@@ -1,5 +1,6 @@
 <?php
-// Rücktritts-Button (Pflicht seit 19.06.2026): Formular, Bestätigungsschritt, Eingangsbestätigung per E-Mail mit Datum und Uhrzeit.
+// Rücktrittsfunktion nach § 13a FAGG (in AT für Verträge ab 1.10.2026): Schaltfläche „Vertrag widerrufen“ → Formular → „Widerruf bestätigen“
+// → Eingangsbestätigung per E-Mail mit Inhalt, Datum und Uhrzeit. Stand 23.10.2026: Prä- & Postnatal zuerst, Inner Circle/Jahreskreis nur noch als frühere Buchung.
 declare(strict_types=1);
 require dirname(__DIR__, 2) . '/api/movecia-lib.php';
 header('Cache-Control: no-store');
@@ -12,7 +13,9 @@ $pdo->exec('CREATE TABLE IF NOT EXISTS mm_withdrawals (
 $h = 'forma_h';
 $lang = (($_POST['lang'] ?? $_GET['lang'] ?? '') === 'de') ? 'de' : (($_POST['lang'] ?? $_GET['lang'] ?? '') === 'en' ? 'en' : '');
 $done = null; $err = '';
-$contracts = ['circle' => 'The Inner Circle', 'year' => 'The Year Circle', 'retreat' => 'Wild Hearts Alpine Retreat', 'natal' => 'Prä- & Postnatal Training (Movecia)', 'other' => 'Other / Sonstiges'];
+$contracts = ['natal' => 'Prä- & Postnatal Training (Studio)', 'natal_online' => 'Prä- & Postnatal Training (Online)', 'retreat' => 'Wild Hearts Alpine Retreat', 'circle' => 'The Inner Circle (frühere Buchung)', 'year' => 'The Year Circle / Jahreskreis (frühere Buchung)', 'other' => 'Sonstiges / Other'];
+$sel = (string)($_POST['contract'] ?? ($_GET['v'] ?? ''));
+if ($lang === '' && in_array($sel, ['natal', 'natal_online'], true)) $lang = 'de';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $L = ($_POST['lang'] ?? 'en') === 'de' ? 'de' : 'en';
@@ -33,14 +36,14 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             ->execute([$name, $email, $contracts[$contract], $ref, $part, $L, $ip, $at]);
         $when = date('d.m.Y, H:i', strtotime($at)) . ' (Vienna time)';
         if ($L === 'de') {
-            $t = "Liebe(r) $name,\n\nhiermit bestätige ich den Eingang deines Rücktritts.\n\nVertrag: {$contracts[$contract]}\n" . ($ref !== '' ? "Angaben zur Buchung: $ref\n" : '') . ($part !== '' ? "Umfang (Teilrücktritt): $part\n" : "Umfang: der gesamte Vertrag\n") . "Eingegangen am: " . date('d.m.Y, H:i', strtotime($at)) . " Uhr (Wiener Zeit)\n\nIch melde mich persönlich bei dir. Eine Rückerstattung erfolgt binnen 14 Tagen über dasselbe Zahlungsmittel, das du verwendet hast.\n\nAlles Liebe\nViv · Movecia, Vivien Malonga, Silvrettastraße 58, 6562 Mathon";
+            $t = "Hallo " . forma_first_name($name) . ",\n\nhiermit bestätige ich den Eingang deines Rücktritts. Das hast du mir mitgeteilt:\n\nName: $name\nE-Mail: $email\nVertrag: {$contracts[$contract]}\n" . ($ref !== '' ? "Angaben zur Buchung: $ref\n" : '') . ($part !== '' ? "Umfang (Teilrücktritt): $part\n" : "Umfang: der gesamte Vertrag\n") . "Eingegangen am: " . date('d.m.Y, H:i', strtotime($at)) . " Uhr (Wiener Zeit)\n\nIch melde mich persönlich bei dir. Die Rückerstattung bekommst du spätestens binnen 14 Tagen über dasselbe Zahlungsmittel, das du verwendet hast. Hast du dir gewünscht, dass die Einheiten schon in der Rücktrittsfrist stattfinden, ziehe ich nur die Einheiten ab, die bereits stattgefunden haben.\n\nBis bald\nVivien · Movecia – Personal Fitness, Vivien Malonga, Silvrettastraße 58, 6562 Mathon";
             $subj = 'Eingangsbestätigung deines Rücktritts';
         } else {
-            $t = "Dear $name,\n\nI hereby confirm that I have received your withdrawal.\n\nContract: {$contracts[$contract]}\n" . ($ref !== '' ? "Booking details: $ref\n" : '') . ($part !== '' ? "Scope (partial withdrawal): $part\n" : "Scope: the whole contract\n") . "Received on: $when\n\nI will get in touch with you personally. Any refund is made within 14 days using the same payment method you used.\n\nWith love\nViv · Movecia, Vivien Malonga, Silvrettastraße 58, 6562 Mathon, Austria";
+            $t = "Dear " . forma_first_name($name) . ",\n\nI hereby confirm that I have received your withdrawal. This is what you told me:\n\nName: $name\nEmail: $email\nContract: {$contracts[$contract]}\n" . ($ref !== '' ? "Booking details: $ref\n" : '') . ($part !== '' ? "Scope (partial withdrawal): $part\n" : "Scope: the whole contract\n") . "Received on: $when\n\nI will get in touch with you personally. You receive your refund no later than 14 days from now, using the same payment method you used. If you asked for sessions to take place during the withdrawal period, only the sessions that have already taken place are deducted.\n\nSee you soon\nVivien · Movecia, Vivien Malonga, Silvrettastraße 58, 6562 Mathon, Austria";
             $subj = 'Confirmation of your withdrawal';
         }
-        mm_mail($email, $subj, $t, mm_mail_html($subj, nl2br(forma_h($t)), $L));
-        $v = "Hallo Viv,\n\n$name ($email) ist über das Rücktritts-Formular zurückgetreten.\n\nVertrag: {$contracts[$contract]}\nAngaben: " . ($ref ?: '–') . "\nTeilrücktritt: " . ($part ?: 'nein, ganzer Vertrag') . "\nEingegangen: " . date('d.m.Y, H:i', strtotime($at)) . " Uhr\n\nDie Eingangsbestätigung ist automatisch an sie gegangen. Bitte die Rückerstattung binnen 14 Tagen in Stripe veranlassen (bei vorzeitigem Beginn anteilig) und ein Abo/Ratenplan beenden.\n";
+        mm_mail($email, $subj, $t, mm_mail_html($subj, nl2br(forma_h($t)), $L), [], 'Vivien · Movecia');
+        $v = "Hallo Viv,\n\n$name ($email) ist über das Rücktritts-Formular zurückgetreten.\n\nVertrag: {$contracts[$contract]}\nAngaben: " . ($ref ?: '–') . "\nTeilrücktritt: " . ($part ?: 'nein, ganzer Vertrag') . "\nEingegangen: " . date('d.m.Y, H:i', strtotime($at)) . " Uhr\n\nDie Eingangsbestätigung ist automatisch an sie gegangen. Bitte die Rückerstattung binnen 14 Tagen in Stripe veranlassen (bei vorzeitigem Beginn nur die stattgefundenen Einheiten abziehen) und beim Prä- & Postnatal Training offene Termine in der Verwaltung absagen bzw. ein Abo/Ratenplan beenden.\n";
         mm_mail(MM_FROM_EMAIL, 'Rücktritt: ' . $name . ' · ' . $contracts[$contract], $v, mm_mail_html('Rücktritt eingegangen', nl2br(forma_h($v)), 'de'));
         $done = ['at' => $at, 'email' => $email];
     }
@@ -52,7 +55,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Withdraw from the contract · Wild Hearts</title>
+<title>Withdraw from the contract · Movecia</title>
 <link rel="icon" href="/img/wildhearts/viv.jpg">
 <style>
 @font-face{font-family:"Italiana";src:url(/fonts/Italiana-Regular.woff) format("woff")}
@@ -89,15 +92,15 @@ a{color:var(--wine)}
       <p><span class="en">Received on</span><span class="de">Eingegangen am</span> <?= $h(date('d.m.Y, H:i', strtotime($done['at']))) ?> <span class="en">(Vienna time).</span><span class="de">Uhr (Wiener Zeit).</span> <span class="en">A confirmation is on its way to your email address.</span><span class="de">Eine Bestätigung ist an deine E-Mail-Adresse unterwegs.</span></p>
     </div>
   <?php else: ?>
-    <p><span class="en">Fill in this form to withdraw from your contract for The Inner Circle or The Year Circle. You will receive a confirmation by email with the date and time it was received. The details of your right of withdrawal are in the <a href="/terms#withdrawal">terms</a>.</span><span class="de">Fülle dieses Formular aus, um von deinem Vertrag für The Inner Circle oder den Jahreskreis zurückzutreten. Du bekommst eine Bestätigung per E-Mail mit Datum und Uhrzeit des Eingangs. Die Einzelheiten zu deinem Rücktrittsrecht findest du in den <a href="/terms?lang=de#withdrawal">Bedingungen</a>.</span></p>
+    <p><span class="en">Fill in this form to withdraw from a contract with Movecia, for example your prenatal and postnatal training. After you confirm, you immediately receive a confirmation by email with your details and the date and time it was received. All details are in the <a href="/terms?lang=en#withdrawal">right of withdrawal</a>.</span><span class="de">Mit diesem Formular trittst du von einem Vertrag mit Movecia zurück, zum Beispiel von deinem Prä- &amp; Postnatal Training. Nach dem Bestätigen bekommst du sofort eine Bestätigung per E-Mail mit deinen Angaben sowie Datum und Uhrzeit des Eingangs. Alle Einzelheiten findest du im <a href="/terms?lang=de#withdrawal">Rücktrittsrecht</a>.</span></p>
     <?php if ($err): ?><p class="err"><?= $h($err) ?></p><?php endif; ?>
     <form method="post" id="f">
       <input type="hidden" name="lang" id="fl" value="<?= $h($lang ?: 'en') ?>">
       <label><span><span class="en">Your name</span><span class="de">Dein Name</span></span><input name="name" required maxlength="120" autocomplete="name" value="<?= $h((string)($_POST['name'] ?? '')) ?>"></label>
       <label><span><span class="en">Your email address (the confirmation is sent here)</span><span class="de">Deine E-Mail-Adresse (dorthin geht die Bestätigung)</span></span><input name="email" type="email" required maxlength="160" autocomplete="email" value="<?= $h((string)($_POST['email'] ?? '')) ?>"></label>
-      <label><span><span class="en">Which contract?</span><span class="de">Welcher Vertrag?</span></span><select name="contract" required><?php foreach ($contracts as $k => $t): ?><option value="<?= $h($k) ?>"<?= ($_POST['contract'] ?? ($_GET['v'] ?? '')) === $k ? ' selected' : '' ?>><?= $h($t) ?></option><?php endforeach; ?></select></label>
-      <label><span><span class="en">Booking details, if you have them (date, email of the booking or invoice number)</span><span class="de">Angaben zur Buchung, falls vorhanden (Datum, E-Mail der Buchung oder Rechnungsnummer)</span></span><input name="reference" maxlength="200" value="<?= $h((string)($_POST['reference'] ?? '')) ?>"></label>
-      <label><span><span class="en">Only part of the contract? Tell me which part (leave empty for the whole contract)</span><span class="de">Nur einen Teil des Vertrags? Schreib, welchen (leer lassen für den ganzen Vertrag)</span></span><textarea name="part" rows="2" maxlength="600"><?= $h((string)($_POST['part'] ?? '')) ?></textarea></label>
+      <label><span><span class="en">Which contract?</span><span class="de">Welcher Vertrag?</span></span><select name="contract" required><?php foreach ($contracts as $k => $t): ?><option value="<?= $h($k) ?>"<?= $sel === $k ? ' selected' : '' ?>><?= $h($t) ?></option><?php endforeach; ?></select></label>
+      <label><span><span class="en">Which booking? (invoice number or booking date, if you have it)</span><span class="de">Welche Buchung? (Rechnungsnummer oder Buchungsdatum, falls zur Hand)</span></span><input name="reference" maxlength="200" value="<?= $h((string)($_POST['reference'] ?? '')) ?>"></label>
+      <label><span><span class="en">Only part of the contract? Tell me which part, for example only the postnatal sessions (leave empty for the whole contract)</span><span class="de">Nur einen Teil des Vertrags? Schreib, welchen, zum Beispiel nur die Postnatal-Einheiten (leer lassen für den ganzen Vertrag)</span></span><textarea name="part" rows="2" maxlength="600"><?= $h((string)($_POST['part'] ?? '')) ?></textarea></label>
       <div class="hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
       <button type="button" id="b1"><span class="en">Withdraw from the contract</span><span class="de">Vertrag widerrufen</span></button>
       <div id="step2" hidden>
@@ -107,7 +110,7 @@ a{color:var(--wine)}
       </div>
     </form>
   <?php endif; ?>
-  <p style="margin-top:26px;font-size:14px">Movecia – Personal Fitness · Vivien Malonga · Silvrettastraße 58, 6562 Mathon, Austria · <a href="mailto:<?= $h(MM_FROM_EMAIL) ?>"><?= $h(MM_FROM_EMAIL) ?></a></p>
+  <p style="margin-top:26px;font-size:14px">Movecia – Personal Fitness · Vivien Malonga · <a href="mailto:<?= $h(MM_FROM_EMAIL) ?>"><?= $h(MM_FROM_EMAIL) ?></a> · <a href="/terms<?= $lang === 'de' ? '?lang=de' : '' ?>#withdrawal"><span class="en">Right of withdrawal</span><span class="de">Rücktrittsrecht</span></a></p>
 </main>
 <script>
 (() => {

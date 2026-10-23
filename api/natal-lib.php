@@ -351,11 +351,12 @@ function natal_h1(string $t): string
 }
 
 /** Schickt eine Mail: Text-Version wird aus den Absätzen gebaut, HTML aus denselben Teilen. */
-function natal_mail(string $to, string $subject, string $title, array $paras, ?array $button = null, array $attachments = []): bool
+function natal_mail(string $to, string $subject, string $title, array $paras, ?array $button = null, array $attachments = [], string $legal = ''): bool
 {
     $text = implode("\n\n", array_map(fn($p) => is_array($p) ? implode("\n", $p) : $p, $paras));
     if ($button) $text .= "\n\n" . $button[1] . ': ' . $button[0];
     $text .= "\n\nBis bald,\nVivien\n\nVivien Malonga · Movecia – Personal Fitness · " . NATAL_COMPANY['email'];
+    if ($legal !== '') $text .= "\n\n----------\n\n" . $legal;
     $html = natal_h1($title);
     foreach ($paras as $p) {
         $html .= is_array($p)
@@ -363,7 +364,26 @@ function natal_mail(string $to, string $subject, string $title, array $paras, ?a
             : '<p style="margin:0 0 14px;">' . nl2br(forma_h($p)) . '</p>';
     }
     if ($button) $html .= natal_btn($button[0], $button[1]);
-    return mm_mail($to, $subject, $text, natal_mail_html($title, $html), $attachments, NATAL_FROM_NAME);
+    $foot = $legal === '' ? '' : '<div style="max-width:560px;margin:18px auto 0;padding:18px 22px;border-radius:18px;background:#FBF8F4;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#7D7076;text-align:left;">' . nl2br(forma_h($legal)) . '</div>';
+    return mm_mail($to, $subject, $text, natal_mail_html($title, $html, $foot), $attachments, NATAL_FROM_NAME);
+}
+
+/** Widerrufsbelehrung + Muster-Widerrufsformular (Anhang I FAGG) für die Buchungsbestätigung (dauerhafter Datenträger, § 7 Abs. 3 FAGG). */
+function natal_legal_text(bool $online = false): string
+{
+    $c = NATAL_COMPANY;
+    $adr = $c['name'] . ', ' . $c['firma'] . ', ' . $c['street'] . ', ' . $c['city'] . ', Österreich';
+    $site = mm_site();
+    return "WIDERRUFSBELEHRUNG\n\n"
+        . "Widerrufsrecht\nDu hast das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsabschlusses.\n"
+        . "Um dein Widerrufsrecht auszuüben, musst du mich ($adr, Telefon {$c['phone']}, E-Mail {$c['email']}) mittels einer eindeutigen Erklärung (zum Beispiel ein mit der Post versandter Brief oder eine E-Mail) über deinen Entschluss, diesen Vertrag zu widerrufen, informieren. Du kannst deinen Rücktritt auch über die Schaltfläche „Vertrag widerrufen“ erklären: $site/withdraw?v=" . ($online ? 'natal_online' : 'natal') . "&lang=de. Du kannst dafür das untenstehende Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist. Zur Wahrung der Widerrufsfrist reicht es aus, dass du die Mitteilung über die Ausübung des Widerrufsrechts vor Ablauf der Widerrufsfrist absendest.\n\n"
+        . "Folgen des Widerrufs\nWenn du diesen Vertrag widerrufst, zahle ich dir alle Zahlungen, die ich von dir erhalten habe, unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurück, an dem die Mitteilung über deinen Widerruf dieses Vertrags bei mir eingegangen ist. Für diese Rückzahlung verwende ich dasselbe Zahlungsmittel, das du bei der ursprünglichen Transaktion eingesetzt hast, es sei denn, mit dir wurde ausdrücklich etwas anderes vereinbart; in keinem Fall werden dir wegen dieser Rückzahlung Entgelte berechnet. Hast du verlangt, dass die Dienstleistungen während der Widerrufsfrist beginnen sollen, so hast du mir einen angemessenen Betrag zu zahlen, der dem Anteil der bis zu dem Zeitpunkt, zu dem du mich von der Ausübung des Widerrufsrechts hinsichtlich dieses Vertrags unterrichtest, bereits erbrachten Dienstleistungen im Vergleich zum Gesamtumfang der im Vertrag vorgesehenen Dienstleistungen entspricht (beim Prä- & Postnatal Training: die Einheiten, die bereits stattgefunden haben).\n\n"
+        . "Vorzeitiges Erlöschen\nDas Rücktrittsrecht erlischt vorzeitig, sobald alle gebuchten Einheiten stattgefunden haben, weil du ausdrücklich verlangt hast, dass die Einheiten schon während der Rücktrittsfrist beginnen, und bestätigt hast, dass du dein Rücktrittsrecht bei vollständiger Vertragserfüllung verlierst (§ 18 Abs. 1 Z 1 FAGG).\n\n"
+        . "MUSTER-WIDERRUFSFORMULAR\n(Wenn Sie den Vertrag widerrufen wollen, dann füllen Sie bitte dieses Formular aus und senden Sie es zurück.)\n"
+        . "– An $adr, E-Mail: {$c['email']}:\n"
+        . "– Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über den Kauf der folgenden Waren (*)/die Erbringung der folgenden Dienstleistung (*)\n"
+        . "– Bestellt am (*)/erhalten am (*)\n– Name des/der Verbraucher(s)\n– Anschrift des/der Verbraucher(s)\n– Unterschrift des/der Verbraucher(s) (nur bei Mitteilung auf Papier)\n– Datum\n(*) Unzutreffendes streichen.\n\n"
+        . "Alle Bedingungen: $site/terms?lang=de";
 }
 
 // --- Kalender ------------------------------------------------------------------------------
@@ -416,7 +436,7 @@ function natal_checkout(PDO $pdo, array $o): string
             ]],
         ]],
         'payment_intent_data' => ['description' => 'Movecia · Prä-/Postnatal ' . $o['title'] . ' · ' . $o['name'], 'metadata' => ['bereich' => 'Movecia', 'natal_order_id' => (string)$o['id']]],
-        'custom_text' => ['submit' => ['message' => 'Leistung von Movecia – Personal Fitness (Vivien Malonga). Die Zahlung läuft über das gemeinsame Konto von FORMA & Movecia. Deine Rechnung im Movecia-Design bekommst du per E-Mail.']],
+        'custom_text' => ['submit' => ['message' => 'Leistung von Movecia – Personal Fitness (Vivien Malonga). Die Zahlung läuft über das gemeinsame Konto von FORMA & Movecia. Deine Rechnung im Movecia-Design bekommst du per E-Mail. Bedingungen & Rücktrittsrecht: ' . $site . '/terms?lang=de']],
         'expires_at' => time() + 31 * 60,
         'success_url' => $site . '/api/natal-bezahlt.php?o=' . $o['id'] . '&k=' . $o['token'],
         'cancel_url' => $site . '/natal/?o=' . $o['id'] . '&k=' . $o['token'] . '&abgebrochen=1',
@@ -473,8 +493,8 @@ function natal_paid_mails(PDO $pdo, array $o, array $wishes): void
     $paras[] = natal_is_online($o)
         ? 'Bitte sprich das Training vorher mit deiner Ärztin oder Hebamme ab. Für unsere Online-Einheiten brauchst du nur eine Matte, etwas Platz und dein Handy oder Laptop, am besten so aufgestellt, dass ich dich ganz sehe. Den Link zum Videoraum findest du in jeder Terminbestätigung.'
         : 'Bitte sprich das Training vorher mit deiner Ärztin oder Hebamme ab. Komm in bequemer Kleidung und bring eine Flasche Wasser mit. Matten und alles andere habe ich im Studio.';
-    $paras[] = 'Die Rechnung bekommst du in einer eigenen E-Mail. Du hast ein 14-tägiges Rücktrittsrecht. Weil du dir gewünscht hast, dass die Termine schon in dieser Zeit stattfinden können, zahlst du bei einem Rücktritt nur die Einheiten, die schon stattgefunden haben. Rücktritts-Formular: ' . mm_site() . '/withdraw?v=natal';
-    natal_mail((string)$o['email'], 'Deine Buchung bei Movecia: ' . $o['title'], 'Schön, dass du dabei bist', $paras, [natal_link($o), 'Meine Termine ansehen']);
+    $paras[] = 'Die Rechnung bekommst du in einer eigenen E-Mail. Du hast ein 14-tägiges Rücktrittsrecht. Bei der Buchung hast du ausdrücklich gewünscht, dass die Einheiten schon in dieser Zeit stattfinden können, und bestätigt, dass dein Rücktrittsrecht erlischt, sobald alle gebuchten Einheiten stattgefunden haben. Trittst du vorher zurück, zahlst du nur die Einheiten, die schon stattgefunden haben. Die vollständige Widerrufsbelehrung und das Muster-Formular findest du unten in dieser E-Mail, zurücktreten kannst du jederzeit hier: ' . mm_site() . '/withdraw?v=' . (natal_is_online($o) ? 'natal_online' : 'natal') . '&lang=de';
+    natal_mail((string)$o['email'], 'Deine Buchung bei Movecia: ' . $o['title'], 'Schön, dass du dabei bist', $paras, [natal_link($o), 'Meine Termine ansehen'], [], natal_legal_text(natal_is_online($o)));
 
     $v = ["Neue Buchung Prä- & Postnatal Training:", [
         $o['name'] . ' · ' . $o['email'] . ($o['phone'] !== '' ? ' · ' . $o['phone'] : ''),

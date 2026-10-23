@@ -523,7 +523,7 @@ footer summary{cursor:pointer}
       <p class="mut" style="font-size:.92rem">Tipp auf die Tage, die dir passen, und wähl die Tageszeit. Du kannst die Termine auch erst nach der Zahlung auf deiner persönlichen Seite aussuchen.</p>
       <div id="calbox"></div>
       <label class="chk"><input type="checkbox" name="health" value="1" required><span>Ich spreche das Training mit meiner Ärztin oder Hebamme ab.</span></label>
-      <label class="chk"><input type="checkbox" name="start_now" value="1" required><span>Ich möchte, dass die Termine schon innerhalb der 14-tägigen Rücktrittsfrist stattfinden können. Trete ich zurück, zahle ich nur die Einheiten, die bereits stattgefunden haben (<a href="/withdraw?v=natal" target="_blank" rel="noopener">Rücktritts-Formular</a>).</span></label>
+      <label class="chk"><input type="checkbox" name="start_now" value="1" required><span>Ich möchte ausdrücklich, dass die Einheiten schon innerhalb der 14-tägigen Rücktrittsfrist stattfinden können. Trete ich zurück, zahle ich nur die Einheiten, die bereits stattgefunden haben. Mir ist bewusst, dass mein Rücktrittsrecht erlischt, sobald alle gebuchten Einheiten stattgefunden haben (<a href="/terms?lang=de#withdrawal" target="_blank" rel="noopener">Rücktrittsrecht &amp; Bedingungen</a>).</span></label>
       <label class="chk"><input type="checkbox" name="consent" value="1" required><span>Meine Angaben werden nur für meine Buchung und die Terminplanung verwendet (Datenschutz siehe unten).</span></label>
       <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
     </div>
@@ -575,13 +575,14 @@ footer summary{cursor:pointer}
   <details><summary>Was soll ich mitbringen?</summary><p>Bequeme Kleidung, eine Flasche Wasser und gern ein Handtuch. Matten und alles andere habe ich im Studio.</p></details>
 </div>
   <details><summary>Ich muss einen Termin verschieben. Was nun?</summary><p>Gib mir bitte so bald wie möglich Bescheid, am besten bis 24 Stunden vorher. Wenn das Baby oder die Gesundheit dazwischenkommt, finden wir immer eine Lösung.</p></details>
+  <details><summary>Kann ich nach der Buchung zurücktreten?</summary><p>Ja, binnen 14 Tagen ohne Angabe von Gründen, ganz einfach über <a href="/withdraw?v=natal&amp;lang=de">„Vertrag widerrufen“</a>. Du bekommst dein Geld zurück, abgezogen werden nur Einheiten, die bereits stattgefunden haben. Alle Einzelheiten stehen im <a href="/terms?lang=de#withdrawal">Rücktrittsrecht</a>.</p></details>
 </section>
 </main>
 <?php endif; ?>
 
 <footer class="w">
   <p>Movecia – Personal Fitness · Vivien Malonga · <a href="mailto:<?= $h(NATAL_COMPANY['email']) ?>"><?= $h(NATAL_COMPANY['email']) ?></a></p>
-  <p style="margin-top:6px"><a href="/withdraw?v=natal">Vertrag widerrufen</a></p>
+  <p style="margin-top:6px"><a href="/terms?lang=de#natal">Bedingungen &amp; Rücktrittsrecht</a> · <a href="/withdraw?v=natal&amp;lang=de" style="font-weight:600">Vertrag widerrufen</a></p>
   <details><summary>Impressum &amp; Datenschutz</summary>
     <p style="margin-top:.6rem"><strong>Impressum:</strong> Vivien Malonga, Movecia – Personal Fitness, Silvrettastraße 58, 6562 Mathon, Österreich. E-Mail: hello@moveciamovement.com. UID: ATU83602825.</p>
     <p style="margin-top:.6rem"><strong>Datenschutz:</strong> Wenn du buchst, speichere ich deinen Namen, deine E-Mail-Adresse, deine Telefonnummer, deinen Geburtstermin, deine Nachricht und deine Wunschtermine, um deine Buchung abzuwickeln und die Termine mit dir zu planen. Die Zahlung läuft über Stripe (Stripe Payments Europe Ltd., Irland). Für die Buchhaltung bewahre ich die Rechnung so lange auf, wie es das Gesetz verlangt. Diese Seite verwendet keine Tracking-Cookies. Fragen oder Löschwünsche an hello@moveciamovement.com.</p>
