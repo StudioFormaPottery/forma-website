@@ -8,6 +8,7 @@ header('Cache-Control: no-store');
 header('X-Robots-Tag: noindex, nofollow');
 $pdo = forma_db();
 natal_schema($pdo);
+natal_bonus_tick($pdo);
 $h = 'forma_h';
 
 require dirname(__DIR__, 3) . '/api/natal-prompter.inc.php';

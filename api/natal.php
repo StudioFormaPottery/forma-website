@@ -4,6 +4,7 @@ declare(strict_types=1);
 require __DIR__ . '/natal-lib.php';
 $pdo = forma_db();
 natal_schema($pdo);
+natal_bonus_tick($pdo);
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'GET' && isset($_GET['ics'])) {
     $o = natal_order_auth($pdo, (int)($_GET['o'] ?? 0), (string)($_GET['k'] ?? ''));
@@ -60,6 +61,10 @@ if ($action === 'buy') {
     $c->execute([$ipHash, date('c', time() - 3600)]);
     if ((int)$c->fetchColumn() >= 8) forma_json(['ok' => false, 'error' => 'Bitte versuch es später noch einmal oder ruf mich an: ' . NATAL_COMPANY['phone']], 429);
     $p = $packs[$key];
+    // Kennenlern-Bonus: Preis pro Einheit bestimmt der Server
+    $bonusCall = ($in['bonus'] ?? '') !== '' ? natal_bonus_valid($pdo, (string)$in['bonus']) : null;
+    $bp = $bonusCall ? (natal_bonus_prices(natal_bonus_cfg()['percent'])[$key] ?? null) : null;
+    if ($bp) { $p['unit_cents'] = $bp['unit']; $p['title'] .= ' · Kennenlern-Bonus'; }
     $wishes = array_slice(natal_clean_wishes((string)($in['wishes'] ?? '[]')), 0, $p['units']);
     $offerId = null;
     if (($in['a'] ?? '') !== '') {
@@ -71,6 +76,7 @@ if ($action === 'buy') {
     $pdo->prepare('INSERT INTO mm_natal_orders (offer_id, package, title, units, unit_cents, amount_cents, name, email, phone, due_date, note, wishes, token, ip_hash, consent_start, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?)')
         ->execute([$offerId, $key, $p['title'], $p['units'], $p['unit_cents'], $p['unit_cents'] * $p['units'], $name, $email, $phone, $due, $note, json_encode($wishes), $tok, $ipHash, date('c')]);
     $o = natal_order($pdo, (int)$pdo->lastInsertId());
+    if ($bp) { $pdo->prepare('UPDATE mm_natal_orders SET bonus_call_id = ? WHERE id = ?')->execute([$bonusCall['id'], $o['id']]); $o['bonus_call_id'] = $bonusCall['id']; }
     try {
         forma_json(['ok' => true, 'redirect' => natal_checkout($pdo, $o)]);
     } catch (Throwable $e) {

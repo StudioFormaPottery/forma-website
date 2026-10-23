@@ -7,6 +7,7 @@ require dirname(__DIR__, 2) . '/api/natal-lib.php';
 header('Cache-Control: no-store');
 $pdo = forma_db();
 natal_schema($pdo);
+natal_bonus_tick($pdo);
 $h = 'forma_h';
 
 $order = null;
@@ -21,6 +22,13 @@ if (!$order && ($_GET['a'] ?? '') !== '') {
     $offer = $q->fetch() ?: null;
     if ($offer && !$offer['opened_at']) $pdo->prepare('UPDATE mm_natal_offers SET opened_at = ? WHERE id = ?')->execute([date('c'), $offer['id']]);
 }
+// Kennenlern-Bonus aus der Mail nach dem Gespräch (?bonus=TOKEN): Pakete günstiger, Preis bestimmt der Server
+$bonus = null; $bonusP = [];
+if (!$order && ($_GET['bonus'] ?? '') !== '') {
+    $bonus = natal_bonus_valid($pdo, (string)$_GET['bonus']);
+    if ($bonus) $bonusP = natal_bonus_prices(natal_bonus_cfg()['percent']);
+}
+$bonusGone = !$order && ($_GET['bonus'] ?? '') !== '' && !$bonus;
 $online = $order ? natal_is_online($order) : (in_array($_GET['m'] ?? '', ['studio', 'online'], true) ? $_GET['m'] === 'online' : ($offer && ($offer['mode'] ?? 'studio') === 'online'));
 $packs = natal_packages_for($online ? 'online' : 'studio');
 // Was in den einzelnen Einheiten passiert (aus dem Curriculum, Vivien 23.10.2026)
@@ -47,7 +55,9 @@ $units = [
 $modeInfo = [];
 foreach (['studio', 'online'] as $md) {
     $ps = natal_packages_for($md);
-    $modeInfo[$md] = ['packs' => $ps, 'single' => $ps[$md === 'online' ? 'o_einzel' : 'einzel']['cents'], 'min' => min(array_column($ps, 'unit_cents'))];
+    $mins = [];
+    foreach ($ps as $k => $x) $mins[] = $bonusP[$k]['unit'] ?? $x['unit_cents'];
+    $modeInfo[$md] = ['packs' => $ps, 'single' => $ps[$md === 'online' ? 'o_einzel' : 'einzel']['cents'], 'min' => min($mins)];
 }
 $single = $packs[$online ? 'o_einzel' : 'einzel']['cents'];
 $where = $online ? 'live per Video' : 'im Studio';
@@ -112,6 +122,12 @@ section{padding-block:clamp(3.5rem,8vw,7rem)}
 .hero{display:grid;gap:2.5rem;align-items:center;padding-block:clamp(2rem,5vw,4.5rem) clamp(3rem,6vw,5rem)}
 @media(min-width:1000px){.hero{grid-template-columns:1.25fr 1fr;gap:4rem}}
 .script{font-family:var(--serif);font-style:italic;font-size:clamp(1.5rem,2.4vw,2.1rem);color:var(--plum);margin-top:.6rem}
+.bonusbox{display:block;margin-left:0;margin-right:0;max-width:none!important;background:var(--plum);color:var(--on);border-radius:18px;padding:1rem 1.25rem;margin-top:1.4rem;max-width:34em;font-size:1rem;box-shadow:0 20px 40px -28px var(--plum)}
+.bonusbox b{font-family:var(--serif);font-size:1.45rem;font-weight:500;display:block}
+.bonusbox.gone{background:var(--card);color:var(--ink);box-shadow:none}
+.pack .was{font-size:.95rem;color:var(--muted);text-decoration:line-through;margin-top:auto;padding-top:.8rem}
+.pack .was + .p{margin-top:0;padding-top:.15rem}
+.pack .bon{align-self:flex-start;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;padding:.25rem .6rem;border-radius:999px;background:var(--plum);color:var(--on)}
 .hello{display:inline-block;background:var(--card);border-radius:18px;padding:.9rem 1.2rem;margin-top:1.4rem;max-width:34em;font-size:1rem}
 .hello b{font-family:var(--serif);font-size:1.35rem;font-weight:500;display:block;color:var(--ink)}
 .lead{font-size:clamp(1.05rem,1.4vw,1.3rem);font-weight:300;color:var(--muted);max-width:32em;margin-top:1.4rem}
@@ -291,6 +307,8 @@ footer summary{cursor:pointer}
 </head>
 <body data-mode="<?= $online ? 'online' : 'studio' ?>">
 <header class="top w"><a class="brand" href="<?= $order ? $h(natal_link($order)) : '#' ?>">Movecia<i></i></a><span class="tag">1:1 <?= $order ? ($online ? 'online' : 'im Studio') : 'im Studio &amp; online' ?> · Prä- &amp; Postnatal</span></header>
+<div class="w"><?php if ($bonus): $bc = natal_bonus_cfg(); ?><p class="bonusbox"><b>Dein Kennenlern-Bonus, <?= $h(forma_first_name((string)$bonus['name'])) ?></b>Danke für unser Gespräch! Jedes Paket ist für dich <?= (int)$bc['percent'] ?> % günstiger, im Studio und online. Der Bonus gilt bis <?= $h(natal_date_de((string)$bonus['bonus_until'])) ?> und ist unten schon eingerechnet.</p>
+    <?php elseif ($bonusGone): ?><p class="bonusbox gone"><b>Dieser Bonus ist leider nicht mehr gültig</b>Er ist abgelaufen oder wurde schon eingelöst. Die Pakete kannst du unten natürlich trotzdem buchen, und bei Fragen schreib mir einfach.</p><?php endif; ?></div>
 
 <?php if ($order):
     $first = forma_first_name((string)$order['name']);
@@ -420,8 +438,8 @@ footer summary{cursor:pointer}
       <div id="klslots" class="picked"><p class="mut" style="font-size:.9rem;padding:.6rem 0">Tipp zuerst auf einen Tag.</p></div>
     </div>
     <form id="klform" class="grid2" hidden novalidate>
-      <label class="f">Vor- und Nachname<input type="text" name="name" autocomplete="name" required maxlength="120" value="<?= $offer ? $h((string)$offer['name']) : '' ?>"></label>
-      <label class="f">E-Mail<input type="email" name="email" autocomplete="email" required maxlength="160"></label>
+      <label class="f">Vor- und Nachname<input type="text" name="name" autocomplete="name" required maxlength="120" value="<?= $offer ? $h((string)$offer['name']) : ($bonus ? $h((string)$bonus['name']) : '') ?>"></label>
+      <label class="f">E-Mail<input type="email" name="email" autocomplete="email" required maxlength="160" value="<?= $bonus ? $h((string)$bonus['email']) : '' ?>"></label>
       <label class="f">Telefon (optional)<input type="tel" name="phone" autocomplete="tel" maxlength="40"></label>
       <label class="f">Was möchtest du besprechen? (optional)<input type="text" name="note" maxlength="600" placeholder="z. B. SSW, Fragen, Wünsche"></label>
       <label class="chk" style="grid-column:1/-1"><input type="checkbox" name="consent" value="1" required><span>Meine Angaben werden nur für dieses Gespräch verwendet (Datenschutz siehe unten).</span></label>
@@ -474,10 +492,11 @@ footer summary{cursor:pointer}
   <p class="mut" style="margin-top:1rem">Jede Einheit dauert 60 Minuten, 1:1 <span class="m-studio">bei mir im Studio</span><span class="m-online">live per Video</span>. Alle Preise inkl. 20 % USt.</p>
   <?php foreach ($modeInfo as $md => $mi): ?>
   <div class="packs m-<?= $md ?>" role="radiogroup" aria-label="Paket <?= $md === 'online' ? 'online' : 'im Studio' ?>">
-    <?php foreach ($mi['packs'] as $k => $p): $save = $mi['single'] * $p['units'] - $p['cents']; ?>
-      <label class="pack"><input type="radio" name="package" value="<?= $h($k) ?>" data-units="<?= (int)$p['units'] ?>" data-cents="<?= (int)$p['cents'] ?>" data-title="<?= $h($p['title']) ?>" data-unit="<?= (int)$p['unit_cents'] ?>"<?= $p['tag'] !== '' && ($online ? 'online' : 'studio') === $md ? ' checked' : '' ?>>
+    <?php foreach ($mi['packs'] as $k => $p): $bp = $bonusP[$k] ?? null; $was = $bp ? $p['cents'] : 0; if ($bp) { $p['cents'] = $bp['total']; $p['unit_cents'] = $bp['unit']; } $save = $mi['single'] * $p['units'] - $p['cents']; ?>
+      <label class="pack"><input type="radio" name="package" value="<?= $h($k) ?>" data-units="<?= (int)$p['units'] ?>" data-cents="<?= (int)$p['cents'] ?>" data-title="<?= $h($p['title'] . ($bp ? ' · Kennenlern-Bonus' : '')) ?>" data-unit="<?= (int)$p['unit_cents'] ?>"<?= $p['tag'] !== '' && ($online ? 'online' : 'studio') === $md ? ' checked' : '' ?>>
         <?php if ($p['tag']): ?><span class="badge"><?= $h($p['tag']) ?></span><?php endif; ?><span class="ck" aria-hidden="true"></span>
         <span class="t"><?= $h(preg_replace('/ online$/', '', $p['title'])) ?></span><span class="s"><?= $h($p['sub']) ?></span>
+        <?php if ($bp): ?><span class="bon">Kennenlern-Bonus</span><span class="was"><?= $h($euro($was)) ?></span><?php endif; ?>
         <span class="p"><?= $h($euro($p['cents'])) ?></span>
         <span class="u"><?= $p['units'] > 1 ? $h($euro($p['unit_cents'])) . ' pro Einheit' : 'pro Einheit' ?></span>
         <?php if ($save > 0): ?><span class="save">du sparst <?= $h($euro($save)) ?></span><?php endif; ?>
@@ -494,8 +513,8 @@ footer summary{cursor:pointer}
       <p class="k">Buchen</p>
       <h3>Deine Angaben</h3>
       <div class="grid2">
-        <label class="f">Vor- und Nachname<input type="text" name="name" autocomplete="name" required maxlength="120" value="<?= $offer ? $h((string)$offer['name']) : '' ?>"></label>
-        <label class="f">E-Mail<input type="email" name="email" autocomplete="email" required maxlength="160"></label>
+        <label class="f">Vor- und Nachname<input type="text" name="name" autocomplete="name" required maxlength="120" value="<?= $offer ? $h((string)$offer['name']) : ($bonus ? $h((string)$bonus['name']) : '') ?>"></label>
+        <label class="f">E-Mail<input type="email" name="email" autocomplete="email" required maxlength="160" value="<?= $bonus ? $h((string)$bonus['email']) : '' ?>"></label>
         <label class="f">Telefon (für Terminfragen)<input type="tel" name="phone" autocomplete="tel" required maxlength="40"></label>
         <label class="f">Voraussichtlicher Geburtstermin<input type="date" name="due_date" id="due"></label>
       </div>
@@ -531,8 +550,8 @@ footer summary{cursor:pointer}
       <p class="mut" style="margin-top:.8rem;max-width:32em">Trag dich ein, dann schicke ich dir alle Pakete, Preise und den Ablauf der Einheiten in Ruhe zum Nachlesen, dazu ab und zu einen Tipp für deine Schwangerschaft und die Zeit danach.</p>
     </div>
     <form id="nlform" class="nlf" novalidate>
-      <label class="f">Vorname<input type="text" name="name" autocomplete="given-name" required maxlength="80" value="<?= $offer ? $h((string)$offer['name']) : '' ?>"></label>
-      <label class="f">E-Mail<input type="email" name="email" autocomplete="email" required maxlength="160"></label>
+      <label class="f">Vorname<input type="text" name="name" autocomplete="given-name" required maxlength="80" value="<?= $offer ? $h((string)$offer['name']) : ($bonus ? $h((string)$bonus['name']) : '') ?>"></label>
+      <label class="f">E-Mail<input type="email" name="email" autocomplete="email" required maxlength="160" value="<?= $bonus ? $h((string)$bonus['email']) : '' ?>"></label>
       <label class="chk"><input type="checkbox" name="consent" value="1" required><span>Ja, Vivien darf mir E-Mails zum Prä- und Postnatal-Training schicken. Ich kann mich jederzeit abmelden.</span></label>
       <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div><button class="btn" type="submit" id="nlbtn">Infos schicken</button></div>
@@ -575,6 +594,7 @@ footer summary{cursor:pointer}
   const MODE = <?= json_encode($order ? 'order' : 'offer') ?>;
   const ORDER = <?= json_encode($order ? ['o' => (int)$order['id'], 'k' => $order['token'], 'left' => $left] : null) ?>;
   const OFFER = <?= json_encode($offer ? (string)$offer['token'] : '') ?>;
+  const BONUS = <?= json_encode($bonus ? (string)$bonus['bonus_token'] : '') ?>;
   const euro = c => '€ ' + (c % 100 ? (c / 100).toFixed(2).replace('.', ',') : String(c / 100));
   const MON = ['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
   const WD = ['So','Mo','Di','Mi','Do','Fr','Sa'];
@@ -747,7 +767,7 @@ footer summary{cursor:pointer}
     f.addEventListener('submit', async e => {
       e.preventDefault(); err.hidden = true;
       const d = Object.fromEntries(new FormData(f));
-      d.package = cur().value; d.action = 'buy'; d.t = loaded; d.a = OFFER;
+      d.package = cur().value; d.action = 'buy'; d.t = loaded; d.a = OFFER; d.bonus = BONUS;
       d.wishes = JSON.stringify(cal.get());
       if (!d.name || !d.email || !d.phone) { err.textContent = 'Bitte füll Name, E-Mail und Telefon aus.'; err.hidden = false; return; }
       if (!d.health || !d.start_now || !d.consent) { err.textContent = 'Bitte bestätige noch die drei Häkchen.'; err.hidden = false; return; }

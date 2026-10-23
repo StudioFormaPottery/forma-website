@@ -4,6 +4,7 @@
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/api/natal-lib.php';
 natal_schema($pdo);
+natal_bonus_tick($pdo);
 $nBack = $self . '?view=natal';
 
 function natal_wa(string $phone): string
@@ -95,8 +96,15 @@ if ($action === 'mm_natal_settings') {
     if (!$cfg['weekdays']) $cfg['weekdays'] = [1, 2, 3, 4, 5];
     $n = trim((string)($_POST['notify'] ?? ''));
     $cfg['notify'] = filter_var($n, FILTER_VALIDATE_EMAIL) ? $n : '';
+    $cfg['bonus'] = ['on' => !empty($_POST['bonus_on']), 'percent' => max(1, min(30, (int)($_POST['bonus_percent'] ?? 7))), 'days' => max(1, min(30, (int)($_POST['bonus_days'] ?? 7)))];
     mm_save_cfg('natal', $cfg);
     go($nBack . '#einstellungen', 'Gespeichert.');
+}
+if ($action === 'mm_natal_bonus_send') {
+    natal_bonus_schema($pdo);
+    $c = $pdo->query('SELECT * FROM mm_natal_calls WHERE id = ' . (int)($_POST['cid'] ?? 0))->fetch();
+    $ok = $c && natal_bonus_send($pdo, $c);
+    go($nBack . '#bonus', $ok ? 'Der Kennenlern-Bonus ist an ' . $c['name'] . ' unterwegs.' : 'Die Mail konnte nicht verschickt werden.');
 }
 if ($action === 'mm_natal_sample') {
     $inv = ['kind' => 'natal', 'nr' => 'MUSTER-' . date('Y') . '-000', 'issued_at' => date('Y-m-d'), 'service_date' => 'nach Vereinbarung', 'name' => 'Lena Muster', 'email' => natal_notify_email(),
@@ -116,6 +124,12 @@ if ($view === 'natal' && isset($_GET['newsvorschau'])) {
     exit;
 }
 
+if ($view === 'natal' && isset($_GET['bonusvorschau'])) {
+    $m = natal_bonus_mail(['name' => 'Anna', 'mode' => 'studio'], 'vorschau', date('Y-m-d', strtotime('+' . natal_bonus_cfg()['days'] . ' days')));
+    header('Content-Type: text/html; charset=utf-8');
+    echo $m['html'];
+    exit;
+}
 if ($view === 'natal' && isset($_GET['mailvorschau'])) {
     $q = $pdo->prepare('SELECT * FROM mm_natal_offers WHERE id = ?');
     $q->execute([(int)$_GET['mailvorschau']]);
@@ -210,6 +224,16 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
                         <form method="post" class="stack" style="margin-top:6px"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_call_cancel"><input type="hidden" name="cid" value="<?= (int)$c['id'] ?>"><textarea name="reason" rows="2" placeholder="Nachricht (optional)"></textarea>
                             <label class="check"><input type="checkbox" name="mail" value="1" checked> Mail mit Link für neuen Termin</label><button class="btn btn-ghost btn-sm" type="submit">Gespräch absagen</button></form></details></span></div>
             <?php endforeach; ?></div><?php endif; ?>
+        <?php natal_bonus_schema($pdo); $bc = natal_bonus_cfg();
+        $sent = $pdo->query("SELECT c.*, (SELECT COUNT(*) FROM mm_natal_orders o WHERE o.bonus_call_id = c.id AND o.status = 'bezahlt') AS used FROM mm_natal_calls c WHERE c.bonus_state <> '' ORDER BY c.bonus_sent_at DESC LIMIT 20")->fetchAll();
+        $open = $pdo->query("SELECT * FROM mm_natal_calls WHERE status = 'gebucht' AND bonus_state = '' AND date < '" . date('Y-m-d') . "' ORDER BY date DESC LIMIT 10")->fetchAll(); ?>
+        <div class="card stack" id="bonus" style="margin-top:12px">
+            <p class="small"><b>Kennenlern-Bonus</b> · <?= $bc['on'] ? 'an' : '<b>aus</b>' ?>: 15 Minuten nach jedem Gespräch bekommt sie automatisch eine Mail mit <?= (int)$bc['percent'] ?> % auf alle Pakete, gültig <?= (int)$bc['days'] ?> Tage. <a href="<?= forma_h($self) ?>?view=natal&amp;bonusvorschau=1" target="_blank" rel="noopener">Mail ansehen</a> · <a href="#einstellungen">ändern</a></p>
+            <?php foreach ($open as $c): ?><div class="ln"><span class="small"><?= forma_h($c['name']) ?> · Gespräch am <?= forma_h(natal_call_when($c)) ?> · noch kein Bonus</span>
+                <form method="post"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_bonus_send"><input type="hidden" name="cid" value="<?= (int)$c['id'] ?>"><button class="btn btn-ghost btn-sm" type="submit">Bonus jetzt schicken</button></form></div><?php endforeach; ?>
+            <?php foreach ($sent as $c): ?><div class="ln"><span class="small"><?= forma_h($c['name']) ?> · geschickt <?= $c['bonus_sent_at'] ? forma_h(date('d. m.', strtotime((string)$c['bonus_sent_at']))) : '' ?> · gültig bis <?= forma_h(natal_date_de((string)$c['bonus_until'], false)) ?></span>
+                <span class="chip<?= (int)$c['used'] ? ' ok' : '' ?>"><?= (int)$c['used'] ? 'gebucht' : ((string)$c['bonus_until'] < date('Y-m-d') ? 'abgelaufen' : 'offen') ?></span></div><?php endforeach; ?>
+        </div>
 
         <h2 id="anfragen">Terminanfragen</h2>
         <?php if (!$reqs): ?><p class="card muted small">Gerade keine offenen Anfragen. Sobald eine Kundin Wunschtermine schickt, bekommst du eine Mail an <?= forma_h(natal_notify_email()) ?> und sie stehen hier.</p><?php endif; ?>
@@ -334,6 +358,11 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <div class="row"><?php foreach ($packs as $k => $p): ?><div class="stack"><label for="np<?= $k ?>"><?= forma_h($p['title']) ?> (<?= (int)$p['units'] ?> × 60 Min.) in €</label><input id="np<?= $k ?>" name="price[<?= $k ?>]" inputmode="decimal" value="<?= $eu($p['cents']) ?>"><span class="small muted">= <?= forma_h(forma_euro($p['unit_cents'])) ?> pro Einheit</span></div><?php endforeach; ?></div>
             <fieldset class="days"><legend>An diesen Tagen dürfen Wunschtermine gewählt werden</legend><div class="wdays"><?php foreach (NATAL_WEEKDAYS as $n => $l): ?><label class="check"><input type="checkbox" name="weekdays[]" value="<?= $n ?>"<?= in_array($n, natal_weekdays(), true) ? ' checked' : '' ?>> <?= $l ?></label><?php endforeach; ?></div></fieldset>
             <label for="nno">Benachrichtigungen an</label><input id="nno" name="notify" type="email" value="<?= forma_h((string)($cfg['notify'] ?? '')) ?>" placeholder="<?= forma_h(MM_FROM_EMAIL) ?>">
+            <fieldset class="days"><legend>Kennenlern-Bonus nach dem Gespräch</legend>
+                <label class="check"><input type="checkbox" name="bonus_on" value="1"<?= natal_bonus_cfg()['on'] ? ' checked' : '' ?>> automatisch verschicken</label>
+                <div class="row"><div class="stack"><label for="nbp">Rabatt auf Pakete in %</label><input id="nbp" name="bonus_percent" type="number" min="1" max="30" value="<?= (int)natal_bonus_cfg()['percent'] ?>"></div>
+                <div class="stack"><label for="nbd">gültig (Tage)</label><input id="nbd" name="bonus_days" type="number" min="1" max="30" value="<?= (int)natal_bonus_cfg()['days'] ?>"></div></div>
+                <span class="small muted">Gilt nur für Pakete, nicht für die Einzelstunde. Preise pro Einheit werden auf ganze Euro gerundet.</span></fieldset>
             <button class="btn" type="submit">Speichern</button>
         </form>
         <form method="post" style="margin-top:10px"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_sample"><button class="link" type="submit">Muster-Rechnung an mich schicken</button></form>

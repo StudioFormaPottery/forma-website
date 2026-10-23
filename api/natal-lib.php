@@ -1008,3 +1008,121 @@ function natal_news_ml(PDO $pdo, array $sub, bool $active = true): bool
     }
 }
 
+// --- Kennenlern-Bonus: Spezialangebot direkt nach dem Kennenlerngespräch (Vivien, 23.10.2026) ---
+// Nur auf Pakete (nicht Einzelstunde), Preis pro Einheit um X % gesenkt und auf ganze Euro gerundet, gültig N Tage.
+
+function natal_bonus_cfg(): array
+{
+    $b = (array)(natal_cfg()['bonus'] ?? []);
+    return ['on' => !isset($b['on']) || !empty($b['on']), 'percent' => max(1, min(30, (int)($b['percent'] ?? 7))), 'days' => max(1, min(30, (int)($b['days'] ?? 7)))];
+}
+
+function natal_bonus_schema(PDO $pdo): void
+{
+    natal_call_schema($pdo);
+    $cc = array_column($pdo->query('PRAGMA table_info(mm_natal_calls)')->fetchAll(), 'name');
+    if (!in_array('bonus_token', $cc, true)) {
+        $pdo->exec("ALTER TABLE mm_natal_calls ADD COLUMN bonus_token TEXT NOT NULL DEFAULT ''");
+        $pdo->exec('ALTER TABLE mm_natal_calls ADD COLUMN bonus_sent_at TEXT');
+        $pdo->exec("ALTER TABLE mm_natal_calls ADD COLUMN bonus_until TEXT NOT NULL DEFAULT ''");
+        $pdo->exec("ALTER TABLE mm_natal_calls ADD COLUMN bonus_state TEXT NOT NULL DEFAULT ''");
+    }
+    $oc = array_column($pdo->query('PRAGMA table_info(mm_natal_orders)')->fetchAll(), 'name');
+    if (!in_array('bonus_call_id', $oc, true)) $pdo->exec('ALTER TABLE mm_natal_orders ADD COLUMN bonus_call_id INTEGER');
+}
+
+/** Bonus-Preise je Paket: [key => [unit, total, save]] (Einzelstunden ausgenommen). */
+function natal_bonus_prices(int $percent): array
+{
+    $out = [];
+    foreach (natal_packages() as $k => $p) {
+        if ((int)$p['units'] < 2) continue;
+        $unit = (int)(round($p['unit_cents'] * (100 - $percent) / 100 / 100) * 100);
+        $out[$k] = ['unit' => $unit, 'total' => $unit * (int)$p['units'], 'save' => (int)$p['cents'] - $unit * (int)$p['units']];
+    }
+    return $out;
+}
+
+/** Gültigen Bonus zum Token finden (noch nicht abgelaufen, noch nicht eingelöst). */
+function natal_bonus_valid(PDO $pdo, string $tok): ?array
+{
+    if (!preg_match('/^[a-f0-9]{24}$/', $tok)) return null;
+    natal_bonus_schema($pdo);
+    $q = $pdo->prepare("SELECT * FROM mm_natal_calls WHERE bonus_token = ? AND bonus_state = 'geschickt'");
+    $q->execute([$tok]);
+    $c = $q->fetch();
+    if (!$c || (string)$c['bonus_until'] < date('Y-m-d')) return null;
+    $u = $pdo->prepare("SELECT COUNT(*) FROM mm_natal_orders WHERE bonus_call_id = ? AND status = 'bezahlt'");
+    $u->execute([$c['id']]);
+    return (int)$u->fetchColumn() > 0 ? null : $c;
+}
+
+/** Mail mit dem Kennenlern-Bonus an die Teilnehmerin. */
+function natal_bonus_send(PDO $pdo, array $c): bool
+{
+    natal_bonus_schema($pdo);
+    $cfg = natal_bonus_cfg();
+    $tok = (string)$c['bonus_token'] !== '' ? (string)$c['bonus_token'] : bin2hex(random_bytes(12));
+    $until = date('Y-m-d', strtotime('+' . $cfg['days'] . ' days'));
+    $pdo->prepare("UPDATE mm_natal_calls SET bonus_token = ?, bonus_until = ?, bonus_state = 'geschickt', bonus_sent_at = ? WHERE id = ?")->execute([$tok, $until, date('c'), $c['id']]);
+    $m = natal_bonus_mail($c, $tok, $until);
+    return mm_mail((string)$c['email'], $m['subject'], $m['text'], $m['html'], [], NATAL_FROM_NAME);
+}
+
+/** Inhalt der Bonus-Mail (auch für die Vorschau in der Verwaltung). */
+function natal_bonus_mail(array $c, string $tok, string $until): array
+{
+    $cfg = natal_bonus_cfg();
+    $first = forma_first_name((string)$c['name']);
+    $base = mm_site() . '/natal/?bonus=' . $tok . ($c['mode'] === 'online' ? '&m=online' : '');
+    $bp = natal_bonus_prices($cfg['percent']);
+    $packs = natal_packages();
+    $rows = ''; $txt = '';
+    foreach (['studio' => 'Im Studio', 'online' => 'Online, live per Video'] as $md => $lbl) {
+        $rows .= '<tr><td colspan="2" style="padding:14px 0 4px;font-family:Georgia,\'Times New Roman\',serif;font-size:19px;">' . $lbl . '</td></tr>';
+        $txt .= "\n\n$lbl:";
+        foreach (natal_packages_for($md) as $k => $p) {
+            if (!isset($bp[$k])) continue;
+            $nm = preg_replace('/ online$/', '', $p['title']);
+            $rows .= '<tr><td style="padding:7px 0;border-top:1px solid #DDD2C6;">' . forma_h($nm) . '<br><span style="font-size:13px;color:#7D7076;">' . (int)$p['units'] . ' × ' . forma_h(forma_euro($bp[$k]['unit'])) . ' statt ' . forma_h(forma_euro($p['unit_cents'])) . '</span></td>'
+                . '<td align="right" style="padding:7px 0;border-top:1px solid #DDD2C6;white-space:nowrap;vertical-align:top;"><span style="font-size:13px;color:#7D7076;text-decoration:line-through;">' . forma_h(forma_euro($p['cents'])) . '</span><br><b>' . forma_h(forma_euro($bp[$k]['total'])) . '</b></td></tr>';
+            $txt .= "\n· $nm: " . forma_euro($bp[$k]['total']) . ' statt ' . forma_euro($p['cents']) . ' (' . $p['units'] . ' × ' . forma_euro($bp[$k]['unit']) . ')';
+        }
+    }
+    $untilDe = natal_date_de($until);
+    $intro = 'danke für unser Gespräch, ich habe mich sehr gefreut, dich kennenzulernen! Wenn du dich für eine Begleitung durch die Schwangerschaft und die Zeit danach entscheidest, habe ich ein kleines Dankeschön für dich.';
+    $bonus = 'Als Kennenlern-Bonus bekommst du jedes Paket ' . $cfg['percent'] . ' % günstiger, im Studio und online. Der Bonus gilt bis ' . $untilDe . ' und ist schon in deinem Link eingetragen.';
+    $html = natal_h1('Dein Kennenlern-Bonus') . '<p style="margin:0 0 14px;">' . forma_h("Hallo $first,") . '</p><p style="margin:0 0 14px;">' . forma_h($intro) . '</p><p style="margin:0 0 14px;">' . forma_h($bonus) . '</p>'
+        . '<div style="margin:16px 0 6px;padding:8px 20px 16px;background:#EADFDE;border-radius:18px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.4;color:#2E2529;">' . $rows . '</table></div>'
+        . natal_btn($base, 'Paket mit Bonus buchen')
+        . '<p style="margin:14px 0 0;">Deine Wunschtermine suchst du dir beim Buchen gleich im Kalender aus. Wenn du noch Fragen hast, antworte einfach auf diese Mail.</p>';
+    $text = "Hallo $first,\n\n$intro\n\n$bonus$txt\n\nPaket mit Bonus buchen: $base\n\nDeine Wunschtermine suchst du dir beim Buchen gleich im Kalender aus. Wenn du noch Fragen hast, antworte einfach auf diese Mail.\n\nBis bald,\nVivien";
+    return ['subject' => 'Danke für unser Gespräch, ' . $first . ' · dein Kennenlern-Bonus', 'text' => $text, 'html' => natal_mail_html('Dein Kennenlern-Bonus', $html)];
+}
+
+/** Läuft bei Seitenaufrufen: schickt den Bonus 15 Minuten nach Ende jedes gebuchten Kennenlerngesprächs (genau einmal). */
+function natal_bonus_run(PDO $pdo): void
+{
+    $cfg = natal_bonus_cfg();
+    if (!$cfg['on']) return;
+    natal_bonus_schema($pdo);
+    $q = $pdo->prepare("SELECT * FROM mm_natal_calls WHERE status = 'gebucht' AND bonus_state = '' AND date >= ? AND date <= ?");
+    $q->execute([date('Y-m-d', strtotime('-3 days')), date('Y-m-d')]);
+    foreach ($q->fetchAll() as $c) {
+        $end = strtotime($c['date'] . ' ' . $c['slot']) + (NATAL_CALL_MINUTES + 15) * 60;
+        if (time() < $end) continue;
+        $claim = $pdo->prepare("UPDATE mm_natal_calls SET bonus_state = 'sende' WHERE id = ? AND bonus_state = ''");
+        $claim->execute([$c['id']]);
+        if ($claim->rowCount() === 1) natal_bonus_send($pdo, $c);
+    }
+}
+
+/** Höchstens alle 3 Minuten nachsehen, ob ein Kennenlern-Bonus fällig ist (wird bei Seitenaufrufen angestoßen). */
+function natal_bonus_tick(PDO $pdo): void
+{
+    $f = forma_data_dir() . '/movecia-natal-bonus.tick';
+    if (is_file($f) && filemtime($f) > time() - 180) return;
+    @touch($f);
+    try { natal_bonus_run($pdo); } catch (Throwable $e) { error_log('Natal bonus: ' . $e->getMessage()); }
+}
+

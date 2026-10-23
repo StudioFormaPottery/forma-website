@@ -6,6 +6,11 @@ require __DIR__ . '/lib.php';
 try {
     $pdo = forma_db();
     forma_reconcile_payments($pdo);
+    // Movecia: Kennenlern-Bonus nach Gesprächsende verschicken (gedrosselt, Fehler stören die Kursliste nie)
+    try {
+        $tick = forma_data_dir() . '/movecia-natal-bonus.tick';
+        if (!is_file($tick) || filemtime($tick) < time() - 180) { require_once __DIR__ . '/natal-lib.php'; natal_schema($pdo); natal_bonus_tick($pdo); }
+    } catch (Throwable $e) { error_log('Natal bonus tick: ' . $e->getMessage()); }
     $online = forma_stripe_key() !== null;
     $out = [];
     foreach (forma_upcoming_courses($pdo) as $c) {
