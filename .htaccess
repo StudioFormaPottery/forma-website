@@ -5,7 +5,7 @@ Options -Indexes
 <FilesMatch "\.(md|sqlite|log)$">
   Require all denied
 </FilesMatch>
-<FilesMatch "^(lib|movecia-lib|movecia)\.php$|\.inc\.php$">
+<FilesMatch "^(lib|movecia-lib|natal-lib|movecia)\.php$|\.inc\.php$">
   Require all denied
 </FilesMatch>
 
@@ -25,6 +25,8 @@ RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^withdraw/?$ wildhearts/withdraw/ [L,QSA]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^circle/?$ wildhearts/circle/ [L,QSA]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^natal/?$ wildhearts/natal/ [L,QSA]
 # Ohne www → mit www (nur Seitenaufrufe, API/Webhooks bleiben unberührt)
 RewriteCond %{HTTP_HOST} ^forma-pottery\.com$ [NC]
 RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$

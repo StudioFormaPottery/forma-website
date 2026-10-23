@@ -243,7 +243,7 @@ if ($action === 'logout') {
 }
 
 // Movecia Movement / Wild Hearts: eigener Bereich (verwaltung/movecia.php)
-if (str_starts_with((string)$action, 'mm_') || $view === 'movecia') {
+if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 'natal') {
     require __DIR__ . '/movecia.php';
 }
 
@@ -2357,6 +2357,8 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
     <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
     <?php if (!forma_stripe_key()): ?><p class="alert">Die Online-Bezahlung ist noch nicht eingerichtet. Bis dahin werden alle Kurse ohne Bezahlung reserviert. <a href="<?= forma_h($self) ?>?view=einstellungen">Jetzt Stripe verbinden</a></p><?php endif; ?>
     <a class="mm-door" href="<?= forma_h($self) ?>?view=movecia"><span class="mm-dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span><span><small>Getrennt von FORMA</small><strong>Movecia Movement</strong><span>Wild Hearts · E-Mail-Liste · Gatherings · Videochat</span></span><span class="mm-arrow" aria-hidden="true">→</span></a>
+    <?php $natalReq = 0; try { $natalReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} ?>
+    <a class="mm-door nt-door" href="<?= forma_h($self) ?>?view=natal"><span class="mm-dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3"/><path d="M7 21c0-5 2-9 5-9s5 4 5 9"/><path d="M12 14a2.5 2.5 0 0 0 0 5"/></svg></span><span><small>Movecia · 1:1 im Studio</small><strong>Prä- &amp; Postnatal</strong><span><?= $natalReq ? ($natalReq === 1 ? '1 Terminanfrage wartet' : $natalReq . ' Terminanfragen warten') : 'Angebote · Terminanfragen · Pakete' ?></span></span><span class="mm-arrow" aria-hidden="true">→</span></a>
     <?php foreach ($minCourses as $mc): ?><a class="card notice" href="<?= forma_h($self) ?>?view=course&amp;id=<?= (int)$mc['id'] ?>"><span class="ic"><?= admin_icon('kalender') ?></span><span><strong>Zu wenige Anmeldungen: <?= forma_h($mc['title']) ?>, <?= forma_h(preg_replace('/\s*·.*$/u', '', (string)$mc['date_text'])) ?></strong><br><span class="muted small">Entscheide: findet statt oder Gäste informieren →</span></span></a><?php endforeach; ?>
     <?php if ($toPlan > 0): ?><a class="card notice" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('private') ?></span><span><strong><?= $toPlan === 1 ? '1 Private-Pottery-Buchung wartet' : $toPlan . ' Private-Pottery-Buchungen warten' ?> auf ihren Termin.</strong><br><span class="muted small">Im Kalender einplanen und Bestätigung schicken →</span></span></a><?php endif; ?>
     <div class="dash">
@@ -2562,6 +2564,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .tile.hl{background:#F6E6DA;border-color:#C98F72}
 .mm-door{display:flex;align-items:center;gap:16px;margin:6px 0 18px;padding:18px 20px;border-radius:22px;background:#3E4A36;color:#F3F1E7;text-decoration:none;box-shadow:0 12px 26px rgba(40,50,35,.22)}
 .mm-door:hover{background:#4E5E44}
+.nt-door{background:#6B5658;margin-top:-8px}.nt-door:hover{background:#7D5E68}
 .mm-door .mm-dot{flex:0 0 48px;width:48px;height:48px;border-radius:58% 42% 47% 53%/52% 46% 54% 48%;background:#C98B78;color:#fff;display:grid;place-items:center}
 .mm-door .mm-dot svg{width:24px;height:24px}
 .mm-door small{display:block;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#E7C4AE}

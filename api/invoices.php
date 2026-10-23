@@ -185,6 +185,11 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
             'gross' => (int)$v['amount_cents'], 'paid' => $v['paid_at'], 'type' => 'Gutschein',
             'pay_note' => ($v['pay_method'] ?? '') === 'bar' ? 'Der Betrag wurde bar im Atelier bezahlt.' : ''];
     }
+    if ($kind === 'natal') {
+        // Movecia · Prä-/Postnatal Training (eigene Rechnung im Movecia-Design, gleicher Nummernkreis)
+        require_once __DIR__ . '/natal-lib.php';
+        return natal_invoice_source($pdo, $refId);
+    }
     if ($kind === 'template') {
         $st = $pdo->prepare("SELECT * FROM template_orders WHERE id = ? AND status = 'bezahlt'");
         $st->execute([$refId]);
@@ -274,7 +279,7 @@ function forma_invoice_for(PDO $pdo, string $kind, int $refId): void
         $year = (int)date('Y');
         if (!empty($GLOBALS['FORMA_TEST'])) {
             // Testbuchung: Rechnung nur zeigen und mailen, keine Nummer verbrauchen, nichts speichern.
-            forma_invoice_deliver(['nr' => 'TEST-' . $year . '-000', 'issued_at' => date('Y-m-d'), 'service_date' => $src['service'], 'name' => $name, 'email' => $email,
+            forma_invoice_deliver(['kind' => $kind, 'nr' => 'TEST-' . $year . '-000', 'issued_at' => date('Y-m-d'), 'service_date' => $src['service'], 'name' => $name, 'email' => $email,
                 'address' => $address, 'country' => $country, 'items' => json_encode($src['items'], JSON_UNESCAPED_UNICODE), 'vat_rate' => $rate,
                 'vat_note' => trim($note . ' TESTBUCHUNG – keine gültige Rechnung.'), 'pay_note' => (string)($src['pay_note'] ?? ''), 'net_cents' => $net, 'vat_cents' => $vat, 'gross_cents' => $gross]);
             return;
@@ -317,6 +322,10 @@ function forma_cents_de(int $c): string
 /** PDF im FORMA-Rechnungsdesign: Kunde links, Logo Mitte, Rechnungsdaten rechts, Positionen, Summen, Fußzeile mit UID. */
 function forma_invoice_pdf(array $inv): string
 {
+    if (str_starts_with((string)($inv['kind'] ?? ''), 'natal')) {
+        require_once __DIR__ . '/natal-lib.php';
+        return natal_invoice_pdf($inv);
+    }
     require_once __DIR__ . '/vendor/fpdf/fpdf.php';
     $t = 'forma_pdf_text';
     $co = FORMA_INVOICE_COMPANY;
@@ -447,6 +456,11 @@ function forma_invoice_send(PDO $pdo, int $id): void
 function forma_invoice_deliver(array $inv): void
 {
     $pdf = forma_invoice_pdf($inv);
+    if (str_starts_with((string)($inv['kind'] ?? ''), 'natal')) {
+        // Movecia: Mail an die Kundin von hello@moveciamovement.com, Kopie für die Buchhaltung an hello@forma-pottery.com
+        natal_invoice_mail($inv, $pdf);
+        return;
+    }
     $file = 'Rechnung_' . $inv['nr'] . '.pdf';
     if (trim((string)$inv['email']) !== '') forma_mail($inv['email'], ((int)$inv['gross_cents'] < 0 ? 'Deine Stornorechnung ' : 'Deine Rechnung ') . $inv['nr'] . ' von FORMA', forma_invoice_mailtext($inv), null, [[$file, $pdf, 'application/pdf']]);
     forma_mail(FORMA_NOTIFY_EMAIL, ((int)$inv['gross_cents'] < 0 ? 'Stornorechnung ' : 'Rechnung ') . $inv['nr'] . ': ' . $inv['name'] . ' (' . forma_cents_de((int)$inv['gross_cents']) . ')',
@@ -510,13 +524,14 @@ function forma_sheet_sync(PDO $pdo): void
         foreach ($list as $inv) {
             $date = date('d.m.Y', strtotime($inv['issued_at']));
             $rate = (float)$inv['vat_rate'];
-            $rowsInv = [['Forma', $inv['nr'], '', $date, $inv['name'], $eur((int)$inv['gross_cents']), $eur((int)$inv['net_cents']), $eur((int)$inv['vat_cents']), forma_invoice_is_voucher($inv) ? 'bezahlt (alter Gutschein)' : (forma_invoice_is_cash($inv) ? 'bezahlt (bar)' : 'bezahlt (online)')]];
+            $isNatal = str_starts_with((string)$inv['kind'], 'natal');
+            $rowsInv = [[$isNatal ? 'Movecia' : 'Forma', $inv['nr'], '', $date, $inv['name'], $eur((int)$inv['gross_cents']), $eur((int)$inv['net_cents']), $eur((int)$inv['vat_cents']), forma_invoice_is_voucher($inv) ? 'bezahlt (alter Gutschein)' : (forma_invoice_is_cash($inv) ? 'bezahlt (bar)' : 'bezahlt (online)')]];
             $rowsPos = [];
             foreach (json_decode($inv['items'], true) as $it) {
                 $g = (int)$it['unit'] * (int)$it['qty'];
                 $n = (int)round($g / (1 + $rate / 100));
                 $svc = preg_match('/^\d\d\.\d\d\.\d{4}$/', $inv['service_date']) ? $inv['service_date'] : $date;
-                $rowsPos[] = ['Forma', $inv['nr'], '', $date, $svc, (int)substr($svc, 3, 2), $inv['kind'] === 'template' ? 'Template (online)' : ($inv['kind'] === 'kasse' ? (forma_invoice_is_cash($inv) ? 'Atelier-Kasse (bar)' : 'Atelier-Kasse (Bezahl-Link)') : (forma_invoice_is_voucher($inv) ? 'Gutschein-Einlösung' : 'Online-Buchung')),
+                $rowsPos[] = [$isNatal ? 'Movecia' : 'Forma', $inv['nr'], '', $date, $svc, (int)substr($svc, 3, 2), $isNatal ? 'Prä-/Postnatal (online)' : ($inv['kind'] === 'template' ? 'Template (online)' : ($inv['kind'] === 'kasse' ? (forma_invoice_is_cash($inv) ? 'Atelier-Kasse (bar)' : 'Atelier-Kasse (Bezahl-Link)') : (forma_invoice_is_voucher($inv) ? 'Gutschein-Einlösung' : 'Online-Buchung'))),
                     trim($it['text']), $inv['name'], $inv['country'], (int)$it['qty'], $eur((int)$it['unit']),
                     $inv['kind'] === 'template' || str_contains($it['text'], 'zum Bemalen') || ($it['kasse'] ?? '') === 'stueck' ? 0 : (int)$it['qty'], $eur($g), $eur($n), $eur($g - $n)];
             }

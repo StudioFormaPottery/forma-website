@@ -1298,7 +1298,7 @@ function forma_stripe_test_mode(?string $key = null): bool
 }
 
 /** Aufruf der Stripe-API. Wirft eine Exception mit verständlicher Meldung, wenn etwas schiefgeht. */
-function forma_stripe(string $method, string $path, array $params = [], ?string $key = null): array
+function forma_stripe(string $method, string $path, array $params = [], ?string $key = null, ?string $version = null): array
 {
     $key = $key ?? forma_stripe_key();
     if (!$key) {
@@ -1316,7 +1316,7 @@ function forma_stripe(string $method, string $path, array $params = [], ?string 
         CURLOPT_CUSTOMREQUEST => $method,
         CURLOPT_USERPWD => $key . ':',
         CURLOPT_TIMEOUT => 20,
-        CURLOPT_HTTPHEADER => ['Stripe-Version: 2024-06-20'],
+        CURLOPT_HTTPHEADER => ['Stripe-Version: ' . ($version ?? '2024-06-20')],
     ]);
     if ($method !== 'GET') {
         curl_setopt($ch, CURLOPT_POSTFIELDS, $body);

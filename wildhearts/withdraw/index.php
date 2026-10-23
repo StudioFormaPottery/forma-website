@@ -12,7 +12,7 @@ $pdo->exec('CREATE TABLE IF NOT EXISTS mm_withdrawals (
 $h = 'forma_h';
 $lang = (($_POST['lang'] ?? $_GET['lang'] ?? '') === 'de') ? 'de' : (($_POST['lang'] ?? $_GET['lang'] ?? '') === 'en' ? 'en' : '');
 $done = null; $err = '';
-$contracts = ['circle' => 'The Inner Circle', 'year' => 'The Year Circle', 'retreat' => 'Wild Hearts Alpine Retreat', 'other' => 'Other / Sonstiges'];
+$contracts = ['circle' => 'The Inner Circle', 'year' => 'The Year Circle', 'retreat' => 'Wild Hearts Alpine Retreat', 'natal' => 'Prä- & Postnatal Training (Movecia)', 'other' => 'Other / Sonstiges'];
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $L = ($_POST['lang'] ?? 'en') === 'de' ? 'de' : 'en';
@@ -95,7 +95,7 @@ a{color:var(--wine)}
       <input type="hidden" name="lang" id="fl" value="<?= $h($lang ?: 'en') ?>">
       <label><span><span class="en">Your name</span><span class="de">Dein Name</span></span><input name="name" required maxlength="120" autocomplete="name" value="<?= $h((string)($_POST['name'] ?? '')) ?>"></label>
       <label><span><span class="en">Your email address (the confirmation is sent here)</span><span class="de">Deine E-Mail-Adresse (dorthin geht die Bestätigung)</span></span><input name="email" type="email" required maxlength="160" autocomplete="email" value="<?= $h((string)($_POST['email'] ?? '')) ?>"></label>
-      <label><span><span class="en">Which contract?</span><span class="de">Welcher Vertrag?</span></span><select name="contract" required><?php foreach ($contracts as $k => $t): ?><option value="<?= $h($k) ?>"<?= ($_POST['contract'] ?? '') === $k ? ' selected' : '' ?>><?= $h($t) ?></option><?php endforeach; ?></select></label>
+      <label><span><span class="en">Which contract?</span><span class="de">Welcher Vertrag?</span></span><select name="contract" required><?php foreach ($contracts as $k => $t): ?><option value="<?= $h($k) ?>"<?= ($_POST['contract'] ?? ($_GET['v'] ?? '')) === $k ? ' selected' : '' ?>><?= $h($t) ?></option><?php endforeach; ?></select></label>
       <label><span><span class="en">Booking details, if you have them (date, email of the booking or invoice number)</span><span class="de">Angaben zur Buchung, falls vorhanden (Datum, E-Mail der Buchung oder Rechnungsnummer)</span></span><input name="reference" maxlength="200" value="<?= $h((string)($_POST['reference'] ?? '')) ?>"></label>
       <label><span><span class="en">Only part of the contract? Tell me which part (leave empty for the whole contract)</span><span class="de">Nur einen Teil des Vertrags? Schreib, welchen (leer lassen für den ganzen Vertrag)</span></span><textarea name="part" rows="2" maxlength="600"><?= $h((string)($_POST['part'] ?? '')) ?></textarea></label>
       <div class="hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>

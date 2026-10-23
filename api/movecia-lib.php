@@ -256,16 +256,28 @@ function mm_button(string $href, string $label): string
 }
 
 /** Verschickt eine Mail als Viv. Mit hinterlegtem Postfach-Passwort per SMTP, sonst per mail(). */
-function mm_mail(string $to, string $subject, string $text, string $html): bool
+function mm_mail(string $to, string $subject, string $text, string $html, array $attachments = [], string $fromName = MM_FROM_NAME): bool
 {
     $b = 'mm' . bin2hex(random_bytes(10));
     $enc = fn(string $s) => rtrim(chunk_split(base64_encode($s), 76, "\r\n"));
     $mime = "--$b\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . $enc($text) . "\r\n"
         . "--$b\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . $enc($html) . "\r\n--$b--";
     $ctype = 'multipart/alternative; boundary="' . $b . '"';
-    $from = mb_encode_mimeheader(MM_FROM_NAME, 'UTF-8') . ' <' . MM_FROM_EMAIL . '>';
+    if ($attachments) {
+        // Anhänge (z. B. Rechnung als PDF, Kalenderdatei): Text + HTML als ein Teil, dahinter die Dateien.
+        $m = 'mx' . bin2hex(random_bytes(10));
+        $mixed = "--$m\r\nContent-Type: $ctype\r\n\r\n$mime\r\n";
+        foreach ($attachments as [$name, $data, $type]) {
+            $mixed .= "--$m\r\nContent-Type: $type; name=\"$name\"\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename=\"$name\"\r\n\r\n" . $enc((string)$data) . "\r\n";
+        }
+        $mime = $mixed . "--$m--";
+        $ctype = 'multipart/mixed; boundary="' . $m . '"';
+    }
+    $from = mb_encode_mimeheader($fromName, 'UTF-8') . ' <' . MM_FROM_EMAIL . '>';
     if (getenv('FORMA_MAIL_LOG')) {
-        file_put_contents(getenv('FORMA_MAIL_LOG'), "FROM: " . MM_FROM_EMAIL . "\nTO: $to\nSUBJECT: $subject\n$text\n-----\n", FILE_APPEND);
+        file_put_contents(getenv('FORMA_MAIL_LOG'), "FROM: $fromName <" . MM_FROM_EMAIL . ">\nTO: $to\nSUBJECT: $subject\n$text\n" . ($attachments ? 'ANHANG: ' . implode(', ', array_column($attachments, 0)) . "\n" : '') . "-----\n", FILE_APPEND);
+        foreach ($attachments as [$n, $d]) @file_put_contents(dirname(getenv('FORMA_MAIL_LOG')) . '/mail_' . $n, $d);
+        if (getenv('FORMA_MAIL_HTML_DIR')) @file_put_contents(getenv('FORMA_MAIL_HTML_DIR') . '/' . preg_replace('/[^a-z0-9]+/i', '_', $subject) . '.html', $html);
         if (!getenv('FORMA_SMTP_HOST')) return true;
     }
     $pw = (string)(mm_cfg('mail')['password'] ?? '');

@@ -5,6 +5,8 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/api/movecia-lib.php';
 mm_schema($pdo);
 try { mm_auto_setup($pdo); } catch (Throwable $e) { error_log('MM setup: ' . $e->getMessage()); }
+// Prä- & Postnatal Training (eigener Reiter ?view=natal)
+require __DIR__ . '/natal.inc.php';
 
 $mmBack = $self . '?view=movecia';
 
@@ -257,6 +259,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <span class="mm-stat"><b><?= $joinedAll ?></b><span>waren schon bei einem Gathering dabei</span></span>
         </div>
         <div class="mm-links">
+            <a href="<?= forma_h($self) ?>?view=natal" style="background:#7D5E68;color:#FBF5F7;border-color:#7D5E68">Prä- &amp; Postnatal →</a>
             <a href="https://moveciamovement.com/" target="_blank" rel="noopener">Link in Bio</a>
             <a href="https://moveciamovement.com/gathering/" target="_blank" rel="noopener">Gathering-Seite</a>
             <a href="https://moveciamovement.com/reset/" target="_blank" rel="noopener">Reset Routine Download</a>
