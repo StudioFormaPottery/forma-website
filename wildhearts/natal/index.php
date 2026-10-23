@@ -30,6 +30,14 @@ $left = $order ? natal_left($pdo, $order) : 0;
 $taken = array_values(array_map(fn($s) => $s['date'], array_filter($sessions, fn($s) => in_array($s['status'], ['angefragt', 'bestaetigt'], true))));
 $cal = ['weekdays' => natal_weekdays(), 'dayparts' => NATAL_DAYPARTS, 'min' => date('Y-m-d', strtotime('+1 day')), 'max' => date('Y-m-d', strtotime('+9 months')), 'taken' => $taken, 'due' => $order['due_date'] ?? ''];
 $euro = fn(int $c) => forma_euro($c);
+$callFree = [];
+if (!$order) {
+    $taken = array_flip(natal_call_taken($pdo));
+    for ($d = 0; $d <= 42; $d++) {
+        $day = date('Y-m-d', strtotime("+$d day"));
+        foreach (NATAL_CALL_SLOTS as $sl) if (natal_call_bookable($day, $sl) && !isset($taken["$day|$sl"])) $callFree[] = "$day|$sl";
+    }
+}
 $wa = 'https://wa.me/' . preg_replace('/\D/', '', NATAL_COMPANY['phone']);
 ?><!doctype html>
 <html lang="de">
@@ -47,6 +55,7 @@ $wa = 'https://wa.me/' . preg_replace('/\D/', '', NATAL_COMPANY['phone']);
 :root{--bg:#F2ECE4;--sand:#E8DED2;--card:#FBF8F4;--ink:#2E2529;--muted:#7D7076;--line:#DDD2C6;--plum:#7D5E68;--plumdeep:#6B5658;--blush:#EADFDE;--peach:#E8D6CA;--on:#FBF5F7;--r:24px;
 --serif:"Cormorant",Georgia,serif;--sans:"Hanken",system-ui,sans-serif}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 @media(min-width:900px){body{font-size:19px}}
@@ -201,6 +210,14 @@ footer a{color:inherit}
 footer details{margin-top:.8rem}
 footer summary{cursor:pointer}
 .hp{position:absolute;left:-5000px}
+.kl{gap:1.4rem}
+.klh{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem 2rem;align-items:flex-start}
+.kltimes{background:var(--blush);border-radius:18px;padding:.9rem 1.2rem;font-size:.95rem;line-height:1.5}
+.kltimes b{display:block;font-family:var(--serif);font-size:1.4rem;font-weight:500}
+.slotb{display:flex;gap:8px;flex-wrap:wrap}
+.slotb button{border:0;background:var(--bg);color:var(--ink);font:inherit;font-size:.95rem;padding:.75em 1.3em;border-radius:999px;cursor:pointer}
+.slotb button[aria-pressed=true]{background:var(--plum);color:var(--on)}
+.slotb button:disabled{opacity:.4;cursor:default;text-decoration:line-through}
 </style>
 </head>
 <body>
@@ -280,7 +297,7 @@ footer summary{cursor:pointer}
     <p class="script">für dich und dein Baby</p>
     <?php if ($offer): ?><p class="hello"><b><?= $h(($offer['salutation'] ?: 'Liebe') . ' ' . $offer['name']) ?>,</b>schön, dass du da bist. Hier ist mein Angebot für dich, mit allem, was wir bis zur Geburt und danach gemeinsam machen können.<?= $offer['note'] !== '' ? '<br><br>' . nl2br($h((string)$offer['note'])) : '' ?></p><?php endif; ?>
     <p class="lead">Prä- und postnatales Training, ganz auf dich abgestimmt: ruhig, kräftigend und mit viel Raum für das, was dein Körper gerade braucht. <?= $online ? 'Live per Video, bequem von zu Hause aus: nur du und ich, ich sehe dich und korrigiere dich wie im Studio.' : 'Bei mir im Studio, nur du und ich.' ?></p>
-    <div class="cta"><a class="btn" href="#pakete">Paket wählen <span aria-hidden="true">→</span></a><a class="btn line" href="#ablauf">So läuft es ab</a></div>
+    <div class="cta"><a class="btn" href="#pakete">Paket wählen <span aria-hidden="true">→</span></a><a class="btn line" href="#kennenlernen">Kostenlos kennenlernen</a></div>
   </div>
   <div class="hv" aria-hidden="true"><div class="b1 blob"></div><div class="b2 blob"></div><div class="b3"></div><p class="q">„Dein Körper leistet gerade Großes. Lass uns ihn gut begleiten.“<small>Vivien</small></p></div>
 </section>
@@ -310,6 +327,34 @@ footer summary{cursor:pointer}
     <div class="step"><b>Paket wählen und bezahlen</b><p>Sicher online über Stripe. Danach bekommst du eine Bestätigung und deine Rechnung per E-Mail.</p></div>
     <div class="step"><b>Wunschtermine aussuchen</b><p>Im Kalender tippst du deine Wunschtage an und wählst Vormittag, Nachmittag oder Abend. Gleich beim Buchen oder später auf deiner persönlichen Seite.</p></div>
     <div class="step"><b>Ich bestätige mit Uhrzeit</b><p>Du bekommst jeden Termin per E-Mail, mit Kalenderdatei für dein Handy<?= $online ? ' und dem Link zum Videoraum' : '' ?>. Weitere Termine fragst du jederzeit über deine Seite an.</p></div>
+  </div>
+</section>
+
+<section class="w" id="kennenlernen" style="padding-top:0">
+  <div class="panel kl">
+    <div class="klh">
+      <div>
+        <p class="k">Vor der Buchung · freiwillig</p>
+        <h2 style="margin-top:.5rem;font-size:clamp(2rem,4vw,3.2rem)">Erst einmal <em>kennenlernen</em>?</h2>
+        <p class="mut" style="margin-top:.8rem;max-width:34em">Buch dir ein kostenloses Gespräch von 30 Minuten, online per Video. Wir sprechen darüber, wie es dir geht, was du dir wünschst und welches Paket zu dir passt. Ganz unverbindlich. Du bekommst den Termin mit Kalenderdatei und Link per E-Mail.</p>
+      </div>
+      <p class="kltimes"><b>Mo–Fr</b>8:00–8:30 Uhr<br>oder 19:00–19:30 Uhr</p>
+    </div>
+    <div class="calw">
+      <div id="klcal"></div>
+      <div id="klslots" class="picked"><p class="mut" style="font-size:.9rem;padding:.6rem 0">Tipp zuerst auf einen Tag.</p></div>
+    </div>
+    <form id="klform" class="grid2" hidden novalidate>
+      <label class="f">Vor- und Nachname<input type="text" name="name" autocomplete="name" required maxlength="120" value="<?= $offer ? $h((string)$offer['name']) : '' ?>"></label>
+      <label class="f">E-Mail<input type="email" name="email" autocomplete="email" required maxlength="160"></label>
+      <label class="f">Telefon (optional)<input type="tel" name="phone" autocomplete="tel" maxlength="40"></label>
+      <label class="f">Was möchtest du besprechen? (optional)<input type="text" name="note" maxlength="600" placeholder="z. B. SSW, Fragen, Wünsche"></label>
+      <label class="chk" style="grid-column:1/-1"><input type="checkbox" name="consent" value="1" required><span>Meine Angaben werden nur für dieses Gespräch verwendet (Datenschutz siehe unten).</span></label>
+      <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div style="grid-column:1/-1"><button class="btn" type="submit" id="klbtn">Gespräch buchen</button></div>
+      <p class="err" id="klerr" hidden style="grid-column:1/-1"></p>
+    </form>
+    <p class="ok" id="klok" hidden></p>
   </div>
 </section>
 
@@ -458,6 +503,60 @@ footer summary{cursor:pointer}
     const r = await fetch('/api/natal.php', {method: 'POST', body: fd});
     let j = {}; try { j = await r.json(); } catch (e) {}
     return j;
+  }
+
+  // --- Kennenlerngespräch ---------------------------------------------------------------------
+  const FREE = <?= json_encode($callFree) ?>;
+  const klcal = document.getElementById('klcal');
+  if (klcal) {
+    const loadedK = Date.now();
+    const freeDays = {};
+    FREE.forEach(x => { const [d, s] = x.split('|'); (freeDays[d] = freeDays[d] || []).push(s); });
+    const now = new Date(); let view = new Date(now.getFullYear(), now.getMonth(), 1);
+    let pick = null, slot = null;
+    const lastFree = FREE.length ? FREE[FREE.length - 1].split('|')[0] : ymd(now);
+    klcal.innerHTML = '<div class="calh"><button type="button" data-m="-1" aria-label="Vorheriger Monat">‹</button><b></b><button type="button" data-m="1" aria-label="Nächster Monat">›</button></div><div class="cal" role="grid"></div>';
+    const grid = klcal.querySelector('.cal'), head = klcal.querySelector('.calh b'), slots = document.getElementById('klslots'), form = document.getElementById('klform');
+    klcal.querySelectorAll('.calh button').forEach(b => b.addEventListener('click', () => { view.setMonth(view.getMonth() + +b.dataset.m); draw(); }));
+    function draw() {
+      head.textContent = MON[view.getMonth()] + ' ' + view.getFullYear();
+      const lead = (new Date(view).getDay() + 6) % 7, days = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+      let html = ['Mo','Di','Mi','Do','Fr','Sa','So'].map(d => '<span class="dw">' + d + '</span>').join('');
+      for (let i = 0; i < lead; i++) html += '<span></span>';
+      for (let d = 1; d <= days; d++) {
+        const s = ymd(new Date(view.getFullYear(), view.getMonth(), d)), ok = !!freeDays[s];
+        html += '<button type="button" class="' + (s === pick ? 'sel' : (ok ? 'ok' : '')) + '" data-d="' + s + '"' + (ok ? '' : ' disabled') + ' aria-label="' + nice(s) + '">' + d + '</button>';
+      }
+      grid.innerHTML = html;
+      klcal.querySelector('[data-m="-1"]').disabled = view <= new Date(now.getFullYear(), now.getMonth(), 1);
+      klcal.querySelector('[data-m="1"]').disabled = ymd(new Date(view.getFullYear(), view.getMonth() + 1, 1)) > lastFree;
+      grid.querySelectorAll('button.ok, button.sel').forEach(b => b.addEventListener('click', () => { pick = b.dataset.d; slot = null; draw(); drawSlots(); }));
+    }
+    function drawSlots() {
+      if (!pick) return;
+      const fr = freeDays[pick] || [];
+      slots.innerHTML = '<div class="pk"><b>' + nice(pick) + '</b><div class="slotb">' + ['08:00', '19:00'].map(s => '<button type="button" data-s="' + s + '" aria-pressed="' + (slot === s) + '"' + (fr.includes(s) ? '' : ' disabled') + '>' + (s === '08:00' ? '8:00–8:30 Uhr' : '19:00–19:30 Uhr') + '</button>').join('') + '</div></div>';
+      slots.querySelectorAll('[data-s]').forEach(b => b.addEventListener('click', () => { slot = b.dataset.s; drawSlots(); form.hidden = false; }));
+    }
+    draw();
+    if (!FREE.length) slots.innerHTML = '<p class="mut">Gerade sind alle Termine vergeben. Schreib mir gern an <?= $h(NATAL_COMPANY['email']) ?>.</p>';
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const err = document.getElementById('klerr'), btn = document.getElementById('klbtn'); err.hidden = true;
+      const d = Object.fromEntries(new FormData(form));
+      if (!pick || !slot) { err.textContent = 'Bitte wähl Tag und Uhrzeit.'; err.hidden = false; return; }
+      if (!d.name || !d.email || !d.consent) { err.textContent = 'Bitte gib Name und E-Mail an und bestätige das Häkchen.'; err.hidden = false; return; }
+      Object.assign(d, {action: 'call', date: pick, slot: slot, t: loadedK, a: OFFER, mode: <?= json_encode($online ? 'online' : 'studio') ?>});
+      btn.disabled = true; btn.textContent = 'Einen Moment …';
+      const j = await post(d);
+      if (j.ok) {
+        form.hidden = true; slots.hidden = true; klcal.hidden = true;
+        const ok = document.getElementById('klok'); ok.hidden = false;
+        ok.textContent = 'Danke! Dein Kennenlerngespräch ist eingetragen: ' + j.when + '. Die Bestätigung mit Kalenderdatei und Link ist per E-Mail unterwegs.';
+        return;
+      }
+      err.textContent = j.error || 'Das hat gerade nicht geklappt.'; err.hidden = false; btn.disabled = false; btn.textContent = 'Gespräch buchen';
+    });
   }
 
   if (MODE === 'offer') {

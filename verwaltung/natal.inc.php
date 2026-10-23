@@ -41,6 +41,10 @@ if ($action === 'mm_natal_cancel') {
     natal_cancel($pdo, (int)($_POST['sid'] ?? 0), trim(mb_substr((string)($_POST['reason'] ?? ''), 0, 400)), !empty($_POST['mail']));
     go($nBack . '#anfragen', 'Abgesagt. Die Einheit ist wieder frei' . (!empty($_POST['mail']) ? ' und sie hat eine Mail mit dem Link für einen neuen Wunschtermin bekommen.' : '.'));
 }
+if ($action === 'mm_natal_call_cancel') {
+    natal_cancel_call($pdo, (int)($_POST['cid'] ?? 0), trim(mb_substr((string)($_POST['reason'] ?? ''), 0, 400)), !empty($_POST['mail']));
+    go($nBack . '#gespraeche', 'Das Kennenlerngespräch ist abgesagt' . (!empty($_POST['mail']) ? ', sie hat eine Mail mit Link für einen neuen Termin bekommen.' : '.'));
+}
 if ($action === 'mm_natal_done') {
     $pdo->prepare("UPDATE mm_natal_sessions SET status = 'erledigt' WHERE id = ? AND status = 'bestaetigt'")->execute([(int)($_POST['sid'] ?? 0)]);
     go($nBack . '#termine', 'Abgehakt.');
@@ -93,6 +97,10 @@ if ($view === 'natal') {
     $upcoming = $pdo->query("SELECT s.*, o.name, o.title, o.phone, o.email FROM mm_natal_sessions s JOIN mm_natal_orders o ON o.id = s.order_id WHERE s.status = 'bestaetigt' ORDER BY s.date, s.start")->fetchAll();
     $offers = $pdo->query('SELECT a.*, (SELECT COUNT(*) FROM mm_natal_orders o WHERE o.offer_id = a.id AND o.status = \'bezahlt\') AS booked FROM mm_natal_offers a ORDER BY a.id DESC LIMIT 30')->fetchAll();
     $revenue = (int)$pdo->query("SELECT COALESCE(SUM(amount_cents),0) FROM mm_natal_orders WHERE status = 'bezahlt'")->fetchColumn();
+    natal_call_schema($pdo);
+    $calls = $pdo->prepare("SELECT * FROM mm_natal_calls WHERE status = 'gebucht' AND date >= ? ORDER BY date, slot");
+    $calls->execute([date('Y-m-d')]);
+    $GLOBALS['natalCalls'] = $calls->fetchAll();
     $today = date('Y-m-d');
     render_page('Prä- & Postnatal', function () use ($self, $flash, $pdo, $orders, $reqs, $upcoming, $offers, $revenue, $today) {
         $packs = natal_packages();
@@ -150,6 +158,20 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <a href="<?= forma_h($self) ?>?view=rechnungen">Rechnungen</a>
             <a href="#einstellungen">Preise &amp; Einstellungen</a>
         </div>
+
+        <?php $calls = $GLOBALS['natalCalls'] ?? []; ?>
+        <h2 id="gespraeche">Kennenlerngespräche</h2>
+        <?php if (!$calls): ?><p class="card muted small">Noch keine Kennenlerngespräche gebucht. Kundinnen buchen sie selbst auf der Angebotsseite (Mo–Fr 8:00 oder 19:00, je 30 Min. online). Du bekommst jedes Mal eine Mail mit Kalenderdatei.</p><?php endif; ?>
+        <?php if ($calls): ?><div class="card">
+            <?php foreach ($calls as $c): ?>
+                <div class="ln"><span><strong><?= forma_h(natal_call_when($c)) ?></strong> <span class="chip"><?= $c['mode'] === 'online' ? 'Interesse online' : 'Interesse Studio' ?></span><br>
+                    <span class="small"><?= forma_h($c['name']) ?> · <a href="mailto:<?= forma_h($c['email']) ?>"><?= forma_h($c['email']) ?></a><?php if ($c['phone'] !== ''): ?> · <a href="<?= forma_h(natal_wa((string)$c['phone'])) ?>" target="_blank" rel="noopener">WhatsApp</a><?php endif; ?></span>
+                    <?php if ($c['note'] !== ''): ?><br><span class="small muted">„<?= forma_h($c['note']) ?>“</span><?php endif; ?></span>
+                    <span class="acts small"><?php if ($c['host_url'] !== ''): ?><a class="btn btn-sm" href="<?= forma_h($c['host_url']) ?>" target="_blank" rel="noopener">Zum Gespräch</a><?php endif; ?>
+                    <details class="more"><summary>absagen</summary>
+                        <form method="post" class="stack" style="margin-top:6px"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_call_cancel"><input type="hidden" name="cid" value="<?= (int)$c['id'] ?>"><textarea name="reason" rows="2" placeholder="Nachricht (optional)"></textarea>
+                            <label class="check"><input type="checkbox" name="mail" value="1" checked> Mail mit Link für neuen Termin</label><button class="btn btn-ghost btn-sm" type="submit">Gespräch absagen</button></form></details></span></div>
+            <?php endforeach; ?></div><?php endif; ?>
 
         <h2 id="anfragen">Terminanfragen</h2>
         <?php if (!$reqs): ?><p class="card muted small">Gerade keine offenen Anfragen. Sobald eine Kundin Wunschtermine schickt, bekommst du eine Mail an <?= forma_h(natal_notify_email()) ?> und sie stehen hier.</p><?php endif; ?>

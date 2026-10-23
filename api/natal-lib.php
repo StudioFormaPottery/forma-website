@@ -618,3 +618,138 @@ function natal_invoice_mail(array $inv, string $pdf): void
         "Neue Online-Rechnung für deine Buchhaltung, Bereich Movecia (Prä-/Postnatal Training).\nBezahlt über das gemeinsame Stripe-Konto FORMA & Movecia.\n\nNummer: {$inv['nr']}\nDatum: " . date('d.m.Y', strtotime($inv['issued_at'])) . "\nKundin: {$inv['name']} ({$inv['email']})\nBrutto: " . forma_cents_de((int)$inv['gross_cents']) . "\nNetto: " . forma_cents_de((int)$inv['net_cents']) . "\nUSt. {$inv['vat_rate']} %: " . forma_cents_de((int)$inv['vat_cents']) . "\n\nAlle Buchungen: " . natal_admin_link() . "\n",
         null, [[$file, $pdf, 'application/pdf']]);
 }
+
+// --- Kennenlerngespräch (gratis, 30 Min., online per Video) ----------------------------------
+// Mo–Fr um 8:00 oder 19:00, jeder Termin nur einmal buchbar, sofort fix, mit eigenem Whereby-Raum.
+
+const NATAL_CALL_SLOTS = ['08:00', '19:00'];
+const NATAL_CALL_MINUTES = 30;
+
+function natal_call_schema(PDO $pdo): void
+{
+    static $done = false;
+    if ($done) return;
+    $done = true;
+    $pdo->exec('CREATE TABLE IF NOT EXISTS mm_natal_calls (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT NOT NULL,
+        slot TEXT NOT NULL,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        phone TEXT NOT NULL DEFAULT \'\',
+        note TEXT NOT NULL DEFAULT \'\',
+        mode TEXT NOT NULL DEFAULT \'studio\',
+        offer_id INTEGER,
+        room_url TEXT NOT NULL DEFAULT \'\',
+        host_url TEXT NOT NULL DEFAULT \'\',
+        status TEXT NOT NULL DEFAULT \'gebucht\',
+        token TEXT NOT NULL,
+        ip_hash TEXT NOT NULL DEFAULT \'\',
+        created_at TEXT NOT NULL
+    )');
+}
+
+/** Ab wann ein Termin buchbar ist: mindestens 3 Stunden im Voraus, höchstens 6 Wochen. */
+function natal_call_bookable(string $date, string $slot): bool
+{
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !in_array($slot, NATAL_CALL_SLOTS, true)) return false;
+    $t = strtotime($date . ' ' . $slot);
+    if (!$t || (int)date('N', $t) > 5) return false;
+    return $t >= time() + 3 * 3600 && $t <= time() + 42 * 86400;
+}
+
+/** Belegte Termine als Liste „JJJJ-MM-TT|HH:MM“. */
+function natal_call_taken(PDO $pdo): array
+{
+    natal_call_schema($pdo);
+    $st = $pdo->prepare("SELECT date || '|' || slot FROM mm_natal_calls WHERE status = 'gebucht' AND date >= ?");
+    $st->execute([date('Y-m-d')]);
+    return $st->fetchAll(PDO::FETCH_COLUMN);
+}
+
+function natal_call_when(array $c): string
+{
+    return natal_date_de((string)$c['date']) . ' um ' . ltrim((string)$c['slot'], '0') . ' Uhr';
+}
+
+/** Eigener Videoraum je Gespräch (Whereby, wenn eingerichtet), sonst der allgemeine Raum-Link. */
+function natal_call_room(array $c): array
+{
+    $key = function_exists('mm_whereby_key') ? mm_whereby_key() : '';
+    if ($key !== '') {
+        try {
+            $end = strtotime($c['date'] . ' ' . $c['slot']) + (NATAL_CALL_MINUTES + 60) * 60;
+            $r = mm_whereby_request('POST', '/meetings', ['endDate' => gmdate('Y-m-d\TH:i:s.000\Z', $end), 'roomMode' => 'normal', 'roomNamePrefix' => 'movecia', 'fields' => ['hostRoomUrl']], $key);
+            if (!empty($r['roomUrl'])) return [(string)$r['roomUrl'], (string)($r['hostRoomUrl'] ?? $r['roomUrl'])];
+        } catch (Throwable $e) {
+            error_log('Natal call room: ' . $e->getMessage());
+        }
+    }
+    $room = trim((string)(natal_cfg()['room'] ?? ''));
+    return [$room, $room];
+}
+
+function natal_call_ics(array $c): string
+{
+    $tz = new DateTimeZone('Europe/Vienna');
+    $f = fn(DateTime $d) => (clone $d)->setTimezone(new DateTimeZone('UTC'))->format('Ymd\THis\Z');
+    $esc = fn(string $v) => str_replace(["\\", ';', ',', "\n"], ['\\\\', '\;', '\\,', '\\n'], $v);
+    $from = new DateTime($c['date'] . ' ' . $c['slot'], $tz);
+    $to = (clone $from)->modify('+' . NATAL_CALL_MINUTES . ' minutes');
+    $where = $c['room_url'] !== '' ? $c['room_url'] : 'Online per Video (Link per E-Mail)';
+    return "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Movecia//Kennenlernen//DE\r\nMETHOD:PUBLISH\r\nBEGIN:VEVENT\r\nUID:natal-call-{$c['id']}@moveciamovement.com\r\nDTSTAMP:" . $f(new DateTime('now', $tz))
+        . "\r\nDTSTART:" . $f($from) . "\r\nDTEND:" . $f($to) . "\r\nSUMMARY:" . $esc('Kennenlerngespräch mit Vivien (Movecia)') . "\r\nLOCATION:" . $esc($where)
+        . "\r\nDESCRIPTION:" . $esc('30 Minuten, kostenlos und unverbindlich, online per Video. Zum Gespräch: ' . $where) . "\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n";
+}
+
+/** Bucht das Gespräch (in einer Transaktion, damit kein Termin doppelt vergeben wird) und schickt die Mails. */
+function natal_book_call(PDO $pdo, array $in): array
+{
+    natal_call_schema($pdo);
+    $pdo->exec('BEGIN IMMEDIATE');
+    try {
+        $q = $pdo->prepare("SELECT COUNT(*) FROM mm_natal_calls WHERE date = ? AND slot = ? AND status = 'gebucht'");
+        $q->execute([$in['date'], $in['slot']]);
+        if ((int)$q->fetchColumn() > 0) { $pdo->exec('ROLLBACK'); return ['ok' => false, 'error' => 'Dieser Termin ist gerade vergeben worden. Bitte wähl einen anderen.']; }
+        $pdo->prepare('INSERT INTO mm_natal_calls (date, slot, name, email, phone, note, mode, offer_id, token, ip_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)')
+            ->execute([$in['date'], $in['slot'], $in['name'], $in['email'], $in['phone'], $in['note'], $in['mode'], $in['offer_id'], bin2hex(random_bytes(12)), $in['ip_hash'], date('c')]);
+        $id = (int)$pdo->lastInsertId();
+        $pdo->exec('COMMIT');
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) $pdo->exec('ROLLBACK');
+        throw $e;
+    }
+    $c = $pdo->query('SELECT * FROM mm_natal_calls WHERE id = ' . $id)->fetch();
+    [$room, $host] = natal_call_room($c);
+    $pdo->prepare('UPDATE mm_natal_calls SET room_url = ?, host_url = ? WHERE id = ?')->execute([$room, $host, $id]);
+    $c['room_url'] = $room; $c['host_url'] = $host;
+    $first = forma_first_name((string)$c['name']);
+    $p = ["Hallo $first,", 'schön, dass wir uns kennenlernen! Dein kostenloses Gespräch ist eingetragen:',
+        [natal_call_when($c), '30 Minuten, online per Video'],
+        $room !== '' ? 'Zum Gespräch tippst du einfach auf den Knopf unten, du brauchst keine App und kein Konto. Am besten mit Handy oder Laptop an einem ruhigen Platz.' : 'Den Link zum Videogespräch schicke ich dir rechtzeitig vor dem Termin.',
+        'Wir sprechen darüber, wie es dir gerade geht, was du dir wünschst und welches Paket zu dir passt. Es ist ganz unverbindlich. Die angehängte Kalenderdatei übernimmt den Termin in deinen Kalender.',
+        'Kommt etwas dazwischen, antworte einfach auf diese E-Mail.'];
+    natal_mail((string)$c['email'], 'Dein Kennenlerngespräch: ' . natal_call_when($c), 'Wir lernen uns kennen', $p, $room !== '' ? [$room, 'Zum Videogespräch'] : null,
+        [['Kennenlerngespraech-Movecia.ics', natal_call_ics($c), 'text/calendar; charset=utf-8; method=PUBLISH']]);
+    $v = ['Neues Kennenlerngespräch (' . ($c['mode'] === 'online' ? 'Interesse online' : 'Interesse Studio') . '):', [natal_call_when($c), $c['name'] . ' · ' . $c['email'] . ($c['phone'] !== '' ? ' · ' . $c['phone'] : '')]];
+    if ($c['note'] !== '') $v[] = 'Ihre Nachricht: ' . $c['note'];
+    $v[] = $host !== '' ? 'Dein Link als Gastgeberin: ' . $host : 'Es gibt noch keinen Videoraum. Schick ihr bitte vor dem Termin einen Link.';
+    $hostIcs = $c; $hostIcs['room_url'] = $host;
+    natal_mail(natal_notify_email(), 'Kennenlerngespräch: ' . $c['name'] . ' · ' . natal_call_when($c), 'Neues Kennenlerngespräch', $v, [natal_admin_link(), 'In der Verwaltung'],
+        [['Kennenlerngespraech-' . preg_replace('/[^A-Za-z0-9]+/', '-', (string)$c['name']) . '.ics', natal_call_ics($hostIcs), 'text/calendar; charset=utf-8; method=PUBLISH']]);
+    return ['ok' => true, 'when' => natal_call_when($c), 'room' => $room];
+}
+
+function natal_cancel_call(PDO $pdo, int $id, string $reason, bool $mail): void
+{
+    natal_call_schema($pdo);
+    $c = $pdo->query('SELECT * FROM mm_natal_calls WHERE id = ' . $id)->fetch();
+    if (!$c || $c['status'] !== 'gebucht') return;
+    $pdo->prepare("UPDATE mm_natal_calls SET status = 'abgesagt' WHERE id = ?")->execute([$id]);
+    if ($mail) {
+        $link = mm_site() . ($c['mode'] === 'online' ? '/natal/online/' : '/natal/') . '#kennenlernen';
+        natal_mail((string)$c['email'], 'Neuer Termin fürs Kennenlerngespräch', 'Lass uns einen neuen Termin finden',
+            ['Hallo ' . forma_first_name((string)$c['name']) . ',', 'unser Gespräch am ' . natal_call_when($c) . ' geht sich leider nicht aus.' . ($reason !== '' ? "\n\n" . $reason : ''), 'Such dir gern einfach einen neuen Termin aus.'],
+            [$link, 'Neuen Termin wählen']);
+    }
+}

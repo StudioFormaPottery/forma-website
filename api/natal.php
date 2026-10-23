@@ -64,6 +64,36 @@ if ($action === 'buy') {
     }
 }
 
+if ($action === 'call') {
+    $loaded = (int)($in['t'] ?? 0);
+    if ($loaded > 0 && ((int)(microtime(true) * 1000) - $loaded) < 3000) forma_json(['ok' => false, 'error' => 'Bitte versuch es in ein paar Sekunden noch einmal.'], 429);
+    $date = (string)($in['date'] ?? '');
+    $slot = (string)($in['slot'] ?? '');
+    $name = forma_clean((string)($in['name'] ?? ''), 120);
+    $email = strtolower(forma_clean((string)($in['email'] ?? ''), 160));
+    $phone = forma_clean((string)($in['phone'] ?? ''), 40);
+    $note = trim(mb_substr(preg_replace("/[\x00-\x09\x0B-\x1F\x7F]/u", '', (string)($in['note'] ?? '')) ?? '', 0, 600));
+    $err = [];
+    if (!natal_call_bookable($date, $slot)) $err[] = 'Bitte wähl einen freien Termin im Kalender.';
+    if (mb_strlen($name) < 2) $err[] = 'Bitte gib deinen Namen an.';
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $err[] = 'Bitte gib eine gültige E-Mail-Adresse an.';
+    if (empty($in['consent'])) $err[] = 'Bitte bestätige die Hinweise zum Datenschutz.';
+    if ($err) forma_json(['ok' => false, 'error' => implode(' ', $err)], 422);
+    natal_call_schema($pdo);
+    $c = $pdo->prepare('SELECT COUNT(*) FROM mm_natal_calls WHERE ip_hash = ? AND created_at >= ?');
+    $c->execute([$ipHash, date('c', time() - 3600)]);
+    if ((int)$c->fetchColumn() >= 4) forma_json(['ok' => false, 'error' => 'Bitte versuch es später noch einmal.'], 429);
+    $offerId = null;
+    if (($in['a'] ?? '') !== '') { $q = $pdo->prepare('SELECT id FROM mm_natal_offers WHERE token = ?'); $q->execute([(string)$in['a']]); $offerId = ($q->fetchColumn() ?: null); }
+    try {
+        $r = natal_book_call($pdo, ['date' => $date, 'slot' => $slot, 'name' => $name, 'email' => $email, 'phone' => $phone, 'note' => $note, 'mode' => ($in['mode'] ?? '') === 'online' ? 'online' : 'studio', 'offer_id' => $offerId, 'ip_hash' => $ipHash]);
+    } catch (Throwable $e) {
+        error_log('Natal call: ' . $e->getMessage());
+        forma_json(['ok' => false, 'error' => 'Das hat gerade nicht geklappt. Bitte versuch es noch einmal.'], 500);
+    }
+    forma_json($r, $r['ok'] ? 200 : 409);
+}
+
 $o = natal_order_auth($pdo, (int)($in['o'] ?? 0), (string)($in['k'] ?? ''));
 if (!$o) forma_json(['ok' => false, 'error' => 'Dieser Link funktioniert leider nicht.'], 404);
 
