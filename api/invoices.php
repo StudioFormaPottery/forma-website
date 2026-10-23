@@ -106,6 +106,12 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
                 'gross' => $vc, 'paid' => $b['paid_at'], 'type' => 'Kurs',
                 'pay_note' => 'Der Betrag ist bereits bezahlt: eingelöst mit deinem FORMA Gutschein Nr. ' . $old['nr'] . '.'];
         }
+        if (($b['manual_pay'] ?? '') === 'bar') {
+            // Von Vivien eingetragen und bar bezahlt: Betrag so, wie sie ihn eingegeben hat.
+            return ['name' => $b['name'], 'email' => $b['email'], 'session' => '', 'address' => (string)($b['bill_address'] ?? ''), 'service' => date('d.m.Y', strtotime($b['start_date'])),
+                'items' => [['text' => $b['title'], 'detail' => $b['date_text'] . ' · FORMA Studio, Mathon', 'qty' => 1, 'unit' => (int)$b['amount_cents']]],
+                'gross' => (int)$b['amount_cents'], 'paid' => $b['paid_at'], 'type' => 'Kurs', 'pay_note' => 'Der Betrag wurde bar im Atelier bezahlt.'];
+        }
         $bSlots = forma_is_bemalen($b) ? forma_extras_slots($b['extras'] ?? '') : [];
         $when = $bSlots ? forma_date_without_time((string)$b['date_text']) . ' · ' . forma_slots_text($bSlots) : $b['date_text'];
         $items = [['text' => $b['title'], 'detail' => $when . ' · FORMA Studio, Mathon', 'qty' => (int)$b['persons'], 'unit' => (int)$b['unit']]];
@@ -176,7 +182,8 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
         if (!$v || (int)$v['amount_cents'] <= 0) return null;
         return ['name' => $v['buyer_name'], 'email' => $v['buyer_email'], 'session' => $v['stripe_session'], 'service' => date('d.m.Y', strtotime((string)$v['paid_at'])),
             'items' => [['text' => 'Gutschein ' . $v['nr'] . ' · ' . forma_voucher_title($v), 'detail' => 'Wertgutschein, einlösbar für alle Kurse im FORMA Atelier', 'qty' => 1, 'unit' => (int)$v['amount_cents']]],
-            'gross' => (int)$v['amount_cents'], 'paid' => $v['paid_at'], 'type' => 'Gutschein'];
+            'gross' => (int)$v['amount_cents'], 'paid' => $v['paid_at'], 'type' => 'Gutschein',
+            'pay_note' => ($v['pay_method'] ?? '') === 'bar' ? 'Der Betrag wurde bar im Atelier bezahlt.' : ''];
     }
     if ($kind === 'template') {
         $st = $pdo->prepare("SELECT * FROM template_orders WHERE id = ? AND status = 'bezahlt'");

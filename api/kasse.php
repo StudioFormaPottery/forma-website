@@ -130,3 +130,92 @@ function forma_kasse_check(PDO $pdo, array $s): string
     }
     return 'offen';
 }
+
+// --- Gutscheine direkt im Atelier ausstellen ---------------------------------------------------------
+// Vivien wählt in der Kasse Kurs oder Betrag, Name und E-Mail. Der Gast scannt den QR-Code und zahlt über Stripe
+// (api/gutschein-zahlen.php) oder zahlt bar. Erst nach der Zahlung bekommt der Gutschein Nummer und Code,
+// dann gehen Mail (mit „Termin einbuchen“) und Info an hello@ raus. Online kann niemand selbst so einen Gutschein anlegen.
+
+/** Auswahl in der Kasse: Kurse mit Preis pro Einheit, dazu freier Betrag ('wert'). */
+function forma_kasse_voucher_options(): array
+{
+    $o = [];
+    foreach (FORMA_VOUCHERS as $k => $p) $o[$k] = ['name' => $p['name'], 'price' => (int)$p['price'], 'one' => $p['one'], 'many' => $p['many']];
+    $o['wert'] = ['name' => 'Freier Betrag', 'price' => 0, 'one' => '', 'many' => ''];
+    return $o;
+}
+
+/** Legt einen Gutschein aus der Kasse an. $method: 'qr' (Stripe) oder 'bar'. Gibt die ID zurück. */
+function forma_kasse_voucher_create(PDO $pdo, string $product, int $qty, int $cents, string $name, string $email, string $recipient, string $method): int
+{
+    $opts = forma_kasse_voucher_options();
+    if (!isset($opts[$product])) throw new RuntimeException('Bitte wähl einen Kurs oder „Freier Betrag“.');
+    if ($product === 'wert') {
+        $qty = 1;
+        if ($cents < 500 || $cents > 200000) throw new RuntimeException('Bitte gib einen Betrag zwischen € 5 und € 2.000 ein.');
+    } else {
+        $qty = max(1, min(10, $qty));
+        $cents = $opts[$product]['price'] * $qty;
+    }
+    if (mb_strlen($name) < 2) throw new RuntimeException('Bitte gib den Namen an.');
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) throw new RuntimeException('Bitte gib eine gültige E-Mail-Adresse an, dorthin kommt der Gutschein mit dem Code.');
+    $bar = $method === 'bar';
+    if (!$bar && !forma_stripe_key()) throw new RuntimeException('Für den QR-Code fehlt noch der Stripe-Schlüssel (Einstellungen). Bar geht trotzdem.');
+    $pdo->prepare("INSERT INTO vouchers (product, qty, amount_cents, recipient, sender, message, design, buyer_name, buyer_email, status, token, note, created_at, kind, via, pay_method)
+        VALUES (?, ?, ?, ?, '', '', 1, ?, ?, 'offen', ?, 'Atelier-Kasse', ?, 'kauf', 'kasse', ?)")
+        ->execute([$product, $qty, $cents, $recipient, $name, $email, bin2hex(random_bytes(16)), date('c'), $bar ? 'bar' : 'qr']);
+    $id = (int)$pdo->lastInsertId();
+    if ($bar) forma_voucher_paid($pdo, $id);
+    return $id;
+}
+
+function forma_kasse_voucher_get(PDO $pdo, int $id): ?array
+{
+    $st = $pdo->prepare("SELECT * FROM vouchers WHERE id = ? AND via = 'kasse'");
+    $st->execute([$id]);
+    return $st->fetch() ?: null;
+}
+
+function forma_kasse_voucher_pay_url(array $v): string
+{
+    return forma_site_url() . '/api/gutschein-zahlen.php?v=' . (int)$v['id'] . '&k=' . rawurlencode((string)$v['token']);
+}
+
+/** Offener QR-Gutschein: inzwischen bezahlt? (fragt Stripe, vergibt dann Nummer und verschickt die Mails) */
+function forma_kasse_voucher_status(PDO $pdo, array $v): string
+{
+    if ($v['status'] !== 'offen' || (string)$v['stripe_session'] === '') return (string)$v['status'];
+    $session = forma_stripe('GET', '/v1/checkout/sessions/' . rawurlencode((string)$v['stripe_session']));
+    if (($session['payment_status'] ?? '') === 'paid') {
+        forma_voucher_paid($pdo, (int)$v['id']);
+        return 'bezahlt';
+    }
+    return 'offen'; // abgelaufene Bezahlseite: der QR-Code bleibt gültig und öffnet einfach eine neue
+}
+
+// --- Bestandskundinnen ---------------------------------------------------------------------------------
+/** Alle, die schon einmal gebucht, bezahlt oder einen Gutschein gekauft haben – eine Zeile pro E-Mail-Adresse, neueste Angaben zuerst. */
+function forma_customers(PDO $pdo): array
+{
+    $rows = [];
+    $add = function (array $r, string $what) use (&$rows) {
+        $email = mb_strtolower(trim((string)$r['email']));
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || $email === FORMA_NOTIFY_EMAIL) return;
+        $at = (string)$r['at'];
+        if (!isset($rows[$email])) $rows[$email] = ['name' => '', 'email' => $email, 'phone' => '', 'at' => '', 'n' => 0, 'what' => []];
+        $c = &$rows[$email];
+        $c['n']++;
+        if ($at >= $c['at']) { $c['at'] = $at; if (trim((string)$r['name']) !== '') $c['name'] = trim((string)$r['name']); }
+        if ($c['name'] === '') $c['name'] = trim((string)$r['name']);
+        if ($c['phone'] === '' && trim((string)($r['phone'] ?? '')) !== '') $c['phone'] = trim((string)$r['phone']);
+        $w = preg_replace('/\s*·.*$/u', '', $what);
+        if ($w !== '' && !in_array($w, $c['what'], true)) $c['what'][] = $w;
+    };
+    foreach ($pdo->query("SELECT b.name, b.email, b.phone, b.created_at AS at, c.title FROM bookings b JOIN courses c ON c.id = b.course_id WHERE b.status IN ('bestaetigt','storniert') AND b.email != ''")->fetchAll() as $r) $add($r, (string)$r['title']);
+    foreach ($pdo->query("SELECT name, email, phone, created_at AS at FROM private_bookings WHERE status IN ('bezahlt','anfrage') AND email != ''")->fetchAll() as $r) $add($r, 'Private Pottery');
+    foreach ($pdo->query("SELECT buyer_name AS name, buyer_email AS email, '' AS phone, created_at AS at FROM vouchers WHERE status IN ('bezahlt','eingeloest') AND buyer_email != ''")->fetchAll() as $r) $add($r, 'Gutschein');
+    foreach ($pdo->query("SELECT name, email, '' AS phone, created_at AS at FROM kasse_sales WHERE status = 'bezahlt' AND email != ''")->fetchAll() as $r) $add($r, 'Pottery bemalen');
+    $rows = array_values(array_filter($rows, fn($c) => $c['name'] !== ''));
+    usort($rows, fn($a, $b) => strcasecmp($a['name'], $b['name']));
+    return $rows;
+}

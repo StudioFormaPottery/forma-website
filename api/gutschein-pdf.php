@@ -38,7 +38,7 @@ function rgb(string $hex): array
 
 $design = (int)$v['design'] === 2 ? 2 : 1;
 $layout = json_decode((string)file_get_contents(__DIR__ . "/gutschein/design$design.json"), true);
-$p = FORMA_VOUCHERS[$v['product']];
+$p = forma_voucher_product($v);
 $texts = [
     'big' => forma_voucher_qty($v),
     'small' => $p['small'],

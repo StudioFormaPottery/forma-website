@@ -656,6 +656,13 @@ function forma_migrate(PDO $pdo): void
         }
         forma_set_setting($pdo, 'voucher_codes_v25', '1');
     }
+    // 23.10.2026: Gutscheine direkt in der Atelier-Kasse ausstellen (QR-Code zu Stripe oder bar), umgebuchte/eingetragene Bestandskundinnen.
+    if (forma_setting($pdo, 'kasse_gutschein_v27') === null) {
+        forma_add_column($pdo, 'vouchers', 'via', "TEXT NOT NULL DEFAULT ''");
+        forma_add_column($pdo, 'vouchers', 'pay_method', "TEXT NOT NULL DEFAULT ''");
+        forma_add_column($pdo, 'bookings', 'manual_pay', "TEXT NOT NULL DEFAULT ''");
+        forma_set_setting($pdo, 'kasse_gutschein_v27', '1');
+    }
     // 16.10.2026: Pottery bemalen ohne Teller, Untersetzer und Unterteller, dafür kleine und große Bowls.
     if (forma_setting($pdo, 'bemalen_sortiment_v26') === null) {
         $b = FORMA_SERIES['bemalen'];
@@ -1079,6 +1086,7 @@ function forma_mail_html(string $text): string
         if (str_contains($url, 'confirm.php')) return 'E-Mail-Adresse bestätigen';
         if (str_contains($url, 'maker-download') || str_contains($url, 'template-download') || str_contains($url, 'maker-mail')) return 'Template herunterladen';
         if (str_contains($url, 'gutschein-pdf')) return 'Gutschein herunterladen';
+        if (str_contains($url, '?code=')) return 'Termin einbuchen';
         if (str_contains($url, 'cancel.php')) return 'Buchung ansehen';
         if (str_contains($url, 'private-zahlen.php') || str_contains($url, 'private-plus.php')) return 'Jetzt online bezahlen';
         if (str_contains($url, 'kurs-aendern.php')) return 'Neuen Termin wählen oder stornieren';
@@ -1490,10 +1498,23 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
     $phone = FORMA_PHONE;
     $site = forma_site_url();
 
-    $payLine = $paid
+    // Von Vivien eingetragen (z. B. Bestandskundin, Umbuchung): eigener Betrag und eigene Zahlart
+    $mp = (string)($b['manual_pay'] ?? '');
+    $vNote = '';
+    if ($mp !== '' && preg_match('/^Von Vivien eingetragen · (.+)$/u', (string)$b['message'], $mm)) $vNote = trim($mm[1]);
+    if ($mp === 'umbuchung') $paid = true;
+    $payLine = $mp === 'umbuchung'
+        ? 'Kosten: € 0 (schon bezahlt, das ist eine Umbuchung)'
+        : ($mp === 'bar' ? 'Bezahlt: ' . forma_euro((int)$b['amount_cents']) . ' bar im Atelier, danke!'
+        : ($mp === 'vorort' ? 'Kosten: ' . forma_euro((int)$b['amount_cents']) . ', bitte vor Ort im Atelier bezahlen'
+        : ''));
+    if ($payLine === '') $payLine = $paid
         ? 'Bezahlt: ' . forma_paid_text((int)$b['amount_cents'], $vc)
         : 'Preis: ' . $b['price_text'] . ($vc > 0 ? ' (davon ' . forma_euro($vc) . ' mit Gutschein bezahlt, den Rest bitte vor Ort)' : '');
-    $intro = $paid
+    $intro = $mp === 'umbuchung'
+        ? "dein Termin für „{$b['title']}“ ist bestätigt! Ich habe dich umgebucht, und weil du schon bezahlt hast, fallen dafür keine weiteren Kosten an. Ich freue mich schon sehr auf dich."
+        : ($mp !== '' ? "dein Termin für „{$b['title']}“ ist bestätigt! Ich habe dich eingetragen und freue mich schon sehr auf dich." : '');
+    if ($intro === '') $intro = $paid
         ? ((int)$b['amount_cents'] <= 0 && $vc > 0
             ? "schön, dass du deinen Gutschein einlöst! Dein Platz für „{$b['title']}“ ist fix und mit deinem Gutschein schon vollständig bezahlt. Ich freue mich schon sehr auf dich."
             : "danke für deine Buchung! Deine Zahlung ist angekommen und dein Platz für „{$b['title']}“ ist fix. Ich freue mich schon sehr auf dich.")
@@ -1501,7 +1522,7 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
     $minNote = '';
     if ((int)$b['min_participants'] > 1) {
         $minNote = "\nDer Termin findet ab {$b['min_participants']} Personen statt. Falls es zu wenige Anmeldungen gibt, melde ich mich rechtzeitig bei dir"
-            . ($paid ? ((int)$b['amount_cents'] <= 0 && $vc > 0 ? ' und wir finden einen neuen Termin, dein Gutschein bleibt dir natürlich erhalten.' : ' und wir finden einen neuen Termin oder du bekommst dein Geld zurück.') : '.') . "\n";
+            . ($mp === 'umbuchung' ? ' und wir finden gemeinsam einen neuen Termin.' : '') . ($mp === 'umbuchung' ? '' : ($paid ? ((int)$b['amount_cents'] <= 0 && $vc > 0 ? ' und wir finden einen neuen Termin, dein Gutschein bleibt dir natürlich erhalten.' : ' und wir finden einen neuen Termin oder du bekommst dein Geld zurück.') : '.')) . "\n";
     }
 
     $pieces = json_decode((string)($b['extras'] ?? ''), true);
@@ -1526,7 +1547,7 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
     $calTxt = ''; $calAtt = [];
     try { [$calTxt, $calAtt] = forma_cal_block($pdo, 'b', $bookingId); } catch (Throwable $e) { error_log('FORMA cal: ' . $e->getMessage()); }
     $customer = "Hallo $first,\n\n$intro\n\nHier noch einmal alles auf einen Blick:\n\n"
-        . "Kurs: {$b['title']}\nTermin: $termin\nPersonen: $personsText\n$piecesLine$payLine\nOrt: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
+        . "Kurs: {$b['title']}\nTermin: $termin\nPersonen: $personsText\n$piecesLine$payLine\n" . ($vNote !== '' ? "Hinweis: $vNote\n" : '') . "Ort: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
         . $minNote
         . $restNote
         . $calTxt
@@ -1544,9 +1565,14 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
         . "\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\n" . (($b['bill_address'] ?? '') !== '' ? "Rechnungsadresse: " . str_replace("\n", ', ', (string)$b['bill_address']) . "\n" : '') . "Nachricht: {$b['message']}\n\n"
         . "Freie Plätze danach: $free\n\nAlle Buchungen: $site/verwaltung/\n";
 
-    forma_mail($b['email'], ($paid ? 'Dein Platz ist fix: ' : 'Deine Anmeldung: ') . $b['title'], $customer, null, $calAtt);
-    forma_mail(FORMA_NOTIFY_EMAIL, ($byLink ? 'Gutschein-Link eingelöst: ' : ($paid ? 'Bezahlt: ' : 'Neue Anmeldung: ')) . $b['title'] . ' (' . $b['name'] . ')', $admin, $b['email']);
-    if ($paid) forma_invoice_for($pdo, 'kurs', $bookingId);
+    if ($mp !== '') {
+        $admin = 'Du hast ' . forma_first_name((string)$b['name']) . ' in der Verwaltung eingetragen und die Bestätigung ist rausgegangen.' . "\n\n"
+            . "Kurs: {$b['title']}\nTermin: $termin\nPersonen: $personsText\n$payLine\n" . ($vNote !== '' ? "Notiz: $vNote\n" : '')
+            . "\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\n\nFreie Plätze danach: $free\n\nAlle Buchungen: $site/verwaltung/\n";
+    }
+    forma_mail($b['email'], ($mp !== '' ? 'Dein Termin ist bestätigt: ' : ($paid ? 'Dein Platz ist fix: ' : 'Deine Anmeldung: ')) . $b['title'], $customer, null, $calAtt);
+    forma_mail(FORMA_NOTIFY_EMAIL, ($mp !== '' ? 'Eingetragen: ' : ($byLink ? 'Gutschein-Link eingelöst: ' : ($paid ? 'Bezahlt: ' : 'Neue Anmeldung: '))) . $b['title'] . ' (' . $b['name'] . ')', $admin, $b['email']);
+    if ($paid && $mp !== 'umbuchung') forma_invoice_for($pdo, 'kurs', $bookingId);
 }
 
 // --- MailerLite -------------------------------------------------------------------
@@ -1658,17 +1684,36 @@ const FORMA_VOUCHERS = [
     ],
 ];
 
-/** „2 Plätze“ / „1 Stunde“ */
+/** Freier Betrag (nur in der Atelier-Kasse ausstellbar, nicht online kaufbar). */
+const FORMA_VOUCHER_WERT = [
+    'name' => 'Wertgutschein', 'price' => 0, 'one' => '', 'many' => '', 'small' => 'für alle Kurse im FORMA Atelier',
+    'desc' => 'Einlösbar für alle Kurse und Workshops im FORMA Atelier: Spin & Go, Pottery bemalen, Offenes Atelier und Private Pottery. Ein Restwert bleibt erhalten.',
+];
+
+/** Produktangaben eines Gutscheins, auch für Wertgutscheine mit freiem Betrag. */
+function forma_voucher_product(array $v): array
+{
+    return FORMA_VOUCHERS[$v['product'] ?? ''] ?? FORMA_VOUCHER_WERT;
+}
+
+/** „2 Plätze“ / „1 Stunde“ / beim Wertgutschein „€ 50“ */
 function forma_voucher_qty(array $v): string
 {
+    if (!isset(FORMA_VOUCHERS[$v['product'] ?? ''])) return forma_euro((int)$v['amount_cents']);
     $p = FORMA_VOUCHERS[$v['product']];
     return (int)$v['qty'] . ' ' . ((int)$v['qty'] === 1 ? $p['one'] : $p['many']);
 }
 
 function forma_voucher_title(array $v): string
 {
-    if (($v['kind'] ?? 'kauf') !== 'kauf') return 'Wertgutschein über ' . forma_euro((int)$v['amount_cents']);
+    if (($v['kind'] ?? 'kauf') !== 'kauf' || !isset(FORMA_VOUCHERS[$v['product'] ?? ''])) return 'Wertgutschein über ' . forma_euro((int)$v['amount_cents']);
     return forma_voucher_qty($v) . ' ' . FORMA_VOUCHERS[$v['product']]['small'];
+}
+
+/** Link aus der Gutschein-Mail: öffnet die Buchung mit schon eingetragenem Code. */
+function forma_voucher_book_url(array $v): string
+{
+    return forma_site_url() . '/?code=' . rawurlencode((string)$v['code']) . '#jetzt-buchen';
 }
 
 /** Bezahlung bestätigen, fortlaufende Nummer vergeben (FORMA-JJJJ-0001) und Mails verschicken. */
@@ -1943,15 +1988,22 @@ function forma_voucher_mails(PDO $pdo, int $id): void
     $title = forma_voucher_title($v);
     $amount = forma_euro((int)$v['amount_cents']);
     $link = forma_voucher_link($v);
+    $book = forma_voucher_book_url($v);
     $phone = FORMA_PHONE;
     $site = forma_site_url();
-    forma_mail($v['buyer_email'], 'Dein FORMA Gutschein ' . $v['nr'], "Hallo $first,\n\nvielen Dank für deinen Gutschein-Kauf! Was für ein schönes Geschenk.\n\n"
+    $atelier = ($v['via'] ?? '') === 'kasse';
+    $intro = $atelier
+        ? "schön, dass du heute bei mir im Atelier warst, und danke für deinen Gutschein! Den Papiergutschein mit der Nummer {$v['nr']} hast du direkt von mir bekommen. Hier ist alles noch einmal digital, damit nichts verloren geht."
+        : 'vielen Dank für deinen Gutschein-Kauf! Was für ein schönes Geschenk.';
+    forma_mail($v['buyer_email'], 'Dein FORMA Gutschein ' . $v['nr'], "Hallo $first,\n\n$intro\n\n"
         . "Gutschein: $title\nWert: $amount\nGutschein-Nr.: {$v['nr']}\nGutscheincode: {$v['code']}\n" . ($v['recipient'] ? "Für: {$v['recipient']}\n" : '')
-        . "\nHier kannst du den Gutschein jederzeit als PDF herunterladen und ausdrucken:\n$link\n\n"
-        . "So wird er eingelöst: Die beschenkte Person bucht ihren Kurs ganz normal auf www.forma-pottery.com und gibt vor dem Bezahlen den Gutscheincode ein. Der Wert wird sofort abgezogen. Oder sie meldet sich bei mir, telefonisch oder per WhatsApp unter $phone, und wir finden gemeinsam einen Termin.\n\n"
+        . "\nMit diesem Button suchst du dir gleich deinen Termin aus, der Gutscheincode ist schon eingetragen:\n$book\n\n"
+        . "Der Gutschein ist ein Wertgutschein: Du kannst ihn für jeden Kurs einlösen, egal wofür er gekauft wurde. Ist der Kurs teurer, zahlst du nur die Differenz online dazu. Ist er günstiger, bleibt der Rest auf deinem Gutschein.\n\n"
+        . "Hier kannst du den Gutschein jederzeit als PDF herunterladen und ausdrucken:\n$link\n\n"
+        . "Lieber persönlich? Ruf mich an oder schreib mir per WhatsApp unter $phone, dann finden wir gemeinsam einen Termin.\n\n"
         . "Gut zu wissen: " . FORMA_VOUCHER_TERMS . "\n\n"
         . "Bis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
-    forma_mail(FORMA_NOTIFY_EMAIL, 'Gutschein verkauft: ' . $v['nr'] . ' (' . $amount . ')', "Ein Gutschein wurde online gekauft und bezahlt.\n\n"
+    forma_mail(FORMA_NOTIFY_EMAIL, 'Gutschein ' . ($atelier ? 'im Atelier ' : '') . 'verkauft: ' . $v['nr'] . ' (' . $amount . ')', ($atelier ? "Ein Gutschein aus der Atelier-Kasse ist bezahlt (" . (($v['pay_method'] ?? '') === 'bar' ? 'bar' : 'online per QR-Code') . "). Schreib die Nummer auf den Papiergutschein.\n\n" : "Ein Gutschein wurde online gekauft und bezahlt.\n\n")
         . "Nr.: {$v['nr']}\nCode: {$v['code']}\nInhalt: $title\nBetrag: $amount\nFür: {$v['recipient']}\nVon: {$v['sender']}\n\n"
         . "Käufer:in: {$v['buyer_name']}\nE-Mail: {$v['buyer_email']}\n\nPDF: $link\nAlle Gutscheine: $site/verwaltung/?view=gutscheine\n", $v['buyer_email']);
     if ((int)$v['amount_cents'] > 0 && ($v['kind'] ?? 'kauf') === 'kauf') forma_invoice_for($pdo, 'gutschein', $id);
@@ -1968,6 +2020,8 @@ function forma_voucher_check(PDO $pdo, array $v): string
         return 'bezahlt';
     }
     if (($session['status'] ?? '') === 'expired') {
+        // Gutscheine aus der Atelier-Kasse bleiben offen: der QR-Code öffnet einfach eine neue Bezahlseite.
+        if (($v['via'] ?? '') === 'kasse') return 'offen';
         $pdo->prepare("UPDATE vouchers SET status = 'abgebrochen' WHERE id = ? AND status = 'offen'")->execute([(int)$v['id']]);
         return 'abgebrochen';
     }

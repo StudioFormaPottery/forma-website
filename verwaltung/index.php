@@ -298,14 +298,36 @@ if ($action === 'booking_status') {
 
 if ($action === 'add_booking') {
     $cid = (int)($_POST['id'] ?? 0);
+    $back = $self . '?view=course&id=' . $cid;
     $name = forma_clean((string)($_POST['name'] ?? ''), 120);
-    if ($name === '') {
-        go($self . '?view=course&id=' . $cid, 'Bitte gib einen Namen an.');
-    }
-    $pdo->prepare('INSERT INTO bookings (course_id, name, email, phone, persons, message, status, created_at) VALUES (?,?,?,?,?,?,\'bestaetigt\',?)')
-        ->execute([$cid, $name, forma_clean((string)($_POST['email'] ?? ''), 160), forma_clean((string)($_POST['phone'] ?? ''), 40),
-            max(1, (int)($_POST['persons'] ?? 1)), 'Von Vivien eingetragen', date('c')]);
-    go($self . '?view=course&id=' . $cid, 'Die Person ist eingetragen.');
+    $email = mb_strtolower(forma_clean((string)($_POST['email'] ?? ''), 160));
+    $persons = max(1, min(20, (int)($_POST['persons'] ?? 1)));
+    if ($name === '') go($back, 'Bitte gib einen Namen an.');
+    $st = $pdo->prepare('SELECT * FROM courses WHERE id = ?');
+    $st->execute([$cid]);
+    $c = $st->fetch();
+    if (!$c) go($self, 'Diesen Termin gibt es nicht mehr.');
+    $mail = isset($_POST['send_mail']);
+    if ($mail && !filter_var($email, FILTER_VALIDATE_EMAIL)) go($back, 'Für die Bestätigung brauche ich eine gültige E-Mail-Adresse. Ohne E-Mail nimm das Häkchen „Bestätigung schicken“ raus.');
+    $amount = euro_to_cents((string)($_POST['amount'] ?? '0'));
+    $pay = (string)($_POST['pay'] ?? 'vorort');
+    $manual = !$mail ? '' : ($amount <= 0 ? 'umbuchung' : ($pay === 'bar' ? 'bar' : 'vorort'));
+    $note = forma_clean((string)($_POST['note'] ?? ''), 200);
+    $over = forma_booked($pdo, $cid) + $persons > (int)$c['capacity'];
+    $now = date('c');
+    $pdo->prepare("INSERT INTO bookings (course_id, name, email, phone, persons, message, status, created_at, amount_cents, paid_at, manual_pay, no_post) VALUES (?,?,?,?,?,?,'bestaetigt',?,?,?,?,?)")
+        ->execute([$cid, $name, $email, forma_clean((string)($_POST['phone'] ?? ''), 40), $persons,
+            'Von Vivien eingetragen' . ($note !== '' ? ' · ' . $note : ''), $now, $manual === 'umbuchung' ? 0 : $amount,
+            in_array($manual, ['umbuchung', 'bar'], true) ? $now : null, $manual, (int)!isset($_POST['post'])]);
+    $bid = (int)$pdo->lastInsertId();
+    if (!$mail) $pdo->prepare('UPDATE bookings SET mailed = 1 WHERE id = ?')->execute([$bid]);
+    else forma_send_booking_mails($pdo, $bid);
+    $first = forma_first_name($name);
+    go($back, "$first ist eingetragen. "
+        . (!$mail ? 'Es wurde keine E-Mail verschickt.' : ($manual === 'umbuchung' ? "$first hat die Terminbestätigung mit Kalendereintrag bekommen (Kosten € 0, Umbuchung)."
+            : ($manual === 'bar' ? "$first hat die Bestätigung und die Rechnung über " . forma_euro($amount) . ' (bar bezahlt) bekommen.'
+            : "$first hat die Bestätigung bekommen, " . forma_euro($amount) . ' zahlt sie vor Ort.')))
+        . ($over ? ' Achtung: Der Termin ist jetzt überbucht, ändere die Plätze bei Bedarf unter „Termin bearbeiten“.' : ''));
 }
 
 if ($action === 'link_create') {
@@ -903,6 +925,168 @@ if ($view === 'bestand') {
     exit;
 }
 
+// --- Gutschein in der Atelier-Kasse ausstellen ---------------------------------------------------------
+if ($action === 'kv_new') {
+    $method = ($_POST['method'] ?? '') === 'bar' ? 'bar' : 'qr';
+    try {
+        $vid = forma_kasse_voucher_create($pdo, (string)($_POST['product'] ?? ''), (int)($_POST['qty'] ?? 1), euro_to_cents((string)($_POST['value'] ?? '')),
+            forma_clean((string)($_POST['name'] ?? ''), 120), mb_strtolower(forma_clean((string)($_POST['email'] ?? ''), 160)), forma_clean((string)($_POST['recipient'] ?? ''), 40), $method);
+    } catch (Throwable $e) {
+        $_SESSION['kv_form'] = $_POST;
+        go($self . '?view=gutschein_kasse', $e->getMessage());
+    }
+    go($self . '?view=gutschein_kasse&v=' . $vid);
+}
+if ($action === 'kv_cash' || $action === 'kv_cancel') {
+    $v = forma_kasse_voucher_get($pdo, (int)($_POST['vid'] ?? 0));
+    if (!$v || $v['status'] !== 'offen') go($self . '?view=gutschein_kasse', 'Dieser Gutschein ist nicht mehr offen.');
+    try { if (forma_kasse_voucher_status($pdo, $v) === 'bezahlt') go($self . '?view=gutschein_kasse&v=' . (int)$v['id'], 'Der Gutschein ist inzwischen online bezahlt.'); } catch (Throwable $e) {}
+    if ($action === 'kv_cancel') {
+        $pdo->prepare("UPDATE vouchers SET status = 'zurueckgezogen' WHERE id = ? AND status = 'offen'")->execute([(int)$v['id']]);
+        go($self . '?view=gutschein_kasse', 'Zurückgezogen. Der QR-Code funktioniert nicht mehr.');
+    }
+    $pdo->prepare("UPDATE vouchers SET pay_method = 'bar' WHERE id = ?")->execute([(int)$v['id']]);
+    forma_voucher_paid($pdo, (int)$v['id']);
+    go($self . '?view=gutschein_kasse&v=' . (int)$v['id']);
+}
+if ($view === 'kv_status') {
+    header('Content-Type: application/json');
+    $v = forma_kasse_voucher_get($pdo, (int)($_GET['id'] ?? 0));
+    $st = 'fehlt';
+    if ($v) {
+        try { $st = forma_kasse_voucher_status($pdo, $v); } catch (Throwable $e) { $st = (string)$v['status']; }
+        $v = forma_kasse_voucher_get($pdo, (int)$v['id']);
+    }
+    echo json_encode(['status' => $st, 'nr' => $v['nr'] ?? null], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+if ($view === 'gutschein_kasse') {
+    forma_reconcile_payments($pdo, true);
+    $cur = isset($_GET['v']) ? forma_kasse_voucher_get($pdo, (int)$_GET['v']) : null;
+    if ($cur && $cur['status'] === 'offen') { try { forma_kasse_voucher_status($pdo, $cur); $cur = forma_kasse_voucher_get($pdo, (int)$cur['id']); } catch (Throwable $e) {} }
+    $openList = $pdo->query("SELECT * FROM vouchers WHERE via = 'kasse' AND status = 'offen' ORDER BY id DESC LIMIT 20")->fetchAll();
+    $doneList = $pdo->query("SELECT * FROM vouchers WHERE via = 'kasse' AND status IN ('bezahlt','eingeloest') ORDER BY id DESC LIMIT 12")->fetchAll();
+    $form = $_SESSION['kv_form'] ?? [];
+    unset($_SESSION['kv_form']);
+    $customers = forma_customers($pdo);
+    $stripe = (bool)forma_stripe_key();
+    render_page('Gutschein ausstellen', function () use ($self, $flash, $cur, $openList, $doneList, $form, $customers, $stripe) {
+        $opts = forma_kasse_voucher_options();
+        $fv = fn($k, $d = '') => forma_h((string)($form[$k] ?? $d)); ?>
+        <p><a href="<?= forma_h($self) ?>?view=kasse">← Zur Kasse</a></p>
+        <p class="eyebrow">Atelier-Kasse</p>
+        <h1>Gutschein ausstellen</h1>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <?php if ($cur): $paid = in_array($cur['status'], ['bezahlt', 'eingeloest'], true); ?>
+        <div class="card stack kv-result" id="kv-result" data-id="<?= (int)$cur['id'] ?>" data-status="<?= forma_h($cur['status']) ?>">
+            <div class="kv-what"><strong><?= forma_h(forma_voucher_title($cur)) ?></strong> · <?= forma_h(forma_euro((int)$cur['amount_cents'])) ?><br><span class="muted small">für <?= forma_h($cur['buyer_name']) ?> · <?= forma_h($cur['buyer_email']) ?><?= $cur['recipient'] !== '' ? ' · Geschenk für ' . forma_h($cur['recipient']) : '' ?></span></div>
+            <div id="kv-wait"<?= $paid ? ' hidden' : '' ?>>
+                <?php if ($cur['status'] === 'offen'): ?>
+                <div class="kv-qr" id="kv-qr" data-url="<?= forma_h(forma_kasse_voucher_pay_url($cur)) ?>"></div>
+                <p class="kv-hint">Mit der Handykamera scannen und bezahlen.</p>
+                <p class="muted small kv-pulse">Wartet auf die Zahlung … sobald sie da ist, erscheint hier die Gutscheinnummer.</p>
+                <div class="row-actions">
+                    <button class="btn btn-ghost btn-sm" type="button" data-copy="<?= forma_h(forma_kasse_voucher_pay_url($cur)) ?>">Bezahl-Link kopieren</button>
+                    <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="vid" value="<?= (int)$cur['id'] ?>"><button class="link small" name="action" value="kv_cash" onclick="return confirm('Doch bar bezahlt? Dann bekommt der Gutschein jetzt seine Nummer und die Mail geht raus.')">Doch bar bezahlt</button> <button class="link small" name="action" value="kv_cancel" onclick="return confirm('Wirklich zurückziehen? Der QR-Code funktioniert dann nicht mehr.')">zurückziehen</button></form>
+                </div>
+                <?php else: ?><p class="muted">Dieser Gutschein wurde zurückgezogen.</p><?php endif; ?>
+            </div>
+            <div id="kv-done"<?= $paid ? '' : ' hidden' ?> class="kv-done">
+                <p class="eyebrow">Bezahlt ✓ · auf den Papiergutschein schreiben</p>
+                <p class="kv-nr" id="kv-nr"><?= forma_h((string)$cur['nr']) ?></p>
+                <p class="muted small">Die Mail mit Gutscheincode, PDF und dem Button „Termin einbuchen“ ist an <?= forma_h($cur['buyer_email']) ?> unterwegs. Du findest den Gutschein unter <a href="<?= forma_h($self) ?>?view=gutscheine">Gutscheine</a>.</p>
+                <p><a class="btn" href="<?= forma_h($self) ?>?view=gutschein_kasse">Nächsten Gutschein ausstellen</a></p>
+            </div>
+        </div>
+        <?php endif; ?>
+        <?php if (!$cur || in_array($cur['status'], ['bezahlt', 'eingeloest', 'zurueckgezogen'], true)): ?>
+        <form method="post" class="card stack" id="kv-form">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="kv_new">
+            <label>Was soll auf den Gutschein?</label>
+            <div class="kv-opts">
+            <?php $sel = (string)($form['product'] ?? 'spin'); foreach ($opts as $k => $o): ?>
+                <label class="kv-opt"><input type="radio" name="product" value="<?= forma_h($k) ?>" data-price="<?= (int)$o['price'] ?>" data-one="<?= forma_h($o['one']) ?>" data-many="<?= forma_h($o['many']) ?>"<?= $sel === $k ? ' checked' : '' ?>>
+                    <span><strong><?= forma_h($o['name']) ?></strong><span class="muted small"><?= $k === 'wert' ? 'Betrag selbst eingeben' : forma_h(forma_euro((int)$o['price'])) . ' pro ' . forma_h($o['one']) ?></span></span></label>
+            <?php endforeach; ?>
+            </div>
+            <div class="row">
+                <div class="stack" id="kv-qty-box"><label for="kv-qty">Wie viele?</label><select id="kv-qty" name="qty"><?php for ($i = 1; $i <= 10; $i++): ?><option value="<?= $i ?>"<?= (int)($form['qty'] ?? 1) === $i ? ' selected' : '' ?>><?= $i ?></option><?php endfor; ?></select></div>
+                <div class="stack" id="kv-val-box" hidden><label for="kv-val">Betrag in €</label><input id="kv-val" name="value" inputmode="decimal" placeholder="z. B. 50" value="<?= $fv('value') ?>"></div>
+                <div class="stack"><label>Gesamt</label><p class="kv-total" id="kv-total">€ 70</p></div>
+            </div>
+            <div class="row">
+                <div class="stack"><label for="kv-name">Name <span class="muted small">(wer kauft)</span></label><input id="kv-name" name="name" required list="kv-cust" autocomplete="off" value="<?= $fv('name') ?>"></div>
+                <div class="stack"><label for="kv-email">E-Mail <span class="muted small">(dorthin kommt der Code)</span></label><input id="kv-email" name="email" type="email" required autocomplete="off" value="<?= $fv('email') ?>"></div>
+            </div>
+            <datalist id="kv-cust"><?php foreach ($customers as $k): ?><option value="<?= forma_h($k['name']) ?>" data-email="<?= forma_h($k['email']) ?>"><?= forma_h($k['email']) ?></option><?php endforeach; ?></datalist>
+            <label for="kv-rec">Für wen ist er? <span class="muted small">(optional, steht auf dem PDF)</span></label><input id="kv-rec" name="recipient" maxlength="40" autocomplete="off" value="<?= $fv('recipient') ?>">
+            <div class="row-actions">
+                <button class="btn" type="submit" name="method" value="qr"<?= $stripe ? '' : ' disabled title="Stripe-Schlüssel fehlt"' ?>>QR-Code zum Bezahlen</button>
+                <button class="btn btn-ghost" type="submit" name="method" value="bar" onclick="return confirm('Bar bezahlt? Dann bekommt der Gutschein sofort seine Nummer und die Mail geht raus.')">Bar bezahlt</button>
+            </div>
+            <p class="muted small">Die Gutscheinnummer gibt es erst, wenn bezahlt ist. Gäste können solche Gutscheine nicht selbst anlegen: Der QR-Code gehört genau zu diesem Gutschein.</p>
+        </form>
+        <?php endif; ?>
+        <?php if ($openList): ?>
+        <h2>Warten noch auf Zahlung</h2>
+        <div class="list">
+        <?php foreach ($openList as $o): ?>
+            <div class="card booking"><div class="booking-head"><strong><?= forma_h($o['buyer_name']) ?> · <?= forma_h(forma_euro((int)$o['amount_cents'])) ?></strong><span class="pill pill-wait">wartet auf Zahlung</span></div>
+            <div class="small"><?= forma_h(forma_voucher_title($o)) ?> · <?= forma_h(date('d. m. Y, H:i', strtotime((string)$o['created_at']))) ?></div>
+            <p><a class="link small" href="<?= forma_h($self) ?>?view=gutschein_kasse&amp;v=<?= (int)$o['id'] ?>">QR-Code zeigen</a></p></div>
+        <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+        <?php if ($doneList): ?>
+        <h2>Zuletzt im Atelier ausgestellt</h2>
+        <div class="list">
+        <?php foreach ($doneList as $o): ?>
+            <div class="card booking"><div class="booking-head"><strong><?= forma_h((string)$o['nr']) ?></strong><span class="pill pill-ok"><?= $o['pay_method'] === 'bar' ? 'bar bezahlt' : 'online bezahlt' ?></span></div>
+            <div class="small"><?= forma_h(forma_voucher_title($o)) ?> · <?= forma_h($o['buyer_name']) ?> · <?= forma_h(date('d. m. Y', strtotime((string)$o['paid_at']))) ?></div></div>
+        <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+        <style>
+            .kv-opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+            .kv-opt{display:flex;gap:10px;align-items:flex-start;border:1.5px solid #E4D2BF;background:#FBF1EA;border-radius:16px;padding:12px 14px;cursor:pointer;font-weight:400}
+            .kv-opt span{display:flex;flex-direction:column;gap:2px;flex:1;text-align:left}
+            .kv-opt input{width:auto;flex:none;margin:4px 0 0;accent-color:#8C2C1D}
+            #kv-form [hidden],.kv-result [hidden]{display:none!important}
+            .kv-opt:has(input:checked){border-color:#8C2C1D;background:#F6E7DD}
+            .kv-total{font-size:1.6rem;color:#8C2C1D;margin:0;font-weight:600}
+            .kv-result{text-align:center;align-items:center}
+            .kv-qr{background:#fff;border-radius:18px;padding:14px;display:inline-block;line-height:0}
+            .kv-qr svg,.kv-qr img{width:min(300px,72vw);height:auto}
+            .kv-hint{font-size:1.15rem;margin:6px 0 0}
+            .kv-nr{font-size:clamp(1.8rem,7vw,2.6rem);letter-spacing:.04em;color:#8C2C1D;margin:4px 0;font-weight:600}
+            .kv-pulse{animation:kvp 1.6s ease-in-out infinite}@keyframes kvp{50%{opacity:.45}}
+        </style>
+        <script src="qrcode.js"></script>
+        <script>
+        (function(){
+            var box=document.getElementById('kv-qr');
+            if(box&&window.qrcode){var q=qrcode(0,'M');q.addData(box.dataset.url);q.make();box.innerHTML=q.createSvgTag(6,2);}
+            document.querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){var t=b.dataset.copy;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){b.textContent='Kopiert ✓';}).catch(function(){prompt('Link kopieren:',t);});});});
+            var r=document.getElementById('kv-result');
+            if(r&&r.dataset.status==='offen'){var tries=0,timer=setInterval(function(){if(++tries>400){clearInterval(timer);return;}
+                fetch('?view=kv_status&id='+r.dataset.id,{cache:'no-store'}).then(function(x){return x.json();}).then(function(d){
+                    if(d&&(d.status==='bezahlt'||d.status==='eingeloest')){clearInterval(timer);document.getElementById('kv-wait').hidden=true;document.getElementById('kv-nr').textContent=d.nr||'';document.getElementById('kv-done').hidden=false;try{navigator.vibrate&&navigator.vibrate(120);}catch(e){}}
+                }).catch(function(){});},4000);}
+            var f=document.getElementById('kv-form');if(!f)return;
+            var qty=document.getElementById('kv-qty'),val=document.getElementById('kv-val'),tot=document.getElementById('kv-total');
+            function upd(){var o=f.querySelector('input[name="product"]:checked');if(!o)return;var wert=o.value==='wert';
+                document.getElementById('kv-qty-box').hidden=wert;document.getElementById('kv-val-box').hidden=!wert;
+                var c=wert?Math.round((parseFloat((val.value||'').replace(/\./g,'').replace(',','.'))||0)*100):(+o.dataset.price)*(+qty.value);
+                tot.textContent='€ '+(c%100?(c/100).toFixed(2).replace('.',','):String(c/100));
+                qty.querySelectorAll('option').forEach(function(op){op.textContent=op.value+' '+(op.value==='1'?o.dataset.one:o.dataset.many);});}
+            f.addEventListener('change',upd);val.addEventListener('input',upd);upd();
+            var nm=document.getElementById('kv-name'),em=document.getElementById('kv-email');
+            nm.addEventListener('change',function(){var op=document.querySelector('#kv-cust option[value="'+CSS.escape(nm.value)+'"]');if(op&&!em.value)em.value=op.dataset.email;});
+        })();
+        </script>
+    <?php });
+}
+
 if ($view === 'kasse') {
     forma_reconcile_payments($pdo, true);
     $courses = $pdo->prepare("SELECT * FROM courses WHERE title = ? AND start_date BETWEEN ? AND ? ORDER BY start_date");
@@ -955,7 +1139,7 @@ if ($view === 'kasse') {
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <p class="eyebrow">Pottery bemalen</p>
         <h1>Kasse</h1>
-        <p><a class="link small" href="<?= forma_h($self) ?>?view=bestand">Bestand ansehen und nachtragen →</a></p>
+        <p class="row-actions"><a class="btn btn-sm" href="<?= forma_h($self) ?>?view=gutschein_kasse">🎟 Gutschein ausstellen</a> <a class="link small" href="<?= forma_h($self) ?>?view=bestand">Bestand ansehen und nachtragen →</a></p>
         <p class="muted">Tipp an, was sie bemalt hat, dann bar kassieren oder einen Bezahl-Link schicken. Die Rechnung kommt automatisch, als Workshop-Leistung mit Fertigstellung. Wer spontan ohne Anmeldung kommt: Atelierbeitrag mit antippen, Name und E-Mail eingeben, dann wird sie gleich im Termin eingetragen.</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <?php if ($courses): ?>
@@ -1543,7 +1727,7 @@ if ($view === 'gutscheine') {
         <div class="card stack">
             <p><strong><?= count(array_filter($vs, fn($x) => ($x['kind'] ?? 'kauf') === 'kauf')) ?></strong> verkaufte Gutscheine · zusammen <strong><?= forma_h(forma_euro((int)$sum)) ?></strong></p>
             <p class="muted small">Jeder bezahlte Gutschein bekommt automatisch eine fortlaufende Nummer und einen geheimen Code. Mit dem Code lösen Gäste ihn online bei der Buchung ein, das wird hier automatisch abgezogen. Löst jemand im Atelier ein, ziehst du den Betrag hier selbst ab. Der Restwert bleibt auf dem Gutschein.</p>
-            <p style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn" href="<?= forma_h($self) ?>?view=kalender&amp;d=<?= date('Y-m-d') ?>&amp;alt=1#tag">🎟 Alten Gutschein einlösen</a><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=gutscheine_export">Liste herunterladen (CSV)</a></p>
+            <p style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn" href="<?= forma_h($self) ?>?view=gutschein_kasse">🎟 Gutschein ausstellen</a><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=kalender&amp;d=<?= date('Y-m-d') ?>&amp;alt=1#tag">Alten Gutschein einlösen</a><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=gutscheine_export">Liste herunterladen (CSV)</a></p>
         </div>
         <div class="card stack links-card" id="links">
             <h2>🎟 Link für alten Gutschein</h2>
@@ -1589,7 +1773,7 @@ if ($view === 'gutscheine') {
         <?php foreach ($vs as $v): $done = $v['status'] === 'eingeloest'; ?>
             <div class="card booking<?= $done ? ' is-cancelled' : '' ?>">
                 <?php $bal = forma_voucher_balance($GLOBALS['pdo'], $v); $uses = $GLOBALS['pdo']->prepare("SELECT * FROM voucher_uses WHERE voucher_id = ? AND status != 'frei' ORDER BY id"); $uses->execute([$v['id']]); $uses = $uses->fetchAll(); ?>
-                <div class="booking-head"><strong><?= forma_h($v['nr']) ?><?= ($v['kind'] ?? 'kauf') === 'alt' ? ' · alter Gutschein, nachgetragen' : (($v['kind'] ?? 'kauf') !== 'kauf' ? ' · Geschenk von dir' : '') ?></strong><span class="pill<?= $done ? '' : ' pill-ok' ?>"><?= $done ? 'eingelöst' . ($v['redeemed_at'] ? ' am ' . forma_h(date('d. m. Y', strtotime($v['redeemed_at']))) : '') : ($bal < (int)$v['amount_cents'] ? 'Restwert ' . forma_h(forma_euro($bal)) : 'offen') ?></span></div>
+                <div class="booking-head"><strong><?= forma_h($v['nr']) ?><?= ($v['kind'] ?? 'kauf') === 'alt' ? ' · alter Gutschein, nachgetragen' : (($v['kind'] ?? 'kauf') !== 'kauf' ? ' · Geschenk von dir' : (($v['via'] ?? '') === 'kasse' ? ' · im Atelier ausgestellt' : '')) ?></strong><span class="pill<?= $done ? '' : ' pill-ok' ?>"><?= $done ? 'eingelöst' . ($v['redeemed_at'] ? ' am ' . forma_h(date('d. m. Y', strtotime($v['redeemed_at']))) : '') : ($bal < (int)$v['amount_cents'] ? 'Restwert ' . forma_h(forma_euro($bal)) : 'offen') ?></span></div>
                 <div><?= forma_h(forma_voucher_title($v)) ?> · <?= forma_h(forma_euro((int)$v['amount_cents'])) ?></div>
                 <div class="small">Code: <span class="sel" style="font-weight:600;letter-spacing:.04em"><?= forma_h((string)$v['code']) ?></span></div>
                 <?php foreach ($uses as $u): ?><div class="muted small">− <?= forma_h(forma_euro((int)$u['cents'])) ?> <?= $u['ref_kind'] === 'atelier' ? 'im Atelier eingelöst' : (($v['kind'] ?? '') === 'alt' ? 'für einen Kurstermin eingelöst' : 'online eingelöst') ?><?= $u['status'] === 'reserviert' ? ' (Zahlung läuft gerade)' : '' ?> · <?= forma_h(date('d. m. Y', strtotime($u['created_at']))) ?><?= $u['note'] !== '' ? ' · ' . forma_h($u['note']) : '' ?></div><?php endforeach; ?>
@@ -1957,20 +2141,95 @@ if ($view === 'course') {
             </div>
         <?php endforeach; ?>
         </div>
-        <h2>Person selbst eintragen</h2>
-        <p class="muted">Zum Beispiel, wenn sich jemand per Telefon oder WhatsApp anmeldet. Es wird keine E-Mail verschickt.</p>
-        <form method="post" class="card stack">
+        <h2 id="eintragen">Person selbst eintragen</h2>
+        <p class="muted">Zum Beispiel bei einer Anmeldung per Telefon oder WhatsApp, oder wenn eine Kundin einen Termin tauscht. Bestandskundinnen suchst du einfach aus der Liste, dann musst du nichts abtippen.</p>
+        <?php $customers = forma_customers($GLOBALS['pdo']); $unit = (int)($c['price_cents'] ?? 0); ?>
+        <form method="post" class="card stack" id="add-form">
             <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
             <input type="hidden" name="action" value="add_booking">
             <input type="hidden" name="id" value="<?= (int)$c['id'] ?>">
-            <label for="bn">Name</label><input id="bn" name="name" required>
-            <div class="row">
-                <div class="stack"><label for="bp">Telefon</label><input id="bp" name="phone"></div>
-                <div class="stack"><label for="bpers">Personen</label><input id="bpers" name="persons" type="number" min="1" value="1"></div>
+            <div class="seg" role="tablist">
+                <button type="button" class="seg-b on" data-mode="alt">Bestandskundin</button>
+                <button type="button" class="seg-b" data-mode="neu">Neue Person</button>
             </div>
-            <label for="be">E-Mail (optional)</label><input id="be" name="email" type="email">
-            <button class="btn" type="submit">Eintragen</button>
+            <div id="cust-pick" class="stack">
+                <label for="cust-q">Name oder E-Mail suchen</label>
+                <input id="cust-q" type="search" placeholder="z. B. Claudia" autocomplete="off">
+                <div class="cust-list" id="cust-list">
+                <?php foreach ($customers as $k): ?>
+                    <button type="button" class="cust" data-name="<?= forma_h($k['name']) ?>" data-email="<?= forma_h($k['email']) ?>" data-phone="<?= forma_h($k['phone']) ?>" data-s="<?= forma_h(mb_strtolower($k['name'] . ' ' . $k['email'])) ?>">
+                        <strong><?= forma_h($k['name']) ?></strong><span class="muted small"><?= forma_h($k['email']) ?> · <?= forma_h(implode(', ', array_slice($k['what'], 0, 3))) ?></span>
+                    </button>
+                <?php endforeach; ?>
+                <?php if (!$customers): ?><p class="muted small">Noch keine Kundinnen mit E-Mail-Adresse gespeichert.</p><?php endif; ?>
+                </div>
+                <p class="muted small" id="cust-none" hidden>Niemand gefunden. Tipp oben auf „Neue Person“.</p>
+            </div>
+            <div id="cust-fields" class="stack">
+                <div class="cust-chosen" id="cust-chosen" hidden><span>Ausgewählt: <strong id="cust-chosen-name"></strong></span><button type="button" class="link small" id="cust-change">andere wählen</button></div>
+                <label for="bn">Name</label><input id="bn" name="name" required autocomplete="off">
+                <div class="row">
+                    <div class="stack"><label for="be">E-Mail</label><input id="be" name="email" type="email" autocomplete="off"></div>
+                    <div class="stack"><label for="bp">Telefon</label><input id="bp" name="phone" autocomplete="off"></div>
+                </div>
+                <div class="row">
+                    <div class="stack"><label for="bpers">Personen</label><input id="bpers" name="persons" type="number" min="1" value="1"></div>
+                    <div class="stack"><label for="bamt">Betrag in € <span class="muted small">(0 = schon bezahlt)</span></label><input id="bamt" name="amount" inputmode="decimal" value="0" data-unit="<?= $unit ?>"></div>
+                </div>
+                <div class="amt-quick small"><button type="button" class="link small" data-amt="0">€ 0 · Umbuchung</button><?php if ($unit > 0): ?> · <button type="button" class="link small" data-amt="unit">Kurspreis (<?= forma_h(forma_euro($unit)) ?> p. P.)</button><?php endif; ?></div>
+                <div class="stack" id="pay-how" hidden>
+                    <label>Wie wird bezahlt?</label>
+                    <label class="check"><input type="radio" name="pay" value="bar"> Bar bezahlt, Rechnung gleich schicken</label>
+                    <label class="check"><input type="radio" name="pay" value="vorort" checked> Zahlt vor Ort beim Kurs</label>
+                </div>
+                <label for="bnote">Hinweis <span class="muted small">(optional, steht auch in ihrer Bestätigung)</span></label>
+                <input id="bnote" name="note" maxlength="200" placeholder="z. B. statt Pottery Pause am Freitag, 13. 11." autocomplete="off">
+                <label class="check"><input type="checkbox" name="send_mail" id="bmail" value="1" checked> Bestätigung per E-Mail schicken (mit Kalendereintrag)</label>
+                <label class="check"><input type="checkbox" name="post" value="1" checked> Bekommt die FORMA Post</label>
+                <p class="muted small" id="add-sum"></p>
+                <button class="btn" type="submit" id="add-submit">Anmelden</button>
+            </div>
         </form>
+        <style>
+            .seg{display:inline-flex;background:var(--sand,#EEE2D4);border-radius:999px;padding:4px;gap:4px;align-self:flex-start}
+            .seg-b{border:0;background:transparent;border-radius:999px;padding:8px 16px;font:inherit;cursor:pointer;color:inherit}
+            .seg-b.on{background:#8C2C1D;color:#FBF1EA}
+            .cust-list{max-height:300px;overflow:auto;display:flex;flex-direction:column;gap:6px;padding:2px}
+            .cust{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;border:1.5px solid #E4D2BF;background:#FBF1EA;border-radius:14px;padding:10px 14px;font:inherit;cursor:pointer;color:inherit}
+            .cust:hover,.cust:focus{border-color:#8C2C1D;outline:none}
+            .cust-chosen{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#E4D2BF;border-radius:14px;padding:10px 14px}
+            label.check{display:flex;gap:8px;align-items:center;font-weight:400}
+            label.check input{width:auto;flex:none;margin:0;accent-color:#8C2C1D}
+            #add-form [hidden]{display:none!important}
+        </style>
+        <script>
+        (function(){
+            var f=document.getElementById('add-form');if(!f)return;
+            var q=document.getElementById('cust-q'),list=document.getElementById('cust-list'),none=document.getElementById('cust-none'),pick=document.getElementById('cust-pick'),fields=document.getElementById('cust-fields'),chosen=document.getElementById('cust-chosen');
+            var bn=document.getElementById('bn'),be=document.getElementById('be'),bp=document.getElementById('bp'),amt=document.getElementById('bamt'),pers=document.getElementById('bpers'),payHow=document.getElementById('pay-how'),sum=document.getElementById('add-sum'),mail=document.getElementById('bmail');
+            var mode='alt';
+            function setMode(m,init){mode=m;f.querySelectorAll('.seg-b').forEach(function(b){b.classList.toggle('on',b.dataset.mode===m);});
+                if(m==='neu'){pick.hidden=true;fields.hidden=false;chosen.hidden=true;bn.value='';be.value='';bp.value='';if(!init)bn.focus();}
+                else{pick.hidden=false;fields.hidden=true;q.value='';filter();}}
+            function filter(){var t=q.value.trim().toLowerCase(),n=0;list.querySelectorAll('.cust').forEach(function(b){var ok=!t||b.dataset.s.indexOf(t)>=0;b.hidden=!ok;if(ok)n++;});none.hidden=n>0;}
+            f.querySelectorAll('.seg-b').forEach(function(b){b.addEventListener('click',function(){setMode(b.dataset.mode);});});
+            q.addEventListener('input',filter);
+            list.addEventListener('click',function(e){var b=e.target.closest('.cust');if(!b)return;
+                bn.value=b.dataset.name;be.value=b.dataset.email;bp.value=b.dataset.phone;
+                document.getElementById('cust-chosen-name').textContent=b.dataset.name;chosen.hidden=false;pick.hidden=true;fields.hidden=false;upd();});
+            document.getElementById('cust-change').addEventListener('click',function(){setMode('alt');q.focus();});
+            f.querySelectorAll('[data-amt]').forEach(function(b){b.addEventListener('click',function(){amt.value=b.dataset.amt==='unit'?String((+amt.dataset.unit*(+pers.value||1))/100).replace('.',','):'0';upd();});});
+            function cents(){var v=amt.value.replace(/[€\s]/g,'');if(v.indexOf(',')>=0)v=v.replace(/\./g,'').replace(',','.');return Math.round((parseFloat(v)||0)*100);}
+            function eur(c){return '€ '+(c%100?(c/100).toFixed(2).replace('.',','):String(c/100));}
+            function upd(){var c=cents(),bar=f.querySelector('input[name="pay"]:checked');payHow.hidden=c<=0||!mail.checked;
+                var who=bn.value.trim().split(' ')[0]||'Sie';
+                sum.textContent=!mail.checked?'Es wird keine E-Mail verschickt.':(c<=0?who+' bekommt eine Terminbestätigung: Kosten € 0, schon bezahlt (Umbuchung).':(bar&&bar.value==='bar'?who+' bekommt Bestätigung und Rechnung über '+eur(c)+' (bar bezahlt).':who+' bekommt die Bestätigung, '+eur(c)+' zahlt sie vor Ort.'));}
+            [amt,pers,mail,bn].forEach(function(x){x.addEventListener('input',upd);x.addEventListener('change',upd);});
+            f.querySelectorAll('input[name="pay"]').forEach(function(x){x.addEventListener('change',upd);});
+            f.addEventListener('submit',function(e){if(mail.checked&&!be.value.trim()){e.preventDefault();alert('Für die Bestätigung brauche ich eine E-Mail-Adresse.');}});
+            setMode(list.querySelector('.cust')?'alt':'neu',true);upd();
+        })();
+        </script>
     <?php });
 }
 
@@ -2048,7 +2307,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
         </section>
         <nav class="tiles">
             <a class="tile hl" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('kalender') ?></span><strong>Kalender</strong><span class="muted small">Kurse &amp; Private Pottery</span></a>
-            <a class="tile hl" href="<?= forma_h($self) ?>?view=kasse"><span class="ic"><?= admin_icon('kasse') ?></span><strong>Kasse</strong><span class="muted small">Pottery bemalen · bar oder Link</span></a>
+            <a class="tile hl" href="<?= forma_h($self) ?>?view=kasse"><span class="ic"><?= admin_icon('kasse') ?></span><strong>Kasse</strong><span class="muted small">Pottery bemalen & Gutscheine</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=bestand"><span class="ic"><?= admin_icon('bestand') ?></span><strong>Bestand</strong><span class="muted small">Pottery bemalen · was ist da?</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=private"><span class="ic"><?= admin_icon('private') ?></span><strong>Private Pottery</strong><span class="muted small"><?= $privateOpen ?> offen</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=edit"><span class="ic"><?= admin_icon('plus') ?></span><strong>Einzeltermin</strong><span class="muted small">z. B. ein Special-Kurs</span></a>
