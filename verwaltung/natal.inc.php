@@ -25,12 +25,33 @@ if ($action === 'mm_natal_offer') {
     $name = forma_clean((string)($_POST['name'] ?? ''), 80);
     $note = trim(mb_substr((string)($_POST['note'] ?? ''), 0, 600));
     if (mb_strlen($name) < 2) go($nBack . '#angebot', 'Bitte gib den Namen ein.');
-    $mode = ($_POST['mode'] ?? '') === 'online' ? 'online' : 'studio';
-    $pdo->prepare('INSERT INTO mm_natal_offers (salutation, name, note, token, mode, created_at) VALUES (?,?,?,?,?,?)')->execute([$sal, $name, $note, bin2hex(random_bytes(10)), $mode, date('c')]);
-    go($nBack . '&neu=' . (int)$pdo->lastInsertId() . '#angebot', 'Das Angebot für ' . $name . ' ist fertig. Kopier die Nachricht oder schick sie direkt per WhatsApp.');
+    $mode = in_array($_POST['mode'] ?? '', ['studio', 'online', 'beide'], true) ? (string)$_POST['mode'] : 'studio';
+    $email = trim((string)($_POST['email'] ?? ''));
+    if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) go($nBack . '#angebot', 'Die E-Mail-Adresse stimmt nicht ganz. Bitte nochmal prüfen.');
+    $grp = $mode === 'beide' ? bin2hex(random_bytes(6)) : '';
+    $ins = $pdo->prepare('INSERT INTO mm_natal_offers (salutation, name, note, token, mode, email, grp, created_at) VALUES (?,?,?,?,?,?,?,?)');
+    $first = 0;
+    foreach ($mode === 'beide' ? ['studio', 'online'] : [$mode] as $m) {
+        $ins->execute([$sal, $name, $note, bin2hex(random_bytes(10)), $m, $email, $grp, date('c')]);
+        $first = $first ?: (int)$pdo->lastInsertId();
+    }
+    go($nBack . '&neu=' . $first . '#angebot', 'Das Angebot für ' . $name . ' ist fertig. ' . ($email !== '' ? 'Schau dir die Mail in der Vorschau an und schick sie dann ab.' : 'Kopier die Nachricht oder schick sie direkt per WhatsApp.'));
+}
+if ($action === 'mm_natal_offer_mail') {
+    $q = $pdo->prepare('SELECT * FROM mm_natal_offers WHERE id = ?');
+    $q->execute([(int)($_POST['aid'] ?? 0)]);
+    $a = $q->fetch();
+    if (!$a) go($nBack . '#angebot', 'Das Angebot gibt es nicht mehr.');
+    $test = ($_POST['test'] ?? '') === '1';
+    $ok = natal_offer_send($pdo, $a, $test);
+    go($nBack . '#angebot', $ok ? ($test ? 'Die Vorschau ist an ' . natal_notify_email() . ' unterwegs.' : 'Die Mail an ' . $a['name'] . ' (' . $a['email'] . ') ist verschickt.') : 'Die Mail konnte nicht verschickt werden. Ist das Postfach-Passwort unter Movecia → Einstellungen hinterlegt?');
 }
 if ($action === 'mm_natal_offer_del') {
-    $pdo->prepare('DELETE FROM mm_natal_offers WHERE id = ?')->execute([(int)($_POST['aid'] ?? 0)]);
+    $q = $pdo->prepare('SELECT grp FROM mm_natal_offers WHERE id = ?');
+    $q->execute([(int)($_POST['aid'] ?? 0)]);
+    $g = (string)$q->fetchColumn();
+    if ($g !== '') $pdo->prepare('DELETE FROM mm_natal_offers WHERE grp = ?')->execute([$g]);
+    else $pdo->prepare('DELETE FROM mm_natal_offers WHERE id = ?')->execute([(int)($_POST['aid'] ?? 0)]);
     go($nBack . '#angebot', 'Der Link ist gelöscht und funktioniert nicht mehr als persönliches Angebot.');
 }
 if ($action === 'mm_natal_confirm') {
@@ -87,6 +108,17 @@ if ($action === 'mm_natal_sample') {
         'pay_note' => 'Der Betrag wurde am ' . date('d.m.Y') . ' online bezahlt (Kartenzahlung über Stripe, gemeinsames Konto FORMA & Movecia). Buchungsvermerk: Leistung von Movecia – Personal Fitness.'];
     natal_mail(natal_notify_email(), '[Muster] Rechnung Movecia', 'Muster-Rechnung', ['So sieht die Rechnung aus, die deine Kundinnen nach der Zahlung bekommen.'], null, [['Muster_Rechnung_Movecia.pdf', natal_invoice_pdf($inv), 'application/pdf']]);
     go($nBack . '#einstellungen', 'Die Muster-Rechnung ist an ' . natal_notify_email() . ' unterwegs.');
+}
+
+if ($view === 'natal' && isset($_GET['mailvorschau'])) {
+    $q = $pdo->prepare('SELECT * FROM mm_natal_offers WHERE id = ?');
+    $q->execute([(int)$_GET['mailvorschau']]);
+    $a = $q->fetch();
+    if (!$a) { http_response_code(404); exit('Angebot nicht gefunden.'); }
+    $m = natal_offer_mail(natal_offer_group($pdo, $a));
+    header('Content-Type: text/html; charset=utf-8');
+    echo $m['html'];
+    exit;
 }
 
 if ($view === 'natal') {
@@ -245,18 +277,30 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
         <h2 id="angebot">Angebot verschicken</h2>
         <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_offer">
             <p class="small muted">Du bekommst einen persönlichen Link: Die Seite begrüßt sie mit Namen, ihr Name ist beim Buchen schon eingetragen. Die fertige Nachricht kannst du kopieren oder direkt per WhatsApp schicken.</p>
-            <div class="stack"><label>Variante</label><div class="wdays"><label class="check"><input type="radio" name="mode" value="studio" checked> 1:1 im Studio</label><label class="check"><input type="radio" name="mode" value="online"> Online per Video</label></div></div>
+            <div class="stack"><label>Variante</label><div class="wdays"><label class="check"><input type="radio" name="mode" value="studio" checked> 1:1 im Studio</label><label class="check"><input type="radio" name="mode" value="online"> Online per Video</label><label class="check"><input type="radio" name="mode" value="beide"> Beides</label></div></div>
             <div class="row"><div class="stack"><label for="nsal">Anrede</label><select id="nsal" name="salutation"><option>Liebe</option><option>Lieber</option><option>Hallo</option></select></div>
                 <div class="stack"><label for="nnm">Vorname</label><input id="nnm" name="name" required maxlength="80" placeholder="z. B. Anna"></div></div>
+            <label for="nem">E-Mail (optional, dann kannst du das Angebot auch als schöne Mail mit den Flyern schicken)</label><input id="nem" name="email" type="email" maxlength="160" placeholder="name@beispiel.at">
             <label for="nnt">Persönliche Zeile auf der Seite (optional)</label><textarea id="nnt" name="note" rows="2" maxlength="600" placeholder="z. B. Wie besprochen starten wir mit einer Einheit pro Woche bis zur Geburt."></textarea>
             <button class="btn" type="submit">Angebot erstellen</button>
         </form>
         <p class="small muted" style="margin:10px 0">Allgemeine Links ohne Namen (nicht verlinkt, nur wer den Link hat, sieht die Seite):<br>Studio: <span class="sel"><?= forma_h(mm_site()) ?>/natal/</span> <button type="button" class="link small" data-copy="<?= forma_h(mm_site()) ?>/natal/">kopieren</button><br>Online: <span class="sel"><?= forma_h(mm_site()) ?>/natal/online/</span> <button type="button" class="link small" data-copy="<?= forma_h(mm_site()) ?>/natal/online/">kopieren</button></p>
         <div class="list">
-        <?php foreach ($offers as $a): $msg = natal_offer_message($a); ?>
-            <div class="card stack<?= $newId === (int)$a['id'] ? ' is-new' : '' ?>">
-                <div class="booking-head"><strong><?= forma_h($a['salutation'] . ' ' . $a['name']) ?> <span class="chip"><?= ($a['mode'] ?? 'studio') === 'online' ? 'online' : 'Studio' ?></span></strong><span class="muted small">erstellt <?= forma_h(date('d. m.', strtotime((string)$a['created_at']))) ?> · <?= (int)$a['booked'] ? '<span class="chip ok">gebucht</span>' : ($a['opened_at'] ? 'angesehen am ' . forma_h(date('d. m., H:i', strtotime((string)$a['opened_at']))) : 'noch nicht geöffnet') ?></span></div>
-                <?php if ($newId === (int)$a['id']): ?><textarea class="msg" readonly><?= forma_h($msg) ?></textarea><?php endif; ?>
+        <?php $seenGrp = []; foreach ($offers as $a):
+            if ((string)($a['grp'] ?? '') !== '') { if (isset($seenGrp[$a['grp']])) continue; $seenGrp[$a['grp']] = 1; }
+            $grpRows = natal_offer_group($pdo, $a); $a = $grpRows[0];
+            $a['booked'] = 0; foreach ($grpRows as $gr) { $bq = $pdo->prepare("SELECT COUNT(*) FROM mm_natal_orders WHERE offer_id = ? AND status = 'bezahlt'"); $bq->execute([$gr['id']]); $a['booked'] += (int)$bq->fetchColumn(); if ($gr['opened_at'] && (!$a['opened_at'] || $gr['opened_at'] > $a['opened_at'])) $a['opened_at'] = $gr['opened_at']; }
+            $isNew = in_array($newId, array_map(fn($r) => (int)$r['id'], $grpRows), true);
+            $msg = natal_offer_message($a, $grpRows); ?>
+            <div class="card stack<?= $isNew ? ' is-new' : '' ?>">
+                <div class="booking-head"><strong><?= forma_h($a['salutation'] . ' ' . $a['name']) ?> <span class="chip"><?= count($grpRows) > 1 ? 'Studio + online' : (($a['mode'] ?? 'studio') === 'online' ? 'online' : 'Studio') ?></span></strong><span class="muted small">erstellt <?= forma_h(date('d. m.', strtotime((string)$a['created_at']))) ?> · <?= (int)$a['booked'] ? '<span class="chip ok">gebucht</span>' : ($a['opened_at'] ? 'angesehen am ' . forma_h(date('d. m., H:i', strtotime((string)$a['opened_at']))) : 'noch nicht geöffnet') ?></span></div>
+                <?php if ($isNew): ?><textarea class="msg" readonly><?= forma_h($msg) ?></textarea><?php endif; ?>
+                <?php if ((string)($a['email'] ?? '') !== ''): ?>
+                <div class="acts" style="padding:10px 12px;border-radius:12px;background:#EEF0E8"><span class="small">✉ <?= forma_h($a['email']) ?><?= $a['mailed_at'] ? ' · <b>Mail verschickt am ' . forma_h(date('d. m., H:i', strtotime((string)$a['mailed_at']))) . '</b>' : '' ?></span>
+                    <a class="btn btn-ghost btn-sm" href="<?= forma_h($self) ?>?view=natal&amp;mailvorschau=<?= (int)$a['id'] ?>" target="_blank" rel="noopener">Mail ansehen</a>
+                    <form method="post"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_offer_mail"><input type="hidden" name="aid" value="<?= (int)$a['id'] ?>"><input type="hidden" name="test" value="1"><button class="btn btn-ghost btn-sm" type="submit">Vorschau an mich</button></form>
+                    <form method="post" onsubmit="return confirm('Mail jetzt an <?= forma_h($a['email']) ?> schicken?')"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_offer_mail"><input type="hidden" name="aid" value="<?= (int)$a['id'] ?>"><button class="btn btn-sm" type="submit"><?= $a['mailed_at'] ? 'Nochmal an ' : 'Jetzt an ' ?><?= forma_h($a['name']) ?> senden</button></form></div>
+                <?php endif; ?>
                 <div class="acts"><button type="button" class="btn btn-sm" data-copy="<?= forma_h($msg) ?>">Nachricht kopieren</button>
                     <a class="btn btn-ghost btn-sm" href="https://wa.me/?text=<?= rawurlencode($msg) ?>" target="_blank" rel="noopener">Per WhatsApp schicken</a>
                     <a class="link small" href="<?= forma_h(natal_offer_link($a)) ?>" target="_blank" rel="noopener">Seite ansehen</a>
