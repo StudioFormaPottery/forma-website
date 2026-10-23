@@ -163,6 +163,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
 .step li::before{content:"";position:absolute;left:2px;top:.5em;width:10px;height:10px;border-radius:var(--blob);background:currentColor;opacity:.5}
 .step .price{font-family:var(--hand);font-size:14px;line-height:1.55;margin-top:16px;opacity:.9}
 .step .fam{margin-top:14px;font-size:15px;font-style:italic;opacity:.9}
+.step .go.line{background:transparent!important;border:1.5px solid currentColor;color:var(--earth)!important;margin-left:6px}
 .step .go{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:12px 20px;border-radius:999px;border:0;font:inherit;font-weight:500;font-size:15.5px;text-decoration:none;cursor:pointer}
 .s1 .no{background:#FBF8F4;color:var(--wine)}.s1 .card{background:#FBF8F4;border:1.5px solid var(--line)}.s1 .kick{color:var(--brown)}.s1 h3{color:var(--wine-deep)}.s1 .note{color:var(--wine)}.s1 .go{background:var(--wine);color:#F2ECE4}
 .s2 .no{background:var(--sage-soft);color:var(--earth)}.s2 .card{background:var(--sage-soft)}.s2 .kick{color:#6B5658}.s2 h3{color:var(--earth)}.s2 .note{color:var(--wine)}.s2 .go{background:var(--earth);color:var(--cream)}
@@ -282,8 +283,26 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
           <a class="go" href="https://www.instagram.com/channel/wrOyV88oT-GAwNiR/" target="_blank" rel="noopener"><span class="en">Join for free →</span><span class="de">Kostenlos dabei sein →</span></a></div>
         </div>
       </li>
-      <li class="step s3">
+      <li class="step s2">
         <span class="no" aria-hidden="true">2</span>
+        <div class="card">
+          <p class="kick"><span class="en">1:1 · in my studio or online</span><span class="de">1:1 · im Studio oder online</span></p>
+          <h3><span class="en">Prenatal &amp; Postnatal Training</span><span class="de">Prä- &amp; Postnatal Training</span></h3>
+          <p class="note"><span class="en">through pregnancy and the time after</span><span class="de">durch die Schwangerschaft und die Zeit danach</span></p>
+          <button class="more-t" type="button" aria-expanded="false"><span class="en">Read more</span><span class="de">Mehr lesen</span></button>
+          <div class="more">
+          <p class="en">Gentle, strengthening sessions just for you, in my studio in Mathon or live by video. Every session is 60 minutes and combines a short talk with movement, breathwork and meditation. Sessions are held in German.</p>
+          <p class="de">Ruhige, kräftigende Einheiten nur für dich, bei mir im Studio in Mathon oder live per Video. Jede Einheit dauert 60 Minuten und verbindet einen kurzen Impuls mit Bewegung, Breathwork und Meditation.</p>
+          <ul class="en"><li>Prenatal: 6 sessions until the birth, from pelvic floor to breathing for labour</li><li>Postnatal: 8 sessions after your doctor's okay, your baby is always welcome</li><li>Combi: 14 sessions, before and after the birth</li><li>Single session: € 75 in the studio, € 65 online</li></ul>
+          <ul class="de"><li>Pränatal: 6 Einheiten bis zur Geburt, vom Beckenboden bis zur Atmung für die Wehen</li><li>Postnatal: 8 Einheiten nach der Freigabe, dein Baby darf immer dabei sein</li><li>Kombi: 14 Einheiten, vor und nach der Geburt</li><li>Einzelstunde: € 75 im Studio, € 65 online</li></ul>
+          <p class="price"><span class="en">In a package from € 52 per session in the studio and € 44 online. A free 30-minute intro call is always possible.</span><span class="de">Im Paket ab € 52 pro Einheit im Studio und ab € 44 online. Ein kostenloses Kennenlerngespräch von 30 Minuten ist jederzeit möglich.</span></p>
+          <a class="go" href="/natal/"><span class="en">See packages →</span><span class="de">Pakete ansehen →</span></a>
+          <button class="go line" type="button" data-join="natal"><span class="en">Send me the info →</span><span class="de">Infos per E-Mail →</span></button>
+          </div>
+        </div>
+      </li>
+      <li class="step s3">
+        <span class="no" aria-hidden="true">3</span>
         <div class="card">
           <p class="kick"><span class="en">A weekend in the Alps · dates coming soon</span><span class="de">Ein Wochenende in den Alpen · Termine folgen</span></p>
           <h3>Wild Hearts Alpine Retreat</h3>
@@ -320,7 +339,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
       <label class="f"><span class="en">First name</span><span class="de">Vorname</span><input type="text" name="name" autocomplete="given-name" required maxlength="80"></label>
       <label class="f"><span class="en">Email</span><span class="de">E-Mail</span><input type="email" name="email" autocomplete="email" required maxlength="160"></label>
       <div class="hp" aria-hidden="true"><label>Leave empty<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
-      <label class="consent"><input type="checkbox" name="consent" required><span><span class="en">Yes, Viv may email me about the Wild Hearts Collective. I can unsubscribe anytime.</span><span class="de">Ja, Viv darf mir E-Mails zum Wild Hearts Collective schicken. Ich kann mich jederzeit abmelden.</span></span></label>
+      <label class="consent"><input type="checkbox" name="consent" required><span id="consent-natal" hidden></span><span id="consent-wh"><span class="en">Yes, Viv may email me about the Wild Hearts Collective. I can unsubscribe anytime.</span><span class="de">Ja, Viv darf mir E-Mails zum Wild Hearts Collective schicken. Ich kann mich jederzeit abmelden.</span></span></label>
       <button type="submit"><span class="en">Count me in</span><span class="de">Ich bin dabei</span></button>
       <p class="msg" id="join-msg" role="status" aria-live="polite" hidden></p>
     </form>
@@ -425,6 +444,9 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
       link: ['Come a little closer', 'Get the Reset Routine for Tired Days for free, plus invitations to our live Wild Hearts Gatherings.'],
       reset: ['Your Reset Routine', 'Leave your first name and email. Once you have confirmed your address, the Reset Routine for Tired Days lands in your inbox, and you choose English or Deutsch.'],
       circle: ['The Inner Circle', 'Leave your name and email and I will send you all the details and prices personally as soon as the Inner Circle opens. The Reset Routine comes as a little gift.'],
+      natal: ['Prenatal & Postnatal Training', 'Leave your first name and email. Once you have confirmed your address, I will send you all packages, prices and how the sessions work (in German).'],
+      natalBox: 'Yes, Vivien may email me about the prenatal and postnatal training. I can unsubscribe anytime.',
+      natalOk: n => 'Thank you, ' + n + '! Please check your inbox and confirm your email address with one click. Right after that, all the info is on its way. 🤍',
       retreat: ['Wild Hearts Alpine Retreat', 'Leave your name and email and I will send you dates, prices and all the details personally as soon as they are ready. The Reset Routine comes as a little gift.'],
       mentoring: ['Mentoring for your heart business', 'Leave your name and email and I will tell you personally how the mentoring works and when we can start. The Reset Routine comes as a little gift.'],
       year: ['The Year Circle', 'Leave your name and email and I will send you all the details and prices personally as soon as applications open. The Reset Routine comes as a little gift.'],
@@ -436,6 +458,9 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
       link: ['Komm ein bisschen näher', 'Hol dir die Reset-Routine für müde Tage kostenlos, dazu Einladungen zu unseren Live-Gatherings.'],
       reset: ['Deine Reset-Routine', 'Trag deinen Vornamen und deine E-Mail ein. Sobald du deine Adresse bestätigt hast, kommt die Reset-Routine für müde Tage zu dir, und du wählst Deutsch oder Englisch.'],
       circle: ['The Inner Circle', 'Trag deinen Namen und deine E-Mail ein, dann schicke ich dir alle Details und Preise persönlich, sobald der Inner Circle öffnet. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
+      natal: ['Prä- & Postnatal Training', 'Trag deinen Vornamen und deine E-Mail ein. Sobald du deine Adresse bestätigt hast, schicke ich dir alle Pakete, Preise und den Ablauf der Einheiten.'],
+      natalBox: 'Ja, Vivien darf mir E-Mails zum Prä- und Postnatal-Training schicken. Ich kann mich jederzeit abmelden.',
+      natalOk: n => 'Danke, ' + n + '! Schau jetzt in dein Postfach und bestätige deine Adresse mit einem Klick. Gleich danach bekommst du alle Infos. 🤍',
       retreat: ['Wild Hearts Alpine Retreat', 'Trag deinen Namen und deine E-Mail ein, dann schicke ich dir Termine, Preise und alle Details persönlich, sobald sie feststehen. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
       mentoring: ['Mentoring für dein Herzensbusiness', 'Trag deinen Namen und deine E-Mail ein, dann erzähle ich dir persönlich, wie das Mentoring abläuft und wann wir starten können. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
       year: ['Der Jahreskreis', 'Trag deinen Namen und deine E-Mail ein, dann schicke ich dir alle Details und Preise persönlich, sobald die Bewerbung startet. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
@@ -445,7 +470,8 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
     }
   };
   const L = () => T[root.lang === 'de' ? 'de' : 'en'];
-  function setJoin(src) { const t = L()[src] || L().link; title.textContent = t[0]; intro.textContent = t[1]; }
+  function setJoin(src) { const t = L()[src] || L().link; title.textContent = t[0]; intro.textContent = t[1];
+    const n = src === 'natal'; document.getElementById('consent-natal').hidden = !n; document.getElementById('consent-wh').hidden = n; document.getElementById('consent-natal').textContent = L().natalBox; document.querySelector('.psst').hidden = n; }
   document.querySelectorAll('.langsw button').forEach(b => b.addEventListener('click', () => pick(b.dataset.lang)));
   let start = new URLSearchParams(location.search).get('lang');
   if (!start) { try { start = localStorage.getItem('wh-lang'); } catch (e) {} }
@@ -471,12 +497,16 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
     const btn = form.querySelector('button');
     btn.disabled = true;
     try {
-      const r = await fetch('/api/wh-subscribe.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, email, consent: true, website: '', source, lang: root.lang, elapsed: Date.now() - loaded})});
+      let r;
+      if (source === 'natal') {
+        const fd = new FormData(); Object.entries({action: 'subscribe', name, email, consent: 1, website: '', source: 'bio', mode: 'studio', t: loaded}).forEach(([k, v]) => fd.append(k, v));
+        r = await fetch('/api/natal.php', {method: 'POST', body: fd});
+      } else r = await fetch('/api/wh-subscribe.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, email, consent: true, website: '', source, lang: root.lang, elapsed: Date.now() - loaded})});
       const j = await r.json().catch(() => ({}));
       if (!r.ok || !j.ok) throw new Error(j.error || 'signup');
       form.querySelectorAll('label, button').forEach(el => el.hidden = true);
       document.querySelector('.psst').hidden = true;
-      show(L().ok(name));
+      show(source === 'natal' ? L().natalOk(name) : L().ok(name));
     } catch (err) {
       btn.disabled = false;
       show(err.message && err.message !== 'signup' ? err.message : L().fail, true);

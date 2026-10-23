@@ -122,6 +122,10 @@ section{padding-block:clamp(3.5rem,8vw,7rem)}
 .modes button[aria-pressed=true]{background:var(--plum);color:var(--on)}
 .modes button[aria-pressed=true] span{color:var(--on);opacity:.85}
 .modes.sm{margin-top:1.4rem}
+.nl{display:grid;gap:1.6rem;align-items:start}
+@media(min-width:900px){.nl{grid-template-columns:1.1fr 1fr;gap:3rem}}
+.nlf{display:grid;gap:.9rem}
+.newsbar{margin:0 auto;max-width:900px;padding:1rem 1.3rem;border-radius:18px;background:var(--plum);color:var(--on);text-align:center}
 .flow{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.4rem}
 .flow span{display:inline-flex;align-items:center;gap:.45rem;padding:.5rem .95rem;border-radius:999px;background:var(--card);font-size:.9rem}
 .flow span i{font-style:normal;font-family:var(--serif);font-size:1.05rem;color:var(--plum)}
@@ -354,6 +358,9 @@ footer summary{cursor:pointer}
 
 <?php else: /* Angebot & Buchung */ ?>
 <main>
+<?php $news = (string)($_GET['news'] ?? ''); if (in_array($news, ['ok', 'ab', 'alt'], true)): ?>
+<div class="w" style="padding-top:1rem"><p class="newsbar"><?= $news === 'ok' ? 'Danke, deine Adresse ist bestätigt! Die Mail mit allen Paketen ist schon unterwegs zu dir. 🤍' : ($news === 'ab' ? 'Du bist abgemeldet und bekommst keine Mails mehr zum Prä- und Postnatal-Training.' : 'Dieser Link funktioniert nicht mehr. Trag dich unten einfach noch einmal ein.') ?></p></div>
+<?php endif; ?>
 <section class="hero w">
   <div>
     <p class="k">Prä- &amp; Postnatal Training · 1:1 im Studio oder online</p>
@@ -516,6 +523,25 @@ footer summary{cursor:pointer}
   </form>
 </section>
 
+<section class="w" id="newsletter" style="padding-top:0">
+  <div class="panel nl">
+    <div>
+      <p class="k">Noch nicht so weit?</p>
+      <h2 style="margin-top:.5rem;font-size:clamp(2rem,4vw,3rem)">Alle Infos <em>per E-Mail</em></h2>
+      <p class="mut" style="margin-top:.8rem;max-width:32em">Trag dich ein, dann schicke ich dir alle Pakete, Preise und den Ablauf der Einheiten in Ruhe zum Nachlesen, dazu ab und zu einen Tipp für deine Schwangerschaft und die Zeit danach.</p>
+    </div>
+    <form id="nlform" class="nlf" novalidate>
+      <label class="f">Vorname<input type="text" name="name" autocomplete="given-name" required maxlength="80" value="<?= $offer ? $h((string)$offer['name']) : '' ?>"></label>
+      <label class="f">E-Mail<input type="email" name="email" autocomplete="email" required maxlength="160"></label>
+      <label class="chk"><input type="checkbox" name="consent" value="1" required><span>Ja, Vivien darf mir E-Mails zum Prä- und Postnatal-Training schicken. Ich kann mich jederzeit abmelden.</span></label>
+      <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div><button class="btn" type="submit" id="nlbtn">Infos schicken</button></div>
+      <p class="err" id="nlerr" hidden></p>
+    </form>
+    <p class="ok" id="nlok" hidden></p>
+  </div>
+</section>
+
 <section class="w faq" style="padding-top:0">
   <p class="k">Gut zu wissen</p>
   <h2 style="margin-top:.6rem;margin-bottom:1.6rem">Häufige <em>Fragen</em></h2>
@@ -667,6 +693,22 @@ footer summary{cursor:pointer}
         return;
       }
       err.textContent = j.error || 'Das hat gerade nicht geklappt.'; err.hidden = false; btn.disabled = false; btn.textContent = 'Gespräch buchen';
+    });
+  }
+
+  const nlf = document.getElementById('nlform');
+  if (nlf) {
+    const nlLoaded = Date.now();
+    nlf.addEventListener('submit', async e => {
+      e.preventDefault();
+      const err = document.getElementById('nlerr'), btn = document.getElementById('nlbtn'); err.hidden = true;
+      const d = Object.fromEntries(new FormData(nlf));
+      if (!d.name || !d.email) { err.textContent = 'Bitte gib Vorname und E-Mail ein.'; err.hidden = false; return; }
+      if (!d.consent) { err.textContent = 'Bitte setz das Häkchen, damit ich dir schreiben darf.'; err.hidden = false; return; }
+      btn.disabled = true; btn.textContent = 'Einen Moment …';
+      const j = await post(Object.assign(d, {action: 'subscribe', t: nlLoaded, mode: document.body.dataset.mode || 'studio', source: 'natal'}));
+      if (j.ok) { nlf.hidden = true; const ok = document.getElementById('nlok'); ok.textContent = j.already ? 'Du bist schon eingetragen. Ich habe dir die Mail mit allen Paketen gerade noch einmal geschickt. 🤍' : 'Danke, ' + d.name + '! Schau jetzt in dein Postfach und bestätige deine Adresse mit einem Klick. Gleich danach bekommst du alle Infos. 🤍'; ok.hidden = false; return; }
+      err.textContent = j.error || 'Das hat gerade nicht geklappt. Bitte versuch es noch einmal.'; err.hidden = false; btn.disabled = false; btn.textContent = 'Infos schicken';
     });
   }
 

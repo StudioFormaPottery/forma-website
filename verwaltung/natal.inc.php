@@ -108,6 +108,14 @@ if ($action === 'mm_natal_sample') {
     go($nBack . '#einstellungen', 'Die Muster-Rechnung ist an ' . natal_notify_email() . ' unterwegs.');
 }
 
+if ($view === 'natal' && isset($_GET['newsvorschau'])) {
+    // Vorschau der Willkommensmail (nichts wird verschickt)
+    $sub = ['name' => 'Anna', 'email' => 'vorschau@example.com', 'token' => str_repeat('0', 32), 'mode' => ''];
+    header('Content-Type: text/html; charset=utf-8');
+    echo natal_news_welcome_html($sub);
+    exit;
+}
+
 if ($view === 'natal' && isset($_GET['mailvorschau'])) {
     $q = $pdo->prepare('SELECT * FROM mm_natal_offers WHERE id = ?');
     $q->execute([(int)$_GET['mailvorschau']]);
@@ -127,6 +135,7 @@ if ($view === 'natal') {
     $upcoming = $pdo->query("SELECT s.*, o.name, o.title, o.phone, o.email, o.package FROM mm_natal_sessions s JOIN mm_natal_orders o ON o.id = s.order_id WHERE s.status = 'bestaetigt' ORDER BY s.date, s.start")->fetchAll();
     $offers = $pdo->query('SELECT a.*, (SELECT COUNT(*) FROM mm_natal_orders o WHERE o.offer_id = a.id AND o.status = \'bezahlt\') AS booked FROM mm_natal_offers a ORDER BY a.id DESC LIMIT 30')->fetchAll();
     $revenue = (int)$pdo->query("SELECT COALESCE(SUM(amount_cents),0) FROM mm_natal_orders WHERE status = 'bezahlt'")->fetchColumn();
+    $GLOBALS['natalSubs'] = $pdo->query("SELECT * FROM mm_natal_subs ORDER BY CASE status WHEN 'bestaetigt' THEN 0 WHEN 'offen' THEN 1 ELSE 2 END, id DESC LIMIT 200")->fetchAll();
     natal_call_schema($pdo);
     $calls = $pdo->prepare("SELECT * FROM mm_natal_calls WHERE status = 'gebucht' AND date >= ? ORDER BY date, slot");
     $calls->execute([date('Y-m-d')]);
@@ -269,6 +278,18 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
                 </div>
             </details>
         <?php endforeach; ?>
+        </div>
+
+        <?php $subs = $GLOBALS['natalSubs'] ?? []; $subOk = count(array_filter($subs, fn($x) => $x['status'] === 'bestaetigt')); ?>
+        <h2 id="newsletter">Newsletter Prä- &amp; Postnatal <span class="chip"><?= $subOk ?> bestätigt</span></h2>
+        <div class="card stack">
+            <p class="small muted">Anmeldung auf der Prä- &amp; Postnatal-Seite und im Link in Bio. Nach der Bestätigung bekommt jede automatisch die Mail mit allen Paketen, Preisen, dem Ablauf und beiden Flyern, und sie kommt in die MailerLite-Gruppe „Prä- &amp; Postnatal“. Du bekommst jedes Mal eine kurze Info.</p>
+            <div class="acts"><a class="btn btn-ghost btn-sm" href="<?= forma_h($self) ?>?view=natal&amp;newsvorschau=1" target="_blank" rel="noopener">Willkommensmail ansehen</a></div>
+            <?php foreach (array_slice($subs, 0, 60) as $x): ?>
+                <div class="ln"><span><strong><?= forma_h($x['name']) ?></strong> <span class="muted small"><?= forma_h($x['email']) ?></span></span>
+                    <span class="small muted"><?= $x['status'] === 'bestaetigt' ? 'bestätigt ' . forma_h(date('d. m.', strtotime((string)$x['confirmed_at']))) : ($x['status'] === 'offen' ? 'noch nicht bestätigt' : 'abgemeldet') ?><?= $x['source'] === 'bio' ? ' · Link in Bio' : '' ?></span></div>
+            <?php endforeach; ?>
+            <?php if (!$subs): ?><p class="small muted">Noch keine Anmeldungen.</p><?php endif; ?>
         </div>
 
         <h2 id="angebot">Angebot verschicken</h2>

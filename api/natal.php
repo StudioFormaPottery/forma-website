@@ -19,6 +19,22 @@ if (!empty($in['website'])) forma_json(['ok' => true]);
 $action = (string)($in['action'] ?? '');
 $ipHash = hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? '') . date('Y-m-d') . 'natal');
 
+if ($action === 'subscribe') {
+    $loaded = (int)($in['t'] ?? 0);
+    if ($loaded > 0 && ((int)(microtime(true) * 1000) - $loaded) < 2000) forma_json(['ok' => false, 'error' => 'Einen Moment bitte, dann versuch es noch einmal.'], 429);
+    $name = forma_clean((string)($in['name'] ?? ''), 80);
+    $email = strtolower(forma_clean((string)($in['email'] ?? ''), 160));
+    if (mb_strlen($name) < 2) forma_json(['ok' => false, 'error' => 'Bitte gib deinen Vornamen ein.'], 422);
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) forma_json(['ok' => false, 'error' => 'Bitte prüf deine E-Mail-Adresse.'], 422);
+    if (empty($in['consent'])) forma_json(['ok' => false, 'error' => 'Bitte setz das Häkchen, damit ich dir schreiben darf.'], 422);
+    $c = $pdo->prepare('SELECT COUNT(*) FROM mm_natal_subs WHERE ip_hash = ? AND created_at >= ?');
+    $c->execute([$ipHash, date('c', time() - 3600)]);
+    if ((int)$c->fetchColumn() >= 6) forma_json(['ok' => false, 'error' => 'Zu viele Anmeldungen von hier. Bitte versuch es später noch einmal.'], 429);
+    $mode = ($in['mode'] ?? '') === 'online' ? 'online' : 'studio';
+    $source = in_array($in['source'] ?? '', ['natal', 'bio'], true) ? $in['source'] : 'natal';
+    forma_json(natal_news_subscribe($pdo, $name, $email, $mode, $source, $ipHash));
+}
+
 if ($action === 'buy') {
     $loaded = (int)($in['t'] ?? 0);
     if ($loaded > 0 && ((int)(microtime(true) * 1000) - $loaded) < 3000) forma_json(['ok' => false, 'error' => 'Bitte versuch es in ein paar Sekunden noch einmal.'], 429);

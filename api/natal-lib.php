@@ -80,6 +80,20 @@ function natal_schema(PDO $pdo): void
         created_at TEXT NOT NULL,
         confirmed_at TEXT
     )');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS mm_natal_subs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        mode TEXT NOT NULL DEFAULT \'\',
+        source TEXT NOT NULL DEFAULT \'\',
+        status TEXT NOT NULL DEFAULT \'offen\',
+        token TEXT NOT NULL,
+        ip_hash TEXT NOT NULL DEFAULT \'\',
+        ml_synced INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL,
+        confirmed_at TEXT,
+        unsub_at TEXT
+    )');
     $sc = array_column($pdo->query('PRAGMA table_info(mm_natal_sessions)')->fetchAll(), 'name');
     if ($sc && !in_array('room_url', $sc, true)) {
         $pdo->exec("ALTER TABLE mm_natal_sessions ADD COLUMN room_url TEXT NOT NULL DEFAULT ''");
@@ -314,7 +328,7 @@ function natal_clean_wishes($raw): array
 
 // --- Mails im Movecia-Design (Pflaume), Absender hello@moveciamovement.com ------------------
 
-function natal_mail_html(string $title, string $inner): string
+function natal_mail_html(string $title, string $inner, string $foot = ''): string
 {
     return '<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . forma_h($title) . '</title></head>'
         . '<body style="margin:0;padding:0;background:#F2ECE4;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2ECE4;"><tr><td align="center" style="padding:26px 12px;">'
@@ -322,7 +336,7 @@ function natal_mail_html(string $title, string $inner): string
         . '<tr><td style="padding:26px 30px 0;font-family:Georgia,\'Times New Roman\',serif;font-size:26px;color:#2E2529;">Movecia<span style="color:#7D5E68;">.</span></td></tr>'
         . '<tr><td style="padding:14px 30px 28px;font-size:16px;line-height:1.65;">' . $inner
         . '<p style="margin:24px 0 0;">Bis bald,<br>Vivien</p></td></tr></table>'
-        . '<p style="max-width:560px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#7D7076;margin:16px auto 0;">Vivien Malonga · Movecia – Personal Fitness · ' . NATAL_COMPANY['street'] . ' · ' . NATAL_COMPANY['city'] . ' · ' . NATAL_COMPANY['email'] . '</p>'
+        . '<p style="max-width:560px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#7D7076;margin:16px auto 0;">Vivien Malonga · Movecia – Personal Fitness · ' . NATAL_COMPANY['street'] . ' · ' . NATAL_COMPANY['city'] . ' · ' . NATAL_COMPANY['email'] . '</p>' . $foot
         . '</td></tr></table></body></html>';
 }
 
@@ -560,6 +574,31 @@ function natal_offer_group(PDO $pdo, array $a): array
     return $rows;
 }
 
+/** Preislisten Studio + Online als Mail-Karten (HTML und Text), Knöpfe auf $base mit &m=studio|online. */
+function natal_pack_cards(string $base): array
+{
+    $html = ''; $text = '';
+    foreach (['studio', 'online'] as $md) {
+        $online = $md === 'online';
+        $label = $online ? 'Online, live per Video' : 'Bei mir im Studio in Mathon';
+        $rows = '';
+        $text .= "\n\n" . $label . ':';
+        foreach (natal_packages_for($md) as $p) {
+            $name = preg_replace('/ online$/', '', $p['title']);
+            $detail = $p['units'] > 1 ? $p['units'] . ' × ' . forma_euro($p['unit_cents']) : '1 Einheit';
+            $rows .= '<tr><td style="padding:7px 0;border-top:1px solid #DDD2C6;">' . forma_h($name) . '<br><span style="font-size:13px;color:#7D7076;">' . forma_h($p['sub']) . '</span></td>'
+                . '<td align="right" style="padding:7px 0;border-top:1px solid #DDD2C6;white-space:nowrap;vertical-align:top;"><b>' . forma_h(forma_euro($p['cents'])) . '</b><br><span style="font-size:13px;color:#7D7076;">' . forma_h($detail) . '</span></td></tr>';
+            $text .= "\n· " . $name . ': ' . forma_euro($p['cents']) . ($p['units'] > 1 ? ' (' . $detail . ')' : '');
+        }
+        $link = $base . (str_contains($base, '?') ? '&' : '?') . 'm=' . $md;
+        $html .= '<div style="margin:18px 0 6px;padding:18px 20px;background:' . ($online ? '#EADFDE' : '#F2ECE4') . ';border-radius:18px;">'
+            . '<p style="margin:0 0 8px;font-family:Georgia,\'Times New Roman\',serif;font-size:21px;color:#2E2529;">' . forma_h($label) . '</p>'
+            . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.4;color:#2E2529;">' . $rows . '</table>'
+            . '<p style="margin:16px 0 2px;text-align:center;"><a href="' . forma_h($link) . '" style="display:inline-block;padding:12px 24px;border-radius:999px;background:#7D5E68;color:#FBF5F7;text-decoration:none;font-weight:bold;">' . ($online ? 'Online ansehen &amp; buchen' : 'Studio ansehen &amp; buchen') . '</a></p></div>';
+    }
+    return [$html, $text];
+}
+
 /** Angebots-Mail im Movecia-Design: Begrüßung, Studio und Online nebeneinander (eine Seite mit Umschalter), Kennenlerngespräch, beide Flyer als PDF. */
 function natal_offer_mail(array $group): array
 {
@@ -575,24 +614,9 @@ function natal_offer_mail(array $group): array
     $html = '<p style="margin:0 0 14px;">' . forma_h($hello) . '</p><p style="margin:0 0 14px;">' . forma_h($intro) . '</p>';
     if ($note !== '') $html .= '<p style="margin:0 0 14px;">' . nl2br(forma_h($note)) . '</p>';
     $text = $hello . "\n\n" . $intro . ($note !== '' ? "\n\n" . $note : '');
-    foreach (['studio', 'online'] as $md) {
-        $online = $md === 'online';
-        $label = $online ? 'Online, live per Video' : 'Bei mir im Studio in Mathon';
-        $rows = '';
-        $text .= "\n\n" . $label . ':';
-        foreach (natal_packages_for($md) as $p) {
-            $name = preg_replace('/ online$/', '', $p['title']);
-            $detail = $p['units'] > 1 ? $p['units'] . ' × ' . forma_euro($p['unit_cents']) : '1 Einheit';
-            $rows .= '<tr><td style="padding:7px 0;border-top:1px solid #DDD2C6;">' . forma_h($name) . '<br><span style="font-size:13px;color:#7D7076;">' . forma_h($p['sub']) . '</span></td>'
-                . '<td align="right" style="padding:7px 0;border-top:1px solid #DDD2C6;white-space:nowrap;vertical-align:top;"><b>' . forma_h(forma_euro($p['cents'])) . '</b><br><span style="font-size:13px;color:#7D7076;">' . forma_h($detail) . '</span></td></tr>';
-            $text .= "\n· " . $name . ': ' . forma_euro($p['cents']) . ($p['units'] > 1 ? ' (' . $detail . ')' : '');
-        }
-        $link = $base . '&m=' . $md;
-        $html .= '<div style="margin:18px 0 6px;padding:18px 20px;background:' . ($online ? '#EADFDE' : '#F2ECE4') . ';border-radius:18px;">'
-            . '<p style="margin:0 0 8px;font-family:Georgia,\'Times New Roman\',serif;font-size:21px;color:#2E2529;">' . forma_h($label) . '</p>'
-            . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.4;color:#2E2529;">' . $rows . '</table>'
-            . '<p style="margin:16px 0 2px;text-align:center;"><a href="' . forma_h($link) . '" style="display:inline-block;padding:12px 24px;border-radius:999px;background:#7D5E68;color:#FBF5F7;text-decoration:none;font-weight:bold;">' . ($online ? 'Online ansehen &amp; buchen' : 'Studio ansehen &amp; buchen') . '</a></p></div>';
-    }
+    [$cardsHtml, $cardsText] = natal_pack_cards($base);
+    $html .= $cardsHtml;
+    $text .= $cardsText;
     $text .= "\n\nDein Angebot ansehen & buchen: " . $base;
     $html .= '<p style="margin:18px 0 14px;">' . forma_h($how) . '</p><p style="margin:0 0 14px;">' . forma_h($call) . '</p>'
         . '<p style="margin:0 0 14px;">Im Anhang findest du die beiden Flyer auch noch als PDF. Bei Fragen schreib mir einfach.</p>';
@@ -886,3 +910,101 @@ function natal_cancel_call(PDO $pdo, int $id, string $reason, bool $mail): void
             [$link, 'Neuen Termin wählen']);
     }
 }
+
+// --- Newsletter Prä- & Postnatal (eigene Liste, Double-Opt-in, MailerLite-Gruppe „Prä- & Postnatal“) ---
+
+const NATAL_ML_GROUP = 'Prä- & Postnatal';
+
+function natal_sub_by_token(PDO $pdo, string $t): ?array
+{
+    if (!preg_match('/^[a-f0-9]{32}$/', $t)) return null;
+    $q = $pdo->prepare('SELECT * FROM mm_natal_subs WHERE token = ?');
+    $q->execute([$t]);
+    return $q->fetch() ?: null;
+}
+
+function natal_news_unsub_link(array $sub): string
+{
+    return mm_site() . '/api/natal-news.php?ab=' . $sub['token'];
+}
+
+/** Anmeldung: neue Adresse → Bestätigungsmail; schon bestätigt → Willkommensmail mit den Paketen noch einmal. */
+function natal_news_subscribe(PDO $pdo, string $name, string $email, string $mode, string $source, string $ip): array
+{
+    $q = $pdo->prepare('SELECT * FROM mm_natal_subs WHERE email = ?');
+    $q->execute([$email]);
+    $sub = $q->fetch();
+    if ($sub && $sub['status'] === 'bestaetigt') { natal_news_welcome($sub); return ['ok' => true, 'already' => true]; }
+    if ($sub) {
+        $pdo->prepare("UPDATE mm_natal_subs SET name = ?, mode = ?, source = ?, status = 'offen', ip_hash = ? WHERE id = ?")->execute([$name, $mode, $source, $ip, $sub['id']]);
+        $sub = array_merge($sub, ['name' => $name, 'mode' => $mode]);
+    } else {
+        $tok = bin2hex(random_bytes(16));
+        $pdo->prepare('INSERT INTO mm_natal_subs (name, email, mode, source, token, ip_hash, created_at) VALUES (?,?,?,?,?,?,?)')->execute([$name, $email, $mode, $source, $tok, $ip, date('c')]);
+        $sub = ['id' => (int)$pdo->lastInsertId(), 'name' => $name, 'email' => $email, 'token' => $tok, 'mode' => $mode];
+    }
+    $first = forma_first_name($name);
+    $ok = natal_mail($email, 'Bitte bestätige deine E-Mail-Adresse', 'Fast geschafft',
+        ["Hallo $first,", 'schön, dass du dich für mein Prä- und Postnatal-Training interessierst. Bitte bestätige noch kurz deine E-Mail-Adresse, dann schicke ich dir gleich alle Pakete und Preise.', 'Wenn du dich nicht angemeldet hast, ignorier diese Mail einfach.'],
+        [mm_site() . '/api/natal-news.php?t=' . $sub['token'], 'Ja, ich möchte die Infos']);
+    return ['ok' => $ok];
+}
+
+/** Willkommensmail nach der Bestätigung: Überblick, Pakete Studio + Online, Einheiten, Kennenlerngespräch, Flyer. */
+function natal_news_welcome(array $sub): bool
+{
+    return natal_news_welcome_build($sub, true);
+}
+
+function natal_news_welcome_html(array $sub): string
+{
+    return natal_news_welcome_build($sub, false);
+}
+
+function natal_news_welcome_build(array $sub, bool $send)
+{
+    $first = forma_first_name((string)$sub['name']);
+    $base = mm_site() . '/natal/';
+    if (($sub['mode'] ?? '') === 'online') $base .= '?m=online';
+    $intro = 'danke fürs Bestätigen! Hier bekommst du wie versprochen alles über mein Prä- und Postnatal-Training. Ich begleite dich 1:1 durch die Schwangerschaft und die Zeit danach, bei mir im Studio in Mathon oder online, live per Video. Jede Einheit dauert 60 Minuten und verbindet einen kurzen Impuls von mir mit Bewegung, Breathwork und Meditation.';
+    $packs = 'Pränatal sind es 6 Einheiten bis zur Geburt: vom Ankommen im Körper über Beckenboden, Rücken und Atmung für die Wehen bis zu Geburtspositionen und einem guten Start ins Wochenbett. Postnatal sind es 8 Einheiten nach der Freigabe: Beckenboden, tiefe Bauchmuskeln, Haltung beim Tragen und Stillen, Kraft für den Alltag, Ruhe für dein Nervensystem und dein eigenes Programm für zu Hause. Im Kombi-Paket begleite ich dich durch beides, und dein Baby darf nach der Geburt immer dabei sein.';
+    $call = 'Wenn du vorher in Ruhe reden möchtest, buch dir gern ein kostenloses Kennenlerngespräch: 30 Minuten online, Montag bis Freitag um 8:00 oder 19:00 Uhr. Den Kalender dafür findest du auf der Seite.';
+    $html = '<p style="margin:0 0 14px;">' . forma_h("Hallo $first,") . '</p><p style="margin:0 0 14px;">' . forma_h($intro) . '</p>'
+        . '<p style="margin:0 0 14px;">' . forma_h($packs) . '</p>'
+        . '<p style="margin:18px 0 0;font-family:Georgia,\'Times New Roman\',serif;font-size:22px;">Pakete &amp; Preise</p>'
+        . '<p style="margin:4px 0 0;font-size:14px;color:#7D7076;">Je mehr Einheiten, desto günstiger. Alle Pakete gelten bis 6 Monate nach der Geburt.</p>';
+    [$ch, $ct] = natal_pack_cards($base);
+    $html .= $ch . '<p style="margin:18px 0 14px;">' . forma_h($call) . '</p>'
+        . '<p style="margin:0 0 14px;">Im Anhang findest du beide Flyer als PDF. Und wenn du Fragen hast, antworte einfach auf diese Mail.</p>';
+    $unsub = natal_news_unsub_link($sub);
+    $foot = '<p style="max-width:560px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#7D7076;margin:8px auto 0;">Du bekommst diese Mail, weil du dich auf moveciamovement.com für Infos zum Prä- und Postnatal-Training angemeldet hast. <a href="' . forma_h($unsub) . '" style="color:#7D7076;">Abmelden</a></p>';
+    $text = "Hallo $first,\n\n$intro\n\n$packs\n\nPakete & Preise (je mehr Einheiten, desto günstiger, gültig bis 6 Monate nach der Geburt):" . $ct . "\n\n$call\n\nAlles ansehen: $base\n\nIm Anhang findest du beide Flyer als PDF. Und wenn du Fragen hast, antworte einfach auf diese Mail.\n\nBis bald,\nVivien\n\nAbmelden: $unsub";
+    $files = [];
+    $dir = dirname(__DIR__) . '/wildhearts/natal/files/';
+    foreach (['Movecia_Prae-Postnatal_Studio.pdf', 'Movecia_Prae-Postnatal_Online.pdf'] as $f) if (is_file($dir . $f)) $files[] = [$f, file_get_contents($dir . $f), 'application/pdf'];
+    $full = natal_mail_html('Willkommen', natal_h1('Schön, dass du da bist') . $html, $foot);
+    if (!$send) return $full;
+    return mm_mail((string)$sub['email'], 'Dein Prä- & Postnatal Training: alle Pakete im Überblick', $text, $full, $files, NATAL_FROM_NAME);
+}
+
+/** In die MailerLite-Gruppe „Prä- & Postnatal“ übertragen bzw. aus der Gruppe nehmen (nicht von allen Listen abmelden). */
+function natal_news_ml(PDO $pdo, array $sub, bool $active = true): bool
+{
+    $cfg = forma_mailerlite();
+    if (!$cfg) return false;
+    try {
+        $gid = forma_ml_group($cfg['api_key'], NATAL_ML_GROUP);
+        if ($active) {
+            forma_ml_request('POST', '/api/subscribers', ['email' => $sub['email'], 'fields' => ['name' => $sub['name']], 'groups' => [$gid]], $cfg['api_key']);
+            $pdo->prepare('UPDATE mm_natal_subs SET ml_synced = 1 WHERE id = ?')->execute([$sub['id']]);
+        } else {
+            $r = forma_ml_request('GET', '/api/subscribers/' . rawurlencode((string)$sub['email']), null, $cfg['api_key']);
+            if (!empty($r['data']['id'])) forma_ml_request('DELETE', '/api/subscribers/' . $r['data']['id'] . '/groups/' . $gid, null, $cfg['api_key']);
+        }
+        return true;
+    } catch (Throwable $e) {
+        error_log('Natal ML: ' . $e->getMessage());
+        return false;
+    }
+}
+
