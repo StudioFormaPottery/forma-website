@@ -560,54 +560,48 @@ function natal_offer_group(PDO $pdo, array $a): array
     return $rows;
 }
 
-/** Angebots-Mail im Movecia-Design: Begrüßung, je Variante die Pakete + persönlicher Link, Kennenlerngespräch, Flyer als PDF. */
+/** Angebots-Mail im Movecia-Design: Begrüßung, Studio und Online nebeneinander (eine Seite mit Umschalter), Kennenlerngespräch, beide Flyer als PDF. */
 function natal_offer_mail(array $group): array
 {
     $a = $group[0];
-    $both = count($group) > 1;
     $first = trim((string)$a['name']);
     $hello = ($a['salutation'] ?: 'Liebe') . ' ' . $first . ',';
-    $intro = $both
-        ? 'wie versprochen schicke ich dir hier mein Angebot für dein Prä- und Postnatal-Training. Du kannst bei mir im Studio trainieren oder online, live per Video. Beides ist 1:1, jede Einheit dauert 60 Minuten.'
-        : 'wie versprochen schicke ich dir hier mein Angebot für dein Prä- und Postnatal-Training ' . (($a['mode'] ?? 'studio') === 'online' ? 'online, live per Video' : 'bei mir im Studio') . '. Es ist 1:1, jede Einheit dauert 60 Minuten.';
-    $how = 'Über deinen Link siehst du alle Pakete und kannst direkt buchen. Deine Wunschtermine suchst du dir im Kalender aus, ich bestätige sie dir dann persönlich. Die Pakete gelten bis 6 Monate nach der Geburt.';
+    $intro = 'wie versprochen schicke ich dir hier mein Angebot für dein Prä- und Postnatal-Training. Du kannst bei mir im Studio trainieren oder online, live per Video. Beides ist 1:1, jede Einheit dauert 60 Minuten.';
+    $how = 'Auf deiner Seite wechselst du oben einfach zwischen Studio und Online, siehst alle Pakete und kannst direkt buchen. Deine Wunschtermine suchst du dir im Kalender aus, ich bestätige sie dir dann persönlich. Die Pakete gelten bis 6 Monate nach der Geburt.';
     $call = 'Wenn du vorher in Ruhe reden möchtest, kannst du auf der Seite auch ein kostenloses Kennenlerngespräch buchen: 30 Minuten online, Montag bis Freitag um 8:00 oder 19:00 Uhr.';
     $note = trim((string)($a['note'] ?? ''));
+    $base = natal_offer_link($a);
 
     $html = '<p style="margin:0 0 14px;">' . forma_h($hello) . '</p><p style="margin:0 0 14px;">' . forma_h($intro) . '</p>';
     if ($note !== '') $html .= '<p style="margin:0 0 14px;">' . nl2br(forma_h($note)) . '</p>';
     $text = $hello . "\n\n" . $intro . ($note !== '' ? "\n\n" . $note : '');
-    foreach ($group as $g) {
-        $online = ($g['mode'] ?? 'studio') === 'online';
+    foreach (['studio', 'online'] as $md) {
+        $online = $md === 'online';
         $label = $online ? 'Online, live per Video' : 'Bei mir im Studio in Mathon';
         $rows = '';
         $text .= "\n\n" . $label . ':';
-        foreach (natal_packages_for($online ? 'online' : 'studio') as $p) {
+        foreach (natal_packages_for($md) as $p) {
             $name = preg_replace('/ online$/', '', $p['title']);
             $detail = $p['units'] > 1 ? $p['units'] . ' × ' . forma_euro($p['unit_cents']) : '1 Einheit';
             $rows .= '<tr><td style="padding:7px 0;border-top:1px solid #DDD2C6;">' . forma_h($name) . '<br><span style="font-size:13px;color:#7D7076;">' . forma_h($p['sub']) . '</span></td>'
                 . '<td align="right" style="padding:7px 0;border-top:1px solid #DDD2C6;white-space:nowrap;vertical-align:top;"><b>' . forma_h(forma_euro($p['cents'])) . '</b><br><span style="font-size:13px;color:#7D7076;">' . forma_h($detail) . '</span></td></tr>';
             $text .= "\n· " . $name . ': ' . forma_euro($p['cents']) . ($p['units'] > 1 ? ' (' . $detail . ')' : '');
         }
-        $link = natal_offer_link($g);
+        $link = $base . '&m=' . $md;
         $html .= '<div style="margin:18px 0 6px;padding:18px 20px;background:' . ($online ? '#EADFDE' : '#F2ECE4') . ';border-radius:18px;">'
             . '<p style="margin:0 0 8px;font-family:Georgia,\'Times New Roman\',serif;font-size:21px;color:#2E2529;">' . forma_h($label) . '</p>'
             . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.4;color:#2E2529;">' . $rows . '</table>'
             . '<p style="margin:16px 0 2px;text-align:center;"><a href="' . forma_h($link) . '" style="display:inline-block;padding:12px 24px;border-radius:999px;background:#7D5E68;color:#FBF5F7;text-decoration:none;font-weight:bold;">' . ($online ? 'Online ansehen &amp; buchen' : 'Studio ansehen &amp; buchen') . '</a></p></div>';
-        $text .= "\nAnsehen & buchen: " . $link;
     }
+    $text .= "\n\nDein Angebot ansehen & buchen: " . $base;
     $html .= '<p style="margin:18px 0 14px;">' . forma_h($how) . '</p><p style="margin:0 0 14px;">' . forma_h($call) . '</p>'
-        . '<p style="margin:0 0 14px;">Im Anhang findest du ' . ($both ? 'die beiden Flyer' : 'den Flyer') . ' auch noch als PDF. Bei Fragen schreib mir einfach.</p>';
-    $text .= "\n\n" . $how . "\n\n" . $call . "\n\nIm Anhang findest du " . ($both ? 'die beiden Flyer' : 'den Flyer') . " auch noch als PDF. Bei Fragen schreib mir einfach.\n\nBis bald,\nVivien\n\nVivien Malonga · Movecia – Personal Fitness · " . NATAL_COMPANY['email'];
+        . '<p style="margin:0 0 14px;">Im Anhang findest du die beiden Flyer auch noch als PDF. Bei Fragen schreib mir einfach.</p>';
+    $text .= "\n\n" . $how . "\n\n" . $call . "\n\nIm Anhang findest du die beiden Flyer auch noch als PDF. Bei Fragen schreib mir einfach.\n\nBis bald,\nVivien\n\nVivien Malonga · Movecia – Personal Fitness · " . NATAL_COMPANY['email'];
 
     $files = [];
     $dir = dirname(__DIR__) . '/wildhearts/natal/files/';
-    foreach ($group as $g) {
-        $f = ($g['mode'] ?? 'studio') === 'online' ? 'Movecia_Prae-Postnatal_Online.pdf' : 'Movecia_Prae-Postnatal_Studio.pdf';
-        if (is_file($dir . $f)) $files[] = [$f, file_get_contents($dir . $f), 'application/pdf'];
-    }
-    $title = 'Dein Prä- & Postnatal Training';
-    return ['subject' => 'Mein Angebot für dich: Prä- & Postnatal Training', 'text' => $text, 'html' => natal_mail_html($title, $html), 'files' => $files];
+    foreach (['Movecia_Prae-Postnatal_Studio.pdf', 'Movecia_Prae-Postnatal_Online.pdf'] as $f) if (is_file($dir . $f)) $files[] = [$f, file_get_contents($dir . $f), 'application/pdf'];
+    return ['subject' => 'Mein Angebot für dich: Prä- & Postnatal Training', 'text' => $text, 'html' => natal_mail_html('Dein Prä- & Postnatal Training', $html), 'files' => $files];
 }
 
 /** Angebots-Mail verschicken (an die Kundin oder als Test an Vivien). */
@@ -628,14 +622,9 @@ function natal_offer_send(PDO $pdo, array $a, bool $test): bool
 /** Fertige Nachricht für WhatsApp zum persönlichen Angebot. */
 function natal_offer_message(array $a, array $group = []): string
 {
-    $group = $group ?: [$a];
     $first = trim((string)$a['name']);
-    if (count($group) > 1) {
-        $links = '';
-        foreach ($group as $g) $links .= (($g['mode'] ?? 'studio') === 'online' ? 'Online: ' : 'Im Studio: ') . natal_offer_link($g) . "\n";
-        return trim(($a['salutation'] ?: 'Liebe') . ' ' . $first . ",\n\nwie besprochen schicke ich dir hier mein Angebot für dein Prä- und Postnatal-Training. Du kannst bei mir im Studio trainieren oder online, live per Video.\n\n" . $links . "\nÜber den Link kannst du direkt buchen und dir deine Wunschtermine im Kalender aussuchen. Wenn du vorher in Ruhe reden möchtest, kannst du dort auch ein kostenloses Kennenlerngespräch von 30 Minuten buchen.\n\nBei Fragen schreib mir einfach.\n\nBis bald,\nVivien");
-    }
-    return trim(($a['salutation'] ?: 'Liebe') . ' ' . $first . ",\n\nwie besprochen schicke ich dir hier mein Angebot für dein Prä- und Postnatal-Training " . (($a['mode'] ?? 'studio') === 'online' ? 'online, live per Video' : 'bei mir im Studio') . ". Du siehst alle Pakete und kannst direkt online buchen. Deine Wunschtermine wählst du im Kalender aus, ich bestätige sie dir dann persönlich.\n\n" . natal_offer_link($a) . "\n\nWenn du Fragen hast, schreib mir einfach.\n\nBis bald,\nVivien");
+    $p = natal_packages();
+    return trim(($a['salutation'] ?: 'Liebe') . ' ' . $first . ",\n\nwie besprochen schicke ich dir hier mein Angebot für dein Prä- und Postnatal-Training. Du kannst bei mir im Studio trainieren (Einzelstunde " . forma_euro($p['einzel']['cents']) . ") oder online, live per Video (Einzelstunde " . forma_euro($p['o_einzel']['cents']) . "). In den Paketen wird jede Einheit günstiger. Auf der Seite wechselst du oben einfach zwischen Studio und Online und siehst alle Preise.\n\n" . natal_offer_link($a) . "\n\nDu kannst direkt buchen und dir deine Wunschtermine im Kalender aussuchen. Wenn du vorher in Ruhe reden möchtest, kannst du dort auch ein kostenloses Kennenlerngespräch von 30 Minuten buchen.\n\nBei Fragen schreib mir einfach.\n\nBis bald,\nVivien");
 }
 
 // --- Rechnung im Movecia-Design (wird von api/invoices.php aufgerufen) ----------------------

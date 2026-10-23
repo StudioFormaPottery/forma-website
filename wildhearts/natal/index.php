@@ -21,8 +21,13 @@ if (!$order && ($_GET['a'] ?? '') !== '') {
     $offer = $q->fetch() ?: null;
     if ($offer && !$offer['opened_at']) $pdo->prepare('UPDATE mm_natal_offers SET opened_at = ? WHERE id = ?')->execute([date('c'), $offer['id']]);
 }
-$online = $order ? natal_is_online($order) : ($offer ? ($offer['mode'] ?? 'studio') === 'online' : (($_GET['m'] ?? '') === 'online'));
+$online = $order ? natal_is_online($order) : (in_array($_GET['m'] ?? '', ['studio', 'online'], true) ? $_GET['m'] === 'online' : ($offer && ($offer['mode'] ?? 'studio') === 'online'));
 $packs = natal_packages_for($online ? 'online' : 'studio');
+$modeInfo = [];
+foreach (['studio', 'online'] as $md) {
+    $ps = natal_packages_for($md);
+    $modeInfo[$md] = ['packs' => $ps, 'single' => $ps[$md === 'online' ? 'o_einzel' : 'einzel']['cents'], 'min' => min(array_column($ps, 'unit_cents'))];
+}
 $single = $packs[$online ? 'o_einzel' : 'einzel']['cents'];
 $where = $online ? 'live per Video' : 'im Studio';
 $sessions = $order ? natal_sessions($pdo, (int)$order['id']) : [];
@@ -89,6 +94,17 @@ section{padding-block:clamp(3.5rem,8vw,7rem)}
 .hello{display:inline-block;background:var(--card);border-radius:18px;padding:.9rem 1.2rem;margin-top:1.4rem;max-width:34em;font-size:1rem}
 .hello b{font-family:var(--serif);font-size:1.35rem;font-weight:500;display:block;color:var(--ink)}
 .lead{font-size:clamp(1.05rem,1.4vw,1.3rem);font-weight:300;color:var(--muted);max-width:32em;margin-top:1.4rem}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:6px;background:var(--card);border-radius:22px;margin-top:1.8rem;max-width:36rem;box-shadow:0 18px 40px -30px rgba(74,58,65,.5)}
+.modes button{font:inherit;text-align:left;border:0;border-radius:17px;padding:.85rem 1rem;background:transparent;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;gap:.15rem;transition:background .2s,color .2s}
+.modes button b{font-family:var(--serif);font-weight:500;font-size:1.45rem;line-height:1.1}
+.modes button span{font-size:.84rem;color:var(--muted);line-height:1.35}
+.modes button[aria-pressed=true]{background:var(--plum);color:var(--on)}
+.modes button[aria-pressed=true] span{color:var(--on);opacity:.85}
+.modes.sm{margin-top:1.4rem}
+.modes button .pr{margin-top:.35rem;color:var(--ink);font-size:.88rem}
+.modes button[aria-pressed=true] .pr{color:var(--on);opacity:1}
+@media(max-width:560px){.top .tag{display:none}.modes button{padding:.75rem .8rem}.modes button b{font-size:1.3rem}}
+body[data-mode=online] .m-studio,body[data-mode=studio] .m-online{display:none!important}
 .cta{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:2rem}
 .hv{position:relative;justify-self:center;width:min(100%,480px);aspect-ratio:1/1}
 @media(max-width:599px){.hv{width:min(100%,300px)}.hv .q{font-size:1.25rem}}
@@ -220,8 +236,8 @@ footer summary{cursor:pointer}
 .slotb button:disabled{opacity:.4;cursor:default;text-decoration:line-through}
 </style>
 </head>
-<body>
-<header class="top w"><a class="brand" href="<?= $order ? $h(natal_link($order)) : '#' ?>">Movecia<i></i></a><span class="tag">1:1 <?= $online ? 'online' : 'im Studio' ?> · Prä- &amp; Postnatal</span></header>
+<body data-mode="<?= $online ? 'online' : 'studio' ?>">
+<header class="top w"><a class="brand" href="<?= $order ? $h(natal_link($order)) : '#' ?>">Movecia<i></i></a><span class="tag">1:1 <?= $order ? ($online ? 'online' : 'im Studio') : 'im Studio &amp; online' ?> · Prä- &amp; Postnatal</span></header>
 
 <?php if ($order):
     $first = forma_first_name((string)$order['name']);
@@ -291,11 +307,15 @@ footer summary{cursor:pointer}
 <main>
 <section class="hero w">
   <div>
-    <p class="k">Prä- &amp; Postnatal Training · 1:1 <?= $online ? 'online' : 'im Studio' ?></p>
+    <p class="k">Prä- &amp; Postnatal Training · 1:1 im Studio oder online</p>
     <h1 style="margin-top:.8rem">Bewegt durch die <em>Schwangerschaft</em> &amp; das Wochenbett</h1>
     <p class="script">für dich und dein Baby</p>
+    <div class="modes" role="group" aria-label="Im Studio oder online">
+      <?php foreach (['studio' => ['Im Studio', 'in Mathon'], 'online' => ['Online', 'live per Video']] as $md => [$lb, $sb]): ?><button type="button" data-mode="<?= $md ?>" aria-pressed="<?= ($online ? 'online' : 'studio') === $md ? 'true' : 'false' ?>"><b><?= $lb ?></b><span><?= $sb ?></span><span class="pr">Einzelstunde <?= $h($euro($modeInfo[$md]['single'])) ?><br>Paket ab <?= $h($euro($modeInfo[$md]['min'])) ?> pro Einheit</span></button><?php endforeach; ?>
+    </div>
     <?php if ($offer): ?><p class="hello"><b><?= $h(($offer['salutation'] ?: 'Liebe') . ' ' . $offer['name']) ?>,</b>schön, dass du da bist. Hier ist mein Angebot für dich, mit allem, was wir bis zur Geburt und danach gemeinsam machen können.<?= $offer['note'] !== '' ? '<br><br>' . nl2br($h((string)$offer['note'])) : '' ?></p><?php endif; ?>
-    <p class="lead">Prä- und postnatales Training, ganz auf dich abgestimmt: ruhig, kräftigend und mit viel Raum für das, was dein Körper gerade braucht. <?= $online ? 'Live per Video, bequem von zu Hause aus: nur du und ich, ich sehe dich und korrigiere dich wie im Studio.' : 'Bei mir im Studio, nur du und ich.' ?></p>
+    <p class="lead">Prä- und postnatales Training, ganz auf dich abgestimmt: ruhig, kräftigend und mit viel Raum für das, was dein Körper gerade braucht. Nur du und ich, bei mir im Studio oder live per Video bequem von zu Hause aus. Wähl einfach, was besser zu dir passt.</p>
+
     <div class="cta"><a class="btn" href="#pakete">Paket wählen <span aria-hidden="true">→</span></a><a class="btn line" href="#kennenlernen">Kostenlos kennenlernen</a></div>
   </div>
   <div class="hv" aria-hidden="true"><div class="b1 blob"></div><div class="b2 blob"></div><div class="b3"></div><p class="q">„Dein Körper leistet gerade Großes. Lass uns ihn gut begleiten.“<small>Vivien</small></p></div>
@@ -325,7 +345,7 @@ footer summary{cursor:pointer}
   <div class="steps">
     <div class="step"><b>Paket wählen und bezahlen</b><p>Sicher online über Stripe. Danach bekommst du eine Bestätigung und deine Rechnung per E-Mail.</p></div>
     <div class="step"><b>Wunschtermine aussuchen</b><p>Im Kalender tippst du deine Wunschtage an und wählst Vormittag, Nachmittag oder Abend. Gleich beim Buchen oder später auf deiner persönlichen Seite.</p></div>
-    <div class="step"><b>Ich bestätige mit Uhrzeit</b><p>Du bekommst jeden Termin per E-Mail, mit Kalenderdatei für dein Handy<?= $online ? ' und dem Link zum Videoraum' : '' ?>. Weitere Termine fragst du jederzeit über deine Seite an.</p></div>
+    <div class="step"><b>Ich bestätige mit Uhrzeit</b><p>Du bekommst jeden Termin per E-Mail, mit Kalenderdatei für dein Handy<span class="m-online"> und dem Link zum Videoraum</span>. Weitere Termine fragst du jederzeit über deine Seite an.</p></div>
   </div>
 </section>
 
@@ -360,10 +380,14 @@ footer summary{cursor:pointer}
 <section class="w" id="pakete" style="padding-top:0">
   <p class="k">Preise &amp; Pakete</p>
   <h2 style="margin-top:.6rem">Je mehr Einheiten, desto <em>günstiger</em></h2>
-  <p class="mut" style="margin-top:.8rem">Jede Einheit dauert 60 Minuten, 1:1 <?= $where ?>. Alle Preise inkl. 20 % USt.</p>
-  <div class="packs" role="radiogroup" aria-label="Paket">
-    <?php foreach ($packs as $k => $p): $save = $single * $p['units'] - $p['cents']; ?>
-      <label class="pack"><input type="radio" name="package" value="<?= $h($k) ?>" data-units="<?= (int)$p['units'] ?>" data-cents="<?= (int)$p['cents'] ?>" data-title="<?= $h($p['title']) ?>" data-unit="<?= (int)$p['unit_cents'] ?>"<?= $p['tag'] !== '' ? ' checked' : '' ?>>
+  <div class="modes sm" role="group" aria-label="Im Studio oder online">
+      <?php foreach (['studio' => ['Im Studio', 'in Mathon'], 'online' => ['Online', 'live per Video']] as $md => [$lb, $sb]): ?><button type="button" data-mode="<?= $md ?>" aria-pressed="<?= ($online ? 'online' : 'studio') === $md ? 'true' : 'false' ?>"><b><?= $lb ?></b><span><?= $sb ?></span><span class="pr">Einzelstunde <?= $h($euro($modeInfo[$md]['single'])) ?><br>Paket ab <?= $h($euro($modeInfo[$md]['min'])) ?> pro Einheit</span></button><?php endforeach; ?>
+    </div>
+  <p class="mut" style="margin-top:1rem">Jede Einheit dauert 60 Minuten, 1:1 <span class="m-studio">bei mir im Studio</span><span class="m-online">live per Video</span>. Alle Preise inkl. 20 % USt.</p>
+  <?php foreach ($modeInfo as $md => $mi): ?>
+  <div class="packs m-<?= $md ?>" role="radiogroup" aria-label="Paket <?= $md === 'online' ? 'online' : 'im Studio' ?>">
+    <?php foreach ($mi['packs'] as $k => $p): $save = $mi['single'] * $p['units'] - $p['cents']; ?>
+      <label class="pack"><input type="radio" name="package" value="<?= $h($k) ?>" data-units="<?= (int)$p['units'] ?>" data-cents="<?= (int)$p['cents'] ?>" data-title="<?= $h($p['title']) ?>" data-unit="<?= (int)$p['unit_cents'] ?>"<?= $p['tag'] !== '' && ($online ? 'online' : 'studio') === $md ? ' checked' : '' ?>>
         <?php if ($p['tag']): ?><span class="badge"><?= $h($p['tag']) ?></span><?php endif; ?><span class="ck" aria-hidden="true"></span>
         <span class="t"><?= $h(preg_replace('/ online$/', '', $p['title'])) ?></span><span class="s"><?= $h($p['sub']) ?></span>
         <span class="p"><?= $h($euro($p['cents'])) ?></span>
@@ -372,6 +396,7 @@ footer summary{cursor:pointer}
       </label>
     <?php endforeach; ?>
   </div>
+  <?php endforeach; ?>
   <p class="mut" style="margin-top:1rem;font-size:.9rem">Kommt dein Baby früher, nutzt du offene Einheiten einfach nach der Geburt. Alle Pakete gelten bis 6 Monate nach der Geburt.</p>
 </section>
 
@@ -415,14 +440,14 @@ footer summary{cursor:pointer}
   <h2 style="margin-top:.6rem;margin-bottom:1.6rem">Häufige <em>Fragen</em></h2>
   <details><summary>Ab wann kann ich nach der Geburt wieder trainieren?</summary><p>Sobald deine Ärztin dich freigibt, meistens nach 6 bis 8 Wochen, nach einem Kaiserschnitt oft etwas später. Bis dahin ruhen deine Einheiten einfach.</p></details>
   <details><summary>Was ist, wenn mein Baby früher kommt?</summary><p>Dann nutzt du die offenen Einheiten einfach nach der Geburt. Nichts verfällt, die Pakete gelten bis 6 Monate nach der Geburt.</p></details>
-<?php if ($online): ?>
+<div class="m-online">
   <details><summary>Wie läuft eine Online-Einheit ab?</summary><p>Wir treffen uns live per Video: Du tippst einfach auf den Link aus deiner Terminbestätigung. Ich sehe dich, leite dich an und korrigiere dich, genau wie im Studio.</p></details>
   <details><summary>Was brauche ich dafür?</summary><p>Eine Matte, etwas Platz zum Liegen und dein Handy, Tablet oder Laptop. Stell es am besten so auf, dass ich dich ganz sehe. Ein Kissen und ein Handtuch sind praktisch.</p></details>
   <details><summary>Darf mein Baby dabei sein?</summary><p>Ja, sehr gern. Nach der Geburt bleibt dein Baby einfach bei dir, wir passen die Einheit an euren Rhythmus an.</p></details>
-<?php else: ?>
+</div><div class="m-studio">
   <details><summary>Darf mein Baby mitkommen?</summary><p>Ja, sehr gern. Nach der Geburt kommt dein Baby einfach mit, wir passen die Einheit an euren Rhythmus an.</p></details>
   <details><summary>Was soll ich mitbringen?</summary><p>Bequeme Kleidung, eine Flasche Wasser und gern ein Handtuch. Matten und alles andere habe ich im Studio.</p></details>
-<?php endif; ?>
+</div>
   <details><summary>Ich muss einen Termin verschieben. Was nun?</summary><p>Gib mir bitte so bald wie möglich Bescheid, am besten bis 24 Stunden vorher. Wenn das Baby oder die Gesundheit dazwischenkommt, finden wir immer eine Lösung.</p></details>
 </section>
 </main>
@@ -545,7 +570,7 @@ footer summary{cursor:pointer}
       const d = Object.fromEntries(new FormData(form));
       if (!pick || !slot) { err.textContent = 'Bitte wähl Tag und Uhrzeit.'; err.hidden = false; return; }
       if (!d.name || !d.email || !d.consent) { err.textContent = 'Bitte gib Name und E-Mail an und bestätige das Häkchen.'; err.hidden = false; return; }
-      Object.assign(d, {action: 'call', date: pick, slot: slot, t: loadedK, a: OFFER, mode: <?= json_encode($online ? 'online' : 'studio') ?>});
+      Object.assign(d, {action: 'call', date: pick, slot: slot, t: loadedK, a: OFFER, mode: document.body.dataset.mode || 'studio'});
       btn.disabled = true; btn.textContent = 'Einen Moment …';
       const j = await post(d);
       if (j.ok) {
@@ -576,6 +601,19 @@ footer summary{cursor:pointer}
       btn.textContent = 'Weiter zur Zahlung · ' + euro(+p.dataset.cents);
     }
     document.querySelectorAll('input[name=package]').forEach(r => r.addEventListener('change', () => { cal.trim(); sum(); }));
+    // Umschalter Studio / Online: gleiches Paket in der anderen Variante wählen, Preise sofort sichtbar
+    function setMode(m) {
+      if (document.body.dataset.mode === m) return;
+      const base = cur().value.replace(/^o_/, '');
+      document.body.dataset.mode = m;
+      document.querySelectorAll('.modes button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
+      const next = document.querySelector('input[name=package][value="' + (m === 'online' ? 'o_' : '') + base + '"]');
+      if (next) next.checked = true;
+      document.querySelector('.tag-mode') && (document.querySelector('.tag-mode').textContent = m === 'online' ? 'online' : 'im Studio');
+      try { const u = new URL(location.href); u.searchParams.set('m', m); history.replaceState(null, '', u); } catch (e) {}
+      cal.trim(); sum();
+    }
+    document.querySelectorAll('.modes button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
     sum();
     f.addEventListener('submit', async e => {
       e.preventDefault(); err.hidden = true;

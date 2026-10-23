@@ -25,7 +25,7 @@ if ($action === 'mm_natal_offer') {
     $name = forma_clean((string)($_POST['name'] ?? ''), 80);
     $note = trim(mb_substr((string)($_POST['note'] ?? ''), 0, 600));
     if (mb_strlen($name) < 2) go($nBack . '#angebot', 'Bitte gib den Namen ein.');
-    $mode = in_array($_POST['mode'] ?? '', ['studio', 'online', 'beide'], true) ? (string)$_POST['mode'] : 'studio';
+    $mode = ($_POST['mode'] ?? '') === 'online' ? 'online' : 'studio';
     $email = trim((string)($_POST['email'] ?? ''));
     if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) go($nBack . '#angebot', 'Die E-Mail-Adresse stimmt nicht ganz. Bitte nochmal prüfen.');
     $grp = $mode === 'beide' ? bin2hex(random_bytes(6)) : '';
@@ -274,8 +274,8 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
 
         <h2 id="angebot">Angebot verschicken</h2>
         <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_offer">
-            <p class="small muted">Du bekommst einen persönlichen Link: Die Seite begrüßt sie mit Namen, ihr Name ist beim Buchen schon eingetragen. Die fertige Nachricht kannst du kopieren oder direkt per WhatsApp schicken.</p>
-            <div class="stack"><label>Variante</label><div class="wdays"><label class="check"><input type="radio" name="mode" value="studio" checked> 1:1 im Studio</label><label class="check"><input type="radio" name="mode" value="online"> Online per Video</label><label class="check"><input type="radio" name="mode" value="beide"> Beides</label></div></div>
+            <p class="small muted">Du bekommst einen persönlichen Link zu einer Seite mit Studio und Online: Die Seite begrüßt sie mit Namen, ihr Name ist beim Buchen schon eingetragen. Die fertige Nachricht kannst du kopieren oder direkt per WhatsApp schicken.</p>
+            <div class="stack"><label>Die Seite zeigt zuerst</label><div class="wdays"><label class="check"><input type="radio" name="mode" value="studio" checked> Im Studio</label><label class="check"><input type="radio" name="mode" value="online"> Online</label></div><span class="small muted">Sie kann oben jederzeit zwischen Studio und Online wechseln und sieht beide Preise.</span></div>
             <div class="row"><div class="stack"><label for="nsal">Anrede</label><select id="nsal" name="salutation"><option>Liebe</option><option>Lieber</option><option>Hallo</option></select></div>
                 <div class="stack"><label for="nnm">Vorname</label><input id="nnm" name="name" required maxlength="80" placeholder="z. B. Anna"></div></div>
             <label for="nem">E-Mail (optional, dann kannst du das Angebot auch als schöne Mail mit den Flyern schicken)</label><input id="nem" name="email" type="email" maxlength="160" placeholder="name@beispiel.at">
@@ -291,7 +291,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             $isNew = in_array($newId, array_map(fn($r) => (int)$r['id'], $grpRows), true);
             $msg = natal_offer_message($a, $grpRows); ?>
             <div class="card stack<?= $isNew ? ' is-new' : '' ?>">
-                <div class="booking-head"><strong><?= forma_h($a['salutation'] . ' ' . $a['name']) ?> <span class="chip"><?= count($grpRows) > 1 ? 'Studio + online' : (($a['mode'] ?? 'studio') === 'online' ? 'online' : 'Studio') ?></span></strong><span class="muted small">erstellt <?= forma_h(date('d. m.', strtotime((string)$a['created_at']))) ?> · <?= (int)$a['booked'] ? '<span class="chip ok">gebucht</span>' : ($a['opened_at'] ? 'angesehen am ' . forma_h(date('d. m., H:i', strtotime((string)$a['opened_at']))) : 'noch nicht geöffnet') ?></span></div>
+                <div class="booking-head"><strong><?= forma_h($a['salutation'] . ' ' . $a['name']) ?> <span class="chip">Studio + online</span></strong><span class="muted small">erstellt <?= forma_h(date('d. m.', strtotime((string)$a['created_at']))) ?> · <?= (int)$a['booked'] ? '<span class="chip ok">gebucht</span>' : ($a['opened_at'] ? 'angesehen am ' . forma_h(date('d. m., H:i', strtotime((string)$a['opened_at']))) : 'noch nicht geöffnet') ?></span></div>
                 <?php if ($isNew): ?><textarea class="msg" readonly><?= forma_h($msg) ?></textarea><?php endif; ?>
                 <?php if ((string)($a['email'] ?? '') !== ''): ?>
                 <div class="acts" style="padding:10px 12px;border-radius:12px;background:#EEF0E8"><span class="small">✉ <?= forma_h($a['email']) ?><?= $a['mailed_at'] ? ' · <b>Mail verschickt am ' . forma_h(date('d. m., H:i', strtotime((string)$a['mailed_at']))) . '</b>' : '' ?></span>
