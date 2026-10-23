@@ -10,7 +10,15 @@ $pdo = forma_db();
 natal_schema($pdo);
 $h = 'forma_h';
 
+require dirname(__DIR__, 3) . '/api/natal-prompter.inc.php';
 $room = natal_room_resolve($pdo, (string)($_GET['r'] ?? ''), (string)($_GET['k'] ?? ''));
+// Teleprompter speichern (nur Gastgeberinnen-Link)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json');
+    if (!$room || !$room['host']) { http_response_code(403); echo '{"ok":false}'; exit; }
+    natal_prompter_save(json_decode((string)file_get_contents('php://input'), true) ?: []);
+    echo '{"ok":true}'; exit;
+}
 $now = time();
 $state = 'invalid';
 $src = '';
@@ -35,6 +43,14 @@ if ($room) {
     }
 }
 $first = $room ? forma_first_name($room['name']) : '';
+$prompter = null;
+if ($room && $room['host']) {
+    $pc = natal_prompter_cfg();
+    $defs = natal_script_defaults();
+    $scripts = [];
+    foreach (NATAL_SCRIPT_TITLES as $sk => $st) $scripts[$sk] = ['title' => $st, 'text' => (string)($pc['texts'][$sk] ?? $defs[$sk] ?? ''), 'def' => (string)($defs[$sk] ?? ''), 'own' => isset($pc['texts'][$sk])];
+    $prompter = ['scripts' => $scripts, 'key' => natal_script_key($pdo, $room), 'speed' => $pc['speed'], 'size' => $pc['size'], 'name' => $first];
+}
 // Kleine Nachrichten für die Wartezeit, im Wechsel: Tipp, Affirmation, Baby (Vivien, 23.10.2026)
 $tips = $room && $room['kind'] === 's' ? [
     'Hol dir noch einen Tee oder ein Glas warmes Wasser.',
@@ -138,6 +154,25 @@ a{color:var(--plum)}
 @media(max-width:1099px){.float{display:none}}
 .bar .tick{flex:1;text-align:center;font-family:var(--serif);font-size:1.1rem;color:var(--plum);transition:opacity .8s;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:820px){.bar .tick{display:none}}
+/* Teleprompter (nur Vivien) */
+.tp{background:var(--deep);color:#F6EFF1;border-bottom:1px solid #2c2227;display:flex;flex-direction:column}
+.tp.min .tp-view,.tp.min .tp-edit{display:none}
+.tp-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px clamp(10px,2vw,20px);background:#3d3036}
+.tp-ctl b{font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-right:4px}
+.tp-ctl select,.tp-ctl button{font:inherit;font-size:.85rem;border-radius:999px;border:1px solid #6b5a62;background:#4A3A41;color:#F6EFF1;padding:.38rem .8rem;cursor:pointer}
+.tp-ctl select{max-width:min(320px,60vw)}
+.tp-ctl button.on{background:var(--plum);border-color:var(--plum)}
+.tp-ctl .sp{font-size:.8rem;opacity:.75;min-width:3.2em;text-align:center}
+.tp-ctl .rt{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.tp-view{position:relative;height:clamp(140px,28vh,320px);overflow:hidden;cursor:pointer}
+.tp-view:before{content:"";position:absolute;left:0;right:0;top:34%;height:2.2em;background:rgba(234,223,222,.08);border-top:1px solid rgba(234,223,222,.18);border-bottom:1px solid rgba(234,223,222,.18);pointer-events:none;z-index:1}
+.tp-view:after{content:"";position:absolute;inset:0;background:linear-gradient(#4A3A41,transparent 18%,transparent 78%,#4A3A41);pointer-events:none;z-index:2}
+.tp-text{position:absolute;left:0;right:0;padding:0 clamp(16px,6vw,90px);white-space:pre-wrap;line-height:1.45;font-family:var(--sans);will-change:transform}
+.tp-text .h{display:block;font-size:.55em;letter-spacing:.06em;color:#C9B4BB;margin-top:.6em}
+.tp-edit{display:none;padding:10px clamp(10px,2vw,20px) 12px}
+.tp.editing .tp-view{display:none}.tp.editing .tp-edit{display:block}
+.tp-edit textarea{width:100%;min-height:220px;border-radius:14px;border:0;padding:12px 14px;font:inherit;font-size:.95rem;line-height:1.5;background:#F6EFF1;color:var(--ink)}
+.tp-edit p{font-size:.8rem;opacity:.75;margin:.4rem 0 0}
 /* Raum */
 .room{height:100%;display:flex;flex-direction:column;background:var(--deep)}
 .bar{display:flex;align-items:center;gap:14px;padding:10px clamp(12px,3vw,24px);background:var(--bg);border-bottom:1px solid var(--line)}
@@ -157,6 +192,20 @@ a{color:var(--plum)}
     <span class="t"><b><?= $h($room['title']) ?><?= $room['host'] ? ' · ' . $h($first) : '' ?></b><span><?= $h($when) ?> · <?= $h($room['sub']) ?></span></span>
     <span class="tick" id="tick" aria-live="polite"></span>
     <span class="clock" id="clock"></span></div>
+  <?php if ($prompter): ?>
+  <div class="tp" id="tp">
+    <div class="tp-ctl"><b>Teleprompter</b>
+      <select id="tpSel" aria-label="Skript"><?php foreach ($prompter['scripts'] as $sk => $sc): ?><option value="<?= $h($sk) ?>"<?= $sk === $prompter['key'] ? ' selected' : '' ?>><?= $h($sc['title']) ?></option><?php endforeach; ?></select>
+      <button type="button" id="tpPlay">▶ Start</button>
+      <button type="button" id="tpTop" title="Zum Anfang">⟲</button>
+      <button type="button" data-sp="-1" title="langsamer">−</button><span class="sp" id="tpSp"></span><button type="button" data-sp="1" title="schneller">+</button>
+      <button type="button" data-sz="-1" title="Schrift kleiner">A−</button><button type="button" data-sz="1" title="Schrift größer">A+</button>
+      <span class="rt"><button type="button" id="tpEd">✎ Bearbeiten</button><button type="button" id="tpMin">▾ Einklappen</button></span>
+    </div>
+    <div class="tp-view" id="tpView"><div class="tp-text" id="tpText"></div></div>
+    <div class="tp-edit"><textarea id="tpArea" spellcheck="true"></textarea><p>Wird automatisch gespeichert. {name} wird durch ihren Vornamen ersetzt, Zeilen in [eckigen Klammern] erscheinen klein als Hinweis. <button type="button" id="tpReset" style="font:inherit;background:none;border:0;color:#EADFDE;text-decoration:underline;cursor:pointer">Vorlage wiederherstellen</button></p></div>
+  </div>
+  <?php endif; ?>
   <div class="frame"><iframe src="<?= $h($src) ?>" allow="camera; microphone; fullscreen; speaker; display-capture; autoplay; compute-pressure" title="Movecia Videoraum"></iframe></div>
 </div>
 <script>
@@ -167,6 +216,35 @@ const N=<?= json_encode($notes, JSON_UNESCAPED_UNICODE) ?>,k=document.getElement
 function nx(){if(!N.length||Date.now()>=s){k.style.opacity=0;return;}k.style.opacity=0;setTimeout(()=>{k.textContent=N[i%N.length][1];k.style.opacity=1;i++;},800);}
 nx();setInterval(nx,9000);})();
 </script>
+<?php if ($prompter): ?>
+<script>
+(function(){
+const P=<?= json_encode($prompter, JSON_UNESCAPED_UNICODE) ?>;
+const tp=document.getElementById('tp'),sel=document.getElementById('tpSel'),view=document.getElementById('tpView'),txt=document.getElementById('tpText'),area=document.getElementById('tpArea'),play=document.getElementById('tpPlay'),spEl=document.getElementById('tpSp');
+let key=P.key,speed=P.speed,size=P.size,y=0,run=false,last=0,saveT=null;
+const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function render(){const t=P.scripts[key].text.replace(/\{name\}/g,P.name);
+ txt.innerHTML=esc(t).replace(/\[([^\]\n]*)\]/g,'<span class="h">$1</span>');txt.style.fontSize=size+'px';spEl.textContent=speed.toFixed(1)+'×';place();}
+function place(){txt.style.transform='translateY('+(view.clientHeight*0.34-y)+'px)';}
+function toTop(){y=0;place();}
+function loop(t){if(run){const dt=last?(t-last)/1000:0;y+=dt*speed*size*0.9;const max=txt.scrollHeight;if(y>max){y=max;stop();}place();}last=t;requestAnimationFrame(loop);}
+function start(){run=true;play.textContent='❚❚ Pause';play.classList.add('on');}
+function stop(){run=false;play.textContent='▶ Start';play.classList.remove('on');}
+function save(o){fetch(location.href,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(o)}).catch(()=>{});}
+play.onclick=()=>run?stop():start();view.onclick=()=>run?stop():start();
+document.getElementById('tpTop').onclick=()=>{stop();toTop();};
+document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{speed=Math.max(.2,Math.min(6,Math.round((speed+(+b.dataset.sp)*.2)*10)/10));render();save({speed});});
+document.querySelectorAll('[data-sz]').forEach(b=>b.onclick=()=>{size=Math.max(16,Math.min(64,size+(+b.dataset.sz)*3));render();save({size});});
+sel.onchange=()=>{key=sel.value;stop();toTop();area.value=P.scripts[key].text;render();};
+document.getElementById('tpEd').onclick=e=>{const on=tp.classList.toggle('editing');e.target.textContent=on?'✓ Fertig':'✎ Bearbeiten';if(on){stop();area.value=P.scripts[key].text;area.focus();}else render();};
+area.oninput=()=>{P.scripts[key].text=area.value;clearTimeout(saveT);saveT=setTimeout(()=>save({key,text:area.value}),700);};
+document.getElementById('tpReset').onclick=()=>{if(!confirm('Deine Änderungen an diesem Skript verwerfen und die Vorlage laden?'))return;P.scripts[key].text=P.scripts[key].def;area.value=P.scripts[key].def;save({reset:key});};
+document.getElementById('tpMin').onclick=e=>{const m=tp.classList.toggle('min');e.target.textContent=m?'▴ Aufklappen':'▾ Einklappen';};
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&document.activeElement!==area&&document.activeElement.tagName!=='SELECT'){e.preventDefault();run?stop():start();}});
+addEventListener('resize',place);render();requestAnimationFrame(loop);
+})();
+</script>
+<?php endif; ?>
 <?php else: ?>
 <div class="wait"><span class="blob b1"></span><span class="blob b2"></span>
   <div class="card">
