@@ -25,7 +25,8 @@ if ($action === 'mm_natal_offer') {
     $name = forma_clean((string)($_POST['name'] ?? ''), 80);
     $note = trim(mb_substr((string)($_POST['note'] ?? ''), 0, 600));
     if (mb_strlen($name) < 2) go($nBack . '#angebot', 'Bitte gib den Namen ein.');
-    $pdo->prepare('INSERT INTO mm_natal_offers (salutation, name, note, token, created_at) VALUES (?,?,?,?,?)')->execute([$sal, $name, $note, bin2hex(random_bytes(10)), date('c')]);
+    $mode = ($_POST['mode'] ?? '') === 'online' ? 'online' : 'studio';
+    $pdo->prepare('INSERT INTO mm_natal_offers (salutation, name, note, token, mode, created_at) VALUES (?,?,?,?,?,?)')->execute([$sal, $name, $note, bin2hex(random_bytes(10)), $mode, date('c')]);
     go($nBack . '&neu=' . (int)$pdo->lastInsertId() . '#angebot', 'Das Angebot für ' . $name . ' ist fertig. Kopier die Nachricht oder schick sie direkt per WhatsApp.');
 }
 if ($action === 'mm_natal_offer_del') {
@@ -70,6 +71,8 @@ if ($action === 'mm_natal_settings') {
     $n = trim((string)($_POST['notify'] ?? ''));
     $cfg['notify'] = filter_var($n, FILTER_VALIDATE_EMAIL) ? $n : '';
     foreach (['bank' => 60, 'iban' => 40, 'bic' => 15] as $f => $max) $cfg[$f] = forma_clean((string)($_POST[$f] ?? ''), $max);
+    $room = trim((string)($_POST['room'] ?? ''));
+    $cfg['room'] = preg_match('#^https://\S+$#', $room) ? mb_substr($room, 0, 300) : '';
     mm_save_cfg('natal', $cfg);
     go($nBack . '#einstellungen', 'Gespeichert.');
 }
@@ -142,7 +145,8 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <span class="st"><b><?= forma_h(forma_euro($revenue)) ?></b><span>Umsatz brutto</span></span>
         </div>
         <div class="nl">
-            <a href="<?= forma_h(mm_site()) ?>/natal/" target="_blank" rel="noopener">Angebotsseite ansehen</a>
+            <a href="<?= forma_h(mm_site()) ?>/natal/" target="_blank" rel="noopener">Seite Studio</a>
+            <a href="<?= forma_h(mm_site()) ?>/natal/online/" target="_blank" rel="noopener">Seite Online</a>
             <a href="#angebot">Angebot verschicken</a>
             <a href="<?= forma_h($self) ?>?view=rechnungen">Rechnungen</a>
             <a href="#einstellungen">Preise &amp; Einstellungen</a>
@@ -220,16 +224,17 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
         <h2 id="angebot">Angebot verschicken</h2>
         <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_offer">
             <p class="small muted">Du bekommst einen persönlichen Link: Die Seite begrüßt sie mit Namen, ihr Name ist beim Buchen schon eingetragen. Die fertige Nachricht kannst du kopieren oder direkt per WhatsApp schicken.</p>
+            <div class="stack"><label>Variante</label><div class="wdays"><label class="check"><input type="radio" name="mode" value="studio" checked> 1:1 im Studio</label><label class="check"><input type="radio" name="mode" value="online"> Online per Video</label></div></div>
             <div class="row"><div class="stack"><label for="nsal">Anrede</label><select id="nsal" name="salutation"><option>Liebe</option><option>Lieber</option><option>Hallo</option></select></div>
                 <div class="stack"><label for="nnm">Vorname</label><input id="nnm" name="name" required maxlength="80" placeholder="z. B. Anna"></div></div>
             <label for="nnt">Persönliche Zeile auf der Seite (optional)</label><textarea id="nnt" name="note" rows="2" maxlength="600" placeholder="z. B. Wie besprochen starten wir mit einer Einheit pro Woche bis zur Geburt."></textarea>
             <button class="btn" type="submit">Angebot erstellen</button>
         </form>
-        <p class="small muted" style="margin:10px 0">Allgemeiner Link ohne Namen (z. B. für Instagram oder den Flyer): <span class="sel"><?= forma_h(mm_site()) ?>/natal/</span> <button type="button" class="link small" data-copy="<?= forma_h(mm_site()) ?>/natal/">kopieren</button></p>
+        <p class="small muted" style="margin:10px 0">Allgemeine Links ohne Namen (nicht verlinkt, nur wer den Link hat, sieht die Seite):<br>Studio: <span class="sel"><?= forma_h(mm_site()) ?>/natal/</span> <button type="button" class="link small" data-copy="<?= forma_h(mm_site()) ?>/natal/">kopieren</button><br>Online: <span class="sel"><?= forma_h(mm_site()) ?>/natal/online/</span> <button type="button" class="link small" data-copy="<?= forma_h(mm_site()) ?>/natal/online/">kopieren</button></p>
         <div class="list">
         <?php foreach ($offers as $a): $msg = natal_offer_message($a); ?>
             <div class="card stack<?= $newId === (int)$a['id'] ? ' is-new' : '' ?>">
-                <div class="booking-head"><strong><?= forma_h($a['salutation'] . ' ' . $a['name']) ?></strong><span class="muted small">erstellt <?= forma_h(date('d. m.', strtotime((string)$a['created_at']))) ?> · <?= (int)$a['booked'] ? '<span class="chip ok">gebucht</span>' : ($a['opened_at'] ? 'angesehen am ' . forma_h(date('d. m., H:i', strtotime((string)$a['opened_at']))) : 'noch nicht geöffnet') ?></span></div>
+                <div class="booking-head"><strong><?= forma_h($a['salutation'] . ' ' . $a['name']) ?> <span class="chip"><?= ($a['mode'] ?? 'studio') === 'online' ? 'online' : 'Studio' ?></span></strong><span class="muted small">erstellt <?= forma_h(date('d. m.', strtotime((string)$a['created_at']))) ?> · <?= (int)$a['booked'] ? '<span class="chip ok">gebucht</span>' : ($a['opened_at'] ? 'angesehen am ' . forma_h(date('d. m., H:i', strtotime((string)$a['opened_at']))) : 'noch nicht geöffnet') ?></span></div>
                 <?php if ($newId === (int)$a['id']): ?><textarea class="msg" readonly><?= forma_h($msg) ?></textarea><?php endif; ?>
                 <div class="acts"><button type="button" class="btn btn-sm" data-copy="<?= forma_h($msg) ?>">Nachricht kopieren</button>
                     <a class="btn btn-ghost btn-sm" href="https://wa.me/?text=<?= rawurlencode($msg) ?>" target="_blank" rel="noopener">Per WhatsApp schicken</a>
@@ -245,6 +250,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <p class="small muted">Preise brutto inkl. 20 % USt. Gilt für neue Buchungen, bereits bezahlte Pakete bleiben, wie sie sind.</p>
             <div class="row"><?php foreach ($packs as $k => $p): ?><div class="stack"><label for="np<?= $k ?>"><?= forma_h($p['title']) ?> (<?= (int)$p['units'] ?> × 60 Min.) in €</label><input id="np<?= $k ?>" name="price[<?= $k ?>]" inputmode="decimal" value="<?= $eu($p['cents']) ?>"><span class="small muted">= <?= forma_h(forma_euro($p['unit_cents'])) ?> pro Einheit</span></div><?php endforeach; ?></div>
             <fieldset class="days"><legend>An diesen Tagen dürfen Wunschtermine gewählt werden</legend><div class="wdays"><?php foreach (NATAL_WEEKDAYS as $n => $l): ?><label class="check"><input type="checkbox" name="weekdays[]" value="<?= $n ?>"<?= in_array($n, natal_weekdays(), true) ? ' checked' : '' ?>> <?= $l ?></label><?php endforeach; ?></div></fieldset>
+            <label for="nrm">Link zu deinem Online-Videoraum (z. B. dein Whereby-Raum), steht in jeder Online-Terminbestätigung</label><input id="nrm" name="room" type="url" value="<?= forma_h((string)($cfg['room'] ?? '')) ?>" placeholder="https://whereby.com/…">
             <label for="nno">Benachrichtigungen an</label><input id="nno" name="notify" type="email" value="<?= forma_h((string)($cfg['notify'] ?? '')) ?>" placeholder="<?= forma_h(MM_FROM_EMAIL) ?>">
             <p class="small muted" style="margin-top:6px">Bankverbindung in der Fußzeile der Rechnung (bleibt nur hier gespeichert, nicht auf der Website):</p>
             <div class="row"><div class="stack"><label for="nbk">Bank</label><input id="nbk" name="bank" value="<?= forma_h((string)($cfg['bank'] ?? '')) ?>" placeholder="BAWAG"></div><div class="stack"><label for="nbi">BIC</label><input id="nbi" name="bic" value="<?= forma_h((string)($cfg['bic'] ?? '')) ?>"></div></div>

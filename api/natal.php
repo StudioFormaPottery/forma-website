@@ -10,7 +10,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'GET' && isset($_GET['ics'])) {
     if (!$o) { http_response_code(404); exit('Nicht gefunden.'); }
     header('Content-Type: text/calendar; charset=utf-8');
     header('Content-Disposition: attachment; filename="Movecia-Termine.ics"');
-    echo natal_ics(natal_sessions($pdo, (int)$o['id']));
+    echo natal_ics(natal_sessions($pdo, (int)$o['id']), '', natal_is_online($o));
     exit;
 }
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') forma_json(['ok' => false, 'error' => 'Ungültige Anfrage.'], 405);

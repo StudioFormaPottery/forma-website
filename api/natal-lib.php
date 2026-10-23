@@ -34,9 +34,12 @@ function natal_schema(PDO $pdo): void
         name TEXT NOT NULL,
         note TEXT NOT NULL DEFAULT \'\',
         token TEXT NOT NULL UNIQUE,
+        mode TEXT NOT NULL DEFAULT \'studio\',
         opened_at TEXT,
         created_at TEXT NOT NULL
     )');
+    $oc = array_column($pdo->query('PRAGMA table_info(mm_natal_offers)')->fetchAll(), 'name');
+    if ($oc && !in_array('mode', $oc, true)) $pdo->exec("ALTER TABLE mm_natal_offers ADD COLUMN mode TEXT NOT NULL DEFAULT 'studio'");
     $pdo->exec('CREATE TABLE IF NOT EXISTS mm_natal_orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         offer_id INTEGER,
@@ -89,13 +92,38 @@ function natal_packages(): array
         'prae' => ['title' => 'Pränatal-Paket', 'units' => 6, 'cents' => 34200, 'sub' => '6 Einheiten bis zur Geburt', 'tag' => ''],
         'post' => ['title' => 'Postnatal-Paket', 'units' => 8, 'cents' => 43200, 'sub' => '8 Einheiten nach der Geburt', 'tag' => ''],
         'kombi' => ['title' => 'Kombi-Paket', 'units' => 14, 'cents' => 72800, 'sub' => '6 Einheiten vor und 8 nach der Geburt', 'tag' => 'Bestpreis'],
+        // Online live per Video (Vorschlag 23.10.2026, ca. 13–15 % unter dem Studio, in der Verwaltung änderbar)
+        'o_einzel' => ['title' => 'Einzelstunde online', 'units' => 1, 'cents' => 6500, 'sub' => '60 Minuten, 1:1 live per Video', 'tag' => ''],
+        'o_prae' => ['title' => 'Pränatal-Paket online', 'units' => 6, 'cents' => 29400, 'sub' => '6 Einheiten bis zur Geburt', 'tag' => ''],
+        'o_post' => ['title' => 'Postnatal-Paket online', 'units' => 8, 'cents' => 36800, 'sub' => '8 Einheiten nach der Geburt', 'tag' => ''],
+        'o_kombi' => ['title' => 'Kombi-Paket online', 'units' => 14, 'cents' => 61600, 'sub' => '6 Einheiten vor und 8 nach der Geburt', 'tag' => 'Bestpreis'],
     ];
+    foreach ($p as $k => $x) $p[$k]['mode'] = str_starts_with($k, 'o_') ? 'online' : 'studio';
     foreach ((natal_cfg()['prices'] ?? []) as $k => $c) if (isset($p[$k]) && (int)$c > 0) $p[$k]['cents'] = (int)$c;
     foreach ($p as $k => $x) $p[$k]['unit_cents'] = (int)round($x['cents'] / $x['units']);
     return $p;
 }
 
 /** Wochentage, an denen Wunschtermine möglich sind (1 = Mo … 7 = So). */
+/** Pakete einer Variante (studio oder online). */
+function natal_packages_for(string $mode): array
+{
+    return array_filter(natal_packages(), fn($p) => $p['mode'] === $mode);
+}
+
+function natal_is_online(array $o): bool
+{
+    return str_starts_with((string)($o['package'] ?? ''), 'o_');
+}
+
+/** Wo die Einheit stattfindet: Studio-Adresse oder Videoraum. */
+function natal_place(bool $online): string
+{
+    if (!$online) return 'Movecia Studio, ' . NATAL_COMPANY['street'] . ', ' . NATAL_COMPANY['city'];
+    $room = trim((string)(natal_cfg()['room'] ?? ''));
+    return $room !== '' ? 'Online per Video: ' . $room : 'Online per Video (den Link bekommst du vor dem Termin)';
+}
+
 function natal_weekdays(): array
 {
     $w = natal_cfg()['weekdays'] ?? [1, 2, 3, 4, 5];
@@ -149,7 +177,7 @@ function natal_link(array $o): string
 
 function natal_offer_link(array $a): string
 {
-    return mm_site() . '/natal/?a=' . $a['token'];
+    return mm_site() . (($a['mode'] ?? 'studio') === 'online' ? '/natal/online/' : '/natal/') . '?a=' . $a['token'];
 }
 
 function natal_admin_link(): string
@@ -248,7 +276,7 @@ function natal_mail(string $to, string $subject, string $title, array $paras, ?a
 
 // --- Kalender ------------------------------------------------------------------------------
 
-function natal_ics(array $sessions, string $who = ''): string
+function natal_ics(array $sessions, string $who = '', bool $online = false): string
 {
     $tz = new DateTimeZone('Europe/Vienna');
     $f = fn(DateTime $d) => (clone $d)->setTimezone(new DateTimeZone('UTC'))->format('Ymd\THis\Z');
@@ -259,20 +287,20 @@ function natal_ics(array $sessions, string $who = ''): string
         $from = new DateTime($s['date'] . ' ' . $s['start'], $tz);
         $to = (clone $from)->modify('+' . (int)$s['minutes'] . ' minutes');
         $out .= "BEGIN:VEVENT\r\nUID:natal-{$s['id']}@moveciamovement.com\r\nDTSTAMP:" . $f(new DateTime('now', $tz)) . "\r\nDTSTART:" . $f($from) . "\r\nDTEND:" . $f($to) . "\r\n"
-            . 'SUMMARY:' . $esc('Movecia · Prä-/Postnatal Training' . ($who !== '' ? ' · ' . $who : '')) . "\r\nLOCATION:" . $esc('Movecia Studio, ' . NATAL_COMPANY['street'] . ', ' . NATAL_COMPANY['city'])
-            . "\r\nDESCRIPTION:" . $esc('1:1 mit Vivien. Bequeme Kleidung, eine Flasche Wasser und gern ein Handtuch mitbringen. Bei Fragen: ' . NATAL_COMPANY['phone']) . "\r\nEND:VEVENT\r\n";
+            . 'SUMMARY:' . $esc('Movecia · Prä-/Postnatal Training' . ($online ? ' online' : '') . ($who !== '' ? ' · ' . $who : '')) . "\r\nLOCATION:" . $esc(natal_place($online))
+            . "\r\nDESCRIPTION:" . $esc(($online ? '1:1 live per Video mit Vivien. Matte, etwas Platz und Handy oder Laptop bereitlegen.' : '1:1 mit Vivien. Bequeme Kleidung, eine Flasche Wasser und gern ein Handtuch mitbringen.') . ' Bei Fragen: ' . NATAL_COMPANY['phone']) . "\r\nEND:VEVENT\r\n";
     }
     return $out . "END:VCALENDAR\r\n";
 }
 
-function natal_gcal(array $s): string
+function natal_gcal(array $s, bool $online = false): string
 {
     $tz = new DateTimeZone('Europe/Vienna');
     $from = new DateTime($s['date'] . ' ' . $s['start'], $tz);
     $to = (clone $from)->modify('+' . (int)$s['minutes'] . ' minutes');
     $f = fn(DateTime $d) => (clone $d)->setTimezone(new DateTimeZone('UTC'))->format('Ymd\THis\Z');
     return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' . rawurlencode('Movecia · Prä-/Postnatal Training') . '&dates=' . $f($from) . '/' . $f($to)
-        . '&location=' . rawurlencode('Movecia Studio, ' . NATAL_COMPANY['street'] . ', ' . NATAL_COMPANY['city']) . '&details=' . rawurlencode('1:1 mit Vivien');
+        . '&location=' . rawurlencode(natal_place($online)) . '&details=' . rawurlencode('1:1 mit Vivien');
 }
 
 // --- Stripe --------------------------------------------------------------------------------
@@ -292,7 +320,7 @@ function natal_checkout(PDO $pdo, array $o): string
             'quantity' => (int)$o['units'],
             'price_data' => ['currency' => 'eur', 'unit_amount' => (int)$o['unit_cents'], 'product_data' => [
                 'name' => 'Movecia · Prä-/Postnatal Training – ' . $o['title'],
-                'description' => ((int)$o['units'] === 1 ? '1 Einheit' : $o['units'] . ' Einheiten') . ' à 60 Min., 1:1 im Movecia Studio · Leistung von Movecia – Personal Fitness (Vivien Malonga)',
+                'description' => ((int)$o['units'] === 1 ? '1 Einheit' : $o['units'] . ' Einheiten') . ' à 60 Min., ' . (natal_is_online($o) ? '1:1 live per Video' : '1:1 im Movecia Studio') . ' · Leistung von Movecia – Personal Fitness (Vivien Malonga)',
             ]],
         ]],
         'payment_intent_data' => ['description' => 'Movecia · Prä-/Postnatal ' . $o['title'] . ' · ' . $o['name'], 'metadata' => ['bereich' => 'Movecia', 'natal_order_id' => (string)$o['id']]],
@@ -350,7 +378,9 @@ function natal_paid_mails(PDO $pdo, array $o, array $wishes): void
     $paras[] = $wl
         ? "Deine Wunschtermine habe ich bekommen:\n– " . implode("\n– ", $wl) . "\n\nIch schaue sie mir an und bestätige dir jeden Termin mit Uhrzeit per E-Mail."
         : 'Deine Termine wählst du ganz einfach über deine persönliche Seite aus. Ich bestätige dir jeden Termin mit Uhrzeit per E-Mail.';
-    $paras[] = 'Bitte sprich das Training vorher mit deiner Ärztin oder Hebamme ab. Komm in bequemer Kleidung und bring eine Flasche Wasser mit. Matten und alles andere habe ich im Studio.';
+    $paras[] = natal_is_online($o)
+        ? 'Bitte sprich das Training vorher mit deiner Ärztin oder Hebamme ab. Für unsere Online-Einheiten brauchst du nur eine Matte, etwas Platz und dein Handy oder Laptop, am besten so aufgestellt, dass ich dich ganz sehe. Den Link zum Videoraum findest du in jeder Terminbestätigung.'
+        : 'Bitte sprich das Training vorher mit deiner Ärztin oder Hebamme ab. Komm in bequemer Kleidung und bring eine Flasche Wasser mit. Matten und alles andere habe ich im Studio.';
     $paras[] = 'Die Rechnung bekommst du in einer eigenen E-Mail. Du hast ein 14-tägiges Rücktrittsrecht. Weil du dir gewünscht hast, dass die Termine schon in dieser Zeit stattfinden können, zahlst du bei einem Rücktritt nur die Einheiten, die schon stattgefunden haben. Rücktritts-Formular: ' . mm_site() . '/withdraw?v=natal';
     natal_mail((string)$o['email'], 'Deine Buchung bei Movecia: ' . $o['title'], 'Schön, dass du dabei bist', $paras, [natal_link($o), 'Meine Termine ansehen']);
 
@@ -415,12 +445,12 @@ function natal_confirm(PDO $pdo, int $sid, string $date, string $time, bool $mai
         $first = forma_first_name((string)$o['name']);
         $left = natal_left($pdo, $o);
         $p = ["Hallo $first,", $moved ? 'an deinem Wunschtag ging es sich leider nicht aus, deshalb habe ich dir diesen Termin eingetragen. Passt er dir nicht, antworte einfach auf diese E-Mail, dann finden wir einen anderen.' : 'dein Termin ist bestätigt. Ich freue mich auf dich!',
-            [natal_when($s), '60 Minuten, 1:1 im Movecia Studio', NATAL_COMPANY['street'] . ', ' . NATAL_COMPANY['city']],
+            natal_is_online($o) ? [natal_when($s), '60 Minuten, 1:1 live per Video', natal_place(true)] : [natal_when($s), '60 Minuten, 1:1 im Movecia Studio', NATAL_COMPANY['street'] . ', ' . NATAL_COMPANY['city']],
             'Mit der angehängten Kalenderdatei übernimmst du den Termin mit einem Tipp in deinen Kalender. Auf deiner persönlichen Seite findest du ihn auch für Google Kalender.',
             'Musst du einen Termin verschieben, gib mir bitte so bald wie möglich Bescheid, am besten bis 24 Stunden vorher. Wenn das Baby dazwischenkommt, finden wir natürlich immer eine Lösung.'];
         if ($left > 0) $p[] = 'Du hast noch ' . ($left === 1 ? '1 Einheit' : "$left Einheiten") . ', die du jederzeit über deine Seite anfragen kannst.';
         natal_mail((string)$o['email'], 'Dein Termin ist bestätigt: ' . natal_when($s), 'Dein Termin steht', $p, [natal_link($o), 'Meine Termine'],
-            [['Movecia-Termin.ics', natal_ics([$s], ''), 'text/calendar; charset=utf-8; method=PUBLISH']]);
+            [['Movecia-Termin.ics', natal_ics([$s], '', natal_is_online($o)), 'text/calendar; charset=utf-8; method=PUBLISH']]);
     }
     return $s;
 }
@@ -444,7 +474,7 @@ function natal_cancel(PDO $pdo, int $sid, string $reason, bool $mail = true): vo
 function natal_offer_message(array $a): string
 {
     $first = trim((string)$a['name']);
-    return trim(($a['salutation'] ?: 'Liebe') . ' ' . $first . ",\n\nwie besprochen schicke ich dir hier mein Angebot für dein Prä- und Postnatal-Training bei mir im Studio. Du siehst alle Pakete und kannst direkt online buchen. Deine Wunschtermine wählst du im Kalender aus, ich bestätige sie dir dann persönlich.\n\n" . natal_offer_link($a) . "\n\nWenn du Fragen hast, schreib mir einfach.\n\nBis bald,\nVivien");
+    return trim(($a['salutation'] ?: 'Liebe') . ' ' . $first . ",\n\nwie besprochen schicke ich dir hier mein Angebot für dein Prä- und Postnatal-Training " . (($a['mode'] ?? 'studio') === 'online' ? 'online, live per Video' : 'bei mir im Studio') . ". Du siehst alle Pakete und kannst direkt online buchen. Deine Wunschtermine wählst du im Kalender aus, ich bestätige sie dir dann persönlich.\n\n" . natal_offer_link($a) . "\n\nWenn du Fragen hast, schreib mir einfach.\n\nBis bald,\nVivien");
 }
 
 // --- Rechnung im Movecia-Design (wird von api/invoices.php aufgerufen) ----------------------
@@ -455,7 +485,7 @@ function natal_invoice_source(PDO $pdo, int $id): ?array
     if (!$o || $o['status'] !== 'bezahlt' || (int)$o['amount_cents'] <= 0) return null;
     $units = (int)$o['units'];
     return ['name' => $o['name'], 'email' => $o['email'], 'session' => (string)$o['stripe_session'], 'service' => 'nach Vereinbarung',
-        'items' => [['text' => 'Prä-/Postnatal Training · ' . $o['title'], 'detail' => ($units === 1 ? '1 Einheit' : $units . ' Einheiten') . ' à 60 Min., 1:1 im Movecia Studio, Mathon · Termine nach Vereinbarung, gültig bis 6 Monate nach der Geburt',
+        'items' => [['text' => 'Prä-/Postnatal Training · ' . $o['title'], 'detail' => ($units === 1 ? '1 Einheit' : $units . ' Einheiten') . ' à 60 Min., ' . (natal_is_online($o) ? '1:1 live online per Video' : '1:1 im Movecia Studio, Mathon') . ' · Termine nach Vereinbarung, gültig bis 6 Monate nach der Geburt',
             'qty' => $units, 'unit' => (int)$o['unit_cents']]],
         'gross' => (int)$o['amount_cents'], 'paid' => $o['paid_at'], 'type' => 'Movecia',
         'pay_note' => 'Der Betrag wurde am ' . date('d.m.Y', strtotime((string)$o['paid_at'])) . ' online bezahlt (Kartenzahlung über Stripe, gemeinsames Konto FORMA & Movecia). Buchungsvermerk: Leistung von Movecia – Personal Fitness.'];

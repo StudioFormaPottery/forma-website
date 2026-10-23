@@ -8,8 +8,6 @@ header('Cache-Control: no-store');
 $pdo = forma_db();
 natal_schema($pdo);
 $h = 'forma_h';
-$packs = natal_packages();
-$single = $packs['einzel']['cents'];
 
 $order = null;
 if (isset($_GET['o'])) {
@@ -23,6 +21,10 @@ if (!$order && ($_GET['a'] ?? '') !== '') {
     $offer = $q->fetch() ?: null;
     if ($offer && !$offer['opened_at']) $pdo->prepare('UPDATE mm_natal_offers SET opened_at = ? WHERE id = ?')->execute([date('c'), $offer['id']]);
 }
+$online = $order ? natal_is_online($order) : ($offer ? ($offer['mode'] ?? 'studio') === 'online' : (($_GET['m'] ?? '') === 'online'));
+$packs = natal_packages_for($online ? 'online' : 'studio');
+$single = $packs[$online ? 'o_einzel' : 'einzel']['cents'];
+$where = $online ? 'live per Video' : 'im Studio';
 $sessions = $order ? natal_sessions($pdo, (int)$order['id']) : [];
 $left = $order ? natal_left($pdo, $order) : 0;
 $taken = array_values(array_map(fn($s) => $s['date'], array_filter($sessions, fn($s) => in_array($s['status'], ['angefragt', 'bestaetigt'], true))));
@@ -34,9 +36,9 @@ $wa = 'https://wa.me/' . preg_replace('/\D/', '', NATAL_COMPANY['phone']);
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title><?= $order ? 'Deine Termine · Movecia' : 'Prä- & Postnatal Training · Movecia' ?></title>
-<meta name="description" content="Prä- und postnatales Training 1:1 bei Vivien im Movecia Studio: sanft, kräftigend und ganz auf dich abgestimmt. Pakete online buchen, Wunschtermine im Kalender wählen.">
-<?php if ($order || $offer): ?><meta name="robots" content="noindex"><?php endif; ?>
+<title><?= $order ? 'Deine Termine · Movecia' : 'Prä- & Postnatal Training' . ($online ? ' online' : '') . ' · Movecia' ?></title>
+<meta name="description" content="Prä- und postnatales Training 1:1 bei Vivien<?= $online ? ', live per Video' : ' im Movecia Studio' ?>: sanft, kräftigend und ganz auf dich abgestimmt.">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#F2ECE4">
 <style>
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:normal;src:url(/fonts/CormorantGaramond-VF.woff) format("woff")}
@@ -202,7 +204,7 @@ footer summary{cursor:pointer}
 </style>
 </head>
 <body>
-<header class="top w"><a class="brand" href="<?= $order ? $h(natal_link($order)) : '#' ?>">Movecia<i></i></a><span class="tag">1:1 im Studio · Prä- &amp; Postnatal</span></header>
+<header class="top w"><a class="brand" href="<?= $order ? $h(natal_link($order)) : '#' ?>">Movecia<i></i></a><span class="tag">1:1 <?= $online ? 'online' : 'im Studio' ?> · Prä- &amp; Postnatal</span></header>
 
 <?php if ($order):
     $first = forma_first_name((string)$order['name']);
@@ -212,7 +214,7 @@ footer summary{cursor:pointer}
 <section class="w" style="padding-top:clamp(1.5rem,4vw,3rem)">
   <p class="k">Deine persönliche Seite</p>
   <h1 style="font-size:clamp(2.6rem,6vw,5rem);margin-top:.4rem">Hallo <em><?= $h($first) ?></em></h1>
-  <p class="lead" style="margin-top:.8rem"><?= $h($order['title']) ?> · Prä- &amp; Postnatal Training bei Vivien</p>
+  <p class="lead" style="margin-top:.8rem"><?= $h($order['title']) ?> · Prä- &amp; Postnatal Training bei Vivien<?= $online ? ', live per Video' : '' ?></p>
   <?php if (isset($_GET['danke']) && $order['status'] === 'bezahlt'): ?><p class="ok" style="margin-top:1.4rem;max-width:44em">Danke! Deine Zahlung ist angekommen. Du bekommst gleich eine Bestätigung und deine Rechnung per E-Mail. <?= $sessions ? 'Deine Wunschtermine sind bei mir, ich bestätige sie dir mit Uhrzeit.' : 'Wähl dir jetzt einfach unten deine Wunschtermine aus.' ?></p><?php endif; ?>
   <?php if ($order['status'] === 'offen'): ?>
     <div class="card" style="margin-top:1.6rem;max-width:44em">
@@ -239,9 +241,10 @@ footer summary{cursor:pointer}
       <div class="sl" style="margin-top:.8rem">
         <?php foreach ($sessions as $s): ?>
           <div class="si"><span><b><?= $h(natal_when($s)) ?></b><?php $ph = natal_phase($order, (string)$s['date']); if ($ph): ?><br><span class="mut" style="font-size:.84rem"><?= $h($ph) ?></span><?php endif; ?></span>
-            <span style="display:flex;gap:.6rem;align-items:center"><?php if ($s['status'] === 'bestaetigt' && $s['start'] !== ''): ?><a href="<?= $h(natal_gcal($s)) ?>" target="_blank" rel="noopener" style="font-size:.84rem">Google Kalender</a><?php endif; ?><span class="chip <?= $h($s['status']) ?>"><?= $h(natal_status_label((string)$s['status'])) ?></span></span></div>
+            <span style="display:flex;gap:.6rem;align-items:center"><?php if ($s['status'] === 'bestaetigt' && $s['start'] !== ''): ?><a href="<?= $h(natal_gcal($s, $online)) ?>" target="_blank" rel="noopener" style="font-size:.84rem">Google Kalender</a><?php endif; ?><span class="chip <?= $h($s['status']) ?>"><?= $h(natal_status_label((string)$s['status'])) ?></span></span></div>
         <?php endforeach; ?>
       </div>
+      <?php if ($online && $conf && trim((string)(natal_cfg()['room'] ?? '')) !== ''): ?><p style="margin-top:1rem"><a class="btn" href="<?= $h(trim((string)natal_cfg()['room'])) ?>" target="_blank" rel="noopener">Zum Videoraum</a></p><?php endif; ?>
       <?php if ($conf): ?><p style="margin-top:1rem"><a class="btn line" href="/api/natal.php?ics=1&amp;o=<?= (int)$order['id'] ?>&amp;k=<?= $h($order['token']) ?>">Alle Termine in meinen Kalender</a></p><?php endif; ?>
     </div>
   </div>
@@ -272,11 +275,11 @@ footer summary{cursor:pointer}
 <main>
 <section class="hero w">
   <div>
-    <p class="k">Prä- &amp; Postnatal Training · 1:1</p>
+    <p class="k">Prä- &amp; Postnatal Training · 1:1 <?= $online ? 'online' : 'im Studio' ?></p>
     <h1 style="margin-top:.8rem">Bewegt durch die <em>Schwangerschaft</em> &amp; das Wochenbett</h1>
     <p class="script">für dich und dein Baby</p>
     <?php if ($offer): ?><p class="hello"><b><?= $h(($offer['salutation'] ?: 'Liebe') . ' ' . $offer['name']) ?>,</b>schön, dass du da bist. Hier ist mein Angebot für dich, mit allem, was wir bis zur Geburt und danach gemeinsam machen können.<?= $offer['note'] !== '' ? '<br><br>' . nl2br($h((string)$offer['note'])) : '' ?></p><?php endif; ?>
-    <p class="lead">Prä- und postnatales Training, ganz auf dich abgestimmt: ruhig, kräftigend und mit viel Raum für das, was dein Körper gerade braucht. Bei mir im Studio, nur du und ich.</p>
+    <p class="lead">Prä- und postnatales Training, ganz auf dich abgestimmt: ruhig, kräftigend und mit viel Raum für das, was dein Körper gerade braucht. <?= $online ? 'Live per Video, bequem von zu Hause aus: nur du und ich, ich sehe dich und korrigiere dich wie im Studio.' : 'Bei mir im Studio, nur du und ich.' ?></p>
     <div class="cta"><a class="btn" href="#pakete">Paket wählen <span aria-hidden="true">→</span></a><a class="btn line" href="#ablauf">So läuft es ab</a></div>
   </div>
   <div class="hv" aria-hidden="true"><div class="b1 blob"></div><div class="b2 blob"></div><div class="b3"></div><p class="q">„Dein Körper leistet gerade Großes. Lass uns ihn gut begleiten.“<small>Vivien</small></p></div>
@@ -306,19 +309,19 @@ footer summary{cursor:pointer}
   <div class="steps">
     <div class="step"><b>Paket wählen und bezahlen</b><p>Sicher online über Stripe. Danach bekommst du eine Bestätigung und deine Rechnung per E-Mail.</p></div>
     <div class="step"><b>Wunschtermine aussuchen</b><p>Im Kalender tippst du deine Wunschtage an und wählst Vormittag, Nachmittag oder Abend. Gleich beim Buchen oder später auf deiner persönlichen Seite.</p></div>
-    <div class="step"><b>Ich bestätige mit Uhrzeit</b><p>Du bekommst jeden Termin per E-Mail, mit Kalenderdatei für dein Handy. Weitere Termine fragst du jederzeit über deine Seite an.</p></div>
+    <div class="step"><b>Ich bestätige mit Uhrzeit</b><p>Du bekommst jeden Termin per E-Mail, mit Kalenderdatei für dein Handy<?= $online ? ' und dem Link zum Videoraum' : '' ?>. Weitere Termine fragst du jederzeit über deine Seite an.</p></div>
   </div>
 </section>
 
 <section class="w" id="pakete" style="padding-top:0">
   <p class="k">Preise &amp; Pakete</p>
   <h2 style="margin-top:.6rem">Je mehr Einheiten, desto <em>günstiger</em></h2>
-  <p class="mut" style="margin-top:.8rem">Jede Einheit dauert 60 Minuten, 1:1 im Studio. Alle Preise inkl. 20 % USt.</p>
+  <p class="mut" style="margin-top:.8rem">Jede Einheit dauert 60 Minuten, 1:1 <?= $where ?>. Alle Preise inkl. 20 % USt.</p>
   <div class="packs" role="radiogroup" aria-label="Paket">
     <?php foreach ($packs as $k => $p): $save = $single * $p['units'] - $p['cents']; ?>
-      <label class="pack"><input type="radio" name="package" value="<?= $h($k) ?>" data-units="<?= (int)$p['units'] ?>" data-cents="<?= (int)$p['cents'] ?>" data-title="<?= $h($p['title']) ?>" data-unit="<?= (int)$p['unit_cents'] ?>"<?= $k === 'kombi' ? ' checked' : '' ?>>
+      <label class="pack"><input type="radio" name="package" value="<?= $h($k) ?>" data-units="<?= (int)$p['units'] ?>" data-cents="<?= (int)$p['cents'] ?>" data-title="<?= $h($p['title']) ?>" data-unit="<?= (int)$p['unit_cents'] ?>"<?= $p['tag'] !== '' ? ' checked' : '' ?>>
         <?php if ($p['tag']): ?><span class="badge"><?= $h($p['tag']) ?></span><?php endif; ?><span class="ck" aria-hidden="true"></span>
-        <span class="t"><?= $h($p['title']) ?></span><span class="s"><?= $h($p['sub']) ?></span>
+        <span class="t"><?= $h(preg_replace('/ online$/', '', $p['title'])) ?></span><span class="s"><?= $h($p['sub']) ?></span>
         <span class="p"><?= $h($euro($p['cents'])) ?></span>
         <span class="u"><?= $p['units'] > 1 ? $h($euro($p['unit_cents'])) . ' pro Einheit' : 'pro Einheit' ?></span>
         <?php if ($save > 0): ?><span class="save">du sparst <?= $h($euro($save)) ?></span><?php endif; ?>
@@ -368,8 +371,14 @@ footer summary{cursor:pointer}
   <h2 style="margin-top:.6rem;margin-bottom:1.6rem">Häufige <em>Fragen</em></h2>
   <details><summary>Ab wann kann ich nach der Geburt wieder trainieren?</summary><p>Sobald deine Ärztin dich freigibt, meistens nach 6 bis 8 Wochen, nach einem Kaiserschnitt oft etwas später. Bis dahin ruhen deine Einheiten einfach.</p></details>
   <details><summary>Was ist, wenn mein Baby früher kommt?</summary><p>Dann nutzt du die offenen Einheiten einfach nach der Geburt. Nichts verfällt, die Pakete gelten bis 6 Monate nach der Geburt.</p></details>
+<?php if ($online): ?>
+  <details><summary>Wie läuft eine Online-Einheit ab?</summary><p>Wir treffen uns live per Video: Du tippst einfach auf den Link aus deiner Terminbestätigung. Ich sehe dich, leite dich an und korrigiere dich, genau wie im Studio.</p></details>
+  <details><summary>Was brauche ich dafür?</summary><p>Eine Matte, etwas Platz zum Liegen und dein Handy, Tablet oder Laptop. Stell es am besten so auf, dass ich dich ganz sehe. Ein Kissen und ein Handtuch sind praktisch.</p></details>
+  <details><summary>Darf mein Baby dabei sein?</summary><p>Ja, sehr gern. Nach der Geburt bleibt dein Baby einfach bei dir, wir passen die Einheit an euren Rhythmus an.</p></details>
+<?php else: ?>
   <details><summary>Darf mein Baby mitkommen?</summary><p>Ja, sehr gern. Nach der Geburt kommt dein Baby einfach mit, wir passen die Einheit an euren Rhythmus an.</p></details>
   <details><summary>Was soll ich mitbringen?</summary><p>Bequeme Kleidung, eine Flasche Wasser und gern ein Handtuch. Matten und alles andere habe ich im Studio.</p></details>
+<?php endif; ?>
   <details><summary>Ich muss einen Termin verschieben. Was nun?</summary><p>Gib mir bitte so bald wie möglich Bescheid, am besten bis 24 Stunden vorher. Wenn das Baby oder die Gesundheit dazwischenkommt, finden wir immer eine Lösung.</p></details>
 </section>
 </main>
