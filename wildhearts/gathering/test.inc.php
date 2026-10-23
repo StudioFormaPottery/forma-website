@@ -29,13 +29,13 @@ $offers = $guest ? [] : mm_offers();
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title><?= $gath ? 'Gathering · Gastgeberin' : 'Technik-Test' ?> · Wild Hearts</title>
-<meta name="theme-color" content="#F3F1E7">
+<meta name="theme-color" content="#F2ECE4">
 <link rel="icon" href="/img/wildhearts/viv.jpg">
 <style>
 @font-face{font-family:"Italiana";font-weight:400;font-display:swap;src:url(/fonts/Italiana-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Hand";font-weight:400;font-display:swap;src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
-:root{--cream:#F6F3EA;--oat:#E3DED0;--blush:#D8DCC6;--wine:#5E6B35;--wine-deep:#3F4A26;--earth:#3E372C;--brown:#6B5D4C;--ink:#2F2B22;--sage-soft:#DCE0D2;--line:#CFC9B5;--blob:58% 42% 47% 53% / 52% 46% 54% 48%}
+:root{--cream:#F2ECE4;--oat:#E8DED2;--blush:#E8D6CA;--wine:#7D5E68;--wine-deep:#6B5658;--earth:#4A3A41;--brown:#7D7076;--ink:#2E2529;--sage-soft:#EADFDE;--line:#DDD2C6;--blob:58% 42% 47% 53% / 52% 46% 54% 48%}
 *{box-sizing:border-box;margin:0}
 [hidden]{display:none!important}
 html,body{background:var(--cream)}
@@ -48,7 +48,7 @@ main{position:relative;max-width:760px;margin:0 auto;padding:max(30px,env(safe-a
 .hand{font-family:"Hand","Bradley Hand",cursive;color:var(--wine);font-size:20px;transform:rotate(-2deg);display:inline-block}
 h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(36px,8vw,52px);line-height:1.05;color:var(--wine-deep);margin-top:6px}
 .lead{color:var(--brown);margin-top:10px}
-.card{margin-top:22px;padding:22px;border-radius:26px;background:#FCFBF6;border:1.5px solid var(--line);box-shadow:0 14px 34px rgba(62,58,40,.08)}
+.card{margin-top:22px;padding:22px;border-radius:26px;background:#FBF8F4;border:1.5px solid var(--line);box-shadow:0 14px 34px rgba(70,50,58,.08)}
 .card h2{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:28px;color:var(--wine-deep);margin-bottom:6px}
 .step{font-family:"Outfit",sans-serif;display:inline-block;width:30px;height:30px;border-radius:50%;background:var(--sage-soft);color:var(--wine-deep);text-align:center;line-height:30px;font-size:16px;margin-right:8px;vertical-align:4px}
 .preview{position:relative;margin-top:14px;border-radius:20px;overflow:hidden;background:var(--earth);aspect-ratio:16/10}
@@ -61,47 +61,47 @@ h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(36px,8vw
 .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:15px;color:var(--brown);flex:1 1 240px}
 select{font:inherit;font-size:16px;padding:11px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--cream);color:var(--ink)}
-button,.btn{font:inherit;font-weight:500;font-size:17px;padding:13px 22px;border-radius:999px;border:0;background:var(--wine);color:#F6F3EA;cursor:pointer;text-decoration:none;display:inline-block}
+button,.btn{font:inherit;font-weight:500;font-size:17px;padding:13px 22px;border-radius:999px;border:0;background:var(--wine);color:#F2ECE4;cursor:pointer;text-decoration:none;display:inline-block}
 button.ghost{background:var(--cream);color:var(--wine-deep);border:1.5px solid var(--line)}
 button:disabled{opacity:.55;cursor:default}
 .tip{font-size:15px;color:var(--brown);margin-top:12px}
 .roomwrap{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--earth);z-index:5}
 .roombar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;color:var(--cream);font-size:15px}
 .roombar button{padding:7px 16px;font-size:15px;background:var(--sage-soft);color:var(--wine-deep)}
-.roomwrap iframe{flex:1;width:100%;border:0;background:#2a1b16;min-height:0}
+.roomwrap iframe{flex:1;width:100%;border:0;background:#2B1E23;min-height:0}
 textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16px;border-radius:18px;border:1.5px solid var(--line);background:var(--cream);color:var(--ink);line-height:1.6;resize:vertical;margin-top:12px}
 .saved{font-size:14px;color:var(--brown);margin-top:6px;min-height:1.2em}
-.prompter{position:relative;flex:0 0 auto;height:34vh;min-height:150px;background:#1F1C16;color:#F6F3EA;overflow:hidden;border-bottom:1px solid #4a4337}
+.prompter{position:relative;flex:0 0 auto;height:34vh;min-height:150px;background:#1F181B;color:#F2ECE4;overflow:hidden;border-bottom:1px solid #5A4C52}
 .prompter.solo{position:fixed;inset:0;height:auto;z-index:6}
 .prompter .scroll{position:absolute;inset:0;overflow-y:auto;padding:18px 7vw 60vh;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .prompter .scroll::-webkit-scrollbar{display:none}
 .prompter .txt{white-space:pre-wrap;line-height:1.45;max-width:900px;margin:0 auto}
-.prompter .txt .dir{color:#9DA58F;font-size:.62em;font-style:italic}
-.prompter .mark{position:absolute;left:8px;top:24px;width:0;height:0;border:8px solid transparent;border-left:12px solid #9DA58F;pointer-events:none}
-.prompter .fade{position:absolute;left:0;right:0;bottom:0;height:46px;background:linear-gradient(transparent,#1F1C16);pointer-events:none}
+.prompter .txt .dir{color:#B79FA6;font-size:.62em;font-style:italic}
+.prompter .mark{position:absolute;left:8px;top:24px;width:0;height:0;border:8px solid transparent;border-left:12px solid #B79FA6;pointer-events:none}
+.prompter .fade{position:absolute;left:0;right:0;bottom:0;height:46px;background:linear-gradient(transparent,#1F181B);pointer-events:none}
 .pctl{position:absolute;right:10px;bottom:8px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;z-index:2}
-.pctl button{padding:6px 12px;font-size:15px;background:rgba(220,224,210,.92);color:var(--wine-deep);border-radius:999px;min-width:40px}
-.pctl .play{background:#9DA58F;color:#1F1C16;font-weight:600}
-.pctl span{align-self:center;color:#B3A78F;font-size:13px;padding:0 4px}
-.pmin{position:absolute;left:10px;bottom:8px;z-index:2;padding:6px 12px;font-size:14px;background:transparent;color:#B3A78F;border:1px solid #4a4337}
+.pctl button{padding:6px 12px;font-size:15px;background:rgba(234,223,222,.92);color:var(--wine-deep);border-radius:999px;min-width:40px}
+.pctl .play{background:#B79FA6;color:#1F181B;font-weight:600}
+.pctl span{align-self:center;color:#C9B2B8;font-size:13px;padding:0 4px}
+.pmin{position:absolute;left:10px;bottom:8px;z-index:2;padding:6px 12px;font-size:14px;background:transparent;color:#C9B2B8;border:1px solid #5A4C52}
 .roombar .rb{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.practice{position:fixed;inset:0;z-index:7;background:#1F1C16;display:flex;flex-direction:column}
-.practice canvas{flex:1;width:100%;min-height:0;object-fit:contain;background:#1F1C16}
-.practice .pbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 16px;color:#B3A78F;font-size:14px}
-.practice .pbar button{padding:7px 16px;font-size:15px;background:#DCE0D2;color:#3F4A26}
+.practice{position:fixed;inset:0;z-index:7;background:#1F181B;display:flex;flex-direction:column}
+.practice canvas{flex:1;width:100%;min-height:0;object-fit:contain;background:#1F181B}
+.practice .pbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 16px;color:#C9B2B8;font-size:14px}
+.practice .pbar button{padding:7px 16px;font-size:15px;background:#EADFDE;color:#6B5658}
 .practice .pbar .recon{background:#93402F;color:#FBF1EA}
-.pask{display:flex;gap:8px;flex-wrap:wrap;padding:10px 16px;background:#1F1C16;border-top:1px solid #4a4337}
-.pask select,.pask input{font:inherit;font-size:16px;padding:9px 12px;border-radius:12px;border:1px solid #4a4337;background:#2c2820;color:#F6F3EA}
+.pask{display:flex;gap:8px;flex-wrap:wrap;padding:10px 16px;background:#1F181B;border-top:1px solid #5A4C52}
+.pask select,.pask input{font:inherit;font-size:16px;padding:9px 12px;border-radius:12px;border:1px solid #5A4C52;background:#2B2226;color:#F2ECE4}
 .pask input{flex:1 1 260px;min-width:0}
-.pask button{padding:9px 16px;font-size:15px;background:#DCE0D2;color:#3F4A26}
-.pask button.ghost{background:transparent;color:#DCE0D2;border:1px solid #6B5D4C}
+.pask button{padding:9px 16px;font-size:15px;background:#EADFDE;color:#6B5658}
+.pask button.ghost{background:transparent;color:#EADFDE;border:1px solid #7D7076}
 .ublist{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .ubrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .ubrow input[type=text]{font:inherit;font-size:16px;padding:10px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--cream);flex:1 1 160px;min-width:0}
 .ubrow label.pick{font-size:14px;padding:8px 12px;border-radius:999px;border:1.5px solid var(--line);cursor:pointer;color:var(--wine-deep);background:var(--cream)}
 .ubrow .sw{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--line);background-size:cover;background-position:center;flex:0 0 auto}
 .ubrow button{padding:8px 12px;font-size:14px}
-.offd{position:fixed;left:16px;bottom:16px;z-index:21;width:min(380px,calc(100% - 32px));max-height:calc(100% - 90px);overflow:auto;background:#FCFBF6;color:var(--ink);border-radius:22px;padding:18px;box-shadow:0 18px 44px rgba(20,18,12,.4);font-size:16px}
+.offd{position:fixed;left:16px;bottom:16px;z-index:21;width:min(380px,calc(100% - 32px));max-height:calc(100% - 90px);overflow:auto;background:#FBF8F4;color:var(--ink);border-radius:22px;padding:18px;box-shadow:0 18px 44px rgba(31,22,26,.4);font-size:16px}
 .offd h3{font-size:19px;font-weight:500;color:var(--wine-deep);margin-bottom:8px}
 .offd label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--brown);margin-top:10px}
 .offd select,.offd input{font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--cream);color:var(--ink)}
@@ -111,21 +111,21 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 .offd .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .offd .acts button{padding:10px 16px;font-size:15px}
 .offd .cl{position:absolute;right:10px;top:8px;background:transparent;color:var(--brown);font-size:22px;padding:4px 8px}
-.qd{position:fixed;right:16px;top:70px;z-index:21;width:min(400px,calc(100% - 32px));max-height:calc(100% - 90px);overflow:auto;background:#FCFBF6;color:var(--ink);border-radius:22px;padding:18px;box-shadow:0 18px 44px rgba(20,18,12,.4);font-size:16px}
+.qd{position:fixed;right:16px;top:70px;z-index:21;width:min(400px,calc(100% - 32px));max-height:calc(100% - 90px);overflow:auto;background:#FBF8F4;color:var(--ink);border-radius:22px;padding:18px;box-shadow:0 18px 44px rgba(31,22,26,.4);font-size:16px}
 .qd h3{font-size:19px;font-weight:500;color:var(--wine-deep);margin-bottom:4px}
 .qd .hint{font-size:13.5px;color:var(--brown);margin-bottom:10px}
 .qd .q{border-top:1px solid var(--line);padding:10px 0}
 .qd .q small{display:block;font-size:12.5px;color:var(--brown)}
 .qd .q p{margin:2px 0 8px;font-size:16px;line-height:1.45}
 .qd .q.on{background:var(--sage-soft);border-radius:12px;padding:10px;border-top:0}
-.qd .q.done p{color:#9A9282}
+.qd .q.done p{color:#A0959A}
 .qd .q button{padding:6px 12px;font-size:14px}
 .qd .own{display:flex;flex-direction:column;gap:8px;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
 .qd .own select,.qd .own input{font:inherit;font-size:15px;padding:9px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--cream);color:var(--ink);width:100%}
 .qd .cl{position:absolute;right:10px;top:8px;background:transparent;color:var(--brown);font-size:22px;padding:4px 8px}
-#qbadge:not(:empty){display:inline-block;min-width:20px;padding:0 6px;border-radius:999px;background:#B9C77A;color:#1F1C16;font-size:12px;margin-left:4px}
+#qbadge:not(:empty){display:inline-block;min-width:20px;padding:0 6px;border-radius:999px;background:#B9C77A;color:#1F181B;font-size:12px;margin-left:4px}
 .roombar .recon{background:#93402F;color:#FBF1EA;border-color:#93402F}
-.roombar .ghostbtn{background:transparent;color:var(--blush);border:1px solid #6B5D4C}
+.roombar .ghostbtn{background:transparent;color:var(--blush);border:1px solid #7D7076}
 </style>
 </head>
 <body>
@@ -502,7 +502,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
   // --- Übungsansicht: nur lokal gezeichnet, nichts davon geht in den Whereby-Raum ---
   const UL = $('ublist');
   if (UL) {
-    const SW = ['#5E6B35', '#9DA58F', '#6B5D4C', '#B3A78F', '#3F4A26', '#8A8F6E'];
+    const SW = ['#7D5E68', '#B79FA6', '#7D7076', '#C9B2B8', '#6B5658', '#8A8F6E'];
     // Namen aus aller Welt: Europa, USA, Lateinamerika, Asien, Afrika, Naher Osten
     const WORLD = ['Anna', 'Sophie', 'Lena', 'Emily', 'Olivia', 'Chloé', 'Giulia', 'Lucía', 'Inês', 'Freya', 'Saoirse', 'Ingrid', 'Zofia', 'Eleni', 'Katarina', 'Madison', 'Ashley', 'Brooke', 'Jasmine', 'Valentina', 'Camila', 'Mariana', 'Yuki', 'Hana', 'Mei', 'Ji-woo', 'Priya', 'Ananya', 'Linh', 'Mai', 'Aiko', 'Siti', 'Leila', 'Yasmin', 'Noa', 'Amara', 'Zara', 'Nia', 'Aisha', 'Ayşe', 'Elif', 'Isla', 'Mia', 'Tamara', 'Rosa'];
     const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -556,7 +556,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     };
     qm.onchange = () => { try { localStorage.setItem('wh-fragen-takt', qm.value); } catch (e) {} if (!PR.hidden) qLoop(); };
     let qList = [], qTimed = [], qMsgs = [], qTimer = 0, qStart = 0, qClock = 0;
-    const NAMECOL = ['#5E6B35', '#8A5A44', '#3F6B6B', '#7A5C8A', '#A0703A', '#4E6E3A', '#9A4F5F', '#3F5A82', '#6B5D4C', '#7C7A2F'];
+    const NAMECOL = ['#7D5E68', '#8A5A44', '#3F6B6B', '#7A5C8A', '#A0703A', '#4E6E3A', '#9A4F5F', '#3F5A82', '#7D7076', '#7C7A2F'];
     const parseQ = l => {
       let at = -1;
       const tm = l.match(/^(\d{1,3}(?:[.,]\d{1,2})?)\s*(?:min\.?|minute[n]?|m)\s*:?\s*/i);
@@ -604,20 +604,20 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       const list = Object.entries(OFFERS).filter(([, x]) => x.reg > 0), w = 480, ih = 118, x = GW - w - 22;
       const sec = Math.ceil(Math.max(0, 25 * 60000 - (now - uOffer.at)) / 1000), live = sec > 0;
       const h = 120 + list.length * ih + 20, y = H - h - 22 + (1 - ease) * 30;
-      g.save(); g.globalAlpha = ease; g.shadowColor = 'rgba(20,18,12,.4)'; g.shadowBlur = 30; g.shadowOffsetY = 12;
-      g.fillStyle = '#F6F3EA'; rr(x, y, w, h, 26); g.fill(); g.shadowColor = 'transparent';
-      g.fillStyle = '#5E6B35'; g.font = '400 19px Hand, cursive'; g.fillText('just for you tonight ♡', x + 24, y + 40);
-      g.fillStyle = '#3F4A26'; g.font = '400 34px Italiana, Georgia, serif'; g.fillText('Ways to walk with me', x + 24, y + 82);
-      g.fillStyle = '#DCE0D2'; rr(x + w - 210, y + 22, 186, 32, 16); g.fill(); g.fillStyle = '#3F4A26'; g.font = '500 15px Outfit, system-ui, sans-serif';
+      g.save(); g.globalAlpha = ease; g.shadowColor = 'rgba(31,22,26,.4)'; g.shadowBlur = 30; g.shadowOffsetY = 12;
+      g.fillStyle = '#F2ECE4'; rr(x, y, w, h, 26); g.fill(); g.shadowColor = 'transparent';
+      g.fillStyle = '#7D5E68'; g.font = '400 19px Hand, cursive'; g.fillText('just for you tonight ♡', x + 24, y + 40);
+      g.fillStyle = '#6B5658'; g.font = '400 34px Italiana, Georgia, serif'; g.fillText('Ways to walk with me', x + 24, y + 82);
+      g.fillStyle = '#EADFDE'; rr(x + w - 210, y + 22, 186, 32, 16); g.fill(); g.fillStyle = '#6B5658'; g.font = '500 15px Outfit, system-ui, sans-serif';
       g.fillText('Gathering prices · ' + Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'), x + w - 198, y + 43);
       list.forEach(([kk, o], i) => {
         const yy = y + 110 + i * ih, lv = live && o.sp > 0 && o.sp < o.reg, per = o.mon ? '/mo' : '';
-        g.strokeStyle = '#DED8C8'; g.lineWidth = 1; g.beginPath(); g.moveTo(x + 24, yy); g.lineTo(x + w - 24, yy); g.stroke();
-        g.fillStyle = '#3F4A26'; g.font = '400 26px Italiana, Georgia, serif'; g.fillText(o.title, x + 24, yy + 34);
-        g.font = '400 15px Outfit, system-ui, sans-serif'; g.fillStyle = '#6B5D4C'; g.fillText((wrap(o.text, w - 48)[0] || '') + ' …', x + 24, yy + 58);
-        if (lv) { g.fillStyle = '#9A9282'; g.font = '400 16px Outfit, system-ui, sans-serif'; const rt = eur(o.reg) + per; g.fillText(rt, x + 24, yy + 94); const rw = g.measureText(rt).width; g.strokeStyle = '#9A9282'; g.beginPath(); g.moveTo(x + 24, yy + 88); g.lineTo(x + 24 + rw, yy + 88); g.stroke(); g.fillStyle = '#3F4A26'; g.font = '500 24px Outfit, system-ui, sans-serif'; g.fillText(eur(o.sp) + per, x + 34 + rw, yy + 95); }
-        else { g.fillStyle = '#3F4A26'; g.font = '500 24px Outfit, system-ui, sans-serif'; g.fillText(eur(o.reg) + per, x + 24, yy + 95); }
-        g.fillStyle = '#5E6B35'; rr(x + w - 174, yy + 70, 150, 38, 19); g.fill(); g.fillStyle = '#F6F3EA'; g.font = '500 16px Outfit, system-ui, sans-serif'; g.textAlign = 'center';
+        g.strokeStyle = '#DDD2C6'; g.lineWidth = 1; g.beginPath(); g.moveTo(x + 24, yy); g.lineTo(x + w - 24, yy); g.stroke();
+        g.fillStyle = '#6B5658'; g.font = '400 26px Italiana, Georgia, serif'; g.fillText(o.title, x + 24, yy + 34);
+        g.font = '400 15px Outfit, system-ui, sans-serif'; g.fillStyle = '#7D7076'; g.fillText((wrap(o.text, w - 48)[0] || '') + ' …', x + 24, yy + 58);
+        if (lv) { g.fillStyle = '#A0959A'; g.font = '400 16px Outfit, system-ui, sans-serif'; const rt = eur(o.reg) + per; g.fillText(rt, x + 24, yy + 94); const rw = g.measureText(rt).width; g.strokeStyle = '#A0959A'; g.beginPath(); g.moveTo(x + 24, yy + 88); g.lineTo(x + 24 + rw, yy + 88); g.stroke(); g.fillStyle = '#6B5658'; g.font = '500 24px Outfit, system-ui, sans-serif'; g.fillText(eur(o.sp) + per, x + 34 + rw, yy + 95); }
+        else { g.fillStyle = '#6B5658'; g.font = '500 24px Outfit, system-ui, sans-serif'; g.fillText(eur(o.reg) + per, x + 24, yy + 95); }
+        g.fillStyle = '#7D5E68'; rr(x + w - 174, yy + 70, 150, 38, 19); g.fill(); g.fillStyle = '#F2ECE4'; g.font = '500 16px Outfit, system-ui, sans-serif'; g.textAlign = 'center';
         g.fillText((kk === 'year' ? 'Apply · ' : 'Book · ') + eur(lv ? o.sp : o.reg), x + w - 99, yy + 95); g.textAlign = 'start';
       });
       g.restore();
@@ -629,24 +629,24 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       const live = o.sp > 0 && o.sp < o.reg, leftMs = Math.max(0, o.min * 60000 - (now - o.at)), sec = Math.ceil(leftMs / 1000);
       g.font = '400 18px Outfit, system-ui, sans-serif'; const ls = wrap(o.text, w - 48).slice(0, 4);
       const h = 120 + ls.length * 26 + 70 + (live ? 46 : 0) + 64, y = H - h - 22 + (1 - ease) * 30;
-      g.save(); g.globalAlpha = ease; g.shadowColor = 'rgba(20,18,12,.4)'; g.shadowBlur = 30; g.shadowOffsetY = 12;
-      g.fillStyle = '#F6F3EA'; rr(x, y, w, h, 26); g.fill(); g.shadowColor = 'transparent';
-      g.fillStyle = '#5E6B35'; g.font = '400 19px Hand, cursive'; g.fillText(live ? 'just for you tonight ♡' : 'when you are ready ♡', x + 24, y + 40);
-      g.fillStyle = '#3F4A26'; g.font = '400 36px Italiana, Georgia, serif'; g.fillText(o.title, x + 24, y + 86);
-      g.fillStyle = '#6B5D4C'; g.font = '400 18px Outfit, system-ui, sans-serif'; ls.forEach((l, i) => g.fillText(l, x + 24, y + 120 + i * 26));
+      g.save(); g.globalAlpha = ease; g.shadowColor = 'rgba(31,22,26,.4)'; g.shadowBlur = 30; g.shadowOffsetY = 12;
+      g.fillStyle = '#F2ECE4'; rr(x, y, w, h, 26); g.fill(); g.shadowColor = 'transparent';
+      g.fillStyle = '#7D5E68'; g.font = '400 19px Hand, cursive'; g.fillText(live ? 'just for you tonight ♡' : 'when you are ready ♡', x + 24, y + 40);
+      g.fillStyle = '#6B5658'; g.font = '400 36px Italiana, Georgia, serif'; g.fillText(o.title, x + 24, y + 86);
+      g.fillStyle = '#7D7076'; g.font = '400 18px Outfit, system-ui, sans-serif'; ls.forEach((l, i) => g.fillText(l, x + 24, y + 120 + i * 26));
       let yy = y + 120 + ls.length * 26 + 30;
       const per = o.mon ? ' / month' : '';
       if (live && sec > 0) {
-        g.fillStyle = '#9A9282'; g.font = '400 20px Outfit, system-ui, sans-serif'; const rt = eur(o.reg) + per; g.fillText(rt, x + 24, yy); const rw = g.measureText(rt).width;
-        g.strokeStyle = '#9A9282'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x + 24, yy - 7); g.lineTo(x + 24 + rw, yy - 7); g.stroke();
-        g.fillStyle = '#3F4A26'; g.font = '500 34px Outfit, system-ui, sans-serif'; g.fillText(eur(o.sp) + per, x + 36 + rw, yy + 2);
-        yy += 30; g.fillStyle = '#DCE0D2'; rr(x + 24, yy, 300, 36, 18); g.fill();
-        g.fillStyle = '#3F4A26'; g.font = '500 17px Outfit, system-ui, sans-serif'; g.fillText('Gathering price ends in ' + Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'), x + 40, yy + 24); yy += 46;
+        g.fillStyle = '#A0959A'; g.font = '400 20px Outfit, system-ui, sans-serif'; const rt = eur(o.reg) + per; g.fillText(rt, x + 24, yy); const rw = g.measureText(rt).width;
+        g.strokeStyle = '#A0959A'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x + 24, yy - 7); g.lineTo(x + 24 + rw, yy - 7); g.stroke();
+        g.fillStyle = '#6B5658'; g.font = '500 34px Outfit, system-ui, sans-serif'; g.fillText(eur(o.sp) + per, x + 36 + rw, yy + 2);
+        yy += 30; g.fillStyle = '#EADFDE'; rr(x + 24, yy, 300, 36, 18); g.fill();
+        g.fillStyle = '#6B5658'; g.font = '500 17px Outfit, system-ui, sans-serif'; g.fillText('Gathering price ends in ' + Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'), x + 40, yy + 24); yy += 46;
       } else {
-        g.fillStyle = '#3F4A26'; g.font = '500 34px Outfit, system-ui, sans-serif'; g.fillText(eur(o.reg) + per, x + 24, yy + 2); yy += 16;
+        g.fillStyle = '#6B5658'; g.font = '500 34px Outfit, system-ui, sans-serif'; g.fillText(eur(o.reg) + per, x + 24, yy + 2); yy += 16;
       }
-      g.fillStyle = '#5E6B35'; rr(x + 24, yy + 8, w - 48, 50, 25); g.fill();
-      g.fillStyle = '#F6F3EA'; g.font = '500 19px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('Book now · ' + eur(live && sec > 0 ? o.sp : o.reg), x + w / 2, yy + 40); g.textAlign = 'start';
+      g.fillStyle = '#7D5E68'; rr(x + 24, yy + 8, w - 48, 50, 25); g.fill();
+      g.fillStyle = '#F2ECE4'; g.font = '500 19px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('Book now · ' + eur(live && sec > 0 ? o.sp : o.reg), x + w / 2, yy + 40); g.textAlign = 'start';
       g.restore();
     };
     const openCount = () => qMsgs.filter(m => !m.done && m.who >= 0).length;
@@ -705,18 +705,18 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     const label = (t, x, y, h, small) => {
       g.font = '500 ' + (small ? 16 : 20) + 'px Outfit, system-ui, sans-serif';
       const w = g.measureText(t).width + 20, lh = small ? 26 : 32;
-      g.fillStyle = 'rgba(31,28,22,.62)'; rr(x + 8, y + h - lh - 8, w, lh, 9); g.fill();
-      g.fillStyle = '#F6F3EA'; g.fillText(t, x + 18, y + h - (small ? 15 : 18));
+      g.fillStyle = 'rgba(31,22,26,.62)'; rr(x + 8, y + h - lh - 8, w, lh, 9); g.fill();
+      g.fillStyle = '#F2ECE4'; g.fillText(t, x + 18, y + h - (small ? 15 : 18));
     };
     const drawChat = (x0, W, H) => {
       const pw = W - x0, now = performance.now();
-      g.fillStyle = '#EFE9DC'; g.fillRect(x0, 0, pw, H);
-      g.fillStyle = 'rgba(94,107,53,.07)';
+      g.fillStyle = '#EDE3DA'; g.fillRect(x0, 0, pw, H);
+      g.fillStyle = 'rgba(125,94,104,.07)';
       for (let yy = 70; yy < H; yy += 34) for (let xx = x0 + ((yy / 34) % 2 ? 10 : 27); xx < W; xx += 34) { g.beginPath(); g.arc(xx, yy, 2.2, 0, Math.PI * 2); g.fill(); }
-      g.fillStyle = '#3F4A26'; g.fillRect(x0, 0, pw, 64);
-      g.fillStyle = '#DCE0D2'; g.beginPath(); g.arc(x0 + 34, 32, 18, 0, Math.PI * 2); g.fill();
-      g.fillStyle = '#3F4A26'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('♡', x0 + 34, 39); g.textAlign = 'start';
-      g.fillStyle = '#F6F3EA'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.fillText('Wild Hearts Chat', x0 + 62, 28);
+      g.fillStyle = '#6B5658'; g.fillRect(x0, 0, pw, 64);
+      g.fillStyle = '#EADFDE'; g.beginPath(); g.arc(x0 + 34, 32, 18, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#6B5658'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('♡', x0 + 34, 39); g.textAlign = 'start';
+      g.fillStyle = '#F2ECE4'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.fillText('Wild Hearts Chat', x0 + 62, 28);
       const oc = openCount();
       g.fillStyle = '#C9D0B8'; g.font = '400 15px Outfit, system-ui, sans-serif'; g.fillText(oc ? oc + (oc === 1 ? ' Frage offen' : ' Fragen offen') : (rows.length + 1) + ' im Kreis', x0 + 62, 50);
       g.save(); g.beginPath(); g.rect(x0, 64, pw, H - 64); g.clip();
@@ -727,13 +727,13 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
           g.font = '500 18px Outfit, system-ui, sans-serif';
           const ls2 = wrap(m.text, pw - 90), bw2 = Math.min(pw - 40, Math.max(...ls2.map(l => g.measureText(l).width)) + 36), bh2 = 22 + ls2.length * 24, bx2 = x0 + (pw - bw2) / 2; yb -= bh2;
           g.save(); g.globalAlpha = ease; g.translate(bx2 + bw2 / 2, yb + bh2 / 2); g.scale(0.8 + 0.2 * ease, 0.8 + 0.2 * ease); g.translate(-(bx2 + bw2 / 2), -(yb + bh2 / 2));
-          g.fillStyle = '#5E6B35'; rr(bx2, yb, bw2, bh2, 16); g.fill(); g.fillStyle = '#F6F3EA';
+          g.fillStyle = '#7D5E68'; rr(bx2, yb, bw2, bh2, 16); g.fill(); g.fillStyle = '#F2ECE4';
           ls2.forEach((l, j) => g.fillText(l, bx2 + 18, yb + 28 + j * 24)); g.restore(); yb -= 12; continue;
         }
         if (m.who < 0) {
           g.font = '400 16px Outfit, system-ui, sans-serif';
           const tw2 = g.measureText(m.text).width + 28, bx = x0 + (pw - tw2) / 2, bh = 32; yb -= bh;
-          g.fillStyle = '#E1EAC9'; rr(bx, yb, tw2, bh, 10); g.fill(); g.fillStyle = '#3F4A26'; g.fillText(m.text, bx + 14, yb + 21); yb -= 10; continue;
+          g.fillStyle = '#E1EAC9'; rr(bx, yb, tw2, bh, 10); g.fill(); g.fillStyle = '#6B5658'; g.fillText(m.text, bx + 14, yb + 21); yb -= 10; continue;
         }
         const name = rows[m.who] ? rows[m.who].name.trim() || 'Gast' : 'Gast', nc = NAMECOL[m.who % NAMECOL.length];
         g.font = '400 20px Outfit, system-ui, sans-serif';
@@ -744,14 +744,14 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
         const bh = 12 + 20 + ls.length * 27 + 24, bx = x0 + 22;
         yb -= bh;
         g.save(); g.globalAlpha = ease; g.translate(bx, yb + bh); g.scale(0.85 + 0.15 * ease, 0.85 + 0.15 * ease); g.translate(-bx, -(yb + bh)) ;
-        g.shadowColor = 'rgba(62,55,44,.14)'; g.shadowBlur = 6; g.shadowOffsetY = 2;
-        g.fillStyle = m.done ? '#F4F6EE' : '#FFFFFF'; rr(bx, yb, bw, bh, 14); g.fill();
+        g.shadowColor = 'rgba(70,50,58,.14)'; g.shadowBlur = 6; g.shadowOffsetY = 2;
+        g.fillStyle = m.done ? '#F6F0EE' : '#FFFFFF'; rr(bx, yb, bw, bh, 14); g.fill();
         g.beginPath(); g.moveTo(bx + 2, yb); g.lineTo(bx - 10, yb); g.lineTo(bx + 2, yb + 14); g.closePath(); g.fill();
         g.shadowColor = 'transparent';
         g.fillStyle = nc; g.font = '500 16px Outfit, system-ui, sans-serif'; g.fillText(name, bx + 14, yb + 26);
-        g.fillStyle = '#2F2B22'; g.font = '400 20px Outfit, system-ui, sans-serif';
+        g.fillStyle = '#2E2529'; g.font = '400 20px Outfit, system-ui, sans-serif';
         ls.forEach((l, j) => g.fillText(l, bx + 14, yb + 53 + j * 27));
-        g.fillStyle = '#9A9282'; g.font = '400 13px Outfit, system-ui, sans-serif';
+        g.fillStyle = '#A0959A'; g.font = '400 13px Outfit, system-ui, sans-serif';
         const tt = m.done ? m.time + '  ✓✓' : m.time; const tw3 = g.measureText(tt).width;
         if (m.done) { g.fillText(m.time, bx + bw - tw3 - 12, yb + bh - 9); g.fillStyle = '#6E9A3A'; g.fillText('✓✓', bx + bw - 26, yb + bh - 9); }
         else g.fillText(tt, bx + bw - tw3 - 12, yb + bh - 9);
@@ -762,20 +762,20 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     };
     const nowHM = () => { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
     const drawTop = (W, TOP, n) => {
-      g.fillStyle = '#3E372C'; g.fillRect(0, 0, W, TOP);
-      g.fillStyle = '#D8DCC6'; g.font = '400 24px Hand, "Bradley Hand", cursive'; g.fillText('welcome, wild heart ♡', 28, 47);
-      g.font = '500 26px Outfit, system-ui, sans-serif'; g.fillStyle = '#F6F3EA'; g.textAlign = 'center';
+      g.fillStyle = '#4A3A41'; g.fillRect(0, 0, W, TOP);
+      g.fillStyle = '#E8D6CA'; g.font = '400 24px Hand, "Bradley Hand", cursive'; g.fillText('welcome, wild heart ♡', 28, 47);
+      g.font = '500 26px Outfit, system-ui, sans-serif'; g.fillStyle = '#F2ECE4'; g.textAlign = 'center';
       g.fillText(callTitle(), W / 2, 36);
-      g.font = '400 17px Outfit, system-ui, sans-serif'; g.fillStyle = '#B3A78F';
+      g.font = '400 17px Outfit, system-ui, sans-serif'; g.fillStyle = '#C9B2B8';
       g.fillText(new Date().toLocaleDateString('de-AT', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'}) + ' · ' + nowHM() + ' · moveciamovement.com', W / 2, 60);
       g.textAlign = 'end';
       let xr = W - 28;
       // kleiner, unaufdringlicher Hinweis, dass es eine Übung ist
       g.font = '500 15px Outfit, system-ui, sans-serif'; const tag = 'Übung', tw2 = g.measureText(tag).width + 22;
-      g.fillStyle = 'rgba(220,224,210,.16)'; rr(xr - tw2, 24, tw2, 28, 14); g.fill(); g.fillStyle = '#B3A78F'; g.fillText(tag, xr - 11, 43); xr -= tw2 + 16;
-      g.fillStyle = '#DCE0D2'; g.font = '500 18px Outfit, system-ui, sans-serif'; g.fillText(n + ' im Raum', xr, 44); xr -= g.measureText(n + ' im Raum').width + 12;
+      g.fillStyle = 'rgba(234,223,222,.16)'; rr(xr - tw2, 24, tw2, 28, 14); g.fill(); g.fillStyle = '#C9B2B8'; g.fillText(tag, xr - 11, 43); xr -= tw2 + 16;
+      g.fillStyle = '#EADFDE'; g.font = '500 18px Outfit, system-ui, sans-serif'; g.fillText(n + ' im Raum', xr, 44); xr -= g.measureText(n + ' im Raum').width + 12;
       g.beginPath(); g.arc(xr - 8, 37, 7, 0, Math.PI * 2); g.fill(); g.beginPath(); g.arc(xr - 8, 54, 12, Math.PI, 0); g.fill();
-      if (uRec) { const s2 = Math.floor((Date.now() - uT0) / 1000); xr -= 40; g.fillStyle = '#C0533F'; g.beginPath(); g.arc(xr - 6, 38, 7, 0, Math.PI * 2); g.fill(); g.fillStyle = '#F6F3EA'; g.textAlign = 'end'; g.fillText(Math.floor(s2 / 60) + ':' + String(s2 % 60).padStart(2, '0'), xr - 20, 44); }
+      if (uRec) { const s2 = Math.floor((Date.now() - uT0) / 1000); xr -= 40; g.fillStyle = '#C0533F'; g.beginPath(); g.arc(xr - 6, 38, 7, 0, Math.PI * 2); g.fill(); g.fillStyle = '#F2ECE4'; g.textAlign = 'end'; g.fillText(Math.floor(s2 / 60) + ':' + String(s2 % 60).padStart(2, '0'), xr - 20, 44); }
       g.textAlign = 'start';
     };
     const icon = (kind, cx, cy, col) => {
@@ -789,17 +789,17 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     };
     const drawBottom = (W, FH, BOT) => {
       const y = FH - BOT;
-      g.fillStyle = '#3E372C'; g.fillRect(0, y, W, BOT);
+      g.fillStyle = '#4A3A41'; g.fillRect(0, y, W, BOT);
       const btns = [['mic', 'Mikro'], ['cam', 'Kamera'], ['share', 'Teilen'], ['chat', 'Chat'], ['hand', 'Melden'], ['more', 'Mehr']];
       const bw = 92, total = btns.length * bw + 140, x0 = (W - total) / 2;
       btns.forEach(([k, lab], i) => {
         const cx = x0 + i * bw + bw / 2, cy = y + 38, active = k === 'chat';
-        g.fillStyle = active ? '#5E6B35' : 'rgba(246,243,234,.1)'; g.beginPath(); g.arc(cx, cy, 26, 0, Math.PI * 2); g.fill();
-        icon(k, cx, cy, '#F6F3EA');
-        g.fillStyle = '#B3A78F'; g.font = '400 14px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText(lab, cx, y + 86); g.textAlign = 'start';
+        g.fillStyle = active ? '#7D5E68' : 'rgba(242,236,228,.1)'; g.beginPath(); g.arc(cx, cy, 26, 0, Math.PI * 2); g.fill();
+        icon(k, cx, cy, '#F2ECE4');
+        g.fillStyle = '#C9B2B8'; g.font = '400 14px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText(lab, cx, y + 86); g.textAlign = 'start';
       });
       const lx = x0 + btns.length * bw + 20;
-      g.fillStyle = '#6B5D4C'; rr(lx, y + 18, 120, 42, 21); g.fill();
+      g.fillStyle = '#7D7076'; rr(lx, y + 18, 120, 42, 21); g.fill();
       g.fillStyle = '#FBF1EA'; g.font = '500 17px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('Verlassen', lx + 60, y + 45); g.textAlign = 'start';
     };
     const frame = () => {
@@ -807,7 +807,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       const c = n <= 2 ? n : n <= 4 ? 2 : n <= 9 ? 3 : 4, rws = Math.ceil(n / c), small = n > 9;
       const tw = Math.min((GW - gap * (c + 1)) / c, ((H - gap * (rws + 1)) / rws) * 16 / 9), th = tw * 9 / 16;
       const open = new Set(qMsgs.filter(m => !m.done && m.who >= 0).map(m => m.who));
-      g.fillStyle = '#2A1B16'; g.fillRect(0, 0, W, FH);
+      g.fillStyle = '#2B1E23'; g.fillRect(0, 0, W, FH);
       drawTop(W, TOP, n); drawBottom(W, FH, BOT);
       g.save(); g.translate(0, TOP);
       for (let k = 0; k < n; k++) {
@@ -816,21 +816,21 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
         const y = (H - (rws * th + (rws - 1) * gap)) / 2 + row * (th + gap);
         if (k === 0) {
           if (cam.videoWidth) cover(cam, cam.videoWidth, cam.videoHeight, x, y, tw, th, true);
-          else { g.fillStyle = '#3E372C'; rr(x, y, tw, th, 14); g.fill(); }
+          else { g.fillStyle = '#4A3A41'; rr(x, y, tw, th, 14); g.fill(); }
           label('Viv', x, y, th, small);
         } else {
           const r = rows[k - 1], im = imgs.get(k - 1);
           if (im) cover(im, im.naturalWidth, im.naturalHeight, x, y, tw, th, false);
           else { g.fillStyle = r.color; rr(x, y, tw, th, 14); g.fill(); }
           const rad = Math.min(tw, th) * 0.19;
-          g.fillStyle = 'rgba(246,243,234,.9)'; g.beginPath(); g.arc(x + tw / 2, y + th / 2 - 8, rad, 0, Math.PI * 2); g.fill();
-          g.fillStyle = '#3F4A26'; g.font = '500 ' + Math.round(rad * 0.9) + 'px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+          g.fillStyle = 'rgba(242,236,228,.9)'; g.beginPath(); g.arc(x + tw / 2, y + th / 2 - 8, rad, 0, Math.PI * 2); g.fill();
+          g.fillStyle = '#6B5658'; g.font = '500 ' + Math.round(rad * 0.9) + 'px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
           g.fillText((r.name.trim()[0] || '?').toUpperCase(), x + tw / 2, y + th / 2 - 6); g.textAlign = 'start'; g.textBaseline = 'alphabetic';
           label(r.name.trim() || 'Gast', x, y, th, small);
           if (open.has(k - 1)) {
             const pulse = 3 + 2 * Math.sin(performance.now() / 180);
             g.strokeStyle = '#B9C77A'; g.lineWidth = pulse; rr(x + 2, y + 2, tw - 4, th - 4, 13); g.stroke();
-            g.fillStyle = '#F6F3EA'; g.beginPath(); g.arc(x + tw - 24, y + 24, small ? 14 : 17, 0, Math.PI * 2); g.fill();
+            g.fillStyle = '#F2ECE4'; g.beginPath(); g.arc(x + tw - 24, y + 24, small ? 14 : 17, 0, Math.PI * 2); g.fill();
             g.font = (small ? 15 : 18) + 'px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('✋', x + tw - 24, y + 25); g.textAlign = 'start'; g.textBaseline = 'alphabetic';
           }
         }

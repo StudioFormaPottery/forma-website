@@ -32,21 +32,21 @@ $startTs = mm_circle_start();
 @font-face{font-family:"Outfit";font-weight:300 500;src:url(/fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:600 800;src:url(/fonts/Outfit-Bold.woff) format("woff")}
 @font-face{font-family:"Hand";src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
-:root{--cream:#F6F3EA;--wine:#5E6B35;--wine-deep:#3F4A26;--brown:#6B5D4C;--ink:#2F2B22;--line:#CFC9B5;--sage:#DCE0D2}
+:root{--cream:#F2ECE4;--wine:#7D5E68;--wine-deep:#6B5658;--brown:#7D7076;--ink:#2E2529;--line:#DDD2C6;--sage:#EADFDE}
 *{box-sizing:border-box;margin:0}
 body{background:var(--cream);font-family:"Outfit",system-ui,sans-serif;color:var(--ink);font-size:18px;line-height:1.6;overflow-x:hidden}
 .bg{position:fixed;inset:0;pointer-events:none}.bg span{position:absolute;border-radius:58% 42% 47% 53%/52% 46% 54% 48%}
 main{position:relative;max-width:760px;margin:0 auto;padding:44px 16px 60px;text-align:center}
-.pol{display:inline-block;background:#FCFBF6;padding:12px 12px 44px;box-shadow:0 16px 36px rgba(62,58,40,.18);transform:rotate(-3deg);position:relative}
+.pol{display:inline-block;background:#FBF8F4;padding:12px 12px 44px;box-shadow:0 16px 36px rgba(70,50,58,.18);transform:rotate(-3deg);position:relative}
 .pol img{display:block;width:260px;height:260px;object-fit:cover}
 .pol span{position:absolute;left:0;right:0;bottom:10px;font-family:"Hand",cursive;color:var(--wine);font-size:17px}
 .hand{font-family:"Hand",cursive;color:var(--wine);font-size:22px;transform:rotate(-2deg);display:inline-block;margin-top:24px}
 h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(42px,9vw,64px);line-height:1.05;color:var(--wine-deep);margin-top:6px}
 .lead{color:var(--brown);margin:12px auto 0;max-width:40ch}
-.price{margin-top:22px}.price .reg{color:#9A9282;text-decoration:line-through;margin-right:10px}.price b{font-size:36px;color:var(--wine-deep);font-weight:500}
+.price{margin-top:22px}.price .reg{color:#A0959A;text-decoration:line-through;margin-right:10px}.price b{font-size:36px;color:var(--wine-deep);font-weight:500}
 .price small{display:block;color:var(--brown);font-size:15px}
-ul{list-style:none;text-align:left;max-width:520px;margin:24px auto 0}li{margin:6px 0;color:#3E372C}li::before{content:"✦  ";color:#9DA58F}
-.card{text-align:left;margin:28px auto 0;max-width:560px;padding:24px 22px;border-radius:28px;background:#FCFBF6;border:1.5px solid var(--line);box-shadow:0 18px 40px rgba(62,58,40,.08)}
+ul{list-style:none;text-align:left;max-width:520px;margin:24px auto 0}li{margin:6px 0;color:#4A3A41}li::before{content:"✦  ";color:#B79FA6}
+.card{text-align:left;margin:28px auto 0;max-width:560px;padding:24px 22px;border-radius:28px;background:#FBF8F4;border:1.5px solid var(--line);box-shadow:0 18px 40px rgba(70,50,58,.08)}
 label.f{display:flex;flex-direction:column;gap:5px;font-size:14px;color:var(--brown);margin-top:12px}
 input[type=text],input[type=email]{font:inherit;font-size:17px;padding:13px 16px;border-radius:16px;border:1.5px solid var(--line);background:var(--cream)}
 .cons{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.45;color:var(--brown);margin-top:14px}
@@ -62,7 +62,7 @@ a{color:var(--wine)}
 </style>
 </head>
 <body>
-<div class="bg" aria-hidden="true"><span style="width:420px;height:420px;right:-200px;top:-150px;background:#E3DED0"></span><span style="width:300px;height:300px;left:-190px;bottom:-60px;background:#D8DCC6;opacity:.6"></span></div>
+<div class="bg" aria-hidden="true"><span style="width:420px;height:420px;right:-200px;top:-150px;background:#E8DED2"></span><span style="width:300px;height:300px;left:-190px;bottom:-60px;background:#E8D6CA;opacity:.6"></span></div>
 <main>
   <div class="pol"><img src="/img/wildhearts/viv-stretch.jpg" alt="Viv stretching"><span>back to you ♡</span></div>
   <?php if ($stay): ?><br><span class="invite">your gift: <?= $h($stayCode) ?> ♡</span><?php elseif ($ref): ?><br><span class="invite"><?= $h(forma_first_name((string)$ref['name'] ?: 'A friend')) ?> invited you ♡</span><?php endif; ?>
@@ -125,7 +125,7 @@ a{color:var(--wine)}
       const j = await r.json();
       if (!j.ok) throw new Error(j.error || '');
       if (j.redirect) { location.href = j.redirect; return; }
-      fs.innerHTML = '<p style="font-family:Hand,cursive;color:#5E6B35;font-size:22px">thank you ♡</p><p>You are staying! Your circle price continues. A confirmation is on its way to your inbox.</p>';
+      fs.innerHTML = '<p style="font-family:Hand,cursive;color:#7D5E68;font-size:22px">thank you ♡</p><p>You are staying! Your circle price continues. A confirmation is on its way to your inbox.</p>';
     } catch (err) { ms.hidden = false; ms.textContent = err.message || 'That did not work just now. Please try again.'; b.disabled = false; }
   });
   const f = document.getElementById('f'), m = document.getElementById('m'), t0 = Date.now();

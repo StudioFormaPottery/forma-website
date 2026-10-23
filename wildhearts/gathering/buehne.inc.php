@@ -15,26 +15,26 @@ if (!isset($testTok)) { http_response_code(404); exit; }
 @font-face{font-family:"Italiana";font-weight:400;font-display:swap;src:url(/fonts/Italiana-Regular.woff) format("woff")}
 *{box-sizing:border-box;margin:0}
 [hidden]{display:none!important}
-html,body{height:100%;background:#1F1C16;color:#F6F3EA;font-family:"Outfit",system-ui,sans-serif;font-size:17px;line-height:1.55}
+html,body{height:100%;background:#1F181B;color:#F2ECE4;font-family:"Outfit",system-ui,sans-serif;font-size:17px;line-height:1.55}
 .stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
 .stage video{width:100%;height:100%;object-fit:contain;background:#000}
-.idle{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#3E372C;text-align:center;padding:24px}
-.idle h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(36px,6vw,60px);color:#DCE0D2}
-.idle p{color:#B3A78F}
-.panel{position:fixed;left:16px;top:16px;width:min(420px,calc(100% - 32px));max-height:calc(100% - 32px);overflow:auto;background:rgba(31,28,22,.94);border:1px solid #4a4337;border-radius:20px;padding:16px;z-index:3}
-.panel h2{font-size:18px;font-weight:500;color:#DCE0D2;margin-bottom:6px}
-.panel ol{padding-left:20px;font-size:15px;color:#E3DED0}
+.idle{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#4A3A41;text-align:center;padding:24px}
+.idle h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(36px,6vw,60px);color:#EADFDE}
+.idle p{color:#C9B2B8}
+.panel{position:fixed;left:16px;top:16px;width:min(420px,calc(100% - 32px));max-height:calc(100% - 32px);overflow:auto;background:rgba(31,22,26,.94);border:1px solid #5A4C52;border-radius:20px;padding:16px;z-index:3}
+.panel h2{font-size:18px;font-weight:500;color:#EADFDE;margin-bottom:6px}
+.panel ol{padding-left:20px;font-size:15px;color:#E8DED2}
 .panel li{margin:4px 0}
-.panel small{display:block;color:#B3A78F;font-size:13.5px;margin-top:8px}
+.panel small{display:block;color:#C9B2B8;font-size:13.5px;margin-top:8px}
 .list{display:flex;flex-direction:column;gap:6px;margin-top:12px}
-.list button{text-align:left;background:#2c2820;color:#F6F3EA;border:1px solid #4a4337}
-.list button.on{background:#5E6B35;border-color:#5E6B35}
-button,label.btn{font:inherit;font-size:16px;padding:10px 16px;border-radius:999px;border:0;background:#9DA58F;color:#1F1C16;cursor:pointer;display:inline-block}
+.list button{text-align:left;background:#2B2226;color:#F2ECE4;border:1px solid #5A4C52}
+.list button.on{background:#7D5E68;border-color:#7D5E68}
+button,label.btn{font:inherit;font-size:16px;padding:10px 16px;border-radius:999px;border:0;background:#B79FA6;color:#1F181B;cursor:pointer;display:inline-block}
 .row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
-.chk{display:flex;gap:8px;align-items:center;font-size:15px;color:#E3DED0}
-.chk input{width:18px;height:18px;accent-color:#9DA58F}
-.ghost{background:transparent;color:#DCE0D2;border:1px solid #6B5D4C}
-.show{position:fixed;left:16px;top:16px;z-index:3;padding:6px 12px;font-size:14px;background:rgba(31,28,22,.7);color:#B3A78F;border:1px solid #4a4337}
+.chk{display:flex;gap:8px;align-items:center;font-size:15px;color:#E8DED2}
+.chk input{width:18px;height:18px;accent-color:#B79FA6}
+.ghost{background:transparent;color:#EADFDE;border:1px solid #7D7076}
+.show{position:fixed;left:16px;top:16px;z-index:3;padding:6px 12px;font-size:14px;background:rgba(31,22,26,.7);color:#C9B2B8;border:1px solid #5A4C52}
 </style>
 </head>
 <body>
@@ -62,12 +62,12 @@ button,label.btn{font:inherit;font-size:16px;padding:10px 16px;border-radius:999
     <label class="chk"><input type="checkbox" id="loop"> In Schleife abspielen</label>
   </div>
   <h2 style="margin-top:18px">Hintergrundmusik</h2>
-  <p style="font-size:15px;color:#E3DED0">Für Bewegungseinheiten: Musik ganz leise im Hintergrund. Wähl eine Musikdatei von deinem Gerät, teil diesen Tab in Whereby mit „Tab-Audio teilen“ und lass deine Kamera an. Die Frauen sehen dich und hören die Musik leise unter deiner Stimme.</p>
+  <p style="font-size:15px;color:#E8DED2">Für Bewegungseinheiten: Musik ganz leise im Hintergrund. Wähl eine Musikdatei von deinem Gerät, teil diesen Tab in Whereby mit „Tab-Audio teilen“ und lass deine Kamera an. Die Frauen sehen dich und hören die Musik leise unter deiner Stimme.</p>
   <label class="btn" style="margin-top:10px">Musik auswählen<input id="mfile" type="file" accept="audio/*" multiple hidden></label>
-  <p id="mname" style="font-size:14px;color:#B3A78F;margin-top:6px"></p>
+  <p id="mname" style="font-size:14px;color:#C9B2B8;margin-top:6px"></p>
   <div class="row">
     <button id="mplay" type="button" disabled>▶ Musik</button>
-    <label class="chk" style="flex:1 1 180px">Lautstärke <input id="mvol" type="range" min="0" max="60" value="15" style="flex:1;accent-color:#9DA58F"></label>
+    <label class="chk" style="flex:1 1 180px">Lautstärke <input id="mvol" type="range" min="0" max="60" value="15" style="flex:1;accent-color:#B79FA6"></label>
   </div>
   <audio id="mus" loop></audio>
   <small>Ohne Häkchen läuft das Video stumm und die Frauen hören nur dich. Mit Ton: beim Teilen in Whereby „Tab-Audio teilen“ anhaken. Am besten am Computer mit Chrome oder Edge, vom Handy aus lässt sich kein Tab teilen. Die Hilfe hier blendet sich beim Abspielen aus, damit die Frauen nur das Video sehen.</small>

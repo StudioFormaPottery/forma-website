@@ -20,7 +20,7 @@ $h = 'forma_h';
 @font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(/fonts/Outfit-Bold.woff) format("woff")}
 @font-face{font-family:"Hand";font-display:swap;src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
-:root{--cream:#F6F3EA;--wine:#5E6B35;--wine-deep:#3F4A26;--brown:#6B5D4C;--ink:#2F2B22;--sage-soft:#DCE0D2;--line:#CFC9B5}
+:root{--cream:#F2ECE4;--wine:#7D5E68;--wine-deep:#6B5658;--brown:#7D7076;--ink:#2E2529;--sage-soft:#EADFDE;--line:#DDD2C6}
 *{box-sizing:border-box;margin:0}
 html,body{background:var(--cream)}
 body{font-family:"Outfit",system-ui,sans-serif;color:var(--ink);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
@@ -30,11 +30,11 @@ main{max-width:860px;margin:0 auto;padding:40px 16px 60px}
 h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(36px,7vw,52px);line-height:1.08;color:var(--wine-deep);margin:8px 0 6px}
 h2{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:30px;color:var(--wine-deep);margin:36px 0 8px}
 h3{font-size:18px;font-weight:600;color:var(--wine-deep);margin:20px 0 4px}
-p,li{color:#3E372C}
+p,li{color:#4A3A41}
 ul{padding-left:22px}
 li{margin:4px 0}
 .lead{color:var(--brown)}
-.card{margin-top:14px;padding:18px 20px;border-radius:22px;background:#FCFBF6;border:1.5px solid var(--line)}
+.card{margin-top:14px;padding:18px 20px;border-radius:22px;background:#FBF8F4;border:1.5px solid var(--line)}
 .price{display:inline-block;padding:3px 12px;border-radius:999px;background:var(--sage-soft);color:var(--wine-deep);font-weight:500;font-size:15px;margin:2px 4px 2px 0}
 .lang{display:flex;gap:6px}
 .lang button{font:inherit;font-size:14px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--wine-deep);cursor:pointer}

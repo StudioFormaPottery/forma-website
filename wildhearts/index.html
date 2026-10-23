@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Wild Hearts Collective · Viv</title>
 <meta name="description" content="For women who want more than just functioning. A free community, a little reset for tired days and live Gatherings, with Viv from the Austrian mountains.">
-<meta name="theme-color" content="#F3F1E7">
+<meta name="theme-color" content="#F2ECE4">
 <link rel="canonical" href="https://moveciamovement.com/">
 <link rel="icon" href="/img/wildhearts/viv.jpg">
 <link rel="apple-touch-icon" href="/img/wildhearts/viv.jpg">
@@ -19,9 +19,9 @@
 @font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(/fonts/Outfit-Bold.woff) format("woff")}
 @font-face{font-family:"Hand";font-weight:400;font-display:swap;src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
 :root{
-  --cream:#F6F3EA;--paper:#EEEADF;--oat:#E3DED0;--blush:#D8DCC6;--rose:#B3A78F;
-  --wine:#5E6B35;--wine-deep:#3F4A26;--earth:#3E372C;--brown:#6B5D4C;--ink:#2F2B22;
-  --sage:#8E9A82;--sage-soft:#DCE0D2;--line:#CFC9B5;
+  --cream:#F2ECE4;--paper:#E8DED2;--oat:#E8DED2;--blush:#E8D6CA;--rose:#C9B2B8;
+  --wine:#7D5E68;--wine-deep:#6B5658;--earth:#4A3A41;--brown:#7D7076;--ink:#2E2529;
+  --sage:#B79FA6;--sage-soft:#EADFDE;--line:#DDD2C6;
   --blob:58% 42% 47% 53% / 52% 46% 54% 48%;
   --serif:"Italiana",Georgia,serif;--hand:"Hand","Bradley Hand",cursive;
   --sans:"Outfit",ui-sans-serif,system-ui,-apple-system,sans-serif;
@@ -41,16 +41,16 @@ a{color:inherit}
 @keyframes morph{0%{border-radius:58% 42% 47% 53% / 52% 46% 54% 48%;transform:rotate(0)}100%{border-radius:42% 58% 60% 40% / 45% 58% 42% 55%;transform:rotate(16deg)}}
 .swirl{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 .swirl span{position:absolute;display:block;animation:swirl var(--d,22s) ease-in-out infinite;animation-delay:var(--delay,0s);opacity:.9}
-.swirl svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 8px rgba(62,58,40,.14))}
+.swirl svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 8px rgba(70,50,58,.14))}
 @keyframes swirl{0%{transform:translate(0,0) rotate(var(--r,0deg))}25%{transform:translate(var(--x1,14px),18px) rotate(calc(var(--r,0deg) + 28deg))}50%{transform:translate(0,34px) rotate(calc(var(--r,0deg) + 8deg))}75%{transform:translate(calc(var(--x1,14px) * -1),14px) rotate(calc(var(--r,0deg) - 22deg))}100%{transform:translate(0,0) rotate(var(--r,0deg))}}
 
 .page{position:relative;z-index:1;width:100%;max-width:640px;margin:0 auto;padding:max(30px,env(safe-area-inset-top)) 16px 10px}
 
 /* Polaroid mit Klebeband */
-.polaroid{position:relative;background:#fff;padding:10px 10px 40px;box-shadow:0 16px 34px rgba(47,43,34,.22)}
+.polaroid{position:relative;background:#fff;padding:10px 10px 40px;box-shadow:0 16px 34px rgba(46,37,41,.22)}
 .polaroid img{display:block;width:100%;height:100%;object-fit:cover}
 .polaroid .cap{white-space:nowrap;line-height:1.2;position:absolute;left:0;right:0;bottom:9px;text-align:center;font-family:var(--hand);font-size:15px;color:var(--brown)}
-.tape{position:absolute;width:86px;height:26px;background:rgba(216,220,198,.82);top:-12px;left:50%;margin-left:-43px;transform:rotate(-6deg)}
+.tape{position:absolute;width:86px;height:26px;background:rgba(232,214,202,.82);top:-12px;left:50%;margin-left:-43px;transform:rotate(-6deg)}
 
 /* Kopf */
 .head{display:flex;flex-direction:column;align-items:center;text-align:center}
@@ -64,25 +64,25 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
 
 /* Knöpfe */
 .links{display:flex;flex-direction:column;gap:14px;margin-top:28px}
-.btn{display:flex;align-items:center;gap:14px;width:100%;padding:16px 20px;border-radius:999px;text-decoration:none;font-family:var(--sans);font-size:17px;font-weight:500;border:1.5px solid var(--line);background:rgba(252,251,246,.94);color:var(--ink);cursor:pointer;text-align:left;transition:transform .2s ease,box-shadow .2s ease}
-.btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(62,58,40,.14)}
+.btn{display:flex;align-items:center;gap:14px;width:100%;padding:16px 20px;border-radius:999px;text-decoration:none;font-family:var(--sans);font-size:17px;font-weight:500;border:1.5px solid var(--line);background:rgba(251,248,244,.94);color:var(--ink);cursor:pointer;text-align:left;transition:transform .2s ease,box-shadow .2s ease}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(70,50,58,.14)}
 .btn:focus-visible,.gift:focus-visible{outline:2px solid var(--wine);outline-offset:3px}
 .btn .ic{flex:0 0 auto;width:42px;height:42px;border-radius:var(--blob);display:grid;place-items:center;background:var(--blush);color:var(--wine-deep)}
 .btn .ic svg{width:21px;height:21px}
 .btn .tx{flex:1;display:flex;flex-direction:column;line-height:1.3}
 .btn .tx small{font-size:13.5px;font-weight:400;color:var(--brown);margin-top:3px}
 .btn .ar{opacity:.55;font-size:18px}
-.btn.main{background:var(--wine);color:#F6F3EA;border-color:var(--wine);box-shadow:0 18px 36px rgba(63,74,38,.28)}
-.btn.main .ic{background:rgba(246,243,234,.18);color:#F6F3EA}
-.btn.main small{color:rgba(246,243,234,.85)}
+.btn.main{background:var(--wine);color:#F2ECE4;border-color:var(--wine);box-shadow:0 18px 36px rgba(107,86,88,.28)}
+.btn.main .ic{background:rgba(242,236,228,.18);color:#F2ECE4}
+.btn.main small{color:rgba(242,236,228,.85)}
 .tag{display:inline-block;margin-left:6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--oat);color:var(--brown);vertical-align:2px;font-weight:500}
 
 /* Geschenk: Reset Routine */
-.gift{position:relative;display:flex;gap:18px;align-items:center;width:100%;margin-top:8px;padding:22px 20px 22px 18px;border-radius:30px;border:0;background:var(--sage-soft);color:var(--ink);text-align:left;font:inherit;cursor:pointer;box-shadow:0 14px 30px rgba(47,43,34,.1);transform:rotate(-.6deg);transition:transform .2s ease}
+.gift{position:relative;display:flex;gap:18px;align-items:center;width:100%;margin-top:8px;padding:22px 20px 22px 18px;border-radius:30px;border:0;background:var(--sage-soft);color:var(--ink);text-align:left;font:inherit;cursor:pointer;box-shadow:0 14px 30px rgba(46,37,41,.1);transform:rotate(-.6deg);transition:transform .2s ease}
 .gift:hover{transform:rotate(0) translateY(-2px)}
-.gift .cov{flex:0 0 auto;width:92px;transform:rotate(-5deg);box-shadow:0 10px 20px rgba(47,43,34,.25);border:4px solid #fff;position:relative}
+.gift .cov{flex:0 0 auto;width:92px;transform:rotate(-5deg);box-shadow:0 10px 20px rgba(46,37,41,.25);border:4px solid #fff;position:relative}
 .gift .cov img{display:block;width:100%;height:auto}
-.gift .cov::before{content:"";position:absolute;width:46px;height:15px;background:rgba(216,220,198,.85);top:-9px;left:50%;margin-left:-23px;transform:rotate(4deg)}
+.gift .cov::before{content:"";position:absolute;width:46px;height:15px;background:rgba(232,214,202,.85);top:-9px;left:50%;margin-left:-23px;transform:rotate(4deg)}
 .gift .note{font-family:var(--hand);font-size:14.5px;color:var(--wine)}
 .gift strong{display:block;font-family:var(--serif);font-weight:400;font-size:27px;line-height:1.08;color:var(--earth);margin-top:4px}
 .gift small{display:block;font-size:14px;color:var(--brown);margin-top:6px;line-height:1.45}
@@ -90,10 +90,10 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
 
 /* Brief */
 .letter{position:relative;margin-top:44px;padding:34px 24px 30px;border-radius:30px;background:var(--wine);color:var(--cream);overflow:hidden}
-.letter::after{content:"";position:absolute;width:180px;height:180px;right:-70px;bottom:-80px;border-radius:var(--blob);background:rgba(216,220,198,.16)}
+.letter::after{content:"";position:absolute;width:180px;height:180px;right:-70px;bottom:-80px;border-radius:var(--blob);background:rgba(232,214,202,.16)}
 .letter>*{position:relative;z-index:1}
 .letter .hello{font-family:var(--hand);font-size:24px;color:var(--blush)}
-.letter p{margin-top:12px;font-size:16.5px;line-height:1.65;color:#EEEEE2}
+.letter p{margin-top:12px;font-size:16.5px;line-height:1.65;color:#F3E9EC}
 .letter .sig{font-family:var(--hand);font-size:17px;color:var(--blush);margin-top:16px;transform:rotate(-1.5deg)}
 .letter .mini{float:right;width:110px;margin:4px 0 10px 16px;padding:6px 6px 26px;transform:rotate(4deg)}
 .letter .mini .ph{height:110px;overflow:hidden}
@@ -107,7 +107,7 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
 .affirm svg{position:absolute;opacity:.9}
 
 /* Anmeldung */
-.join{position:relative;margin-top:44px;padding:34px 22px 24px;border-radius:30px;background:#FCFBF6;border:1.5px solid var(--line);box-shadow:0 18px 40px rgba(62,58,40,.1);scroll-margin-top:20px}
+.join{position:relative;margin-top:44px;padding:34px 22px 24px;border-radius:30px;background:#FBF8F4;border:1.5px solid var(--line);box-shadow:0 18px 40px rgba(70,50,58,.1);scroll-margin-top:20px}
 .join .tape{top:-13px}
 .join h2{font-family:var(--serif);font-weight:400;font-size:33px;line-height:1.1;color:var(--wine-deep);text-align:center}
 .join p.intro{text-align:center;color:var(--brown);margin-top:10px;font-size:16.5px}
@@ -118,7 +118,7 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
 .join input:focus{outline:2px solid var(--blush);outline-offset:1px;border-color:var(--wine)}
 .consent{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;color:var(--brown)}
 .consent input{margin-top:3px;width:18px;height:18px;accent-color:var(--wine);flex:0 0 auto}
-.join button{font:inherit;font-weight:500;font-size:17px;padding:16px 22px;border-radius:999px;border:0;background:var(--wine);color:#F6F3EA;cursor:pointer;margin-top:4px}
+.join button{font:inherit;font-weight:500;font-size:17px;padding:16px 22px;border-radius:999px;border:0;background:var(--wine);color:#F2ECE4;cursor:pointer;margin-top:4px}
 .join button:disabled{opacity:.6;cursor:wait}
 .msg{text-align:center;font-size:15.5px;line-height:1.5;color:var(--ink);padding:6px 0 0}
 .msg.err{color:var(--wine)}
@@ -131,7 +131,7 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
 .foot a{color:var(--brown)}
 .foot .in{max-width:640px;margin:0 auto}
 .foot .bye{font-family:var(--hand);font-size:16px;color:var(--wine);margin-bottom:8px}
-.foot details{margin-top:12px;text-align:left;background:rgba(249,247,240,.7);border-radius:18px;padding:10px 16px}
+.foot details{margin-top:12px;text-align:left;background:rgba(251,248,244,.7);border-radius:18px;padding:10px 16px}
 .foot summary{cursor:pointer;text-align:center;list-style:none}
 .foot summary::-webkit-details-marker{display:none}
 .foot details p{margin-top:8px}
@@ -139,9 +139,9 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);li
 
 /* Sprache EN/DE */
 html[lang=de] .en,html[lang=en] .de{display:none!important}
-.langsw{position:absolute;right:16px;top:max(14px,env(safe-area-inset-top));z-index:3;display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(252,251,246,.92);border:1.5px solid var(--line);font-size:13px;letter-spacing:.06em}
+.langsw{position:absolute;right:16px;top:max(14px,env(safe-area-inset-top));z-index:3;display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(251,248,244,.92);border:1.5px solid var(--line);font-size:13px;letter-spacing:.06em}
 .langsw button{font:inherit;border:0;background:transparent;color:var(--brown);padding:6px 11px;border-radius:999px;cursor:pointer}
-.langsw button[aria-pressed=true]{background:var(--wine);color:#F6F3EA}
+.langsw button[aria-pressed=true]{background:var(--wine);color:#F2ECE4}
 
 /* Angebote: die Stufen */
 .offer{position:relative;margin-top:52px;scroll-margin-top:20px}
@@ -152,8 +152,8 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
 .steps{list-style:none;padding:0;margin:28px 0 0;display:flex;flex-direction:column;gap:18px;position:relative}
 .steps::before{content:"";position:absolute;left:27px;top:30px;bottom:30px;border-left:2px dashed var(--rose);opacity:.6}
 .step{position:relative;display:flex;gap:16px;align-items:flex-start}
-.step .no{flex:0 0 56px;width:56px;height:56px;border-radius:var(--blob);display:grid;place-items:center;font-family:var(--serif);font-size:26px;position:relative;z-index:1;box-shadow:0 10px 20px rgba(47,43,34,.16)}
-.step .card{flex:1;min-width:0;border-radius:28px;padding:22px 20px 20px;box-shadow:0 14px 30px rgba(47,43,34,.1)}
+.step .no{flex:0 0 56px;width:56px;height:56px;border-radius:var(--blob);display:grid;place-items:center;font-family:var(--serif);font-size:26px;position:relative;z-index:1;box-shadow:0 10px 20px rgba(46,37,41,.16)}
+.step .card{flex:1;min-width:0;border-radius:28px;padding:22px 20px 20px;box-shadow:0 14px 30px rgba(46,37,41,.1)}
 .step .kick{font-size:11.5px;letter-spacing:.24em;text-transform:uppercase}
 .step h3{font-family:var(--serif);font-weight:400;font-size:29px;line-height:1.08;margin-top:4px}
 .step .note{font-family:var(--hand);font-size:15px;margin-top:4px}
@@ -164,10 +164,10 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
 .step .price{font-family:var(--hand);font-size:14px;line-height:1.55;margin-top:16px;opacity:.9}
 .step .fam{margin-top:14px;font-size:15px;font-style:italic;opacity:.9}
 .step .go{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:12px 20px;border-radius:999px;border:0;font:inherit;font-weight:500;font-size:15.5px;text-decoration:none;cursor:pointer}
-.s1 .no{background:#FCFBF6;color:var(--wine)}.s1 .card{background:#FCFBF6;border:1.5px solid var(--line)}.s1 .kick{color:var(--brown)}.s1 h3{color:var(--wine-deep)}.s1 .note{color:var(--wine)}.s1 .go{background:var(--wine);color:#F6F3EA}
-.s2 .no{background:var(--sage-soft);color:var(--earth)}.s2 .card{background:var(--sage-soft)}.s2 .kick{color:#55604C}.s2 h3{color:var(--earth)}.s2 .note{color:var(--wine)}.s2 .go{background:var(--earth);color:var(--cream)}
-.s3 .no{background:var(--wine);color:var(--cream)}.s3 .card{background:var(--wine);color:#EEEEE2}.s3 .kick{color:var(--blush)}.s3 h3{color:var(--cream)}.s3 .note{color:var(--blush)}.s3 .go{background:var(--cream);color:var(--wine-deep)}
-.s4 .no{background:var(--earth);color:var(--blush)}.s4 .card{background:var(--earth);color:#E6E4D8}.s4 .kick{color:var(--rose)}.s4 h3{color:var(--cream)}.s4 .note{color:var(--blush)}.s4 .go{background:var(--blush);color:var(--earth)}
+.s1 .no{background:#FBF8F4;color:var(--wine)}.s1 .card{background:#FBF8F4;border:1.5px solid var(--line)}.s1 .kick{color:var(--brown)}.s1 h3{color:var(--wine-deep)}.s1 .note{color:var(--wine)}.s1 .go{background:var(--wine);color:#F2ECE4}
+.s2 .no{background:var(--sage-soft);color:var(--earth)}.s2 .card{background:var(--sage-soft)}.s2 .kick{color:#6B5658}.s2 h3{color:var(--earth)}.s2 .note{color:var(--wine)}.s2 .go{background:var(--earth);color:var(--cream)}
+.s3 .no{background:var(--wine);color:var(--cream)}.s3 .card{background:var(--wine);color:#F3E9EC}.s3 .kick{color:var(--blush)}.s3 h3{color:var(--cream)}.s3 .note{color:var(--blush)}.s3 .go{background:var(--cream);color:var(--wine-deep)}
+.s4 .no{background:var(--earth);color:var(--blush)}.s4 .card{background:var(--earth);color:#EADFDE}.s4 .kick{color:var(--rose)}.s4 h3{color:var(--cream)}.s4 .note{color:var(--blush)}.s4 .go{background:var(--blush);color:var(--earth)}
 .offer .tag{margin-left:0}
 @media (min-width:900px){
   .offer{width:min(1120px,calc(100vw - 64px));margin-left:50%;transform:translateX(-50%)}
@@ -242,7 +242,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
 
     <a class="btn" href="#angebot">
       <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/></svg></span>
-      <span class="tx"><span><span class="en">Ways to walk with me</span><span class="de">So begleite ich dich</span></span><small><span class="en">Collective, Inner Circle, Alpine Retreat and the Year Circle</span><span class="de">Collective, Inner Circle, Alpine Retreat und der Jahreskreis</span></small></span>
+      <span class="tx"><span><span class="en">Ways to walk with me</span><span class="de">So begleite ich dich</span></span><small><span class="en">The Collective and the Alpine Retreat</span><span class="de">Das Collective und das Alpine Retreat</span></small></span>
       <span class="ar" aria-hidden="true">↓</span>
     </a>
     <a class="btn" href="https://www.instagram.com/movementwithviv/" target="_blank" rel="noopener">
@@ -282,25 +282,8 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
           <a class="go" href="https://www.instagram.com/channel/wrOyV88oT-GAwNiR/" target="_blank" rel="noopener"><span class="en">Join for free →</span><span class="de">Kostenlos dabei sein →</span></a></div>
         </div>
       </li>
-      <li class="step s2">
-        <span class="no" aria-hidden="true">2</span>
-        <div class="card">
-          <p class="kick"><span class="en">Membership · opens 1 December 2026</span><span class="de">Mitgliedschaft · ab 1. Dezember 2026</span></p>
-          <h3>The Inner Circle</h3>
-          <p class="note"><span class="en">back to yourself, month after month</span><span class="de">zurück zu dir, Monat für Monat</span></p>
-          <button class="more-t" type="button" aria-expanded="false"><span class="en">Read more</span><span class="de">Mehr lesen</span></button>
-          <div class="more">
-          <p class="en">For mamas and every woman worn out by the mental load who wants to come back to herself. The Inner Circle is your circle of the month: you can simply be there, breathe out and feel your nervous system settle. Here we women support each other and work on ourselves together, step by step, back to you.</p>
-          <p class="de">Für Mamas und alle Frauen, die vom Mental Load erschöpft sind und wieder bei sich ankommen möchten. Der Inner Circle ist dein Kreis des Monats: Du darfst einfach dabei sein, durchatmen und spüren, wie dein Nervensystem zur Ruhe kommt. Hier unterstützen wir Frauen uns gegenseitig und arbeiten gemeinsam an uns, Schritt für Schritt zurück zu dir.</p>
-          <ul class="en"><li>A monthly live circle where you can simply be</li><li>Breathwork and gentle movement together to calm your nervous system</li><li>Talks on the topics that truly move you</li><li>Women who lift each other up and support each other</li><li>A members' area with rituals, affirmations and short movement sessions</li><li>A holistic system that gives you space, wherever you are right now</li></ul>
-          <ul class="de"><li>Ein monatlicher Live-Kreis, in dem du einfach dabei sein darfst</li><li>Gemeinsame Breathwork- und Bewegungseinheiten, die dein Nervensystem beruhigen</li><li>Impulsvorträge zu Themen, die dich wirklich bewegen</li><li>Frauen, die sich gegenseitig stärken und unterstützen</li><li>Ein Mitgliederbereich mit Ritualen, Affirmationen und kurzen Bewegungseinheiten</li><li>Ein ganzheitliches System, das dir Raum gibt, egal wo du gerade stehst</li></ul>
-          <p class="price"><span class="en">€39 a month, or €312 a year (€26 a month). New content every month, growing with the Wheel of the Year. Book your place now, your first payment is taken on 1 December.</span><span class="de">€ 39 im Monat oder € 312 im Jahr (€ 26 im Monat). Jeden Monat neue Inhalte, passend zum Jahreskreis. Sichere dir jetzt deinen Platz, die erste Abbuchung ist am 1. Dezember.</span></p>
-          <a class="go" href="/circle"><span class="en">Book my place →</span><span class="de">Platz sichern →</span></a>
-          </div>
-        </div>
-      </li>
       <li class="step s3">
-        <span class="no" aria-hidden="true">3</span>
+        <span class="no" aria-hidden="true">2</span>
         <div class="card">
           <p class="kick"><span class="en">A weekend in the Alps · dates coming soon</span><span class="de">Ein Wochenende in den Alpen · Termine folgen</span></p>
           <h3>Wild Hearts Alpine Retreat</h3>
@@ -317,29 +300,12 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
           </div>
         </div>
       </li>
-      <li class="step s4">
-        <span class="no" aria-hidden="true">4</span>
-        <div class="card">
-          <p class="kick"><span class="en">12 months · by application</span><span class="de">12 Monate · mit Bewerbung</span></p>
-          <h3><span class="en">The Year Circle</span><span class="de">Der Jahreskreis</span></h3>
-          <p class="note"><span class="en">a whole year, side by side</span><span class="de">ein ganzes Jahr, Seite an Seite</span></p>
-          <button class="more-t" type="button" aria-expanded="false"><span class="en">Read more</span><span class="de">Mehr lesen</span></button>
-          <div class="more">
-          <p class="en">For you if you don't just want to make better use of your time for yourself, but also want to bring your heart idea to life. Whether you have just finished your yoga teacher training, are at the start of your own creative business or heart project, or want to publish a book and don't know where to begin: whatever your idea is, we'll bring it to life together, and I'm happy to support you along the way.</p>
-          <p class="de">Für dich, wenn du nicht nur deine Zeit für dich besser nutzen, sondern auch deine Herzensidee verwirklichen möchtest. Ganz egal, ob du gerade deine Yogalehrerausbildung abgeschlossen hast, am Anfang deiner Selbstständigkeit, deines Kreativbusiness oder deines Herzensprojekts stehst oder ein Buch veröffentlichen möchtest und nicht weißt, wo du anfangen sollst: Welche Idee du auch hast, wir bringen sie gemeinsam ins Leben, und ich unterstütze dich gern dabei.</p>
-          <ul class="en"><li>Everything in the Inner Circle</li><li>1:1 mentoring for your heart idea</li><li>Movement and breathwork through the cycle of the year</li><li>A members' area that walks with you all year, with reminders and nudges like a best friend who has your back</li><li>Only a few places each year</li></ul>
-          <ul class="de"><li>Alles aus dem Inner Circle</li><li>1:1 Mentoring für deine Herzensidee</li><li>Bewegung und Breathwork im Rhythmus des Jahreskreises</li><li>Ein Mitgliederbereich, der dich das ganze Jahr begleitet, mit Erinnerungen und Impulsen wie von deiner besten Freundin</li><li>Nur wenige Plätze pro Jahr</li></ul>
-          <p class="price"><span class="en">Prices and details follow. Leave your email and I'll send you everything personally.</span><span class="de">Preise und Details folgen. Trag dich ein, dann schicke ich dir alles persönlich.</span></p>
-          <button class="go" type="button" data-join="year"><span class="en">Keep me posted →</span><span class="de">Informiere mich →</span></button>
-          </div>
-        </div>
-      </li>
     </ol>
   </section>
 
   <section class="affirm" aria-label="Affirmation">
-    <svg style="left:18px;top:16px" width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4c2 15 12 25 28 28-16 3-26 13-28 28-2-15-12-25-28-28 16-3 26-13 28-28z" fill="#B3A78F"/></svg>
-    <svg style="right:20px;top:18px" width="34" height="34" viewBox="0 0 120 120" aria-hidden="true"><path d="M80 18a42 42 0 1 0 22 62A34 34 0 0 1 80 18z" fill="#D8DCC6"/></svg>
+    <svg style="left:18px;top:16px" width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4c2 15 12 25 28 28-16 3-26 13-28 28-2-15-12-25-28-28 16-3 26-13 28-28z" fill="#C9B2B8"/></svg>
+    <svg style="right:20px;top:18px" width="34" height="34" viewBox="0 0 120 120" aria-hidden="true"><path d="M80 18a42 42 0 1 0 22 62A34 34 0 0 1 80 18z" fill="#E8D6CA"/></svg>
     <p class="k"><span class="en">for tonight</span><span class="de">für heute Abend</span></p>
     <p class="big"><span class="en">I am allowed to rest.</span><span class="de">Ich darf ruhen.</span></p>
     <p class="hand"><span class="en">and I'm allowed to want more.</span><span class="de">und ich darf mehr wollen.</span></p>
@@ -361,7 +327,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
   </section>
 </main>
 
-<div class="wave" aria-hidden="true"><svg viewBox="0 0 1200 70" preserveAspectRatio="none"><path d="M0 40C150 10 300 10 450 32S750 68 900 44 1100 14 1200 26V70H0Z" fill="#E3DED0"/></svg></div>
+<div class="wave" aria-hidden="true"><svg viewBox="0 0 1200 70" preserveAspectRatio="none"><path d="M0 40C150 10 300 10 450 32S750 68 900 44 1100 14 1200 26V70H0Z" fill="#E8DED2"/></svg></div>
 <footer class="foot">
   <div class="in">
     <p class="bye"><span class="en">with love from the mountains ♡</span><span class="de">mit Liebe aus den Bergen ♡</span></p>
@@ -380,7 +346,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
 <script>
 (() => {
   // Wirbelnde Icons: passend zur Jahreszeit, in FORMA-Farben
-  const C = {r: '#5E6B35', b: '#D3D6BE', k: '#6B5D4C', p: '#F6F3EA', s: '#E1DCCB', g: '#9DA58F'};
+  const C = {r: '#7D5E68', b: '#EADFDE', k: '#7D7076', p: '#F2ECE4', s: '#E8D6CA', g: '#B79FA6'};
   const I = {
     leaf: `<path d="M32 6c14 8 22 20 20 34-1 8-8 14-16 15-1-12 2-24 8-34-8 9-13 21-14 34C17 52 11 44 12 34 14 21 22 12 32 6z" fill="${C.r}"/><path d="M30 55c1-14 6-27 14-37" stroke="${C.p}" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>`,
     leaf2: `<path d="M10 46C9 28 22 12 44 10c6-1 10 0 10 0s1 4 0 10C52 42 36 55 18 54l-6 6-3-3 6-6c-3-2-5-3-5-5z" fill="${C.b}"/><path d="M14 52L44 20" stroke="${C.k}" stroke-width="2" stroke-linecap="round" opacity=".55"/>`,
@@ -456,7 +422,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
   const loaded = Date.now();
   const T = {
     en: {
-      link: ['Come a little closer', 'Get the Reset Routine for Tired Days for free, plus invitations to our live Wild Hearts Gatherings and first news about the Inner Circle.'],
+      link: ['Come a little closer', 'Get the Reset Routine for Tired Days for free, plus invitations to our live Wild Hearts Gatherings.'],
       reset: ['Your Reset Routine', 'Leave your first name and email. Once you have confirmed your address, the Reset Routine for Tired Days lands in your inbox, and you choose English or Deutsch.'],
       circle: ['The Inner Circle', 'Leave your name and email and I will send you all the details and prices personally as soon as the Inner Circle opens. The Reset Routine comes as a little gift.'],
       retreat: ['Wild Hearts Alpine Retreat', 'Leave your name and email and I will send you dates, prices and all the details personally as soon as they are ready. The Reset Routine comes as a little gift.'],
@@ -467,7 +433,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
       fail: 'That did not work just now. Please try again in a moment or write to hello@moveciamovement.com.'
     },
     de: {
-      link: ['Komm ein bisschen näher', 'Hol dir die Reset-Routine für müde Tage kostenlos, dazu Einladungen zu unseren Live-Gatherings und die ersten Neuigkeiten zum Inner Circle.'],
+      link: ['Komm ein bisschen näher', 'Hol dir die Reset-Routine für müde Tage kostenlos, dazu Einladungen zu unseren Live-Gatherings.'],
       reset: ['Deine Reset-Routine', 'Trag deinen Vornamen und deine E-Mail ein. Sobald du deine Adresse bestätigt hast, kommt die Reset-Routine für müde Tage zu dir, und du wählst Deutsch oder Englisch.'],
       circle: ['The Inner Circle', 'Trag deinen Namen und deine E-Mail ein, dann schicke ich dir alle Details und Preise persönlich, sobald der Inner Circle öffnet. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],
       retreat: ['Wild Hearts Alpine Retreat', 'Trag deinen Namen und deine E-Mail ein, dann schicke ich dir Termine, Preise und alle Details persönlich, sobald sie feststehen. Die Reset-Routine bekommst du als kleines Geschenk dazu.'],

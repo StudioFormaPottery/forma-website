@@ -79,7 +79,7 @@ $h = 'forma_h';
 <title><?= $open ? 'Gathering room' : 'Wild Hearts Gathering' ?> · Wild Hearts</title>
 <meta name="description" content="A free live circle for women who want more than just functioning. With Viv, from the Austrian mountains.">
 <?php if ($me): ?><meta name="robots" content="noindex, nofollow"><?php endif; ?>
-<meta name="theme-color" content="#F3F1E7">
+<meta name="theme-color" content="#F2ECE4">
 <link rel="icon" href="/img/wildhearts/viv.jpg">
 <meta property="og:title" content="Wild Hearts Gathering">
 <meta property="og:image" content="https://moveciamovement.com/img/wildhearts/og.jpg">
@@ -88,7 +88,7 @@ $h = 'forma_h';
 @font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(/fonts/Outfit-Bold.woff) format("woff")}
 @font-face{font-family:"Hand";font-weight:400;font-display:swap;src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
-:root{--cream:#F6F3EA;--oat:#E3DED0;--blush:#D8DCC6;--rose:#B3A78F;--wine:#5E6B35;--wine-deep:#3F4A26;--earth:#3E372C;--brown:#6B5D4C;--ink:#2F2B22;--sage-soft:#DCE0D2;--line:#CFC9B5;--blob:58% 42% 47% 53% / 52% 46% 54% 48%;--hand:"Hand","Bradley Hand",cursive}
+:root{--cream:#F2ECE4;--oat:#E8DED2;--blush:#E8D6CA;--rose:#C9B2B8;--wine:#7D5E68;--wine-deep:#6B5658;--earth:#4A3A41;--brown:#7D7076;--ink:#2E2529;--sage-soft:#EADFDE;--line:#DDD2C6;--blob:58% 42% 47% 53% / 52% 46% 54% 48%;--hand:"Hand","Bradley Hand",cursive}
 *{box-sizing:border-box;margin:0}
 [hidden]{display:none!important}
 html,body{background:var(--cream)}
@@ -103,15 +103,15 @@ main{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:max(36px,
 h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(38px,9vw,56px);line-height:1.05;color:var(--wine-deep);margin-top:8px}
 .when{display:inline-block;margin-top:18px;padding:14px 22px;border-radius:22px;background:var(--sage-soft);color:var(--earth);font-weight:500}
 .lead{color:var(--brown);margin:16px auto 0;max-width:38ch}
-.card{position:relative;margin-top:30px;padding:32px 22px 24px;border-radius:30px;background:#FCFBF6;border:1.5px solid var(--line);box-shadow:0 18px 40px rgba(62,58,40,.1);text-align:left}
-.tape{position:absolute;width:86px;height:26px;background:rgba(216,220,198,.82);top:-13px;left:50%;margin-left:-43px;transform:rotate(-6deg)}
+.card{position:relative;margin-top:30px;padding:32px 22px 24px;border-radius:30px;background:#FBF8F4;border:1.5px solid var(--line);box-shadow:0 18px 40px rgba(70,50,58,.1);text-align:left}
+.tape{position:absolute;width:86px;height:26px;background:rgba(232,214,202,.82);top:-13px;left:50%;margin-left:-43px;transform:rotate(-6deg)}
 form{display:flex;flex-direction:column;gap:12px}
 label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--brown)}
 input[type=text],input[type=email]{font:inherit;font-size:17px;padding:14px 18px;border-radius:18px;border:1.5px solid var(--line);background:var(--cream);color:var(--ink)}
 input:focus{outline:2px solid var(--blush);outline-offset:1px;border-color:var(--wine)}
 .consent{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;color:var(--brown)}
 .consent input{margin-top:3px;width:18px;height:18px;accent-color:var(--wine);flex:0 0 auto}
-button,.btn{font:inherit;font-weight:500;font-size:17px;padding:15px 24px;border-radius:999px;border:0;background:var(--wine);color:#F6F3EA;cursor:pointer;text-decoration:none;display:inline-block;text-align:center}
+button,.btn{font:inherit;font-weight:500;font-size:17px;padding:15px 24px;border-radius:999px;border:0;background:var(--wine);color:#F2ECE4;cursor:pointer;text-decoration:none;display:inline-block;text-align:center}
 button:disabled{opacity:.6;cursor:wait}
 .msg{text-align:center;font-size:15.5px;line-height:1.5;padding:6px 0 0}
 .msg.err{color:var(--wine)}
@@ -126,7 +126,7 @@ body.room{background:var(--earth)}
 .roombar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;color:var(--cream);font-size:14px}
 .roombar .hand{color:var(--blush);font-size:16px}
 .roombar a{color:var(--blush)}
-.roomwrap iframe{flex:1;width:100%;border:0;background:#2a1b16}
+.roomwrap iframe{flex:1;width:100%;border:0;background:#2B1E23}
 </style>
 </head>
 <?php if ($open): ?>
