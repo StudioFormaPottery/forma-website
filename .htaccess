@@ -33,6 +33,8 @@ RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^natal/online/?$ wildhearts/natal/index.php?m=online [L,QSA]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^natal/raum/?$ wildhearts/natal/raum/ [L,QSA]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^natal/mitglied/?$ wildhearts/natal/mitglied/ [L,QSA]
 # Ohne www → mit www (nur Seitenaufrufe, API/Webhooks bleiben unberührt)
 RewriteCond %{HTTP_HOST} ^forma-pottery\.com$ [NC]
 RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$

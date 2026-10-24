@@ -309,3 +309,59 @@ function natal_spotify_embed(string $url): string
     if (!preg_match('~open\.spotify\.com/(?:intl-[a-z]+/)?(?:embed/)?(playlist|album)/([A-Za-z0-9]{10,40})~', $url, $m)) return '';
     return 'https://open.spotify.com/embed/' . $m[1] . '/' . $m[2] . '?utm_source=generator&theme=0';
 }
+
+/** Widerrufsfrist (Vivien, 24.10.2026): in den ersten 14 Tagen nach der Buchung nur Begrüßung und Workbook-Vorschau
+ *  (erstes Drittel, am Bildschirm, kein Download). Danach ist alles offen. */
+function natal_member_full_from(array $o): int
+{
+    return strtotime((string)($o['paid_at'] ?: $o['created_at'])) + 14 * 86400;
+}
+
+function natal_member_full(array $o): bool
+{
+    return time() >= natal_member_full_from($o);
+}
+
+// --- „Baby ist da“ (Vivien, 24.10.2026) ------------------------------------------------------------
+
+/** Glückwunsch-Mail mit Icons. Liefert ['subject','text','html']. */
+function natal_birth_mail(array $o): array
+{
+    $first = forma_first_name((string)$o['name']);
+    $site = mm_site();
+    $icons = '';
+    foreach (['wolke', 'schuh', 'herz', 'rassel', 'mobile'] as $i) $icons .= '<img src="' . $site . '/img/movecia/icons/' . $i . '.png" width="46" height="46" alt="" style="display:inline-block;width:46px;height:46px;margin:0 5px;border:0;">';
+    $paras = [
+        "Hallo $first,",
+        'Ich freue mich so sehr für dich und deine ganze Familie.',
+        'Ich wünsche dir ganz, ganz viel Glück und eine wunderschöne, sanfte Kennenlernzeit. Jetzt zählt nur das Ankommen: du, dein Kind und deine Familie. Gönn dir Ruhe, lass dich umsorgen und nimm dir alle Zeit, die ihr braucht.',
+        'Um unsere Einheiten musst du dich gerade gar nicht kümmern. Deine restlichen Einheiten sind jetzt Rückbildungseinheiten. Wenn du so weit bist, meist nach der Nachuntersuchung etwa sechs bis acht Wochen nach der Geburt, suchst du dir einfach neue Wunschtermine aus, und wir beginnen ganz behutsam wieder.',
+        'Und wenn du in der Zwischenzeit etwas brauchst, eine Frage hast oder einfach erzählen magst, melde dich jederzeit bei mir. Ich bin für dich da.',
+    ];
+    $html = '<p style="margin:6px 0 18px;text-align:center;">' . $icons . '</p>'
+        . '<h1 style="font-family:Georgia,\'Times New Roman\',serif;font-weight:400;font-size:34px;line-height:1.15;color:#2E2529;margin:0 0 6px;text-align:center;">Hurra, dein Baby ist da!</h1>'
+        . '<p style="margin:0 0 22px;text-align:center;font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-size:19px;color:#7D5E68;">Willkommen auf der Welt, kleines Wunder.</p>';
+    foreach (array_slice($paras, 1) as $i => $p) $html .= '<p style="margin:0 0 14px;">' . ($i === 0 ? '<strong>' . forma_h('Liebe ' . $first . ',') . '</strong><br>' : '') . forma_h($p) . '</p>';
+    $html .= natal_btn(natal_link($o), 'Meine Termine');
+    $text = "Hurra, dein Baby ist da!\n\n" . implode("\n\n", $paras) . "\n\nMeine Termine: " . natal_link($o) . "\n\nAlles Liebe,\nVivien";
+    return ['subject' => 'Hurra, dein Baby ist da! 🤍', 'text' => $text, 'html' => natal_mail_html('Hurra, dein Baby ist da!', $html)];
+}
+
+/** Geburt eintragen: alle Termine ab dem Geburtstag gelten als Postnatal. Optional Glückwunsch-Mail. Liefert Hinweise für die Verwaltung. */
+function natal_birth_set(PDO $pdo, array $o, string $date, bool $mail): array
+{
+    $pdo->prepare('UPDATE mm_natal_orders SET birth_date = ? WHERE id = ?')->execute([$date, $o['id']]);
+    $o['birth_date'] = $date;
+    $notes = [];
+    if ($mail && !$o['birth_mailed_at']) {
+        $m = natal_birth_mail($o);
+        if (mm_mail((string)$o['email'], $m['subject'], $m['text'], $m['html'], [], NATAL_FROM_NAME)) {
+            $pdo->prepare('UPDATE mm_natal_orders SET birth_mailed_at = ? WHERE id = ?')->execute([date('c'), $o['id']]);
+            $notes[] = 'Glückwunsch-Mail ist verschickt.';
+        } else $notes[] = 'Die Mail konnte nicht verschickt werden.';
+    }
+    $soon = $pdo->prepare("SELECT COUNT(*) FROM mm_natal_sessions WHERE order_id = ? AND status IN ('angefragt','bestaetigt') AND date >= ? AND date < ?");
+    $soon->execute([$o['id'], $date, date('Y-m-d', strtotime($date . ' +6 weeks'))]);
+    if (($n = (int)$soon->fetchColumn()) > 0) $notes[] = $n . ($n === 1 ? ' Termin liegt' : ' Termine liegen') . ' in den ersten 6 Wochen nach der Geburt. Bitte verschieben oder absagen.';
+    return $notes;
+}

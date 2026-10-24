@@ -96,6 +96,14 @@ if ($action === 'mm_natal_settings') {
     if (!$cfg['weekdays']) $cfg['weekdays'] = [1, 2, 3, 4, 5];
     $n = trim((string)($_POST['notify'] ?? ''));
     $cfg['notify'] = filter_var($n, FILTER_VALIDATE_EMAIL) ? $n : '';
+    // Spotify-Playlists für den Mitgliederbereich: je Zeile „Titel | Link“
+    $sp = [];
+    foreach (preg_split('/\R/', (string)($_POST['spotify'] ?? '')) as $ln) {
+        $parts = array_map('trim', explode('|', $ln, 2));
+        $url = $parts[1] ?? $parts[0];
+        if (natal_spotify_embed($url) !== '') $sp[] = ['title' => isset($parts[1]) && $parts[0] !== '' ? mb_substr($parts[0], 0, 40) : 'Musik', 'url' => $url];
+    }
+    $cfg['spotify'] = array_slice($sp, 0, 6);
     $cfg['bonus'] = ['on' => !empty($_POST['bonus_on']), 'percent' => max(1, min(30, (int)($_POST['bonus_percent'] ?? 7))), 'days' => max(1, min(30, (int)($_POST['bonus_days'] ?? 7)))];
     mm_save_cfg('natal', $cfg);
     go($nBack . '#einstellungen', 'Gespeichert.');
@@ -116,6 +124,49 @@ if ($action === 'mm_natal_sample') {
     go($nBack . '#einstellungen', 'Die Muster-Rechnung ist an ' . natal_notify_email() . ' unterwegs.');
 }
 
+if ($action === 'mm_natal_birth') {
+    $o = natal_order($pdo, (int)($_POST['oid'] ?? 0));
+    $d = (string)($_POST['date'] ?? '');
+    if (!$o || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $d) || $d > date('Y-m-d')) go($nBack . '#kundinnen', 'Bitte gib das Geburtsdatum ein.');
+    $notes = natal_birth_set($pdo, $o, $d, !empty($_POST['mail']));
+    go($nBack . '&k=' . (int)$o['id'] . '#k' . (int)$o['id'], 'Eingetragen: Alle Einheiten ab ' . date('j. n.', strtotime($d)) . ' sind jetzt Postnatal. ' . implode(' ', $notes));
+}
+if ($action === 'mm_natal_birth_undo') {
+    $pdo->prepare("UPDATE mm_natal_orders SET birth_date = '' WHERE id = ?")->execute([(int)($_POST['oid'] ?? 0)]);
+    go($nBack . '&k=' . (int)$_POST['oid'] . '#k' . (int)$_POST['oid'], 'Geburtsdatum entfernt.');
+}
+if ($action === 'mm_natal_rec_del') {
+    $q = $pdo->prepare('SELECT * FROM mm_natal_recs WHERE id = ?');
+    $q->execute([(int)($_POST['rid'] ?? 0)]);
+    $r = $q->fetch();
+    if ($r) natal_rec_delete($pdo, $r);
+    go($nBack . '&k=' . (int)($r['order_id'] ?? 0) . '#k' . (int)($r['order_id'] ?? 0), 'Aufnahme gelöscht.');
+}
+if ($action === 'mm_natal_prompter_save') {
+    require_once dirname(__DIR__) . '/api/natal-prompter.inc.php';
+    natal_prompter_save(json_decode((string)($_POST['json'] ?? '{}'), true) ?: []);
+    header('Content-Type: application/json');
+    exit('{"ok":true}');
+}
+if ($view === 'natal' && isset($_GET['babyvorschau'])) {
+    $o = natal_order($pdo, (int)$_GET['babyvorschau']) ?: ['name' => 'Anna Beispiel', 'id' => 0, 'token' => 'vorschau'];
+    header('Content-Type: text/html; charset=utf-8');
+    echo natal_birth_mail($o)['html'];
+    exit;
+}
+if ($view === 'natal' && isset($_GET['workbook'])) {
+    require_once dirname(__DIR__) . '/api/natal-workbook.inc.php';
+    $k = (string)$_GET['workbook'];
+    if (!isset(natal_units()[$k])) { http_response_code(404); exit('Unbekannte Einheit.'); }
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: inline; filename="Workbook-' . $k . '.pdf"');
+    echo natal_workbook_pdf($k, (string)($_GET['name'] ?? ''), '');
+    exit;
+}
+if ($view === 'natal' && isset($_GET['prompter'])) {
+    require __DIR__ . '/natal-prompter.inc.php';
+    exit;
+}
 if ($view === 'natal' && isset($_GET['newsvorschau'])) {
     // Vorschau der Willkommensmail (nichts wird verschickt)
     $sub = ['name' => 'Anna', 'email' => 'vorschau@example.com', 'token' => str_repeat('0', 32), 'mode' => ''];
@@ -206,6 +257,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
         </div>
         <div class="nl">
             <a href="<?= forma_h(mm_site()) ?>/natal/" target="_blank" rel="noopener">Seite ansehen</a>
+            <a href="#skripte">Skripte &amp; Workbooks</a>
             <a href="#angebot">Angebot verschicken</a>
             <a href="<?= forma_h($self) ?>?view=rechnungen">Rechnungen</a>
             <a href="#einstellungen">Preise &amp; Einstellungen</a>
@@ -262,8 +314,9 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
         <?php if (!$future && !$past): ?><p class="card muted small">Noch keine bestätigten Termine.</p><?php endif; ?>
         <?php if ($future): ?><div class="card">
             <?php foreach ($future as $s): ?>
-                <div class="ln"><span><strong><?= forma_h(natal_when($s)) ?></strong><br><span class="muted small"><?= forma_h($s['name']) ?> · <?= forma_h($s['title']) ?></span></span>
-                    <span class="acts small"><?php if (natal_is_online($s)): ?><a class="btn btn-sm" href="<?= forma_h(natal_room_link('s', (int)$s['id'], true)) ?>" target="_blank" rel="noopener">Zum Videoraum</a><?php endif; ?><?php if ($s['phone'] !== ''): ?><a href="<?= forma_h(natal_wa((string)$s['phone'])) ?>" target="_blank" rel="noopener">WhatsApp</a><?php endif; ?>
+                <?php $so = natal_order($pdo, (int)$s['order_id']); $uk = $so ? natal_session_key($pdo, $so, (int)$s['id']) : 'frei'; ?>
+                <div class="ln"><span><strong><?= forma_h(natal_when($s)) ?></strong><br><span class="muted small"><?= forma_h($s['name']) ?> · <?= forma_h($s['title']) ?></span><br><span class="chip"><?= forma_h(natal_unit_label($uk)) ?></span></span>
+                    <span class="acts small"><a class="btn btn-ghost btn-sm" href="<?= forma_h($self) ?>?view=natal&amp;prompter=s<?= (int)$s['id'] ?>" target="_blank" rel="noopener">Teleprompter</a><?php if (natal_is_online($s)): ?><a class="btn btn-sm" href="<?= forma_h(natal_room_link('s', (int)$s['id'], true)) ?>" target="_blank" rel="noopener">Zum Videoraum</a><?php endif; ?><?php if ($s['phone'] !== ''): ?><a href="<?= forma_h(natal_wa((string)$s['phone'])) ?>" target="_blank" rel="noopener">WhatsApp</a><?php endif; ?>
                     <details class="more"><summary>ändern / absagen</summary>
                         <form method="post" class="stack" style="margin-top:6px"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_confirm"><input type="hidden" name="sid" value="<?= (int)$s['id'] ?>">
                             <div class="tm" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><input type="date" name="date" value="<?= forma_h($s['date']) ?>"><input type="time" name="time" value="<?= forma_h($s['start']) ?>" step="900"></div>
@@ -292,7 +345,35 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
                         <div class="small" style="border:1px solid var(--line);border-radius:12px;padding:8px 12px"><strong>Gesundheit</strong><?php foreach ($fl as [$lv, $tx]): ?><br><span style="color:<?= $lv === 'rot' ? '#A0463A' : '#8a6a2a' ?>">⚠ <?= forma_h($tx) ?></span><?php endforeach; ?>
                             <?php foreach (natal_health_lines($hd) as $ln): ?><br><span class="muted"><?= forma_h($ln) ?></span><?php endforeach; ?></div>
                     <?php elseif ($o['status'] === 'bezahlt' && !$o['purged_at']): ?><p class="small" style="color:#A0463A">Gesundheitsfragebogen fehlt noch. Sie kann ihn auf ihrer persönlichen Seite ausfüllen.</p><?php endif; ?>
-                    <?php foreach ($ss as $s): ?><div class="ln small"><span><?= forma_h(natal_when($s)) ?></span><span class="chip<?= $s['status'] === 'bestaetigt' ? ' ok' : ($s['status'] === 'angefragt' ? ' wait' : '') ?>"><?= forma_h(natal_status_label((string)$s['status'])) ?></span></div><?php endforeach; ?>
+                    <?php foreach ($ss as $s): $uk = natal_session_key($pdo, $o, (int)$s['id']); $rec = natal_rec_for($pdo, (int)$s['id']); $past = natal_session_done($s); ?>
+                        <div class="ln small"><span><?= forma_h(natal_when($s)) ?><?php if ($s['status'] !== 'abgesagt'): ?><br><span class="muted"><?= forma_h(natal_unit_label($uk)) ?></span><?php endif; ?></span>
+                            <span class="acts"><span class="chip<?= $s['status'] === 'bestaetigt' ? ' ok' : ($s['status'] === 'angefragt' ? ' wait' : '') ?>"><?= forma_h(natal_status_label((string)$s['status'])) ?></span>
+                            <?php if ($s['status'] !== 'abgesagt' && natal_order_is_member($o)): ?>
+                                <?php if ($rec): ?><a href="/api/natal-rec.php?id=<?= (int)$rec['id'] ?>&amp;k=<?= forma_h(natal_rec_admin_key((int)$rec['id'])) ?>" target="_blank" rel="noopener">▶ Aufnahme (<?= (int)round($rec['bytes'] / 1e6) ?> MB)</a>
+                                    <form method="post" onsubmit="return confirm('Aufnahme wirklich löschen?')"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_rec_del"><input type="hidden" name="rid" value="<?= (int)$rec['id'] ?>"><button class="link small" type="submit">löschen</button></form>
+                                <?php elseif ($past || $s['status'] === 'erledigt'): ?><label class="link small" style="cursor:pointer">Aufnahme hochladen<input type="file" accept="video/*" hidden data-up="<?= forma_h('/api/natal-rec.php?r=s' . (int)$s['id'] . '&k=' . natal_room_key('s', (int)$s['id'], true)) ?>"></label><span class="upst muted"></span><?php endif; ?>
+                            <?php endif; ?></span></div>
+                    <?php endforeach; ?>
+                    <?php if ($o['status'] === 'bezahlt'): $hasM = natal_member_by_email($pdo, (string)$o['email']); ?>
+                        <div class="small" style="border-top:1px solid var(--line);padding-top:10px">
+                            <?php if (natal_order_is_member($o)): ?>
+                                <strong>Mitgliederbereich:</strong> <?= $hasM ? 'Konto angelegt' . ($hasM['last_login'] ? ', zuletzt da am ' . forma_h(date('d. m.', strtotime((string)$hasM['last_login']))) : '') : 'noch kein Passwort gewählt' ?>
+                                · <?= natal_member_full($o) ? 'alles offen' : 'Vorschau bis ' . forma_h(date('d. m.', natal_member_full_from($o))) . ' (Widerrufsfrist)' ?>
+                                · Zugang bis <?= forma_h(date('d. m. Y', strtotime(natal_order_until($pdo, $o)))) ?>
+                                <?php if (!$hasM): ?><br>Link zum Passwort wählen: <button type="button" class="link small" data-copy="<?= forma_h(natal_member_start_link($o)) ?>">kopieren</button><?php endif; ?>
+                            <?php else: ?><strong>Einzelstunde:</strong> kein Mitgliederbereich, nur die persönliche Terminseite.<?php endif; ?>
+                        </div>
+                        <?php if ((string)$o['birth_date'] !== ''): ?>
+                            <form method="post" class="small" style="background:#F2ECE4;border-radius:12px;padding:8px 12px"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_birth_undo"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>">👶 Baby geboren am <?= forma_h(date('d. m. Y', strtotime((string)$o['birth_date']))) ?><?= $o['birth_mailed_at'] ? ' · Glückwunsch-Mail verschickt' : '' ?> · <button class="link small" type="submit">entfernen</button></form>
+                        <?php elseif (preg_replace('/^o_/', '', (string)$o['package']) !== 'post'): ?>
+                            <details class="more"><summary>👶 Baby ist da</summary>
+                                <form method="post" class="stack" style="margin-top:8px"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_birth"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>">
+                                    <label>Geburtsdatum</label><input type="date" name="date" max="<?= date('Y-m-d') ?>" value="<?= date('Y-m-d') ?>" required>
+                                    <p class="small muted">Alle Einheiten ab diesem Tag werden zu Postnatal-Einheiten (ab Postnatal 1).</p>
+                                    <label class="check"><input type="checkbox" name="mail" value="1" checked> Glückwunsch-Mail an sie schicken (<a href="<?= forma_h($self) ?>?view=natal&amp;babyvorschau=<?= (int)$o['id'] ?>" target="_blank" rel="noopener">Mail ansehen</a>)</label>
+                                    <button class="btn btn-sm" type="submit">Eintragen</button></form></details>
+                        <?php endif; ?>
+                    <?php endif; ?>
                     <p class="small">Ihre persönliche Seite: <span class="sel"><?= forma_h(natal_link($o)) ?></span> <button type="button" class="link small" data-copy="<?= forma_h(natal_link($o)) ?>">kopieren</button></p>
                     <?php if ($o['status'] === 'offen'): ?>
                         <form method="post"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_recheck"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>"><button class="btn btn-ghost btn-sm" type="submit">Zahlung bei Stripe prüfen</button></form>
@@ -306,6 +387,17 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
                 </div>
             </details>
         <?php endforeach; ?>
+        </div>
+
+        <h2 id="skripte">Skripte &amp; Workbooks</h2>
+        <div class="card stack">
+            <p class="small muted">Für jede Einheit gibt es ein fertiges Teleprompter-Skript (Impuls, Übungen, Breathwork, Meditation, Abschluss) und ein Workbook. Im Videoraum wählt der Teleprompter die Einheit automatisch, bei Studio-Terminen öffnest du ihn unter „Nächste Termine“. Hier kannst du alles testen und deine Texte anpassen.</p>
+            <div class="acts"><a class="btn btn-sm" href="<?= forma_h($self) ?>?view=natal&amp;prompter=kennenlernen" target="_blank" rel="noopener">Teleprompter · Kennenlerngespräch</a>
+                <a class="btn btn-ghost btn-sm" href="<?= forma_h(mm_site()) ?>/natal/mitglied/?demo=prae" target="_blank" rel="noopener">Mitgliederbereich (Beispiel prä)</a>
+                <a class="btn btn-ghost btn-sm" href="<?= forma_h(mm_site()) ?>/natal/mitglied/?demo=post" target="_blank" rel="noopener">… post</a>
+                <a class="btn btn-ghost btn-sm" href="<?= forma_h(mm_site()) ?>/natal/mitglied/?demo=vorschau" target="_blank" rel="noopener">… erste 14 Tage</a>
+                <a class="btn btn-ghost btn-sm" href="<?= forma_h($self) ?>?view=natal&amp;babyvorschau=0" target="_blank" rel="noopener">„Baby ist da“-Mail</a></div>
+            <?php foreach (NATAL_UNIT_KEYS as $uk): ?><div class="ln"><span><?= forma_h(natal_unit_label($uk)) ?></span><span class="acts small"><a href="<?= forma_h($self) ?>?view=natal&amp;prompter=<?= $uk ?>" target="_blank" rel="noopener">Teleprompter</a><a href="<?= forma_h($self) ?>?view=natal&amp;workbook=<?= $uk ?>" target="_blank" rel="noopener">Workbook (PDF)</a></span></div><?php endforeach; ?>
         </div>
 
         <?php $subs = $GLOBALS['natalSubs'] ?? []; $subOk = count(array_filter($subs, fn($x) => $x['status'] === 'bestaetigt')); ?>
@@ -361,6 +453,9 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <p class="small muted">Preise brutto inkl. 20 % USt. Gilt für neue Buchungen, bereits bezahlte Pakete bleiben, wie sie sind.</p>
             <div class="row"><?php foreach ($packs as $k => $p): ?><div class="stack"><label for="np<?= $k ?>"><?= forma_h($p['title']) ?> (<?= (int)$p['units'] ?> × 60 Min.) in €</label><input id="np<?= $k ?>" name="price[<?= $k ?>]" inputmode="decimal" value="<?= $eu($p['cents']) ?>"><span class="small muted">= <?= forma_h(forma_euro($p['unit_cents'])) ?> pro Einheit</span></div><?php endforeach; ?></div>
             <fieldset class="days"><legend>An diesen Tagen dürfen Wunschtermine gewählt werden</legend><div class="wdays"><?php foreach (NATAL_WEEKDAYS as $n => $l): ?><label class="check"><input type="checkbox" name="weekdays[]" value="<?= $n ?>"<?= in_array($n, natal_weekdays(), true) ? ' checked' : '' ?>> <?= $l ?></label><?php endforeach; ?></div></fieldset>
+            <label for="nsp">Musik im Mitgliederbereich (Spotify-Playlists, je Zeile „Titel | Link“)</label>
+            <textarea id="nsp" name="spotify" rows="3" placeholder="Ruhig ankommen | https://open.spotify.com/playlist/…"><?= forma_h(implode("\n", array_map(fn($x) => $x['title'] . ' | ' . $x['url'], (array)($cfg['spotify'] ?? [])))) ?></textarea>
+            <span class="small muted">Link in Spotify über „Teilen → Link kopieren“. Ohne Eintrag zeigt der Bereich ruhige Klaviermusik von Spotify.</span>
             <label for="nno">Benachrichtigungen an</label><input id="nno" name="notify" type="email" value="<?= forma_h((string)($cfg['notify'] ?? '')) ?>" placeholder="<?= forma_h(MM_FROM_EMAIL) ?>">
             <fieldset class="days"><legend>Kennenlern-Bonus nach dem Gespräch</legend>
                 <label class="check"><input type="checkbox" name="bonus_on" value="1"<?= natal_bonus_cfg()['on'] ? ' checked' : '' ?>> automatisch verschicken</label>
@@ -371,6 +466,22 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
         </form>
         <form method="post" style="margin-top:10px"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_sample"><button class="link" type="submit">Muster-Rechnung an mich schicken</button></form>
 <script>
+// Aufnahme hochladen (z. B. vom iPhone): in Stücken direkt zum Termin
+document.querySelectorAll('input[data-up]').forEach(inp => inp.addEventListener('change', async () => {
+  const f = inp.files[0]; if (!f) return;
+  const st = inp.closest('.acts').querySelector('.upst'), base = inp.dataset.up, CH = 8 * 1024 * 1024;
+  const j0 = await (await fetch(base + '&a=start&mime=' + encodeURIComponent(f.type || 'video/mp4'), {method: 'POST'})).json().catch(() => ({}));
+  if (!j0.ok) { st.textContent = 'Upload geht gerade nicht.'; return; }
+  let off = 0;
+  while (off < f.size) {
+    st.textContent = Math.round(off / f.size * 100) + ' % …';
+    try { const j = await (await fetch(base + '&a=chunk&id=' + j0.id + '&off=' + off, {method: 'POST', headers: {'Content-Type': 'application/octet-stream'}, body: f.slice(off, off + CH)})).json(); if (typeof j.size === 'number') off = j.size; else throw 0; }
+    catch (e) { st.textContent = 'Verbindung hakt, versuche weiter …'; await new Promise(r => setTimeout(r, 3000)); }
+  }
+  const j = await (await fetch(base + '&a=finish&id=' + j0.id, {method: 'POST'})).json().catch(() => ({}));
+  st.textContent = j.ok ? '✓ gespeichert' : 'Speichern hat nicht geklappt.';
+  if (j.ok) setTimeout(() => location.reload(), 900);
+}));
 document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
   const t = b.dataset.copy, old = b.textContent;
   try { await navigator.clipboard.writeText(t); } catch (e) { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); document.execCommand('copy'); a.remove(); }

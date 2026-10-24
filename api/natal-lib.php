@@ -495,7 +495,13 @@ function natal_paid_mails(PDO $pdo, array $o, array $wishes): void
         ? 'Bitte sprich das Training vorher mit deiner Ärztin oder Hebamme ab. Für unsere Online-Einheiten brauchst du nur eine Matte, etwas Platz und dein Handy oder Laptop, am besten so aufgestellt, dass ich dich ganz sehe. Den Link zum Videoraum findest du in jeder Terminbestätigung.'
         : 'Bitte sprich das Training vorher mit deiner Ärztin oder Hebamme ab. Komm in bequemer Kleidung und bring eine Flasche Wasser mit. Matten und alles andere habe ich im Studio.';
     $paras[] = 'Die Rechnung bekommst du in einer eigenen E-Mail. Du hast ein 14-tägiges Rücktrittsrecht. Bei der Buchung hast du ausdrücklich gewünscht, dass die Einheiten schon in dieser Zeit stattfinden können, und bestätigt, dass dein Rücktrittsrecht erlischt, sobald alle gebuchten Einheiten stattgefunden haben. Trittst du vorher zurück, zahlst du nur die Einheiten, die schon stattgefunden haben. Die vollständige Widerrufsbelehrung und das Muster-Formular findest du unten in dieser E-Mail, zurücktreten kannst du jederzeit hier: ' . mm_site() . '/withdraw?v=' . (natal_is_online($o) ? 'natal_online' : 'natal') . '&lang=de';
-    natal_mail((string)$o['email'], 'Deine Buchung bei Movecia: ' . $o['title'], 'Schön, dass du dabei bist', $paras, [natal_link($o), 'Meine Termine ansehen'], [], natal_legal_text(natal_is_online($o)));
+    $btn = [natal_link($o), 'Meine Termine ansehen'];
+    if (natal_order_is_member($o)) {
+        // Mitgliederbereich (Vivien, 24.10.2026): Konto mit E-Mail + Passwort, Termine weiterhin über die persönliche Seite
+        $paras[] = 'In deinem Mitgliederbereich findest du nach jeder Einheit dein Workbook mit allem, was wir gemacht haben' . (natal_is_online($o) ? ', und die Aufnahme der Einheit' : '') . '. Du meldest dich mit deiner E-Mail-Adresse und einem Passwort an, das du dir über den Knopf unten aussuchst. Deine Termine und Wunschtermine findest du hier: ' . natal_link($o);
+        $btn = [natal_member_by_email($pdo, (string)$o['email']) ? natal_member_link() : natal_member_start_link($o), 'Zu meinem Mitgliederbereich'];
+    }
+    natal_mail((string)$o['email'], 'Deine Buchung bei Movecia: ' . $o['title'], 'Schön, dass du dabei bist', $paras, $btn, [], natal_legal_text(natal_is_online($o)));
 
     $v = ["Neue Buchung Prä- & Postnatal Training:", [
         $o['name'] . ' · ' . $o['email'] . ($o['phone'] !== '' ? ' · ' . $o['phone'] : ''),

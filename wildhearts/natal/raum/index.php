@@ -177,6 +177,11 @@ a{color:var(--plum)}
 .tp.editing .tp-view{display:none}.tp.editing .tp-edit{display:block}
 .tp-edit textarea{width:100%;min-height:220px;border-radius:14px;border:0;padding:12px 14px;font:inherit;font-size:.95rem;line-height:1.5;background:#F6EFF1;color:var(--ink)}
 .tp-edit p{font-size:.8rem;opacity:.75;margin:.4rem 0 0}
+/* Aufnahme (nur Vivien, nur ihre Kamera) */
+.rec{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted)}
+.rec button{font:inherit;font-size:.82rem;border-radius:999px;border:1px solid var(--plum);background:transparent;color:var(--plum);padding:.32rem .8rem;cursor:pointer;white-space:nowrap}
+.rec button.on{background:#A0463A;border-color:#A0463A;color:#fff}
+@media(max-width:560px){.rec span{display:none}}
 /* Raum */
 .room{height:100%;display:flex;flex-direction:column;background:var(--deep)}
 .bar{display:flex;align-items:center;gap:14px;padding:10px clamp(12px,3vw,24px);background:var(--bg);border-bottom:1px solid var(--line)}
@@ -195,6 +200,7 @@ a{color:var(--plum)}
   <div class="bar"><span class="brand"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia<i></i></span>
     <span class="t"><b><?= $h($room['title']) ?><?= $room['host'] ? ' · ' . $h($first) : '' ?></b><span><?= $h($when) ?> · <?= $h($room['sub']) ?></span></span>
     <span class="tick" id="tick" aria-live="polite"></span>
+    <?php if ($room['host'] && $room['kind'] === 's'): ?><span class="rec"><button type="button" id="recBtn" title="Nimmt nur deine Kamera und dein Mikro auf">● Aufnahme</button><span id="recSt"></span></span><?php endif; ?>
     <span class="clock" id="clock"></span></div>
   <?php if ($prompter): ?>
   <div class="tp" id="tp">
@@ -220,6 +226,41 @@ const N=<?= json_encode($notes, JSON_UNESCAPED_UNICODE) ?>,k=document.getElement
 function nx(){if(!N.length||Date.now()>=s){k.style.opacity=0;return;}k.style.opacity=0;setTimeout(()=>{k.textContent=N[i%N.length][1];k.style.opacity=1;i++;},800);}
 nx();setInterval(nx,9000);})();
 </script>
+<?php if ($room['host'] && $room['kind'] === 's'): ?>
+<script>
+// Aufnahme: nur Viviens eigene Kamera und Mikro (nicht der Whereby-Raum), Upload in Stücken direkt zum Termin.
+(function(){
+const btn=document.getElementById('recBtn'),st=document.getElementById('recSt');if(!btn)return;
+const base='/api/natal-rec.php?r=<?= $h((string)$_GET['r']) ?>&k=<?= $h((string)$_GET['k']) ?>';
+let rec=null,stream=null,id=0,off=0,queue=[],busy=false,t0=0,stopped=false,tick=null,mime='';
+const fmt=b=>b>1e9?(b/1e9).toFixed(1)+' GB':Math.round(b/1e6)+' MB';
+const show=()=>{const m=Math.floor((Date.now()-t0)/60000);st.textContent=rec?('läuft '+m+' Min · '+fmt(off)+' gespeichert'):st.textContent;};
+async function pump(){if(busy)return;busy=true;
+ while(queue.length){const b=queue[0];
+  try{const r=await fetch(base+'&a=chunk&id='+id+'&off='+off,{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:b});const j=await r.json();
+   if(j.ok){off=j.size;queue.shift();}else if(typeof j.size==='number'){off=j.size;queue.shift();}else throw 0;}
+  catch(e){st.textContent='Upload hakt, ich versuche es weiter …';await new Promise(r=>setTimeout(r,3000));}}
+ busy=false;
+ if(stopped&&!queue.length){const s=Math.round((Date.now()-t0)/1000);const r=await fetch(base+'&a=finish&id='+id+'&sec='+s,{method:'POST'});const j=await r.json().catch(()=>({}));
+  st.textContent=j.ok?'✓ Aufnahme gespeichert ('+fmt(j.bytes)+'), sie ist jetzt im Bereich der Kundin.':'Die Aufnahme konnte nicht gespeichert werden.';btn.disabled=false;stopped=false;}}
+btn.addEventListener('click',async()=>{
+ if(rec){rec.stop();stream.getTracks().forEach(t=>t.stop());rec=null;clearInterval(tick);btn.classList.remove('on');btn.textContent='● Aufnahme';btn.disabled=true;st.textContent='wird fertig hochgeladen …';return;}
+ if(!confirm('Aufnahme starten? Aufgenommen werden nur deine Kamera und dein Mikro. Tipp: Mit Kopfhörern ist auch die Stimme der Kundin nicht zu hören.'))return;
+ try{stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720}},audio:{echoCancellation:true,noiseSuppression:true}});}
+ catch(e){alert('Kamera oder Mikro sind gesperrt. Bitte im Browser erlauben.');return;}
+ mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','video/mp4'].find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported(m))||'';
+ const r=await fetch(base+'&a=start&mime='+encodeURIComponent(mime||'video/webm'),{method:'POST'});const j=await r.json().catch(()=>({}));
+ if(!j.ok){alert('Die Aufnahme kann gerade nicht starten.');stream.getTracks().forEach(t=>t.stop());return;}
+ id=j.id;off=0;queue=[];t0=Date.now();
+ rec=new MediaRecorder(stream,mime?{mimeType:mime,videoBitsPerSecond:1200000}:{videoBitsPerSecond:1200000});
+ rec.ondataavailable=e=>{if(e.data&&e.data.size){queue.push(e.data);pump();}};
+ rec.onstop=()=>{stopped=true;pump();};
+ rec.start(5000);btn.classList.add('on');btn.textContent='■ Stopp';tick=setInterval(show,5000);show();
+});
+addEventListener('beforeunload',e=>{if(rec||queue.length||stopped){e.preventDefault();e.returnValue='';}});
+})();
+</script>
+<?php endif; ?>
 <?php if ($prompter): ?>
 <script>
 (function(){

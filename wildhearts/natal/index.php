@@ -356,6 +356,12 @@ footer summary{cursor:pointer}
     </div>
   </div>
 </section>
+<?php if (natal_order_is_member($order)): $hasM = natal_member_by_email($pdo, (string)$order['email']); ?>
+<section class="w" style="padding-top:0"><div class="card" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;align-items:center;background:var(--plum);color:var(--on)">
+  <p><b style="font-family:var(--serif);font-size:1.6rem;font-weight:500">Dein Mitgliederbereich</b><br><span style="opacity:.85">Workbooks, Übungsabfolgen<?= $online ? ', Aufnahmen' : '' ?> und Musik nach jeder Einheit.</span></p>
+  <a class="btn" style="background:var(--peach);color:var(--ink);border-color:var(--peach)" href="<?= $h($hasM ? natal_member_link() : natal_member_start_link($order)) ?>"><?= $hasM ? 'Zu meinem Bereich' : 'Passwort wählen und los' ?></a>
+</div></section>
+<?php endif; ?>
 <?php $hd = natal_health_get($order); ?>
 <section class="w" style="padding-top:0" id="gesundheit">
   <?php if (!$hd): ?><div class="panel" id="hqbox">
@@ -601,7 +607,7 @@ footer summary{cursor:pointer}
   <p style="margin-top:6px"><a href="/terms?lang=de#natal">Bedingungen &amp; Rücktrittsrecht</a> · <a href="/withdraw?v=natal&amp;lang=de" style="font-weight:600">Vertrag widerrufen</a></p>
   <details><summary>Impressum &amp; Datenschutz</summary>
     <p style="margin-top:.6rem"><strong>Impressum:</strong> Vivien Malonga, Movecia – Personal Fitness, Silvrettastraße 58, 6562 Mathon, Österreich. E-Mail: hello@moveciamovement.com. UID: ATU83602825.</p>
-    <p style="margin-top:.6rem"><strong>Datenschutz:</strong> Wenn du buchst, speichere ich deinen Namen, deine E-Mail-Adresse, deine Telefonnummer, deinen Geburtstermin, deine Nachricht und deine Wunschtermine, um deine Buchung abzuwickeln und die Termine mit dir zu planen. Die Zahlung läuft über Stripe (Stripe Payments Europe Ltd., Irland). Für die Buchhaltung bewahre ich die Rechnung so lange auf, wie es das Gesetz verlangt. Diese Seite verwendet keine Tracking-Cookies. Fragen oder Löschwünsche an hello@moveciamovement.com.</p>
+    <p style="margin-top:.6rem"><strong>Datenschutz:</strong> Wenn du buchst, speichere ich deinen Namen, deine E-Mail-Adresse, deine Telefonnummer, deinen Geburtstermin, deine Nachricht und deine Wunschtermine, um deine Buchung abzuwickeln und die Termine mit dir zu planen. Deine Angaben im Gesundheitsfragebogen verwende ich nur mit deiner ausdrücklichen Einwilligung, um das Training sicher für dich zu gestalten. Bei Paketen bekommst du einen Mitgliederbereich (E-Mail und Passwort), mit Workbooks und bei Online-Einheiten Aufnahmen, auf denen nur ich zu sehen bin. Einen Monat nach deiner letzten Einheit werden Konto, Aufnahmen und Gesundheitsangaben automatisch gelöscht. Die Musik im Mitgliederbereich kommt von Spotify (Spotify AB, Schweden) und lädt erst, wenn du den Bereich öffnest. Die Zahlung läuft über Stripe (Stripe Payments Europe Ltd., Irland). Für die Buchhaltung bewahre ich die Rechnung so lange auf, wie es das Gesetz verlangt. Diese Seite verwendet keine Tracking-Cookies. Fragen oder Löschwünsche an hello@moveciamovement.com.</p>
   </details>
 </footer>
 
