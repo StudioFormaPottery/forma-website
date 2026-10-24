@@ -13,7 +13,7 @@ $in = json_decode((string)file_get_contents('php://input'), true);
 if (!is_array($in)) $in = $_POST;
 $name = trim((string)($in['name'] ?? ''));
 $email = strtolower(trim((string)($in['email'] ?? '')));
-$source = in_array($in['source'] ?? '', ['reset', 'circle', 'mentoring', 'year', 'retreat'], true) ? $in['source'] : 'link';
+$source = in_array($in['source'] ?? '', ['reset', 'circle', 'mentoring', 'year', 'retreat', 'unfold'], true) ? $in['source'] : 'link';
 $lang = ($in['lang'] ?? '') === 'de' ? 'de' : 'en';
 $de = $lang === 'de';
 if (!empty($in['website'])) $out(['ok' => true]); // Honeypot
@@ -32,8 +32,8 @@ $s->execute([$email]);
 $sub = $s->fetch();
 if ($sub && $sub['status'] === 'bestaetigt') {
     if ($sub['source'] !== $source && $source !== 'link') $pdo->prepare('UPDATE mm_subscribers SET source = ? WHERE id = ?')->execute([$source, $sub['id']]);
-    // schon dabei: Willkommensmail mit dem Download einfach noch einmal schicken
-    mm_mail_welcome($sub);
+    // schon dabei: Willkommensmail (bzw. Unfold-Infos) einfach noch einmal schicken
+    if ($source === 'unfold') { $sub['lang'] = $lang; mm_mail_unfold_info($sub); mm_notify_interest($sub, 'unfold'); } else mm_mail_welcome($sub);
     $out(['ok' => true, 'already' => true]);
 }
 if ($sub) {
@@ -46,4 +46,5 @@ if ($sub) {
         ->execute([mb_substr($name, 0, 80), mb_substr($email, 0, 160), $source, $lang, $tok, $ip, date('c')]);
     $sub = ['id' => (int)$pdo->lastInsertId(), 'name' => mb_substr($name, 0, 80), 'email' => $email, 'token' => $tok, 'lang' => $lang];
 }
+$sub['source'] = $source;
 $out(['ok' => mm_mail_confirm($sub)]);

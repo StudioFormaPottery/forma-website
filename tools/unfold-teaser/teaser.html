@@ -1,0 +1,48 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:"Cormorant";font-weight:300 700;src:url(/fonts/CormorantGaramond-VF.woff) format("woff")}
+@font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(/fonts/CormorantGaramond-Italic-VF.woff) format("woff")}
+@font-face{font-family:"Hanken";font-weight:300 700;src:url(/fonts/HankenGrotesk-VF.woff) format("woff")}
+*{box-sizing:border-box;margin:0}
+body{width:1080px;height:var(--h);background:#F2ECE4;font-family:"Hanken";color:#2E2529;overflow:hidden;position:relative}
+.blob{position:absolute;border-radius:62% 38% 46% 54%/55% 45% 55% 45%}
+.top{position:absolute;left:84px;right:84px;top:var(--top);display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;align-items:center;gap:14px;font-family:"Cormorant";font-size:44px}
+.brand img{width:46px}.brand i{display:inline-block;width:13px;height:13px;border-radius:50%;background:#7D5E68;margin-left:3px}
+.tag{font-size:22px;letter-spacing:.24em;text-transform:uppercase;color:#7D5E68}
+.pic{position:absolute;left:var(--pl);width:var(--pw);top:var(--pt);height:var(--ph);border-radius:400px 400px 40px 40px;overflow:hidden}
+.pic img{width:100%;height:100%;object-fit:cover;filter:saturate(.92)}
+.txt{position:absolute;left:84px;right:84px;bottom:var(--bot)}
+h1{font-family:"Cormorant";font-weight:500;font-size:var(--h1);line-height:.9;letter-spacing:-.01em}
+.sub{font-family:"Cormorant";font-style:italic;font-size:var(--sub);color:#7D5E68;margin-top:6px}
+.lead{font-size:30px;line-height:1.45;margin-top:26px;max-width:860px}
+.pills{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.pills span{border:1.5px solid #DDD2C6;background:#FBF8F4;border-radius:999px;padding:12px 24px;font-size:24px}
+.pills span.p{background:#7D5E68;color:#FBF5F7;border-color:#7D5E68}
+.url{margin-top:30px;font-size:24px;color:#7D7076;letter-spacing:.04em}
+.soon{position:absolute;right:var(--sr);top:var(--st);width:210px;height:210px;border-radius:50%;background:#7D5E68;color:#FBF5F7;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:"Cormorant";font-size:30px;line-height:1.05;transform:rotate(-8deg)}
+.soon b{font-size:64px;font-weight:500}
+</style></head><body>
+<span class="blob" style="width:520px;height:480px;background:#EADFDE;right:-160px;top:-120px"></span>
+<span class="blob" style="width:360px;height:340px;background:#E8D6CA;left:-160px;bottom:var(--b2)"></span>
+<div class="top"><span class="brand"><img src="/img/movecia/movecia-zeichen-klein.svg"><span>Movecia<i></i></span></span><span class="tag" id="tag"></span></div>
+<div class="pic"><img src="/img/wildhearts/cover.jpg"></div>
+<div class="soon"><span id="s1"></span><b id="s2"></b><span id="s3"></span></div>
+<div class="txt"><h1>Unfold</h1><p class="sub">The Mindful Becoming</p><p class="lead" id="lead"></p><div class="pills" id="pills"></div><p class="url">moveciamovement.com/unfold</p></div>
+<script>
+const q=new URLSearchParams(location.search),de=q.get('l')==='de',story=q.get('f')==='story';
+const H=story?1920:1350,r=document.documentElement.style;
+const set=(k,v)=>r.setProperty(k,v);
+set('--h',H+'px');set('--top',story?'110px':'64px');
+if(story){set('--pl','150px');set('--pw','780px');set('--pt','240px');set('--ph','760px');set('--bot','150px');set('--h1','190px');set('--sub','68px');set('--sr','90px');set('--st','880px');set('--b2','560px');}
+else{set('--pl','84px');set('--pw','912px');set('--pt','150px');set('--ph','600px');set('--bot','64px');set('--h1','150px');set('--sub','56px');set('--sr','70px');set('--st','620px');set('--b2','300px');}
+document.getElementById('tag').textContent=de?'Neu · 3 Monate':'New · 3 months';
+document.getElementById('s1').textContent=de?'Start':'Starts';
+document.getElementById('s2').textContent='1.2.';
+document.getElementById('s3').textContent=de?'2027':'2027';
+if(!de){document.getElementById('s2').textContent='1 Feb';}
+document.getElementById('lead').textContent=de?'Drei Monate, um zu dir zurückzufinden, deinen Wert zu spüren und endlich ins Tun zu kommen. Live, in kleiner Runde, mit Workbooks und sanfter Bewegung.':'Three months to come back to yourself, feel your worth and finally begin. Live, in a small circle, with workbooks and gentle movement.';
+const p=de?['Wöchentlicher Live-Call','Deutsch & English','max. 10 Plätze']:['Weekly live call','English & Deutsch','max. 10 spots'];
+document.getElementById('pills').innerHTML=p.map((x,i)=>'<span'+(i==2?' class="p"':'')+'>'+x+'</span>').join('');
+if(!story){document.querySelector('.lead').style.fontSize='27px';document.querySelector('.lead').style.marginTop='16px';document.querySelector('.pills').style.marginTop='22px';document.querySelector('.url').style.marginTop='20px';document.querySelector('.pic img').style.objectPosition='50% 22%';}
+</script></body></html>

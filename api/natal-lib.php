@@ -99,6 +99,7 @@ function natal_schema(PDO $pdo): void
         $pdo->exec("ALTER TABLE mm_natal_sessions ADD COLUMN room_url TEXT NOT NULL DEFAULT ''");
         $pdo->exec("ALTER TABLE mm_natal_sessions ADD COLUMN host_url TEXT NOT NULL DEFAULT ''");
     }
+    natal_member_schema($pdo);
 }
 
 // --- Einstellungen (Preise, Wochentage, Bankverbindung für die Rechnung) -------------------
@@ -502,6 +503,11 @@ function natal_paid_mails(PDO $pdo, array $o, array $wishes): void
         'Geburtstermin: ' . ($o['due_date'] !== '' ? natal_date_de((string)$o['due_date']) : 'nicht angegeben'),
     ]];
     if ($o['note'] !== '') $v[] = 'Ihre Nachricht: ' . $o['note'];
+    $hd = natal_health_get($o);
+    if ($hd) {
+        $red = count(array_filter(natal_health_flags($hd), fn($x) => $x[0] === 'rot'));
+        $v[] = 'Gesundheitsfragebogen ausgefüllt' . ($red ? ': ⚠ ' . $red . ($red === 1 ? ' Hinweis braucht' : ' Hinweise brauchen') . ' eine ärztliche Freigabe.' : '.') . ' Details nur in der Verwaltung.';
+    }
     $v[] = $wl ? "Wunschtermine zum Bestätigen:\n– " . implode("\n– ", $wl) : 'Noch keine Wunschtermine. Sie wählt sie über ihre persönliche Seite aus.';
     natal_mail(natal_notify_email(), 'Neue Buchung Prä-/Postnatal: ' . $o['name'] . ' · ' . $o['title'], 'Neue Buchung', $v, [natal_admin_link(), 'In der Verwaltung öffnen']);
 }
@@ -1145,5 +1151,9 @@ function natal_bonus_tick(PDO $pdo): void
     if (is_file($f) && filemtime($f) > time() - 180) return;
     @touch($f);
     try { natal_bonus_run($pdo); } catch (Throwable $e) { error_log('Natal bonus: ' . $e->getMessage()); }
+    try { natal_member_run($pdo); } catch (Throwable $e) { error_log('Natal member: ' . $e->getMessage()); }
 }
 
+require_once __DIR__ . '/natal-units.inc.php';
+require_once __DIR__ . '/natal-health.inc.php';
+require_once __DIR__ . '/natal-member.inc.php';

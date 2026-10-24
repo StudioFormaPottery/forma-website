@@ -53,7 +53,8 @@ if ($action === 'buy') {
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $err[] = 'Bitte gib eine gültige E-Mail-Adresse an.';
     if (mb_strlen(preg_replace('/\D/', '', $phone)) < 6) $err[] = 'Bitte gib deine Telefonnummer an, damit ich dich bei Terminfragen erreiche.';
     if (empty($in['consent'])) $err[] = 'Bitte bestätige die Hinweise zum Datenschutz.';
-    if (empty($in['health'])) $err[] = 'Bitte bestätige, dass du das Training mit deiner Ärztin oder Hebamme absprichst.';
+    [$health, $hErr] = natal_health_clean($in);
+    $err = array_merge($err, $hErr);
     if (empty($in['start_now'])) $err[] = 'Bitte bestätige, dass die Termine schon in der Rücktrittsfrist beginnen dürfen.';
     if ($err) forma_json(['ok' => false, 'error' => implode(' ', $err)], 422);
     if (!forma_stripe_key()) forma_json(['ok' => false, 'error' => 'Die Online-Zahlung ist gerade nicht erreichbar. Bitte schreib mir an ' . MM_FROM_EMAIL . '.'], 503);
@@ -76,6 +77,7 @@ if ($action === 'buy') {
     $pdo->prepare('INSERT INTO mm_natal_orders (offer_id, package, title, units, unit_cents, amount_cents, name, email, phone, due_date, note, wishes, token, ip_hash, consent_start, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?)')
         ->execute([$offerId, $key, $p['title'], $p['units'], $p['unit_cents'], $p['unit_cents'] * $p['units'], $name, $email, $phone, $due, $note, json_encode($wishes), $tok, $ipHash, date('c')]);
     $o = natal_order($pdo, (int)$pdo->lastInsertId());
+    natal_health_save($pdo, (int)$o['id'], $health);
     if ($bp) { $pdo->prepare('UPDATE mm_natal_orders SET bonus_call_id = ? WHERE id = ?')->execute([$bonusCall['id'], $o['id']]); $o['bonus_call_id'] = $bonusCall['id']; }
     try {
         forma_json(['ok' => true, 'redirect' => natal_checkout($pdo, $o)]);
@@ -127,6 +129,21 @@ if ($action === 'pay') {
         error_log('Natal pay: ' . $e->getMessage());
         forma_json(['ok' => false, 'error' => 'Die Online-Zahlung ist gerade nicht erreichbar. Bitte versuch es gleich noch einmal.'], 502);
     }
+}
+
+if ($action === 'health') {
+    if ($o['status'] !== 'bezahlt') forma_json(['ok' => false, 'error' => 'Das geht nach der Zahlung.'], 409);
+    [$health, $hErr] = natal_health_clean($in);
+    if ($hErr) forma_json(['ok' => false, 'error' => implode(' ', $hErr)], 422);
+    $first = natal_health_get($o) === null;
+    natal_health_save($pdo, (int)$o['id'], $health);
+    $fl = natal_health_flags($health);
+    $red = count(array_filter($fl, fn($x) => $x[0] === 'rot'));
+    natal_mail(natal_notify_email(), 'Gesundheitsfragebogen ' . ($first ? 'ausgefüllt' : 'geändert') . ': ' . $o['name'], 'Gesundheitsfragebogen', [
+        $o['name'] . ' hat ihren Gesundheitsfragebogen ' . ($first ? 'ausgefüllt' : 'geändert') . '.',
+        $red ? '⚠ ' . $red . ($red === 1 ? ' Hinweis braucht' : ' Hinweise brauchen') . ' eine ärztliche Freigabe. Die Details stehen nur in der Verwaltung.' : 'Die Details stehen in der Verwaltung.',
+    ], [natal_admin_link() . '&k=' . (int)$o['id'] . '#k' . (int)$o['id'], 'In der Verwaltung ansehen']);
+    forma_json(['ok' => true]);
 }
 
 if ($action === 'wish') {

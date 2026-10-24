@@ -231,7 +231,7 @@ body[data-mode=online] .m-studio,body[data-mode=studio] .m-online{display:none!i
 .grid2{display:grid;gap:12px}
 @media(min-width:640px){.grid2{grid-template-columns:1fr 1fr}}
 label.f{display:flex;flex-direction:column;gap:.35rem;font-size:.86rem;color:var(--muted)}
-input[type=text],input[type=email],input[type=tel],input[type=date],textarea,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:1px solid transparent;border-radius:14px;padding:.8em 1em;width:100%;min-width:0}
+input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],textarea,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:1px solid transparent;border-radius:14px;padding:.8em 1em;width:100%;min-width:0}
 input:focus,textarea:focus,select:focus{border-color:var(--plum);outline:none}
 textarea{min-height:84px;resize:vertical}
 .chk{display:flex;gap:.7rem;font-size:.88rem;color:var(--muted);align-items:flex-start}
@@ -306,6 +306,7 @@ footer summary{cursor:pointer}
 .slotb button{border:0;background:var(--bg);color:var(--ink);font:inherit;font-size:.95rem;padding:.75em 1.3em;border-radius:999px;cursor:pointer}
 .slotb button[aria-pressed=true]{background:var(--plum);color:var(--on)}
 .slotb button:disabled{opacity:.4;cursor:default;text-decoration:line-through}
+<?= NATAL_HEALTH_CSS ?>
 </style>
 </head>
 <body data-mode="<?= $online ? 'online' : 'studio' ?>">
@@ -354,6 +355,18 @@ footer summary{cursor:pointer}
       <?php if ($conf): ?><p style="margin-top:1rem"><a class="btn line" href="/api/natal.php?ics=1&amp;o=<?= (int)$order['id'] ?>&amp;k=<?= $h($order['token']) ?>">Alle Termine in meinen Kalender</a></p><?php endif; ?>
     </div>
   </div>
+</section>
+<?php $hd = natal_health_get($order); ?>
+<section class="w" style="padding-top:0" id="gesundheit">
+  <?php if (!$hd): ?><div class="panel" id="hqbox">
+    <p class="k">Bitte noch ausfüllen</p>
+    <?= natal_health_form(null, (string)$order['due_date']) ?>
+    <div><button class="btn" type="button" id="hqsave">Angaben speichern</button></div>
+    <p class="err" id="hqerr" hidden></p>
+  </div><?php else: ?>
+  <details class="card" id="hqbox"><summary style="cursor:pointer;list-style:none"><b style="font-family:var(--serif);font-size:1.3rem;font-weight:500">Deine Gesundheitsangaben</b> <span class="mut" style="font-size:.9rem">· ausgefüllt am <?= $h(date('j. n. Y', strtotime((string)$hd['at']))) ?> · ändern</span></summary>
+    <div style="margin-top:1rem"><?= natal_health_form($hd) ?><div style="margin-top:.8rem"><button class="btn" type="button" id="hqsave">Änderungen speichern</button></div><p class="err" id="hqerr" hidden></p></div>
+  </details><?php endif; ?>
 </section>
 <?php if ($left > 0): ?>
 <section class="w" style="padding-top:0" id="anfragen">
@@ -522,10 +535,10 @@ footer summary{cursor:pointer}
         <label class="f">Voraussichtlicher Geburtstermin<input type="date" name="due_date" id="due"></label>
       </div>
       <label class="f">Möchtest du mir vorab etwas sagen? (optional)<textarea name="note" maxlength="1000" placeholder="z. B. wie es dir gerade geht oder was dir wichtig ist"></textarea></label>
+      <?= natal_health_form() ?>
       <h3 style="margin-top:.6rem">Deine Wunschtermine <span class="mut" style="font-family:var(--sans);font-size:.9rem">(optional)</span></h3>
       <p class="mut" style="font-size:.92rem">Tipp auf die Tage, die dir passen, und wähl die Tageszeit. Du kannst die Termine auch erst nach der Zahlung auf deiner persönlichen Seite aussuchen.</p>
       <div id="calbox"></div>
-      <label class="chk"><input type="checkbox" name="health" value="1" required><span>Ich spreche das Training mit meiner Ärztin oder Hebamme ab.</span></label>
       <label class="chk"><input type="checkbox" name="start_now" value="1" required><span>Ich möchte ausdrücklich, dass die Einheiten schon innerhalb der 14-tägigen Rücktrittsfrist stattfinden können. Trete ich zurück, zahle ich nur die Einheiten, die bereits stattgefunden haben. Mir ist bewusst, dass mein Rücktrittsrecht erlischt, sobald alle gebuchten Einheiten stattgefunden haben (<a href="/terms?lang=de#withdrawal" target="_blank" rel="noopener">Rücktrittsrecht &amp; Bedingungen</a>).</span></label>
       <label class="chk"><input type="checkbox" name="consent" value="1" required><span>Meine Angaben werden nur für meine Buchung und die Terminplanung verwendet (Datenschutz siehe unten).</span></label>
       <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -592,6 +605,7 @@ footer summary{cursor:pointer}
   </details>
 </footer>
 
+<script><?= NATAL_HEALTH_JS ?></script>
 <script>
 (() => {
   const CAL = <?= json_encode($cal, JSON_UNESCAPED_UNICODE) ?>;
@@ -739,6 +753,7 @@ footer summary{cursor:pointer}
   if (MODE === 'offer') {
     const loaded = Date.now();
     const f = document.getElementById('bookf'), err = document.getElementById('err'), btn = document.getElementById('paybtn');
+    const HQ = HealthQ(f);
     const cur = () => document.querySelector('input[name=package]:checked');
     const cal = Calendar(document.getElementById('calbox'), () => +cur().dataset.units, sum);
     const due = document.getElementById('due');
@@ -774,13 +789,27 @@ footer summary{cursor:pointer}
       d.package = cur().value; d.action = 'buy'; d.t = loaded; d.a = OFFER; d.bonus = BONUS;
       d.wishes = JSON.stringify(cal.get());
       if (!d.name || !d.email || !d.phone) { err.textContent = 'Bitte füll Name, E-Mail und Telefon aus.'; err.hidden = false; return; }
-      if (!d.health || !d.start_now || !d.consent) { err.textContent = 'Bitte bestätige noch die drei Häkchen.'; err.hidden = false; return; }
+      const hqe = HQ ? HQ.check() : ''; if (hqe) { err.textContent = hqe; err.hidden = false; return; }
+      HQ && HQ.collect(d);
+      if (!d.start_now || !d.consent) { err.textContent = 'Bitte bestätige noch die Häkchen zum Start und zum Datenschutz.'; err.hidden = false; return; }
       btn.disabled = true; btn.textContent = 'Einen Moment …';
       const j = await post(d);
       if (j.ok && j.redirect) { location.href = j.redirect; return; }
       err.textContent = j.error || 'Das hat gerade nicht geklappt. Bitte versuch es noch einmal.'; err.hidden = false; btn.disabled = false; sum();
     });
   } else if (ORDER) {
+    const hb = document.getElementById('hqbox');
+    if (hb) { const HQ = HealthQ(hb), sb = document.getElementById('hqsave'), he = document.getElementById('hqerr');
+      sb.addEventListener('click', async () => {
+        he.hidden = true; const m = HQ.check(); if (m) { he.textContent = m; he.hidden = false; return; }
+        const d = {action: 'health', o: ORDER.o, k: ORDER.k};
+        hb.querySelectorAll('input,select,textarea').forEach(el => { if (!el.name || el.name === 'h_iss') return; if ((el.type === 'radio' || el.type === 'checkbox') && !el.checked) return; d[el.name] = el.value; });
+        HQ.collect(d); sb.disabled = true;
+        const j = await post(d);
+        if (j.ok) { location.reload(); return; }
+        he.textContent = j.error || 'Das hat nicht geklappt.'; he.hidden = false; sb.disabled = false;
+      });
+    }
     const pay = document.getElementById('payagain');
     if (pay) pay.addEventListener('click', async () => {
       pay.disabled = true;

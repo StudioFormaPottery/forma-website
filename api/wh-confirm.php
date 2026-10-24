@@ -10,15 +10,11 @@ if ($sub['status'] !== 'bestaetigt') {
     $u = $pdo->prepare("UPDATE mm_subscribers SET status = 'bestaetigt', confirmed_at = ? WHERE id = ? AND status <> 'bestaetigt'");
     $u->execute([date('c'), $sub['id']]);
     if ($u->rowCount() === 1) {
-        mm_mail_welcome($sub);
+        if ($sub['source'] === 'unfold') mm_mail_unfold_info($sub); else mm_mail_welcome($sub);
         mm_ml_push($pdo, $sub);
-        if (in_array($sub['source'], ['mentoring', 'year', 'circle', 'retreat'], true)) {
-            // Viv bekommt Bescheid, wenn jemand Interesse an einem bezahlten Angebot zeigt
-            $what = ['mentoring' => 'Mentoring für ihr Herzensbusiness', 'year' => 'den Jahreskreis', 'circle' => 'den Inner Circle', 'retreat' => 'das Alpine Retreat'][$sub['source']];
-            $t = "Hallo Viv,\n\n{$sub['name']} ({$sub['email']}) interessiert sich für $what und hat ihre E-Mail-Adresse gerade bestätigt.\nSprache: " . ($sub['lang'] === 'de' ? 'Deutsch' : 'Englisch') . "\n\nDu siehst sie in der Verwaltung unter Movecia Movement → E-Mail-Liste.\n";
-            mm_mail(MM_FROM_EMAIL, 'Neue Interessentin: ' . $sub['name'] . ' · ' . $what, $t, mm_mail_html('Neue Interessentin', nl2br(forma_h($t)), 'de'));
-        }
+        if (in_array($sub['source'], ['mentoring', 'year', 'circle', 'retreat', 'unfold'], true)) mm_notify_interest($sub, (string)$sub['source']);
     }
 }
+if ($sub['source'] === 'unfold') { header('Location: /unfold/?ok=1&lang=' . ($sub['lang'] === 'de' ? 'de' : 'en') . '#infos', true, 302); exit; }
 header('Location: /reset/?ok=1' . ($sub['lang'] === 'de' ? '&lang=de' : ''), true, 302);
 exit;

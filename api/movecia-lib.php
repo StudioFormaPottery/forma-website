@@ -457,6 +457,25 @@ function mm_mail_confirm(array $sub): bool
     $first = forma_first_name($sub['name']);
     $link = mm_site() . '/api/wh-confirm.php?t=' . $sub['token'];
     $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#7D5E68;';
+    if (($sub['source'] ?? '') === 'unfold') {
+        // Unfold-Infoliste (Vivien, 24.10.2026): erst bestätigen, dann kommen alle Infos, bevor Unfold offiziell gepostet wird
+        if ($de) {
+            $text = "Hey $first,\n\ndanke, dass du dich für Unfold – The Mindful Becoming eingetragen hast!\n\nBitte bestätige zuerst deine E-Mail-Adresse:\n$link\n\nAnschließend schicke ich dir alle Infos, noch bevor ich offiziell poste, wann Unfold startet. Es gibt höchstens 10 Plätze.\n\nFalls du dich nicht eingetragen hast, ignoriere diese Mail einfach.\n\nAlles Liebe, Viv";
+            $html = '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
+                . '<p style="margin:14px 0 0;">danke, dass du dich für <strong>Unfold – The Mindful Becoming</strong> eingetragen hast!</p>'
+                . '<p style="margin:14px 0 0;">Bitte bestätige zuerst deine E-Mail-Adresse. Anschließend schicke ich dir alle Infos, noch bevor ich offiziell poste, wann Unfold startet. Es gibt höchstens 10 Plätze.</p>'
+                . mm_button($link, 'Ja, ich bestätige meine E-Mail')
+                . '<p style="margin:16px 0 0;font-size:14px;color:#7D7076;">Falls du dich nicht eingetragen hast, ignoriere diese Mail einfach.</p>';
+            return mm_mail($sub['email'], 'Bitte bestätige deine E-Mail für Unfold 🌿', $text, mm_mail_html('E-Mail bestätigen', $html, 'de'));
+        }
+        $text = "Hey $first,\n\nthank you for joining the list for Unfold – The Mindful Becoming!\n\nPlease confirm your email address first:\n$link\n\nRight after that I'll send you all the details, before I officially share when Unfold starts. There are no more than 10 spots.\n\nIf you didn't sign up, simply ignore this email.\n\nWith love, Viv";
+        $html = '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
+            . '<p style="margin:14px 0 0;">thank you for joining the list for <strong>Unfold – The Mindful Becoming</strong>!</p>'
+            . '<p style="margin:14px 0 0;">Please confirm your email address first. Right after that I\'ll send you all the details, before I officially share when Unfold starts. There are no more than 10 spots.</p>'
+            . mm_button($link, 'Yes, confirm my email')
+            . '<p style="margin:16px 0 0;font-size:14px;color:#7D7076;">If you didn\'t sign up, simply ignore this email.</p>';
+        return mm_mail($sub['email'], 'Please confirm your email for Unfold 🌿', $text, mm_mail_html('Confirm your email', $html));
+    }
     if ($de) {
         $text = "Hey $first,\n\nnur noch ein Klick, dann bist du dabei. Bitte bestätige hier deine E-Mail-Adresse:\n$link\n\nGleich danach wartet deine Reset-Routine für müde Tage auf dich, auf Deutsch und Englisch.\n\nFalls du dich nicht angemeldet hast, ignoriere diese Mail einfach. Dann hörst du nichts mehr von mir.\n\nAlles Liebe, Viv";
         $html = '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
@@ -471,6 +490,50 @@ function mm_mail_confirm(array $sub): bool
         . mm_button($link, 'Yes, confirm my email')
         . '<p style="margin:16px 0 0;font-size:14px;color:#7D7076;">If you didn\'t sign up, simply ignore this email and you won\'t hear from me again.</p>';
     return mm_mail($sub['email'], "One click and you're in 🌙", $text, mm_mail_html('Confirm your email', $html));
+}
+
+/** Viv bekommt Bescheid, wenn jemand Interesse an einem Angebot zeigt (nach der Bestätigung). */
+function mm_notify_interest(array $sub, string $source): void
+{
+    $what = ['mentoring' => 'Mentoring für ihr Herzensbusiness', 'year' => 'den Jahreskreis', 'circle' => 'den Inner Circle', 'retreat' => 'das Alpine Retreat', 'unfold' => 'Unfold – The Mindful Becoming'][$source] ?? $source;
+    $t = "Hallo Viv,\n\n{$sub['name']} ({$sub['email']}) interessiert sich für $what und hat ihre E-Mail-Adresse bestätigt.\nSprache: " . (($sub['lang'] ?? 'en') === 'de' ? 'Deutsch' : 'Englisch') . "\n\nDu siehst sie in der Verwaltung unter Movecia Movement → E-Mail-Liste.\n";
+    mm_mail(MM_FROM_EMAIL, 'Neue Interessentin: ' . $sub['name'] . ' · ' . $what, $t, mm_mail_html('Neue Interessentin', nl2br(forma_h($t)), 'de'));
+}
+
+/** Unfold-Infomail nach der Bestätigung (DE/EN): was es ist, Preise, Info-Gathering, Reset-Routine als kleines Geschenk. */
+function mm_mail_unfold_info(array $sub): bool
+{
+    $de = ($sub['lang'] ?? 'en') === 'de';
+    $first = forma_first_name($sub['name']);
+    $page = mm_site() . '/unfold/?lang=' . ($de ? 'de' : 'en');
+    $out = mm_site() . '/api/wh-unsubscribe.php?t=' . $sub['token'];
+    $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#7D5E68;';
+    $img = '<img src="' . mm_site() . '/img/wildhearts/cover.jpg" width="500" alt="" style="display:block;width:100%;max-width:500px;height:auto;max-height:340px;object-fit:cover;border-radius:16px;margin:0 0 20px;">';
+    $li = fn(array $xs) => '<ul style="margin:10px 0 0;padding-left:20px;">' . implode('', array_map(fn($x) => '<li style="margin:4px 0;">' . $x . '</li>', $xs)) . '</ul>';
+    if ($de) {
+        $items = ['Ein Live-Call pro Woche in kleiner Runde, immer ein Termin auf Deutsch und einer auf Englisch', 'Jeden Monat ein Workbook zu Mindset, Selbstwert und deinen Ideen, mit Journaling-Fragen', 'Kurze Impuls-Videos von mir', 'Drei Monate Zugang zur Movecia Mindful Movement Method: sanfte Flows, Breathwork, Somatic Movement, Meditation', 'Alle Aufnahmen, falls du einmal nicht live dabei sein kannst'];
+        $text = "Hey $first,\n\nschön, dass du dabei bist! Hier sind alle Infos zu Unfold – The Mindful Becoming, noch bevor ich es offiziell poste.\n\nUnfold ist eine Begleitung über drei Monate für Frauen, die ins Tun kommen wollen, aber nicht wissen, wo sie anfangen sollen. Wir starten am 1. Februar 2027.\n\nFebruar · Wurzeln: ankommen und Raum schaffen\nMärz · Knospen: Selbstwert und Ideen\nApril · Entfalten: ins Tun kommen\n\nDabei:\n– " . implode("\n– ", $items) . "\n\nEs gibt höchstens 10 Plätze.\nPreis: € 450 auf einmal oder 3 × € 160.\nVor dem Start gibt es ein kostenloses Info-Gathering (30 Minuten). Nur dort bekommst du Unfold für € 390. Den Termin schicke ich dir rechtzeitig.\n\nAlle Details: $page\n\nAlles Liebe, Viv\n\nAbmelden: $out";
+        $html = $img . '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
+            . '<p style="margin:14px 0 0;">schön, dass du dabei bist! Hier sind alle Infos zu <strong>Unfold – The Mindful Becoming</strong>, noch bevor ich es offiziell poste.</p>'
+            . '<p style="margin:14px 0 0;">Unfold ist eine Begleitung über drei Monate für Frauen, die ins Tun kommen wollen, aber nicht wissen, wo sie anfangen sollen. Wir starten am <strong>1. Februar 2027</strong>.</p>'
+            . '<p style="margin:16px 0 0;"><strong>Februar · Wurzeln</strong> ankommen und Raum schaffen<br><strong>März · Knospen</strong> Selbstwert und Ideen<br><strong>April · Entfalten</strong> ins Tun kommen</p>'
+            . '<p style="margin:16px 0 0;">Das ist dabei:</p>' . $li($items)
+            . '<p style="margin:16px 0 0;background:#F2ECE4;border-radius:14px;padding:14px 16px;">Höchstens <strong>10 Plätze</strong>.<br>Preis: <strong>€ 450</strong> auf einmal oder 3 × € 160.<br>Vor dem Start gibt es ein kostenloses <strong>Info-Gathering</strong> (30 Minuten). Nur dort bekommst du Unfold für <strong>€ 390</strong>. Den Termin schicke ich dir rechtzeitig.</p>'
+            . mm_button($page, 'Alle Details ansehen')
+            . '<p style="margin:22px 0 0;font-size:12px;color:#7D7076;">Du bekommst diese E-Mail, weil du dich auf moveciamovement.com eingetragen hast. <a href="' . forma_h($out) . '" style="color:#7D7076;">Abmelden</a></p>';
+        return mm_mail($sub['email'], 'Unfold – The Mindful Becoming: alle Infos für dich 🌿', $text, mm_mail_html('Unfold · The Mindful Becoming', $html, 'de'));
+    }
+    $items = ['One live call per week in a small circle, always one call in English and one in German', 'A monthly workbook for mindset, self-worth and your ideas, with journaling prompts', 'Short talk videos from me', 'Three months of the Movecia Mindful Movement Method: gentle flows, breathwork, somatic movement, meditation', 'All recordings, in case you can\'t join live'];
+    $text = "Hey $first,\n\nso lovely to have you! Here is everything about Unfold – The Mindful Becoming, before I officially share it.\n\nUnfold is a three-month journey for women who are ready to begin but don't know where to start. We start on 1 February 2027.\n\nFebruary · Roots: arrive and make space\nMarch · Buds: self-worth and ideas\nApril · Unfold: begin\n\nIncluded:\n– " . implode("\n– ", $items) . "\n\nThere are no more than 10 spots.\nPrice: € 450 at once or 3 × € 160.\nBefore the start there is a free Info Gathering (30 minutes). Only there you get Unfold for € 390. I'll send you the date in good time.\n\nAll details: $page\n\nWith love, Viv\n\nUnsubscribe: $out";
+    $html = $img . '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
+        . '<p style="margin:14px 0 0;">so lovely to have you! Here is everything about <strong>Unfold – The Mindful Becoming</strong>, before I officially share it.</p>'
+        . '<p style="margin:14px 0 0;">Unfold is a three-month journey for women who are ready to begin but don\'t know where to start. We start on <strong>1 February 2027</strong>.</p>'
+        . '<p style="margin:16px 0 0;"><strong>February · Roots</strong> arrive and make space<br><strong>March · Buds</strong> self-worth and ideas<br><strong>April · Unfold</strong> begin</p>'
+        . '<p style="margin:16px 0 0;">What\'s included:</p>' . $li($items)
+        . '<p style="margin:16px 0 0;background:#F2ECE4;border-radius:14px;padding:14px 16px;">No more than <strong>10 spots</strong>.<br>Price: <strong>€ 450</strong> at once or 3 × € 160.<br>Before the start there is a free <strong>Info Gathering</strong> (30 minutes). Only there you get Unfold for <strong>€ 390</strong>. I\'ll send you the date in good time.</p>'
+        . mm_button($page, 'See all details')
+        . '<p style="margin:22px 0 0;font-size:12px;color:#7D7076;">You get this email because you signed up on moveciamovement.com. <a href="' . forma_h($out) . '" style="color:#7D7076;">Unsubscribe</a></p>';
+    return mm_mail($sub['email'], 'Unfold – The Mindful Becoming: everything for you 🌿', $text, mm_mail_html('Unfold · The Mindful Becoming', $html));
 }
 
 function mm_mail_welcome(array $sub): bool
