@@ -1,0 +1,450 @@
+<?php
+// Verwaltung → Movecia → „Method & Unfold“ (?view=method): Programme und Videos (Upload direkt zu Bunny Stream),
+// Workbooks, Sprechtexte mit Teleprompter, Mitglieder, Preise, Unfold-Plätze und Calls, Einstellungen.
+// Wird von verwaltung/movecia.php eingebunden (angemeldet, CSRF geprüft).
+declare(strict_types=1);
+require_once dirname(__DIR__) . '/api/method-lib.php';
+mv_schema($pdo);
+mv_seed($pdo);
+$vBack = $self . '?view=method';
+
+$mvJson = function (array $x): void { header('Content-Type: application/json; charset=utf-8'); echo json_encode($x); exit; };
+
+if ($action === 'mm_mv_bunny_save') {
+    $old = mv_bunny();
+    $new = [
+        'lib' => preg_replace('/\D+/', '', (string)($_POST['lib'] ?? '')),
+        'cdn' => preg_replace('~^https?://~', '', trim((string)($_POST['cdn'] ?? ''), " /")),
+        'key' => trim((string)($_POST['key'] ?? '')) ?: $old['key'],
+        'token' => trim((string)($_POST['token'] ?? '')) ?: $old['token'],
+    ];
+    if ($new['lib'] === '' || $new['key'] === '') go($vBack . '#bunny', 'Bitte trag mindestens die Library-ID und den API-Schlüssel ein.');
+    mm_save_cfg('bunny', $new);
+    try { mv_bunny_req('GET', '/videos?page=1&itemsPerPage=1'); go($vBack . '#bunny', 'Bunny ist verbunden. Du kannst jetzt Videos hochladen.'); }
+    catch (Throwable $e) { go($vBack . '#bunny', 'Gespeichert, aber Bunny antwortet noch nicht: ' . $e->getMessage()); }
+}
+if ($action === 'mm_mv_bunny_remove') { mm_save_cfg('bunny', null); go($vBack . '#bunny', 'Bunny ist getrennt.'); }
+
+if ($action === 'mm_mv_cfg') {
+    $e = fn(string $k) => mm_euro_in((string)($_POST[$k] ?? ''));
+    $in = [];
+    foreach (['m1', 'm3', 'm12', 'g_m1', 'g_m3', 'g_m12', 'u_once', 'u_inst', 'g_u_once'] as $k) if (($v = $e($k)) > 0) $in[$k] = $v;
+    foreach (['launch', 'u_start', 'u_end'] as $k) if (preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST[$k] ?? ''))) $in[$k] = (string)$_POST[$k];
+    $in['u_seats'] = max(1, min(40, (int)($_POST['u_seats'] ?? 10)));
+    $in['u_open'] = !empty($_POST['u_open']) ? 1 : 0;
+    $in['u_call_de'] = forma_clean((string)($_POST['u_call_de'] ?? ''), 80);
+    $in['u_call_en'] = forma_clean((string)($_POST['u_call_en'] ?? ''), 80);
+    mv_save_cfg($in);
+    go($vBack . '#preise', 'Gespeichert. Die Seiten zeigen sofort die neuen Angaben.');
+}
+
+if ($action === 'mm_mv_rooms') {
+    if (mm_whereby_key() === '') go($vBack . '#unfold', 'Trag zuerst unter Movecia → Einstellungen deinen Whereby-Schlüssel ein.');
+    $c = mv_cfg();
+    $out = [];
+    foreach (['de', 'en'] as $lg) {
+        $r = mm_whereby_request('POST', '/meetings', ['endDate' => gmdate('Y-m-d\TH:i:s.000\Z', mv_unfold_end() + 14 * 86400), 'roomMode' => 'group', 'roomNamePrefix' => 'unfold-' . $lg, 'fields' => ['hostRoomUrl']], mm_whereby_key());
+        if (empty($r['roomUrl'])) go($vBack . '#unfold', 'Whereby hat keinen Raum zurückgegeben. Bitte versuch es noch einmal.');
+        $out['u_room_' . $lg] = (string)$r['roomUrl'];
+        $out['u_host_' . $lg] = (string)($r['hostRoomUrl'] ?? '');
+    }
+    mv_save_cfg($out);
+    go($vBack . '#unfold', 'Die beiden Unfold-Videoräume (Deutsch und Englisch) sind angelegt. Sie bleiben bis zwei Wochen nach dem Ende offen.');
+}
+
+if ($action === 'mm_mv_prog_save') {
+    $id = (int)($_POST['id'] ?? 0);
+    $f = [
+        'audience' => ($_POST['audience'] ?? '') === 'unfold' ? 'unfold' : 'method',
+        'title_de' => forma_clean((string)($_POST['title_de'] ?? ''), 120),
+        'title_en' => forma_clean((string)($_POST['title_en'] ?? ''), 120),
+        'intro_de' => mb_substr(trim((string)($_POST['intro_de'] ?? '')), 0, 1500),
+        'intro_en' => mb_substr(trim((string)($_POST['intro_en'] ?? '')), 0, 1500),
+        'unlock' => preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST['unlock'] ?? '')) ? (string)$_POST['unlock'] : '',
+        'theme' => preg_replace('/[^a-z0-9-]/', '', strtolower((string)($_POST['theme'] ?? ''))),
+        'sort' => (int)($_POST['sort'] ?? 0),
+        'visible' => !empty($_POST['visible']) ? 1 : 0,
+    ];
+    if ($f['title_de'] === '') go($vBack . ($id ? '&p=' . $id : '') . '#prog', 'Bitte gib einen Titel ein.');
+    if ($id) {
+        $pdo->prepare('UPDATE mv_programs SET audience=?, title_de=?, title_en=?, intro_de=?, intro_en=?, unlock=?, theme=?, sort=?, visible=? WHERE id=?')->execute([...array_values($f), $id]);
+    } else {
+        $pdo->prepare('INSERT INTO mv_programs (audience, title_de, title_en, intro_de, intro_en, unlock, theme, sort, visible, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)')->execute([...array_values($f), date('c')]);
+        $id = (int)$pdo->lastInsertId();
+    }
+    go($vBack . '&p=' . $id, 'Programm gespeichert.');
+}
+if ($action === 'mm_mv_prog_delete') {
+    $id = (int)($_POST['id'] ?? 0);
+    foreach (mv_lessons($pdo, $id) as $l) { mv_bunny_delete($l['video_de']); mv_bunny_delete($l['video_en']); }
+    foreach (mv_files($pdo, $id) as $f) @unlink(mv_file_dir() . '/' . basename($f['file']));
+    $pdo->prepare('DELETE FROM mv_lessons WHERE program_id = ?')->execute([$id]);
+    $pdo->prepare('DELETE FROM mv_files WHERE program_id = ?')->execute([$id]);
+    $pdo->prepare('DELETE FROM mv_programs WHERE id = ?')->execute([$id]);
+    go($vBack . '#programme', 'Programm gelöscht.');
+}
+
+if ($action === 'mm_mv_lesson_save') {
+    $id = (int)($_POST['id'] ?? 0);
+    $pid = (int)($_POST['program_id'] ?? 0);
+    $f = [
+        'program_id' => $pid,
+        'title_de' => forma_clean((string)($_POST['title_de'] ?? ''), 120),
+        'title_en' => forma_clean((string)($_POST['title_en'] ?? ''), 120),
+        'text_de' => mb_substr(trim((string)($_POST['text_de'] ?? '')), 0, 2000),
+        'text_en' => mb_substr(trim((string)($_POST['text_en'] ?? '')), 0, 2000),
+        'cat' => isset(MV_CATS[$_POST['cat'] ?? '']) ? (string)$_POST['cat'] : 'flow',
+        'energy' => isset(MV_ENERGY[$_POST['energy'] ?? '']) ? (string)$_POST['energy'] : 'any',
+        'minutes' => max(0, min(240, (int)($_POST['minutes'] ?? 0))),
+        'sort' => (int)($_POST['sort'] ?? 0),
+        'visible' => !empty($_POST['visible']) ? 1 : 0,
+        'script_de' => mb_substr((string)($_POST['script_de'] ?? ''), 0, 30000),
+        'script_en' => mb_substr((string)($_POST['script_en'] ?? ''), 0, 30000),
+    ];
+    if ($f['title_de'] === '' || !mv_program($pdo, $pid)) go($vBack . '&p=' . $pid, 'Bitte gib einen Titel ein.');
+    if ($id) {
+        $pdo->prepare('UPDATE mv_lessons SET program_id=?, title_de=?, title_en=?, text_de=?, text_en=?, cat=?, energy=?, minutes=?, sort=?, visible=?, script_de=?, script_en=? WHERE id=?')->execute([...array_values($f), $id]);
+    } else {
+        $pdo->prepare('INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, visible, script_de, script_en, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)')->execute([...array_values($f), date('c')]);
+        $id = (int)$pdo->lastInsertId();
+    }
+    go($vBack . '&l=' . $id, 'Gespeichert.');
+}
+if ($action === 'mm_mv_lesson_delete') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    if ($l) { mv_bunny_delete($l['video_de']); mv_bunny_delete($l['video_en']); $pdo->prepare('DELETE FROM mv_lessons WHERE id = ?')->execute([$l['id']]); $pdo->prepare('DELETE FROM mv_progress WHERE lesson_id = ?')->execute([$l['id']]); }
+    go($vBack . '&p=' . (int)($l['program_id'] ?? 0), 'Lektion gelöscht.');
+}
+
+// Video-Upload: Server legt das Video bei Bunny an, der Browser lädt die Datei direkt dorthin (TUS), dann wird es eingetragen
+if ($action === 'mm_mv_video_new') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    $lg = ($_POST['lang'] ?? '') === 'en' ? 'en' : 'de';
+    if (!$l) $mvJson(['error' => 'Lektion nicht gefunden.']);
+    try { $mvJson(mv_bunny_new(mv_t($l, 'title', $lg) . ' · ' . strtoupper($lg))); } catch (Throwable $e) { $mvJson(['error' => $e->getMessage()]); }
+}
+if ($action === 'mm_mv_video_set') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    $lg = ($_POST['lang'] ?? '') === 'en' ? 'en' : 'de';
+    $guid = preg_replace('/[^a-f0-9-]/', '', (string)($_POST['guid'] ?? ''));
+    if (!$l || $guid === '') $mvJson(['error' => 'Fehlt.']);
+    if ($l['video_' . $lg] !== '' && $l['video_' . $lg] !== $guid) mv_bunny_delete($l['video_' . $lg]);
+    $pdo->prepare('UPDATE mv_lessons SET video_' . $lg . ' = ? WHERE id = ?')->execute([$guid, $l['id']]);
+    $mvJson(['ok' => 1]);
+}
+if ($action === 'mm_mv_video_clear') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    $lg = ($_POST['lang'] ?? '') === 'en' ? 'en' : 'de';
+    if ($l) { mv_bunny_delete($l['video_' . $lg]); $pdo->prepare('UPDATE mv_lessons SET video_' . $lg . " = '' WHERE id = ?")->execute([$l['id']]); }
+    go($vBack . '&l=' . (int)($l['id'] ?? 0), 'Video entfernt.');
+}
+
+if ($action === 'mm_mv_file_add') {
+    $pid = (int)($_POST['program_id'] ?? 0);
+    $up = $_FILES['file'] ?? null;
+    if (!mv_program($pdo, $pid) || !$up || $up['error'] !== UPLOAD_ERR_OK) go($vBack . '&p=' . $pid . '#dateien', 'Die Datei ist nicht angekommen. Ist sie vielleicht zu groß?');
+    $ext = strtolower(pathinfo((string)$up['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, ['pdf', 'png', 'jpg', 'jpeg', 'zip'], true)) go($vBack . '&p=' . $pid . '#dateien', 'Bitte lade ein PDF (oder PNG/JPG/ZIP) hoch.');
+    $name = bin2hex(random_bytes(12)) . '.' . $ext;
+    move_uploaded_file($up['tmp_name'], mv_file_dir() . '/' . $name);
+    $label = forma_clean((string)($_POST['label_de'] ?? ''), 80) ?: 'Workbook';
+    $pdo->prepare('INSERT INTO mv_files (program_id, label_de, label_en, lang, file, created_at) VALUES (?,?,?,?,?,?)')
+        ->execute([$pid, $label, forma_clean((string)($_POST['label_en'] ?? ''), 80) ?: $label, in_array($_POST['lang'] ?? '', ['de', 'en'], true) ? $_POST['lang'] : 'both', $name, date('c')]);
+    go($vBack . '&p=' . $pid . '#dateien', 'Datei hochgeladen. Die Frauen sehen sie im Programm.');
+}
+if ($action === 'mm_mv_file_delete') {
+    $q = $pdo->prepare('SELECT * FROM mv_files WHERE id = ?');
+    $q->execute([(int)($_POST['id'] ?? 0)]);
+    $f = $q->fetch();
+    if ($f) { @unlink(mv_file_dir() . '/' . basename($f['file'])); $pdo->prepare('DELETE FROM mv_files WHERE id = ?')->execute([$f['id']]); }
+    go($vBack . '&p=' . (int)($f['program_id'] ?? 0) . '#dateien', 'Datei gelöscht.');
+}
+
+// Als Mitglied testen: Zugang ohne Zahlung (Method oder Unfold), Mail mit Passwort-Link an die angegebene Adresse
+if ($action === 'mm_mv_test') {
+    $email = strtolower(trim((string)($_POST['email'] ?? '')));
+    $kind = ($_POST['kind'] ?? '') === 'unfold' ? 'unfold' : 'method';
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) go($vBack . '#test', 'Bitte gib eine E-Mail-Adresse ein (am besten eine zweite eigene).');
+    $lg = ($_POST['lang'] ?? '') === 'en' ? 'en' : 'de';
+    $pdo->prepare("INSERT INTO mv_subs (kind, plan, email, name, lang, call_lang, amount_cents, first_cents, status, token, consent_digital, consent_live, source, test, created_at, paid_at, period_end) VALUES (?,?,?,?,?,?,0,0,'aktiv',?,?,1,'test',1,?,?,?)")
+        ->execute([$kind, $kind === 'unfold' ? 'u1' : 'm1', $email, forma_clean((string)($_POST['name'] ?? 'Test'), 80) ?: 'Test', $lg, $lg, bin2hex(random_bytes(16)), empty($_POST['starter']) ? 1 : 0, date('c'), date('c', empty($_POST['starter']) ? time() : time()), time() + 30 * 86400]);
+    mv_welcome($pdo, mv_sub($pdo, (int)$pdo->lastInsertId()));
+    go($vBack . '#test', 'Testzugang angelegt. An ' . $email . ' ist die Willkommensmail mit dem Passwort-Link unterwegs. Er gilt 30 Tage.');
+}
+if ($action === 'mm_mv_test_delete') {
+    $r = mv_sub($pdo, (int)($_POST['id'] ?? 0));
+    if ($r && (int)$r['test'] === 1 && $r['source'] === 'test') {
+        $pdo->prepare('DELETE FROM mv_subs WHERE id = ?')->execute([$r['id']]);
+        if (!$pdo->query('SELECT COUNT(*) FROM mv_subs WHERE lower(email) = ' . $pdo->quote(strtolower($r['email'])))->fetchColumn()) {
+            $m = mv_member_by_email($pdo, (string)$r['email']);
+            if ($m) foreach (['mv_progress', 'mv_favs', 'mv_journal'] as $t) $pdo->prepare("DELETE FROM $t WHERE member_id = ?")->execute([$m['id']]);
+            $pdo->prepare('DELETE FROM mv_members WHERE lower(email) = ?')->execute([strtolower($r['email'])]);
+        }
+    }
+    go($vBack . '#test', 'Testzugang gelöscht.');
+}
+if ($action === 'mm_mv_sync') {
+    $n = 0;
+    foreach ($pdo->query("SELECT * FROM mv_subs WHERE status IN ('offen','aktiv') AND stripe_session <> ''")->fetchAll() as $r) {
+        try { $r['status'] === 'offen' ? mv_check_paid($pdo, $r) : mv_sync($pdo, $r, true); $n++; } catch (Throwable $e) { error_log('MV sync all: ' . $e->getMessage()); }
+    }
+    go($vBack . '#mitglieder', $n . ' Buchungen mit Stripe abgeglichen.');
+}
+if ($action === 'mm_mv_resend') {
+    $r = mv_sub($pdo, (int)($_POST['id'] ?? 0));
+    if ($r) { $pdo->prepare('UPDATE mv_subs SET mailed = 0 WHERE id = ?')->execute([$r['id']]); mv_welcome($pdo, mv_sub($pdo, (int)$r['id'])); }
+    go($vBack . '#mitglieder', 'Willkommensmail mit Zugang nochmal geschickt.');
+}
+
+if ($view === 'method') {
+    // Video-Status für die Anzeige beim Hochladen
+    if (isset($_GET['vstatus'])) { $i = mv_bunny_info(preg_replace('/[^a-f0-9-]/', '', (string)$_GET['vstatus'])); $mvJson(['status' => (int)($i['status'] ?? -1), 'progress' => (int)($i['encodeProgress'] ?? 0), 'length' => (int)($i['length'] ?? 0)]); }
+    try { mv_tick($pdo); } catch (Throwable $e) { error_log('MV tick: ' . $e->getMessage()); }
+
+    // Teleprompter für Sprechtexte (Vollbild, nur für Vivien)
+    if (isset($_GET['prompter'])) {
+        $l = mv_lesson($pdo, (int)$_GET['prompter']);
+        $lg = ($_GET['lang'] ?? '') === 'en' ? 'en' : 'de';
+        $txt = $l ? (string)$l['script_' . $lg] : '';
+        header('Content-Type: text/html; charset=utf-8'); ?><!doctype html><html lang="<?= $lg ?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Teleprompter</title>
+<style>body{margin:0;background:#1E1719;color:#F6EFEA;font:400 44px/1.5 Georgia,serif}#t{padding:40vh 8vw 80vh;white-space:pre-wrap;max-width:1100px;margin:0 auto}.ui{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:12px;background:rgba(30,23,25,.9);font:15px system-ui}.ui button{font:inherit;padding:9px 16px;border-radius:999px;border:1px solid #6B5658;background:#4A3A41;color:#F6EFEA;cursor:pointer}.mir #t{transform:scaleX(-1)}.hint{color:#A8959B;font-size:.55em}.mark{color:#E8D6CA;font-size:.6em}body::before{content:"";position:fixed;left:0;right:0;top:38vh;height:2px;background:rgba(232,214,202,.25)}</style></head><body>
+<div id="t"><?= preg_replace(['/\[([^\]]+)\]/', '/^(\d{1,2}:\d{2})/m'], ['<span class="hint">[$1]</span>', '<span class="mark">$1</span>'], forma_h($txt !== '' ? $txt : ($lg === 'en' ? 'No script yet. Add it in the lesson.' : 'Noch kein Sprechtext. Trag ihn bei der Lektion ein.'))) ?></div>
+<div class="ui"><button id="go">▶ Start</button><button data-s="-1">langsamer</button><button data-s="1">schneller</button><button data-z="-4">A−</button><button data-z="4">A+</button><button id="top">⟲</button><button id="mir">Spiegeln</button></div>
+<script>let run=false,sp=1.2,fs=44,y=0;const go=document.getElementById('go');function loop(){if(run){window.scrollBy(0,sp);}requestAnimationFrame(loop)}loop();
+function t(){run=!run;go.textContent=run?'❚❚ Pause':'▶ Start'}go.onclick=t;document.getElementById('t').onclick=t;document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();t()}});
+document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{sp=Math.max(.2,sp+(+b.dataset.s)*.3)});document.querySelectorAll('[data-z]').forEach(b=>b.onclick=()=>{fs=Math.max(24,fs+(+b.dataset.z));document.body.style.fontSize=fs+'px'});
+document.getElementById('top').onclick=()=>scrollTo(0,0);document.getElementById('mir').onclick=()=>document.body.classList.toggle('mir');</script></body></html><?php exit;
+    }
+
+    $pEdit = isset($_GET['p']) ? mv_program($pdo, (int)$_GET['p']) : null;
+    $lEdit = isset($_GET['l']) ? mv_lesson($pdo, (int)$_GET['l']) : null;
+    $newLessonFor = isset($_GET['neu']) ? mv_program($pdo, (int)$_GET['neu']) : null;
+    render_page('Method & Unfold', function () use ($self, $flash, $pdo, $pEdit, $lEdit, $newLessonFor) {
+        $c = mv_cfg();
+        $b = mv_bunny();
+        $plans = mv_plans();
+        $csrf = '<input type="hidden" name="csrf" value="' . forma_h(csrf()) . '">';
+        $eu = fn(int $x) => $x ? rtrim(rtrim(number_format($x / 100, 2, ',', ''), '0'), ',') : '';
+        $subs = $pdo->query("SELECT * FROM mv_subs WHERE status IN ('aktiv','beendet') OR (status = 'offen' AND created_at >= '" . date('c', time() - 86400) . "') ORDER BY id DESC LIMIT 200")->fetchAll();
+        $real = array_filter($subs, fn($s) => $s['source'] !== 'test');
+        $mActive = count(array_filter($real, fn($s) => $s['kind'] === 'method' && $s['status'] === 'aktiv'));
+        $uTaken = mv_unfold_taken($pdo);
+        $mrr = 0; foreach ($real as $s) if ($s['kind'] === 'method' && $s['status'] === 'aktiv' && !(int)$s['cancel_end']) $mrr += (int)round($s['amount_cents'] / ($plans[$s['plan']]['months'] ?? 1));
+        $progs = array_merge(mv_programs($pdo, 'method'), mv_programs($pdo, 'unfold'));
+        $site = mm_site();
+        $catOpt = function (string $cur) { $o = ''; foreach (MV_CATS as $k => $n) $o .= '<option value="' . $k . '"' . ($k === $cur ? ' selected' : '') . '>' . forma_h($n[0]) . '</option>'; return $o; };
+        $enOpt = function (string $cur) { $o = ''; foreach (MV_ENERGY as $k => $n) $o .= '<option value="' . $k . '"' . ($k === $cur ? ' selected' : '') . '>' . forma_h($n[0]) . '</option>'; return $o; }; ?>
+<style>
+:root{--paper:#F2ECE4;--card:#FBF8F4;--clay:#7D5E68;--soft:#7D7076;--line:#DDD2C6;--ink:#2E2529}
+body{background:var(--paper)}h1,h2{color:#6B5658}
+.nh{position:relative;overflow:hidden;border-radius:26px;background:#4A3A41;color:#FBF5F7;padding:24px 24px 22px}
+.nh::after{content:"";position:absolute;width:220px;height:210px;right:-80px;top:-90px;border-radius:62% 38% 46% 54%/55% 45% 55% 45%;background:rgba(232,214,202,.3)}
+.nh h1{color:#FBF5F7;font-family:Georgia,serif;font-weight:400;font-size:34px;margin:2px 0 4px;position:relative}.nh p{position:relative;margin:0;color:#EADFDE}.nh .eyebrow{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#E8D6CA}
+.ns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}@media(min-width:700px){.ns{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.ns a,.ns span.st{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;color:var(--ink);text-decoration:none;display:flex;flex-direction:column}
+.ns b{font-family:Georgia,serif;font-weight:400;font-size:32px;line-height:1.1;color:#7D5E68}.ns span span{font-size:14px;color:var(--soft);line-height:1.3}
+.nl{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.nl a{display:inline-block;padding:7px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:#6B5658;font-size:15px}
+.btn{background:#7D5E68;border-color:#7D5E68;color:#FBF5F7}.btn-ghost{background:transparent;color:#7D5E68}.link{color:#7D5E68}
+.chip{display:inline-block;border-radius:999px;padding:1px 10px;font-size:13px;background:#EADFDE;color:#6B5658}.chip.ok{background:#7D5E68;color:#FBF5F7}.chip.wait{background:#E8D6CA}
+.ln{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding:9px 0;align-items:center}
+.g2{display:grid;gap:10px}@media(min-width:800px){.g2{grid-template-columns:1fr 1fr}}
+.g3{display:grid;gap:10px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.prow{display:grid;gap:4px;border-top:1px solid var(--line);padding:10px 0}
+.prow a.t{font-family:Georgia,serif;font-size:21px;color:var(--ink);text-decoration:none}
+.vbox{border:1px dashed var(--line);border-radius:16px;padding:12px;display:grid;gap:8px}
+.vbar{height:8px;border-radius:9px;background:#EADFDE;overflow:hidden}.vbar i{display:block;height:100%;width:0;background:#7D5E68;transition:width .3s}
+textarea.script{min-height:220px;font-size:15px;line-height:1.55}
+details.more summary{cursor:pointer;color:#7D5E68}
+label.inl{display:flex;gap:8px;align-items:center}
+</style>
+        <p><a href="<?= forma_h($self) ?>?view=movecia">← Movecia</a> · <a href="<?= forma_h($self) ?>?view=method">Method &amp; Unfold</a></p>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+
+<?php if ($lEdit || $newLessonFor):
+        $l = $lEdit ?: ['id' => 0, 'program_id' => $newLessonFor['id'], 'title_de' => '', 'title_en' => '', 'text_de' => '', 'text_en' => '', 'cat' => 'flow', 'energy' => 'any', 'minutes' => 15, 'sort' => count(mv_lessons($pdo, (int)$newLessonFor['id'])), 'visible' => 1, 'video_de' => '', 'video_en' => '', 'script_de' => '', 'script_en' => ''];
+        $p = mv_program($pdo, (int)$l['program_id']); ?>
+        <h1><?= $l['id'] ? forma_h($l['title_de']) : 'Neue Lektion' ?></h1>
+        <p class="muted">in <a href="<?= forma_h($self) ?>?view=method&amp;p=<?= (int)$p['id'] ?>"><?= forma_h($p['title_de']) ?></a></p>
+        <?php if ($l['id']): ?>
+        <h2>Videos</h2>
+        <?php if (!mv_bunny_ok()): ?><p class="card">Damit du Videos hochladen kannst, trag zuerst unten auf der <a href="<?= forma_h($self) ?>?view=method#bunny">Method-Seite unter „Bunny Stream“</a> deine Library-ID und den API-Schlüssel ein.</p>
+        <?php else: ?>
+        <div class="g2">
+        <?php foreach (['de' => 'Deutsch', 'en' => 'Englisch'] as $lg => $ln): $g = $l['video_' . $lg]; $info = $g ? mv_bunny_info($g) : null; ?>
+            <div class="vbox" data-lang="<?= $lg ?>">
+                <b>Video <?= $ln ?></b>
+                <?php if ($g): ?>
+                    <?php if (($info['status'] ?? 0) === 4): ?><iframe src="<?= forma_h(mv_embed($g)) ?>" style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px" allowfullscreen></iframe><span class="muted small">Fertig · <?= (int)round(($info['length'] ?? 0) / 60) ?> Min.</span>
+                    <?php else: ?><span class="muted small vst" data-guid="<?= forma_h($g) ?>">Wird bei Bunny verarbeitet …</span><?php endif; ?>
+                    <form method="post" onsubmit="return confirm('Video wirklich entfernen?')"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_video_clear"><input type="hidden" name="id" value="<?= (int)$l['id'] ?>"><input type="hidden" name="lang" value="<?= $lg ?>"><button class="link small" type="submit">Video entfernen</button></form>
+                <?php endif; ?>
+                <label class="small muted"><?= $g ? 'Durch neues Video ersetzen' : 'Video auswählen (MP4/MOV vom Handy oder Computer)' ?></label>
+                <input type="file" accept="video/*" class="vfile">
+                <div class="vbar" hidden><i></i></div><span class="small muted vmsg"></span>
+            </div>
+        <?php endforeach; ?>
+        </div>
+        <p class="small muted">Das Video geht direkt von deinem Gerät zu Bunny, du kannst große Dateien hochladen. Lass die Seite offen, bis „fertig hochgeladen“ erscheint. Danach wandelt Bunny es in ein paar Minuten für alle Geräte um.</p>
+        <?php endif; endif; ?>
+
+        <h2>Angaben</h2>
+        <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_lesson_save"><input type="hidden" name="id" value="<?= (int)$l['id'] ?>"><input type="hidden" name="program_id" value="<?= (int)$l['program_id'] ?>">
+            <div class="g2"><label>Titel (Deutsch)<input name="title_de" value="<?= forma_h($l['title_de']) ?>" required></label><label>Titel (Englisch)<input name="title_en" value="<?= forma_h($l['title_en']) ?>"></label></div>
+            <div class="g2"><label>Kurzbeschreibung (Deutsch)<textarea name="text_de" rows="3"><?= forma_h($l['text_de']) ?></textarea></label><label>Kurzbeschreibung (Englisch)<textarea name="text_en" rows="3"><?= forma_h($l['text_en']) ?></textarea></label></div>
+            <div class="g3"><label>Art<select name="cat"><?= $catOpt($l['cat']) ?></select></label><label>Energie<select name="energy"><?= $enOpt($l['energy']) ?></select></label><label>Minuten<input name="minutes" type="number" min="0" max="240" value="<?= (int)$l['minutes'] ?>"></label></div>
+            <div class="g2"><label>Reihenfolge<input name="sort" type="number" value="<?= (int)$l['sort'] ?>"></label><label class="inl"><input type="checkbox" name="visible" value="1" <?= $l['visible'] ? 'checked' : '' ?>> sichtbar für Mitglieder</label></div>
+            <details class="more" <?= ($l['script_de'] . $l['script_en']) !== '' ? 'open' : '' ?>><summary>Sprechtext für Voice-over / Teleprompter</summary>
+                <p class="small muted">Zeitmarken wie „0:45“ am Zeilenanfang werden im Teleprompter hervorgehoben, [Hinweise in eckigen Klammern] erscheinen klein.</p>
+                <div class="g2"><label>Deutsch<textarea class="script" name="script_de"><?= forma_h($l['script_de']) ?></textarea></label><label>Englisch<textarea class="script" name="script_en"><?= forma_h($l['script_en']) ?></textarea></label></div>
+                <?php if ($l['id']): ?><p class="acts"><a class="btn btn-ghost btn-sm" target="_blank" href="<?= forma_h($self) ?>?view=method&amp;prompter=<?= (int)$l['id'] ?>&amp;lang=de">Teleprompter Deutsch</a> <a class="btn btn-ghost btn-sm" target="_blank" href="<?= forma_h($self) ?>?view=method&amp;prompter=<?= (int)$l['id'] ?>&amp;lang=en">Teleprompter Englisch</a></p><?php endif; ?>
+            </details>
+            <button class="btn" type="submit">Speichern</button>
+        </form>
+        <?php if ($l['id']): ?><form method="post" onsubmit="return confirm('Lektion mit Videos löschen?')" style="margin-top:12px"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_lesson_delete"><input type="hidden" name="id" value="<?= (int)$l['id'] ?>"><button class="link small" type="submit">Lektion löschen</button></form><?php endif; ?>
+
+        <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
+        <script>
+        (function(){
+          const csrf=<?= json_encode(csrf()) ?>, lid=<?= (int)$l['id'] ?>;
+          function post(a,data){const f=new FormData();f.append('csrf',csrf);f.append('action',a);for(const k in data)f.append(k,data[k]);return fetch(location.pathname,{method:'POST',body:f,credentials:'same-origin'}).then(r=>r.json())}
+          function watch(el,g){const t=setInterval(()=>fetch(location.pathname+'?view=method&vstatus='+g,{credentials:'same-origin'}).then(r=>r.json()).then(j=>{
+            if(j.status===4){clearInterval(t);el.textContent='Fertig umgewandelt ✓ – lade die Seite neu, um es anzusehen.';}
+            else if(j.status>=5){clearInterval(t);el.textContent='Bunny konnte das Video nicht umwandeln. Bitte versuch es mit einer anderen Datei.';}
+            else el.textContent='Bunny wandelt das Video um'+(j.progress?' ('+j.progress+' %)':'')+' …';}),5000)}
+          document.querySelectorAll('.vst').forEach(el=>watch(el,el.dataset.guid));
+          document.querySelectorAll('.vbox').forEach(box=>{const inp=box.querySelector('.vfile');if(!inp)return;
+            inp.addEventListener('change',()=>{const file=inp.files[0];if(!file)return;const bar=box.querySelector('.vbar'),fill=bar.querySelector('i'),msg=box.querySelector('.vmsg');
+              msg.textContent='Wird vorbereitet …';inp.disabled=true;
+              post('mm_mv_video_new',{id:lid,lang:box.dataset.lang}).then(j=>{if(j.error){msg.textContent=j.error;inp.disabled=false;return;}
+                bar.hidden=false;const up=new tus.Upload(file,{endpoint:j.endpoint,retryDelays:[0,3000,10000,30000,60000],chunkSize:50*1024*1024,
+                  headers:{AuthorizationSignature:j.sig,AuthorizationExpire:String(j.expire),VideoId:j.guid,LibraryId:String(j.lib)},
+                  metadata:{filetype:file.type,title:file.name},
+                  onError:e=>{msg.textContent='Upload unterbrochen: '+e.message+' – wähl die Datei einfach nochmal aus.';inp.disabled=false},
+                  onProgress:(s,t)=>{const p=Math.round(s/t*100);fill.style.width=p+'%';msg.textContent='Lädt hoch … '+p+' %'},
+                  onSuccess:()=>{post('mm_mv_video_set',{id:lid,lang:box.dataset.lang,guid:j.guid}).then(()=>{msg.textContent='Fertig hochgeladen ✓';watch(msg,j.guid)})}});
+                up.start();}).catch(()=>{msg.textContent='Das hat nicht geklappt. Bitte lade die Seite neu.';inp.disabled=false});});});
+        })();
+        </script>
+
+<?php elseif ($pEdit || isset($_GET['neuprog'])):
+        $p = $pEdit ?: ['id' => 0, 'audience' => ($_GET['neuprog'] ?? '') === 'unfold' ? 'unfold' : 'method', 'title_de' => '', 'title_en' => '', 'intro_de' => '', 'intro_en' => '', 'unlock' => '', 'theme' => '', 'sort' => 0, 'visible' => 1]; ?>
+        <h1><?= $p['id'] ? forma_h($p['title_de']) : 'Neues Programm' ?></h1>
+        <?php if ($p['id']): $ls = mv_lessons($pdo, (int)$p['id']); ?>
+        <h2>Lektionen</h2>
+        <div class="card">
+            <?php if (!$ls): ?><p class="muted small">Noch keine Lektion.</p><?php endif; ?>
+            <?php foreach ($ls as $l): ?><div class="ln"><span><a href="<?= forma_h($self) ?>?view=method&amp;l=<?= (int)$l['id'] ?>"><strong><?= forma_h($l['title_de']) ?></strong></a><br><span class="small muted"><?= forma_h(MV_CATS[$l['cat']][0] ?? '') ?> · <?= (int)$l['minutes'] ?> Min. · <?= forma_h(MV_ENERGY[$l['energy']][0] ?? '') ?><?= $l['visible'] ? '' : ' · ausgeblendet' ?></span></span>
+                <span class="acts"><span class="chip <?= $l['video_de'] ? 'ok' : '' ?>">DE <?= $l['video_de'] ? '✓' : '–' ?></span><span class="chip <?= $l['video_en'] ? 'ok' : '' ?>">EN <?= $l['video_en'] ? '✓' : '–' ?></span></span></div><?php endforeach; ?>
+            <p style="margin-top:10px"><a class="btn btn-sm" href="<?= forma_h($self) ?>?view=method&amp;neu=<?= (int)$p['id'] ?>">+ Lektion</a></p>
+        </div>
+        <h2 id="dateien">Workbooks &amp; Downloads</h2>
+        <div class="card stack">
+            <?php foreach (mv_files($pdo, (int)$p['id']) as $f): ?><div class="ln"><span><?= forma_h($f['label_de']) ?> <span class="small muted">· <?= $f['lang'] === 'both' ? 'für alle' : ($f['lang'] === 'de' ? 'nur Deutsch' : 'nur Englisch') ?></span></span>
+                <form method="post" onsubmit="return confirm('Datei löschen?')"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_file_delete"><input type="hidden" name="id" value="<?= (int)$f['id'] ?>"><button class="link small" type="submit">löschen</button></form></div><?php endforeach; ?>
+            <form method="post" enctype="multipart/form-data" class="stack"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_file_add"><input type="hidden" name="program_id" value="<?= (int)$p['id'] ?>">
+                <div class="g3"><label>Name (Deutsch)<input name="label_de" placeholder="Workbook Dezember"></label><label>Name (Englisch)<input name="label_en" placeholder="December workbook"></label><label>Für<select name="lang"><option value="both">alle</option><option value="de">nur Deutsch</option><option value="en">nur Englisch</option></select></label></div>
+                <input type="file" name="file" accept=".pdf,.png,.jpg,.jpeg,.zip" required><button class="btn btn-sm" type="submit">Hochladen</button></form>
+            <p class="small muted">Workbook, Planner, Meal-Prep oder Rezepte: Die Frauen sehen sie als Knöpfe beim Programm.</p>
+        </div>
+        <?php endif; ?>
+        <h2 id="prog">Angaben</h2>
+        <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_prog_save"><input type="hidden" name="id" value="<?= (int)$p['id'] ?>">
+            <div class="g2"><label>Für<select name="audience"><option value="method" <?= $p['audience'] === 'method' ? 'selected' : '' ?>>Method (alle Mitglieder)</option><option value="unfold" <?= $p['audience'] === 'unfold' ? 'selected' : '' ?>>Unfold (nur Unfold-Teilnehmerinnen)</option></select></label>
+                <label>Freischalten am (leer = sofort, z. B. Ankommen)<input type="date" name="unlock" value="<?= forma_h($p['unlock']) ?>"></label></div>
+            <div class="g2"><label>Titel (Deutsch)<input name="title_de" value="<?= forma_h($p['title_de']) ?>" required placeholder="Jänner · Neubeginn"></label><label>Titel (Englisch)<input name="title_en" value="<?= forma_h($p['title_en']) ?>" placeholder="January · New beginnings"></label></div>
+            <div class="g2"><label>Einleitung (Deutsch)<textarea name="intro_de" rows="4"><?= forma_h($p['intro_de']) ?></textarea></label><label>Einleitung (Englisch)<textarea name="intro_en" rows="4"><?= forma_h($p['intro_en']) ?></textarea></label></div>
+            <div class="g3"><label>Reihenfolge<input type="number" name="sort" value="<?= (int)$p['sort'] ?>"></label><label>Kürzel <span class="small muted">(ankommen = auch in den ersten 14 Tagen offen)</span><input name="theme" value="<?= forma_h($p['theme']) ?>"></label><label class="inl"><input type="checkbox" name="visible" value="1" <?= $p['visible'] ? 'checked' : '' ?>> sichtbar</label></div>
+            <button class="btn" type="submit">Speichern</button>
+        </form>
+        <?php if ($p['id']): ?><form method="post" onsubmit="return confirm('Programm mit allen Lektionen, Videos und Dateien löschen?')" style="margin-top:12px"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_prog_delete"><input type="hidden" name="id" value="<?= (int)$p['id'] ?>"><button class="link small" type="submit">Programm löschen</button></form><?php endif; ?>
+
+<?php else: ?>
+        <section class="nh"><p class="eyebrow">Movecia · On-Demand</p><h1>Method &amp; Unfold</h1><p>Programme und Videos, Mitglieder, Unfold-Plätze und Preise.</p></section>
+        <div class="ns">
+            <a href="#mitglieder"><b><?= $mActive ?></b><span>aktive Method-Mitglieder</span></a>
+            <a href="#unfold"><b><?= $uTaken ?>/<?= (int)$c['u_seats'] ?></b><span>Unfold-Plätze belegt</span></a>
+            <span class="st"><b><?= forma_h(mv_eur($mrr)) ?></b><span>Method pro Monat (ungefähr)</span></span>
+            <a href="#programme"><b><?= count($progs) ?></b><span>Programme</span></a>
+        </div>
+        <div class="nl">
+            <a href="<?= forma_h($site) ?>/method/" target="_blank">Method-Seite</a>
+            <a href="<?= forma_h($site) ?>/unfold/" target="_blank">Unfold-Seite</a>
+            <a href="<?= forma_h($site) ?>/mitglieder/?demo=1" target="_blank">Mitgliederbereich (Beispiel)</a>
+            <a href="<?= forma_h($site) ?>/mitglieder/" target="_blank">Login für Mitglieder</a>
+            <?php if (!mv_bunny_ok()): ?><a href="#bunny" style="background:#7D5E68;color:#FBF5F7">Bunny verbinden</a><?php endif; ?>
+        </div>
+
+        <h2 id="programme">Programme</h2>
+        <div class="card">
+            <?php foreach ($progs as $p): $n = count(mv_lessons($pdo, (int)$p['id'])); ?>
+            <div class="prow"><a class="t" href="<?= forma_h($self) ?>?view=method&amp;p=<?= (int)$p['id'] ?>"><?= forma_h($p['title_de']) ?></a>
+                <span class="small muted"><?= $p['audience'] === 'unfold' ? 'Unfold' : 'Method' ?> · <?= $p['unlock'] === '' ? 'sofort offen' : 'ab ' . date('d.m.Y', strtotime($p['unlock'])) ?> · <?= $n ?> Lektion<?= $n === 1 ? '' : 'en' ?><?= $p['visible'] ? '' : ' · ausgeblendet' ?></span></div>
+            <?php endforeach; ?>
+            <p class="acts" style="margin-top:10px"><a class="btn btn-sm" href="<?= forma_h($self) ?>?view=method&amp;neuprog=method">+ Monatsprogramm Method</a> <a class="btn btn-ghost btn-sm" href="<?= forma_h($self) ?>?view=method&amp;neuprog=unfold">+ Unfold-Monat</a></p>
+            <p class="small muted">Jedes Programm öffnet sich am eingetragenen Tag von selbst (z. B. am 1. des Monats). Neue Mitglieder sehen alle bisherigen Monate.</p>
+        </div>
+
+        <h2 id="mitglieder">Mitglieder</h2>
+        <div class="card">
+            <?php if (!$real): ?><p class="muted small">Noch niemand. Sobald jemand bucht, steht sie hier und du bekommst eine Mail.</p><?php endif; ?>
+            <?php foreach ($real as $s): $pl = $plans[$s['plan']] ?? ['de' => $s['plan']]; ?>
+            <div class="ln"><span><strong><?= forma_h($s['name'] ?: $s['email']) ?></strong> <span class="small muted"><?= forma_h($s['email']) ?></span><br>
+                <span class="small muted"><?= $s['kind'] === 'unfold' ? 'Unfold' : 'Method' ?> · <?= forma_h($pl['de']) ?> · <?= forma_h(mv_eur((int)$s['first_cents'])) ?><?= (int)$s['special'] ? ' (Gathering-Preis)' : '' ?> · seit <?= forma_h(date('d.m.Y', strtotime((string)($s['paid_at'] ?: $s['created_at'])))) ?><?= $s['kind'] === 'unfold' ? ' · Call ' . ($s['call_lang'] === 'en' ? 'Englisch' : 'Deutsch') : '' ?><?= (int)$s['bill_start'] > time() ? ' · Abbuchung ab ' . date('d.m.Y', (int)$s['bill_start']) : '' ?><?= (int)$s['cancel_end'] ? ' · gekündigt zum ' . date('d.m.Y', (int)$s['cancel_end']) : '' ?></span></span>
+                <span class="acts"><span class="chip <?= $s['status'] === 'aktiv' ? 'ok' : 'wait' ?>"><?= ['aktiv' => 'aktiv', 'beendet' => 'beendet', 'offen' => 'Zahlung offen'][$s['status']] ?? forma_h($s['status']) ?></span>
+                <?php if ($s['status'] === 'aktiv'): ?><form method="post"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_resend"><input type="hidden" name="id" value="<?= (int)$s['id'] ?>"><button class="link small" type="submit">Zugang nochmal schicken</button></form><?php endif; ?></span></div>
+            <?php endforeach; ?>
+            <form method="post" style="margin-top:10px"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_sync"><button class="btn btn-ghost btn-sm" type="submit">Mit Stripe abgleichen</button></form>
+            <p class="small muted">Rechnungen gehen nach jeder Zahlung automatisch raus (Movecia-Design, Kopie an hello@forma-pottery.com), auch bei jeder Verlängerung.</p>
+        </div>
+
+        <h2 id="test">Als Mitglied testen</h2>
+        <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_test">
+            <p class="small muted">Legt einen Zugang ohne Zahlung an (30 Tage) und schickt die echte Willkommensmail. Nimm am besten eine zweite eigene Adresse.</p>
+            <div class="g3"><label>Name<input name="name" value="Test Vivien"></label><label>E-Mail<input type="email" name="email" required></label><label>Was<select name="kind"><option value="method">Method</option><option value="unfold">Unfold (inkl. Method)</option></select></label></div>
+            <div class="g2"><label>Sprache<select name="lang"><option value="de">Deutsch</option><option value="en">Englisch</option></select></label><label class="inl"><input type="checkbox" name="starter" value="1"> wie in den ersten 14 Tagen (ohne Sofort-Zugang)</label></div>
+            <button class="btn btn-sm" type="submit">Testzugang anlegen</button>
+            <?php foreach (array_filter($subs, fn($s) => $s['source'] === 'test') as $s): ?><div class="ln"><span><?= forma_h($s['email']) ?> <span class="small muted">· <?= $s['kind'] === 'unfold' ? 'Unfold' : 'Method' ?></span></span>
+                <button class="link small" form="td<?= (int)$s['id'] ?>" type="submit">löschen</button></div><?php endforeach; ?>
+        </form>
+        <?php foreach (array_filter($subs, fn($s) => $s['source'] === 'test') as $s): ?><form id="td<?= (int)$s['id'] ?>" method="post" hidden><?= $csrf ?><input type="hidden" name="action" value="mm_mv_test_delete"><input type="hidden" name="id" value="<?= (int)$s['id'] ?>"></form><?php endforeach; ?>
+
+        <h2 id="unfold">Unfold</h2>
+        <div class="card stack">
+            <p>Start <?= forma_h(date('d.m.Y', mv_ts($c['u_start']))) ?> · Ende <?= forma_h(date('d.m.Y', mv_unfold_end())) ?> · <?= $uTaken ?> von <?= (int)$c['u_seats'] ?> Plätzen belegt · <?= $c['u_open'] ? 'buchbar' : 'gerade nicht buchbar' ?></p>
+            <?php $cfgRaw = mm_cfg('method') ?? []; ?>
+            <?php if (!empty($cfgRaw['u_room_de'])): ?>
+                <p class="small">Videoräume: <a href="<?= forma_h((string)($cfgRaw['u_host_de'] ?? $cfgRaw['u_room_de'])) ?>" target="_blank">Deutsch als Gastgeberin öffnen</a> · <a href="<?= forma_h((string)($cfgRaw['u_host_en'] ?? $cfgRaw['u_room_en'])) ?>" target="_blank">Englisch als Gastgeberin öffnen</a></p>
+                <p class="small muted">Die Teilnehmerinnen kommen über den Knopf „Zum Call“ in ihrem Mitgliederbereich hinein (ab einem Tag vor dem Start sichtbar).</p>
+            <?php else: ?>
+                <form method="post"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_rooms"><button class="btn btn-sm" type="submit">Videoräume für die Calls anlegen</button></form>
+                <p class="small muted">Ein Raum für Deutsch, einer für Englisch, gleicher Link für alle Wochen.</p>
+            <?php endif; ?>
+        </div>
+
+        <h2 id="preise">Preise &amp; Termine</h2>
+        <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_cfg">
+            <b>Method</b>
+            <div class="g3"><label>monatlich €<input name="m1" value="<?= $eu($c['m1']) ?>"></label><label>3 Monate €<input name="m3" value="<?= $eu($c['m3']) ?>"></label><label>1 Jahr €<input name="m12" value="<?= $eu($c['m12']) ?>"></label></div>
+            <div class="g3"><label>Gathering: 1. Monat €<input name="g_m1" value="<?= $eu($c['g_m1']) ?>"></label><label>Gathering: 3 Monate €<input name="g_m3" value="<?= $eu($c['g_m3']) ?>"></label><label>Gathering: 1. Jahr €<input name="g_m12" value="<?= $eu($c['g_m12']) ?>"></label></div>
+            <label>Start der Method (vorher buchbar, Abbuchung ab diesem Tag)<input type="date" name="launch" value="<?= forma_h($c['launch']) ?>"></label>
+            <b>Unfold</b>
+            <div class="g3"><label>auf einmal €<input name="u_once" value="<?= $eu($c['u_once']) ?>"></label><label>Rate (3 ×) €<input name="u_inst" value="<?= $eu($c['u_inst']) ?>"></label><label>Info-Gathering €<input name="g_u_once" value="<?= $eu($c['g_u_once']) ?>"></label></div>
+            <div class="g3"><label>Start<input type="date" name="u_start" value="<?= forma_h($c['u_start']) ?>"></label><label>Ende<input type="date" name="u_end" value="<?= forma_h($c['u_end']) ?>"></label><label>Plätze<input type="number" name="u_seats" min="1" max="40" value="<?= (int)$c['u_seats'] ?>"></label></div>
+            <div class="g2"><label>Call Deutsch<input name="u_call_de" value="<?= forma_h($c['u_call_de']) ?>"></label><label>Call Englisch<input name="u_call_en" value="<?= forma_h($c['u_call_en']) ?>"></label></div>
+            <label class="inl"><input type="checkbox" name="u_open" value="1" <?= $c['u_open'] ? 'checked' : '' ?>> Unfold ist buchbar</label>
+            <button class="btn" type="submit">Speichern</button>
+        </form>
+
+        <h2 id="bunny">Bunny Stream (Videos)</h2>
+        <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_bunny_save">
+            <p class="small muted">In Bunny: Stream → deine Library „Movecia Method“ → <b>API</b>. Dort stehen Video Library ID, CDN Hostname und API Key. Den Token-Schlüssel findest du unter <b>Security</b> (dort auch „Embed view token authentication“ einschalten), dann können die Videos nur im Mitgliederbereich abgespielt werden.</p>
+            <div class="g2"><label>Video Library ID<input name="lib" value="<?= forma_h($b['lib']) ?>" inputmode="numeric"></label><label>CDN Hostname<input name="cdn" value="<?= forma_h($b['cdn']) ?>" placeholder="vz-xxxxxxxx-xxx.b-cdn.net"></label></div>
+            <div class="g2"><label>API Key<input type="password" name="key" placeholder="<?= $b['key'] !== '' ? 'gespeichert · leer lassen zum Behalten' : '' ?>" autocomplete="off"></label><label>Token Authentication Key<input type="password" name="token" placeholder="<?= $b['token'] !== '' ? 'gespeichert · leer lassen zum Behalten' : 'optional, für den Kopierschutz' ?>" autocomplete="off"></label></div>
+            <button class="btn" type="submit">Speichern und prüfen</button>
+            <?php if (mv_bunny_ok()): ?><span class="small">✓ verbunden<?= $b['token'] !== '' ? ', Kopierschutz an' : ', Kopierschutz noch aus' ?></span><?php endif; ?>
+        </form>
+        <?php if (mv_bunny_ok()): ?><form method="post" onsubmit="return confirm('Bunny trennen?')" style="margin-top:8px"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_bunny_remove"><button class="link small" type="submit">Bunny trennen</button></form><?php endif; ?>
+<?php endif;
+    });
+    exit;
+}

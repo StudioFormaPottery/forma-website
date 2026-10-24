@@ -1,0 +1,13 @@
+{
+  "name": "Movecia Mitgliederbereich",
+  "short_name": "Movecia",
+  "start_url": "/mitglieder/",
+  "scope": "/mitglieder/",
+  "display": "standalone",
+  "background_color": "#F2ECE4",
+  "theme_color": "#F2ECE4",
+  "icons": [
+    {"src": "/img/movecia/movecia-app-180.png", "sizes": "180x180", "type": "image/png"},
+    {"src": "/img/movecia/movecia-zeichen-1024.png", "sizes": "1024x1024", "type": "image/png"}
+  ]
+}

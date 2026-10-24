@@ -822,7 +822,7 @@ function natal_invoice_mail(array $inv, string $pdf): void
             null, [[$file, $pdf, 'application/pdf']]);
     }
     forma_mail(FORMA_NOTIFY_EMAIL, 'Rechnung ' . $inv['nr'] . ' (Movecia): ' . $inv['name'] . ' (' . forma_cents_de((int)$inv['gross_cents']) . ')',
-        "Neue Online-Rechnung für deine Buchhaltung, Bereich Movecia (Prä-/Postnatal Training).\nBezahlt über das gemeinsame Stripe-Konto FORMA & Movecia.\n\nNummer: {$inv['nr']}\nDatum: " . date('d.m.Y', strtotime($inv['issued_at'])) . "\nKundin: {$inv['name']} ({$inv['email']})\nBrutto: " . forma_cents_de((int)$inv['gross_cents']) . "\nNetto: " . forma_cents_de((int)$inv['net_cents']) . "\nUSt. {$inv['vat_rate']} %: " . forma_cents_de((int)$inv['vat_cents']) . "\n\nAlle Buchungen: " . natal_admin_link() . "\n",
+        "Neue Online-Rechnung für deine Buchhaltung, Bereich Movecia (" . (str_starts_with((string)$inv['kind'], 'mv_') ? ($inv['kind'] === 'mv_unfold' ? 'Unfold' : 'Mindful Movement Method') : 'Prä-/Postnatal Training') . ").\nBezahlt über das gemeinsame Stripe-Konto FORMA & Movecia.\n\nNummer: {$inv['nr']}\nDatum: " . date('d.m.Y', strtotime($inv['issued_at'])) . "\nKundin: {$inv['name']} ({$inv['email']})\nBrutto: " . forma_cents_de((int)$inv['gross_cents']) . "\nNetto: " . forma_cents_de((int)$inv['net_cents']) . "\nUSt. {$inv['vat_rate']} %: " . forma_cents_de((int)$inv['vat_cents']) . "\n\nAlle Buchungen: " . natal_admin_link() . "\n",
         null, [[$file, $pdf, 'application/pdf']]);
 }
 

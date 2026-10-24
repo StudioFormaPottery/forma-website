@@ -5,7 +5,7 @@ Options -Indexes
 <FilesMatch "\.(md|sqlite|log)$">
   Require all denied
 </FilesMatch>
-<FilesMatch "^(lib|movecia-lib|natal-lib|movecia)\.php$|\.inc\.php$">
+<FilesMatch "^(lib|movecia-lib|natal-lib|method-lib|movecia)\.php$|\.inc\.php$">
   Require all denied
 </FilesMatch>
 
@@ -44,6 +44,14 @@ RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^natal/raum/?$ wildhearts/natal/raum/ [L,QSA]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^natal/mitglied/?$ wildhearts/natal/mitglied/ [L,QSA]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^mitglieder/?$ wildhearts/mitglieder/ [L,QSA]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^method/?$ wildhearts/method/ [L,QSA]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^unfold/call/?$ wildhearts/unfold/call/ [L,QSA]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^links/?$ wildhearts/index.html [L,QSA]
 # Ohne www → mit www (nur Seitenaufrufe, API/Webhooks bleiben unberührt)
 RewriteCond %{HTTP_HOST} ^forma-pottery\.com$ [NC]
 RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
