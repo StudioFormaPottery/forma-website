@@ -17,6 +17,8 @@ RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^robots\.txt$ wildhearts/robots.txt [L]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^sitemap\.xml$ wildhearts/sitemap.xml [L]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^([a-f0-9]{32})\.txt$ wildhearts/$1.txt [L]
 # moveciamovement.com zeigt auf der Startseite den Wild Hearts Collective (Adresse bleibt stehen)
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^$ wildhearts/ [L]
