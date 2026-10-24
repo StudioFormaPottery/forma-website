@@ -82,9 +82,34 @@ $wa = 'https://wa.me/' . preg_replace('/\D/', '', NATAL_COMPANY['phone']);
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title><?= $order ? 'Deine Termine · Movecia' : 'Prä- & Postnatal Training' . ($online ? ' online' : '') . ' · Movecia' ?></title>
-<meta name="description" content="Prä- und postnatales Training 1:1 bei Vivien<?= $online ? ', live per Video' : ' im Movecia Studio' ?>: sanft, kräftigend und ganz auf dich abgestimmt.">
+<?php
+// Google & Co. (Vivien, 24.10.2026): nur die öffentliche Angebotsseite wird gefunden, persönliche Links (?o, ?a, ?bonus) nie
+$public = !$order && !$offer && !$bonus && !$bonusGone && !array_intersect(['o', 'a', 'k', 'bonus', 'news', 'danke', 'start'], array_keys($_GET));
+$seoTitle = 'Schwangerschafts- & Rückbildungstraining 1:1 · Prä- & Postnatal Training in Tirol & online | Movecia';
+$seoDesc = 'Prä- und postnatales Training 1:1 mit Vivien Malonga: Schwangerschaftstraining, Geburtsvorbereitung, Beckenboden und Rückbildung. Im Studio in Mathon im Paznaun (nahe Ischgl, Galtür, Kappl, Landeck) oder live online. Einzelstunde ab € ' . (int)round(min(array_column(natal_packages(), 'cents')) / 100) . ', kostenloses Kennenlerngespräch.';
+?>
+<title><?= $order ? 'Deine Termine · Movecia' : ($public ? $h($seoTitle) : 'Prä- & Postnatal Training · Movecia') ?></title>
+<meta name="description" content="<?= $h($seoDesc) ?>">
+<?php if ($public): ?>
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://moveciamovement.com/natal/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="de_AT">
+<meta property="og:site_name" content="Movecia">
+<meta property="og:url" content="https://moveciamovement.com/natal/">
+<meta property="og:title" content="Prä- & Postnatal Training 1:1 · im Studio in Tirol oder online">
+<meta property="og:description" content="Sanft, kräftigend und ganz auf dich abgestimmt: Schwangerschaftstraining, Beckenboden und Rückbildung mit Vivien. Kostenloses Kennenlerngespräch.">
+<meta property="og:image" content="https://moveciamovement.com/img/movecia/natal-teilen.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Movecia · Prä- & Postnatal Training mit Vivien">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="geo.region" content="AT-7">
+<meta name="geo.placename" content="Mathon, Paznaun, Tirol">
+<script type="application/ld+json"><?= natal_seo_jsonld() ?></script>
+<?php else: ?>
 <meta name="robots" content="noindex, nofollow">
+<?php endif; ?>
 <meta name="theme-color" content="#F2ECE4">
 <style>
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:normal;src:url(/fonts/CormorantGaramond-VF.woff) format("woff")}
@@ -583,10 +608,20 @@ footer summary{cursor:pointer}
   </div>
 </section>
 
+<section class="w" id="wo" style="padding-top:0">
+  <p class="k">Für wen &amp; wo</p>
+  <h2 style="margin-top:.6rem">Im Paznaun oder <em>überall</em> online</h2>
+  <div class="two">
+    <div class="card"><h3>Im Studio in Mathon</h3><p style="margin-top:.6rem">Mein Studio liegt in Mathon im Paznaun, mitten in Tirol. Hierher kommen Schwangere und junge Mamas aus Ischgl, Galtür, Kappl, See und dem ganzen Paznaun, aber auch aus Landeck und Zams. Schwangerschaftstraining, Geburtsvorbereitung, Beckenboden- und Rückbildungstraining finden hier immer 1:1 statt, ohne Gruppe und ohne Vergleich.</p></div>
+    <div class="card pl"><h3>Online, wo immer du bist</h3><p style="margin-top:.6rem">Du wohnst weiter weg, in Innsbruck, Vorarlberg, Deutschland oder der Schweiz, oder willst nach der Geburt einfach nicht aus dem Haus? Dann trainieren wir live per Video. Ich sehe dich, leite dich an und korrigiere dich wie im Studio, dein Baby kann einfach neben dir liegen.</p></div>
+  </div>
+</section>
+
 <section class="w faq" style="padding-top:0">
   <p class="k">Gut zu wissen</p>
   <h2 style="margin-top:.6rem;margin-bottom:1.6rem">Häufige <em>Fragen</em></h2>
-  <details><summary>Ab wann kann ich nach der Geburt wieder trainieren?</summary><p>Sobald deine Ärztin dich freigibt, meistens nach 6 bis 8 Wochen, nach einem Kaiserschnitt oft etwas später. Bis dahin ruhen deine Einheiten einfach.</p></details>
+<?php foreach (array_slice(natal_seo_faq(), 0, 3) as [$fq, $fa]): ?>  <details><summary><?= $h($fq) ?></summary><p><?= $h($fa) ?></p></details>
+<?php endforeach; ?>  <details><summary>Ab wann kann ich nach der Geburt wieder trainieren?</summary><p>Sobald deine Ärztin dich freigibt, meistens nach 6 bis 8 Wochen, nach einem Kaiserschnitt oft etwas später. Bis dahin ruhen deine Einheiten einfach.</p></details>
   <details><summary>Was ist, wenn mein Baby früher kommt?</summary><p>Dann nutzt du die offenen Einheiten einfach nach der Geburt. Nichts verfällt, die Pakete gelten bis 6 Monate nach der Geburt.</p></details>
 <div class="m-online">
   <details><summary>Wie läuft eine Online-Einheit ab?</summary><p>Wir treffen uns live per Video: Du tippst einfach auf den Link aus deiner Terminbestätigung. Ich sehe dich, leite dich an und korrigiere dich, genau wie im Studio.</p></details>

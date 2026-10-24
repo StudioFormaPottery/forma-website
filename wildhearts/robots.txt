@@ -1,0 +1,11 @@
+# robots.txt für moveciamovement.com (per .htaccess ausgeliefert)
+User-agent: *
+Disallow: /api/
+Disallow: /verwaltung/
+Disallow: /gathering/
+Disallow: /natal/raum/
+Disallow: /natal/mitglied/
+Disallow: /circle/
+Disallow: /reset/
+
+Sitemap: https://moveciamovement.com/sitemap.xml

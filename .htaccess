@@ -12,6 +12,11 @@ Options -Indexes
 # Interne Dateien für die Gutscheine
 <IfModule mod_rewrite.c>
 RewriteEngine On
+# moveciamovement.com: eigene robots.txt und Sitemap für Google (Vivien, 24.10.2026)
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^robots\.txt$ wildhearts/robots.txt [L]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^sitemap\.xml$ wildhearts/sitemap.xml [L]
 # moveciamovement.com zeigt auf der Startseite den Wild Hearts Collective (Adresse bleibt stehen)
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^$ wildhearts/ [L]

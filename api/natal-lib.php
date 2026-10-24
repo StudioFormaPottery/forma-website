@@ -1163,3 +1163,74 @@ function natal_bonus_tick(PDO $pdo): void
 require_once __DIR__ . '/natal-units.inc.php';
 require_once __DIR__ . '/natal-health.inc.php';
 require_once __DIR__ . '/natal-member.inc.php';
+
+// --- Google & KI-Suche (Vivien, 24.10.2026) -------------------------------------------------
+// Strukturierte Daten für moveciamovement.com/natal: Ort nur als Gemeinde (keine Straße, Adresse steht nur im Impressum).
+function natal_seo_faq(): array
+{
+    $pk = natal_packages();
+    $eu = fn($p, $unit = false) => number_format(($unit ? $p['unit_cents'] : $p['cents']) / 100, 0, ',', '.');
+    return [
+        ['Was ist prä- und postnatales Training?', 'Begleitetes Training in der Schwangerschaft (pränatal) und nach der Geburt (postnatal): sanfte Mobilisation, Atemarbeit, Beckenboden, Geburtsvorbereitung, Rückbildung und schonender Aufbau der tiefen Bauchmuskulatur. Bei Movecia immer 1:1 mit Vivien Malonga.'],
+        ['Wo findet das Training statt?', 'Im Movecia Studio in Mathon im Paznaun (Tirol), gut erreichbar aus Ischgl, Galtür, Kappl, See und Landeck, oder live online per Video von zu Hause aus, egal wo du wohnst.'],
+        ['Was kostet das Training?', 'Im Studio kostet die Einzelstunde € ' . $eu($pk['einzel']) . ', Pakete gibt es ab € ' . $eu($pk['kombi'], true) . ' pro Einheit. Online kostet die Einzelstunde € ' . $eu($pk['o_einzel']) . ', Pakete ab € ' . $eu($pk['o_kombi'], true) . ' pro Einheit. Das Kennenlerngespräch (30 Minuten, online) ist kostenlos.'],
+        ['Ab wann kann ich nach der Geburt wieder trainieren?', 'Sobald deine Ärztin dich freigibt, meistens nach 6 bis 8 Wochen, nach einem Kaiserschnitt oft etwas später. Bis dahin ruhen deine Einheiten einfach.'],
+        ['Was ist, wenn mein Baby früher kommt?', 'Dann nutzt du die offenen Einheiten einfach nach der Geburt. Die Pakete gelten bis 6 Monate nach der Geburt.'],
+        ['Darf mein Baby mitkommen?', 'Ja, sehr gern. Nach der Geburt kommt dein Baby einfach mit, wir passen die Einheit an euren Rhythmus an.'],
+        ['Wie läuft eine Online-Einheit ab?', 'Wir treffen uns live per Video über deinen persönlichen Link aus der Terminbestätigung. Du brauchst nur eine Matte, etwas Platz und dein Handy, Tablet oder Laptop.'],
+    ];
+}
+
+function natal_seo_jsonld(): string
+{
+    $base = 'https://moveciamovement.com';
+    $offers = [];
+    foreach (natal_packages() as $k => $p) {
+        $offers[] = [
+            '@type' => 'Offer',
+            'name' => $p['title'] . ($p['units'] > 1 ? ' (' . $p['units'] . ' × 60 Min.)' : ' (60 Min.)'),
+            'price' => number_format($p['cents'] / 100, 2, '.', ''),
+            'priceCurrency' => 'EUR',
+            'availability' => 'https://schema.org/InStock',
+            'url' => $base . '/natal/' . ($p['mode'] === 'online' ? 'online/' : ''),
+        ];
+    }
+    $biz = [
+        '@type' => ['LocalBusiness', 'SportsActivityLocation'],
+        '@id' => $base . '/#movecia',
+        'name' => 'Movecia – Yoga, Pilates & Mindful Movement',
+        'alternateName' => 'Movecia Personal Fitness',
+        'url' => $base . '/',
+        'logo' => $base . '/img/movecia/movecia-zeichen-1024.png',
+        'image' => $base . '/img/movecia/natal-teilen.jpg',
+        'email' => NATAL_COMPANY['email'],
+        'telephone' => str_replace(' ', '', NATAL_COMPANY['phone']),
+        'priceRange' => '€€',
+        'address' => ['@type' => 'PostalAddress', 'postalCode' => '6562', 'addressLocality' => 'Mathon', 'addressRegion' => 'Tirol', 'addressCountry' => 'AT'],
+        'areaServed' => array_merge(
+            array_map(fn($c) => ['@type' => 'City', 'name' => $c], ['Mathon', 'Ischgl', 'Galtür', 'Kappl', 'See', 'Landeck', 'Pians', 'Zams']),
+            [['@type' => 'AdministrativeArea', 'name' => 'Paznaun'], ['@type' => 'AdministrativeArea', 'name' => 'Tirol'], ['@type' => 'Country', 'name' => 'Österreich'], ['@type' => 'Country', 'name' => 'Deutschland'], ['@type' => 'Country', 'name' => 'Schweiz']]
+        ),
+        'founder' => ['@type' => 'Person', 'name' => 'Vivien Malonga', 'jobTitle' => 'Personal Trainerin für Yoga, Pilates und prä-/postnatales Training'],
+        'sameAs' => ['https://www.instagram.com/movementwithviv/'],
+    ];
+    $service = [
+        '@type' => 'Service',
+        '@id' => $base . '/natal/#service',
+        'name' => 'Prä- & Postnatal Training 1:1',
+        'alternateName' => ['Schwangerschaftstraining', 'Rückbildungstraining', 'Beckenbodentraining nach der Geburt', 'Geburtsvorbereitung', 'Pränatal Pilates', 'Postnatal Training online'],
+        'serviceType' => 'Prä- und postnatales Personal Training',
+        'description' => 'Einzeltraining in der Schwangerschaft und nach der Geburt: Mobilisation, Atemarbeit, Beckenboden, Geburtsvorbereitung, Rückbildung und Kräftigung. Im Studio in Mathon (Paznaun, Tirol) oder live online per Video.',
+        'provider' => ['@id' => $base . '/#movecia'],
+        'areaServed' => $biz['areaServed'],
+        'audience' => ['@type' => 'PeopleAudience', 'audienceType' => 'Schwangere und frischgebackene Mütter'],
+        'availableChannel' => [
+            ['@type' => 'ServiceChannel', 'name' => 'Im Studio in Mathon', 'serviceLocation' => ['@id' => $base . '/#movecia']],
+            ['@type' => 'ServiceChannel', 'name' => 'Live online per Video', 'serviceUrl' => $base . '/natal/online/'],
+        ],
+        'hasOfferCatalog' => ['@type' => 'OfferCatalog', 'name' => 'Pakete', 'itemListElement' => $offers],
+    ];
+    $faq = ['@type' => 'FAQPage', '@id' => $base . '/natal/#faq', 'mainEntity' => array_map(fn($q) => ['@type' => 'Question', 'name' => $q[0], 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $q[1]]], natal_seo_faq())];
+    $page = ['@type' => 'WebPage', '@id' => $base . '/natal/', 'url' => $base . '/natal/', 'name' => 'Prä- & Postnatal Training 1:1 · Movecia', 'inLanguage' => 'de-AT', 'about' => ['@id' => $base . '/natal/#service'], 'isPartOf' => ['@type' => 'WebSite', 'name' => 'Movecia', 'url' => $base . '/']];
+    return json_encode(['@context' => 'https://schema.org', '@graph' => [$page, $biz, $service, $faq]], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG);
+}
