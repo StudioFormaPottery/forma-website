@@ -262,6 +262,23 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <a href="<?= forma_h($self) ?>?view=rechnungen">Rechnungen</a>
             <a href="#einstellungen">Preise &amp; Einstellungen</a>
         </div>
+<style>
+.qa{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0 4px}
+@media(min-width:900px){.qa{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.qa form{margin:0}
+.qa a,.qa button{display:flex;flex-direction:column;gap:4px;width:100%;height:100%;box-sizing:border-box;text-align:left;padding:16px;border-radius:20px;border:1px solid #DDD2C6;background:#FBF8F4;color:#2E2529;text-decoration:none;font:inherit;cursor:pointer}
+.qa b{font-size:17px;font-weight:600;color:#4A3A41}
+.qa span{font-size:14px;color:#7D7076;line-height:1.35}
+.qa .ic{font-size:26px;line-height:1}
+.qa .main{background:#7D5E68;border-color:#7D5E68}.qa .main b,.qa .main span{color:#FBF5F7}
+</style>
+        <h2 style="margin-top:18px">Schnellzugriff</h2>
+        <div class="qa">
+            <form method="post" target="_blank"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_testroom"><button class="main" type="submit"><span class="ic">🎥</span><b>Video &amp; Technik testen</b><span>Kamera, Mikro, Teleprompter, Aufnahme – danach direkt in deinen Testraum</span></button></form>
+            <a href="#termine"><span class="ic">📅</span><b>Nächste Online-Termine</b><span>Bei jedem Termin „Zum Videoraum“ – öffnet 60 Min. vorher, mit Teleprompter</span></a>
+            <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/?demo=prae" target="_blank" rel="noopener"><span class="ic">🌿</span><b>Mitgliederbereich ansehen</b><span>So sieht ihn eine Kundin mit Paket (Beispiel Pränatal, auch <u>post</u> unter Prä- &amp; Postnatal)</span></a>
+            <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/" target="_blank" rel="noopener"><span class="ic">🔑</span><b>Login für Kundinnen</b><span>moveciamovement.com/natal/mitglied – diesen Link bekommen sie auch per Mail</span></a>
+        </div>
 
         <?php $calls = $GLOBALS['natalCalls'] ?? []; ?>
         <h2 id="gespraeche">Kennenlerngespräche</h2>
