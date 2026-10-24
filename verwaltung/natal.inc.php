@@ -114,6 +114,14 @@ if ($action === 'mm_natal_bonus_send') {
     $ok = $c && natal_bonus_send($pdo, $c);
     go($nBack . '#bonus', $ok ? 'Der Kennenlern-Bonus ist an ' . $c['name'] . ' unterwegs.' : 'Die Mail konnte nicht verschickt werden.');
 }
+if ($action === 'mm_natal_testkundin') {
+    $r = natal_test_order($pdo, $_POST);
+    go($nBack . ($r['ok'] ? '&k=' . (int)$r['order']['id'] . '#testkundin' : '#testkundin'), $r['ok'] ? 'Die Testkundin ist angelegt. Schau jetzt in das Postfach von ' . $r['order']['email'] . ': Dort ist die Buchungsmail mit dem Knopf „Zu meinem Mitgliederbereich“. Am besten in einem privaten Browserfenster oder auf dem Handy öffnen.' : $r['error']);
+}
+if ($action === 'mm_natal_testdel') {
+    $ok = natal_test_delete($pdo, (int)($_POST['oid'] ?? 0));
+    go($nBack . '#testkundin', $ok ? 'Die Testkundin ist gelöscht (Buchung, Termine, Aufnahmen und Konto).' : 'Das war keine Testbuchung.');
+}
 if ($action === 'mm_natal_sample') {
     $inv = ['kind' => 'natal', 'nr' => 'MUSTER-' . date('Y') . '-000', 'issued_at' => date('Y-m-d'), 'service_date' => 'nach Vereinbarung', 'name' => 'Lena Muster', 'email' => natal_notify_email(),
         'address' => "Musterweg 1\n6561 Ischgl", 'country' => 'AT', 'vat_rate' => 20, 'vat_note' => 'MUSTER – keine gültige Rechnung.',
@@ -199,7 +207,8 @@ if ($view === 'natal') {
     $reqs = $pdo->query("SELECT s.*, o.name, o.title, o.phone, o.email, o.due_date, o.units FROM mm_natal_sessions s JOIN mm_natal_orders o ON o.id = s.order_id WHERE s.status = 'angefragt' ORDER BY s.date, s.id")->fetchAll();
     $upcoming = $pdo->query("SELECT s.*, o.name, o.title, o.phone, o.email, o.package FROM mm_natal_sessions s JOIN mm_natal_orders o ON o.id = s.order_id WHERE s.status = 'bestaetigt' ORDER BY s.date, s.start")->fetchAll();
     $offers = $pdo->query('SELECT a.*, (SELECT COUNT(*) FROM mm_natal_orders o WHERE o.offer_id = a.id AND o.status = \'bezahlt\') AS booked FROM mm_natal_offers a ORDER BY a.id DESC LIMIT 30')->fetchAll();
-    $revenue = (int)$pdo->query("SELECT COALESCE(SUM(amount_cents),0) FROM mm_natal_orders WHERE status = 'bezahlt'")->fetchColumn();
+    natal_member_schema($pdo);
+    $revenue = (int)$pdo->query("SELECT COALESCE(SUM(amount_cents),0) FROM mm_natal_orders WHERE status = 'bezahlt' AND is_test = 0")->fetchColumn();
     $GLOBALS['natalSubs'] = $pdo->query("SELECT * FROM mm_natal_subs ORDER BY CASE status WHEN 'bestaetigt' THEN 0 WHEN 'offen' THEN 1 ELSE 2 END, id DESC LIMIT 200")->fetchAll();
     natal_call_schema($pdo);
     $calls = $pdo->prepare("SELECT * FROM mm_natal_calls WHERE status = 'gebucht' AND date >= ? ORDER BY date, slot");
@@ -257,6 +266,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
         </div>
         <div class="nl">
             <a href="<?= forma_h(mm_site()) ?>/natal/" target="_blank" rel="noopener">Seite ansehen</a>
+            <a href="#testkundin">Als Kundin testen</a>
             <a href="#skripte">Skripte &amp; Workbooks</a>
             <a href="#angebot">Angebot verschicken</a>
             <a href="<?= forma_h($self) ?>?view=rechnungen">Rechnungen</a>
@@ -351,7 +361,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
         <div class="list">
         <?php foreach ($orders as $o): $ss = natal_sessions($pdo, (int)$o['id']); $used = natal_used($pdo, (int)$o['id']); $done = count(array_filter($ss, fn($s) => in_array($s['status'], ['bestaetigt', 'erledigt'], true))); ?>
             <details class="card" id="k<?= (int)$o['id'] ?>" <?= $openK === (int)$o['id'] ? 'open' : '' ?>>
-                <summary style="cursor:pointer;list-style:none"><div class="booking-head"><span><strong><?= forma_h($o['name']) ?></strong> <span class="muted small">· <?= forma_h($o['title']) ?></span></span>
+                <summary style="cursor:pointer;list-style:none"><div class="booking-head"><span><strong><?= forma_h($o['name']) ?></strong> <span class="muted small">· <?= forma_h($o['title']) ?></span><?php if (!empty($o['is_test'])): ?> <span class="chip" style="background:#EADFDE;color:#6B5658">TEST</span><?php endif; ?></span>
                     <?php $hd0 = natal_health_get($o); if ($hd0 && array_filter(natal_health_flags($hd0), fn($x) => $x[0] === 'rot')): ?><span class="chip" style="background:#F6E7E4;color:#A0463A">⚠ Freigabe</span> <?php endif; ?><span class="chip <?= $o['status'] === 'bezahlt' ? 'ok' : 'wait' ?>"><?= $o['status'] === 'bezahlt' ? 'bezahlt ' . forma_h(forma_euro((int)$o['amount_cents'])) : 'Zahlung offen' ?></span></div>
                     <?php if ($o['status'] === 'bezahlt'): ?><p class="small muted" style="margin:6px 0 4px"><?= $done ?> bestätigt · <?= $used - $done ?> angefragt · <?= (int)$o['units'] - $used ?> noch frei von <?= (int)$o['units'] ?></p><div class="bar"><i style="width:<?= (int)round($used / max(1, (int)$o['units']) * 100) ?>%"></i></div><?php endif; ?></summary>
                 <div class="stack" style="margin-top:12px">
@@ -405,6 +415,24 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             </details>
         <?php endforeach; ?>
         </div>
+
+        <h2 id="testkundin">Als Kundin testen</h2>
+        <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_testkundin">
+            <p class="small muted">Leg dir eine Testkundin mit einer zweiten E-Mail-Adresse an (z. B. deine private). Du bekommst dort die echte Buchungsmail, legst dein Passwort an und siehst den Mitgliederbereich genau wie eine Kundin. Kostet nichts, es gibt keine Rechnung und sie zählt nicht zum Umsatz. Öffne die Mail am besten auf dem Handy oder in einem privaten Browserfenster.</p>
+            <div class="row"><div class="stack"><label for="tkn">Name</label><input id="tkn" name="name" value="Test Kundin" maxlength="80"></div>
+                <div class="stack"><label for="tke">E-Mail für den Test</label><input id="tke" name="email" type="email" required placeholder="deine zweite Adresse"></div></div>
+            <div class="stack"><label for="tkp">Paket</label><select id="tkp" name="package"><?php foreach (natal_packages() as $pk => $pp): if ((int)$pp['units'] < 2) continue; ?><option value="<?= forma_h($pk) ?>"<?= $pk === 'o_kombi' ? ' selected' : '' ?>><?= forma_h($pp['title']) ?></option><?php endforeach; ?></select></div>
+            <label class="check"><input type="checkbox" name="full" value="1" checked> Mitgliederbereich sofort komplett zeigen (die 14 Tage Widerrufsfrist überspringen)</label>
+            <label class="check"><input type="checkbox" name="done" value="1" checked> Eine Einheit gestern als erledigt eintragen (damit das erste Workbook freigeschaltet ist)</label>
+            <label class="check"><input type="checkbox" name="room" value="1" checked> Online-Termin in 20 Minuten (Videoraum öffnet sofort, du kannst dich als Kundin und hier als Gastgeberin einwählen)</label>
+            <button class="btn" type="submit">Testkundin anlegen und Mail schicken</button>
+        </form>
+        <?php $tests = $pdo->query('SELECT * FROM mm_natal_orders WHERE is_test = 1 ORDER BY id DESC')->fetchAll(); if ($tests): ?><div class="card stack" style="margin-top:10px">
+            <?php foreach ($tests as $t): $ts = $pdo->query("SELECT * FROM mm_natal_sessions WHERE order_id = " . (int)$t['id'] . " AND status = 'bestaetigt' ORDER BY date, start LIMIT 1")->fetch(); ?>
+            <div class="ln"><span class="small"><strong><?= forma_h($t['name']) ?></strong> · <?= forma_h($t['email']) ?> · <?= forma_h($t['title']) ?></span>
+                <span class="acts small"><a href="<?= forma_h(mm_site()) ?>/natal/mitglied/" target="_blank" rel="noopener">Login</a> · <a href="<?= forma_h(natal_link($t)) ?>" target="_blank" rel="noopener">Ihre Terminseite</a><?php if ($ts): ?> · <a href="<?= forma_h(natal_room_link('s', (int)$ts['id'])) ?>" target="_blank" rel="noopener">Videoraum als Kundin</a> · <a href="<?= forma_h(natal_room_link('s', (int)$ts['id'], true)) ?>" target="_blank" rel="noopener">als Gastgeberin</a><?php endif; ?>
+                <form method="post" onsubmit="return confirm('Testkundin mit Konto und Aufnahmen löschen?')"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_testdel"><input type="hidden" name="oid" value="<?= (int)$t['id'] ?>"><button class="link small" type="submit">löschen</button></form></span></div>
+            <?php endforeach; ?></div><?php endif; ?>
 
         <h2 id="skripte">Skripte &amp; Workbooks</h2>
         <div class="card stack">

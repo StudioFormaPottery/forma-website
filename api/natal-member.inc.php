@@ -15,7 +15,7 @@ function natal_member_schema(PDO $pdo): void
     if ($done) return;
     $done = true;
     $oc = array_column($pdo->query('PRAGMA table_info(mm_natal_orders)')->fetchAll(), 'name');
-    foreach (['health' => "TEXT NOT NULL DEFAULT ''", 'health_at' => 'TEXT', 'purged_at' => 'TEXT', 'warned_at' => 'TEXT', 'birth_date' => "TEXT NOT NULL DEFAULT ''", 'birth_mailed_at' => 'TEXT'] as $c => $t) {
+    foreach (['is_test' => 'INTEGER NOT NULL DEFAULT 0', 'health' => "TEXT NOT NULL DEFAULT ''", 'health_at' => 'TEXT', 'purged_at' => 'TEXT', 'warned_at' => 'TEXT', 'birth_date' => "TEXT NOT NULL DEFAULT ''", 'birth_mailed_at' => 'TEXT'] as $c => $t) {
         if ($oc && !in_array($c, $oc, true)) $pdo->exec("ALTER TABLE mm_natal_orders ADD COLUMN $c $t");
     }
     $pdo->exec('CREATE TABLE IF NOT EXISTS mm_natal_members (
@@ -365,3 +365,51 @@ function natal_birth_set(PDO $pdo, array $o, string $date, bool $mail): array
     if (($n = (int)$soon->fetchColumn()) > 0) $notes[] = $n . ($n === 1 ? ' Termin liegt' : ' Termine liegen') . ' in den ersten 6 Wochen nach der Geburt. Bitte verschieben oder absagen.';
     return $notes;
 }
+
+// --- Testkundin (Vivien, 24.10.2026: Ablauf mit eigener zweiter E-Mail-Adresse durchspielen) ------
+/** Legt eine bezahlte Test-Buchung (€ 0, keine Rechnung, nicht im Umsatz) an und schickt die echte Buchungsmail mit Konto-Link. */
+function natal_test_order(PDO $pdo, array $in): array
+{
+    natal_member_schema($pdo);
+    $packs = natal_packages();
+    $key = (string)($in['package'] ?? 'kombi');
+    if (!isset($packs[$key]) || (int)$packs[$key]['units'] < 2) $key = 'kombi';
+    $p = $packs[$key];
+    $email = strtolower(trim((string)($in['email'] ?? '')));
+    $name = trim((string)($in['name'] ?? '')) ?: 'Test Kundin';
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return ['ok' => false, 'error' => 'Bitte eine gültige E-Mail-Adresse eingeben.'];
+    $full = !empty($in['full']);
+    $paid = $full ? date('c', time() - 15 * 86400) : date('c');
+    $due = date('Y-m-d', strtotime(str_starts_with(preg_replace('/^o_/', '', $key), 'post') ? '-6 weeks' : '+8 weeks'));
+    $tok = bin2hex(random_bytes(16));
+    $pdo->prepare("INSERT INTO mm_natal_orders (package, title, units, unit_cents, amount_cents, name, email, phone, due_date, note, wishes, status, token, consent_start, created_at, paid_at, is_test) VALUES (?,?,?,0,0,?,?,'',?,'Testbuchung aus der Verwaltung','[]','bezahlt',?,1,?,?,1)")
+        ->execute([$key, $p['title'] . ' · TEST', $p['units'], $name, $email, $due, $tok, $paid, $paid]);
+    $o = natal_order($pdo, (int)$pdo->lastInsertId());
+    $ins = $pdo->prepare('INSERT INTO mm_natal_sessions (order_id, date, start, status, created_at, confirmed_at) VALUES (?,?,?,?,?,?)');
+    if (!empty($in['done'])) $ins->execute([$o['id'], date('Y-m-d', strtotime('-1 day')), '10:00', 'erledigt', date('c'), date('c')]);
+    if (!empty($in['room'])) {
+        $t = time() + 20 * 60;
+        $ins->execute([$o['id'], date('Y-m-d', $t), date('H:i', $t), 'bestaetigt', date('c'), date('c')]);
+    }
+    natal_paid_mails($pdo, $o, []);
+    return ['ok' => true, 'order' => $o];
+}
+
+/** Test-Buchung samt Terminen, Aufnahmen und (wenn sonst nichts mehr dranhängt) Konto löschen. */
+function natal_test_delete(PDO $pdo, int $oid): bool
+{
+    natal_member_schema($pdo);
+    $o = natal_order($pdo, $oid);
+    if (!$o || !(int)$o['is_test']) return false;
+    foreach ($pdo->query('SELECT id FROM mm_natal_sessions WHERE order_id = ' . $oid)->fetchAll(PDO::FETCH_COLUMN) as $sid) {
+        $r = natal_rec_for($pdo, (int)$sid);
+        if ($r) natal_rec_delete($pdo, $r);
+    }
+    $pdo->prepare('DELETE FROM mm_natal_sessions WHERE order_id = ?')->execute([$oid]);
+    $pdo->prepare('DELETE FROM mm_natal_orders WHERE id = ?')->execute([$oid]);
+    $q = $pdo->prepare('SELECT COUNT(*) FROM mm_natal_orders WHERE email = ?');
+    $q->execute([$o['email']]);
+    if ((int)$q->fetchColumn() === 0) $pdo->prepare('DELETE FROM mm_natal_members WHERE email = ?')->execute([$o['email']]);
+    return true;
+}
+
