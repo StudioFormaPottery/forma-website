@@ -11,7 +11,7 @@ function mm_subnav(string $active): void
     global $pdo;
     $self = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?');
     $req = 0; try { $req = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {}
-    $tabs = [['movecia', '?view=movecia', 'Übersicht'], ['method', '?view=method', 'Method &amp; Unfold'], ['natal', '?view=natal', 'Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['texte', '?view=texte', 'Teleprompter'], ['einst', '?view=movecia#einstellungen', 'Einstellungen']]; ?>
+    $tabs = [['movecia', '?view=movecia', 'Übersicht'], ['method', '?view=method', 'Method &amp; Unfold'], ['natal', '?view=natal', 'Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['texte', '?view=texte', 'Teleprompter'], ['presse', '?view=presse', 'Presse'], ['einst', '?view=movecia#einstellungen', 'Einstellungen']]; ?>
 <style>
 .mvsub{position:sticky;top:0;z-index:40;margin:-8px -16px 16px;padding:10px 16px;background:rgba(242,236,228,.96);border-bottom:1px solid #DDD2C6;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .mvsub::-webkit-scrollbar{display:none}
@@ -30,6 +30,8 @@ require __DIR__ . '/natal.inc.php';
 require __DIR__ . '/method.inc.php';
 // Teleprompter-Texte (?view=texte)
 require __DIR__ . '/texte.inc.php';
+// Presse & Gemeinde (?view=presse)
+require __DIR__ . '/presse.inc.php';
 
 $mmBack = $self . '?view=movecia';
 

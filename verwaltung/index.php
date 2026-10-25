@@ -243,7 +243,7 @@ if ($action === 'logout') {
 }
 
 // Movecia Movement / Wild Hearts: eigener Bereich (verwaltung/movecia.php)
-if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 'natal' || $view === 'method' || $view === 'texte') {
+if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 'natal' || $view === 'method' || $view === 'texte' || $view === 'presse') {
     require __DIR__ . '/movecia.php';
 }
 
