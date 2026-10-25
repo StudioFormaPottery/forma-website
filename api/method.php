@@ -24,7 +24,7 @@ if (isset($_GET['file'])) {
     $acc = $m ? mv_access($pdo, (string)$m['email']) : null;
     $today = (new DateTimeImmutable('now', new DateTimeZone('Europe/Vienna')))->format('Y-m-d');
     $ok = $f && $acc && ($f['unlock'] === '' || $f['unlock'] <= $today) && (int)$f['visible'] === 1
-        && ($f['audience'] === 'unfold' ? $acc['unfold'] !== null : ($acc['method'] && (!$acc['starter'] || $f['theme'] === 'ankommen')));
+        && ($f['audience'] === 'unfold' ? ($acc['unfold'] !== null && empty($acc['ulock'])) : ($acc['method'] && (!$acc['starter'] || $f['theme'] === 'ankommen')));
     $path = $f ? mv_file_dir() . '/' . basename((string)$f['file']) : '';
     if (!$ok || !is_file($path)) { http_response_code(404); mm_page('oh', 'Not available', 'This file is only available in the members area.', '/mitglieder/', 'Members area'); }
     $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));

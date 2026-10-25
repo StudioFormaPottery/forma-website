@@ -31,11 +31,13 @@ function mv_cfg(): array
         'launch' => '2026-12-01',
         'm1' => 2900, 'm3' => 7500, 'm12' => 24000,                 // Method regulär
         'g_m1' => 1900, 'g_m3' => 6500, 'g_m12' => 19900,           // Method im Gathering (erste Zahlung)
-        'u_once' => 45000, 'u_inst' => 16000, 'u_n' => 3, 'g_u_once' => 39000,
+        'u_once' => 45000, 'u_inst' => 16500, 'u_n' => 3, 'g_u_once' => 39000,
         'u_seats' => 10, 'u_start' => '2027-01-10', 'u_end' => '2027-04-11', 'u_open' => 1,
         'u_call_de' => 'Sonntag, 19:00 Uhr', 'u_call_en' => 'Sunday, 8:15 pm (Vienna time)',
     ];
     $c = mm_cfg('method') ?? [];
+    // Vivien 25.10.2026: Raten sichtbar teurer (3 × € 165 statt 3 × € 160), alter gespeicherter Wert wird einmal angehoben
+    if ((int)($c['u_inst'] ?? 0) === 16000 && empty($c['inst_v2'])) { $c['u_inst'] = 16500; $c['inst_v2'] = 1; mm_save_cfg('method', $c); }
     foreach ($def as $k => $v) $def[$k] = is_int($v) ? (int)($c[$k] ?? $v) : (string)($c[$k] ?? $v);
     return $def;
 }
@@ -209,6 +211,8 @@ function mv_schema(PDO $pdo): void
     if (!in_array('open_mailed', $sc, true)) $pdo->exec('ALTER TABLE mv_subs ADD COLUMN open_mailed INTEGER NOT NULL DEFAULT 0');
     // Google-Bewertung nach dem Ende von Unfold (Vivien, 25.10.2026)
     if (!in_array('review_sent', $sc, true)) $pdo->exec('ALTER TABLE mv_subs ADD COLUMN review_sent INTEGER NOT NULL DEFAULT 0');
+    // Testzugänge: eigener Startzeitpunkt (Vivien, 25.10.2026)
+    if (!in_array('open_from', $sc, true)) $pdo->exec('ALTER TABLE mv_subs ADD COLUMN open_from INTEGER NOT NULL DEFAULT 0');
     mv_scripts_sync($pdo);
 }
 
@@ -347,7 +351,7 @@ function mv_unfold_free(PDO $pdo): int
     return max(0, mv_cfg()['u_seats'] - mv_unfold_taken($pdo));
 }
 
-/** Ende der Unfold-Begleitung (inkl. Method-Zugang). */
+/** Ende der Unfold-Begleitung. Unfold ist ein eigenes Programm, ohne Method-Zugang (Vivien, 25.10.2026). */
 function mv_unfold_end(): int { return mv_ts(mv_cfg()['u_end'], '23:59'); }
 
 /**
@@ -356,6 +360,7 @@ function mv_unfold_end(): int { return mv_ts(mv_cfg()['u_end'], '23:59'); }
  */
 function mv_open_at(array $s): int
 {
+    if ((int)($s['open_from'] ?? 0) > 0) return (int)$s['open_from'];
     if ($s['kind'] === 'unfold') return mv_ts(mv_cfg()['u_start'], '00:00');
     $paid = strtotime((string)($s['paid_at'] ?? '')) ?: 0;
     return max((int)$s['bill_start'], $paid);
@@ -372,6 +377,52 @@ function mv_withdraw_until(array $s): int
     return mv_ts((new DateTimeImmutable('@' . ($from + 14 * 86400)))->setTimezone(new DateTimeZone('Europe/Vienna'))->format('Y-m-d'), '23:59');
 }
 
+/**
+ * Testteilnehmerin (Vivien, 25.10.2026): Zugang ohne Zahlung für Method, Unfold oder beides, damit sie den
+ * Mitgliederbereich so sieht wie eine Kundin. $o: kinds (['method','unfold']), started, waive, lang, name, email (optional).
+ * Ohne E-Mail wird eine Platzhalter-Adresse vergeben und keine Mail verschickt. Zählt nicht als Platz bei Unfold.
+ */
+function mv_test_create(PDO $pdo, array $o): array
+{
+    $c = mv_cfg();
+    $email = strtolower(trim((string)($o['email'] ?? '')));
+    $mail = filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+    if (!$mail) $email = 'test-' . bin2hex(random_bytes(3)) . '@test.moveciamovement.com';
+    $lang = ($o['lang'] ?? '') === 'en' ? 'en' : 'de';
+    $name = forma_clean((string)($o['name'] ?? ''), 80) ?: 'Test';
+    $m = mv_member_ensure($pdo, $email, $name, $lang);
+    if ((string)$m['pass_hash'] === '') {
+        $pdo->prepare('UPDATE mv_members SET pass_hash = ? WHERE id = ?')->execute([password_hash(bin2hex(random_bytes(12)), PASSWORD_DEFAULT), $m['id']]);
+        $m = mv_member($pdo, (int)$m['id']);
+    }
+    $now = time();
+    foreach (array_unique((array)($o['kinds'] ?? ['method'])) as $kind) {
+        if (!in_array($kind, ['method', 'unfold'], true)) continue;
+        $open = !empty($o['started']) ? $now - 3600 : ($kind === 'unfold' ? mv_ts($c['u_start'], '00:00') : max(mv_launch(), $now + 86400));
+        $pdo->prepare("INSERT INTO mv_subs (kind, plan, email, name, lang, call_lang, amount_cents, first_cents, status, token, consent_digital, consent_live, source, test, created_at, paid_at, period_end, bill_start, open_from, open_mailed, review_sent) VALUES (?,?,?,?,?,?,0,0,'aktiv',?,?,1,'test',1,?,?,?,?,?,?,1)")
+            ->execute([$kind, $kind === 'unfold' ? 'u1' : 'm1', $email, $name, $lang, $lang, bin2hex(random_bytes(16)), !empty($o['waive']) ? 1 : 0, date('c'), date('c'), $open + 30 * 86400, $kind === 'method' ? $open : 0, $open, $mail ? 0 : 1]);
+        if ($mail) mv_welcome($pdo, mv_sub($pdo, (int)$pdo->lastInsertId()));
+    }
+    return $m;
+}
+
+/** Knopf „Als Testteilnehmerin einloggen“: Link 10 Minuten gültig, nur für Testzugänge. */
+function mv_test_login_link(int $memberId): string
+{
+    $exp = time() + 600;
+    return mm_site() . '/mitglieder/?testlogin=' . $memberId . '&e=' . $exp . '&k=' . hash_hmac('sha256', "tl:$memberId:$exp", mv_secret());
+}
+
+function mv_test_login_ok(PDO $pdo, int $memberId, int $exp, string $k): ?array
+{
+    if ($exp < time() || !hash_equals(hash_hmac('sha256', "tl:$memberId:$exp", mv_secret()), $k)) return null;
+    $m = mv_member($pdo, $memberId);
+    if (!$m) return null;
+    $q = $pdo->prepare("SELECT COUNT(*) FROM mv_subs WHERE lower(email) = ? AND source = 'test'");
+    $q->execute([strtolower((string)$m['email'])]);
+    return (int)$q->fetchColumn() > 0 ? $m : null;
+}
+
 /** Startet diese Buchung erst in der Zukunft? */
 function mv_pending(array $s): bool { return mv_open_at($s) > time(); }
 
@@ -384,11 +435,13 @@ function mv_access(PDO $pdo, string $email): array
 {
     $subs = mv_subs_of($pdo, $email);
     $now = time();
-    $method = false; $starter = true; $unfold = null; $until = 0; $methodSub = null; $pending = [];
+    $method = false; $starter = true; $unfold = null; $ulock = false; $until = 0; $methodSub = null; $pending = [];
     foreach ($subs as $s) {
         if (mv_open_at($s) > $now) { $pending[] = $s; continue; }
         if ($s['kind'] === 'unfold') {
-            if ($now <= mv_unfold_end()) { $unfold = $s; $method = true; $until = max($until, mv_unfold_end()); }
+            // Unfold ist ein eigenes Programm: kein Zugang zur Method-Bibliothek
+            if ($now <= mv_unfold_end()) { $unfold = $s; $until = max($until, mv_unfold_end()); $ulock = (int)$s['consent_digital'] !== 1 && mv_withdraw_until($s) > $now; }
+            continue;
         } else {
             // Abo: aktiv bis Periodenende, 2 Tage Puffer für Abbuchungen
             $end = max((int)$s['period_end'], (int)$s['bill_start']);
@@ -399,7 +452,7 @@ function mv_access(PDO $pdo, string $email): array
     // Konto-Ansicht zeigt eine vorgebuchte Method trotzdem (Kündigen vor dem Start)
     if (!$methodSub) foreach ($pending as $s) if ($s['kind'] === 'method') { $methodSub = $s; break; }
     $openAt = $pending ? min(array_map('mv_open_at', $pending)) : 0;
-    return ['method' => $method, 'starter' => $method && $starter, 'unfold' => $unfold, 'until' => $until, 'sub' => $methodSub, 'subs' => $subs, 'pending' => $pending, 'open_at' => $openAt];
+    return ['method' => $method, 'starter' => $method && $starter, 'unfold' => $unfold, 'ulock' => $ulock, 'until' => $until, 'sub' => $methodSub, 'subs' => $subs, 'pending' => $pending, 'open_at' => $openAt];
 }
 
 // --- Stripe ---------------------------------------------------------------------------------------
@@ -436,6 +489,12 @@ function mv_checkout(PDO $pdo, array $in, bool $special = false, string $source 
     if (!$fromRoom && ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL))) throw new RuntimeException($en ? 'Please enter your name and email.' : 'Bitte gib deinen Namen und deine E-Mail an.');
     $digital = !empty($in['digital']) ? 1 : 0;
     $live = !empty($in['live']) ? 1 : 0;
+    // Eine klare Wahl (Vivien, 25.10.2026): Verzicht auf das Rücktrittsrecht ja oder nein
+    if (isset($in['wr'])) {
+        if (!in_array($in['wr'], ['verzicht', 'behalten'], true)) throw new RuntimeException($en ? 'Please choose whether you keep your right of withdrawal.' : 'Bitte wähle, ob du dein Rücktrittsrecht behältst.');
+        $digital = $in['wr'] === 'verzicht' ? 1 : 0;
+        $live = 1;
+    }
     $callLang = in_array($in['call_lang'] ?? '', ['de', 'en'], true) ? $in['call_lang'] : $lang;
     if ($p['kind'] === 'unfold') {
         if (!$c['u_open']) throw new RuntimeException($en ? 'Unfold is not open for booking right now.' : 'Unfold ist gerade nicht buchbar.');
@@ -621,7 +680,12 @@ function mv_legal(array $r): string
         : ($en ? 'You can withdraw from your booking without giving reasons until ' . $d($until) . '. ' : 'Du kannst bis ' . $d($until) . ' ohne Angabe von Gründen von deiner Buchung zurücktreten. ');
     if ($isU) $x .= $en ? 'Once the programme has started, you pay only for the part already used if you withdraw. ' : 'Ab dem Start zahlst du bei einem Rücktritt nur den Teil, der bis dahin genutzt wurde. ';
     else $x .= $en ? 'You can cancel your membership at any time to the end of the paid period, right in your members area. ' : 'Du kannst deine Mitgliedschaft jederzeit zum Ende des bezahlten Zeitraums kündigen, direkt im Mitgliederbereich. ';
-    $x .= (int)$r['consent_digital'] === 1
+    if ($isU) $x .= (int)$r['consent_digital'] === 1
+        ? ($en ? 'Your choice: you waive your right of withdrawal and use everything from the start, including all videos and workbooks (§ 18 (1) 11 FAGG). '
+               : 'Deine Wahl: Du verzichtest auf dein Rücktrittsrecht und nutzt ab dem Start gleich alles, auch alle Videos und Workbooks (§ 18 Abs. 1 Z 11 FAGG). ')
+        : ($en ? 'Your choice: you keep your right of withdrawal. Live calls and videos start as planned, the workbook downloads unlock on ' . $d($until + 60) . '. '
+               : 'Deine Wahl: Du behältst dein Rücktrittsrecht. Live-Calls und Videos starten wie geplant, die Workbook-Downloads öffnen sich am ' . $d($until + 60) . '. ');
+    else $x .= (int)$r['consent_digital'] === 1
         ? ($en ? 'Confirmation: you expressly agreed that the video library and downloads (digital content) are unlocked in full ' . ($pre ? 'on ' . $d($open) : 'immediately') . ', and you acknowledged that you lose your right of withdrawal for this digital content as soon as it is unlocked (§ 18 (1) 11 FAGG). '
                : 'Bestätigung: Du hast ausdrücklich zugestimmt, dass die Videobibliothek und die Downloads (digitale Inhalte) ' . ($pre ? 'am ' . $d($open) : 'sofort') . ' ganz freigeschaltet werden, und zur Kenntnis genommen, dass du dein Rücktrittsrecht für diese digitalen Inhalte mit der Freischaltung verlierst (§ 18 Abs. 1 Z 11 FAGG). ')
         : ($en ? 'You did not choose immediate full access: you start with the welcome module, the full library unlocks after your withdrawal period on ' . $d($until + 60) . '. '
@@ -671,12 +735,12 @@ function mv_welcome(PDO $pdo, array $r): void
         $lines = $en ? [
             "Dear $first,",
             "how lovely, you are in! Your booking for $title ($price) is confirmed.",
-            $isU ? 'Your weekly live call: ' . $call . '. Your members area with the Unfold videos, workbooks and the Movecia Mindful Movement Method is open for you until ' . mv_date(mv_unfold_end(), 'en') . '.' : 'You can start right now: your members area is ready.',
+            $isU ? 'Your weekly live call: ' . $call . '. Your members area with the Unfold videos, workbooks and recordings is open for you until ' . mv_date(mv_unfold_end(), 'en') . '.' : 'You can start right now: your members area is ready.',
             $hasPw ? 'Log in with your email and your password.' : 'Choose your password once, then you can log in from any device with your email.',
         ] : [
             "Hallo $first,",
             "wie schön, du bist dabei! Deine Buchung für $title ($price) ist bestätigt.",
-            $isU ? 'Dein wöchentlicher Live-Call: ' . $call . '. Dein Mitgliederbereich mit den Unfold-Videos, Workbooks und der Movecia Mindful Movement Method ist bis ' . mv_date(mv_unfold_end()) . ' für dich offen.' : 'Du kannst sofort loslegen: Dein Mitgliederbereich ist bereit.',
+            $isU ? 'Dein wöchentlicher Live-Call: ' . $call . '. Dein Mitgliederbereich mit den Unfold-Videos, Workbooks und Aufnahmen ist bis ' . mv_date(mv_unfold_end()) . ' für dich offen.' : 'Du kannst sofort loslegen: Dein Mitgliederbereich ist bereit.',
             $hasPw ? 'Melde dich einfach mit deiner E-Mail und deinem Passwort an.' : 'Leg einmal dein Passwort fest, danach meldest du dich auf jedem Gerät mit deiner E-Mail an.',
         ];
         $subj = $en ? 'You are in: ' : 'Du bist dabei: ';
@@ -721,13 +785,13 @@ function mv_open_mail(PDO $pdo, array $r): void
     $lines = $en ? [
         "Dear $first,",
         "today is the day: your access to $title is open!",
-        $isU ? 'In your members area you will find the Unfold videos, your workbooks, the link to our live call (' . $call . ') and the whole Movecia Mindful Movement Method.' : 'Your members area with the whole library is ready for you. Start wherever it feels right today.',
+        $isU ? 'In your members area you will find the Unfold videos, your workbooks, the link to our live call (' . $call . ') and every recording.' : 'Your members area with the whole library is ready for you. Start wherever it feels right today.',
         $hasPw ? 'Log in with your email and your password.' : 'Choose your password once, then you can log in from any device with your email.',
         'As promised, your 14-day withdrawal period starts today and runs until ' . mv_date($until, 'en') . '.',
     ] : [
         "Hallo $first,",
         "heute ist es so weit: Dein Zugang zu $title ist offen!",
-        $isU ? 'In deinem Mitgliederbereich findest du die Unfold-Videos, deine Workbooks, den Link zu unserem Live-Call (' . $call . ') und die ganze Movecia Mindful Movement Method.' : 'Dein Mitgliederbereich mit der ganzen Bibliothek ist für dich bereit. Fang heute dort an, wo es sich für dich gut anfühlt.',
+        $isU ? 'In deinem Mitgliederbereich findest du die Unfold-Videos, deine Workbooks, den Link zu unserem Live-Call (' . $call . ') und alle Aufnahmen.' : 'Dein Mitgliederbereich mit der ganzen Bibliothek ist für dich bereit. Fang heute dort an, wo es sich für dich gut anfühlt.',
         $hasPw ? 'Melde dich einfach mit deiner E-Mail und deinem Passwort an.' : 'Leg einmal dein Passwort fest, danach meldest du dich auf jedem Gerät mit deiner E-Mail an.',
         'Wie versprochen beginnt deine 14-tägige Rücktrittsfrist heute und läuft bis ' . mv_date($until) . '.',
     ];
@@ -774,7 +838,7 @@ function mv_invoice_source(PDO $pdo, string $kind, int $payId): ?array
     if ($p['skind'] === 'unfold') {
         $c = mv_cfg();
         $text = 'Unfold – The Mindful Becoming' . ($p['plan'] === 'u3' ? ' · Rate' : '');
-        $detail = '3-monatige Online-Begleitung ' . date('d.m.Y', mv_ts($c['u_start'])) . ' bis ' . date('d.m.Y', mv_unfold_end()) . ': wöchentliche Live-Calls per Video, Workbooks, Impuls-Videos, Zugang zur Mindful Movement Method' . ((int)$p['special'] && $p['plan'] === 'u1' ? ' · Gathering-Preis' : '');
+        $detail = '3-monatige Online-Begleitung ' . date('d.m.Y', mv_ts($c['u_start'])) . ' bis ' . date('d.m.Y', mv_unfold_end()) . ': wöchentliche Live-Calls per Video, Workbooks, Impuls-Videos, Bewegungsvideos' . ((int)$p['special'] && $p['plan'] === 'u1' ? ' · Gathering-Preis' : '');
         $service = date('d.m.Y', mv_ts($c['u_start']));
     } else {
         $text = 'Movecia Mindful Movement Method · Mitgliedschaft ' . $pl['de'];

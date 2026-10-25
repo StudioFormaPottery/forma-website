@@ -163,14 +163,18 @@ if ($action === 'mm_mv_file_delete') {
 
 // Als Mitglied testen: Zugang ohne Zahlung (Method oder Unfold), Mail mit Passwort-Link an die angegebene Adresse
 if ($action === 'mm_mv_test') {
-    $email = strtolower(trim((string)($_POST['email'] ?? '')));
-    $kind = ($_POST['kind'] ?? '') === 'unfold' ? 'unfold' : 'method';
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) go($vBack . '#test', 'Bitte gib eine E-Mail-Adresse ein (am besten eine zweite eigene).');
-    $lg = ($_POST['lang'] ?? '') === 'en' ? 'en' : 'de';
-    $pdo->prepare("INSERT INTO mv_subs (kind, plan, email, name, lang, call_lang, amount_cents, first_cents, status, token, consent_digital, consent_live, source, test, created_at, paid_at, period_end) VALUES (?,?,?,?,?,?,0,0,'aktiv',?,?,1,'test',1,?,?,?)")
-        ->execute([$kind, $kind === 'unfold' ? 'u1' : 'm1', $email, forma_clean((string)($_POST['name'] ?? 'Test'), 80) ?: 'Test', $lg, $lg, bin2hex(random_bytes(16)), empty($_POST['starter']) ? 1 : 0, date('c'), date('c', empty($_POST['starter']) ? time() : time()), time() + 30 * 86400]);
-    mv_welcome($pdo, mv_sub($pdo, (int)$pdo->lastInsertId()));
-    go($vBack . '#test', 'Testzugang angelegt. An ' . $email . ' ist die Willkommensmail mit dem Passwort-Link unterwegs. Er gilt 30 Tage.');
+    $was = (string)($_POST['kind'] ?? 'method');
+    $kinds = $was === 'beides' ? ['method', 'unfold'] : [$was === 'unfold' ? 'unfold' : 'method'];
+    $m = mv_test_create($pdo, ['kinds' => $kinds, 'started' => ($_POST['phase'] ?? 'start') === 'start', 'waive' => ($_POST['wr'] ?? '') === 'verzicht',
+        'lang' => $_POST['lang'] ?? 'de', 'name' => $_POST['name'] ?? 'Test', 'email' => $_POST['email'] ?? '']);
+    header('Location: ' . mv_test_login_link((int)$m['id']), true, 303);
+    exit;
+}
+if ($action === 'mm_mv_test_login') {
+    $m = mv_member($pdo, (int)($_POST['mid'] ?? 0));
+    if (!$m) go($vBack . '#test', 'Diesen Testzugang gibt es nicht mehr.');
+    header('Location: ' . mv_test_login_link((int)$m['id']), true, 303);
+    exit;
 }
 if ($action === 'mm_mv_test_delete') {
     $r = mv_sub($pdo, (int)($_POST['id'] ?? 0));
@@ -225,7 +229,27 @@ document.getElementById('top').onclick=()=>scrollTo(0,0);document.getElementById
         $b = mv_bunny();
         $plans = mv_plans();
         $csrf = '<input type="hidden" name="csrf" value="' . forma_h(csrf()) . '">';
-        ob_start(); ?>
+        ob_start();
+        $tsubs = $pdo->query("SELECT s.*, m.id AS mid FROM mv_subs s LEFT JOIN mv_members m ON lower(m.email) = lower(s.email) WHERE s.source = 'test' ORDER BY s.id DESC LIMIT 30")->fetchAll();
+        $tby = []; foreach ($tsubs as $t) $tby[(int)$t['mid']][] = $t; ?>
+        <h2 id="test">🧪 Als Testteilnehmerin ansehen</h2>
+        <div class="card stack" style="background:#F6EFEC;border-color:#D9C5C4">
+            <p class="small muted" style="margin:0">Ein Klick legt eine Testteilnehmerin ohne Zahlung an und öffnet ihren Mitgliederbereich in einem neuen Tab, genau wie ihn eine Kundin sieht. Sie zählt nicht als Unfold-Platz und taucht nicht im Umsatz auf. Ohne E-Mail geht keine Mail raus.</p>
+            <form method="post" target="_blank" class="stack"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_test">
+                <div class="g3"><label>Was<select name="kind"><option value="method">The Method</option><option value="unfold">Unfold</option><option value="beides">Method + Unfold</option></select></label>
+                    <label>Zeitpunkt<select name="phase"><option value="start">schon gestartet</option><option value="vorher">vor dem Start (Warteseite)</option></select></label>
+                    <label>Rücktrittsrecht<select name="wr"><option value="verzicht">verzichtet (alles offen)</option><option value="behalten">behalten (erste 14 Tage)</option></select></label></div>
+                <div class="g3"><label>Name<input name="name" value="Test Vivien"></label><label>Sprache<select name="lang"><option value="de">Deutsch</option><option value="en">Englisch</option></select></label><label>E-Mail <span class="small muted">(optional, dann echte Mails)</span><input type="email" name="email" placeholder="leer lassen"></label></div>
+                <div><button class="btn" type="submit">Als Testteilnehmerin einloggen →</button></div>
+            </form>
+            <p class="small muted" style="margin:0">Für Prä- &amp; Postnatal: <a href="?view=natal#testkundin">dort „Als Kundin testen“</a>.</p>
+            <?php foreach ($tby as $mid => $ts): if (!$mid) continue; $t0 = $ts[0]; ?>
+            <div class="ln"><span><strong><?= forma_h($t0['name']) ?></strong> <span class="small muted">· <?= forma_h(implode(' + ', array_map(fn($t) => $t['kind'] === 'unfold' ? 'Unfold' : 'Method', $ts))) ?> · <?= (int)$t0['open_from'] > time() ? 'vor dem Start' : 'gestartet' ?> · <?= (int)$t0['consent_digital'] ? 'verzichtet' : 'Rücktrittsrecht behalten' ?><?= str_ends_with((string)$t0['email'], '@test.moveciamovement.com') ? '' : ' · ' . forma_h($t0['email']) ?></span></span>
+                <span class="acts"><form method="post" target="_blank"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_test_login"><input type="hidden" name="mid" value="<?= (int)$mid ?>"><button class="link small" type="submit">einloggen</button></form>
+                <?php foreach ($ts as $t): ?><form method="post" onsubmit="return confirm('Testzugang löschen?')"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_test_delete"><input type="hidden" name="id" value="<?= (int)$t['id'] ?>"><button class="link small" type="submit">löschen<?= count($ts) > 1 ? ' (' . ($t['kind'] === 'unfold' ? 'Unfold' : 'Method') . ')' : '' ?></button></form><?php endforeach; ?></span></div>
+            <?php endforeach; ?>
+        </div>
+
         <h2 id="bunny"><?= mv_bunny_ok() ? 'Bunny Stream (Videos)' : 'Schritt 1: Bunny Stream verbinden' ?></h2>
         <?php if (!mv_bunny_ok()): ?><p class="card" style="background:#EADFDE;border-color:#D9C5C4;font-size:15px">Hier trägst du deine Bunny-Daten ein (Library-ID, CDN Hostname, API Key und Token-Schlüssel). Erst danach kannst du bei jeder Lektion Videos hochladen. Sobald Bunny verbunden ist, rutscht dieser Bereich nach unten.</p><?php endif; ?>
         <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_bunny_save">
@@ -411,17 +435,6 @@ label.inl{display:flex;gap:8px;align-items:center}
             <form method="post" style="margin-top:10px"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_sync"><button class="btn btn-ghost btn-sm" type="submit">Mit Stripe abgleichen</button></form>
             <p class="small muted">Rechnungen gehen nach jeder Zahlung automatisch raus (Movecia-Design, Kopie an hello@forma-pottery.com), auch bei jeder Verlängerung.</p>
         </div>
-
-        <h2 id="test">Als Mitglied testen</h2>
-        <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_test">
-            <p class="small muted">Legt einen Zugang ohne Zahlung an (30 Tage) und schickt die echte Willkommensmail. Nimm am besten eine zweite eigene Adresse.</p>
-            <div class="g3"><label>Name<input name="name" value="Test Vivien"></label><label>E-Mail<input type="email" name="email" required></label><label>Was<select name="kind"><option value="method">Method</option><option value="unfold">Unfold (inkl. Method)</option></select></label></div>
-            <div class="g2"><label>Sprache<select name="lang"><option value="de">Deutsch</option><option value="en">Englisch</option></select></label><label class="inl"><input type="checkbox" name="starter" value="1"> wie in den ersten 14 Tagen (ohne Sofort-Zugang)</label></div>
-            <button class="btn btn-sm" type="submit">Testzugang anlegen</button>
-            <?php foreach (array_filter($subs, fn($s) => $s['source'] === 'test') as $s): ?><div class="ln"><span><?= forma_h($s['email']) ?> <span class="small muted">· <?= $s['kind'] === 'unfold' ? 'Unfold' : 'Method' ?></span></span>
-                <button class="link small" form="td<?= (int)$s['id'] ?>" type="submit">löschen</button></div><?php endforeach; ?>
-        </form>
-        <?php foreach (array_filter($subs, fn($s) => $s['source'] === 'test') as $s): ?><form id="td<?= (int)$s['id'] ?>" method="post" hidden><?= $csrf ?><input type="hidden" name="action" value="mm_mv_test_delete"><input type="hidden" name="id" value="<?= (int)$s['id'] ?>"></form><?php endforeach; ?>
 
         <h2 id="unfold">Unfold</h2>
         <div class="card stack">

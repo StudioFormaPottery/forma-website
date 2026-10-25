@@ -15,6 +15,11 @@ $h = 'forma_h';
 $self = '/mitglieder/';
 $ip = hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? '') . date('Y-m-d') . 'mv');
 $go = function (string $q = '') use ($self) { header('Location: ' . $self . $q, true, 303); exit; };
+// Testteilnehmerin aus der Verwaltung (Vivien, 25.10.2026)
+if (isset($_GET['testlogin'])) {
+    $tm = mv_test_login_ok($pdo, (int)$_GET['testlogin'], (int)($_GET['e'] ?? 0), (string)($_GET['k'] ?? ''));
+    if ($tm) { mv_login($pdo, $tm); $go(); }
+}
 $me = mv_current($pdo);
 $demo = !$me && isset($_GET['demo']);
 $lang = $me ? (string)$me['lang'] : ((($_GET['lang'] ?? '') === 'en') ? 'en' : (((($_GET['lang'] ?? '') === 'de')) ? 'de' : ''));
@@ -230,7 +235,7 @@ if (!$me && !$demo) {
 if ($demo) {
     if ($lang === '') $lang = 'de';
     $me = ['id' => 0, 'name' => 'Anna Beispiel', 'email' => 'anna@example.com', 'lang' => $lang];
-    $acc = ['method' => true, 'starter' => isset($_GET['starter']), 'unfold' => isset($_GET['unfold']) ? ['call_lang' => 'de', 'plan' => 'u1'] : null, 'until' => strtotime('+1 month'), 'sub' => ['plan' => 'm1', 'period_end' => strtotime('+20 days'), 'bill_start' => 0, 'cancel_end' => 0, 'amount_cents' => 2900, 'kind' => 'method'], 'subs' => []];
+    $acc = ['method' => !isset($_GET['nurunfold']), 'ulock' => false, 'starter' => isset($_GET['starter']), 'unfold' => isset($_GET['unfold']) || isset($_GET['nurunfold']) ? ['call_lang' => 'de', 'plan' => 'u1'] : null, 'until' => strtotime('+1 month'), 'sub' => ['plan' => 'm1', 'period_end' => strtotime('+20 days'), 'bill_start' => 0, 'cancel_end' => 0, 'amount_cents' => 2900, 'kind' => 'method'], 'subs' => []];
     $done = []; $favs = []; $week = 3;
     if (isset($_GET['warte'])) { $ps = ['kind' => 'unfold', 'paid_at' => date('c'), 'bill_start' => 0]; $acc = ['method' => false, 'starter' => false, 'unfold' => null, 'until' => 0, 'sub' => null, 'subs' => [], 'pending' => [$ps], 'open_at' => mv_open_at($ps)]; }
 } else {
@@ -246,13 +251,18 @@ $now = new DateTimeImmutable('now', $tz);
 $hour = (int)$now->format('G');
 $hello = $hour < 4 ? $L('Guten Abend', 'Good evening') : ($hour < 11 ? $L('Guten Morgen', 'Good morning') : ($hour < 17 ? $L('Hallo', 'Hello') : $L('Guten Abend', 'Good evening')));
 $tab = in_array($_GET['tab'] ?? '', ['bibliothek', 'journal', 'unfold', 'konto'], true) ? $_GET['tab'] : 'bibliothek';
+// Unfold ist ein eigenes Programm: ohne Method gibt es keine Bibliothek, dann startet die Seite bei Unfold
+if (!$acc['method'] && $acc['unfold'] && $tab === 'bibliothek') $tab = 'unfold';
 $launch = mv_launch();
 $prelaunch = !mv_launched();
 $c = mv_cfg();
-$q = $demo ? '&demo=1' . (isset($_GET['unfold']) ? '&unfold=1' : '') . (isset($_GET['starter']) ? '&starter=1' : '') . ($lang === 'en' ? '&lang=en' : '') : '';
+$q = $demo ? '&demo=1' . (isset($_GET['unfold']) ? '&unfold=1' : '') . (isset($_GET['nurunfold']) ? '&nurunfold=1' : '') . (isset($_GET['starter']) ? '&starter=1' : '') . ($lang === 'en' ? '&lang=en' : '') : '';
 
 // Programme + Lektionen, die sie sehen darf (Beispielansicht mit Unfold zeigt die zweite Unfold-Woche)
-$today = $demo && isset($_GET['unfold']) ? date('Y-m-d', mv_ts($c['u_start']) + 11 * 86400) : $now->format('Y-m-d');
+$today = $demo && (isset($_GET['unfold']) || isset($_GET['nurunfold'])) ? date('Y-m-d', mv_ts($c['u_start']) + 11 * 86400) : $now->format('Y-m-d');
+// Testzugang vor dem echten Unfold-Start: zeigt Woche 2, damit Vivien Videos und Workbooks sieht
+$isTest = !$demo && $me && array_filter($acc['subs'] ?? [], fn($s) => $s['source'] === 'test');
+if ($isTest && $acc['unfold'] && $today < $c['u_start']) $today = date('Y-m-d', mv_ts($c['u_start']) + 11 * 86400);
 $progs = [];
 $all = [];
 if ($acc['method']) {
@@ -303,14 +313,15 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
 <header class="w bar"><div class="in top">
   <a class="brand" href="<?= $self . ($demo ? '?demo=1' : '') ?>"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a>
   <nav class="tabs" aria-label="<?= $L('Bereiche', 'Sections') ?>">
-    <a href="?tab=bibliothek<?= $q ?>" <?= $tab === 'bibliothek' && !$lesson ? 'aria-current="page"' : '' ?>><?= $L('Bibliothek', 'Library') ?></a>
+    <?php if ($acc['method']): ?><a href="?tab=bibliothek<?= $q ?>" <?= $tab === 'bibliothek' && !$lesson ? 'aria-current="page"' : '' ?>><?= $L('Bibliothek', 'Library') ?></a><?php endif; ?>
     <?php if ($acc['unfold']): ?><a href="?tab=unfold<?= $q ?>" <?= $tab === 'unfold' ? 'aria-current="page"' : '' ?>>Unfold</a><?php endif; ?>
     <a href="?tab=journal<?= $q ?>" <?= $tab === 'journal' ? 'aria-current="page"' : '' ?>>Journal</a>
     <a href="?tab=konto<?= $q ?>" <?= $tab === 'konto' ? 'aria-current="page"' : '' ?>><?= $L('Konto', 'Account') ?></a>
   </nav>
   <?= $demo ? '<div class="lang"><a class="lb" href="?demo=1&amp;lang=de" aria-pressed="' . ($lang !== 'en' ? 'true' : 'false') . '">DE</a><a class="lb" href="?demo=1&amp;lang=en" aria-pressed="' . ($lang === 'en' ? 'true' : 'false') . '">EN</a></div>' : mv_lang_switch($lang, '?' . http_build_query(array_intersect_key($_GET, ['tab' => 1, 'l' => 1])), true) ?>
 </div></header>
-<?php if ($demo): ?><p class="demo w"><?= $L('Beispielansicht ohne echtes Konto.', 'Example view without a real account.') ?> <a href="?demo=1&amp;starter=1<?= $lang === 'en' ? '&amp;lang=en' : '' ?>"><?= $L('Widerrufsfrist', 'Withdrawal period') ?></a> · <a href="?demo=1&amp;unfold=1<?= $lang === 'en' ? '&amp;lang=en' : '' ?>"><?= $L('mit Unfold', 'with Unfold') ?></a> · <a href="?demo=1&amp;warte=1<?= $lang === 'en' ? '&amp;lang=en' : '' ?>"><?= $L('vor dem Start', 'before the start') ?></a></p><?php endif; ?>
+<?php if (!empty($isTest)): ?><p class="demo w"><?= $L('Testzugang · so sieht es eine Teilnehmerin', 'Test access · this is what a participant sees') ?><?= $acc['unfold'] && $now->format('Y-m-d') < $c['u_start'] ? $L(' (Unfold als Woche 2)', ' (Unfold shown as week 2)') : '' ?></p><?php endif; ?>
+<?php if ($demo): ?><p class="demo w"><?= $L('Beispielansicht ohne echtes Konto.', 'Example view without a real account.') ?> <a href="?demo=1&amp;starter=1<?= $lang === 'en' ? '&amp;lang=en' : '' ?>"><?= $L('Widerrufsfrist', 'Withdrawal period') ?></a> · <a href="?demo=1&amp;unfold=1<?= $lang === 'en' ? '&amp;lang=en' : '' ?>"><?= $L('Method + Unfold', 'Method + Unfold') ?></a> · <a href="?demo=1&amp;nurunfold=1<?= $lang === 'en' ? '&amp;lang=en' : '' ?>"><?= $L('nur Unfold', 'Unfold only') ?></a> · <a href="?demo=1&amp;warte=1<?= $lang === 'en' ? '&amp;lang=en' : '' ?>"><?= $L('vor dem Start', 'before the start') ?></a></p><?php endif; ?>
 
 <main class="w"><div class="in">
 <?php if (!$acc['method'] && !$acc['unfold'] && !empty($acc['pending'])): $oa = (int)$acc['open_at']; ?>
@@ -395,7 +406,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
       </div>
     <?php endif; ?>
     <?php if ($u): ?>
-      <div class="card"><h3>Unfold – The Mindful Becoming</h3><p><?= $L('Start', 'Start') ?>: <?= $h(mv_date(mv_ts($c['u_start']), $lang)) ?> · <?= $L('Calls auf', 'Calls in') ?> <?= $u['call_lang'] === 'en' ? $L('Englisch', 'English') : $L('Deutsch', 'German') ?></p><p class="mut"><?= $L('Inklusive Method bis', 'Including the Method until') ?> <?= $h(mv_date(mv_unfold_end(), $lang)) ?></p></div>
+      <div class="card"><h3>Unfold – The Mindful Becoming</h3><p><?= $L('Start', 'Start') ?>: <?= $h(mv_date(mv_ts($c['u_start']), $lang)) ?> · <?= $L('Calls auf', 'Calls in') ?> <?= $u['call_lang'] === 'en' ? $L('Englisch', 'English') : $L('Deutsch', 'German') ?></p><p class="mut"><?= $L('Begleitung bis', 'Programme until') ?> <?= $h(mv_date(mv_unfold_end(), $lang)) ?></p></div>
     <?php endif; ?>
       <div class="card"><h3><?= $L('Passwort ändern', 'Change password') ?></h3>
         <?php if (isset($_GET['pwok'])): ?><p class="note"><?= $L('Neues Passwort gespeichert.', 'New password saved.') ?></p><?php endif; ?>
@@ -417,14 +428,15 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
     $wk = $tnow >= $ustart ? min(13, intdiv($tnow - $ustart, 7 * 86400) + 1) : 0; ?>
   <section class="uhero">
     <div><p class="k">Unfold · The Mindful Becoming</p><h1 class="h2"><?= $wk ? $L('Woche ', 'Week ') . $wk . $L(' von 13', ' of 13') : (time() < $ustart ? $L('Bald geht es los', 'We begin soon') : $L('Dein Weg in drei Monaten', 'Your path in three months')) ?></h1>
-      <p class="lead"><?= !$wk ? $L('Wir starten am ', 'We begin on ') . $h(mv_date($ustart, $lang)) . '. ' . $L('Bis dahin ist die ganze Method schon für dich offen.', 'Until then, the whole Method is already open for you.') : $L('Jede Woche treffen wir uns live, und jeden Montag und Donnerstag kommt ein neues Bewegungsvideo dazu. Hier findest du außerdem deine Workbooks und den Link zum Call.', 'Every week we meet live, and every Monday and Thursday a new movement video arrives. Here you also find your workbooks and the link to the call.') ?></p></div>
+      <p class="lead"><?= !$wk ? $L('Wir starten am ', 'We begin on ') . $h(mv_date($ustart, $lang)) . '. ' . $L('Bis dahin kannst du dich hier schon in Ruhe umsehen.', 'Until then, feel free to look around.') : $L('Jede Woche treffen wir uns live, und jeden Montag und Donnerstag kommt ein neues Bewegungsvideo dazu. Hier findest du außerdem deine Workbooks und den Link zum Call.', 'Every week we meet live, and every Monday and Thursday a new movement video arrives. Here you also find your workbooks and the link to the call.') ?></p></div>
     <div class="ucall card"><p class="k"><?= $L('Dein Live-Call', 'Your live call') ?></p><h3><?= $h($u['call_lang'] === 'en' ? $c['u_call_en'] : $c['u_call_de']) ?></h3><p class="mut small"><?= $u['call_lang'] === 'en' ? $L('auf Englisch', 'in English') : $L('auf Deutsch', 'in German') ?></p>
       <?php if ($room !== '' && $tnow >= $ustart - 86400): ?><a class="btn" href="/unfold/call/" target="_blank" rel="noopener"><?= $L('Zum Call', 'Join the call') ?></a><?php else: ?><p class="mut small"><?= $L('Der Link zum Call erscheint hier vor dem Start.', 'The link to the call appears here before we start.') ?></p><?php endif; ?></div>
   </section>
   <?php foreach ($uProgs as $x): $p = $x['p']; ?>
   <section class="prog">
     <div class="phead"><div><p class="k"><?= $x['open'] ? $L('Offen', 'Open') : $L('Ab', 'From') . ' ' . $h(mv_date(strtotime($p['unlock'] . ' 12:00'), $lang)) ?></p><h2 class="h3"><?= $h(mv_t($p, 'title', $lang)) ?></h2><p class="mut"><?= $h(mv_t($p, 'intro', $lang)) ?></p></div>
-      <?php if ($x['files']): ?><div class="files"><?php foreach ($x['files'] as $f) if ($f['lang'] === 'both' || $f['lang'] === $lang): ?><a class="chip" href="/api/method.php?file=<?= (int)$f['id'] ?>" target="_blank">⤓ <?= $h(mv_t($f, 'label', $lang)) ?></a><?php endif; ?></div><?php endif; ?></div>
+      <?php if ($x['files'] && !empty($acc['ulock'])): ?><div class="files"><span class="chip" style="opacity:.6">🔒 <?= $L('Workbook ab ', 'Workbook from ') . $h(mv_date(mv_withdraw_until($acc['unfold']) + 60, $lang)) ?></span></div>
+      <?php elseif ($x['files']): ?><div class="files"><?php foreach ($x['files'] as $f) if ($f['lang'] === 'both' || $f['lang'] === $lang): ?><a class="chip" href="/api/method.php?file=<?= (int)$f['id'] ?>" target="_blank">⤓ <?= $h(mv_t($f, 'label', $lang)) ?></a><?php endif; ?></div><?php endif; ?></div>
     <?php if ($x['lessons']): ?><div class="row"><?php foreach ($x['lessons'] as $l) echo $card($l, $p, false); ?></div><?php endif; ?>
   </section>
   <?php endforeach; ?>

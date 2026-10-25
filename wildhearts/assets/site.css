@@ -84,3 +84,11 @@ details.q summary::-webkit-details-marker{display:none}
 details.q summary::after{content:"+";color:var(--plum)}details.q[open] summary::after{content:"–"}
 details.q p{margin-top:.6rem;color:var(--muted)}
 .hp{position:absolute;left:-9999px}
+/* Rücktrittsrecht: eine klare Wahl (Vivien, 25.10.2026) */
+.wrf{border:0;padding:0;margin:.2rem 0 0;display:grid;gap:.45rem}
+.wrf legend{font-size:.86rem;color:var(--muted);margin-bottom:.35rem;padding:0}
+.wro{display:flex;gap:.7rem;align-items:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:.75rem 1rem;cursor:pointer;font-size:.95rem}
+.wro input{accent-color:var(--plum);width:18px;height:18px;margin-top:.15rem;flex:none}
+.wro span{display:grid;gap:.1rem}.wro small{color:var(--muted);font-size:.84rem}
+.wro:has(input:checked){border-color:var(--plum);background:#fff}
+.wrn{color:var(--muted);font-size:.82rem}

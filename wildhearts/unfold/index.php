@@ -37,7 +37,7 @@ $site = mm_site();
 $faq = [
  ['Was ist Unfold?', 'Unfold – The Mindful Becoming ist eine 3-monatige Online-Begleitung für Frauen mit Vivien Malonga: jede Woche ein Live-Call mit Impulsvortrag, zwei Bewegungsvideos pro Woche (Yoga, Bodyweight, Somatic und freie Bewegung), Workbooks für Mental Load, Organisation und Selbstwert sowie Journaling, Meditation und Breathwork.'],
  ['Wann startet Unfold?', 'Der erste Live-Call ist am ' . mv_date($st) . '. Unfold dauert 13 Wochen, es gibt höchstens ' . (int)$c['u_seats'] . ' Plätze.'],
- ['Was kostet Unfold?', $eur($c['u_once']) . ' auf einmal oder ' . (int)$c['u_n'] . ' × ' . $eur($c['u_inst']) . '. Im kostenlosen Info-Gathering vor dem Start gibt es Unfold für ' . $eur($c['g_u_once']) . '.'],
+ ['Was kostet Unfold?', $eur($c['u_once']) . ' auf einmal oder ' . (int)$c['u_n'] . ' × ' . $eur($c['u_inst']) . '.'],
  ['Muss ich sportlich sein?', 'Nein. Die Bewegung ist sanft und achtsam, jede Übung hat leichtere Varianten und es gibt eigene Videos für müde Tage.'],
  ['Gibt es Unfold auf Englisch?', 'Ja. Es gibt immer einen Live-Call auf Deutsch und einen auf Englisch, die Videos gibt es in beiden Sprachen.'],
 ];
@@ -145,8 +145,22 @@ ol.wk li{display:flex;gap:.8rem;align-items:flex-start;font-size:.9em;color:var(
 fieldset.opt{border:0;padding:0;margin:.2rem 0 0;display:grid;gap:.45rem}
 fieldset.opt legend{font-size:.86rem;color:var(--muted);margin-bottom:.35rem;padding:0}
 .pick{display:flex;gap:.7rem;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:.75rem 1rem;cursor:pointer;font-size:.95rem}
-.pick input{accent-color:var(--plum);width:18px;height:18px}
+.pick input{accent-color:var(--plum);width:18px;height:18px;flex:none}
 .pick:has(input:checked){border-color:var(--plum);background:#fff}
+.pick.wr span{display:grid;gap:.1rem}.pick.wr small{color:var(--muted);font-size:.84rem}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.plan{position:relative;display:grid;gap:.15rem;align-content:start;background:var(--bg);border:1.5px solid var(--line);border-radius:20px;padding:1.5rem 1rem 1rem;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s}
+.plan input{position:absolute;opacity:0;pointer-events:none}
+.plan .pt{font-size:.85rem;color:var(--muted)}
+.plan .pa{font-family:var(--serif);font-size:1.7rem;line-height:1.1;color:var(--ink)}
+.plan .ps{font-size:.8rem;color:var(--muted)}
+.plan.best .ps{color:var(--plum);font-weight:600}
+.plan .badge{position:absolute;top:-.7rem;left:1rem;background:var(--plum);color:var(--on);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;padding:.28rem .7rem;border-radius:99px}
+.plan:has(input:checked){border-color:var(--plum);background:#fff;box-shadow:0 8px 24px -14px rgba(74,58,65,.45)}
+.plan:has(input:checked)::after{content:"✓";position:absolute;top:.7rem;right:.8rem;width:1.35rem;height:1.35rem;border-radius:50%;background:var(--plum);color:#fff;font-size:.75rem;display:grid;place-items:center}
+.plan:has(input:focus-visible){outline:2px solid var(--plum);outline-offset:2px}
+.tag{font-style:normal;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;background:rgba(232,214,202,.25);padding:.15rem .5rem;border-radius:99px;margin-left:.3rem}
+@media(max-width:420px){.plans{grid-template-columns:1fr}}
 .ok{background:var(--blush);border-radius:16px;padding:1rem 1.2rem}
 .err{color:#A0463A;font-size:.9rem}
 .me{display:grid;gap:1.6rem;align-items:center}
@@ -246,7 +260,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
     <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#7D5E68" stroke-width="1.6" stroke-linecap="round"><path d="M6 34c6-10 12-10 18 0s12 10 18 0"/><circle cx="24" cy="13" r="4"/></svg><b><span class="de">Zwei Bewegungsvideos pro Woche</span><span class="en">Two movement videos a week</span></b><p><span class="de">Jeden Montag ein Full-Day-Flow (ca. 30 Min.) und jeden Donnerstag ein sanfter Tired-Day-Flow (ca. 15 Min.), immer ein Mix aus Yoga, Bodyweight, Somatic und freier Bewegung. Du machst sie, wann es dir passt.</span><span class="en">Every Monday a Full Day flow (about 30 min.) and every Thursday a gentle Tired Day flow (about 15 min.), always a mix of yoga, bodyweight, somatic and free movement. You do them whenever it suits you.</span></p></div>
     <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#7D5E68" stroke-width="1.6" stroke-linecap="round"><rect x="9" y="7" width="30" height="34" rx="5"/><path d="M16 16h16M16 23h16M16 30h10"/></svg><b><span class="de">Monatliches Workbook</span><span class="en">Monthly workbook</span></b><p><span class="de">Zum Ausdrucken oder am iPad: Übungen zu Mindset, Selbstwert und deinen Ideen, mit Journaling-Fragen für jede Woche.</span><span class="en">Print it or use it on your tablet: exercises for mindset, self-worth and your ideas, with journaling prompts for every week.</span></p></div>
     <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#7D5E68" stroke-width="1.6" stroke-linecap="round"><circle cx="24" cy="24" r="16"/><path d="M20 17l11 7-11 7z"/></svg><b><span class="de">Impulse von mir</span><span class="en">Talks from me</span></b><p><span class="de">Kurze Videos, in denen ich dir erzähle, was mir selbst geholfen hat, als ich mein Atelier und meine Arbeit mit Frauen aufgebaut habe.</span><span class="en">Short videos in which I share what helped me when I built my studio and my work with women.</span></p></div>
-    <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#7D5E68" stroke-width="1.6" stroke-linecap="round"><path d="M10 34c6-2 8-10 14-10s8 8 14 10"/><circle cx="24" cy="14" r="4"/><path d="M8 40h32"/></svg><b><span class="de">Die Mindful Movement Method</span><span class="en">The Mindful Movement Method</span></b><p><span class="de">Drei Monate voller Zugang zu meiner On-Demand-Bibliothek: sanfte Flows, Breathwork, Somatic Movement und Meditationen.</span><span class="en">Three months of full access to my on-demand library: gentle flows, breathwork, somatic movement and meditations.</span></p></div>
+    <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#7D5E68" stroke-width="1.6" stroke-linecap="round"><path d="M10 34c6-2 8-10 14-10s8 8 14 10"/><circle cx="24" cy="14" r="4"/><path d="M8 40h32"/></svg><b><span class="de">Rituale für deinen Alltag</span><span class="en">Rituals for your everyday life</span></b><p><span class="de">Journaling, Meditation und Breathwork, die dich durch die Woche tragen und dir helfen, bei dir anzukommen.</span><span class="en">Journaling, meditation and breathwork that carry you through the week and help you come home to yourself.</span></p></div>
     <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#7D5E68" stroke-width="1.6" stroke-linecap="round"><path d="M24 40c-9-6-14-11-14-18a8 8 0 0 1 14-5 8 8 0 0 1 14 5c0 7-5 12-14 18z"/></svg><b><span class="de">Frauen an deiner Seite</span><span class="en">Women by your side</span></b><p><span class="de">Ihr unterstützt euch gegenseitig, teilt eure Schritte und feiert jeden kleinen Erfolg miteinander.</span><span class="en">You support each other, share your steps and celebrate every small win together.</span></p></div>
     <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#7D5E68" stroke-width="1.6" stroke-linecap="round"><rect x="7" y="11" width="34" height="26" rx="5"/><circle cx="24" cy="24" r="5"/><path d="M33 16h2"/></svg><b><span class="de">Alle Aufnahmen</span><span class="en">All recordings</span></b><p><span class="de">Einen Call verpasst? Kein Problem, du findest jede Aufnahme danach in deinem Mitgliederbereich.</span><span class="en">Missed a call? No problem, you will find every recording in your members area afterwards.</span></p></div>
   </div>
@@ -258,12 +272,12 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
     <div style="position:relative">
       <p class="k"><span class="de">Deine Investition</span><span class="en">Your investment</span></p>
       <h2 style="margin-top:.6rem"><span class="de">Drei Monate <em style="color:var(--peach)">für dich</em></span><span class="en">Three months <em style="color:var(--peach)">for you</em></span></h2>
-      <p class="note"><span class="de">Dabei sind die wöchentlichen Live-Calls, 26 Bewegungsvideos, alle Workbooks, alle Aufnahmen und drei Monate Mindful Movement Method. Unfold startet nur zweimal im Jahr und es gibt höchstens 10 Plätze, damit jede Frau wirklich gesehen wird.</span><span class="en">Included are the weekly live calls, 26 movement videos, all workbooks, all recordings and three months of the Mindful Movement Method. Unfold only starts twice a year and there are no more than 10 spots, so every woman is truly seen.</span></p>
-      <p class="gp"><b><span class="de">Info-Gathering · 30 Minuten · kostenlos</span><span class="en">Info Gathering · 30 minutes · free</span></b><span class="de">Vor dem Start erzähle ich dir live alles über Unfold und beantworte deine Fragen. Nur dort gibt es Unfold zum Gathering-Preis von <?= $eur($c['g_u_once']) ?>.</span><span class="en">Before the start I'll tell you everything about Unfold live and answer your questions. Only there you get Unfold for the Gathering price of <?= $eur($c['g_u_once']) ?>.</span></p>
+      <p class="note"><span class="de">Dabei sind die wöchentlichen Live-Calls, 26 Bewegungsvideos, alle Workbooks, alle Aufnahmen und deine Rituale für Journaling, Meditation und Breathwork. Unfold startet nur zweimal im Jahr und es gibt höchstens 10 Plätze, damit jede Frau wirklich gesehen wird.</span><span class="en">Included are the weekly live calls, 26 movement videos, all workbooks, all recordings and your rituals for journaling, meditation and breathwork. Unfold only starts twice a year and there are no more than 10 spots, so every woman is truly seen.</span></p>
+      <p class="gp"><b><span class="de">Info-Gathering · 30 Minuten · kostenlos</span><span class="en">Info Gathering · 30 minutes · free</span></b><span class="de">Vor dem Start erzähle ich dir live alles über Unfold und beantworte deine Fragen.</span><span class="en">Before the start I'll tell you everything about Unfold live and answer your questions.</span></p>
     </div>
     <div style="position:relative">
       <p class="amt"><?= $eur($c['u_once']) ?></p>
-      <div class="row" style="margin-top:.8rem"><span><span class="de">einmalig</span><span class="en">one payment</span></span><span><?= $eur($c['u_once']) ?></span></div>
+      <div class="row" style="margin-top:.8rem"><span><span class="de">auf einmal</span><span class="en">in full</span> <em class="tag"><span class="de">beliebteste Wahl</span><span class="en">most popular</span></em></span><span><?= $eur($c['u_once']) ?></span></div>
       <div class="row"><span><span class="de">oder in <?= (int)$c['u_n'] ?> Raten</span><span class="en">or <?= (int)$c['u_n'] ?> instalments</span></span><span><?= (int)$c['u_n'] ?> × <?= $eur($c['u_inst']) ?></span></div>
       <div class="row"><span><span class="de">Erster Live-Call</span><span class="en">First live call</span></span><span><span class="de"><?= $stDe ?></span><span class="en"><?= $stEn ?></span></span></div>
       <a class="btn light" href="#buchen" style="margin-top:1.2rem"><span class="de">Platz sichern</span><span class="en">Book my spot</span> →</a>
@@ -287,15 +301,27 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
       <label class="f"><span class="de">Vor- und Nachname</span><span class="en">Full name</span><input type="text" name="name" autocomplete="name" required maxlength="80"></label>
       <label class="f">E-Mail<input type="email" name="email" autocomplete="email" required maxlength="160"></label>
       <fieldset class="opt"><legend><span class="de">Zahlung</span><span class="en">Payment</span></legend>
-        <label class="pick"><input type="radio" name="plan" value="u1" checked><span><b><?= $eur($c['u_once']) ?></b> <span class="de">auf einmal</span><span class="en">in full</span></span></label>
-        <label class="pick"><input type="radio" name="plan" value="u3"><span><b><?= (int)$c['u_n'] ?> × <?= $eur($c['u_inst']) ?></b> <span class="de">monatlich</span><span class="en">monthly</span></span></label>
+        <?php $instTotal = (int)$c['u_n'] * (int)$c['u_inst']; $save = $instTotal - (int)$c['u_once']; ?>
+        <div class="plans">
+          <label class="plan best"><input type="radio" name="plan" value="u1" checked><span class="badge"><span class="de">Beliebteste Wahl</span><span class="en">Most popular</span></span>
+            <span class="pt"><span class="de">Auf einmal</span><span class="en">Pay in full</span></span>
+            <span class="pa"><?= $eur($c['u_once']) ?></span>
+            <span class="ps"><?= $save > 0 ? '<span class="de">Du sparst ' . $eur($save) . '</span><span class="en">You save ' . $eur($save) . '</span>' : '<span class="de">einmalig</span><span class="en">one payment</span>' ?></span></label>
+          <label class="plan"><input type="radio" name="plan" value="u3">
+            <span class="pt"><span class="de">In <?= (int)$c['u_n'] ?> Raten</span><span class="en"><?= (int)$c['u_n'] ?> instalments</span></span>
+            <span class="pa"><?= (int)$c['u_n'] ?> × <?= $eur($c['u_inst']) ?></span>
+            <span class="ps"><span class="de">monatlich · gesamt <?= $eur($instTotal) ?></span><span class="en">monthly · <?= $eur($instTotal) ?> in total</span></span></label>
+        </div>
       </fieldset>
       <fieldset class="opt"><legend><span class="de">Dein Live-Call</span><span class="en">Your live call</span></legend>
         <label class="pick"><input type="radio" name="call_lang" value="de"><span><b>Deutsch</b> · <?= forma_h($c['u_call_de']) ?></span></label>
         <label class="pick"><input type="radio" name="call_lang" value="en"><span><b>English</b> · <?= forma_h($c['u_call_en']) ?></span></label>
       </fieldset>
-      <label class="chk"><input type="checkbox" name="live" value="1" required><span><span class="de">Ich möchte, dass Unfold am <?= $stDe ?> für mich beginnt, auch wenn meine Rücktrittsfrist dann noch bis <?= $wuDe ?> läuft. Mir ist klar: Trete ich nach dem Start zurück, zahle ich nur den Teil, der bis dahin genutzt wurde.</span><span class="en">I would like Unfold to begin for me on <?= $stEn ?>, even though my withdrawal period then still runs until <?= $wuEn ?>. I understand that if I withdraw after the start, I pay only for the part already used.</span> <a href="/terms/#unfold" target="_blank">AGB &amp; Rücktritt / Terms</a></span></label>
-      <label class="chk"><input type="checkbox" name="digital" value="1"><span><span class="de">Optional: Bitte schalte am <?= $stDe ?> gleich die ganze Videobibliothek mit Downloads frei. Mir ist bewusst, dass ich mit der Freischaltung mein Rücktrittsrecht für diese digitalen Inhalte verliere. Ohne Häkchen starte ich mit dem Ankommen-Modul, der Rest der Bibliothek öffnet sich nach meiner Rücktrittsfrist.</span><span class="en">Optional: please unlock the whole video library with downloads on <?= $stEn ?>. I understand that I lose my right of withdrawal for this digital content once it is unlocked. Without this tick, I start with the welcome module and the rest of the library opens after my withdrawal period.</span></span></label>
+      <fieldset class="opt"><legend><span class="de">Dein Rücktrittsrecht</span><span class="en">Your right of withdrawal</span></legend>
+        <label class="pick wr"><input type="radio" name="wr" value="verzicht"><span><b><span class="de">Gleich alles nutzen</span><span class="en">Use everything right away</span></b><small><span class="de">Ich verzichte auf mein Rücktrittsrecht.</span><span class="en">I waive my right of withdrawal.</span></small></span></label>
+        <label class="pick wr"><input type="radio" name="wr" value="behalten"><span><b><span class="de">Rücktrittsrecht behalten</span><span class="en">Keep my right of withdrawal</span></b><small><span class="de">bis <?= $wuDe ?>, die Workbooks öffnen sich danach.</span><span class="en">until <?= $wuEn ?>, the workbooks open after that.</span></small></span></label>
+        <p class="mut" style="margin:.2rem 0 0;font-size:.84rem"><span class="de">Alle Details stehen in den</span><span class="en">All details are in the</span> <a href="/terms/#unfold" target="_blank"><span class="de">Bedingungen</span><span class="en">terms</span></a>.</p>
+      </fieldset>
       <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div><button class="btn" type="submit" id="bb"><span class="de">Weiter zur Zahlung</span><span class="en">Continue to payment</span> →</button></div>
       <p class="err" id="be" hidden></p>
@@ -310,7 +336,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
     <div>
       <p class="k"><span class="de">Info-Gathering · kostenlos</span><span class="en">Info Gathering · free</span></p>
       <h2 style="margin-top:.6rem"><span class="de">Erst mal <em>reinspüren</em></span><span class="en">Get a <em>feel</em> first</span></h2>
-      <p class="mut" style="margin-top:.8rem"><span class="de">Trag dich ein und bestätige deine E-Mail-Adresse. Dann schicke ich dir alle Infos und den Termin für das 30-minütige Info-Gathering vor dem Start. Nur dort gibt es Unfold für <?= $eur($c['g_u_once']) ?>.</span><span class="en">Leave your details and confirm your email. I'll send you all the details and the date of the 30-minute Info Gathering before the start. Only there you get Unfold for <?= $eur($c['g_u_once']) ?>.</span></p>
+      <p class="mut" style="margin-top:.8rem"><span class="de">Trag dich ein und bestätige deine E-Mail-Adresse. Dann schicke ich dir alle Infos und den Termin für das 30-minütige Info-Gathering vor dem Start.</span><span class="en">Leave your details and confirm your email. I'll send you all the details and the date of the 30-minute Info Gathering before the start.</span></p>
     </div>
     <form id="jf" novalidate>
       <label class="f"><span class="de">Vorname</span><span class="en">First name</span><input type="text" name="name" autocomplete="given-name" required maxlength="80"></label>
@@ -341,7 +367,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
   <details class="q"><summary><span class="de">Wie viel Zeit brauche ich pro Woche?</span><span class="en">How much time do I need per week?</span></summary><p><span class="de">Rechne mit etwa zwei Stunden: der Live-Call, ein Impuls-Video und ein wenig Zeit mit deinem Workbook. Die zwei Bewegungsvideos pro Woche machst du, wann es dir passt.</span><span class="en">Plan for about two hours: the live call, a short talk video and some time with your workbook. You do the two weekly movement videos whenever it suits you.</span></p></details>
   <details class="q"><summary><span class="de">Was ist, wenn ich einen Call verpasse?</span><span class="en">What if I miss a call?</span></summary><p><span class="de">Jeder Call wird aufgenommen und steht danach in deinem Mitgliederbereich. Du kannst auch einmal in die andere Sprachgruppe wechseln.</span><span class="en">Every call is recorded and waits for you in your members area. You can also join the other language group now and then.</span></p></details>
   <details class="q"><summary><span class="de">Muss ich sportlich sein?</span><span class="en">Do I need to be fit?</span></summary><p><span class="de">Überhaupt nicht. Die Bewegung ist sanft und achtsam, ganz ohne Leistungsdruck. Du machst nur, was sich für dich gut anfühlt.</span><span class="en">Not at all. The movement is gentle and mindful, without any pressure to perform. You only do what feels good to you.</span></p></details>
-  <details class="q"><summary><span class="de">Wann beginnt es und wann bekomme ich Zugang?</span><span class="en">When does it start and when do I get access?</span></summary><p><span class="de">Du kannst schon jetzt buchen und dir deinen Platz sichern. Dein Zugang zum Mitgliederbereich schaltet sich am <?= $stDe ?> frei, am selben Tag ist der erste Live-Call, und ab dann kommen jeden Montag und Donnerstag neue Bewegungsvideos. Dein Rücktrittsrecht beginnt erst mit dem Start und läuft bis <?= $wuDe ?>. Im kostenlosen 30-minütigen Info-Gathering kostet Unfold <?= $eur($c['g_u_once']) ?> statt <?= $eur($c['u_once']) ?>.</span><span class="en">You can book now and save your spot. Your access to the members area unlocks on <?= $stEn ?>, the first live call is that same day, and from then on new movement videos arrive every Monday and Thursday. Your right of withdrawal only begins with the start and runs until <?= $wuEn ?>. In the free 30-minute Info Gathering, Unfold is <?= $eur($c['g_u_once']) ?> instead of <?= $eur($c['u_once']) ?>.</span></p></details>
+  <details class="q"><summary><span class="de">Wann beginnt es und wann bekomme ich Zugang?</span><span class="en">When does it start and when do I get access?</span></summary><p><span class="de">Du kannst schon jetzt buchen und dir deinen Platz sichern. Dein Zugang zum Mitgliederbereich schaltet sich am <?= $stDe ?> frei, am selben Tag ist der erste Live-Call, und ab dann kommen jeden Montag und Donnerstag neue Bewegungsvideos. Dein Rücktrittsrecht beginnt erst mit dem Start und läuft bis <?= $wuDe ?>.</span><span class="en">You can book now and save your spot. Your access to the members area unlocks on <?= $stEn ?>, the first live call is that same day, and from then on new movement videos arrive every Monday and Thursday. Your right of withdrawal only begins with the start and runs until <?= $wuEn ?>.</span></p></details>
   <details class="q"><summary><span class="de">Kann ich in Raten zahlen?</span><span class="en">Can I pay in instalments?</span></summary><p><span class="de">Ja. Du zahlst entweder einmal <?= $eur($c['u_once']) ?> oder <?= (int)$c['u_n'] ?> × <?= $eur($c['u_inst']) ?>, jeweils monatlich.</span><span class="en">Yes. You pay either <?= $eur($c['u_once']) ?> at once or <?= (int)$c['u_n'] ?> monthly instalments of <?= $eur($c['u_inst']) ?>.</span></p></details>
 </div></section>
 </main>
@@ -369,8 +395,8 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
       ev.preventDefault(); be.hidden = true;
       const de = root.dataset.l === 'de';
       if (!bf.name.value.trim() || !bf.email.value.includes('@')) { be.textContent = de ? 'Bitte gib deinen Namen und deine E-Mail an.' : 'Please enter your name and email.'; be.hidden = false; return; }
-      if (!bf.live.checked) { be.textContent = de ? 'Bitte bestätige das erste Kästchen zum Beginn deines Zugangs.' : 'Please confirm the first box about the start of your access.'; be.hidden = false; return; }
-      const d = Object.fromEntries(new FormData(bf)); d.lang = root.dataset.l; d.digital = bf.digital.checked ? 1 : 0;
+      if (!bf.querySelector('input[name=wr]:checked')) { be.textContent = de ? 'Bitte wähle, ob du dein Rücktrittsrecht behältst.' : 'Please choose whether you keep your right of withdrawal.'; be.hidden = false; return; }
+      const d = Object.fromEntries(new FormData(bf)); d.lang = root.dataset.l;
       bb.disabled = true;
       try {
         const r = await fetch('/api/method.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(d)});
