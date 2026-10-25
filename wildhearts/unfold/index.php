@@ -19,14 +19,36 @@ $lang = ($_GET['lang'] ?? '') === 'en' ? 'en' : (($_GET['lang'] ?? '') === 'de' 
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Unfold · The Mindful Becoming · Movecia</title>
-<meta name="description" content="Unfold – The Mindful Becoming: 3 Monate Begleitung mit Vivien, live online, auf Deutsch und Englisch, mit wöchentlichem Live-Call und zwei Bewegungsvideos pro Woche. Start am 10. Jänner 2027.">
-<meta property="og:title" content="Unfold · The Mindful Becoming">
+<title>Unfold – 3-Monats-Begleitung für Frauen: Mindful Movement, Mental Load & Selbstwert | Movecia</title>
+<meta name="description" content="Unfold – The Mindful Becoming: dein 3-Monats-Begleiter für Mindful Movement mit Vivien Malonga. Wöchentlicher Live-Call, zwei Bewegungsvideos pro Woche (Yoga, Somatic, Bodyweight), Workbooks für Mental Load und Selbstwert. Online, Deutsch &amp; Englisch, Start 10. Jänner 2027.">
+<link rel="canonical" href="https://moveciamovement.com/unfold/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta property="og:type" content="website"><meta property="og:url" content="https://moveciamovement.com/unfold/"><meta name="twitter:card" content="summary_large_image">
+<meta property="og:title" content="Unfold – The Mindful Becoming · 3 Monate Begleitung mit Vivien">
 <meta property="og:description" content="3 months to come back to yourself and begin. Live online with Vivien, in English and German. Starts 10 January 2027.">
-<meta property="og:image" content="/img/wildhearts/og.jpg">
+<meta property="og:image" content="https://moveciamovement.com/img/movecia/og-unfold.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="theme-color" content="#F2ECE4">
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
+<?php
+$site = mm_site();
+$faq = [
+ ['Was ist Unfold?', 'Unfold – The Mindful Becoming ist eine 3-monatige Online-Begleitung für Frauen mit Vivien Malonga: jede Woche ein Live-Call mit Impulsvortrag, zwei Bewegungsvideos pro Woche (Yoga, Bodyweight, Somatic und freie Bewegung), Workbooks für Mental Load, Organisation und Selbstwert sowie Journaling, Meditation und Breathwork.'],
+ ['Wann startet Unfold?', 'Der erste Live-Call ist am ' . mv_date($st) . '. Unfold dauert 13 Wochen, es gibt höchstens ' . (int)$c['u_seats'] . ' Plätze.'],
+ ['Was kostet Unfold?', $eur($c['u_once']) . ' auf einmal oder ' . (int)$c['u_n'] . ' × ' . $eur($c['u_inst']) . '. Im kostenlosen Info-Gathering vor dem Start gibt es Unfold für ' . $eur($c['g_u_once']) . '.'],
+ ['Muss ich sportlich sein?', 'Nein. Die Bewegung ist sanft und achtsam, jede Übung hat leichtere Varianten und es gibt eigene Videos für müde Tage.'],
+ ['Gibt es Unfold auf Englisch?', 'Ja. Es gibt immer einen Live-Call auf Deutsch und einen auf Englisch, die Videos gibt es in beiden Sprachen.'],
+];
+$ld = [
+ ['@context' => 'https://schema.org', '@type' => 'Course', '@id' => $site . '/unfold/#course', 'name' => 'Unfold – The Mindful Becoming', 'description' => '3-Monats-Begleitung für Frauen: Mindful Movement, Live-Calls mit Impulsvortrag, Workbooks für Mental Load und Selbstwert, Journaling, Meditation und Breathwork.',
+  'provider' => ['@type' => 'Organization', 'name' => 'Movecia', 'sameAs' => $site . '/'], 'inLanguage' => ['de', 'en'], 'image' => $site . '/img/movecia/og-unfold.jpg',
+  'offers' => [['@type' => 'Offer', 'category' => 'Paid', 'price' => number_format($c['u_once'] / 100, 2, '.', ''), 'priceCurrency' => 'EUR', 'availability' => $free > 0 ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/SoldOut', 'url' => $site . '/unfold/#buchen']],
+  'hasCourseInstance' => [['@type' => 'CourseInstance', 'courseMode' => 'Online', 'startDate' => $c['u_start'], 'endDate' => date('Y-m-d', mv_unfold_end()), 'courseSchedule' => ['@type' => 'Schedule', 'repeatFrequency' => 'P1W', 'repeatCount' => 13], 'instructor' => ['@type' => 'Person', 'name' => 'Vivien Malonga'], 'location' => ['@type' => 'VirtualLocation', 'url' => $site . '/unfold/']]]],
+ ['@context' => 'https://schema.org', '@type' => 'FAQPage', 'mainEntity' => array_map(fn($q) => ['@type' => 'Question', 'name' => $q[0], 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $q[1]]], $faq)],
+ ['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => [['@type' => 'ListItem', 'position' => 1, 'name' => 'Movecia', 'item' => $site . '/'], ['@type' => 'ListItem', 'position' => 2, 'name' => 'Unfold', 'item' => $site . '/unfold/']]],
+];
+foreach ($ld as $j) echo '<script type="application/ld+json">' . json_encode($j, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "</script>\n";
+?>
 <style>
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:normal;src:url(/fonts/CormorantGaramond-VF.woff) format("woff")}
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(/fonts/CormorantGaramond-Italic-VF.woff) format("woff")}
@@ -40,7 +62,7 @@ html[data-l=de] .en,html[data-l=en] .de{display:none!important}
 .w{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
 .in{max-width:1440px;margin:0 auto}
 h1,h2,h3{font-family:var(--serif);font-weight:500;line-height:1.05;margin:0;letter-spacing:-.01em}
-h1{font-size:clamp(3.2rem,9vw,7rem)}h2{font-size:clamp(2.2rem,5vw,3.6rem)}h3{font-size:1.6rem}
+h1{font-size:clamp(3.2rem,9vw,7rem);letter-spacing:.01em}h2{font-size:clamp(2.2rem,5vw,3.6rem)}h3{font-size:1.6rem}
 em{font-style:italic;color:var(--plum)}
 p{margin:0}
 .k{font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;color:var(--plum);font-weight:500}

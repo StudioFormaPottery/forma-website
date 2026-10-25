@@ -11,7 +11,11 @@ $c = mv_cfg();
 $eu = fn(int $x) => '€ ' . ($x % 100 ? number_format($x / 100, 2, ',', '.') : number_format($x / 100, 0, ',', '.'));
 $launch = mv_launch();
 $pre = !mv_launched();
-mvl_head('Movecia Mindful Movement Method · On demand', 'Die Movecia Mindful Movement Method: deine Videobibliothek mit Flows, Somatic Movement, Breathwork und Meditation, jeden Monat ein neues Programm mit Workbook. Auf Deutsch und Englisch.', mm_site() . '/method/');
+$site = mm_site();
+$prod = ['@context' => 'https://schema.org', '@type' => 'Product', 'name' => 'Movecia Mindful Movement Method', 'brand' => ['@type' => 'Brand', 'name' => 'Movecia'], 'image' => $site . '/img/movecia/og-method.jpg',
+    'description' => 'On-Demand-Mitgliedschaft mit Videos für Mindful Movement, Yoga-Flows, Somatic Movement, Breathwork und Meditation, jeden Monat ein neues Programm mit Workbook. Auf Deutsch und Englisch.',
+    'offers' => array_map(fn($k, $n) => ['@type' => 'Offer', 'name' => $n, 'price' => number_format($c[$k] / 100, 2, '.', ''), 'priceCurrency' => 'EUR', 'availability' => 'https://schema.org/InStock', 'url' => $site . '/method/#buchen'], ['m1', 'm3', 'm12'], ['Monatlich', '3 Monate', '1 Jahr'])];
+mvl_head('Mindful Movement Method · Online Yoga, Somatic Movement & Breathwork on demand | Movecia', 'Online-Mitgliedschaft mit Vivien Malonga: Yoga-Flows, Somatic Movement, Breathwork und Meditation on demand, 5–30 Minuten, für volle und müde Tage. Jeden Monat ein neues Programm mit Workbook. Ab € ' . round($c['m12'] / 1200) . ' im Monat.', $site . '/method/', '/img/movecia/og-method.jpg', '', [$prod]);
 ?>
 <body>
 <?php mvl_top('method'); ?>

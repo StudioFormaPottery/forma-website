@@ -18,7 +18,15 @@ $st = mv_ts($c['u_start']);
 $uFree = mv_unfold_free($pdo);
 $g = null;
 try { mm_schema($pdo); $g = mm_next_gathering($pdo); } catch (Throwable $e) {}
-mvl_head('Movecia · Mindful Movement mit Vivien', 'Movecia ist Mindful Movement mit Vivien Malonga: Yoga, Somatic Movement, Breathwork und Meditation, online on demand, live und im Paznaun. Für Frauen, die sich in ihrem Körper wieder zu Hause fühlen wollen.', mm_site() . '/');
+$site = mm_site();
+$org = ['@context' => 'https://schema.org', '@type' => ['SportsActivityLocation', 'LocalBusiness'], '@id' => $site . '/#movecia', 'name' => 'Movecia', 'alternateName' => 'Movecia – Personal Fitness', 'url' => $site . '/', 'logo' => $site . '/img/movecia/movecia-zeichen-1024.png', 'image' => $site . '/img/movecia/og-start.jpg',
+    'description' => 'Mindful Movement, Yoga, Somatic Movement, Breathwork und Meditation mit Vivien Malonga – online on demand, live per Video und im Paznaun (Tirol).',
+    'email' => 'hello@moveciamovement.com', 'telephone' => NATAL_COMPANY['phone'], 'founder' => ['@type' => 'Person', 'name' => 'Vivien Malonga', 'jobTitle' => 'Yogalehrerin und Bewegungstrainerin'],
+    'address' => ['@type' => 'PostalAddress', 'postalCode' => '6562', 'addressLocality' => 'Mathon', 'addressRegion' => 'Tirol', 'addressCountry' => 'AT'],
+    'areaServed' => [['@type' => 'Place', 'name' => 'Paznaun'], ['@type' => 'Place', 'name' => 'Landeck'], ['@type' => 'Country', 'name' => 'Österreich'], ['@type' => 'Place', 'name' => 'Online']],
+    'knowsLanguage' => ['de', 'en'], 'priceRange' => '€€'];
+$web = ['@context' => 'https://schema.org', '@type' => 'WebSite', 'name' => 'Movecia', 'url' => $site . '/', 'inLanguage' => ['de', 'en'], 'publisher' => ['@id' => $site . '/#movecia']];
+mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malonga', 'Mindful Movement mit Vivien Malonga: Yoga, Somatic Movement, Breathwork und Meditation für Frauen. Online on demand, Unfold 3-Monats-Begleitung, Prä- & Postnatal Training und 1:1 im Paznaun, Tirol.', $site . '/', '/img/movecia/og-start.jpg', '', [$org, $web]);
 ?>
 <body>
 <?php mvl_top(); ?>

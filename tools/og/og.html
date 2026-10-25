@@ -1,0 +1,24 @@
+<!doctype html><html><head><meta charset="utf-8">
+<!-- Vorschaubilder 1200×630 für Google/Teilen (Vivien, 25.10.2026): ?p=start|unfold|method -->
+<style>
+@font-face{font-family:"Cormorant";font-weight:300 700;src:url(../../fonts/CormorantGaramond-VF.woff)}
+@font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(../../fonts/CormorantGaramond-Italic-VF.woff)}
+@font-face{font-family:"Hanken";font-weight:300 700;src:url(../../fonts/HankenGrotesk-VF.woff)}
+*{margin:0;box-sizing:border-box}body{width:1200px;height:630px;background:#F5E9DF;font-family:Hanken;color:#2E2529;position:relative;overflow:hidden}
+.ph{position:absolute;right:0;top:0;bottom:0;width:560px;background-size:cover;background-position:50% 50%}
+.ph::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#F5E9DF 0,rgba(245,233,223,0) 30%),rgba(214,160,122,.12)}
+.t{position:absolute;left:70px;top:70px;width:640px}
+.brand{display:flex;align-items:center;gap:12px;font-family:Cormorant;font-size:38px}.brand img{width:38px}.brand i{width:10px;height:10px;border-radius:50%;background:#7D5E68;display:inline-block}
+.k{margin-top:48px;font-size:20px;letter-spacing:.22em;text-transform:uppercase;color:#7D5E68}
+h1{font-family:Cormorant;font-weight:500;font-size:104px;line-height:.95;margin-top:12px;letter-spacing:.01em}
+.sub{font-family:Cormorant;font-style:italic;font-size:40px;color:#7D5E68;margin-top:8px}
+.f{margin-top:30px;display:flex;flex-wrap:wrap;gap:10px}.f span{background:#FCF6F0;border:1px solid #E6D3C4;border-radius:99px;padding:9px 18px;font-size:20px}
+</style></head><body>
+<script>
+const p=new URLSearchParams(location.search).get('p')||'start';
+const D={
+ start:['art-reach.jpg','Mindful Movement · Yoga · Somatic','Movecia','Bewegung beginnt bei dir.',['online on demand','live','Paznaun, Tirol']],
+ unfold:['reach.jpg','3 Monate Begleitung · live online','Unfold','The Mindful Becoming',['Start 10. Jänner','wöchentlicher Live-Call','2 Videos pro Woche']],
+ method:['art-fold.jpg','On demand · Deutsch & English','Mindful Movement Method','Ein paar ruhige Minuten für dich.',['ab € 20 im Monat','Breathwork','Somatic Movement']]}[p];
+document.body.innerHTML=`<div class="ph" style="background-image:url(../../img/movecia/fotos/${D[0]})"></div><div class="t"><div class="brand"><img src="../../img/movecia/movecia-zeichen-klein.svg"><span>Movecia<i></i></span></div><p class="k">${D[1]}</p><h1 style="${D[2].length>12?'font-size:80px':''}">${D[2]}</h1><p class="sub">${D[3]}</p><div class="f">${D[4].map(x=>'<span>'+x+'</span>').join('')}</div></div>`;
+</script></body></html>

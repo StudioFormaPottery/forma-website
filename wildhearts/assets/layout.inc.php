@@ -2,7 +2,7 @@
 // Gemeinsamer Rahmen für die öffentlichen Movecia-Seiten (Hauptseite, Method): Kopf mit Menü, DE/EN, Fuß.
 // Texte zweisprachig als <span class="de">/<span class="en">, Sprache aus ?lang=, sonst gemerkt (localStorage wh-lang), sonst Browser.
 
-function mvl_head(string $title, string $desc, string $canon, string $og = '/img/movecia/natal-teilen.jpg', string $extraCss = ''): void
+function mvl_head(string $title, string $desc, string $canon, string $og = '/img/movecia/og-start.jpg', string $extraCss = '', array $jsonld = []): void
 {
     $l = ($_GET['lang'] ?? '') === 'en' ? 'en' : (($_GET['lang'] ?? '') === 'de' ? 'de' : '');
     ?><!doctype html>
@@ -13,7 +13,11 @@ function mvl_head(string $title, string $desc, string $canon, string $og = '/img
 <title><?= forma_h($title) ?></title>
 <meta name="description" content="<?= forma_h($desc) ?>">
 <link rel="canonical" href="<?= forma_h($canon) ?>">
-<meta property="og:title" content="<?= forma_h($title) ?>"><meta property="og:description" content="<?= forma_h($desc) ?>"><meta property="og:image" content="<?= forma_h($og) ?>">
+<meta property="og:type" content="website"><meta property="og:url" content="<?= forma_h($canon) ?>"><meta property="og:site_name" content="Movecia"><meta property="og:locale" content="de_AT"><meta property="og:locale:alternate" content="en_GB">
+<meta property="og:title" content="<?= forma_h($title) ?>"><meta property="og:description" content="<?= forma_h($desc) ?>"><meta property="og:image" content="<?= forma_h(mm_site() . $og) ?>"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<?php foreach ($jsonld as $j): ?><script type="application/ld+json"><?= json_encode($j, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
+<?php endforeach; ?>
 <meta name="theme-color" content="#F2ECE4">
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
