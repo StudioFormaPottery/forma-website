@@ -228,7 +228,7 @@ body{background:var(--paper)}
 .head .brand span{color:#7D5E68}
 .mm-hero{position:relative;overflow:hidden;border-radius:26px;background:#4A3A41;color:#FBF5F7;padding:24px 24px 22px}
 .mm-hero::after{content:"";position:absolute;width:220px;height:220px;right:-80px;top:-90px;border-radius:58% 42% 47% 53%/52% 46% 54% 48%;background:rgba(232,214,202,.3)}
-.mm-hero h1{color:#FBF5F7;font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:34px;margin:2px 0 4px;position:relative}
+.mm-hero h1{color:#FBF5F7;font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:34px;margin:2px 0 4px;position:relative}
 .mm-hero p{position:relative;margin:0;color:#EADFDE}
 .mm-hero .eyebrow{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#E8D6CA}
 .mm-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
@@ -261,6 +261,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .qa form{margin:0}
 .qa a,.qa button{display:flex;flex-direction:column;gap:4px;width:100%;height:100%;box-sizing:border-box;text-align:left;padding:16px;border-radius:20px;border:1px solid #DDD2C6;background:#FBF8F4;color:#2E2529;text-decoration:none;font:inherit;cursor:pointer}
 .qa b{font-size:17px;font-weight:600;color:#4A3A41}
+.qa span{overflow-wrap:anywhere}
 .qa span{font-size:14px;color:#7D7076;line-height:1.35}
 .qa .ic{font-size:26px;line-height:1}
 .qa .main{background:#7D5E68;border-color:#7D5E68}.qa .main b,.qa .main span{color:#FBF5F7}
@@ -271,6 +272,8 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <?php if ($next): ?><a href="<?= forma_h($GLOBALS['mmHostLink']((int)$next['id'])) ?>" target="_blank" rel="noopener"><span class="ic">✨</span><b>Nächstes Gathering öffnen</b><span>Als Gastgeberin: <?= forma_h($next['title']) ?></span></a><?php else: ?><a href="#neu"><span class="ic">✨</span><b>Gathering anlegen</b><span>Noch keines geplant</span></a><?php endif; ?>
             <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/?demo=prae" target="_blank" rel="noopener"><span class="ic">🌿</span><b>Mitgliederbereich ansehen</b><span>So sieht ihn eine Kundin mit Paket (Beispiel Pränatal, auch <u>post</u> unter Prä- &amp; Postnatal)</span></a>
             <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/" target="_blank" rel="noopener"><span class="ic">🔑</span><b>Login für Kundinnen</b><span>moveciamovement.com/natal/mitglied – diesen Link bekommen sie auch per Mail</span></a>
+            <a href="<?= forma_h($self) ?>?view=method"><span class="ic">🌱</span><b>Method &amp; Unfold</b><span>Programme, Lektionen, Mitglieder, Unfold-Plätze, Preise</span></a>
+            <a href="<?= forma_h($self) ?>?view=method#bunny"><span class="ic">🎬</span><b>Bunny (Videos) <?= function_exists('mv_bunny_ok') && mv_bunny_ok() ? '✓' : 'verbinden' ?></b><span>Hier trägst du Library-ID, CDN Hostname, API Key und Token-Schlüssel ein</span></a>
         </div>
         <div class="mm-stats">
             <a class="mm-stat" href="#liste"><b><?= $subOk ?></b><span>auf der E-Mail-Liste<?= $subOpen ? ' · ' . $subOpen . ' noch nicht bestätigt' : '' ?></span></a>

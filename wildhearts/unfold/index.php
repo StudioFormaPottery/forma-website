@@ -124,7 +124,7 @@ section.s{padding-top:clamp(3rem,7vw,6rem);padding-bottom:0}
 @media(min-width:900px){.join{grid-template-columns:1fr 1fr;gap:3rem;align-items:center}}
 .join form{display:grid;gap:.8rem}
 .f{display:flex;flex-direction:column;gap:.35rem;font-size:.86rem;color:var(--muted)}
-input[type=text],input[type=email]{font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:1px solid transparent;border-radius:14px;padding:.8em 1em;width:100%}
+input[type=text],input[type=email]{font:inherit;font-size:1rem;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:14px;padding:.8em 1em;width:100%}
 input:focus{outline:2px solid var(--plum);outline-offset:1px}
 .chk{display:flex;gap:.6rem;align-items:flex-start;font-size:.88rem;color:var(--muted)}.chk input{margin-top:.3em;accent-color:var(--plum)}
 .hp{position:absolute;left:-9999px}

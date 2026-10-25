@@ -1781,7 +1781,7 @@ if ($view === 'gutscheine') {
         <div class="card stack links-card" id="links">
             <h2>🎟 Link für alten Gutschein</h2>
             <p class="muted small">Für Gäste mit einem alten Gutschein ohne Nummer. Du schickst ihnen einen persönlichen Link, sie suchen sich selbst einen Spin &amp; Go Termin aus und geben ihre Daten ein. Der Gutschein bekommt dabei automatisch eine Nummer, der Gast bekommt Bestätigung und Rechnung (bezahlt mit Gutschein), du eine Info-Mail. Jeder Link löst genau einen Gutschein ein und bucht einen Platz. Steht mehr auf dem Gutschein, bleibt der Rest als Guthaben mit Code erhalten. Kommt eine Freundin mit eigenem Gutschein mit, erstellst du ihr einfach einen eigenen Link.</p>
-            <p><a class="btn btn-ghost btn-sm" href="../einloesen/?t=vorschau" target="_blank" rel="noopener">👀 Vorschau: So sieht die Seite für deine Gäste aus</a></p>
+            <p><a class="btn btn-ghost btn-sm" style="white-space:normal;max-width:100%" href="../einloesen/?t=vorschau" target="_blank" rel="noopener">👀 Vorschau: So sieht die Seite für deine Gäste aus</a></p>
             <form method="post" class="stack">
                 <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="link_create">
                 <div class="row">
@@ -2481,6 +2481,7 @@ function render_page(string $title, callable $body): void
 @font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(../fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(../fonts/Outfit-Bold.woff) format("woff")}
 @font-face{font-family:"Bricolage Grotesque";font-weight:600 800;font-display:swap;src:url(../fonts/BricolageGrotesque-Bold.woff) format("woff")}
+@font-face{font-family:"Cormorant Garamond";font-weight:300 700;font-display:swap;src:url(../fonts/CormorantGaramond-VF.woff) format("woff")}
 :root{--paper:#EEE2D4;--card:#F8F1EA;--ink:#33211B;--soft:#674B40;--clay:#8C2C1D;--line:#D9C5B2;color-scheme:light}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font:18.5px/1.55 "Outfit",system-ui,sans-serif}
@@ -2568,7 +2569,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .mm-door .mm-dot{flex:0 0 48px;width:48px;height:48px;border-radius:58% 42% 47% 53%/52% 46% 54% 48%;background:#C98B78;color:#fff;display:grid;place-items:center}
 .mm-door .mm-dot svg{width:24px;height:24px}
 .mm-door small{display:block;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#E8D6CA}
-.mm-door strong{display:block;font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:26px;line-height:1.15}
+.mm-door strong{display:block;font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:26px;line-height:1.15}
 .mm-door span span,.mm-door>span:nth-child(2)>span{display:block;font-size:14.5px;color:#EADFDE}
 .mm-door .mm-arrow{margin-left:auto;font-size:22px;color:#E8D6CA}
 .agenda h2{margin-top:0}

@@ -225,6 +225,18 @@ document.getElementById('top').onclick=()=>scrollTo(0,0);document.getElementById
         $b = mv_bunny();
         $plans = mv_plans();
         $csrf = '<input type="hidden" name="csrf" value="' . forma_h(csrf()) . '">';
+        ob_start(); ?>
+        <h2 id="bunny"><?= mv_bunny_ok() ? 'Bunny Stream (Videos)' : 'Schritt 1: Bunny Stream verbinden' ?></h2>
+        <?php if (!mv_bunny_ok()): ?><p class="card" style="background:#EADFDE;border-color:#D9C5C4;font-size:15px">Hier trägst du deine Bunny-Daten ein (Library-ID, CDN Hostname, API Key und Token-Schlüssel). Erst danach kannst du bei jeder Lektion Videos hochladen. Sobald Bunny verbunden ist, rutscht dieser Bereich nach unten.</p><?php endif; ?>
+        <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_bunny_save">
+            <p class="small muted">In Bunny: Stream → deine Library „Movecia Method“ → <b>API</b>. Dort stehen Video Library ID, CDN Hostname und API Key. Den Token-Schlüssel findest du unter <b>Security</b> (dort auch „Embed view token authentication“ einschalten), dann können die Videos nur im Mitgliederbereich abgespielt werden.</p>
+            <div class="g2"><label>Video Library ID<input name="lib" value="<?= forma_h($b['lib']) ?>" inputmode="numeric"></label><label>CDN Hostname<input name="cdn" value="<?= forma_h($b['cdn']) ?>" placeholder="vz-xxxxxxxx-xxx.b-cdn.net"></label></div>
+            <div class="g2"><label>API Key<input type="password" name="key" placeholder="<?= $b['key'] !== '' ? 'gespeichert · leer lassen zum Behalten' : '' ?>" autocomplete="off"></label><label>Token Authentication Key<input type="password" name="token" placeholder="<?= $b['token'] !== '' ? 'gespeichert · leer lassen zum Behalten' : 'optional, für den Kopierschutz' ?>" autocomplete="off"></label></div>
+            <button class="btn" type="submit">Speichern und prüfen</button>
+            <?php if (mv_bunny_ok()): ?><span class="small">✓ verbunden<?= $b['token'] !== '' ? ', Kopierschutz an' : ', Kopierschutz noch aus' ?></span><?php endif; ?>
+        </form>
+        <?php if (mv_bunny_ok()): ?><form method="post" onsubmit="return confirm('Bunny trennen?')" style="margin-top:8px"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_bunny_remove"><button class="link small" type="submit">Bunny trennen</button></form><?php endif; ?>
+        <?php $bunnyHtml = ob_get_clean();
         $eu = fn(int $x) => $x ? rtrim(rtrim(number_format($x / 100, 2, ',', ''), '0'), ',') : '';
         $subs = $pdo->query("SELECT * FROM mv_subs WHERE status IN ('aktiv','beendet') OR (status = 'offen' AND created_at >= '" . date('c', time() - 86400) . "') ORDER BY id DESC LIMIT 200")->fetchAll();
         $real = array_filter($subs, fn($s) => $s['source'] !== 'test');
@@ -240,10 +252,10 @@ document.getElementById('top').onclick=()=>scrollTo(0,0);document.getElementById
 body{background:var(--paper)}h1,h2{color:#6B5658}
 .nh{position:relative;overflow:hidden;border-radius:26px;background:#4A3A41;color:#FBF5F7;padding:24px 24px 22px}
 .nh::after{content:"";position:absolute;width:220px;height:210px;right:-80px;top:-90px;border-radius:62% 38% 46% 54%/55% 45% 55% 45%;background:rgba(232,214,202,.3)}
-.nh h1{color:#FBF5F7;font-family:Georgia,serif;font-weight:400;font-size:34px;margin:2px 0 4px;position:relative}.nh p{position:relative;margin:0;color:#EADFDE}.nh .eyebrow{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#E8D6CA}
+.nh h1{color:#FBF5F7;font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:34px;margin:2px 0 4px;position:relative}.nh p{position:relative;margin:0;color:#EADFDE}.nh .eyebrow{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#E8D6CA}
 .ns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}@media(min-width:700px){.ns{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .ns a,.ns span.st{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;color:var(--ink);text-decoration:none;display:flex;flex-direction:column}
-.ns b{font-family:Georgia,serif;font-weight:400;font-size:32px;line-height:1.1;color:#7D5E68}.ns span span{font-size:14px;color:var(--soft);line-height:1.3}
+.ns b{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-variant-numeric:lining-nums;font-size:32px;line-height:1.1;color:#7D5E68}.ns a span,.ns span.st span{font-size:14px;color:var(--soft);line-height:1.3}
 .nl{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.nl a{display:inline-block;padding:7px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:#6B5658;font-size:15px}
 .btn{background:#7D5E68;border-color:#7D5E68;color:#FBF5F7}.btn-ghost{background:transparent;color:#7D5E68}.link{color:#7D5E68}
 .chip{display:inline-block;border-radius:999px;padding:1px 10px;font-size:13px;background:#EADFDE;color:#6B5658}.chip.ok{background:#7D5E68;color:#FBF5F7}.chip.wait{background:#E8D6CA}
@@ -251,7 +263,7 @@ body{background:var(--paper)}h1,h2{color:#6B5658}
 .g2{display:grid;gap:10px}@media(min-width:800px){.g2{grid-template-columns:1fr 1fr}}
 .g3{display:grid;gap:10px;grid-template-columns:repeat(3,minmax(0,1fr))}
 .prow{display:grid;gap:4px;border-top:1px solid var(--line);padding:10px 0}
-.prow a.t{font-family:Georgia,serif;font-size:21px;color:var(--ink);text-decoration:none}
+.prow a.t{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:21px;color:var(--ink);text-decoration:none}
 .vbox{border:1px dashed var(--line);border-radius:16px;padding:12px;display:grid;gap:8px}
 .vbar{height:8px;border-radius:9px;background:#EADFDE;overflow:hidden}.vbar i{display:block;height:100%;width:0;background:#7D5E68;transition:width .3s}
 textarea.script{min-height:220px;font-size:15px;line-height:1.55}
@@ -372,8 +384,9 @@ label.inl{display:flex;gap:8px;align-items:center}
             <a href="<?= forma_h($site) ?>/unfold/" target="_blank">Unfold-Seite</a>
             <a href="<?= forma_h($site) ?>/mitglieder/?demo=1" target="_blank">Mitgliederbereich (Beispiel)</a>
             <a href="<?= forma_h($site) ?>/mitglieder/" target="_blank">Login für Mitglieder</a>
-            <?php if (!mv_bunny_ok()): ?><a href="#bunny" style="background:#7D5E68;color:#FBF5F7">Bunny verbinden</a><?php endif; ?>
+            <a href="#bunny"<?= mv_bunny_ok() ? '' : ' style="background:#7D5E68;color:#FBF5F7"' ?>>⚙ Bunny (Videos)<?= mv_bunny_ok() ? ' ✓' : ' verbinden' ?></a>
         </div>
+        <?php if (!mv_bunny_ok()) echo $bunnyHtml; ?>
 
         <h2 id="programme">Programme</h2>
         <div class="card">
@@ -436,15 +449,7 @@ label.inl{display:flex;gap:8px;align-items:center}
             <button class="btn" type="submit">Speichern</button>
         </form>
 
-        <h2 id="bunny">Bunny Stream (Videos)</h2>
-        <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_bunny_save">
-            <p class="small muted">In Bunny: Stream → deine Library „Movecia Method“ → <b>API</b>. Dort stehen Video Library ID, CDN Hostname und API Key. Den Token-Schlüssel findest du unter <b>Security</b> (dort auch „Embed view token authentication“ einschalten), dann können die Videos nur im Mitgliederbereich abgespielt werden.</p>
-            <div class="g2"><label>Video Library ID<input name="lib" value="<?= forma_h($b['lib']) ?>" inputmode="numeric"></label><label>CDN Hostname<input name="cdn" value="<?= forma_h($b['cdn']) ?>" placeholder="vz-xxxxxxxx-xxx.b-cdn.net"></label></div>
-            <div class="g2"><label>API Key<input type="password" name="key" placeholder="<?= $b['key'] !== '' ? 'gespeichert · leer lassen zum Behalten' : '' ?>" autocomplete="off"></label><label>Token Authentication Key<input type="password" name="token" placeholder="<?= $b['token'] !== '' ? 'gespeichert · leer lassen zum Behalten' : 'optional, für den Kopierschutz' ?>" autocomplete="off"></label></div>
-            <button class="btn" type="submit">Speichern und prüfen</button>
-            <?php if (mv_bunny_ok()): ?><span class="small">✓ verbunden<?= $b['token'] !== '' ? ', Kopierschutz an' : ', Kopierschutz noch aus' ?></span><?php endif; ?>
-        </form>
-        <?php if (mv_bunny_ok()): ?><form method="post" onsubmit="return confirm('Bunny trennen?')" style="margin-top:8px"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_bunny_remove"><button class="link small" type="submit">Bunny trennen</button></form><?php endif; ?>
+        <?php if (mv_bunny_ok()) echo $bunnyHtml; ?>
 <?php endif;
     });
     exit;
