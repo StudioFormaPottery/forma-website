@@ -1,0 +1,26 @@
+{
+  "id": "/?movecia-app",
+  "name": "Movecia · Mindful Movement",
+  "short_name": "Movecia",
+  "description": "Mindful Movement mit Vivien: Method on demand, Unfold, Prä- & Postnatal Training, Gatherings und dein Mitgliederbereich.",
+  "lang": "de-AT",
+  "dir": "ltr",
+  "start_url": "/?app=1",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2ECE4",
+  "theme_color": "#F2ECE4",
+  "categories": ["health", "fitness", "lifestyle"],
+  "icons": [
+    { "src": "/img/movecia/movecia-app-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/img/movecia/movecia-app-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/img/movecia/movecia-app-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Mitgliederbereich", "short_name": "Login", "url": "/mitglieder/", "icons": [{ "src": "/img/movecia/movecia-app-192.png", "sizes": "192x192" }] },
+    { "name": "Method", "url": "/method/", "icons": [{ "src": "/img/movecia/movecia-app-192.png", "sizes": "192x192" }] },
+    { "name": "Unfold", "url": "/unfold/", "icons": [{ "src": "/img/movecia/movecia-app-192.png", "sizes": "192x192" }] },
+    { "name": "Prä- & Postnatal", "url": "/natal/", "icons": [{ "src": "/img/movecia/movecia-app-192.png", "sizes": "192x192" }] }
+  ]
+}

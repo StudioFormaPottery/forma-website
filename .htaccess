@@ -21,6 +21,13 @@ RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^([a-f0-9]{32})\.txt$ wildhearts/$1.txt [L]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^(google[0-9a-f]+\.html)$ wildhearts/$1 [L]
+# moveciamovement.com als Web-App (Vivien, 25.10.2026): eigenes Manifest und eigener Service Worker
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^app\.webmanifest$ wildhearts/app/manifest.webmanifest [L]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^sw\.js$ wildhearts/app/sw.js [L]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^app/?$ /?install=1 [R=302,L]
 # moveciamovement.com: Hauptseite Movecia (seit 25.10.2026), Link in Bio unter /links
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^$ wildhearts/start/ [L]

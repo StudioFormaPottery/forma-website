@@ -24,6 +24,7 @@ $mail = $h(MM_FROM_EMAIL);
 <meta name="description" content="Terms, cancellation policy and right of withdrawal for Movecia: prenatal and postnatal training, retreat and free gatherings.">
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
+<link rel="manifest" href="/app.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movecia"><meta name="apple-mobile-web-app-status-bar-style" content="default"><script src="/wildhearts/assets/app.js?v=1" defer></script>
 <style>
 @font-face{font-family:"Italiana";font-display:swap;src:url(/fonts/Italiana-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}

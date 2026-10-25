@@ -49,6 +49,7 @@ function mv_menu(string $active = '', array $o = []): void
   </nav>
   <div class="mvm-foot">
     <a class="mvm-login" href="/mitglieder/"><span class="de">Login Mitgliederbereich</span><span class="en">Log in to members area</span></a>
+    <a class="mvm-app" href="/?install=1" data-mv-app><img src="/img/movecia/movecia-app-192.png" alt="" width="34" height="34"><span><b><span class="de">Movecia als App</span><span class="en">Movecia as an app</span></b><small><span class="de">Aufs Handy holen, ohne App Store</span><span class="en">Add it to your phone, no app store</span></small></span></a>
     <?php if ($lang): ?><div class="mvm-lang" role="group" aria-label="Sprache / Language"><button type="button" data-mvm-l="de">Deutsch</button><button type="button" data-mvm-l="en">English</button></div><?php endif; ?>
     <a class="mvm-mail" href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a>
   </div>
@@ -78,6 +79,11 @@ html:not([data-l=en]):not([lang=en]) .mvm .en,html:not([data-l=en]):not([lang=en
 .mvm-list a:active{background:#FBF8F4}
 .mvm-foot{margin-top:auto;padding-top:24px;display:flex;flex-direction:column;gap:14px;align-items:flex-start}
 .mvm-login{display:inline-flex;align-items:center;justify-content:center;width:100%;background:#7D5E68;color:#FBF5F7;border-radius:999px;padding:.9em 1.4em;text-decoration:none;font-weight:500}
+.mvm-app{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:10px 14px;border:1px solid #DDD2C6;border-radius:18px;background:#FBF8F4;color:#2E2529;text-decoration:none}
+.mvm-app img{border-radius:9px;flex:0 0 34px}
+.mvm-app b{display:block;font-weight:500;font-size:.98rem}
+.mvm-app small{display:block;font-size:.82rem;color:#7D7076}
+.mv-standalone .mvm-app{display:none}
 .mvm-lang{display:flex;background:#FBF8F4;border:1px solid #DDD2C6;border-radius:999px;padding:3px}
 .mvm-lang button{font:inherit;font-size:.9rem;border:0;background:none;border-radius:999px;padding:.4em 1em;cursor:pointer;color:#7D7076}
 .mvm-lang button[aria-pressed=true]{background:#7D5E68;color:#FBF5F7}
