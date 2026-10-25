@@ -209,6 +209,7 @@ function mv_schema(PDO $pdo): void
     if (!in_array('open_mailed', $sc, true)) $pdo->exec('ALTER TABLE mv_subs ADD COLUMN open_mailed INTEGER NOT NULL DEFAULT 0');
     // Google-Bewertung nach dem Ende von Unfold (Vivien, 25.10.2026)
     if (!in_array('review_sent', $sc, true)) $pdo->exec('ALTER TABLE mv_subs ADD COLUMN review_sent INTEGER NOT NULL DEFAULT 0');
+    mv_scripts_sync($pdo);
 }
 
 // --- Konten ---------------------------------------------------------------------------------------
@@ -854,6 +855,7 @@ function mv_seed(PDO $pdo): void
         [$d, 'Abendmeditation: Rückzug', 'Evening meditation: retreat', 'Den Tag ablegen und weich werden.', 'Putting the day down and softening.', 'meditation', 'tired', 15],
     ] as $i => $x) $l->execute([...$x, $i, $now]);
     mv_seed_unfold($pdo);
+    mv_scripts_sync($pdo, true);
 }
 
 /** Unfold: drei Monate mit je einem Programm, darin die 26 Bewegungsvideos aus dem Filmplan (api/seed/unfold-videos.json). */
@@ -872,6 +874,32 @@ function mv_seed_unfold(PDO $pdo): void
     }
     $l = $pdo->prepare('INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, unlock, script_de, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)');
     foreach ($j['videos'] as $i => $v) $l->execute([$ids[$v['month']], $v['title_de'], $v['title_en'], $v['text_de'], $v['text_en'], $v['cat'], $v['energy'], $v['minutes'], $i, $v['unlock'], $v['script_de'], $now]);
+}
+
+/**
+ * Sprechtexte (Voice-over/Talking Head) DE + EN für alle Unfold- und Method-Lektionen (Vivien, 25.10.2026:
+ * Storytelling statt Übungslisten, echte Übungsnamen). Quelle api/seed/lesson-scripts.json, Schlüssel = title_de.
+ * Überschreibt nur leere Texte oder das alte Übungsgerüst aus dem Filmplan, nie eigene Änderungen.
+ */
+function mv_scripts_sync(PDO $pdo, bool $force = false): void
+{
+    $ver = 1;
+    $c = mm_cfg('scripts') ?? [];
+    if (!$force && (int)($c['v'] ?? 0) >= $ver) return;
+    $map = json_decode((string)@file_get_contents(__DIR__ . '/seed/lesson-scripts.json'), true) ?: [];
+    $old = [];
+    $seed = json_decode((string)@file_get_contents(__DIR__ . '/seed/unfold-videos.json'), true) ?: [];
+    foreach ($seed['videos'] ?? [] as $v) $old[$v['title_de']] = trim((string)$v['script_de']);
+    $u = $pdo->prepare('UPDATE mv_lessons SET script_de = ?, script_en = ? WHERE id = ?');
+    foreach ($pdo->query('SELECT id, title_de, script_de, script_en FROM mv_lessons')->fetchAll() as $l) {
+        $t = $map[$l['title_de']] ?? null;
+        if (!$t) continue;
+        $de = trim((string)$l['script_de']);
+        $newDe = ($de === '' || $de === ($old[$l['title_de']] ?? " ")) ? $t['de'] : (string)$l['script_de'];
+        $newEn = trim((string)$l['script_en']) === '' ? $t['en'] : (string)$l['script_en'];
+        if ($newDe !== $l['script_de'] || $newEn !== $l['script_en']) $u->execute([$newDe, $newEn, $l['id']]);
+    }
+    if ((int)$pdo->query('SELECT COUNT(*) FROM mv_lessons')->fetchColumn() > 0) { $c['v'] = $ver; mm_save_cfg('scripts', $c); }
 }
 
 function mv_today(): string
