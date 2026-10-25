@@ -44,27 +44,9 @@ body.m2{background:#4A3A41;color:#FBF5F7}
 .pil span{display:inline-grid;place-items:center;width:52px;height:52px;border-radius:50%;background:#E8D6CA;font-family:Cormorant,serif;font-size:30px}
 .price{display:flex;align-items:baseline;gap:22px;margin-top:36px;font-family:Cormorant,serif}
 .price b{font-size:110px;font-weight:400;line-height:1}.price span{font-family:Hanken;font-size:30px;color:#7D7076}
+.m1 h1{font-size:150px}.story.m1 h1{font-size:180px}.m1 .ph{bottom:auto;height:40%;background-position:50% 35%}.m1 .ph::after{background:linear-gradient(180deg,rgba(242,236,228,0) 70%,#F2ECE4 100%)}.story.m1 .ph{height:50%}
 .m3 .price{margin-bottom:30px}
-@font-face{font-family:"Hand";src:url(../../fonts/HomemadeApple-Regular.woff) format("woff")}
-body.m1{background:radial-gradient(70% 55% at 85% 12%,#F3DCD3 0,transparent 70%),radial-gradient(60% 50% at 0% 100%,#EFDCCF 0,transparent 70%),#F7EFE8}
-.m1 .arch{position:absolute;right:84px;top:175px;width:430px;height:570px;border-radius:240px 240px 34px 34px;overflow:hidden;border:14px solid #FFFBF7;box-shadow:0 40px 70px -40px rgba(125,94,104,.6);background:#EBD5CF}
-.m1 .arch img{width:100%;height:100%;object-fit:cover;object-position:42% 50%}
-.m1 .sticker{position:absolute;right:40px;top:200px;width:176px;height:176px;border-radius:50%;background:#7D5E68;color:#FBF5F7;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(9deg);box-shadow:0 20px 34px -18px rgba(74,58,65,.7);text-align:center;line-height:1.05;font-size:26px}
-.m1 .sticker small{font-size:18px;letter-spacing:.18em;text-transform:uppercase;color:#E8D6CA}.m1 .sticker b{font-family:Cormorant,serif;font-weight:500;font-size:74px;line-height:.95}
-.m1 .note{position:absolute;right:70px;top:850px;font-family:Hand,cursive;font-size:25px;color:#7D5E68;background:#FFFBF7;border-radius:22px;padding:18px 28px;transform:rotate(-5deg);box-shadow:0 16px 30px -18px rgba(74,58,65,.55)}
-.m1 .txt{position:absolute;left:84px;width:480px;top:250px}
-.m1 .hi{font-family:Hand,cursive;font-size:29px;white-space:nowrap;color:#7D5E68;transform:rotate(-2deg);transform-origin:left}
-.m1 h1{font-size:150px;margin-top:6px}
-.m1 .lead{font-size:31px;margin-top:16px}.m1 .facts{margin-top:26px;gap:10px}.m1 .facts span{font-size:24px;padding:10px 20px}
-.m1 .facts span{background:#FFFBF7;border-color:#EADFDE}
-.m1 .foot{position:absolute;left:84px;right:84px;bottom:80px}
-.m1 .blob.b1{width:300px;height:280px;left:-90px;top:240px;background:#EADFDE}
-.m1 .spark{position:absolute;fill:#7D5E68;opacity:.5}
-.story.m1 .arch{right:auto;left:50%;margin-left:-270px;top:300px;width:540px;height:690px}
-.story.m1 .sticker{top:330px;right:110px}
-.story.m1 .note{top:920px;right:auto;left:110px}
-.story.m1 .txt{left:90px;right:90px;width:auto;top:1045px;text-align:center}.story.m1 .hi{font-size:34px}.story.m1 h1{font-size:180px}.story.m1 .hi{transform-origin:center}.story.m1 .facts{justify-content:center}
-.story.m1 .foot{left:90px;right:90px;bottom:240px}
+.m1 .foot{margin-top:70px}
 .story h1{font-size:210px}.story .q{font-size:108px}.story .pil{grid-template-columns:1fr;gap:16px}.story .pil div{padding:26px 30px}
 </style></head>
 <body>
@@ -76,16 +58,12 @@ const brand=`<div class="top"><div class="brand"><img src="../../img/movecia/mov
 const foot=`<div class="foot"><div class="url">${T('Jetzt buchen','Book now')}<b>moveciamovement.com/unfold</b></div><span class="btn">${T('Link in Bio','Link in bio')} →</span></div>`;
 let h='';
 if(m==='1'){
- const spark=(x,y,w,c)=>`<svg class="spark" style="left:${x}px;top:${y}px;width:${w}px;fill:${c||'#7D5E68'}" viewBox="0 0 24 24"><path d="M12 2c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7z"/></svg>`;
- h=`<span class="blob b1"></span>${spark(140,330,40)}${spark(560,190,26,'#C9A2A9')}${spark(f==='story'?900:620,f==='story'?1040:1040,30,'#C9A2A9')}
- <div class="wrap" style="padding-bottom:0">${brand.replace(T('Nur 10 Plätze','Only 10 spots'),T('Kleine Runde · 10 Plätze','Small circle · 10 spots'))}</div>
- <div class="arch"><img src="../../img/movecia/fotos/reach-warm.jpg"></div>
- <div class="sticker"><small>${T('Start','Starts')}</small><b>10.</b>${T('Jänner','January')}</div>
- <p class="note">${T('komm, wir fangen gemeinsam an ♡','come, let’s begin together ♡')}</p>
- <div class="txt"><p class="hi">${T('für dich, mit ganz viel Herz','for you, with all my heart')}</p><h1>Unfold</h1><p class="sub">The Mindful Becoming</p>
+ h=`<div class="ph" style="background-image:url(../../img/movecia/fotos/art-reach.jpg)"></div><div class="wrap">${brand}
+ <div style="margin-top:auto"><p class="k">${T('3 Monate Begleitung · live online','3 months of guidance · live online')}</p>
+ <h1>Unfold</h1><p class="sub">The Mindful Becoming</p>
  <p class="lead">${T('Dein 3-Monats-Begleiter für Mindful Movement. Denn Bewegung beginnt bei dir.','Your 3-month companion for mindful movement. Because movement begins with you.')}</p>
- <div class="facts"><span>${T('wöchentlicher Live-Call','weekly live call')}</span><span>${T('2 Videos pro Woche','2 videos a week')}</span><span>Deutsch &amp; English</span></div></div>
- ${foot}`;
+ <div class="facts"><span>${T('Start 10. Jänner','Starts 10 January')}</span><span>${T('wöchentlicher Live-Call','weekly live call')}</span><span>${T('2 Videos pro Woche','2 videos a week')}</span><span>Deutsch &amp; English</span></div></div>
+ <div style="height:50px"></div>${foot}</div>`;
 }
 if(m==='2'){
  h=`<span class="blob" style="width:520px;height:480px;right:-160px;top:-120px;background:rgba(232,214,202,.12)"></span><div class="wrap">${brand.replace('movecia-zeichen-klein','movecia-zeichen-hell')}

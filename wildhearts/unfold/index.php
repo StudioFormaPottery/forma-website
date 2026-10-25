@@ -58,7 +58,6 @@ a{color:var(--plum)}
 /* Hero */
 .hero{display:grid;gap:2rem;align-items:center;padding-top:clamp(1rem,4vw,3rem);padding-bottom:clamp(2rem,6vw,5rem)}
 @media(min-width:960px){.hero{grid-template-columns:1.15fr .85fr;gap:4rem}}
-.hello-hand{font-family:"Hand",cursive;color:var(--plum);font-size:1.15rem;margin-top:1rem;transform:rotate(-2deg);transform-origin:left}
 .hero .sub{font-family:var(--serif);font-style:italic;font-size:clamp(1.6rem,3.6vw,2.6rem);color:var(--plum);margin-top:.2rem}
 .hero .lead{font-size:1.1em;max-width:34em;margin-top:1.4rem}
 .facts{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.6rem}
@@ -66,7 +65,7 @@ a{color:var(--plum)}
 .cta{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.8rem}
 .pic{position:relative;aspect-ratio:4/5;border-radius:220px 220px var(--r) var(--r);overflow:hidden;background:var(--peach)}
 .pic img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.92)}
-.pic-old-stamp{position:absolute;left:14px;bottom:14px;right:14px;background:rgba(251,248,244,.92);backdrop-filter:blur(6px);border-radius:18px;padding:.9rem 1.1rem;font-family:var(--serif);font-size:1.25rem;line-height:1.25}
+.pic .stamp{position:absolute;left:14px;bottom:14px;right:14px;background:rgba(251,248,244,.92);backdrop-filter:blur(6px);border-radius:18px;padding:.9rem 1.1rem;font-family:var(--serif);font-size:1.25rem;line-height:1.25}
 .pic .stamp small{display:block;font-family:var(--sans);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--plum);margin-bottom:.25rem}
 .blob{position:absolute;border-radius:62% 38% 46% 54%/55% 45% 55% 45%;pointer-events:none}
 /* Bereiche */
@@ -106,21 +105,6 @@ input[type=text],input[type=email]{font:inherit;font-size:1rem;color:var(--ink);
 input:focus{outline:2px solid var(--plum);outline-offset:1px}
 .chk{display:flex;gap:.6rem;align-items:flex-start;font-size:.88rem;color:var(--muted)}.chk input{margin-top:.3em;accent-color:var(--plum)}
 .hp{position:absolute;left:-9999px}
-@font-face{font-family:"Hand";src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
-.cover{position:relative;padding:10px 6px 60px;max-width:560px;justify-self:center;width:100%}
-.cover .pic{position:relative;background:linear-gradient(160deg,#F6E6DB,#EBD5CF);box-shadow:0 30px 60px -36px rgba(125,94,104,.55);border:10px solid #FBF8F4}
-.cover .pic img{filter:none;object-position:45% 50%}
-.cover .sticker{position:absolute;right:-6px;top:30px;width:118px;height:118px;border-radius:50%;background:var(--plum);color:var(--on);display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(8deg);box-shadow:0 14px 26px -14px rgba(74,58,65,.6);font-size:.85rem;line-height:1.1;text-align:center}
-.cover .sticker small{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--peach)}
-.cover .sticker b{font-family:var(--serif);font-weight:500;font-size:2.6rem;line-height:1}
-.cover .note-hand{position:absolute;left:-4px;bottom:68px;font-family:"Hand",cursive;font-size:1.05rem;color:var(--plum);background:#FBF8F4;padding:.5rem 1rem;border-radius:14px;transform:rotate(-4deg);box-shadow:0 10px 20px -14px rgba(74,58,65,.5)}
-.cover .stamp{position:absolute;left:16%;right:6%;bottom:0;background:#FBF8F4;border-radius:18px;padding:.8rem 1.1rem;font-family:var(--serif);font-size:1.2rem;line-height:1.25;box-shadow:0 14px 26px -18px rgba(74,58,65,.45)}
-.cover .stamp small{display:block;font-family:var(--sans);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--plum);margin-bottom:.2rem}
-.spark{position:absolute;fill:var(--plum);opacity:.55;animation:tw 4s ease-in-out infinite}
-.spark.s1{width:26px;left:6%;top:12%}.spark.s2{width:18px;right:22%;top:-4px;animation-delay:1.6s;fill:#C9A2A9}
-@keyframes tw{50%{transform:scale(.7) rotate(20deg);opacity:.25}}
-@media(prefers-reduced-motion:reduce){.spark{animation:none}}
-@media(max-width:599px){.cover .sticker{width:92px;height:92px;right:0}.cover .sticker b{font-size:2rem}.cover .note-hand{font-size:.85rem}}
 .ps{display:grid;gap:14px}@media(min-width:960px){.ps{grid-template-columns:1fr 1fr}}
 .pb{background:var(--card);border-radius:var(--r);padding:clamp(1.4rem,3vw,2.4rem)}.pb .who{margin-top:1.2rem}.pb .who li{background:var(--bg)}
 .sol{background:var(--deep);color:var(--on);border-radius:var(--r);padding:clamp(1.4rem,3vw,2.4rem)}.sol .k{color:var(--peach)}.sol h2{color:var(--on)}.sol em{color:var(--peach)}.sol p{color:#E3D6DA;margin-top:1rem}
@@ -166,22 +150,16 @@ footer a{color:var(--muted)}
 <section class="w"><div class="in hero">
   <div>
     <p class="k"><span class="de">3 Monate Begleitung · live online</span><span class="en">3 months of guidance · live online</span></p>
-    <p class="hello-hand"><span class="de">für dich, mit ganz viel Herz</span><span class="en">for you, with all my heart</span></p>
-    <h1 style="margin-top:.2rem">Unfold</h1>
+    <h1 style="margin-top:.8rem">Unfold</h1>
     <p class="sub">The Mindful Becoming</p>
     <p class="lead"><span class="de">Für dich, wenn du spürst, dass mehr in dir steckt, und einfach nicht weißt, wo du anfangen sollst. Drei Monate, in denen du zu dir zurückfindest, deinen Wert wieder spürst und Schritt für Schritt ins Tun kommst. In deinem Tempo und mit Frauen an deiner Seite, denen es genauso geht.</span><span class="en">For you, if you can feel there is more inside you and simply don't know where to begin. Three months to come back to yourself, feel your worth again and step by step start doing what matters to you. At your own pace, with women by your side who feel the same.</span></p>
     <div class="facts"><span><span class="de">Start <?= $stDe ?></span><span class="en">Starts <?= $stEn ?></span></span><span><span class="de">13 Wochen</span><span class="en">13 weeks</span></span><span><span class="de">wöchentlicher Live-Call</span><span class="en">weekly live call</span></span><span><span class="de">2 Bewegungsvideos pro Woche</span><span class="en">2 movement videos a week</span></span><span><span class="de">max. <?= (int)$c['u_seats'] ?> Plätze</span><span class="en">max. <?= (int)$c['u_seats'] ?> spots</span></span><span>Deutsch &amp; English</span></div>
     <div class="cta"><a class="btn" href="#buchen"><?= $open ? '<span class="de">Platz sichern</span><span class="en">Book my spot</span>' : '<span class="de">Auf die Warteliste</span><span class="en">Join the waitlist</span>' ?> →</a><a class="btn line" href="#inhalt"><span class="de">Was dich erwartet</span><span class="en">What's inside</span></a></div>
   </div>
-  <div class="cover">
-    <span class="blob" style="width:230px;height:210px;background:var(--blush);left:-40px;top:-24px"></span>
-    <span class="blob" style="width:150px;height:140px;background:var(--peach);right:-26px;bottom:90px"></span>
-    <svg class="spark s1" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7z"/></svg>
-    <svg class="spark s2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7z"/></svg>
-    <div class="pic"><img src="/img/movecia/fotos/reach-warm.jpg" alt="Vivien in einer sanften Seitstreckung auf der Matte"></div>
-    <div class="sticker"><small><span class="de">Start</span><span class="en">Starts</span></small><b><?= (int)date('j', $st) ?>.</b><span class="de">Jänner</span><span class="en">January</span></div>
-    <p class="note-hand"><span class="de">komm, wir fangen gemeinsam an ♡</span><span class="en">come, let’s begin together ♡</span></p>
-    <p class="stamp"><small><span class="de">Kleine Runde</span><span class="en">Small circle</span></small><span class="de">13 Wochen · höchstens <?= (int)$c['u_seats'] ?> Frauen</span><span class="en">13 weeks · no more than <?= (int)$c['u_seats'] ?> women</span></p>
+  <div style="position:relative">
+    <span class="blob" style="width:200px;height:190px;background:var(--blush);left:-50px;top:-30px"></span>
+    <div class="pic"><img src="/img/wildhearts/cover.jpg" alt="Vivien sitzt ruhig am Fenster">
+      <p class="stamp"><small><span class="de">Nur zweimal im Jahr</span><span class="en">Only twice a year</span></small><span class="de">Jänner bis April · höchstens <?= (int)$c['u_seats'] ?> Plätze</span><span class="en">January to April · max. <?= (int)$c['u_seats'] ?> spots</span></p></div>
   </div>
 </div></section>
 
