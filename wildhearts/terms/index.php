@@ -5,6 +5,8 @@
 // Rücktrittsfunktion nach § 13a FAGG (ab 1.10.2026): moveciamovement.com/withdraw
 declare(strict_types=1);
 require dirname(__DIR__, 2) . '/api/natal-lib.php';
+require_once dirname(__DIR__, 2) . '/api/method-lib.php';
+$mvc = mv_cfg();
 header('Cache-Control: no-cache');
 $o = mm_offers();
 $eur = fn(int $c) => '€ ' . ($c % 100 === 0 ? number_format($c / 100, 0, ',', '.') : number_format($c / 100, 2, ',', '.'));
@@ -77,12 +79,33 @@ a{color:var(--wine)}
     <p class="small"><span class="en">Payments are processed securely by Stripe. After every booking you receive a confirmation and your invoice by email. All prices include 20 % VAT.</span><span class="de">Zahlungen laufen sicher über Stripe. Nach jeder Buchung bekommst du eine Bestätigung und deine Rechnung per E-Mail. Alle Preise inklusive 20 % USt.</span></p>
   </div>
   <nav class="nav">
+    <a href="#method">Method</a>
+    <a href="#unfold">Unfold</a>
     <a href="#natal"><span class="en">Prenatal &amp; postnatal</span><span class="de">Prä- &amp; Postnatal</span></a>
     <a href="#retreat">Retreat</a>
     <a href="#free"><span class="en">Free offers</span><span class="de">Kostenlos</span></a>
     <a href="#withdrawal"><span class="en">Right of withdrawal</span><span class="de">Rücktrittsrecht</span></a>
     <a class="go" href="/withdraw"><span class="en">Withdraw from the contract</span><span class="de">Vertrag widerrufen</span></a>
   </nav>
+
+  <h2 id="method"><span class="en">Movecia Mindful Movement Method (on demand)</span><span class="de">Movecia Mindful Movement Method (on demand)</span></h2>
+  <p><span class="price"><span class="en">monthly</span><span class="de">monatlich</span> <?= $eur($mvc['m1']) ?></span><span class="price"><span class="en">3 months</span><span class="de">3 Monate</span> <?= $eur($mvc['m3']) ?></span><span class="price"><span class="en">1 year</span><span class="de">1 Jahr</span> <?= $eur($mvc['m12']) ?></span></p>
+  <ul>
+    <li><span class="en">A membership with access to the online video library and the monthly programmes with workbooks, in English and German. The contract is concluded when you complete your payment via Stripe.</span><span class="de">Eine Mitgliedschaft mit Zugang zur Online-Videobibliothek und den Monatsprogrammen mit Workbooks, auf Deutsch und Englisch. Der Vertrag kommt mit deiner Zahlung über Stripe zustande.</span></li>
+    <li><span class="en">The membership renews automatically for the period you chose (one month, three months or one year). You can cancel at any time to the end of the paid period, directly in your members area or by email. Nothing is charged after that.</span><span class="de">Die Mitgliedschaft verlängert sich automatisch um den gewählten Zeitraum (ein Monat, drei Monate oder ein Jahr). Du kannst jederzeit zum Ende des bezahlten Zeitraums kündigen, direkt im Mitgliederbereich oder per E-Mail. Danach wird nichts mehr abgebucht.</span></li>
+    <li><span class="en">If you book before the opening day (<?= mv_date(mv_launch(), 'en') ?>), your card is saved and your first payment is taken on the opening day.</span><span class="de">Buchst du vor dem Start (<?= mv_date(mv_launch()) ?>), wird deine Karte hinterlegt und die erste Zahlung am Starttag eingezogen.</span></li>
+    <li><span class="en">A Gathering price applies only to the first payment and only while it is shown in the live Gathering; after that the regular price applies.</span><span class="de">Ein Gathering-Preis gilt nur für die erste Zahlung und nur, solange er im Live-Gathering eingeblendet ist, danach gilt der reguläre Preis.</span></li>
+    <li><span class="en">Withdrawal for digital content, see <a href="#digital">below</a>.</span><span class="de">Rücktritt bei digitalen Inhalten, siehe <a href="#digital">unten</a>.</span></li>
+  </ul>
+
+  <h2 id="unfold">Unfold – The Mindful Becoming</h2>
+  <p><span class="price"><span class="en">in full</span><span class="de">auf einmal</span> <?= $eur($mvc['u_once']) ?></span><span class="price"><?= (int)$mvc['u_n'] ?> × <?= $eur($mvc['u_inst']) ?></span><span class="price"><span class="en">Info Gathering price</span><span class="de">Info-Gathering-Preis</span> <?= $eur($mvc['g_u_once']) ?></span></p>
+  <ul>
+    <li><span class="en">13 weeks of online guidance from <?= mv_date(mv_ts($mvc['u_start']), 'en') ?> to <?= mv_date(mv_unfold_end(), 'en') ?>: a weekly live video call (one group in German, one in English), two on-demand movement videos per week, workbooks and the Mindful Movement Method until the end. No more than <?= (int)$mvc['u_seats'] ?> participants.</span><span class="de">13 Wochen Online-Begleitung von <?= mv_date(mv_ts($mvc['u_start'])) ?> bis <?= mv_date(mv_unfold_end()) ?>: ein wöchentlicher Live-Videocall (eine Gruppe auf Deutsch, eine auf Englisch), zwei On-Demand-Bewegungsvideos pro Woche, Workbooks und die Mindful Movement Method bis zum Ende. Höchstens <?= (int)$mvc['u_seats'] ?> Teilnehmerinnen.</span></li>
+    <li><span class="en">You pay either in full or in <?= (int)$mvc['u_n'] ?> monthly instalments. The instalments are owed for the fixed term even if you stop taking part.</span><span class="de">Du zahlst auf einmal oder in <?= (int)$mvc['u_n'] ?> monatlichen Raten. Die Raten bleiben für die feste Laufzeit geschuldet, auch wenn du nicht mehr teilnimmst.</span></li>
+    <li><span class="en">Missed calls are recorded and available in your members area. The live calls are coaching and movement guidance, not therapy or medical treatment.</span><span class="de">Verpasste Calls werden aufgenommen und stehen in deinem Mitgliederbereich. Die Live-Calls sind Begleitung und Bewegungsanleitung, keine Therapie und keine medizinische Behandlung.</span></li>
+    <li><span class="en">You have a 14-day right of withdrawal, see <a href="#withdrawal">below</a>. If you asked for the start right away and withdraw within 14 days, you pay only for the part already used.</span><span class="de">Du hast ein 14-tägiges Rücktrittsrecht, siehe <a href="#withdrawal">unten</a>. Wolltest du den sofortigen Beginn und trittst innerhalb von 14 Tagen zurück, zahlst du nur den Teil, der bis dahin genutzt wurde.</span></li>
+  </ul>
 
   <h2 id="natal"><span class="en">Prenatal &amp; postnatal training</span><span class="de">Prä- &amp; Postnatal Training</span></h2>
   <p class="plabel"><span class="en">In the studio in Mathon</span><span class="de">Im Studio in Mathon</span></p>

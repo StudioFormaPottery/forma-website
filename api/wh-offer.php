@@ -51,6 +51,8 @@ if ($act === 'get') {
         $c = $pdo->prepare("SELECT COUNT(*) AS n, COALESCE(SUM(amount_cents),0) AS sum FROM mm_orders WHERE scope = ? AND status = 'bezahlt'");
         $c->execute([$scope]);
         $r['booked'] = $c->fetch();
+        // Method/Unfold-Käufe aus diesem Raum (eigenes Mitgliedersystem)
+        try { require_once __DIR__ . '/method-lib.php'; mv_schema($pdo); $m = $pdo->prepare("SELECT COUNT(*) AS n, COALESCE(SUM(first_cents),0) AS sum FROM mv_subs WHERE source = ? AND status = 'aktiv'"); $m->execute([$scope]); $mm = $m->fetch(); $r['booked'] = ['n' => (int)$r['booked']['n'] + (int)$mm['n'], 'sum' => (int)$r['booked']['sum'] + (int)$mm['sum']]; } catch (Throwable $e) { error_log('MV booked: ' . $e->getMessage()); }
         $qs = $pdo->prepare('SELECT id, text, name, source, status, created_at FROM mm_questions WHERE scope = ? ORDER BY id DESC LIMIT 60');
         $qs->execute([$scope]);
         $r['questions'] = array_map(fn($q) => $q + ['label' => mm_q_label($q)], $qs->fetchAll());

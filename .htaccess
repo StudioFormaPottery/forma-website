@@ -21,9 +21,9 @@ RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^([a-f0-9]{32})\.txt$ wildhearts/$1.txt [L]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^(google[0-9a-f]+\.html)$ wildhearts/$1 [L]
-# moveciamovement.com zeigt auf der Startseite den Wild Hearts Collective (Adresse bleibt stehen)
+# moveciamovement.com: Hauptseite Movecia (seit 25.10.2026), Link in Bio unter /links
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
-RewriteRule ^$ wildhearts/ [L]
+RewriteRule ^$ wildhearts/start/ [L]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^reset/?$ wildhearts/reset/ [L]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]

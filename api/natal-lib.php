@@ -790,7 +790,7 @@ function natal_invoice_pdf(array $inv): string
     $pdf->SetXY(18, $y); $pdf->MultiCell(174, 4.8, $t($paid), 0, 'L');
     $pdf->SetTextColor(...$sage); $pdf->SetFont('Inter', 'B', 11); $pdf->SetX(18); $pdf->Cell(174, 9, $t('Vielen Dank!'), 0, 1);
     $pdf->SetTextColor(...$soft); $pdf->SetFont('Inter', '', 7.8); $pdf->SetX(18);
-    $pdf->MultiCell(174, 4, $t('Leistungszeitraum laut Terminvereinbarung. Sofern nicht gesondert angegeben, entspricht das Leistungsdatum dem Rechnungsdatum.'), 0, 'L');
+    $pdf->MultiCell(174, 4, $t(str_starts_with((string)($inv['kind'] ?? ''), 'mv_') ? 'Leistungszeitraum wie bei der Leistung angegeben.' : 'Leistungszeitraum laut Terminvereinbarung. Sofern nicht gesondert angegeben, entspricht das Leistungsdatum dem Rechnungsdatum.'), 0, 'L');
 
     // Fußzeile: drei Spalten
     $fy = 258;

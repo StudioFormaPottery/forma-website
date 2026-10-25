@@ -100,12 +100,13 @@ if ($action === 'mm_mv_lesson_save') {
         'visible' => !empty($_POST['visible']) ? 1 : 0,
         'script_de' => mb_substr((string)($_POST['script_de'] ?? ''), 0, 30000),
         'script_en' => mb_substr((string)($_POST['script_en'] ?? ''), 0, 30000),
+        'unlock' => preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST['unlock'] ?? '')) ? (string)$_POST['unlock'] : '',
     ];
     if ($f['title_de'] === '' || !mv_program($pdo, $pid)) go($vBack . '&p=' . $pid, 'Bitte gib einen Titel ein.');
     if ($id) {
-        $pdo->prepare('UPDATE mv_lessons SET program_id=?, title_de=?, title_en=?, text_de=?, text_en=?, cat=?, energy=?, minutes=?, sort=?, visible=?, script_de=?, script_en=? WHERE id=?')->execute([...array_values($f), $id]);
+        $pdo->prepare('UPDATE mv_lessons SET program_id=?, title_de=?, title_en=?, text_de=?, text_en=?, cat=?, energy=?, minutes=?, sort=?, visible=?, script_de=?, script_en=?, unlock=? WHERE id=?')->execute([...array_values($f), $id]);
     } else {
-        $pdo->prepare('INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, visible, script_de, script_en, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)')->execute([...array_values($f), date('c')]);
+        $pdo->prepare('INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, visible, script_de, script_en, unlock, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)')->execute([...array_values($f), date('c')]);
         $id = (int)$pdo->lastInsertId();
     }
     go($vBack . '&l=' . $id, 'Gespeichert.');
@@ -261,7 +262,7 @@ label.inl{display:flex;gap:8px;align-items:center}
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
 
 <?php if ($lEdit || $newLessonFor):
-        $l = $lEdit ?: ['id' => 0, 'program_id' => $newLessonFor['id'], 'title_de' => '', 'title_en' => '', 'text_de' => '', 'text_en' => '', 'cat' => 'flow', 'energy' => 'any', 'minutes' => 15, 'sort' => count(mv_lessons($pdo, (int)$newLessonFor['id'])), 'visible' => 1, 'video_de' => '', 'video_en' => '', 'script_de' => '', 'script_en' => ''];
+        $l = $lEdit ?: ['id' => 0, 'program_id' => $newLessonFor['id'], 'title_de' => '', 'title_en' => '', 'text_de' => '', 'text_en' => '', 'cat' => 'flow', 'energy' => 'any', 'minutes' => 15, 'sort' => count(mv_lessons($pdo, (int)$newLessonFor['id'])), 'visible' => 1, 'video_de' => '', 'video_en' => '', 'script_de' => '', 'script_en' => '', 'unlock' => ''];
         $p = mv_program($pdo, (int)$l['program_id']); ?>
         <h1><?= $l['id'] ? forma_h($l['title_de']) : 'Neue Lektion' ?></h1>
         <p class="muted">in <a href="<?= forma_h($self) ?>?view=method&amp;p=<?= (int)$p['id'] ?>"><?= forma_h($p['title_de']) ?></a></p>
@@ -292,7 +293,7 @@ label.inl{display:flex;gap:8px;align-items:center}
             <div class="g2"><label>Titel (Deutsch)<input name="title_de" value="<?= forma_h($l['title_de']) ?>" required></label><label>Titel (Englisch)<input name="title_en" value="<?= forma_h($l['title_en']) ?>"></label></div>
             <div class="g2"><label>Kurzbeschreibung (Deutsch)<textarea name="text_de" rows="3"><?= forma_h($l['text_de']) ?></textarea></label><label>Kurzbeschreibung (Englisch)<textarea name="text_en" rows="3"><?= forma_h($l['text_en']) ?></textarea></label></div>
             <div class="g3"><label>Art<select name="cat"><?= $catOpt($l['cat']) ?></select></label><label>Energie<select name="energy"><?= $enOpt($l['energy']) ?></select></label><label>Minuten<input name="minutes" type="number" min="0" max="240" value="<?= (int)$l['minutes'] ?>"></label></div>
-            <div class="g2"><label>Reihenfolge<input name="sort" type="number" value="<?= (int)$l['sort'] ?>"></label><label class="inl"><input type="checkbox" name="visible" value="1" <?= $l['visible'] ? 'checked' : '' ?>> sichtbar für Mitglieder</label></div>
+            <div class="g3"><label>Reihenfolge<input name="sort" type="number" value="<?= (int)$l['sort'] ?>"></label><label>Erscheint am <span class="small muted">(leer = mit dem Programm)</span><input type="date" name="unlock" value="<?= forma_h((string)$l['unlock']) ?>"></label><label class="inl"><input type="checkbox" name="visible" value="1" <?= $l['visible'] ? 'checked' : '' ?>> sichtbar für Mitglieder</label></div>
             <details class="more" <?= ($l['script_de'] . $l['script_en']) !== '' ? 'open' : '' ?>><summary>Sprechtext für Voice-over / Teleprompter</summary>
                 <p class="small muted">Zeitmarken wie „0:45“ am Zeilenanfang werden im Teleprompter hervorgehoben, [Hinweise in eckigen Klammern] erscheinen klein.</p>
                 <div class="g2"><label>Deutsch<textarea class="script" name="script_de"><?= forma_h($l['script_de']) ?></textarea></label><label>Englisch<textarea class="script" name="script_en"><?= forma_h($l['script_en']) ?></textarea></label></div>
@@ -333,7 +334,7 @@ label.inl{display:flex;gap:8px;align-items:center}
         <h2>Lektionen</h2>
         <div class="card">
             <?php if (!$ls): ?><p class="muted small">Noch keine Lektion.</p><?php endif; ?>
-            <?php foreach ($ls as $l): ?><div class="ln"><span><a href="<?= forma_h($self) ?>?view=method&amp;l=<?= (int)$l['id'] ?>"><strong><?= forma_h($l['title_de']) ?></strong></a><br><span class="small muted"><?= forma_h(MV_CATS[$l['cat']][0] ?? '') ?> · <?= (int)$l['minutes'] ?> Min. · <?= forma_h(MV_ENERGY[$l['energy']][0] ?? '') ?><?= $l['visible'] ? '' : ' · ausgeblendet' ?></span></span>
+            <?php foreach ($ls as $l): ?><div class="ln"><span><a href="<?= forma_h($self) ?>?view=method&amp;l=<?= (int)$l['id'] ?>"><strong><?= forma_h($l['title_de']) ?></strong></a><br><span class="small muted"><?= $l['unlock'] !== '' ? 'ab ' . date('d.m.', strtotime($l['unlock'])) . ' · ' : '' ?><?= forma_h(MV_CATS[$l['cat']][0] ?? '') ?> · <?= (int)$l['minutes'] ?> Min. · <?= forma_h(MV_ENERGY[$l['energy']][0] ?? '') ?><?= $l['visible'] ? '' : ' · ausgeblendet' ?></span></span>
                 <span class="acts"><span class="chip <?= $l['video_de'] ? 'ok' : '' ?>">DE <?= $l['video_de'] ? '✓' : '–' ?></span><span class="chip <?= $l['video_en'] ? 'ok' : '' ?>">EN <?= $l['video_en'] ? '✓' : '–' ?></span></span></div><?php endforeach; ?>
             <p style="margin-top:10px"><a class="btn btn-sm" href="<?= forma_h($self) ?>?view=method&amp;neu=<?= (int)$p['id'] ?>">+ Lektion</a></p>
         </div>

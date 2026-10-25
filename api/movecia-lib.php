@@ -503,37 +503,36 @@ function mm_notify_interest(array $sub, string $source): void
 /** Unfold-Infomail nach der Bestätigung (DE/EN): was es ist, Preise, Info-Gathering, Reset-Routine als kleines Geschenk. */
 function mm_mail_unfold_info(array $sub): bool
 {
+    require_once __DIR__ . '/method-lib.php';
+    $c = mv_cfg();
     $de = ($sub['lang'] ?? 'en') === 'de';
     $first = forma_first_name($sub['name']);
-    $page = mm_site() . '/unfold/?lang=' . ($de ? 'de' : 'en');
+    $page = mm_site() . '/unfold/?lang=' . ($de ? 'de' : 'en') . '#buchen';
     $out = mm_site() . '/api/wh-unsubscribe.php?t=' . $sub['token'];
+    $st = mv_date(mv_ts($c['u_start']), $de ? 'de' : 'en');
+    $eu = fn(int $x) => '€ ' . number_format($x / 100, 0, ',', '.');
     $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#7D5E68;';
     $img = '<img src="' . mm_site() . '/img/wildhearts/cover.jpg" width="500" alt="" style="display:block;width:100%;max-width:500px;height:auto;max-height:340px;object-fit:cover;border-radius:16px;margin:0 0 20px;">';
-    $li = fn(array $xs) => '<ul style="margin:10px 0 0;padding-left:20px;">' . implode('', array_map(fn($x) => '<li style="margin:4px 0;">' . $x . '</li>', $xs)) . '</ul>';
-    if ($de) {
-        $items = ['Ein Live-Call pro Woche in kleiner Runde, immer ein Termin auf Deutsch und einer auf Englisch', 'Jeden Monat ein Workbook zu Mindset, Selbstwert und deinen Ideen, mit Journaling-Fragen', 'Kurze Impuls-Videos von mir', 'Drei Monate Zugang zur Movecia Mindful Movement Method: sanfte Flows, Breathwork, Somatic Movement, Meditation', 'Alle Aufnahmen, falls du einmal nicht live dabei sein kannst'];
-        $text = "Hey $first,\n\nschön, dass du dabei bist! Hier sind alle Infos zu Unfold – The Mindful Becoming, noch bevor ich es offiziell poste.\n\nUnfold ist eine Begleitung über drei Monate für Frauen, die ins Tun kommen wollen, aber nicht wissen, wo sie anfangen sollen. Wir starten am 1. Februar 2027.\n\nFebruar · Wurzeln: ankommen und Raum schaffen\nMärz · Knospen: Selbstwert und Ideen\nApril · Entfalten: ins Tun kommen\n\nDabei:\n– " . implode("\n– ", $items) . "\n\nEs gibt höchstens 10 Plätze.\nPreis: € 450 auf einmal oder 3 × € 160.\nVor dem Start gibt es ein kostenloses Info-Gathering (30 Minuten). Nur dort bekommst du Unfold für € 390. Den Termin schicke ich dir rechtzeitig.\n\nAlle Details: $page\n\nAlles Liebe, Viv\n\nAbmelden: $out";
-        $html = $img . '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
-            . '<p style="margin:14px 0 0;">schön, dass du dabei bist! Hier sind alle Infos zu <strong>Unfold – The Mindful Becoming</strong>, noch bevor ich es offiziell poste.</p>'
-            . '<p style="margin:14px 0 0;">Unfold ist eine Begleitung über drei Monate für Frauen, die ins Tun kommen wollen, aber nicht wissen, wo sie anfangen sollen. Wir starten am <strong>1. Februar 2027</strong>.</p>'
-            . '<p style="margin:16px 0 0;"><strong>Februar · Wurzeln</strong> ankommen und Raum schaffen<br><strong>März · Knospen</strong> Selbstwert und Ideen<br><strong>April · Entfalten</strong> ins Tun kommen</p>'
-            . '<p style="margin:16px 0 0;">Das ist dabei:</p>' . $li($items)
-            . '<p style="margin:16px 0 0;background:#F2ECE4;border-radius:14px;padding:14px 16px;">Höchstens <strong>10 Plätze</strong>.<br>Preis: <strong>€ 450</strong> auf einmal oder 3 × € 160.<br>Vor dem Start gibt es ein kostenloses <strong>Info-Gathering</strong> (30 Minuten). Nur dort bekommst du Unfold für <strong>€ 390</strong>. Den Termin schicke ich dir rechtzeitig.</p>'
-            . mm_button($page, 'Alle Details ansehen')
-            . '<p style="margin:22px 0 0;font-size:12px;color:#7D7076;">Du bekommst diese E-Mail, weil du dich auf moveciamovement.com eingetragen hast. <a href="' . forma_h($out) . '" style="color:#7D7076;">Abmelden</a></p>';
-        return mm_mail($sub['email'], 'Unfold – The Mindful Becoming: alle Infos für dich 🌿', $text, mm_mail_html('Unfold · The Mindful Becoming', $html, 'de'));
-    }
-    $items = ['One live call per week in a small circle, always one call in English and one in German', 'A monthly workbook for mindset, self-worth and your ideas, with journaling prompts', 'Short talk videos from me', 'Three months of the Movecia Mindful Movement Method: gentle flows, breathwork, somatic movement, meditation', 'All recordings, in case you can\'t join live'];
-    $text = "Hey $first,\n\nso lovely to have you! Here is everything about Unfold – The Mindful Becoming, before I officially share it.\n\nUnfold is a three-month journey for women who are ready to begin but don't know where to start. We start on 1 February 2027.\n\nFebruary · Roots: arrive and make space\nMarch · Buds: self-worth and ideas\nApril · Unfold: begin\n\nIncluded:\n– " . implode("\n– ", $items) . "\n\nThere are no more than 10 spots.\nPrice: € 450 at once or 3 × € 160.\nBefore the start there is a free Info Gathering (30 minutes). Only there you get Unfold for € 390. I'll send you the date in good time.\n\nAll details: $page\n\nWith love, Viv\n\nUnsubscribe: $out";
+    $li = fn(array $xs) => '<ul style="margin:10px 0 0;padding-left:20px;">' . implode('', array_map(fn($x) => '<li style="margin:4px 0;">' . forma_h($x) . '</li>', $xs)) . '</ul>';
+    $L = fn(string $d, string $e) => $de ? $d : $e;
+    $intro = $L("Unfold ist dein 3-Monats-Begleiter für Mindful Movement, denn Bewegung beginnt bei dir. Wir bewegen uns gemeinsam, ich gebe dir jede Woche einen Impuls zu einem Thema, das dich wirklich beschäftigt, und Schritt für Schritt wird es leichter. Der erste Live-Call ist am $st.",
+        "Unfold is your 3-month companion for mindful movement, because movement begins with you. We move together, every week I give you a talk on a topic that really matters to you, and step by step it gets lighter. The first live call is on $st.");
+    $chap = $L("Woche 1–4 · Wurzeln: Mental Load, Erschöpfung verstehen, Organisation\nWoche 5–8 · Knospen: Grenzen, Selbstwert, innere Kritikerin, Ideen\nWoche 9–13 · Entfalten: Klarheit, Gewohnheiten, Mut, feiern",
+        "Weeks 1–4 · Roots: mental load, understanding exhaustion, organisation\nWeeks 5–8 · Buds: boundaries, self-worth, inner critic, ideas\nWeeks 9–13 · Unfold: clarity, habits, courage, celebrating");
+    $items = $de ? ['Jede Woche ein Live-Call mit Impulsvortrag in kleiner Runde (Deutsch oder Englisch)', 'Zwei Bewegungsvideos pro Woche: Yoga, Bodyweight, Somatic und freie Bewegung', 'Workbooks für deine Mental Health: Mental Load, Organisation, Selbstwert, Journaling', 'Meditation und Breathwork als kleine Rituale für den Alltag', 'Die ganze Mindful Movement Method und alle Aufnahmen']
+        : ['A weekly live call with a short talk in a small circle (English or German)', 'Two movement videos a week: yoga, bodyweight, somatic and free movement', 'Workbooks for your mental health: mental load, organisation, self-worth, journaling', 'Meditation and breathwork as small everyday rituals', 'The whole Mindful Movement Method and all recordings'];
+    $price = $L('Höchstens ' . $c['u_seats'] . ' Plätze, ab sofort buchbar. Preis: ' . $eu($c['u_once']) . ' auf einmal oder ' . $c['u_n'] . ' × ' . $eu($c['u_inst']) . '. Im kostenlosen Info-Gathering (30 Minuten) vor dem Start gibt es Unfold für ' . $eu($c['g_u_once']) . ', den Termin schicke ich dir rechtzeitig.',
+        'No more than ' . $c['u_seats'] . ' spots, bookable now. Price: ' . $eu($c['u_once']) . ' at once or ' . $c['u_n'] . ' × ' . $eu($c['u_inst']) . '. In the free Info Gathering (30 minutes) before the start you get Unfold for ' . $eu($c['g_u_once']) . ', I will send you the date in good time.');
+    $text = "Hey $first,\n\n" . $L('schön, dass du dabei bist! Hier sind alle Infos zu Unfold – The Mindful Becoming.', 'so lovely to have you! Here is everything about Unfold – The Mindful Becoming.') . "\n\n$intro\n\n$chap\n\n" . $L('Dabei:', 'Included:') . "\n– " . implode("\n– ", $items) . "\n\n$price\n\n" . $L('Platz sichern', 'Book your spot') . ": $page\n\n" . $L('Alles Liebe, Viv', 'With love, Viv') . "\n\n" . $L('Abmelden', 'Unsubscribe') . ": $out";
     $html = $img . '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
-        . '<p style="margin:14px 0 0;">so lovely to have you! Here is everything about <strong>Unfold – The Mindful Becoming</strong>, before I officially share it.</p>'
-        . '<p style="margin:14px 0 0;">Unfold is a three-month journey for women who are ready to begin but don\'t know where to start. We start on <strong>1 February 2027</strong>.</p>'
-        . '<p style="margin:16px 0 0;"><strong>February · Roots</strong> arrive and make space<br><strong>March · Buds</strong> self-worth and ideas<br><strong>April · Unfold</strong> begin</p>'
-        . '<p style="margin:16px 0 0;">What\'s included:</p>' . $li($items)
-        . '<p style="margin:16px 0 0;background:#F2ECE4;border-radius:14px;padding:14px 16px;">No more than <strong>10 spots</strong>.<br>Price: <strong>€ 450</strong> at once or 3 × € 160.<br>Before the start there is a free <strong>Info Gathering</strong> (30 minutes). Only there you get Unfold for <strong>€ 390</strong>. I\'ll send you the date in good time.</p>'
-        . mm_button($page, 'See all details')
-        . '<p style="margin:22px 0 0;font-size:12px;color:#7D7076;">You get this email because you signed up on moveciamovement.com. <a href="' . forma_h($out) . '" style="color:#7D7076;">Unsubscribe</a></p>';
-    return mm_mail($sub['email'], 'Unfold – The Mindful Becoming: everything for you 🌿', $text, mm_mail_html('Unfold · The Mindful Becoming', $html));
+        . '<p style="margin:14px 0 0;">' . $L('schön, dass du dabei bist! Hier sind alle Infos zu <strong>Unfold – The Mindful Becoming</strong>.', 'so lovely to have you! Here is everything about <strong>Unfold – The Mindful Becoming</strong>.') . '</p>'
+        . '<p style="margin:14px 0 0;">' . forma_h($intro) . '</p>'
+        . '<p style="margin:16px 0 0;">' . nl2br(forma_h($chap)) . '</p>'
+        . '<p style="margin:16px 0 0;">' . $L('Das ist dabei:', 'What\'s included:') . '</p>' . $li($items)
+        . '<p style="margin:16px 0 0;background:#F2ECE4;border-radius:14px;padding:14px 16px;">' . forma_h($price) . '</p>'
+        . mm_button($page, $L('Platz sichern', 'Book my spot'))
+        . '<p style="margin:22px 0 0;font-size:12px;color:#7D7076;">' . $L('Du bekommst diese E-Mail, weil du dich auf moveciamovement.com eingetragen hast.', 'You get this email because you signed up on moveciamovement.com.') . ' <a href="' . forma_h($out) . '" style="color:#7D7076;">' . $L('Abmelden', 'Unsubscribe') . '</a></p>';
+    return mm_mail($sub['email'], $L('Unfold – The Mindful Becoming: alle Infos für dich 🌿', 'Unfold – The Mindful Becoming: everything for you 🌿'), $text, mm_mail_html('Unfold · The Mindful Becoming', $html, $de ? 'de' : 'en'));
 }
 
 function mm_mail_welcome(array $sub): bool
@@ -610,7 +609,7 @@ function mm_page(string $hi, string $title, string $text, string $btnHref = '', 
 
 // --- Angebote am Ende eines Gatherings (Inner Circle, Jahreskreis, Alpine Retreat) ----------
 
-const MM_OFFER_KEYS = ['circle', 'year', 'retreat'];
+const MM_OFFER_KEYS = ['method', 'unfold', 'circle', 'year', 'retreat'];
 
 function mm_offer_schema(PDO $pdo): void
 {
@@ -674,7 +673,11 @@ function mm_offer_schema(PDO $pdo): void
 /** Die drei Angebote mit Viv's Einstellungen (Titel, Text auf Englisch, regulärer Preis, Zahlungsart). */
 function mm_offers(): array
 {
+    require_once __DIR__ . '/method-lib.php';
+    $mc = mv_cfg();
     $def = [
+        'method' => ['price' => $mc['m1'], 'special' => $mc['g_m1'], 'title' => 'Movecia Mindful Movement Method', 'billing' => 'monthly', 'intro' => 1, 'text' => 'Your on-demand library: gentle flows, somatic movement, breathwork, meditation and a new programme with workbook every month. In English and German.'],
+        'unfold' => ['price' => $mc['u_once'], 'special' => $mc['g_u_once'], 'plans' => [[$mc['u_n'], $mc['u_inst'], 0]], 'title' => 'Unfold – The Mindful Becoming', 'billing' => 'once', 'text' => '13 weeks for you: a weekly live call, two movement videos a week, workbooks and the whole Method. Starts ' . mv_date(mv_ts($mc['u_start']), 'en') . '.'],
         'circle' => ['price' => 3900, 'special' => 2900, 'periods' => [[6, 17400], [12, 31200]], 'title' => 'The Inner Circle', 'billing' => 'monthly', 'text' => 'Your monthly circle: live gatherings, breathwork, gentle movement and a members area with rituals and affirmations. A space where women support each other and come back to themselves.'],
         'year' => ['price' => 240000, 'special' => 199000, 'plans' => [[3, 80000, 66400], [6, 40000, 33200]], 'title' => 'The Year Circle', 'billing' => 'once', 'text' => 'Twelve months together: The Inner Circle plus 1:1 mentoring for the idea that is close to your heart. Like a best friend who walks the whole year with you.'],
         'retreat' => ['price' => 79000, 'special' => 69000, 'title' => 'Wild Hearts Alpine Retreat', 'billing' => 'once', 'text' => 'A weekend in the Austrian Alps: yoga, Pilates, forest walks, breathwork, pottery, cooking together and a women\'s circle. Lots of quiet, lots of nature, back to you.'],
@@ -695,13 +698,14 @@ function mm_offers(): array
             'periods' => array_values(array_filter(array_map(fn($x) => [(int)($x[0] ?? 0), max(0, (int)($x[1] ?? 0))], is_array($c['periods'] ?? null) ? $c['periods'] : ($def[$k]['periods'] ?? [])), fn($x) => in_array($x[0], [6, 12], true) && $x[1] > 0)),
             'minutes' => max(5, min(180, (int)($c['minutes'] ?? 25))),
             // Inner Circle: Vorteilspreis gilt nur für die ersten Monate, Empfehlung verlängert ihn, mit Obergrenze
-            'intro_months' => max(1, (int)($c['intro_months'] ?? 3)),
+            'intro_months' => max(1, (int)($c['intro_months'] ?? ($def[$k]['intro'] ?? 3))),
             'ref_months' => max(1, (int)($c['ref_months'] ?? 3)),
             'max_months' => max(1, (int)($c['max_months'] ?? 6)),
             // Inner Circle: Start der Mitgliedschaft; bis dahin buchbar, abgebucht wird erst ab diesem Tag
             'start' => preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($c['start'] ?? '')) ? (string)$c['start'] : ($k === 'circle' ? '2026-12-01' : ''),
         ];
     }
+    foreach (['method', 'unfold'] as $k) { $out[$k]['price_cents'] = $def[$k]['price']; if (empty($cfg[$k]['special_cents'])) $out[$k]['special_cents'] = $def[$k]['special']; $out[$k]['plans'] = $k === 'unfold' ? $def[$k]['plans'] : []; $out[$k]['periods'] = []; $out[$k]['start'] = ''; }
     return $out;
 }
 
@@ -723,6 +727,12 @@ function mm_price_en(int $cents, string $billing): string
 /** Ratenplan eines Angebots für die Anzeige (Preis bestimmt beim Bezahlen immer der Server). */
 function mm_inst_public(string $offer, bool $live): ?array
 {
+    if ($offer === 'method') {
+        // Method: zusätzlich 3 Monate und 1 Jahr, im Gathering mit eigenem Vorteilspreis für die erste Zahlung
+        $c = mv_cfg();
+        return [['plan' => 'p3', 'count' => 3, 'regular' => mm_price_en($c['m3'], 'once'), 'special' => null, 'label' => 'or 3 months for ' . mm_price_en($live ? $c['g_m3'] : $c['m3'], 'once') . ($live ? ' (instead of ' . mm_price_en($c['m3'], 'once') . ')' : '')],
+            ['plan' => 'p12', 'count' => 12, 'regular' => mm_price_en($c['m12'], 'once'), 'special' => null, 'label' => 'or 1 year for ' . mm_price_en($live ? $c['g_m12'] : $c['m12'], 'once') . ($live ? ' (instead of ' . mm_price_en($c['m12'], 'once') . ')' : '')]];
+    }
     $o = mm_offers()[$offer] ?? null;
     if ($o && $o['periods']) return array_map(fn($p) => ['plan' => 'p' . $p[0], 'count' => $p[0], 'regular' => mm_price_en($p[1], 'once'), 'special' => null, 'label' => mm_period_label($p)], $o['periods']);
     if (!$o || !$o['plans']) return null;
@@ -734,6 +744,7 @@ function mm_inst_public(string $offer, bool $live): ?array
 function mm_intro_note(string $offer, int $regular, string $billing): ?string
 {
     if ($billing !== 'monthly') return null;
+    if ($offer === 'method') return 'for your first month, then ' . mm_price_en($regular, 'monthly');
     $o = mm_offers()[$offer] ?? null;
     return $o ? 'for your first ' . $o['intro_months'] . ' months, then ' . mm_price_en($regular, 'monthly') : null;
 }
@@ -884,6 +895,12 @@ function mm_order_checkout(PDO $pdo, array $sp, string $name, string $email, str
         foreach (json_decode((string)$sp['items'], true) ?: [] as $it) if ($it['offer'] === $item) $pick = $it;
         if (!$pick) throw new RuntimeException('Unknown offer.');
         $sp = array_merge($sp, ['offer' => $pick['offer'], 'title' => $pick['title'], 'text' => $pick['text'], 'billing' => $pick['billing'], 'regular_cents' => $pick['regular_cents'], 'special_cents' => $pick['special_cents'], 'items' => '']);
+    }
+    if (in_array($sp['offer'], ['method', 'unfold'], true)) {
+        // Method und Unfold laufen über das eigene Mitgliedersystem (api/method-lib.php)
+        require_once __DIR__ . '/method-lib.php';
+        $map = ['method' => ['full' => 'm1', 'p3' => 'm3', 'p12' => 'm12'], 'unfold' => ['full' => 'u1', 'inst3' => 'u3']][$sp['offer']];
+        return mv_spotlight_checkout($pdo, $sp, $name, $email, $map[$plan] ?? reset($map), $consent, $digital, 'en');
     }
     $pub = mm_spotlight_public($sp);
     $special = $pub['live'];

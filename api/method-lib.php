@@ -32,8 +32,8 @@ function mv_cfg(): array
         'm1' => 2900, 'm3' => 7500, 'm12' => 24000,                 // Method regulär
         'g_m1' => 1900, 'g_m3' => 6500, 'g_m12' => 19900,           // Method im Gathering (erste Zahlung)
         'u_once' => 45000, 'u_inst' => 16000, 'u_n' => 3, 'g_u_once' => 39000,
-        'u_seats' => 10, 'u_start' => '2027-02-01', 'u_end' => '2027-05-01', 'u_open' => 1,
-        'u_call_de' => 'Dienstag, 19:00 Uhr', 'u_call_en' => 'Wednesday, 7 pm (Vienna time)',
+        'u_seats' => 10, 'u_start' => '2027-01-10', 'u_end' => '2027-04-11', 'u_open' => 1,
+        'u_call_de' => 'Sonntag, 19:00 Uhr', 'u_call_en' => 'Sunday, 8:15 pm (Vienna time)',
     ];
     $c = mm_cfg('method') ?? [];
     foreach ($def as $k => $v) $def[$k] = is_int($v) ? (int)($c[$k] ?? $v) : (string)($c[$k] ?? $v);
@@ -202,6 +202,8 @@ function mv_schema(PDO $pdo): void
     // Sprechtexte (Voice-over/Talking Head) je Lektion für den Teleprompter
     $lc = array_column($pdo->query('PRAGMA table_info(mv_lessons)')->fetchAll(), 'name');
     if (!in_array('script_de', $lc, true)) { $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN script_de TEXT NOT NULL DEFAULT ''"); $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN script_en TEXT NOT NULL DEFAULT ''"); }
+    // eigenes Freischaltdatum pro Lektion (Unfold: zwei Bewegungsvideos pro Woche), leer = mit dem Programm
+    if (!in_array('unlock', $lc, true)) $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN unlock TEXT NOT NULL DEFAULT ''");
 }
 
 // --- Konten ---------------------------------------------------------------------------------------
@@ -396,7 +398,8 @@ function mv_checkout(PDO $pdo, array $in, bool $special = false, string $source 
     $en = $lang === 'en';
     $name = forma_clean((string)($in['name'] ?? ''), 80);
     $email = strtolower(trim((string)($in['email'] ?? '')));
-    if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) throw new RuntimeException($en ? 'Please enter your name and email.' : 'Bitte gib deinen Namen und deine E-Mail an.');
+    $fromRoom = $source !== 'web';
+    if (!$fromRoom && ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL))) throw new RuntimeException($en ? 'Please enter your name and email.' : 'Bitte gib deinen Namen und deine E-Mail an.');
     $digital = !empty($in['digital']) ? 1 : 0;
     $live = !empty($in['live']) ? 1 : 0;
     $callLang = in_array($in['call_lang'] ?? '', ['de', 'en'], true) ? $in['call_lang'] : $lang;
@@ -405,9 +408,9 @@ function mv_checkout(PDO $pdo, array $in, bool $special = false, string $source 
         if (mv_unfold_free($pdo) <= 0) throw new RuntimeException($en ? 'Unfold is fully booked. Join the list and I will let you know about the next round.' : 'Unfold ist ausgebucht. Trag dich in die Liste ein, dann sag ich dir Bescheid, wenn die nächste Runde startet.');
         if (!$live) throw new RuntimeException($en ? 'Please confirm the box about the start of your access.' : 'Bitte bestätige das Kästchen zum Beginn deines Zugangs.');
         // Schon gebucht?
-        foreach (mv_subs_of($pdo, $email) as $s) if ($s['kind'] === 'unfold') throw new RuntimeException($en ? 'You are already booked for Unfold. Log in to your members area.' : 'Du bist für Unfold schon angemeldet. Melde dich einfach im Mitgliederbereich an.');
+        if ($email !== '') foreach (mv_subs_of($pdo, $email) as $s) if ($s['kind'] === 'unfold') throw new RuntimeException($en ? 'You are already booked for Unfold. Log in to your members area.' : 'Du bist für Unfold schon angemeldet. Melde dich einfach im Mitgliederbereich an.');
     } else {
-        foreach (mv_subs_of($pdo, $email) as $s) if ($s['kind'] === 'method') throw new RuntimeException($en ? 'You already have a membership. Log in to your members area.' : 'Du hast schon eine Mitgliedschaft. Melde dich einfach im Mitgliederbereich an.');
+        if ($email !== '') foreach (mv_subs_of($pdo, $email) as $s) if ($s['kind'] === 'method') throw new RuntimeException($en ? 'You already have a membership. Log in to your members area.' : 'Du hast schon eine Mitgliedschaft. Melde dich einfach im Mitgliederbereich an.');
     }
     $special = $special && $p['g'] > 0 && $p['g'] < $p['cents'];
     $first = $special ? $p['g'] : $p['cents'];
@@ -425,7 +428,6 @@ function mv_checkout(PDO $pdo, array $in, bool $special = false, string $source 
         'mode' => $sub ? 'subscription' : 'payment',
         'locale' => $en ? 'en' : 'de',
         'billing_address_collection' => 'required',
-        'customer_email' => $email,
         'client_reference_id' => 'mv-' . $sid,
         'metadata' => ['mv_sub' => (string)$sid],
         'line_items' => [['quantity' => 1, 'price_data' => $price]],
@@ -435,6 +437,7 @@ function mv_checkout(PDO $pdo, array $in, bool $special = false, string $source 
         'cancel_url' => $site . ($p['kind'] === 'unfold' ? '/unfold/' : '/method/') . '?abbruch=1' . ($en ? '&lang=en' : ''),
         'branding_settings' => ['display_name' => 'Movecia – Personal Fitness'],
     ];
+    if ($email !== '') $params['customer_email'] = $email;
     if ($sub) $params['subscription_data'] = ['metadata' => ['mv_sub' => (string)$sid], 'description' => $title];
     else $params['payment_intent_data'] = ['statement_descriptor_suffix' => 'MOVECIA', 'description' => $title];
     // Vor dem Start der Method: jetzt buchen, Karte hinterlegen, erste Abbuchung am Starttag (Stripe braucht 48 Std. Vorlauf)
@@ -469,9 +472,10 @@ function mv_check_paid(PDO $pdo, array $r): string
     $a = $cd['address'] ?? [];
     $country = strtoupper((string)($a['country'] ?? 'AT')) ?: 'AT';
     $addr = implode("\n", array_filter([(string)($a['line1'] ?? ''), (string)($a['line2'] ?? ''), trim(($a['postal_code'] ?? '') . ' ' . ($a['city'] ?? '')), $country !== 'AT' ? $country : '']));
-    $name = (string)($cd['name'] ?? '') ?: $r['name'];
-    $u = $pdo->prepare("UPDATE mv_subs SET status = 'aktiv', paid_at = ?, sub_id = ?, customer = ?, address = ?, country = ?, name = ? WHERE id = ? AND status = 'offen'");
-    $u->execute([date('c'), (string)($s['subscription'] ?? ''), (string)($s['customer'] ?? ''), $addr, $country, $name, $r['id']]);
+    $name = $r['name'] ?: (string)($cd['name'] ?? '');
+    $email = $r['email'] ?: strtolower((string)($cd['email'] ?? ''));
+    $u = $pdo->prepare("UPDATE mv_subs SET status = 'aktiv', paid_at = ?, sub_id = ?, customer = ?, address = ?, country = ?, name = ?, email = ? WHERE id = ? AND status = 'offen'");
+    $u->execute([date('c'), (string)($s['subscription'] ?? ''), (string)($s['customer'] ?? ''), $addr, $country, $name, $email, $r['id']]);
     if ($u->rowCount() !== 1) return 'aktiv';
     $r = mv_sub($pdo, (int)$r['id']);
     if ($r['kind'] === 'unfold' && $r['sub_id'] !== '') {
@@ -657,7 +661,7 @@ function mv_invoice_source(PDO $pdo, string $kind, int $payId): ?array
 
 function mv_programs(PDO $pdo, string $audience = 'method', bool $onlyOpen = false): array
 {
-    $q = $pdo->prepare('SELECT * FROM mv_programs WHERE audience = ? ' . ($onlyOpen ? "AND visible = 1 AND (unlock = '' OR unlock <= ?) " : 'AND ? = ? ') . 'ORDER BY CASE WHEN unlock = \'\' THEN 0 ELSE 1 END, unlock DESC, sort, id');
+    $q = $pdo->prepare('SELECT * FROM mv_programs WHERE audience = ? ' . ($onlyOpen ? "AND visible = 1 AND (unlock = '' OR unlock <= ?) " : 'AND ? = ? ') . 'ORDER BY CASE WHEN unlock = \'\' THEN 0 ELSE 1 END, unlock ' . ($audience === 'unfold' ? 'ASC' : 'DESC') . ', sort, id');
     $today = (new DateTimeImmutable('now', new DateTimeZone('Europe/Vienna')))->format('Y-m-d');
     $q->execute($onlyOpen ? [$audience, $today] : [$audience, 1, 1]);
     return $q->fetchAll();
@@ -709,9 +713,6 @@ function mv_seed(PDO $pdo): void
     $a = (int)$pdo->lastInsertId();
     $ins->execute(['method', 'Dezember · Rückzug & Ruhe', 'December · Retreat & Rest', 'Der Dezember ist laut und voll. Dieses Programm schenkt dir kleine, ruhige Inseln: sanfte Flows für müde Tage, Atem für volle Tage und Momente nur für dich.', 'December is loud and full. This programme gives you small, quiet islands: gentle flows for tired days, breath for full days and moments just for you.', 'winter', '2026-12-01', 1, $now]);
     $d = (int)$pdo->lastInsertId();
-    $ins->execute(['unfold', 'Februar · Wurzeln', 'February · Roots', 'Ankommen und Raum schaffen.', 'Arrive and make space.', 'wurzeln', '2027-02-01', 0, $now]);
-    $ins->execute(['unfold', 'März · Knospen', 'March · Buds', 'Selbstwert und Ideen.', 'Self-worth and ideas.', 'knospen', '2027-03-01', 1, $now]);
-    $ins->execute(['unfold', 'April · Entfalten', 'April · Unfold', 'Ins Tun kommen.', 'Begin.', 'entfalten', '2027-04-01', 2, $now]);
     $l = $pdo->prepare('INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)');
     foreach ([
         [$a, 'Willkommen in der Method', 'Welcome to the Method', 'Ein paar Worte von mir: was dich hier erwartet und wie du die Bibliothek für dich nutzt.', 'A few words from me: what awaits you here and how to use the library for yourself.', 'talk', 'any', 6],
@@ -723,6 +724,30 @@ function mv_seed(PDO $pdo): void
         [$d, 'Box Breathing für volle Tage', 'Box breathing for full days', 'Vier Takte, die dein Nervensystem beruhigen.', 'Four counts that calm your nervous system.', 'breath', 'full', 5],
         [$d, 'Abendmeditation: Rückzug', 'Evening meditation: retreat', 'Den Tag ablegen und weich werden.', 'Putting the day down and softening.', 'meditation', 'tired', 15],
     ] as $i => $x) $l->execute([...$x, $i, $now]);
+    mv_seed_unfold($pdo);
+}
+
+/** Unfold: drei Monate mit je einem Programm, darin die 26 Bewegungsvideos aus dem Filmplan (api/seed/unfold-videos.json). */
+function mv_seed_unfold(PDO $pdo): void
+{
+    $j = json_decode((string)@file_get_contents(__DIR__ . '/seed/unfold-videos.json'), true);
+    if (!$j) return;
+    $start = new DateTimeImmutable($j['start']);
+    $now = date('c');
+    $ids = [];
+    $p = $pdo->prepare('INSERT INTO mv_programs (audience, title_de, title_en, intro_de, intro_en, theme, unlock, sort, created_at) VALUES (?,?,?,?,?,?,?,?,?)');
+    foreach ($j['months'] as $i => $m) {
+        $unlock = $start->modify('+' . (($m['from'] - 1) * 7) . ' days')->format('Y-m-d');
+        $p->execute(['unfold', 'Monat ' . ($i + 1) . ' · ' . $m['de'], 'Month ' . ($i + 1) . ' · ' . $m['en'], $m['intro_de'], $m['intro_en'], strtolower($m['de']), $unlock, $i, $now]);
+        $ids[$i] = (int)$pdo->lastInsertId();
+    }
+    $l = $pdo->prepare('INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, unlock, script_de, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)');
+    foreach ($j['videos'] as $i => $v) $l->execute([$ids[$v['month']], $v['title_de'], $v['title_en'], $v['text_de'], $v['text_en'], $v['cat'], $v['energy'], $v['minutes'], $i, $v['unlock'], $v['script_de'], $now]);
+}
+
+function mv_today(): string
+{
+    return (new DateTimeImmutable('now', new DateTimeZone('Europe/Vienna')))->format('Y-m-d');
 }
 
 // --- Fortschritt & Journal ------------------------------------------------------------------------------
@@ -882,5 +907,5 @@ function mv_spotlight_checkout(PDO $pdo, array $sp, string $name, string $email,
     $kind = $sp['offer'];
     if ($kind === 'method' && !in_array($plan, ['m1', 'm3', 'm12'], true)) $plan = 'm1';
     if ($kind === 'unfold' && !in_array($plan, ['u1', 'u3'], true)) $plan = 'u1';
-    return mv_checkout($pdo, ['plan' => $plan, 'name' => $name, 'email' => $email, 'lang' => $lang, 'digital' => $digital, 'live' => $consent ?: 1], $live, $sp['scope'] === 'test' ? 'test' : 'gathering');
+    return mv_checkout($pdo, ['plan' => $plan, 'name' => $name, 'email' => $email, 'lang' => $lang, 'digital' => $digital, 'live' => $consent ?: 1], $live, (string)$sp['scope']);
 }

@@ -70,6 +70,7 @@ if ($action === 'mm_testroom') {
 if ($action === 'mm_save_offers') {
     $cfg = mm_cfg('offers') ?? [];
     foreach (MM_OFFER_KEYS as $k) {
+        if (in_array($k, ['method', 'unfold'], true)) continue;
         $c = is_array($cfg[$k] ?? null) ? $cfg[$k] : [];
         $c['title'] = forma_clean((string)($_POST['title'][$k] ?? ''), 80) ?: (mm_offers()[$k]['title']);
         $c['text'] = mb_substr(trim((string)($_POST['text'][$k] ?? '')), 0, 600);
@@ -222,36 +223,36 @@ if ($view === 'movecia') {
         $dDate = $d['starts_at'] ? substr($d['starts_at'], 0, 10) : '';
         $dTime = $d['starts_at'] ? substr($d['starts_at'], 11, 5) : '19:00'; ?>
 <style>
-:root{--paper:#E4E7DC;--card:#F7F7F1;--clay:#4E5E44;--soft:#5E5A4E;--line:#C7CEBB}
+:root{--paper:#F2ECE4;--card:#FBF8F4;--clay:#7D5E68;--soft:#7D7076;--line:#DDD2C6}
 body{background:var(--paper)}
-.head .brand span{color:#4E5E44}
-.mm-hero{position:relative;overflow:hidden;border-radius:26px;background:#3E4A36;color:#F3F1E7;padding:24px 24px 22px}
-.mm-hero::after{content:"";position:absolute;width:220px;height:220px;right:-80px;top:-90px;border-radius:58% 42% 47% 53%/52% 46% 54% 48%;background:rgba(201,139,120,.35)}
-.mm-hero h1{color:#F3F1E7;font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:34px;margin:2px 0 4px;position:relative}
-.mm-hero p{position:relative;margin:0;color:#DCE0D2}
-.mm-hero .eyebrow{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#E7C4AE}
+.head .brand span{color:#7D5E68}
+.mm-hero{position:relative;overflow:hidden;border-radius:26px;background:#4A3A41;color:#FBF5F7;padding:24px 24px 22px}
+.mm-hero::after{content:"";position:absolute;width:220px;height:220px;right:-80px;top:-90px;border-radius:58% 42% 47% 53%/52% 46% 54% 48%;background:rgba(232,214,202,.3)}
+.mm-hero h1{color:#FBF5F7;font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:34px;margin:2px 0 4px;position:relative}
+.mm-hero p{position:relative;margin:0;color:#EADFDE}
+.mm-hero .eyebrow{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#E8D6CA}
 .mm-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
-.mm-stat{background:#FBFAF4;border:1px solid var(--line);border-radius:18px;padding:12px 14px;color:var(--ink);text-decoration:none;display:flex;flex-direction:column}
-.mm-stat b{font-family:"Bricolage Grotesque","Outfit",sans-serif;font-size:32px;line-height:1.1;color:#4E5E44}
+.mm-stat{background:#FBF8F4;border:1px solid var(--line);border-radius:18px;padding:12px 14px;color:var(--ink);text-decoration:none;display:flex;flex-direction:column}
+.mm-stat b{font-family:"Bricolage Grotesque","Outfit",sans-serif;font-size:32px;line-height:1.1;color:#7D5E68}
 .mm-stat span{font-size:14px;color:var(--soft);line-height:1.3}
-.mm-stat.live b{color:#93402F}
+.mm-stat.live b{color:#A0463A}
 .mm-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.mm-links a{display:inline-block;padding:7px 14px;border-radius:999px;background:#F7F7F1;border:1px solid var(--line);text-decoration:none;color:#4E5E44;font-size:15px}
+.mm-links a{display:inline-block;padding:7px 14px;border-radius:999px;background:#FBF8F4;border:1px solid var(--line);text-decoration:none;color:#7D5E68;font-size:15px}
 .mm-g summary{cursor:pointer;list-style:none}
 .mm-g summary::-webkit-details-marker{display:none}
 .mm-g .row3{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .mm-g .btn{padding:9px 16px;min-height:0;font-size:16px}
 .mm-signup{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding:8px 0}
-.mm-badge{display:inline-block;border-radius:999px;padding:1px 9px;font-size:13px;background:#DCE0D2;color:#3E4A36}
-.mm-badge.on{background:#93402F;color:#FBF1EA}
+.mm-badge{display:inline-block;border-radius:999px;padding:1px 9px;font-size:13px;background:#EADFDE;color:#4A3A41}
+.mm-badge.on{background:#A0463A;color:#FBF1EA}
 select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
 @media (min-width:700px){.mm-stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style>
         <p><a href="<?= forma_h($self) ?>">← Zurück zu FORMA</a></p>
         <section class="mm-hero">
             <p class="eyebrow">Movecia Movement</p>
-            <h1>Wild Hearts Collective</h1>
-            <p>Dein eigener Bereich, getrennt von FORMA: E-Mail-Liste, Gatherings und Videoraum.</p>
+            <h1>Movecia</h1>
+            <p>Dein eigener Bereich, getrennt von FORMA: Method &amp; Unfold, Prä- &amp; Postnatal, Gatherings, E-Mail-Liste und Videoraum.</p>
         </section>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
 <style>
@@ -280,7 +281,8 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         <div class="mm-links">
             <a href="<?= forma_h($self) ?>?view=method" style="background:#4A3A41;color:#FBF5F7;border-color:#4A3A41">Method &amp; Unfold →</a>
             <a href="<?= forma_h($self) ?>?view=natal" style="background:#7D5E68;color:#FBF5F7;border-color:#7D5E68">Prä- &amp; Postnatal →</a>
-            <a href="https://moveciamovement.com/" target="_blank" rel="noopener">Link in Bio</a>
+            <a href="https://moveciamovement.com/" target="_blank" rel="noopener">Website</a>
+            <a href="https://moveciamovement.com/links/" target="_blank" rel="noopener">Link in Bio</a>
             <a href="https://moveciamovement.com/gathering/" target="_blank" rel="noopener">Gathering-Seite</a>
             <a href="https://moveciamovement.com/reset/" target="_blank" rel="noopener">Reset Routine Download</a>
             <a href="https://dashboard.mailerlite.com/automations" target="_blank" rel="noopener">MailerLite</a>
@@ -306,7 +308,8 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         <form method="post" class="card stack">
             <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_save_offers">
             <p class="small">Diese Angebote kannst du am Ende eines Gatherings aus deinem Gastgeberinnen-Fenster einblenden („✦ Angebot“). Hier trägst du den regulären Preis ein. Den günstigeren Gathering-Preis und wie viele Minuten er gilt, gibst du beim Einblenden ein. Läuft der Countdown ab, gilt automatisch wieder der reguläre Preis, auch beim Bezahlen. Titel und Text sehen die Frauen, deshalb auf Englisch.</p>
-            <?php foreach ($offs as $k => $o): ?>
+            <p class="small">Method und Unfold kannst du ebenfalls einblenden. Ihre Preise (auch die Gathering-Preise) stellst du unter <a href="<?= forma_h($self) ?>?view=method#preise">Method &amp; Unfold → Preise</a> ein.</p>
+            <?php foreach ($offs as $k => $o): if (in_array($k, ['method', 'unfold'], true)) continue; ?>
                 <div class="stack" style="border-top:1px solid var(--line);padding-top:12px">
                     <label for="ot<?= $k ?>"><strong><?= ['circle' => 'Inner Circle', 'year' => 'Jahreskreis', 'retreat' => 'Alpine Retreat'][$k] ?></strong> · Titel</label>
                     <input id="ot<?= $k ?>" name="title[<?= $k ?>]" value="<?= forma_h($o['title']) ?>" maxlength="80">
@@ -381,8 +384,8 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 
         <h2>Gatherings</h2>
         <?php if ($next && $next['room_url'] !== ''): ?>
-            <a class="card notice" href="<?= forma_h($GLOBALS['mmHostLink']((int)$next['id'])) ?>" target="_blank" rel="noopener" style="border-color:#4E5E44;background:#F7F7F1"><span class="ic" style="background:#DCE0D2;color:#4E5E44"><?= admin_icon('kalender') ?></span><span><strong>Als Gastgeberin in den Raum: <?= forma_h($next['title']) ?></strong><br><span class="muted small"><?= forma_h(mm_when_de($next)) ?> · dein Fenster mit Teleprompter, Aufnahme und Video-Bühne →</span></span></a>
-            <a class="card notice" href="<?= forma_h(preg_replace('/&g=\d+$/', '', $GLOBALS['mmHostLink']((int)$next['id'])) . '&probe=' . (int)$next['id']) ?>" target="_blank" rel="noopener"><span class="ic" style="background:#DCE0D2;color:#4E5E44"><?= admin_icon('kalender') ?></span><span><strong>Probelauf: <?= forma_h($next['title']) ?></strong><br><span class="muted small">im Testraum mit Übungsfenstern, Skript und Call-Name dieses Gatherings, mit Aufnahme zum Anschauen →</span></span></a>
+            <a class="card notice" href="<?= forma_h($GLOBALS['mmHostLink']((int)$next['id'])) ?>" target="_blank" rel="noopener" style="border-color:#7D5E68;background:#FBF8F4"><span class="ic" style="background:#EADFDE;color:#7D5E68"><?= admin_icon('kalender') ?></span><span><strong>Als Gastgeberin in den Raum: <?= forma_h($next['title']) ?></strong><br><span class="muted small"><?= forma_h(mm_when_de($next)) ?> · dein Fenster mit Teleprompter, Aufnahme und Video-Bühne →</span></span></a>
+            <a class="card notice" href="<?= forma_h(preg_replace('/&g=\d+$/', '', $GLOBALS['mmHostLink']((int)$next['id'])) . '&probe=' . (int)$next['id']) ?>" target="_blank" rel="noopener"><span class="ic" style="background:#EADFDE;color:#7D5E68"><?= admin_icon('kalender') ?></span><span><strong>Probelauf: <?= forma_h($next['title']) ?></strong><br><span class="muted small">im Testraum mit Übungsfenstern, Skript und Call-Name dieses Gatherings, mit Aufnahme zum Anschauen →</span></span></a>
         <?php endif; ?>
         <?php if (!$gatherings): ?><p class="muted">Noch kein Gathering geplant. Leg unten das erste an, zum Beispiel Anfang Dezember.</p><?php endif; ?>
         <div class="list">
@@ -460,7 +463,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                 const E = f.elements; E.title.value = p.title; E.minutes.value = p.minutes; E.time.value = p.time; E.description.value = p.text; E.script.value = p.script;
                 if (p.date) E.date.value = p.date;
                 else if (!E.date.value && p.time === '08:00') { const d = new Date(); d.setDate(d.getDate() + ((7 - d.getDay()) % 7 || 7)); E.date.value = d.toISOString().slice(0, 10); }
-                document.querySelectorAll('[data-preset]').forEach(x => x.style.background = x === a ? '#DCE0D2' : '');
+                document.querySelectorAll('[data-preset]').forEach(x => x.style.background = x === a ? '#EADFDE' : '');
               }));
             })();
             </script>
@@ -510,7 +513,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <?php if (!$logs): ?><p class="muted small">Noch keine Mail verschickt.</p><?php endif; ?>
             <?php foreach ($logs as $l): ?>
                 <div class="mm-signup"><span><strong><?= forma_h($l['subject']) ?></strong><br><span class="muted small"><?= forma_h(date('d. m., H:i', strtotime($l['at']))) ?> · an <?= forma_h($l['to_addr']) ?> · <?= forma_h($l['method']) ?></span>
-                <?php if ($l['error'] !== ''): ?><br><span class="small" style="color:#93402F"><?= forma_h($l['error']) ?></span><?php endif; ?></span>
+                <?php if ($l['error'] !== ''): ?><br><span class="small" style="color:#A0463A"><?= forma_h($l['error']) ?></span><?php endif; ?></span>
                 <span><span class="mm-badge<?= $l['ok'] ? '' : ' on' ?>"><?= $l['ok'] ? 'verschickt' : 'fehlgeschlagen' ?></span></span></div>
             <?php endforeach; ?>
         </div>

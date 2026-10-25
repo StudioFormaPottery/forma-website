@@ -250,13 +250,14 @@ $prelaunch = !mv_launched();
 $c = mv_cfg();
 $q = $demo ? '&demo=1' . (isset($_GET['unfold']) ? '&unfold=1' : '') . (isset($_GET['starter']) ? '&starter=1' : '') . ($lang === 'en' ? '&lang=en' : '') : '';
 
-// Programme + Lektionen, die sie sehen darf
+// Programme + Lektionen, die sie sehen darf (Beispielansicht mit Unfold zeigt die zweite Unfold-Woche)
+$today = $demo && isset($_GET['unfold']) ? date('Y-m-d', mv_ts($c['u_start']) + 11 * 86400) : $now->format('Y-m-d');
 $progs = [];
 $all = [];
 if ($acc['method']) {
     foreach (mv_programs($pdo, 'method', true) as $p) {
         $lock = $acc['starter'] && $p['theme'] !== 'ankommen';
-        $ls = mv_lessons($pdo, (int)$p['id'], true);
+        $ls = array_values(array_filter(mv_lessons($pdo, (int)$p['id'], true), fn($l) => $l['unlock'] === '' || $l['unlock'] <= $today));
         $progs[] = ['p' => $p, 'lessons' => $ls, 'lock' => $lock, 'files' => mv_files($pdo, (int)$p['id'])];
         foreach ($ls as $l) $all[(int)$l['id']] = ['l' => $l, 'p' => $p, 'lock' => $lock];
     }
@@ -265,10 +266,11 @@ $uProgs = [];
 if ($acc['unfold']) {
     foreach (mv_programs($pdo, 'unfold', false) as $p) {
         if (!(int)$p['visible']) continue;
-        $open = $p['unlock'] === '' || $p['unlock'] <= $now->format('Y-m-d');
-        $ls = $open ? mv_lessons($pdo, (int)$p['id'], true) : [];
+        $open = $p['unlock'] === '' || $p['unlock'] <= $today;
+        // alle Videos des Monats sichtbar, noch nicht erschienene mit Datum und gesperrt
+        $ls = mv_lessons($pdo, (int)$p['id'], true);
         $uProgs[] = ['p' => $p, 'lessons' => $ls, 'open' => $open, 'files' => $open ? mv_files($pdo, (int)$p['id']) : []];
-        foreach ($ls as $l) $all[(int)$l['id']] = ['l' => $l, 'p' => $p, 'lock' => false];
+        foreach ($ls as $l) if ($l['unlock'] === '' || $l['unlock'] <= $today) $all[(int)$l['id']] = ['l' => $l, 'p' => $p, 'lock' => false];
     }
 }
 
@@ -277,7 +279,10 @@ $lesson = null;
 if (isset($_GET['l']) && isset($all[(int)$_GET['l']])) $lesson = $all[(int)$_GET['l']];
 
 $fmtMin = fn(int $m) => $m > 0 ? $m . ' Min.' : '';
-$card = function (array $l, array $p, bool $lock) use ($lang, $done, $favs, $q, $h, $L): string {
+$card = function (array $l, array $p, bool $lock) use ($lang, $done, $favs, $q, $h, $L, $today): string {
+    $future = $l['unlock'] !== '' && $l['unlock'] > $today;
+    $lockLabel = $future ? $L('ab ', 'from ') . mv_date(strtotime($l['unlock'] . ' 12:00'), $lang) : $L('ab Tag 15', 'from day 15');
+    $lock = $lock || $future;
     $vid = mv_video_for($l, $lang);
     $th = mv_thumb($vid);
     $cat = MV_CATS[$l['cat']] ?? MV_CATS['flow'];
@@ -287,7 +292,7 @@ $card = function (array $l, array $p, bool $lock) use ($lang, $done, $favs, $q, 
     $bucket = $min === 0 ? '' : ($min <= 7 ? 's' : ($min <= 20 ? 'm' : 'l'));
     return '<a class="lc c-' . $h($l['cat']) . ($lock ? ' locked' : '') . '" href="' . ($lock ? '#' : '?l=' . (int)$l['id'] . $q) . '" data-cat="' . $h($l['cat']) . '" data-energy="' . $h($l['energy']) . '" data-len="' . $bucket . '" data-fav="' . (in_array((int)$l['id'], $favs, true) ? 1 : 0) . '">'
         . '<span class="th">' . ($th ? '<img src="' . $h($th) . '" alt="" loading="lazy">' : '<span class="ic">' . mv_icon($l['cat']) . '</span>')
-        . ($min ? '<span class="min">' . $min . ' Min.</span>' : '') . ($isDone ? '<span class="dn" title="' . $L('schon gemacht', 'done') . '">✓</span>' : '') . ($lock ? '<span class="lk">' . $L('ab Tag 15', 'from day 15') . '</span>' : '') . (!$vid ? '<span class="soon">' . $L('Video folgt', 'Video coming') . '</span>' : '') . '</span>'
+        . ($min ? '<span class="min">' . $min . ' Min.</span>' : '') . ($isDone ? '<span class="dn" title="' . $L('schon gemacht', 'done') . '">✓</span>' : '') . ($lock ? '<span class="lk">' . $h($lockLabel) . '</span>' : '') . (!$vid && !$lock ? '<span class="soon">' . $L('Video folgt', 'Video coming') . '</span>' : '') . '</span>'
         . '<span class="tx"><span class="cat">' . $h($cat[$lang === 'en' ? 1 : 0]) . ($l['energy'] !== 'any' ? ' · ' . $h($en[$lang === 'en' ? 1 : 0]) : '') . '</span><b>' . $h(mv_t($l, 'title', $lang)) . '</b></span></a>';
 };
 
@@ -397,13 +402,14 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
   </section>
 
 <?php elseif ($tab === 'unfold' && $acc['unfold']):
-    $u = $acc['unfold']; $room = (string)($c['u_room_' . ($u['call_lang'] === 'en' ? 'en' : 'de')] ?? (mm_cfg('method')['u_room_' . ($u['call_lang'] === 'en' ? 'en' : 'de')] ?? ''));
-    $ustart = mv_ts($c['u_start']); ?>
+    $u = $acc['unfold']; $room = (string)((mm_cfg('method') ?? [])['u_room_' . ($u['call_lang'] === 'en' ? 'en' : 'de')] ?? '');
+    $ustart = mv_ts($c['u_start'], '00:00'); $tnow = strtotime($today . ' 12:00');
+    $wk = $tnow >= $ustart ? min(13, intdiv($tnow - $ustart, 7 * 86400) + 1) : 0; ?>
   <section class="uhero">
-    <div><p class="k">Unfold · The Mindful Becoming</p><h1 class="h2"><?= time() < $ustart ? $L('Bald geht es los', 'We begin soon') : $L('Dein Weg in drei Monaten', 'Your path in three months') ?></h1>
-      <p class="lead"><?= time() < $ustart ? $L('Wir starten am ', 'We begin on ') . $h(mv_date($ustart, $lang)) . '. ' . $L('Bis dahin ist die ganze Method schon für dich offen.', 'Until then, the whole Method is already open for you.') : $L('Jede Woche treffen wir uns live. Hier findest du deine Workbooks, Impulse und den Link zum Call.', 'Every week we meet live. Here you find your workbooks, talks and the link to the call.') ?></p></div>
+    <div><p class="k">Unfold · The Mindful Becoming</p><h1 class="h2"><?= $wk ? $L('Woche ', 'Week ') . $wk . $L(' von 13', ' of 13') : (time() < $ustart ? $L('Bald geht es los', 'We begin soon') : $L('Dein Weg in drei Monaten', 'Your path in three months')) ?></h1>
+      <p class="lead"><?= !$wk ? $L('Wir starten am ', 'We begin on ') . $h(mv_date($ustart, $lang)) . '. ' . $L('Bis dahin ist die ganze Method schon für dich offen.', 'Until then, the whole Method is already open for you.') : $L('Jede Woche treffen wir uns live, und jeden Montag und Donnerstag kommt ein neues Bewegungsvideo dazu. Hier findest du außerdem deine Workbooks und den Link zum Call.', 'Every week we meet live, and every Monday and Thursday a new movement video arrives. Here you also find your workbooks and the link to the call.') ?></p></div>
     <div class="ucall card"><p class="k"><?= $L('Dein Live-Call', 'Your live call') ?></p><h3><?= $h($u['call_lang'] === 'en' ? $c['u_call_en'] : $c['u_call_de']) ?></h3><p class="mut small"><?= $u['call_lang'] === 'en' ? $L('auf Englisch', 'in English') : $L('auf Deutsch', 'in German') ?></p>
-      <?php if ($room !== '' && time() >= $ustart - 86400): ?><a class="btn" href="/unfold/call/" target="_blank" rel="noopener"><?= $L('Zum Call', 'Join the call') ?></a><?php else: ?><p class="mut small"><?= $L('Der Link zum Call erscheint hier vor dem Start.', 'The link to the call appears here before we start.') ?></p><?php endif; ?></div>
+      <?php if ($room !== '' && $tnow >= $ustart - 86400): ?><a class="btn" href="/unfold/call/" target="_blank" rel="noopener"><?= $L('Zum Call', 'Join the call') ?></a><?php else: ?><p class="mut small"><?= $L('Der Link zum Call erscheint hier vor dem Start.', 'The link to the call appears here before we start.') ?></p><?php endif; ?></div>
   </section>
   <?php foreach ($uProgs as $x): $p = $x['p']; ?>
   <section class="prog">

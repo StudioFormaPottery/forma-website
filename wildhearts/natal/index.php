@@ -203,13 +203,13 @@ section{padding-block:clamp(3.5rem,8vw,7rem)}
 @media(max-width:560px){.top .tag{display:none}.modes button{padding:.75rem .8rem}.modes button b{font-size:1.3rem}}
 body[data-mode=online] .m-studio,body[data-mode=studio] .m-online{display:none!important}
 .cta{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:2rem}
-.hv{position:relative;justify-self:center;width:min(100%,480px);aspect-ratio:1/1}
-@media(max-width:599px){.hv{width:min(100%,300px)}.hv .q{font-size:1.25rem}}
-.hv .b1{position:absolute;inset:4% 2% 6% 10%;background:var(--blush)}
-.hv .b2{position:absolute;width:30%;aspect-ratio:1;left:2%;top:6%;background:var(--plum);opacity:.92}
-.hv .b3{position:absolute;width:20%;aspect-ratio:1;right:4%;bottom:6%;background:var(--peach);border-radius:50%}
-.hv .q{position:absolute;inset:26% 16% 24% 26%;display:flex;flex-direction:column;justify-content:center;font-family:var(--serif);font-size:clamp(1.5rem,2.6vw,2.2rem);line-height:1.2;color:var(--ink)}
-.hv .q small{font-family:var(--sans);font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--plum);margin-top:1rem}
+.hv{position:relative;justify-self:center;width:min(100%,460px);margin:0;padding:0 0 18% 0}
+.hv img{position:relative;display:block;width:82%;margin-left:12%;aspect-ratio:3/4;object-fit:cover;object-position:50% 20%;border-radius:240px 240px 24px 24px}
+.hv .b1{position:absolute;inset:6% 0 20% 2%;background:var(--blush)}
+.hv .b3{position:absolute;width:22%;aspect-ratio:1;left:0;top:4%;background:var(--peach);border-radius:50%}
+.hv .q{position:absolute;left:0;right:14%;bottom:0;background:rgba(251,248,244,.95);border-radius:20px;padding:1rem 1.2rem;font-family:var(--serif);font-size:clamp(1.2rem,2vw,1.55rem);line-height:1.25;color:var(--ink);box-shadow:0 14px 30px -20px rgba(74,58,65,.5)}
+.hv .q small{display:block;font-family:var(--sans);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--plum);margin-top:.5rem}
+@media(max-width:599px){.hv{width:min(100%,320px)}}
 .mq{overflow:hidden;background:var(--plum);color:var(--on);padding-block:1rem}
 .mq-in{display:flex;gap:2.4rem;width:max-content;animation:mq 40s linear infinite;font-family:var(--serif);font-style:italic;font-size:clamp(1.4rem,2.4vw,2rem)}
 .mq-in span::after{content:"✦";font-style:normal;font-size:.55em;margin-left:2.4rem;opacity:.6;vertical-align:middle}
@@ -439,7 +439,7 @@ footer summary{cursor:pointer}
 
     <div class="cta"><a class="btn" href="#pakete">Paket wählen <span aria-hidden="true">→</span></a><a class="btn line" href="#kennenlernen">Kostenlos kennenlernen</a></div>
   </div>
-  <div class="hv" aria-hidden="true"><div class="b1 blob"></div><div class="b2 blob"></div><div class="b3"></div><p class="q">„Dein Körper leistet gerade Großes. Lass uns ihn gut begleiten.“<small>Vivien</small></p></div>
+  <figure class="hv"><div class="b1 blob" aria-hidden="true"></div><div class="b3" aria-hidden="true"></div><img src="/img/movecia/fotos/schwanger.jpg" alt="Vivien in ihrer Schwangerschaft" width="683" height="1024"><figcaption class="q">„Dein Körper leistet gerade Großes. Lass uns ihn gut begleiten.“<small>Vivien</small></figcaption></figure>
 </section>
 <div class="mq" aria-hidden="true"><div class="mq-in"><?php for ($i = 0; $i < 2; $i++) foreach (['ankommen', 'atmen', 'spüren', 'stärken', 'loslassen', 'vertrauen', 'zurückfinden'] as $wd) echo '<span>' . $wd . '</span>'; ?></div></div>
 
