@@ -657,4 +657,590 @@ Blas jetzt deine Kerze aus, und lass deine Kräuter sicher ruhen, bis sie ganz e
 Frohes Samhain, ihr wilden Herzen. Ein gutes neues Jahr im Jahreskreis. Danke, dass ihr heute Abend da wart.
 
 Gute Nacht.',
+  'Morning · 15 min · Breathwork' => '[0:00 · ANKOMMEN]
+
+Guten Morgen, ihr wilden Herzen. Guten Morgen.
+
+Lasst mich alle begrüßen, die heute dafür früh aufgestanden sind. {names}. Ich freue mich so, dass ihr da seid.
+
+Vielleicht hast du noch deinen Pyjama an. Vielleicht hältst du deinen ersten Kaffee oder Tee in den Händen. Vielleicht ist es bei dir zu Hause noch ganz still, oder es ist schon laut und du hast dich für ein paar Minuten davongeschlichen. Jede Version von dir ist heute Morgen willkommen.
+
+Das ist {title}. Bevor der Tag an dir zu ziehen beginnt, nehmen wir uns fünfzehn Minuten, die nur dir gehören. Kamera an oder aus, im Sitzen oder im Liegen, alles ist gut.
+
+[Pause]
+
+[1:30 · DEINEN PLATZ VORBEREITEN]
+
+Lass uns deinen Platz zuerst ein bisschen gemütlich machen.
+
+Wenn du kannst, setz dich so hin, dass du dich anlehnen kannst. Stell dein Getränk neben dich. Leg dir eine Decke um die Schultern, wenn du magst.
+
+Und dann spür einfach einmal nach: Wie bist du heute aufgewacht? Ausgeruht? Müde? Schon mit einer Liste im Kopf?
+
+Du musst nichts daran ändern. Nimm es einfach wahr und sag dir selbst einen guten Morgen.
+
+[Pause]
+
+[2:30 · WARUM WIR MORGENS ATMEN]
+
+Heute Morgen machen wir gemeinsam eine kurze Atemübung. Nichts Wildes und nichts Anstrengendes, nur dein Atem, ein bisschen langsamer und ein bisschen tiefer als sonst.
+
+Die Art, wie wir atmen, verrät unserem Nervensystem, wie sicher wir sind. Wenn wir den Tag schon gehetzt beginnen, wird unser Atem kurz und rutscht nach oben in die Brust. Und unser Körper denkt sich: Irgendetwas stimmt nicht, beeil dich.
+
+Deshalb erzählen wir ihm heute Morgen etwas anderes.
+
+Noch ein kleiner Hinweis, bevor wir anfangen: Wenn dir irgendwann schwindelig wird, geh einfach zurück zu deinem normalen Atem. Dein Körper weiß es immer am besten. Und wenn du schwanger bist, bleib bei allem sanft und weich und halte den Atem nicht an.
+
+[3:30 · BREATHWORK: ANKOMMENSATEM]
+
+Leg eine Hand auf deinen Bauch und eine Hand auf deine Brust.
+
+Atme durch die Nase ein und lass zuerst die Hand auf deinem Bauch steigen.
+
+Atme langsam durch die Nase aus und spür, wie der Bauch wieder sinkt.
+
+[gemeinsam atmen, fünf langsame Atemzüge, etwa eine Minute]
+
+Schön. Spür einmal, wie sich die Hand auf deinem Bauch mehr bewegt als die auf deiner Brust. Das ist der Atem, der dich beruhigt.
+
+[5:00 · BREATHWORK: BOX BREATHING]
+
+Jetzt geben wir dem Atem einen sanften Rhythmus. Er heißt Box Breathing, und ich komme an vollen Morgen zu Hause selbst immer wieder darauf zurück.
+
+Atme ein auf vier … zwei, drei, vier.
+
+Halte sanft auf vier … zwei, drei, vier.
+
+Atme aus auf vier … zwei, drei, vier.
+
+Und halte leer auf vier … zwei, drei, vier.
+
+[vier Runden anleiten, etwa zwei Minuten, langsam zählen]
+
+Und lass den Rhythmus wieder los. Atme ganz natürlich.
+
+[8:00 · EINE MORGENGESCHICHTE]
+
+Ich möchte dir erzählen, warum ich das am Morgen so gern mache.
+
+Bei uns zu Hause können die Morgen ganz schön viel sein. Vier Kinder, Frühstück, Schultaschen, einer findet seinen Schuh nicht, eine will sich nicht anziehen. Und ich glaube, so viele von uns kennen das: direkt aus dem Bett in all das hinein, und man fühlt sich schon im Rückstand, bevor der Tag überhaupt angefangen hat.
+
+[dein Detail: wie ein echter Morgen bei dir aussieht, ein kleiner Moment]
+
+Was mir an den schweren Tagen hilft, ist keine perfekte Routine. Es sind die Dinge, die ich gelernt habe und weitergebe: meinen Atem verlangsamen, ein wenig sanfte Bewegung, ein kleines Ritual nur für mich. Ein paar Atemzüge, bevor ich dem Tag die Tür öffne.
+
+Der Tag ist danach immer noch voll. Aber ich bin anders darin. Ein bisschen mehr bei mir und ein bisschen weniger gehetzt.
+
+[10:00 · DEINE ABSICHT]
+
+Bevor wir zum Ende kommen, möchte ich dich bitten, dir ein Wort für heute auszusuchen. Ein Wort dafür, wie du durch diesen Tag gehen möchtest.
+
+Ruhig. Sanft. Mutig. Präsent. Weich. Stark.
+
+Wenn du magst, schreib dein Wort in den Chat, dann tragen wir heute die Worte der anderen ein Stück mit.
+
+[warten und einige Worte mit den Namen vorlesen]
+
+Was für schöne Worte. Lasst sie uns mitnehmen.
+
+[11:30 · EINE FRAGE AUS DEM KREIS]
+
+[Wenn eine Frage im Chat oder in deiner Fragenliste steht, beantworte sie hier. Wenn nicht, nimm diese:]
+
+Eine Frage, die ich oft höre, lautet: „Und wenn ich morgens keine fünfzehn Minuten habe?“
+
+Dann nimm dir eine Minute. Vier Runden Box Breathing dauern ungefähr eine Minute. Das reicht, um deinem Körper zu sagen: Ich bin da, ich bin sicher, ich schaffe diesen Tag. Klein und oft ist so viel wirkungsvoller als perfekt und selten.
+
+[12:30 · EINE EINLADUNG]
+
+Wenn sich dieser Morgen gut angefühlt hat, komm beim nächsten Mal wieder. Dann atmen wir wieder gemeinsam.
+
+Und wenn du dir für jeden Tag ein bisschen Unterstützung wünschst: Meine Reset Routine für müde Tage gibt es kostenlos auf moveciamovement.com, und meine Mindful Movement Method öffnet am 1. Dezember, mit kurzen Morgeneinheiten wie dieser, ganz wann es dir passt. Du kannst dir deinen Platz schon jetzt sichern.
+
+[Wenn du heute Morgen ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir etwas auf den Bildschirm gelegt. Schau es dir an, wann immer es dir passt.
+
+[13:30 · ABSCHLUSS]
+
+Lasst uns noch einen letzten Box-Atemzug gemeinsam nehmen. Ein auf vier … halten … aus auf vier … halten … und loslassen.
+
+Leg deine Hand auf dein Herz und sag dir dein Wort ganz still noch einmal vor.
+
+Danke, dass du deinen Tag mit uns begonnen hast.
+
+Geh sanft in deinen Morgen, ihr wilden Herzen. Habt einen wunderschönen Tag.',
+  'Morning · 30 min · Breathwork & intention' => '[0:00 · ANKOMMEN]
+
+Guten Morgen, ihr wilden Herzen. Herzlich willkommen.
+
+Lasst mich jeder von euch einen guten Morgen wünschen. {names}. Danke, dass ihr euch diesen Morgen selbst schenkt.
+
+Vielleicht bist du heute vor allen anderen zu Hause aufgewacht, nur dafür. Vielleicht laufen im Hintergrund gerade Kinder herum. Vielleicht liegst du sogar noch im Bett. All das ist hier willkommen.
+
+Das ist {title}. In den nächsten dreißig Minuten atmen wir, bewegen uns ein bisschen und setzen eine Absicht für den Tag. Du brauchst keine Erfahrung, du musst nur da sein. Kamera an oder aus, ganz wie du magst.
+
+[Pause]
+
+[2:00 · DEINEN PLATZ VORBEREITEN]
+
+Lass uns deinen Platz gemütlich machen.
+
+Such dir einen Sitz, in dem dein Rücken lang sein darf, auf einem Stuhl, auf dem Sofa oder auf dem Boden mit einem Kissen unter dir. Stell dir etwas zu trinken daneben, und wenn du magst, einen Stift und einen Zettel für später.
+
+Wickel dich in eine Decke, wenn es bei dir kalt ist. Hier in den Bergen sind die Morgen schon ganz schön frisch.
+
+[Pause]
+
+Und jetzt spür einfach nach, wie du heute Morgen angekommen bist. In deinem Körper, in deiner Stimmung, in deinen Gedanken. Ohne Urteil, nur ein leises Guten Morgen an dich selbst.
+
+[4:00 · EIN PAAR WORTE VORAB]
+
+Bevor wir anfangen, möchte ich dir noch etwas über Breathwork sagen.
+
+Über die Jahre habe ich mehr als elfhundert Stunden Ausbildung gemacht. Yoga, Pilates, Rehabilitation, Regulation des Nervensystems, Yoga Nidra. Und trotzdem habe ich das Wichtigste nicht in einem Kurs gelernt, sondern an meinen eigenen schwersten Tagen. An den Tagen, an denen ich auf eine Art müde war, gegen die kein Schlaf hilft, mit vier Kindern und einem vollen Leben um mich herum.
+
+An diesen Tagen war mein Atem immer das Erste, was ich verändern konnte. Noch vor meinen Gedanken, vor meiner Stimmung und vor allem anderen.
+
+Deshalb fangen wir heute Morgen genau dort an.
+
+Ein kleiner Hinweis zur Sicherheit: Wir bleiben bei allem sanft. Wenn dir irgendwann schwindelig wird, geh einfach zurück zu deinem normalen Atem. Wenn du schwanger bist, lass das Atemanhalten weg und bleib ganz weich.
+
+[6:00 · ÜBUNG 1: RUHIGER ATEM]
+
+Schließ die Augen oder lass deinen Blick weich werden.
+
+Leg eine Hand auf deinen Bauch.
+
+Wir atmen jetzt in einem langsamen, gleichmäßigen Rhythmus, ein auf fünf und aus auf fünf. Dieser Rhythmus ist eine der beruhigendsten Arten zu atmen, für dein Herz und für dein ganzes Nervensystem.
+
+Atme ein … zwei, drei, vier, fünf.
+
+Atme aus … zwei, drei, vier, fünf.
+
+[etwa drei Minuten anleiten, zuerst leise mitzählen, dann still weiteratmen lassen]
+
+Du kannst jetzt allein weiterzählen. Ein auf fünf … aus auf fünf.
+
+[etwa eine Minute still atmen lassen]
+
+Und lass das Zählen los. Atme einfach.
+
+[10:00 · ÜBUNG 2: SUMMENDER ATEM]
+
+Jetzt wird es ein bisschen verspielt, mit einem summenden Atem.
+
+Atme durch die Nase ein. Und beim Ausatmen bleiben deine Lippen geschlossen, und du summst, wie eine Biene. Mmmmm.
+
+[gemeinsam summen]
+
+Spür die Vibration in deinem Gesicht, in deinem Hals und in deiner Brust. Summen ist eines der liebevollsten Dinge, die du für dein Nervensystem tun kannst. Es ist wie eine kleine Massage von innen.
+
+Noch einmal. Atme ein … und summ.
+
+[noch fünf Runden gemeinsam]
+
+Und ruh dich aus. Spür, wie sich dein Gesicht jetzt anfühlt. Vielleicht ein bisschen kribbelig, vielleicht weicher.
+
+[12:30 · ÜBUNG 3: SANFTE BEWEGUNG]
+
+Lass uns den Körper ein wenig aufwecken.
+
+Setz dich aufrecht hin und leg deine Hände auf die Knie.
+
+Mit dem Einatmen öffnest du die Brust nach vorn und hebst den Blick ein wenig.
+
+Mit dem Ausatmen rundest du den Rücken und lässt das Kinn Richtung Brust sinken.
+
+[fünf langsame Runden anleiten]
+
+Jetzt hebst du den rechten Arm und neigst dich sanft nach links. Spür die lange Seite deines Körpers und atme in deine Rippen.
+
+[drei Atemzüge halten]
+
+Und zurück zur Mitte. Jetzt hebst du den linken Arm und neigst dich sanft nach rechts.
+
+[drei Atemzüge halten]
+
+Und zurück zur Mitte. Kreise ein paarmal mit den Schultern, in die Richtung, die sich gut anfühlt.
+
+Und lass deine Hände ruhen.
+
+[16:00 · ÜBUNG 4: WECHSELATMUNG]
+
+Die letzte Atemübung bringt dich ins Gleichgewicht. Sie heißt Wechselatmung.
+
+Führ deine rechte Hand zum Gesicht. Leg den Daumen neben dein rechtes Nasenloch und den Ringfinger neben dein linkes.
+
+Verschließ die rechte Seite sanft mit dem Daumen und atme links ein.
+
+Verschließ die linke Seite mit dem Ringfinger, öffne die rechte und atme rechts aus.
+
+Atme rechts ein.
+
+Verschließ die rechte Seite, öffne die linke und atme links aus.
+
+Das ist eine Runde. Lasst sie uns gemeinsam machen, ganz langsam.
+
+[etwa zwei Minuten anleiten; wenn es jemandem zu kompliziert ist, einfach weiter ein auf fünf und aus auf fünf atmen lassen]
+
+Und lass deine Hand sinken. Atme wieder ganz normal durch beide Seiten.
+
+[Pause]
+
+[19:30 · DEINE ABSICHT FÜR HEUTE]
+
+Nimm jetzt deinen Stift und deinen Zettel, oder einfach deine Gedanken.
+
+Ich möchte, dass du dir eine Frage beantwortest: Wie möchte ich mich am Ende dieses Tages fühlen?
+
+Nicht, was ich schaffen möchte, sondern wie ich mich fühlen möchte.
+
+Schreib einen Satz auf, oder auch nur ein Wort.
+
+[etwa eine Minute Stille geben]
+
+Und wenn du magst, schreib dein Wort in den Chat, dann tragen wir heute die Absichten der anderen ein Stück mit.
+
+[warten und einige Worte mit den Namen vorlesen]
+
+[herzlich reagieren, zum Beispiel:] Schaut euch diese Worte an. Was für ein schöner Anfang für einen Tag.
+
+[22:30 · EINE FRAGE AUS DEM KREIS]
+
+[Wenn eine Frage im Chat oder in deiner Fragenliste steht, beantworte sie hier. Wenn nicht, nimm diese:]
+
+Eine Frage, die ich oft höre, lautet: „Wie bleibe ich an ganz normalen Morgen dran, wenn kein Gathering ist?“
+
+Fang winzig an. Such dir eine einzige Übung von heute Morgen aus. Vielleicht den summenden Atem, während das Teewasser kocht. Vielleicht fünf Atemzüge ein auf fünf und aus auf fünf, bevor du aufstehst. Eine Minute am Tag, die du wirklich machst, ist so viel mehr wert als dreißig Minuten, die du nur planst.
+
+[24:30 · EINE GESCHICHTE ZUM MITNEHMEN]
+
+Ich möchte dir noch etwas erzählen.
+
+Als ich mit meinen allerersten Personal Trainings begonnen habe, dachte ich, meine Aufgabe sei es, Frauen in Bewegung zu bringen. Aber fast jede Frau hat mir früher oder später erzählt, wie erschöpft sie ist. Und so oft habe ich gehört: „Ich hatte heute null Motivation aufzustehen, aber ich wusste, dass du kommst.“
+
+Dieser Satz ist bei mir geblieben. Denn manchmal brauchen wir nicht mehr Disziplin. Wir brauchen jemanden, der auf uns wartet, einen Kreis, der bemerkt, dass wir da sind.
+
+Genau das sollen diese Morgen für dich sein. Ein Ort, an dem jemand auf dich wartet, an dem du erwartet wirst und willkommen bist, genau so, wie du bist.
+
+[26:30 · EINE EINLADUNG]
+
+Wenn du immer wieder zu Morgen wie diesem zurückkommen möchtest, sei beim nächsten Gathering dabei. Die Gatherings sind kostenlos, und das Datum findest du immer auf moveciamovement.com.
+
+Und wenn du das als Teil deines Lebens möchtest, mit Atemarbeit, kurzen Bewegungseinheiten und jeden Monat einem neuen Programm, dann öffnet meine Mindful Movement Method am 1. Dezember, und du kannst dir deinen Platz schon jetzt sichern.
+
+[Wenn du heute Morgen ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir jetzt etwas auf den Bildschirm gelegt. Schau es dir in Ruhe an.
+
+[28:00 · ABSCHLUSS]
+
+Lasst uns mit drei gemeinsamen Atemzügen schließen. Ein auf fünf … aus auf fünf.
+
+[gemeinsam atmen]
+
+Leg deine Hände auf dein Herz und sag dir deine Absicht noch einmal ganz still vor.
+
+Danke, dass du deinen Tag mit mir und miteinander begonnen hast.
+
+Ich wünsche dir, dass du dich heute Abend genau so fühlst, wie du es dir heute Morgen gewünscht hast.
+
+Habt einen wunderschönen Tag, ihr wilden Herzen. Bis bald.',
+  'Evening · 15 min · Smoke & release ritual' => '[0:00 · ANKOMMEN]
+
+Guten Abend, ihr wilden Herzen. Kommt herein.
+
+Lasst mich alle begrüßen, die heute Abend da sind. {names}. Ich freue mich so, dass ihr durch den Tag gekommen seid und hierher gefunden habt.
+
+Der Tag liegt jetzt hinter dir. Was auch immer heute passiert ist, was gut gelaufen ist und was nicht, du musst es nicht mit in diesen Raum tragen. Du darfst es an der Tür ablegen.
+
+Das ist {title}. Fünfzehn Minuten, um deinen Tag sanft abzuschließen. Dimm das Licht, wenn du kannst. Kamera an oder aus, ganz wie es sich gemütlich anfühlt.
+
+[Pause]
+
+[1:30 · DEIN RITUAL VORBEREITEN]
+
+Heute Abend machen wir gemeinsam ein kleines Reinigungsritual, um den Tag abzuschließen und Platz für Ruhe zu machen.
+
+Wenn du etwas zum sanften Räuchern hast, ein Kräuterbündel, ein wenig Rosmarin oder ein Räucherstäbchen, dann leg es dir jetzt mit einem Feuerzeug und einer feuerfesten Schale bereit. Öffne bitte das Fenster einen Spalt und lass den Rauch nie unbeaufsichtigt.
+
+Und wenn du nichts davon hast oder zu Hause keinen Rauch möchtest, ist eine Kerze wunderbar. Und wenn du gar nichts hast, reicht dein Atem. Wirklich.
+
+[einen Moment zum Vorbereiten geben]
+
+[3:00 · LANDEN]
+
+Lass uns zuerst landen.
+
+Setz dich bequem hin und lass deine Hände in deinem Schoß ruhen.
+
+Atme durch die Nase ein …
+
+Und lass einen langen, langsamen Atem durch den Mund ausströmen.
+
+[gemeinsam atmen]
+
+Noch einmal, und diesmal wird das Ausatmen noch länger, als würdest du sanft über eine heiße Tasse Tee pusten.
+
+[ausatmen]
+
+Noch einmal. Lass deine Stirn weich werden, lass deinen Kiefer los und lass die Schultern sinken.
+
+[4:30 · DIE GESCHICHTE FÜR HEUTE ABEND]
+
+Ich möchte dir erzählen, warum ich kleine Rituale am Abend so liebe.
+
+Mit vier Kindern gehören die Abende oft zu den vollsten Stunden des Tages. Abendessen, Baden, Geschichten vorlesen, einer braucht noch ein Glas Wasser, eine kann nicht einschlafen. Und vielleicht kennst du das auch: Wenn es im Haus endlich still ist, liegt dein Körper zwar auf dem Sofa, aber dein Kopf geht noch einmal den ganzen Tag durch.
+
+[dein Detail: wie deine Abende wirklich aussehen, ein kleiner Moment]
+
+Was mir hilft, einen Tag abzuschließen, ist etwas sehr Altes und sehr Einfaches. Ein kleines Ritual, das meinem Körper sagt: Der Tag ist jetzt vorbei. Eine Kerze anzünden, das Fenster öffnen, ein wenig Rauch durch den Raum ziehen lassen. Nicht, weil es Magie ist, sondern weil es ein klarer Moment des Abschließens ist. Unser Nervensystem versteht Rituale besser als To-do-Listen.
+
+[7:00 · DAS RITUAL]
+
+Lass es uns gemeinsam machen.
+
+Wenn du deine Kräuter, dein Räucherwerk oder deine Kerze hast, zünde sie jetzt an, ganz langsam und vorsichtig.
+
+[zünde deines auch an]
+
+Schau für einen Moment in die Flamme oder in den Rauch. Sieh, wie er sich bewegt. Er zieht nie in einer geraden Linie, oder? Er bewegt sich sanft, überall dorthin, wo Platz ist.
+
+Denk jetzt an eine Sache von heute, die du nicht mit ins Bett nehmen möchtest. Eine Sorge, ein Gespräch, ein Gefühl oder einen Gedanken, der immer wiederkommt.
+
+Du musst es nicht aussprechen. Du musst nur wissen, was es ist.
+
+Atme ein … und stell dir beim Ausatmen vor, wie es mit dem Rauch hinauszieht oder im Licht der Kerze schmilzt, durch das offene Fenster hinaus in die Nacht.
+
+[Pause]
+
+Atme noch einmal ein … und lass es noch ein bisschen mehr los.
+
+[Pause]
+
+Und ein letztes Mal. Ein … und loslassen.
+
+[10:00 · DU BIST DRAN]
+
+Wenn du magst, schreib ein Wort in den Chat für das, was du heute Abend loslässt. Oder ein Wort für das, was du stattdessen fühlen möchtest.
+
+[warten und einige Worte sanft mit den Namen vorlesen]
+
+Danke. Ich spüre, wie der Raum leichter wird.
+
+[11:00 · EINE FRAGE AUS DEM KREIS]
+
+[Wenn eine Frage im Chat oder in deiner Fragenliste steht, beantworte sie hier. Wenn nicht, nimm diese:]
+
+Eine Frage, die ich oft höre, lautet: „Ist es wichtig, welche Kräuter ich nehme?“
+
+Es ist schön, etwas zu wählen, dessen Duft du magst. Rosmarin, Lavendel, ein wenig Salbei aus dem Garten. Am wichtigsten sind aber deine Absicht und der Moment, den du dir für dich nimmst. Eine Kerze und ein tiefer Atemzug mit einer klaren Absicht sind genauso kraftvoll.
+
+[12:00 · EINE EINLADUNG]
+
+Wenn dir der heutige Abend geholfen hat, deinen Tag abzuschließen, komm beim nächsten Mal wieder. Dann machen wir das wieder gemeinsam.
+
+Und wenn du dir solche Rituale jeden Monat wünschst, für die Morgen, für die Abende und für die schweren Tage dazwischen, dann öffnet meine Mindful Movement Method am 1. Dezember, und du kannst dir deinen Platz schon jetzt sichern.
+
+[Wenn du heute Abend ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir etwas auf den Bildschirm gelegt. Lies es in Ruhe, es eilt nicht.
+
+[13:30 · ABSCHLUSS]
+
+Blas jetzt deine Kerze aus, oder lass deine Kräuter sicher in der Schale ruhen, bis sie ganz erloschen sind.
+
+[deine ausblasen]
+
+Leg beide Hände auf dein Herz.
+
+Sag dir ganz still: Der Tag ist vorbei. Ich habe mein Bestes gegeben. Ich darf jetzt ruhen.
+
+Danke, dass du das Ende deines Tages mit uns verbracht hast.
+
+Schlaft gut, ihr wilden Herzen. Gute Nacht.',
+  'Evening · 30 min · Ritual & deep rest' => '[0:00 · ANKOMMEN]
+
+Guten Abend, ihr wilden Herzen. Kommt herein, kommt herein.
+
+Lasst mich euch alle begrüßen. {names}. Es ist so schön, diesen Tag mit euch zu beenden.
+
+Vielleicht schlafen die Kinder endlich. Vielleicht bist du gerade von der Arbeit heimgekommen. Vielleicht ist das der erste Moment heute, in dem du dich hinsetzt. Wie auch immer du heute Abend ankommst, du darfst den Tag jetzt loslassen. Du bist hier.
+
+Das ist {title}. In den nächsten dreißig Minuten schließen wir den Tag gemeinsam ab. Ein kleines Ritual, ein wenig sanfte Bewegung und zum Schluss eine tiefe Ruhe. Du kannst alles im Sitzen oder im Liegen mitmachen. Kamera an oder aus, so wie es sich am besten anfühlt.
+
+[Pause]
+
+[2:00 · DEINEN PLATZ VORBEREITEN]
+
+Lass uns deinen Platz für den Abend vorbereiten.
+
+Dimm das Licht, wenn du kannst. Leg dir eine Decke und ein Kissen in die Nähe, denn zum Schluss möchtest du dich vielleicht hinlegen.
+
+Wenn du eine Kerze hast, stell sie vor dich. Wenn du mit Rauch arbeiten möchtest, leg dir deine Kräuter oder dein Räucherwerk mit einer feuerfesten Schale bereit und öffne das Fenster einen Spalt. Lass die Flamme und den Rauch nie unbeaufsichtigt. Und wenn du nichts davon hast, ist das völlig in Ordnung. Dein Atem reicht.
+
+Leg dir auch einen Stift und einen Zettel bereit.
+
+[einen Moment zum Vorbereiten geben]
+
+[4:00 · LANDEN]
+
+Setz dich bequem hin und lass deine Hände ruhen.
+
+Atme durch die Nase ein …
+
+Und atme durch den Mund aus, mit einem langen, langsamen Seufzer.
+
+[hörbar ausatmen]
+
+Noch einmal. Durch die Nase ein … und ein langer Seufzer aus.
+
+Noch einmal. Und lass mit diesem Seufzer den Tag von deinen Schultern gleiten.
+
+[ausatmen]
+
+Schön. Lass deinen Atem jetzt seinen eigenen Rhythmus finden.
+
+[5:30 · DIE GESCHICHTE FÜR HEUTE ABEND]
+
+Bevor wir mit unserem Ritual beginnen, möchte ich dir etwas erzählen.
+
+Als ich angefangen habe, mit Frauen zu arbeiten, dachte ich, ich sei dafür da, sie in Bewegung zu bringen. Und dann hat mir fast jede Frau erzählt, wie erschöpft sie ist. Nicht die Art von Müdigkeit, gegen die eine gute Nacht hilft, sondern die, die tiefer sitzt.
+
+Ich kenne diese Müdigkeit. Ich habe vier Kinder und ein volles Leben, und auch ich habe meine schweren Tage. Und was ich an meinen eigenen schwersten Tagen gelernt habe: Ruhe passiert nicht zufällig. Schon gar nicht für Frauen, die viel tragen. Unser Körper muss in die Ruhe eingeladen werden, sanft und mit einem klaren Zeichen, dass der Tag vorbei ist.
+
+[dein Detail: ein Abend, an dem du das gespürt hast, und was dir geholfen hat, in deinen Worten]
+
+Genau das ist der heutige Abend. Eine Einladung in die Ruhe.
+
+[8:00 · RITUAL: DEN TAG KLÄREN]
+
+Lass uns mit unserem Ritual beginnen.
+
+Zünde jetzt deine Kerze an, oder deine Kräuter oder dein Räucherwerk, ganz langsam und vorsichtig.
+
+[zünde deines auch an]
+
+Schau ein paar Atemzüge lang in die Flamme oder in den Rauch. Lass deine Augen darauf ruhen.
+
+Nimm jetzt deinen Zettel und schreib drei kleine Dinge von heute auf, die gut waren. Sie dürfen winzig sein. Eine warme Tasse Kaffee. Eine Umarmung. Ein Moment Sonne im Gesicht. Jemand, der dich angelächelt hat.
+
+[etwa eine Minute geben]
+
+Und darunter schreibst du eine Sache, die du heute Abend zurücklassen möchtest. Eine Sorge, ein Gespräch, ein Gefühl, das dir noch in der Brust sitzt.
+
+[etwa eine Minute geben]
+
+Schau dir jetzt an, was du zurücklassen möchtest. Atme ein … und stell dir beim Ausatmen vor, wie es mit dem Rauch hinauszieht oder im Licht der Kerze schmilzt, durch das offene Fenster hinaus in die Nacht.
+
+[Pause]
+
+Noch einmal. Atme ein … und lass es noch ein bisschen mehr los.
+
+[Pause]
+
+Wenn du magst, falte den Zettel und leg ihn zur Seite. Die letzte Zeile darfst du morgen abreißen oder einfach wegwerfen. Die drei guten Dinge behältst du.
+
+[11:30 · DU BIST DRAN]
+
+Wenn du teilen möchtest, schreib eines deiner guten Dinge in den Chat. Lasst uns diesen Raum mit den kleinen guten Momenten von heute füllen.
+
+[warten und einige mit den Namen vorlesen]
+
+[herzlich reagieren, zum Beispiel:] Schaut euch das an. Heute war so viel Gutes dabei, auch wenn es sich nicht so angefühlt hat.
+
+[13:30 · SANFTE BEWEGUNG]
+
+Lass uns den Körper jetzt ein wenig lösen, bevor wir ruhen.
+
+Setz dich aufrecht hin. Lass deinen Kopf sanft zur rechten Schulter sinken und atme in die linke Seite deines Nackens.
+
+[drei Atemzüge halten]
+
+Und langsam zur anderen Seite.
+
+[drei Atemzüge halten]
+
+Verschränk deine Finger, dreh die Handflächen nach vorn und streck die Arme vor dir aus. Mach deinen oberen Rücken rund wie eine Katze.
+
+[drei Atemzüge halten]
+
+Jetzt komm, wenn du kannst, auf den Boden oder in dein Bett. Zieh die Knie zur Brust und wieg dich sanft von einer Seite zur anderen, wie eine kleine Massage für deinen unteren Rücken.
+
+[etwa eine Minute wiegen]
+
+Und wenn eine Wand in deiner Nähe ist, kannst du die Beine für ein paar Minuten an der Wand hochlegen. Wenn nicht, leg dich einfach auf den Rücken, mit einem Kissen unter den Knien.
+
+[einen Moment zum Einrichten geben]
+
+[18:00 · TIEFE RUHE]
+
+Mach es dir jetzt richtig bequem. Deck dich mit deiner Decke zu und lass die Augen zufallen.
+
+Wir reisen jetzt langsam durch den Körper und lassen jeden Teil weich werden. Du musst nichts tun. Folge einfach meiner Stimme, oder lass dich treiben. Beides ist perfekt.
+
+Bring deine Aufmerksamkeit zu deinen Füßen. Lass sie schwer werden.
+
+Deine Beine, schwer und warm.
+
+Deine Hüften, die in den Boden sinken.
+
+Dein Bauch, der sich von selbst hebt und senkt.
+
+Deine Brust und dein Herz, das den ganzen Tag lang still für dich schlägt.
+
+Deine Hände und deine Arme, lass sie schwer sein.
+
+Deine Schultern, die nach unten schmelzen.
+
+Dein Nacken und dein Kiefer. Lass deine Zähne ein wenig auseinandergehen.
+
+Deine Augen, schwer in ihren Höhlen.
+
+Deine Stirn, glatt und weit.
+
+Dein ganzer Körper, gehalten vom Boden unter dir.
+
+[Pause, etwa eine Minute Stille]
+
+Lass uns jetzt in einem langsamen, beruhigenden Rhythmus atmen. Ein auf vier … und aus auf sechs.
+
+[etwa zwei Minuten anleiten, leise zählen, dann Stille]
+
+[Pause, etwa eine Minute Stille]
+
+[24:00 · EINE FRAGE AUS DEM KREIS]
+
+[Sprich hier leise. Wenn eine Frage im Chat oder in deiner Fragenliste steht, beantworte sie sanft. Wenn nicht, nimm diese:]
+
+Eine Frage, die ich oft höre, lautet: „Was mache ich, wenn ich nachts meine Gedanken nicht abschalten kann?“
+
+Kämpf nicht gegen sie an. Gedanken sind wie Wolken, und wenn man gegen sie kämpft, werden sie nur schwerer. Bemerk den Gedanken, sag dir leise „denken“ und kehr zu deinem Atem zurück. Ein auf vier, aus auf sechs. Immer wieder, so oft du es brauchst. Jedes Mal, wenn du zurückkommst, hast du es richtig gemacht.
+
+[25:30 · ZURÜCKKOMMEN]
+
+Komm jetzt langsam wieder zurück. Beweg deine Finger und deine Zehen.
+
+Wenn du liegen bleiben und gleich einschlafen möchtest, darfst du das gern. Lass deine Kamera einfach aus und gleite hinüber.
+
+Und wenn du noch einmal aufstehen musst, roll dich zuerst auf die Seite, bleib dort einen Atemzug lang liegen und komm langsam hoch.
+
+[27:00 · EINE EINLADUNG]
+
+[leise]
+
+Wenn dir der heutige Abend gutgetan hat, komm zum nächsten Gathering. Die Gatherings sind kostenlos, und das Datum findest du auf moveciamovement.com.
+
+Und wenn du solche Abende als Teil deines Lebens möchtest, mit tiefer Ruhe, Atemarbeit und sanfter Bewegung, immer dann, wenn du sie brauchst, dann öffnet meine Mindful Movement Method am 1. Dezember, und du kannst dir deinen Platz schon jetzt sichern.
+
+[Wenn du heute Abend ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir etwas auf den Bildschirm gelegt. Schau es dir morgen an, wenn du ausgeruht bist. Es eilt nicht.
+
+[28:30 · ABSCHLUSS]
+
+Blas jetzt deine Kerze aus, oder lass deine Kräuter sicher in der Schale ruhen, bis sie ganz erloschen sind.
+
+[deine ausblasen]
+
+Leg deine Hände auf dein Herz.
+
+Der Tag ist vorbei. Du hast dein Bestes gegeben. Du darfst jetzt ruhen.
+
+Danke, dass du deinen Tag mit mir beendet hast.
+
+Schlaft gut, ihr wilden Herzen. Gute Nacht.',
 );
