@@ -15,7 +15,7 @@ function natal_member_schema(PDO $pdo): void
     if ($done) return;
     $done = true;
     $oc = array_column($pdo->query('PRAGMA table_info(mm_natal_orders)')->fetchAll(), 'name');
-    foreach (['is_test' => 'INTEGER NOT NULL DEFAULT 0', 'health' => "TEXT NOT NULL DEFAULT ''", 'health_at' => 'TEXT', 'purged_at' => 'TEXT', 'warned_at' => 'TEXT', 'birth_date' => "TEXT NOT NULL DEFAULT ''", 'birth_mailed_at' => 'TEXT'] as $c => $t) {
+    foreach (['is_test' => 'INTEGER NOT NULL DEFAULT 0', 'health' => "TEXT NOT NULL DEFAULT ''", 'health_at' => 'TEXT', 'purged_at' => 'TEXT', 'warned_at' => 'TEXT', 'birth_date' => "TEXT NOT NULL DEFAULT ''", 'birth_mailed_at' => 'TEXT', 'review_sent_at' => 'TEXT'] as $c => $t) {
         if ($oc && !in_array($c, $oc, true)) $pdo->exec("ALTER TABLE mm_natal_orders ADD COLUMN $c $t");
     }
     $pdo->exec('CREATE TABLE IF NOT EXISTS mm_natal_members (
@@ -110,6 +110,14 @@ function natal_order_until(PDO $pdo, array $o): string
 }
 
 /** Läuft der Bereich schon im „letzten Monat“ (alle Einheiten vorbei)? */
+/** Ende der letzten erledigten Einheit (Zeitstempel), 0 wenn keine. */
+function natal_order_last_end(PDO $pdo, array $o): int
+{
+    $end = 0;
+    foreach (natal_order_plan($pdo, $o) as [, $s]) if ($s && (string)$s['start'] !== '') $end = max($end, strtotime($s['date'] . ' ' . $s['start']) + (int)$s['minutes'] * 60);
+    return $end;
+}
+
 function natal_order_finished(PDO $pdo, array $o): bool
 {
     foreach (natal_order_plan($pdo, $o) as [, $s]) if (!natal_session_done($s)) return false;
@@ -278,6 +286,12 @@ function natal_member_run(PDO $pdo): void
                 'dein Mitgliederbereich mit allen Aufnahmen und Workbooks ist noch bis ' . natal_date_de($until) . ' für dich da. Danach lösche ich ihn mit allen Aufnahmen und deinen Gesundheitsangaben, so wie besprochen.',
                 'Wenn du magst, lade dir deine Workbooks vorher noch herunter. Sie gehören dir.',
             ], [natal_member_link(), 'Zu meinem Bereich']);
+        }
+        // Google-Bewertung (Vivien, 25.10.2026): eine Stunde nach der letzten Einheit, genau einmal
+        if (!$o['review_sent_at'] && mm_review_url() !== '' && natal_order_finished($pdo, $o) && natal_order_last_end($pdo, $o) + 3600 <= time()) {
+            $u = $pdo->prepare('UPDATE mm_natal_orders SET review_sent_at = ? WHERE id = ? AND review_sent_at IS NULL');
+            $u->execute([date('c'), $o['id']]);
+            if ($u->rowCount() === 1) { try { mm_review_mail((string)$o['email'], (string)$o['name'], 'de', (int)$o['units'] > 1 ? 'natal' : 'natal1', (int)($o['is_test'] ?? 0) === 1); } catch (Throwable $e) { error_log('Natal review: ' . $e->getMessage()); } }
         }
         if ($today < $until) continue;
         $rs = $pdo->prepare('SELECT * FROM mm_natal_recs WHERE order_id = ?');

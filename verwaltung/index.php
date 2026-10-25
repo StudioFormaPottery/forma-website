@@ -243,7 +243,7 @@ if ($action === 'logout') {
 }
 
 // Movecia Movement / Wild Hearts: eigener Bereich (verwaltung/movecia.php)
-if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 'natal' || $view === 'method') {
+if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 'natal' || $view === 'method' || $view === 'texte') {
     require __DIR__ . '/movecia.php';
 }
 
@@ -2356,9 +2356,8 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
     </section>
     <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
     <?php if (!forma_stripe_key()): ?><p class="alert">Die Online-Bezahlung ist noch nicht eingerichtet. Bis dahin werden alle Kurse ohne Bezahlung reserviert. <a href="<?= forma_h($self) ?>?view=einstellungen">Jetzt Stripe verbinden</a></p><?php endif; ?>
-    <a class="mm-door" href="<?= forma_h($self) ?>?view=movecia"><span class="mm-dot" aria-hidden="true"><img src="/img/movecia/movecia-zeichen-hell.svg" alt="" style="width:78%;height:78%"></span><span><small>Getrennt von FORMA</small><strong>Movecia Movement</strong><span>Wild Hearts · E-Mail-Liste · Gatherings · Videochat</span></span><span class="mm-arrow" aria-hidden="true">→</span></a>
     <?php $natalReq = 0; try { $natalReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} ?>
-    <a class="mm-door nt-door" href="<?= forma_h($self) ?>?view=natal"><span class="mm-dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3"/><path d="M7 21c0-5 2-9 5-9s5 4 5 9"/><path d="M12 14a2.5 2.5 0 0 0 0 5"/></svg></span><span><small>Movecia · 1:1 im Studio</small><strong>Prä- &amp; Postnatal</strong><span><?= $natalReq ? ($natalReq === 1 ? '1 Terminanfrage wartet' : $natalReq . ' Terminanfragen warten') : 'Angebote · Terminanfragen · Pakete' ?></span></span><span class="mm-arrow" aria-hidden="true">→</span></a>
+    <a class="mm-door" href="<?= forma_h($self) ?>?view=movecia"><span class="mm-dot" aria-hidden="true"><img src="/img/movecia/movecia-zeichen-hell.svg" alt="" style="width:78%;height:78%"></span><span><small>Getrennt von FORMA</small><strong>Movecia</strong><span><?= $natalReq ? ($natalReq === 1 ? '1 Terminanfrage wartet · ' : $natalReq . ' Terminanfragen warten · ') : '' ?>Method &amp; Unfold · Prä- &amp; Postnatal · Gatherings · Teleprompter</span></span><span class="mm-arrow" aria-hidden="true">→</span></a>
     <?php foreach ($minCourses as $mc): ?><a class="card notice" href="<?= forma_h($self) ?>?view=course&amp;id=<?= (int)$mc['id'] ?>"><span class="ic"><?= admin_icon('kalender') ?></span><span><strong>Zu wenige Anmeldungen: <?= forma_h($mc['title']) ?>, <?= forma_h(preg_replace('/\s*·.*$/u', '', (string)$mc['date_text'])) ?></strong><br><span class="muted small">Entscheide: findet statt oder Gäste informieren →</span></span></a><?php endforeach; ?>
     <?php if ($toPlan > 0): ?><a class="card notice" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('private') ?></span><span><strong><?= $toPlan === 1 ? '1 Private-Pottery-Buchung wartet' : $toPlan . ' Private-Pottery-Buchungen warten' ?> auf ihren Termin.</strong><br><span class="muted small">Im Kalender einplanen und Bestätigung schicken →</span></span></a><?php endif; ?>
     <div class="dash">

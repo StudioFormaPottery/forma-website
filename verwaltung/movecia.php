@@ -4,11 +4,32 @@
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/api/movecia-lib.php';
 mm_schema($pdo);
+
+/** Ein gemeinsames Movecia-Menü für alle Movecia-Bereiche der Verwaltung (Vivien, 25.10.2026: es gibt FORMA und Movecia). */
+function mm_subnav(string $active): void
+{
+    global $pdo;
+    $self = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?');
+    $req = 0; try { $req = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {}
+    $tabs = [['movecia', '?view=movecia', 'Übersicht'], ['method', '?view=method', 'Method &amp; Unfold'], ['natal', '?view=natal', 'Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['texte', '?view=texte', 'Teleprompter'], ['einst', '?view=movecia#einstellungen', 'Einstellungen']]; ?>
+<style>
+.mvsub{position:sticky;top:0;z-index:40;margin:-8px -16px 16px;padding:10px 16px;background:rgba(242,236,228,.96);border-bottom:1px solid #DDD2C6;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.mvsub::-webkit-scrollbar{display:none}
+.mvsub a{flex:0 0 auto;padding:8px 14px;border-radius:999px;border:1px solid #DDD2C6;background:#FBF8F4;color:#6B5658;text-decoration:none;font-size:15px;white-space:nowrap}
+.mvsub a.on{background:#7D5E68;border-color:#7D5E68;color:#FBF5F7}
+.mvsub a.fo{background:transparent;border-color:transparent;color:#8C2C1D;padding-left:4px}
+.mvsub i{font-style:normal;display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:999px;background:#B5544A;color:#fff;font-size:12px;text-align:center}
+</style>
+<nav class="mvsub" aria-label="Movecia"><a class="fo" href="<?= forma_h($self) ?>">← FORMA</a><?php foreach ($tabs as [$k, $q, $t]): ?><a href="<?= forma_h($self) . $q ?>"<?= $k === $active ? ' class="on" aria-current="page"' : '' ?>><?= $t ?></a><?php endforeach; ?></nav>
+<?php
+}
 try { mm_auto_setup($pdo); } catch (Throwable $e) { error_log('MM setup: ' . $e->getMessage()); }
 // Prä- & Postnatal Training (eigener Reiter ?view=natal)
 require __DIR__ . '/natal.inc.php';
 // Method & Unfold (eigener Reiter ?view=method)
 require __DIR__ . '/method.inc.php';
+// Teleprompter-Texte (?view=texte)
+require __DIR__ . '/texte.inc.php';
 
 $mmBack = $self . '?view=movecia';
 
@@ -70,7 +91,7 @@ if ($action === 'mm_testroom') {
 if ($action === 'mm_save_offers') {
     $cfg = mm_cfg('offers') ?? [];
     foreach (MM_OFFER_KEYS as $k) {
-        if (in_array($k, ['method', 'unfold'], true)) continue;
+        if (in_array($k, ['method', 'unfold'], true) || in_array($k, MM_OFFER_RETIRED, true)) continue;
         $c = is_array($cfg[$k] ?? null) ? $cfg[$k] : [];
         $c['title'] = forma_clean((string)($_POST['title'][$k] ?? ''), 80) ?: (mm_offers()[$k]['title']);
         $c['text'] = mb_substr(trim((string)($_POST['text'][$k] ?? '')), 0, 600);
@@ -156,6 +177,13 @@ if ($action === 'mm_save_whereby') {
         try { if (mm_whereby_room($pdo, (int)$g['id'])) $n++; } catch (Throwable $e) { error_log('MM room: ' . $e->getMessage()); }
     }
     go($mmBack . '#einstellungen', 'Whereby ist verbunden.' . ($n ? ($n === 1 ? ' Der Videoraum für dein Gathering ist angelegt.' : " $n Videoräume sind angelegt.") : ''));
+}
+
+if ($action === 'mm_save_review') {
+    $u = trim((string)($_POST['review_url'] ?? ''));
+    if ($u !== '' && !preg_match('#^https://#', $u)) go($mmBack . '#einstellungen', 'Bitte füge den ganzen Link ein, er beginnt mit https://');
+    mm_save_cfg('review', $u === '' ? null : ['url' => $u]);
+    go($mmBack . '#einstellungen', $u === '' ? 'Bewertungslink entfernt, Bewertungs-Mails warten.' : 'Bewertungslink gespeichert. Ab jetzt gehen die Bewertungs-Mails nach Unfold und nach Prä- & Postnatal automatisch raus.');
 }
 
 if ($action === 'mm_remove_whereby') {
@@ -248,7 +276,7 @@ body{background:var(--paper)}
 select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
 @media (min-width:700px){.mm-stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style>
-        <p><a href="<?= forma_h($self) ?>">← Zurück zu FORMA</a></p>
+        <?php mm_subnav('movecia'); ?>
         <section class="mm-hero">
             <p class="eyebrow">Movecia Movement</p>
             <h1>Movecia</h1>
@@ -273,6 +301,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/?demo=prae" target="_blank" rel="noopener"><span class="ic">🌿</span><b>Mitgliederbereich ansehen</b><span>So sieht ihn eine Kundin mit Paket (Beispiel Pränatal, auch <u>post</u> unter Prä- &amp; Postnatal)</span></a>
             <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/" target="_blank" rel="noopener"><span class="ic">🔑</span><b>Login für Kundinnen</b><span>moveciamovement.com/natal/mitglied – diesen Link bekommen sie auch per Mail</span></a>
             <a href="<?= forma_h($self) ?>?view=method"><span class="ic">🌱</span><b>Method &amp; Unfold</b><span>Programme, Lektionen, Mitglieder, Unfold-Plätze, Preise</span></a>
+            <a href="<?= forma_h($self) ?>?view=texte"><span class="ic">🎙️</span><b>Teleprompter-Texte</b><span>Alle Sprechtexte zum Einsprechen: Gatherings, Prä-/Postnatal, Unfold, Method</span></a>
             <a href="<?= forma_h($self) ?>?view=method#bunny"><span class="ic">🎬</span><b>Bunny (Videos) <?= function_exists('mv_bunny_ok') && mv_bunny_ok() ? '✓' : 'verbinden' ?></b><span>Hier trägst du Library-ID, CDN Hostname, API Key und Token-Schlüssel ein</span></a>
         </div>
         <div class="mm-stats">
@@ -310,9 +339,9 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         <h2 id="angebote">Angebote</h2>
         <form method="post" class="card stack">
             <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_save_offers">
-            <p class="small">Diese Angebote kannst du am Ende eines Gatherings aus deinem Gastgeberinnen-Fenster einblenden („✦ Angebot“). Hier trägst du den regulären Preis ein. Den günstigeren Gathering-Preis und wie viele Minuten er gilt, gibst du beim Einblenden ein. Läuft der Countdown ab, gilt automatisch wieder der reguläre Preis, auch beim Bezahlen. Titel und Text sehen die Frauen, deshalb auf Englisch.</p>
+            <p class="small">Am Ende eines Gatherings kannst du im Gastgeberinnen-Fenster („✦ Angebot“) Unfold, die Method und das Alpine Retreat einblenden. Hier trägst du den regulären Preis fürs Retreat ein. Den günstigeren Gathering-Preis und wie viele Minuten er gilt, gibst du beim Einblenden ein. Läuft der Countdown ab, gilt automatisch wieder der reguläre Preis, auch beim Bezahlen. Titel und Text sehen die Frauen, deshalb auf Englisch.</p>
             <p class="small">Method und Unfold kannst du ebenfalls einblenden. Ihre Preise (auch die Gathering-Preise) stellst du unter <a href="<?= forma_h($self) ?>?view=method#preise">Method &amp; Unfold → Preise</a> ein.</p>
-            <?php foreach ($offs as $k => $o): if (in_array($k, ['method', 'unfold'], true)) continue; ?>
+            <?php foreach ($offs as $k => $o): if (in_array($k, ['method', 'unfold'], true) || in_array($k, MM_OFFER_RETIRED, true)) continue; ?>
                 <div class="stack" style="border-top:1px solid var(--line);padding-top:12px">
                     <label for="ot<?= $k ?>"><strong><?= ['circle' => 'Inner Circle', 'year' => 'Jahreskreis', 'retreat' => 'Alpine Retreat'][$k] ?></strong> · Titel</label>
                     <input id="ot<?= $k ?>" name="title[<?= $k ?>]" value="<?= forma_h($o['title']) ?>" maxlength="80">
@@ -351,7 +380,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                     <p class="muted small">Die Frauen können dann auf einmal, in 3 oder in 6 Monatsraten zahlen. Stripe bucht monatlich ab und hört nach der letzten Rate von selbst auf. Ein leeres Feld schaltet diese Variante aus.</p>
                 <?php endif; ?>
             <?php endforeach; ?>
-            <p class="muted small">Bei „monatlich“ wird ein Abo über Stripe abgeschlossen. Beim Inner Circle gilt der Gathering-Preis nur für die oben eingestellten Monate, danach automatisch der reguläre Preis.</p>
+            <p class="muted small">Inner Circle und Jahreskreis gibt es nicht mehr. Sie stehen nirgends mehr zur Auswahl, frühere Buchungen bleiben unten in der Liste.</p>
             <button class="btn" type="submit">Angebote speichern</button>
         </form>
         <?php try { $tp = mm_test_promo(); } catch (Throwable $e) { $tp = null; } if ($tp && (int)$tp['until'] > time()): ?>
@@ -496,6 +525,13 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                 <input name="whereby_key" type="password" autocomplete="off" placeholder="<?= $hasWhereby ? 'Neuen Schlüssel einfügen, um ihn zu ersetzen' : 'Whereby API-Schlüssel' ?>">
                 <button class="btn" type="submit">Whereby verbinden</button></form>
             <?php if ($hasWhereby): ?><form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_remove_whereby"><button class="link small" type="submit">Whereby trennen</button></form><?php endif; ?>
+        </div>
+        <div class="card stack" style="margin-top:12px">
+            <p><strong>Google-Bewertungslink</strong> <?= mm_review_url() !== '' ? '<span class="mm-badge">hinterlegt</span>' : '<span class="mm-badge on">fehlt noch</span>' ?></p>
+            <p class="muted small">Für die Danke-Mail mit Bitte um eine Google-Bewertung: am Morgen nach dem Ende von Unfold und eine Stunde nach der letzten Prä-/Postnatal-Einheit. Den Link findest du im Google-Unternehmensprofil von Movecia unter „Nach Rezensionen fragen“. Solange er fehlt, warten die Mails und gehen raus, sobald du ihn einträgst.</p>
+            <form method="post" class="stack"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_save_review">
+                <input name="review_url" type="url" autocomplete="off" value="<?= forma_h(mm_review_url()) ?>" placeholder="https://g.page/r/…/review">
+                <button class="btn" type="submit">Link speichern</button></form>
         </div>
         <div class="card stack" style="margin-top:12px">
             <p><strong>Absender hello@moveciamovement.com</strong> <?= $hasMail ? '<span class="mm-badge">verbunden</span>' : '<span class="mm-badge on">noch nicht verbunden</span>' ?></p>

@@ -21,7 +21,7 @@ if (!$guest) foreach ((require __DIR__ . '/skripte-de.inc.php') as $st => $sx) i
 $pPick = '';
 $sg = $gath ?: $probe;
 if ($sg && ($sg['script'] ?? '') !== '' && isset($pLib[$sg['script']])) { $pPick = $sg['script']; $pText = $pLang === 'de' && isset($pDe[$pPick]) ? $pDe[$pPick] : $pLib[$pPick]; }
-$offers = $guest ? [] : mm_offers();
+$offers = $guest ? [] : mm_offers_active();
 ?><!doctype html>
 <html lang="de">
 <head>
@@ -510,7 +510,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     const DEF = shuffle(WORLD);
     let rows = [];
     try { rows = JSON.parse(localStorage.getItem('wh-uebung') || 'null') || []; } catch (e) {}
-    const BUY = [['', 'bucht nichts'], ['circle', 'bucht Inner Circle'], ['year', 'bewirbt sich: Jahreskreis'], ['retreat', 'bucht Alpine Retreat']];
+    const BUY = [['', 'bucht nichts'], ['unfold', 'bucht Unfold'], ['method', 'bucht die Method'], ['retreat', 'bucht Alpine Retreat']];
     if (!rows.length) rows = DEF.slice(0, 5).map((n, i) => ({name: n, color: SW[i % SW.length]}));
     const imgs = new Map();
     const store = () => { try { localStorage.setItem('wh-uebung', JSON.stringify(rows.map(r => ({name: r.name, color: r.color, buys: r.buys || ''})))); } catch (e) {} };

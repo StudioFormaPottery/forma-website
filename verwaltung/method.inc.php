@@ -372,6 +372,7 @@ label.inl{display:flex;gap:8px;align-items:center}
         <?php if ($p['id']): ?><form method="post" onsubmit="return confirm('Programm mit allen Lektionen, Videos und Dateien löschen?')" style="margin-top:12px"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_prog_delete"><input type="hidden" name="id" value="<?= (int)$p['id'] ?>"><button class="link small" type="submit">Programm löschen</button></form><?php endif; ?>
 
 <?php else: ?>
+        <?php mm_subnav('method'); ?>
         <section class="nh"><p class="eyebrow">Movecia · On-Demand</p><h1>Method &amp; Unfold</h1><p>Programme und Videos, Mitglieder, Unfold-Plätze und Preise.</p></section>
         <div class="ns">
             <a href="#mitglieder"><b><?= $mActive ?></b><span>aktive Method-Mitglieder</span></a>

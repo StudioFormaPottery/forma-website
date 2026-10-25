@@ -100,7 +100,7 @@ Then take one minute. Four rounds of box breathing take about one minute. That\'
 
 If this morning felt good, come back next time. We\'ll breathe together again.
 
-And if you want a little support for every day, my Reset Routine for Tired Days is free on moveciamovement.com, and The Inner Circle opens on the 1st of December with short morning rituals just like this one. You can already book your place.
+And if you want a little support for every day, my Reset Routine for Tired Days is free on moveciamovement.com, and my Mindful Movement Method opens on the 1st of December, with short morning sessions just like this one, whenever you have time. You can already book your place.
 
 [If you show an offer this morning: show it now, and say:] I\'ve put something on your screen for you. Have a look whenever it suits you.
 
@@ -271,7 +271,7 @@ That\'s what I want these mornings to be for you. A place where someone is waiti
 
 If you\'d like to keep coming back to mornings like this, join the next Gathering. They\'re free, and you\'ll always find the date on moveciamovement.com.
 
-And if you want this as part of your life, with rituals, breathwork, short movement sessions and a circle of women who walk with you every month, The Inner Circle opens on the 1st of December, and you can already book your place.
+And if you want this as part of your life, with breathwork, short movement sessions and a new programme every month, my Mindful Movement Method opens on the 1st of December, and you can already book your place.
 
 [If you show an offer this morning: show it now, and say:] I\'ve put something on your screen for you now. Take a look in your own time.
 
@@ -382,7 +382,7 @@ It\'s lovely to choose something you like the smell of. Rosemary, lavender, a li
 
 If tonight helped you to close your day, come back next time. We\'ll do this together again.
 
-And if you\'d like rituals like this every month, for the mornings, the evenings and the hard days in between, The Inner Circle opens on the 1st of December, and you can already book your place.
+And if you\'d like rituals like this every month, for the mornings, the evenings and the hard days in between, my Mindful Movement Method opens on the 1st of December, and you can already book your place.
 
 [If you show an offer tonight: show it now, and say:] I\'ve put something on your screen for you. Read it in peace, there\'s no rush.
 
@@ -571,7 +571,7 @@ And if you need to get up again, roll onto your side first, rest there for a bre
 
 If tonight did you good, come back to the next Gathering. They\'re free, and you\'ll find the date on moveciamovement.com.
 
-And if you want evenings like this as part of your life, with rituals, deep rest and a circle of women who hold each other, The Inner Circle opens on the 1st of December, and you can already book your place.
+And if you want evenings like this as part of your life, with deep rest, breathwork and gentle movement whenever you need it, my Mindful Movement Method opens on the 1st of December, and you can already book your place.
 
 [If you show an offer tonight: show it now, and say:] I\'ve put something on your screen. Look at it tomorrow, when you\'re rested. There\'s no rush.
 
@@ -694,13 +694,13 @@ This is what the Wild Hearts Collective is about. Coming back to the old rhythms
 
 Our next Gathering is coming up soon, and of course it\'s free. You\'ll always find the date on moveciamovement.com.
 
-And for the women who want to walk the whole Wheel of the Year together, celebrating each season, each festival, with their own gatherings and a heart project that grows with the year, that\'s what The Year Circle is for. There are only four places each year.
+And for the women who want to go deeper, there is Unfold, my three months of guidance from the 10th of January: a weekly live call, two movement videos a week and workbooks for your mental load, your worth and your ideas. There are only ten places.
 
-And now a little secret, because you are here tonight: The Inner Circle opens on the 1st of December. Every month a live circle, breathwork, gentle movement, and a members area with rituals that grows with the Wheel of the Year, always updated. Just in time for the new year, so your intentions don\'t stay alone.
+And now a little secret, because you are here tonight: my Mindful Movement Method opens on the 1st of December. Yoga flows, somatic movement, breathwork and meditation on demand, from five to thirty minutes, for full days and for tired days, and every month a new programme with a workbook. Just in time for the new year, so your intentions don\'t stay alone.
 
-Tonight you can already book your place at the Gathering price of 29 euros a month for your first three months. Nothing is charged today. Your first payment is only taken on the 1st of December, when the circle opens.
+Tonight you can already book your place at the Gathering price, your first month for 19 euros instead of 29. Nothing is charged today. Your first payment is only taken on the 1st of December, when the Method opens.
 
-[show the Inner Circle offer now, and say:] I\'ve put it on your screen for you. Take your time with it, and only if it feels right.
+[show the Method offer now, and say:] I\'ve put it on your screen for you. Take your time with it, and only if it feels right.
 
 [18:30 · CLOSING]
 
@@ -829,7 +829,7 @@ And I understand that. Some days the important things wait. And they will still 
 
 This is exactly what we do in this circle. We come together, we breathe, we tell the truth, and we remind each other of what we are carrying, and of who we are underneath all of it.
 
-If tonight felt good for you, I would love to see you at the next Gathering. And if you want more of this, every month, with a real circle of women around you, then keep an eye on The Inner Circle. I\'m building it for exactly this, for women who give so much and want a place to come back to themselves.
+If tonight felt good for you, I would love to see you at the next Gathering. And if you want more of this, every month, with a real circle of women around you, then have a look at Unfold, my three months of guidance from the 10th of January. I\'ve built it for exactly this, for women who give so much and want a place to come back to themselves.
 
 [If you show an offer tonight: show it now, and say:] I\'ve put something on your screen for you now. Take a look in your own time, no pressure at all.
 
@@ -948,7 +948,7 @@ And honestly? I didn\'t feel courageous. I felt tired, and a bit lost. I didn\'t
 
 This is what we do in the Wild Hearts Collective. We make space for women who are in the middle of something, and we walk next to each other.
 
-If you\'d like to keep going, come to the next Gathering. And if you\'re standing at the beginning of something that really matters to you, an idea, a project, a new chapter, then have a look at The Year Circle. It\'s twelve months together, for women who want to bring their heart\'s idea to life, with someone next to them the whole way.
+If you\'d like to keep going, come to the next Gathering. And if you\'re standing at the beginning of something that really matters to you, an idea, a project, a new chapter, then have a look at Unfold. It\'s three months together, from the 10th of January, for women who want to come back to themselves and take the first real steps towards their idea, with someone next to them the whole way.
 
 [If you show an offer tonight: show it now, and say:] I\'ve put it on your screen right now, so you can read about it in peace.
 
@@ -1075,7 +1075,7 @@ Sometimes, yes. There are days for pushing, and it can feel amazing. But if you 
 
 This circle exists because so many women feel alone with their exhaustion. And hearing another woman say "me too" can change a whole day.
 
-If tonight helped you even a little, come back to the next Gathering. And if you want this every month, with rituals, breathwork, short movement sessions and a circle of women who hold each other up, then The Inner Circle is for you. It opens on the 1st of December, and you can already book your place.
+If tonight helped you even a little, come back to the next Gathering. And if you want this every month, with rituals, breathwork, short movement sessions and a small circle of women who hold each other up, then Unfold is for you. It begins on the 10th of January, and you can already book your place.
 
 [If you show an offer tonight: show it now, and say:] I\'ve put it on your screen, so you can take a look while we close.
 
@@ -1198,7 +1198,7 @@ I understand that fear so well. And sometimes there is a quiet time in between, 
 
 And if there\'s an idea in you that keeps spinning around, a project, a dream, a new chapter, then I want you to know that change is possible, and I\'d love to walk that way with you.
 
-That\'s what The Year Circle is for. Twelve months together, with only four places each year, for women who want to turn their heart\'s idea into something real. And if you simply want to come back to yourself in nature, keep an eye on our Wild Hearts Alpine Retreat here in the Tyrolean mountains, planned for 2028.
+That\'s what Unfold is for. Three months together from the 10th of January, with only ten places, for women who want to turn their idea into something real. And if you simply want to come back to yourself in nature, keep an eye on our Wild Hearts Alpine Retreat here in the Tyrolean mountains, planned for 2028.
 
 And of course, the next Gathering is always free. I\'d love to see you there.
 

@@ -118,7 +118,7 @@ Das verstehe ich gut. Manche Tage lassen die wichtigen Dinge warten, und sie sin
 
 Genau das tun wir in diesem Kreis. Wir kommen zusammen, wir atmen, wir sagen die Wahrheit, und wir erinnern einander daran, was wir tragen, und wer wir unter all dem sind.
 
-Wenn sich der heutige Abend gut für dich angefühlt hat, würde ich mich so freuen, dich beim nächsten Gathering wiederzusehen. Und wenn du mehr davon möchtest, jeden Monat und mit einem echten Kreis von Frauen um dich herum, dann behalte The Inner Circle im Blick. Ich baue ihn genau dafür auf, für Frauen, die so viel geben und einen Ort brauchen, an dem sie zu sich zurückfinden.
+Wenn sich der heutige Abend gut für dich angefühlt hat, würde ich mich so freuen, dich beim nächsten Gathering wiederzusehen. Und wenn du mehr davon möchtest, jeden Monat und mit einem echten Kreis von Frauen um dich herum, dann schau dir Unfold an, meine dreimonatige Begleitung ab dem 10. Jänner. Ich habe sie genau dafür gebaut, für Frauen, die so viel geben und einen Ort brauchen, an dem sie zu sich zurückfinden.
 
 [Wenn du heute ein Angebot zeigst: jetzt einblenden und sagen:] Ich habe dir gerade etwas auf den Bildschirm gelegt. Schau es dir in Ruhe an, ganz ohne Druck.
 
@@ -243,7 +243,7 @@ Ganz ehrlich? Ich habe mich nicht mutig gefühlt, sondern müde und ein bisschen
 
 Genau das tun wir im Wild Hearts Collective. Wir schaffen Raum für Frauen, die gerade mitten in etwas stecken, und wir gehen nebeneinander her.
 
-Wenn du weitermachen möchtest, komm zum nächsten Gathering. Und wenn du am Anfang von etwas stehst, das dir wirklich wichtig ist, einer Idee, einem Projekt, einem neuen Kapitel, dann schau dir den Jahreskreis an. Das sind zwölf Monate gemeinsam, für Frauen, die ihre Herzensidee lebendig werden lassen möchten, mit jemandem an ihrer Seite, den ganzen Weg lang.
+Wenn du weitermachen möchtest, komm zum nächsten Gathering. Und wenn du am Anfang von etwas stehst, das dir wirklich wichtig ist, einer Idee, einem Projekt, einem neuen Kapitel, dann schau dir Unfold an. Das sind drei Monate gemeinsam ab dem 10. Jänner, für Frauen, die zu sich zurückfinden und die ersten echten Schritte zu ihrer Idee gehen möchten, mit jemandem an ihrer Seite, den ganzen Weg lang.
 
 [Wenn du heute ein Angebot zeigst: jetzt einblenden und sagen:] Ich habe es dir gerade auf den Bildschirm gelegt, damit du in Ruhe darüber lesen kannst.
 
@@ -376,7 +376,7 @@ Manchmal schon. Es gibt Tage zum Pushen, und das kann sich großartig anfühlen.
 
 Diesen Kreis gibt es, weil sich so viele Frauen mit ihrer Erschöpfung allein fühlen. Und wenn eine andere Frau sagt „mir geht es genauso“, kann das einen ganzen Tag verändern.
 
-Wenn dir der heutige Abend auch nur ein bisschen gutgetan hat, komm zum nächsten Gathering wieder. Und wenn du das jeden Monat möchtest, mit Ritualen, Atemarbeit, kurzen Bewegungseinheiten und einem Kreis von Frauen, die einander halten, dann ist The Inner Circle für dich. Er öffnet am 1. Dezember, und du kannst dir deinen Platz schon jetzt sichern.
+Wenn dir der heutige Abend auch nur ein bisschen gutgetan hat, komm zum nächsten Gathering wieder. Und wenn du das jeden Monat möchtest, mit Ritualen, Atemarbeit, kurzen Bewegungseinheiten und einem kleinen Kreis von Frauen, die einander halten, dann ist Unfold für dich. Es beginnt am 10. Jänner, und du kannst dir deinen Platz schon jetzt sichern.
 
 [Wenn du heute ein Angebot zeigst: jetzt einblenden und sagen:] Ich habe es dir auf den Bildschirm gelegt, damit du es dir anschauen kannst, während wir zum Abschluss kommen.
 
@@ -505,7 +505,7 @@ Diese Angst verstehe ich so gut. Und manchmal gibt es tatsächlich eine stille Z
 
 Und wenn in dir eine Idee immer wieder auftaucht, ein Projekt, ein Traum, ein neues Kapitel, dann möchte ich, dass du weißt: Veränderung ist möglich, und ich würde diesen Weg sehr gern mit dir gehen.
 
-Genau dafür gibt es den Jahreskreis. Zwölf Monate gemeinsam, mit nur vier Plätzen im Jahr, für Frauen, die ihre Herzensidee Wirklichkeit werden lassen möchten. Und wenn du einfach in der Natur zu dir zurückfinden möchtest, behalte unser Wild Hearts Alpine Retreat hier in den Tiroler Bergen im Blick, geplant für 2028.
+Genau dafür gibt es Unfold. Drei Monate gemeinsam ab dem 10. Jänner, mit nur zehn Plätzen, für Frauen, die ihre Idee Wirklichkeit werden lassen möchten. Und wenn du einfach in der Natur zu dir zurückfinden möchtest, behalte unser Wild Hearts Alpine Retreat hier in den Tiroler Bergen im Blick, geplant für 2028.
 
 Und natürlich ist das nächste Gathering immer kostenlos. Ich würde mich freuen, dich dort zu sehen.
 
@@ -632,13 +632,13 @@ Genau darum geht es im Wild Hearts Collective: zurückzufinden zu den alten Rhyt
 
 Unser nächstes Gathering kommt bald, und natürlich ist es kostenlos. Das Datum findest du immer auf moveciamovement.com.
 
-Und für die Frauen, die den ganzen Jahreskreis gemeinsam gehen möchten, jede Jahreszeit und jedes Fest mit eigenen Gatherings feiern und dabei eine Herzensidee mit dem Jahr wachsen lassen, gibt es den Jahreskreis. Es gibt nur vier Plätze im Jahr.
+Und für die Frauen, die tiefer gehen möchten, gibt es Unfold, meine dreimonatige Begleitung ab dem 10. Jänner: ein wöchentlicher Live-Call, zwei Bewegungsvideos pro Woche und Workbooks für deinen Mental Load, deinen Selbstwert und deine Ideen. Es gibt nur zehn Plätze.
 
-Und jetzt verrate ich euch noch etwas, weil ihr heute Abend da seid: The Inner Circle öffnet am 1. Dezember. Jeden Monat ein Live-Kreis, Atemarbeit, sanfte Bewegung und ein Mitgliederbereich mit Ritualen, der mit dem Jahreskreis wächst und immer aktuell ist. Genau rechtzeitig zum neuen Jahr, damit deine Vorsätze nicht allein bleiben.
+Und jetzt verrate ich euch noch etwas, weil ihr heute Abend da seid: Meine Mindful Movement Method öffnet am 1. Dezember. Yoga-Flows, Somatic Movement, Atemarbeit und Meditation zum Abrufen, von fünf bis dreißig Minuten, für volle und für müde Tage, und jeden Monat ein neues Programm mit Workbook. Genau rechtzeitig zum neuen Jahr, damit deine Vorsätze nicht allein bleiben.
 
-Heute Abend kannst du dir deinen Platz schon zum Gathering-Preis von 29 Euro im Monat für deine ersten drei Monate sichern. Heute wird nichts abgebucht. Die erste Zahlung kommt erst am 1. Dezember, wenn der Kreis öffnet.
+Heute Abend kannst du dir deinen Platz schon zum Gathering-Preis sichern, deinen ersten Monat für 19 statt 29 Euro. Heute wird nichts abgebucht. Die erste Zahlung kommt erst am 1. Dezember, wenn die Method öffnet.
 
-[jetzt das Inner-Circle-Angebot einblenden und sagen:] Ich habe es dir auf den Bildschirm gelegt. Lies es in Ruhe, und nur, wenn es sich richtig anfühlt.
+[jetzt das Method-Angebot einblenden und sagen:] Ich habe es dir auf den Bildschirm gelegt. Lies es in Ruhe, und nur, wenn es sich richtig anfühlt.
 
 [18:30 · ABSCHLUSS]
 

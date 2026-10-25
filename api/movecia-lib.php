@@ -251,6 +251,43 @@ function mm_mail_html(string $title, string $html, string $lang = 'en'): string
         . '</td></tr></table></body></html>';
 }
 
+/** Google-Bewertungslink für Movecia (Verwaltung → Movecia → Einstellungen). Leer = Bewertungs-Mails warten. */
+function mm_review_url(): string
+{
+    $u = trim((string)((mm_cfg('review') ?? [])['url'] ?? ''));
+    return preg_match('#^https://#', $u) ? $u : '';
+}
+
+/**
+ * Bitte um eine Google-Bewertung nach Unfold bzw. nach dem Prä-/Postnatal-Paket (Vivien, 25.10.2026).
+ * $what: 'unfold' | 'natal' | 'natal1' (Einzelstunde)
+ */
+function mm_review_mail(string $to, string $name, string $lang, string $what, bool $test = false): bool
+{
+    $url = mm_review_url();
+    if ($url === '' || trim($to) === '') return false;
+    $en = $lang === 'en';
+    $first = forma_first_name($name ?: ($en ? 'love' : 'du'));
+    $thing = ['unfold' => $en ? 'our three months of Unfold' : 'unsere drei Monate Unfold', 'natal' => $en ? 'our sessions together' : 'unsere gemeinsamen Einheiten', 'natal1' => $en ? 'our session' : 'unsere Einheit'][$what] ?? ($en ? 'our time together' : 'unsere gemeinsame Zeit');
+    $lines = $en ? [
+        "Dear $first,",
+        "thank you so much for $thing. It meant a lot to me that you were there and gave yourself this time.",
+        'May I ask you a small favour? A short Google review helps other women find Movecia. Two sentences about how it felt for you are completely enough.',
+    ] : [
+        "Hallo $first,",
+        "danke von Herzen für $thing. Es hat mir viel bedeutet, dass du dabei warst und dir diese Zeit geschenkt hast.",
+        'Darf ich dich um einen kleinen Gefallen bitten? Eine kurze Bewertung auf Google hilft anderen Frauen, Movecia zu finden. Zwei Sätze dazu, wie es sich für dich angefühlt hat, reichen völlig.',
+    ];
+    $btn = $en ? 'Write a review ★★★★★' : 'Jetzt bewerten ★★★★★';
+    $after = $en ? 'Thank you, it really means a lot to me.' : 'Danke dir, das bedeutet mir wirklich viel.';
+    $text = implode("\n\n", $lines) . "\n\n$btn: $url\n\n$after";
+    $html = '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#7D5E68;">' . ($en ? 'thank you ♡' : 'danke ♡') . '</p>';
+    foreach ($lines as $l) $html .= '<p>' . forma_h($l) . '</p>';
+    $html .= mm_button($url, $btn) . '<p>' . forma_h($after) . '</p>';
+    $subj = ($test ? '[TEST] ' : '') . ($en ? 'Thank you for ' : 'Danke für ') . $thing;
+    return mm_mail($to, $subj, $text, mm_mail_html($en ? 'Thank you' : 'Danke', $html, $en ? 'en' : 'de'), [], 'Vivien · Movecia');
+}
+
 function mm_button(string $href, string $label): string
 {
     return '<p style="margin:22px 0 4px;text-align:center;"><a href="' . forma_h($href) . '" style="display:inline-block;padding:15px 30px;border-radius:999px;background:#7D5E68;color:#F2ECE4;text-decoration:none;font-weight:bold;">' . forma_h($label) . '</a></p>';
@@ -610,6 +647,8 @@ function mm_page(string $hi, string $title, string $text, string $btnHref = '', 
 // --- Angebote am Ende eines Gatherings (Inner Circle, Jahreskreis, Alpine Retreat) ----------
 
 const MM_OFFER_KEYS = ['method', 'unfold', 'circle', 'year', 'retreat'];
+// Gibt es nicht mehr (Vivien, 23./25.10.2026): bleiben nur für bestehende Buchungen technisch erhalten, werden nirgends mehr angeboten.
+const MM_OFFER_RETIRED = ['circle', 'year'];
 
 function mm_offer_schema(PDO $pdo): void
 {
@@ -671,6 +710,12 @@ function mm_offer_schema(PDO $pdo): void
 }
 
 /** Die drei Angebote mit Viv's Einstellungen (Titel, Text auf Englisch, regulärer Preis, Zahlungsart). */
+/** Nur die Angebote, die es gerade gibt (Method, Unfold, Retreat). */
+function mm_offers_active(): array
+{
+    return array_diff_key(mm_offers(), array_flip(MM_OFFER_RETIRED));
+}
+
 function mm_offers(): array
 {
     require_once __DIR__ . '/method-lib.php';
@@ -857,7 +902,7 @@ function mm_spotlight_show(PDO $pdo, string $scope, string $offer, int $special,
     mm_offer_schema($pdo);
     if ($offer === 'all') {
         $items = [];
-        foreach (mm_offers() as $k => $x) {
+        foreach (mm_offers_active() as $k => $x) {
             if ($x['price_cents'] <= 0) continue;
             $items[] = ['offer' => $k, 'title' => $x['title'], 'text' => $x['text'], 'billing' => $x['billing'], 'regular_cents' => $x['price_cents'], 'special_cents' => $x['special_cents'] < $x['price_cents'] ? $x['special_cents'] : 0];
         }

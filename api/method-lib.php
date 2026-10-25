@@ -207,6 +207,8 @@ function mv_schema(PDO $pdo): void
     // Vorab-Buchungen (Vivien, 25.10.2026): Mail „dein Zugang ist offen“ am Starttag genau einmal
     $sc = array_column($pdo->query('PRAGMA table_info(mv_subs)')->fetchAll(), 'name');
     if (!in_array('open_mailed', $sc, true)) $pdo->exec('ALTER TABLE mv_subs ADD COLUMN open_mailed INTEGER NOT NULL DEFAULT 0');
+    // Google-Bewertung nach dem Ende von Unfold (Vivien, 25.10.2026)
+    if (!in_array('review_sent', $sc, true)) $pdo->exec('ALTER TABLE mv_subs ADD COLUMN review_sent INTEGER NOT NULL DEFAULT 0');
 }
 
 // --- Konten ---------------------------------------------------------------------------------------
@@ -571,6 +573,7 @@ function mv_tick(PDO $pdo): void
     if (is_file($f) && (int)file_get_contents($f) > time() - 600) return;
     @file_put_contents($f, (string)time());
     mv_open_run($pdo);
+    mv_review_run($pdo);
     if (!forma_stripe_key()) return;
     $open = $pdo->prepare("SELECT * FROM mv_subs WHERE status = 'offen' AND stripe_session <> '' AND created_at >= ? ORDER BY id LIMIT 10");
     $open->execute([date('c', time() - 2 * 86400)]);
@@ -692,7 +695,7 @@ function mv_send_member_mail(array $r, string $subject, string $hand, string $ti
     $text = implode("\n\n", $lines) . ($link !== '' ? "\n\n$btn: $link" : '') . "\n\n$q" . ($en ? "\n\nSee you soon,\nVivien" : "\n\nBis bald,\nVivien") . ($legal !== '' ? "\n\n$legal" : '');
     $html = '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#7D5E68;">' . forma_h($hand) . '</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:28px;color:#6B5658;margin:0 0 14px;">' . forma_h($title) . '</h1>';
     foreach ($lines as $l) $html .= '<p>' . forma_h($l) . '</p>';
-    $html .= ($link !== '' ? mm_button($link, $btn) : '') . '<p>' . $q . '</p><p>' . ($en ? 'See you soon,<br>Vivien' : 'Bis bald,<br>Vivien') . '</p>'
+    $html .= ($link !== '' ? mm_button($link, $btn) : '') . '<p>' . $q . '</p>'
         . ($legal !== '' ? '<p style="font-size:13px;color:#7D7076;border-top:1px solid #DDD2C6;padding-top:12px;margin-top:22px;">' . forma_h($legal) . '</p>' : '');
     mm_mail((string)$r['email'], $subject, $text, mm_mail_html($title, $html, (string)$r['lang']), [], 'Vivien · Movecia');
 }
@@ -730,6 +733,20 @@ function mv_open_mail(PDO $pdo, array $r): void
     if ((int)$r['consent_digital'] !== 1 && !$isU) $lines[] = $en ? 'Until then you begin with the welcome module, after that the whole library opens by itself.' : 'Bis dahin beginnst du mit dem Ankommen-Modul, danach öffnet sich die ganze Bibliothek von selbst.';
     $pfx = (int)$r['test'] === 1 ? '[TEST] ' : '';
     mv_send_member_mail($r, $pfx . ($en ? 'Your access is open: ' : 'Dein Zugang ist offen: ') . $title, $en ? 'it begins ♡' : 'es geht los ♡', $title, $lines, $link, $btn, mv_legal($r));
+}
+
+/** Bewertungs-Mail am Morgen nach dem Ende von Unfold (10 Uhr), genau einmal, sobald ein Bewertungslink hinterlegt ist. */
+function mv_review_run(PDO $pdo): void
+{
+    if (mm_review_url() === '' || time() < mv_unfold_end() + 10 * 3600) return;
+    $q = $pdo->query("SELECT * FROM mv_subs WHERE kind = 'unfold' AND status = 'aktiv' AND review_sent = 0 AND email <> '' ORDER BY id LIMIT 30");
+    foreach ($q->fetchAll() as $r) {
+        if (mv_open_at($r) > time()) continue; // gehört zu einer späteren Runde
+        $u = $pdo->prepare('UPDATE mv_subs SET review_sent = 1 WHERE id = ? AND review_sent = 0');
+        $u->execute([$r['id']]);
+        if ($u->rowCount() !== 1) continue;
+        try { mm_review_mail((string)$r['email'], (string)$r['name'], (string)$r['lang'], 'unfold', (int)$r['test'] === 1); } catch (Throwable $e) { error_log('MV review: ' . $e->getMessage()); }
+    }
 }
 
 /** Freischalt-Mails für alle Vorab-Buchungen, deren Start erreicht ist. */

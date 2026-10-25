@@ -256,6 +256,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
 .wdays{display:flex;flex-wrap:wrap;gap:6px 14px}
 </style>
         <p><a href="<?= forma_h($self) ?>?view=movecia">← Movecia</a> · <a href="<?= forma_h($self) ?>">FORMA</a></p>
+        <?php mm_subnav('natal'); ?>
         <section class="nh"><p class="eyebrow">Movecia · 1:1 im Studio</p><h1>Prä- &amp; Postnatal</h1><p>Angebote verschicken, Wunschtermine bestätigen und alle Pakete im Blick.</p></section>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <div class="ns">
