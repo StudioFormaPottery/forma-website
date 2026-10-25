@@ -15,6 +15,7 @@ CSS = """
 *{box-sizing:border-box;margin:0}
 body{width:1080px;height:1350px;overflow:hidden;background:#F5E9DF;color:#2E2529;font-family:Hanken,sans-serif;position:relative}
 body.s{height:1920px}
+body.pin{height:1620px}.pin .wrap{padding:110px 90px 120px}
 body.dark{background:#4A3A41;color:#FBF5F7}
 .blob{position:absolute;border-radius:62% 38% 46% 54%/55% 45% 55% 45%}
 .wrap{position:absolute;inset:0;padding:84px;display:flex;flex-direction:column;z-index:2}
@@ -62,13 +63,13 @@ def title(p):
     if p.get('em'): t += ' <em>' + esc(p['em']) + '</em>'
     return t
 
-def page(p, story):
-    cls = ['s' if story else 'f', 't-' + p['type']] + (['dark'] if p.get('dark') else [])
+def page(p, story, pin=False):
+    cls = (['pin', 's'] if pin else ['s' if story else 'f']) + ['t-' + p['type']] + (['dark'] if p.get('dark') else [])
     logo = '/img/movecia/movecia-zeichen-hell.svg' if p.get('dark') else '/img/movecia/movecia-zeichen-klein.svg'
     top = f'<div class="top"><div class="brand"><img src="{logo}"><span>Movecia<i></i></span></div><span class="k">{esc(p.get("day",""))}</span></div>'
     foot = ''
     if p.get('cta') or p.get('url'):
-        foot = f'<div class="foot"><div class="url">{esc(p.get("cta",""))}<b>{esc(p.get("url",""))}</b></div><span class="btn">Link in Bio →</span></div>'
+        foot = f'<div class="foot"><div class="url">{esc(p.get("cta",""))}<b>{esc(p.get("url",""))}</b></div><span class="btn">{esc(p.get("btn", "Link in Bio"))} →</span></div>'
     body = f'<p class="k">{esc(p.get("kicker",""))}</p><h1>{title(p)}</h1>'
     if p.get('text'): body += f'<p class="text">{esc(p["text"])}</p>'
     if p['type'] == 'steps': body += '<div class="steps">' + ''.join(f'<div><span>{i+1}</span>{esc(s)}</div>' for i, s in enumerate(p['items'])) + '</div>'
