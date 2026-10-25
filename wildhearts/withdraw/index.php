@@ -85,7 +85,7 @@ a{color:var(--wine)}
 </head>
 <body>
 <main>
-  <div class="lang"><a href="?lang=en" data-l="en">EN</a><a href="?lang=de" data-l="de">DE</a></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><a href="/" style="font-family:Georgia,serif;font-size:1.4rem;color:inherit;text-decoration:none">Movecia</a><div style="display:flex;align-items:center;gap:10px"><div class="lang"><a href="?lang=en" data-l="en">EN</a><a href="?lang=de" data-l="de">DE</a></div><?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('', ['links' => false, 'lang' => false]); ?></div></div>
   <h1><span class="en">Withdraw from the contract</span><span class="de">Vertrag widerrufen</span></h1>
   <?php if ($done): ?>
     <div class="ok">

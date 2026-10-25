@@ -143,7 +143,7 @@ section{padding-block:clamp(3.5rem,8vw,7rem)}
 .brand{font-family:var(--serif);font-size:1.9rem;font-weight:500;color:var(--ink);text-decoration:none;line-height:1;display:flex;align-items:baseline}
 .brand i{width:.3em;height:.3em;border-radius:50%;background:var(--plum);display:inline-block;margin-left:.08em}
 .brand .mk{width:1.35em;height:1.35em;margin-right:.32em;align-self:center;flex:none}
-.top .tag{font-size:.8rem;color:var(--muted);letter-spacing:.06em}
+.top-r{display:flex;align-items:center;gap:.8rem}.top .tag{font-size:.8rem;color:var(--muted);letter-spacing:.06em}
 .blob{border-radius:62% 38% 46% 54%/55% 45% 55% 45%;animation:morph 14s ease-in-out infinite alternate}
 @keyframes morph{50%{border-radius:40% 60% 58% 42%/44% 58% 42% 56%}100%{border-radius:45% 55% 60% 40%/40% 60% 45% 55%}}
 @media(prefers-reduced-motion:reduce){.blob,.mq-in{animation:none!important}}
@@ -335,7 +335,7 @@ footer summary{cursor:pointer}
 </style>
 </head>
 <body data-mode="<?= $online ? 'online' : 'studio' ?>">
-<header class="top w"><a class="brand" href="<?= $order ? $h(natal_link($order)) : '#' ?>"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia<i></i></a><span class="tag">1:1 <?= $order ? ($online ? 'online' : 'im Studio') : 'im Studio &amp; online' ?> · Prä- &amp; Postnatal</span></header>
+<header class="top w"><a class="brand" href="<?= $order ? $h(natal_link($order)) : '/' ?>"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia<i></i></a><span class="top-r"><span class="tag">1:1 <?= $order ? ($online ? 'online' : 'im Studio') : 'im Studio &amp; online' ?> · Prä- &amp; Postnatal</span><?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('natal', ['lang' => false]); ?></span></header>
 <div class="w"><?php if ($bonus): $bc = natal_bonus_cfg(); ?><p class="bonusbox"><b>Dein Kennenlern-Bonus, <?= $h(forma_first_name((string)$bonus['name'])) ?></b>Danke für unser Gespräch! Jedes Paket ist für dich <?= (int)$bc['percent'] ?> % günstiger, im Studio und online. Der Bonus gilt bis <?= $h(natal_date_de((string)$bonus['bonus_until'])) ?> und ist unten schon eingerechnet.</p>
     <?php elseif ($bonusGone): ?><p class="bonusbox gone"><b>Dieser Bonus ist leider nicht mehr gültig</b>Er ist abgelaufen oder wurde schon eingelöst. Die Pakete kannst du unten natürlich trotzdem buchen, und bei Fragen schreib mir einfach.</p><?php endif; ?></div>
 

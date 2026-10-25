@@ -10,6 +10,7 @@ require __DIR__ . '/../assets/layout.inc.php';
 header('Cache-Control: no-cache');
 $pdo = forma_db();
 mv_schema($pdo);
+try { mv_tick($pdo); } catch (Throwable $e) { error_log('MV tick: ' . $e->getMessage()); } // u. a. Freischalt-Mails am Starttag
 $c = mv_cfg();
 $eu = fn(int $x) => '€ ' . number_format($x / 100, 0, ',', '.');
 $natalMin = PHP_INT_MAX;

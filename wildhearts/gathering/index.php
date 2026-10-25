@@ -147,6 +147,7 @@ body.room{background:var(--earth)}
 </body>
 <?php else: ?>
 <body>
+<div style="position:fixed;top:max(14px,env(safe-area-inset-top));right:16px;z-index:40"><?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('gathering', ['links' => false, 'lang' => false]); ?></div>
 <div class="bg" aria-hidden="true"><span class="a"></span><span class="b"></span></div>
 <main>
 <?php if ($me && $g && !$over): ?>

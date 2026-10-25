@@ -2,13 +2,8 @@
 :root{--mauve:#8A7378;--mauve-d:#6F5A60}
 .site-top{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.9);backdrop-filter:blur(10px)}
 .site-top .top{padding-top:16px;padding-bottom:16px}
-.nav a.l.on{background:var(--card)}
-.nav a.login{border:1px solid var(--line)}
-.menu-t.outer{display:none}
-@media(max-width:899px){
-  .nav:not(.open){display:none}.menu-t.outer{display:grid;place-items:center}
-  .nav.open .lang{margin-top:1.4rem}
-}
+.top-r{display:flex;align-items:center;gap:.5rem;margin-left:auto}
+@media(max-width:899px){.site-top .lang{display:none}}
 h1,h2{font-weight:400}
 .hero-x{padding-top:clamp(2rem,6vw,5rem);padding-bottom:clamp(1.6rem,4vw,3rem)}
 .hero-x .k{margin-bottom:1rem}

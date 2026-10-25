@@ -232,6 +232,7 @@ if ($demo) {
     $me = ['id' => 0, 'name' => 'Anna Beispiel', 'email' => 'anna@example.com', 'lang' => $lang];
     $acc = ['method' => true, 'starter' => isset($_GET['starter']), 'unfold' => isset($_GET['unfold']) ? ['call_lang' => 'de', 'plan' => 'u1'] : null, 'until' => strtotime('+1 month'), 'sub' => ['plan' => 'm1', 'period_end' => strtotime('+20 days'), 'bill_start' => 0, 'cancel_end' => 0, 'amount_cents' => 2900, 'kind' => 'method'], 'subs' => []];
     $done = []; $favs = []; $week = 3;
+    if (isset($_GET['warte'])) { $ps = ['kind' => 'unfold', 'paid_at' => date('c'), 'bill_start' => 0]; $acc = ['method' => false, 'starter' => false, 'unfold' => null, 'until' => 0, 'sub' => null, 'subs' => [], 'pending' => [$ps], 'open_at' => mv_open_at($ps)]; }
 } else {
     $acc = mv_access($pdo, (string)$me['email']);
     $done = mv_done_ids($pdo, (int)$me['id']);
@@ -309,10 +310,19 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
   </nav>
   <?= $demo ? '<div class="lang"><a class="lb" href="?demo=1&amp;lang=de" aria-pressed="' . ($lang !== 'en' ? 'true' : 'false') . '">DE</a><a class="lb" href="?demo=1&amp;lang=en" aria-pressed="' . ($lang === 'en' ? 'true' : 'false') . '">EN</a></div>' : mv_lang_switch($lang, '?' . http_build_query(array_intersect_key($_GET, ['tab' => 1, 'l' => 1])), true) ?>
 </div></header>
-<?php if ($demo): ?><p class="demo w"><?= $L('Beispielansicht ohne echtes Konto.', 'Example view without a real account.') ?> <a href="?demo=1&amp;starter=1<?= $lang === 'en' ? '&amp;lang=en' : '' ?>"><?= $L('Widerrufsfrist', 'Withdrawal period') ?></a> · <a href="?demo=1&amp;unfold=1<?= $lang === 'en' ? '&amp;lang=en' : '' ?>"><?= $L('mit Unfold', 'with Unfold') ?></a></p><?php endif; ?>
+<?php if ($demo): ?><p class="demo w"><?= $L('Beispielansicht ohne echtes Konto.', 'Example view without a real account.') ?> <a href="?demo=1&amp;starter=1<?= $lang === 'en' ? '&amp;lang=en' : '' ?>"><?= $L('Widerrufsfrist', 'Withdrawal period') ?></a> · <a href="?demo=1&amp;unfold=1<?= $lang === 'en' ? '&amp;lang=en' : '' ?>"><?= $L('mit Unfold', 'with Unfold') ?></a> · <a href="?demo=1&amp;warte=1<?= $lang === 'en' ? '&amp;lang=en' : '' ?>"><?= $L('vor dem Start', 'before the start') ?></a></p><?php endif; ?>
 
 <main class="w"><div class="in">
-<?php if (!$acc['method'] && !$acc['unfold']): ?>
+<?php if (!$acc['method'] && !$acc['unfold'] && !empty($acc['pending'])): $oa = (int)$acc['open_at']; ?>
+  <section class="hello"><div>
+    <p class="k"><?= $h($hello) ?>, <?= $h($first) ?></p>
+    <h1 class="h"><?= $L('Schön, dass du da bist.', 'Lovely that you are here.') ?></h1>
+    <p class="mut lead"><?= $L('Gerade bereite ich noch alles für dich vor. Dein Zugang schaltet sich am ', 'I am still preparing everything for you. Your access unlocks on ') . '<strong>' . $h(mv_date($oa, $lang)) . '</strong>' . $L(' frei, dann bekommst du eine E-Mail und alles ist für dich offen.', '. You will get an email that day, and everything will be open for you.') ?></p>
+    <ul class="mut" style="margin-top:1rem;padding-left:1.1rem"><?php foreach ($acc['pending'] as $ps): ?><li><?= $ps['kind'] === 'unfold' ? 'Unfold – The Mindful Becoming' : 'Mindful Movement Method' ?> · <?= $L('Start', 'Start') ?> <?= $h(mv_date(mv_open_at($ps), $lang)) ?> · <?= $L('Rücktritt möglich bis', 'Withdrawal possible until') ?> <?= $h(mv_date(mv_withdraw_until($ps), $lang)) ?></li><?php endforeach; ?></ul>
+  </div>
+  <div class="soon card"><p class="k"><?= $L('Dein Start', 'Your start') ?></p><h3><?= $h(mv_date($oa, $lang)) ?></h3><p class="count" data-t="<?= $oa ?>"></p></div></section>
+
+<?php elseif (!$acc['method'] && !$acc['unfold']): ?>
   <section class="hello"><p class="k"><?= $h($hello) ?>, <?= $h($first) ?></p><h1 class="h"><?= $L('Deine Mitgliedschaft ist beendet', 'Your membership has ended') ?></h1>
   <p class="mut lead"><?= $L('Schön, dass du da warst. Wenn du wieder einsteigen magst, ist die Bibliothek mit allen Monaten für dich bereit.', 'Lovely that you were here. If you would like to come back, the library with all months is ready for you.') ?></p>
   <p style="margin-top:1.4rem"><a class="btn" href="/method/<?= $lang === 'en' ? '?lang=en' : '' ?>"><?= $L('Wieder einsteigen', 'Come back') ?></a></p></section>
