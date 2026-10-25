@@ -269,6 +269,18 @@ function mv_schema(PDO $pdo): void
         // Wer schon ein Passwort hat oder schon eine Mail bekommen hat, gilt als bestätigt
         $pdo->exec("UPDATE mv_members SET email_ok = 1 WHERE pass_hash <> '' OR lower(email) IN (SELECT lower(email) FROM mv_subs WHERE mailed = 1)");
     }
+    // Programme ohne Monatsnamen (Vivien, 25.10.2026): jede startet bei Monat 1, egal in welchem Kalendermonat
+    if (empty((mm_cfg('method') ?? [])['names_v1'])) {
+        $months = 'Jänner|Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember|January|February|March|May|June|July|October|December';
+        foreach ($pdo->query("SELECT id, title_de, title_en, intro_de, intro_en FROM mv_programs WHERE audience = 'method'")->fetchAll() as $p) {
+            $tde = preg_replace('/^(' . $months . ')\s*·\s*/u', '', (string)$p['title_de']);
+            $ten = preg_replace('/^(' . $months . ')\s*·\s*/u', '', (string)$p['title_en']);
+            $ide = str_replace('Der Dezember ist laut und voll.', 'Manche Wochen sind laut und voll.', (string)$p['intro_de']);
+            $ien = str_replace('December is loud and full.', 'Some weeks are loud and full.', (string)$p['intro_en']);
+            $pdo->prepare('UPDATE mv_programs SET title_de = ?, title_en = ?, intro_de = ?, intro_en = ? WHERE id = ?')->execute([$tde, $ten, $ide, $ien, $p['id']]);
+        }
+        mv_save_cfg(['names_v1' => 1]);
+    }
     mv_scripts_sync($pdo);
 }
 
@@ -1144,7 +1156,7 @@ function mv_file_dir(): string
     return $d;
 }
 
-/** Ankommen-Modul und Dezember-Programm einmal anlegen, damit Vivien nur noch Videos dazulegt. */
+/** Ankommen-Modul und erstes Monatsprogramm einmal anlegen, damit Vivien nur noch Videos dazulegt. */
 function mv_seed(PDO $pdo): void
 {
     mv_schema($pdo);
@@ -1153,7 +1165,7 @@ function mv_seed(PDO $pdo): void
     $ins = $pdo->prepare('INSERT INTO mv_programs (audience, title_de, title_en, intro_de, intro_en, theme, unlock, sort, created_at) VALUES (?,?,?,?,?,?,?,?,?)');
     $ins->execute(['method', 'Ankommen', 'Arrive', 'Schön, dass du da bist. Hier lernst du die Method kennen, findest deinen Platz und deine ersten kleinen Rituale. Fang einfach an, es gibt kein Zu-spät.', 'So lovely that you are here. This is where you get to know the Method, find your spot and your first small rituals. Simply begin, there is no too late.', 'ankommen', '', 0, $now]);
     $a = (int)$pdo->lastInsertId();
-    $ins->execute(['method', 'Dezember · Rückzug & Ruhe', 'December · Retreat & Rest', 'Der Dezember ist laut und voll. Dieses Programm schenkt dir kleine, ruhige Inseln: sanfte Flows für müde Tage, Atem für volle Tage und Momente nur für dich.', 'December is loud and full. This programme gives you small, quiet islands: gentle flows for tired days, breath for full days and moments just for you.', 'winter', '2026-12-01', 1, $now]);
+    $ins->execute(['method', 'Rückzug & Ruhe', 'Retreat & Rest', 'Manche Wochen sind laut und voll. Dieses Programm schenkt dir kleine, ruhige Inseln: sanfte Flows für müde Tage, Atem für volle Tage und Momente nur für dich.', 'Some weeks are loud and full. This programme gives you small, quiet islands: gentle flows for tired days, breath for full days and moments just for you.', 'winter', '2026-12-01', 1, $now]);
     $d = (int)$pdo->lastInsertId();
     $l = $pdo->prepare('INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)');
     foreach ([
