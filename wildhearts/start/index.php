@@ -1,5 +1,5 @@
 <?php
-// moveciamovement.com – Hauptseite Movecia (Vivien, 25.10.2026): „Ich bin Vivien, ich bin Movecia“.
+// moveciamovement.com – Hauptseite Movecia (Vivien, 25.10.2026): Überschrift nur „Ich bin Movecia.“
 // Ruhig nach Vorbild Mindful Body: große feine Schrift, Mauve-Band, weich verschwommene Bilder.
 // Die Bilder sind vorerst Viviens eigene Fotos (künstlerisch weichgezeichnet) und gemalte Platzhalter,
 // später kommen Everygen-Bilder (Liste der Bildideen in CLAUDE.md). Teacher Training wird bewusst nicht gezeigt.
@@ -34,7 +34,7 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
 <main>
 <section class="w"><div class="in hero-x">
   <p class="k"><span class="de">Mindful Movement · Yoga · Somatic · Breathwork</span><span class="en">Mindful movement · yoga · somatic · breathwork</span></p>
-  <h1><span class="de">Ich bin Vivien.<br><em>Ich bin Movecia.</em></span><span class="en">I am Vivien.<br><em>I am Movecia.</em></span></h1>
+  <h1><span class="de"><em>Ich bin Movecia.</em></span><span class="en"><em>I am Movecia.</em></span></h1>
   <p class="sub"><span class="de">Bewegung beginnt bei dir.</span><span class="en">Movement begins with you.</span></p>
   <p class="lead"><span class="de">Movecia heißt „in Bewegung“. Ich begleite Frauen zurück in ihren Körper, mit sanfter, achtsamer Bewegung, mit Atem und mit Raum für das, was sie wirklich beschäftigt. Online, wann immer du magst, live in kleinen Runden und persönlich bei mir in den Tiroler Bergen.</span><span class="en">Movecia means “in motion”. I guide women back into their bodies with gentle, mindful movement, with breath and with room for what truly matters to them. Online whenever you like, live in small circles and in person with me in the Tyrolean mountains.</span></p>
   <div class="cta"><a class="btn" href="#angebote"><span class="de">So begleite ich dich</span><span class="en">Ways to move with me</span> →</a><a class="btn line" href="/unfold/"><span class="de">Unfold · Start <?= mv_date($st) ?></span><span class="en">Unfold · starts <?= mv_date($st, 'en') ?></span></a></div>
