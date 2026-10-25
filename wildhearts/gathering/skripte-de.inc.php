@@ -1084,13 +1084,13 @@ Setz dich bequem hin und lass deine Hände ruhen.
 
 Atme durch die Nase ein …
 
-Und atme durch den Mund aus, mit einem langen, langsamen Seufzer.
+Und atme lang und hörbar durch den Mund aus.
 
 [hörbar ausatmen]
 
-Noch einmal. Durch die Nase ein … und ein langer Seufzer aus.
+Noch einmal. Durch die Nase ein … und lang durch den Mund aus.
 
-Noch einmal. Und lass mit diesem Seufzer den Tag von deinen Schultern gleiten.
+Noch einmal. Und lass mit diesem Ausatmen den Tag von deinen Schultern gleiten.
 
 [ausatmen]
 

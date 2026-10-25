@@ -68,10 +68,10 @@ details.tx>summary small{font-family:"Outfit",sans-serif;font-size:14px;color:va
 <?php endforeach; ?>
 </details>
 
-<details class="tx" id="natal"><summary>Prä- &amp; Postnatal <small><?= count(NATAL_UNIT_KEYS) + 1 ?> Texte</small></summary>
-    <div class="ti" data-q="kennenlerngespräch"><span class="t">Kennenlerngespräch<span class="m">30 Min. online, mit Fragen</span></span><span class="b"><a href="<?= $u('view=natal&prompter=kennenlernen') ?>" target="_blank" rel="noopener">Teleprompter</a></span></div>
+<details class="tx" id="natal"><summary>Prä- &amp; Postnatal <small><?= count(NATAL_UNIT_KEYS) + 1 ?> Texte · DE + EN</small></summary>
+    <div class="ti" data-q="kennenlerngespräch"><span class="t">Kennenlerngespräch<span class="m">30 Min. online, mit Fragen</span></span><span class="b"><a href="<?= $u('view=natal&prompter=kennenlernen') ?>" target="_blank" rel="noopener">Deutsch</a><a class="g" href="<?= $u('view=natal&prompter=kennenlernen_en') ?>" target="_blank" rel="noopener">Englisch</a></span></div>
 <?php foreach (NATAL_UNIT_KEYS as $k): ?>
-    <div class="ti" data-q="<?= forma_h(mb_strtolower(natal_unit_label($k))) ?>"><span class="t"><?= forma_h(natal_unit_label($k)) ?><span class="m">Impuls, Übungen, Breathwork, Meditation</span></span><span class="b"><a href="<?= $u('view=natal&prompter=' . $k) ?>" target="_blank" rel="noopener">Teleprompter</a><a class="g" href="<?= $u('view=natal&workbook=' . $k) ?>" target="_blank" rel="noopener">Workbook</a></span></div>
+    <div class="ti" data-q="<?= forma_h(mb_strtolower(natal_unit_label($k))) ?>"><span class="t"><?= forma_h(natal_unit_label($k)) ?><span class="m">Impuls, Übungen, Breathwork, Meditation</span></span><span class="b"><a href="<?= $u('view=natal&prompter=' . $k) ?>" target="_blank" rel="noopener">Deutsch</a><a class="g" href="<?= $u('view=natal&prompter=' . $k . '_en') ?>" target="_blank" rel="noopener">Englisch</a><a class="g" href="<?= $u('view=natal&workbook=' . $k) ?>" target="_blank" rel="noopener">Workbook</a></span></div>
 <?php endforeach; ?>
 </details>
 
