@@ -1,0 +1,69 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- Early-Bird-Werbung Method & Unfold (Vivien, 25.10.2026): ?p=method|unfold, f=feed|story, l=de|en. Per Playwright gerendert. -->
+<style>
+@font-face{font-family:"Cormorant";font-weight:300 700;src:url(../../fonts/CormorantGaramond-VF.woff) format("woff")}
+@font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(../../fonts/CormorantGaramond-Italic-VF.woff) format("woff")}
+@font-face{font-family:"Hanken";font-weight:300 700;src:url(../../fonts/HankenGrotesk-VF.woff) format("woff")}
+*{box-sizing:border-box;margin:0}
+body{width:1080px;height:1350px;overflow:hidden;background:#F5E9DF;color:#2E2529;font-family:Hanken,sans-serif;position:relative}
+body.story{height:1920px}
+.ph{position:absolute;left:0;right:0;top:0;height:44%;background-size:cover;background-position:50% 35%}
+.story .ph{height:46%}
+.ph::before{content:"";position:absolute;inset:0;background:rgba(214,160,122,.17);mix-blend-mode:multiply}
+.ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(245,233,223,0) 62%,#F5E9DF 100%)}
+.wrap{position:absolute;inset:0;padding:78px 84px 84px;display:flex;flex-direction:column}
+.story .wrap{padding:170px 90px 230px}
+.top{display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:14px;font-family:Cormorant,serif;font-size:46px;background:rgba(252,246,240,.9);padding:10px 24px 10px 14px;border-radius:99px}
+.brand img{width:44px}.brand i{display:inline-block;width:11px;height:11px;border-radius:50%;background:#7D5E68}
+.pill{font-size:24px;letter-spacing:.16em;text-transform:uppercase;background:#4A3A41;color:#F2ECE4;border-radius:99px;padding:14px 26px}
+.body{margin-top:auto}
+.k{display:inline-block;font-size:25px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;background:rgba(252,246,240,.94);color:#6B5658;padding:12px 24px;border-radius:99px}
+h1{font-family:Cormorant,serif;font-weight:500;font-size:132px;line-height:.92;margin-top:22px}
+.story h1{font-size:150px}
+.sub{font-family:Cormorant,serif;font-style:italic;font-size:54px;color:#7D5E68;margin-top:8px}
+.deal{margin-top:34px;background:#4A3A41;color:#FBF5F7;border-radius:36px;padding:34px 40px;display:grid;grid-template-columns:auto 1fr;gap:10px 36px;align-items:center}
+.deal .now{font-family:Cormorant,serif;font-size:120px;line-height:.9;font-weight:500}
+.deal .now small{font-family:Hanken;font-size:28px;font-weight:400;color:#E8D6CA;margin-left:6px}
+.deal .was{font-size:30px;color:#EADFDE;line-height:1.35}
+.deal .was s{opacity:.75}
+.deal .till{grid-column:1/-1;font-size:26px;letter-spacing:.12em;text-transform:uppercase;color:#E8D6CA;border-top:1px solid rgba(232,214,202,.3);padding-top:16px;margin-top:6px}
+.rows{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.rows span{background:#FCF6F0;border:1px solid #E6D3C4;border-radius:99px;padding:12px 24px;font-size:26px}
+.foot{margin-top:40px;display:flex;justify-content:space-between;align-items:flex-end;gap:30px}
+.story .foot{margin-top:60px}
+.url{font-size:28px;color:#4A3A41}.url b{display:block;font-family:Cormorant,serif;font-weight:500;font-size:44px}
+.btn{background:#7D5E68;color:#FBF5F7;border-radius:99px;padding:22px 38px;font-size:28px;white-space:nowrap}
+.method.feed h1{font-size:104px}.method.feed .ph{height:36%}.method h1{text-shadow:0 0 30px rgba(245,233,223,.9)}
+</style></head>
+<body>
+<script>
+const P=new URLSearchParams(location.search), pr=P.get('p')||'method', f=P.get('f')||'feed', l=P.get('l')||'de', de=l==='de';
+document.body.classList.add(f,pr);
+const T=(a,b)=>de?a:b;
+let h='';
+if(pr==='method'){
+ h=`<div class="ph" style="background-image:url(../../img/movecia/fotos/art-fold.jpg)"></div><div class="wrap">
+ <div class="top"><div class="brand"><img src="../../img/movecia/movecia-zeichen-klein.svg"><span>Movecia<i></i></span></div><span class="pill">Early Bird</span></div>
+ <div class="body"><p class="k">${T('On demand · Start 1. Dezember','On demand · opens 1 December')}</p>
+ <h1>Mindful Movement Method</h1><p class="sub">${T('Ein paar ruhige Minuten für dich, jeden Tag.','A few quiet minutes for you, every day.')}</p>
+ <div class="deal"><div class="now">€ 29<small>${T('/ Monat','/ month')}</small></div>
+ <div class="was">${T('statt <s>€ 39</s> im Monat.<br>Dein Preis bleibt, solange du dabei bist.','instead of <s>€ 39</s> a month.<br>Your price stays as long as you are a member.')}</div>
+ <div class="till">${T('Nur bei Buchung bis 1. Dezember','Only when you book by 1 December')}</div></div>
+ <div class="rows"><span>${T('3 Monate € 75 statt € 111','3 months € 75 instead of € 111')}</span><span>${T('1 Jahr € 240 statt € 396','1 year € 240 instead of € 396')}</span><span>${T('jede startet bei Monat 1','everyone starts with month 1')}</span><span>Deutsch &amp; English</span></div></div>
+ <div class="foot"><div class="url">${T('Jetzt Platz sichern','Book now')}<b>moveciamovement.com/method</b></div><span class="btn">${T('Link in Bio','Link in bio')} →</span></div></div>`;
+} else {
+ h=`<div class="ph" style="background-image:url(../../img/movecia/fotos/art-reach.jpg)"></div><div class="wrap">
+ <div class="top"><div class="brand"><img src="../../img/movecia/movecia-zeichen-klein.svg"><span>Movecia<i></i></span></div><span class="pill">${T('Nur 10 Plätze','Only 10 spots')}</span></div>
+ <div class="body"><p class="k">${T('3 Monate live online · Start 10. Jänner','3 months live online · starts 10 January')}</p>
+ <h1>Unfold</h1><p class="sub">The Mindful Becoming</p>
+ <div class="deal"><div class="now">€ 450</div>
+ <div class="was">${T('statt <s>€ 490</s>, oder 3 × € 165<br>statt 3 × € 175.','instead of <s>€ 490</s>, or 3 × € 165<br>instead of 3 × € 175.')}</div>
+ <div class="till">${T('Early-Bird bis 11. Jänner','Early bird until 11 January')}</div></div>
+ <div class="rows"><span>${T('wöchentlicher Live-Call','weekly live call')}</span><span>${T('2 Bewegungsvideos pro Woche','2 movement videos a week')}</span><span>Workbooks</span><span>Deutsch &amp; English</span></div></div>
+ <div class="foot"><div class="url">${T('Jetzt Platz sichern','Book your spot')}<b>moveciamovement.com/unfold</b></div><span class="btn">${T('Link in Bio','Link in bio')} →</span></div></div>`;
+}
+document.body.insertAdjacentHTML('beforeend',h);
+</script>
+</body></html>
