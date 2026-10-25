@@ -184,10 +184,11 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
 </style>
 </head>
 <body>
-<header class="w"><div class="in top">
+<header class="w"><div class="in top mvt">
   <a class="brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a>
-  <div class="top-r"><?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('unfold'); ?>
-  <div class="lang" role="group" aria-label="Sprache / Language"><button type="button" data-l="de">Deutsch</button><button type="button" data-l="en">English</button></div></div>
+  <?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_bar('unfold'); ?>
+  <div class="top-r"><div class="lang" role="group" aria-label="Sprache / Language"><button type="button" data-l="de">Deutsch</button><button type="button" data-l="en">English</button></div>
+  <?php mv_menu('unfold', ['links' => false, 'mob' => true]); ?></div>
 </div></header>
 
 <main>

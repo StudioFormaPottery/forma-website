@@ -92,3 +92,73 @@ details.q p{margin-top:.6rem;color:var(--muted)}
 .wro span{display:grid;gap:.1rem}.wro small{color:var(--muted);font-size:.84rem}
 .wro:has(input:checked){border-color:var(--plum);background:#fff}
 .wrn{color:var(--muted);font-size:.82rem}
+/* ---------- Mehr Bewegung (Vivien, 25.10.2026): Wellen, fließende Linien, sanftes Schweben ---------- */
+.hero-wrap{position:relative;isolation:isolate;overflow:hidden}
+.hero-flow{position:absolute;inset:auto 0 0 0;height:min(62vw,620px);z-index:-1;pointer-events:none;-webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent 96%);mask-image:linear-gradient(to bottom,#000 55%,transparent 96%)}
+.hero-flow span{position:absolute;left:0;right:0;bottom:0;background-repeat:repeat-x;background-position:0 100%;animation:mvwave linear infinite}
+.hero-flow .w1{height:100%;background-size:900px 100%;opacity:.55;animation-duration:38s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 720 200' preserveAspectRatio='none'%3E%3Cpath d='M0 80 C180 20 540 140 720 80 L720 200 L0 200Z' fill='%23E8D6CA'/%3E%3C/svg%3E")}
+.hero-flow .w2{height:72%;background-size:1100px 100%;opacity:.5;animation-duration:27s;animation-direction:reverse;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 720 200' preserveAspectRatio='none'%3E%3Cpath d='M0 90 C180 40 540 140 720 90 L720 200 L0 200Z' fill='%23EADFDE'/%3E%3C/svg%3E")}
+.hero-flow .w3{height:48%;background-size:760px 100%;opacity:.32;animation-duration:21s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 720 200' preserveAspectRatio='none'%3E%3Cpath d='M0 100 C180 60 540 140 720 100 L720 200 L0 200Z' fill='%23C9AFB5'/%3E%3C/svg%3E")}
+@keyframes mvwave{to{background-position-x:var(--wx,1800px)}}
+.hero-flow .w1{--wx:900px}.hero-flow .w2{--wx:1100px}.hero-flow .w3{--wx:760px}
+.hero-orb{position:absolute;border-radius:50%;filter:blur(60px);z-index:-1;pointer-events:none;will-change:transform}
+.hero-orb.o1{width:44vw;height:44vw;max-width:620px;max-height:620px;right:-10vw;top:-12vw;background:radial-gradient(circle,#E8D6CA 0,rgba(232,214,202,0) 70%);animation:mvorb 19s ease-in-out infinite alternate}
+.hero-orb.o2{width:30vw;height:30vw;max-width:420px;max-height:420px;left:-8vw;top:28%;background:radial-gradient(circle,#D9C3C3 0,rgba(217,195,195,0) 70%);animation:mvorb 24s ease-in-out infinite alternate-reverse}
+@keyframes mvorb{0%{transform:translate(0,0) scale(1)}50%{transform:translate(4vw,3vw) scale(1.12)}100%{transform:translate(-3vw,5vw) scale(.94)}}
+/* gezeichnete Linie im Kopfbereich */
+.hero-line{position:absolute;right:-2vw;top:2%;width:min(46vw,680px);height:auto;z-index:-1;pointer-events:none;color:var(--plum);opacity:.55}
+.hero-line path{fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:mvdraw 4.2s cubic-bezier(.45,.05,.25,1) .3s forwards}
+.hero-line path+path{stroke-width:1;opacity:.6;animation-delay:.9s;animation-duration:5s}
+@keyframes mvdraw{to{stroke-dashoffset:0}}
+.hero-x .sub .wv{display:block;width:min(240px,60%);height:14px;margin-top:.3rem;color:var(--plum)}
+.hero-x .sub .wv path{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:mvdraw 1.8s ease 1s forwards}
+.hero-x h1 .ln{display:inline-block;opacity:0;transform:translateY(.35em) rotate(1.5deg);animation:mvrise 1.2s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes mvrise{to{opacity:1;transform:none}}
+/* Lauftext */
+.flowtext{overflow:hidden;white-space:nowrap;padding:clamp(1.4rem,3vw,2.2rem) 0;border-block:1px solid var(--line);margin-top:clamp(1.4rem,3vw,2.4rem);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.flowtext div{display:inline-flex;animation:mvslide 46s linear infinite}
+.flowtext span{font-family:var(--serif);font-style:italic;font-size:clamp(1.7rem,3.6vw,3rem);color:var(--plum);padding-right:1.1em;display:inline-flex;align-items:center;gap:1.1em}
+.flowtext span::after{content:"";width:.32em;height:.32em;border-radius:50%;background:var(--peach);box-shadow:0 0 0 1px var(--plum) inset}
+.flowtext:hover div{animation-play-state:paused}
+@keyframes mvslide{to{transform:translateX(-50%)}}
+/* Wellen-Kanten am Mauve-Band und an weichen Bereichen */
+.band{position:relative;margin-top:clamp(5rem,10vw,8rem);margin-bottom:60px}
+.band::before,.band::after{content:"";position:absolute;left:0;right:0;height:60px;background-repeat:repeat-x;background-size:900px 60px;animation:mvwave 30s linear infinite;--wx:900px;pointer-events:none}
+.band::before{bottom:100%;background-position:0 100%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 720 60' preserveAspectRatio='none'%3E%3Cpath d='M0 30 C180 0 540 60 720 30 L720 60 L0 60Z' fill='%238A7378'/%3E%3C/svg%3E")}
+.band::after{top:100%;background-position:0 0;animation-direction:reverse;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 720 60' preserveAspectRatio='none'%3E%3Cpath d='M0 30 C180 60 540 0 720 30 L720 0 L0 0Z' fill='%238A7378'/%3E%3C/svg%3E")}
+.soft{position:relative;background:var(--blush);margin-top:clamp(5rem,10vw,8rem);padding-bottom:clamp(3.4rem,7vw,5.5rem);margin-bottom:60px}
+.soft::before,.soft::after{content:"";position:absolute;left:0;right:0;height:60px;background-repeat:repeat-x;background-size:1100px 60px;animation:mvwave 40s linear infinite;--wx:1100px;pointer-events:none}
+.soft::before{bottom:100%;background-position:0 100%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 720 60' preserveAspectRatio='none'%3E%3Cpath d='M0 34 C180 6 540 60 720 34 L720 60 L0 60Z' fill='%23EADFDE'/%3E%3C/svg%3E")}
+.soft::after{top:100%;background-position:0 0;animation-direction:reverse;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 720 60' preserveAspectRatio='none'%3E%3Cpath d='M0 26 C180 54 540 0 720 26 L720 0 L0 0Z' fill='%23EADFDE'/%3E%3C/svg%3E")}
+.soft.sec{padding-top:clamp(2rem,5vw,3.6rem)}
+.soft+.sec{padding-top:clamp(2.6rem,6vw,4.4rem)}
+/* Schritte mit gezeichneten Icons und verbindender Welle */
+.steps{position:relative;isolation:isolate}
+.steps .ic{display:block;width:74px;height:74px;margin:0 auto .8rem;color:var(--plum)}
+.steps .ic path,.steps .ic circle{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}
+.steps.in-view .ic path,.steps.in-view .ic circle{animation:mvdraw 2.2s ease forwards}
+.steps.in-view>div:nth-child(3) .ic *{animation-delay:.35s}.steps.in-view>div:nth-child(4) .ic *{animation-delay:.7s}
+.steps .ic{animation:mvbob 6s ease-in-out infinite}.steps>div:nth-child(3) .ic{animation-delay:-2s}.steps>div:nth-child(4) .ic{animation-delay:-4s}
+@keyframes mvbob{50%{transform:translateY(-7px)}}
+.steps-wave{display:none}
+@media(min-width:900px){.steps>div+div{border-left:0}.steps-wave{display:block;position:absolute;left:12%;right:12%;top:96px;height:40px;width:76%;color:var(--plum);opacity:.35;z-index:-1}.steps-wave path{fill:none;stroke:currentColor;stroke-width:1.2;stroke-dasharray:3 7}}
+.steps .n{background:var(--bg)}
+.soft .steps .n{background:var(--blush)}
+/* Angebote: gestaffelt einschweben, sanft anheben */
+.offers .offer.rv:nth-child(2){transition-delay:.12s}.offers .offer.rv:nth-child(3){transition-delay:.24s}.offers .offer.rv:nth-child(4){transition-delay:.36s}
+.offer .art{transition:transform .6s cubic-bezier(.2,.7,.2,1),border-radius .8s ease}
+.offer:hover .art{transform:translateY(-8px);border-radius:120px 120px var(--r) var(--r)}
+.values div{transition:padding .35s ease,background .35s ease}
+.values div:hover{padding-left:.8rem;background:linear-gradient(90deg,var(--blush),transparent)}
+.values div:hover span{transform:rotate(-8deg)}.values span{display:inline-block;transition:transform .35s ease}
+.about .art.arch{animation:mvbreathe 9s ease-in-out infinite}
+@keyframes mvbreathe{50%{border-radius:300px 220px var(--r) var(--r)}}
+.rv{transform:translateY(28px)}
+@media(prefers-reduced-motion:reduce){
+  .hero-flow span,.hero-orb,.flowtext div,.band::before,.band::after,.soft::before,.soft::after,.steps .ic,.about .art.arch{animation:none!important}
+  .hero-line path,.hero-x .sub .wv path,.steps .ic *{animation:none!important;stroke-dashoffset:0!important}
+  .hero-x h1 .ln{animation:none;opacity:1;transform:none}
+}

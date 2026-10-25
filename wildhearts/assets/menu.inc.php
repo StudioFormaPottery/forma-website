@@ -27,6 +27,14 @@ function mv_menu_items(): array
     ];
 }
 
+// Mittige Linkleiste im Kopf (Vivien, 25.10.2026): Kopf = Logo links · Leiste Mitte · Sprache/Knopf rechts.
+// mv_bar('start') gibt nur die Leiste aus, mv_menu('start', ['links' => false, 'mob' => true]) den Knopf,
+// der am großen Bildschirm verschwindet, sobald die Leiste sichtbar ist.
+function mv_bar(string $active = ''): void
+{
+    ?><nav class="mvm-bar mvm-mid" aria-label="Menü"><?php foreach (mv_menu_items() as [$href, $de, $en, $k]) if ($k !== 'start'): ?><a href="<?= $href ?>"<?= $k === $active ? ' class="on" aria-current="page"' : '' ?>><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></a><?php endif; ?><a class="lg" href="/mitglieder/"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="7" r="3.2"/><path d="M3.8 17c.9-3.2 3.3-5 6.2-5s5.3 1.8 6.2 5"/></svg><span class="de">Login</span><span class="en">Log in</span></a></nav><?php
+}
+
 function mv_menu(string $active = '', array $o = []): void
 {
     static $assets = false;
@@ -36,7 +44,7 @@ function mv_menu(string $active = '', array $o = []): void
     if ($links): ?>
 <nav class="mvm-bar" aria-label="Menü"><?php foreach ($items as [$href, $de, $en, $k]) if ($k !== 'start'): ?><a href="<?= $href ?>"<?= $k === $active ? ' class="on" aria-current="page"' : '' ?>><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></a><?php endif; ?><a class="lg" href="/mitglieder/"><span class="de">Login</span><span class="en">Log in</span></a></nav>
 <?php endif; ?>
-<button class="mvm-btn" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mvm-panel"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14"/></svg></button>
+<button class="mvm-btn<?= !empty($o['mob']) ? ' mvm-mob' : '' ?>" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mvm-panel"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14"/></svg></button>
 <?php if ($assets) return; $assets = true; ?>
 <div class="mvm" id="mvm-panel" role="dialog" aria-modal="true" aria-label="Menü" hidden>
   <div class="mvm-top">
@@ -60,7 +68,27 @@ function mv_menu(string $active = '', array $o = []): void
 .mvm-bar a:hover,.mvm-bar a.on{background:var(--card,#FBF8F4)}
 .mvm-bar a.lg{border:1px solid var(--line,#DDD2C6)}
 .mvm-btn{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;border:1px solid var(--line,#DDD2C6);background:var(--card,#FBF8F4);color:var(--ink,#2E2529);border-radius:999px;cursor:pointer;padding:0}
-@media(min-width:900px){.mvm-bar{display:flex}.mvm-bar~.mvm-btn{display:none}}
+@media(min-width:900px){.mvm-bar:not(.mvm-mid){display:flex}.mvm-bar:not(.mvm-mid)~.mvm-btn{display:none}}
+/* Kopf mit mittiger Leiste und größerem Logo */
+.mvt{position:relative}
+.mvt .brand{gap:0;font-size:2.05rem;align-items:center}
+.mvt .brand img,.mvt .brand .mk{width:40px;height:40px;margin:0 .6rem 0 0;transition:transform .9s cubic-bezier(.3,.7,.2,1)}
+.mvt .brand:hover img,.mvt .brand:hover .mk{transform:rotate(-14deg) scale(1.06)}
+.mvm-mid{display:none;justify-content:center;gap:.15rem;margin:0}
+.mvm-mid a{position:relative;font-size:1.02rem;padding:.5em .95em;display:inline-flex;align-items:center;gap:.4em}
+.mvm-mid a:not(.lg)::after{content:"";position:absolute;left:50%;bottom:.18em;width:0;height:1.5px;border-radius:2px;background:var(--plum,#7D5E68);transition:width .35s ease,left .35s ease}
+.mvm-mid a:not(.lg):hover::after,.mvm-mid a.on::after{width:46%;left:27%}
+.mvm-mid a:hover,.mvm-mid a.on{background:transparent;color:var(--plum,#7D5E68)}
+.mvm-mid a.lg{margin-left:.5rem;border-color:var(--plum,#7D5E68);color:var(--plum,#7D5E68)}
+.mvm-mid a.lg:hover{background:var(--plum,#7D5E68);color:#FBF5F7}
+@media(min-width:900px){.mvt .brand{font-size:2.5rem}.mvt .brand img,.mvt .brand .mk{width:50px;height:50px}}
+@media(min-width:1180px){
+  .mvt{display:grid!important;grid-template-columns:1fr auto 1fr;align-items:center}
+  .mvt>.brand{justify-self:start}
+  .mvt>.top-r{justify-self:end;margin-left:0}
+  .mvm-mid{display:flex}
+  .mvm-btn.mvm-mob{display:none}
+}
 html:not([data-l=en]):not([lang=en]) .mvm .en,html:not([data-l=en]):not([lang=en]) .mvm-bar .en,html[data-l=en] .mvm .de,html[data-l=en] .mvm-bar .de,html[lang=en]:not([data-l=de]) .mvm .de,html[lang=en]:not([data-l=de]) .mvm-bar .de{display:none!important}
 .mvm{position:fixed;inset:0;z-index:1000;background:#F2ECE4;color:#2E2529;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;padding:max(14px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));font-family:"Hanken",system-ui,sans-serif;font-size:17px;line-height:1.5;opacity:0;transform:translateX(24px);transition:opacity .25s ease,transform .25s ease}
 .mvm.open{opacity:1;transform:none}

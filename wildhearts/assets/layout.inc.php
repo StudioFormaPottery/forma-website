@@ -22,8 +22,8 @@ function mvl_head(string $title, string $desc, string $canon, string $og = '/img
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
 <link rel="manifest" href="/app.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movecia"><meta name="apple-mobile-web-app-status-bar-style" content="default"><script src="/wildhearts/assets/app.js?v=1" defer></script>
-<link rel="stylesheet" href="/wildhearts/assets/mv.css?v=2">
-<link rel="stylesheet" href="/wildhearts/assets/site.css?v=2">
+<link rel="stylesheet" href="/wildhearts/assets/mv.css?v=3">
+<link rel="stylesheet" href="/wildhearts/assets/site.css?v=3">
 <?= $extraCss ?>
 <script>(function(){var l=<?= json_encode($l) ?>;try{if(!l)l=localStorage.getItem('wh-lang')||''}catch(e){}if(!l)l=(navigator.language||'').toLowerCase().indexOf('en')===0?'en':'de';document.documentElement.dataset.l=l;document.documentElement.lang=l;})();</script>
 </head>
@@ -34,11 +34,12 @@ function mvl_top(string $active = ''): void
 {
     require_once __DIR__ . '/menu.inc.php';
     ?>
-<header class="w site-top"><div class="in top">
+<header class="w site-top"><div class="in top mvt">
   <a class="brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a>
+  <?php mv_bar($active === '' ? 'start' : $active); ?>
   <div class="top-r">
-    <?php mv_menu($active === '' ? 'start' : $active); ?>
     <div class="lang" role="group" aria-label="Sprache / Language"><button type="button" data-set="de">DE</button><button type="button" data-set="en">EN</button></div>
+    <?php mv_menu($active === '' ? 'start' : $active, ['links' => false, 'mob' => true]); ?>
   </div>
 </div></header>
 <?php

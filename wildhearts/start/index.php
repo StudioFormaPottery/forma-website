@@ -32,14 +32,19 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
 <body>
 <?php mvl_top(); ?>
 <main>
-<section class="w"><div class="in hero-x">
+<section class="w hero-wrap">
+<div class="hero-flow" aria-hidden="true"><span class="w1"></span><span class="w2"></span><span class="w3"></span></div>
+<span class="hero-orb o1" aria-hidden="true" data-par=".12"></span><span class="hero-orb o2" aria-hidden="true" data-par="-.08"></span>
+<svg class="hero-line" viewBox="0 0 820 420" aria-hidden="true"><path pathLength="1" d="M10 300 C120 200 210 380 330 290 S520 90 620 170 S760 330 810 110"/><path pathLength="1" d="M60 350 C170 270 250 410 370 330 S540 160 650 230 S770 360 815 190"/></svg>
+<div class="in hero-x">
   <p class="k"><span class="de">Mindful Movement · Yoga · Somatic · Breathwork</span><span class="en">Mindful movement · yoga · somatic · breathwork</span></p>
-  <h1><span class="de"><em>Ich bin Movecia.</em></span><span class="en"><em>I am Movecia.</em></span></h1>
-  <p class="sub"><span class="de">Bewegung beginnt bei dir.</span><span class="en">Movement begins with you.</span></p>
+  <h1><span class="de"><em class="ln">Ich bin Movecia.</em></span><span class="en"><em class="ln">I am Movecia.</em></span></h1>
+  <p class="sub"><span class="de">Bewegung beginnt bei dir.</span><span class="en">Movement begins with you.</span><svg class="wv" viewBox="0 0 240 14" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2 7 C22 1 42 13 62 7 S102 1 122 7 S162 13 182 7 S222 1 238 7"/></svg></p>
   <p class="lead"><span class="de">Movecia heißt „in Bewegung“. Ich begleite Frauen zurück in ihren Körper, mit sanfter, achtsamer Bewegung, mit Atem und mit Raum für das, was sie wirklich beschäftigt. Online, wann immer du magst, live in kleinen Runden und persönlich bei mir in den Tiroler Bergen.</span><span class="en">Movecia means “in motion”. I guide women back into their bodies with gentle, mindful movement, with breath and with room for what truly matters to them. Online whenever you like, live in small circles and in person with me in the Tyrolean mountains.</span></p>
   <div class="cta"><a class="btn" href="#angebote"><span class="de">So begleite ich dich</span><span class="en">Ways to move with me</span> →</a><a class="btn line" href="/unfold/"><span class="de">Unfold · Start <?= mv_date($st) ?></span><span class="en">Unfold · starts <?= mv_date($st, 'en') ?></span></a></div>
 </div>
-<div class="in"><div class="art wide rv"><img src="/img/movecia/fotos/art-reach.jpg" alt="" fetchpriority="high"></div></div></section>
+<div class="in"><div class="art wide rv"><img src="/img/movecia/fotos/art-reach.jpg" alt="" fetchpriority="high" data-par=".06"></div></div></section>
+<div class="flowtext" aria-hidden="true"><div class="de"><span>Atmen</span><span>Spüren</span><span>Bewegen</span><span>Ankommen</span><span>Kraft finden</span><span>Entfalten</span><span>Atmen</span><span>Spüren</span><span>Bewegen</span><span>Ankommen</span><span>Kraft finden</span><span>Entfalten</span><span>Atmen</span><span>Spüren</span><span>Bewegen</span><span>Ankommen</span><span>Kraft finden</span><span>Entfalten</span><span>Atmen</span><span>Spüren</span><span>Bewegen</span><span>Ankommen</span><span>Kraft finden</span><span>Entfalten</span></div><div class="en"><span>Breathe</span><span>Feel</span><span>Move</span><span>Arrive</span><span>Find strength</span><span>Unfold</span><span>Breathe</span><span>Feel</span><span>Move</span><span>Arrive</span><span>Find strength</span><span>Unfold</span><span>Breathe</span><span>Feel</span><span>Move</span><span>Arrive</span><span>Find strength</span><span>Unfold</span><span>Breathe</span><span>Feel</span><span>Move</span><span>Arrive</span><span>Find strength</span><span>Unfold</span></div></div>
 
 <section class="band"><div class="w"><div class="in">
   <p class="k"><span class="de">Wofür Movecia steht</span><span class="en">What Movecia stands for</span></p>
@@ -74,12 +79,12 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
   </div>
 </div></section>
 
-<section class="w sec"><div class="in">
+<section class="w sec soft"><div class="in">
   <div class="rv" style="text-align:center"><p class="k"><span class="de">Der Weg</span><span class="en">The path</span></p><h2 style="margin-top:.6rem"><span class="de">In drei <em>Schritten</em> zurück zu dir</span><span class="en">Back to yourself in three <em>steps</em></span></h2></div>
-  <div class="steps rv">
-    <div><span class="n">1</span><h3><span class="de">Ankommen</span><span class="en">Arrive</span></h3><p><span class="de">Du lernst wieder zu spüren, was dein Körper braucht, und beruhigst dein Nervensystem mit Atem und sanfter Bewegung.</span><span class="en">You learn to feel what your body needs again and calm your nervous system with breath and gentle movement.</span></p></div>
-    <div><span class="n">2</span><h3><span class="de">Kraft aufbauen</span><span class="en">Build strength</span></h3><p><span class="de">Mit Bewegung ohne Erschöpfung wächst deine Kraft, in deinem Tempo und ohne Leistungsdruck.</span><span class="en">With movement without exhaustion your strength grows, at your pace and without pressure.</span></p></div>
-    <div><span class="n">3</span><h3><span class="de">Entfalten</span><span class="en">Unfold</span></h3><p><span class="de">Du nimmst die Ruhe und die Kraft mit in deinen Alltag und gehst die Dinge an, die dir wirklich wichtig sind.</span><span class="en">You take the calm and the strength into your everyday life and go after what truly matters to you.</span></p></div>
+  <div class="steps rv"><svg class="steps-wave" viewBox="0 0 760 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 20 C95 0 190 40 285 20 S475 0 570 20 S665 40 760 20"/></svg>
+    <div><svg class="ic" viewBox="0 0 64 64" aria-hidden="true"><path pathLength="1" d="M32 54 C18 46 12 34 16 22 C24 26 30 34 32 54 Z"/><path pathLength="1" d="M32 54 C46 46 52 34 48 22 C40 26 34 34 32 54 Z"/><path pathLength="1" d="M10 58 C20 54 44 54 54 58"/><circle pathLength="1" cx="32" cy="12" r="4"/></svg><span class="n">1</span><h3><span class="de">Ankommen</span><span class="en">Arrive</span></h3><p><span class="de">Du lernst wieder zu spüren, was dein Körper braucht, und beruhigst dein Nervensystem mit Atem und sanfter Bewegung.</span><span class="en">You learn to feel what your body needs again and calm your nervous system with breath and gentle movement.</span></p></div>
+    <div><svg class="ic" viewBox="0 0 64 64" aria-hidden="true"><path pathLength="1" d="M6 52 L24 24 L33 37 L42 22 L58 52 Z"/><path pathLength="1" d="M20 30 L24 24 L28 30"/><path pathLength="1" d="M4 58 C18 54 46 54 60 58"/></svg><span class="n">2</span><h3><span class="de">Kraft aufbauen</span><span class="en">Build strength</span></h3><p><span class="de">Mit Bewegung ohne Erschöpfung wächst deine Kraft, in deinem Tempo und ohne Leistungsdruck.</span><span class="en">With movement without exhaustion your strength grows, at your pace and without pressure.</span></p></div>
+    <div><svg class="ic" viewBox="0 0 64 64" aria-hidden="true"><path pathLength="1" d="M32 50 C22 44 18 32 22 18 C28 24 32 32 32 50 Z"/><path pathLength="1" d="M32 50 C42 44 46 32 42 18 C36 24 32 32 32 50 Z"/><path pathLength="1" d="M32 50 C18 50 8 42 6 30 C16 30 26 38 32 50 Z"/><path pathLength="1" d="M32 50 C46 50 56 42 58 30 C48 30 38 38 32 50 Z"/><path pathLength="1" d="M32 50 L32 60"/></svg><span class="n">3</span><h3><span class="de">Entfalten</span><span class="en">Unfold</span></h3><p><span class="de">Du nimmst die Ruhe und die Kraft mit in deinen Alltag und gehst die Dinge an, die dir wirklich wichtig sind.</span><span class="en">You take the calm and the strength into your everyday life and go after what truly matters to you.</span></p></div>
   </div>
 </div></section>
 
@@ -129,6 +134,14 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
 </div></section>
 </main>
 <?php mvl_foot(); ?>
+<script>
+(function(){ // sanftes Mitschweben beim Scrollen
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  var els=[].slice.call(document.querySelectorAll('[data-par]')),tick=false;
+  function run(){var y=window.scrollY;els.forEach(function(e){var f=parseFloat(e.dataset.par)||0;e.style.translate='0 '+(y*f).toFixed(1)+'px'});tick=false}
+  addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(run)}},{passive:true});
+})();
+</script>
 <script>
 (function(){
   var f=document.getElementById('rf'),m=document.getElementById('rmsg'),t0=Date.now();
