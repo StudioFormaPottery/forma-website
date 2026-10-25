@@ -50,6 +50,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             if ($r && hash_equals((string)$r['token'], (string)($_POST['k'] ?? '')) && $r['status'] === 'aktiv') {
                 $m = mv_member_ensure($pdo, (string)$r['email'], (string)$r['name'], (string)$r['lang']);
                 if ($m['pass_hash'] !== '') { $m = null; $err = $pl === 'en' ? 'You already have a password. Simply log in.' : 'Du hast schon ein Passwort. Melde dich einfach an.'; }
+                elseif ((int)$m['email_ok'] !== 1) { $m = null; $err = $pl === 'en' ? 'Please confirm your email address first, the link is in your inbox.' : 'Bitte bestätige zuerst deine E-Mail-Adresse, der Link ist in deinem Postfach.'; }
             }
         }
         if ($err === '') {
@@ -168,7 +169,7 @@ if (!$me && !$demo) {
     if ($resetM && $lang === '') $lang = (string)$resetM['lang'];
     if ($lang === '') $lang = str_starts_with(strtolower((string)($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? 'de')), 'en') ? 'en' : 'de';
     $L = fn(string $de, string $en) => ($lang === 'en' ? $en : $de);
-    $mode = $resetTok !== '' ? 'reset' : ($start ? ($start['status'] === 'aktiv' ? ($startMember && $startMember['pass_hash'] !== '' ? 'login' : 'new') : 'wait') : (isset($_GET['vergessen']) ? 'forgot' : 'login'));
+    $mode = $resetTok !== '' ? 'reset' : ($start ? ($start['status'] === 'aktiv' ? ($startMember && $startMember['pass_hash'] !== '' ? 'login' : ($startMember && (int)$startMember['email_ok'] === 1 ? 'new' : 'confirm')) : 'wait') : (isset($_GET['vergessen']) ? 'forgot' : 'login'));
     mv_head($L('Mitgliederbereich', 'Members area'), $lang);
     ?>
 <body class="auth">
@@ -186,6 +187,11 @@ if (!$me && !$demo) {
         <div class="field"><label for="pw2"><?= $L('Passwort wiederholen', 'Repeat password') ?></label><input id="pw2" type="password" name="pw2" autocomplete="new-password" required minlength="8"></div>
         <button class="btn" type="submit"><?= $L('Los geht’s', 'Let’s begin') ?></button>
       </form>
+    <?php elseif ($mode === 'confirm'): ?>
+      <p class="k"><?= $L('Nur noch ein Klick', 'One last click') ?></p>
+      <h1 class="h"><?= $L('Danke', 'Thank you') ?>, <em><?= $h(forma_first_name((string)$start['name'])) ?></em>. <?= $L('Bitte bestätige deine E-Mail.', 'Please confirm your email.') ?></h1>
+      <p class="mut"><?= $L('Deine Zahlung ist angekommen. Ich habe dir gerade eine kurze Mail an', 'Your payment arrived. I have just sent a short email to') ?> <b><?= $h((string)$start['email']) ?></b> <?= $L('geschickt. Klick dort auf „E-Mail bestätigen“, dann bekommst du deine Willkommensmail mit allen Infos, deiner Rechnung und deinem Zugang.', '. Click “Confirm my email” there, then you get your welcome email with all the information, your invoice and your access.') ?></p>
+      <p class="mut small"><?= $L('Nichts angekommen? Schau bitte auch im Spam- oder Werbung-Ordner nach.', 'Nothing there? Please also check your spam or promotions folder.') ?></p>
     <?php elseif ($mode === 'wait'): ?>
       <p class="k"><?= $L('Fast geschafft', 'Almost there') ?></p>
       <h1 class="h"><?= $L('Deine Zahlung wird gerade bestätigt', 'Your payment is being confirmed') ?></h1>
@@ -266,13 +272,20 @@ $isTest = !$demo && $me && array_filter($acc['subs'] ?? [], fn($s) => $s['source
 if ($isTest && $acc['unfold'] && $today < $c['u_start']) $today = date('Y-m-d', mv_ts($c['u_start']) + 11 * 86400);
 $progs = [];
 $all = [];
+$mNext = null;
 if ($acc['method']) {
-    foreach (mv_programs($pdo, 'method', true) as $p) {
+    // Monat für Monat ab ihrem Starttag (Vivien, 25.10.2026): Ankommen + Monat 1 bis n, neuester zuerst
+    if ($demo && !isset($acc['month'])) $acc['month'] = ['n' => 2, 'next_at' => strtotime('+12 days'), 'start' => strtotime('-48 days')];
+    $mv = mv_method_view($pdo, $acc);
+    foreach ($mv['open'] as $x) {
+        $p = $x['p'] + ['_n' => $x['n']];
         $lock = $acc['starter'] && $p['theme'] !== 'ankommen';
-        $ls = array_values(array_filter(mv_lessons($pdo, (int)$p['id'], true), fn($l) => $l['unlock'] === '' || $l['unlock'] <= $today));
+        $ls = mv_lessons($pdo, (int)$p['id'], true);
+        foreach ($ls as &$l) $l['unlock'] = ''; unset($l); // Method: Lektionen gehen mit ihrem Monat auf
         $progs[] = ['p' => $p, 'lessons' => $ls, 'lock' => $lock, 'files' => mv_files($pdo, (int)$p['id'])];
         foreach ($ls as $l) $all[(int)$l['id']] = ['l' => $l, 'p' => $p, 'lock' => $lock];
     }
+    $mNext = $mv['next'];
 }
 $uProgs = [];
 if ($acc['unfold']) {
@@ -443,7 +456,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
   <?php endforeach; ?>
 
 <?php else: /* Bibliothek */
-    $cur = null; foreach ($progs as $x) if ($x['p']['unlock'] !== '' && !$x['lock']) { $cur = $x; break; } ?>
+    $cur = null; foreach ($progs as $x) if ((int)$x['p']['_n'] > 0 && !$x['lock']) { $cur = $x; break; } ?>
   <section class="hello">
     <div>
       <p class="k"><?= $h($hello) ?>, <?= $h($first) ?></p>
@@ -452,9 +465,9 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
       <p class="mut small"><?= $L('Kein Streak, kein Druck. Jeder Tag, an dem du dir Zeit schenkst, zählt.', 'No streaks, no pressure. Every day you give yourself time counts.') ?></p>
     </div>
     <?php if ($prelaunch): ?><div class="soon card"><p class="k"><?= $L('Bald', 'Soon') ?></p><h3><?= $L('Die Method öffnet am', 'The Method opens on') ?> <?= $h(mv_date($launch, $lang)) ?></h3><p class="mut small"><?= $L('Bis dahin kannst du mit dem Ankommen-Modul beginnen.', 'Until then you can begin with the welcome module.') ?></p><p class="count" data-t="<?= $launch ?>"></p></div>
-    <?php elseif ($cur): ?><a class="soon card cur" href="#p<?= (int)$cur['p']['id'] ?>"><p class="k"><?= $L('Programm des Monats', 'Programme of the month') ?></p><h3><?= $h(mv_t($cur['p'], 'title', $lang)) ?></h3><p class="mut small"><?= $h(mb_strimwidth(mv_t($cur['p'], 'intro', $lang), 0, 150, '…')) ?></p></a><?php endif; ?>
+    <?php elseif ($cur): ?><a class="soon card cur" href="#p<?= (int)$cur['p']['id'] ?>"><p class="k"><?= $L('Dein Monat ', 'Your month ') . (int)$cur['p']['_n'] ?></p><h3><?= $h(mv_t($cur['p'], 'title', $lang)) ?></h3><p class="mut small"><?= $h(mb_strimwidth(mv_t($cur['p'], 'intro', $lang), 0, 150, '…')) ?></p></a><?php endif; ?>
   </section>
-  <?php if ($acc['starter']): ?><p class="note"><?= $L('Du bist in den ersten 14 Tagen nach deiner Buchung. Bis dahin ist das Ankommen-Modul für dich offen, danach öffnet sich die ganze Bibliothek von selbst.', 'You are in the first 14 days after your booking. Until then the welcome module is open for you, after that the whole library opens by itself.') ?></p><?php endif; ?>
+  <?php if ($acc['starter']): ?><p class="note"><?= $L('Du bist in den ersten 14 Tagen nach deiner Buchung und hast dein Rücktrittsrecht behalten. Bis dahin ist das Ankommen-Modul für dich offen, danach öffnet sich dein Monat 1 von selbst.', 'You are in the first 14 days after your booking and kept your right of withdrawal. Until then the welcome module is open for you, after that your month 1 opens by itself.') ?></p><?php endif; ?>
 
   <div class="filters" role="toolbar" aria-label="Filter">
     <div class="fg"><span class="fl"><?= $L('Wie viel Zeit hast du?', 'How much time do you have?') ?></span>
@@ -468,11 +481,16 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
 
   <?php foreach ($progs as $x): $p = $x['p']; ?>
   <section class="prog" id="p<?= (int)$p['id'] ?>">
-    <div class="phead"><div><p class="k"><?= $p['unlock'] === '' ? $L('Zum Start', 'To begin') : $h(mv_date(strtotime($p['unlock'] . ' 12:00'), $lang)) ?><?= $x['lock'] ? ' · ' . $L('öffnet sich nach 14 Tagen', 'opens after 14 days') : '' ?></p><h2 class="h3"><?= $h(mv_t($p, 'title', $lang)) ?></h2><?php if (mv_t($p, 'intro', $lang) !== ''): ?><p class="mut pintro"><?= $h(mv_t($p, 'intro', $lang)) ?></p><?php endif; ?></div>
+    <div class="phead"><div><p class="k"><?= (int)$p['_n'] === 0 ? $L('Zum Ankommen', 'To begin') : $L('Monat ', 'Month ') . (int)$p['_n'] ?><?= $x['lock'] ? ' · ' . $L('öffnet sich nach 14 Tagen', 'opens after 14 days') : '' ?></p><h2 class="h3"><?= $h(mv_t($p, 'title', $lang)) ?></h2><?php if (mv_t($p, 'intro', $lang) !== ''): ?><p class="mut pintro"><?= $h(mv_t($p, 'intro', $lang)) ?></p><?php endif; ?></div>
       <?php if ($x['files'] && !$x['lock']): ?><div class="files"><?php foreach ($x['files'] as $f) if ($f['lang'] === 'both' || $f['lang'] === $lang): ?><a class="chip" href="/api/method.php?file=<?= (int)$f['id'] ?>" target="_blank">⤓ <?= $h(mv_t($f, 'label', $lang)) ?></a><?php endif; ?></div><?php endif; ?></div>
     <div class="row"><?php foreach ($x['lessons'] as $l) echo $card($l, $p, $x['lock']); ?></div>
   </section>
   <?php endforeach; ?>
+  <?php if ($mNext): ?>
+  <section class="prog nextm">
+    <div class="phead"><div><p class="k"><?= $L('Monat ', 'Month ') . (int)$mNext['n'] . ' · ' . $L('öffnet sich am ', 'opens on ') . $h(mv_date((int)$mNext['at'], $lang)) ?></p><h2 class="h3">🔒 <?= $h(mv_t($mNext['p'], 'title', $lang)) ?></h2><p class="mut pintro"><?= $L('Dein nächster Monat kommt von selbst, an deinem Starttag. Bis dahin ist alles, was du brauchst, schon hier.', 'Your next month arrives by itself, on your start day. Until then, everything you need is already here.') ?></p></div></div>
+  </section>
+  <?php endif; ?>
 <?php endif; ?>
 </div></main>
 <footer class="f w"><div class="in"><span>Movecia · Vivien Malonga</span><span><a href="/"><?= $L('Startseite', 'Home') ?></a> · <a href="/terms/"><?= $L('Bedingungen', 'Terms') ?></a> · <a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a></span></div></footer>

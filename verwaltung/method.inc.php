@@ -28,8 +28,8 @@ if ($action === 'mm_mv_bunny_remove') { mm_save_cfg('bunny', null); go($vBack . 
 if ($action === 'mm_mv_cfg') {
     $e = fn(string $k) => mm_euro_in((string)($_POST[$k] ?? ''));
     $in = [];
-    foreach (['m1', 'm3', 'm12', 'g_m1', 'g_m3', 'g_m12', 'u_once', 'u_inst', 'g_u_once'] as $k) if (($v = $e($k)) > 0) $in[$k] = $v;
-    foreach (['launch', 'u_start', 'u_end'] as $k) if (preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST[$k] ?? ''))) $in[$k] = (string)$_POST[$k];
+    foreach (['m1', 'm3', 'm12', 'eb_m1', 'eb_m3', 'eb_m12', 'g_m1', 'g_m3', 'g_m12', 'u_once', 'u_inst', 'eb_u_once', 'eb_u_inst', 'g_u_once'] as $k) if (($v = $e($k)) > 0) $in[$k] = $v;
+    foreach (['launch', 'u_start', 'u_end', 'eb_m_until', 'eb_u_until'] as $k) if (preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST[$k] ?? ''))) $in[$k] = (string)$_POST[$k];
     $in['u_seats'] = max(1, min(40, (int)($_POST['u_seats'] ?? 10)));
     $in['u_open'] = !empty($_POST['u_open']) ? 1 : 0;
     $in['u_call_de'] = forma_clean((string)($_POST['u_call_de'] ?? ''), 80);
@@ -226,6 +226,7 @@ document.getElementById('top').onclick=()=>scrollTo(0,0);document.getElementById
     $newLessonFor = isset($_GET['neu']) ? mv_program($pdo, (int)$_GET['neu']) : null;
     render_page('Method & Unfold', function () use ($self, $flash, $pdo, $pEdit, $lEdit, $newLessonFor) {
         $c = mv_cfg();
+        $raw = mv_cfg_raw();
         $b = mv_bunny();
         $plans = mv_plans();
         $csrf = '<input type="hidden" name="csrf" value="' . forma_h(csrf()) . '">';
@@ -452,11 +453,17 @@ label.inl{display:flex;gap:8px;align-items:center}
         <h2 id="preise">Preise &amp; Termine</h2>
         <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_cfg">
             <b>Method</b>
-            <div class="g3"><label>monatlich €<input name="m1" value="<?= $eu($c['m1']) ?>"></label><label>3 Monate €<input name="m3" value="<?= $eu($c['m3']) ?>"></label><label>1 Jahr €<input name="m12" value="<?= $eu($c['m12']) ?>"></label></div>
-            <div class="g3"><label>Gathering: 1. Monat €<input name="g_m1" value="<?= $eu($c['g_m1']) ?>"></label><label>Gathering: 3 Monate €<input name="g_m3" value="<?= $eu($c['g_m3']) ?>"></label><label>Gathering: 1. Jahr €<input name="g_m12" value="<?= $eu($c['g_m12']) ?>"></label></div>
+            <p class="small muted">Gerade gilt: <?= $c['eb_m'] ? 'Early-Bird bis ' . date('d.m.Y', $c['eb_m_end']) : 'regulärer Preis' ?>. Wer zum Early-Bird-Preis bucht, behält ihn, solange das Abo läuft.</p>
+            <div class="g3"><label>Early-Bird monatlich €<input name="eb_m1" value="<?= $eu($raw['eb_m1']) ?>"></label><label>Early-Bird 3 Monate €<input name="eb_m3" value="<?= $eu($raw['eb_m3']) ?>"></label><label>Early-Bird 1 Jahr €<input name="eb_m12" value="<?= $eu($raw['eb_m12']) ?>"></label></div>
+            <label>Early-Bird gilt bis einschließlich<input type="date" name="eb_m_until" value="<?= forma_h($raw['eb_m_until']) ?>"></label>
+            <div class="g3"><label>danach monatlich €<input name="m1" value="<?= $eu($raw['m1']) ?>"></label><label>danach 3 Monate €<input name="m3" value="<?= $eu($raw['m3']) ?>"></label><label>danach 1 Jahr €<input name="m12" value="<?= $eu($raw['m12']) ?>"></label></div>
+            <div class="g3"><label>Gathering: 1. Monat €<input name="g_m1" value="<?= $eu($raw['g_m1']) ?>"></label><label>Gathering: 3 Monate €<input name="g_m3" value="<?= $eu($raw['g_m3']) ?>"></label><label>Gathering: 1. Jahr €<input name="g_m12" value="<?= $eu($raw['g_m12']) ?>"></label></div>
+            <p class="small muted">Die Gathering-Preise gelten während der Early-Bird-Zeit. Danach bekommt man im Gathering für die erste Zahlung den Early-Bird-Preis.</p>
             <label>Start der Method (vorher buchbar, Abbuchung ab diesem Tag)<input type="date" name="launch" value="<?= forma_h($c['launch']) ?>"></label>
             <b>Unfold</b>
-            <div class="g3"><label>auf einmal €<input name="u_once" value="<?= $eu($c['u_once']) ?>"></label><label>Rate (3 ×) €<input name="u_inst" value="<?= $eu($c['u_inst']) ?>"></label><label>Info-Gathering €<input name="g_u_once" value="<?= $eu($c['g_u_once']) ?>"></label></div>
+            <p class="small muted">Gerade gilt: <?= $c['eb_u'] ? 'Early-Bird bis ' . date('d.m.Y', $c['eb_u_end']) : 'regulärer Preis' ?>.</p>
+            <div class="g3"><label>Early-Bird auf einmal €<input name="eb_u_once" value="<?= $eu($raw['eb_u_once']) ?>"></label><label>Early-Bird Rate (3 ×) €<input name="eb_u_inst" value="<?= $eu($raw['eb_u_inst']) ?>"></label><label>Early-Bird bis einschließlich<input type="date" name="eb_u_until" value="<?= forma_h($raw['eb_u_until']) ?>"></label></div>
+            <div class="g3"><label>danach auf einmal €<input name="u_once" value="<?= $eu($raw['u_once']) ?>"></label><label>danach Rate (3 ×) €<input name="u_inst" value="<?= $eu($raw['u_inst']) ?>"></label><label>Info-Gathering €<input name="g_u_once" value="<?= $eu($raw['g_u_once']) ?>"></label></div>
             <div class="g3"><label>Start<input type="date" name="u_start" value="<?= forma_h($c['u_start']) ?>"></label><label>Ende<input type="date" name="u_end" value="<?= forma_h($c['u_end']) ?>"></label><label>Plätze<input type="number" name="u_seats" min="1" max="40" value="<?= (int)$c['u_seats'] ?>"></label></div>
             <div class="g2"><label>Call Deutsch<input name="u_call_de" value="<?= forma_h($c['u_call_de']) ?>"></label><label>Call Englisch<input name="u_call_en" value="<?= forma_h($c['u_call_en']) ?>"></label></div>
             <label class="inl"><input type="checkbox" name="u_open" value="1" <?= $c['u_open'] ? 'checked' : '' ?>> Unfold ist buchbar</label>

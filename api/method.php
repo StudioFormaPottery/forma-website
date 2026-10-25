@@ -15,6 +15,23 @@ if (isset($_GET['paid'])) {
     exit;
 }
 
+// E-Mail bestätigen (Vivien, 25.10.2026): erst danach Willkommensmail, Rechnung und Zugang
+if (isset($_GET['bestaetigen'])) {
+    $m = mv_confirm_ok($pdo, (int)$_GET['bestaetigen'], (int)($_GET['e'] ?? 0), (string)($_GET['k'] ?? ''));
+    if (!$m) mm_page('oh', 'Link nicht gültig · Link not valid', 'Dieser Link funktioniert leider nicht mehr. Schreib mir einfach, dann schicke ich dir einen neuen. · This link no longer works. Simply write to me and I will send you a new one.');
+    $was = (int)$m['email_ok'] === 1;
+    try { mv_confirm($pdo, $m); } catch (Throwable $e) { error_log('MV confirm: ' . $e->getMessage()); }
+    $en = $m['lang'] === 'en';
+    $pending = array_filter(mv_subs_of($pdo, (string)$m['email']), fn($s) => mv_open_at($s) > time());
+    $m = mv_member($pdo, (int)$m['id']);
+    if (!$pending && $m['pass_hash'] === '') { header('Location: ' . mv_pw_link($pdo, $m, 24 * 7), true, 303); exit; }
+    if (!$pending) { header('Location: /mitglieder/' . ($en ? '?lang=en' : ''), true, 303); exit; }
+    $at = min(array_map('mv_open_at', $pending));
+    mm_page('ok', $en ? 'Thank you, your email is confirmed' : 'Danke, deine E-Mail ist bestätigt',
+        ($was ? '' : ($en ? 'I have just sent you your welcome email with all the information. ' : 'Ich habe dir gerade deine Willkommensmail mit allen Infos geschickt. '))
+        . ($en ? 'Your access unlocks on ' . mv_date($at, 'en') . '. That day you get an email with your link to the members area.' : 'Dein Zugang schaltet sich am ' . mv_date($at) . ' frei. An diesem Tag bekommst du eine E-Mail mit deinem Link zum Mitgliederbereich.'));
+}
+
 // Workbook / Planner / Rezepte herunterladen
 if (isset($_GET['file'])) {
     $m = mv_current($pdo);
@@ -23,8 +40,9 @@ if (isset($_GET['file'])) {
     $f = $q->fetch();
     $acc = $m ? mv_access($pdo, (string)$m['email']) : null;
     $today = (new DateTimeImmutable('now', new DateTimeZone('Europe/Vienna')))->format('Y-m-d');
-    $ok = $f && $acc && ($f['unlock'] === '' || $f['unlock'] <= $today) && (int)$f['visible'] === 1
-        && ($f['audience'] === 'unfold' ? ($acc['unfold'] !== null && empty($acc['ulock'])) : ($acc['method'] && (!$acc['starter'] || $f['theme'] === 'ankommen')));
+    // Method: Monat für Monat ab dem eigenen Starttag (Vivien, 25.10.2026), Unfold: nach Datum
+    $ok = $f && $acc && (int)$f['visible'] === 1
+        && ($f['audience'] === 'unfold' ? (($f['unlock'] === '' || $f['unlock'] <= $today) && $acc['unfold'] !== null && empty($acc['ulock'])) : mv_method_program_open($pdo, $acc, (int)$f['program_id']));
     $path = $f ? mv_file_dir() . '/' . basename((string)$f['file']) : '';
     if (!$ok || !is_file($path)) { http_response_code(404); mm_page('oh', 'Not available', 'This file is only available in the members area.', '/mitglieder/', 'Members area'); }
     $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));

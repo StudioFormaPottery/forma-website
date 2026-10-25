@@ -459,6 +459,11 @@ function forma_invoice_send(PDO $pdo, int $id): void
 {
     $inv = forma_invoice_get($pdo, $id);
     if (!$inv || (int)$inv['mailed'] === 1) return;
+    // Method & Unfold (Vivien, 25.10.2026): Rechnung erst nach bestätigter E-Mail-Adresse, dann über mv_invoices_release()
+    if (in_array((string)$inv['kind'], ['mv_method', 'mv_unfold'], true) && function_exists('mv_member_by_email')) {
+        $m = mv_member_by_email($pdo, (string)$inv['email']);
+        if ($m && (int)($m['email_ok'] ?? 1) !== 1) return;
+    }
     $pdo->prepare('UPDATE invoices SET mailed = 1 WHERE id = ?')->execute([$id]);
     forma_invoice_deliver($inv);
 }

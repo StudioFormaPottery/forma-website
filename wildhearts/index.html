@@ -294,7 +294,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
           <div class="more">
           <ul class="en"><li>A weekly live call with a short talk, in English or German</li><li>Two movement videos a week: yoga, bodyweight, somatic and free movement</li><li>Workbooks for your mental health, mental load and organisation</li><li>Rituals: journaling, meditation and breathwork</li></ul>
           <ul class="de"><li>Jede Woche ein Live-Call mit Impulsvortrag, auf Deutsch oder Englisch</li><li>Zwei Bewegungsvideos pro Woche: Yoga, Bodyweight, Somatic und freie Bewegung</li><li>Workbooks für deine Mental Health, deinen Mental Load und mehr Organisation</li><li>Rituale: Journaling, Meditation und Breathwork</li></ul>
-          <p class="price"><span class="en">€ 450 in full or 3 × € 165. Bookable now.</span><span class="de">€ 450 auf einmal oder 3 × € 165. Ab sofort buchbar.</span></p>
+          <p class="price" data-until="2027-01-11T23:59:59+01:00"><span class="en">Early bird until 11 January: € 450 in full or 3 × € 165 (after that € 490). Bookable now.</span><span class="de">Early-Bird bis 11. Jänner: € 450 auf einmal oder 3 × € 165 (danach € 490). Ab sofort buchbar.</span></p><p class="price" data-from="2027-01-11T23:59:59+01:00" hidden><span class="en">€ 490 in full or 3 × € 175.</span><span class="de">€ 490 auf einmal oder 3 × € 175.</span></p>
           <a class="go" href="/unfold/"><span class="en">Book my spot →</span><span class="de">Platz sichern →</span></a>
           </div>
         </div>
@@ -309,7 +309,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
           <div class="more">
           <ul class="en"><li>Your video library: flows, somatic movement, breathwork, meditation</li><li>For full days and tired days, 5 to 30 minutes</li><li>A new programme with workbook on the 1st of every month</li></ul>
           <ul class="de"><li>Deine Videobibliothek: Flows, Somatic Movement, Breathwork, Meditation</li><li>Für volle und für müde Tage, 5 bis 30 Minuten</li><li>Am 1. jedes Monats ein neues Programm mit Workbook</li></ul>
-          <p class="price"><span class="en">€ 29 a month, € 75 for 3 months or € 240 a year.</span><span class="de">€ 29 im Monat, € 75 für 3 Monate oder € 240 im Jahr.</span></p>
+          <p class="price" data-until="2026-12-01T23:59:59+01:00"><span class="en">Early bird until 1 December: € 29 a month instead of € 39, € 75 for 3 months or € 240 a year. Your price stays as long as you are a member.</span><span class="de">Early-Bird bis 1. Dezember: € 29 statt € 39 im Monat, € 75 für 3 Monate oder € 240 im Jahr. Dein Preis bleibt, solange du dabei bist.</span></p><p class="price" data-from="2026-12-01T23:59:59+01:00" hidden><span class="en">€ 39 a month, € 111 for 3 months (€ 37 a month) or € 396 a year (€ 33 a month).</span><span class="de">€ 39 im Monat, € 111 für 3 Monate (€ 37 im Monat) oder € 396 im Jahr (€ 33 im Monat).</span></p>
           <a class="go" href="/method/"><span class="en">See the Method →</span><span class="de">Zur Method →</span></a>
           </div>
         </div>
@@ -546,5 +546,6 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
   });
 })();
 </script>
+<script>(function(){var n=Date.now();document.querySelectorAll('[data-until]').forEach(function(e){if(n>Date.parse(e.dataset.until))e.hidden=true;});document.querySelectorAll('[data-from]').forEach(function(e){if(n>Date.parse(e.dataset.from))e.hidden=false;});})();</script>
 </body>
 </html>

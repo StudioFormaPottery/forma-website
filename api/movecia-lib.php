@@ -632,7 +632,7 @@ function mm_ml_retry(PDO $pdo): void
 function mm_page(string $hi, string $title, string $text, string $btnHref = '', string $btnLabel = ''): void
 {
     header('Content-Type: text/html; charset=utf-8');
-    echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>' . forma_h($title) . ' · Wild Hearts</title>'
+    echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>' . forma_h($title) . ' · Movecia</title>'
         . '<style>@font-face{font-family:"Italiana";src:url(/fonts/Italiana-Regular.woff) format("woff")}@font-face{font-family:"Outfit";src:url(/fonts/Outfit-Regular.woff) format("woff")}@font-face{font-family:"Hand";src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}'
         . 'body{margin:0;min-height:100vh;display:grid;place-items:center;background:#F2ECE4;color:#2E2529;font:17px/1.6 Outfit,system-ui,sans-serif;text-align:center;padding:24px 16px}main{max-width:520px}'
         . '.hi{font-family:Hand,cursive;color:#7D5E68;font-size:22px;transform:rotate(-2deg)}h1{font-family:Italiana,Georgia,serif;font-weight:400;font-size:44px;line-height:1.05;color:#6B5658;margin:8px 0 12px}p{color:#7D7076}'
