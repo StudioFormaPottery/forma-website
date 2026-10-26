@@ -310,7 +310,7 @@ M1_ORDER = ['k:method:rueckzug', 't:Morgen-Flow für dunkle Tage', 'k:method:m1:
             'k:method:m1:mitte', 'k:method:m1:mentalload', 't:Kraft ohne Erschöpfung', 'k:method:m1:ruecken', 't:Abendmeditation: Rückzug',
             'k:method:m1:abendflow', 'k:method:m1:beine']
 
-out = {'v': 5, 'm1_order': M1_ORDER, 'm1_steps': list(mj['steps'].keys()), 'steps': steps, 'ex': ex, 'due': {k: v.isoformat() for k, v in due.items()}, 'new': new,
+out = {'v': 6, 'm1_order': M1_ORDER, 'm1_steps': list(mj['steps'].keys()), 'steps': steps, 'ex': ex, 'due': {k: v.isoformat() for k, v in due.items()}, 'new': new,
        'natal_programs': {'prae': ['Pränatal · Videos', 'Prenatal · Videos'], 'post': ['Postnatal · Videos', 'Postnatal · Videos']}}
 path = os.path.join(ROOT, 'api', 'seed', 'produktion.json')
 json.dump(out, open(path, 'w'), ensure_ascii=False, indent=1)

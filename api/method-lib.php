@@ -1378,7 +1378,7 @@ function mv_prod_sync(PDO $pdo, bool $force = false): void
         foreach ($j['new'] as $n) foreach ($n['steps'] ?? [] as $x) mv_clip_ensure($pdo, $x[0], $x[1]);
     }
     // v4 (Vivien, 26.10.2026): Method Monat 1 mit 12 Videos, neue Voice-over-Texte je Übung, Talking Head zum Monat neu
-    if (in_array((int)($c['v'] ?? 0), [3, 4], true)) {
+    if (in_array((int)($c['v'] ?? 0), [3, 4, 5], true)) {
         $js = fn($st) => [json_encode($st, JSON_UNESCAPED_UNICODE), json_encode(array_map(fn($x) => [$x[0], $x[1]], $st), JSON_UNESCAPED_UNICODE)];
         $setT = $pdo->prepare("UPDATE mv_lessons SET steps = ?, ex = ? WHERE title_de = ? AND ukey = ''");
         foreach ($j['m1_steps'] ?? [] as $t) if (isset($j['steps'][$t])) $setT->execute([...$js($j['steps'][$t]), $t]);
@@ -1397,7 +1397,7 @@ function mv_prod_sync(PDO $pdo, bool $force = false): void
         if (!empty($n['steps'])) $pdo->prepare('UPDATE mv_lessons SET steps = ?, ex = ?, mode = ? WHERE id = ?')->execute([json_encode($n['steps'], JSON_UNESCAPED_UNICODE), json_encode(array_map(fn($x) => [$x[0], $x[1]], $n['steps']), JSON_UNESCAPED_UNICODE), (string)($n['mode'] ?? ''), (int)$pdo->lastInsertId()]);
     }
     // feste Reihenfolge der Videos in Monat 1
-    if ((int)($c['v'] ?? 0) < 5 && !empty($j['m1_order'])) {
+    if ((int)($c['v'] ?? 0) < 6 && !empty($j['m1_order'])) {
         $pid = $prog('method', 'Rückzug & Ruhe');
         foreach ($j['m1_order'] as $pos => $ref) {
             [$t, $v] = explode(':', $ref, 2);
