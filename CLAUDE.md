@@ -336,3 +336,4 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Verwaltung → Movecia → Übersicht → „💬 Personal Training Anfragen“ (`#pt`): offene oben mit Zähler, Antworten (mailto), WhatsApp (bei Telefon), ✓ Erledigt / Wieder offen, erledigte löschbar. Datenschutz /terms: Absatz „Anfragen“.
 
 - Videos auf öffentlichen Movecia-Seiten (Vivien, 26.10.2026): kein Rahmen, Ränder laufen weich in den Hintergrund aus (Klasse `.soft`, CSS-Maske in `site.css`, Unfold-Seite eigene Regel `.pic.soft`). Tanz-Video: Linie und Wörter in dunklem Pflaume mit hellem Schein.
+- Hauptseite Bewegungs-Bereich (Vivien, 26.10.2026): am Computer `.vpair` = Tanz-Video (max. 400 px, Linie/Wörter weiß mit dunklem Schatten) links, rechts `.vside` mit `start-arme.mp4` und „Bewegung beginnt bei dir.“; am Handy nur das Tanz-Video.

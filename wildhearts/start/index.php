@@ -50,6 +50,7 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
 
 <section class="w vids" aria-label="Movecia in Bewegung"><div class="in">
   <!-- Nur noch das Tanz-Video, darüber die Linie ankommen · spüren · entfalten (Vivien, 26.10.2026) -->
+  <div class="vpair">
   <figure class="vsolo soft rv">
     <video src="/video/movecia/unfold.mp4?v=10" poster="/img/movecia/fotos/ev-unfold.jpg?v=10" autoplay muted loop playsinline preload="metadata" aria-label="Vivien tanzt langsam in ihrem lichten Studio"></video>
     <div class="flow" aria-hidden="true">
@@ -61,6 +62,12 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
     </div>
     <figcaption class="sr"><span class="de">ankommen, spüren, entfalten</span><span class="en">arrive, feel, unfold</span></figcaption>
   </figure>
+  <!-- am Computer daneben: Armbewegung vor den Bergen (Vivien, 26.10.2026) -->
+  <figure class="vside soft rv" aria-hidden="true">
+    <video src="/video/movecia/start-arme.mp4?v=10" poster="/img/movecia/fotos/ev-start-arme.jpg?v=10" autoplay muted loop playsinline preload="none"></video>
+    <figcaption><span class="de">Bewegung beginnt bei dir.</span><span class="en">Movement begins with you.</span></figcaption>
+  </figure>
+  </div>
 </div></section>
 
 <section class="w sec" id="angebote"><div class="in">
