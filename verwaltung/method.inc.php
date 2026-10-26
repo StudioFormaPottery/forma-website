@@ -151,6 +151,32 @@ if ($action === 'mm_mv_prod') {
     $pdo->prepare('UPDATE mv_lessons SET prod = ? WHERE id = ?')->execute([json_encode($p ?: new stdClass()), $l['id']]);
     $mvJson(['ok' => 1]);
 }
+// Übungs-Clips (Vivien, 26.10.2026): pro Übung ein kurzer Clip, der Player im Mitgliederbereich spielt ihn mit 30/45-Sek.-Timer
+if ($action === 'mm_mv_clip_new') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    $i = (int)($_POST['i'] ?? -1);
+    $ex = $l ? mv_lesson_ex($l) : [];
+    if (!$l || !isset($ex[$i])) $mvJson(['error' => 'Übung nicht gefunden.']);
+    try { $mvJson(mv_bunny_new($l['title_de'] . ' · ' . ($i + 1) . '. ' . $ex[$i][0])); } catch (Throwable $e) { $mvJson(['error' => $e->getMessage()]); }
+}
+if ($action === 'mm_mv_clip_set') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    $i = (int)($_POST['i'] ?? -1);
+    $guid = preg_replace('/[^a-f0-9-]/', '', (string)($_POST['guid'] ?? ''));
+    if (!$l || $i < 0 || $guid === '') $mvJson(['error' => 'Fehlt.']);
+    $p = mv_lesson_prod($l);
+    if (!empty($p['c' . $i]) && $p['c' . $i] !== $guid) mv_bunny_delete((string)$p['c' . $i]);
+    $p['c' . $i] = $guid;
+    $pdo->prepare('UPDATE mv_lessons SET prod = ? WHERE id = ?')->execute([json_encode($p), $l['id']]);
+    $l['prod'] = json_encode($p);
+    $mvJson(['ok' => 1, 'view' => mv_embed($guid), 'clips' => count(mv_lesson_clips($l)), 'done' => mv_lesson_done($l)]);
+}
+if ($action === 'mm_mv_clip_clear') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    $i = (int)($_POST['i'] ?? -1);
+    if ($l) { $p = mv_lesson_prod($l); if (!empty($p['c' . $i])) { mv_bunny_delete((string)$p['c' . $i]); unset($p['c' . $i]); $pdo->prepare('UPDATE mv_lessons SET prod = ? WHERE id = ?')->execute([json_encode($p ?: new stdClass()), $l['id']]); } }
+    $mvJson(['ok' => 1]);
+}
 if ($action === 'mm_mv_due') {
     $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
     $d = (string)($_POST['due'] ?? '');

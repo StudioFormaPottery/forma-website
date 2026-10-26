@@ -1268,6 +1268,12 @@ function mv_prod_sync(PDO $pdo, bool $force = false): void
         foreach ($ps as $p) if ($p['title_de'] === $ref) return (int)$p['id'];
         return (int)($ps[1]['id'] ?? $ps[0]['id'] ?? 0);
     };
+    // v2 (Vivien, 26.10.2026: kein Gymnastikball): Prä-/Postnatal-Einträge vom 26.10. einmal mit den neuen Texten und Übungen auffrischen
+    if ((int)($c['v'] ?? 0) === 1) {
+        $up = $pdo->prepare('UPDATE mv_lessons SET title_de = ?, title_en = ?, text_de = ?, text_en = ?, script_de = ?, script_en = ?, ex = ? WHERE ukey = ?');
+        foreach ($j['new'] as $n) if (str_starts_with($n['ukey'], 'natal:') || str_starts_with($n['ukey'], 'unfold:') || str_starts_with($n['ukey'], 'method:'))
+            $up->execute([$n['title_de'], $n['title_en'], $n['text_de'], $n['text_en'], $n['de'], $n['en'], $n['ex'] ? json_encode($n['ex'], JSON_UNESCAPED_UNICODE) : '', $n['ukey']]);
+    }
     $has = $pdo->prepare('SELECT COUNT(*) FROM mv_lessons WHERE ukey = ?');
     $ins = $pdo->prepare('INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, unlock, script_de, script_en, ukey, due, ex, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
     foreach ($j['new'] as $n) {
@@ -1296,10 +1302,40 @@ function mv_lesson_prod(array $l): array
     return is_array($x) ? $x : [];
 }
 
-/** Ist das Video fertig? Beide Sprachen hochgeladen. */
+/** Bewegungsvideo aus einzelnen Übungs-Clips (Vivien, 26.10.2026)? Dann gilt nicht das ganze Video, sondern ein Clip je Übung. */
+function mv_lesson_is_clips(array $l): bool
+{
+    // Breathwork und Meditation bleiben ein ganzes, geführtes Video (wie ein Talking Head)
+    return !in_array($l['cat'], ['talk', 'breath', 'meditation'], true) && mv_lesson_ex($l) !== [];
+}
+
+/** Clip-IDs (Bunny) je Übung: [i => guid] */
+function mv_lesson_clips(array $l): array
+{
+    $out = [];
+    foreach (mv_lesson_prod($l) as $k => $v) if (preg_match('/^c(\d+)$/', (string)$k, $m) && is_string($v) && $v !== '') $out[(int)$m[1]] = $v;
+    return $out;
+}
+
+/** Ist das Video fertig? Bewegungsvideo: zu jeder Übung ein Clip. Talking Head: Deutsch und Englisch hochgeladen. */
 function mv_lesson_done(array $l): bool
 {
+    if (mv_lesson_is_clips($l)) return count(mv_lesson_clips($l)) >= count(mv_lesson_ex($l));
     return (string)$l['video_de'] !== '' && (string)$l['video_en'] !== '';
+}
+
+/** Daten für den Übungs-Player im Mitgliederbereich (nur wenn jede Übung einen Clip hat), sonst null. */
+function mv_flow_data(array $l, string $lang): ?array
+{
+    if (!mv_lesson_is_clips($l) || !mv_lesson_done($l) || mv_bunny()['lib'] === '') return null;
+    $clips = mv_lesson_clips($l);
+    $items = [];
+    foreach (mv_lesson_ex($l) as $i => $e) {
+        $src = mv_embed($clips[$i]);
+        if ($src === '') return null;
+        $items[] = ['name' => $lang === 'en' ? (string)($e[1] ?? $e[0]) : (string)$e[0], 'src' => $src . '&autoplay=true&loop=true&muted=true'];
+    }
+    return ['lang' => $lang, 'title' => mv_t($l, 'title', $lang), 'items' => $items];
 }
 
 /** Prä-/Postnatal-Videos einer Einheit: ['talk' => Lektion|null, 'move' => Lektion|null] */

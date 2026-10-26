@@ -352,19 +352,20 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
   <p class="mut lead"><?= $L('Schön, dass du da warst. Wenn du wieder einsteigen magst, ist die Bibliothek mit allen Monaten für dich bereit.', 'Lovely that you were here. If you would like to come back, the library with all months is ready for you.') ?></p>
   <p style="margin-top:1.4rem"><a class="btn" href="/method/<?= $lang === 'en' ? '?lang=en' : '' ?>"><?= $L('Wieder einsteigen', 'Come back') ?></a></p></section>
 
-<?php elseif ($lesson): $l = $lesson['l']; $p = $lesson['p']; $vid = mv_video_for($l, $lang); $isFav = in_array((int)$l['id'], $favs, true);
+<?php elseif ($lesson): $l = $lesson['l']; $p = $lesson['p']; $vid = mv_video_for($l, $lang); $flow = $lesson['lock'] ? null : mv_flow_data($l, $lang); $isFav = in_array((int)$l['id'], $favs, true);
     $sib = array_values(array_filter($all, fn($x) => (int)$x['p']['id'] === (int)$p['id'])); $next = null;
     foreach ($sib as $i => $x) if ((int)$x['l']['id'] === (int)$l['id']) $next = $sib[$i + 1] ?? null; ?>
   <p class="back"><a href="?tab=<?= $p['audience'] === 'unfold' ? 'unfold' : 'bibliothek' ?><?= $q ?>">← <?= $h(mv_t($p, 'title', $lang)) ?></a></p>
   <section class="lesson">
-    <div class="player"><?php if ($lesson['lock']): ?><div class="ph"><p><?= $L('Dieses Video öffnet sich 14 Tage nach deiner Buchung.', 'This video opens 14 days after your booking.') ?></p></div>
+    <?php if ($flow): ?><div data-mv-flow="<?= $h(json_encode($flow, JSON_UNESCAPED_UNICODE)) ?>"></div><script src="/wildhearts/assets/flow-player.js?v=1" defer></script>
+    <?php else: ?><div class="player"><?php if ($lesson['lock']): ?><div class="ph"><p><?= $L('Dieses Video öffnet sich 14 Tage nach deiner Buchung.', 'This video opens 14 days after your booking.') ?></p></div>
       <?php elseif ($vid && mv_bunny()['lib'] !== ''): ?><iframe src="<?= $h(mv_embed($vid)) ?>" loading="lazy" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen" allowfullscreen title="<?= $h(mv_t($l, 'title', $lang)) ?>"></iframe>
-      <?php else: ?><div class="ph"><span class="ic"><?= mv_icon($l['cat']) ?></span><p><?= $L('Dieses Video kommt bald. Schau gern bald wieder vorbei.', 'This video is coming soon. Come back soon.') ?></p></div><?php endif; ?></div>
+      <?php else: ?><div class="ph"><span class="ic"><?= mv_icon($l['cat']) ?></span><p><?= $L('Dieses Video kommt bald. Schau gern bald wieder vorbei.', 'This video is coming soon. Come back soon.') ?></p></div><?php endif; ?></div><?php endif; ?>
     <div class="ltext">
       <p class="k"><?= $h((MV_CATS[$l['cat']] ?? MV_CATS['flow'])[$lang === 'en' ? 1 : 0]) ?><?= (int)$l['minutes'] ? ' · ' . (int)$l['minutes'] . ' Min.' : '' ?><?= $l['energy'] !== 'any' ? ' · ' . $h(MV_ENERGY[$l['energy']][$lang === 'en' ? 1 : 0]) : '' ?></p>
       <h1 class="h2"><?= $h(mv_t($l, 'title', $lang)) ?></h1>
       <?php if (mv_t($l, 'text', $lang) !== ''): ?><p class="lead"><?= nl2br($h(mv_t($l, 'text', $lang))) ?></p><?php endif; ?>
-      <?php if ($lang === 'en' && $l['video_en'] === '' && $l['video_de'] !== ''): ?><p class="mut small">This video is in German for now, the English version is coming.</p><?php elseif ($lang === 'de' && $l['video_de'] === '' && $l['video_en'] !== ''): ?><p class="mut small">Dieses Video gibt es gerade nur auf Englisch, die deutsche Fassung kommt.</p><?php endif; ?>
+      <?php if ($flow): ?><?php elseif ($lang === 'en' && $l['video_en'] === '' && $l['video_de'] !== ''): ?><p class="mut small">This video is in German for now, the English version is coming.</p><?php elseif ($lang === 'de' && $l['video_de'] === '' && $l['video_en'] !== ''): ?><p class="mut small">Dieses Video gibt es gerade nur auf Englisch, die deutsche Fassung kommt.</p><?php endif; ?>
       <?php if (!$lesson['lock']): ?>
       <div class="acts">
         <form method="post" data-ajax="done"><input type="hidden" name="a" value="done"><input type="hidden" name="l" value="<?= (int)$l['id'] ?>"><button class="btn" type="submit" <?= $demo ? 'disabled' : '' ?>><?= isset($_GET['ok']) ? $L('Schön, du warst bei dir ✓', 'Lovely, you showed up ✓') : $L('Ich war heute bei mir ✓', 'I showed up today ✓') ?></button></form>

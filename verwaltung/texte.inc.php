@@ -74,44 +74,46 @@ document.getElementById('top').onclick=()=>scrollTo(0,0);document.getElementById
         $row = function (string $aud, array $p, array $l) use ($u, $dd, $isTalk, $state, $audName, $bunny): void {
             $id = (int)$l['id'];
             $talk = $isTalk($l);
+            $guided = !$talk && in_array($l['cat'], ['breath', 'meditation'], true);
             $ex = mv_lesson_ex($l);
-            $pr = mv_lesson_prod($l);
+            $clipMode = mv_lesson_is_clips($l);
+            $clips = mv_lesson_clips($l);
             $st = $state($l);
             $hasDe = trim((string)$l['script_de']) !== ''; $hasEn = trim((string)$l['script_en']) !== '';
-            if ($talk) { $tot = 2; $got = (int)!empty($pr['td']) + (int)!empty($pr['te']); }
-            else { $tot = count($ex) * 3; $got = 0; foreach ($ex as $i => $_) foreach (['f', 'd', 'e'] as $s) $got += (int)!empty($pr['x' . $i . $s]); }
             ?>
     <div class="ti <?= $st ?>" id="l<?= $id ?>" data-q="<?= forma_h(mb_strtolower($p['title_de'] . ' ' . $l['title_de'] . ' ' . $l['title_en'] . ' ' . implode(' ', array_map(fn($e) => $e[0] . ' ' . ($e[1] ?? ''), $ex)))) ?>">
-      <span class="t"><span class="kind <?= $talk ? 'k-talk' : 'k-move' ?>"><?= $talk ? 'Talking Head' : 'Bewegungsvideo' ?></span> <?= forma_h($l['title_de']) ?>
-        <span class="m"><?= (int)$l['minutes'] ? (int)$l['minutes'] . ' Min.' : '' ?><?= $l['unlock'] !== '' ? ' · erscheint ' . forma_h(date('d.m.Y', strtotime($l['unlock']))) : '' ?></span>
+      <span class="t"><span class="kind <?= $talk ? 'k-talk' : 'k-move' ?>"><?= $talk ? 'Talking Head' : ($guided ? 'Geführtes Video' : 'Bewegungsvideo') ?></span> <?= forma_h($l['title_de']) ?>
+        <span class="m"><?= $clipMode ? count($ex) . ' Übungen' : ((int)$l['minutes'] ? (int)$l['minutes'] . ' Min.' : '') ?><?= $l['unlock'] !== '' ? ' · erscheint ' . forma_h(date('d.m.Y', strtotime($l['unlock']))) : '' ?></span>
         <span class="sts">
           <span class="due" data-due-label="<?= $id ?>"><?= $st === 'done' ? '✓ fertig' : ((string)$l['due'] !== '' ? ($st === 'late' ? '⚠ war fällig ' : 'fertig bis ') . forma_h($dd((string)$l['due'])) : 'kein Datum') ?></span>
-          <span class="up <?= $l['video_de'] !== '' ? 'y' : '' ?>" data-up="<?= $id ?>-de">DE <?= $l['video_de'] !== '' ? '✓' : '–' ?></span><span class="up <?= $l['video_en'] !== '' ? 'y' : '' ?>" data-up="<?= $id ?>-en">EN <?= $l['video_en'] !== '' ? '✓' : '–' ?></span>
-          <?php if ($tot): ?><span class="cnt" data-cnt="<?= $id ?>"><?= $got ?>/<?= $tot ?> abgehakt</span><?php endif; ?>
+          <?php if ($clipMode): ?><span class="up <?= count($clips) >= count($ex) ? 'y' : '' ?>" data-cnt="<?= $id ?>" data-of="<?= count($ex) ?>"><?= count($clips) ?> von <?= count($ex) ?> Clips</span>
+          <?php else: ?><span class="up <?= $l['video_de'] !== '' ? 'y' : '' ?>" data-up="<?= $id ?>-de">DE <?= $l['video_de'] !== '' ? '✓' : '–' ?></span><span class="up <?= $l['video_en'] !== '' ? 'y' : '' ?>" data-up="<?= $id ?>-en">EN <?= $l['video_en'] !== '' ? '✓' : '–' ?></span><?php endif; ?>
         </span></span>
-      <span class="b"><?php if ($hasDe): ?><a href="<?= $u('view=method&lang=de&prompter=' . $id) ?>" target="_blank" rel="noopener">Deutsch</a><?php endif; ?><?php if ($hasEn): ?><a href="<?= $u('view=method&lang=en&prompter=' . $id) ?>" target="_blank" rel="noopener">Englisch</a><?php endif; ?><?php if (!$hasDe && !$hasEn): ?><span class="no">Text fehlt noch</span><?php endif; ?><button type="button" class="g" data-open="<?= $id ?>" aria-expanded="false"><?= $talk ? 'Checkliste' : 'Übungen' ?></button></span>
+      <span class="b"><?php if (!$clipMode): ?><?php if ($hasDe): ?><a href="<?= $u('view=method&lang=de&prompter=' . $id) ?>" target="_blank" rel="noopener">Deutsch</a><?php endif; ?><?php if ($hasEn): ?><a href="<?= $u('view=method&lang=en&prompter=' . $id) ?>" target="_blank" rel="noopener">Englisch</a><?php endif; ?><?php endif; ?><button type="button" class="g" data-open="<?= $id ?>" aria-expanded="false"><?= $clipMode ? 'Übungen &amp; Clips' : 'Video hochladen' ?></button></span>
     </div>
     <div class="pp" id="pp<?= $id ?>" hidden data-id="<?= $id ?>">
-      <p class="how"><?= $talk ? '🗣 <b>Talking Head:</b> Du sprichst direkt in die Kamera, der Teleprompter läuft dabei mit.' : '🎬 <b>Bewegungsvideo:</b> Du filmst die Übungen und sprichst den Text danach als Voice-over mit dem Teleprompter ein.' ?> <span class="muted"><?= $audName[$aud] ?> · <?= forma_h($p['title_de']) ?></span></p>
+      <?php if ($clipMode): ?>
+      <p class="how"><b>So geht's:</b> Film jede Übung einzeln, ein kurzer Clip reicht (etwa 10 Sekunden bis 1 Minute), und lade ihn hier direkt bei der Übung hoch. Schneiden musst du nichts. Im Mitgliederbereich läuft dein Clip in Schleife, die Frauen wählen vorher 30 oder 45 Sekunden, und danach kommt automatisch die nächste Übung. Ein Clip gilt für Deutsch und Englisch.</p>
+      <?php else: ?>
+      <?php if ($guided): ?><p class="how"><b>So geht's:</b> Atemübung oder Meditation nimmst du einmal am Stück auf, gern ruhig im Bild sitzend oder liegend, während du mit dem Teleprompter (Knopf „Deutsch“ oder „Englisch“) anleitest. Schneiden musst du nichts. Danach lädst du das ganze Video hier hoch, einmal auf Deutsch und einmal auf Englisch.</p><?php else: ?>
+      <p class="how"><b>So geht's:</b> Du sprichst einmal am Stück direkt in die Kamera, der Teleprompter (Knopf „Deutsch“ oder „Englisch“) läuft dabei mit. Schneiden musst du nichts. Danach lädst du das ganze Video hier hoch, einmal auf Deutsch und einmal auf Englisch.</p><?php endif; ?>
+      <?php endif; ?>
       <label class="duein">Fertig bis <input type="date" value="<?= forma_h((string)$l['due']) ?>" data-due="<?= $id ?>"></label>
-      <?php if ($talk): ?>
+      <?php if (!$bunny): ?><p class="small muted">Zum Hochladen zuerst unter <a href="<?= $u('view=method') ?>#bunny">Method &amp; Unfold → Bunny</a> verbinden.</p><?php endif; ?>
+      <?php if ($clipMode): ?>
       <div class="exl">
-        <div class="ex"><span class="n">Talking Head aufgenommen<?php if (trim((string)$l['text_de']) !== ''): ?><small><?= forma_h($l['text_de']) ?></small><?php endif; ?></span><span class="ch">
-          <button type="button" data-k="td" aria-pressed="<?= !empty($pr['td']) ? 'true' : 'false' ?>">🎙 Deutsch</button><button type="button" data-k="te" aria-pressed="<?= !empty($pr['te']) ? 'true' : 'false' ?>">🎙 Englisch</button></span></div>
-      </div>
-      <?php elseif ($ex): ?>
-      <div class="exl">
-        <div class="exh"><span>Übung</span><span>🎬 gefilmt · 🎙 Deutsch · 🎙 Englisch</span></div>
-        <?php foreach ($ex as $i => $e): ?>
-        <div class="ex"><span class="n"><?= $i + 1 ?>. <?= forma_h($e[0]) ?><?php if (!empty($e[1]) && $e[1] !== $e[0]): ?><small><?= forma_h($e[1]) ?></small><?php endif; ?></span><span class="ch">
-          <button type="button" data-k="x<?= $i ?>f" aria-pressed="<?= !empty($pr['x' . $i . 'f']) ? 'true' : 'false' ?>" aria-label="gefilmt">🎬 Film</button><button type="button" data-k="x<?= $i ?>d" aria-pressed="<?= !empty($pr['x' . $i . 'd']) ? 'true' : 'false' ?>">DE</button><button type="button" data-k="x<?= $i ?>e" aria-pressed="<?= !empty($pr['x' . $i . 'e']) ? 'true' : 'false' ?>">EN</button></span></div>
+        <?php foreach ($ex as $i => $e): $g = $clips[$i] ?? ''; ?>
+        <div class="ex cbox" data-id="<?= $id ?>" data-i="<?= $i ?>"><span class="n"><?= $i + 1 ?>. <?= forma_h($e[0]) ?><?php if (!empty($e[1]) && $e[1] !== $e[0]): ?><small><?= forma_h($e[1]) ?></small><?php endif; ?>
+            <small class="vmsg <?= $g ? 'ok' : '' ?>"><?php if ($g): ?>✓ Clip ist da · <a href="<?= forma_h(mv_embed($g)) ?>" target="_blank" rel="noopener">ansehen</a><?php else: ?>noch kein Clip<?php endif; ?></small>
+            <span class="vbar" hidden><i></i></span></span>
+          <?php if ($bunny): ?><label class="upbtn sm"><input type="file" accept="video/*" class="vfile"><?= $g ? 'Ersetzen' : '⬆ Clip hochladen' ?></label><?php endif; ?></div>
         <?php endforeach; ?>
       </div>
-      <?php else: ?><p class="muted small">Für dieses Video ist noch keine Übungsliste hinterlegt.</p><?php endif; ?>
+      <?php else: ?>
       <div class="ups">
       <?php foreach (['de' => 'Deutsch', 'en' => 'Englisch'] as $lg => $ln): ?>
         <div class="vbox" data-id="<?= $id ?>" data-lang="<?= $lg ?>">
-          <b>Fertiges Video · <?= $ln ?></b>
+          <b>Video · <?= $ln ?></b>
           <span class="small vmsg"><?= $l['video_' . $lg] !== '' ? '✓ hochgeladen' : 'noch nicht hochgeladen' ?></span>
           <?php if ($bunny): ?>
           <label class="upbtn"><input type="file" accept="video/*" class="vfile"><?= $l['video_' . $lg] !== '' ? 'Video ersetzen' : '⬆ Video hochladen' ?></label>
@@ -120,8 +122,8 @@ document.getElementById('top').onclick=()=>scrollTo(0,0);document.getElementById
         </div>
       <?php endforeach; ?>
       </div>
-      <?php if (!$bunny): ?><p class="small muted">Zum Hochladen zuerst unter <a href="<?= $u('view=method') ?>#bunny">Method &amp; Unfold → Bunny</a> verbinden.</p><?php endif; ?>
-      <p class="small muted">Das Video landet direkt in „<?= forma_h($p['title_de']) ?>“ bei dieser Lektion. <a href="<?= $u('view=method&l=' . $id) ?>">Lektion ansehen oder bearbeiten</a></p>
+      <?php endif; ?>
+      <p class="small muted"><?= $audName[$aud] ?> · <?= forma_h($p['title_de']) ?> · <a href="<?= $u('view=method&l=' . $id) ?>">Lektion bearbeiten</a></p>
     </div>
 <?php
         }; ?>
@@ -153,6 +155,7 @@ details.tx>summary small{font-family:"Outfit",sans-serif;font-size:14px;color:va
 .ch button[aria-pressed=true]{background:#7D5E68;border-color:#7D5E68;color:#fff}
 @media(max-width:640px){.ex{flex-wrap:wrap}.ex .n{flex:1 1 100%}.ch{width:100%}.ch button{flex:1}}
 .ups{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin:14px 0 6px}.vbox{display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.ex .vmsg{display:block;font-size:13px;color:var(--soft)}.ex .vmsg.ok{color:#4E6B3E}.ex .vbar{display:block;margin-top:6px;max-width:260px}.ex .vbar[hidden]{display:none}.upbtn.sm{flex:0 0 auto;padding:8px 14px;font-size:14px}
 .upbtn{display:inline-flex;justify-content:center;padding:10px 14px;border-radius:999px;background:#4A3A41;color:#FBF5F7;cursor:pointer;font-weight:500;font-size:15px}.upbtn input{display:none}
 .vbar{height:8px;border-radius:9px;background:#EADFDE;overflow:hidden}.vbar i{display:block;height:100%;width:0;background:#7D5E68;transition:width .3s}
 .wk{margin:0;padding:10px 0;border-top:1px solid var(--line)}.wk h3{margin:0 0 6px;font-size:16px;color:#4A3A41}.wk h3 small{font-weight:400;color:var(--soft)}
@@ -160,7 +163,7 @@ details.tx>summary small{font-family:"Outfit",sans-serif;font-size:14px;color:va
 .hide-done .ti.done,.hide-done .ti.done+.pp,.hide-done .wk.alldone,.hide-done .wk a.done{display:none}
 </style>
 <?php mm_subnav('texte'); ?>
-<section class="nh"><p class="eyebrow">Movecia · Einsprechen &amp; Produktion</p><h1>Teleprompter-Texte</h1><p>Alle Sprechtexte an einem Ort. „Deutsch“ oder „Englisch“ öffnet den Teleprompter, „Übungen“ zeigt dir, was zu diesem Video gehört: Du hakst ab, was gefilmt und eingesprochen ist, und lädst das fertige Video direkt hoch. Ein Video gilt als fertig, wenn Deutsch und Englisch hochgeladen sind.</p></section>
+<section class="nh"><p class="eyebrow">Movecia · Einsprechen &amp; Produktion</p><h1>Teleprompter-Texte</h1><p>Hier siehst du alle Videos, die du aufnehmen möchtest, und bis wann. Bei einem <b>Bewegungsvideo</b> lädst du zu jeder Übung einen kurzen Clip hoch, fertig. Bei einem <b>Talking Head</b> sprichst du mit dem Teleprompter in die Kamera und lädst das ganze Video auf Deutsch und Englisch hoch. Sobald alles da ist, steht „✓ fertig“ dabei.</p></section>
 <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
 <div class="stats"><div><b><?= $nDone ?>/<?= count($all) ?></b><span>Videos fertig</span></div><div><b><?= $nWeek ?></b><span>bis Sonntag fällig</span></div><div class="<?= $nLate ? 'bad' : '' ?>"><b><?= $nLate ?></b><span>überfällig</span></div></div>
 <input class="tx-search" type="search" id="txs" placeholder="Suchen, z. B. Beckenboden, Woche 3, Clamshell …" aria-label="Text suchen">
@@ -238,6 +241,23 @@ details.tx>summary small{font-family:"Outfit",sans-serif;font-size:14px;color:va
           onSuccess:()=>{post('mm_mv_video_set',{id:id,lang:lg,guid:j.guid}).then(()=>{msg.textContent='✓ Fertig hochgeladen. Bunny wandelt es jetzt in ein paar Minuten um.';inp.disabled=false;
             const t=document.querySelector('[data-up="'+id+'-'+lg+'"]');if(t){t.classList.add('y');t.textContent=lg.toUpperCase()+' ✓'}
             if(document.querySelector('[data-up="'+id+'-de"]').classList.contains('y')&&document.querySelector('[data-up="'+id+'-en"]').classList.contains('y')){const r=document.getElementById('l'+id);r.classList.remove('late','open');r.classList.add('done');const lab=document.querySelector('[data-due-label="'+id+'"]');if(lab)lab.textContent='✓ fertig'}})}});
+        up.start();}).catch(()=>{msg.textContent='Das hat nicht geklappt. Bitte lade die Seite neu.';inp.disabled=false});});});
+  // Übungs-Clips: je Übung ein kurzer Clip direkt zu Bunny
+  document.querySelectorAll('.cbox').forEach(box=>{const inp=box.querySelector('.vfile');if(!inp)return;
+    inp.addEventListener('change',()=>{const file=inp.files[0];if(!file)return;const id=box.dataset.id,i=box.dataset.i,bar=box.querySelector('.vbar'),fill=bar.querySelector('i'),msg=box.querySelector('.vmsg');
+      if(typeof tus==='undefined'){msg.textContent='Der Upload konnte nicht geladen werden. Bitte Seite neu laden.';return}
+      msg.classList.remove('ok');msg.textContent='Wird vorbereitet …';inp.disabled=true;
+      post('mm_mv_clip_new',{id:id,i:i}).then(j=>{if(j.error){msg.textContent=j.error;inp.disabled=false;return;}
+        bar.hidden=false;const up=new tus.Upload(file,{endpoint:j.endpoint,retryDelays:[0,3000,10000,30000,60000],chunkSize:50*1024*1024,
+          headers:{AuthorizationSignature:j.sig,AuthorizationExpire:String(j.expire),VideoId:j.guid,LibraryId:String(j.lib)},
+          metadata:{filetype:file.type,title:file.name},
+          onError:e=>{msg.textContent='Upload unterbrochen, wähl den Clip einfach nochmal aus.';inp.disabled=false},
+          onProgress:(a,t)=>{const p=Math.round(a/t*100);fill.style.width=p+'%';msg.textContent='Lädt hoch … '+p+' %'},
+          onSuccess:()=>{post('mm_mv_clip_set',{id:id,i:i,guid:j.guid}).then(r=>{inp.disabled=false;bar.hidden=true;msg.classList.add('ok');
+            msg.innerHTML='✓ Clip ist da · <a target="_blank" rel="noopener" href="'+r.view+'">ansehen</a> (Bunny braucht ein paar Minuten zum Umwandeln)';
+            const lab=inp.parentNode;lab.lastChild.textContent='Ersetzen';
+            const c=document.querySelector('[data-cnt="'+id+'"]');if(c){c.textContent=r.clips+' von '+c.dataset.of+' Clips';if(r.done)c.classList.add('y')}
+            if(r.done){const row=document.getElementById('l'+id);row.classList.remove('late','open');row.classList.add('done');const d=document.querySelector('[data-due-label="'+id+'"]');if(d)d.textContent='✓ fertig'}})}});
         up.start();}).catch(()=>{msg.textContent='Das hat nicht geklappt. Bitte lade die Seite neu.';inp.disabled=false});});});
 })();
 </script>

@@ -68,6 +68,8 @@ function natal_member_videos(PDO $pdo, string $unit): array
         mv_schema($pdo);
         foreach (mv_natal_videos($pdo, $unit) as $k => $l) {
             if (!$l) continue;
+            // Bewegungsvideo aus Übungs-Clips: Player mit 30/45-Sek.-Timer
+            if ($k === 'move' && mv_lesson_is_clips($l)) { $fd = mv_flow_data($l, 'de'); if ($fd) $out['move'] = 'flow:' . json_encode($fd, JSON_UNESCAPED_UNICODE); continue; }
             $g = (string)$l['video_de'] !== '' ? (string)$l['video_de'] : (string)$l['video_en'];
             if ($g !== '') $out[$k] = mv_embed($g);
         }
@@ -411,12 +413,13 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
 </div></footer>
 
 <?php if ($me): ?>
+<script src="/wildhearts/assets/flow-player.js?v=1"></script>
 <script>
 (() => {
   const DEMO = <?= json_encode($demo) ?>;
   const sh = document.getElementById('sheet'), sb = document.getElementById('shb'), st = document.getElementById('sht');
   const open = (t, html) => { st.textContent = t; sb.innerHTML = html; sh.hidden = false; document.body.style.overflow = 'hidden'; };
-  const close = () => { sh.hidden = true; sb.innerHTML = ''; document.body.style.overflow = ''; };
+  const close = () => { if (typeof flowP !== 'undefined' && flowP) { flowP.stop(); flowP = null; } sh.hidden = true; sb.innerHTML = ''; document.body.style.overflow = ''; };
   document.getElementById('shx').onclick = close; sh.onclick = e => { if (e.target === sh) close(); };
   addEventListener('keydown', e => { if (e.key === 'Escape' && !sh.hidden) close(); });
   document.querySelectorAll('[data-wb]').forEach(b => b.addEventListener('click', async () => {
@@ -429,7 +432,9 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
     if (DEMO) { open(b.dataset.t, '<div style="aspect-ratio:16/9;border-radius:18px;background:var(--deep);color:var(--on);display:flex;align-items:center;justify-content:center;text-align:center;padding:1rem">Hier läuft die Aufnahme der Einheit.<br>Man sieht nur Vivien.</div>'); return; }
     open(b.dataset.t, '<video controls playsinline preload="metadata" controlslist="nodownload" src="' + b.dataset.rec + '"></video><p class="mut" style="font-size:.85rem;margin-top:.6rem">Diese Aufnahme ist nur für dich.</p>');
   }));
+  let flowP = null;
   document.querySelectorAll('[data-vid]').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.vid.indexOf('flow:') === 0 && window.MvFlow) { open(b.dataset.t, ''); const d = document.createElement('div'); sb.appendChild(d); flowP = MvFlow(d, JSON.parse(b.dataset.vid.slice(5))); return; }
     if (DEMO) { open(b.dataset.t, '<div style="aspect-ratio:16/9;border-radius:18px;background:var(--deep);color:var(--on);display:flex;align-items:center;justify-content:center;text-align:center;padding:1rem">Hier läuft das Video zur Einheit.</div>'); return; }
     const f = document.createElement('iframe');
     f.src = b.dataset.vid; f.allow = 'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen'; f.allowFullscreen = true;

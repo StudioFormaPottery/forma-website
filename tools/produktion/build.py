@@ -111,13 +111,13 @@ for i, k in enumerate(KEYS):
     new.append({'ukey': f'natal:{k}:talk', 'aud': 'natal', 'prog': prog, 'sort': i * 2, 'unlock': '', 'cat': 'talk', 'energy': 'any',
                 'minutes': int(t.get('minutes') or 8), 'title_de': t['title_de'], 'title_en': t['title_en'], 'text_de': t['text_de'], 'text_en': t['text_en'],
                 'de': t['de'], 'en': t['en'], 'ex': [], 'due': d.isoformat(), 'unit': k})
-    exl = [[e[0], en[k]['ex'][j][0]] for j, e in enumerate(u['ex'])] + [[u['breath'][0], en[k]['breath'][0]], [u['med'][0], en[k]['med'][0]]]
+    exl = [[e[0], en[k]['ex'][j][0]] for j, e in enumerate(u['ex'])] + [[u['breath'][0], en[k]['breath'][0]]]  # Meditation gehört ins Talking-Head-/Live-Format, nicht in den 30/45-Sek.-Player
     new.append({'ukey': f'natal:{k}:move', 'aud': 'natal', 'prog': prog, 'sort': i * 2 + 1, 'unlock': '', 'cat': 'flow', 'energy': 'any',
                 'minutes': 20, 'title_de': u['title'] + ' · Bewegungsvideo', 'title_en': en[k]['title'] + ' · Movement video',
                 'text_de': 'Alle Übungen dieser Einheit zum Mitmachen, in deinem Tempo.', 'text_en': 'All exercises from this session to follow along, at your own pace.',
                 'de': move_script(u, "de", k), 'en': move_script(u, "en", k), 'ex': exl, 'due': d.isoformat(), 'unit': k})
 
-out = {'v': 1, 'ex': ex, 'due': {k: v.isoformat() for k, v in due.items()}, 'new': new,
+out = {'v': 2, 'ex': ex, 'due': {k: v.isoformat() for k, v in due.items()}, 'new': new,
        'natal_programs': {'prae': ['Pränatal · Videos', 'Prenatal · Videos'], 'post': ['Postnatal · Videos', 'Postnatal · Videos']}}
 path = os.path.join(ROOT, 'api', 'seed', 'produktion.json')
 json.dump(out, open(path, 'w'), ensure_ascii=False, indent=1)
