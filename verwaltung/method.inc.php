@@ -443,7 +443,7 @@ label.inl{display:flex;gap:8px;align-items:center}
 
 <?php else: ?>
         <?php mm_subnav('method'); ?>
-        <section class="nh"><p class="eyebrow">Movecia · On-Demand</p><h1>Method &amp; Unfold</h1><p>Programme und Videos, Mitglieder, Unfold-Plätze und Preise.</p></section>
+        <section class="nh"><p class="eyebrow">Movecia · On-Demand</p><h1>Method &amp; Unfold</h1><p>Programme und Videos, Mitglieder, Unfold-Plätze und Preise.</p><p style="margin-top:12px"><a href="<?= forma_h($self) ?>?view=vorschau#method" style="display:inline-block;padding:8px 16px;border-radius:999px;background:#E8D6CA;color:#4A3A41;text-decoration:none;font-size:15px">👁 Als Teilnehmerin ansehen</a></p></section>
         <div class="ns">
             <a href="#mitglieder"><b><?= $mActive ?></b><span>aktive Method-Mitglieder</span></a>
             <a href="#unfold"><b><?= $uTaken ?>/<?= (int)$c['u_seats'] ?></b><span>Unfold-Plätze belegt</span></a>

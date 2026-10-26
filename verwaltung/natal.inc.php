@@ -286,6 +286,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
 </style>
         <h2 style="margin-top:18px">Schnellzugriff</h2>
         <div class="qa">
+            <a class="main" href="<?= forma_h($self) ?>?view=vorschau#natal"><span class="ic">👁</span><b>Als Kundin ansehen</b><span>Mitgliederbereich, Seiten und Videoraum so, wie deine Kundinnen sie sehen</span></a>
             <form method="post" target="_blank"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_testroom"><button class="main" type="submit"><span class="ic">🎥</span><b>Video &amp; Technik testen</b><span>Kamera, Mikro, Teleprompter, Aufnahme – danach direkt in deinen Testraum</span></button></form>
             <a href="#termine"><span class="ic">📅</span><b>Nächste Online-Termine</b><span>Bei jedem Termin „Zum Videoraum“ – öffnet 60 Min. vorher, mit Teleprompter</span></a>
             <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/?demo=prae" target="_blank" rel="noopener"><span class="ic">🌿</span><b>Mitgliederbereich ansehen</b><span>So sieht ihn eine Kundin mit Paket (Beispiel Pränatal, auch <u>post</u> unter Prä- &amp; Postnatal)</span></a>
