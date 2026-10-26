@@ -250,6 +250,17 @@ if ($action === 'mm_mv_mode') {
     $m = ($_POST['mode'] ?? '') === 'move' ? 'move' : 'flow';
     if (!$l) $mvJson(['error' => 'Fehlt.']);
     $pdo->prepare('UPDATE mv_lessons SET mode = ? WHERE id = ?')->execute([$m, $l['id']]);
+    // Umschalten auf Flow: Übungen ohne Sprechtext bekommen den Text der neuesten gespeicherten Aufnahme dieser Übung,
+    // dann sind sie sofort eingesprochen
+    if ($m === 'flow') {
+        $st = mv_lesson_steps($l); $ch = false;
+        foreach ($st as $i => $x) foreach (['de' => 'tde', 'en' => 'ten'] as $g => $k) {
+            if (trim($x[$k]) !== '') continue;
+            $t = mv_voice_takes($pdo, mv_clip_key($x['de']), $g)[0] ?? null;
+            if ($t) { $st[$i][$k] = (string)$t['text']; $ch = true; }
+        }
+        if ($ch) { mv_lesson_steps_save($pdo, (int)$l['id'], $st); $l = mv_lesson($pdo, (int)$l['id']); }
+    }
     $l['mode'] = $m;
     $mvJson(['ok' => 1, 'status' => mv_lesson_status($pdo, $l)]);
 }

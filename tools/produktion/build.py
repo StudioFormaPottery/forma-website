@@ -298,10 +298,16 @@ MOVES = [
 ]
 en_of = {de: en for de, en in CANON.values()}
 for x in [x for st in list(steps.values()) + [n.get('steps') or [] for n in new] for x in st]: en_of.setdefault(x[0], x[1])
+# Sprechtexte für Bewegungsvideos aus den Flows übernehmen (wortgleich): im Bewegungsvideo werden sie nicht abgespielt,
+# aber schaltet Vivien es auf „Flow“ um, ist es mit den gespeicherten Aufnahmen sofort eingesprochen
+text_of = {}
+for st in list(mj['steps'].values()):
+    for idx, x in enumerate(st):
+        if 0 < idx < len(st) - 1 and x[2]: text_of.setdefault(x[0], (x[2], x[3]))
 for key, sort, tde, ten, xde, xen, lst in MOVES:
     miss = [d for d in lst if d not in en_of]
     if miss: raise SystemExit('Übung ohne englischen Namen: ' + ', '.join(miss))
-    st = [[d, en_of[d], '', '', 45] for d in lst]
+    st = [[d, en_of[d], *text_of.get(d, ('', '')), 45] for d in lst]
     new.append({'ukey': key, 'aud': 'method', 'prog': M1, 'sort': sort, 'unlock': '', 'cat': 'body', 'energy': 'any', 'minutes': 8,
                 'title_de': tde, 'title_en': ten, 'text_de': xde, 'text_en': xen, 'de': '', 'en': '', 'ex': [[x[0], x[1]] for x in st],
                 'steps': st, 'mode': 'move', 'due': M1_DUE[key].isoformat()})
@@ -310,7 +316,7 @@ M1_ORDER = ['k:method:rueckzug', 't:Morgen-Flow für dunkle Tage', 'k:method:m1:
             'k:method:m1:mitte', 'k:method:m1:mentalload', 't:Kraft ohne Erschöpfung', 'k:method:m1:ruecken', 't:Abendmeditation: Rückzug',
             'k:method:m1:abendflow', 'k:method:m1:beine']
 
-out = {'v': 6, 'm1_order': M1_ORDER, 'm1_steps': list(mj['steps'].keys()), 'steps': steps, 'ex': ex, 'due': {k: v.isoformat() for k, v in due.items()}, 'new': new,
+out = {'v': 7, 'welcome': mj.get('welcome'), 'm1_order': M1_ORDER, 'm1_steps': list(mj['steps'].keys()), 'steps': steps, 'ex': ex, 'due': {k: v.isoformat() for k, v in due.items()}, 'new': new,
        'natal_programs': {'prae': ['Pränatal · Videos', 'Prenatal · Videos'], 'post': ['Postnatal · Videos', 'Postnatal · Videos']}}
 path = os.path.join(ROOT, 'api', 'seed', 'produktion.json')
 json.dump(out, open(path, 'w'), ensure_ascii=False, indent=1)

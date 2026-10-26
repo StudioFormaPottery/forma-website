@@ -40,7 +40,7 @@ body{background:#F2ECE4}main{max-width:900px}
 <div class="pv-w">
 <?php if ($fd): ?>
   <div data-mv-flow="<?= $h(json_encode($fd, JSON_UNESCAPED_UNICODE)) ?>"></div>
-  <script src="/wildhearts/assets/flow-player.js?v=2"></script>
+  <script src="/wildhearts/assets/flow-player.js?v=3"></script>
 <?php else: ?>
   <div class="pv-v"><?php if ($vid !== '' && mv_bunny()['lib'] !== ''): ?><iframe src="<?= $h(mv_embed($vid)) ?>" allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe><?php else: ?><div class="pv-e">Das Video ist noch nicht hochgeladen. Sobald es da ist, läuft es hier.</div><?php endif; ?></div>
 <?php endif; ?>
@@ -103,7 +103,7 @@ if ($view === 'videos') {
       </div>
     <?php if ($clips): $rows = mv_lesson_clip_rows($pdo, $l); ?>
       <p class="how" data-how-flow<?= $flow ? '' : ' hidden' ?>><b>So geht's:</b> 1. Jede Übung kurz filmen und bei <b>„Clip“</b> hochladen. 2. Danach pro Übung auf <b>„Deutsch einsprechen“</b> und <b>„Englisch einsprechen“</b> tippen. Der Text steht dabei groß da, dein Clip läuft daneben. Jede Übung läuft bei den Frauen so lange wie unten angegeben (meist 2 Minuten).</p>
-      <p class="how" data-how-move<?= $flow ? ' hidden' : '' ?>><b>So geht's:</b> Jede Übung kurz filmen (10 Sekunden bis 1 Minute) und bei <b>„Clip“</b> hochladen. Kein Sprechen. Die Frauen wählen 30 oder 45 Sekunden pro Übung.</p>
+      <p class="how" data-how-move<?= $flow ? ' hidden' : '' ?>><b>So geht's:</b> Jede Übung kurz filmen (10 Sekunden bis 1 Minute) und bei <b>„Clip“</b> hochladen. Kein Sprechen. Die Frauen wählen 30 oder 45 Sekunden pro Übung. Deine Voice-overs werden hier nicht abgespielt. Tippst du oben auf „Flow“, wird daraus ein Flow mit deiner Stimme, und jede Übung, die du schon in einem anderen Flow eingesprochen hast, ist dann sofort fertig.</p>
       <ol class="exl">
       <?php foreach (mv_lesson_steps($l) as $i => $e): $c = $rows[$i]; $g = (string)$c['guid']; $used = count($usage[$c['ckey']] ?? []);
           $vd = mv_voice_url($id, $i, 'de'); $ve = mv_voice_url($id, $i, 'en'); ?>

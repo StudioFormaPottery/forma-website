@@ -133,7 +133,8 @@
       <div class="mvf-prov" role="group">${provBtns}</div>
       <div data-pbody></div>
       <p class="mvf-err" data-merr hidden></p>
-      <div class="mvf-row"><button type="button" data-moff hidden>${T('Musik ausschalten', 'Turn music off')}</button></div>`;
+      <div class="mvf-row"><button type="button" data-moff hidden>${T('Musik ausschalten', 'Turn music off')}</button></div>
+      <p class="mvf-note">${T('Der Player des Musikdienstes lädt erst, wenn du hier eine Playlist startest.', 'The music service player only loads once you start a playlist here.')} <a href="/terms/#musik" target="_blank" rel="noopener">${T('Datenschutz', 'Privacy')}</a></p>`;
     const pbody = box.querySelector('[data-pbody]'), err = box.querySelector('[data-merr]'), off = box.querySelector('[data-moff]'), lab = box.querySelector('summary span');
     function save() { try { localStorage.setItem('mvf-music', JSON.stringify(st)); } catch (e) {} }
     function mount() {

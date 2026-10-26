@@ -1123,42 +1123,45 @@ function mv_done_first(PDO $pdo, int $mid): array
 }
 
 /**
- * The Method als begleitendes Programm (Vivien, 26.10.2026): Alle starten bei Ankommen, Video 1, und gehen Schritt
- * für Schritt. Das nächste Video öffnet erst, wenn das vorige ganz durchgelaufen ist, höchstens eines pro Tag, und ein
- * neuer Monat frühestens an ihrem Monatstag. Kein Vorspulen, keine Abkürzung.
- * Rückgabe: ['state' => [lesson_id => ['open' => bool, 'why' => ''|'prev'|'tomorrow'|'date'|'starter', 'at' => ts]],
- *            'current' => lesson_id der nächsten offenen Lektion (oder 0), 'month' => erreichter Monat (0 = Ankommen),
- *            'order' => [lesson_id, …]]
+ * The Method als begleitendes Programm (Vivien, 26.10.2026, Stand 20:23): Das Ankommen (3 Videos) ist sofort ganz offen,
+ * „Starte hier“ ist das erste Video (erklärt die Method). Danach geht es Video für Video: das nächste Monatsvideo öffnet
+ * sich, sobald das vorige ganz gemacht ist (gleich danach, auch am selben Tag), das erste Monatsvideo nach dem
+ * „Starte hier“-Video. Ein neuer Monat frühestens an ihrem Monatstag. Gedacht sind etwa drei Termine pro Woche.
+ * Rückgabe: ['state' => [lesson_id => ['open', 'why' => ''|'prev'|'date'|'starter', 'at', 'm']], 'current', 'month',
+ *            'order', 'start' => lesson_id des „Starte hier“-Videos]
  */
 function mv_method_path(PDO $pdo, array $acc, array $doneFirst, ?int $now = null): array
 {
     $now = $now ?? time();
-    $tz = new DateTimeZone('Europe/Vienna');
-    $today = (new DateTimeImmutable('@' . $now))->setTimezone($tz)->format('Y-m-d');
     $mm = mv_method_months($pdo);
     $start = (int)($acc['month']['start'] ?? $now);
     $off = (int)($acc['month']['off'] ?? 0);
-    $seq = [];
-    foreach ($mm['welcome'] as $p) foreach (mv_lessons($pdo, (int)$p['id'], true) as $l) $seq[] = [$l, 0, $p];
-    foreach ($mm['months'] as $i => $p) foreach (mv_lessons($pdo, (int)$p['id'], true) as $l) $seq[] = [$l, $i + 1, $p];
-    $state = []; $order = []; $current = 0; $month = 0; $blocked = false; $prevDone = null;
-    foreach ($seq as $k => [$l, $m, $p]) {
+    $welcome = []; $months = [];
+    foreach ($mm['welcome'] as $p) foreach (mv_lessons($pdo, (int)$p['id'], true) as $l) $welcome[] = $l;
+    foreach ($mm['months'] as $i => $p) foreach (mv_lessons($pdo, (int)$p['id'], true) as $l) $months[] = [$l, $i + 1];
+    $state = []; $order = []; $month = 0;
+    $first = $welcome ? (int)$welcome[0]['id'] : 0;
+    foreach ($welcome as $l) { $id = (int)$l['id']; $order[] = $id; $state[$id] = ['open' => true, 'why' => '', 'at' => 0, 'm' => 0]; }
+    $prevOk = !$first || isset($doneFirst[$first]);
+    $blocked = false;
+    foreach ($months as [$l, $m]) {
         $id = (int)$l['id']; $order[] = $id;
         $isDone = isset($doneFirst[$id]);
         if ($blocked) { $state[$id] = ['open' => false, 'why' => 'prev', 'at' => 0, 'm' => $m]; continue; }
         $why = ''; $at = 0;
-        if ($k > 0 && $prevDone === null) $why = 'prev';
-        elseif ($k > 0 && $prevDone === $today && !$isDone) $why = 'tomorrow';
-        elseif ($m > 0 && !empty($acc['starter'])) $why = 'starter';
+        if (!$prevOk && !$isDone) $why = 'prev';
+        elseif (!empty($acc['starter'])) $why = 'starter';
         elseif ($m > 1) { $at = mv_month_at($start, max(0, $m - 1 - $off)); if ($at > $now && !$isDone) $why = 'date'; }
         $open = $why === '' || $isDone;
-        $state[$id] = ['open' => $open, 'why' => $open ? '' : $why, 'at' => $why === 'tomorrow' ? strtotime('tomorrow', $now) : $at, 'm' => $m];
+        $state[$id] = ['open' => $open, 'why' => $open ? '' : $why, 'at' => $at, 'm' => $m];
         if ($open) $month = max($month, $m);
-        if ($open && !$isDone && !$current) $current = $id;
         if (!$open) $blocked = true;
-        $prevDone = $isDone ? $doneFirst[$id] : null;
+        $prevOk = $isDone;
     }
-    return ['state' => $state, 'current' => $current, 'month' => $month, 'order' => $order];
+    // „Heute dran“: erst „Starte hier“, dann das nächste offene Monatsvideo (Ankommen-Videos 2 und 3 sind frei wählbar)
+    if ($first && !isset($doneFirst[$first])) $current = $first;
+    else { $current = 0; foreach ($months as [$l]) { $id = (int)$l['id']; if (($state[$id]['open'] ?? false) && !isset($doneFirst[$id])) { $current = $id; break; } } }
+    return ['state' => $state, 'current' => $current, 'month' => $month, 'order' => $order, 'start' => $first];
 }
 
 /** Darf sie dieses Method-Programm sehen (z. B. für Downloads)? */
@@ -1378,11 +1381,16 @@ function mv_prod_sync(PDO $pdo, bool $force = false): void
         foreach ($j['new'] as $n) foreach ($n['steps'] ?? [] as $x) mv_clip_ensure($pdo, $x[0], $x[1]);
     }
     // v4 (Vivien, 26.10.2026): Method Monat 1 mit 12 Videos, neue Voice-over-Texte je Übung, Talking Head zum Monat neu
-    if (in_array((int)($c['v'] ?? 0), [3, 4, 5], true)) {
+    if (in_array((int)($c['v'] ?? 0), [3, 4, 5, 6], true)) {
         $js = fn($st) => [json_encode($st, JSON_UNESCAPED_UNICODE), json_encode(array_map(fn($x) => [$x[0], $x[1]], $st), JSON_UNESCAPED_UNICODE)];
         $setT = $pdo->prepare("UPDATE mv_lessons SET steps = ?, ex = ? WHERE title_de = ? AND ukey = ''");
         foreach ($j['m1_steps'] ?? [] as $t) if (isset($j['steps'][$t])) $setT->execute([...$js($j['steps'][$t]), $t]);
         $up = $pdo->prepare('UPDATE mv_lessons SET title_de = ?, title_en = ?, text_de = ?, text_en = ?, script_de = ?, script_en = ?, minutes = ? WHERE ukey = ?');
+        // v7: „Starte hier“-Video erklärt den Aufbau der Method (neuer Sprechtext)
+        if (!empty($j['welcome']['de'])) $pdo->prepare("UPDATE mv_lessons SET script_de = ?, script_en = ? WHERE title_de = ? AND ukey = ''")->execute([$j['welcome']['de'], $j['welcome']['en'], $j['welcome']['title']]);
+        // v7: Bewegungsvideos von Monat 1 bekommen die Sprechtexte der Flows (für ein späteres Umschalten auf Flow)
+        $setK = $pdo->prepare('UPDATE mv_lessons SET steps = ? WHERE ukey = ?');
+        foreach ($j['new'] as $n) if (($n['mode'] ?? '') === 'move' && str_starts_with($n['ukey'], 'method:m1:')) $setK->execute([json_encode($n['steps'], JSON_UNESCAPED_UNICODE), $n['ukey']]);
         foreach ($j['new'] as $n) if ($n['ukey'] === 'method:rueckzug') $up->execute([$n['title_de'], $n['title_en'], $n['text_de'], $n['text_en'], $n['de'], $n['en'], (int)$n['minutes'], $n['ukey']]);
     }
     $has = $pdo->prepare('SELECT COUNT(*) FROM mv_lessons WHERE ukey = ?');
@@ -1397,7 +1405,7 @@ function mv_prod_sync(PDO $pdo, bool $force = false): void
         if (!empty($n['steps'])) $pdo->prepare('UPDATE mv_lessons SET steps = ?, ex = ?, mode = ? WHERE id = ?')->execute([json_encode($n['steps'], JSON_UNESCAPED_UNICODE), json_encode(array_map(fn($x) => [$x[0], $x[1]], $n['steps']), JSON_UNESCAPED_UNICODE), (string)($n['mode'] ?? ''), (int)$pdo->lastInsertId()]);
     }
     // feste Reihenfolge der Videos in Monat 1
-    if ((int)($c['v'] ?? 0) < 6 && !empty($j['m1_order'])) {
+    if ((int)($c['v'] ?? 0) < 7 && !empty($j['m1_order'])) {
         $pid = $prog('method', 'Rückzug & Ruhe');
         foreach ($j['m1_order'] as $pos => $ref) {
             [$t, $v] = explode(':', $ref, 2);
