@@ -133,6 +133,7 @@ body{background:var(--paper)}h1,h2{color:#6B5658}
 @media(min-width:900px){main{max-width:1240px;padding-left:32px;padding-right:32px}body{font-size:19.5px}}
 .nh{border-radius:26px;background:#4A3A41;color:#FBF5F7;padding:22px 24px}.nh h1{color:#FBF5F7;font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:34px;margin:2px 0 4px}.nh p{margin:0;color:#EADFDE}.nh .eyebrow{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#E8D6CA}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}.stats div{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px}.stats b{display:block;font-family:"Cormorant Garamond",Georgia,serif;font-size:32px;font-weight:500;color:#6B5658;line-height:1}.stats span{font-size:14px;color:var(--soft)}.stats .bad b{color:#A04A4A}
+.tovid{display:flex;flex-direction:column;gap:4px;margin-top:16px;padding:18px 20px;border-radius:22px;background:#7D5E68;color:#FBF5F7;text-decoration:none}.tovid b{font-size:22px}.tovid span{font-size:17px;color:#F2E6E9}
 .tx-search{width:100%;margin:16px 0 4px;font:inherit;padding:12px 16px;border:1px solid var(--line);border-radius:999px;background:#fff}
 .filt{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 0;font-size:15px}.filt label{display:flex;gap:6px;align-items:center;font-weight:400}.filt input{width:auto}
 details.tx{background:var(--card);border:1px solid var(--line);border-radius:20px;margin-top:12px;padding:4px 16px}
@@ -163,31 +164,11 @@ details.tx>summary small{font-family:"Outfit",sans-serif;font-size:14px;color:va
 .hide-done .ti.done,.hide-done .ti.done+.pp,.hide-done .wk.alldone,.hide-done .wk a.done{display:none}
 </style>
 <?php mm_subnav('texte'); ?>
-<section class="nh"><p class="eyebrow">Movecia · Einsprechen &amp; Produktion</p><h1>Teleprompter-Texte</h1><p>Hier siehst du alle Videos, die du aufnehmen möchtest, und bis wann. Bei einem <b>Bewegungsvideo</b> lädst du zu jeder Übung einen kurzen Clip hoch, fertig. Bei einem <b>Talking Head</b> sprichst du mit dem Teleprompter in die Kamera und lädst das ganze Video auf Deutsch und Englisch hoch. Sobald alles da ist, steht „✓ fertig“ dabei.</p></section>
+<section class="nh"><p class="eyebrow">Movecia · Einsprechen &amp; Produktion</p><h1>Live-Texte</h1><p>Die Teleprompter-Texte für deine Live-Termine: Prä- &amp; Postnatal-Einheiten und Gatherings. Text antippen, dann läuft er.</p></section>
 <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
-<div class="stats"><div><b><?= $nDone ?>/<?= count($all) ?></b><span>Videos fertig</span></div><div><b><?= $nWeek ?></b><span>bis Sonntag fällig</span></div><div class="<?= $nLate ? 'bad' : '' ?>"><b><?= $nLate ?></b><span>überfällig</span></div></div>
-<input class="tx-search" type="search" id="txs" placeholder="Suchen, z. B. Beckenboden, Woche 3, Clamshell …" aria-label="Text suchen">
-<div class="filt"><label><input type="checkbox" id="hd" checked> Erledigtes ausblenden</label></div>
-
-<details class="tx" id="zeitplan" open><summary>Dein Zeitplan <small>nach „fertig bis“</small></summary>
-<?php foreach ($plan as $d => $xs):
-        $doneAll = !array_filter($xs, fn($x) => !mv_lesson_done($x[2]));
-        $late = $d !== '9999' && $d < $today && !$doneAll; ?>
-  <div class="wk <?= $doneAll ? 'alldone' : '' ?> <?= $late ? 'late' : '' ?>"><h3><?= $d === '9999' ? 'Ohne Datum' : 'Fertig bis ' . forma_h($dd($d)) . ' ' . date('Y', strtotime($d)) ?> <small>· <?= count($xs) ?> Video<?= count($xs) === 1 ? '' : 's' ?><?= $late ? ' · überfällig' : '' ?></small></h3>
-  <?php foreach ($xs as [$aud, $p, $l]): ?><a href="#l<?= (int)$l['id'] ?>" data-go="<?= (int)$l['id'] ?>" class="<?= mv_lesson_done($l) ? 'done' : '' ?>"><i><?= $isTalk($l) ? '🗣 Talking Head' : '🎬 Bewegung' ?> · <?= $audName[$aud] ?></i><?= forma_h($l['title_de']) ?></a><?php endforeach; ?>
-  </div>
-<?php endforeach; ?>
-</details>
-
-<?php foreach ($groups as $aud => [$label, $items]): $done = count(array_filter($items, fn($x) => mv_lesson_done($x[1]))); ?>
-<details class="tx" id="g-<?= $aud ?>"><summary><?= $label ?> <small><?= $done ?> von <?= count($items) ?> fertig</small></summary>
-<?php if (!$items): ?><p class="muted small">Noch keine Lektionen angelegt.</p><?php endif; ?>
-<?php $lastP = 0; foreach ($items as [$p, $l]): if ((int)$p['id'] !== $lastP): $lastP = (int)$p['id']; ?><p class="small" style="margin:14px 0 2px;color:#7D5E68;font-weight:600"><?= forma_h($p['title_de']) ?></p><?php endif; ?>
-<?php $row($aud, $p, $l); endforeach; ?>
-</details>
-<?php endforeach; ?>
-
-<details class="tx" id="natal"><summary>Live · Prä- &amp; Postnatal-Einheiten <small>Teleprompter im Videoraum · DE + EN</small></summary>
+<a class="tovid" href="<?= forma_h($self) ?>?view=videos"><b>🎬 Videos hochladen</b><span>Clips und Videos für Method, Unfold und Prä-/Postnatal findest du jetzt auf einer eigenen, übersichtlichen Seite.</span></a>
+<input class="tx-search" type="search" id="txs" placeholder="Text suchen, z. B. Atem, Beckenboden, Samhain …" aria-label="Text suchen">
+<details class="tx" id="natal" open><summary>Live · Prä- &amp; Postnatal-Einheiten <small>Teleprompter im Videoraum · DE + EN</small></summary>
     <div class="ti" data-q="kennenlerngespräch"><span class="t">Kennenlerngespräch<span class="m">30 Min. online, mit Fragen</span></span><span class="b"><a href="<?= $u('view=natal&prompter=kennenlernen') ?>" target="_blank" rel="noopener">Deutsch</a><a href="<?= $u('view=natal&prompter=kennenlernen_en') ?>" target="_blank" rel="noopener">Englisch</a></span></div>
 <?php foreach (NATAL_UNIT_KEYS as $k): ?>
     <div class="ti" data-q="<?= forma_h(mb_strtolower(natal_unit_label($k))) ?>"><span class="t"><?= forma_h(natal_unit_label($k)) ?><span class="m">Live-Einheit: Impuls, Übungen, Breathwork, Meditation</span></span><span class="b"><a href="<?= $u('view=natal&prompter=' . $k) ?>" target="_blank" rel="noopener">Deutsch</a><a href="<?= $u('view=natal&prompter=' . $k . '_en') ?>" target="_blank" rel="noopener">Englisch</a><a href="<?= $u('view=natal&workbook=' . $k) ?>" target="_blank" rel="noopener">Workbook</a></span></div>
@@ -208,7 +189,7 @@ details.tx>summary small{font-family:"Outfit",sans-serif;font-size:14px;color:va
   const MO=['Jän.','Feb.','März','Apr.','Mai','Juni','Juli','Aug.','Sep.','Okt.','Nov.','Dez.'],WD=['So','Mo','Di','Mi','Do','Fr','Sa'];
   function post(a,data){const f=new FormData();f.append('csrf',csrf);f.append('action',a);for(const k in data)f.append(k,data[k]);return fetch(location.pathname,{method:'POST',body:f,credentials:'same-origin'}).then(r=>r.json())}
   // Erledigtes ausblenden (gemerkt)
-  const hd=document.getElementById('hd');let keep=null;try{keep=localStorage.getItem('mv-hd')}catch(e){}
+  const hd=document.getElementById('hd')||document.createElement('input');let keep=null;try{keep=localStorage.getItem('mv-hd')}catch(e){}
   if(keep==='0')hd.checked=false;function applyHd(){document.body.classList.toggle('hide-done',hd.checked);try{localStorage.setItem('mv-hd',hd.checked?'1':'0')}catch(e){}}
   hd.addEventListener('change',applyHd);applyHd();
   // Suche

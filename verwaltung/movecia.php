@@ -11,11 +11,12 @@ function mm_subnav(string $active): void
     global $pdo;
     $self = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?');
     $req = 0; try { $req = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {}
-    $tabs = [['movecia', '?view=movecia', 'Übersicht'], ['method', '?view=method', 'Method &amp; Unfold'], ['natal', '?view=natal', 'Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', 'Teleprompter'], ['presse', '?view=presse', 'Presse'], ['einst', '?view=movecia#einstellungen', 'Einstellungen']]; ?>
+    $tabs = [['movecia', '?view=movecia', 'Übersicht'], ['videos', '?view=videos', '🎬 Videos hochladen'], ['method', '?view=method', 'Method &amp; Unfold'], ['natal', '?view=natal', 'Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', 'Live-Texte'], ['presse', '?view=presse', 'Presse'], ['einst', '?view=movecia#einstellungen', 'Einstellungen']]; ?>
 <style>
 .mvsub{position:sticky;top:0;z-index:40;margin:-8px -16px 16px;padding:10px 16px;background:rgba(242,236,228,.96);border-bottom:1px solid #DDD2C6;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .mvsub::-webkit-scrollbar{display:none}
-.mvsub a{flex:0 0 auto;padding:8px 14px;border-radius:999px;border:1px solid #DDD2C6;background:#FBF8F4;color:#6B5658;text-decoration:none;font-size:15px;white-space:nowrap}
+.mvsub a{flex:0 0 auto;padding:10px 16px;border-radius:999px;border:1px solid #DDD2C6;background:#FBF8F4;color:#6B5658;text-decoration:none;font-size:17px;white-space:nowrap}
+<?= $active !== 'videos' ? 'main{zoom:1.12}' : '' ?>
 .mvsub a.on{background:#7D5E68;border-color:#7D5E68;color:#FBF5F7}
 .mvsub a.fo{background:transparent;border-color:transparent;color:#8C2C1D;padding-left:4px}
 .mvsub i{font-style:normal;display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:999px;background:#B5544A;color:#fff;font-size:12px;text-align:center}
@@ -32,6 +33,8 @@ require __DIR__ . '/method.inc.php';
 require __DIR__ . '/texte.inc.php';
 // Presse & Gemeinde (?view=presse)
 require __DIR__ . '/presse.inc.php';
+// Videos hochladen (?view=videos)
+require __DIR__ . '/videos.inc.php';
 // Als Teilnehmerin ansehen (?view=vorschau)
 require __DIR__ . '/vorschau.inc.php';
 
@@ -302,7 +305,8 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         <div class="qa">
             <form method="post" target="_blank"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_testroom"><button class="main" type="submit"><span class="ic">🎥</span><b>Video &amp; Technik testen</b><span>Kamera, Mikro, Teleprompter, Aufnahme – danach direkt in deinen Testraum</span></button></form>
             <?php if ($next): ?><a href="<?= forma_h($GLOBALS['mmHostLink']((int)$next['id'])) ?>" target="_blank" rel="noopener"><span class="ic">✨</span><b>Nächstes Gathering öffnen</b><span>Als Gastgeberin: <?= forma_h($next['title']) ?></span></a><?php else: ?><a href="#neu"><span class="ic">✨</span><b>Gathering anlegen</b><span>Noch keines geplant</span></a><?php endif; ?>
-            <a class="main" href="<?= forma_h($self) ?>?view=vorschau"><span class="ic">👁</span><b>Als Teilnehmerin ansehen</b><span>Alle Seiten und Programme so, wie deine Teilnehmerinnen sie sehen</span></a>
+            <a class="main" href="<?= forma_h($self) ?>?view=videos"><span class="ic">🎬</span><b>Videos hochladen</b><span>Clips und Videos für Method, Unfold und Prä-/Postnatal – mit Zeitplan</span></a>
+            <a href="<?= forma_h($self) ?>?view=vorschau"><span class="ic">👁</span><b>Als Teilnehmerin ansehen</b><span>Alle Seiten und Programme so, wie deine Teilnehmerinnen sie sehen</span></a>
             <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/?demo=prae" target="_blank" rel="noopener"><span class="ic">🌿</span><b>Mitgliederbereich ansehen</b><span>So sieht ihn eine Kundin mit Paket (Beispiel Pränatal, auch <u>post</u> unter Prä- &amp; Postnatal)</span></a>
             <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/" target="_blank" rel="noopener"><span class="ic">🔑</span><b>Login für Kundinnen</b><span>moveciamovement.com/natal/mitglied – diesen Link bekommen sie auch per Mail</span></a>
             <a href="<?= forma_h($self) ?>?view=method#test"><span class="ic">🧪</span><b>Als Testteilnehmerin einloggen</b><span>Method, Unfold oder beides – so sieht es eine Kundin (Prä-/Postnatal: unter Prä- &amp; Postnatal)</span></a>
