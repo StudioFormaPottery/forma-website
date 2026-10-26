@@ -176,3 +176,10 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
 .vside.soft video{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 16%,#000 84%,transparent 100%),linear-gradient(180deg,transparent 0,#000 18%,#000 82%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent 0,#000 16%,#000 84%,transparent 100%),linear-gradient(180deg,transparent 0,#000 18%,#000 82%,transparent 100%);mask-composite:intersect}
 .vsolo.soft .f-lab{text-shadow:0 1px 2px rgba(46,37,41,.7),0 0 10px rgba(46,37,41,.55),0 2px 24px rgba(46,37,41,.5)}
 .vsolo.soft .f-line{box-shadow:0 0 5px rgba(46,37,41,.45)}
+
+/* Handy: nichts darf seitlich über den Bildschirm ragen (Vivien, 26.10.2026: „alles ist verschoben“).
+   Videos bleiben ohne Rahmen mit weichem Rand (Maske), werden aber wieder sauber abgeschnitten. */
+html,body{overflow-x:hidden;overflow-x:clip;max-width:100%}
+.soft{overflow:hidden!important}
+.soft video{transform:none!important}
+.vsolo.soft{max-width:100%}

@@ -93,7 +93,7 @@ a{color:var(--plum)}
 video::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none}
 .pic img,.pic video{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.95) sepia(.06)}
 .pic::after{content:"";position:absolute;inset:0;background:rgba(214,160,122,.13);mix-blend-mode:multiply;pointer-events:none}.pic .stamp{z-index:1}
-.pic.soft{border-radius:0;overflow:visible;background:none}.pic.soft::after{display:none}
+.pic.soft{border-radius:0;overflow:hidden;background:none}.pic.soft video{transform:none}.pic.soft::after{display:none}
 .pic.soft video{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 20%,#000 80%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 86%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent 0,#000 20%,#000 80%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 86%,transparent 100%);mask-composite:intersect}
 .pic .stamp{position:absolute;left:14px;bottom:14px;right:14px;background:rgba(251,248,244,.92);backdrop-filter:blur(6px);border-radius:18px;padding:.9rem 1.1rem;font-family:var(--serif);font-size:1.25rem;line-height:1.25}
 .pic .stamp small{display:block;font-family:var(--sans);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--plum);margin-bottom:.25rem}
