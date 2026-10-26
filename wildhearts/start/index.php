@@ -49,11 +49,18 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
 </div></div></section>
 
 <section class="w vids" aria-label="Movecia in Bewegung"><div class="in">
-  <div class="vrow">
-    <figure class="vf rv"><video src="/video/movecia/start-arme.mp4?v=1" poster="/img/movecia/fotos/ev-start-arme.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Langsame Armbewegung vor den Bergen"></video><figcaption><span class="de">ankommen</span><span class="en">arrive</span></figcaption></figure>
-    <figure class="vf vf-mid rv"><video src="/video/movecia/unfold.mp4?v=3" poster="/img/movecia/fotos/ev-unfold.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Fließende Bewegung im lichten Studio"></video><figcaption><span class="de">spüren</span><span class="en">feel</span></figcaption></figure>
-    <figure class="vf rv"><video src="/video/movecia/start.mp4?v=4" poster="/img/movecia/fotos/ev-start.jpg?v=2" autoplay muted loop playsinline preload="metadata" aria-label="Bewegung auf der Matte"></video><figcaption><span class="de">entfalten</span><span class="en">unfold</span></figcaption></figure>
-  </div>
+  <!-- Nur noch das Tanz-Video, darüber die Linie ankommen · spüren · entfalten (Vivien, 26.10.2026) -->
+  <figure class="vsolo rv">
+    <video src="/video/movecia/unfold.mp4?v=3" poster="/img/movecia/fotos/ev-unfold.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Vivien tanzt langsam in ihrem lichten Studio"></video>
+    <div class="flow" aria-hidden="true">
+      <span class="f-lab f-top"><span class="de">ankommen</span><span class="en">arrive</span></span>
+      <span class="f-line"></span>
+      <span class="f-dot"></span>
+      <span class="f-lab f-mid"><span class="de">spüren</span><span class="en">feel</span></span>
+      <span class="f-lab f-bot"><span class="de">entfalten</span><span class="en">unfold</span></span>
+    </div>
+    <figcaption class="sr"><span class="de">ankommen, spüren, entfalten</span><span class="en">arrive, feel, unfold</span></figcaption>
+  </figure>
 </div></section>
 
 <section class="w sec" id="angebote"><div class="in">
