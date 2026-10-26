@@ -10,8 +10,8 @@ const PRESSE_TO = [
 ];
 
 const PRESSE_PHOTOS = [
-    'forma' => [['img/scheiben-studio.jpg', 'Studio-FORMA_Toepferscheiben.jpg'], ['img/tassen-henkel.jpg', 'Studio-FORMA_Tassen.jpg'], ['img/atelier-ecke.jpg', 'Studio-FORMA_Atelier.jpg']],
-    'movecia' => [['img/movecia/fotos/reach.jpg', 'Movecia_Mindful-Movement.jpg'], ['img/movecia/fotos/fold.jpg', 'Movecia_Bewegung.jpg'], ['img/movecia/movecia-logo-quer.png', 'Movecia_Logo.png']],
+    'forma' => [['img/atelier-ecke.jpg', 'Studio-FORMA_Atelier.jpg'], ['img/studio.jpg', 'Studio-FORMA_Studio.jpg'], ['img/scheiben-abend.jpg', 'Studio-FORMA_Toepferscheiben.jpg'], ['img/drehen.jpg', 'Studio-FORMA_An-der-Scheibe.jpg']],
+    'movecia' => [['img/movecia/fotos/ev-start.jpg', 'Movecia_Mindful-Movement.jpg'], ['img/movecia/fotos/ev-natal-sitzend.jpg', 'Movecia_Ankommen.jpg'], ['img/movecia/fotos/ev-method-karte.jpg', 'Movecia_Method.jpg'], ['img/movecia/fotos/ev-unfold.jpg', 'Movecia_Unfold.jpg'], ['img/movecia/fotos/ev-natal.jpg', 'Movecia_Praenatal.jpg'], ['img/movecia/fotos/ev-unfold-karte.jpg', 'Movecia_Journaling.jpg'], ['img/movecia/fotos/ev-start-arme.jpg', 'Movecia_Bewegung.jpg'], ['img/movecia/movecia-logo-quer.png', 'Movecia_Logo.png']],
 ];
 
 /** Alle sechs Mails: Schlüssel brand-empfänger. */
@@ -116,8 +116,10 @@ function presse_html(string $brand, string $to): string
     $soft = $f ? '#E4D2BF' : '#EADFDE';
     $serif = $f ? 'Georgia,serif' : 'Georgia,\'Cormorant Garamond\',serif';
     $pics = '';
-    foreach (array_slice(PRESSE_PHOTOS[$brand], 0, 2) as [$p]) {
-        $pics .= '<td width="50%" style="padding:4px"><img src="' . $site . '/' . $p . '" width="260" alt="" style="display:block;width:100%;height:auto;border-radius:14px"></td>';
+    foreach (array_chunk(array_slice(PRESSE_PHOTOS[$brand], 0, 4), 2) as $row) {
+        $pics .= '<tr>';
+        foreach ($row as [$p]) $pics .= '<td width="50%" style="padding:4px"><img src="' . $site . '/img/presse/' . basename($p) . '" width="260" alt="" style="display:block;width:100%;height:auto;border-radius:14px"></td>';
+        $pics .= '</tr>';
     }
     $body = '<p style="margin:0 0 14px">' . $h($i['hello']) . '</p>';
     foreach ($i['paras'] as $p) $body .= '<p style="margin:0 0 14px">' . $h($p) . '</p>';
@@ -125,7 +127,7 @@ function presse_html(string $brand, string $to): string
         . '<p style="margin:0 0 4px">' . $h($s[0]) . '</p><p style="margin:0;font-family:' . $serif . ';font-size:22px;color:' . $acc . '">' . $h($s[1]) . '</p>'
         . '<p style="margin:2px 0 0;font-size:13px;color:#7D7076">' . $h($s[2]) . '<br>' . $h($s[3]) . '</p>'
         . '<p style="margin:18px 0 0;font-size:14px;color:#7D7076">' . $h($i['ps']) . '</p>'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0 6px"><tr>' . $pics . '</tr></table>'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0 6px">' . $pics . '</table>'
         . '<div style="margin:18px 0 0;padding:22px 24px;border-radius:18px;background:' . $soft . '">'
         . '<p style="margin:0 0 6px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:' . $acc . '">Pressetext</p>'
         . '<p style="margin:0 0 12px;font-family:' . $serif . ';font-size:22px;line-height:1.25;color:' . $ink . '">' . $h($r['title']) . '</p>';
