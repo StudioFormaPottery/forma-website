@@ -251,6 +251,13 @@ function mv_schema(PDO $pdo): void
     if (!in_array('script_de', $lc, true)) { $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN script_de TEXT NOT NULL DEFAULT ''"); $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN script_en TEXT NOT NULL DEFAULT ''"); }
     // eigenes Freischaltdatum pro Lektion (Unfold: zwei Bewegungsvideos pro Woche), leer = mit dem Programm
     if (!in_array('unlock', $lc, true)) $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN unlock TEXT NOT NULL DEFAULT ''");
+    // Produktion (Vivien, 26.10.2026): fester Schlüssel für angelegte Einträge, „fertig bis“, Übungsliste, Häkchen
+    if (!in_array('ukey', $lc, true)) {
+        $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN ukey TEXT NOT NULL DEFAULT ''");
+        $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN due TEXT NOT NULL DEFAULT ''");
+        $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN ex TEXT NOT NULL DEFAULT ''");
+        $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN prod TEXT NOT NULL DEFAULT ''");
+    }
     // Vorab-Buchungen (Vivien, 25.10.2026): Mail „dein Zugang ist offen“ am Starttag genau einmal
     $sc = array_column($pdo->query('PRAGMA table_info(mv_subs)')->fetchAll(), 'name');
     if (!in_array('open_mailed', $sc, true)) $pdo->exec('ALTER TABLE mv_subs ADD COLUMN open_mailed INTEGER NOT NULL DEFAULT 0');
@@ -282,6 +289,7 @@ function mv_schema(PDO $pdo): void
         mv_save_cfg(['names_v1' => 1]);
     }
     mv_scripts_sync($pdo);
+    mv_prod_sync($pdo);
 }
 
 // --- Konten ---------------------------------------------------------------------------------------
@@ -1180,6 +1188,7 @@ function mv_seed(PDO $pdo): void
     ] as $i => $x) $l->execute([...$x, $i, $now]);
     mv_seed_unfold($pdo);
     mv_scripts_sync($pdo, true);
+    mv_prod_sync($pdo, true);
 }
 
 /** Unfold: drei Monate mit je einem Programm, darin die 26 Bewegungsvideos aus dem Filmplan (api/seed/unfold-videos.json). */
@@ -1224,6 +1233,82 @@ function mv_scripts_sync(PDO $pdo, bool $force = false): void
         if ($newDe !== $l['script_de'] || $newEn !== $l['script_en']) $u->execute([$newDe, $newEn, $l['id']]);
     }
     if ((int)$pdo->query('SELECT COUNT(*) FROM mv_lessons')->fetchColumn() > 0) { $c['v'] = $ver; mm_save_cfg('scripts', $c); }
+}
+
+/**
+ * Produktionsplan (Vivien, 26.10.2026): Übungslisten und „fertig bis“ für alle Videos, dazu die Talking Heads für
+ * Method und Unfold und je Prä-/Postnatal-Einheit ein Talking Head („Vertiefung“) und ein Bewegungsvideo.
+ * Quelle api/seed/produktion.json (gebaut von tools/produktion/build.py). Legt nur an, was fehlt (Schlüssel ukey),
+ * und setzt Übungen/Datum nur, wo noch nichts steht. Nie eigene Änderungen überschreiben.
+ */
+function mv_prod_sync(PDO $pdo, bool $force = false): void
+{
+    $j = json_decode((string)@file_get_contents(__DIR__ . '/seed/produktion.json'), true);
+    if (!$j) return;
+    $c = mm_cfg('produktion') ?? [];
+    if (!$force && (int)($c['v'] ?? 0) >= (int)$j['v']) return;
+    if ((int)$pdo->query('SELECT COUNT(*) FROM mv_lessons')->fetchColumn() === 0) return;
+    $now = date('c');
+    $u = $pdo->prepare("UPDATE mv_lessons SET ex = CASE WHEN ex = '' THEN ? ELSE ex END, due = CASE WHEN due = '' THEN ? ELSE due END WHERE title_de = ?");
+    foreach ($j['ex'] as $t => $list) $u->execute([json_encode($list, JSON_UNESCAPED_UNICODE), (string)($j['due'][$t] ?? ''), $t]);
+    foreach ($j['due'] as $t => $d) if (!isset($j['ex'][$t])) $u->execute(['', $d, $t]);
+    $pdo->exec("UPDATE mv_lessons SET ex = '' WHERE ex = '\"\"'");
+    // Programme finden bzw. für Prä-/Postnatal anlegen
+    $prog = function ($aud, $ref) use ($pdo, $j, $now): int {
+        if ($aud === 'natal') {
+            $q = $pdo->prepare("SELECT id FROM mv_programs WHERE audience = 'natal' AND theme = ?");
+            $q->execute(['natal-' . $ref]);
+            if ($id = (int)$q->fetchColumn()) return $id;
+            [$de, $en] = $j['natal_programs'][$ref];
+            $pdo->prepare("INSERT INTO mv_programs (audience, title_de, title_en, theme, sort, created_at) VALUES ('natal',?,?,?,?,?)")->execute([$de, $en, 'natal-' . $ref, $ref === 'prae' ? 0 : 1, $now]);
+            return (int)$pdo->lastInsertId();
+        }
+        $ps = mv_programs($pdo, $aud);
+        if (is_int($ref)) return (int)($ps[$ref]['id'] ?? 0);
+        foreach ($ps as $p) if ($p['title_de'] === $ref) return (int)$p['id'];
+        return (int)($ps[1]['id'] ?? $ps[0]['id'] ?? 0);
+    };
+    $has = $pdo->prepare('SELECT COUNT(*) FROM mv_lessons WHERE ukey = ?');
+    $ins = $pdo->prepare('INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, unlock, script_de, script_en, ukey, due, ex, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+    foreach ($j['new'] as $n) {
+        $has->execute([$n['ukey']]);
+        if ((int)$has->fetchColumn() > 0) continue;
+        $pid = $prog($n['aud'], $n['prog']);
+        if (!$pid) continue;
+        $ins->execute([$pid, $n['title_de'], $n['title_en'], $n['text_de'], $n['text_en'], $n['cat'], $n['energy'], (int)$n['minutes'], (int)$n['sort'], (string)$n['unlock'],
+            $n['de'], $n['en'], $n['ukey'], $n['due'], $n['ex'] ? json_encode($n['ex'], JSON_UNESCAPED_UNICODE) : '', $now]);
+    }
+    $c['v'] = (int)$j['v'];
+    mm_save_cfg('produktion', $c);
+}
+
+/** Übungsliste einer Lektion: [[de, en], …] */
+function mv_lesson_ex(array $l): array
+{
+    $x = json_decode((string)($l['ex'] ?? ''), true);
+    return is_array($x) ? $x : [];
+}
+
+/** Häkchen einer Lektion: ['x0f' => 1, 'x0d' => 1, 'td' => 1, …] (f = gefilmt, d/e = Deutsch/Englisch eingesprochen) */
+function mv_lesson_prod(array $l): array
+{
+    $x = json_decode((string)($l['prod'] ?? ''), true);
+    return is_array($x) ? $x : [];
+}
+
+/** Ist das Video fertig? Beide Sprachen hochgeladen. */
+function mv_lesson_done(array $l): bool
+{
+    return (string)$l['video_de'] !== '' && (string)$l['video_en'] !== '';
+}
+
+/** Prä-/Postnatal-Videos einer Einheit: ['talk' => Lektion|null, 'move' => Lektion|null] */
+function mv_natal_videos(PDO $pdo, string $unit): array
+{
+    $q = $pdo->prepare('SELECT * FROM mv_lessons WHERE ukey = ? AND visible = 1');
+    $out = [];
+    foreach (['talk', 'move'] as $k) { $q->execute(['natal:' . $unit . ':' . $k]); $out[$k] = $q->fetch() ?: null; }
+    return $out;
 }
 
 function mv_today(): string

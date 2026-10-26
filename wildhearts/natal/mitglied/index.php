@@ -7,6 +7,7 @@
 declare(strict_types=1);
 require dirname(__DIR__, 3) . '/api/natal-lib.php';
 require_once dirname(__DIR__, 3) . '/api/natal-workbook.inc.php';
+require_once dirname(__DIR__, 3) . '/api/method-lib.php';
 header('Cache-Control: no-store');
 header('X-Robots-Tag: noindex, nofollow');
 $pdo = forma_db();
@@ -59,6 +60,20 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 }
 
 // --- Daten für die Seite ----------------------------------------------------------------------
+/** Videos einer Einheit für den Mitgliederbereich: Bunny-Embed (Deutsch, sonst Englisch) oder ''. */
+function natal_member_videos(PDO $pdo, string $unit): array
+{
+    $out = ['talk' => '', 'move' => ''];
+    try {
+        mv_schema($pdo);
+        foreach (mv_natal_videos($pdo, $unit) as $k => $l) {
+            if (!$l) continue;
+            $g = (string)$l['video_de'] !== '' ? (string)$l['video_de'] : (string)$l['video_en'];
+            if ($g !== '') $out[$k] = mv_embed($g);
+        }
+    } catch (Throwable $e) { error_log('natal videos: ' . $e->getMessage()); }
+    return $out;
+}
 /** Ansicht einer Buchung für die Seite (echte Daten). */
 function natal_member_view(PDO $pdo, array $o): array
 {
@@ -73,15 +88,18 @@ function natal_member_view(PDO $pdo, array $o): array
         if ($isDone) { $done++; $lastKey = $k; }
         elseif ($s && $s['status'] === 'bestaetigt' && !$next) $next = $s;
         $state = $isDone ? 'done' : ($s ? ($s['status'] === 'bestaetigt' ? 'next' : 'planned') : 'later');
-        $wb = 0; $pdf = ''; $rec = '';
+        $wb = 0; $pdf = ''; $rec = ''; $talk = ''; $move = '';
         if ($full && $isDone) {
             $wb = 99;
+            // Talking Head („Vertiefung“) und Bewegungsvideo der Einheit (Vivien, 26.10.2026): erst nach dem Termin
+            $vv = natal_member_videos($pdo, $k);
+            $talk = $vv['talk']; $move = $vv['move'];
             $pdf = '/api/natal-workbook.php?o=' . (int)$o['id'] . '&u=' . $k;
             $r = $s ? natal_rec_for($pdo, (int)$s['id']) : null;
             if ($r) $rec = '/api/natal-rec.php?id=' . (int)$r['id'];
         } elseif (!$full && $i === 0) $wb = $prev;
         $units[] = ['key' => $k, 'nr' => $i + 1, 'label' => natal_unit_label($k), 'title' => $u['title'], 'theme' => $u['theme'], 'state' => $state,
-            'when' => $s ? natal_when($s) : '', 'wb' => $wb, 'pdf' => $pdf, 'rec' => $rec];
+            'when' => $s ? natal_when($s) : '', 'wb' => $wb, 'pdf' => $pdf, 'rec' => $rec, 'talk' => $talk, 'move' => $move];
     }
     $online = natal_is_online($o);
     $room = $next && $online ? natal_room_link('s', (int)$next['id']) : '';
@@ -104,7 +122,8 @@ function natal_member_demo(string $v): array
         $when = $state === 'later' ? '' : natal_date_de(date('Y-m-d', $state === 'done' ? $d : strtotime('+' . (2 + ($i - $doneN) * 7) . ' days'))) . ($state === 'planned' ? ', Vormittag' : ' um 9:30 Uhr');
         $wb = $v === 'vorschau' ? ($i === 0 ? natal_workbook_preview_count(count(natal_workbook_pages($k))) : 0) : ($state === 'done' ? 99 : 0);
         $units[] = ['key' => $k, 'nr' => $i + 1, 'label' => natal_unit_label($k), 'title' => $u['title'], 'theme' => $u['theme'], 'state' => $state, 'when' => $when,
-            'wb' => $wb, 'pdf' => $state === 'done' && $v !== 'vorschau' ? '#demo' : '', 'rec' => $state === 'done' && $v !== 'vorschau' ? '#demo' : ''];
+            'wb' => $wb, 'pdf' => $state === 'done' && $v !== 'vorschau' ? '#demo' : '', 'rec' => $state === 'done' && $v !== 'vorschau' ? '#demo' : '',
+            'talk' => $state === 'done' && $v !== 'vorschau' ? '#demo' : '', 'move' => $state === 'done' && $v !== 'vorschau' ? '#demo' : ''];
     }
     return ['id' => 0, 'title' => $post ? 'Postnatal-Paket' : 'Pränatal-Paket', 'phase' => $post ? 'post' : 'prae', 'full' => $v !== 'vorschau', 'fullFrom' => strtotime('+12 days'),
         'until' => date('Y-m-d', strtotime('+5 months')), 'finished' => false, 'units' => $units, 'done' => $doneN, 'total' => count($units),
@@ -346,7 +365,8 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
 
 <section class="w" style="margin-top:clamp(2rem,5vw,3.5rem)"><div class="in">
   <p class="k">Deine Einheiten</p>
-  <h2 style="margin-top:.4rem">Workbooks <em>&amp;</em> Aufnahmen</h2>
+  <h2 style="margin-top:.4rem">Workbooks, Videos <em>&amp;</em> Aufnahmen</h2>
+  <p class="mut" style="max-width:46rem">Nach jeder Einheit findest du hier ein Video, in dem ich das Thema noch ausführlicher erkläre, und ein Bewegungsvideo mit allen Übungen zum Mitmachen, dazu dein Workbook und die Aufnahme unserer Stunde.</p>
   <div class="units">
   <?php foreach ($v['units'] as $u): ?>
     <div class="unit <?= $h($u['state']) ?>">
@@ -355,7 +375,9 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
       <h3><?= $h($u['title']) ?></h3>
       <p class="th"><?= $h($u['theme']) ?></p>
       <p class="st"><?= $u['state'] === 'done' ? 'War am ' . $h($u['when']) : ($u['state'] === 'next' ? 'Am ' . $h($u['when']) : ($u['state'] === 'planned' ? 'Angefragt: ' . $h($u['when']) : 'Kommt noch')) ?></p>
-      <?php if ($u['wb'] || $u['pdf'] || $u['rec']): ?><div class="acts">
+      <?php if ($u['wb'] || $u['pdf'] || $u['rec'] || $u['talk'] || $u['move']): ?><div class="acts">
+        <?php if ($u['talk']): ?><button class="btn sm" type="button" data-vid="<?= $h($u['talk']) ?>" data-t="<?= $h($u['title']) ?> · Vertiefung">▶ Vertiefung</button><?php endif; ?>
+        <?php if ($u['move']): ?><button class="btn sm" type="button" data-vid="<?= $h($u['move']) ?>" data-t="<?= $h($u['title']) ?> · Bewegungsvideo">▶ Bewegungsvideo</button><?php endif; ?>
         <?php if ($u['wb']): ?><button class="btn sm" type="button" data-wb="<?= $h($u['key']) ?>" data-o="<?= (int)$v['id'] ?>" data-t="<?= $h($u['label']) ?>"><?= $u['wb'] < 99 ? 'Workbook-Vorschau' : 'Workbook' ?></button><?php endif; ?>
         <?php if ($u['rec']): ?><button class="btn sm line" type="button" data-rec="<?= $h($u['rec']) ?>" data-t="<?= $h($u['label']) ?>">▶ Aufnahme</button><?php endif; ?>
         <?php if ($u['pdf']): ?><a class="btn sm line" href="<?= $h($u['pdf']) ?>">PDF</a><?php endif; ?>
@@ -406,6 +428,13 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
   document.querySelectorAll('[data-rec]').forEach(b => b.addEventListener('click', () => {
     if (DEMO) { open(b.dataset.t, '<div style="aspect-ratio:16/9;border-radius:18px;background:var(--deep);color:var(--on);display:flex;align-items:center;justify-content:center;text-align:center;padding:1rem">Hier läuft die Aufnahme der Einheit.<br>Man sieht nur Vivien.</div>'); return; }
     open(b.dataset.t, '<video controls playsinline preload="metadata" controlslist="nodownload" src="' + b.dataset.rec + '"></video><p class="mut" style="font-size:.85rem;margin-top:.6rem">Diese Aufnahme ist nur für dich.</p>');
+  }));
+  document.querySelectorAll('[data-vid]').forEach(b => b.addEventListener('click', () => {
+    if (DEMO) { open(b.dataset.t, '<div style="aspect-ratio:16/9;border-radius:18px;background:var(--deep);color:var(--on);display:flex;align-items:center;justify-content:center;text-align:center;padding:1rem">Hier läuft das Video zur Einheit.</div>'); return; }
+    const f = document.createElement('iframe');
+    f.src = b.dataset.vid; f.allow = 'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen'; f.allowFullscreen = true;
+    f.style.cssText = 'width:100%;aspect-ratio:16/9;border:0;border-radius:18px;background:var(--deep)';
+    open(b.dataset.t, ''); sb.appendChild(f);
   }));
   document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
     document.getElementById('spot').src = b.dataset.sp;

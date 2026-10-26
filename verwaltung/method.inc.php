@@ -66,6 +66,7 @@ if ($action === 'mm_mv_prog_save') {
         'visible' => !empty($_POST['visible']) ? 1 : 0,
     ];
     if ($f['title_de'] === '') go($vBack . ($id ? '&p=' . $id : '') . '#prog', 'Bitte gib einen Titel ein.');
+    if ($id && (mv_program($pdo, $id)['audience'] ?? '') === 'natal') $f['audience'] = 'natal'; // Prä-/Postnatal-Videos bleiben dort
     if ($id) {
         $pdo->prepare('UPDATE mv_programs SET audience=?, title_de=?, title_en=?, intro_de=?, intro_en=?, unlock=?, theme=?, sort=?, visible=? WHERE id=?')->execute([...array_values($f), $id]);
     } else {
@@ -138,6 +139,24 @@ if ($action === 'mm_mv_video_clear') {
     $lg = ($_POST['lang'] ?? '') === 'en' ? 'en' : 'de';
     if ($l) { mv_bunny_delete($l['video_' . $lg]); $pdo->prepare('UPDATE mv_lessons SET video_' . $lg . " = '' WHERE id = ?")->execute([$l['id']]); }
     go($vBack . '&l=' . (int)($l['id'] ?? 0), 'Video entfernt.');
+}
+
+// Produktion (Vivien, 26.10.2026): Häkchen „gefilmt / eingesprochen“ und „fertig bis“ direkt aus den Teleprompter-Texten
+if ($action === 'mm_mv_prod') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    $k = (string)($_POST['k'] ?? '');
+    if (!$l || !preg_match('/^(x\d{1,2}[fde]|t[de])$/', $k)) $mvJson(['error' => 'Fehlt.']);
+    $p = mv_lesson_prod($l);
+    if (!empty($_POST['on'])) $p[$k] = 1; else unset($p[$k]);
+    $pdo->prepare('UPDATE mv_lessons SET prod = ? WHERE id = ?')->execute([json_encode($p ?: new stdClass()), $l['id']]);
+    $mvJson(['ok' => 1]);
+}
+if ($action === 'mm_mv_due') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    $d = (string)($_POST['due'] ?? '');
+    if (!$l || ($d !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $d))) $mvJson(['error' => 'Fehlt.']);
+    $pdo->prepare('UPDATE mv_lessons SET due = ? WHERE id = ?')->execute([$d, $l['id']]);
+    $mvJson(['ok' => 1]);
 }
 
 if ($action === 'mm_mv_file_add') {
