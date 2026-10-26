@@ -40,7 +40,7 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
   <p class="lead"><span class="de">Movecia heißt „in Bewegung“. Ich begleite Frauen zurück in ihren Körper, mit sanfter, achtsamer Bewegung, mit Atem und mit Raum für das, was sie wirklich beschäftigt. Online, wann immer du magst, live in kleinen Runden und persönlich bei mir in den Tiroler Bergen.</span><span class="en">Movecia means “in motion”. I guide women back into their bodies with gentle, mindful movement, with breath and with room for what truly matters to them. Online whenever you like, live in small circles and in person with me in the Tyrolean mountains.</span></p>
   <div class="cta"><a class="btn" href="#angebote"><span class="de">So begleite ich dich</span><span class="en">Ways to move with me</span> →</a><a class="btn line" href="/unfold/"><span class="de">Unfold · Start <?= mv_date($st) ?></span><span class="en">Unfold · starts <?= mv_date($st, 'en') ?></span></a></div>
 </div>
-<div class="in"><div class="art wide rv"><video src="/video/movecia/start.mp4?v=9" poster="/img/movecia/fotos/ev-start.jpg?v=9" autoplay muted loop playsinline preload="metadata" aria-label="Vivien bewegt sich langsam in ihrem lichten Studio mit Blick auf die Berge"></video></div></div></section>
+<div class="in"><div class="art wide rv"><video src="/video/movecia/start.mp4?v=10" poster="/img/movecia/fotos/ev-start.jpg?v=10" autoplay muted loop playsinline preload="metadata" aria-label="Vivien bewegt sich langsam in ihrem lichten Studio mit Blick auf die Berge"></video></div></div></section>
 
 <section class="band"><div class="w"><div class="in">
   <p class="k"><span class="de">Wofür Movecia steht</span><span class="en">What Movecia stands for</span></p>
@@ -51,7 +51,7 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
 <section class="w vids" aria-label="Movecia in Bewegung"><div class="in">
   <!-- Nur noch das Tanz-Video, darüber die Linie ankommen · spüren · entfalten (Vivien, 26.10.2026) -->
   <figure class="vsolo rv">
-    <video src="/video/movecia/unfold.mp4?v=9" poster="/img/movecia/fotos/ev-unfold.jpg?v=9" autoplay muted loop playsinline preload="metadata" aria-label="Vivien tanzt langsam in ihrem lichten Studio"></video>
+    <video src="/video/movecia/unfold.mp4?v=10" poster="/img/movecia/fotos/ev-unfold.jpg?v=10" autoplay muted loop playsinline preload="metadata" aria-label="Vivien tanzt langsam in ihrem lichten Studio"></video>
     <div class="flow" aria-hidden="true">
       <span class="f-lab f-top"><span class="de">ankommen</span><span class="en">arrive</span></span>
       <span class="f-line"></span>
@@ -67,22 +67,22 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
   <div class="sec-h rv"><div><p class="k"><span class="de">So begleite ich dich</span><span class="en">Ways to move with me</span></p><h2 style="margin-top:.6rem"><span class="de">Für jeden <em>Moment</em> deines Lebens</span><span class="en">For every <em>season</em> of your life</span></h2></div>
     <p><span class="de">Ob du jeden Tag ein paar ruhige Minuten für dich suchst, eine Begleitung über drei Monate oder Unterstützung rund um die Geburt: Hier findest du deinen Weg.</span><span class="en">Whether you are looking for a few quiet minutes every day, three months of guidance or support around birth: here you find your way.</span></p></div>
   <div class="offers">
-    <a class="offer o-method rv" href="/method/"><span class="onum">01</span><div class="art"><img src="/img/movecia/fotos/ev-method-karte.jpg?v=9" alt="" loading="lazy"></div><?= mv_icons(['sonne','blatt','welle'], 'ico', 0) ?><div class="tx">
+    <a class="offer o-method rv" href="/method/"><span class="onum">01</span><div class="art"><img src="/img/movecia/fotos/ev-method-foto.jpg?v=1" alt="" loading="lazy"></div><?= mv_icons(['sonne','blatt','welle'], 'ico', 0) ?><div class="tx">
       <p class="k">On demand</p><h3>Mindful Movement Method</h3>
       <p><span class="de">Deine Videobibliothek für zu Hause: Flows, Somatic Movement, Breathwork und Meditation, jeden Monat ein neues Programm mit Workbook.</span><span class="en">Your video library at home: flows, somatic movement, breathwork and meditation, a new programme with workbook every month.</span></p>
       <div class="meta"><span class="chip"><span class="de">ab <?= $eu((int)round($c['m12'] / 12)) ?> im Monat</span><span class="en">from <?= $eu((int)round($c['m12'] / 12)) ?> a month</span></span><span class="chip">DE · EN</span></div>
       <p class="more"><span class="de">Zur Method</span><span class="en">See the Method</span> →</p></div></a>
-    <a class="offer o-unfold rv" href="/unfold/"><span class="onum">02</span><div class="art"><img src="/img/movecia/fotos/ev-unfold-karte.jpg?v=9" alt="" loading="lazy"></div><?= mv_icons(['knospe','bluete','spirale'], 'ico', 1.5) ?><div class="tx">
+    <a class="offer o-unfold rv" href="/unfold/"><span class="onum">02</span><div class="art"><img src="/img/movecia/fotos/ev-unfold-karte.jpg?v=10" alt="" loading="lazy"></div><?= mv_icons(['knospe','bluete','spirale'], 'ico', 1.5) ?><div class="tx">
       <p class="k"><span class="de">3 Monate Begleitung</span><span class="en">3 months of guidance</span></p><h3>Unfold</h3>
       <p><span class="de">Dein 3-Monats-Begleiter: wöchentlicher Live-Call mit Impulsvortrag, zwei Bewegungsvideos pro Woche, Workbooks für Mental Load, Selbstwert und deine Ideen.</span><span class="en">Your 3-month companion: a weekly live call with a talk, two movement videos a week, workbooks for mental load, self-worth and your ideas.</span></p>
       <div class="meta"><span class="chip"><span class="de">Start <?= mv_date($st) ?></span><span class="en">Starts <?= mv_date($st, 'en') ?></span></span><span class="chip"><span class="de">max. <?= (int)$c['u_seats'] ?> Plätze</span><span class="en">max. <?= (int)$c['u_seats'] ?> spots</span></span></div>
       <p class="more"><?= $uFree > 0 ? '<span class="de">Platz sichern</span><span class="en">Book your spot</span>' : '<span class="de">Warteliste</span><span class="en">Waitlist</span>' ?> →</p></div></a>
-    <a class="offer o-natal rv" href="/natal/"><span class="onum">03</span><div class="art"><img src="/img/movecia/fotos/ev-natal.jpg?v=9" alt="" loading="lazy"></div><?= mv_icons(['mond','herz','atem'], 'ico', 3) ?><div class="tx">
+    <a class="offer o-natal rv" href="/natal/"><span class="onum">03</span><div class="art"><img src="/img/movecia/fotos/ev-natal.jpg?v=10" alt="" loading="lazy"></div><?= mv_icons(['mond','herz','atem'], 'ico', 3) ?><div class="tx">
       <p class="k">1:1 · <span class="de">Studio &amp; online</span><span class="en">studio &amp; online</span></p><h3><span class="de">Prä- &amp; Postnatal</span><span class="en">Pre- &amp; postnatal</span></h3>
       <p><span class="de">Achtsames Training in der Schwangerschaft und danach, mit Atem, Beckenboden und Impulsen für eine leichtere Geburt und ein sanftes Ankommen danach.</span><span class="en">Mindful training during pregnancy and after, with breath, pelvic floor work and guidance for an easier birth and a gentle arrival afterwards.</span></p>
       <div class="meta"><span class="chip"><span class="de">ab <?= $eu($natalMin) ?> pro Einheit</span><span class="en">from <?= $eu($natalMin) ?> per session</span></span><span class="chip"><span class="de">Kennenlernen gratis</span><span class="en">free intro call</span></span></div>
       <p class="more"><span class="de">Mehr erfahren</span><span class="en">Learn more</span> →</p></div></a>
-    <a class="offer o-gather rv" href="/gathering/"><span class="onum">04</span><div class="art"><img src="/img/movecia/fotos/ev-gathering.jpg?v=9" alt="" loading="lazy"></div><?= mv_icons(['kerze','kreis','berg'], 'ico', 4.5) ?><div class="tx">
+    <a class="offer o-gather rv" href="/gathering/"><span class="onum">04</span><div class="art"><img src="/img/movecia/fotos/ev-gathering.jpg?v=10" alt="" loading="lazy"></div><?= mv_icons(['kerze','kreis','berg'], 'ico', 4.5) ?><div class="tx">
       <p class="k"><span class="de">Live · kostenlos</span><span class="en">Live · free</span></p><h3>Gatherings</h3>
       <p><span class="de">Einmal im Monat treffen wir uns live: ein ruhiger Abend mit Bewegung, Atem und Gesprächen, offen für alle Frauen.</span><span class="en">Once a month we meet live: a calm evening with movement, breath and conversation, open to all women.</span></p>
       <div class="meta"><span class="chip"><?= $g ? '<span class="de">nächstes: ' . forma_h(mm_when_de($g)) . '</span><span class="en">next: ' . forma_h(mm_when($g)) . '</span>' : '<span class="de">monatlich</span><span class="en">monthly</span>' ?></span></div>

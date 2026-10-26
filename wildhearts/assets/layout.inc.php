@@ -58,6 +58,8 @@ function mvl_foot(): void
   set(root.dataset.l);
   document.querySelectorAll('.lang [data-set]').forEach(function(b){b.addEventListener('click',function(){set(b.dataset.set)})});
   // sanftes Einblenden beim Scrollen
+  /* Hintergrund-Videos laufen immer in Schleife weiter, auch wenn iPhone/Safari sie nach dem ersten Durchlauf anhält (Vivien, 26.10.2026) */
+  document.querySelectorAll('video[autoplay][loop]').forEach(function(v){var go=function(){var p=v.play();if(p&&p.catch)p.catch(function(){})};v.addEventListener('ended',function(){v.currentTime=0;go()});v.addEventListener('pause',function(){if(!document.hidden)setTimeout(function(){if(v.paused&&!document.hidden)go()},400)});if('IntersectionObserver' in window){new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting&&v.paused)go()})}).observe(v)}document.addEventListener('visibilitychange',function(){if(!document.hidden&&v.paused)go()})});
   if('IntersectionObserver' in window&&!matchMedia('(prefers-reduced-motion: reduce)').matches){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in-view');io.unobserve(e.target)}})},{rootMargin:'0px 0px -8% 0px'});document.querySelectorAll('.rv').forEach(function(x){io.observe(x)});}else document.querySelectorAll('.rv').forEach(function(x){x.classList.add('in-view')});
 })();
 </script>

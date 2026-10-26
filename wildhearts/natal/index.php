@@ -441,7 +441,7 @@ footer summary{cursor:pointer}
 
     <div class="cta"><a class="btn" href="#pakete">Paket wählen <span aria-hidden="true">→</span></a><a class="btn line" href="#kennenlernen">Kostenlos kennenlernen</a></div>
   </div>
-  <figure class="hv"><div class="b1 blob" aria-hidden="true"></div><div class="b3" aria-hidden="true"></div><img src="/img/movecia/fotos/ev-natal.jpg?v=9" alt="Vivien in ihrer Schwangerschaft im lichten Studio" width="640" height="794"><figcaption class="q">„Dein Körper leistet gerade Großes. Lass uns ihn gut begleiten.“<small>Vivien</small></figcaption></figure>
+  <figure class="hv"><div class="b1 blob" aria-hidden="true"></div><div class="b3" aria-hidden="true"></div><img src="/img/movecia/fotos/ev-natal.jpg?v=10" alt="Vivien in ihrer Schwangerschaft im lichten Studio" width="640" height="794"><figcaption class="q">„Dein Körper leistet gerade Großes. Lass uns ihn gut begleiten.“<small>Vivien</small></figcaption></figure>
 </section>
 <div class="mq" aria-hidden="true"><div class="mq-in"><?php for ($i = 0; $i < 2; $i++) foreach (['ankommen', 'atmen', 'spüren', 'stärken', 'loslassen', 'vertrauen', 'zurückfinden'] as $wd) echo '<span>' . $wd . '</span>'; ?></div></div>
 
@@ -460,7 +460,7 @@ footer summary{cursor:pointer}
       <li>Haltung und Rücken für Tragen und Stillen</li>
       <li>Schritt für Schritt zurück zu Kraft und Energie, dein Baby darf mitkommen</li></ul></div>
   </div>
-  <figure class="wide-pic"><img src="/img/movecia/fotos/ev-natal-sitzend.jpg?v=9" alt="Schwangere Frau sitzt ruhig atmend auf der Matte vor großen Fenstern mit Bergblick" width="1280" height="858" loading="lazy"></figure>
+  <figure class="wide-pic"><img src="/img/movecia/fotos/ev-natal-sitzend.jpg?v=10" alt="Schwangere Frau sitzt ruhig atmend auf der Matte vor großen Fenstern mit Bergblick" width="1280" height="858" loading="lazy"></figure>
 </section>
 
 <section class="w" id="ablauf" style="padding-top:0">
