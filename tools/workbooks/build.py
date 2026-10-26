@@ -52,14 +52,14 @@ h1,h2,h3,h4{font-family:"Cormorant",serif;font-weight:500;margin:0;line-height:1
 /* Deckblatt */
 .cover{height:297mm;position:relative;overflow:hidden;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 26mm;break-after:page}
 .cover .blob1{position:absolute;width:130mm;height:110mm;left:40mm;top:38mm;background:var(--peach);border-radius:58% 42% 50% 50%/48% 56% 44% 52%;opacity:.75}
-.cover .blob2{position:absolute;width:90mm;height:90mm;right:-24mm;bottom:-20mm;background:var(--blush);border-radius:50%}
-.cover .blob3{position:absolute;width:60mm;height:60mm;left:-18mm;bottom:40mm;background:var(--blush);border-radius:46% 54% 50% 50%;opacity:.7}
+.cover .blob2{position:absolute;width:90mm;height:90mm;right:-24mm;bottom:-20mm;background:var(--blush);border-radius:50%;opacity:.45}
+.cover .blob3{position:absolute;width:60mm;height:60mm;left:-18mm;bottom:40mm;background:var(--blush);border-radius:46% 54% 50% 50%;opacity:.4}
 .cover .ring{position:absolute;width:118mm;height:100mm;left:44mm;top:40mm;border:1.4px solid var(--plum);border-radius:52% 48% 46% 54%/56% 46% 54% 44%;transform:rotate(9deg);opacity:.55}
 .cover>*{position:relative}
 .cover .logo{position:absolute;top:16mm;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:2mm;font-family:"Cormorant";font-size:16pt;color:var(--plum)}
 .cover .logo img{width:7mm;height:7mm}
-.cover .big svg{width:52mm;height:52mm;filter:drop-shadow(0 3mm 4mm rgba(125,94,104,.18))}
-.cover .tape{display:inline-block;margin:9mm 0 3mm;background:#fff;padding:1.6mm 5mm;font-size:8pt;letter-spacing:.16em;text-transform:uppercase;color:var(--plum);font-weight:600;transform:rotate(-2deg);border-radius:1mm;box-shadow:0 1mm 3mm rgba(74,58,65,.08)}
+.cover .big svg{width:52mm;height:52mm}
+.cover .tape{display:inline-block;margin:9mm 0 3mm;background:#fff;padding:1.6mm 5mm;font-size:8pt;letter-spacing:.16em;text-transform:uppercase;color:var(--plum);font-weight:600;transform:rotate(-2deg);border-radius:1mm}
 .cover h1{font-size:46pt;line-height:.98;max-width:150mm}
 .cover .sub{font-family:"Cormorant";font-style:italic;font-size:17pt;color:var(--plum);margin-top:3mm;max-width:130mm}
 .cover .for{font-family:"Hand";font-size:10pt;color:var(--muted);margin-top:12mm;display:flex;gap:3mm;align-items:flex-end}

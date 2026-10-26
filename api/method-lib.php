@@ -332,7 +332,7 @@ function mv_schema(PDO $pdo): void
  */
 function mv_workbooks_sync(PDO $pdo): void
 {
-    $ver = 1;
+    $ver = 2; // 2: ohne Schatten (Vivien, 26.10.2026)
     $c = mm_cfg('workbooks') ?? [];
     if ((int)($c['v'] ?? 0) >= $ver) return;
     $src = __DIR__ . '/seed/workbooks/pdf/';
