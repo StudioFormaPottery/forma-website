@@ -141,41 +141,86 @@ if ($action === 'mm_mv_video_clear') {
     go($vBack . '&l=' . (int)($l['id'] ?? 0), 'Video entfernt.');
 }
 
-// Produktion (Vivien, 26.10.2026): Häkchen „gefilmt / eingesprochen“ und „fertig bis“ direkt aus den Teleprompter-Texten
-if ($action === 'mm_mv_prod') {
+// Mediathek (Vivien, 26.10.2026): jede Übung wird einmal gefilmt und steckt dann in jedem Video, das sie enthält.
+// Clip finden über die Mediathek-ID (c) oder über Video + Übungsnummer (id, i).
+$mvClip = function () use ($pdo): ?array {
+    if (!empty($_POST['c'])) { $q = $pdo->prepare('SELECT * FROM mv_clips WHERE id = ?'); $q->execute([(int)$_POST['c']]); return $q->fetch() ?: null; }
     $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
-    $k = (string)($_POST['k'] ?? '');
-    if (!$l || !preg_match('/^(x\d{1,2}[fde]|t[de])$/', $k)) $mvJson(['error' => 'Fehlt.']);
-    $p = mv_lesson_prod($l);
-    if (!empty($_POST['on'])) $p[$k] = 1; else unset($p[$k]);
-    $pdo->prepare('UPDATE mv_lessons SET prod = ? WHERE id = ?')->execute([json_encode($p ?: new stdClass()), $l['id']]);
-    $mvJson(['ok' => 1]);
-}
-// Übungs-Clips (Vivien, 26.10.2026): pro Übung ein kurzer Clip, der Player im Mitgliederbereich spielt ihn mit 30/45-Sek.-Timer
-if ($action === 'mm_mv_clip_new') {
-    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    $st = $l ? mv_lesson_steps($l) : [];
     $i = (int)($_POST['i'] ?? -1);
-    $ex = $l ? mv_lesson_ex($l) : [];
-    if (!$l || !isset($ex[$i])) $mvJson(['error' => 'Übung nicht gefunden.']);
-    try { $mvJson(mv_bunny_new($l['title_de'] . ' · ' . ($i + 1) . '. ' . $ex[$i][0])); } catch (Throwable $e) { $mvJson(['error' => $e->getMessage()]); }
+    return isset($st[$i]) ? mv_clip_ensure($pdo, $st[$i]['de'], $st[$i]['en']) : null;
+};
+if ($action === 'mm_mv_clip_new') {
+    $c = $mvClip();
+    if (!$c) $mvJson(['error' => 'Übung nicht gefunden.']);
+    try { $mvJson(mv_bunny_new('Übung · ' . $c['name_de'])); } catch (Throwable $e) { $mvJson(['error' => $e->getMessage()]); }
 }
 if ($action === 'mm_mv_clip_set') {
-    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
-    $i = (int)($_POST['i'] ?? -1);
+    $c = $mvClip();
     $guid = preg_replace('/[^a-f0-9-]/', '', (string)($_POST['guid'] ?? ''));
-    if (!$l || $i < 0 || $guid === '') $mvJson(['error' => 'Fehlt.']);
-    $p = mv_lesson_prod($l);
-    if (!empty($p['c' . $i]) && $p['c' . $i] !== $guid) mv_bunny_delete((string)$p['c' . $i]);
-    $p['c' . $i] = $guid;
-    $pdo->prepare('UPDATE mv_lessons SET prod = ? WHERE id = ?')->execute([json_encode($p), $l['id']]);
-    $l['prod'] = json_encode($p);
-    $mvJson(['ok' => 1, 'view' => mv_embed($guid), 'clips' => count(mv_lesson_clips($l)), 'done' => mv_lesson_done($l)]);
+    if (!$c || $guid === '') $mvJson(['error' => 'Fehlt.']);
+    if ($c['guid'] !== '' && $c['guid'] !== $guid) mv_bunny_delete((string)$c['guid']);
+    $pdo->prepare('UPDATE mv_clips SET guid = ?, updated_at = ? WHERE id = ?')->execute([$guid, date('c'), $c['id']]);
+    mv_clips_all($pdo, true);
+    $used = count(mv_clip_usage($pdo)[$c['ckey']] ?? []);
+    $mvJson(['ok' => 1, 'c' => (int)$c['id'], 'view' => mv_embed($guid), 'used' => $used]);
 }
 if ($action === 'mm_mv_clip_clear') {
+    $c = $mvClip();
+    if ($c && $c['guid'] !== '') { mv_bunny_delete((string)$c['guid']); $pdo->prepare("UPDATE mv_clips SET guid = '', updated_at = ? WHERE id = ?")->execute([date('c'), $c['id']]); }
+    $mvJson(['ok' => 1]);
+}
+if ($action === 'mm_mv_clip_tags') {
+    $c = $mvClip();
+    if (!$c) $mvJson(['error' => 'Fehlt.']);
+    $se = array_values(array_intersect(array_keys(MV_SEASONS), (array)($_POST['seasons'] ?? [])));
+    $sy = array_values(array_intersect(array_keys(MV_STYLES), (array)($_POST['styles'] ?? [])));
+    $pdo->prepare('UPDATE mv_clips SET seasons = ?, styles = ?, updated_at = ? WHERE id = ?')->execute([implode(',', $se), implode(',', $sy), date('c'), $c['id']]);
+    $mvJson(['ok' => 1]);
+}
+// Voice-over je Übung (Flow): direkt im Browser aufgenommen oder als Datei hochgeladen
+if ($action === 'mm_mv_voice') {
     $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
     $i = (int)($_POST['i'] ?? -1);
-    if ($l) { $p = mv_lesson_prod($l); if (!empty($p['c' . $i])) { mv_bunny_delete((string)$p['c' . $i]); unset($p['c' . $i]); $pdo->prepare('UPDATE mv_lessons SET prod = ? WHERE id = ?')->execute([json_encode($p ?: new stdClass()), $l['id']]); } }
+    $g = ($_POST['g'] ?? '') === 'en' ? 'en' : 'de';
+    $st = $l ? mv_lesson_steps($l) : [];
+    $f = $_FILES['audio'] ?? null;
+    if (!$l || !isset($st[$i]) || !$f || (int)$f['error'] !== 0 || (int)$f['size'] < 500) $mvJson(['error' => 'Die Aufnahme ist nicht angekommen. Bitte noch einmal.']);
+    if ((int)$f['size'] > 60 * 1024 * 1024) $mvJson(['error' => 'Die Datei ist zu groß (höchstens 60 MB).']);
+    $ext = strtolower(pathinfo((string)$f['name'], PATHINFO_EXTENSION));
+    $mime = (string)(@mime_content_type((string)$f['tmp_name']) ?: '');
+    if (!in_array($ext, ['webm', 'ogg', 'mp4', 'm4a', 'mp3', 'wav', 'aac'], true)) $ext = str_contains($mime, 'mp4') ? 'm4a' : (str_contains($mime, 'ogg') ? 'ogg' : (str_contains($mime, 'mpeg') ? 'mp3' : (str_contains($mime, 'wav') ? 'wav' : 'webm')));
+    if ($mime !== '' && !preg_match('~^(audio|video)/|application/octet-stream~', $mime)) $mvJson(['error' => 'Das ist keine Tonaufnahme.']);
+    if ($old = mv_voice_path((int)$l['id'], $i, $g)) @unlink($old);
+    if (!move_uploaded_file((string)$f['tmp_name'], mv_voice_dir() . '/L' . (int)$l['id'] . '-' . $i . '-' . $g . '.' . $ext)) $mvJson(['error' => 'Speichern hat nicht geklappt.']);
+    $mvJson(['ok' => 1, 'url' => mv_voice_url((int)$l['id'], $i, $g), 'status' => mv_lesson_status($pdo, $l)]);
+}
+if ($action === 'mm_mv_voice_clear') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    $g = ($_POST['g'] ?? '') === 'en' ? 'en' : 'de';
+    if ($l && ($f = mv_voice_path((int)$l['id'], (int)($_POST['i'] ?? -1), $g))) @unlink($f);
     $mvJson(['ok' => 1]);
+}
+// Sprechtext oder Dauer einer Übung ändern, Art des Videos (Flow mit Voice-over / Bewegungsvideo 30–45 Sek.)
+if ($action === 'mm_mv_step') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    $i = (int)($_POST['i'] ?? -1);
+    $st = $l ? mv_lesson_steps($l) : [];
+    if (!isset($st[$i])) $mvJson(['error' => 'Fehlt.']);
+    $k = (string)($_POST['k'] ?? '');
+    if ($k === 'sec') $st[$i]['sec'] = max(20, min(900, (int)$_POST['v']));
+    elseif ($k === 'tde' || $k === 'ten') $st[$i][$k] = mb_substr(str_replace("\r", '', (string)$_POST['v']), 0, 6000);
+    else $mvJson(['error' => 'Fehlt.']);
+    mv_lesson_steps_save($pdo, (int)$l['id'], $st);
+    $mvJson(['ok' => 1]);
+}
+if ($action === 'mm_mv_mode') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    $m = ($_POST['mode'] ?? '') === 'move' ? 'move' : 'flow';
+    if (!$l) $mvJson(['error' => 'Fehlt.']);
+    $pdo->prepare('UPDATE mv_lessons SET mode = ? WHERE id = ?')->execute([$m, $l['id']]);
+    $l['mode'] = $m;
+    $mvJson(['ok' => 1, 'status' => mv_lesson_status($pdo, $l)]);
 }
 if ($action === 'mm_mv_due') {
     $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));

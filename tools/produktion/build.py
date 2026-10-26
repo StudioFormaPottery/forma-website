@@ -117,7 +117,144 @@ for i, k in enumerate(KEYS):
                 'text_de': 'Alle Übungen dieser Einheit zum Mitmachen, in deinem Tempo.', 'text_en': 'All exercises from this session to follow along, at your own pace.',
                 'de': move_script(u, "de", k), 'en': move_script(u, "en", k), 'ex': exl, 'due': d.isoformat(), 'unit': k})
 
-out = {'v': 2, 'ex': ex, 'due': {k: v.isoformat() for k, v in due.items()}, 'new': new,
+
+# --- Einheitliche Übungsnamen (Vivien, 26.10.2026): eine Übung = ein Clip in der Mediathek, überall wiederverwendet.
+# Gibt es keinen eindeutigen deutschen Namen, steht der gängige englische Name auch im Deutschen.
+CANON = {}
+def _c(de, en, *alts):
+    for a in (de,) + alts: CANON[a] = (de, en)
+_c('Verlängertes Ausatmen', 'Extended exhale', 'Verlängerte Ausatmung')
+_c('Ausschütteln (Shaking)', 'Shaking', 'Shaking', 'Shaking (Ausschütteln)', 'Schütteln')
+_c('Abklopfen (Body Tapping)', 'Body tapping', 'Body Tapping', 'Body Tapping (Abklopfen)', 'Abklopfen')
+_c('Katze-Kuh', 'Cat-Cow', 'Katze und Kuh', 'Katze-Kuh (Marjaryasana-Bitilasana)')
+_c('Herabschauender Hund (Adho Mukha Svanasana)', 'Downward-facing dog', 'Herabschauender Hund')
+_c('Kindhaltung (Balasana)', "Child's pose", 'Kindhaltung')
+_c('Endentspannung (Savasana)', 'Final relaxation (Savasana)', 'Savasana')
+_c('Drehung in Rückenlage (Supta Matsyendrasana)', 'Supine twist', 'Liegende Drehung', 'Drehung in Rückenlage')
+_c('Glute Bridge (Beckenheben)', 'Glute bridge', 'Glute Bridge', 'Schulterbrücke (Glute Bridge)')
+_c('Brücke (Setu Bandhasana)', 'Bridge pose', 'Schulterbrücke')
+_c('Wandsitz (Wall Sit)', 'Wall sit', 'Wall Sit', 'Wandsitz')
+_c('Göttin (Utkata Konasana)', 'Goddess pose', 'Göttin')
+_c('Happy Baby (Ananda Balasana)', 'Happy baby', 'Happy Baby', 'Glückliches Baby (Ananda Balasana)')
+_c('Hoher Ausfallschritt (Crescent Lunge)', 'Crescent lunge', 'High Lunge', 'High Lunge (hoher Ausfallschritt)')
+_c('Ausfallschritt rückwärts (Reverse Lunge)', 'Reverse lunge', 'Reverse Lunge', 'Ausfallschritt rückwärts')
+_c('Seitlicher Ausfallschritt (Side Lunge)', 'Side lunge', 'Side Lunge', 'Side Lunge (seitlicher Ausfallschritt)', 'Seitlicher Ausfallschritt')
+_c('Kniebeuge (Squat)', 'Squat', 'Kniebeuge', 'Kniebeugen')
+_c('Clamshell', 'Clamshell', 'Clamshell (Pilates)', 'Clamshell (Pilates) in Seitlage')
+_c('Seitliches Beinheben (Side Leg Lift)', 'Side-lying leg lift', 'Side Leg Lift (Pilates)', 'Seitliches Beinheben')
+_c('Eidechse (Lizard Pose)', 'Lizard pose', 'Eidechse (Utthan Pristhasana)')
+_c('Figur 4 in Rückenlage', 'Supine figure four', 'Liegende Taube (Figure Four)')
+_c('Seitlicher Winkel (Parsvakonasana)', 'Extended side angle', 'Extended Side Angle')
+_c('Sphinx (Salamba Bhujangasana)', 'Sphinx pose', 'Sphinx')
+_c('Roll Down im Stand', 'Standing roll down', 'Roll Down')
+_c('Dead Bug', 'Dead bug')
+_c('Bird Dog', 'Bird dog', 'Bird Dog (Vierfüßlerstand mit Arm und Bein)')
+_c('Box Breathing', 'Box breathing')
+_c('Thread the Needle', 'Thread the needle', 'Thread the Needle (Faden durchs Nadelöhr)')
+_c('Floor Flow', 'Floor flow', 'Floor Flow (Bodenfluss)')
+_c('Füße erden', 'Grounding the feet', 'Füße spüren im Stand')
+_c('Hände auf Herz und Bauch', 'Hands on heart and belly', 'Atembeobachtung, Hände auf Herz und Bauch')
+_c('Doppeltes Einatmen mit langer Ausatmung', 'Double inhale, long exhale', 'Physiologischer Seufzer (doppeltes Einatmen)')
+_c('Becken-Achter im Stand', 'Standing pelvic figure eights', 'Hüftachten im Stand')
+_c('Hip Hinge im Stand', 'Standing hip hinge', 'Hip Hinge (Good Morning)')
+_c('Beckenkippen (Pelvic Tilts)', 'Pelvic tilts', 'Becken kippen in Rückenlage')
+_c('Kopf rollen in Rückenlage', 'Head rolls lying down', 'Kopf rollen im Liegen')
+_c('Seitliches Zusammenziehen in Rückenlage (Somatics)', 'Lateral contraction lying down', 'Seitliches Zusammenziehen in Rückenlage', 'Somatische Seitbeuge im Liegen (Hanna Somatics)')
+_c('Swimming (Pilates) in Bauchlage', 'Swimming (Pilates)')
+_c('Knie pendeln (Scheibenwischer)', 'Windshield wipers', 'Knie pendeln', 'Scheibenwischer')
+_c('Beine an der Wand (Viparita Karani)', 'Legs up the wall', 'Beine an die Wand')
+_c('Selbstumarmung (Butterfly Hug)', 'Self-hug (butterfly hug)', 'Selbstumarmung')
+_c('Baum (Vrksasana)', 'Tree pose')
+_c('Brustdehnung im Türrahmen', 'Doorway chest stretch', 'Brustdehnung')
+_c('Rudern mit Band', 'Band row')
+_c('Seitstütz auf dem Knie', 'Kneeling side plank', 'Seitstütz auf den Knien')
+_c('Langsames Krabbeln (Bear Crawl)', 'Slow bear crawl', 'Langsamer Bear Crawl', 'Langsames Krabbeln')
+_c('Bear Plank', 'Bear plank', 'Bear Hold', 'Bear Plank (schwebende Knie)')
+_c('Reach Flow (Arme in alle Richtungen)', 'Reach flow', 'Arm Sweeps in alle Richtungen')
+_c('Wirbelsäulenwelle im Stand (Body Roll)', 'Standing spinal wave', 'Wirbelsäulenwelle im Stand', 'Body Roll')
+_c('Ankommen im Liegen', 'Arriving lying down', 'im Bett oder auf der Matte')
+_c('Unterarmstütz (Forearm Plank)', 'Forearm plank')
+_c('Dreieck (Trikonasana)', 'Triangle pose')
+_c('Krieger 2 (Virabhadrasana II)', 'Warrior II')
+_c('Tiefer Ausfallschritt (Anjaneyasana)', 'Low lunge')
+def canon(de, en):
+    return CANON.get(de, (de, en))
+
+# --- Schritte je Video (Vivien, 26.10.2026): Übung, Sprechtext DE/EN pro Übung, Sekunden ------------------
+# Flow: Clip läuft in Schleife, Timer (Standard 2 Min. bzw. „N Min.“ aus dem Skript), Voice-over pro Übung.
+# Bewegungsvideo: gleiche Übungen, Timer 30/45 Sek., ohne Sprechen. Form: [[de, en, text_de, text_en, sekunden], …]
+import re
+TIME = re.compile(r'^\d{1,2}:\d{2}$')
+def sections(text):
+    out, cur = [], None
+    for line in (text or '').split('\n'):
+        m = re.match(r'^\[(.+)\]\s*$', line.strip())
+        if m and ('·' in m.group(1) or re.match(r'^\d+:\d\d', m.group(1)) or m.group(1).strip().isupper()):
+            h = m.group(1).strip()
+            if h.startswith(('Bewegungsvideo', 'Movement video', 'Talking Head', 'Talking head')): continue
+            cur = [h, []]; out.append(cur)
+        elif cur is not None:
+            cur[1].append(line)
+    return [(h, '\n'.join(t).strip()) for h, t in out]
+def hname(h):
+    parts = [x.strip() for x in h.split('·') if x.strip()]
+    parts = [x for x in parts if not TIME.match(x)]
+    real = [x for x in parts if not (x.isupper() and len(x) > 2) and not re.match(r'^(ca\.\s*)?\d', x)]
+    return real[0] if real else None
+def secs_of(h):
+    m = re.search(r'(\d+)(?:\s*[–-]\s*(\d+))?\s*Min', h)
+    return max(60, min(900, int(m.group(2) or m.group(1)) * 60)) if m else 120
+def merged(secs):
+    res, pending = [], ''
+    for h, t in secs:
+        n = hname(h)
+        if n is None:
+            if res and re.search(r'ABSCHLUSS|CLOSING|AUSKLANG', h.upper()):
+                res[-1][2] = (res[-1][2] + '\n\n' + t).strip()
+            else:
+                pending = (pending + '\n\n' + t).strip()
+            continue
+        res.append([n, h, ((pending + '\n\n') if pending else '') + t]); pending = ''
+    if pending and res: res[-1][2] += '\n\n' + pending
+    return res
+def steps_for(de_text, en_text, exlist):
+    md, me = merged(sections(de_text)), merged(sections(en_text))
+    if len(me) != len(md): me = None
+    out = []
+    for i, (n, h, t) in enumerate(md):
+        if len(md) == len(exlist): de_n, en_n = exlist[i][0], exlist[i][1]
+        else: de_n, en_n = n, (me[i][0] if me else n)
+        de_n, en_n = canon(de_n, en_n)
+        out.append([de_n, en_n, t, me[i][2] if me else '', secs_of(h)])
+    return out
+
+lscripts = json.load(open(os.path.join(ROOT, 'api', 'seed', 'lesson-scripts.json')))
+steps = {}
+for title, sc in lscripts.items():
+    if title in ('Willkommen in der Method',): continue
+    st = steps_for(sc.get('de', ''), sc.get('en', ''), ex.get(title, []))
+    if st: steps[title] = st
+for n in new:
+    if n['cat'] == 'talk': continue
+    if n['ukey'].startswith('natal:'):
+        k = n['unit']; u = units[k]; e = en[k]
+        st = []
+        for j, x in enumerate(u['ex']):
+            ex_en = e['ex'][j]
+            tde = x[2] + (('\n[' + x[3] + ']') if len(x) > 3 and x[3] else '')
+            ten = ex_en[2] + (('\n[' + ex_en[3] + ']') if len(ex_en) > 3 and ex_en[3] else '')
+            sec = 120 if not re.search(r'Min', x[1]) else secs_of(x[1])
+            st.append([*canon(x[0], ex_en[0]), tde, ten, sec])
+        st.append([*canon(u['breath'][0], e['breath'][0]), u['breath'][1], e['breath'][1], 120])
+        intro_de = f'Schön, dass du da bist. Wir gehen gemeinsam durch die Übungen aus unserer Einheit „{u["title"]}“, in deinem eigenen Tempo. Wenn sich etwas nicht gut anfühlt, machst du eine Pause oder lässt die Übung einfach weg.'
+        intro_en = f'Lovely to have you here. We move together through the exercises from our session "{e["title"]}", at your own pace. If anything does not feel good, take a break or simply leave that exercise out.'
+        st[0][2] = intro_de + '\n\n' + st[0][2]; st[0][3] = intro_en + '\n\n' + st[0][3]
+        st[-1][2] += '\n\n' + u['close']; st[-1][3] += '\n\n' + e['close']
+        n['steps'] = st; n['mode'] = 'move'; n['ex'] = [[a, b] for a, b, *_ in st]
+    else:
+        n['steps'] = steps_for(n['de'], n['en'], n['ex'])
+
+out = {'v': 3, 'steps': steps, 'ex': ex, 'due': {k: v.isoformat() for k, v in due.items()}, 'new': new,
        'natal_programs': {'prae': ['Pränatal · Videos', 'Prenatal · Videos'], 'post': ['Postnatal · Videos', 'Postnatal · Videos']}}
 path = os.path.join(ROOT, 'api', 'seed', 'produktion.json')
 json.dump(out, open(path, 'w'), ensure_ascii=False, indent=1)

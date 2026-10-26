@@ -74,7 +74,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             $today = (new DateTimeImmutable('now', new DateTimeZone('Europe/Vienna')))->format('Y-m-d');
             $q = $pdo->prepare('SELECT COUNT(*) FROM mv_progress WHERE member_id = ? AND lesson_id = ? AND substr(done_at,1,10) = ?');
             $q->execute([$mid, $lid, $today]);
-            if (!$q->fetchColumn() && mv_lesson($pdo, $lid)) $pdo->prepare('INSERT INTO mv_progress (member_id, lesson_id, done_at) VALUES (?,?,?)')->execute([$mid, $lid, (new DateTimeImmutable('now', new DateTimeZone('Europe/Vienna')))->format('c')]);
+            $okL = mv_lesson($pdo, $lid);
+            if ($okL) { $pg = mv_program($pdo, (int)$okL['program_id']); if ($pg && $pg['audience'] === 'method') { $ac = mv_access($pdo, (string)$me['email']); $st = $ac['method'] ? (mv_method_path($pdo, $ac, mv_done_first($pdo, $mid))['state'][$lid] ?? null) : null; if (!$st || !$st['open']) $okL = null; } }
+            if (!$q->fetchColumn() && $okL) $pdo->prepare('INSERT INTO mv_progress (member_id, lesson_id, done_at) VALUES (?,?,?)')->execute([$mid, $lid, (new DateTimeImmutable('now', new DateTimeZone('Europe/Vienna')))->format('c')]);
             if ($ajax) { header('Content-Type: application/json'); echo json_encode(['week' => mv_week_days($pdo, $mid)]); exit; }
             $go('?l=' . $lid . '&ok=1');
         }
@@ -126,7 +128,7 @@ function mv_head(string $title, string $lang): void
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Movecia">
 <link rel="stylesheet" href="/wildhearts/assets/mv.css?v=1">
-<link rel="stylesheet" href="/wildhearts/mitglieder/app.css?v=1">
+<link rel="stylesheet" href="/wildhearts/mitglieder/app.css?v=2">
 </head>
 <?php
 }
@@ -243,11 +245,12 @@ if ($demo) {
     if ($lang === '') $lang = 'de';
     $me = ['id' => 0, 'name' => 'Anna Beispiel', 'email' => 'anna@example.com', 'lang' => $lang];
     $acc = ['method' => !isset($_GET['nurunfold']), 'ulock' => false, 'starter' => isset($_GET['starter']), 'unfold' => isset($_GET['unfold']) || isset($_GET['nurunfold']) ? ['call_lang' => 'de', 'plan' => 'u1'] : null, 'until' => strtotime('+1 month'), 'sub' => ['plan' => 'm1', 'period_end' => strtotime('+20 days'), 'bill_start' => 0, 'cancel_end' => 0, 'amount_cents' => 2900, 'kind' => 'method'], 'subs' => []];
-    $done = []; $favs = []; $week = 3;
+    $done = []; $favs = []; $week = 3; $doneFirst = [];
     if (isset($_GET['warte'])) { $ps = ['kind' => 'unfold', 'paid_at' => date('c'), 'bill_start' => 0]; $acc = ['method' => false, 'starter' => false, 'unfold' => null, 'until' => 0, 'sub' => null, 'subs' => [], 'pending' => [$ps], 'open_at' => mv_open_at($ps)]; }
 } else {
     $acc = mv_access($pdo, (string)$me['email']);
     $done = mv_done_ids($pdo, (int)$me['id']);
+    $doneFirst = mv_done_first($pdo, (int)$me['id']);
     $favs = mv_fav_ids($pdo, (int)$me['id']);
     $week = mv_week_days($pdo, (int)$me['id']);
 }
@@ -273,19 +276,34 @@ if ($isTest && $acc['unfold'] && $today < $c['u_start']) $today = date('Y-m-d', 
 $progs = [];
 $all = [];
 $mNext = null;
+$path = null;
 if ($acc['method']) {
-    // Monat für Monat ab ihrem Starttag (Vivien, 25.10.2026): Ankommen + Monat 1 bis n, neuester zuerst
-    if ($demo && !isset($acc['month'])) $acc['month'] = ['n' => 2, 'next_at' => strtotime('+12 days'), 'start' => strtotime('-48 days')];
-    $mv = mv_method_view($pdo, $acc);
-    foreach ($mv['open'] as $x) {
+    // Programm Schritt für Schritt (Vivien, 26.10.2026): alle starten bei Ankommen, Video 1. Das nächste Video öffnet
+    // erst, wenn das vorige ganz durchgelaufen ist, höchstens eines pro Tag, ein neuer Monat frühestens am Monatstag.
+    if ($demo && !isset($acc['month'])) $acc['month'] = ['n' => 2, 'next_at' => strtotime('+12 days'), 'start' => strtotime('-48 days'), 'off' => 0];
+    if ($demo) {
+        // Beispiel: Ankommen erledigt, in Monat 1 die ersten zwei Videos, das dritte ist heute dran
+        $k = 0; $mmD = mv_method_months($pdo);
+        foreach ($mmD['welcome'] as $p) foreach (mv_lessons($pdo, (int)$p['id'], true) as $l) $doneFirst[(int)$l['id']] = date('Y-m-d', strtotime('-' . (20 - $k++) . ' days'));
+        foreach (array_slice($mmD['months'], 0, 1) as $p) foreach (array_slice(mv_lessons($pdo, (int)$p['id'], true), 0, 2) as $l) $doneFirst[(int)$l['id']] = date('Y-m-d', strtotime('-' . (8 - $k++) . ' days'));
+        $done = array_keys($doneFirst);
+    }
+    $path = mv_method_path($pdo, $acc, $doneFirst);
+    $mmAll = mv_method_months($pdo);
+    $reach = max(1, (int)$path['month']);
+    $list = [];
+    foreach (array_slice($mmAll['months'], 0, $reach) as $i => $p) $list[] = ['p' => $p, 'n' => $i + 1];
+    $list = array_reverse($list);
+    foreach ($mmAll['welcome'] as $p) $list[] = ['p' => $p, 'n' => 0];
+    foreach ($list as $x) {
         $p = $x['p'] + ['_n' => $x['n']];
         $lock = $acc['starter'] && $p['theme'] !== 'ankommen';
         $ls = mv_lessons($pdo, (int)$p['id'], true);
-        foreach ($ls as &$l) $l['unlock'] = ''; unset($l); // Method: Lektionen gehen mit ihrem Monat auf
+        foreach ($ls as &$l) $l['unlock'] = ''; unset($l); // Method: Lektionen gehen Schritt für Schritt auf
         $progs[] = ['p' => $p, 'lessons' => $ls, 'lock' => $lock, 'files' => mv_files($pdo, (int)$p['id'])];
-        foreach ($ls as $l) $all[(int)$l['id']] = ['l' => $l, 'p' => $p, 'lock' => $lock];
+        foreach ($ls as $l) $all[(int)$l['id']] = ['l' => $l, 'p' => $p, 'lock' => $lock || !($path['state'][(int)$l['id']]['open'] ?? false)];
     }
-    $mNext = $mv['next'];
+    if (isset($mmAll['months'][$reach])) $mNext = ['p' => $mmAll['months'][$reach], 'n' => $reach + 1, 'at' => mv_month_at((int)$acc['month']['start'], $reach - (int)($acc['month']['off'] ?? 0))];
 }
 $uProgs = [];
 if ($acc['unfold']) {
@@ -304,9 +322,15 @@ $lesson = null;
 if (isset($_GET['l']) && isset($all[(int)$_GET['l']])) $lesson = $all[(int)$_GET['l']];
 
 $fmtMin = fn(int $m) => $m > 0 ? $m . ' Min.' : '';
-$card = function (array $l, array $p, bool $lock) use ($lang, $done, $favs, $q, $h, $L, $today): string {
+$card = function (array $l, array $p, bool $lock) use ($lang, $done, $favs, $q, $h, $L, $today, $path): string {
     $future = $l['unlock'] !== '' && $l['unlock'] > $today;
     $lockLabel = $future ? $L('ab ', 'from ') . mv_date(strtotime($l['unlock'] . ' 12:00'), $lang) : $L('ab Tag 15', 'from day 15');
+    $ps = $p['audience'] === 'method' && $path ? ($path['state'][(int)$l['id']] ?? null) : null;
+    $isCur = $ps && $path['current'] === (int)$l['id'];
+    if ($ps && !$ps['open'] && !$lock) {
+        $lock = true;
+        $lockLabel = match ($ps['why']) { 'tomorrow' => $L('ab morgen', 'tomorrow'), 'date' => $L('ab ', 'from ') . mv_date((int)$ps['at'], $lang), 'starter' => $L('ab Tag 15', 'from day 15'), default => $L('Schritt für Schritt', 'step by step') };
+    }
     $lock = $lock || $future;
     $vid = mv_video_for($l, $lang);
     $th = mv_thumb($vid);
@@ -315,9 +339,9 @@ $card = function (array $l, array $p, bool $lock) use ($lang, $done, $favs, $q, 
     $isDone = in_array((int)$l['id'], $done, true);
     $min = (int)$l['minutes'];
     $bucket = $min === 0 ? '' : ($min <= 7 ? 's' : ($min <= 20 ? 'm' : 'l'));
-    return '<a class="lc c-' . $h($l['cat']) . ($lock ? ' locked' : '') . '" href="' . ($lock ? '#' : '?l=' . (int)$l['id'] . $q) . '" data-cat="' . $h($l['cat']) . '" data-energy="' . $h($l['energy']) . '" data-len="' . $bucket . '" data-fav="' . (in_array((int)$l['id'], $favs, true) ? 1 : 0) . '">'
+    return '<a class="lc c-' . $h($l['cat']) . ($lock ? ' locked' : '') . ($isCur ? ' cur' : '') . '" href="' . ($lock ? '#' : '?l=' . (int)$l['id'] . $q) . '" data-cat="' . $h($l['cat']) . '" data-energy="' . $h($l['energy']) . '" data-len="' . $bucket . '" data-fav="' . (in_array((int)$l['id'], $favs, true) ? 1 : 0) . '">'
         . '<span class="th">' . ($th ? '<img src="' . $h($th) . '" alt="" loading="lazy">' : '<span class="ic">' . mv_icon($l['cat']) . '</span>')
-        . ($min ? '<span class="min">' . $min . ' Min.</span>' : '') . ($isDone ? '<span class="dn" title="' . $L('schon gemacht', 'done') . '">✓</span>' : '') . ($lock ? '<span class="lk">' . $h($lockLabel) . '</span>' : '') . (!$vid && !$lock ? '<span class="soon">' . $L('Video folgt', 'Video coming') . '</span>' : '') . '</span>'
+        . ($min ? '<span class="min">' . $min . ' Min.</span>' : '') . ($isDone ? '<span class="dn" title="' . $L('schon gemacht', 'done') . '">✓</span>' : '') . ($isCur ? '<span class="now">' . $L('Heute dran', 'Up today') . '</span>' : '') . ($lock ? '<span class="lk">' . $h($lockLabel) . '</span>' : '') . (!$vid && !$lock ? '<span class="soon">' . $L('Video folgt', 'Video coming') . '</span>' : '') . '</span>'
         . '<span class="tx"><span class="cat">' . $h($cat[$lang === 'en' ? 1 : 0]) . ($l['energy'] !== 'any' ? ' · ' . $h($en[$lang === 'en' ? 1 : 0]) : '') . '</span><b>' . $h(mv_t($l, 'title', $lang)) . '</b></span></a>';
 };
 
@@ -357,9 +381,9 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
     foreach ($sib as $i => $x) if ((int)$x['l']['id'] === (int)$l['id']) $next = $sib[$i + 1] ?? null; ?>
   <p class="back"><a href="?tab=<?= $p['audience'] === 'unfold' ? 'unfold' : 'bibliothek' ?><?= $q ?>">← <?= $h(mv_t($p, 'title', $lang)) ?></a></p>
   <section class="lesson">
-    <?php if ($flow): ?><div data-mv-flow="<?= $h(json_encode($flow, JSON_UNESCAPED_UNICODE)) ?>"></div><script src="/wildhearts/assets/flow-player.js?v=1" defer></script>
-    <?php else: ?><div class="player"><?php if ($lesson['lock']): ?><div class="ph"><p><?= $L('Dieses Video öffnet sich 14 Tage nach deiner Buchung.', 'This video opens 14 days after your booking.') ?></p></div>
-      <?php elseif ($vid && mv_bunny()['lib'] !== ''): ?><iframe src="<?= $h(mv_embed($vid)) ?>" loading="lazy" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen" allowfullscreen title="<?= $h(mv_t($l, 'title', $lang)) ?>"></iframe>
+    <?php if ($flow): ?><div data-mv-flow="<?= $h(json_encode($flow, JSON_UNESCAPED_UNICODE)) ?>" data-l="<?= (int)$l['id'] ?>"></div><script src="/wildhearts/assets/flow-player.js?v=2" defer></script>
+    <?php else: ?><div class="player"><?php if ($lesson['lock']): $ps = $path['state'][(int)$l['id']] ?? null; ?><div class="ph"><p><?= $ps && !$ps['open'] && $ps['why'] !== 'starter' ? ($ps['why'] === 'tomorrow' ? $L('Dieses Video öffnet sich morgen. Ein Schritt pro Tag reicht.', 'This video opens tomorrow. One step a day is enough.') : ($ps['why'] === 'date' ? $L('Dieser Monat öffnet sich am ', 'This month opens on ') . $h(mv_date((int)$ps['at'], $lang)) . '.' : $L('Dieses Video öffnet sich, sobald du das vorige ganz gemacht hast.', 'This video opens once you have done the previous one all the way through.'))) : $L('Dieses Video öffnet sich 14 Tage nach deiner Buchung.', 'This video opens 14 days after your booking.') ?></p></div>
+      <?php elseif ($vid && mv_bunny()['lib'] !== ''): ?><iframe data-guard="<?= (int)$l['id'] ?>" src="<?= $h(mv_embed($vid)) ?>" loading="lazy" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen" allowfullscreen title="<?= $h(mv_t($l, 'title', $lang)) ?>"></iframe>
       <?php else: ?><div class="ph"><span class="ic"><?= mv_icon($l['cat']) ?></span><p><?= $L('Dieses Video kommt bald. Schau gern bald wieder vorbei.', 'This video is coming soon. Come back soon.') ?></p></div><?php endif; ?></div><?php endif; ?>
     <div class="ltext">
       <p class="k"><?= $h((MV_CATS[$l['cat']] ?? MV_CATS['flow'])[$lang === 'en' ? 1 : 0]) ?><?= (int)$l['minutes'] ? ' · ' . (int)$l['minutes'] . ' Min.' : '' ?><?= $l['energy'] !== 'any' ? ' · ' . $h(MV_ENERGY[$l['energy']][$lang === 'en' ? 1 : 0]) : '' ?></p>
@@ -368,11 +392,11 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
       <?php if ($flow): ?><?php elseif ($lang === 'en' && $l['video_en'] === '' && $l['video_de'] !== ''): ?><p class="mut small">This video is in German for now, the English version is coming.</p><?php elseif ($lang === 'de' && $l['video_de'] === '' && $l['video_en'] !== ''): ?><p class="mut small">Dieses Video gibt es gerade nur auf Englisch, die deutsche Fassung kommt.</p><?php endif; ?>
       <?php if (!$lesson['lock']): ?>
       <div class="acts">
-        <form method="post" data-ajax="done"><input type="hidden" name="a" value="done"><input type="hidden" name="l" value="<?= (int)$l['id'] ?>"><button class="btn" type="submit" <?= $demo ? 'disabled' : '' ?>><?= isset($_GET['ok']) ? $L('Schön, du warst bei dir ✓', 'Lovely, you showed up ✓') : $L('Ich war heute bei mir ✓', 'I showed up today ✓') ?></button></form>
+        <p class="autodone mut small" data-autodone><?= in_array((int)$l['id'], $done, true) ? '✓ ' . $L('Schon gemacht. Du kannst es so oft wiederholen, wie du magst.', 'Done. You can repeat it as often as you like.') : $L('Wird von selbst abgehakt, wenn du bis zum Ende dabei warst.', 'Ticked off by itself once you have stayed until the end.') ?></p>
         <form method="post" data-ajax="fav"><input type="hidden" name="a" value="fav"><input type="hidden" name="l" value="<?= (int)$l['id'] ?>"><button class="btn line fav" type="submit" aria-pressed="<?= $isFav ? 'true' : 'false' ?>" <?= $demo ? 'disabled' : '' ?>>♡ <span><?= $isFav ? $L('Gemerkt', 'Saved') : $L('Merken', 'Save') ?></span></button></form>
       </div>
       <?php endif; ?>
-      <?php if ($next): ?><a class="nextl" href="?l=<?= (int)$next['l']['id'] . $q ?>"><span class="mut small"><?= $L('Als Nächstes', 'Up next') ?></span><b><?= $h(mv_t($next['l'], 'title', $lang)) ?></b></a><?php endif; ?>
+      <?php if ($next && !$next['lock']): ?><a class="nextl" href="?l=<?= (int)$next['l']['id'] . $q ?>"><span class="mut small"><?= $L('Als Nächstes', 'Up next') ?></span><b><?= $h(mv_t($next['l'], 'title', $lang)) ?></b></a><?php endif; ?>
     </div>
   </section>
 
@@ -466,7 +490,8 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
       <p class="mut small"><?= $L('Kein Streak, kein Druck. Jeder Tag, an dem du dir Zeit schenkst, zählt.', 'No streaks, no pressure. Every day you give yourself time counts.') ?></p>
     </div>
     <?php if ($prelaunch): ?><div class="soon card"><p class="k"><?= $L('Bald', 'Soon') ?></p><h3><?= $L('Die Method öffnet am', 'The Method opens on') ?> <?= $h(mv_date($launch, $lang)) ?></h3><p class="mut small"><?= $L('Bis dahin kannst du mit dem Ankommen-Modul beginnen.', 'Until then you can begin with the welcome module.') ?></p><p class="count" data-t="<?= $launch ?>"></p></div>
-    <?php elseif ($cur): ?><a class="soon card cur" href="#p<?= (int)$cur['p']['id'] ?>"><p class="k"><?= $L('Dein Monat ', 'Your month ') . (int)$cur['p']['_n'] ?></p><h3><?= $h(mv_t($cur['p'], 'title', $lang)) ?></h3><p class="mut small"><?= $h(mb_strimwidth(mv_t($cur['p'], 'intro', $lang), 0, 150, '…')) ?></p></a><?php endif; ?>
+    <?php elseif ($path && $path['current'] && isset($all[$path['current']])): $cl = $all[$path['current']]; ?><a class="soon card cur" href="?l=<?= (int)$path['current'] . $q ?>"><p class="k"><?= $L('Heute dran', 'Up today') ?> · <?= (int)$cl['p']['_n'] ? $L('Monat ', 'Month ') . (int)$cl['p']['_n'] : $L('Ankommen', 'Welcome') ?></p><h3><?= $h(mv_t($cl['l'], 'title', $lang)) ?></h3><p class="mut small"><?= $L('Schritt für Schritt: Wenn du dieses Video ganz gemacht hast, öffnet sich morgen das nächste.', 'Step by step: once you have done this video all the way through, the next one opens tomorrow.') ?></p><span class="btn sm">▶ <?= $L('Jetzt starten', 'Start now') ?></span></a>
+    <?php elseif ($path): $nx = null; foreach ($path['order'] as $oid) if (!($path['state'][$oid]['open'] ?? false)) { $nx = $path['state'][$oid]; break; } ?><div class="soon card cur"><p class="k"><?= $L('Für heute', 'For today') ?></p><h3><?= $L('Du warst heute bei dir ♡', 'You showed up today ♡') ?></h3><p class="mut small"><?= $nx && $nx['why'] === 'tomorrow' ? $L('Dein nächstes Video öffnet sich morgen. Bis dahin darf sich alles setzen.', 'Your next video opens tomorrow. Until then, let it all settle.') : ($nx && $nx['why'] === 'date' ? $L('Dein nächster Monat öffnet sich am ', 'Your next month opens on ') . $h(mv_date((int)$nx['at'], $lang)) . '.' : $L('Du kannst jedes Video, das du schon gemacht hast, so oft wiederholen, wie du magst.', 'You can repeat every video you have done as often as you like.')) ?></p></div><?php endif; ?>
   </section>
   <?php if ($acc['starter']): ?><p class="note"><?= $L('Du bist in den ersten 14 Tagen nach deiner Buchung und hast dein Rücktrittsrecht behalten. Bis dahin ist das Ankommen-Modul für dich offen, danach öffnet sich dein Monat 1 von selbst.', 'You are in the first 14 days after your booking and kept your right of withdrawal. Until then the welcome module is open for you, after that your month 1 opens by itself.') ?></p><?php endif; ?>
 
@@ -489,7 +514,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
   <?php endforeach; ?>
   <?php if ($mNext): ?>
   <section class="prog nextm">
-    <div class="phead"><div><p class="k"><?= $L('Monat ', 'Month ') . (int)$mNext['n'] . ' · ' . $L('öffnet sich am ', 'opens on ') . $h(mv_date((int)$mNext['at'], $lang)) ?></p><h2 class="h3">🔒 <?= $h(mv_t($mNext['p'], 'title', $lang)) ?></h2><p class="mut pintro"><?= $L('Dein nächster Monat kommt von selbst, an deinem Starttag. Bis dahin ist alles, was du brauchst, schon hier.', 'Your next month arrives by itself, on your start day. Until then, everything you need is already here.') ?></p></div></div>
+    <div class="phead"><div><p class="k"><?= $L('Monat ', 'Month ') . (int)$mNext['n'] . ' · ' . $L('frühestens am ', 'from ') . $h(mv_date((int)$mNext['at'], $lang)) ?></p><h2 class="h3">🔒 <?= $h(mv_t($mNext['p'], 'title', $lang)) ?></h2><p class="mut pintro"><?= $L('Dein nächster Monat öffnet sich, wenn du alle Videos von diesem Monat gemacht hast, frühestens an deinem Monatstag. So bleibst du Schritt für Schritt dran.', 'Your next month opens once you have done every video of this month, at the earliest on your monthly date. That way you keep going step by step.') ?></p></div></div>
   </section>
   <?php endif; ?>
 <?php endif; ?>
@@ -520,6 +545,21 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
   // Countdown bis zum Start
   var c=document.querySelector('.count');if(c){var t=+c.dataset.t*1000;var tick=function(){var s=Math.max(0,Math.floor((t-Date.now())/1000)),d=Math.floor(s/86400),h=Math.floor(s%86400/3600);c.textContent=(document.documentElement.dataset.l==='en'?d+' days · '+h+' hours':'noch '+d+' Tage · '+h+' Std.');};tick();setInterval(tick,60000);}
   document.querySelectorAll('.lc.locked').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault()})});
+  // Erledigt wird nur, wer bis zum Ende dabei war (Vivien, 26.10.2026): Player-Ende oder Video bis zum Schluss
+  var en=document.documentElement.dataset.l==='en',sent=false;
+  function markDone(lid){if(sent||!lid)return;sent=true;var d=new FormData();d.append('a','done');d.append('l',lid);d.append('ajax','1');
+    fetch(location.pathname,{method:'POST',body:d,credentials:'same-origin'}).then(function(){var p=document.querySelector('[data-autodone]');if(p)p.textContent=en?'✓ Lovely, you showed up for yourself. The next step opens tomorrow.':'✓ Schön, du warst bei dir. Der nächste Schritt öffnet sich morgen.';}).catch(function(){sent=false});}
+  var fl=document.querySelector('[data-mv-flow]');if(fl)fl.addEventListener('mvflow:done',function(){markDone(fl.dataset.l)});
+  var gv=document.querySelector('iframe[data-guard]');
+  if(gv){var s=document.createElement('script');s.src='https://assets.mediadelivery.net/playerjs/player-0.1.0.min.js';s.onload=function(){try{
+      var pl=new playerjs.Player(gv),max=0,dur=0;
+      pl.on('ready',function(){pl.getDuration(function(d){dur=d||0});
+        pl.on('timeupdate',function(t){var c=t.seconds||0;dur=t.duration||dur;
+          if(c>max+3){pl.setCurrentTime(max);return}   // kein Vorspulen
+          if(c>max)max=c;
+          if(dur&&max>=dur-2)markDone(gv.dataset.guard);});
+        pl.on('ended',function(){if(dur&&max>=dur*0.9)markDone(gv.dataset.guard)});});
+    }catch(e){}};document.head.appendChild(s);}
 })();
 </script>
 </body>

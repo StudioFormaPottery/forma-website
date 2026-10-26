@@ -11,12 +11,12 @@ function mm_subnav(string $active): void
     global $pdo;
     $self = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?');
     $req = 0; try { $req = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {}
-    $tabs = [['movecia', '?view=movecia', 'Übersicht'], ['videos', '?view=videos', '🎬 Videos hochladen'], ['method', '?view=method', 'Method &amp; Unfold'], ['natal', '?view=natal', 'Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', 'Live-Texte'], ['presse', '?view=presse', 'Presse'], ['einst', '?view=movecia#einstellungen', 'Einstellungen']]; ?>
+    $tabs = [['movecia', '?view=movecia', 'Übersicht'], ['videos', '?view=videos', '🎬 Videos hochladen'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['method', '?view=method', 'Method &amp; Unfold'], ['natal', '?view=natal', 'Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', 'Live-Texte'], ['presse', '?view=presse', 'Presse'], ['einst', '?view=movecia#einstellungen', 'Einstellungen']]; ?>
 <style>
 .mvsub{position:sticky;top:0;z-index:40;margin:-8px -16px 16px;padding:10px 16px;background:rgba(242,236,228,.96);border-bottom:1px solid #DDD2C6;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .mvsub::-webkit-scrollbar{display:none}
 .mvsub a{flex:0 0 auto;padding:10px 16px;border-radius:999px;border:1px solid #DDD2C6;background:#FBF8F4;color:#6B5658;text-decoration:none;font-size:17px;white-space:nowrap}
-<?= $active !== 'videos' ? 'main{zoom:1.12}' : '' ?>
+<?= !in_array($active, ['videos', 'mediathek'], true) ? 'main{zoom:1.12}' : '' ?>
 .mvsub a.on{background:#7D5E68;border-color:#7D5E68;color:#FBF5F7}
 .mvsub a.fo{background:transparent;border-color:transparent;color:#8C2C1D;padding-left:4px}
 .mvsub i{font-style:normal;display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:999px;background:#B5544A;color:#fff;font-size:12px;text-align:center}
@@ -35,6 +35,7 @@ require __DIR__ . '/texte.inc.php';
 require __DIR__ . '/presse.inc.php';
 // Videos hochladen (?view=videos)
 require __DIR__ . '/videos.inc.php';
+require __DIR__ . '/mediathek.inc.php';
 // Als Teilnehmerin ansehen (?view=vorschau)
 require __DIR__ . '/vorschau.inc.php';
 
@@ -202,7 +203,7 @@ if ($action === 'mm_save_mail') {
     $pw = (string)($_POST['mail_password'] ?? '');
     if ($pw === '') go($mmBack . '#einstellungen', 'Bitte gib das Passwort des Postfachs hello@moveciamovement.com ein.');
     try {
-        mm_smtp($pw, MM_FROM_EMAIL, 'Test: Mails vom Wild Hearts Collective', 'text/plain; charset=UTF-8', "Hallo Viv,\n\ndas Postfach hello@moveciamovement.com ist mit deiner Verwaltung verbunden. Gathering-Mails gehen ab jetzt von hier raus.\n", mb_encode_mimeheader(MM_FROM_NAME, 'UTF-8') . ' <' . MM_FROM_EMAIL . '>');
+        mm_smtp($pw, MM_FROM_EMAIL, 'Test: Mails von Movecia', 'text/plain; charset=UTF-8', "Hallo Viv,\n\ndas Postfach hello@moveciamovement.com ist mit deiner Verwaltung verbunden. Gathering-Mails gehen ab jetzt von hier raus.\n", mb_encode_mimeheader(MM_FROM_NAME, 'UTF-8') . ' <' . MM_FROM_EMAIL . '>');
     } catch (Throwable $e) {
         go($mmBack . '#einstellungen', 'Die Anmeldung beim Postfach hat nicht geklappt. Bitte prüfe das Passwort von hello@moveciamovement.com und versuch es noch einmal.');
     }
@@ -213,7 +214,7 @@ if ($action === 'mm_save_mail') {
 if ($action === 'mm_test_mail') {
     $to = strtolower(trim((string)($_POST['to'] ?? '')));
     if (!filter_var($to, FILTER_VALIDATE_EMAIL)) go($mmBack . '#mails', 'Bitte gib eine gültige E-Mail-Adresse ein.');
-    $ok = mm_mail($to, 'Test from the Wild Hearts Collective 🌙', "Hey Viv,\n\nthis is a test. If you can read this, emails from hello@moveciamovement.com arrive.\n", mm_mail_html('Test', '<p style="margin:0;">Hey Viv,</p><p>this is a test. If you can read this, emails from hello@moveciamovement.com arrive. 🤍</p>'));
+    $ok = mm_mail($to, 'Test from Movecia 🌙', "Hey Viv,\n\nthis is a test. If you can read this, emails from hello@moveciamovement.com arrive.\n", mm_mail_html('Test', '<p style="margin:0;">Hey Viv,</p><p>this is a test. If you can read this, emails from hello@moveciamovement.com arrive. 🤍</p>'));
     go($mmBack . '#mails', $ok ? 'Die Test-Mail ist raus an ' . $to . '. Schau auch im Spam nach. Unten siehst du, auf welchem Weg sie verschickt wurde.' : 'Die Test-Mail konnte nicht verschickt werden. Unten steht der Grund.');
 }
 
@@ -305,13 +306,14 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         <div class="qa">
             <form method="post" target="_blank"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_testroom"><button class="main" type="submit"><span class="ic">🎥</span><b>Video &amp; Technik testen</b><span>Kamera, Mikro, Teleprompter, Aufnahme – danach direkt in deinen Testraum</span></button></form>
             <?php if ($next): ?><a href="<?= forma_h($GLOBALS['mmHostLink']((int)$next['id'])) ?>" target="_blank" rel="noopener"><span class="ic">✨</span><b>Nächstes Gathering öffnen</b><span>Als Gastgeberin: <?= forma_h($next['title']) ?></span></a><?php else: ?><a href="#neu"><span class="ic">✨</span><b>Gathering anlegen</b><span>Noch keines geplant</span></a><?php endif; ?>
-            <a class="main" href="<?= forma_h($self) ?>?view=videos"><span class="ic">🎬</span><b>Videos hochladen</b><span>Clips und Videos für Method, Unfold und Prä-/Postnatal – mit Zeitplan</span></a>
+            <a class="main" href="<?= forma_h($self) ?>?view=videos"><span class="ic">🎬</span><b>Videos hochladen</b><span>Clips filmen, Voice-over einsprechen, Talking Heads – mit Zeitplan</span></a>
+            <a class="main" href="<?= forma_h($self) ?>?view=mediathek"><span class="ic">📚</span><b>Mediathek</b><span>Jede Übung einmal gefilmt, nach Jahreszeit und Stil sortiert</span></a>
             <a href="<?= forma_h($self) ?>?view=vorschau"><span class="ic">👁</span><b>Als Teilnehmerin ansehen</b><span>Alle Seiten und Programme so, wie deine Teilnehmerinnen sie sehen</span></a>
             <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/?demo=prae" target="_blank" rel="noopener"><span class="ic">🌿</span><b>Mitgliederbereich ansehen</b><span>So sieht ihn eine Kundin mit Paket (Beispiel Pränatal, auch <u>post</u> unter Prä- &amp; Postnatal)</span></a>
             <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/" target="_blank" rel="noopener"><span class="ic">🔑</span><b>Login für Kundinnen</b><span>moveciamovement.com/natal/mitglied – diesen Link bekommen sie auch per Mail</span></a>
             <a href="<?= forma_h($self) ?>?view=method#test"><span class="ic">🧪</span><b>Als Testteilnehmerin einloggen</b><span>Method, Unfold oder beides – so sieht es eine Kundin (Prä-/Postnatal: unter Prä- &amp; Postnatal)</span></a>
             <a href="<?= forma_h($self) ?>?view=method"><span class="ic">🌱</span><b>Method &amp; Unfold</b><span>Programme, Lektionen, Mitglieder, Unfold-Plätze, Preise</span></a>
-            <a href="<?= forma_h($self) ?>?view=texte"><span class="ic">🎙️</span><b>Teleprompter-Texte</b><span>Alle Sprechtexte zum Einsprechen: Gatherings, Prä-/Postnatal, Unfold, Method</span></a>
+            <a href="<?= forma_h($self) ?>?view=texte"><span class="ic">🎙️</span><b>Live-Texte</b><span>Teleprompter für Gatherings und Prä-/Postnatal-Einheiten</span></a>
             <a href="<?= forma_h($self) ?>?view=method#bunny"><span class="ic">🎬</span><b>Bunny (Videos) <?= function_exists('mv_bunny_ok') && mv_bunny_ok() ? '✓' : 'verbinden' ?></b><span>Hier trägst du Library-ID, CDN Hostname, API Key und Token-Schlüssel ein</span></a>
         </div>
         <div class="mm-stats">
@@ -331,7 +333,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <a href="https://whereby.com/information/embedded/" target="_blank" rel="noopener">Whereby</a>
         </div>
 
-        <h2 id="liste">E-Mail-Liste Wild Hearts</h2>
+        <h2 id="liste">E-Mail-Liste</h2>
         <div class="card stack">
             <p class="small muted">Die Frauen melden sich auf moveciamovement.com an und bekommen eine Bestätigungsmail von hello@moveciamovement.com. Erst nach dem Klick sind sie auf der Liste, bekommen die Reset Routine und landen automatisch in MailerLite in der Gruppe „Wild Hearts“ (getrennt von der FORMA Post).<?= $ml && empty($ml['error']) ? ' MailerLite zählt dort gerade ' . (int)$ml['active'] . ' aktive Kontakte.' : '' ?></p>
             <?php if (!$subs): ?><p class="muted small">Noch niemand. Teste es einmal selbst mit deiner eigenen Adresse.</p><?php endif; ?>
@@ -353,7 +355,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <p class="small">Method und Unfold kannst du ebenfalls einblenden. Ihre Preise (auch die Gathering-Preise) stellst du unter <a href="<?= forma_h($self) ?>?view=method#preise">Method &amp; Unfold → Preise</a> ein.</p>
             <?php foreach ($offs as $k => $o): if (in_array($k, ['method', 'unfold'], true) || in_array($k, MM_OFFER_RETIRED, true)) continue; ?>
                 <div class="stack" style="border-top:1px solid var(--line);padding-top:12px">
-                    <label for="ot<?= $k ?>"><strong><?= ['circle' => 'Inner Circle', 'year' => 'Jahreskreis', 'retreat' => 'Alpine Retreat'][$k] ?></strong> · Titel</label>
+                    <label for="ot<?= $k ?>"><strong><?= $k === 'retreat' ? 'Alpine Retreat' : forma_h($k) ?></strong> · Titel</label>
                     <input id="ot<?= $k ?>" name="title[<?= $k ?>]" value="<?= forma_h($o['title']) ?>" maxlength="80">
                     <label for="ox<?= $k ?>">Kurzer Text</label>
                     <textarea id="ox<?= $k ?>" name="text[<?= $k ?>]" rows="3" maxlength="600"><?= forma_h($o['text']) ?></textarea>
@@ -363,45 +365,18 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                         <div class="stack"><label for="ob<?= $k ?>">Zahlung</label><select id="ob<?= $k ?>" name="billing[<?= $k ?>]"><option value="once"<?= $o['billing'] === 'once' ? ' selected' : '' ?>>einmalig</option><option value="monthly"<?= $o['billing'] === 'monthly' ? ' selected' : '' ?>>monatlich (Abo)</option></select></div>
                     </div>
                 </div>
-                <?php if ($k === 'circle'): ?>
-                    <div class="row">
-                        <div class="stack"><label for="cim">Gathering-Preis gilt für die ersten … Monate</label><input id="cim" name="intro_months" type="number" min="1" max="24" value="<?= (int)$o['intro_months'] ?>"></div>
-                        <div class="stack"><label for="crm">Pro eingeladener Freundin … Monate mehr</label><input id="crm" name="ref_months" type="number" min="1" max="24" value="<?= (int)$o['ref_months'] ?>"></div>
-                        <div class="stack"><label for="cmm">Höchstens … Monate insgesamt pro Frau</label><input id="cmm" name="max_months" type="number" min="1" max="24" value="<?= (int)$o['max_months'] ?>"></div>
-                    </div>
-                    <?php $pe = []; foreach ($o['periods'] as $pp) $pe[$pp[0]] = $pp[1]; $eu2 = fn($c) => $c ? forma_h(rtrim(rtrim(number_format($c / 100, 2, ',', ''), '0'), ',')) : ''; ?>
-                    <div class="row">
-                        <div class="stack"><label for="cp6">6 Monate im Voraus in €</label><input id="cp6" name="period[6]" inputmode="decimal" value="<?= $eu2($pe[6] ?? 0) ?>" placeholder="leer = aus"></div>
-                        <div class="stack"><label for="cp12">1 Jahr im Voraus in €</label><input id="cp12" name="period[12]" inputmode="decimal" value="<?= $eu2($pe[12] ?? 0) ?>" placeholder="leer = aus"></div>
-                    </div>
-                    <div class="row"><div class="stack"><label for="cst">Start der Mitgliedschaft (erste Abbuchung)</label><input id="cst" name="start" type="date" value="<?= forma_h($o['start']) ?>"></div></div>
-                    <p class="muted small">Bis zu diesem Tag können die Frauen schon buchen und ihre Karte hinterlegen, abgebucht wird erst am Starttag um 9 Uhr. Der Gathering-Preis gilt dann für die ersten Abbuchungen ab dem Start. Ein Datum in der Vergangenheit = sofort abbuchen.</p>
-                    <p class="muted small">Im Voraus zahlen: fester Preis, kein zusätzlicher Gathering-Rabatt, verlängert sich automatisch um denselben Zeitraum und ist jederzeit zum Ende des bezahlten Zeitraums kündbar.</p>
-                    <p class="muted small">Danach gilt der reguläre Preis. Zu Beginn des 3. Monats bekommt jede Frau automatisch eine Mail mit ihrem persönlichen Einladungslink (moveciamovement.com/circle/?ref=…). Die Freundin zahlt damit ihre ersten Monate den Gathering-Preis, die Einladende bekommt Monate dazu, bis zur Obergrenze. Die gilt auch für die Freundin: Ihre ersten Monate zählen mit.</p>
-                <?php endif; ?>
-                <?php if ($k === 'year'): $eu = fn($c) => $c ? forma_h(rtrim(rtrim(number_format($c / 100, 2, ',', ''), '0'), ',')) : ''; ?>
-                    <?php $pl = []; foreach ($o['plans'] as $pp) $pl[$pp[0]] = $pp; ?>
-                    <?php foreach ([3, 6] as $n): ?>
-                    <div class="row">
-                        <div class="stack"><label for="pr<?= $n ?>"><?= $n ?> Raten: Rate regulär in €</label><input id="pr<?= $n ?>" name="plan_reg[<?= $n ?>]" inputmode="decimal" value="<?= $eu($pl[$n][1] ?? 0) ?>" placeholder="leer = keine <?= $n ?> Raten"></div>
-                        <div class="stack"><label for="ps<?= $n ?>"><?= $n ?> Raten: Rate zum Gathering-Preis in €</label><input id="ps<?= $n ?>" name="plan_sp[<?= $n ?>]" inputmode="decimal" value="<?= $eu($pl[$n][2] ?? 0) ?>"></div>
-                    </div>
-                    <?php endforeach; ?>
-                    <p class="muted small">Die Frauen können dann auf einmal, in 3 oder in 6 Monatsraten zahlen. Stripe bucht monatlich ab und hört nach der letzten Rate von selbst auf. Ein leeres Feld schaltet diese Variante aus.</p>
-                <?php endif; ?>
             <?php endforeach; ?>
-            <p class="muted small">Inner Circle und Jahreskreis gibt es nicht mehr. Sie stehen nirgends mehr zur Auswahl, frühere Buchungen bleiben unten in der Liste.</p>
             <button class="btn" type="submit">Angebote speichern</button>
         </form>
         <?php try { $tp = mm_test_promo(); } catch (Throwable $e) { $tp = null; } if ($tp && (int)$tp['until'] > time()): ?>
         <div class="card stack" style="margin-top:12px">
             <p><strong>Gutscheincode für deine Testbuchung</strong></p>
             <p class="small"><span class="sel" style="font-size:20px;letter-spacing:.06em"><?= forma_h($tp['code']) ?></span> · 100 % · höchstens 3 Mal · bis <?= forma_h(date('d. m. Y', (int)$tp['until'])) ?><?= $tp['live'] ? '' : ' · Stripe-Testmodus' ?></p>
-            <p class="muted small">Im Stripe-Bezahlfenster bei „Gutscheincode hinzufügen“ eingeben, dann zahlst du € 0. Das Feld erscheint nur beim regulären Preis (z. B. moveciamovement.com/circle ohne Einladungslink). Test-Abo danach in Stripe kündigen. Bitte nicht weitergeben.</p>
+            <p class="muted small">Im Stripe-Bezahlfenster bei „Gutscheincode hinzufügen“ eingeben, dann zahlst du € 0. Das Feld erscheint nur beim regulären Preis. Test-Abo danach in Stripe kündigen. Bitte nicht weitergeben.</p>
         </div>
         <?php endif; ?>
-        <div class="card stack" style="margin-top:12px">
-            <p><strong>Buchungen</strong></p>
+        <details class="card stack" style="margin-top:12px">
+            <summary><strong>Buchungen aus Gathering-Angeboten (<?= count($orders) ?>)</strong> <span class="muted small">· frühere Inner-Circle- und Jahreskreis-Buchungen stehen auch hier</span></summary>
             <?php if (!$orders): ?><p class="muted small">Noch keine. Probier es im Testraum aus: Angebot einblenden und mit dem Gast-Link (zweites Gerät) „buchen“. Im Stripe-Testmodus geht das mit der Testkarte 4242 4242 4242 4242.</p><?php endif; ?>
             <?php foreach ($orders as $o): ?>
                 <div class="mm-signup<?= $o['status'] === 'abgebrochen' ? ' is-cancelled' : '' ?>">
@@ -411,7 +386,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                 </div>
             <?php endforeach; ?>
             <?php if ($openOrd): ?><form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_order_recheck"><button class="link small" type="submit">Offene Zahlungen bei Stripe prüfen</button></form><?php endif; ?>
-        </div>
+        </details>
 
         <h2 id="technik">Technik-Test</h2>
         <?php $tr = mm_cfg('testroom') ?? []; $trReady = !empty($tr['room_url']) && (int)($tr['ends'] ?? 0) > time(); ?>

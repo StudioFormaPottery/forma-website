@@ -24,8 +24,14 @@ if ($view === 'vorschau') {
     $mTalk = $first('method', 'talk');
     $uMove = $first('unfold', 'body');
     $uTalk = $first('unfold', 'talk');
+    // Player-Vorschau: ein Flow (mit Voice-over) und ein Bewegungsvideo (30/45 Sek.)
+    $pFlow = $pMove = null;
+    foreach (['method', 'unfold', 'natal'] as $aud) foreach (mv_programs($pdo, $aud) as $p) foreach (mv_lessons($pdo, (int)$p['id']) as $l) {
+        if (!mv_lesson_is_clips($l)) continue;
+        if (mv_lesson_mode($l) === 'flow') $pFlow = $pFlow ?? $l; else $pMove = $pMove ?? $l;
+    }
 
-    render_page('Als Teilnehmerin ansehen', function () use ($self, $flash, $site, $mFlow, $mTalk, $uMove, $uTalk) {
+    render_page('Als Teilnehmerin ansehen', function () use ($self, $flash, $site, $mFlow, $mTalk, $uMove, $uTalk, $pFlow, $pMove) {
         $h = 'forma_h';
         $tile = function (string $href, string $ic, string $title, string $text, bool $ext = true) use ($h): void { ?>
             <a href="<?= $h($href) ?>"<?= $ext ? ' target="_blank" rel="noopener"' : ' class="real"' ?>><span class="ic"><?= $ic ?></span><b><?= $title ?></b><span><?= $text ?></span></a>
@@ -53,6 +59,14 @@ body{background:#F2ECE4}h1,h2{color:#6B5658}
 <section class="nh"><p class="eyebrow">Movecia · Vorschau</p><h1>Als Teilnehmerin ansehen</h1><p>Jeder Knopf öffnet in einem neuen Tab genau die Ansicht, die eine Teilnehmerin hat. Die Beispielansichten brauchen kein Konto, es wird dabei nichts gebucht und nichts verschickt. Die rosa Kacheln sind echte Testzugänge, mit denen du alles selbst durchklicken kannst.</p></section>
 <?php if ($flash): ?><p class="alert"><?= $h($flash) ?></p><?php endif; ?>
 
+<section class="grp" id="player"><h2>Der Übungs-Player</h2><p>So laufen Flow und Bewegungsvideo bei den Teilnehmerinnen: deine Übung, runder Timer, Sonnenaufgang-Klang in den letzten 5 Sekunden, eigene Musik. In der Vorschau kannst du überspringen, die Frauen nicht.</p><div class="qa">
+<?php
+        if ($pFlow) $tile($self . '?view=videos&play=' . (int)$pFlow['id'], '🌊', 'Flow mit Voice-over', $h($pFlow['title_de']) . ' · jede Übung so lange wie eingestellt, deine Stimme dazu');
+        if ($pMove) $tile($self . '?view=videos&play=' . (int)$pMove['id'], '⏱', 'Bewegungsvideo 30/45 Sek.', $h($pMove['title_de']) . ' · ohne Sprechen, Timer nach Wahl');
+        $tile($self . '?view=mediathek', '📚', 'Mediathek', 'Alle Übungen, nach Jahreszeit und Stil');
+?>
+</div></section>
+
 <section class="grp" id="seiten"><h2>Deine Seiten</h2><p>Was jede Besucherin sieht, bevor sie bucht.</p><div class="qa">
 <?php
         $tile($site . '/', '🏠', 'Hauptseite', 'moveciamovement.com');
@@ -70,7 +84,7 @@ body{background:#F2ECE4}h1,h2{color:#6B5658}
 <?php
         $tile($m . '?demo=1', '📚', 'Mitgliederbereich', 'Bibliothek mit dem aktuellen Monat, Journal, Konto');
         $tile($m . '?demo=1&lang=en', '🇬🇧', 'Auf Englisch', 'Derselbe Bereich in englischer Sprache');
-        if ($mFlow) $tile($m . '?demo=1&l=' . (int)$mFlow['id'], '🎬', 'Ein Bewegungsvideo', $h($mFlow['title_de']) . ' · mit 30/45-Sek.-Player, sobald alle Clips da sind');
+        if ($mFlow) $tile($m . '?demo=1&l=' . (int)$mFlow['id'], '🎬', 'Ein Bewegungsvideo', $h($mFlow['title_de']) . ' · im Mitgliederbereich, sobald alles hochgeladen ist');
         if ($mTalk) $tile($m . '?demo=1&l=' . (int)$mTalk['id'], '🗣', 'Ein Talking Head', $h($mTalk['title_de']));
         $tile($m . '?demo=1&starter=1', '⏳', 'Während der Widerrufsfrist', 'Wer das Rücktrittsrecht behalten hat: erst das Ankommen-Modul');
         $tile($m . '?demo=1&warte=1', '📅', 'Vor dem Start', 'Gebucht, aber noch nicht freigeschaltet: Warteseite mit Startdatum');

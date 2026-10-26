@@ -258,6 +258,23 @@ function mv_schema(PDO $pdo): void
         $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN ex TEXT NOT NULL DEFAULT ''");
         $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN prod TEXT NOT NULL DEFAULT ''");
     }
+    // Flow & Mediathek (Vivien, 26.10.2026): Schritte je Video (Übung, Voice-over-Text DE/EN, Sekunden), Art flow/move
+    if (!in_array('steps', $lc, true)) {
+        $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN steps TEXT NOT NULL DEFAULT ''");
+        $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN mode TEXT NOT NULL DEFAULT ''");
+    }
+    // Mediathek: jede Übung genau einmal gefilmt, überall wiederverwendet (nach Jahreszeit und Stil sortiert)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS mv_clips (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ckey TEXT NOT NULL UNIQUE,
+        name_de TEXT NOT NULL,
+        name_en TEXT NOT NULL DEFAULT '',
+        guid TEXT NOT NULL DEFAULT '',
+        seasons TEXT NOT NULL DEFAULT '',
+        styles TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL DEFAULT ''
+    )");
     // Vorab-Buchungen (Vivien, 25.10.2026): Mail „dein Zugang ist offen“ am Starttag genau einmal
     $sc = array_column($pdo->query('PRAGMA table_info(mv_subs)')->fetchAll(), 'name');
     if (!in_array('open_mailed', $sc, true)) $pdo->exec('ALTER TABLE mv_subs ADD COLUMN open_mailed INTEGER NOT NULL DEFAULT 0');
@@ -1049,7 +1066,7 @@ function mv_member_month(PDO $pdo, array $s): array
     $k = 0;
     while ($k < 240 && mv_month_at($start, $k + 1) <= $now) $k++;
     $off = isset($s['id']) ? mv_month_offset($pdo, $s) : 0;
-    return ['n' => $off + $k + 1, 'next_at' => mv_month_at($start, $k + 1), 'start' => $start];
+    return ['n' => $off + $k + 1, 'next_at' => mv_month_at($start, $k + 1), 'start' => $start, 'off' => $off];
 }
 
 /** Method-Programme in ihrer festen Reihenfolge: Ankommen zuerst, dann Monat 1, 2, 3 … (nach Datum, Reihenfolge). */
@@ -1079,6 +1096,56 @@ function mv_method_view(PDO $pdo, array $acc): array
     return ['open' => $open, 'next' => $next];
 }
 
+/** Wann hat sie jede Lektion zum ersten Mal ganz gemacht? [lesson_id => 'Y-m-d'] (Wiener Datum) */
+function mv_done_first(PDO $pdo, int $mid): array
+{
+    $q = $pdo->prepare('SELECT lesson_id, MIN(done_at) d FROM mv_progress WHERE member_id = ? GROUP BY lesson_id');
+    $q->execute([$mid]);
+    $tz = new DateTimeZone('Europe/Vienna');
+    $out = [];
+    foreach ($q->fetchAll() as $r) $out[(int)$r['lesson_id']] = (new DateTimeImmutable((string)$r['d']))->setTimezone($tz)->format('Y-m-d');
+    return $out;
+}
+
+/**
+ * The Method als begleitendes Programm (Vivien, 26.10.2026): Alle starten bei Ankommen, Video 1, und gehen Schritt
+ * für Schritt. Das nächste Video öffnet erst, wenn das vorige ganz durchgelaufen ist, höchstens eines pro Tag, und ein
+ * neuer Monat frühestens an ihrem Monatstag. Kein Vorspulen, keine Abkürzung.
+ * Rückgabe: ['state' => [lesson_id => ['open' => bool, 'why' => ''|'prev'|'tomorrow'|'date'|'starter', 'at' => ts]],
+ *            'current' => lesson_id der nächsten offenen Lektion (oder 0), 'month' => erreichter Monat (0 = Ankommen),
+ *            'order' => [lesson_id, …]]
+ */
+function mv_method_path(PDO $pdo, array $acc, array $doneFirst, ?int $now = null): array
+{
+    $now = $now ?? time();
+    $tz = new DateTimeZone('Europe/Vienna');
+    $today = (new DateTimeImmutable('@' . $now))->setTimezone($tz)->format('Y-m-d');
+    $mm = mv_method_months($pdo);
+    $start = (int)($acc['month']['start'] ?? $now);
+    $off = (int)($acc['month']['off'] ?? 0);
+    $seq = [];
+    foreach ($mm['welcome'] as $p) foreach (mv_lessons($pdo, (int)$p['id'], true) as $l) $seq[] = [$l, 0, $p];
+    foreach ($mm['months'] as $i => $p) foreach (mv_lessons($pdo, (int)$p['id'], true) as $l) $seq[] = [$l, $i + 1, $p];
+    $state = []; $order = []; $current = 0; $month = 0; $blocked = false; $prevDone = null;
+    foreach ($seq as $k => [$l, $m, $p]) {
+        $id = (int)$l['id']; $order[] = $id;
+        $isDone = isset($doneFirst[$id]);
+        if ($blocked) { $state[$id] = ['open' => false, 'why' => 'prev', 'at' => 0, 'm' => $m]; continue; }
+        $why = ''; $at = 0;
+        if ($k > 0 && $prevDone === null) $why = 'prev';
+        elseif ($k > 0 && $prevDone === $today && !$isDone) $why = 'tomorrow';
+        elseif ($m > 0 && !empty($acc['starter'])) $why = 'starter';
+        elseif ($m > 1) { $at = mv_month_at($start, max(0, $m - 1 - $off)); if ($at > $now && !$isDone) $why = 'date'; }
+        $open = $why === '' || $isDone;
+        $state[$id] = ['open' => $open, 'why' => $open ? '' : $why, 'at' => $why === 'tomorrow' ? strtotime('tomorrow', $now) : $at, 'm' => $m];
+        if ($open) $month = max($month, $m);
+        if ($open && !$isDone && !$current) $current = $id;
+        if (!$open) $blocked = true;
+        $prevDone = $isDone ? $doneFirst[$id] : null;
+    }
+    return ['state' => $state, 'current' => $current, 'month' => $month, 'order' => $order];
+}
+
 /** Darf sie dieses Method-Programm sehen (z. B. für Downloads)? */
 function mv_method_program_open(PDO $pdo, array $acc, int $programId): bool
 {
@@ -1095,6 +1162,12 @@ function mv_month_run(PDO $pdo): void
     foreach ($q->fetchAll() as $s) {
         if (mv_open_at($s) > time()) continue;
         $mm = mv_member_month($pdo, $s);
+        if ($mm['n'] <= (int)$s['month_mailed']) continue;
+        // Programm Schritt für Schritt (26.10.2026): Mail erst, wenn sie den Monat auch wirklich erreicht hat
+        $mq = $pdo->prepare('SELECT id FROM mv_members WHERE lower(email) = ?');
+        $mq->execute([strtolower((string)$s['email'])]);
+        $mid = (int)$mq->fetchColumn();
+        if ($mm['n'] > 1) $mm['n'] = min($mm['n'], max(1, mv_method_path($pdo, ['month' => $mm, 'starter' => false], $mid ? mv_done_first($pdo, $mid) : [])['month']));
         if ($mm['n'] <= (int)$s['month_mailed']) continue;
         $u = $pdo->prepare('UPDATE mv_subs SET month_mailed = ? WHERE id = ? AND month_mailed < ?');
         $u->execute([$mm['n'], $s['id'], $mm['n']]);
@@ -1274,6 +1347,21 @@ function mv_prod_sync(PDO $pdo, bool $force = false): void
         foreach ($j['new'] as $n) if (str_starts_with($n['ukey'], 'natal:') || str_starts_with($n['ukey'], 'unfold:') || str_starts_with($n['ukey'], 'method:'))
             $up->execute([$n['title_de'], $n['title_en'], $n['text_de'], $n['text_en'], $n['de'], $n['en'], $n['ex'] ? json_encode($n['ex'], JSON_UNESCAPED_UNICODE) : '', $n['ukey']]);
     }
+    // v3 (Vivien, 26.10.2026: Flow mit Voice-over je Übung, Mediathek): vorhandene Clips in die Mediathek übernehmen,
+    // dann Schritte (Übung + Sprechtext + Sekunden) und Übungslisten aus dem Seed setzen
+    if ((int)($c['v'] ?? 0) < 3) {
+        foreach ($pdo->query("SELECT * FROM mv_lessons WHERE prod LIKE '%\"c%'")->fetchAll() as $l) {
+            $ex = mv_lesson_ex($l);
+            foreach (mv_lesson_clips_old($l) as $i => $g) if (isset($ex[$i])) mv_clip_set($pdo, (string)$ex[$i][0], (string)($ex[$i][1] ?? ''), $g);
+        }
+        $js = fn($st) => [json_encode($st, JSON_UNESCAPED_UNICODE), json_encode(array_map(fn($x) => [$x[0], $x[1]], $st), JSON_UNESCAPED_UNICODE)];
+        $setT = $pdo->prepare("UPDATE mv_lessons SET steps = ?, ex = ? WHERE title_de = ? AND ukey = ''");
+        foreach ($j['steps'] ?? [] as $t => $st) $setT->execute([...$js($st), $t]);
+        $setK = $pdo->prepare('UPDATE mv_lessons SET steps = ?, ex = ?, mode = ? WHERE ukey = ?');
+        foreach ($j['new'] as $n) if (!empty($n['steps'])) $setK->execute([...$js($n['steps']), (string)($n['mode'] ?? ''), $n['ukey']]);
+        foreach ($j['steps'] ?? [] as $st) foreach ($st as $x) mv_clip_ensure($pdo, $x[0], $x[1]);
+        foreach ($j['new'] as $n) foreach ($n['steps'] ?? [] as $x) mv_clip_ensure($pdo, $x[0], $x[1]);
+    }
     $has = $pdo->prepare('SELECT COUNT(*) FROM mv_lessons WHERE ukey = ?');
     $ins = $pdo->prepare('INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, unlock, script_de, script_en, ukey, due, ex, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
     foreach ($j['new'] as $n) {
@@ -1283,59 +1371,216 @@ function mv_prod_sync(PDO $pdo, bool $force = false): void
         if (!$pid) continue;
         $ins->execute([$pid, $n['title_de'], $n['title_en'], $n['text_de'], $n['text_en'], $n['cat'], $n['energy'], (int)$n['minutes'], (int)$n['sort'], (string)$n['unlock'],
             $n['de'], $n['en'], $n['ukey'], $n['due'], $n['ex'] ? json_encode($n['ex'], JSON_UNESCAPED_UNICODE) : '', $now]);
+        if (!empty($n['steps'])) $pdo->prepare('UPDATE mv_lessons SET steps = ?, ex = ?, mode = ? WHERE id = ?')->execute([json_encode($n['steps'], JSON_UNESCAPED_UNICODE), json_encode(array_map(fn($x) => [$x[0], $x[1]], $n['steps']), JSON_UNESCAPED_UNICODE), (string)($n['mode'] ?? ''), (int)$pdo->lastInsertId()]);
     }
     $c['v'] = (int)$j['v'];
     mm_save_cfg('produktion', $c);
 }
 
+/**
+ * Schritte eines Videos (Vivien, 26.10.2026): je Übung Name DE/EN, Voice-over-Text DE/EN und Sekunden.
+ * Flow: Clip läuft in Schleife, Timer = Sekunden (Standard 2 Min.), Viviens Voice-over je Übung.
+ * Bewegungsvideo: dieselben Clips, die Teilnehmerin wählt 30 oder 45 Sekunden, ohne Sprechen.
+ */
+function mv_lesson_steps(array $l): array
+{
+    $out = [];
+    $s = json_decode((string)($l['steps'] ?? ''), true);
+    if (is_array($s) && $s) {
+        foreach ($s as $x) $out[] = ['de' => (string)$x[0], 'en' => (string)(($x[1] ?? '') ?: $x[0]), 'tde' => (string)($x[2] ?? ''), 'ten' => (string)($x[3] ?? ''), 'sec' => max(20, min(900, (int)($x[4] ?? 120)))];
+        return $out;
+    }
+    $e = json_decode((string)($l['ex'] ?? ''), true);
+    if (is_array($e)) foreach ($e as $x) if (is_array($x) && ($x[0] ?? '') !== '') $out[] = ['de' => (string)$x[0], 'en' => (string)(($x[1] ?? '') ?: $x[0]), 'tde' => '', 'ten' => '', 'sec' => 120];
+    return $out;
+}
+
+/** Schritte speichern (Form [[de, en, text_de, text_en, sek], …]) und Übungsliste mitziehen. */
+function mv_lesson_steps_save(PDO $pdo, int $id, array $steps): void
+{
+    $raw = array_map(fn($x) => [$x['de'], $x['en'], $x['tde'], $x['ten'], (int)$x['sec']], $steps);
+    $pdo->prepare('UPDATE mv_lessons SET steps = ?, ex = ? WHERE id = ?')->execute([json_encode($raw, JSON_UNESCAPED_UNICODE), json_encode(array_map(fn($x) => [$x[0], $x[1]], $raw), JSON_UNESCAPED_UNICODE), $id]);
+}
+
 /** Übungsliste einer Lektion: [[de, en], …] */
 function mv_lesson_ex(array $l): array
 {
-    $x = json_decode((string)($l['ex'] ?? ''), true);
-    return is_array($x) ? $x : [];
+    return array_map(fn($x) => [$x['de'], $x['en']], mv_lesson_steps($l));
 }
 
-/** Häkchen einer Lektion: ['x0f' => 1, 'x0d' => 1, 'td' => 1, …] (f = gefilmt, d/e = Deutsch/Englisch eingesprochen) */
+/** flow = mit Voice-over und festem Timer je Übung, move = Bewegungsvideo mit 30/45 Sek. ohne Sprechen */
+function mv_lesson_mode(array $l): string
+{
+    $m = (string)($l['mode'] ?? '');
+    if ($m === 'flow' || $m === 'move') return $m;
+    return str_ends_with((string)($l['ukey'] ?? ''), ':move') ? 'move' : 'flow';
+}
+
 function mv_lesson_prod(array $l): array
 {
     $x = json_decode((string)($l['prod'] ?? ''), true);
     return is_array($x) ? $x : [];
 }
 
-/** Bewegungsvideo aus einzelnen Übungs-Clips (Vivien, 26.10.2026)? Dann gilt nicht das ganze Video, sondern ein Clip je Übung. */
+/** Aus kurzen Übungs-Clips gebaut? Alles außer Talking Heads (auch Atem und Meditation, Vivien 26.10.2026). */
 function mv_lesson_is_clips(array $l): bool
 {
-    // Breathwork und Meditation bleiben ein ganzes, geführtes Video (wie ein Talking Head)
-    return !in_array($l['cat'], ['talk', 'breath', 'meditation'], true) && mv_lesson_ex($l) !== [];
+    return $l['cat'] !== 'talk' && mv_lesson_steps($l) !== [];
 }
 
-/** Clip-IDs (Bunny) je Übung: [i => guid] */
-function mv_lesson_clips(array $l): array
+/** Clips aus der ersten Fassung (prod c<i>, vor der Mediathek) */
+function mv_lesson_clips_old(array $l): array
 {
     $out = [];
     foreach (mv_lesson_prod($l) as $k => $v) if (preg_match('/^c(\d+)$/', (string)$k, $m) && is_string($v) && $v !== '') $out[(int)$m[1]] = $v;
     return $out;
 }
 
-/** Ist das Video fertig? Bewegungsvideo: zu jeder Übung ein Clip. Talking Head: Deutsch und Englisch hochgeladen. */
-function mv_lesson_done(array $l): bool
+// --- Mediathek: jede Übung einmal gefilmt, überall wiederverwendet ---------------------------------------
+
+const MV_SEASONS = ['fruehling' => ['Frühling', 'Spring', '🌸'], 'sommer' => ['Sommer', 'Summer', '☀️'], 'herbst' => ['Herbst', 'Autumn', '🍂'], 'winter' => ['Winter', 'Winter', '❄️'], 'immer' => ['Ganzjährig', 'All year', '♾️']];
+const MV_STYLES = ['yoga' => 'Yoga', 'pilates' => 'Pilates', 'somatic' => 'Somatic', 'bodyweight' => 'Bodyweight', 'mobility' => 'Mobility', 'atem' => 'Atem', 'ruhe' => 'Ruhe & Meditation', 'natal' => 'Prä-/Postnatal'];
+
+/** Schlüssel einer Übung: der Name, klein geschrieben, ohne Sonderzeichen (gleicher Name = gleicher Clip) */
+function mv_clip_key(string $name): string
 {
-    if (mv_lesson_is_clips($l)) return count(mv_lesson_clips($l)) >= count(mv_lesson_ex($l));
-    return (string)$l['video_de'] !== '' && (string)$l['video_en'] !== '';
+    $n = strtr(mb_strtolower(trim($name)), ['ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue', 'ß' => 'ss', 'é' => 'e']);
+    $k = trim((string)preg_replace('/[^a-z0-9]+/', '-', $n), '-');
+    return $k !== '' ? $k : substr(md5($name), 0, 12);
 }
 
-/** Daten für den Übungs-Player im Mitgliederbereich (nur wenn jede Übung einen Clip hat), sonst null. */
-function mv_flow_data(array $l, string $lang): ?array
+function mv_clips_all(PDO $pdo, bool $fresh = false): array
 {
-    if (!mv_lesson_is_clips($l) || !mv_lesson_done($l) || mv_bunny()['lib'] === '') return null;
-    $clips = mv_lesson_clips($l);
-    $items = [];
-    foreach (mv_lesson_ex($l) as $i => $e) {
-        $src = mv_embed($clips[$i]);
-        if ($src === '') return null;
-        $items[] = ['name' => $lang === 'en' ? (string)($e[1] ?? $e[0]) : (string)$e[0], 'src' => $src . '&autoplay=true&loop=true&muted=true'];
+    static $c = null;
+    if ($c === null || $fresh) {
+        $c = [];
+        foreach ($pdo->query('SELECT * FROM mv_clips ORDER BY name_de')->fetchAll() as $r) $c[$r['ckey']] = $r;
     }
-    return ['lang' => $lang, 'title' => mv_t($l, 'title', $lang), 'items' => $items];
+    return $c;
+}
+
+/** Übung in der Mediathek anlegen (falls neu), mit Stil-Vorschlag aus dem Namen */
+function mv_clip_ensure(PDO $pdo, string $de, string $en = ''): array
+{
+    $k = mv_clip_key($de);
+    $all = mv_clips_all($pdo);
+    if (isset($all[$k])) return $all[$k];
+    $low = mb_strtolower($de . ' ' . $en);
+    $sty = [];
+    foreach (['pilates' => 'pilates|clamshell|dead bug|bird dog|swimming|roll up|toe tap|heel slide|side leg', 'somatic' => 'somati|shaking|ausschütteln|abklopfen|tapping|orientieren|nachspüren|pandiculation|pendeln|wiegen|selbstumarmung',
+        'bodyweight' => 'kniebeuge|squat|lunge|ausfallschritt|plank|stütz|wandsitz|wall|liegestütz|bear|bridge|wadenheben|rudern|hüpfen', 'atem' => 'atem|atmung|ausatm|breath|box|summen|einatmen',
+        'ruhe' => 'savasana|body scan|meditation|den tag|ausklang|ruhe', 'yoga' => 'asana|hund|krieger|kindhaltung|baum|göttin|dreieck|taube|katze|eidechse|sphinx|kobra|malasana|happy baby|thread|figur 4|drehung|berghaltung|tor ',
+        'mobility' => 'kreise|kreisen|welle|roll down|hip hinge|mobil|achter|seitbeuge|reach|flow'] as $st => $re) if (preg_match('/' . $re . '/u', $low)) $sty[] = $st;
+    $pdo->prepare('INSERT OR IGNORE INTO mv_clips (ckey, name_de, name_en, styles, seasons, created_at) VALUES (?,?,?,?,?,?)')->execute([$k, $de, $en !== '' ? $en : $de, implode(',', $sty), 'immer', date('c')]);
+    return mv_clips_all($pdo, true)[$k];
+}
+
+function mv_clip_set(PDO $pdo, string $de, string $en, string $guid): void
+{
+    $c = mv_clip_ensure($pdo, $de, $en);
+    $pdo->prepare('UPDATE mv_clips SET guid = ?, updated_at = ? WHERE id = ?')->execute([$guid, date('c'), $c['id']]);
+    mv_clips_all($pdo, true);
+}
+
+/** Clip je Schritt: [i => Mediathek-Zeile] (fehlt eine Übung in der Mediathek, wird sie angelegt) */
+function mv_lesson_clip_rows(PDO $pdo, array $l): array
+{
+    $out = [];
+    foreach (mv_lesson_steps($l) as $i => $x) $out[$i] = mv_clips_all($pdo)[mv_clip_key($x['de'])] ?? mv_clip_ensure($pdo, $x['de'], $x['en']);
+    return $out;
+}
+
+/** In wie vielen Videos kommt jede Übung vor? [ckey => [[Lektion-ID, Titel], …]] */
+function mv_clip_usage(PDO $pdo): array
+{
+    $u = [];
+    foreach ($pdo->query("SELECT id, title_de, steps, ex, cat FROM mv_lessons WHERE visible = 1 AND cat <> 'talk'")->fetchAll() as $l)
+        foreach (mv_lesson_steps($l) as $x) $u[mv_clip_key($x['de'])][(int)$l['id']] = (string)$l['title_de'];
+    return $u;
+}
+
+// --- Voice-over je Übung (nur Flow) ------------------------------------------------------------------------
+
+function mv_voice_dir(): string
+{
+    $d = forma_data_dir() . '/voice';
+    if (!is_dir($d)) @mkdir($d, 0775, true);
+    return $d;
+}
+
+function mv_voice_path(int $lid, int $i, string $g): ?string
+{
+    foreach (glob(mv_voice_dir() . '/L' . $lid . '-' . $i . '-' . ($g === 'en' ? 'en' : 'de') . '.*') ?: [] as $f) return $f;
+    return null;
+}
+
+function mv_voice_sig(int $lid, int $i, string $g): string
+{
+    return substr(hash_hmac('sha256', 'voice:' . $lid . ':' . $i . ':' . $g, mv_secret()), 0, 24);
+}
+
+function mv_voice_url(int $lid, int $i, string $g): string
+{
+    $f = mv_voice_path($lid, $i, $g);
+    return $f ? '/api/method-voice.php?l=' . $lid . '&i=' . $i . '&g=' . $g . '&v=' . filemtime($f) . '&k=' . mv_voice_sig($lid, $i, $g) : '';
+}
+
+/** Stand eines Videos: wie viele Clips und Voice-overs fehlen noch? */
+function mv_lesson_status(PDO $pdo, array $l): array
+{
+    $st = mv_lesson_steps($l);
+    if (!mv_lesson_is_clips($l)) {
+        $d = (string)$l['video_de'] !== ''; $e = (string)$l['video_en'] !== '';
+        return ['n' => 0, 'clips' => 0, 'de' => (int)$d, 'en' => (int)$e, 'flow' => false, 'done' => $d && $e];
+    }
+    $rows = mv_lesson_clip_rows($pdo, $l);
+    $flow = mv_lesson_mode($l) === 'flow';
+    $c = $d = $e = 0;
+    foreach ($st as $i => $x) {
+        if (($rows[$i]['guid'] ?? '') !== '') $c++;
+        if ($flow) { if (mv_voice_path((int)$l['id'], $i, 'de')) $d++; if (mv_voice_path((int)$l['id'], $i, 'en')) $e++; }
+    }
+    $n = count($st);
+    return ['n' => $n, 'clips' => $c, 'de' => $d, 'en' => $e, 'flow' => $flow, 'done' => $n > 0 && $c >= $n && (!$flow || ($d >= $n && $e >= $n))];
+}
+
+/** Ist das Video fertig? Aus Clips: jede Übung hat einen Clip (Flow: und beide Voice-overs). Talking Head: DE und EN. */
+function mv_lesson_done(array $l): bool
+{
+    return mv_lesson_status(forma_db(), $l)['done'];
+}
+
+/** Musik-Vorschläge für den Player (Spotify-Playlists aus der Verwaltung, sonst ruhiges Klavier) */
+function mv_music_lists(): array
+{
+    $out = function_exists('natal_spotify_lists') ? natal_spotify_lists() : [];
+    if (!$out) $out = [['title' => 'Peaceful Piano', 'url' => 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO?utm_source=generator&theme=0']];
+    return $out;
+}
+
+/**
+ * Daten für den Player im Mitgliederbereich. Nur wenn alles da ist (Clips, beim Flow auch Voice-over), sonst null.
+ * $preview: Vorschau in der Verwaltung, zeigt auch Unfertiges (fehlende Clips als Platzhalter, Text statt Voice-over).
+ */
+function mv_flow_data(array $l, string $lang, bool $preview = false): ?array
+{
+    if (!mv_lesson_is_clips($l)) return null;
+    $bunny = mv_bunny()['lib'] !== '';
+    if (!$bunny && !$preview) return null;
+    $pdo = forma_db();
+    $rows = mv_lesson_clip_rows($pdo, $l);
+    $mode = mv_lesson_mode($l);
+    $g = $lang === 'en' ? 'en' : 'de';
+    $items = [];
+    foreach (mv_lesson_steps($l) as $i => $x) {
+        $guid = (string)($rows[$i]['guid'] ?? '');
+        $src = $guid !== '' && $bunny ? mv_embed($guid) . '&autoplay=true&loop=true&muted=true&preload=true' : '';
+        if ($src === '' && !$preview) return null;
+        $voice = $mode === 'flow' ? mv_voice_url((int)$l['id'], $i, $g) : '';
+        if ($mode === 'flow' && $voice === '' && !$preview) return null;
+        $items[] = ['name' => $g === 'en' ? $x['en'] : $x['de'], 'src' => $src, 'sec' => $x['sec'], 'voice' => $voice] + ($preview ? ['text' => $g === 'en' ? $x['ten'] : $x['tde']] : []);
+    }
+    return ['lang' => $g, 'mode' => $mode, 'title' => mv_t($l, 'title', $g), 'items' => $items, 'music' => mv_music_lists(), 'preview' => $preview];
 }
 
 /** Prä-/Postnatal-Videos einer Einheit: ['talk' => Lektion|null, 'move' => Lektion|null] */
