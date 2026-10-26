@@ -32,7 +32,7 @@ $lang = ($_GET['lang'] ?? '') === 'en' ? 'en' : (($_GET['lang'] ?? '') === 'de' 
 <meta name="theme-color" content="#F2ECE4">
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
-<link rel="manifest" href="/app.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movecia"><meta name="apple-mobile-web-app-status-bar-style" content="default"><script src="/wildhearts/assets/app.js?v=1" defer></script>
+<link rel="manifest" href="/app.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movecia"><meta name="apple-mobile-web-app-status-bar-style" content="default"><script src="/wildhearts/assets/app.js?v=2" defer></script>
 <?php
 $site = mm_site();
 $faq = [
@@ -90,6 +90,7 @@ a{color:var(--plum)}
 .facts>span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4em 1em;font-size:.88rem}
 .cta{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.8rem}
 .pic{position:relative;aspect-ratio:4/5;border-radius:220px 220px var(--r) var(--r);overflow:hidden;background:var(--peach)}
+video::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none}
 .pic img,.pic video{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.95) sepia(.06)}
 .pic::after{content:"";position:absolute;inset:0;background:rgba(214,160,122,.13);mix-blend-mode:multiply;pointer-events:none}.pic .stamp{z-index:1}
 .pic .stamp{position:absolute;left:14px;bottom:14px;right:14px;background:rgba(251,248,244,.92);backdrop-filter:blur(6px);border-radius:18px;padding:.9rem 1.1rem;font-family:var(--serif);font-size:1.25rem;line-height:1.25}

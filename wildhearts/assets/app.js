@@ -98,3 +98,37 @@
   window.mvAppInstall = open;
   if (/[?&]install=1/.test(location.search) && !standalone) window.addEventListener('load', function () { setTimeout(open, 400); });
 })();
+
+/* Stille Hintergrundvideos (Vivien, 26.10.2026): sollen sofort laufen, ohne Play-Knopf.
+   Erst normal starten; blockiert das Gerät (iPhone-Stromsparmodus u. Ä.), beim ersten Tippen/Scrollen nochmal versuchen,
+   und in Safari das Video als <img> zeigen – das spielt dort auch im Stromsparmodus ab. */
+(function () {
+  function ready(fn) { if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+  ready(function () {
+    var vids = [].slice.call(document.querySelectorAll('video[autoplay][muted]'));
+    if (!vids.length) return;
+    var safari = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
+    function asImg(v) {
+      if (!safari || !v.parentNode) return;
+      var img = document.createElement('img');
+      img.src = v.currentSrc || v.getAttribute('src'); img.alt = v.getAttribute('aria-label') || '';
+      img.className = v.className; img.setAttribute('style', v.getAttribute('style') || '');
+      img.onerror = function () { if (img.parentNode) img.parentNode.replaceChild(v, img); };
+      v.parentNode.replaceChild(img, v);
+    }
+    vids.forEach(function (v) {
+      v.muted = true; v.defaultMuted = true; v.playsInline = true;
+      v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
+      v.removeAttribute('controls'); v.disablePictureInPicture = true;
+      var p = v.play();
+      if (p && p.catch) p.catch(function () {
+        var retry = function () {
+          var q = v.play(); if (q && q.catch) q.catch(function () { asImg(v); });
+          ['touchstart', 'scroll', 'click'].forEach(function (ev) { window.removeEventListener(ev, retry); });
+        };
+        ['touchstart', 'scroll', 'click'].forEach(function (ev) { window.addEventListener(ev, retry, { passive: true, once: true }); });
+        asImg(v);
+      });
+    });
+  });
+})();
