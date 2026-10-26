@@ -1,0 +1,1225 @@
+{
+ "key": "unfold-m2",
+ "lang": "en",
+ "eyebrow": "Unfold · Month 2 · Weeks 5–8",
+ "title": "Buds",
+ "subtitle": "Self-worth & ideas",
+ "icon": "blume",
+ "letter": [
+  "My dear, a whole month is behind you. You have looked at what makes you tired, you have taken your mental load out of your head and put it all down on paper, you have learnt something about your nervous system and perhaps already found a routine or two that make everyday life easier. No matter how much of it you managed and how often life got in the way: you are still here, and you can be proud of that.",
+  "The first month was about roots, about the ground you stand on. Now, in the second month, we look at what wants to grow from that ground. I have called it “Buds”, because to me a bud describes exactly this state: everything is already there, the colour, the shape and the whole flower, and it only needs warmth, light and a little time to open.",
+  "Over the next four weeks, it is all about you. We will talk about why it can be so hard to say no, and how you can set boundaries without feeling bad for days afterwards. Together we will look for your strengths and values, for what truly makes you you when you are not being a mum, partner, colleague or organiser for a moment. We will get to know the inner critic, that familiar voice that so often has the last word, and practise answering it kindly and firmly. And at the end of the month we will open the floodgates for your ideas, so that they finally get the space they deserve.",
+  "I know from my own experience that these topics in particular can stir up a lot. When we have spent years mainly being there for others, it can sometimes feel strange or even selfish to direct so much attention towards ourselves. So I want to tell you right at the start that your self-worth is not a reward you first have to earn. It is already there, sometimes just a little buried under expectations, duties and old sentences that never came from you in the first place.",
+  "Use this workbook in whatever way suits you. You do not have to do every exercise or fill every line. Some questions will speak to you immediately; others you can skip and perhaps come back to in a few weeks. Your movement videos continue to accompany you, with a Full Day flow on Mondays and a gentle Tired Day flow on Thursdays, and this month I have chosen them deliberately so that they open, lengthen and strengthen you physically, in tune with what is happening on the inside.",
+  "I am so looking forward to walking through this month with you and hearing in our live calls what is blossoming in you. Movement begins with you, and sometimes it begins with a single honest sentence about yourself. With all my heart, your Vivien"
+ ],
+ "overview": [
+  {
+   "icon": "stimmung",
+   "title": "To begin · Where you are right now",
+   "text": "A little check-in after the first month, so you can see what has already shifted."
+  },
+  {
+   "icon": "schild",
+   "title": "Week 5 · Boundaries without guilt",
+   "text": "Why no is so hard to say, how to decline kindly and clearly, and what you would like to say yes to instead."
+  },
+  {
+   "icon": "stern",
+   "title": "Week 6 · What makes you you",
+   "text": "Your values, your strengths and what makes you feel alive, from your own point of view and from that of people close to you."
+  },
+  {
+   "icon": "spiegel",
+   "title": "Week 7 · Your inner critic",
+   "text": "Where the strict voice comes from, how to recognise its sentences and how to answer it with self-compassion."
+  },
+  {
+   "icon": "rakete",
+   "title": "Week 8 · Let your ideas flow",
+   "text": "Creative exercises, morning pages and an idea collection page, so that your ideas finally get room."
+  },
+  {
+   "icon": "feier",
+   "title": "Month in review · What has blossomed",
+   "text": "You look back, gather your insights and prepare for Month 3."
+  }
+ ],
+ "chapters": [
+  {
+   "icon": "stimmung",
+   "kicker": "To begin",
+   "title": "Where you are right now",
+   "intro": "Before we move into the new topics, let us pause for a moment. This check-in shows you where you stand after the first month, and at the end of this month it will make a lovely comparison.",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "We often rush from one topic to the next without noticing what has already changed along the way. Changes that come from within are especially quiet. Perhaps you breathe a little more consciously in the evening, perhaps you have handed over a task you would once have taken on as a matter of course, or you notice more quickly when your battery is running low. Things like these barely stand out in everyday life, which is why it is worth writing them down deliberately."
+    },
+    {
+     "t": "p",
+     "text": "Answer the following questions honestly and without judgement. There is no right or wrong here, and no such thing as “too little”. If a score is low, that is simply valuable information about where you can take particularly good care of yourself this month."
+    },
+    {
+     "t": "scale",
+     "title": "How I am right now",
+     "items": [
+      "My energy in everyday life",
+      "How well I sleep",
+      "How easy my mental load feels at the moment",
+      "How often I take time for myself",
+      "How well I sense what I need",
+      "How kindly I speak to myself",
+      "How much I believe in myself",
+      "How much room my own ideas have right now"
+     ],
+     "low": "hardly",
+     "high": "very"
+    },
+    {
+     "t": "prompts",
+     "title": "Looking back on Month 1",
+     "lines": 4,
+     "items": [
+      "What has changed since I started Unfold, even if it is only something small?",
+      "Which exercise, thought or video from the first month has stayed with me, and why?",
+      "What have I learnt about my exhaustion and my mental load that I did not know before?",
+      "Which new routine would I like to take with me into the second month?"
+     ]
+    },
+    {
+     "t": "prompts",
+     "title": "My wishes for Month 2",
+     "lines": 4,
+     "items": [
+      "When I think about the topics of boundaries, self-worth, the inner critic and ideas: which one touches me most, and what does it stir in me?",
+      "How would I like to feel at the end of this month?",
+      "What do I need over the next four weeks from myself and from the people around me?"
+     ]
+    },
+    {
+     "t": "tip",
+     "text": "Take a photo of your answers on this page or pop in a bookmark. At the end of the month you will answer the same scale again, and it is moving every single time to lay the two pages side by side."
+    },
+    {
+     "t": "p",
+     "text": "So that the rituals from the first month do not fall asleep, here is a weekly tracker. You can use it afresh every week this month by simply choosing one colour per week. A tick does not mean you did something perfectly; it is enough that you took a moment for it."
+    },
+    {
+     "t": "tracker",
+     "title": "My rituals in Month 2",
+     "items": [
+      "Full Day flow (Monday) or Tired Day flow (Thursday)",
+      "Five minutes of journaling",
+      "A breathing practice or meditation",
+      "Spent time outside in daylight",
+      "Drank enough water",
+      "Said no once or held a boundary",
+      "Said something kind to myself",
+      "Wrote down an idea"
+     ]
+    }
+   ]
+  },
+  {
+   "icon": "schild",
+   "kicker": "Week 5",
+   "title": "Boundaries without guilt",
+   "intro": "This week we look at why saying no is often so hard for us, where the guilty conscience comes from and how you can learn to stand up for yourself kindly and clearly.",
+   "blocks": [
+    {
+     "t": "h",
+     "text": "Your talk for this week"
+    },
+    {
+     "t": "p",
+     "text": "Do you know that moment when someone asks you for something and your mouth is already saying yes while your gut is still protesting? The teacher asks whether you could bake a cake for the school fair and run the stall. A colleague asks you to look over a presentation quickly, even though you had planned to leave on time. Your mother-in-law announces a visit for the very weekend you had been looking forward to as a quiet Sunday. And before you have even thought about it, you hear yourself saying: “Of course, no problem.”"
+    },
+    {
+     "t": "p",
+     "text": "The fact that this happens to us so often has little to do with weakness. Many of us learnt very early on that we are liked when we are helpful, easy-going and pleasant. A good girl does not answer back, she shares, she is considerate and she puts her own needs last. These messages were rarely meant unkindly, and much of what they taught us is genuinely valuable. We are good at empathising with others, we see what is needed, and we hold families, teams and friendships together. It only becomes a problem when this ability no longer has an off switch and we lose ourselves in it."
+    },
+    {
+     "t": "p",
+     "text": "There is a term for this pattern that you may already have come across: people pleasing. It describes the deep habit of wanting to keep everyone happy, avoiding conflict at almost any cost and putting your own wishes aside so that nobody is disappointed. From the outside, a woman who lives like this often seems incredibly strong and reliable. On the inside, though, it often feels like exhaustion, like a quiet anger that has nowhere to go, and like the sense that your own life is really being shaped by other people's expectations."
+    },
+    {
+     "t": "p",
+     "text": "So why does saying no feel so threatening? For our brain, belonging has always been vital for survival. For a very long stretch of human history it was dangerous to be cast out of the group, and to this day our nervous system reacts sensitively to anything that looks like rejection or conflict. So when you are afraid of disappointing someone, an ancient protective programme kicks in. It wants to keep you safe, even when the situation is in fact completely harmless and your colleague will probably have forgotten your no within five minutes."
+    },
+    {
+     "t": "p",
+     "text": "That is why the guilty conscience that shows up after a no should be taken with a pinch of salt. It feels like proof that you have done something wrong. In truth it often only shows you that you have just broken an old, unspoken rule, such as “I must always be available” or “Other people's needs matter more than mine”. A feeling is a piece of information, and it is worth looking closely at what it is telling you. Sometimes you really have hurt someone and would like to make amends. Very often, though, you are simply practising something new, and anything new feels uncomfortable at first."
+    },
+    {
+     "t": "p",
+     "text": "I like to picture a boundary as a garden fence with a gate in it, far friendlier than a wall you build against other people. The fence shows where your garden begins, what belongs to you and what you are responsible for. You can open the gate for whomever you like, whenever you like. Without a fence, everyone tramples through the flower beds, usually without any ill intent, simply because nobody knows where the path ends. Boundaries often make relationships easier, in fact, because others know where they stand with you and because your yes becomes genuine again."
+    },
+    {
+     "t": "p",
+     "text": "There are different kinds of boundaries, and it helps to tell them apart. Time boundaries concern your hours and appointments, so when you are available and when you are not. Physical boundaries concern your body, your space and your need for rest or closeness. Emotional boundaries protect you from taking on other people's feelings and problems as your own without being asked. Then there are material boundaries around money and possessions, and mental boundaries, which are about your opinions, your beliefs and your energy for certain conversations. Most of the women I work with already have a good sense for one or two of these areas and almost none for the others."
+    },
+    {
+     "t": "p",
+     "text": "And then there are the boundaries we set with ourselves. That is the moment when you put your phone away in the evening even though you could quickly check your emails, or when you allow yourself to leave the laundry basket for once because you want to be in bed by ten. These are boundaries too, and they are at least as important as the ones you set with others."
+    },
+    {
+     "t": "p",
+     "text": "This week I would like to invite you to choose your yes consciously again, without having to say no to everything from now on. Every yes to one thing is at the same time a no to something else, often to your rest, your time with the children, your sleep or your own projects. When you learn to pause briefly before agreeing, you win back a small piece of freedom every time. You can start slowly, with small situations where little is at stake, and you are allowed to feel unsure. Setting boundaries is a skill like riding a bike: it becomes more natural with every bit of practice."
+    },
+    {
+     "t": "fact",
+     "title": "Why we sometimes “fawn”",
+     "text": "Alongside fight, flight and freeze, some experts, such as the psychotherapist Pete Walker, describe a fourth stress response known as “fawn”. It means appeasing and trying to please in order to avert a threat. Anyone who learnt early on that fitting in brings safety will often reach for this pattern automatically when under pressure. It is a protective strategy that once made sense, and with patience and practice it can be loosened."
+    },
+    {
+     "t": "fact",
+     "title": "The pause before you answer",
+     "text": "Many agreements happen in the first two or three seconds, before the thinking part of our brain can even have its say. Even a short delay such as “I will just check my calendar and get back to you by tomorrow” gives you time to sense what you really want. This pause is one of the most effective tools for stepping out of automatic patterns."
+    },
+    {
+     "t": "fact",
+     "title": "A no does not need a long explanation",
+     "text": "The more reasons we list, the more we invite the other person to negotiate. A short, friendly no with one sentence of appreciation is usually received better than a long justification. You are allowed to say no simply because you do not want to or do not have the capacity."
+    },
+    {
+     "t": "h",
+     "text": "Sentences that help you say no"
+    },
+    {
+     "t": "p",
+     "text": "Especially at the beginning, we often simply lack the words. That is why I have put together a collection of phrases for you. Read through them calmly, mark the ones that feel like you, and feel free to say them out loud a few times, so that they come more easily when it really counts."
+    },
+    {
+     "t": "list",
+     "items": [
+      "“Thank you for thinking of me. This time I will pass.”",
+      "“That sounds like a lovely project, but I do not have the capacity for it right now.”",
+      "“I will check my calendar and let you know tomorrow.”",
+      "“That does not work for me, and that is completely fine.”",
+      "“I can bake the cake, but I will not run the stall this time.”",
+      "“Not today, but on Thursday I could give you half an hour.”",
+      "“I have realised that I have taken on too much, so I am handing this task back.”",
+      "“I would rather not talk about that right now.”",
+      "“I understand that this disappoints you. My answer is still no.”",
+      "“I am not available after 8 pm; I will get back to you tomorrow morning.”",
+      "“I have kept Sunday free for the family, so your visit would suit us better on another weekend.”",
+      "“I am happy to help if you tell me which other task I can leave for it.”",
+      "“No, thank you.”"
+     ]
+    },
+    {
+     "t": "tip",
+     "text": "Practise saying no first where little is at stake: with the shop assistant offering you a loyalty card, or when asked whether you would like a second helping. That way your nervous system learns in small doses that nothing bad happens after a no, and the big situations become easier over time."
+    },
+    {
+     "t": "exercise",
+     "title": "Recognising my yes patterns",
+     "time": "15 min.",
+     "intro": "Before you change anything, it is worth taking an honest look at when, and with whom, you automatically say yes.",
+     "steps": [
+      "Think back over the last two weeks and write down three situations in which you said yes even though you actually wanted to say no.",
+      "For each situation, note who asked you and how you felt at the moment you agreed.",
+      "Ask yourself what you feared might happen if you had said no. Write the fear down as honestly as possible, even if it seems exaggerated.",
+      "Consider what the yes cost you: time, sleep, energy, mood or time with your loved ones.",
+      "Look for a common pattern. Is it certain people, certain areas of life or certain situations, for example when you are tired or caught off guard?",
+      "To finish, write a sentence you would like to say the next time you are in a similar situation."
+     ]
+    },
+    {
+     "t": "prompts",
+     "title": "My yes situations",
+     "lines": 3,
+     "items": [
+      "Situation 1: Who asked, what did I say, and what would I have liked to say?",
+      "Situation 2: Who asked, what did I say, and what would I have liked to say?",
+      "Situation 3: Who asked, what did I say, and what would I have liked to say?",
+      "The pattern I recognise:"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Your boundary map"
+    },
+    {
+     "t": "p",
+     "text": "The following table helps you get an overview of where your boundaries are already well held and where they are crossed again and again, by others or by you yourself. In each row, note how things are for you in this area right now, and think of one small boundary you would like to try out over the coming weeks."
+    },
+    {
+     "t": "table",
+     "title": "Boundary map",
+     "cols": [
+      "Area",
+      "Where my boundary is often crossed",
+      "How it feels",
+      "My new small boundary"
+     ],
+     "rows": [
+      [
+       "Time & appointments",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Body & rest",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Feelings & conversations",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Family & relationship",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Work & colleagues",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Friendships",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Phone & availability",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Money & possessions",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Boundaries with myself",
+       "",
+       "",
+       ""
+      ]
+     ]
+    },
+    {
+     "t": "exercise",
+     "title": "Feeling a no in your body",
+     "time": "5 min.",
+     "intro": "Boundaries begin in the body. This little exercise helps you physically sense the difference between a genuine yes and a forced yes.",
+     "steps": [
+      "Sit upright or stand with your feet hip-width apart, feel your feet on the floor and take three calm breaths.",
+      "Think of something you are genuinely looking forward to and say yes to it inwardly. Notice what happens in your chest, your belly and your shoulders.",
+      "Now think of a request you do not really want to fulfil, and say yes to it inwardly anyway. Again, notice where something changes.",
+      "Now say no to the same request, inwardly or quietly out loud. Observe whether your breath changes, whether you stand taller or whether restlessness shows up.",
+      "Write down in one or two sentences how you will recognise, in future, a yes that does not truly come from you."
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Your yes-to-me list"
+    },
+    {
+     "t": "p",
+     "text": "Every no creates space, and you are allowed to fill that space consciously. Perhaps with an hour at the stable, a walk without headphones, a book, your movement video or simply an afternoon with nothing planned. Write down here everything you would like to say yes to this month. The more concrete, the better."
+    },
+    {
+     "t": "checklist",
+     "title": "What I would like to say yes to",
+     "items": [
+      "My movement videos on Monday and Thursday",
+      "At least one evening a week when I go to bed early",
+      "Time for a hobby that belongs to me alone",
+      "Meeting up with a friend who does me good",
+      "Half an hour outside in the fresh air, with nothing to do",
+      "Accepting help when it is offered to me",
+      "",
+      "",
+      "",
+      ""
+     ]
+    },
+    {
+     "t": "prompts",
+     "title": "Journaling for week 5",
+     "lines": 4,
+     "items": [
+      "What messages about saying no did I hear as a child, and which of them do I no longer want to believe today?",
+      "With which person is it hardest for me to set a boundary, and what makes it so hard with them in particular?",
+      "What would my week look like if I only said yes when I really meant it?",
+      "Which boundary did I hold this week, and how did I feel afterwards?"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Your movement this week"
+    },
+    {
+     "t": "p",
+     "text": "Your Full Day flow on Monday is called “Opening your heart”. It widens your chest, your shoulders and your breathing space so that you can stand tall and open again. I love this link to the topic of boundaries, because a woman who stands up for herself is allowed to feel open and soft at the same time. On Thursday the Tired Day flow “Waking up your spine” is waiting for you, in which you move your spine in all directions without any effort. In both videos, notice how it feels to leave a position as soon as your body says it has had enough. That too is a boundary you are respecting."
+    },
+    {
+     "t": "quote",
+     "text": "My no protects my yes. I am allowed to give my time and my strength to where my heart is."
+    }
+   ]
+  },
+  {
+   "icon": "stern",
+   "kicker": "Week 6",
+   "title": "What makes you you",
+   "intro": "Who are you when you do not have to get anything done for anyone? This week we go in search of your values, your strengths and what makes you feel alive.",
+   "blocks": [
+    {
+     "t": "h",
+     "text": "Your talk for this week"
+    },
+    {
+     "t": "p",
+     "text": "When I ask women in my classes to introduce themselves briefly, almost the same thing happens every time. They tell me how many children they have, where they work and perhaps where they live. When I then ask what makes them who they are, what they are good at and what truly matters to them, there is often a long pause. Every time, that pause shows me how rarely we ask ourselves this question when everyday life consists of appointments, shopping lists and other people's needs."
+    },
+    {
+     "t": "p",
+     "text": "Self-worth has a lot to do with self-knowledge. Knowing what matters to you and what you are good at puts you on firmer ground. Decisions become easier because you have an inner compass. Criticism hurts less deeply because it does not immediately shake your whole picture of yourself. And you waste less energy living a life that really belongs to someone else. That is exactly why this week sits between boundaries and the inner critic: only once you know what you want to protect can you stand up for it clearly."
+    },
+    {
+     "t": "p",
+     "text": "Let us begin with values. Values are the things that truly matter to you in life, regardless of whether they are fashionable or whether your family shares them. They show up in your decisions, in what annoys you and in the moments when you feel completely yourself. A woman for whom freedom is a core value suffers under a tightly packed calendar in a very different way from a woman for whom security and order are especially important. Neither is better or worse; they simply need different things in order to feel good."
+    },
+    {
+     "t": "p",
+     "text": "Things get interesting where we live against our values, often without noticing. If creativity means a great deal to you, but you have not held a paintbrush, clay or a notebook in years, a quiet dissatisfaction builds up that is hard to name. If honesty is at the very top of your list and you constantly swallow things in your family to keep the peace, it costs you an enormous amount of strength. Many feelings of emptiness or irritability become easier to understand when we hold them up against our values."
+    },
+    {
+     "t": "p",
+     "text": "Values change over the course of a lifetime, by the way. In your early twenties adventure may have mattered most, with small children it was security and stability, and now something that has been asleep for a long time may be stirring again. That is why it is worth taking a fresh look again and again, rather than holding on to a picture of yourself that was true ten years ago."
+    },
+    {
+     "t": "p",
+     "text": "Then there are your strengths. Many of us find it incredibly hard to name our own strengths. Partly that is because we learnt to be modest and not to push ourselves forward. Partly it is because we often do not even notice our greatest strengths, since they come so easily to us. If you keep track of five calendars as a matter of course, stay calm in a crisis or sense how someone is feeling before they say a word, you probably think that is normal. For many other people it is anything but."
+    },
+    {
+     "t": "p",
+     "text": "Positive psychology has a lovely idea about this: we often get further by using our strengths consciously than by constantly working on our weaknesses. That does not mean weaknesses do not matter. But the energy you have spent for years criticising yourself for not being tidier, faster or more patient could also be invested in what already makes you stand out. Many women feel genuine relief the moment they see their strengths clearly in front of them."
+    },
+    {
+     "t": "p",
+     "text": "And finally, this week is about what makes you feel alive. These are the moments when you forget time, when you feel light and awake and afterwards have more energy than before. For one woman it is working with her hands, for another a deep conversation, for the next a ride through the woods, music, gardening or organising a party. These moments are valuable clues to your values and strengths, and they will play a big part next month when you choose your one idea."
+    },
+    {
+     "t": "p",
+     "text": "I invite you to be curious this week, just as you would be with a new friend you are only just getting to know. Ask yourself questions, listen to yourself and ask the people who know you well, too. You will be surprised by how much is there once you take a conscious look."
+    },
+    {
+     "t": "fact",
+     "title": "The 24 character strengths",
+     "text": "The psychologists Christopher Peterson and Martin Seligman, together with many colleagues, described 24 character strengths found in cultures all over the world, including curiosity, kindness, perseverance, humour, gratitude and creativity. Every person carries all of them, but to different degrees. If you would like to dive deeper, you can find the free VIA questionnaire online, which shows you your personal top strengths."
+    },
+    {
+     "t": "fact",
+     "title": "Why we overlook our strengths",
+     "text": "What comes easily to us we often take for granted, assuming it is the same for everyone else. At the same time, our brain notices mistakes and weaknesses far more attentively than what is going well. That is why an outside view is so valuable: people who like us often see our strengths more clearly than we do."
+    },
+    {
+     "t": "fact",
+     "title": "Values as a compass",
+     "text": "Studies from acceptance and commitment therapy and motivation research show that goals connected to our own values are pursued for longer and bring more satisfaction than goals we pursue out of a sense of duty or for other people's approval. Knowing your values is therefore good preparation for Month 3."
+    },
+    {
+     "t": "h",
+     "text": "Finding your values"
+    },
+    {
+     "t": "p",
+     "text": "Read through the following list calmly and tick every value that speaks to you. Take your time and go with your gut feeling. All that matters is what truly resonates with you, regardless of which values sound good or what a good mother would supposedly choose. There is space at the bottom for any values that are missing."
+    },
+    {
+     "t": "checklist",
+     "title": "Choosing your values",
+     "items": [
+      "Adventure",
+      "Mindfulness",
+      "Recognition",
+      "Authenticity",
+      "Balance",
+      "Enthusiasm",
+      "Learning",
+      "Gratitude",
+      "Honesty",
+      "Family",
+      "Fairness",
+      "Freedom",
+      "Friendship",
+      "Care",
+      "Security and comfort",
+      "Serenity",
+      "Community",
+      "Justice",
+      "Health",
+      "Faith and spirituality",
+      "Generosity",
+      "Harmony",
+      "Humour",
+      "Creativity",
+      "Joy of life",
+      "Lightness",
+      "Love",
+      "Loyalty",
+      "Compassion",
+      "Courage",
+      "Nature",
+      "Curiosity",
+      "Openness",
+      "Order",
+      "Respect",
+      "Calm",
+      "Beauty",
+      "Self-determination",
+      "Safety",
+      "Meaning",
+      "Fun",
+      "Stability",
+      "Tradition",
+      "Independence",
+      "Responsibility",
+      "Connection",
+      "Trust",
+      "Growth",
+      "Wisdom",
+      "Appreciation",
+      "Belonging",
+      "Reliability",
+      "",
+      "",
+      "",
+      ""
+     ]
+    },
+    {
+     "t": "exercise",
+     "title": "Your top 5 values",
+     "time": "20 min.",
+     "intro": "From the values you have ticked, you now choose, step by step, the five that matter most to you at the moment.",
+     "steps": [
+      "Look at all the values you have ticked and cross out any you hesitate over when you read them a second time.",
+      "Group similar values together, for example calm, serenity and balance, and for each group choose the word that feels most right.",
+      "Narrow your list down to ten values. This may feel hard, but you are not losing any value; you are simply setting priorities for this phase of your life.",
+      "For each remaining pair, ask yourself which of the two you would keep if you had to choose, and in this way narrow it down to five.",
+      "Enter your five values in the table below and write down what each one means to you in very concrete terms.",
+      "Honestly rate how much you are living this value at the moment, on a scale from 1 to 10, and think of a small step to give it more room."
+     ]
+    },
+    {
+     "t": "table",
+     "title": "My top 5 values",
+     "cols": [
+      "Value",
+      "What it means to me",
+      "How much I live it (1–10)",
+      "One small step"
+     ],
+     "rows": 5
+    },
+    {
+     "t": "tip",
+     "text": "Write your five values on a small card and put it somewhere you pass every morning, on the bathroom mirror or next to the coffee machine. Whenever you face a decision, ask yourself briefly which option fits your values better."
+    },
+    {
+     "t": "h",
+     "text": "The strengths mirror"
+    },
+    {
+     "t": "p",
+     "text": "For this exercise you need a little courage, because you will ask three people who know you well and whom you trust to tell you something about yourself. That might be your partner, a friend, your sister, a colleague or an older child. Choose people who wish you well. You can send the questions by message so that they can answer in their own time, or ask them on a walk."
+    },
+    {
+     "t": "exercise",
+     "title": "The strengths mirror: asking three people",
+     "time": "spread over the week",
+     "intro": "Others often see what we overlook in ourselves. With these questions you collect a loving view from the outside.",
+     "steps": [
+      "Choose three people who experience you in different areas of life, for example at home, at work and among your friends.",
+      "Send them a short message, for example: “I am doing a programme at the moment that is about my strengths. Would you be willing to answer a few questions completely honestly? It would mean a lot to me.”",
+      "Ask them these questions: What do you think I am particularly good at? What would you ask me for help with? In which moments do you see me completely in my element? Which three words describe me best? What do you think I am capable of that I may not yet believe I can do?",
+      "Accept the answers without playing them down or immediately putting them into perspective. A simple “Thank you, that really touches me” is quite enough.",
+      "Enter the answers in the table and mark everything that was mentioned more than once.",
+      "At the end, read everything out loud and notice which piece of feedback surprised or touched you most."
+     ]
+    },
+    {
+     "t": "table",
+     "title": "My strengths mirror",
+     "cols": [
+      "Question",
+      "Person 1",
+      "Person 2",
+      "Person 3"
+     ],
+     "rows": [
+      [
+       "What am I particularly good at?",
+       "",
+       "",
+       ""
+      ],
+      [
+       "What would you ask me for help with?",
+       "",
+       "",
+       ""
+      ],
+      [
+       "When am I completely in my element?",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Three words that describe me",
+       "",
+       "",
+       ""
+      ],
+      [
+       "What do you think I am capable of?",
+       "",
+       "",
+       ""
+      ]
+     ]
+    },
+    {
+     "t": "prompts",
+     "title": "What the mirror shows me",
+     "lines": 3,
+     "items": [
+      "What was mentioned more than once?",
+      "What surprised me, and why might I find it hard to believe?",
+      "Which strength would I like to use more consciously over the coming weeks?"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "What makes me feel alive"
+    },
+    {
+     "t": "exercise",
+     "title": "Following the clues: when I forget time",
+     "time": "20 min.",
+     "intro": "This exercise takes you back to the moments when you felt completely alive. They hold valuable clues to what you need and what you can give to the world.",
+     "steps": [
+      "Get yourself a drink you enjoy, sit somewhere quiet and take a few deep breaths into your belly.",
+      "Remember three to five moments in your life when you forgot time, whether from childhood, your teenage years or last week.",
+      "For each moment, write down what you were doing, who you were with and where it was.",
+      "Ask yourself what exactly made it so fulfilling: were you creating something, helping others, learning something, out in nature or organising something?",
+      "Look for what they have in common and write it in one sentence beginning with “I feel alive when …”."
+     ]
+    },
+    {
+     "t": "table",
+     "title": "My moments of feeling alive",
+     "cols": [
+      "Moment",
+      "What I was doing",
+      "What made it fulfilling"
+     ],
+     "rows": 5
+    },
+    {
+     "t": "prompts",
+     "title": "Journaling for week 6",
+     "lines": 4,
+     "items": [
+      "I feel alive when …",
+      "Who am I when I do not have to get anything done for anyone?",
+      "Which of my values is getting too little room in my everyday life at the moment, and what would change if it had more space?",
+      "What am I proud of about myself, quite apart from what I do for others?"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Your movement this week"
+    },
+    {
+     "t": "p",
+     "text": "On Monday the Full Day flow “Strength in your sides” awaits you. It strengthens the muscles along your sides and your waist, giving you support and length at the same time. I think this fits beautifully with a week in which you discover your own strengths. On Thursday, “Releasing your shoulders” brings a gentle Tired Day flow for a neck and shoulders that carry too much. Perhaps you will notice how much you shoulder every day, and allow yourself to set part of it down for a few minutes."
+    },
+    {
+     "t": "quote",
+     "text": "I do not have to earn my worth. I am allowed to discover who I already am."
+    }
+   ]
+  },
+  {
+   "icon": "spiegel",
+   "kicker": "Week 7",
+   "title": "Your inner critic",
+   "intro": "Almost every woman knows her: the voice that says you are not good enough, not slim enough or not organised enough. This week you get to know her and practise answering her kindly.",
+   "blocks": [
+    {
+     "t": "h",
+     "text": "Your talk for this week"
+    },
+    {
+     "t": "p",
+     "text": "Imagine a friend calls you and tells you that she forgot the parents' evening, that dinner got burnt and that today she simply feels overwhelmed. What would you say to her? Probably something like: “That is completely normal with everything you are juggling right now. Make yourself a cup of tea and do not be so hard on yourself.” And now imagine exactly the same thing happens to you. What do you say to yourself then? For many women it sounds very different: “Typical, you just cannot get anything right. Other people manage, after all.”"
+    },
+    {
+     "t": "p",
+     "text": "I call this voice the inner critic. She is the part of us that constantly judges, compares and looks for mistakes. She speaks up when you look in the mirror, when you have a new idea, when you want to speak up in a group or when you look back on your day in the evening. For some women she is loud and harsh, for others quieter and more subtle, like a constant background hum of doubt."
+    },
+    {
+     "t": "p",
+     "text": "Where does she come from? The inner critic does not appear out of nowhere. She is often made up of voices we heard in the past, from parents, teachers, siblings or peers. Sentences such as “Stop making such a fuss”, “What will people think?” or “You will never amount to anything” dig in deep, especially when we heard them often as children. On top of that come the messages from society that accompany women throughout their lives: how we should look, what a good mother should be like, how much we have to achieve to be worth something. Social media amplifies all of this, because there we are constantly comparing ourselves with carefully chosen snippets of other people's lives."
+    },
+    {
+     "t": "p",
+     "text": "The surprising thing is that in most cases the inner critic actually means well. She wants to protect you. At some point she learnt that you are safer if you make no mistakes, if you do not stand out and if you try hard before anyone else can criticise you. She is, so to speak, an overzealous bodyguard working with outdated methods. The only problem is that today her strategy keeps you small rather than protecting you. She stops you from trying new things, from showing yourself and from being kind to yourself when something goes wrong."
+    },
+    {
+     "t": "p",
+     "text": "Research now tells us fairly clearly that harsh self-criticism rarely leads to better performance. The British psychologist Paul Gilbert describes how self-criticism can affect our body in a similar way to a threat from outside. The stress system kicks in, we feel tense and ashamed and would most like to hide. In this state it is hard to think clearly, learn from mistakes or bravely try something new. When we speak to ourselves kindly, on the other hand, we are more likely to activate the system responsible for soothing, connection and safety, and it is precisely from this state that we grow."
+    },
+    {
+     "t": "p",
+     "text": "Many women worry that they will become lazy or careless if they turn the critic down. “If I am not strict with myself, I will not get anything done at all”, I often hear. Yet research by the American psychologist Kristin Neff points rather to the opposite. People with more self-compassion often take more responsibility for their mistakes, because those mistakes no longer shake them so deeply. After a setback they are more likely to try again, and they stay more motivated in the long run. So self-compassion is a stable foundation on which responsibility and growth become much easier."
+    },
+    {
+     "t": "p",
+     "text": "The first step in dealing with the inner critic is to notice her at all. Her sentences often run so automatically that we take them for the truth. When you start observing them, a little distance appears. You realise: this is not me, this is a thought I have thought a thousand times before. Some women find it helps to give their critic a name or to imagine her as a character, such as a strict governess with glasses or a nervous little creature constantly sounding the alarm. That may sound playful, but it creates exactly this helpful distance."
+    },
+    {
+     "t": "p",
+     "text": "The second step is to answer her, with neither a counterattack nor surrender. You do not have to argue with her or silence her. You can listen to her, thank her for her concern and then decide for yourself what you want to believe. A sentence such as “I hear you, and I know you want to protect me. I am going to try anyway” can change an astonishing amount."
+    },
+    {
+     "t": "p",
+     "text": "Be patient with yourself this week. The inner critic often has decades of head start, and she will not turn into a loving companion in seven days. But every time you notice her and consciously choose a kinder sentence, a new track forms in your brain. And tracks we walk often become paths over time. If you notice that the voice weighs on you very heavily, that it paralyses you or that dark thoughts are joining in, please seek support from a therapist or doctor. That is a sign of strength and self-care."
+    },
+    {
+     "t": "fact",
+     "title": "The negativity bias",
+     "text": "Our brain usually reacts more strongly to negative things than to positive ones. Criticism sticks for longer than praise, and one unpleasant moment can overshadow an entire lovely day. Psychologists call this the negativity bias. It made sense for our ancestors, who needed to spot dangers quickly. Today it helps to know that the inner critic benefits from this built-in tendency and that we are allowed to steer against it consciously."
+    },
+    {
+     "t": "fact",
+     "title": "The three building blocks of self-compassion",
+     "text": "Kristin Neff describes self-compassion through three elements. Mindfulness means noticing your own pain without brushing it aside or losing yourself in it. Common humanity means remembering that all people make mistakes and suffer, and that you are not alone in this. Self-kindness means meeting yourself the way you would meet a good friend."
+    },
+    {
+     "t": "fact",
+     "title": "The power of soothing touch",
+     "text": "A warm hand on your heart or a gentle hug can signal safety to the nervous system. Research on touch suggests that it sets processes in motion that are linked to soothing and connection, such as the release of oxytocin. This works when you touch yourself too, which is why it is a fixed part of the self-compassion break."
+    },
+    {
+     "t": "h",
+     "text": "Typical sentences of the inner critic"
+    },
+    {
+     "t": "p",
+     "text": "Read through the following list and tick the sentences you recognise. There is space at the bottom for her very own favourite sentences, because every critic has her own language."
+    },
+    {
+     "t": "checklist",
+     "title": "Does this sound familiar?",
+     "items": [
+      "“You are not good enough.”",
+      "“Other people manage, so why can't you?”",
+      "“Who do you think you are to try this?”",
+      "“It will never work anyway.”",
+      "“You are a bad mother if you take time for yourself.”",
+      "“Stop making such a fuss.”",
+      "“You look terrible.”",
+      "“You have forgotten everything again.”",
+      "“What will other people think of you?”",
+      "“You should have done that better.”",
+      "“You are too old, too late or too inexperienced for this.”",
+      "“You can only rest once everything is done.”",
+      "“You are too much.”",
+      "“You are not enough.”",
+      "",
+      "",
+      ""
+     ]
+    },
+    {
+     "t": "exercise",
+     "title": "Getting to know your critic",
+     "time": "20 min.",
+     "intro": "Once you know how your critic speaks, when she shows up and what she actually wants, she loses part of her power.",
+     "steps": [
+      "Sit comfortably, place one hand on your belly and take a few calm breaths in which the exhale is a little longer than the inhale.",
+      "Imagine your inner critic as a character. What does she look like, how old is she, what does her voice sound like and what is she wearing?",
+      "Give her a name that might even make you smile a little.",
+      "Write down the situations in which she speaks up particularly often, for example in the morning in front of the mirror, at work, while cooking or when you think about your ideas.",
+      "Ask her in your mind what she wants to protect you from, and write down the first answer that comes.",
+      "Write a kind sentence with which you would like to answer her from now on, for example: “Thank you for looking out for me. I can manage.”"
+     ]
+    },
+    {
+     "t": "prompts",
+     "title": "My critic",
+     "lines": 3,
+     "items": [
+      "This is what she looks like, and this is her name:",
+      "This is where she speaks up most often:",
+      "Her favourite sentences:",
+      "What she wants to protect me from:",
+      "My kind answer:"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Your thought record"
+    },
+    {
+     "t": "p",
+     "text": "The thought record is a tool you can use throughout the week. Whenever you notice the critic getting loud, note down the situation and her sentence. Then imagine what a loving friend would say to you in the same situation, and use that to write a new sentence you can believe. It does not have to be exaggeratedly positive; it should simply feel honest and kind. I have already filled in the first example for you."
+    },
+    {
+     "t": "table",
+     "title": "Thought record",
+     "cols": [
+      "Situation",
+      "What the critic says",
+      "What a friend would say",
+      "My new sentence"
+     ],
+     "rows": [
+      [
+       "I forgot the parents' evening.",
+       "“You just cannot get anything right.”",
+       "“You are juggling so much right now; things are bound to slip through sometimes.”",
+       "“I forgot something, and I can ring the teacher tomorrow.”"
+      ],
+      [
+       "",
+       "",
+       "",
+       ""
+      ],
+      [
+       "",
+       "",
+       "",
+       ""
+      ],
+      [
+       "",
+       "",
+       "",
+       ""
+      ],
+      [
+       "",
+       "",
+       "",
+       ""
+      ],
+      [
+       "",
+       "",
+       "",
+       ""
+      ],
+      [
+       "",
+       "",
+       "",
+       ""
+      ],
+      [
+       "",
+       "",
+       "",
+       ""
+      ]
+     ]
+    },
+    {
+     "t": "tip",
+     "text": "Say your new sentence out loud, ideally with one hand on your heart. It may feel strange at first, but our brain takes in sentences we hear out loud quite differently from thoughts that merely drift through our head."
+    },
+    {
+     "t": "h",
+     "text": "The self-compassion break"
+    },
+    {
+     "t": "p",
+     "text": "This little practice goes back to Kristin Neff, and I have written it down for you here in my own words. It takes only one or two minutes and can be done anywhere: in the car outside the nursery, in the loo at work or in bed at night. You can use it whenever you notice that something is hard for you or the critic is getting loud."
+    },
+    {
+     "t": "exercise",
+     "title": "Self-compassion break",
+     "time": "2 min.",
+     "intro": "Three short sentences and a touch that bring you back to yourself in a difficult moment.",
+     "steps": [
+      "Pause and notice what is hard right now. Say a sentence to yourself inwardly that acknowledges it, for example: “This is really tough right now” or “This hurts.”",
+      "Remind yourself that you are not alone in this. Say to yourself, for example: “Many women feel exactly the same in moments like this” or “Mistakes and overwhelm are part of being human.”",
+      "Place one or both hands on your heart, your belly or your cheeks, wherever it feels comforting to you, and feel the warmth of your hands.",
+      "Say a kind sentence to yourself, as if you were speaking to a good friend, for example: “I am allowed to be kind to myself”, “I am doing my best, and that is enough” or “What do I need right now?”",
+      "Stay in this position for two or three more breaths and notice whether anything has changed in your body."
+     ]
+    },
+    {
+     "t": "breath",
+     "title": "Breathing with a long exhale",
+     "pattern": "4 · 6",
+     "text": "Breathe in through your nose for a count of four and breathe out gently through your nose or slightly parted lips for a count of six. An exhale that is a little longer than the inhale can help your nervous system shift from alarm to calm. Repeat this for six to ten rounds, ideally right before or after the self-compassion break. If you feel dizzy, simply go back to breathing normally."
+    },
+    {
+     "t": "exercise",
+     "title": "A letter from your best friend",
+     "time": "20 min.",
+     "intro": "In this exercise you write yourself a letter, but from the point of view of someone who loves and understands you unconditionally.",
+     "steps": [
+      "Think of something you are criticising yourself for at the moment, such as your body, your patience with the children or a project you did not finish.",
+      "Imagine a friend who accepts you completely, with all your strengths and weaknesses. This can be a real person or an imagined one.",
+      "Write a letter to yourself from her point of view. What would she say about the situation? How would she remind you that you are human? What would she wish for you?",
+      "Put the letter aside for a few hours, then read it slowly, ideally out loud, and let the words sink in.",
+      "Keep it, so that you can bring it out again on difficult days."
+     ]
+    },
+    {
+     "t": "notes",
+     "title": "My letter",
+     "lines": 18
+    },
+    {
+     "t": "prompts",
+     "title": "Journaling for week 7",
+     "lines": 4,
+     "items": [
+      "Whose voices do I hear in my inner critic, and which of them do not actually belong to me at all?",
+      "What has the critic already held me back from in my life?",
+      "How would my everyday life change if I spoke to myself the way I speak to a good friend?",
+      "At which moment this week did I manage to be kind to myself?"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Your movement this week"
+    },
+    {
+     "t": "p",
+     "text": "Your Full Day flow on Monday is called “Growing tall”. It lengthens you from your feet to the crown of your head and includes a strength round for your back. I love going physically into your full size in a week when the inner critic wants to make you small. Notice how your thoughts change when you stand tall and stable. On Thursday comes the Tired Day flow “Twist and release”, with gentle twists that wring out your torso and clear your head, just right after a day full of critical thoughts."
+    },
+    {
+     "t": "quote",
+     "text": "I am allowed to speak to myself as I would to someone I love."
+    }
+   ]
+  },
+  {
+   "icon": "rakete",
+   "kicker": "Week 8",
+   "title": "Let your ideas flow",
+   "intro": "Now that you have set boundaries, discovered your values and answered your critic, there is room for what wants to grow in you. This week your ideas are allowed to flow without you having to judge them yet.",
+   "blocks": [
+    {
+     "t": "h",
+     "text": "Your talk for this week"
+    },
+    {
+     "t": "p",
+     "text": "Many women who come to Unfold have been carrying an idea around for a very long time. Some have a whole folder full of plans, others just a vague feeling that there ought to be something more. Some want to start a small business, others want to write a book, train in something new, take on voluntary work, plant a garden or finally paint again. And then there are women who say: “I do not really have any ideas left; they got lost somewhere between the changing table and the tax return.” If that sounds like you, this week is especially for you."
+    },
+    {
+     "t": "p",
+     "text": "Creativity is not a gift reserved for artists. Every person is creative, because at its core creativity means connecting things in new ways and finding solutions. You are creative when you conjure up dinner from three leftovers in the fridge, when you defuse an argument between your children with a game or when you organise a family calendar so that every appointment fits. This ability is there. It may simply have been used for a long time exclusively for other people's needs."
+    },
+    {
+     "t": "p",
+     "text": "What holds creativity back most is usually judging our ideas too early. No sooner does an idea appear than the inner critic speaks up: “That already exists”, “You do not have time for that” or “Who would ever buy that?” And the idea has vanished again before it could even breathe. That is why it is so good that we spent last week with this voice. This week she can take a break."
+    },
+    {
+     "t": "p",
+     "text": "Creativity research often distinguishes between two kinds of thinking. Divergent thinking opens up in all directions; it gathers, spins and connects without judging. Convergent thinking sorts, evaluates and selects. Both are important, but they do not work at the same time. If you try to collect ideas and check them for feasibility at the same moment, it is like pressing the accelerator and the brake at once. So this week belongs entirely to divergent thinking. The choosing comes next month, when we find, among all your ideas, the one that wants to come first."
+    },
+    {
+     "t": "p",
+     "text": "Ideas also need room, quite literally. Most good ideas do not come when we sit at a desk straining to think. They come in the shower, on a walk, while driving, while kneading clay or while grooming a horse. That is because in relaxed, undemanding moments our brain can associate freely. Different networks in the brain then work together in a way that favours new connections. But if your day is scheduled from morning to night and every free minute is filled with your phone, there is hardly any room for this process."
+    },
+    {
+     "t": "p",
+     "text": "So this week I would like to invite you to build a few small empty spaces into your day. Go for a walk without a podcast, leave your phone in your bag while you wait and treat yourself to ten minutes of simply gazing out of the window. At first this may feel unfamiliar or even boring. Yet boredom is astonishingly fertile ground for creativity."
+    },
+    {
+     "t": "p",
+     "text": "Another key is quantity. The advertising executive Alex Osborn, who popularised brainstorming in the 1940s, stressed even then that quantity leads to quality. The first ideas are almost always the obvious ones, the ones anyone would have. Only once these are written down do the surprising, bold and truly personal ideas arrive. That is why this week you will deliberately collect lots of ideas, including silly, unrealistic and seemingly unimportant ones."
+    },
+    {
+     "t": "p",
+     "text": "And do not forget that your ideas are closely connected to everything we have worked on so far. The values and strengths from week 6 and the moments in which you feel alive are like signposts. Ideas that fit your values carry you for longer, because they come from within you. So it is worth opening the pages from the last few weeks again this week and looking for the clues they hold."
+    },
+    {
+     "t": "p",
+     "text": "Let yourself be surprised this week. Perhaps a completely new idea will emerge, perhaps an old one will finally regain its colour, and perhaps you will notice that several small ideas actually belong together. Everything is allowed, nothing has to be put into action straight away, and no idea is too small to be written down."
+    },
+    {
+     "t": "fact",
+     "title": "Walking makes you creative",
+     "text": "In a much-cited study from Stanford University in 2014, participants came up with considerably more creative ideas while walking than while sitting, and the effect even lasted for a short while afterwards. So a walk is a wonderful companion to any idea-gathering session, whether across a meadow, through the woods or simply around the block."
+    },
+    {
+     "t": "fact",
+     "title": "The time in which ideas ripen",
+     "text": "Creativity research describes a phase known as incubation. After we have engaged intensively with a question, our brain keeps working on it, even while we are long since busy with something else. That is why solutions often pop up when we are no longer thinking about them at all. So it is wise to collect ideas, let them rest and then come back to them later."
+    },
+    {
+     "t": "fact",
+     "title": "Morning pages",
+     "text": "In her book “The Artist's Way”, the author Julia Cameron popularised a method she calls morning pages. Straight after waking up, you write three pages by hand, without stopping and without censoring yourself. Beautiful writing does not matter at all; the point is to clear your head on paper. Many people report that over time this creates room for new thoughts and ideas."
+    },
+    {
+     "t": "h",
+     "text": "Creative exercises"
+    },
+    {
+     "t": "exercise",
+     "title": "20 ideas in 10 minutes",
+     "time": "10 min.",
+     "intro": "This exercise quickly gets you into divergent thinking. The aim is quantity; quality can still be completely irrelevant.",
+     "steps": [
+      "Set a timer for ten minutes and have a sheet of paper and a pen you enjoy writing with ready.",
+      "At the top, write the question: “What would I love to do, try, create or change if anything were possible?”",
+      "Write down everything that comes to mind as fast as you can, numbering your ideas from 1 to 20 as you go.",
+      "If you get stuck, keep writing anyway, including absurd, funny or tiny ideas. It is often just after the point where it gets hard that the most surprising ideas appear.",
+      "Do not judge or cross out anything while the timer is running.",
+      "When the time is up, read through your list once and mark the three ideas that make your heart beat a little faster or make you smile."
+     ]
+    },
+    {
+     "t": "notes",
+     "title": "My 20 ideas",
+     "lines": 20
+    },
+    {
+     "t": "exercise",
+     "title": "Trying morning pages",
+     "time": "20–30 min. in the morning",
+     "intro": "Try morning pages on at least three days this week. If three pages feel like too much, start with one page or ten minutes.",
+     "steps": [
+      "In the evening, put a notebook and pen next to your bed or wherever you drink your coffee or tea in the morning.",
+      "Straight after getting up, before you pick up your phone, write down everything that is going through your mind.",
+      "Keep the pen moving, even if all you write is: “I cannot think of anything, I am tired, the children are still asleep.”",
+      "Do not reread what you have written during the first few weeks. It is only about the writing itself.",
+      "At the end of the week, note in a few sentences whether anything has changed in your head or in your day."
+     ]
+    },
+    {
+     "t": "tip",
+     "text": "With four children, my mornings are rarely quiet, and I know yours may be similar. If mornings really do not work, write your pages in the evening, during your lunch break or in the car while you wait for a child. Regularity matters far more than the time of day."
+    },
+    {
+     "t": "exercise",
+     "title": "Your idea mind map",
+     "time": "20 min.",
+     "intro": "A mind map helps you look at an idea from every angle and discover new connections. It works especially well for one of the three ideas you marked in the 20 ideas exercise.",
+     "steps": [
+      "Take a large sheet in landscape format and write your topic or idea in the middle. Draw a circle around it.",
+      "From the circle, draw four to six thick branches and label each with a keyword, for example: For whom? Why it matters to me, What I need for it, First steps, What excites me about it, Who could help me.",
+      "Let smaller twigs grow from each branch, writing on them everything that comes to mind. Use single words rather than whole sentences.",
+      "Feel free to use different colours, little drawings or symbols. Our brain links images and colours especially well.",
+      "If you notice a connection between two branches, draw an arrow. These very connections are often the most exciting part.",
+      "Look at your finished mind map and write one sentence at the bottom about what you now know about your idea that was not clear to you before."
+     ]
+    },
+    {
+     "t": "notes",
+     "title": "Space for your mind map",
+     "lines": 22
+    },
+    {
+     "t": "exercise",
+     "title": "The question for your childhood self",
+     "time": "15 min.",
+     "intro": "As children, we often still know exactly what we love. This exercise invites you to reconnect with that part of yourself.",
+     "steps": [
+      "Close your eyes for a moment and picture yourself at about eight years old. What did you look like, what were you wearing, where did you most love to play?",
+      "In your mind, ask this girl: “What do you love doing most of all?” and listen closely to her answer.",
+      "Ask further: “What did you want to be when you grew up?” and “What did you dream of?”",
+      "Write down all the answers, even if they seem unrealistic today, such as vet, princess or circus rider.",
+      "Consider what longing lies behind these dreams. Behind the wish to become a circus rider, for example, there may be a love of animals, of movement or of the stage.",
+      "Note how this longing could find a place in your life today, even in a very small form."
+     ]
+    },
+    {
+     "t": "prompts",
+     "title": "My childhood self",
+     "lines": 3,
+     "items": [
+      "As a child, what I loved most was …",
+      "I wanted to be …",
+      "The longing behind these dreams is …",
+      "This is how it could find a place in my life today:"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Your idea collection page"
+    },
+    {
+     "t": "p",
+     "text": "This is where you collect all the ideas that come to you this week, from the exercises, in the shower, on a walk or in the middle of the night. You do not have to judge them yet, but the columns will make it easier for you to choose next month. Simply tick “Fits my values” if you feel that the idea fits your top 5 values, and under “Energy” rate how much joy you feel when you think about the idea."
+    },
+    {
+     "t": "table",
+     "title": "Idea collection page",
+     "cols": [
+      "My idea",
+      "Where it came from",
+      "Fits my values",
+      "Energy (1–10)"
+     ],
+     "rows": 14
+    },
+    {
+     "t": "checklist",
+     "title": "Small empty spaces for ideas this week",
+     "items": [
+      "A walk without headphones and without my phone",
+      "Ten minutes gazing out of the window",
+      "Making something with my hands, for example pottery, baking, gardening or painting",
+      "Visiting an exhibition, a market or a place I have never been to",
+      "Always having a notebook or notes app with me for spontaneous ideas",
+      "Spending an evening without screens",
+      ""
+     ]
+    },
+    {
+     "t": "prompts",
+     "title": "Journaling for week 8",
+     "lines": 4,
+     "items": [
+      "Which idea have I been carrying around the longest, and what has kept me from giving it room so far?",
+      "When and where do my best ideas come to me, and how can I create more moments like that?",
+      "Which idea from this week surprised me the most?",
+      "If my inner critic went on holiday for a year, what would I try?"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Your movement this week"
+    },
+    {
+     "t": "p",
+     "text": "Halfway through Unfold, a slightly stronger Full Day flow awaits you on Monday with “Courage in your body”. It invites you to feel how much strength is already within you. I can hardly think of a better way to prepare for letting bold ideas in. On Thursday comes the Tired Day flow “Breath as your anchor”, with three breathing practices you can take anywhere, wrapped in gentle movement. Feel free to try them right before a creative exercise, because a calm breath often creates exactly the space in which ideas appear."
+    },
+    {
+     "t": "quote",
+     "text": "My ideas are allowed to exist before they are perfect."
+    }
+   ]
+  },
+  {
+   "icon": "feier",
+   "kicker": "Month in review",
+   "title": "What has blossomed",
+   "intro": "Four weeks full of topics are behind you. Before we move into the final month, take a calm look back, gather your insights and celebrate what has already grown.",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "Perhaps this month you consciously said no for the first time in a long while. Perhaps you heard something about yourself from a friend that moved you to tears, or you gave your inner critic a name and were able to smile at her a few times. Perhaps your list of ideas has grown longer than you would have thought. And perhaps you have also noticed how hard some of these topics are and how much time they need. All of this is part of it, and all of it is valuable."
+    },
+    {
+     "t": "p",
+     "text": "Give yourself a quiet half hour for this review, ideally with a cup of tea and your workbook on your lap. Beforehand, leaf through the pages of the last four weeks once more and look at what you have written."
+    },
+    {
+     "t": "scale",
+     "title": "How I am now",
+     "items": [
+      "My energy in everyday life",
+      "How well I sleep",
+      "How easy my mental load feels at the moment",
+      "How often I take time for myself",
+      "How well I sense what I need",
+      "How kindly I speak to myself",
+      "How much I believe in myself",
+      "How much room my own ideas have right now"
+     ],
+     "low": "hardly",
+     "high": "very"
+    },
+    {
+     "t": "tip",
+     "text": "Now place the scale from the beginning of this month next to it. Do not only look for big leaps; even a single extra point in kindness towards yourself is a real step."
+    },
+    {
+     "t": "prompts",
+     "title": "Looking back on Month 2",
+     "lines": 4,
+     "items": [
+      "What have I learnt about myself this month that I did not know before?",
+      "Which boundary did I set, and what did it change?",
+      "My five most important values and my greatest strengths are:",
+      "How do I speak to myself today when something goes wrong, and what is different from four weeks ago?",
+      "Which ideas have become especially dear to me this month?",
+      "What am I proud of this month?",
+      "What do I definitely want to take with me from this month?"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Looking ahead to Month 3 · Unfold"
+    },
+    {
+     "t": "p",
+     "text": "The third and final month of Unfold is about getting started. It is called “Unfold · Begin”, and we open it in week 9 with a big and beautiful task: from all your ideas, you choose the one that wants to come first. For this you will need everything you have gathered this month, your values, your strengths, what makes you feel alive and, of course, your idea collection page."
+    },
+    {
+     "t": "p",
+     "text": "After that we look at how good intentions become habits that stay, how you can bravely become visible and ask for support, how you can stay kind to yourself when something does not work out, and at the end we celebrate together what has grown. You will walk into spring with a plan and a lot of trust."
+    },
+    {
+     "t": "exercise",
+     "title": "Your shortlist for week 9",
+     "time": "15 min.",
+     "intro": "So that you start next month well prepared, you will now make a small, non-binding shortlist.",
+     "steps": [
+      "Open your idea collection page and your list of 20 ideas.",
+      "Mark every idea that fits at least two of your top 5 values.",
+      "From these ideas, choose no more than three where your energy is highest.",
+      "Write these three ideas in the table below and note what draws you to each one and what may still be making you hesitate.",
+      "Let the shortlist rest until our first live call in the third month. Your brain will keep working on it in the meantime."
+     ]
+    },
+    {
+     "t": "table",
+     "title": "My three favourites",
+     "cols": [
+      "Idea",
+      "What draws me to it",
+      "What still makes me hesitate"
+     ],
+     "rows": 3
+    },
+    {
+     "t": "prompts",
+     "title": "For the transition",
+     "lines": 3,
+     "items": [
+      "What do I need to start the third month well?",
+      "What can I let go of before we carry on?",
+      "A sentence I would like to take with me into Month 3:"
+     ]
+    },
+    {
+     "t": "quote",
+     "text": "Everything that wants to blossom is already within me."
+    }
+   ]
+  }
+ ],
+ "closing": "A bud opens at its own pace when it receives enough warmth and light. Keep giving yourself that warmth; I am looking forward to everything that will blossom in you in Month 3."
+}

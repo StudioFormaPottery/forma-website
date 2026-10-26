@@ -1,0 +1,303 @@
+{
+  "key": "method-ankommen",
+  "lang": "en",
+  "eyebrow": "Mindful Movement Method · Arrive",
+  "title": "Arrive",
+  "subtitle": "Your first steps, your own space and your first little rituals",
+  "icon": "nest",
+  "letter": [
+    "Dear you, I'm so glad you're here. If you're opening this workbook right now, you've already chosen something that gets far too little room in most women's lives, namely a bit of time that belongs entirely to you. Maybe the shopping list is still lying next to you, maybe a laundry basket is waiting, or a child who's about to need something from you. All of that is allowed to be there, and still I'd like to invite you to breathe out deeply for the next few minutes and simply arrive with yourself.",
+    "I live in the mountains with my husband and our four children, and I know how full a day can get and how quiet your own voice can become along the way. I found my way back to myself through movement, and through the gentle kind where you don't have to prove anything. A few slow minutes on the mat and one conscious breath with my hand on my belly were often enough to make room inside me again. That's exactly the experience I want to share with you.",
+    "The Mindful Movement Method is built to walk beside you rather than overwhelm you. You begin with Arrive, and after that a new programme with its own theme opens up month by month. You move at your own pace, and you don't have to compare yourself with anyone, not even with the version of you from a few years ago.",
+    "This workbook is your companion for the first few days. In it you'll find an explanation of how the Method works, ideas for your own space at home, the most important basics of mindful movement, and pages where you can write down where you are right now and where you'd like to go. Write in it, cross things out, doodle in the margins. It's your book, and it doesn't have to look pretty to do you good.",
+    "I'm so happy that we're walking this path together. Make yourself a cup of tea, get comfortable, and then let's simply begin. With love, Vivien"
+  ],
+  "overview": [
+    {"icon": "kompass", "title": "How the Method works", "text": "How the videos build on each other and why you go step by step."},
+    {"icon": "schritte", "title": "Your three Arrive videos", "text": "What's waiting for you in your welcome video, your first flow and your first breathing practice."},
+    {"icon": "home", "title": "Your space at home", "text": "A little corner where you love stepping onto the mat, and what you need for it."},
+    {"icon": "welle", "title": "The basics of mindful movement", "text": "Breath, pace, pauses and the difference between a stretch and pain."},
+    {"icon": "atem", "title": "Breath That Holds You", "text": "Your first breathing practice to follow along with, for every moment when it all gets too much."},
+    {"icon": "spiegel", "title": "Where are you right now?", "text": "An honest check-in on your energy, sleep, stress and how you feel in your body."},
+    {"icon": "stern", "title": "Your intention", "text": "What you wish for yourself over the coming months, in your own words."},
+    {"icon": "kalender", "title": "Your first weeks", "text": "A weekly tracker and a simple plan for your three sessions a week."},
+    {"icon": "kerze", "title": "First little rituals", "text": "Small habits that fit easily into a busy everyday life."}
+  ],
+  "chapters": [
+    {
+      "icon": "kompass",
+      "kicker": "Chapter 1",
+      "title": "How the Method works",
+      "intro": "Before you get started, I'd like to take a moment to explain how the Method is structured. When you know what to expect, it's easier to stick with it and stay true to yourself along the way.",
+      "blocks": [
+        {"t": "p", "text": "The Mindful Movement Method is a membership that accompanies you month by month. Everyone begins with the module “Arrive”, which is made up of three videos and is open to you straight away. After that, your first month opens with its own programme of twelve videos, and every month after that brings a new theme that suits the season and what many women are dealing with at that time of year. The first month is called “Retreat & Rest” and carries you through the dark winter weeks."},
+        {"t": "h", "text": "Step by step through your programme"},
+        {"t": "steps", "items": [
+          "You start with the video “Welcome to the Method”. In it I tell you why this place exists and how to find your way around.",
+          "The other two Arrive videos, “Your First Flow” and “Breath That Holds You”, are open to you at any time. You can repeat them as often as you like.",
+          "As soon as you've watched the welcome video all the way through, the first video of your monthly programme opens up.",
+          "Each following video unlocks once you've completed the previous one to the end. You'll then find it right away in your library, even on the same day.",
+          "A new month opens on your monthly start date at the earliest. That way you have enough time to experience the current programme without rushing."
+        ]},
+        {"t": "h", "text": "Three sessions a week"},
+        {"t": "p", "text": "The idea is that you set aside time for a video about three times a week. With twelve videos a month, that lets you move comfortably through your programme without it feeling like one more obligation. Most videos last between five and thirty minutes, so you can fit them in before breakfast, during your lunch break or in the evening once the children are asleep. If you'd like to do more on a particular day, for example adding a breathing practice after a flow, you're of course very welcome to."},
+        {"t": "fact", "title": "Why three sessions?", "text": "Habits form through repetition within a manageable framework. Three set time slots a week are realistic for most women, even in busy weeks, and they come around often enough for your body to recognise the movements and for you to feel that something is changing. A plan you can actually keep will serve you far better in the long run than an ambitious plan you give up after two weeks."},
+        {"t": "h", "text": "Three kinds of videos"},
+        {"t": "p", "text": "Each month, three kinds of videos take turns. Each one has its own purpose, and together they make up a blend of movement, strength, knowledge and rest."},
+        {"t": "list", "items": [
+          "Flow: Here I guide you with my voice through a sequence of exercises from yoga, Pilates and somatics. I tell you how to move into a pose, what you might feel there and how to come back out of it. You don't need to look at the screen and can stay completely with yourself.",
+          "Movement video: These videos have no talking. You see one exercise after another and move along to a timer, choosing yourself whether each exercise lasts 30 or 45 seconds. You can play your own favourite music alongside.",
+          "Talking head: Here we sit together as if we were having tea. I share knowledge and thoughts with you, for example about mental load, or guide you through a breathing practice or a guided meditation."
+        ]},
+        {"t": "tip", "text": "For the movement videos it's worth putting together a little playlist of your own. In the morning I love calm instrumental music, and in the afternoon something with a bit more rhythm. If you always start the same playlist, after a few times your body will know from the very first song that your time is beginning."},
+        {"t": "h", "text": "Why you can't skip ahead"},
+        {"t": "p", "text": "You might be wondering why you can't simply open all the videos at once in the Method, fast-forward or skip ahead. I made that choice very deliberately. When everything lies in front of us at the same time, we tend to click around, never find a proper starting point and in the end don't stick with anything. I know that feeling very well from my own life."},
+        {"t": "p", "text": "When a video only opens after you've fully completed the previous one, a clear thread runs through everything. You don't have to think about what comes next, because that decision has already been made. That takes a small but noticeable weight off your shoulders, especially on days when your mind is already full of decisions. The videos also build on each other: what you practise in a flow comes up again in a movement video, and the breathing practices prepare you for the meditations."},
+        {"t": "fact", "title": "You can never fall behind", "text": "If you miss a day, or even a whole week, your next video simply waits for you. There's nothing to catch up on and no list piling up. You carry on exactly where you left off."},
+        {"t": "quote", "text": "I go step by step, and every step counts."}
+      ]
+    },
+    {
+      "icon": "schritte",
+      "kicker": "Chapter 2",
+      "title": "Your three Arrive videos",
+      "intro": "Arrive is your gentle way in. From today, these three videos are entirely yours, and you can come back to them whenever you like.",
+      "blocks": [
+        {"t": "h", "text": "Welcome to the Method"},
+        {"t": "p", "text": "In this talking head I tell you why I built the Method and what lies ahead of you over the coming months. You'll learn how the videos are structured, where to find your journal and why I hope you'll be gentle with yourself. It's best to watch it in a quiet moment, maybe on the sofa with a cup of tea. Only once you've watched this video all the way through does your first monthly video open up."},
+        {"t": "h", "text": "Your First Flow"},
+        {"t": "p", "text": "Your first flow lasts about fifteen minutes and is so gentle that it will suit you, no matter how long it's been since you last moved. You begin lying down, make your way slowly via all fours up to standing and finally come to rest on the mat again. These are the exercises you'll meet in it:"},
+        {"t": "list", "items": [
+          "Breath awareness lying on your back",
+          "Pelvic Tilts",
+          "Windshield Wipers",
+          "Cat-Cow",
+          "Child's Pose (Balasana)",
+          "Downward-Facing Dog (Adho Mukha Svanasana)",
+          "Roll Up to standing",
+          "Mountain Pose (Tadasana)",
+          "Standing Side Bend",
+          "Warrior II (Virabhadrasana II)",
+          "Final relaxation (Savasana)"
+        ]},
+        {"t": "tip", "text": "Many of these exercises will stay with you throughout the whole Method. If you do your first flow two or three times, you'll soon know the basic movements so well that in later videos you can focus entirely on how things feel."},
+        {"t": "h", "text": "Breath That Holds You"},
+        {"t": "p", "text": "This short breathing practice takes only about five minutes and is meant for all the moments when things get too much. You breathe in through your nose for a count of four and slowly out again for a count of six. You can do it sitting, standing or lying down, in the car outside the nursery just as well as in bed at night. In Chapter 5 you'll find the practice written out so you can read it and follow along."},
+        {"t": "table", "title": "My Arrive", "cols": ["Video", "Done on", "How I felt afterwards"], "rows": [
+          ["Welcome to the Method", "", ""],
+          ["Your First Flow", "", ""],
+          ["Breath That Holds You", "", ""],
+          ["Your First Flow (repeat)", "", ""],
+          ["Breath That Holds You (repeat)", "", ""]
+        ]}
+      ]
+    },
+    {
+      "icon": "home",
+      "kicker": "Chapter 3",
+      "title": "Your space at home",
+      "intro": "You don't need a studio of your own or a perfect room. But a little corner you love being in makes it so much easier to step onto the mat regularly.",
+      "blocks": [
+        {"t": "p", "text": "If your mat has to be fetched from the basement every time and you first have to clear away toys, fifteen minutes quickly turn into half an hour, and on busy days you end up skipping it altogether. A set spot lowers that hurdle. It reminds you every day that something is waiting for you here, and over time your body learns to settle more easily in this place."},
+        {"t": "h", "text": "How to find your corner"},
+        {"t": "list", "items": [
+          "You need about as much space as your mat is long, plus an arm's length on either side so you can stretch your arms out.",
+          "A bit of free wall is handy, because some exercises, such as Legs Up the Wall or Wall Angels, need a wall behind you.",
+          "Make sure the floor isn't slippery. On tiles or wooden floors it's best to put a non-slip mat or a rug underneath.",
+          "If you can, choose a spot with daylight or a warm lamp. Harsh ceiling light makes it harder to wind down in the evening.",
+          "Set up your tablet or laptop so that you can see the screen comfortably from the mat without twisting your head too far."
+        ]},
+        {"t": "tip", "text": "In our house a room is rarely completely empty. What helps is a small box or basket holding your blanket, cushion and block. That way everything is ready in a minute, and tidied away again just as quickly afterwards."},
+        {"t": "checklist", "title": "What you need", "items": [
+          "A yoga mat or a soft rug",
+          "A wool blanket to lie on and to cover yourself with",
+          "A firm cushion or meditation cushion to sit on",
+          "A second cushion or a rolled-up towel for your knees and head",
+          "Optional: two yoga blocks or two thick books",
+          "A glass of water or a cup of tea within reach",
+          "Warm socks for the final relaxation",
+          "Comfortable clothes you can move freely in",
+          "Your phone on flight mode or in another room",
+          "This workbook and a pen"
+        ]},
+        {"t": "fact", "title": "A place as a signal", "text": "Our brain likes to link places with certain activities. If you always practise in the same spot, you often need less of a run-up, because simply rolling out the mat becomes the starting signal. That's why it helps to use your corner just for your own time if possible, rather than also turning it into a drop zone for laundry or post."},
+        {"t": "prompts", "title": "My corner", "items": [
+          "Where in my home do I feel most at ease, and where could my mat go?",
+          "What would I need to change so that I love using this spot?",
+          "Which small thing would make my corner cosier, like a candle, a plant or a particular cushion?"
+        ], "lines": 3}
+      ]
+    },
+    {
+      "icon": "welle",
+      "kicker": "Chapter 4",
+      "title": "The basics of mindful movement",
+      "intro": "Mindful movement means really noticing your body while you practise. These basics will help you move safely and with joy.",
+      "blocks": [
+        {"t": "p", "text": "Many of us learned to link movement with performance. We count repetitions, compare ourselves with others and keep going even when our body has long been quietly protesting. The Method is about something different. You're allowed to be curious about how a movement feels today, and you're allowed to adapt it to your day. That doesn't make the exercises any less effective. Quite the opposite, because when you practise mindfully you usually move with better form and get injured less often."},
+        {"t": "h", "text": "Your breath leads the way"},
+        {"t": "p", "text": "During the exercises, breathe through your nose if you can and let your breath flow calmly. In many flows we link a movement with the breath, for example opening up as you breathe in and rounding as you breathe out. If you notice you're holding your breath, take it as a friendly hint to make the movement a little smaller or slower. In strengthening exercises most women find it helps to breathe out during the effort, for instance as you press up out of a squat."},
+        {"t": "h", "text": "Slow is your pace"},
+        {"t": "p", "text": "Slow movements often challenge your muscles more than you'd expect, and they give you time to feel what's happening in your body. You don't have to keep up with the pace in the video. If an exercise in a movement video changes too quickly for you, choose the 45-second timer, or do one repetition fewer and make it fully conscious instead."},
+        {"t": "h", "text": "Telling a stretch from pain"},
+        {"t": "p", "text": "A stretch can be clearly noticeable, but it should never feel sharp or make you hold your breath. This overview helps you make sense of your body's signals:"},
+        {"t": "table", "title": "What am I feeling?", "cols": ["Good sign", "Careful, better ease off"], "rows": [
+          ["A pulling, even sensation in the muscle", "A stabbing, sharp or shooting pain"],
+          ["Warmth and slight trembling during strength work", "Pain in a joint, such as the knee or shoulder"],
+          ["The sensation eases a little after a few breaths", "Tingling, numbness or pain that radiates"],
+          ["You can keep breathing calmly and talking", "You're holding your breath or grimacing"],
+          ["After the exercise you feel more open and loose", "Dizziness, nausea or pressure in your head"]
+        ]},
+        {"t": "tip", "text": "I like to picture a scale from one to ten. A stretch can feel like a four to six. Anything above that is a sign to take a step back, bend a knee or place a cushion underneath."},
+        {"t": "h", "text": "Pauses are part of it"},
+        {"t": "p", "text": "You can pause at any time. Child's Pose is your place of retreat in every video, where you can sink down when you want to catch your breath. A pause isn't giving up, and it doesn't make your practice any worse. Often the moment when you stop and notice the after-effects is the most valuable part of an exercise."},
+        {"t": "fact", "title": "Please check first", "text": "If you're pregnant, have recently had a baby, are getting back into exercise after surgery, or have conditions such as back pain, high blood pressure, heart or circulation problems or joint issues, please talk to your doctor or midwife before you begin. In every exercise, choose the easier variation as soon as something doesn't feel right, and stop if you feel pain, dizziness or shortness of breath. The Method videos are no substitute for medical advice or therapy."},
+        {"t": "quote", "text": "Today my body is allowed to tell me what it needs."}
+      ]
+    },
+    {
+      "icon": "atem",
+      "kicker": "Chapter 5",
+      "title": "Breath That Holds You",
+      "intro": "This breathing practice is your little first-aid kit for overwhelming moments. It only takes a few minutes and works anywhere.",
+      "blocks": [
+        {"t": "p", "text": "When we're under pressure, our breath often becomes shallow and fast, and we tend to breathe high up into the chest. That happens completely automatically, for example when the children are fighting, the phone rings and dinner is burning all at the same time. The other way round, a deliberately slow breath lets us send our body a signal that it can calm down a little again."},
+        {"t": "breath", "title": "Extended exhale", "pattern": "4 · 6", "text": "Breathe in through your nose and slowly count to four. Then breathe out through your mouth or nose and count to six. Repeat this about ten times, then let go of the counting."},
+        {"t": "exercise", "title": "How to do the practice", "time": "3 to 5 minutes", "intro": "You can sit, stand or lie down. All that matters is that you have a moment to yourself.", "steps": [
+          "Place one hand on your heart and the other on your belly.",
+          "Let your shoulders drop and release your jaw by letting your teeth part slightly.",
+          "Breathe in through your nose and slowly count to four. Feel your belly rise under your hand.",
+          "Breathe out slowly and count to six. Imagine gently blowing across a hot cup of tea.",
+          "Repeat this about ten times. If four and six feel too long, start with three and five.",
+          "Let go of the counting, keep breathing naturally and take a moment to notice how you feel now."
+        ]},
+        {"t": "fact", "title": "Why the long exhale?", "text": "As you breathe out, your heartbeat naturally slows down a little, and as you breathe in it speeds up slightly. When you deliberately lengthen the exhale, you emphasise this calming phase. That's why many people experience slow breathing with a long exhale as relaxing. It's a simple tool that helps you gain a little distance in an overwhelming moment, even though it doesn't, of course, solve the causes of stress."},
+        {"t": "tip", "text": "Pick a set moment in your day to build the practice in, for example every time you get into the car, before you start the engine. That way it becomes a habit, and on difficult days your body will remember it all by itself."},
+        {"t": "table", "title": "When did my breath help me?", "cols": ["Date", "Situation", "Before (1 to 10)", "After (1 to 10)"], "rows": 6}
+      ]
+    },
+    {
+      "icon": "spiegel",
+      "kicker": "Chapter 6",
+      "title": "Where are you right now?",
+      "intro": "Before you set off, it's worth taking an honest look at how you're doing right now. There's no right or wrong here, only where you stand today.",
+      "blocks": [
+        {"t": "p", "text": "This check-in is a snapshot of today. In a few months you can flip back and compare. Things often change so slowly that we don't even notice it in everyday life, and only looking back shows us how far we've come. Take a few minutes, breathe deeply once and circle whatever feels true for you without overthinking it."},
+        {"t": "scale", "title": "How I'm doing today", "items": [
+          "My energy in everyday life",
+          "How restful my sleep is",
+          "How calm I feel inside",
+          "How comfortable I feel in my body",
+          "How flexible I feel",
+          "How strong I feel",
+          "How much time I take for myself",
+          "How easy I find it to take breaks"
+        ], "low": "barely", "high": "very"},
+        {"t": "scale", "title": "My stress right now", "items": [
+          "How full my head feels",
+          "How tense my shoulders and neck are",
+          "How often I feel rushed"
+        ], "low": "a little", "high": "a lot"},
+        {"t": "prompts", "title": "An honest look", "items": [
+          "Where in my body do I feel tension or tiredness right now?",
+          "What drains my energy the most at the moment?",
+          "When did I last feel really good in my body, and what was different back then?",
+          "What gives me energy back on an ordinary day?"
+        ], "lines": 4},
+        {"t": "fact", "title": "If your scores stay low for a long time", "text": "If you've felt exhausted for weeks, are sleeping badly all the time or feel low, please take that seriously. Movement and breathing practices can support you, but they're no substitute for getting checked. A doctor can, for example, look into whether physical causes such as iron deficiency or a thyroid condition are behind it, and if you're struggling emotionally, a therapist is a good place to turn."}
+      ]
+    },
+    {
+      "icon": "stern",
+      "kicker": "Chapter 7",
+      "title": "Your intention for the coming months",
+      "intro": "An intention is like a compass. It gives you a direction without setting out a rigid path.",
+      "blocks": [
+        {"t": "p", "text": "Many of us start a new year or a new programme with big goals. We want to lose five kilos, do yoga every morning at six and never feel stressed again. Goals like that often put us under pressure instead, and when we don't reach them, we feel bad. An intention is gentler. It describes how you'd like to feel and what attitude you want to take towards yourself."},
+        {"t": "p", "text": "An intention might sound like this: “I want to take time for myself three times a week, without a guilty conscience.” Or: “I want to feel my back properly again and switch off more easily in the evening.” Put it in your own words so that it feels true for you."},
+        {"t": "prompts", "title": "What I wish for", "items": [
+          "How do I want to feel in my body three months from now?",
+          "What should change in my everyday life if I step onto the mat regularly?",
+          "What has kept me from taking time for myself until now?",
+          "What can I allow myself over the coming months, even if it still feels hard?",
+          "Who or what can support me so that I stick with it?"
+        ], "lines": 4},
+        {"t": "h", "text": "My intention in one sentence"},
+        {"t": "notes", "title": "Write your intention here and read it quietly to yourself once before each video.", "lines": 4},
+        {"t": "tip", "text": "Also write your intention on a little slip of paper and put it in your basket with your blanket and cushion. When you find it before you practise, it reminds you why you chose this time for yourself."},
+        {"t": "quote", "text": "I don't have to change everything at once. It's enough to start today."}
+      ]
+    },
+    {
+      "icon": "kalender",
+      "kicker": "Chapter 8",
+      "title": "Your first weeks",
+      "intro": "A small plan helps you build the Method into your everyday life. Put your three sessions in your calendar like a doctor's appointment you wouldn't simply move.",
+      "blocks": [
+        {"t": "p", "text": "Look at your week and think about where there are realistic windows of time. Maybe it's Monday morning once the children have left the house, Wednesday evening when your partner does bedtime, and Saturday morning. It doesn't have to be the same days every week, but fixed anchors make it easier."},
+        {"t": "table", "title": "My three sessions a week", "cols": ["Week", "Session 1", "Session 2", "Session 3"], "rows": [
+          ["Week 1", "", "", ""],
+          ["Week 2", "", "", ""],
+          ["Week 3", "", "", ""],
+          ["Week 4", "", "", ""]
+        ]},
+        {"t": "tracker", "title": "My weekly tracker", "items": [
+          "A video from the Method",
+          "Breath That Holds You",
+          "Five minutes outside in the fresh air",
+          "Drank enough water",
+          "Put my phone away an hour before bed",
+          "A moment just for me"
+        ]},
+        {"t": "tip", "text": "The tracker is an invitation, not a test. If there are only two ticks in a week, those are two moments you gave yourself. Look at what went well rather than at the empty boxes."},
+        {"t": "prompts", "title": "After the first week", "items": [
+          "Which time of day worked best for me?",
+          "What got in my way, and how can I make it easier next week?"
+        ], "lines": 3}
+      ]
+    },
+    {
+      "icon": "kerze",
+      "kicker": "Chapter 9",
+      "title": "First little rituals",
+      "intro": "Rituals are small, recurring moments that give your day a frame. They take hardly any time and work precisely because you repeat them often.",
+      "blocks": [
+        {"t": "p", "text": "What sets a ritual apart from an ordinary habit is the attention you bring to it. Brushing your teeth is a habit. But when you hold your first cup of tea in the morning with both hands, feel its warmth and look out of the window for three breaths before the day begins, it becomes a ritual. Choose one or two of the following ideas that speak to you and try them out for a week."},
+        {"t": "exercise", "title": "The morning anchor", "time": "2 minutes", "intro": "For the moment right after you wake up, before you reach for your phone.", "steps": [
+          "After you wake up, stay lying down for a moment and stretch out as long as you can.",
+          "Place one hand on your belly and take three calm breaths.",
+          "Quietly ask yourself what you need today. Maybe the answer is patience, warmth or a break in the afternoon.",
+          "Take that one word with you into your day."
+        ]},
+        {"t": "exercise", "title": "The transition pause", "time": "15 seconds", "intro": "For the moments between two tasks, when you switch from one role to the next.", "steps": [
+          "Before you start the next task, stand still for a moment and feel your feet on the floor.",
+          "Breathe in through your nose three times and let each breath flow out a little longer.",
+          "Then begin the next thing consciously."
+        ]},
+        {"t": "exercise", "title": "The evening wind-down", "time": "5 minutes", "intro": "For the end of the day, when the house slowly grows quiet.", "steps": [
+          "Dim the lights a little and put your phone out of reach.",
+          "Write down three things that were good today, even if they're very small.",
+          "Write down one thing you want to get done tomorrow, so it doesn't keep circling in your head.",
+          "Lie down and do a few rounds of the extended exhale from Chapter 5."
+        ]},
+        {"t": "checklist", "title": "My rituals for this week", "items": [
+          "Morning anchor after waking up",
+          "Drank my first cup of tea or coffee in peace",
+          "Transition pause between two tasks",
+          "A short walk in daylight",
+          "Lit a candle before stepping onto the mat",
+          "Evening wind-down with three good things",
+          "A breathing practice in bed before falling asleep"
+        ]},
+        {"t": "tip", "text": "Link a new ritual to something you already do every day. The transition pause fits beautifully with the moment you pick up your car keys, and the evening wind-down with the moment you plug your phone into its charger."},
+        {"t": "prompts", "title": "Looking back on your first week", "items": [
+          "Which ritual felt most natural?",
+          "What did I notice for the first time about myself or my body this week?",
+          "What am I looking forward to in my first month?"
+        ], "lines": 4},
+        {"t": "quote", "text": "Small moments for myself aren't a luxury. They carry me through full days."}
+      ]
+    }
+  ],
+  "closing": "You've taken the first step, and that's often the hardest one. I'm looking forward to walking with you through your first month, entirely at your own pace and with as much calm as you need right now."
+}
