@@ -26,7 +26,7 @@ function mvl_head(string $title, string $desc, string $canon, string $og = '/img
 <link rel="stylesheet" href="/wildhearts/assets/site.css?v=7">
 <?= $extraCss ?>
 <script>(function(){var l=<?= json_encode($l) ?>;try{if(!l)l=localStorage.getItem('wh-lang')||''}catch(e){}if(!l)l=(navigator.language||'').toLowerCase().indexOf('en')===0?'en':'de';document.documentElement.dataset.l=l;document.documentElement.lang=l;})();</script>
-<script src="/wildhearts/assets/schutz.js?v=2"></script>
+<script src="/wildhearts/assets/schutz.js?v=3"></script>
 </head>
 <?php
 }

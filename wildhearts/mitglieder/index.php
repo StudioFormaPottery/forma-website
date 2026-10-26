@@ -130,7 +130,7 @@ function mv_head(string $title, string $lang): void
 <meta name="apple-mobile-web-app-title" content="Movecia">
 <link rel="stylesheet" href="/wildhearts/assets/mv.css?v=1">
 <link rel="stylesheet" href="/wildhearts/mitglieder/app.css?v=2">
-<script src="/wildhearts/assets/schutz.js?v=2"></script>
+<script src="/wildhearts/assets/schutz.js?v=3"></script>
 </head>
 <?php
 }

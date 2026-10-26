@@ -23,6 +23,4 @@
     if ('MutationObserver' in window) new MutationObserver(function (ms) { ms.forEach(function (r) { r.addedNodes.forEach(function (n) { if (n.nodeType === 1) { if (/^(IMG|VIDEO)$/.test(n.tagName)) prep(n.parentNode || document); else prep(n); } }); }); }).observe(document.documentElement, { childList: true, subtree: true });
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
-  // „Dieser Inhalt ist nur für dich“-Fenster auf allen Movecia-Seiten
-  var w = document.createElement('script'); w.src = '/wildhearts/assets/wasserzeichen.js?v=2'; w.defer = true; (document.head || document.documentElement).appendChild(w);
 })();

@@ -335,7 +335,7 @@ footer summary{cursor:pointer}
 .slotb button:disabled{opacity:.4;cursor:default;text-decoration:line-through}
 <?= NATAL_HEALTH_CSS ?>
 </style>
-<script src="/wildhearts/assets/schutz.js?v=2"></script>
+<script src="/wildhearts/assets/schutz.js?v=3"></script>
 </head>
 <body data-mode="<?= $online ? 'online' : 'studio' ?>">
 <header class="top w"><a class="brand" href="<?= $order ? $h(natal_link($order)) : '/' ?>"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia<i></i></a><span class="top-r"><span class="tag">1:1 <?= $order ? ($online ? 'online' : 'im Studio') : 'im Studio &amp; online' ?> · Prä- &amp; Postnatal</span><?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('natal', ['lang' => false]); ?></span></header>

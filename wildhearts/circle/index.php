@@ -62,7 +62,7 @@ a{color:var(--wine)}
 .plans{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}.pl{display:flex;gap:10px;align-items:center;padding:11px 14px;border:1.5px solid var(--line);border-radius:16px;background:var(--cream);cursor:pointer;font-size:16px}.pl input{accent-color:var(--wine);width:17px;height:17px}.pl em{font-style:normal;font-size:12.5px;background:var(--sage);color:var(--wine-deep);border-radius:999px;padding:2px 9px;margin-left:4px}
 .invite{display:inline-block;margin-top:16px;padding:8px 18px;border-radius:999px;background:var(--sage);color:var(--wine-deep);font-size:15px}
 </style>
-<script src="/wildhearts/assets/schutz.js?v=2"></script>
+<script src="/wildhearts/assets/schutz.js?v=3"></script>
 </head>
 <body>
 <div class="bg" aria-hidden="true"><span style="width:420px;height:420px;right:-200px;top:-150px;background:#E8DED2"></span><span style="width:300px;height:300px;left:-190px;bottom:-60px;background:#E8D6CA;opacity:.6"></span></div>

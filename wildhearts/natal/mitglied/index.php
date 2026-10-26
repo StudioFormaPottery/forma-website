@@ -258,7 +258,7 @@ input:focus{outline:2px solid var(--plum);outline-offset:1px}
 footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);text-align:center}
 </style>
 <?= natal_workbook_assets() ?>
-<script src="/wildhearts/assets/schutz.js?v=2"></script>
+<script src="/wildhearts/assets/schutz.js?v=3"></script>
 </head>
 <body>
 <?php if ($demo): ?><p class="demo">Vorschau mit Beispieldaten · <a style="color:var(--peach)" href="?demo=prae">pränatal</a> · <a style="color:var(--peach)" href="?demo=post">postnatal</a> · <a style="color:var(--peach)" href="?demo=vorschau">in den ersten 14 Tagen</a></p><?php endif; ?>
