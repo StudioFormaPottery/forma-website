@@ -127,7 +127,7 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
     <p class="k"><span class="de">Persönlich im Paznaun</span><span class="en">In person in the Paznaun valley</span></p>
     <h3 style="font-size:2rem;margin-top:.5rem"><span class="de">1:1 Personal Training</span><span class="en">1:1 personal training</span></h3>
     <p class="mut" style="margin-top:.6rem"><span class="de">Im Studio in Mathon oder draußen in der Natur: Training, das zu deinem Körper und deinem Alltag passt. Auch für Gäste im Urlaub.</span><span class="en">In the studio in Mathon or outdoors in nature: training that fits your body and your everyday life. Also for holiday guests.</span></p>
-    <p style="margin-top:1.2rem"><a class="btn line" href="mailto:hello@moveciamovement.com?subject=Personal%20Training"><span class="de">Anfrage schicken</span><span class="en">Send a request</span></a></p>
+    <p style="margin-top:1.2rem"><button class="btn line" type="button" data-pt-open><span class="de">Anfrage schicken</span><span class="en">Send a request</span></button></p>
   </div>
   <div class="box dark rv">
     <p class="k"><span class="de">Geschenk für dich</span><span class="en">A gift for you</span></p>
@@ -145,6 +145,73 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
 </div></section>
 </main>
 <?php mvl_foot(); ?>
+<?php require_once dirname(__DIR__, 2) . '/api/mm-pt.inc.php';
+$ptChips = function (string $name, array $map, string $type = 'checkbox') { foreach ($map as $k => [$de, $en]) echo '<label class="ptc"><input type="' . $type . '" name="' . $name . '[]" value="' . $k . '"><span><span class="de">' . htmlspecialchars($de) . '</span><span class="en">' . htmlspecialchars($en) . '</span></span></label>'; }; ?>
+<!-- 1:1 Personal Training anfragen (Vivien, 26.10.2026): Formular statt E-Mail, landet in der Verwaltung -->
+<dialog id="ptd" class="ptd" aria-labelledby="pth">
+  <form id="ptf" novalidate>
+    <button class="ptx" type="button" data-pt-close aria-label="Schließen">✕</button>
+    <p class="k"><span class="de">1:1 Personal Training</span><span class="en">1:1 personal training</span></p>
+    <h2 id="pth"><span class="de">Erzähl mir, was du dir <em>wünschst</em></span><span class="en">Tell me what you <em>wish for</em></span></h2>
+    <p class="ptq"><span class="de">Was wünschst du dir?</span><span class="en">What would you like?</span></p>
+    <div class="ptg"><?php $ptChips('goals', MM_PT_GOALS); ?></div>
+    <p class="ptq"><span class="de">Wo möchtest du trainieren?</span><span class="en">Where would you like to train?</span></p>
+    <div class="ptg"><?php $ptChips('places', MM_PT_PLACES); ?></div>
+    <p class="ptq"><span class="de">Wann passt es dir meistens?</span><span class="en">When does it usually suit you?</span></p>
+    <div class="ptg"><?php $ptChips('times', MM_PT_TIMES); ?></div>
+    <p class="ptq"><span class="de">Ein paar Worte zu dir</span><span class="en">A few words about you</span></p>
+    <textarea name="message" rows="4" maxlength="1500" data-ph-de="Zum Beispiel, wie es dir gerade geht, was du vorhast oder ob es Beschwerden gibt, die ich kennen sollte." data-ph-en="For example how you are feeling right now, what you have in mind or anything about your body I should know."></textarea>
+    <div class="ptrow">
+      <input type="text" name="name" autocomplete="name" maxlength="80" required data-ph-de="Dein Name" data-ph-en="Your name">
+      <input type="email" name="email" autocomplete="email" maxlength="160" required placeholder="E-Mail">
+    </div>
+    <input type="text" name="phone" autocomplete="tel" maxlength="40" data-ph-de="Telefon (optional, falls ich dich anrufen darf)" data-ph-en="Phone (optional, if I may call you)">
+    <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <p class="small ptn"><span class="de">Ich nutze deine Angaben nur, um mich bei dir zu melden. Mehr dazu im <a href="/terms/#datenschutz">Datenschutz</a>.</span><span class="en">I only use your details to get back to you. More in the <a href="/terms/#datenschutz">privacy notice</a>.</span></p>
+    <div><button class="btn" type="submit"><span class="de">Anfrage abschicken</span><span class="en">Send my request</span></button></div>
+    <p class="ptmsg" id="ptmsg" hidden></p>
+  </form>
+  <div class="ptok" id="ptok" hidden>
+    <img src="/img/movecia/movecia-zeichen.svg" alt="" width="58" height="58">
+    <h2><span class="de">Danke dir von Herzen</span><span class="en">Thank you so much</span></h2>
+    <p><span class="de">Deine Anfrage ist bei mir angekommen. Ich melde mich in den nächsten Tagen persönlich bei dir, und eine kleine Bestätigung liegt schon in deinem Postfach.</span><span class="en">Your request has reached me. I will get back to you personally within the next few days, and a short confirmation is already in your inbox.</span></p>
+    <button class="btn line" type="button" data-pt-close><span class="de">Schließen</span><span class="en">Close</span></button>
+  </div>
+</dialog>
+<style>
+.ptd{border:0;padding:0;border-radius:28px;background:var(--bg,#F2ECE4);color:var(--ink,#2E2529);width:min(640px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;box-shadow:0 30px 80px rgba(46,37,41,.3)}
+.ptd::backdrop{background:rgba(46,37,41,.5);backdrop-filter:blur(4px)}
+.ptd form,.ptok{padding:clamp(1.4rem,4vw,2.4rem);display:flex;flex-direction:column;gap:.7rem;position:relative}
+.ptd h2{font-size:clamp(1.7rem,4vw,2.3rem);margin:.2rem 0 .4rem;line-height:1.1}
+.ptq{margin:.7rem 0 0;font-weight:500;color:var(--deep,#4A3A41)}
+.ptg{display:flex;flex-wrap:wrap;gap:.5rem}
+.ptc{cursor:pointer}.ptc input{position:absolute;opacity:0;pointer-events:none}
+.ptc>span{display:inline-block;padding:.55em 1em;border:1px solid var(--line,#DDD2C6);border-radius:999px;background:#FBF8F4;font-size:.98rem;transition:background .2s,color .2s,border-color .2s}
+.ptc input:checked+span{background:var(--plum,#7D5E68);border-color:var(--plum,#7D5E68);color:#FBF5F7}
+.ptc input:focus-visible+span{outline:2px solid var(--peach,#E8D6CA);outline-offset:2px}
+.ptrow{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}@media(max-width:560px){.ptrow{grid-template-columns:1fr}}
+.ptx{position:absolute;right:16px;top:14px;border:0;background:none;font-size:1.3rem;color:var(--muted,#7D7076);cursor:pointer;padding:.3em}
+.ptn{color:var(--muted,#7D7076);margin:.2rem 0}.ptn a{color:inherit}
+.ptmsg{color:var(--plum,#7D5E68);margin:0}
+.ptok{align-items:center;text-align:center}
+</style>
+<script>
+(function(){
+  var d=document.getElementById('ptd'),f=document.getElementById('ptf'),ok=document.getElementById('ptok'),m=document.getElementById('ptmsg'),t0=Date.now();
+  if(!d)return;
+  function ph(){var en=document.documentElement.dataset.l==='en';d.querySelectorAll('[data-ph-de]').forEach(function(x){x.placeholder=en?x.dataset.phEn:x.dataset.phDe;});}
+  document.querySelectorAll('[data-pt-open]').forEach(function(b){b.addEventListener('click',function(){ph();f.hidden=false;ok.hidden=true;m.hidden=true;if(d.showModal)d.showModal();else d.setAttribute('open','');});});
+  d.addEventListener('click',function(e){if(e.target.closest('[data-pt-close]')||e.target===d)d.close();});
+  if(/[#&]anfrage/.test(location.hash)){ph();d.showModal&&d.showModal();}
+  f.addEventListener('submit',async function(e){e.preventDefault();var en=document.documentElement.dataset.l==='en';
+    var fd=new FormData(f);fd.append('lang',en?'en':'de');fd.append('t',String(t0));
+    var b=f.querySelector('[type=submit]');b.disabled=true;
+    try{var r=await fetch('/api/pt-anfrage.php',{method:'POST',body:fd});var j=await r.json();
+      if(j.ok){f.hidden=true;ok.hidden=false;f.reset();}else{m.textContent=j.error||'…';m.hidden=false;}}
+    catch(x){m.textContent=en?'That did not work just now. Please try again.':'Das hat gerade nicht geklappt. Bitte versuch es noch einmal.';m.hidden=false;}
+    b.disabled=false;});
+})();
+</script>
 <script>
 (function(){
   var f=document.getElementById('rf'),m=document.getElementById('rmsg'),t0=Date.now();

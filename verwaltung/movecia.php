@@ -41,6 +41,16 @@ require __DIR__ . '/vorschau.inc.php';
 
 $mmBack = $self . '?view=movecia';
 
+// Personal Training Anfragen (Vivien, 26.10.2026)
+require_once dirname(__DIR__) . '/api/mm-pt.inc.php';
+if ($action === 'mm_pt_done' || $action === 'mm_pt_open' || $action === 'mm_pt_delete') {
+    mm_pt_schema($pdo);
+    $pid = (int)($_POST['pid'] ?? 0);
+    if ($action === 'mm_pt_delete') $pdo->prepare('DELETE FROM mm_pt_requests WHERE id = ?')->execute([$pid]);
+    else $pdo->prepare('UPDATE mm_pt_requests SET status = ?, done_at = ? WHERE id = ?')->execute([$action === 'mm_pt_done' ? 'erledigt' : 'neu', $action === 'mm_pt_done' ? date('c') : '', $pid]);
+    go($mmBack . '#pt', $action === 'mm_pt_delete' ? 'Anfrage gelöscht.' : 'Gespeichert.');
+}
+
 if ($action === 'mm_save_gathering') {
     $gid = (int)($_POST['gid'] ?? 0);
     $title = forma_clean((string)($_POST['title'] ?? ''), 120);
@@ -322,6 +332,25 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .qa .ic{font-size:26px;line-height:1}
 .qa .main{background:#7D5E68;border-color:#7D5E68}.qa .main b,.qa .main span{color:#FBF5F7}
 </style>
+        <?php $ptList = []; try { $ptList = mm_pt_list($pdo); } catch (Throwable $e) {} ?>
+        <section id="pt" style="margin:18px 0;padding:18px 20px;border-radius:22px;background:#FBF8F4;border:1px solid #DDD2C6">
+            <h2 style="margin:0 0 .3rem">💬 Personal Training Anfragen<?php $ptOpen = count(array_filter($ptList, fn($r) => $r['status'] === 'neu')); if ($ptOpen): ?> <span style="display:inline-block;background:#7D5E68;color:#FBF5F7;border-radius:999px;font-size:15px;padding:.1em .7em;vertical-align:middle"><?= $ptOpen ?> neu</span><?php endif; ?></h2>
+            <?php if (!$ptList): ?><p style="margin:.3rem 0 0;color:#7D7076;font-size:16px">Noch keine Anfragen. Sie kommen über „Anfrage schicken“ beim 1:1 Personal Training auf moveciamovement.com.</p><?php endif; ?>
+            <?php foreach ($ptList as $r): $done = $r['status'] !== 'neu'; $wa = preg_replace('/[^0-9]/', '', preg_replace('/^\+/', '', preg_replace('/^0(?!0)/', '43', (string)$r['phone']))); ?>
+            <div style="margin-top:12px;padding:14px 16px;border-radius:18px;background:<?= $done ? '#F2ECE4' : '#fff' ?>;border:1px solid #E6DCD2;<?= $done ? 'opacity:.7' : '' ?>">
+                <p style="margin:0;font-size:18px"><b><?= forma_h($r['name']) ?></b> <span style="color:#7D7076;font-size:15px">· <?= forma_h(date('d.m. H:i', strtotime((string)$r['created_at']))) ?><?= $r['lang'] === 'en' ? ' · Englisch' : '' ?><?= $done ? ' · erledigt' : '' ?></span></p>
+                <p style="margin:.3rem 0;font-size:16px"><?= forma_h($r['email']) ?><?= $r['phone'] !== '' ? ' · ' . forma_h($r['phone']) : '' ?></p>
+                <?php foreach ([['Wünscht sich', $r['goals'], MM_PT_GOALS], ['Wo', $r['places'], MM_PT_PLACES], ['Wann', $r['times'], MM_PT_TIMES]] as [$lbl, $csv, $map]): $vals = mm_pt_labels((string)$csv, $map); if ($vals): ?><p style="margin:.2rem 0;font-size:16px"><span style="color:#7D7076"><?= $lbl ?>:</span> <?= forma_h(implode(', ', $vals)) ?></p><?php endif; endforeach; ?>
+                <?php if ($r['message'] !== ''): ?><p style="margin:.5rem 0;font-size:16px;white-space:pre-wrap;background:#FBF8F4;border-radius:12px;padding:.6em .8em"><?= forma_h($r['message']) ?></p><?php endif; ?>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:.6rem">
+                    <a href="mailto:<?= forma_h($r['email']) ?>?subject=<?= rawurlencode($r['lang'] === 'en' ? 'Your personal training request' : 'Deine Anfrage für Personal Training') ?>" style="font-size:15px;padding:.5em 1em;border-radius:999px;background:#7D5E68;color:#FBF5F7;text-decoration:none">✉️ Antworten</a>
+                    <?php if (strlen($wa) >= 8): ?><a href="https://wa.me/<?= forma_h($wa) ?>" target="_blank" rel="noopener" style="font-size:15px;padding:.5em 1em;border-radius:999px;background:#EADFDE;color:#4A3A41;text-decoration:none">WhatsApp</a><?php endif; ?>
+                    <form method="post" style="margin:0"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="pid" value="<?= (int)$r['id'] ?>"><input type="hidden" name="action" value="<?= $done ? 'mm_pt_open' : 'mm_pt_done' ?>"><button type="submit" style="font-size:15px;padding:.5em 1em;border-radius:999px;border:1px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer"><?= $done ? 'Wieder offen' : '✓ Erledigt' ?></button></form>
+                    <?php if ($done): ?><form method="post" style="margin:0" onsubmit="return confirm('Anfrage löschen?')"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="pid" value="<?= (int)$r['id'] ?>"><input type="hidden" name="action" value="mm_pt_delete"><button type="submit" style="font-size:15px;padding:.5em 1em;border-radius:999px;border:0;background:none;color:#7D7076;cursor:pointer">löschen</button></form><?php endif; ?>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </section>
         <?php $devSus = []; try { $devSus = mm_dev_suspects($pdo); } catch (Throwable $e) {} if ($devSus): ?>
         <div style="margin:16px 0;padding:16px 18px;border-radius:20px;background:#F6E9E4;border:1px solid #E2C7BD">
             <b style="font-size:17px;color:#4A3A41">⚠ Vielleicht geteilte Zugänge</b>
