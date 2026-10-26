@@ -40,13 +40,21 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
   <p class="lead"><span class="de">Movecia heißt „in Bewegung“. Ich begleite Frauen zurück in ihren Körper, mit sanfter, achtsamer Bewegung, mit Atem und mit Raum für das, was sie wirklich beschäftigt. Online, wann immer du magst, live in kleinen Runden und persönlich bei mir in den Tiroler Bergen.</span><span class="en">Movecia means “in motion”. I guide women back into their bodies with gentle, mindful movement, with breath and with room for what truly matters to them. Online whenever you like, live in small circles and in person with me in the Tyrolean mountains.</span></p>
   <div class="cta"><a class="btn" href="#angebote"><span class="de">So begleite ich dich</span><span class="en">Ways to move with me</span> →</a><a class="btn line" href="/unfold/"><span class="de">Unfold · Start <?= mv_date($st) ?></span><span class="en">Unfold · starts <?= mv_date($st, 'en') ?></span></a></div>
 </div>
-<div class="in"><div class="art wide rv"><video src="/video/movecia/start.mp4?v=3" poster="/img/movecia/fotos/ev-start.jpg?v=2" autoplay muted loop playsinline preload="metadata" aria-label="Vivien bewegt sich langsam in ihrem lichten Studio mit Blick auf die Berge"></video></div></div></section>
+<div class="in"><div class="art wide rv"><video src="/video/movecia/start.mp4?v=4" poster="/img/movecia/fotos/ev-start.jpg?v=2" autoplay muted loop playsinline preload="metadata" aria-label="Vivien bewegt sich langsam in ihrem lichten Studio mit Blick auf die Berge"></video></div></div></section>
 
 <section class="band"><div class="w"><div class="in">
   <p class="k"><span class="de">Wofür Movecia steht</span><span class="en">What Movecia stands for</span></p>
   <blockquote><span class="de">Für Frauen, die sich in ihrem Körper wieder sicher, stark und zu Hause fühlen wollen.</span><span class="en">For women who want to feel safe, strong and at home in their bodies again.</span></blockquote>
   <p class="after"><span class="de">Hier musst du nichts leisten. Du darfst langsam werden, spüren, was du brauchst, und dir Schritt für Schritt deine Kraft zurückholen.</span><span class="en">Here you don't have to perform. You may slow down, feel what you need and, step by step, take back your strength.</span></p>
 </div></div></section>
+
+<section class="w vids" aria-label="Movecia in Bewegung"><div class="in">
+  <div class="vrow">
+    <figure class="vf rv"><video src="/video/movecia/start-arme.mp4?v=1" poster="/img/movecia/fotos/ev-start-arme.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Langsame Armbewegung vor den Bergen"></video><figcaption><span class="de">ankommen</span><span class="en">arrive</span></figcaption></figure>
+    <figure class="vf vf-mid rv"><video src="/video/movecia/unfold.mp4?v=3" poster="/img/movecia/fotos/ev-unfold.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Fließende Bewegung im lichten Studio"></video><figcaption><span class="de">spüren</span><span class="en">feel</span></figcaption></figure>
+    <figure class="vf rv"><video src="/video/movecia/start.mp4?v=4" poster="/img/movecia/fotos/ev-start.jpg?v=2" autoplay muted loop playsinline preload="metadata" aria-label="Bewegung auf der Matte"></video><figcaption><span class="de">entfalten</span><span class="en">unfold</span></figcaption></figure>
+  </div>
+</div></section>
 
 <section class="w sec" id="angebote"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">So begleite ich dich</span><span class="en">Ways to move with me</span></p><h2 style="margin-top:.6rem"><span class="de">Für jeden <em>Moment</em> deines Lebens</span><span class="en">For every <em>season</em> of your life</span></h2></div>
