@@ -36,7 +36,7 @@ if ($view === 'presse') {
                 <div class="card stack" id="<?= $key ?>">
                     <b><?= $bn ?></b>
                     <p class="small"><?= forma_h(presse_subject($b, $to)) ?></p>
-                    <p class="small muted"><?= !empty($st['sent']) ? '✓ verschickt am ' . date('d.m.Y H:i', strtotime($st['sent'])) : (!empty($st['preview']) ? 'Vorschau geschickt am ' . date('d.m.Y H:i', strtotime($st['preview'])) : 'noch nicht verschickt') ?></p>
+                    <p class="small muted"><?= !empty($st['sent']) ? '✓ verschickt am ' . date('d.m.Y H:i', strtotime($st['sent'])) : (isset(PRESSE_SCHEDULE[$key]) ? 'geplant für ' . date('d.m.Y H:i', strtotime(PRESSE_SCHEDULE[$key])) . ' Uhr · ' : '') . (!empty($st['preview']) ? 'Vorschau geschickt am ' . date('d.m.Y H:i', strtotime($st['preview'])) : 'noch nicht verschickt') ?></p>
                     <div class="row" style="display:flex;gap:8px;flex-wrap:wrap">
                         <a class="btn btn-sm" href="?view=presse&amp;mail=<?= $key ?>" target="_blank">Ansehen</a>
                         <form method="post"><?= $csrf ?><input type="hidden" name="action" value="mm_presse_preview"><input type="hidden" name="key" value="<?= $key ?>"><button class="btn btn-sm" type="submit">Vorschau an mich</button></form>

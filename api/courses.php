@@ -11,6 +11,10 @@ try {
         $tick = forma_data_dir() . '/movecia-natal-bonus.tick';
         if (!is_file($tick) || filemtime($tick) < time() - 180) { require_once __DIR__ . '/natal-lib.php'; natal_schema($pdo); natal_bonus_tick($pdo); }
     } catch (Throwable $e) { error_log('Natal bonus tick: ' . $e->getMessage()); }
+    // Presse-Mails zum geplanten Zeitpunkt (Vivien, 26.10.2026), Fehler stören die Kursliste nie
+    try {
+        if (time() >= strtotime('2026-10-27 08:30') && time() < strtotime('2026-11-03')) { require_once __DIR__ . '/movecia-lib.php'; require_once __DIR__ . '/presse.inc.php'; presse_due(); }
+    } catch (Throwable $e) { error_log('Presse due: ' . $e->getMessage()); }
     $online = forma_stripe_key() !== null;
     $out = [];
     foreach (forma_upcoming_courses($pdo) as $c) {

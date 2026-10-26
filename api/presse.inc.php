@@ -193,3 +193,35 @@ function presse_send(string $key, bool $preview): bool
     }
     return $ok;
 }
+
+/** Geplanter Versand (Vivien, 26.10.2026): FORMA 27.10. 8:30, Movecia 8:45 (Wiener Zeit). */
+const PRESSE_SCHEDULE = [
+    'forma-rundschau' => '2026-10-27 08:30', 'forma-meinbezirk' => '2026-10-27 08:31',
+    'movecia-rundschau' => '2026-10-27 08:45', 'movecia-meinbezirk' => '2026-10-27 08:46',
+];
+
+/** Verschickt fällige Mails genau einmal (Sperre per flock), höchstens 3 Versuche je Mail. Gibt Ergebnis je Schlüssel zurück. */
+function presse_due(): array
+{
+    $out = [];
+    $lock = @fopen(forma_data_dir() . '/presse.lock', 'c');
+    if (!$lock || !flock($lock, LOCK_EX | LOCK_NB)) return ['busy' => true];
+    try {
+        foreach (PRESSE_SCHEDULE as $key => $at) {
+            $log = presse_log();
+            if (!empty($log[$key]['sent'])) { $out[$key] = 'schon verschickt ' . $log[$key]['sent']; continue; }
+            if (time() < strtotime($at)) { $out[$key] = 'geplant ' . $at; continue; }
+            if (($log[$key]['tries'] ?? 0) >= 3) { $out[$key] = 'fehlgeschlagen (3 Versuche)'; continue; }
+            $ok = false;
+            try { $ok = presse_send($key, false); } catch (Throwable $e) { error_log('Presse ' . $key . ': ' . $e->getMessage()); }
+            if (!$ok) {
+                $log = presse_log();
+                $log[$key]['tries'] = ($log[$key]['tries'] ?? 0) + 1;
+                $log[$key]['last_try'] = date('c');
+                @file_put_contents(forma_data_dir() . '/presse.json', json_encode($log, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            }
+            $out[$key] = $ok ? 'jetzt verschickt' : 'Versand fehlgeschlagen';
+        }
+    } finally { flock($lock, LOCK_UN); fclose($lock); }
+    return $out;
+}
