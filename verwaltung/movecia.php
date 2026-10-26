@@ -322,6 +322,13 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .qa .ic{font-size:26px;line-height:1}
 .qa .main{background:#7D5E68;border-color:#7D5E68}.qa .main b,.qa .main span{color:#FBF5F7}
 </style>
+        <?php $devSus = []; try { $devSus = mm_dev_suspects($pdo); } catch (Throwable $e) {} if ($devSus): ?>
+        <div style="margin:16px 0;padding:16px 18px;border-radius:20px;background:#F6E9E4;border:1px solid #E2C7BD">
+            <b style="font-size:17px;color:#4A3A41">⚠ Vielleicht geteilte Zugänge</b>
+            <p style="margin:.4rem 0 .6rem;color:#7D7076;font-size:15px">Diese Zugänge liefen in den letzten 30 Tagen auf auffällig vielen Geräten oder an vielen Orten, oder haben sich oft gegenseitig verdrängt. Es muss nicht heißen, dass jemand teilt, aber du kannst nachfragen.</p>
+            <?php foreach ($devSus as $d): ?><p style="margin:.2rem 0;font-size:15px"><b><?= forma_h($d['email'] ?: ('#' . $d['member_id'])) ?></b> · <?= $d['kind'] === 'natal' ? 'Prä-/Postnatal' : 'Method/Unfold' ?> · <?= (int)$d['devices'] ?> Geräte · <?= (int)$d['nets'] ?> Orte · <?= (int)$d['pauses'] ?>× verdrängt · zuletzt <?= forma_h(date('d.m. H:i', strtotime((string)$d['last']))) ?></p><?php endforeach; ?>
+        </div>
+        <?php endif; ?>
         <h2 style="margin-top:18px">Schnellzugriff</h2>
         <div class="qa">
             <form method="post" target="_blank"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_testroom"><button class="main" type="submit"><span class="ic">🎥</span><b>Video &amp; Technik testen</b><span>Kamera, Mikro, Teleprompter, Aufnahme – danach direkt in deinen Testraum</span></button></form>

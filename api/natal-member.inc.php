@@ -174,6 +174,7 @@ function natal_member_login(array $m, PDO $pdo): void
     $v = $m['id'] . '.' . $exp . '.' . natal_member_sig((int)$m['id'], $exp, (string)$m['pass_hash']);
     setcookie(NATAL_MEMBER_COOKIE, $v, ['expires' => $exp, 'path' => '/', 'secure' => !empty($_SERVER['HTTPS']) || str_starts_with(mm_site(), 'https'), 'httponly' => true, 'samesite' => 'Lax']);
     $_COOKIE[NATAL_MEMBER_COOKIE] = $v;
+    mm_dev_login($pdo, 'natal', (int)$m['id']);
     $pdo->prepare('UPDATE mm_natal_members SET last_login = ? WHERE id = ?')->execute([date('c'), $m['id']]);
 }
 
@@ -191,6 +192,7 @@ function natal_member_current(PDO $pdo): ?array
     $q->execute([(int)$m[1]]);
     $row = $q->fetch();
     if (!$row || !hash_equals(natal_member_sig((int)$row['id'], (int)$m[2], (string)$row['pass_hash']), $m[3])) return null;
+    if (!mm_dev_check($pdo, 'natal', (int)$row['id'])) { natal_member_logout(); return null; } // ein Zugang = eine Person
     return $row;
 }
 

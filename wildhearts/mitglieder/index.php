@@ -27,6 +27,7 @@ $L = fn(string $de, string $en) => ($lang === 'en' ? $en : $de);
 
 // --- Aktionen ---------------------------------------------------------------------------------
 $err = ''; $note = '';
+if (!$me && ($kt = mm_dev_kicked_text($lang === 'en' ? 'en' : 'de')) !== '') $err = $kt; // Zugang auf zu vielen Geräten
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $a = (string)($_POST['a'] ?? '');
     $pl = ($_POST['lang'] ?? '') === 'en' ? 'en' : 'de';
@@ -67,7 +68,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     if ($me) {
         $mid = (int)$me['id'];
         $ajax = !empty($_POST['ajax']);
-        if ($a === 'logout') { mv_logout(); $go('?bye=1'); }
+        if ($a === 'logout') { mm_dev_logout($pdo); mv_logout(); $go('?bye=1'); }
         if ($a === 'lang') { $pdo->prepare('UPDATE mv_members SET lang = ? WHERE id = ?')->execute([$pl, $mid]); $go((string)($_POST['back'] ?? '')); }
         if ($a === 'done') {
             $lid = (int)($_POST['l'] ?? 0);
@@ -564,5 +565,6 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
     }catch(e){}};document.head.appendChild(s);}
 })();
 </script>
+<?php if ($me) { ?><script src="/wildhearts/assets/geraet.js?v=1" data-kind="mv" defer></script><?php } ?>
 </body>
 </html>

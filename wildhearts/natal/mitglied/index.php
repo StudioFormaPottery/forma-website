@@ -25,7 +25,7 @@ $note = '';
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $a = (string)($_POST['a'] ?? '');
     if (!empty($_POST['website'])) $go();
-    if ($a === 'logout') { natal_member_logout(); $go('?bye=1'); }
+    if ($a === 'logout') { mm_dev_logout($pdo); natal_member_logout(); $go('?bye=1'); }
     if ($a === 'login') {
         $email = strtolower(trim((string)($_POST['email'] ?? '')));
         if (natal_member_throttled($pdo, $ipHash)) $err = 'Zu viele Versuche. Bitte warte eine Viertelstunde oder setz dein Passwort neu.';
@@ -137,6 +137,7 @@ $me = $demo ? ['name' => 'Anna Beispiel', 'email' => 'anna@example.com'] : natal
 $views = [];
 if ($demo) $views = [natal_member_demo($demo)];
 elseif ($me) foreach (natal_member_orders($pdo, (string)$me['email']) as $o) $views[] = natal_member_view($pdo, $o);
+if (!$me && !$demo && ($kt = mm_dev_kicked_text('de')) !== '') $err = $kt; // Zugang auf zu vielen Geräten
 if ($me && !$demo && !$views) { natal_member_logout(); $me = null; $note = 'Dein Bereich ist abgelaufen. Danke, dass ich dich begleiten durfte!'; }
 
 // Workbook-Fragment (per fetch)
@@ -450,5 +451,6 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
 })();
 </script>
 <?php endif; ?>
+<?php if ($me && !$demo) { ?><script src="/wildhearts/assets/geraet.js?v=1" data-kind="natal" defer></script><?php } ?>
 </body>
 </html>

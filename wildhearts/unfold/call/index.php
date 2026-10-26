@@ -39,5 +39,6 @@ iframe{flex:1;width:100%;border:0;background:var(--deep)}
   <p><?= $cl === 'en' ? $h($c['u_call_en']) . ' · English' : $h($c['u_call_de']) . ' · Deutsch' ?> · <a href="?l=<?= $cl === 'en' ? 'de' : 'en' ?>"><?= $en ? 'switch to the ' . ($cl === 'en' ? 'German' : 'English') . ' group' : 'zur ' . ($cl === 'en' ? 'deutschen' : 'englischen') . ' Gruppe wechseln' ?></a></p></div>
 <?php if ($src): ?><iframe src="<?= $h($src) ?>" allow="camera; microphone; fullscreen; speaker; display-capture; autoplay" title="Unfold Live-Call"></iframe>
 <?php else: ?><div class="empty"><div><h2><?= $en ? 'The room opens soon' : 'Der Raum öffnet bald' ?></h2><p class="mut"><?= $en ? 'The link appears here before the first call.' : 'Der Link erscheint hier vor dem ersten Call.' ?></p></div></div><?php endif; ?>
+<?php if (!empty($me)) { ?><script src="/wildhearts/assets/geraet.js?v=1" data-kind="mv" defer></script><?php } ?>
 </body>
 </html>

@@ -432,6 +432,7 @@ function mv_login(PDO $pdo, array $m): void
     $v = $m['id'] . '.' . $exp . '.' . mv_sig((int)$m['id'], $exp, (string)$m['pass_hash']);
     setcookie(MV_COOKIE, $v, ['expires' => $exp, 'path' => '/', 'secure' => str_starts_with(mm_site(), 'https'), 'httponly' => true, 'samesite' => 'Lax']);
     $_COOKIE[MV_COOKIE] = $v;
+    mm_dev_login($pdo, 'mv', (int)$m['id']);
     $pdo->prepare('UPDATE mv_members SET last_login = ? WHERE id = ?')->execute([date('c'), $m['id']]);
 }
 
@@ -447,6 +448,7 @@ function mv_current(PDO $pdo): ?array
     if (!preg_match('/^(\d+)\.(\d+)\.([0-9a-f]{64})$/', $c, $x) || (int)$x[2] < time()) return null;
     $m = mv_member($pdo, (int)$x[1]);
     if (!$m || $m['pass_hash'] === '' || !hash_equals(mv_sig((int)$m['id'], (int)$x[2], (string)$m['pass_hash']), $x[3])) return null;
+    if (!mm_dev_check($pdo, 'mv', (int)$m['id'])) { mv_logout(); return null; } // ein Zugang = eine Person
     return $m;
 }
 
