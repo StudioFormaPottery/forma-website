@@ -9,262 +9,215 @@
 <link rel="canonical" href="https://moveciamovement.com/links/">
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
-<link rel="manifest" href="/app.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movecia"><meta name="apple-mobile-web-app-status-bar-style" content="default"><script src="/wildhearts/assets/app.js?v=2" defer></script>
+<link rel="manifest" href="/app.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movecia"><meta name="apple-mobile-web-app-status-bar-style" content="default"><script src="/wildhearts/assets/app.js?v=2" defer></script><script src="/wildhearts/assets/schutz.js" defer></script>
 <meta property="og:title" content="The Wild Hearts Collective">
 <meta property="og:description" content="For women who want more than just functioning. Come back to yourself, together.">
 <meta property="og:image" content="https://moveciamovement.com/img/wildhearts/og.jpg">
 <meta property="og:url" content="https://moveciamovement.com/links/">
 <style>
-@font-face{font-family:"Italiana";font-weight:400;font-display:swap;src:url(/fonts/Italiana-Regular.woff) format("woff")}
-@font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}
-@font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(/fonts/Outfit-Bold.woff) format("woff")}
-@font-face{font-family:"Hand";font-weight:400;font-display:swap;src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
-:root{
-  --cream:#F2ECE4;--paper:#E8DED2;--oat:#E8DED2;--blush:#E8D6CA;--rose:#C9B2B8;
-  --wine:#7D5E68;--wine-deep:#6B5658;--earth:#4A3A41;--brown:#7D7076;--ink:#2E2529;
-  --sage:#B79FA6;--sage-soft:#EADFDE;--line:#DDD2C6;
-  --blob:58% 42% 47% 53% / 52% 46% 54% 48%;
-  --serif:"Italiana",Georgia,serif;--hand:"Hand","Bradley Hand",cursive;
-  --sans:"Outfit",ui-sans-serif,system-ui,-apple-system,sans-serif;
-}
+/* Link in Bio im Design der Movecia-Hauptseite (Vivien, 26.10.2026): Beige, Pflaume, Cormorant + Hanken, rundes Profilbild im Logo-Stil. */
+@font-face{font-family:"Cormorant";font-weight:300 700;font-style:normal;src:url(/fonts/CormorantGaramond-VF.woff) format("woff");font-display:swap}
+@font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(/fonts/CormorantGaramond-Italic-VF.woff) format("woff");font-display:swap}
+@font-face{font-family:"Hanken";font-weight:300 700;src:url(/fonts/HankenGrotesk-VF.woff) format("woff");font-display:swap}
+:root{--bg:#F2ECE4;--card:#FBF8F4;--ink:#2E2529;--muted:#7D7076;--line:#DDD2C6;--plum:#7D5E68;--plumdeep:#6B5658;--deep:#4A3A41;--blush:#EADFDE;--peach:#E8D6CA;--mauve:#8A7378;--on:#FBF5F7;
+  --serif:"Cormorant",Georgia,serif;--sans:"Hanken",system-ui,-apple-system,sans-serif}
 *{box-sizing:border-box;margin:0}
-[hidden]{display:none!important}
-html{background:var(--cream)}
-body{min-height:100dvh;font-family:var(--sans);color:var(--ink);background:var(--cream);-webkit-font-smoothing:antialiased;overflow-x:hidden;font-size:17px;line-height:1.6;position:relative}
+html{overflow-x:hidden;overflow-x:clip}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-x:clip}
+img{max-width:100%;display:block}
 a{color:inherit}
-.hand{font-family:var(--hand);font-weight:400;line-height:1.55}
-
-/* Hintergrund */
-.bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.bg span{position:absolute;border-radius:var(--blob);animation:morph 18s ease-in-out infinite alternate}
-.bg .a{width:440px;height:440px;right:-210px;top:-160px;background:var(--oat);opacity:.8}
-.bg .b{width:320px;height:320px;left:-200px;top:44%;background:var(--blush);opacity:.5;animation-duration:22s}
-@keyframes morph{0%{border-radius:58% 42% 47% 53% / 52% 46% 54% 48%;transform:rotate(0)}100%{border-radius:42% 58% 60% 40% / 45% 58% 42% 55%;transform:rotate(16deg)}}
-.swirl{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.swirl span{position:absolute;display:block;animation:swirl var(--d,22s) ease-in-out infinite;animation-delay:var(--delay,0s);opacity:.9}
-.swirl svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 8px rgba(70,50,58,.14))}
-@keyframes swirl{0%{transform:translate(0,0) rotate(var(--r,0deg))}25%{transform:translate(var(--x1,14px),18px) rotate(calc(var(--r,0deg) + 28deg))}50%{transform:translate(0,34px) rotate(calc(var(--r,0deg) + 8deg))}75%{transform:translate(calc(var(--x1,14px) * -1),14px) rotate(calc(var(--r,0deg) - 22deg))}100%{transform:translate(0,0) rotate(var(--r,0deg))}}
-
-.page{position:relative;z-index:1;width:100%;max-width:640px;margin:0 auto;padding:max(30px,env(safe-area-inset-top)) 16px 10px}
-
-/* Polaroid mit Klebeband */
-.polaroid{position:relative;background:#fff;padding:10px 10px 40px;box-shadow:0 16px 34px rgba(46,37,41,.22)}
-.polaroid img{display:block;width:100%;height:100%;object-fit:cover}
-.polaroid .cap{white-space:nowrap;line-height:1.2;position:absolute;left:0;right:0;bottom:9px;text-align:center;font-family:var(--hand);font-size:15px;color:var(--brown)}
-.tape{position:absolute;width:86px;height:26px;background:rgba(232,214,202,.82);top:-12px;left:50%;margin-left:-43px;transform:rotate(-6deg)}
+[hidden]{display:none!important}
+.page{width:min(100% - 32px,600px);margin:0 auto;padding:max(18px,env(safe-area-inset-top)) 0 3rem}
+html[lang=de] .en,html[lang=en] .de{display:none!important}
 
 /* Kopf */
-.head{display:flex;flex-direction:column;align-items:center;text-align:center}
-.head .polaroid{width:220px;transform:rotate(-3deg);margin-top:6px}
-.head .polaroid .ph{height:220px;overflow:hidden}
-.hey{font-family:var(--hand);font-size:26px;color:var(--wine);margin-top:22px;transform:rotate(-2deg)}
-h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,10.5vw,60px);line-height:1.02;letter-spacing:.012em;color:var(--wine-deep);margin-top:6px}
-.by{font-size:12.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--brown);margin-top:12px}
-.lead{font-size:18px;line-height:1.6;color:var(--brown);margin-top:14px;max-width:34ch}
-.lead em{font-style:normal;color:var(--ink)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.brand{display:flex;align-items:center;gap:.45rem;font-family:var(--serif);font-size:1.6rem;line-height:1;color:var(--ink);text-decoration:none}
+.brand img{width:30px;height:30px}
+.brand i{font-style:normal;color:var(--plum)}
+.langsw{display:flex;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px}
+.langsw button{font:600 .74rem/1 var(--sans);letter-spacing:.08em;border:0;background:none;color:var(--muted);padding:.5em .8em;border-radius:999px;cursor:pointer}
+.langsw button[aria-pressed=true]{background:var(--plum);color:var(--on)}
 
-/* Knöpfe */
-.links{display:flex;flex-direction:column;gap:14px;margin-top:28px}
-.btn{display:flex;align-items:center;gap:14px;width:100%;padding:16px 20px;border-radius:999px;text-decoration:none;font-family:var(--sans);font-size:17px;font-weight:500;border:1.5px solid var(--line);background:rgba(251,248,244,.94);color:var(--ink);cursor:pointer;text-align:left;transition:transform .2s ease,box-shadow .2s ease}
-.btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(70,50,58,.14)}
-.btn:focus-visible,.gift:focus-visible{outline:2px solid var(--wine);outline-offset:3px}
-.btn .ic{flex:0 0 auto;width:42px;height:42px;border-radius:var(--blob);display:grid;place-items:center;background:var(--blush);color:var(--wine-deep)}
-.btn .ic svg{width:21px;height:21px}
-.btn .tx{flex:1;display:flex;flex-direction:column;line-height:1.3}
-.btn .tx small{font-size:13.5px;font-weight:400;color:var(--brown);margin-top:3px}
-.btn .ar{opacity:.55;font-size:18px}
-.btn.main{background:var(--wine);color:#F2ECE4;border-color:var(--wine);box-shadow:0 18px 36px rgba(107,86,88,.28)}
-.btn.main .ic{background:rgba(242,236,228,.18);color:#F2ECE4}
-.btn.main small{color:rgba(242,236,228,.85)}
-.tag{display:inline-block;margin-left:6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--oat);color:var(--brown);vertical-align:2px;font-weight:500}
+.head{text-align:center;padding:2.2rem 0 1.4rem}
+.avatar{position:relative;width:148px;height:148px;margin:0 auto}
+.avatar::before{content:"";position:absolute;inset:-6px -14px 4px -2px;background:var(--peach);border-radius:58% 42% 52% 48%/50% 56% 44% 50%;transform:rotate(-8deg)}
+.avatar::after{content:"";position:absolute;inset:-9px -4px -6px -10px;border:1.6px solid var(--plum);border-radius:52% 48% 46% 54%/56% 46% 54% 44%;transform:rotate(12deg);pointer-events:none}
+.avatar img{position:relative;width:100%;height:100%;object-fit:cover;border-radius:50%;box-shadow:0 14px 30px -18px rgba(74,58,65,.6)}
+.avatar .dot{position:absolute;right:6px;top:14px;width:13px;height:13px;border-radius:50%;background:var(--plum);border:2.5px solid var(--bg);z-index:2}
+.k{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--plum);font-weight:600}
+.head .k{margin-top:1.6rem}
+.head h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.6rem,10vw,3.4rem);line-height:1;letter-spacing:-.01em;margin-top:.4rem}
+.head .sub{font-family:var(--serif);font-style:italic;font-size:1.45rem;color:var(--plum);margin-top:.3rem}
+.head .lead{color:var(--muted);max-width:30em;margin:.9rem auto 0;font-size:1rem}
 
-/* Geschenk: Reset Routine */
-.gift{position:relative;display:flex;gap:18px;align-items:center;width:100%;margin-top:8px;padding:22px 20px 22px 18px;border-radius:30px;border:0;background:var(--sage-soft);color:var(--ink);text-align:left;font:inherit;cursor:pointer;box-shadow:0 14px 30px rgba(46,37,41,.1);transform:rotate(-.6deg);transition:transform .2s ease}
-.gift:hover{transform:rotate(0) translateY(-2px)}
-.gift .cov{flex:0 0 auto;width:92px;transform:rotate(-5deg);box-shadow:0 10px 20px rgba(46,37,41,.25);border:4px solid #fff;position:relative}
-.gift .cov img{display:block;width:100%;height:auto}
-.gift .cov::before{content:"";position:absolute;width:46px;height:15px;background:rgba(232,214,202,.85);top:-9px;left:50%;margin-left:-23px;transform:rotate(4deg)}
-.gift .note{font-family:var(--hand);font-size:14.5px;color:var(--wine)}
-.gift strong{display:block;font-family:var(--serif);font-weight:400;font-size:27px;line-height:1.08;color:var(--earth);margin-top:4px}
-.gift small{display:block;font-size:14px;color:var(--brown);margin-top:6px;line-height:1.45}
-.gift .go{display:inline-block;margin-top:10px;font-size:14.5px;font-weight:500;color:var(--wine-deep);border-bottom:1.5px solid var(--rose)}
+/* Links */
+.links{display:grid;gap:.7rem;margin-top:.6rem}
+.btn{display:flex;align-items:center;gap:.9rem;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:22px;padding:.6rem 1.1rem .6rem .6rem;min-height:76px;transition:transform .35s ease,box-shadow .35s ease,border-color .35s;cursor:pointer;font:inherit;text-align:left;width:100%}
+.btn:hover,.btn:focus-visible{transform:translateY(-2px);box-shadow:0 16px 30px -22px rgba(74,58,65,.55);border-color:var(--peach)}
+.btn:focus-visible{outline:2px solid var(--plum);outline-offset:3px}
+.btn .th{flex:0 0 58px;height:58px;border-radius:16px;overflow:hidden;background:var(--peach)}
+.btn .th img{width:100%;height:100%;object-fit:cover}
+.btn .th.ic{display:grid;place-items:center;background:var(--blush);color:var(--plum)}
+.btn .th.ic svg{width:26px;height:26px}
+.btn .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
+.btn .tx b{font-family:var(--serif);font-weight:600;font-size:1.32rem;line-height:1.1}
+.btn .tx small{color:var(--muted);font-size:.86rem;margin-top:.2rem}
+.btn .ar{color:var(--plum);font-size:1.1rem;flex:0 0 auto}
+.btn.main{background:var(--plum);border-color:var(--plum);color:var(--on)}
+.btn.main .tx small{color:rgba(251,245,247,.82)}
+.btn.main .ar{color:var(--on)}
+.btn.main .tag{align-self:flex-start;background:var(--on);color:var(--plum);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;border-radius:999px;padding:.2em .7em;margin-bottom:.35rem}
+.btn.gift{background:var(--blush);border-color:var(--blush)}
+.btn.gift .th{flex-basis:50px;height:70px;border-radius:6px;box-shadow:0 8px 16px -10px rgba(74,58,65,.6);transform:rotate(-4deg);margin-left:.3rem}
+.btn.gift .tx em{font-family:var(--serif);font-size:1.02rem;color:var(--plum)}
+.small-links{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin-top:1.1rem}
+.small-links a{display:inline-flex;align-items:center;gap:.4rem;text-decoration:none;font-size:.9rem;color:var(--deep);background:transparent;border:1px solid var(--line);border-radius:999px;padding:.45rem .95rem}
+.small-links a:hover{border-color:var(--plum)}
+.small-links svg{width:16px;height:16px;color:var(--plum)}
 
 /* Brief */
-.letter{position:relative;margin-top:44px;padding:34px 24px 30px;border-radius:30px;background:var(--wine);color:var(--cream);overflow:hidden}
-.letter::after{content:"";position:absolute;width:180px;height:180px;right:-70px;bottom:-80px;border-radius:var(--blob);background:rgba(232,214,202,.16)}
-.letter>*{position:relative;z-index:1}
-.letter .hello{font-family:var(--hand);font-size:24px;color:var(--blush)}
-.letter p{margin-top:12px;font-size:16.5px;line-height:1.65;color:#F3E9EC}
-.letter .sig{font-family:var(--hand);font-size:17px;color:var(--blush);margin-top:16px;transform:rotate(-1.5deg)}
-.letter .mini{float:right;width:110px;margin:4px 0 10px 16px;padding:6px 6px 26px;transform:rotate(4deg)}
-.letter .mini .ph{height:110px;overflow:hidden}
-.letter .mini .cap{font-size:12px;bottom:5px}
+.letter{display:grid;grid-template-columns:110px 1fr;gap:1.2rem;align-items:start;margin-top:2.6rem;background:var(--card);border-radius:26px;padding:1.4rem}
+.letter .pic{border-radius:60px 60px 18px 18px;overflow:hidden;aspect-ratio:3/4}
+.letter .pic img{width:100%;height:100%;object-fit:cover}
+.letter .hello{font-family:var(--serif);font-style:italic;font-size:1.5rem;color:var(--plum);line-height:1.1}
+.letter p{margin-top:.6rem;font-size:.97rem}
+.letter .sig{font-family:var(--serif);font-style:italic;font-size:1.2rem;color:var(--plum)}
+@media(max-width:480px){.letter{grid-template-columns:1fr}.letter .pic{width:120px;margin:0 auto}}
+
+/* Angebote */
+.offer{margin-top:3rem}
+.offer-head{text-align:center}
+.offer-head .hand{font-family:var(--serif);font-style:italic;font-size:1.2rem;color:var(--plum)}
+.offer-head h2{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,8vw,2.8rem);line-height:1.05;margin-top:.2rem}
+.offer-head .sub{color:var(--muted);margin:.5rem auto 0;max-width:30em;font-size:.97rem}
+.steps{list-style:none;padding:0;margin-top:1.4rem;display:grid;gap:1rem}
+.step{position:relative}
+.step .no{position:absolute;left:14px;top:14px;z-index:2;width:34px;height:34px;border-radius:50%;background:var(--bg);color:var(--plum);font-family:var(--serif);font-size:1.25rem;display:grid;place-items:center}
+.card{background:var(--card);border-radius:26px;overflow:hidden;cursor:pointer}
+.card .pic{aspect-ratio:16/8;overflow:hidden;background:var(--peach)}
+.card .pic img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s ease}
+.card:hover .pic img{transform:scale(1.03)}
+.card>:not(.pic){margin-left:1.3rem;margin-right:1.3rem}
+.card .kick{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--plum);font-weight:600;margin-top:1.1rem}
+.card h3{font-family:var(--serif);font-weight:500;font-size:1.75rem;line-height:1.08;margin-top:.25rem}
+.card .note{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:1.12rem;margin-top:.15rem}
+.more-t{display:inline-flex;align-items:center;gap:.4rem;margin:.8rem 0 1.2rem 1.3rem;background:none;border:0;font:600 .86rem var(--sans);color:var(--plum);cursor:pointer;padding:0}
+.more-t::after{content:"+";font-size:1.1rem;line-height:1;transition:transform .3s}
+.step.open .more-t::after{transform:rotate(45deg)}
+.more{display:none;padding-bottom:1.3rem}
+.step.open .more{display:block}
+.more ul{padding-left:1.1rem;margin-top:.2rem}
+.more li{margin:.3rem 0;font-size:.95rem}
+.more p{font-size:.95rem;margin-top:.5rem}
+.more .price{background:var(--bg);border-radius:14px;padding:.7rem .9rem;margin-top:.8rem;font-size:.9rem}
+.more .fam{color:var(--muted);font-size:.9rem}
+.go{display:inline-flex;align-items:center;margin-top:1rem;margin-right:.4rem;background:var(--plum);color:var(--on);text-decoration:none;font:600 .92rem var(--sans);border:1px solid var(--plum);border-radius:999px;padding:.7rem 1.2rem;cursor:pointer}
+.go.line{background:transparent;color:var(--plum)}
 
 /* Affirmation */
-.affirm{margin-top:18px;padding:30px 22px;border-radius:30px;background:var(--earth);color:var(--cream);text-align:center;position:relative;overflow:hidden}
-.affirm .k{font-size:11.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--rose)}
-.affirm .big{font-family:var(--serif);font-size:32px;line-height:1.15;margin-top:10px}
-.affirm .hand{font-size:19px;color:var(--blush);margin-top:8px;transform:rotate(-2deg)}
-.affirm svg{position:absolute;opacity:.9}
+.affirm{margin-top:3rem;background:var(--mauve);color:var(--on);border-radius:30px;padding:2.2rem 1.4rem;text-align:center;position:relative;overflow:hidden}
+.affirm .k{color:rgba(251,245,247,.75)}
+.affirm .big{font-family:var(--serif);font-style:italic;font-size:clamp(2rem,8vw,2.6rem);line-height:1.1;margin-top:.5rem}
+.affirm .hand{font-family:var(--serif);font-size:1.2rem;margin-top:.4rem;opacity:.9}
+.affirm img{position:absolute;opacity:.18;width:120px;right:-24px;bottom:-24px}
 
 /* Anmeldung */
-.join{position:relative;margin-top:44px;padding:34px 22px 24px;border-radius:30px;background:#FBF8F4;border:1.5px solid var(--line);box-shadow:0 18px 40px rgba(70,50,58,.1);scroll-margin-top:20px}
-.join .tape{top:-13px}
-.join h2{font-family:var(--serif);font-weight:400;font-size:33px;line-height:1.1;color:var(--wine-deep);text-align:center}
-.join p.intro{text-align:center;color:var(--brown);margin-top:10px;font-size:16.5px}
-.join .psst{text-align:center;font-family:var(--hand);font-size:14.5px;color:var(--wine);margin-top:10px}
-.join form{display:flex;flex-direction:column;gap:12px;margin-top:20px}
-.join label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--brown)}
-.join input[type=text],.join input[type=email]{font:inherit;font-size:17px;padding:14px 18px;border-radius:18px;border:1.5px solid var(--line);background:var(--cream);color:var(--ink)}
-.join input:focus{outline:2px solid var(--blush);outline-offset:1px;border-color:var(--wine)}
-.consent{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;color:var(--brown)}
-.consent input{margin-top:3px;width:18px;height:18px;accent-color:var(--wine);flex:0 0 auto}
-.join button{font:inherit;font-weight:500;font-size:17px;padding:16px 22px;border-radius:999px;border:0;background:var(--wine);color:#F2ECE4;cursor:pointer;margin-top:4px}
-.join button:disabled{opacity:.6;cursor:wait}
-.msg{text-align:center;font-size:15.5px;line-height:1.5;color:var(--ink);padding:6px 0 0}
-.msg.err{color:var(--wine)}
-.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.join{margin-top:3rem;background:var(--card);border-radius:26px;padding:1.6rem 1.4rem;scroll-margin-top:16px}
+.join .tape{display:none}
+.join h2{font-family:var(--serif);font-weight:500;font-size:2rem;line-height:1.05}
+.join .intro{color:var(--muted);margin-top:.4rem;font-size:.97rem}
+.join .psst{font-family:var(--serif);font-style:italic;color:var(--plum);margin-top:.6rem;font-size:1.08rem}
+#join-form{display:grid;gap:.8rem;margin-top:1rem}
+.f{display:grid;gap:.3rem;font-size:.82rem;font-weight:600;color:var(--deep)}
+.f input{font:inherit;font-weight:400;font-size:1rem;padding:.8rem 1rem;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink)}
+.f input:focus{outline:2px solid var(--plum);outline-offset:1px}
+.hp{position:absolute;left:-9999px}
+.consent{display:flex;gap:.6rem;align-items:flex-start;font-size:.86rem;color:var(--muted)}
+.consent input{margin-top:.25rem;accent-color:var(--plum)}
+#join-form button{font:600 1rem var(--sans);background:var(--plum);color:var(--on);border:0;border-radius:999px;padding:.9rem 1.2rem;cursor:pointer}
+.msg{background:var(--blush);border-radius:14px;padding:.8rem 1rem;font-size:.95rem}
+.msg.err{background:#F4E1DF}
 
 /* Fuß */
-.wave{position:relative;z-index:1;margin-top:40px;line-height:0}
-.wave svg{display:block;width:100%;height:70px}
-.foot{position:relative;z-index:1;background:var(--oat);text-align:center;font-size:13px;line-height:1.7;color:var(--brown);padding:6px 16px max(26px,env(safe-area-inset-bottom))}
-.foot a{color:var(--brown)}
-.foot .in{max-width:640px;margin:0 auto}
-.foot .bye{font-family:var(--hand);font-size:16px;color:var(--wine);margin-bottom:8px}
-.foot details{margin-top:12px;text-align:left;background:rgba(251,248,244,.7);border-radius:18px;padding:10px 16px}
-.foot summary{cursor:pointer;text-align:center;list-style:none}
-.foot summary::-webkit-details-marker{display:none}
-.foot details p{margin-top:8px}
-
-
-/* Sprache EN/DE */
-html[lang=de] .en,html[lang=en] .de{display:none!important}
-.langsw{position:absolute;right:16px;top:max(14px,env(safe-area-inset-top));z-index:3;display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(251,248,244,.92);border:1.5px solid var(--line);font-size:13px;letter-spacing:.06em}
-.langsw button{font:inherit;border:0;background:transparent;color:var(--brown);padding:6px 11px;border-radius:999px;cursor:pointer}
-.langsw button[aria-pressed=true]{background:var(--wine);color:#F2ECE4}
-
-/* Angebote: die Stufen */
-.offer{position:relative;margin-top:52px;scroll-margin-top:20px}
-.offer-head{text-align:center}
-.offer-head .hand{font-size:21px;color:var(--wine);transform:rotate(-2deg)}
-.offer-head h2{font-family:var(--serif);font-weight:400;font-size:clamp(34px,8.5vw,48px);line-height:1.06;color:var(--wine-deep);margin-top:6px}
-.offer-head p.sub{color:var(--brown);margin:10px auto 0;max-width:36ch}
-.steps{list-style:none;padding:0;margin:28px 0 0;display:flex;flex-direction:column;gap:18px;position:relative}
-.steps::before{content:"";position:absolute;left:27px;top:30px;bottom:30px;border-left:2px dashed var(--rose);opacity:.6}
-.step{position:relative;display:flex;gap:16px;align-items:flex-start}
-.step .no{flex:0 0 56px;width:56px;height:56px;border-radius:var(--blob);display:grid;place-items:center;font-family:var(--serif);font-size:26px;position:relative;z-index:1;box-shadow:0 10px 20px rgba(46,37,41,.16)}
-.step .card{flex:1;min-width:0;border-radius:28px;padding:22px 20px 20px;box-shadow:0 14px 30px rgba(46,37,41,.1)}
-.step .kick{font-size:11.5px;letter-spacing:.24em;text-transform:uppercase}
-.step h3{font-family:var(--serif);font-weight:400;font-size:29px;line-height:1.08;margin-top:4px}
-.step .note{font-family:var(--hand);font-size:15px;margin-top:4px}
-.step p{margin-top:10px;font-size:16.5px;line-height:1.6}
-.step ul{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
-.step li{position:relative;padding-left:24px;font-size:16px;line-height:1.5}
-.step li::before{content:"";position:absolute;left:2px;top:.5em;width:10px;height:10px;border-radius:var(--blob);background:currentColor;opacity:.5}
-.step .price{font-family:var(--hand);font-size:14px;line-height:1.55;margin-top:16px;opacity:.9}
-.step .fam{margin-top:14px;font-size:15px;font-style:italic;opacity:.9}
-.step .go.line{background:transparent!important;border:1.5px solid currentColor;color:var(--earth)!important;margin-left:6px}
-.step .go{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:12px 20px;border-radius:999px;border:0;font:inherit;font-weight:500;font-size:15.5px;text-decoration:none;cursor:pointer}
-.s1 .no{background:#FBF8F4;color:var(--wine)}.s1 .card{background:#FBF8F4;border:1.5px solid var(--line)}.s1 .kick{color:var(--brown)}.s1 h3{color:var(--wine-deep)}.s1 .note{color:var(--wine)}.s1 .go{background:var(--wine);color:#F2ECE4}
-.s2 .no{background:var(--sage-soft);color:var(--earth)}.s2 .card{background:var(--sage-soft)}.s2 .kick{color:#6B5658}.s2 h3{color:var(--earth)}.s2 .note{color:var(--wine)}.s2 .go{background:var(--earth);color:var(--cream)}
-.s3 .no{background:var(--wine);color:var(--cream)}.s3 .card{background:var(--wine);color:#F3E9EC}.s3 .kick{color:var(--blush)}.s3 h3{color:var(--cream)}.s3 .note{color:var(--blush)}.s3 .go{background:var(--cream);color:var(--wine-deep)}
-.s4 .no{background:var(--earth);color:var(--blush)}.s4 .card{background:var(--earth);color:#EADFDE}.s4 .kick{color:var(--rose)}.s4 h3{color:var(--cream)}.s4 .note{color:var(--blush)}.s4 .go{background:var(--blush);color:var(--earth)}
-.offer .tag{margin-left:0}
-@media (min-width:900px){
-  .offer{width:min(1120px,calc(100vw - 64px));margin-left:50%;transform:translateX(-50%)}
-  .steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:8px;column-gap:22px;row-gap:0;align-items:start}
-  .steps .step{align-self:start}
-  .steps::before{display:none}
-  .step .card{padding:28px 28px 26px}.step h3{font-size:33px}.step p,.step li{font-size:18px}
-}
-
-/* Handy: Stufen zum Aufklappen */
-.more-t{display:none}
-@media (max-width:899px){
-  .step .more{display:none}
-  .step.open .more{display:block}
-  .step .card{cursor:pointer}
-  .more-t{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:0;border:0;background:none;font:inherit;font-size:15px;font-weight:500;color:inherit;opacity:.85;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-  .more-t::after{content:"▾";text-decoration:none;display:inline-block;transition:transform .2s}
-  .step.open .more-t::after{transform:rotate(180deg)}
-  .step.open .more-t .en,.step.open .more-t .de{font-size:0}
-  html[lang=en] .step.open .more-t .en::before{content:"Show less";font-size:15px}
-  html[lang=de] .step.open .more-t .de::before{content:"Weniger";font-size:15px}
-}
-
-@media (max-width:640px){.swirl .desk{display:none}}
-@media (min-width:900px){
-  body{font-size:18px}
-  .page{max-width:720px;padding-top:56px}
-  .head .polaroid{width:250px}.head .polaroid .ph{height:250px}
-  .btn{font-size:18.5px;padding:18px 24px}
-  .lead{font-size:20px}
-  .gift{padding:26px 28px}.gift .cov{width:110px}.gift strong{font-size:31px}
-  .letter{padding:44px 40px 38px}.letter p{font-size:18px}.letter .mini{width:140px}.letter .mini .ph{height:140px}
-}
-@media (prefers-reduced-motion:reduce){.bg span,.swirl span{animation:none}.btn,.gift{transition:none}}
+.wave{display:none}
+.foot{text-align:center;color:var(--muted);font-size:.86rem;padding:2.4rem 16px 3rem}
+.foot .bye{font-family:var(--serif);font-style:italic;font-size:1.25rem;color:var(--plum);margin-bottom:.8rem}
+.foot a{color:var(--plum)}
+.foot details{margin-top:.8rem}
+.foot summary{cursor:pointer}
+.foot details p{text-align:left;max-width:600px;margin:.6rem auto 0}
+@media(prefers-reduced-motion:reduce){.btn,.card .pic img{transition:none}}
 </style>
 </head>
 <body>
-
-<div class="bg" aria-hidden="true"><span class="a"></span><span class="b"></span></div>
-<div class="swirl" id="swirl" aria-hidden="true"></div>
-
 <main class="page">
-  <div class="langsw" role="group" aria-label="Language / Sprache"><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="de" aria-pressed="false">DE</button></div>
+  <div class="top">
+    <a class="brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt="" width="30" height="30"><span>Movecia<i>.</i></span></a>
+    <div class="langsw" role="group" aria-label="Language / Sprache"><button type="button" data-lang="de" aria-pressed="false">DE</button><button type="button" data-lang="en" aria-pressed="true">EN</button></div>
+  </div>
+
   <header class="head">
-    <figure class="polaroid">
-      <span class="tape" aria-hidden="true"></span>
-      <div class="ph"><img src="/img/wildhearts/viv-stretch.jpg" alt="Viv" width="534" height="534"></div>
-      <figcaption class="cap"><span class="en">hi, I'm Viv ♡</span><span class="de">hallo, ich bin Viv ♡</span></figcaption>
-    </figure>
-    <p class="hey"><span class="en">hey you, come in ♡</span><span class="de">hey du, komm rein ♡</span></p>
-    <h1>The Wild Hearts Collective</h1>
-    <p class="by"><span class="en">a circle for women</span><span class="de">ein Kreis für Frauen</span></p>
-    <p class="lead"><span class="en">For women who want more than just functioning. <em>Move your body, your life, your ideas</em>, and come back to yourself, together.</span><span class="de">Für Frauen, die mehr wollen als nur funktionieren. <em>Bewege deinen Körper, dein Leben, deine Ideen</em> und finde gemeinsam mit uns zu dir zurück.</span></p>
+    <div class="avatar"><img src="/img/movecia/fotos/ev-profil.jpg?v=1" alt="Vivien Malonga" width="296" height="296"><span class="dot" aria-hidden="true"></span></div>
+    <p class="k">Mindful Movement · Yoga · Somatic · Breathwork</p>
+    <h1>Vivien Malonga</h1>
+    <p class="sub"><span class="de">Bewegung beginnt bei dir.</span><span class="en">Movement begins with you.</span></p>
+    <p class="lead"><span class="de">Ich begleite Frauen zurück in ihren Körper, online und bei mir in den Tiroler Bergen.</span><span class="en">I guide women back into their bodies, online and with me in the Tyrolean mountains.</span></p>
   </header>
 
   <nav class="links" aria-label="Links">
-    <a class="btn main" href="https://www.instagram.com/channel/wrOyV88oT-GAwNiR/" target="_blank" rel="noopener">
-      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span>
-      <span class="tx"><span class="en">Join the Wild Hearts Collective</span><span class="de">Komm ins Wild Hearts Collective</span><small><span class="en">Our free community channel on Instagram</span><span class="de">Unser kostenloser Community-Kanal auf Instagram</span></small></span>
+    <a class="btn main" href="/unfold/">
+      <span class="th"><img src="/img/movecia/fotos/ev-unfold-karte.jpg?v=10" alt="" width="116" height="116"></span>
+      <span class="tx"><span class="tag"><span class="de">Start 10. Jänner</span><span class="en">Starts 10 January</span></span><b>Unfold – The Mindful Becoming</b><small><span class="de">Dein 3-Monats-Begleiter · nur 10 Plätze</span><span class="en">Your 3-month companion · only 10 spots</span></small></span>
       <span class="ar" aria-hidden="true">→</span>
     </a>
-
-    <button class="gift" type="button" data-join="reset">
-      <span class="cov"><img class="en" src="/img/wildhearts/reset-cover-en.jpg" alt="" width="440" height="624"><img class="de" src="/img/wildhearts/reset-cover-de.jpg" alt="" width="440" height="624" loading="lazy"></span>
-      <span>
-        <span class="note"><span class="en">my little gift for you</span><span class="de">mein kleines Geschenk für dich</span></span>
-        <strong><span class="en">Reset Routine for Tired Days</span><span class="de">Reset-Routine für müde Tage</span></strong>
-        <small><span class="en">Ten quiet minutes for the evenings you gave everything away. Free, in English and Deutsch.</span><span class="de">Zehn stille Minuten für die Abende, an denen du alles gegeben hast. Kostenlos, auf Deutsch und Englisch.</span></small>
-        <span class="go"><span class="en">Send it to me →</span><span class="de">Schick sie mir →</span></span>
-      </span>
-    </button>
-
-    <a class="btn" href="#angebot">
-      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/></svg></span>
-      <span class="tx"><span><span class="en">Ways to walk with me</span><span class="de">So begleite ich dich</span></span><small><span class="en">Unfold, the Method, pre- &amp; postnatal and more</span><span class="de">Unfold, die Method, Prä- &amp; Postnatal und mehr</span></small></span>
-      <span class="ar" aria-hidden="true">↓</span>
+    <a class="btn" href="/method/">
+      <span class="th"><img src="/img/movecia/fotos/ev-method-foto.jpg?v=3" alt="" width="116" height="116"></span>
+      <span class="tx"><b>Mindful Movement Method</b><small><span class="de">On demand ab 1. Dezember</span><span class="en">On demand from 1 December</span><span data-until="2026-12-01T23:59:59+01:00"><span class="de"> · Early-Bird € 29</span><span class="en"> · early bird € 29</span></span></small></span>
+      <span class="ar" aria-hidden="true">→</span>
     </a>
-    <a class="btn" href="https://www.instagram.com/movementwithviv/" target="_blank" rel="noopener">
-      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".8" fill="currentColor"/></svg></span>
-      <span class="tx">@movementwithviv<small><span class="en">Movement, honest talks and life in the mountains</span><span class="de">Bewegung, ehrliche Gespräche und das Leben in den Bergen</span></small></span>
+    <a class="btn" href="/natal/">
+      <span class="th"><img src="/img/movecia/fotos/ev-natal.jpg?v=10" alt="" width="116" height="116"></span>
+      <span class="tx"><b><span class="de">Prä- &amp; Postnatal Training</span><span class="en">Prenatal &amp; Postnatal</span></b><small><span class="de">1:1 im Studio oder online</span><span class="en">1:1 in my studio or online</span></small></span>
+      <span class="ar" aria-hidden="true">→</span>
+    </a>
+    <a class="btn" href="/#anfrage">
+      <span class="th"><img src="/img/movecia/fotos/ev-platz-quadrat.jpg?v=9" alt="" width="116" height="116"></span>
+      <span class="tx"><b>1:1 Personal Training</b><small><span class="de">Im Studio in Mathon oder draußen</span><span class="en">In my studio in Mathon or outdoors</span></small></span>
+      <span class="ar" aria-hidden="true">→</span>
+    </a>
+    <button class="btn gift" type="button" data-join="reset">
+      <span class="th"><img class="de" src="/img/wildhearts/reset-cover-de.jpg" alt="" width="100" height="140"><img class="en" src="/img/wildhearts/reset-cover-en.jpg" alt="" width="100" height="140"></span>
+      <span class="tx"><em><span class="de">mein Geschenk für dich</span><span class="en">my gift for you</span></em><b><span class="de">Reset-Routine für müde Tage</span><span class="en">Reset Routine for Tired Days</span></b><small><span class="de">Kostenlos als PDF</span><span class="en">Free PDF</span></small></span>
+      <span class="ar" aria-hidden="true">→</span>
+    </button>
+    <a class="btn" href="https://www.instagram.com/channel/wrOyV88oT-GAwNiR/" target="_blank" rel="noopener">
+      <span class="th ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span>
+      <span class="tx"><b>Wild Hearts Collective</b><small><span class="de">Unser kostenloser Community-Kanal</span><span class="en">Our free community channel</span></small></span>
       <span class="ar" aria-hidden="true">→</span>
     </a>
   </nav>
 
+  <div class="small-links">
+    <a href="/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>moveciamovement.com</a>
+    <a href="/gathering/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg><span class="de">Live-Gatherings</span><span class="en">Live gatherings</span></a>
+    <a href="https://www.instagram.com/movementwithviv/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/></svg>@movementwithviv</a>
+    <a href="/#angebote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M4 12h16"/></svg><span class="de">Alle Angebote</span><span class="en">All offers</span></a>
+  </div>
+
   <section class="letter" aria-label="Viv">
-    <figure class="polaroid mini"><div class="ph"><img src="/img/movecia/fotos/ev-platz-quadrat.jpg?v=9" alt="" width="640" height="640" loading="lazy"></div><figcaption class="cap"><span class="en">my spot</span><span class="de">mein Platz</span></figcaption></figure>
-    <p class="hello"><span class="en">Dear wild heart,</span><span class="de">Liebes wildes Herz,</span></p>
-    <p class="en">you are always there for everyone else. You hold it all together, you manage, you remember everything, and somewhere along the way it's easy to forget yourself.</p>
-    <p class="de">du bist immer für alle anderen da. Du hältst alles zusammen, organisierst, denkst an alles, und irgendwo auf dem Weg vergisst du dabei leicht dich selbst.</p>
-    <p class="en">That's exactly why the Wild Hearts Collective exists. So you never forget that you are a whole person too. This is your place, a place where you don't get lost.</p>
-    <p class="de">Genau deshalb gibt es das Wild Hearts Collective. Damit du nie vergisst, dass auch du ein ganzer Mensch bist. Das hier ist dein Ort, ein Ort, an dem du dich nicht verlierst.</p>
-    <p class="sig"><span class="en">we matter. we are here. and we are seen. ♡ Viv</span><span class="de">wir sind wichtig. wir sind da. und wir werden gesehen. ♡ Viv</span></p>
+    <div class="pic"><img src="/img/movecia/fotos/ev-gathering.jpg?v=10" alt="" width="240" height="320" loading="lazy"></div>
+    <div>
+      <p class="hello"><span class="en">Dear you,</span><span class="de">Liebe du,</span></p>
+      <p class="en">you are always there for everyone else. You hold it all together, you manage, you remember everything, and somewhere along the way it's easy to forget yourself.</p>
+      <p class="de">du bist immer für alle anderen da. Du hältst alles zusammen, organisierst, denkst an alles, und irgendwo auf dem Weg vergisst du dabei leicht dich selbst.</p>
+      <p class="en">This is your place to come back to yourself. Gently, at your own pace, one step at a time.</p>
+      <p class="de">Hier ist dein Ort, um zu dir zurückzukommen. Sanft, in deinem Tempo, Schritt für Schritt.</p>
+      <p class="sig">♡ Viv</p>
+    </div>
   </section>
 
-  <section class="offer" id="angebot" aria-labelledby="offer-title">
+<section class="offer" id="angebot" aria-labelledby="offer-title">
     <div class="offer-head">
       <p class="hand"><span class="en">one step at a time ♡</span><span class="de">Schritt für Schritt ♡</span></p>
       <h2 id="offer-title"><span class="en">Ways to walk with me</span><span class="de">So begleite ich dich</span></h2>
@@ -273,7 +226,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
     <ol class="steps">
       <li class="step s1">
         <span class="no" aria-hidden="true">1</span>
-        <div class="card">
+        <div class="card"><div class="pic"><img src="/img/movecia/fotos/ev-gathering.jpg?v=10" alt="" width="600" height="300" loading="lazy"></div>
           <p class="kick"><span class="en">Free · open to everyone</span><span class="de">Kostenlos · offen für alle</span></p>
           <h3>The Wild Hearts Collective</h3>
           <p class="note"><span class="en">where it all begins</span><span class="de">hier beginnt alles</span></p>
@@ -286,7 +239,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
       </li>
       <li class="step s3">
         <span class="no" aria-hidden="true">2</span>
-        <div class="card">
+        <div class="card"><div class="pic"><img src="/img/movecia/fotos/ev-unfold-karte.jpg?v=10" alt="" width="600" height="300" loading="lazy"></div>
           <p class="kick"><span class="en">3 months · starts 10 January · 10 spots</span><span class="de">3 Monate · Start 10. Jänner · 10 Plätze</span></p>
           <h3>Unfold – The Mindful Becoming</h3>
           <p class="note"><span class="en">your 3-month companion, because movement begins with you</span><span class="de">dein 3-Monats-Begleiter, denn Bewegung beginnt bei dir</span></p>
@@ -301,7 +254,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
       </li>
       <li class="step s1">
         <span class="no" aria-hidden="true">3</span>
-        <div class="card">
+        <div class="card"><div class="pic"><img src="/img/movecia/fotos/ev-method-foto.jpg?v=3" alt="" width="600" height="300" loading="lazy"></div>
           <p class="kick"><span class="en">On demand · from 1 December</span><span class="de">On demand · ab 1. Dezember</span></p>
           <h3>Mindful Movement Method</h3>
           <p class="note"><span class="en">a few quiet minutes for you, every day</span><span class="de">ein paar ruhige Minuten für dich, jeden Tag</span></p>
@@ -316,7 +269,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
       </li>
       <li class="step s2">
         <span class="no" aria-hidden="true">4</span>
-        <div class="card">
+        <div class="card"><div class="pic"><img src="/img/movecia/fotos/ev-natal.jpg?v=10" alt="" width="600" height="300" loading="lazy"></div>
           <p class="kick"><span class="en">1:1 · in my studio or online</span><span class="de">1:1 · im Studio oder online</span></p>
           <h3><span class="en">Prenatal &amp; Postnatal Training</span><span class="de">Prä- &amp; Postnatal Training</span></h3>
           <p class="note"><span class="en">through pregnancy and the time after</span><span class="de">durch die Schwangerschaft und die Zeit danach</span></p>
@@ -334,7 +287,7 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
       </li>
       <li class="step s4">
         <span class="no" aria-hidden="true">5</span>
-        <div class="card">
+        <div class="card"><div class="pic"><img src="/img/movecia/fotos/ev-platz-quadrat.jpg?v=9" alt="" width="600" height="300" loading="lazy"></div>
           <p class="kick"><span class="en">A weekend in the Alps · dates coming soon</span><span class="de">Ein Wochenende in den Alpen · Termine folgen</span></p>
           <h3>Wild Hearts Alpine Retreat</h3>
           <p class="note"><span class="en">a weekend that awakens your creative potential</span><span class="de">ein Wochenende, das dein kreatives Potenzial weckt</span></p>
@@ -354,14 +307,13 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
   </section>
 
   <section class="affirm" aria-label="Affirmation">
-    <svg style="left:18px;top:16px" width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4c2 15 12 25 28 28-16 3-26 13-28 28-2-15-12-25-28-28 16-3 26-13 28-28z" fill="#C9B2B8"/></svg>
-    <svg style="right:20px;top:18px" width="34" height="34" viewBox="0 0 120 120" aria-hidden="true"><path d="M80 18a42 42 0 1 0 22 62A34 34 0 0 1 80 18z" fill="#E8D6CA"/></svg>
-    <p class="k"><span class="en">for tonight</span><span class="de">für heute Abend</span></p>
+    <img src="/img/movecia/movecia-zeichen-hell.svg" alt="" width="120" height="120">
+    <p class="k"><span class="en">for today</span><span class="de">für heute</span></p>
     <p class="big"><span class="en">I am allowed to rest.</span><span class="de">Ich darf ruhen.</span></p>
     <p class="hand"><span class="en">and I'm allowed to want more.</span><span class="de">und ich darf mehr wollen.</span></p>
   </section>
 
-  <section class="join" id="join" aria-labelledby="join-title">
+<section class="join" id="join" aria-labelledby="join-title">
     <span class="tape" aria-hidden="true"></span>
     <h2 id="join-title"></h2>
     <p class="intro" id="join-intro"></p>
@@ -377,7 +329,6 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
   </section>
 </main>
 
-<div class="wave" aria-hidden="true"><svg viewBox="0 0 1200 70" preserveAspectRatio="none"><path d="M0 40C150 10 300 10 450 32S750 68 900 44 1100 14 1200 26V70H0Z" fill="#E8DED2"/></svg></div>
 <footer class="foot">
   <div class="in">
     <p class="bye"><span class="en">with love from the mountains ♡</span><span class="de">mit Liebe aus den Bergen ♡</span></p>
@@ -393,69 +344,15 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
     </details>
   </div>
 </footer>
-
 <script>
 (() => {
-  // Wirbelnde Icons: passend zur Jahreszeit, in FORMA-Farben
-  const C = {r: '#7D5E68', b: '#EADFDE', k: '#7D7076', p: '#F2ECE4', s: '#E8D6CA', g: '#B79FA6'};
-  const I = {
-    leaf: `<path d="M32 6c14 8 22 20 20 34-1 8-8 14-16 15-1-12 2-24 8-34-8 9-13 21-14 34C17 52 11 44 12 34 14 21 22 12 32 6z" fill="${C.r}"/><path d="M30 55c1-14 6-27 14-37" stroke="${C.p}" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>`,
-    leaf2: `<path d="M10 46C9 28 22 12 44 10c6-1 10 0 10 0s1 4 0 10C52 42 36 55 18 54l-6 6-3-3 6-6c-3-2-5-3-5-5z" fill="${C.b}"/><path d="M14 52L44 20" stroke="${C.k}" stroke-width="2" stroke-linecap="round" opacity=".55"/>`,
-    leaf3: `<path d="M32 4l6 12 12-4-4 12 12 6-12 6 4 12-12-4-6 12-6-12-12 4 4-12-12-6 12-6-4-12 12 4z" fill="${C.k}" opacity=".85"/><path d="M32 58V30" stroke="${C.p}" stroke-width="2" stroke-linecap="round" opacity=".6"/>`,
-    acorn: `<path d="M32 6v6" stroke="${C.k}" stroke-width="3" stroke-linecap="round"/><path d="M14 22c0-7 8-11 18-11s18 4 18 11v3H14z" fill="${C.k}"/><path d="M17 25h30c0 17-7 30-15 33-8-3-15-16-15-33z" fill="${C.b}"/>`,
-    mushroom: `<path d="M8 32C8 18 20 10 32 10s24 8 24 22z" fill="${C.r}"/><circle cx="22" cy="22" r="3" fill="${C.p}"/><circle cx="36" cy="18" r="2.5" fill="${C.p}"/><circle cx="44" cy="26" r="2" fill="${C.p}"/><path d="M24 32h16l-2 20a4 4 0 01-4 4h-4a4 4 0 01-4-4z" fill="${C.s}"/>`,
-    moon: `<path d="M44 8a26 26 0 1 0 12 34A20 20 0 0 1 44 8z" fill="${C.b}"/><circle cx="26" cy="30" r="3" fill="${C.s}"/><circle cx="34" cy="44" r="2" fill="${C.s}"/>`,
-    star: `<path d="M32 4c2 15 12 25 28 28-16 3-26 13-28 28-2-15-12-25-28-28 16-3 26-13 28-28z" fill="${C.r}"/>`,
-    sparkle: `<path d="M32 10c1.5 10 8 16.5 18 18-10 1.5-16.5 8-18 18-1.5-10-8-16.5-18-18 10-1.5 16.5-8 18-18z" fill="${C.k}" opacity=".7"/>`,
-    heart: `<path d="M32 54S10 40 10 24a11 11 0 0 1 22-4 11 11 0 0 1 22 4c0 16-22 30-22 30z" fill="${C.r}" opacity=".85"/>`,
-    snow: `<g stroke="${C.k}" stroke-width="3" stroke-linecap="round"><path d="M32 6v52M9 19l46 26M9 45l46-26"/></g>`,
-    tree: `<path d="M32 4l14 18h-7l11 14h-7l11 14H10l11-14h-7l11-14h-7z" fill="${C.g}"/><rect x="28" y="50" width="8" height="10" fill="${C.k}"/>`,
-    sprout: `<path d="M32 58V30" stroke="${C.k}" stroke-width="3" stroke-linecap="round"/><path d="M32 32C30 18 20 12 8 14c1 12 11 19 24 18zM32 26c2-12 12-18 24-16-1 12-11 18-24 16z" fill="${C.g}"/>`,
-    flower: `<path d="M32 30v28" stroke="${C.k}" stroke-width="3"/><g fill="${C.b}"><circle cx="32" cy="12" r="8"/><circle cx="22" cy="22" r="8"/><circle cx="42" cy="22" r="8"/><circle cx="26" cy="32" r="8"/><circle cx="38" cy="32" r="8"/></g><circle cx="32" cy="24" r="6" fill="${C.r}"/>`,
-    sun: `<circle cx="32" cy="32" r="12" fill="${C.r}"/><g stroke="${C.b}" stroke-width="4" stroke-linecap="round"><path d="M32 4v8M32 52v8M4 32h8M52 32h8M12 12l6 6M46 46l6 6M12 52l6-6M46 18l6-6"/></g>`
-  };
-  const m = new Date().getMonth() + 1;
-  const season = m >= 3 && m <= 5 ? ['sprout', 'flower', 'moon', 'heart', 'leaf2'] : m >= 6 && m <= 8 ? ['sun', 'flower', 'moon', 'heart', 'leaf2'] : m >= 9 && m <= 11 ? ['leaf', 'leaf2', 'heart', 'acorn', 'mushroom', 'moon', 'star', 'leaf3'] : ['snow', 'tree', 'moon', 'heart', 'star', 'sparkle'];
-  const spots = [
-    [3, 6, 50, ''], [86, 4, 44, ''], [6, 30, 40, 'desk'], [90, 24, 54, 'desk'], [2, 52, 44, ''], [88, 46, 40, ''],
-    [12, 70, 52, 'desk'], [84, 66, 46, 'desk'], [4, 86, 36, ''], [90, 84, 42, ''], [20, 14, 32, 'desk'], [76, 90, 34, 'desk']
-  ];
-  const box = document.getElementById('swirl');
-  const small = window.innerWidth < 640;
-  spots.forEach(([x, y, size, cls], i) => {
-    const s = document.createElement('span');
-    if (cls) s.className = cls;
-    if (small) { if (x < 50) s.style.left = '-14px'; else s.style.right = '-14px'; s.style.opacity = '.7'; }
-    else s.style.left = x + '%';
-    s.style.top = y + '%';
-    s.style.width = s.style.height = (small ? Math.round(size * 0.72) : size) + 'px';
-    s.style.setProperty('--r', ((i * 47) % 60 - 30) + 'deg');
-    s.style.setProperty('--d', (18 + (i * 7) % 14) + 's');
-    s.style.setProperty('--x1', ((i % 2 ? -1 : 1) * (10 + (i * 5) % 16)) + 'px');
-    s.style.setProperty('--delay', (-i * 2.1) + 's');
-    s.innerHTML = '<svg viewBox="0 0 64 64">' + I[season[i % season.length]] + '</svg>';
-    box.appendChild(s);
-  });
-
   // Angebote am Handy: antippen zum Auf- und Zuklappen
   document.querySelectorAll('.step').forEach(st => {
     const t = st.querySelector('.more-t');
     const toggle = () => { const o = st.classList.toggle('open'); t.setAttribute('aria-expanded', String(o)); };
     t.addEventListener('click', e => { e.stopPropagation(); toggle(); });
-    st.querySelector('.card').addEventListener('click', e => { if (window.innerWidth < 900 && !e.target.closest('a,button')) toggle(); });
+    st.querySelector('.card').addEventListener('click', e => { if (!e.target.closest('a,button')) toggle(); });
   });
-  // Angebote am Computer: Kacheln wie ein Mauerwerk, damit Nr. 3 direkt unter Nr. 1 sitzt
-  const steps = [...document.querySelectorAll('.step')];
-  const masonry = () => {
-    const wide = window.innerWidth >= 900;
-    steps.forEach(st => {
-      st.style.gridRowEnd = '';
-      if (wide) st.style.gridRowEnd = 'span ' + Math.ceil((st.getBoundingClientRect().height + 22) / 8);
-    });
-  };
-  window.addEventListener('resize', masonry);
-  window.addEventListener('load', masonry);
-  if (document.fonts) document.fonts.ready.then(masonry);
   // Sprache: EN/DE umschaltbar, gemerkt im Browser, ?lang=de für direkte Links
   const root = document.documentElement;
   const pick = l => {
@@ -463,7 +360,6 @@ html[lang=de] .en,html[lang=en] .de{display:none!important}
     document.querySelectorAll('.langsw button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === root.lang)));
     try { localStorage.setItem('wh-lang', root.lang); } catch (e) {}
     setJoin(source);
-    if (typeof masonry === 'function') masonry();
   };
   let source = 'link';
   const form = document.getElementById('join-form');
