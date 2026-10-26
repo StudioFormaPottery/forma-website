@@ -1,5 +1,5 @@
 /* Movecia Übungs-Player (Vivien, 26.10.2026): Jede Übung ist ein kurzer Clip von Vivien (Bunny-Embed, läuft stumm
-   in Schleife). Vorher wählt man 30 oder 45 Sekunden, ein runder Timer zählt herunter, in den letzten 3 Sekunden
+   in Schleife). Vorher wählt man 30 oder 45 Sekunden, ein runder Timer zählt herunter, in den letzten 5 Sekunden
    blüht ein sanfter „Sonnenaufgang“-Klang auf, dann startet die nächste Übung von selbst.
    Aufruf: MvFlow(element, {lang, title, items:[{name, src}]}) oder automatisch für jedes [data-mv-flow]. */
 (function () {
@@ -30,8 +30,8 @@
 .mvf-ring .t{fill:rgba(251,245,247,.82);stroke:rgba(74,58,65,.15);stroke-width:7}
 .mvf-ring .p{fill:none;stroke:var(--mvf-deep);stroke-width:7;stroke-linecap:round;transition:stroke .6s}
 .mvf-ring .n{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--mvf-deep)}
-.mvf-ring .n b{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(2rem,6vw,2.9rem);line-height:1;font-variant-numeric:tabular-nums}
-.mvf-ring .n span{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
+.mvf-ring .n b{font-family:"Cormorant Garamond",Georgia,serif;font-weight:700;font-size:clamp(2rem,6vw,2.9rem);line-height:1;font-variant-numeric:tabular-nums}
+.mvf-ring .n span{margin-top:.45em;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
 .mvf-stage.end .mvf-ring .p{stroke:#C98A5E}
 .mvf-sun{position:absolute;left:0;right:0;bottom:-45%;height:85%;background:radial-gradient(closest-side,rgba(241,201,165,.85),transparent);opacity:0;transition:opacity 1.4s ease;pointer-events:none}
 .mvf-stage.end .mvf-sun{opacity:1}
@@ -129,7 +129,7 @@
       const dt = (now - last) / 1000; last = now;
       if (!sw) {
         left -= dt;
-        if (left <= 3 && !chimed) { chimed = true; q('[data-st]').classList.add('end'); if (sound) sunrise(3); }
+        if (left <= 5 && !chimed) { chimed = true; q('[data-st]').classList.add('end'); if (sound) sunrise(5); }
         if (left <= 0) { left = 0; draw(); advance(); } else draw();
       }
       raf = requestAnimationFrame(tick);
