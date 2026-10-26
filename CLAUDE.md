@@ -334,3 +334,5 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 ## Movecia · 1:1 Personal Training Anfragen (Vivien, 26.10.2026)
 - Startseite (`wildhearts/start/index.php`): „Anfrage schicken“ öffnet ein Fenster (`#ptd`, auch per `/#anfrage`) statt mailto: Chips zum Ankreuzen (Wünsche `MM_PT_GOALS`, Ort `MM_PT_PLACES`, Zeit `MM_PT_TIMES` in `api/mm-pt.inc.php`), kurzer Text, Name, E-Mail, Telefon optional. `api/pt-anfrage.php` speichert in `mm_pt_requests` (max. 5/Std. je IP-Hash, Honeypot, 3 s Mindestzeit), Eingangsbestätigung an die Interessentin (DE/EN) und Info an `natal_notify_email()`.
 - Verwaltung → Movecia → Übersicht → „💬 Personal Training Anfragen“ (`#pt`): offene oben mit Zähler, Antworten (mailto), WhatsApp (bei Telefon), ✓ Erledigt / Wieder offen, erledigte löschbar. Datenschutz /terms: Absatz „Anfragen“.
+
+- Videos auf öffentlichen Movecia-Seiten (Vivien, 26.10.2026): kein Rahmen, Ränder laufen weich in den Hintergrund aus (Klasse `.soft`, CSS-Maske in `site.css`, Unfold-Seite eigene Regel `.pic.soft`). Tanz-Video: Linie und Wörter in dunklem Pflaume mit hellem Schein.

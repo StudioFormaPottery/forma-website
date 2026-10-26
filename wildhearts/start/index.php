@@ -40,7 +40,7 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
   <p class="lead"><span class="de">Movecia heißt „in Bewegung“. Ich begleite Frauen zurück in ihren Körper, mit sanfter, achtsamer Bewegung, mit Atem und mit Raum für das, was sie wirklich beschäftigt. Online, wann immer du magst, live in kleinen Runden und persönlich bei mir in den Tiroler Bergen.</span><span class="en">Movecia means “in motion”. I guide women back into their bodies with gentle, mindful movement, with breath and with room for what truly matters to them. Online whenever you like, live in small circles and in person with me in the Tyrolean mountains.</span></p>
   <div class="cta"><a class="btn" href="#angebote"><span class="de">So begleite ich dich</span><span class="en">Ways to move with me</span> →</a><a class="btn line" href="/unfold/"><span class="de">Unfold · Start <?= mv_date($st) ?></span><span class="en">Unfold · starts <?= mv_date($st, 'en') ?></span></a></div>
 </div>
-<div class="in"><div class="art wide rv"><video src="/video/movecia/start.mp4?v=10" poster="/img/movecia/fotos/ev-start.jpg?v=10" autoplay muted loop playsinline preload="metadata" aria-label="Vivien bewegt sich langsam in ihrem lichten Studio mit Blick auf die Berge"></video></div></div></section>
+<div class="in"><div class="art wide soft rv"><video src="/video/movecia/start.mp4?v=10" poster="/img/movecia/fotos/ev-start.jpg?v=10" autoplay muted loop playsinline preload="metadata" aria-label="Vivien bewegt sich langsam in ihrem lichten Studio mit Blick auf die Berge"></video></div></div></section>
 
 <section class="band"><div class="w"><div class="in">
   <p class="k"><span class="de">Wofür Movecia steht</span><span class="en">What Movecia stands for</span></p>
@@ -50,7 +50,7 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
 
 <section class="w vids" aria-label="Movecia in Bewegung"><div class="in">
   <!-- Nur noch das Tanz-Video, darüber die Linie ankommen · spüren · entfalten (Vivien, 26.10.2026) -->
-  <figure class="vsolo rv">
+  <figure class="vsolo soft rv">
     <video src="/video/movecia/unfold.mp4?v=10" poster="/img/movecia/fotos/ev-unfold.jpg?v=10" autoplay muted loop playsinline preload="metadata" aria-label="Vivien tanzt langsam in ihrem lichten Studio"></video>
     <div class="flow" aria-hidden="true">
       <span class="f-lab f-top"><span class="de">ankommen</span><span class="en">arrive</span></span>

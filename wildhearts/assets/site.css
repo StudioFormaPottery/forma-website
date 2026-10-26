@@ -146,3 +146,17 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
 @media(prefers-reduced-motion:reduce){.f-line{transform:none;transition:none}.f-dot,.vsolo .f-lab{opacity:1;transition:none}.f-dot svg{animation:none}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media(max-width:759px){.vsolo{width:min(100%,380px);border-radius:190px 190px 26px 26px}}
+
+/* Videos fließend in den Hintergrund statt im Rahmen (Vivien, 26.10.2026) */
+.soft{border-radius:0!important;overflow:visible!important;background:none!important}
+.soft::after{display:none!important}
+.soft video{-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 60%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 60%,transparent 100%)}
+.art.wide.soft video{transform:none;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 16%,#000 84%,transparent 100%),linear-gradient(180deg,transparent 0,#000 18%,#000 80%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent 0,#000 16%,#000 84%,transparent 100%),linear-gradient(180deg,transparent 0,#000 18%,#000 80%,transparent 100%);mask-composite:intersect}
+.art.wide.soft:hover video{transform:none}
+.vsolo.soft{max-height:92vh;width:min(100%,520px)}
+.vsolo.soft video{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22%,#000 78%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 84%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent 0,#000 22%,#000 78%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 84%,transparent 100%);mask-composite:intersect}
+.vsolo.soft .flow{color:#4A3A41}
+.vsolo.soft .f-lab{text-shadow:0 0 14px rgba(242,236,228,.95),0 0 4px rgba(242,236,228,.9)}
+.vsolo.soft .f-top{top:9%}.vsolo.soft .f-bot{bottom:6%}
+.vsolo.soft .f-line{top:calc(9% + 2.6rem);bottom:calc(6% + 2.8rem);background:rgba(74,58,65,.55)}
+.vsolo.soft .f-line::after{border-color:rgba(74,58,65,.7)}
