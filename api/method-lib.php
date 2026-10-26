@@ -1406,6 +1406,8 @@ function mv_prod_sync(PDO $pdo, bool $force = false): void
             $n['de'], $n['en'], $n['ukey'], $n['due'], $n['ex'] ? json_encode($n['ex'], JSON_UNESCAPED_UNICODE) : '', $now]);
         if (!empty($n['steps'])) $pdo->prepare('UPDATE mv_lessons SET steps = ?, ex = ?, mode = ? WHERE id = ?')->execute([json_encode($n['steps'], JSON_UNESCAPED_UNICODE), json_encode(array_map(fn($x) => [$x[0], $x[1]], $n['steps']), JSON_UNESCAPED_UNICODE), (string)($n['mode'] ?? ''), (int)$pdo->lastInsertId()]);
     }
+    // v8 (Vivien, 26.10.2026): „Willkommen in der Method“ gefühlvoller, mehr Herz statt Erklärung
+    if ((int)($c['v'] ?? 0) < 8 && !empty($j['welcome']['de'])) $pdo->prepare("UPDATE mv_lessons SET script_de = ?, script_en = ? WHERE title_de = ? AND ukey = ''")->execute([$j['welcome']['de'], $j['welcome']['en'], $j['welcome']['title']]);
     // feste Reihenfolge der Videos in Monat 1
     if ((int)($c['v'] ?? 0) < 7 && !empty($j['m1_order'])) {
         $pid = $prog('method', 'Rückzug & Ruhe');
