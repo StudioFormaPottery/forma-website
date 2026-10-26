@@ -1,0 +1,57 @@
+<!doctype html>
+<!-- Movecia-Gutschein: Hintergründe der beiden Designs (A4 quer). Texte setzt api/mv-gutschein-pdf.php darüber.
+     Erzeugen: python3 tools/mv-gutschein/build.py (rendert ?d=1 und ?d=2 gegen den lokalen Server, schreibt api/mv-gutschein/design1|2.jpg) -->
+<html lang="de"><head><meta charset="utf-8"><title>Movecia Gutschein</title>
+<style>
+@font-face{font-family:Cormorant;src:url(/fonts/CormorantGaramond-VF.woff) format("woff");font-weight:300 700}
+@font-face{font-family:Hanken;src:url(/fonts/HankenGrotesk-VF.woff) format("woff");font-weight:100 900}
+@page{size:297mm 210mm;margin:0}
+html,body{margin:0;padding:0}
+.pg{position:relative;width:297mm;height:210mm;overflow:hidden;background:#fff}
+svg{position:absolute;inset:0;width:297mm;height:210mm}
+.wm{position:absolute;font-family:Cormorant,Georgia,serif;font-weight:500;color:#2E2529;line-height:1;letter-spacing:-.005em}
+.wm i{display:inline-block;width:.27em;height:.27em;border-radius:50%;background:#7D5E68;margin-left:.04em}
+.tag{position:absolute;font-family:Hanken,sans-serif;font-size:7.4pt;letter-spacing:.22em;color:#7D7076;text-transform:uppercase}
+.d2,.d1{display:none}
+body[data-d="1"] .d1,body[data-d="2"] .d2{display:block}
+</style></head>
+<body data-d="1">
+<!-- Design 1 „Kiesel“: großes Logo-Zeichen links, Text rechts -->
+<div class="pg d1">
+  <svg viewBox="0 0 297 210">
+    <!-- sehr zarte Fläche hinter dem Zeichen -->
+    <ellipse cx="66" cy="108" rx="58" ry="62" fill="#F7F1EC"/>
+    <!-- Logo-Zeichen groß (Pfirsich-Form, feiner Kiesel-Umriss, Punkt) -->
+    <g transform="translate(66 106) scale(1.18) translate(-63 -60)">
+      <path d="M56 32 C 76 29, 92 44, 91 64 C 90 84, 72 96, 53 92 C 34 88, 25 72, 29 53 C 32 40, 43 33, 56 32 Z" fill="#E8D6CA" transform="translate(-6 -4)"/>
+      <path d="M44 30 C 62 20, 90 28, 98 50 C 104 68, 92 78, 84 88 C 76 100, 50 98, 36 88 C 22 78, 22 58, 28 46 C 32 38, 38 33, 44 30 Z" fill="none" stroke="#7D5E68" stroke-width="1.1" stroke-linejoin="round" transform="translate(7 4) translate(63 60) scale(0.85) translate(-63 -60)"/>
+      <circle cx="81" cy="54" r="8" fill="#7D5E68"/>
+    </g>
+    <!-- feine Trennlinie und Rahmen -->
+    <line x1="134" y1="30" x2="134" y2="180" stroke="#DDD2C6" stroke-width=".3"/>
+    <rect x="9" y="9" width="279" height="192" rx="7" fill="none" stroke="#DDD2C6" stroke-width=".35"/>
+    <!-- kleiner Punkt unten rechts -->
+    <circle cx="276" cy="189" r="1.6" fill="#7D5E68"/>
+  </svg>
+  <div class="wm" style="left:150mm;top:22mm;font-size:22pt">Movecia<i></i></div>
+  <div class="tag" style="left:150mm;top:33mm">Yoga · Pilates · Mindful Movement</div>
+</div>
+
+<!-- Design 2 „Welle“: zentriert, feine Bewegungslinie unten -->
+<div class="pg d2">
+  <svg viewBox="0 0 297 210">
+    <circle cx="258" cy="40" r="22" fill="#F4ECE8"/>
+    <circle cx="38" cy="168" r="14" fill="#F7F1EC"/>
+    <path d="M14 172 C 52 150, 86 192, 128 170 S 206 146, 244 168 S 276 178, 284 166" fill="none" stroke="#E8D6CA" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M14 166 C 54 142, 88 186, 130 163 S 208 138, 246 160 S 277 171, 284 158" fill="none" stroke="#7D5E68" stroke-width=".55" stroke-linecap="round"/>
+    <circle cx="246" cy="160" r="2" fill="#7D5E68"/>
+    <g transform="translate(148.5 26) scale(.22) translate(-63 -60)">
+      <path d="M56 32 C 76 29, 92 44, 91 64 C 90 84, 72 96, 53 92 C 34 88, 25 72, 29 53 C 32 40, 43 33, 56 32 Z" fill="#E8D6CA" transform="translate(-6 -4)"/>
+      <path d="M44 30 C 62 20, 90 28, 98 50 C 104 68, 92 78, 84 88 C 76 100, 50 98, 36 88 C 22 78, 22 58, 28 46 C 32 38, 38 33, 44 30 Z" fill="none" stroke="#7D5E68" stroke-width="4" stroke-linejoin="round" transform="translate(7 4) translate(63 60) scale(0.85) translate(-63 -60)"/>
+      <circle cx="81" cy="54" r="10" fill="#7D5E68"/>
+    </g>
+  </svg>
+  <div class="wm" style="left:0;right:0;text-align:center;top:39mm;font-size:17pt">Movecia<i></i></div>
+</div>
+<script>var d=new URLSearchParams(location.search).get('d')||'1';document.body.dataset.d=d;</script>
+</body></html>

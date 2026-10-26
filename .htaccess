@@ -59,12 +59,17 @@ RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^unfold/call/?$ wildhearts/unfold/call/ [L,QSA]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^links/?$ wildhearts/index.html [L,QSA]
+# Gutscheine kaufen und einlösen (Vivien, 26.10.2026)
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^gutschein/?$ wildhearts/gutschein/ [L,QSA]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^(voucher|gutscheine)/?$ /gutschein/ [R=301,L]
 # Ohne www → mit www (nur Seitenaufrufe, API/Webhooks bleiben unberührt)
 RewriteCond %{HTTP_HOST} ^forma-pottery\.com$ [NC]
 RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
 RewriteCond %{REQUEST_URI} !^/(api|verwaltung)/
 RewriteRule ^(.*)$ https://www.forma-pottery.com/$1 [R=301,L]
-RewriteRule ^api/(fpdf|gutschein|seed)/ - [F,L]
+RewriteRule ^api/(fpdf|gutschein|mv-gutschein|seed)/ - [F,L]
 RewriteRule ^tools/ - [F,L]
 </IfModule>
 

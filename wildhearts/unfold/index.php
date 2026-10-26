@@ -3,6 +3,8 @@
 // 3 Monate Begleitung ab 10. Jänner 2027 (erster Live-Call), live online, Deutsch und Englisch. Seit 25.10.2026 sofort buchbar.
 declare(strict_types=1);
 require dirname(__DIR__, 2) . '/api/method-lib.php';
+require_once dirname(__DIR__, 2) . '/api/mv-gutschein-lib.php';
+require __DIR__ . '/../assets/voucher.inc.php';
 header('Cache-Control: no-store');
 $pdo = forma_db();
 mv_schema($pdo);
@@ -76,8 +78,9 @@ a{color:var(--plum)}
 .btn:hover{background:var(--plumdeep)}.btn.line{background:transparent;color:var(--plum);box-shadow:inset 0 0 0 1px var(--plum)}
 /* Kopf */
 .top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-top:14px;padding-bottom:14px}
-.brand{display:flex;align-items:center;gap:.5rem;font-family:var(--serif);font-size:1.7rem;color:var(--ink);text-decoration:none}
-.brand img{width:30px;height:30px}.brand i{display:inline-block;width:.32em;height:.32em;border-radius:50%;background:var(--plum);margin-left:.05em;vertical-align:baseline}
+.brand{display:flex;align-items:center;gap:.6rem;font-family:var(--serif);font-size:2.05rem;color:var(--ink);text-decoration:none}
+.brand img{width:62px;height:62px;flex:none}
+@media(max-width:599px){.brand{font-size:1.8rem;gap:.5rem}.brand img{width:44px;height:44px}}.brand i{display:inline-block;width:.32em;height:.32em;border-radius:50%;background:var(--plum);margin-left:.05em;vertical-align:baseline}
 .lang{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px}
 .lang button{font:inherit;font-size:.85rem;border:0;background:none;border-radius:999px;padding:.35em .9em;cursor:pointer;color:var(--muted)}
 .lang button[aria-pressed=true]{background:var(--plum);color:var(--on)}
@@ -308,11 +311,11 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
       <fieldset class="opt"><legend><span class="de">Zahlung</span><span class="en">Payment</span></legend>
         <?php $instTotal = (int)$c['u_n'] * (int)$c['u_inst']; $save = $instTotal - (int)$c['u_once']; ?>
         <div class="plans">
-          <label class="plan best"><input type="radio" name="plan" value="u1" checked><span class="badge"><span class="de">Beliebteste Wahl</span><span class="en">Most popular</span></span>
+          <label class="plan best"><input type="radio" name="plan" value="u1" data-cents="<?= (int)$c['u_once'] ?>" checked><span class="badge"><span class="de">Beliebteste Wahl</span><span class="en">Most popular</span></span>
             <span class="pt"><span class="de">Auf einmal</span><span class="en">Pay in full</span></span>
             <span class="pa"><?= $eur($c['u_once']) ?></span>
             <span class="ps"><?= $save > 0 ? '<span class="de">Du sparst ' . $eur($save) . '</span><span class="en">You save ' . $eur($save) . '</span>' : '<span class="de">einmalig</span><span class="en">one payment</span>' ?></span></label>
-          <label class="plan"><input type="radio" name="plan" value="u3">
+          <label class="plan"><input type="radio" name="plan" value="u3" data-cents="<?= (int)$c['u_inst'] ?>">
             <span class="pt"><span class="de">In <?= (int)$c['u_n'] ?> Raten</span><span class="en"><?= (int)$c['u_n'] ?> instalments</span></span>
             <span class="pa"><?= (int)$c['u_n'] ?> × <?= $eur($c['u_inst']) ?></span>
             <span class="ps"><span class="de">monatlich · gesamt <?= $eur($instTotal) ?></span><span class="en">monthly · <?= $eur($instTotal) ?> in total</span></span></label>
@@ -327,6 +330,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
         <label class="pick wr"><input type="radio" name="wr" value="behalten"><span><b><span class="de">Rücktrittsrecht behalten</span><span class="en">Keep my right of withdrawal</span></b><small><span class="de">bis <?= $wuDe ?>, die Workbooks öffnen sich danach.</span><span class="en">until <?= $wuEn ?>, the workbooks open after that.</span></small></span></label>
         <p class="mut" style="margin:.2rem 0 0;font-size:.84rem"><span class="de">Alle Details stehen in den</span><span class="en">All details are in the</span> <a href="/terms/#unfold" target="_blank"><span class="de">Bedingungen</span><span class="en">terms</span></a>.</p>
       </fieldset>
+      <?php mvg_schema($pdo); mv_voucher_field('unfold'); ?>
       <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div><button class="btn" type="submit" id="bb"><span class="de">Weiter zur Zahlung</span><span class="en">Continue to payment</span> →</button></div>
       <p class="err" id="be" hidden></p>

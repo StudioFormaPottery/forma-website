@@ -122,7 +122,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font
 a{color:var(--plum)}
 .brand{font-family:var(--serif);font-size:1.8rem;font-weight:500;color:var(--ink);text-decoration:none;line-height:1;display:inline-flex;align-items:baseline}
 .brand i{width:.3em;height:.3em;border-radius:50%;background:var(--plum);display:inline-block;margin-left:.08em}
-.brand .mk{width:1.35em;height:1.35em;margin-right:.32em;align-self:center;flex:none}
+.brand .mk{width:1.7em;height:1.7em;margin-right:.32em;align-self:center;flex:none}
 .k{font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:var(--plum)}
 .mut{color:var(--muted)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.6em;padding:.95em 1.6em;border-radius:999px;background:var(--plum);color:var(--on);font:inherit;font-size:.95rem;font-weight:500;text-decoration:none;border:1px solid var(--plum);cursor:pointer}

@@ -22,7 +22,7 @@ function mvl_head(string $title, string $desc, string $canon, string $og = '/img
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
 <link rel="manifest" href="/app.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movecia"><meta name="apple-mobile-web-app-status-bar-style" content="default"><script src="/wildhearts/assets/app.js?v=2" defer></script>
-<link rel="stylesheet" href="/wildhearts/assets/mv.css?v=2">
+<link rel="stylesheet" href="/wildhearts/assets/mv.css?v=3">
 <link rel="stylesheet" href="/wildhearts/assets/site.css?v=5">
 <?= $extraCss ?>
 <script>(function(){var l=<?= json_encode($l) ?>;try{if(!l)l=localStorage.getItem('wh-lang')||''}catch(e){}if(!l)l=(navigator.language||'').toLowerCase().indexOf('en')===0?'en':'de';document.documentElement.dataset.l=l;document.documentElement.lang=l;})();</script>
@@ -49,7 +49,7 @@ function mvl_foot(): void
     ?>
 <footer class="f w"><div class="in">
   <span>Movecia · Vivien Malonga · <span class="de">Mindful Movement aus den Tiroler Bergen</span><span class="en">Mindful movement from the Tyrolean mountains</span></span>
-  <span><a href="/mitglieder/"><span class="de">Mitgliederbereich</span><span class="en">Members area</span></a> · <a href="/terms/"><span class="de">Impressum &amp; Bedingungen</span><span class="en">Imprint &amp; terms</span></a> · <a href="/withdraw/"><span class="de">Vertrag widerrufen</span><span class="en">Withdraw</span></a> · <a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a></span>
+  <span><a href="/gutschein/"><span class="de">Gutscheine</span><span class="en">Gift vouchers</span></a> · <a href="/mitglieder/"><span class="de">Mitgliederbereich</span><span class="en">Members area</span></a> · <a href="/terms/"><span class="de">Impressum &amp; Bedingungen</span><span class="en">Imprint &amp; terms</span></a> · <a href="/withdraw/"><span class="de">Vertrag widerrufen</span><span class="en">Withdraw</span></a> · <a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a></span>
 </div></footer>
 <script>
 (function(){

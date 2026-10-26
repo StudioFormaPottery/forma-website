@@ -198,8 +198,8 @@ em{font-style:italic;color:var(--plum)}p{margin:0}a{color:var(--plum)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5em;padding:.8em 1.4em;border-radius:999px;background:var(--plum);color:var(--on);font:inherit;font-size:.92rem;font-weight:500;text-decoration:none;border:1px solid var(--plum);cursor:pointer}
 .btn.line{background:transparent;color:var(--plum)}.btn.sm{padding:.5em 1em;font-size:.84rem}
 .top{display:flex;justify-content:space-between;align-items:center;padding-top:14px;padding-bottom:14px}
-.brand{font-family:var(--serif);font-size:1.7rem;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:.4rem}
-.brand img{width:30px;height:30px}.brand i{display:inline-block;width:.3em;height:.3em;border-radius:50%;background:var(--plum);margin-left:.05em}
+.brand{font-family:var(--serif);font-size:2rem;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:.55rem}
+.brand img{width:50px;height:50px;flex:none}.brand i{display:inline-block;width:.3em;height:.3em;border-radius:50%;background:var(--plum);margin-left:.05em}
 .top form button{font:inherit;font-size:.85rem;background:none;border:0;color:var(--muted);cursor:pointer;text-decoration:underline}
 /* Kopf mit Affirmation und schwebenden Icons */
 .hero{display:grid;gap:1rem;align-items:center;padding-top:clamp(1rem,3vw,2.4rem);padding-bottom:clamp(1.6rem,4vw,3rem)}

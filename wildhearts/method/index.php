@@ -3,6 +3,8 @@
 // Buchung direkt hier (Stripe-Abo über api/method.php). Vor dem Start: Karte hinterlegen, erste Abbuchung am Starttag.
 declare(strict_types=1);
 require dirname(__DIR__, 2) . '/api/method-lib.php';
+require_once dirname(__DIR__, 2) . '/api/mv-gutschein-lib.php';
+require __DIR__ . '/../assets/voucher.inc.php';
 require __DIR__ . '/../assets/layout.inc.php';
 header('Cache-Control: no-cache');
 $pdo = forma_db();
@@ -61,9 +63,9 @@ mvl_head('Mindful Movement Method · Online Yoga, Somatic Movement & Breathwork 
   <?php if ($eb): ?><div class="ebb rv"><p class="k"><span class="de">Early-Bird bis <?= mv_date($ebEnd) ?></span><span class="en">Early bird until <?= mv_date($ebEnd, 'en') ?></span></p><p><span class="de">Wer bis zum Start bucht, zahlt <b><?= $eu($c['m1']) ?> statt <?= $eu($c['r_m1']) ?> im Monat</b>, und dein Preis bleibt so, solange du dabei bist. Ab dem <?= mv_date($ebEnd + 86400) ?> kostet die Method <?= $eu($c['r_m1']) ?> im Monat.</span><span class="en">Book before the start and pay <b><?= $eu($c['m1']) ?> instead of <?= $eu($c['r_m1']) ?> a month</b>, and your price stays that way for as long as you are a member. From <?= mv_date($ebEnd + 86400, 'en') ?> the Method costs <?= $eu($c['r_m1']) ?> a month.</span></p></div><?php endif; ?>
   <?php $was = fn(string $k) => $eb ? '<s class="was">' . $eu($c['r_' . $k]) . '</s> ' : ''; ?>
   <div class="prices">
-    <label class="pc"><input type="radio" name="plan" value="m1"><p class="k"><span class="de">Monatlich</span><span class="en">Monthly</span></p><p class="amt"><?= $was('m1') . $eu($c['m1']) ?></p><p class="mut"><span class="de">pro Monat</span><span class="en">per month</span></p></label>
-    <label class="pc"><input type="radio" name="plan" value="m3" checked><p class="k"><span class="de">3 Monate</span><span class="en">3 months</span></p><p class="amt"><?= $was('m3') . $eu($c['m3']) ?></p><p class="mut"><span class="de">alle 3 Monate · <?= $eu((int)round($c['m3'] / 3)) ?> im Monat</span><span class="en">every 3 months · <?= $eu((int)round($c['m3'] / 3)) ?> a month</span></p></label>
-    <label class="pc best"><input type="radio" name="plan" value="m12"><span class="flag"><span class="de">bester Wert</span><span class="en">best value</span></span><p class="k" style="color:var(--peach)"><span class="de">1 Jahr</span><span class="en">1 year</span></p><p class="amt"><?= $was('m12') . $eu($c['m12']) ?></p><p class="mut"><span class="de">pro Jahr · <?= $eu((int)round($c['m12'] / 12)) ?> im Monat</span><span class="en">per year · <?= $eu((int)round($c['m12'] / 12)) ?> a month</span></p></label>
+    <label class="pc"><input type="radio" name="plan" value="m1" data-cents="<?= (int)$c['m1'] ?>"><p class="k"><span class="de">Monatlich</span><span class="en">Monthly</span></p><p class="amt"><?= $was('m1') . $eu($c['m1']) ?></p><p class="mut"><span class="de">pro Monat</span><span class="en">per month</span></p></label>
+    <label class="pc"><input type="radio" name="plan" value="m3" data-cents="<?= (int)$c['m3'] ?>" checked><p class="k"><span class="de">3 Monate</span><span class="en">3 months</span></p><p class="amt"><?= $was('m3') . $eu($c['m3']) ?></p><p class="mut"><span class="de">alle 3 Monate · <?= $eu((int)round($c['m3'] / 3)) ?> im Monat</span><span class="en">every 3 months · <?= $eu((int)round($c['m3'] / 3)) ?> a month</span></p></label>
+    <label class="pc best"><input type="radio" name="plan" value="m12" data-cents="<?= (int)$c['m12'] ?>"><span class="flag"><span class="de">bester Wert</span><span class="en">best value</span></span><p class="k" style="color:var(--peach)"><span class="de">1 Jahr</span><span class="en">1 year</span></p><p class="amt"><?= $was('m12') . $eu($c['m12']) ?></p><p class="mut"><span class="de">pro Jahr · <?= $eu((int)round($c['m12'] / 12)) ?> im Monat</span><span class="en">per year · <?= $eu((int)round($c['m12'] / 12)) ?> a month</span></p></label>
   </div>
   <style>.ebb{background:var(--plumdeep);color:#F5EEE6;border-radius:22px;padding:1.1rem 1.4rem;margin:0 0 14px}.ebb .k{color:var(--peach)}.ebb p{margin:.3rem 0 0}.was{opacity:.5;font-size:.6em;font-weight:400;margin-right:.2em}</style>
   <div class="split" style="margin-top:14px">
@@ -76,6 +78,7 @@ mvl_head('Mindful Movement Method · Online Yoga, Somatic Movement & Breathwork 
           <label class="wro"><input type="radio" name="wr" value="behalten"><span><b><span class="de">Rücktrittsrecht behalten</span><span class="en">Keep my right of withdrawal</span></b><small><span class="de">14 Tage lang, bis dahin ist das Ankommen-Modul offen, danach dein Monat 1.</span><span class="en">for 14 days, until then the welcome module is open, after that your month 1.</span></small></span></label>
           <small class="wrn"><span class="de">Alle Details stehen in den</span><span class="en">All details are in the</span> <a href="/terms/#method" target="_blank"><span class="de">Bedingungen</span><span class="en">terms</span></a>.</small>
         </fieldset>
+        <?php mvg_schema($pdo); mv_voucher_field('method'); ?>
         <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
         <div><button class="btn" type="submit" id="mb"><span class="de">Weiter zur Zahlung</span><span class="en">Continue to payment</span> →</button></div>
         <p class="err" id="me" hidden></p>

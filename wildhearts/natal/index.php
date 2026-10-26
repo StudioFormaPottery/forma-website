@@ -4,9 +4,14 @@
 // ?o=ID&k=TOKEN  persönliche Seite nach der Buchung (Einheiten, Termine, neue Wunschtermine)
 declare(strict_types=1);
 require dirname(__DIR__, 2) . '/api/natal-lib.php';
+require_once dirname(__DIR__, 2) . '/api/mv-gutschein-lib.php';
+require __DIR__ . '/../assets/voucher.inc.php';
 header('Cache-Control: no-store');
 $pdo = forma_db();
 natal_schema($pdo);
+mvg_schema($pdo);
+// Link aus der Gutschein-Mail: ?p=paket wählt das Paket vor (Vivien, 26.10.2026)
+$preP = isset(natal_packages()[$_GET['p'] ?? '']) ? (string)$_GET['p'] : '';
 natal_bonus_tick($pdo);
 $h = 'forma_h';
 
@@ -143,7 +148,8 @@ section{padding-block:clamp(3.5rem,8vw,7rem)}
 .top{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding-block:1rem;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .brand{font-family:var(--serif);font-size:1.9rem;font-weight:500;color:var(--ink);text-decoration:none;line-height:1;display:flex;align-items:baseline}
 .brand i{width:.3em;height:.3em;border-radius:50%;background:var(--plum);display:inline-block;margin-left:.08em}
-.brand .mk{width:1.35em;height:1.35em;margin-right:.32em;align-self:center;flex:none}
+.brand .mk{width:62px;height:62px;margin-right:.45rem;align-self:center;flex:none}
+@media(max-width:599px){.brand .mk{width:44px;height:44px}}
 .top-r{display:flex;align-items:center;gap:.8rem}.top .tag{font-size:.8rem;color:var(--muted);letter-spacing:.06em}
 .blob{border-radius:62% 38% 46% 54%/55% 45% 55% 45%;animation:morph 14s ease-in-out infinite alternate}
 @keyframes morph{50%{border-radius:40% 60% 58% 42%/44% 58% 42% 56%}100%{border-radius:45% 55% 60% 40%/40% 60% 45% 55%}}
@@ -543,7 +549,7 @@ footer summary{cursor:pointer}
   <?php foreach ($modeInfo as $md => $mi): ?>
   <div class="packs m-<?= $md ?>" role="radiogroup" aria-label="Paket <?= $md === 'online' ? 'online' : 'im Studio' ?>">
     <?php foreach ($mi['packs'] as $k => $p): $bp = $bonusP[$k] ?? null; $was = $bp ? $p['cents'] : 0; if ($bp) { $p['cents'] = $bp['total']; $p['unit_cents'] = $bp['unit']; } $save = $mi['single'] * $p['units'] - $p['cents']; ?>
-      <label class="pack"><input type="radio" name="package" value="<?= $h($k) ?>" data-units="<?= (int)$p['units'] ?>" data-cents="<?= (int)$p['cents'] ?>" data-title="<?= $h($p['title'] . ($bp ? ' · Kennenlern-Bonus' : '')) ?>" data-unit="<?= (int)$p['unit_cents'] ?>"<?= $p['tag'] !== '' && ($online ? 'online' : 'studio') === $md ? ' checked' : '' ?>>
+      <label class="pack"><input type="radio" name="package" value="<?= $h($k) ?>" data-units="<?= (int)$p['units'] ?>" data-cents="<?= (int)$p['cents'] ?>" data-title="<?= $h($p['title'] . ($bp ? ' · Kennenlern-Bonus' : '')) ?>" data-unit="<?= (int)$p['unit_cents'] ?>"<?= ($preP !== '' ? $preP === $k : $p['tag'] !== '' && ($online ? 'online' : 'studio') === $md) ? ' checked' : '' ?>>
         <?php if ($p['tag']): ?><span class="badge"><?= $h($p['tag']) ?></span><?php endif; ?><span class="ck" aria-hidden="true"></span>
         <span class="t"><?= $h(preg_replace('/ online$/', '', $p['title'])) ?></span><span class="s"><?= $h($p['sub']) ?></span>
         <?php if ($bp): ?><span class="bon">Kennenlern-Bonus</span><span class="was"><?= $h($euro($was)) ?></span><?php endif; ?>
@@ -575,6 +581,7 @@ footer summary{cursor:pointer}
       <div id="calbox"></div>
       <label class="chk"><input type="checkbox" name="start_now" value="1" required><span>Ich möchte ausdrücklich, dass die Einheiten schon innerhalb der 14-tägigen Rücktrittsfrist stattfinden können. Trete ich zurück, zahle ich nur die Einheiten, die bereits stattgefunden haben. Mir ist bewusst, dass mein Rücktrittsrecht erlischt, sobald alle gebuchten Einheiten stattgefunden haben (<a href="/terms?lang=de#withdrawal" target="_blank" rel="noopener">Rücktrittsrecht &amp; Bedingungen</a>).</span></label>
       <label class="chk"><input type="checkbox" name="consent" value="1" required><span>Meine Angaben werden nur für meine Buchung und die Terminplanung verwendet (Datenschutz siehe unten).</span></label>
+      <?php mv_voucher_field('natal', ['bilingual' => false]); ?>
       <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
     </div>
     <aside class="side">

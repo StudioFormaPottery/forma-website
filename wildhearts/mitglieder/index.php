@@ -404,7 +404,13 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
     <?php if (isset($_GET['weiter'])): ?><p class="note"><?= $L('Wie schön, du bleibst! Deine Mitgliedschaft läuft weiter.', 'How lovely, you are staying! Your membership continues.') ?></p><?php endif; ?>
     <?php if (isset($_GET['fehler'])): ?><p class="err"><?= $L('Das hat gerade nicht geklappt. Bitte versuch es noch einmal oder schreib mir.', 'That did not work just now. Please try again or write to me.') ?></p><?php endif; ?>
     <div class="kgrid">
-    <?php if ($s): $pl = mv_plans()[$s['plan']] ?? null; $end = max((int)$s['period_end'], (int)$s['bill_start']); ?>
+    <?php if ($s && ($s['source'] ?? '') === 'gutschein'): $pl = mv_plans()[$s['plan']] ?? null; // Method-Gutschein: Monate ohne Abo (Vivien, 26.10.2026) ?>
+      <div class="card"><h3>Mindful Movement Method</h3>
+        <p><?= $L('Gutschein', 'Voucher') ?> · <?= $h($pl ? ($lang === 'en' ? $pl['en'] : $pl['de']) : '') ?> · <?= $L('ohne Abo', 'no subscription') ?></p>
+        <p class="mut"><?= (int)$s['bill_start'] > time() ? $L('Start am', 'Starts on') . ' ' . $h(mv_date((int)$s['bill_start'], $lang)) . ' · ' : '' ?><?= $L('Zugang bis', 'Access until') ?> <?= $h(mv_date((int)$s['period_end'] - 60, $lang)) ?></p>
+        <p class="mut small"><?= $L('Danach endet dein Zugang von selbst. Wenn du weitermachen möchtest, kannst du die Method jederzeit hier buchen:', 'After that your access simply ends. If you would like to continue, you can book the Method here at any time:') ?> <a href="/method/<?= $lang === 'en' ? '?lang=en' : '' ?>">moveciamovement.com/method</a></p>
+      </div>
+    <?php elseif ($s): $pl = mv_plans()[$s['plan']] ?? null; $end = max((int)$s['period_end'], (int)$s['bill_start']); ?>
       <div class="card"><h3>Mindful Movement Method</h3>
         <p><?= $h($pl ? ($lang === 'en' ? $pl['en'] : $pl['de']) : '') ?> · <?= mv_eur((int)$s['amount_cents']) ?> <?= $h($pl ? ($lang === 'en' ? $pl['per_en'] : $pl['per_de']) : '') ?></p>
         <?php if ((int)$s['bill_start'] > time()): ?><p class="mut"><?= $L('Start und erste Zahlung am', 'Start and first payment on') ?> <?= $h(mv_date((int)$s['bill_start'], $lang)) ?></p>

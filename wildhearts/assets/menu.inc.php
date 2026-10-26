@@ -23,6 +23,7 @@ function mv_menu_items(): array
         ['/unfold/', 'Unfold', 'Unfold', 'unfold', '3 Monate Begleitung' . ($u[0] ?? ''), '3 months of guidance' . ($u[1] ?? '')],
         ['/natal/', 'Prä- &amp; Postnatal', 'Pre- &amp; postnatal', 'natal', '1:1 im Studio &amp; online', '1:1 in the studio &amp; online'],
         ['/gathering/', 'Gatherings', 'Gatherings', 'gathering', 'Kostenlos live, einmal im Monat', 'Free and live, once a month'],
+        ['/gutschein/', 'Gutscheine', 'Gift vouchers', 'gutschein', 'Zum Verschenken und Ausdrucken', 'To give and print'],
         ['/#vivien', 'Über mich', 'About me', 'about', 'Ich bin Vivien', 'I am Vivien'],
     ];
 }
@@ -34,13 +35,13 @@ function mv_menu(string $active = '', array $o = []): void
     $links = $o['links'] ?? true;
     $items = mv_menu_items();
     if ($links): ?>
-<nav class="mvm-bar" aria-label="Menü"><?php foreach ($items as [$href, $de, $en, $k]) if ($k !== 'start'): ?><a href="<?= $href ?>"<?= $k === $active ? ' class="on" aria-current="page"' : '' ?>><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></a><?php endif; ?><a class="lg" href="/mitglieder/"><span class="de">Login</span><span class="en">Log in</span></a></nav>
+<nav class="mvm-bar" aria-label="Menü"><?php foreach ($items as [$href, $de, $en, $k]) if ($k !== 'start'): ?><a href="<?= $href ?>" class="<?= $k === 'gutschein' ? 'xl' : '' ?><?= $k === $active ? ' on" aria-current="page' : '' ?>"><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></a><?php endif; ?><a class="lg" href="/mitglieder/"><span class="de">Login</span><span class="en">Log in</span></a></nav>
 <?php endif; ?>
 <button class="mvm-btn" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mvm-panel"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14"/></svg></button>
 <?php if ($assets) return; $assets = true; ?>
 <div class="mvm" id="mvm-panel" role="dialog" aria-modal="true" aria-label="Menü" hidden>
   <div class="mvm-top">
-    <a class="mvm-brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt="" width="28" height="28">Movecia<i></i></a>
+    <a class="mvm-brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt="" width="44" height="44">Movecia<i></i></a>
     <button class="mvm-x" type="button" aria-label="Menü schließen"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg></button>
   </div>
   <nav class="mvm-list" aria-label="Seiten">
@@ -59,6 +60,7 @@ function mv_menu(string $active = '', array $o = []): void
 .mvm-bar a{color:var(--ink,#2E2529);text-decoration:none;padding:.45em .8em;border-radius:999px;font-size:.95rem;white-space:nowrap}
 .mvm-bar a:hover,.mvm-bar a.on{background:var(--card,#FBF8F4)}
 .mvm-bar a.lg{border:1px solid var(--line,#DDD2C6)}
+.mvm-bar a.xl{display:none}@media(min-width:1240px){.mvm-bar a.xl{display:inline}}
 .mvm-btn{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;border:1px solid var(--line,#DDD2C6);background:var(--card,#FBF8F4);color:var(--ink,#2E2529);border-radius:999px;cursor:pointer;padding:0}
 @media(min-width:900px){.mvm-bar{display:flex}.mvm-bar~.mvm-btn{display:none}}
 html:not([data-l=en]):not([lang=en]) .mvm .en,html:not([data-l=en]):not([lang=en]) .mvm-bar .en,html[data-l=en] .mvm .de,html[data-l=en] .mvm-bar .de,html[lang=en]:not([data-l=de]) .mvm .de,html[lang=en]:not([data-l=de]) .mvm-bar .de{display:none!important}

@@ -27,8 +27,10 @@ a{color:var(--plum)}
 .btn[disabled]{opacity:.55;cursor:default}
 /* Kopf */
 .top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-top:14px;padding-bottom:14px}
-.brand{display:flex;align-items:center;gap:.5rem;font-family:var(--serif);font-size:1.75rem;color:var(--ink);text-decoration:none;line-height:1}
-.brand img{width:30px;height:30px}.brand i{display:inline-block;width:.3em;height:.3em;border-radius:50%;background:var(--plum);margin-left:.04em}
+.brand{display:flex;align-items:center;gap:.6rem;font-family:var(--serif);font-size:2.05rem;color:var(--ink);text-decoration:none;line-height:1}
+/* Logo-Zeichen groß (Vivien, 26.10.2026: „der Dot ist so schön“) */
+.brand img{width:62px;height:62px;flex:none}
+@media(max-width:599px){.brand{font-size:1.8rem;gap:.5rem}.brand img{width:44px;height:44px}}.brand i{display:inline-block;width:.3em;height:.3em;border-radius:50%;background:var(--plum);margin-left:.04em}
 .nav{display:flex;align-items:center;gap:.4rem}
 .nav a.l{color:var(--ink);text-decoration:none;padding:.45em .8em;border-radius:999px;font-size:.95rem}
 .nav a.l:hover{background:var(--card)}

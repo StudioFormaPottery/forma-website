@@ -656,10 +656,36 @@ function mv_checkout(PDO $pdo, array $in, bool $special = false, string $source 
     }
     $special = $special && $p['g'] > 0 && $p['g'] < $p['cents'];
     $first = $special ? $p['g'] : $p['cents'];
+    // Gutschein (Vivien, 26.10.2026): Programm-Gutschein deckt sein Programm ganz (Method: Monate ohne Abo),
+    // sonst zählt der Wert und wird von der ersten Zahlung abgezogen.
+    $vq = null;
+    if (trim((string)($in['code'] ?? '')) !== '' && !$fromRoom) {
+        require_once __DIR__ . '/mv-gutschein-lib.php';
+        mvg_schema($pdo);
+        $lk = mvg_lookup($pdo, (string)$in['code'], $lang);
+        if (!$lk['ok']) throw new RuntimeException($lk['error']);
+        $vq = mvg_quote($pdo, $lk['voucher'], $lk['balance'], $p['kind'], $first) + ['v' => $lk['voucher']];
+        $gin = ['name' => $name, 'email' => $email, 'lang' => $lang, 'wr' => $digital ? 'verzicht' : 'behalten', 'call_lang' => $callLang];
+        if ($vq['gift_months'] > 0) {
+            if ($p['kind'] !== 'method') throw new RuntimeException($en ? 'This is a Method voucher. Please redeem it on the Method page.' : 'Das ist ein Gutschein für die Method. Bitte löse ihn auf der Method-Seite ein.');
+            $r = mvg_method_gift($pdo, $vq['v'], (int)$vq['use'], $gin);
+            return mm_site() . '/api/method.php?paid=' . $r['id'] . '&k=' . $r['token'];
+        }
+        if ($p['kind'] === 'unfold' && ($vq['program'] || ($plan === 'u1' && $vq['full']))) {
+            $r = mvg_unfold_full($pdo, $vq['v'], (int)$vq['use'], (int)$plans['u1']['cents'], $gin);
+            return mm_site() . '/api/method.php?paid=' . $r['id'] . '&k=' . $r['token'];
+        }
+        if ($p['kind'] === 'unfold' && $vq['program'] === false && $vq['cover'] <= 0) $vq = null;
+    }
     $tok = bin2hex(random_bytes(16));
     $pdo->prepare('INSERT INTO mv_subs (kind, plan, email, name, lang, call_lang, amount_cents, first_cents, special, token, consent_digital, consent_live, source, test, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
         ->execute([$p['kind'], $plan, $email, $name, $lang, $p['kind'] === 'unfold' ? $callLang : '', $p['cents'], $first, $special ? 1 : 0, $tok, $digital, $live, $source, forma_stripe_test_mode() ? 1 : 0, date('c')]);
     $sid = (int)$pdo->lastInsertId();
+    if ($vq && $vq['cover'] > 0) {
+        // Wert des Gutscheins für die erste Zahlung reservieren (eingelöst, sobald bezahlt ist)
+        $pdo->prepare('UPDATE mv_subs SET voucher_id = ?, voucher_cents = ? WHERE id = ?')->execute([$vq['v']['id'], $vq['cover'], $sid]);
+        mvg_use($pdo, (int)$vq['v']['id'], 'mv', $sid, (int)$vq['cover'], false, $p['kind'] === 'unfold' ? 'Unfold' : 'Method');
+    }
     $site = mm_site();
     $title = $p['kind'] === 'unfold' ? 'Unfold – The Mindful Becoming' : 'Movecia Mindful Movement Method';
     $sub = $p['kind'] === 'method' || $plan === 'u3';
@@ -690,7 +716,8 @@ function mv_checkout(PDO $pdo, array $in, bool $special = false, string $source 
         $params['custom_text']['submit']['message'] = ($en ? 'Nothing is charged today. The Method opens on ' . mv_date($launch, 'en') . ', your first payment is taken then. ' : 'Heute wird nichts abgebucht. Die Method startet am ' . mv_date($launch) . ', dann wird die erste Zahlung eingezogen. ') . $terms;
         $pdo->prepare('UPDATE mv_subs SET bill_start = ? WHERE id = ?')->execute([$launch, $sid]);
     }
-    if ($special) $params['discounts'] = [['coupon' => mv_coupon_once($p['cents'] - $p['g'])]];
+    if ($vq && $vq['cover'] > 0) $params['discounts'] = [['coupon' => mvg_stripe_coupon(min($p['cents'], (int)$vq['cover'] + ($special ? $p['cents'] - $p['g'] : 0)), (string)$vq['v']['nr'])]];
+    elseif ($special) $params['discounts'] = [['coupon' => mv_coupon_once($p['cents'] - $p['g'])]];
     else $params['allow_promotion_codes'] = 'true';
     try {
         $s = forma_stripe('POST', '/v1/checkout/sessions', $params, null, '2025-09-30.clover');
@@ -720,6 +747,7 @@ function mv_check_paid(PDO $pdo, array $r): string
     $u->execute([date('c'), (string)($s['subscription'] ?? ''), (string)($s['customer'] ?? ''), $addr, $country, $name, $email, $r['id']]);
     if ($u->rowCount() !== 1) return 'aktiv';
     $r = mv_sub($pdo, (int)$r['id']);
+    if (!empty($r['voucher_id'])) { require_once __DIR__ . '/mv-gutschein-lib.php'; mvg_finalize($pdo, 'mv', (int)$r['id']); }
     if ($r['kind'] === 'unfold' && $r['sub_id'] !== '') {
         // Raten: Abo endet kurz nach der letzten Rate
         try { forma_stripe('POST', '/v1/subscriptions/' . rawurlencode($r['sub_id']), ['cancel_at' => strtotime('+' . (mv_cfg()['u_n'] - 1) . ' months +10 days')]); }
@@ -823,13 +851,14 @@ function mv_legal(array $r): string
     $d = fn(int $t) => mv_date($t, $en ? 'en' : 'de');
     $isU = $r['kind'] === 'unfold';
     $x = '';
-    if (!$isU && (int)$r['bill_start'] > time()) $x .= $en ? 'Nothing is charged before the start. ' : 'Vor dem Start wird nichts abgebucht. ';
+    if (!$isU && (int)$r['bill_start'] > time() && ($r['source'] ?? '') !== 'gutschein') $x .= $en ? 'Nothing is charged before the start. ' : 'Vor dem Start wird nichts abgebucht. ';
     // Rücktrittsfrist (Vivien, 25.10.2026): bei Vorab-Buchung erst ab dem Start, also bis 14 Tage nach dem Start
     $x .= $pre
         ? ($en ? 'Your right of withdrawal: because your access only starts on ' . $d($open) . ', your 14-day withdrawal period only starts then too. You can withdraw without giving reasons until ' . $d($until) . '. If you withdraw before the start, you get everything back. '
                : 'Dein Rücktrittsrecht: Weil dein Zugang erst am ' . $d($open) . ' beginnt, beginnt auch deine 14-tägige Rücktrittsfrist erst an diesem Tag. Du kannst also bis ' . $d($until) . ' ohne Angabe von Gründen zurücktreten. Trittst du vor dem Start zurück, bekommst du alles zurück. ')
         : ($en ? 'You can withdraw from your booking without giving reasons until ' . $d($until) . '. ' : 'Du kannst bis ' . $d($until) . ' ohne Angabe von Gründen von deiner Buchung zurücktreten. ');
     if ($isU) $x .= $en ? 'Once the programme has started, you pay only for the part already used if you withdraw. ' : 'Ab dem Start zahlst du bei einem Rücktritt nur den Teil, der bis dahin genutzt wurde. ';
+    elseif (($r['source'] ?? '') === 'gutschein') $x .= $en ? 'Your voucher unlocks the Method until ' . $d((int)$r['period_end'] - 60) . '. There is no subscription and nothing is charged; it simply ends. ' : 'Dein Gutschein schaltet die Method bis ' . $d((int)$r['period_end'] - 60) . ' frei. Es läuft kein Abo und nichts wird abgebucht, sie endet von selbst. ';
     else $x .= $en ? 'You can cancel your membership at any time to the end of the paid period, right in your members area. ' : 'Du kannst deine Mitgliedschaft jederzeit zum Ende des bezahlten Zeitraums kündigen, direkt im Mitgliederbereich. ';
     if ($isU) $x .= (int)$r['consent_digital'] === 1
         ? ($en ? 'Your choice: you waive your right of withdrawal and use everything from the start, including all videos and workbooks (§ 18 (1) 11 FAGG). '
@@ -855,6 +884,11 @@ function mv_welcome(PDO $pdo, array $r): void
     $c = mv_cfg();
     $price = mv_eur((int)$r['first_cents']) . ($r['plan'] === 'u1' ? '' : ' ' . ($en ? $p['per_en'] : $p['per_de']));
     if ((int)$r['special'] === 1 && $r['plan'] !== 'u1') $price .= $en ? ' (first payment at the Gathering price, then ' . mv_eur((int)$r['amount_cents']) . ')' : ' (erste Zahlung zum Gathering-Preis, danach ' . mv_eur((int)$r['amount_cents']) . ')';
+    $gift = ($r['source'] ?? '') === 'gutschein';
+    if ($gift) $price = $r['kind'] === 'method'
+        ? ($en ? 'your voucher, ' . $p['en'] . ', no subscription' : 'dein Gutschein, ' . $p['de'] . ', ohne Abo')
+        : ($en ? 'paid with your voucher' : 'mit deinem Gutschein bezahlt');
+    elseif ((int)($r['voucher_cents'] ?? 0) > 0) $price .= $en ? ', first payment minus your voucher of ' . mv_eur((int)$r['voucher_cents']) : ', erste Zahlung abzüglich deines Gutscheins über ' . mv_eur((int)$r['voucher_cents']);
     $isU = $r['kind'] === 'unfold';
     $title = $isU ? 'Unfold – The Mindful Becoming' : 'Movecia Mindful Movement Method';
     $open = mv_open_at($r);
@@ -867,11 +901,11 @@ function mv_welcome(PDO $pdo, array $r): void
         $pdo->prepare('UPDATE mv_subs SET open_mailed = 0 WHERE id = ?')->execute([$r['id']]);
         $lines = $en ? [
             "Dear $first,",
-            "thank you so much, you are in! Your booking for $title ($price) is confirmed" . ((int)$r['bill_start'] > time() ? ', and nothing is charged until the start' : '') . '.',
+            "thank you so much, you are in! Your booking for $title ($price) is confirmed" . ((int)$r['bill_start'] > time() && !$gift ? ', and nothing is charged until the start' : '') . '.',
             'Right now I am preparing everything for you, so there is nothing to see yet. Your account unlocks on ' . mv_date($open, 'en') . '. That day you will receive an email with your link to the members area, and from then on everything is open for you.',
         ] : [
             "Hallo $first,",
-            "danke von Herzen, du bist dabei! Deine Buchung für $title ($price) ist bestätigt" . ((int)$r['bill_start'] > time() ? ', abgebucht wird erst am Starttag' : '') . '.',
+            "danke von Herzen, du bist dabei! Deine Buchung für $title ($price) ist bestätigt" . ((int)$r['bill_start'] > time() && !$gift ? ', abgebucht wird erst am Starttag' : '') . '.',
             'Gerade bereite ich noch alles für dich vor, deshalb gibt es jetzt noch nichts zu sehen. Dein Zugang schaltet sich am ' . mv_date($open) . ' frei. An diesem Tag bekommst du eine E-Mail mit deinem Link zum Mitgliederbereich, und ab dann ist alles für dich offen.',
         ];
         if ($isU) $lines[] = $en ? 'Our first live call: ' . mv_date(mv_ts($c['u_start']), 'en') . ', ' . $call . '.' : 'Unser erster Live-Call: ' . mv_date(mv_ts($c['u_start'])) . ', ' . $call . '.';
@@ -909,7 +943,9 @@ function mv_notify_viv(PDO $pdo, array $r): void
     $open = mv_open_at($r);
     $pre = $open > time();
     $pfx = (int)$r['test'] === 1 ? '[TEST] ' : '';
-    $v = 'Hallo Viv,' . "\n\n" . ($r['name'] ?: 'Jemand') . ' (' . $r['email'] . ') hat gerade ' . $title . ' gebucht: ' . $p['de'] . ', ' . mv_eur((int)$r['first_cents']) . ((int)$r['special'] ? ' (Gathering-Preis)' : '')
+    $vg = '';
+    if (!empty($r['voucher_id'])) { require_once __DIR__ . '/mv-gutschein-lib.php'; $vv = mvg_get($pdo, (int)$r['voucher_id']); $vg = ($r['source'] ?? '') === 'gutschein' ? ' (mit Gutschein ' . ($vv['nr'] ?? '') . ' eingelöst, ohne Zahlung)' : ' (Gutschein ' . ($vv['nr'] ?? '') . ' über ' . mv_eur((int)$r['voucher_cents']) . ' von der ersten Zahlung abgezogen)'; }
+    $v = 'Hallo Viv,' . "\n\n" . ($r['name'] ?: 'Jemand') . ' (' . $r['email'] . ') hat gerade ' . $title . ' gebucht: ' . $p['de'] . ', ' . (($r['source'] ?? '') === 'gutschein' ? 'Gutschein' : mv_eur((int)$r['first_cents'])) . $vg . ((int)$r['special'] ? ' (Gathering-Preis)' : '')
         . ((int)$r['bill_start'] > time() ? ', Abbuchung ab ' . date('d.m.Y', (int)$r['bill_start']) : '') . ($isU ? ', Call auf ' . ($r['call_lang'] === 'en' ? 'Englisch' : 'Deutsch') . '. Noch ' . mv_unfold_free($pdo) . ' von ' . $c['u_seats'] . ' Plätzen frei' : '')
         . ($pre ? '. Zugang öffnet sich automatisch am ' . date('d.m.Y', $open) . ' (dann geht die Freischalt-Mail raus), Rücktritt möglich bis ' . date('d.m.Y', mv_withdraw_until($r)) : '') . ".\n\nAlle Mitglieder: " . forma_site_url() . "/verwaltung/?view=method\n";
     mm_mail(MM_FROM_EMAIL, $pfx . 'Neue Buchung: ' . ($isU ? 'Unfold' : 'Method') . ' · ' . ($r['name'] ?: $r['email']), $v, mm_mail_html('Neue Buchung', nl2br(forma_h($v)), 'de'));
@@ -991,7 +1027,7 @@ function mv_open_run(PDO $pdo): void
 
 function mv_invoice_source(PDO $pdo, string $kind, int $payId): ?array
 {
-    $q = $pdo->prepare('SELECT p.*, s.kind AS skind, s.plan, s.name, s.email, s.address, s.country, s.special FROM mv_payments p JOIN mv_subs s ON s.id = p.sub_row WHERE p.id = ?');
+    $q = $pdo->prepare('SELECT p.*, s.kind AS skind, s.plan, s.name, s.email, s.address, s.country, s.special, s.voucher_id, s.voucher_cents FROM mv_payments p JOIN mv_subs s ON s.id = p.sub_row WHERE p.id = ?');
     $q->execute([$payId]);
     $p = $q->fetch();
     if (!$p || (int)$p['cents'] <= 0) return null;
@@ -1008,8 +1044,19 @@ function mv_invoice_source(PDO $pdo, string $kind, int $payId): ?array
         $detail = 'On-Demand-Videobibliothek (Movement Flows, Somatic Movement, Breathwork, Meditation), Monatsprogramme mit Workbooks' . $per;
         $service = date('d.m.Y', $from);
     }
+    $items = [['text' => $text, 'detail' => $detail, 'qty' => 1, 'unit' => (int)$p['cents']]];
+    // Erste Zahlung teilweise mit Gutschein (Vivien, 26.10.2026): Gutschein als eigene Zeile
+    if ((int)($p['voucher_cents'] ?? 0) > 0 && !empty($p['voucher_id'])) {
+        $first = $pdo->prepare('SELECT MIN(id) FROM mv_payments WHERE sub_row = ?');
+        $first->execute([$p['sub_row']]);
+        if ((int)$first->fetchColumn() === (int)$p['id']) {
+            require_once __DIR__ . '/mv-gutschein-lib.php';
+            $items[0]['unit'] = (int)$p['cents'] + (int)$p['voucher_cents'];
+            $items[] = mvg_invoice_line($pdo, (int)$p['voucher_id'], (int)$p['voucher_cents']);
+        }
+    }
     return ['name' => $p['name'], 'email' => $p['email'], 'session' => '', 'address' => $p['address'], 'country' => $p['country'] ?: 'AT', 'service' => $service,
-        'items' => [['text' => $text, 'detail' => $detail, 'qty' => 1, 'unit' => (int)$p['cents']]],
+        'items' => $items,
         'gross' => (int)$p['cents'], 'paid' => $p['paid_at'], 'type' => 'Movecia',
         'pay_note' => 'Der Betrag wurde am ' . date('d.m.Y', strtotime((string)$p['paid_at'])) . ' online bezahlt (Kartenzahlung über Stripe, gemeinsames Konto FORMA & Movecia). Buchungsvermerk: Leistung von Movecia – Personal Fitness.'];
 }
