@@ -7,7 +7,6 @@ declare(strict_types=1);
 const PRESSE_TO = [
     'rundschau' => ['name' => 'Rundschau, Redaktion Landeck', 'email' => 'redaktion.landeck@rundschau.at', 'hello' => 'Liebe Redaktion der Rundschau Landeck,', 'kind' => 'presse'],
     'meinbezirk' => ['name' => 'MeinBezirk Tirol, Georg Herrmann', 'email' => 'georg.herrmann@meinbezirk.at', 'hello' => 'Sehr geehrter Herr Herrmann,', 'kind' => 'meinbezirk'],
-    'gemeinde' => ['name' => 'Gemeinde Ischgl', 'email' => 'gemeinde@ischgl.gv.at', 'hello' => 'Liebes Team der Gemeinde Ischgl,', 'kind' => 'gemeinde'],
 ];
 
 const PRESSE_PHOTOS = [
