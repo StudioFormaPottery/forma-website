@@ -33,7 +33,7 @@ mvl_head('Mindful Movement Method · Online Yoga, Somatic Movement & Breathwork 
     <?php if ($pre): ?><div class="facts"><span><span class="de">Start am <?= mv_date($launch) ?></span><span class="en">Opens on <?= mv_date($launch, 'en') ?></span></span><span><span class="de">jetzt buchen, bezahlt wird erst ab dem Start</span><span class="en">book now, pay from the start</span></span></div><?php endif; ?>
   </div>
 </div>
-<div class="in"><div class="art wide rv"><img src="/img/movecia/fotos/art-fold.jpg" alt="" fetchpriority="high"></div></div></section>
+<div class="in"><div class="art wide rv"><img src="/img/movecia/fotos/ev-method.jpg" alt="" fetchpriority="high"></div></div></section>
 
 <section class="w sec" id="inhalt"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">In der Bibliothek</span><span class="en">In the library</span></p><h2 style="margin-top:.6rem"><span class="de">Bewegung, die sich <em>gut</em> anfühlt</span><span class="en">Movement that feels <em>good</em></span></h2></div>

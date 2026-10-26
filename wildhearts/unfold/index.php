@@ -90,7 +90,7 @@ a{color:var(--plum)}
 .facts>span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4em 1em;font-size:.88rem}
 .cta{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.8rem}
 .pic{position:relative;aspect-ratio:4/5;border-radius:220px 220px var(--r) var(--r);overflow:hidden;background:var(--peach)}
-.pic img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.95) sepia(.06)}
+.pic img,.pic video{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.95) sepia(.06)}
 .pic::after{content:"";position:absolute;inset:0;background:rgba(214,160,122,.13);mix-blend-mode:multiply;pointer-events:none}.pic .stamp{z-index:1}
 .pic .stamp{position:absolute;left:14px;bottom:14px;right:14px;background:rgba(251,248,244,.92);backdrop-filter:blur(6px);border-radius:18px;padding:.9rem 1.1rem;font-family:var(--serif);font-size:1.25rem;line-height:1.25}
 .pic .stamp small{display:block;font-family:var(--sans);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--plum);margin-bottom:.25rem}
@@ -202,7 +202,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
   </div>
   <div style="position:relative">
     <span class="blob" style="width:200px;height:190px;background:var(--blush);left:-50px;top:-30px"></span>
-    <div class="pic"><img src="/img/wildhearts/cover.jpg" alt="Vivien sitzt ruhig am Fenster">
+    <div class="pic"><video src="/video/movecia/unfold.mp4" poster="/img/movecia/fotos/ev-unfold.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Vivien bewegt sich langsam und achtsam vor hellen Leinenvorhängen"></video>
       <p class="stamp"><small><span class="de">Nur zweimal im Jahr</span><span class="en">Only twice a year</span></small><span class="de">Jänner bis April · höchstens <?= (int)$c['u_seats'] ?> Plätze</span><span class="en">January to April · max. <?= (int)$c['u_seats'] ?> spots</span></p></div>
   </div>
 </div></section>
