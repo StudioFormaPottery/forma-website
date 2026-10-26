@@ -263,6 +263,20 @@ function mv_schema(PDO $pdo): void
         $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN steps TEXT NOT NULL DEFAULT ''");
         $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN mode TEXT NOT NULL DEFAULT ''");
     }
+    // Voice-over-Bibliothek (Vivien, 26.10.2026): jede eingesprochene Übung bleibt mit Text gespeichert und wird in
+    // neuen Flows wiederverwendet, sobald dort derselbe Text zur selben Übung steht (text_hash)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS mv_voices (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ckey TEXT NOT NULL,
+        lang TEXT NOT NULL,
+        text_hash TEXT NOT NULL,
+        text TEXT NOT NULL DEFAULT '',
+        file TEXT NOT NULL,
+        lesson_id INTEGER NOT NULL DEFAULT 0,
+        step INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL
+    )");
+    $pdo->exec('CREATE INDEX IF NOT EXISTS mv_voices_k ON mv_voices (ckey, lang, text_hash)');
     // Mediathek: jede Übung genau einmal gefilmt, überall wiederverwendet (nach Jahreszeit und Stil sortiert)
     $pdo->exec("CREATE TABLE IF NOT EXISTS mv_clips (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -307,6 +321,7 @@ function mv_schema(PDO $pdo): void
     }
     mv_scripts_sync($pdo);
     mv_prod_sync($pdo);
+    mv_voice_migrate($pdo);
 }
 
 // --- Konten ---------------------------------------------------------------------------------------
@@ -1362,6 +1377,14 @@ function mv_prod_sync(PDO $pdo, bool $force = false): void
         foreach ($j['steps'] ?? [] as $st) foreach ($st as $x) mv_clip_ensure($pdo, $x[0], $x[1]);
         foreach ($j['new'] as $n) foreach ($n['steps'] ?? [] as $x) mv_clip_ensure($pdo, $x[0], $x[1]);
     }
+    // v4 (Vivien, 26.10.2026): Method Monat 1 mit 12 Videos, neue Voice-over-Texte je Übung, Talking Head zum Monat neu
+    if (in_array((int)($c['v'] ?? 0), [3, 4], true)) {
+        $js = fn($st) => [json_encode($st, JSON_UNESCAPED_UNICODE), json_encode(array_map(fn($x) => [$x[0], $x[1]], $st), JSON_UNESCAPED_UNICODE)];
+        $setT = $pdo->prepare("UPDATE mv_lessons SET steps = ?, ex = ? WHERE title_de = ? AND ukey = ''");
+        foreach ($j['m1_steps'] ?? [] as $t) if (isset($j['steps'][$t])) $setT->execute([...$js($j['steps'][$t]), $t]);
+        $up = $pdo->prepare('UPDATE mv_lessons SET title_de = ?, title_en = ?, text_de = ?, text_en = ?, script_de = ?, script_en = ?, minutes = ? WHERE ukey = ?');
+        foreach ($j['new'] as $n) if ($n['ukey'] === 'method:rueckzug') $up->execute([$n['title_de'], $n['title_en'], $n['text_de'], $n['text_en'], $n['de'], $n['en'], (int)$n['minutes'], $n['ukey']]);
+    }
     $has = $pdo->prepare('SELECT COUNT(*) FROM mv_lessons WHERE ukey = ?');
     $ins = $pdo->prepare('INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, unlock, script_de, script_en, ukey, due, ex, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
     foreach ($j['new'] as $n) {
@@ -1372,6 +1395,14 @@ function mv_prod_sync(PDO $pdo, bool $force = false): void
         $ins->execute([$pid, $n['title_de'], $n['title_en'], $n['text_de'], $n['text_en'], $n['cat'], $n['energy'], (int)$n['minutes'], (int)$n['sort'], (string)$n['unlock'],
             $n['de'], $n['en'], $n['ukey'], $n['due'], $n['ex'] ? json_encode($n['ex'], JSON_UNESCAPED_UNICODE) : '', $now]);
         if (!empty($n['steps'])) $pdo->prepare('UPDATE mv_lessons SET steps = ?, ex = ?, mode = ? WHERE id = ?')->execute([json_encode($n['steps'], JSON_UNESCAPED_UNICODE), json_encode(array_map(fn($x) => [$x[0], $x[1]], $n['steps']), JSON_UNESCAPED_UNICODE), (string)($n['mode'] ?? ''), (int)$pdo->lastInsertId()]);
+    }
+    // feste Reihenfolge der Videos in Monat 1
+    if ((int)($c['v'] ?? 0) < 5 && !empty($j['m1_order'])) {
+        $pid = $prog('method', 'Rückzug & Ruhe');
+        foreach ($j['m1_order'] as $pos => $ref) {
+            [$t, $v] = explode(':', $ref, 2);
+            $pdo->prepare('UPDATE mv_lessons SET sort = ? WHERE program_id = ? AND ' . ($t === 'k' ? 'ukey' : 'title_de') . ' = ?')->execute([$pos, $pid, $v]);
+        }
     }
     $c['v'] = (int)$j['v'];
     mm_save_cfg('produktion', $c);
@@ -1422,10 +1453,11 @@ function mv_lesson_prod(array $l): array
     return is_array($x) ? $x : [];
 }
 
-/** Aus kurzen Übungs-Clips gebaut? Alles außer Talking Heads (auch Atem und Meditation, Vivien 26.10.2026). */
+/** Aus kurzen Übungs-Clips gebaut? Alles außer Talking Heads. Breathwork und (geführte) Meditation sind Talking Heads
+ *  (Vivien, 26.10.2026): ein ganzes Video je Sprache mit Teleprompter. */
 function mv_lesson_is_clips(array $l): bool
 {
-    return $l['cat'] !== 'talk' && mv_lesson_steps($l) !== [];
+    return !in_array($l['cat'], ['talk', 'breath', 'meditation'], true) && mv_lesson_steps($l) !== [];
 }
 
 /** Clips aus der ersten Fassung (prod c<i>, vor der Mediathek) */
@@ -1508,11 +1540,82 @@ function mv_voice_dir(): string
     return $d;
 }
 
+/** Eigene Aufnahme dieser Lektion/Übung, sonst eine gespeicherte Aufnahme derselben Übung mit genau demselben Text. */
 function mv_voice_path(int $lid, int $i, string $g): ?string
 {
-    foreach (glob(mv_voice_dir() . '/L' . $lid . '-' . $i . '-' . ($g === 'en' ? 'en' : 'de') . '.*') ?: [] as $f) return $f;
-    return null;
+    $g = $g === 'en' ? 'en' : 'de';
+    foreach (glob(mv_voice_dir() . '/L' . $lid . '-' . $i . '-' . $g . '.*') ?: [] as $f) return $f;
+    $t = mv_voice_take_for($lid, $i, $g);
+    return $t ? $t['path'] : null;
 }
+
+/** Normalisierter Text-Fingerabdruck (Leerraum egal) */
+function mv_text_hash(string $t): string
+{
+    return sha1(trim((string)preg_replace('/\s+/u', ' ', $t)));
+}
+
+/** Gespeicherte Aufnahme aus der Bibliothek für diese Übung (gleiche Übung, Sprache und gleicher Text) */
+function mv_voice_take_for(int $lid, int $i, string $g): ?array
+{
+    static $cache = [];
+    $k = $lid . ':' . $i . ':' . $g;
+    if (array_key_exists($k, $cache)) return $cache[$k];
+    $pdo = forma_db();
+    $l = mv_lesson($pdo, $lid);
+    $st = $l ? mv_lesson_steps($l) : [];
+    $x = $st[$i] ?? null;
+    $txt = $x ? ($g === 'en' ? $x['ten'] : $x['tde']) : '';
+    if (!$x || trim($txt) === '') return $cache[$k] = null;
+    try {
+        $q = $pdo->prepare('SELECT * FROM mv_voices WHERE ckey = ? AND lang = ? AND text_hash = ? ORDER BY id DESC');
+        $q->execute([mv_clip_key($x['de']), $g, mv_text_hash($txt)]);
+        foreach ($q->fetchAll() as $r) { $f = mv_voice_dir() . '/' . $r['file']; if (is_file($f)) return $cache[$k] = $r + ['path' => $f]; }
+    } catch (Throwable $e) {}
+    return $cache[$k] = null;
+}
+
+/** Neue Aufnahme in die Bibliothek legen (eigene Datei-Kopie, damit sie bleibt, auch wenn die Lektion neu eingesprochen wird) */
+function mv_voice_take_add(PDO $pdo, int $lid, int $i, string $g, string $src): void
+{
+    $l = mv_lesson($pdo, $lid);
+    $x = $l ? (mv_lesson_steps($l)[$i] ?? null) : null;
+    if (!$x || !is_file($src)) return;
+    $txt = $g === 'en' ? $x['ten'] : $x['tde'];
+    $name = 'T' . bin2hex(random_bytes(6)) . '.' . strtolower(pathinfo($src, PATHINFO_EXTENSION));
+    if (!@copy($src, mv_voice_dir() . '/' . $name)) return;
+    $pdo->prepare('INSERT INTO mv_voices (ckey, lang, text_hash, text, file, lesson_id, step, created_at) VALUES (?,?,?,?,?,?,?,?)')
+        ->execute([mv_clip_key($x['de']), $g, mv_text_hash($txt), $txt, $name, $lid, $i, date('c')]);
+}
+
+/** Alle gespeicherten Aufnahmen einer Übung in einer Sprache (neueste zuerst) */
+function mv_voice_takes(PDO $pdo, string $ckey, string $g): array
+{
+    $q = $pdo->prepare('SELECT * FROM mv_voices WHERE ckey = ? AND lang = ? ORDER BY id DESC');
+    $q->execute([$ckey, $g === 'en' ? 'en' : 'de']);
+    return array_values(array_filter($q->fetchAll(), fn($r) => is_file(mv_voice_dir() . '/' . $r['file'])));
+}
+
+/** Zahl der gespeicherten Aufnahmen je Übung: [ckey => ['de' => n, 'en' => n]] */
+function mv_voice_counts(PDO $pdo): array
+{
+    $o = [];
+    foreach ($pdo->query('SELECT ckey, lang, COUNT(*) n FROM mv_voices GROUP BY ckey, lang')->fetchAll() as $r) $o[$r['ckey']][$r['lang']] = (int)$r['n'];
+    return $o;
+}
+
+/** Einmalig: Aufnahmen von vor der Bibliothek dort eintragen */
+function mv_voice_migrate(PDO $pdo): void
+{
+    $c = mm_cfg('voices') ?? [];
+    if ((int)($c['v'] ?? 0) >= 1) return;
+    foreach (glob(mv_voice_dir() . '/L*-*-*.*') ?: [] as $f)
+        if (preg_match('/^L(\d+)-(\d+)-(de|en)\./', basename($f), $m)) mv_voice_take_add($pdo, (int)$m[1], (int)$m[2], $m[3], $f);
+    mm_save_cfg('voices', ['v' => 1]);
+}
+
+function mv_take_sig(int $id): string { return substr(hash_hmac('sha256', 'take:' . $id, mv_secret()), 0, 24); }
+function mv_take_url(int $id): string { return '/api/method-voice.php?t=' . $id . '&k=' . mv_take_sig($id); }
 
 function mv_voice_sig(int $lid, int $i, string $g): string
 {

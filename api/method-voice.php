@@ -3,12 +3,22 @@
 // Der Link ist signiert (mv_voice_url), die Dateien liegen nur im Datenordner (../forma-data/voice/).
 declare(strict_types=1);
 require __DIR__ . '/method-lib.php';
+if (isset($_GET['t'])) {
+    // Aufnahme aus der Bibliothek (Verwaltung: anhören, bevor man sie übernimmt)
+    $tid = (int)$_GET['t'];
+    if (!hash_equals(mv_take_sig($tid), (string)($_GET['k'] ?? ''))) { http_response_code(403); exit; }
+    $q = forma_db()->prepare('SELECT file FROM mv_voices WHERE id = ?'); $q->execute([$tid]);
+    $f = ($n = $q->fetchColumn()) ? mv_voice_dir() . '/' . $n : null;
+    if (!$f || !is_file($f)) { http_response_code(404); exit; }
+    goto serve;
+}
 $lid = (int)($_GET['l'] ?? 0);
 $i = (int)($_GET['i'] ?? -1);
 $g = ($_GET['g'] ?? '') === 'en' ? 'en' : 'de';
 if ($lid < 1 || $i < 0 || !hash_equals(mv_voice_sig($lid, $i, $g), (string)($_GET['k'] ?? ''))) { http_response_code(403); exit; }
 $f = mv_voice_path($lid, $i, $g);
 if (!$f || !is_file($f)) { http_response_code(404); exit; }
+serve:
 $ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
 $type = ['webm' => 'audio/webm', 'ogg' => 'audio/ogg', 'mp4' => 'audio/mp4', 'm4a' => 'audio/mp4', 'mp3' => 'audio/mpeg', 'wav' => 'audio/wav', 'aac' => 'audio/aac'][$ext] ?? 'application/octet-stream';
 $size = filesize($f);

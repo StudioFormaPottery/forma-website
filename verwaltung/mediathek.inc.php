@@ -11,10 +11,11 @@ if ($view === 'mediathek') {
     mv_seed($pdo);
     $clips = array_values(mv_clips_all($pdo, true));
     $usage = mv_clip_usage($pdo);
+    $vc = mv_voice_counts($pdo);
     // Übungen, die gerade in keinem Video stecken, ans Ende
     usort($clips, fn($a, $b) => [isset($usage[$a['ckey']]) ? 0 : 1, -count($usage[$a['ckey']] ?? []), $a['name_de']] <=> [isset($usage[$b['ckey']]) ? 0 : 1, -count($usage[$b['ckey']] ?? []), $b['name_de']]);
 
-    render_page('Mediathek', function () use ($self, $flash, $clips, $usage) {
+    render_page('Mediathek', function () use ($self, $flash, $clips, $usage, $vc) {
         $h = 'forma_h';
         $bunny = mv_bunny_ok();
         $nHave = count(array_filter($clips, fn($c) => $c['guid'] !== ''));
@@ -54,7 +55,7 @@ main{max-width:1200px}
 </style>
 <?php mm_subnav('mediathek'); ?>
 <section class="vh"><h1>📚 Mediathek</h1>
-  <p>Hier ist jede Übung genau einmal. Du filmst sie einmal (gleicher Raum, schwarzer Sport-BH, schwarze Leggings), und sie steckt automatisch in jedem Flow und Bewegungsvideo, das sie enthält. Mit Jahreszeit und Stil stelle ich neue Videos passend zur Saison aus deinen Clips zusammen.</p>
+  <p>Hier ist jede Übung genau einmal. Du filmst sie einmal (gleicher Raum, schwarzer Sport-BH, schwarze Leggings), und sie steckt automatisch in jedem Flow und Bewegungsvideo, das sie enthält. Jedes Voice-over, das du einsprichst, bleibt hier mit seinem Text gespeichert. Mit Jahreszeit und Stil stelle ich daraus neue Flows passend zur Saison zusammen, die schon fertig eingesprochen sind.</p>
   <div class="num"><span><b><?= $nHave ?></b>von <?= count($clips) ?> Übungen gefilmt</span><a href="<?= $u('view=videos') ?>" style="color:#E8D6CA;font-size:18px;align-self:center">→ Videos hochladen</a></div></section>
 <?php if ($flash): ?><p class="alert"><?= $h($flash) ?></p><?php endif; ?>
 <?php if (!$bunny): ?><p class="tip">Zum Hochladen muss einmal Bunny verbunden sein: <a href="<?= $u('view=method') ?>#bunny">hier verbinden</a>.</p><?php endif; ?>
@@ -71,7 +72,7 @@ main{max-width:1200px}
   <div class="mc<?= $g ? ' ok' : '' ?>" data-c="<?= (int)$c['id'] ?>" data-have="<?= $g ? 1 : 0 ?>" data-q="<?= $h(mb_strtolower($c['name_de'] . ' ' . $c['name_en'])) ?>" data-se="<?= $h(implode(',', $se)) ?>" data-sy="<?= $h(implode(',', $sy)) ?>">
     <h3><?= $h($c['name_de']) ?><?php if ($c['name_en'] !== $c['name_de']): ?><small><?= $h($c['name_en']) ?></small><?php endif; ?></h3>
     <div class="v"><?php if ($g && mv_bunny()['lib'] !== ''): ?><button type="button" data-play="<?= $h(mv_embed($g) . '&autoplay=true&loop=true&muted=true') ?>">▶ Clip ansehen</button><?php else: ?><span class="e">noch kein Clip</span><?php endif; ?></div>
-    <span class="msg"><?= $g ? '✓ gefilmt' : 'noch nicht gefilmt' ?><?= $use ? ' · in ' . count($use) . ' ' . (count($use) === 1 ? 'Video' : 'Videos') : ' · gerade in keinem Video' ?></span>
+    <span class="msg"><?= $g ? '✓ gefilmt' : 'noch nicht gefilmt' ?><?= $use ? ' · in ' . count($use) . ' ' . (count($use) === 1 ? 'Video' : 'Videos') : ' · gerade in keinem Video' ?><?php $v = $vc[$c['ckey']] ?? []; if ($v): ?><br>🎙 Voice-over gespeichert: Deutsch <?= (int)($v['de'] ?? 0) ?> · Englisch <?= (int)($v['en'] ?? 0) ?><?php endif; ?></span>
     <?php if ($bunny): ?><label class="up<?= $g ? ' again' : '' ?>"><input type="file" accept="video/*" class="vfile"><span><?= $g ? 'Neu hochladen' : '📹 Clip hochladen' ?></span></label><span class="bar" hidden><i></i></span><?php endif; ?>
     <div class="tg" data-k="seasons" aria-label="Jahreszeit"><?php foreach (MV_SEASONS as $k => $s): ?><button type="button" data-v="<?= $k ?>" aria-pressed="<?= in_array($k, $se, true) ? 'true' : 'false' ?>"><?= $s[2] ?> <?= $h($s[0]) ?></button><?php endforeach; ?></div>
     <div class="tg" data-k="styles" aria-label="Stil"><?php foreach (MV_STYLES as $k => $s): ?><button type="button" data-v="<?= $k ?>" aria-pressed="<?= in_array($k, $sy, true) ? 'true' : 'false' ?>"><?= $h($s) ?></button><?php endforeach; ?></div>

@@ -254,7 +254,63 @@ for n in new:
     else:
         n['steps'] = steps_for(n['de'], n['en'], n['ex'])
 
-out = {'v': 3, 'steps': steps, 'ex': ex, 'due': {k: v.isoformat() for k, v in due.items()}, 'new': new,
+# --- The Method · Monat 1 „Rückzug & Ruhe“ mit 12 Videos (Vivien, 26.10.2026) -------------------------------
+# Rhythmus: Talking Head zum Monatsthema, dann immer Flow → Bewegungsvideo → Talking Head (Impuls, Mental Load,
+# Breathwork, geführte Meditation). Flow-Texte je Übung aus texte/method-m1.json (mittlere Übungen themenneutral,
+# damit jede Aufnahme in künftigen Flows wiederverwendet werden kann). Bewegungsvideos nur aus vorhandenen Übungen.
+M1 = 'Rückzug & Ruhe'
+mfile = os.path.join(HERE, 'texte', 'method-m1.json')
+mj = json.load(open(mfile)) if os.path.exists(mfile) else {'steps': {}, 'talk': {}}
+for t, st in mj['steps'].items():
+    st = [[*canon(x[0], x[1]), x[2], x[3], int(x[4])] for x in st]
+    mj['steps'][t] = st
+    if t in steps: steps[t] = st; ex[t] = [[x[0], x[1]] for x in st]
+for k, t in mj['talk'].items():
+    if k == 'method:rueckzug':
+        for n in new:
+            if n['ukey'] == k: n.update({kk: t[kk] for kk in ('title_de', 'title_en', 'text_de', 'text_en', 'de', 'en')}); n['minutes'] = int(t.get('minutes') or 5)
+    else:
+        talks[k] = t
+M1_DUE = {'method:m1:warm': D(2026, 11, 29), 'method:m1:mitte': D(2026, 12, 6), 'method:m1:mentalload': D(2026, 12, 6),
+          'method:m1:ruecken': D(2026, 12, 13), 'method:m1:abendflow': D(2026, 12, 13), 'method:m1:beine': D(2026, 12, 13)}
+if 'method:m1:mentalload' in talks:
+    talk('method:m1:mentalload', 'method', M1, 6, '', M1_DUE['method:m1:mentalload'])
+if 'Abendflow: Schwere ablegen' in mj['steps']:
+    st = mj['steps']['Abendflow: Schwere ablegen']
+    new.append({'ukey': 'method:m1:abendflow', 'aud': 'method', 'prog': M1, 'sort': 10, 'unlock': '', 'cat': 'flow', 'energy': 'tired',
+                'minutes': round(sum(x[4] for x in st) / 60), 'title_de': 'Abendflow: Schwere ablegen', 'title_en': 'Evening flow: letting go of the heaviness',
+                'text_de': 'Ein ruhiger Flow für den Abend, der dir hilft, die Last des Tages abzulegen und weich in die Nacht zu gleiten.',
+                'text_en': 'A calm evening flow that helps you put down the weight of the day and drift softly into the night.',
+                'de': '', 'en': '', 'ex': [[x[0], x[1]] for x in st], 'steps': st, 'mode': 'flow', 'due': M1_DUE['method:m1:abendflow'].isoformat()})
+MOVES = [
+    ('method:m1:warm', 2, 'Warm werden', 'Warming up', 'Kurze Übungen, die deinen Körper an kalten Tagen sanft aufwärmen. Du wählst 30 oder 45 Sekunden pro Übung und hörst dazu deine eigene Musik.',
+     'Short exercises that gently warm your body on cold days. Choose 30 or 45 seconds per exercise and play your own music.',
+     ['Ausschütteln (Shaking)', 'Armkreisen und Hüftkreise im Stand', 'Wirbelsäulenwelle im Stand (Body Roll)', 'Roll Down im Stand', 'Katze-Kuh', 'Thread the Needle', 'Herabschauender Hund (Adho Mukha Svanasana)', 'Tiefer Ausfallschritt (Anjaneyasana)', 'Kniebeuge (Squat)', 'Berghaltung (Tadasana)']),
+    ('method:m1:mitte', 5, 'Starke Mitte', 'A strong centre', 'Ruhige Kraft für Bauch, Rücken und Beckenboden, Übung für Übung mit Timer.',
+     'Calm strength for your belly, back and pelvic floor, one exercise at a time with a timer.',
+     ['Beckenkippen (Pelvic Tilts)', 'Glute Bridge (Beckenheben)', 'Dead Bug', 'Bird Dog', 'Unterarmstütz (Forearm Plank)', 'Seitstütz auf dem Knie', 'Swimming (Pilates) in Bauchlage', 'Toe Taps', 'Kindhaltung (Balasana)']),
+    ('method:m1:ruecken', 8, 'Rücken und Schultern lösen', 'Releasing back and shoulders', 'Für alle Tage, an denen du viel getragen, gebückt und gesessen hast.',
+     'For all the days when you have carried, bent and sat a lot.',
+     ['Katze-Kuh', 'Thread the Needle', 'Open Book (Rotation der Brustwirbelsäule in Seitlage)', 'Sphinx (Salamba Bhujangasana)', 'Kleine Kobra (Bhujangasana)', 'Brustdehnung im Türrahmen', 'Wall Angels an der Wand', 'Kindhaltung (Balasana)', 'Drehung in Rückenlage (Supta Matsyendrasana)']),
+    ('method:m1:beine', 11, 'Beine und Hüften', 'Legs and hips', 'Kräftige Beine, bewegliche Hüften: kurze Übungen mit Timer, ganz ohne Hast.',
+     'Strong legs, mobile hips: short exercises with a timer, without any rush.',
+     ['Kniebeuge (Squat)', 'Ausfallschritt rückwärts (Reverse Lunge)', 'Seitlicher Ausfallschritt (Side Lunge)', 'Wadenheben', 'Clamshell', 'Seitliches Beinheben (Side Leg Lift)', 'Glute Bridge (Beckenheben)', 'Eidechse (Lizard Pose)', 'Figur 4 in Rückenlage']),
+]
+en_of = {de: en for de, en in CANON.values()}
+for x in [x for st in list(steps.values()) + [n.get('steps') or [] for n in new] for x in st]: en_of.setdefault(x[0], x[1])
+for key, sort, tde, ten, xde, xen, lst in MOVES:
+    miss = [d for d in lst if d not in en_of]
+    if miss: raise SystemExit('Übung ohne englischen Namen: ' + ', '.join(miss))
+    st = [[d, en_of[d], '', '', 45] for d in lst]
+    new.append({'ukey': key, 'aud': 'method', 'prog': M1, 'sort': sort, 'unlock': '', 'cat': 'body', 'energy': 'any', 'minutes': 8,
+                'title_de': tde, 'title_en': ten, 'text_de': xde, 'text_en': xen, 'de': '', 'en': '', 'ex': [[x[0], x[1]] for x in st],
+                'steps': st, 'mode': 'move', 'due': M1_DUE[key].isoformat()})
+# feste Reihenfolge im Monat (Titel bestehender Lektionen bzw. ukey neuer)
+M1_ORDER = ['k:method:rueckzug', 't:Morgen-Flow für dunkle Tage', 'k:method:m1:warm', 't:Box Breathing für volle Tage', 't:Somatisches Loslassen',
+            'k:method:m1:mitte', 'k:method:m1:mentalload', 't:Kraft ohne Erschöpfung', 'k:method:m1:ruecken', 't:Abendmeditation: Rückzug',
+            'k:method:m1:abendflow', 'k:method:m1:beine']
+
+out = {'v': 5, 'm1_order': M1_ORDER, 'm1_steps': list(mj['steps'].keys()), 'steps': steps, 'ex': ex, 'due': {k: v.isoformat() for k, v in due.items()}, 'new': new,
        'natal_programs': {'prae': ['Pränatal · Videos', 'Prenatal · Videos'], 'post': ['Postnatal · Videos', 'Postnatal · Videos']}}
 path = os.path.join(ROOT, 'api', 'seed', 'produktion.json')
 json.dump(out, open(path, 'w'), ensure_ascii=False, indent=1)

@@ -60,8 +60,9 @@ if ($view === 'videos') {
     }
     usort($all, fn($a, $b) => [(string)$a['l']['due'] ?: '9999', (int)$a['l']['id']] <=> [(string)$b['l']['due'] ?: '9999', (int)$b['l']['id']]);
     $usage = mv_clip_usage($pdo);
+    $vcount = mv_voice_counts($pdo);
 
-    render_page('Videos hochladen', function () use ($self, $flash, $all, $pdo, $usage) {
+    render_page('Videos hochladen', function () use ($self, $flash, $all, $pdo, $usage, $vcount) {
         $h = 'forma_h';
         $today = (new DateTimeImmutable('now', new DateTimeZone('Europe/Vienna')))->format('Y-m-d');
         $WD = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
@@ -77,13 +78,13 @@ if ($view === 'videos') {
             return 'Clips ' . $s['clips'] . '/' . $s['n'] . ($s['flow'] ? ' · Deutsch ' . $s['de'] . '/' . $s['n'] . ' · Englisch ' . $s['en'] . '/' . $s['n'] : '');
         };
 
-        $card = function (array $x, bool $isOpen) use ($h, $dd, $today, $bunny, $u, $pdo, $usage, $mmss, $stText): void {
+        $card = function (array $x, bool $isOpen) use ($h, $dd, $today, $bunny, $u, $pdo, $usage, $vcount, $mmss, $stText): void {
             $l = $x['l']; $id = (int)$l['id']; $s = $x['s'];
             $clips = mv_lesson_is_clips($l);
             $flow = $clips && mv_lesson_mode($l) === 'flow';
             $fin = $s['done'];
             $late = !$fin && (string)$l['due'] !== '' && $l['due'] < $today;
-            $kind = !$clips ? 'Talking Head' : ($flow ? 'Flow · mit Voice-over' : 'Bewegungsvideo · 30/45 Sek.'); ?>
+            $kind = !$clips ? 'Talking Head' . (['breath' => ' · Breathwork', 'meditation' => ' · Meditation'][$l['cat']] ?? '') : ($flow ? 'Flow · mit Voice-over' : 'Bewegungsvideo · 30/45 Sek.'); ?>
   <details class="vc<?= $fin ? ' fin' : '' ?><?= $late ? ' late' : '' ?>" id="v<?= $id ?>" data-aud="<?= $h($x['aud']) ?>"<?= $isOpen ? ' open' : '' ?>>
     <summary>
       <span class="kind <?= !$clips ? 'k-talk' : ($flow ? 'k-flow' : 'k-move') ?>" data-kind="<?= $id ?>"><?= $kind ?></span>
@@ -117,10 +118,10 @@ if ($view === 'videos') {
               <?php if ($bunny): ?><label class="up<?= $g ? ' again' : '' ?>"><input type="file" accept="video/*" class="vfile"><span><?= $g ? 'Neu hochladen' : 'Clip hochladen' ?></span></label><?php endif; ?>
               <span class="bar" hidden><i></i></span>
             </div>
-            <?php foreach (['de' => [$vd, 'Deutsch'], 'en' => [$ve, 'Englisch']] as $vg => [$vu, $vn]): ?>
-            <div class="cell voice<?= $vu ? ' ok' : '' ?>" data-flow-only data-g="<?= $vg ?>"<?= $flow ? '' : ' hidden' ?>>
+            <?php foreach (['de' => [$vd, 'Deutsch'], 'en' => [$ve, 'Englisch']] as $vg => [$vu, $vn]): $own = (bool)glob(mv_voice_dir() . '/L' . $id . '-' . $i . '-' . $vg . '.*'); $nt = (int)($vcount[$c['ckey']][$vg] ?? 0); ?>
+            <div class="cell voice<?= $vu ? ' ok' : '' ?>" data-flow-only data-g="<?= $vg ?>" data-takes="<?= $nt ?>"<?= $flow ? '' : ' hidden' ?>>
               <span class="lab">🎙 <?= $vn ?></span>
-              <span class="msg"><?= $vu ? '✓ eingesprochen' : 'fehlt noch' ?></span>
+              <span class="msg"><?= $vu ? ($own ? '✓ eingesprochen' : '✓ aus deiner Bibliothek') : ($nt ? 'fehlt · ♻ ' . $nt . ' gespeicherte Aufnahme' . ($nt > 1 ? 'n' : '') : 'fehlt noch') ?></span>
               <?php if ($vu): ?><audio controls preload="none" src="<?= $h($vu) ?>"></audio><?php endif; ?>
               <button type="button" class="rec<?= $vu ? ' again' : '' ?>" data-rec="<?= $vg ?>"><?= $vu ? 'Nochmal einsprechen' : $vn . ' einsprechen' ?></button>
             </div>
@@ -230,6 +231,9 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
 .rm-b label input{display:none}
 .rm-b .sm{min-height:44px;font-size:16px;padding:8px 16px;border-color:#DDD2C6}
 .rm-m{font-size:17px;color:#6B5658;margin:0}
+.rm-tl{display:flex;flex-direction:column;gap:10px}.rm-tl .tk{background:#fff;border:1.5px solid #DDD2C6;border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.rm-tl .tk p{margin:0;font-size:16px;line-height:1.5;color:#2E2529;max-height:7.5em;overflow:auto;white-space:pre-wrap}.rm-tl .tk small{font-size:14px;color:#7D7076}
+.rm-tl .tk button{align-self:flex-start;font:inherit;font-size:17px;font-weight:500;min-height:48px;padding:10px 20px;border-radius:999px;border:0;background:#3F6B3E;color:#fff;cursor:pointer}
 .rm-lvl{height:10px;border-radius:9px;background:#EADFDE;overflow:hidden;max-width:320px}.rm-lvl i{display:block;height:100%;width:0;background:#7D5E68}
 </style>
 <?php mm_subnav('videos'); ?>
@@ -267,9 +271,11 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
       <button type="button" class="stop" id="rmStop" hidden>■ Stopp</button>
       <button type="button" class="save" id="rmSave" hidden>✓ Speichern</button>
       <button type="button" id="rmAgain" hidden>↺ Nochmal</button>
+      <button type="button" class="sm" id="rmTk" hidden>♻ Gespeicherte Aufnahme nehmen</button>
       <button type="button" class="sm" id="rmEdit">Text bearbeiten</button>
       <label class="sm">Datei hochladen<input type="file" accept="audio/*,video/mp4,.m4a,.mp3,.wav" id="rmFile"></label>
     </div>
+    <div id="rmTl" class="rm-tl" hidden></div>
     <audio id="rmA" controls hidden></audio>
     <p class="rm-m" id="rmM"></p>
   </div>
@@ -333,8 +339,15 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
     const tx=li.querySelector(g==='de'?'[data-tde]':'[data-ten]').value;
     $('rmTx').innerHTML=tx?textHtml(tx):'<span class="hint">Für diese Übung gibt es noch keinen Text. Tipp auf „Text bearbeiten“, um einen zu schreiben.</span>';
     $('rmEd').value=tx;$('rmEd').hidden=true;$('rmTx').hidden=false;$('rmEdit').textContent='Text bearbeiten';
+    $('rmTk').hidden=!(+li.querySelector('.cell.voice[data-g="'+g+'"]').dataset.takes);$('rmTl').hidden=true;$('rmTl').innerHTML='';
     reset();rm.hidden=false;document.body.style.overflow='hidden';
   }
+  // Gespeicherte Aufnahme derselben Übung übernehmen: der Text der Übung wird zum Text dieser Aufnahme
+  $('rmTk').onclick=()=>{const tl=$('rmTl');tl.hidden=false;tl.innerHTML='<p class="rm-m">Lädt …</p>';
+    post('mm_mv_voice_takes',{id:cur.id,i:cur.i,g:cur.g}).then(r=>{if(!r.takes||!r.takes.length){tl.innerHTML='<p class="rm-m">Keine gespeicherte Aufnahme gefunden.</p>';return}
+      tl.innerHTML=r.takes.map(t=>'<div class="tk"><small>aus „'+esc(t.from)+'“ · '+esc(t.at)+'</small><audio controls preload="none" src="'+esc(t.url)+'"></audio><p>'+esc(t.text)+'</p><button type="button" data-take="'+t.id+'">Diese Aufnahme nehmen</button></div>').join('');
+      tl.querySelectorAll('[data-take]').forEach(b=>b.onclick=()=>post('mm_mv_voice_use',{id:cur.id,i:cur.i,g:cur.g,take:b.dataset.take}).then(x=>{if(x.error){$('rmM').textContent=x.error;return}
+        cur.li.querySelector(cur.g==='de'?'[data-tde]':'[data-ten]').value=x.text;saved(x);}));});};
   function reset(){blob=null;chunks=[];$('rmGo').hidden=false;$('rmStop').hidden=true;$('rmSave').hidden=true;$('rmAgain').hidden=true;$('rmA').hidden=true;$('rmA').removeAttribute('src');
     $('rmC').innerHTML='0:00 <small>von '+fmt(cur.sec)+' Min.</small>';$('rmL').style.width='0';$('rmM').textContent=TIP;$('rmTx').scrollTop=0;}
   function stopStream(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}cancelAnimationFrame(tick);}
@@ -359,7 +372,7 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
   $('rmStop').onclick=()=>{if(rec&&rec.state==='recording')rec.stop()};
   $('rmAgain').onclick=reset;
   function saved(r){if(r.error){$('rmM').textContent=r.error;return}
-    const cell=cur.li.querySelector('.cell.voice[data-g="'+cur.g+'"]');cell.classList.add('ok');cell.querySelector('.msg').textContent='✓ eingesprochen';
+    const cell=cur.li.querySelector('.cell.voice[data-g="'+cur.g+'"]');cell.classList.add('ok');cell.querySelector('.msg').textContent=r.text!==undefined?'✓ aus deiner Bibliothek':'✓ eingesprochen';
     let a=cell.querySelector('audio');if(!a){a=document.createElement('audio');a.controls=true;cell.querySelector('.msg').after(a)}a.src=r.url;
     const b=cell.querySelector('.rec');b.textContent='Nochmal einsprechen';b.classList.add('again');status(cur.id,r.status);
     $('rmM').textContent='✓ Gespeichert.';setTimeout(close,700);}

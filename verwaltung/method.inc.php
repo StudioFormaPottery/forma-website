@@ -192,8 +192,39 @@ if ($action === 'mm_mv_voice') {
     if (!in_array($ext, ['webm', 'ogg', 'mp4', 'm4a', 'mp3', 'wav', 'aac'], true)) $ext = str_contains($mime, 'mp4') ? 'm4a' : (str_contains($mime, 'ogg') ? 'ogg' : (str_contains($mime, 'mpeg') ? 'mp3' : (str_contains($mime, 'wav') ? 'wav' : 'webm')));
     if ($mime !== '' && !preg_match('~^(audio|video)/|application/octet-stream~', $mime)) $mvJson(['error' => 'Das ist keine Tonaufnahme.']);
     if ($old = mv_voice_path((int)$l['id'], $i, $g)) @unlink($old);
-    if (!move_uploaded_file((string)$f['tmp_name'], mv_voice_dir() . '/L' . (int)$l['id'] . '-' . $i . '-' . $g . '.' . $ext)) $mvJson(['error' => 'Speichern hat nicht geklappt.']);
+    $dest = mv_voice_dir() . '/L' . (int)$l['id'] . '-' . $i . '-' . $g . '.' . $ext;
+    if (!move_uploaded_file((string)$f['tmp_name'], $dest)) $mvJson(['error' => 'Speichern hat nicht geklappt.']);
+    // in die Voice-over-Bibliothek: steht dieselbe Übung mit demselben Text in einem neuen Flow, ist sie dort sofort fertig
+    try { mv_voice_take_add($pdo, (int)$l['id'], $i, $g, $dest); } catch (Throwable $e) { error_log('voice take: ' . $e->getMessage()); }
     $mvJson(['ok' => 1, 'url' => mv_voice_url((int)$l['id'], $i, $g), 'status' => mv_lesson_status($pdo, $l)]);
+}
+// Gespeicherte Aufnahmen einer Übung (zum Anhören und Übernehmen)
+if ($action === 'mm_mv_voice_takes') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    $st = $l ? mv_lesson_steps($l) : [];
+    $i = (int)($_POST['i'] ?? -1);
+    $g = ($_POST['g'] ?? '') === 'en' ? 'en' : 'de';
+    if (!isset($st[$i])) $mvJson(['error' => 'Fehlt.']);
+    $out = [];
+    foreach (mv_voice_takes($pdo, mv_clip_key($st[$i]['de']), $g) as $t) {
+        $src = mv_lesson($pdo, (int)$t['lesson_id']);
+        $out[] = ['id' => (int)$t['id'], 'url' => mv_take_url((int)$t['id']), 'text' => (string)$t['text'], 'from' => $src ? (string)$src['title_de'] : '', 'at' => date('d.m.Y', strtotime((string)$t['created_at']))];
+    }
+    $mvJson(['ok' => 1, 'takes' => $out]);
+}
+// Vorhandene Aufnahme aus der Bibliothek übernehmen: der Text der Übung wird der Text dieser Aufnahme
+if ($action === 'mm_mv_voice_use') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    $i = (int)($_POST['i'] ?? -1);
+    $g = ($_POST['g'] ?? '') === 'en' ? 'en' : 'de';
+    $q = $pdo->prepare('SELECT * FROM mv_voices WHERE id = ?'); $q->execute([(int)($_POST['take'] ?? 0)]); $t = $q->fetch();
+    $st = $l ? mv_lesson_steps($l) : [];
+    if (!$t || !isset($st[$i]) || $t['lang'] !== $g || $t['ckey'] !== mv_clip_key($st[$i]['de'])) $mvJson(['error' => 'Diese Aufnahme passt nicht zu dieser Übung.']);
+    $st[$i][$g === 'en' ? 'ten' : 'tde'] = (string)$t['text'];
+    mv_lesson_steps_save($pdo, (int)$l['id'], $st);
+    foreach (glob(mv_voice_dir() . '/L' . (int)$l['id'] . '-' . $i . '-' . $g . '.*') ?: [] as $old) @unlink($old);
+    $l = mv_lesson($pdo, (int)$l['id']);
+    $mvJson(['ok' => 1, 'url' => mv_take_url((int)$t['id']), 'text' => (string)$t['text'], 'status' => mv_lesson_status($pdo, $l)]);
 }
 if ($action === 'mm_mv_voice_clear') {
     $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
