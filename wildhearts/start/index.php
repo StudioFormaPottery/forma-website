@@ -4,6 +4,7 @@
 // Die Bilder sind vorerst Viviens eigene Fotos (künstlerisch weichgezeichnet) und gemalte Platzhalter,
 // später kommen Everygen-Bilder (Liste der Bildideen in CLAUDE.md). Teacher Training wird bewusst nicht gezeigt.
 declare(strict_types=1);
+require_once __DIR__ . '/../assets/icons.inc.php';
 require dirname(__DIR__, 2) . '/api/method-lib.php';
 require_once dirname(__DIR__, 2) . '/api/natal-lib.php';
 require __DIR__ . '/../assets/layout.inc.php';
@@ -51,22 +52,22 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
   <div class="sec-h rv"><div><p class="k"><span class="de">So begleite ich dich</span><span class="en">Ways to move with me</span></p><h2 style="margin-top:.6rem"><span class="de">Für jeden <em>Moment</em> deines Lebens</span><span class="en">For every <em>season</em> of your life</span></h2></div>
     <p><span class="de">Ob du jeden Tag ein paar ruhige Minuten für dich suchst, eine Begleitung über drei Monate oder Unterstützung rund um die Geburt: Hier findest du deinen Weg.</span><span class="en">Whether you are looking for a few quiet minutes every day, three months of guidance or support around birth: here you find your way.</span></p></div>
   <div class="offers">
-    <a class="offer rv" href="/method/"><div class="art"><img src="/img/movecia/fotos/ev-method-karte.jpg" alt="" loading="lazy"></div><div class="tx">
+    <a class="offer o-method rv" href="/method/"><span class="onum">01</span><div class="art"><img src="/img/movecia/fotos/ev-method-karte.jpg" alt="" loading="lazy"></div><?= mv_icons(['sonne','blatt','welle'], 'ico', 0) ?><div class="tx">
       <p class="k">On demand</p><h3>Mindful Movement Method</h3>
       <p><span class="de">Deine Videobibliothek für zu Hause: Flows, Somatic Movement, Breathwork und Meditation, jeden Monat ein neues Programm mit Workbook.</span><span class="en">Your video library at home: flows, somatic movement, breathwork and meditation, a new programme with workbook every month.</span></p>
       <div class="meta"><span class="chip"><span class="de">ab <?= $eu((int)round($c['m12'] / 12)) ?> im Monat</span><span class="en">from <?= $eu((int)round($c['m12'] / 12)) ?> a month</span></span><span class="chip">DE · EN</span></div>
       <p class="more"><span class="de">Zur Method</span><span class="en">See the Method</span> →</p></div></a>
-    <a class="offer rv" href="/unfold/"><div class="art"><img src="/img/movecia/fotos/ev-unfold-karte.jpg" alt="" loading="lazy"></div><div class="tx">
+    <a class="offer o-unfold rv" href="/unfold/"><span class="onum">02</span><div class="art"><img src="/img/movecia/fotos/ev-unfold-karte.jpg" alt="" loading="lazy"></div><?= mv_icons(['knospe','bluete','spirale'], 'ico', 1.5) ?><div class="tx">
       <p class="k"><span class="de">3 Monate Begleitung</span><span class="en">3 months of guidance</span></p><h3>Unfold</h3>
       <p><span class="de">Dein 3-Monats-Begleiter: wöchentlicher Live-Call mit Impulsvortrag, zwei Bewegungsvideos pro Woche, Workbooks für Mental Load, Selbstwert und deine Ideen.</span><span class="en">Your 3-month companion: a weekly live call with a talk, two movement videos a week, workbooks for mental load, self-worth and your ideas.</span></p>
       <div class="meta"><span class="chip"><span class="de">Start <?= mv_date($st) ?></span><span class="en">Starts <?= mv_date($st, 'en') ?></span></span><span class="chip"><span class="de">max. <?= (int)$c['u_seats'] ?> Plätze</span><span class="en">max. <?= (int)$c['u_seats'] ?> spots</span></span></div>
       <p class="more"><?= $uFree > 0 ? '<span class="de">Platz sichern</span><span class="en">Book your spot</span>' : '<span class="de">Warteliste</span><span class="en">Waitlist</span>' ?> →</p></div></a>
-    <a class="offer rv" href="/natal/"><div class="art"><img src="/img/movecia/fotos/ev-natal.jpg" alt="" loading="lazy"></div><div class="tx">
+    <a class="offer o-natal rv" href="/natal/"><span class="onum">03</span><div class="art"><img src="/img/movecia/fotos/ev-natal.jpg" alt="" loading="lazy"></div><?= mv_icons(['mond','herz','atem'], 'ico', 3) ?><div class="tx">
       <p class="k">1:1 · <span class="de">Studio &amp; online</span><span class="en">studio &amp; online</span></p><h3><span class="de">Prä- &amp; Postnatal</span><span class="en">Pre- &amp; postnatal</span></h3>
       <p><span class="de">Achtsames Training in der Schwangerschaft und danach, mit Atem, Beckenboden und Impulsen für eine leichtere Geburt und ein sanftes Ankommen danach.</span><span class="en">Mindful training during pregnancy and after, with breath, pelvic floor work and guidance for an easier birth and a gentle arrival afterwards.</span></p>
       <div class="meta"><span class="chip"><span class="de">ab <?= $eu($natalMin) ?> pro Einheit</span><span class="en">from <?= $eu($natalMin) ?> per session</span></span><span class="chip"><span class="de">Kennenlernen gratis</span><span class="en">free intro call</span></span></div>
       <p class="more"><span class="de">Mehr erfahren</span><span class="en">Learn more</span> →</p></div></a>
-    <a class="offer rv" href="/gathering/"><div class="art"><img src="/img/movecia/fotos/ev-gathering.jpg" alt="" loading="lazy"></div><div class="tx">
+    <a class="offer o-gather rv" href="/gathering/"><span class="onum">04</span><div class="art"><img src="/img/movecia/fotos/ev-gathering.jpg" alt="" loading="lazy"></div><?= mv_icons(['kerze','kreis','berg'], 'ico', 4.5) ?><div class="tx">
       <p class="k"><span class="de">Live · kostenlos</span><span class="en">Live · free</span></p><h3>Gatherings</h3>
       <p><span class="de">Einmal im Monat treffen wir uns live: ein ruhiger Abend mit Bewegung, Atem und Gesprächen, offen für alle Frauen.</span><span class="en">Once a month we meet live: a calm evening with movement, breath and conversation, open to all women.</span></p>
       <div class="meta"><span class="chip"><?= $g ? '<span class="de">nächstes: ' . forma_h(mm_when_de($g)) . '</span><span class="en">next: ' . forma_h(mm_when($g)) . '</span>' : '<span class="de">monatlich</span><span class="en">monthly</span>' ?></span></div>
@@ -77,9 +78,9 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
 <section class="w sec"><div class="in">
   <div class="rv" style="text-align:center"><p class="k"><span class="de">Der Weg</span><span class="en">The path</span></p><h2 style="margin-top:.6rem"><span class="de">In drei <em>Schritten</em> zurück zu dir</span><span class="en">Back to yourself in three <em>steps</em></span></h2></div>
   <div class="steps rv">
-    <div><span class="n">1</span><h3><span class="de">Ankommen</span><span class="en">Arrive</span></h3><p><span class="de">Du lernst wieder zu spüren, was dein Körper braucht, und beruhigst dein Nervensystem mit Atem und sanfter Bewegung.</span><span class="en">You learn to feel what your body needs again and calm your nervous system with breath and gentle movement.</span></p></div>
-    <div><span class="n">2</span><h3><span class="de">Kraft aufbauen</span><span class="en">Build strength</span></h3><p><span class="de">Mit Bewegung ohne Erschöpfung wächst deine Kraft, in deinem Tempo und ohne Leistungsdruck.</span><span class="en">With movement without exhaustion your strength grows, at your pace and without pressure.</span></p></div>
-    <div><span class="n">3</span><h3><span class="de">Entfalten</span><span class="en">Unfold</span></h3><p><span class="de">Du nimmst die Ruhe und die Kraft mit in deinen Alltag und gehst die Dinge an, die dir wirklich wichtig sind.</span><span class="en">You take the calm and the strength into your everyday life and go after what truly matters to you.</span></p></div>
+    <div><span class="n step-ico"><?= mv_icons(['atem','welle'], 'si', 0) ?><b>1</b></span><h3><span class="de">Ankommen</span><span class="en">Arrive</span></h3><p><span class="de">Du lernst wieder zu spüren, was dein Körper braucht, und beruhigst dein Nervensystem mit Atem und sanfter Bewegung.</span><span class="en">You learn to feel what your body needs again and calm your nervous system with breath and gentle movement.</span></p></div>
+    <div><span class="n step-ico"><?= mv_icons(['berg','blatt'], 'si', 2) ?><b>2</b></span><h3><span class="de">Kraft aufbauen</span><span class="en">Build strength</span></h3><p><span class="de">Mit Bewegung ohne Erschöpfung wächst deine Kraft, in deinem Tempo und ohne Leistungsdruck.</span><span class="en">With movement without exhaustion your strength grows, at your pace and without pressure.</span></p></div>
+    <div><span class="n step-ico"><?= mv_icons(['bluete','sonne'], 'si', 4) ?><b>3</b></span><h3><span class="de">Entfalten</span><span class="en">Unfold</span></h3><p><span class="de">Du nimmst die Ruhe und die Kraft mit in deinen Alltag und gehst die Dinge an, die dir wirklich wichtig sind.</span><span class="en">You take the calm and the strength into your everyday life and go after what truly matters to you.</span></p></div>
   </div>
 </div></section>
 
