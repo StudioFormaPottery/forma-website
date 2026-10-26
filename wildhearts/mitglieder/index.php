@@ -130,7 +130,7 @@ function mv_head(string $title, string $lang): void
 <meta name="apple-mobile-web-app-title" content="Movecia">
 <link rel="stylesheet" href="/wildhearts/assets/mv.css?v=1">
 <link rel="stylesheet" href="/wildhearts/mitglieder/app.css?v=2">
-<script src="/wildhearts/assets/schutz.js?v=1"></script>
+<script src="/wildhearts/assets/schutz.js?v=2"></script>
 </head>
 <?php
 }
@@ -567,6 +567,6 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
 </script>
 <?php if ($me) { ?><script src="/wildhearts/assets/geraet.js?v=1" data-kind="mv" defer></script><?php } ?>
 <?php if ($me) echo mm_wm_script('mv', (int)$me['id'], $lang === 'en' ? 'en' : 'de', (string)($me['name'] ?? '')), "\n"; ?>
-<?php if (!$me && !empty($demo)) { ?><script src="/wildhearts/assets/wasserzeichen.js?v=1" data-code="MV-BEISPIEL" data-lang="<?= $lang === 'en' ? 'en' : 'de' ?>" defer></script><?php } ?>
+<?php if (!$me && !empty($demo)) { ?><script src="/wildhearts/assets/wasserzeichen.js?v=2" data-nocopy="1" data-name="Anna" data-lang="<?= $lang === 'en' ? 'en' : 'de' ?>" defer></script><?php } ?>
 </body>
 </html>

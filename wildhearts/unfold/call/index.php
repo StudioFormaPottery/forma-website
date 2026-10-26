@@ -32,7 +32,7 @@ html,body{height:100%}body{display:flex;flex-direction:column}
 iframe{flex:1;width:100%;border:0;background:var(--deep)}
 .empty{flex:1;display:grid;place-items:center;text-align:center;padding:2rem}
 </style>
-<script src="/wildhearts/assets/schutz.js?v=1"></script>
+<script src="/wildhearts/assets/schutz.js?v=2"></script>
 </head>
 <body>
 <div class="bar"><a class="brand" href="/mitglieder/?tab=unfold"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Unfold<i></i></span></a>

@@ -25,6 +25,7 @@ function mm_wm_lookup(PDO $pdo, string $code): ?array
 
 function mm_wm_script(string $kind, int $id, string $lang = 'de', string $name = ''): string
 {
+    // Wasserzeichen entfernt (Vivien, 26.10.2026): nur noch Vorname fürs „Nur für dich“-Fenster und Kopierschutz der Texte
     $first = trim((string)strtok(trim($name), ' '));
-    return '<script src="/wildhearts/assets/wasserzeichen.js?v=1" data-code="' . htmlspecialchars(mm_wm_code($kind, $id), ENT_QUOTES) . '" data-name="' . htmlspecialchars($first, ENT_QUOTES) . '" data-lang="' . ($lang === 'en' ? 'en' : 'de') . '" defer></script>';
+    return '<script src="/wildhearts/assets/wasserzeichen.js?v=2" data-nocopy="1" data-name="' . htmlspecialchars($first, ENT_QUOTES) . '" data-lang="' . ($lang === 'en' ? 'en' : 'de') . '" defer></script>';
 }

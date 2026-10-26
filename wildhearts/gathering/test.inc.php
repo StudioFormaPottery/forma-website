@@ -128,7 +128,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 .roombar .recon{background:#93402F;color:#FBF1EA;border-color:#93402F}
 .roombar .ghostbtn{background:transparent;color:var(--blush);border:1px solid #7D7076}
 </style>
-<script src="/wildhearts/assets/schutz.js?v=1"></script>
+<script src="/wildhearts/assets/schutz.js?v=2"></script>
 </head>
 <body>
 <div class="bg" aria-hidden="true"><span class="a"></span><span class="b"></span></div>

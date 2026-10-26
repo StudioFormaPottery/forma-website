@@ -83,7 +83,7 @@ button{font:inherit;font-weight:500;font-size:17px;padding:14px 22px;border-radi
 [lang="de"] .en,[lang="en"] .de{display:none}
 a{color:var(--wine)}
 </style>
-<script src="/wildhearts/assets/schutz.js?v=1"></script>
+<script src="/wildhearts/assets/schutz.js?v=2"></script>
 </head>
 <body>
 <main>

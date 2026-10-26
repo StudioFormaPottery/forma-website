@@ -37,7 +37,7 @@ button,label.btn{font:inherit;font-size:16px;padding:10px 16px;border-radius:999
 .ghost{background:transparent;color:#EADFDE;border:1px solid #7D7076}
 .show{position:fixed;left:16px;top:16px;z-index:3;padding:6px 12px;font-size:14px;background:rgba(31,22,26,.7);color:#C9B2B8;border:1px solid #5A4C52}
 </style>
-<script src="/wildhearts/assets/schutz.js?v=1"></script>
+<script src="/wildhearts/assets/schutz.js?v=2"></script>
 </head>
 <body>
 <div class="idle" id="idle"><h1>Wild Hearts</h1><p>Gleich geht es weiter ♡</p></div>
