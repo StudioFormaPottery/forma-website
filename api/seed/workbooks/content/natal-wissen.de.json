@@ -1,0 +1,1725 @@
+{
+ "prae1": {
+  "icon": "keim",
+  "title": "Gut zu wissen: Dein Körper in der Schwangerschaft",
+  "intro": "Hier findest du alles in Ruhe zum Nachlesen, was ich dir in der Einheit nur kurz erzählen konnte, und ein paar Dinge, die ich dir zusätzlich ans Herz legen möchte.",
+  "blocks": [
+   {
+    "t": "p",
+    "text": "Dein Körper leistet in diesen Monaten etwas, das man von außen nur zum Teil sieht. Er baut ein ganzes Organ neu auf, die Plazenta, er vergrößert die Gebärmutter auf ein Vielfaches und stellt seinen Kreislauf, seine Atmung und seinen Stoffwechsel um. Wenn du dich manchmal müde, wackelig oder einfach anders fühlst, dann hat das sehr handfeste Gründe. Je besser du sie kennst, desto gelassener kannst du mit deinem Körper umgehen."
+   },
+   {
+    "t": "h",
+    "text": "Was sich von Drittel zu Drittel verändert"
+   },
+   {
+    "t": "table",
+    "title": "Die drei Schwangerschaftsdrittel im Überblick",
+    "cols": [
+     "Zeitraum",
+     "Was in deinem Körper passiert",
+     "Was dir jetzt guttun kann"
+    ],
+    "rows": [
+     [
+      "1. Drittel (bis ca. 13. SSW)",
+      "Hormone steigen stark an, oft Übelkeit, Müdigkeit, empfindliche Brust, häufiger Harndrang.",
+      "Kleine Mahlzeiten, viel Ruhe, sanfte Bewegung, wenn es sich gut anfühlt."
+     ],
+     [
+      "2. Drittel (ca. 14.–27. SSW)",
+      "Energie kommt oft zurück, der Bauch wächst sichtbar, Bänder werden weicher, erste Kindsbewegungen.",
+      "Eine gute Zeit, um Kraft aufzubauen und Routinen zu finden."
+     ],
+     [
+      "3. Drittel (ab ca. 28. SSW)",
+      "Schwerpunkt wandert deutlich nach vorn, Atem wird kürzer, Schlaf unruhiger, Übungswehen sind möglich.",
+      "Mehr Pausen, Seitlage, Fokus auf Atmung, Beweglichkeit und Loslassen."
+     ]
+    ]
+   },
+   {
+    "t": "fact",
+    "title": "Relaxin und deine Gelenke",
+    "text": "Relaxin steigt schon in den ersten Wochen an und erreicht im ersten Drittel seinen Höhepunkt. Es lockert vor allem die Verbindungen im Becken, also die Schambeinfuge vorn und die Iliosakralgelenke hinten, wirkt aber auf Bindegewebe im ganzen Körper. Deshalb fühlen sich manche Frauen in Dehnungen plötzlich viel beweglicher. Diese neue Beweglichkeit ist kein Zeichen dafür, dass du weiter gehen solltest. Bleib in Dehnungen lieber bei etwa siebzig Prozent deines Bewegungsumfangs. Die Lockerung bildet sich nach der Geburt nur langsam zurück, in der Stillzeit oft noch etwas langsamer, und genau deshalb achten wir auch danach noch auf sanfte Übergänge."
+   },
+   {
+    "t": "fact",
+    "title": "Mehr Blut, mehr Arbeit für dein Herz",
+    "text": "Dein Blutvolumen nimmt bis zum Ende der Schwangerschaft um rund vierzig bis fünfzig Prozent zu, und dein Herz schlägt in Ruhe etwas schneller als vorher. Gleichzeitig weiten sich die Blutgefäße. Das erklärt, warum dir beim schnellen Aufstehen schwindlig werden kann. Steh deshalb aus dem Liegen immer über die Seite auf, bleib einen Moment sitzen und trink über den Tag verteilt ausreichend."
+   },
+   {
+    "t": "fact",
+    "title": "Warum wir ab der Mitte der Schwangerschaft nicht lange flach auf dem Rücken liegen",
+    "text": "Etwa ab der 20. Schwangerschaftswoche kann die Gebärmutter in der flachen Rückenlage auf die große Hohlvene drücken, die das Blut aus dem Unterkörper zum Herzen bringt. Manche Frauen merken das als Schwindel, Übelkeit oder Herzklopfen. Kurze Momente auf dem Rücken sind für die meisten Frauen unproblematisch, für längeres Liegen wählen wir aber die Seitlage oder einen leicht erhöhten Oberkörper. Wenn dir in Rückenlage unwohl wird, dreh dich einfach auf die linke Seite, dann bessert es sich meist rasch."
+   },
+   {
+    "t": "h",
+    "text": "Bewegung in der Schwangerschaft: wie viel ist gut?"
+   },
+   {
+    "t": "p",
+    "text": "Für gesunde Schwangere ohne Komplikationen empfehlen die Weltgesundheitsorganisation und die gynäkologischen Fachgesellschaften etwa 150 Minuten moderate Bewegung pro Woche, verteilt auf mehrere Tage, dazu sanftes Krafttraining. Moderat heißt, dass du dich dabei noch gut unterhalten könntest. Dieser sogenannte Sprechtest ist in der Schwangerschaft verlässlicher als jede Pulsuhr. Wer vorher wenig Sport gemacht hat, beginnt mit kürzeren Einheiten und steigert sich langsam. Bitte sprich vor dem Start mit deiner Gynäkologin oder Hebamme, besonders wenn bei dir eine Placenta praevia, eine Zervixschwäche, Bluthochdruck, eine Mehrlingsschwangerschaft oder vorzeitige Wehen bekannt sind."
+   },
+   {
+    "t": "tip",
+    "text": "Leg dir eine Wasserflasche und einen kleinen Snack bereit, bevor wir loslegen. In der Schwangerschaft kann der Blutzucker schneller absinken, und mit einer Handvoll Nüssen oder einer Banane bist du viel entspannter dabei."
+   },
+   {
+    "t": "checklist",
+    "title": "Hör sofort auf und melde dich ärztlich, wenn du beim Bewegen oder danach Folgendes bemerkst",
+    "items": [
+     "Blutungen aus der Scheide",
+     "Flüssigkeit, die aus der Scheide läuft oder tröpfelt (möglicher Blasensprung)",
+     "regelmäßige, schmerzhafte Kontraktionen oder ein Ziehen wie bei Regelschmerzen, das nicht nachlässt",
+     "Schwindel, Ohnmachtsgefühl oder Sehstörungen",
+     "Schmerzen in der Brust oder Atemnot, die schon vor der Anstrengung da ist",
+     "starke Kopfschmerzen, plötzliche Schwellungen an Gesicht oder Händen",
+     "Schmerzen, Rötung oder Schwellung in einer Wade",
+     "deutlich weniger oder keine Kindsbewegungen mehr (ab dem Zeitpunkt, an dem du sie regelmäßig spürst)"
+    ]
+   },
+   {
+    "t": "p",
+    "text": "Das soll dir keine Angst machen. Die allermeisten Frauen bewegen sich die ganze Schwangerschaft über ohne jedes Problem. Es ist aber ein gutes Gefühl zu wissen, worauf man achten sollte, und im Zweifel rufst du lieber einmal zu viel im Kreißsaal oder bei deiner Hebamme an als einmal zu wenig."
+   },
+   {
+    "t": "fact",
+    "title": "Die Rippen weiten sich mit",
+    "text": "Damit dein Baby Platz hat und deine Lunge trotzdem genug Raum bekommt, weitet sich dein unterer Brustkorb um einige Zentimeter, und das Zwerchfell steht höher als vorher. Viele Frauen merken das daran, dass Lieblings-BHs plötzlich enger sitzen, obwohl die Körbchengröße passt. Ein BH mit Verlängerungshaken oder ein weicher Bustier ohne Bügel ist jetzt angenehmer. Die 360°-Atmung, die wir geübt haben, hält diesen Bereich beweglich."
+   },
+   {
+    "t": "table",
+    "title": "Mein Körper-Tagebuch",
+    "cols": [
+     "Woche",
+     "Was ich gerade spüre",
+     "Was mir gutgetan hat"
+    ],
+    "rows": 6
+   },
+   {
+    "t": "tip",
+    "text": "Fotografier deinen Bauch ruhig jede Woche an derselben Stelle im Haus. Diese Bilder sind später ein wunderschönes Andenken, und an Tagen, an denen du mit deinem Körper haderst, siehst du schwarz auf weiß, was er gerade erschafft."
+   },
+   {
+    "t": "quote",
+    "text": "Mein Körper wächst mit meinem Baby, und ich wachse mit."
+   }
+  ]
+ },
+ "prae2": {
+  "icon": "blume",
+  "title": "Gut zu wissen: Beckenboden verstehen",
+  "intro": "Der Beckenboden ist für viele Frauen ein ziemlich unbekannter Teil des eigenen Körpers. Hier lernst du ihn ein bisschen besser kennen, ganz ohne Fachchinesisch.",
+  "blocks": [
+   {
+    "t": "p",
+    "text": "In der Einheit haben wir den Beckenboden als Hängematte beschrieben. Das Bild passt gut, ist aber noch etwas vereinfacht. Eigentlich besteht er aus drei Schichten, die übereinander liegen und in unterschiedliche Richtungen verlaufen. Gemeinsam bilden sie einen elastischen Boden, der sich heben, senken, anspannen und weit werden kann."
+   },
+   {
+    "t": "h",
+    "text": "Die drei Schichten, einfach erklärt"
+   },
+   {
+    "t": "table",
+    "title": "So ist dein Beckenboden aufgebaut",
+    "cols": [
+     "Schicht",
+     "Wo sie liegt",
+     "Was sie vor allem macht"
+    ],
+    "rows": [
+     [
+      "Äußere Schicht",
+      "direkt unter der Haut, rund um Harnröhre, Scheide und After",
+      "verschließt die Öffnungen, spielt bei Lust und Empfinden eine Rolle"
+     ],
+     [
+      "Mittlere Schicht",
+      "ein dreieckiges Muskel- und Bindegewebsfeld im vorderen Becken",
+      "gibt Halt von unten, besonders für Blase und Harnröhre"
+     ],
+     [
+      "Innere Schicht",
+      "die kräftigste, tiefste Lage, wie eine Schale vom Schambein bis zum Steißbein",
+      "trägt die Organe, arbeitet mit Atmung und tiefer Bauchmuskulatur zusammen"
+     ]
+    ]
+   },
+   {
+    "t": "fact",
+    "title": "Was dein Beckenboden alles leistet",
+    "text": "Er hält Blase, Gebärmutter und Darm an ihrem Platz und sorgt dafür, dass du Urin, Stuhl und Winde halten kannst, bis du entscheidest, loszulassen. Er stabilisiert gemeinsam mit den tiefen Bauch- und Rückenmuskeln dein Becken und deine Wirbelsäule. Er reagiert blitzschnell, wenn du hustest oder springst, und er spielt eine wichtige Rolle für das sexuelle Empfinden. In der Schwangerschaft trägt er zusätzlich das Gewicht deines Babys, des Fruchtwassers und der Plazenta, also gegen Ende mehrere Kilo."
+   },
+   {
+    "t": "fact",
+    "title": "Warum ein angespannter Beckenboden nicht automatisch ein starker ist",
+    "text": "Manche Frauen halten ihren Beckenboden unbewusst ständig fest, etwa weil sie viel Stress haben, viel sitzen oder früher gelernt haben, den Bauch einzuziehen. Ein dauerhaft angespannter Muskel ermüdet aber und kann sich weniger gut zusammenziehen, wenn es darauf ankommt. Er kann sich außerdem durch Druck, Schmerzen beim Sex oder Schwierigkeiten beim Wasserlassen bemerkbar machen. Deshalb üben wir das Loslassen so bewusst, und deshalb ist eine Beckenboden-Physiotherapeutin auch dann die richtige Ansprechpartnerin, wenn du das Gefühl hast, nicht mehr richtig entspannen zu können."
+   },
+   {
+    "t": "fact",
+    "title": "Bitte keinen Pipi-Stopp als Training",
+    "text": "Früher wurde Frauen manchmal geraten, beim Wasserlassen den Strahl anzuhalten, um den Beckenboden zu trainieren. Als einmaliger Test, um den Muskel zu finden, ist das für manche hilfreich. Als regelmäßige Übung stört es aber das fein abgestimmte Zusammenspiel von Blase und Beckenboden und kann dazu führen, dass die Blase nicht mehr vollständig leer wird. Trainiere deshalb immer außerhalb der Toilette."
+   },
+   {
+    "t": "h",
+    "text": "Beckenboden und Verdauung"
+   },
+   {
+    "t": "p",
+    "text": "Das Schwangerschaftshormon Progesteron entspannt neben den Bändern auch die Darmmuskulatur und macht sie träger. Verstopfung ist deshalb sehr häufig, und starkes Pressen auf der Toilette belastet den Beckenboden jedes Mal wie eine kleine Last von oben. Viel trinken, ballaststoffreich essen und dich täglich bewegen hilft dem Darm. Auf der Toilette hilft eine ganz einfache Veränderung der Haltung."
+   },
+   {
+    "t": "list",
+    "items": [
+     "Stell die Füße auf einen kleinen Hocker, sodass die Knie höher sind als die Hüften.",
+     "Lehn dich mit geradem Rücken leicht nach vorn und stütz die Unterarme auf die Oberschenkel.",
+     "Lass den Bauch weich werden und atme lang durch den leicht geöffneten Mund aus, als würdest du eine Kerze sanft ausblasen.",
+     "Nimm dir Zeit, statt zu pressen. Wenn es nicht klappt, steh auf und versuch es später noch einmal."
+    ]
+   },
+   {
+    "t": "tip",
+    "text": "Ein kleiner Kinderhocker im Bad ist eine der günstigsten und wirksamsten Anschaffungen für deinen Beckenboden, in der Schwangerschaft und nach der Geburt. Deine Kinder werden ihn später ohnehin brauchen."
+   },
+   {
+    "t": "fact",
+    "title": "Dammmassage: was die Forschung sagt",
+    "text": "Studien zeigen, dass eine regelmäßige Dammmassage ab etwa der 34. Schwangerschaftswoche bei Frauen, die zum ersten Mal ein Kind bekommen, das Risiko für einen Dammschnitt und für Verletzungen, die genäht werden müssen, etwas senken kann. Außerdem berichten manche Frauen, dass sie das Gefühl der Dehnung bei der Geburt dadurch schon kannten und weniger erschrocken waren. Üblich sind ein- bis zweimal pro Woche einige Minuten mit einem neutralen Öl, etwa Mandel- oder Jojobaöl. Wie genau das geht, zeigt dir am besten deine Hebamme. Bei Scheideninfektionen, Herpes, Blutungen oder einer Placenta praevia bitte vorher ärztlich abklären."
+   },
+   {
+    "t": "fact",
+    "title": "Urinverlust in der Schwangerschaft",
+    "text": "Wenn beim Husten, Niesen oder Lachen ein paar Tropfen Urin abgehen, ist das in der Schwangerschaft häufig, weil Baby und Gebärmutter von oben auf die Blase drücken. Häufig heißt aber nicht, dass du es einfach hinnehmen musst. Sprich es bei deiner Hebamme oder Gynäkologin an. Gezieltes Beckenbodentraining in der Schwangerschaft kann das Risiko für Inkontinenz in den Monaten nach der Geburt verringern."
+   },
+   {
+    "t": "checklist",
+    "title": "Fragen, die du deiner Hebamme stellen kannst",
+    "items": [
+     "Kannst du mir zeigen, wie die Dammmassage richtig geht, und ab wann ist sie für mich sinnvoll?",
+     "Ich verliere manchmal etwas Urin. Was kann ich jetzt schon dagegen machen?",
+     "Ich spüre manchmal Druck nach unten. Ist das in meiner Woche normal?",
+     "Welche Geburtspositionen schonen den Beckenboden am meisten?",
+     "Wie wird bei euch in der Klinik der Damm während der Austreibungsphase unterstützt, zum Beispiel mit warmen Kompressen?",
+     "Wann und wo kann ich nach der Geburt den Beckenboden untersuchen lassen?"
+    ]
+   },
+   {
+    "t": "tracker",
+    "title": "Mein Beckenboden-Tracker für diese Woche",
+    "items": [
+     "10 Atemzüge mit bewusstem Loslassen",
+     "Beckenboden finden im Sitzen (8 Wiederholungen)",
+     "Toilettenhaltung mit Hocker, ohne Pressen",
+     "ausreichend getrunken",
+     "mindestens 20 Minuten bewegt"
+    ]
+   },
+   {
+    "t": "tip",
+    "text": "Verknüpf deine Atemzüge mit etwas, das du ohnehin jeden Tag machst, zum Beispiel mit dem ersten Kaffee oder Tee am Morgen oder mit dem Moment, in dem du abends die Zähne geputzt hast. So brauchst du keinen Wecker und keine extra Zeit."
+   },
+   {
+    "t": "quote",
+    "text": "Ich darf festhalten, und ich darf loslassen. Beides gehört zu mir."
+   }
+  ]
+ },
+ "prae3": {
+  "icon": "schild",
+  "title": "Gut zu wissen: Rücken, Becken und Schlaf",
+  "intro": "Damit du verstehst, woher Beschwerden kommen, und weißt, was dir im Alltag hilft und wann du dir lieber Unterstützung holst.",
+  "blocks": [
+   {
+    "t": "p",
+    "text": "Rücken- und Beckenschmerzen gehören zu den häufigsten Beschwerden in der Schwangerschaft. Etwa jede zweite Frau kennt sie, manche nur gelegentlich, andere fast täglich. Die gute Nachricht ist, dass Bewegung, Kraft und ein paar kluge Alltagsgewohnheiten bei den meisten Frauen spürbar helfen. Und wenn es trotzdem nicht besser wird, gibt es gute Behandlungsmöglichkeiten."
+   },
+   {
+    "t": "h",
+    "text": "Woher die Schmerzen kommen können"
+   },
+   {
+    "t": "table",
+    "title": "Häufige Beschwerden und was dahintersteckt",
+    "cols": [
+     "Beschwerde",
+     "So fühlt es sich oft an",
+     "Was meist dahintersteckt"
+    ],
+    "rows": [
+     [
+      "Unterer Rückenschmerz",
+      "dumpf, im Kreuz, schlimmer nach langem Stehen",
+      "Hohlkreuz durch den Bauch, müde Rückenstrecker"
+     ],
+     [
+      "Beckengürtelschmerz (Iliosakralgelenke)",
+      "hinten neben dem Kreuzbein, manchmal in den Po oder Oberschenkel ausstrahlend",
+      "gelockerte Gelenke, ungleichmäßige Belastung"
+     ],
+     [
+      "Symphysenschmerz",
+      "vorn am Schambein, stechend beim Treppensteigen, Anziehen, Umdrehen im Bett",
+      "gelockerte Schambeinfuge, Bewegungen mit gespreizten Beinen"
+     ],
+     [
+      "Ischiasartige Beschwerden",
+      "Ziehen vom Po ins Bein, manchmal Kribbeln",
+      "gereizte Muskeln oder Nerven im Gesäß, selten ein Bandscheibenproblem"
+     ]
+    ]
+   },
+   {
+    "t": "fact",
+    "title": "Beckengürtelschmerz ist behandelbar",
+    "text": "Viele Frauen glauben, Schmerzen im Becken müssten sie bis zur Geburt einfach aushalten. Das stimmt nicht. Eine Physiotherapeutin mit Erfahrung in der Schwangerschaft kann gezielt behandeln, manchmal hilft ein Beckengurt, der das Becken von außen stabilisiert, und deine Gynäkologin kann dich bei starken Beschwerden auch krankschreiben. Sprich es bitte an, sobald Schmerzen dich im Alltag einschränken oder dich nachts wecken."
+   },
+   {
+    "t": "h",
+    "text": "Alltag, der deinen Rücken schont"
+   },
+   {
+    "t": "table",
+    "title": "Kleine Handgriffe mit großer Wirkung",
+    "cols": [
+     "Situation",
+     "So wird es leichter"
+    ],
+    "rows": [
+     [
+      "Ins Auto ein- und aussteigen",
+      "Erst mit dem Po auf den Sitz, dann beide Beine gemeinsam hineindrehen. Eine Plastiktüte auf dem Sitz macht das Drehen leichter."
+     ],
+     [
+      "Hose, Socken, Schuhe anziehen",
+      "Im Sitzen statt auf einem Bein, Schuhe mit Schuhlöffel oder zum Hineinschlüpfen."
+     ],
+     [
+      "Treppen bei Symphysenschmerz",
+      "Stufe für Stufe, jeweils mit demselben Bein beginnen und das zweite nachziehen."
+     ],
+     [
+      "Umdrehen im Bett",
+      "Knie zusammen, Po anspannen und als Ganzes drehen, ein Satinlaken hilft beim Rutschen."
+     ],
+     [
+      "Ein Kleinkind oder Einkäufe heben",
+      "In die Knie gehen, Last nah am Körper, ausatmen, dann heben. Lieber zweimal gehen als einmal schwer tragen."
+     ],
+     [
+      "Langes Stehen, zum Beispiel beim Kochen",
+      "Einen Fuß abwechselnd auf eine kleine Stufe stellen, öfter das Gewicht verlagern."
+     ],
+     [
+      "Langes Sitzen am Schreibtisch",
+      "Alle 30 bis 45 Minuten aufstehen, ein Keilkissen kippt das Becken leicht nach vorn."
+     ]
+    ]
+   },
+   {
+    "t": "tip",
+    "text": "Wärme ist für einen verspannten Rücken oft wunderbar, ein Kirschkernkissen oder eine Wärmflasche auf dem Kreuz. Auf den Bauch selbst gehört in der Schwangerschaft aber keine starke Hitze, und eine Sauna oder ein sehr heißes Bad besprichst du bitte vorher mit deiner Gynäkologin."
+   },
+   {
+    "t": "h",
+    "text": "Besser schlafen mit Bauch"
+   },
+   {
+    "t": "p",
+    "text": "Ab dem letzten Drittel empfehlen Fachleute, vor allem auf der Seite einzuschlafen. Beide Seiten sind gut, die linke wird oft bevorzugt, weil sie die Durchblutung von Gebärmutter und Plazenta besonders gut unterstützt. Wenn du nachts auf dem Rücken aufwachst, ist das kein Grund zur Sorge. Dreh dich einfach wieder auf die Seite. Ein langes Seitenschläferkissen, das zwischen Knien und Armen liegt und den Bauch stützt, macht für viele Frauen einen riesigen Unterschied."
+   },
+   {
+    "t": "fact",
+    "title": "Wadenkrämpfe in der Nacht",
+    "text": "Nächtliche Wadenkrämpfe sind in der zweiten Schwangerschaftshälfte häufig. Hilfreich kann es sein, die Wade vor dem Schlafen sanft zu dehnen, viel zu trinken und im Krampf die Zehen Richtung Nase zu ziehen. Ob für dich Magnesium sinnvoll ist und in welcher Dosierung, besprichst du am besten mit deiner Ärztin oder Hebamme, bevor du etwas einnimmst. Eine Wade, die dauerhaft geschwollen, warm und schmerzhaft ist, ist kein Krampf und muss sofort ärztlich angeschaut werden."
+   },
+   {
+    "t": "fact",
+    "title": "Sodbrennen",
+    "text": "Die Gebärmutter drückt von unten auf den Magen, und das Progesteron entspannt den Schließmuskel am Mageneingang. Mehrere kleine Mahlzeiten, zwei bis drei Stunden Abstand zwischen Abendessen und Schlafen und ein leicht erhöhtes Kopfende helfen vielen Frauen. Medikamente gegen Sodbrennen bitte nur in Absprache mit Ärztin oder Apotheke."
+   },
+   {
+    "t": "checklist",
+    "title": "Bitte melde dich gleich bei Ärztin oder Kreißsaal, wenn du Folgendes bemerkst",
+    "items": [
+     "Rückenschmerzen, die in Wellen kommen und gehen, vor der 37. Schwangerschaftswoche (können Wehen sein)",
+     "einseitige Flankenschmerzen mit Fieber oder Brennen beim Wasserlassen (mögliche Nierenbeckenentzündung)",
+     "Taubheit im Genitalbereich oder plötzliche Probleme, Blase oder Darm zu kontrollieren",
+     "Schmerzen, die ein Bein schwächer werden lassen oder mit starkem Kribbeln einhergehen",
+     "Schmerzen nach einem Sturz oder Unfall, auch wenn er harmlos wirkte"
+    ]
+   },
+   {
+    "t": "table",
+    "title": "Mein Rücken- und Beckenprotokoll",
+    "cols": [
+     "Datum",
+     "Wo",
+     "Stärke 1–10",
+     "Was hat geholfen?"
+    ],
+    "rows": 7
+   },
+   {
+    "t": "tip",
+    "text": "Nimm dieses Protokoll zu deinem nächsten Termin bei Gynäkologin oder Physiotherapeutin mit. Mit ein paar Notizen kannst du viel genauer beschreiben, wann es wehtut, und bekommst gezieltere Hilfe."
+   },
+   {
+    "t": "quote",
+    "text": "Ich darf um Unterstützung bitten, auch wenn ich vieles allein schaffen könnte."
+   }
+  ]
+ },
+ "prae4": {
+  "icon": "welle",
+  "title": "Gut zu wissen: Hormone, Wehen und wann es losgeht",
+  "intro": "Wissen nimmt Angst. Hier liest du, welche Hormone dich bei der Geburt unterstützen, wie du echte Wehen erkennst und wann du dich auf den Weg machst.",
+  "blocks": [
+   {
+    "t": "p",
+    "text": "Eine Geburt wird von einem fein abgestimmten Zusammenspiel von Hormonen gesteuert. Du musst es nicht bis ins Detail verstehen, um gut zu gebären. Wenn du aber weißt, was diese Hormone brauchen, kannst du dir und deiner Begleitperson helfen, eine Umgebung zu schaffen, in der dein Körper gut arbeiten kann."
+   },
+   {
+    "t": "h",
+    "text": "Die Hormone der Geburt"
+   },
+   {
+    "t": "fact",
+    "title": "Oxytocin, das Hormon der Wehen und der Liebe",
+    "text": "Oxytocin sorgt dafür, dass sich die Gebärmutter zusammenzieht und sich der Muttermund öffnet. Dasselbe Hormon ist auch beim Kuscheln, beim Stillen und beim ersten Hautkontakt mit deinem Baby im Spiel. Es fließt am besten, wenn du dich sicher, warm und ungestört fühlst. Gedämpftes Licht, wenige Menschen, vertraute Stimmen und das Gefühl, nicht beobachtet zu werden, helfen ihm."
+   },
+   {
+    "t": "fact",
+    "title": "Endorphine, deine körpereigene Schmerzlinderung",
+    "text": "Mit der Intensität der Wehen schüttet dein Körper vermehrt Endorphine aus. Sie dämpfen das Schmerzempfinden und können eine Art Trance auslösen, in der viele Frauen ganz nach innen gehen. Darum wirken Gebärende oft so, als wären sie weit weg. Das ist ein gutes Zeichen, und es lohnt sich, sie in diesem Zustand möglichst wenig mit Fragen herauszuholen."
+   },
+   {
+    "t": "fact",
+    "title": "Adrenalin, der Gegenspieler",
+    "text": "Angst, Kälte, grelles Licht oder Hektik lassen den Adrenalinspiegel steigen. In der Eröffnungsphase kann das die Wehen bremsen, ganz ähnlich wie bei einer Katze, die ihre Jungen nur in einem ruhigen Versteck bekommt. Ganz am Ende der Geburt sorgt ein kurzer Adrenalinschub dagegen für die Extraportion Kraft und Wachheit, die du für die letzten Wehen brauchst. Deine lange Ausatmung ist das beste Mittel, um in der Eröffnungsphase das Adrenalin niedrig zu halten."
+   },
+   {
+    "t": "h",
+    "text": "Übungswehen, Senkwehen, echte Wehen"
+   },
+   {
+    "t": "table",
+    "title": "Woran du die Wehen unterscheidest",
+    "cols": [
+     "Art",
+     "Wann",
+     "Wie sie sich anfühlen"
+    ],
+    "rows": [
+     [
+      "Übungswehen (Braxton-Hicks)",
+      "oft ab der Mitte der Schwangerschaft",
+      "Bauch wird hart, meist schmerzlos, unregelmäßig, lassen bei Ruhe oder einem warmen Bad nach"
+     ],
+     [
+      "Senkwehen",
+      "in den letzten Wochen vor der Geburt",
+      "ziehend, manchmal wie Regelschmerzen, das Baby rutscht tiefer ins Becken, Atmen wird oft leichter"
+     ],
+     [
+      "Eröffnungswehen",
+      "zu Beginn der Geburt",
+      "werden regelmäßiger, länger und stärker, bleiben auch bei Ruhe und Lagewechsel"
+     ]
+    ]
+   },
+   {
+    "t": "p",
+    "text": "Bei vielen Frauen beginnt die Geburt mit einer Latenzphase, in der die Wehen noch unregelmäßig sind und der Muttermund weich wird. Sie kann einige Stunden, bei manchen Frauen auch ein bis zwei Tage dauern. In dieser Zeit bist du zu Hause oft am besten aufgehoben: essen, trinken, ruhen, eine warme Dusche, ein langsamer Spaziergang."
+   },
+   {
+    "t": "checklist",
+    "title": "Ruf im Kreißsaal oder bei deiner Hebamme an, wenn",
+    "items": [
+     "die Wehen regelmäßig etwa alle fünf Minuten kommen und das über ein bis zwei Stunden so bleibt (bei weiteren Kindern oft schon früher, frag in deiner Klinik nach, was für dich gilt)",
+     "die Fruchtblase springt, auch ohne Wehen. Merk dir die Uhrzeit und schau, ob das Fruchtwasser klar ist",
+     "das Fruchtwasser grünlich, bräunlich oder blutig ist (dann bitte sofort)",
+     "du hellrote Blutungen hast, die mehr sind als eine leichte Zeichnungsblutung",
+     "du dein Baby deutlich weniger oder gar nicht mehr spürst",
+     "du starke Dauerschmerzen im Bauch hast, die zwischen den Wehen nicht nachlassen",
+     "du vor der vollendeten 37. Schwangerschaftswoche regelmäßige Wehen bemerkst",
+     "du einfach unsicher bist. Dafür ist das Telefon im Kreißsaal da."
+    ]
+   },
+   {
+    "t": "table",
+    "title": "Wehenprotokoll",
+    "cols": [
+     "Uhrzeit Beginn",
+     "Dauer (Sek.)",
+     "Abstand (Min.)",
+     "Notiz"
+    ],
+    "rows": 10
+   },
+   {
+    "t": "tip",
+    "text": "Es gibt viele Apps zum Wehenzählen, aber ein Zettel und ein Stift erledigen das genauso gut. Gib diese Aufgabe am besten deiner Begleitperson, dann kannst du dich ganz auf deinen Atem konzentrieren."
+   },
+   {
+    "t": "h",
+    "text": "Möglichkeiten der Schmerzlinderung"
+   },
+   {
+    "t": "p",
+    "text": "Neben Atmung, Bewegung und Positionen gibt es viele Wege, dich bei der Geburt zu unterstützen. Dazu gehören Wärme, eine warme Badewanne oder Dusche, Massage und Gegendruck, ein TENS-Gerät, und in manchen Kliniken Lachgas. Medizinische Möglichkeiten wie Schmerzmittel oder eine Periduralanästhesie (PDA) bespricht deine Klinik mit dir bei der Geburtsanmeldung. Keine dieser Entscheidungen ist ein Versagen. Es ist deine Geburt, und du darfst wählen, was dich gut durch sie trägt, auch wenn du es dir unterwegs anders überlegst."
+   },
+   {
+    "t": "fact",
+    "title": "Was ein ruhiger Atem bewirken kann",
+    "text": "Eine lange Ausatmung aktiviert den Teil deines Nervensystems, der für Ruhe und Erholung zuständig ist. Atemübungen ersetzen keine Schmerzlinderung, die du dir wünschst, aber sie helfen vielen Frauen, sich zwischen den Wehen besser zu erholen, die Kontrolle zu behalten und sich weniger ausgeliefert zu fühlen. Je öfter du die Wellenatmung vorher übst, desto leichter findet dein Körper sie auch unter der Geburt."
+   },
+   {
+    "t": "checklist",
+    "title": "So gestaltest du eine oxytocinfreundliche Umgebung",
+    "items": [
+     "gedämpftes Licht, eine Lichterkette oder LED-Kerzen (frag in der Klinik, was erlaubt ist)",
+     "deine Playlist und Kopfhörer",
+     "eigene Kleidung, ein weiches Shirt, warme Socken",
+     "ein Duft, den du magst, zum Beispiel auf einem Tuch",
+     "eine Begleitperson, die Fragen von außen für dich übernimmt",
+     "ein Satz oder eine Affirmation, die du dir vorher aufgeschrieben hast"
+    ]
+   },
+   {
+    "t": "quote",
+    "text": "Jede Welle bringt mich meinem Baby ein Stück näher."
+   }
+  ]
+ },
+ "prae5": {
+  "icon": "kompass",
+  "title": "Gut zu wissen: Geburtswünsche und Kliniktasche",
+  "intro": "Hier hast du Platz für deine Wünsche, gute Fragen für Entscheidungen unter der Geburt und eine Packliste mit den Dingen, die auf den üblichen Listen oft fehlen.",
+  "blocks": [
+   {
+    "t": "p",
+    "text": "Eine Geburt lässt sich nicht planen wie ein Termin. Trotzdem hilft es sehr, sich vorher Gedanken zu machen. Wer seine Wünsche kennt und sie aufgeschrieben hat, kann unter der Geburt leichter loslassen, weil die Begleitperson und das Team wissen, was wichtig ist. Und wenn es anders kommt, fällt es leichter, sich auf neue Wege einzulassen, wenn du schon einmal darüber nachgedacht hast."
+   },
+   {
+    "t": "h",
+    "text": "Meine Wünsche für die Geburt"
+   },
+   {
+    "t": "table",
+    "title": "Mein Geburtswunsch-Blatt",
+    "cols": [
+     "Thema",
+     "Mein Wunsch"
+    ],
+    "rows": [
+     [
+      "Wer begleitet mich?",
+      ""
+     ],
+     [
+      "Licht, Musik, Atmosphäre",
+      ""
+     ],
+     [
+      "Positionen, die ich ausprobieren möchte",
+      ""
+     ],
+     [
+      "Wasser (Dusche, Wanne)",
+      ""
+     ],
+     [
+      "Schmerzlinderung, die ich mir vorstellen kann",
+      ""
+     ],
+     [
+      "Wie ich angesprochen werden möchte",
+      ""
+     ],
+     [
+      "Nach der Geburt: Haut an Haut, Abnabeln, Stillen",
+      ""
+     ],
+     [
+      "Falls ein Kaiserschnitt nötig wird",
+      ""
+     ],
+     [
+      "Was mir sonst noch wichtig ist",
+      ""
+     ]
+    ]
+   },
+   {
+    "t": "tip",
+    "text": "Halte dein Geburtswunsch-Blatt kurz, am besten auf einer Seite, und nimm zwei Ausdrucke mit in die Klinik. Ein Satz wie „Bitte erklärt mir jeden Eingriff, bevor ihr ihn durchführt“ ist für das Team viel hilfreicher als eine lange Liste."
+   },
+   {
+    "t": "fact",
+    "title": "Wenn es einen Kaiserschnitt braucht",
+    "text": "Auch ein geplanter oder ungeplanter Kaiserschnitt kann eine schöne, selbstbestimmte Geburt sein. Viele Kliniken ermöglichen heute, dass dein Baby direkt nach der Geburt auf deine Brust gelegt wird, dass das Tuch gesenkt wird, damit du den Moment siehst, oder dass deine Begleitperson die ganze Zeit bei dir bleibt. Frag bei der Geburtsanmeldung nach, was in deiner Klinik möglich ist, und schreib dir deine Wünsche dazu auf."
+   },
+   {
+    "t": "fact",
+    "title": "Gute Entscheidungen unter der Geburt",
+    "text": "Manchmal wird dir unter der Geburt etwas vorgeschlagen, etwa ein Wehentropf, das Öffnen der Fruchtblase oder eine Lageveränderung. Wenn es kein Notfall ist, darfst du dir Zeit für eine Entscheidung nehmen. Diese fünf Fragen helfen dir oder deiner Begleitperson dabei: Was ist der Nutzen? Welche Risiken gibt es? Welche Alternativen gibt es? Was sagt mein Bauchgefühl? Was passiert, wenn wir noch eine Weile abwarten? In einem echten Notfall handelt das Team schnell, und dann ist es gut, ihm zu vertrauen."
+   },
+   {
+    "t": "h",
+    "text": "Die Kliniktasche"
+   },
+   {
+    "t": "p",
+    "text": "Die meisten Kliniken geben dir eine Liste mit den Grundlagen wie Nachthemd, Babykleidung und Hygieneartikel. Hier sind die Dinge, die Frauen danach am häufigsten vermisst haben. Pack die Tasche etwa ab der 36. Woche, dann bist du entspannt, falls dein Baby früher kommt."
+   },
+   {
+    "t": "checklist",
+    "title": "Ergänzungen für dich",
+    "items": [
+     "Lippenbalsam (die Luft im Kreißsaal ist trocken, und vom Atmen werden die Lippen spröde)",
+     "Haargummis und eine Haarklammer",
+     "ein extra langes Ladekabel und eine Powerbank",
+     "eine Trinkflasche mit Strohhalm, damit du auch in jeder Position trinken kannst",
+     "Snacks und Traubenzucker für dich und für deine Begleitperson",
+     "dein eigenes Kissen in einem bunten Bezug, damit es nicht verwechselt wird",
+     "warme Socken und eine Strickjacke",
+     "große Binden und Netzunterhosen oder bequeme Unterhosen, die eine Nummer größer sind",
+     "Still-BH oder weiches Bustier, Stilleinlagen",
+     "lockere Kleidung mit hohem Bund für die Heimfahrt, besonders nach einem Kaiserschnitt",
+     "eine kleine Sprühflasche mit Wasser zum Erfrischen",
+     "Kopfhörer und deine Playlist",
+     "dein Geburtswunsch-Blatt"
+    ]
+   },
+   {
+    "t": "checklist",
+    "title": "Dokumente (bitte in deiner Klinik nachfragen, was genau gebraucht wird)",
+    "items": [
+     "Eltern-Kind-Pass (früher Mutter-Kind-Pass) bzw. Mutterpass",
+     "e-card bzw. Versicherungskarte",
+     "Lichtbildausweis",
+     "für die Anmeldung beim Standesamt: Geburtsurkunden der Eltern, gegebenenfalls Heiratsurkunde oder Vaterschaftsanerkennung",
+     "Unterlagen über Allergien oder Vorerkrankungen, Befunde"
+    ]
+   },
+   {
+    "t": "checklist",
+    "title": "Für deine Begleitperson",
+    "items": [
+     "dein Geburtswunsch-Blatt kennen und dabeihaben",
+     "Kleingeld oder Karte für Parkplatz und Automat",
+     "Wechselshirt, Zahnbürste, etwas Warmes zum Anziehen",
+     "die Kreuzbeinmassage und den Gegendruck an den Hüften geübt haben",
+     "wissen, wie sie dich an deine Atmung erinnern kann",
+     "einen Plan haben, wer sich um Geschwister und Haustiere kümmert"
+    ]
+   },
+   {
+    "t": "tip",
+    "text": "Pack die Sachen für dich und die für dein Baby in getrennte Beutel, zum Beispiel in zwei Stoffsäckchen in verschiedenen Farben. Dann findet deine Begleitperson alles, ohne die ganze Tasche auszuräumen."
+   },
+   {
+    "t": "quote",
+    "text": "Ich darf meine Geburt mitgestalten, und ich darf mich tragen lassen."
+   }
+  ]
+ },
+ "prae6": {
+  "icon": "nest",
+  "title": "Gut zu wissen: Das Wochenbett vorbereiten",
+  "intro": "Je besser das Nest vorbereitet ist, desto mehr Ruhe hast du später für dich und dein Baby. Hier findest du, was dich körperlich erwartet, was du organisieren kannst und wann du dich sofort melden solltest.",
+  "blocks": [
+   {
+    "t": "p",
+    "text": "Das Wochenbett wird in unserer Kultur oft unterschätzt. Viele Frauen sind wenige Tage nach der Geburt schon wieder auf den Beinen, kümmern sich um Besuch, Haushalt und Geschwister und wundern sich, warum die Erholung so lange dauert. Dabei ist die Zeit nach der Geburt eine echte Heilungsphase, in der dein Körper sehr viel Arbeit leistet. Wenn du sie gut vorbereitest, schenkst du dir selbst und deinem Baby einen ruhigen Start."
+   },
+   {
+    "t": "h",
+    "text": "Was körperlich auf dich zukommt"
+   },
+   {
+    "t": "fact",
+    "title": "Der Wochenfluss",
+    "text": "Nach der Geburt löst sich die Plazenta, und an der Stelle, an der sie gesessen hat, entsteht eine Wunde in der Gebärmutter, etwa so groß wie ein Teller. Während sie heilt, hast du einen Ausfluss, den Wochenfluss. In den ersten Tagen ist er kräftig und hellrot, danach wird er bräunlich, später gelblich und schließlich weißlich. Er hält meist vier bis sechs Wochen an. Wenn du dich zu viel bewegst, wird er manchmal wieder stärker oder röter. Das ist ein liebevoller Hinweis deines Körpers, dass du einen Gang zurückschalten solltest."
+   },
+   {
+    "t": "fact",
+    "title": "Nachwehen und Milcheinschuss",
+    "text": "Die Gebärmutter zieht sich nach der Geburt wieder zusammen, das spürst du als Nachwehen, oft besonders beim Stillen, weil dabei Oxytocin ausgeschüttet wird. Beim zweiten oder dritten Kind sind sie meist stärker als beim ersten. Zwischen dem zweiten und vierten Tag kommt dann oft der Milcheinschuss. Die Brust wird prall, warm und manchmal empfindlich, und viele Frauen sind an diesen Tagen auch emotional besonders dünnhäutig. Häufiges Anlegen, kühlende Auflagen nach dem Stillen und viel Ruhe helfen."
+   },
+   {
+    "t": "fact",
+    "title": "Hebammenbetreuung nach der Geburt",
+    "text": "Eine Hebamme, die dich in den ersten Tagen und Wochen zu Hause besucht, ist eine der wertvollsten Unterstützungen im Wochenbett. Sie schaut nach deiner Gebärmutter, deinen Geburtsverletzungen oder deiner Narbe, nach dem Stillen und nach deinem Baby. Kläre am besten jetzt schon, welche Hebamme dich betreut und welche Leistungen deine Krankenkasse übernimmt, denn gerade in ländlichen Regionen sind die Plätze oft früh vergeben."
+   },
+   {
+    "t": "checklist",
+    "title": "Wochenbett-Vorbereitung",
+    "items": [
+     "Hebamme für die Nachbetreuung zu Hause organisiert",
+     "zehn bis fünfzehn Portionen Essen vorgekocht und eingefroren, zum Beispiel Suppen, Eintöpfe, Dhal",
+     "eine Liste mit Gerichten, die Freundinnen und Familie vorbeibringen können",
+     "eine Wochenbett-Station neben Bett und Sofa: Wasserflasche, Snacks, Stilleinlagen, Ladekabel, Lippenbalsam, Taschentücher",
+     "große Binden, eine kleine Spülflasche für den Damm beim Toilettengang, bequeme Unterhosen",
+     "Kühlpads für den Damm (deine Hebamme zeigt dir, wie du sie richtig verwendest)",
+     "Einkäufe für die ersten zwei Wochen erledigt oder Lieferung organisiert",
+     "Besuchsregeln besprochen: wer wann kommen darf und wie lange",
+     "Betreuung für Geschwister und Haustiere geklärt",
+     "Nummern von Hebamme, Gynäkologin, Kinderärztin und Stillberatung gut sichtbar notiert"
+    ]
+   },
+   {
+    "t": "tip",
+    "text": "Häng einen Zettel an die Haustür oder schreib in die Familiengruppe, dass Besuch herzlich willkommen ist, wenn er etwas zu essen mitbringt, sich selbst einen Tee kocht und nach einer Stunde wieder geht. Wer dich wirklich liebt, wird das verstehen und sich freuen, helfen zu dürfen."
+   },
+   {
+    "t": "table",
+    "title": "Wer hilft mir wobei?",
+    "cols": [
+     "Aufgabe",
+     "Wer",
+     "Telefon"
+    ],
+    "rows": [
+     [
+      "Kochen und Essen bringen",
+      "",
+      ""
+     ],
+     [
+      "Einkaufen",
+      "",
+      ""
+     ],
+     [
+      "Wäsche und Haushalt",
+      "",
+      ""
+     ],
+     [
+      "Geschwister, Kindergarten, Schule",
+      "",
+      ""
+     ],
+     [
+      "Haustiere",
+      "",
+      ""
+     ],
+     [
+      "Fahrten (Kinderarzt, Apotheke)",
+      "",
+      ""
+     ],
+     [
+      "Jemand, mit dem ich reden kann",
+      "",
+      ""
+     ],
+     [
+      "",
+      "",
+      ""
+     ]
+    ]
+   },
+   {
+    "t": "h",
+    "text": "Wann du dich sofort melden solltest"
+   },
+   {
+    "t": "p",
+    "text": "Die allermeisten Wochenbetten verlaufen ohne Komplikationen. Trotzdem gibt es ein paar Zeichen, bei denen du nicht abwarten solltest. Häng diese Liste am besten gut sichtbar auf, damit auch dein Partner oder deine Partnerin sie kennt."
+   },
+   {
+    "t": "checklist",
+    "title": "Bitte sofort Hebamme, Ärztin oder Klinik anrufen (in einem Notfall 144), wenn",
+    "items": [
+     "du stark blutest, etwa eine große Binde innerhalb einer Stunde durchblutet ist, oder du Blutklumpen größer als eine Pflaume verlierst",
+     "du Fieber über 38 °C hast",
+     "der Wochenfluss unangenehm riecht oder du starke Unterbauchschmerzen hast",
+     "eine Stelle an der Brust gerötet, heiß und schmerzhaft ist und du dich grippig fühlst",
+     "eine Wade geschwollen, warm oder schmerzhaft ist",
+     "du Atemnot oder Schmerzen in der Brust hast",
+     "du starke Kopfschmerzen, Sehstörungen oder plötzliche Schwellungen bemerkst (auch nach der Geburt ist eine Präeklampsie möglich)",
+     "deine Narbe oder dein Damm stärker schmerzt, nässt oder sich rötet",
+     "du Gedanken hast, dir oder deinem Baby etwas anzutun"
+    ]
+   },
+   {
+    "t": "fact",
+    "title": "Auch Partner dürfen erschöpft sein",
+    "text": "Nicht nur Mütter erleben nach der Geburt eine große Umstellung. Auch Väter und Co-Mütter können sich erschöpft, traurig oder überfordert fühlen, und auch bei ihnen gibt es depressive Verstimmungen nach der Geburt. Sprecht schon jetzt darüber, wie ihr euch gegenseitig auffangt und woran ihr merkt, dass einer von euch Unterstützung braucht."
+   },
+   {
+    "t": "quote",
+    "text": "Ich darf ruhen. Ruhe ist der Anfang meiner Heilung."
+   }
+  ]
+ },
+ "post1": {
+  "icon": "umarmung",
+  "title": "Gut zu wissen: Die ersten Wochen nach der Geburt",
+  "intro": "Dein Körper heilt gerade an vielen Stellen gleichzeitig. Hier kannst du in Ruhe nachlesen, was dabei passiert, was dir die ersten Tage leichter macht und welche Fragen du bei der Nachuntersuchung stellen kannst.",
+  "blocks": [
+   {
+    "t": "p",
+    "text": "In den ersten Wochen nach der Geburt verändert sich dein Körper fast so schnell wie in der ganzen Schwangerschaft. Vieles davon spürst du, manches siehst du, und einiges passiert ganz still im Inneren. Es ist völlig in Ordnung, wenn du dich gerade weder wie vor der Schwangerschaft noch wie in der Schwangerschaft fühlst. Dein Körper ist auf dem Weg zu etwas Neuem."
+   },
+   {
+    "t": "h",
+    "text": "Was in deinem Körper heilt"
+   },
+   {
+    "t": "fact",
+    "title": "Die Gebärmutter bildet sich zurück",
+    "text": "Direkt nach der Geburt wiegt die Gebärmutter etwa ein Kilo und reicht bis zum Nabel. In den folgenden sechs bis acht Wochen schrumpft sie auf ihre ursprüngliche Größe von etwa sechzig bis achtzig Gramm. Deine Hebamme tastet in den ersten Tagen regelmäßig, wie hoch sie noch steht. Stillen, ausreichend Ruhe und eine regelmäßig geleerte Blase unterstützen diese Rückbildung."
+   },
+   {
+    "t": "fact",
+    "title": "Geburtsverletzungen und Damm",
+    "text": "Ein Riss oder Schnitt am Damm heilt meist innerhalb von zwei bis drei Wochen, die Fäden lösen sich in der Regel von selbst auf. In den ersten Tagen können Kühlpads, die Seitlage und ein Sitzring Erleichterung bringen. Beim Wasserlassen hilft es, lauwarmes Wasser aus einer kleinen Spülflasche über den Damm laufen zu lassen, dann brennt es weniger. Beim ersten Stuhlgang darfst du eine saubere Binde oder ein Tuch sanft gegen den Damm halten, das gibt Sicherheit."
+   },
+   {
+    "t": "fact",
+    "title": "Nach einem Kaiserschnitt",
+    "text": "Ein Kaiserschnitt ist eine große Bauchoperation, bei der mehrere Gewebeschichten durchtrennt werden. Die Hautnarbe ist meist nach etwa zwei Wochen verschlossen, die tieferen Schichten brauchen viele Wochen bis Monate. In den ersten Wochen ist es üblich, nichts zu heben, was deutlich schwerer ist als dein Baby. Ein Taubheitsgefühl rund um die Narbe ist häufig und bildet sich oft über Monate zurück. Wann du mit einer sanften Narbenmassage beginnen kannst, besprichst du mit deiner Hebamme oder Ärztin, meist ist das erst nach vollständiger Wundheilung."
+   },
+   {
+    "t": "table",
+    "title": "So verändert sich der Wochenfluss",
+    "cols": [
+     "Zeitraum (ungefähr)",
+     "Farbe und Menge"
+    ],
+    "rows": [
+     [
+      "1. bis 4. Tag",
+      "hellrot, kräftig, manchmal kleine Blutklümpchen"
+     ],
+     [
+      "ca. 1. bis 2. Woche",
+      "bräunlich, deutlich weniger"
+     ],
+     [
+      "ca. 2. bis 3. Woche",
+      "gelblich"
+     ],
+     [
+      "ca. 3. bis 6. Woche",
+      "weißlich, wenig, dann versiegt er"
+     ]
+    ]
+   },
+   {
+    "t": "tip",
+    "text": "Trink beim Stillen jedes Mal ein großes Glas Wasser. Stell dir dafür an jeden Platz, an dem du stillst, eine gefüllte Flasche. So kommst du fast nebenbei auf die Menge, die dein Körper gerade braucht, und auch dein Darm wird es dir danken."
+   },
+   {
+    "t": "h",
+    "text": "Deine Geburtsgeschichte"
+   },
+   {
+    "t": "p",
+    "text": "Manche Frauen erleben ihre Geburt als kraftvoll und schön, andere als überwältigend, beängstigend oder enttäuschend, und oft ist alles gleichzeitig wahr. Es kann sehr heilsam sein, die eigene Geschichte zu erzählen und zu verstehen, was passiert ist. Du kannst bei deiner Klinik den Geburtsbericht anfordern und ihn mit deiner Hebamme durchgehen. Viele Kliniken bieten auch ein Nachgespräch an. Wenn dich Bilder oder Gefühle von der Geburt nicht loslassen, du Albträume hast oder bestimmte Orte meidest, sprich bitte mit deiner Hebamme oder Ärztin. Dafür gibt es gute Unterstützung."
+   },
+   {
+    "t": "h",
+    "text": "Deine Bauchmitte im Blick"
+   },
+   {
+    "t": "p",
+    "text": "Den Diastase-Selbsttest hast du in der Einheit kennengelernt. Damit du deine Entwicklung über die nächsten Wochen verfolgen kannst, findest du hier dein Messprotokoll. Miss am besten immer zur gleichen Tageszeit und in der gleichen Position. Notiere zur Breite in Fingern immer auch, wie fest es sich in der Tiefe anfühlt."
+   },
+   {
+    "t": "table",
+    "title": "Mein Diastase-Messprotokoll",
+    "cols": [
+     "Datum",
+     "über dem Nabel",
+     "auf Nabelhöhe",
+     "unter dem Nabel",
+     "Spannung (fest / mittel / weich)"
+    ],
+    "rows": 8
+   },
+   {
+    "t": "fact",
+    "title": "So liest du dein Protokoll",
+    "text": "Wichtig ist der Verlauf über mehrere Wochen, nicht ein einzelner Wert. Wenn die Bauchmitte allmählich fester wird, ist das ein schönes Zeichen, auch wenn noch Finger dazwischen passen. Wenn sich nach etwa acht bis zwölf Wochen gar nichts verändert, du eine Vorwölbung am Nabel bemerkst oder Schmerzen hast, lass dich bitte von einer Physiotherapeutin mit Schwerpunkt Beckenboden und Rektusdiastase oder von deiner Ärztin untersuchen."
+   },
+   {
+    "t": "h",
+    "text": "Die Nachuntersuchung"
+   },
+   {
+    "t": "p",
+    "text": "Einige Wochen nach der Geburt steht die Nachuntersuchung bei deiner Gynäkologin an, so wie es dein Eltern-Kind-Pass vorsieht. Oft ist dieser Termin recht kurz, deshalb lohnt es sich, deine Fragen vorher aufzuschreiben."
+   },
+   {
+    "t": "checklist",
+    "title": "Fragen für deine Nachuntersuchung",
+    "items": [
+     "Wie sind meine Geburtsverletzungen bzw. meine Narbe verheilt?",
+     "Wie ist mein Beckenboden? Können Sie ihn tasten und mir sagen, ob ich ihn richtig anspanne?",
+     "Ich verliere Urin, spüre Druck nach unten oder habe Schmerzen. Können Sie mir eine Beckenboden-Physiotherapie verordnen?",
+     "Ist meine Bauchmitte auffällig?",
+     "Sollte mein Blutbild, vor allem das Eisen, kontrolliert werden?",
+     "Welche Verhütung passt jetzt, auch in der Stillzeit?",
+     "Ab wann kann ich wieder mit Sport beginnen, und gibt es bei mir Einschränkungen?",
+     "Wie geht es mir seelisch, und an wen kann ich mich wenden, wenn es mir nicht gut geht?"
+    ]
+   },
+   {
+    "t": "quote",
+    "text": "Ich gebe meinem Körper die Zeit, die er zum Heilen braucht."
+   }
+  ]
+ },
+ "post2": {
+  "icon": "schild",
+  "title": "Gut zu wissen: Dein Beckenboden im Alltag",
+  "intro": "Dein Beckenboden erholt sich auch außerhalb der Übungsminuten, bei jedem Heben, bei jedem Toilettengang und in jeder Nacht. Hier findest du alles, was ihn im Alltag unterstützt.",
+  "blocks": [
+   {
+    "t": "p",
+    "text": "Nach der Geburt fühlt sich der Beckenboden für viele Frauen zunächst taub, schwer oder kaum spürbar an. Das ist normal, denn Muskeln, Bindegewebe und Nerven wurden stark gedehnt und brauchen Zeit, um sich zu erholen. Bei den meisten Frauen kommt das Gefühl über die ersten Wochen nach und nach zurück. Mit gezieltem Training und ein paar Gewohnheiten im Alltag unterstützt du diesen Prozess enorm."
+   },
+   {
+    "t": "fact",
+    "title": "Stillen, Hormone und Schleimhäute",
+    "text": "Während du stillst, ist dein Östrogenspiegel niedrig. Das kann die Schleimhäute in der Scheide trockener und empfindlicher machen und das Bindegewebe etwas weniger straff. Manche Frauen bemerken deshalb in der Stillzeit leichter Druck nach unten oder Beschwerden beim Sex. Das bessert sich meist, wenn sich der Zyklus wieder einstellt. Ein gutes Gleitgel hilft vielen, und wenn die Trockenheit dich stark stört, kann deine Gynäkologin mit dir über eine lokale Behandlung sprechen."
+   },
+   {
+    "t": "fact",
+    "title": "Druck nach unten am Abend",
+    "text": "Viele Frauen spüren in den ersten Monaten abends ein Schweregefühl im Becken, besonders nach einem langen Tag auf den Beinen. Der Beckenboden ist dann einfach müde. Leg dich zwischendurch hin, gern mit einem Kissen unter dem Becken, und verteil schwere Aufgaben über den Tag. Wenn das Gefühl stärker wird, du etwas in der Scheide tasten kannst oder es nach einigen Wochen nicht besser wird, lass dich bitte von einer Beckenboden-Physiotherapeutin untersuchen. Eine Senkung lässt sich gut behandeln, vor allem wenn man früh beginnt."
+   },
+   {
+    "t": "h",
+    "text": "Gewohnheiten, die deinen Beckenboden schützen"
+   },
+   {
+    "t": "list",
+    "items": [
+     "Geh zur Toilette, wenn du musst, aber nicht ständig vorsorglich. Häufiges Gehen ohne echten Drang gewöhnt die Blase an kleine Mengen.",
+     "Setz dich zum Wasserlassen ganz hin, statt über der Brille zu schweben. Nur im Sitzen kann der Beckenboden völlig loslassen.",
+     "Stell die Füße beim Stuhlgang auf einen kleinen Hocker und atme lang aus, statt zu pressen.",
+     "Trink über den Tag verteilt genug, in der Stillzeit oft etwas mehr als sonst. Zu wenig Flüssigkeit macht den Urin konzentriert und reizt die Blase.",
+     "Spann deinen Beckenboden an, bevor du hustest, niest, die Babyschale hebst oder den Kinderwagen ins Auto lädst.",
+     "Trag dein Baby nah am Körper und wechsel die Seite."
+    ]
+   },
+   {
+    "t": "tip",
+    "text": "Kleb dir einen kleinen farbigen Punkt an Orte, an denen du oft vorbeikommst, an den Wickeltisch, an den Kühlschrank oder ans Lenkrad. Jedes Mal, wenn du ihn siehst, machst du ein paar schnelle Aktivierungen. Nach ein paar Wochen ist das ganz selbstverständlich."
+   },
+   {
+    "t": "fact",
+    "title": "Sex nach der Geburt",
+    "text": "Es gibt keinen festen Zeitpunkt, ab dem du wieder Sex haben solltest. Viele Ärztinnen raten, zu warten, bis der Wochenfluss versiegt ist und Geburtsverletzungen verheilt sind. Danach zählt vor allem, ob du dich bereit fühlst. Müdigkeit, ein verändertes Körpergefühl und das viele Körperliche mit dem Baby machen Lust für viele Frauen erst einmal zu einem Randthema, und das ist in Ordnung. Wenn Sex schmerzt, ist das kein Zustand, den du hinnehmen musst. Eine Beckenboden-Physiotherapeutin oder deine Gynäkologin kann dir helfen. Und denk daran, dass du schon vor der ersten Regelblutung wieder schwanger werden kannst."
+   },
+   {
+    "t": "fact",
+    "title": "So findest du eine Beckenboden-Physiotherapeutin",
+    "text": "In Österreich bekommst du Physiotherapie mit einer ärztlichen Verordnung, zum Beispiel von deiner Gynäkologin oder Hausärztin. Frag gezielt nach einer Therapeutin mit Weiterbildung im Bereich Beckenboden oder Urogynäkologie. Viele arbeiten als Wahltherapeutinnen, dann bekommst du nach dem Einreichen einen Teil der Kosten von deiner Krankenkasse zurück. Eine gute Beckenboden-Physiotherapeutin untersucht dich behutsam, erklärt dir genau, was sie findet, und stimmt das Training ganz auf dich ab."
+   },
+   {
+    "t": "checklist",
+    "title": "Mit diesen Beschwerden lohnt sich eine Beckenboden-Physiotherapie",
+    "items": [
+     "Urinverlust beim Husten, Niesen, Lachen, Heben oder Hüpfen",
+     "plötzlicher, sehr starker Harndrang, bei dem du es kaum zur Toilette schaffst",
+     "Schwierigkeiten, Winde oder Stuhl zu halten",
+     "Druck- oder Fremdkörpergefühl in der Scheide",
+     "Schmerzen beim Sex, beim Sitzen oder an der Narbe",
+     "das Gefühl, den Beckenboden gar nicht zu spüren oder nicht loslassen zu können",
+     "eine Rektusdiastase, die sich nach einigen Monaten nicht verändert"
+    ]
+   },
+   {
+    "t": "tracker",
+    "title": "Mein Beckenboden-Tracker",
+    "items": [
+     "10 schnelle Aktivierungen, dreimal am Tag",
+     "5 lange Aktivierungen, dreimal am Tag",
+     "Knack vor dem Heben, Husten, Niesen",
+     "Toilettenhaltung mit Hocker",
+     "genug getrunken",
+     "mich einmal am Tag hingelegt"
+    ]
+   },
+   {
+    "t": "table",
+    "title": "Mein Beschwerde-Protokoll",
+    "cols": [
+     "Datum",
+     "Situation",
+     "Was ist passiert (Tropfen, Druck, Schmerz)",
+     "Wie stark 1–10"
+    ],
+    "rows": 6
+   },
+   {
+    "t": "tip",
+    "text": "Bring dieses Protokoll zur Beckenboden-Physiotherapie mit. Je genauer du beschreiben kannst, wann etwas auftritt, desto gezielter kann sie mit dir arbeiten."
+   },
+   {
+    "t": "quote",
+    "text": "Mein Beckenboden und ich werden jeden Tag mehr ein Team."
+   }
+  ]
+ },
+ "post3": {
+  "icon": "kompass",
+  "title": "Gut zu wissen: Deine Bauchmitte verstehen",
+  "intro": "Was genau bei einer Rektusdiastase passiert, wie du deine Bauchmitte im Alltag schonst und wann es sinnvoll ist, genauer hinschauen zu lassen.",
+  "blocks": [
+   {
+    "t": "p",
+    "text": "Zwischen deinen beiden geraden Bauchmuskeln verläuft eine Bindegewebsnaht, die Linea alba. Sie ist eine Art festes Band aus Bindegewebe, in das die seitlichen Bauchmuskeln einstrahlen. In der Schwangerschaft wird dieses Band durch die Hormone weicher und durch den wachsenden Bauch gedehnt. So entsteht die Rektusdiastase. Sie ist eine sinnvolle Anpassung deines Körpers und kein Schaden."
+   },
+   {
+    "t": "fact",
+    "title": "Was in den ersten Monaten passiert",
+    "text": "Die größte Veränderung geschieht in den ersten sechs bis acht Wochen nach der Geburt, wenn sich Gewebe und Muskeln von selbst wieder annähern. Danach geht es langsamer weiter. Viele Frauen sehen bis etwa sechs Monate nach der Geburt noch deutliche Fortschritte, manche auch darüber hinaus. Training kann diesen Prozess unterstützen, vor allem indem es die Spannung der tiefen Bauchmuskeln und damit die Belastbarkeit der Linea alba verbessert."
+   },
+   {
+    "t": "fact",
+    "title": "Breite ist nicht alles",
+    "text": "Lange galt der Abstand in Fingern als das wichtigste Maß. Heute wissen wir, dass die Spannung des Bindegewebes mindestens genauso viel aussagt. Eine Bauchmitte, die mit zwei Fingern Abstand fest und gut gespannt ist, kann gut funktionieren. Eine schmalere, aber sehr weiche Bauchmitte braucht vielleicht mehr Aufmerksamkeit. Deshalb notieren wir beides."
+   },
+   {
+    "t": "h",
+    "text": "Coning im Alltag erkennen"
+   },
+   {
+    "t": "p",
+    "text": "Das Zelt oder den Kamm, den wir Coning nennen, siehst du nicht nur bei Übungen. Auch im Alltag gibt es Bewegungen, bei denen sich deine Bauchmitte vorwölben kann. Schau dir in den nächsten Tagen einmal bewusst zu und notiere, wo es passiert. Meist reicht eine kleine Veränderung, damit die Bauchmitte ruhig bleibt."
+   },
+   {
+    "t": "table",
+    "title": "Mein Alltags-Check für die Bauchmitte",
+    "cols": [
+     "Bewegung",
+     "Wölbt sich etwas?",
+     "So mache ich es leichter"
+    ],
+    "rows": [
+     [
+      "Aus der Rückenlage aufsetzen",
+      "",
+      "über die Seite aufstehen"
+     ],
+     [
+      "Baby aus dem Bett oder vom Boden heben",
+      "",
+      "erst ausatmen, Beckenboden heben, dann aus den Knien heben"
+     ],
+     [
+      "Babyschale tragen",
+      "",
+      "nah am Körper oder in der Armbeuge, Seiten wechseln"
+     ],
+     [
+      "Kinderwagen ins Auto laden",
+      "",
+      "in Teile zerlegen, Hilfe annehmen"
+     ],
+     [
+      "Husten oder Niesen",
+      "",
+      "Knack, eventuell eine Hand auf den Bauch legen"
+     ],
+     [
+      "Stuhlgang",
+      "",
+      "Hocker unter die Füße, lang ausatmen"
+     ],
+     [
+      "",
+      "",
+      ""
+     ]
+    ]
+   },
+   {
+    "t": "fact",
+    "title": "Bauchgurt und Tapes",
+    "text": "Manche Frauen empfinden einen Bauchgurt oder ein Kinesio-Tape in den ersten Wochen als angenehm, weil es ihnen ein Gefühl von Halt gibt, besonders nach einem Kaiserschnitt. Das kann eine sinnvolle Unterstützung sein. Ein Gurt nimmt der Bauchmitte aber nicht die Arbeit ab, die sie selbst lernen darf. Trage ihn nicht dauerhaft und nicht zu eng, damit er keinen zusätzlichen Druck nach unten auf den Beckenboden ausübt. Ob er für dich passt, besprichst du am besten mit deiner Hebamme oder Physiotherapeutin."
+   },
+   {
+    "t": "fact",
+    "title": "Deine Kaiserschnittnarbe",
+    "text": "Wenn die Narbe gut verheilt ist und deine Ärztin oder Hebamme einverstanden ist, kannst du beginnen, sie sanft zu berühren und zu mobilisieren. Viele Frauen empfinden die Narbe anfangs als fremd, manche mögen sie gar nicht ansehen. Fang ganz behutsam an, vielleicht zuerst nur mit der flachen Hand über der Kleidung. Eine Narbe, die gut verschieblich ist, kann sich positiv auf das Körpergefühl, die Beweglichkeit und manchmal auch auf Rückenbeschwerden auswirken. Eine Physiotherapeutin kann dir die passenden Griffe zeigen."
+   },
+   {
+    "t": "tip",
+    "text": "Ein Gedanke, der vielen Frauen hilft: Dein Bauch muss nicht wieder so aussehen wie vorher, damit er gut funktioniert. Weiche Haut, Dehnungsstreifen und eine kleine Wölbung sind Spuren von etwas Großartigem. Unser Ziel ist eine Bauchmitte, die dich gut durch deinen Alltag trägt."
+   },
+   {
+    "t": "checklist",
+    "title": "Lass deine Bauchmitte bitte ärztlich oder physiotherapeutisch anschauen, wenn",
+    "items": [
+     "du am Nabel oder entlang der Bauchmitte eine Vorwölbung bemerkst, die auch im Liegen bleibt",
+     "die Vorwölbung schmerzt, hart wird oder sich nicht mehr zurückdrücken lässt (dann bitte sofort)",
+     "du Schmerzen in der Bauchmitte oder im Rücken hast, die nicht besser werden",
+     "sich nach etwa drei Monaten trotz Training kaum etwas verändert",
+     "du gleichzeitig Probleme mit dem Beckenboden hast, etwa Urinverlust oder Druck nach unten"
+    ]
+   },
+   {
+    "t": "tracker",
+    "title": "Mein Bauchmitte-Tracker",
+    "items": [
+     "Reißverschluss-Atmung, 10 Atemzüge",
+     "Heel Slides und Toe Taps",
+     "über die Seite aufgestanden",
+     "beim Heben ausgeatmet",
+     "kein Coning bemerkt"
+    ]
+   },
+   {
+    "t": "quote",
+    "text": "Mein Bauch hat Leben getragen. Ich begegne ihm mit Respekt und Geduld."
+   }
+  ]
+ },
+ "post4": {
+  "icon": "herz",
+  "title": "Gut zu wissen: Stillen, Füttern und Tragen",
+  "intro": "Du verbringst gerade viele Stunden am Tag mit Stillen, Füttern und Tragen. Hier findest du Positionen, Tipps fürs Tragen und Hinweise, wann du dir Unterstützung holen solltest.",
+  "blocks": [
+   {
+    "t": "p",
+    "text": "Ob du stillst, abpumpst, das Fläschchen gibst oder alles kombinierst: Du verbringst gerade viele Stunden am Tag in derselben Haltung. Allein beim Stillen kommen in den ersten Monaten oft acht bis zwölf Mahlzeiten am Tag zusammen. Es lohnt sich deshalb sehr, sich diese Zeit so bequem wie möglich einzurichten. Jede Minute, die du entspannt und gut gestützt sitzt oder liegst, ist eine Minute Erholung für deinen Nacken, deine Schultern und deinen Rücken."
+   },
+   {
+    "t": "h",
+    "text": "Stillpositionen im Überblick"
+   },
+   {
+    "t": "table",
+    "title": "Welche Position wann passt",
+    "cols": [
+     "Position",
+     "So geht es",
+     "Gut, wenn"
+    ],
+    "rows": [
+     [
+      "Wiegehaltung",
+      "Baby liegt Bauch an Bauch quer vor dir, sein Kopf in deiner Armbeuge",
+      "du schon etwas Übung hast und gut sitzt"
+     ],
+     [
+      "Zurückgelehnt (Laid-back)",
+      "du lehnst dich halb zurück, Baby liegt bäuchlings auf dir",
+      "in den ersten Tagen, dein Baby kann seine Reflexe zum Andocken gut nutzen"
+     ],
+     [
+      "Rückenhaltung (Football)",
+      "Baby liegt seitlich neben dir unter deinem Arm, die Beine zeigen nach hinten",
+      "nach einem Kaiserschnitt, bei großer Brust, bei Zwillingen"
+     ],
+     [
+      "Seitlage",
+      "ihr liegt euch Bauch an Bauch gegenüber, ein Kissen im Rücken",
+      "nachts, wenn du müde bist, nach Kaiserschnitt oder Dammverletzung"
+     ]
+    ]
+   },
+   {
+    "t": "fact",
+    "title": "Bauch an Bauch",
+    "text": "Egal in welcher Position: Ohr, Schulter und Hüfte deines Babys sollten eine Linie bilden, und sein Bauch zeigt zu dir. Dann muss es den Kopf nicht drehen, um zu trinken, und kann viel besser saugen. Bring dein Baby zur Brust, statt dich zu ihm hinunterzubeugen, und stütz es mit Kissen so, dass deine Arme es nicht halten müssen."
+   },
+   {
+    "t": "fact",
+    "title": "Wenn das Stillen wehtut",
+    "text": "In den ersten Tagen fühlen sich viele Brustwarzen empfindlich an. Anhaltende Schmerzen während des ganzen Stillens, wunde oder blutige Brustwarzen sind aber ein Zeichen, dass am Anlegen etwas verändert werden sollte. Hol dir dann früh Hilfe bei deiner Hebamme oder einer Stillberaterin mit IBCLC-Zertifizierung. Auch die La Leche Liga bietet kostenlose Beratung an. Kleine Veränderungen am Anlegen machen oft einen riesigen Unterschied."
+   },
+   {
+    "t": "fact",
+    "title": "Milchstau oder Brustentzündung?",
+    "text": "Ein Milchstau zeigt sich als harte, schmerzhafte Stelle in der Brust, manchmal gerötet. Häufiges Anlegen, Ruhe, kühlende Auflagen nach dem Stillen und eine sanfte, lockere Kleidung helfen oft schon. Kommen Fieber, Schüttelfrost oder ein starkes Krankheitsgefühl dazu, oder wird es nach ein bis zwei Tagen nicht besser, melde dich bitte bei deiner Hebamme oder Ärztin. Dann kann eine Brustentzündung dahinterstecken, die behandelt werden muss."
+   },
+   {
+    "t": "h",
+    "text": "Füttern mit dem Fläschchen"
+   },
+   {
+    "t": "p",
+    "text": "Auch beim Fläschchengeben gelten dieselben Regeln für deinen Körper: gut gestützter Rücken, Kissen unter dem Arm, Füße auf dem Boden oder auf einer kleinen Stütze. Halte dein Baby eher aufrecht und die Flasche fast waagrecht, damit es selbst bestimmen kann, wie schnell es trinkt, und mach zwischendurch kleine Pausen. Wechsel die Seite, auf der du dein Baby hältst, so wie beim Stillen. Dann werden beide Schultern gleichmäßig belastet."
+   },
+   {
+    "t": "h",
+    "text": "Tragen, das dir und deinem Baby guttut"
+   },
+   {
+    "t": "checklist",
+    "title": "Der Tragecheck für Tuch und Trage",
+    "items": [
+     "Dein Baby sitzt nah und eng an deinem Körper, es hängt nicht durch.",
+     "Du kannst seinen Kopf küssen, ohne dich zu verrenken. Er liegt also hoch genug.",
+     "Du siehst sein Gesicht, nichts verdeckt Mund und Nase.",
+     "Zwischen Kinn und Brust deines Babys passen etwa zwei Finger.",
+     "Seine Beine sind gespreizt und angehockt, die Knie etwas höher als der Po (M-Position).",
+     "Die Gurte verteilen das Gewicht auf Schultern und Hüfte, nichts drückt einseitig."
+    ]
+   },
+   {
+    "t": "tip",
+    "text": "Lass dir das Binden des Tragetuchs oder das Einstellen der Trage von einer Trageberaterin zeigen. Eine gut eingestellte Trage fühlt sich ganz anders an, und dein Rücken wird es dir bei jedem Spaziergang danken."
+   },
+   {
+    "t": "fact",
+    "title": "Der Mama-Daumen",
+    "text": "Viele frischgebackene Mütter bekommen Schmerzen an der Daumenseite des Handgelenks. Das liegt oft daran, dass wir das Baby mit weit abgespreiztem Daumen unter den Achseln hochheben. Versuch, dein Baby stattdessen mit der ganzen Hand und dem Unterarm zu schaufeln, die Daumen liegen dabei an den Fingern. Wenn die Schmerzen bleiben oder stärker werden, lass das bitte ärztlich oder physiotherapeutisch anschauen."
+   },
+   {
+    "t": "checklist",
+    "title": "So richtest du dein Still- oder Füttereck ein",
+    "items": [
+     "ein Stuhl oder Sofaplatz mit guter Rückenlehne",
+     "ein Stillkissen und ein zusätzliches Kissen für unter den Arm",
+     "eine Fußstütze oder ein Hocker",
+     "eine Wasserflasche und ein Snack in Griffweite",
+     "Spucktuch, Taschentücher, Ladekabel",
+     "eine Decke für dich und gedämpftes Licht für die Nacht",
+     "ein Zettel mit deiner 5-Minuten-Pause, damit du sie nicht vergisst"
+    ]
+   },
+   {
+    "t": "quote",
+    "text": "Ich trage mein Kind, und ich darf mich selbst gut halten."
+   }
+  ]
+ },
+ "post5": {
+  "icon": "berg",
+  "title": "Gut zu wissen: Kraft klug aufbauen",
+  "intro": "Wie du die Belastung Schritt für Schritt steigerst, woran du erkennst, dass dein Körper bereit für mehr ist, und was dir dabei von innen Kraft gibt.",
+  "blocks": [
+   {
+    "t": "p",
+    "text": "Dein Körper ist nach der Geburt anpassungsfähiger, als du vielleicht denkst. Muskeln reagieren auch jetzt auf Training, sie brauchen nur einen klugen Aufbau und genug Erholung. Der wichtigste Grundsatz lautet: Erst kommt die Kontrolle, dann die Wiederholung, dann das Gewicht. Wenn du eine Übung sauber, ruhig und ohne Beschwerden schaffst, darfst du sie ein kleines Stück schwerer machen."
+   },
+   {
+    "t": "h",
+    "text": "So steigerst du dich sicher"
+   },
+   {
+    "t": "table",
+    "title": "Deine Stufen zu mehr Kraft",
+    "cols": [
+     "Stufe",
+     "Woran du arbeitest",
+     "Bereit für die nächste Stufe, wenn"
+    ],
+    "rows": [
+     [
+      "1 · Verbinden",
+      "Atmung, Beckenboden, tiefe Bauchmuskeln",
+      "du den Beckenboden sicher anspannen und loslassen kannst"
+     ],
+     [
+      "2 · Stabilisieren",
+      "Heel Slides, Toe Taps, Brücke, Clamshell",
+      "die Bauchmitte ruhig bleibt und kein Druck nach unten entsteht"
+     ],
+     [
+      "3 · Kräftigen",
+      "Kniebeugen, Ausfallschritt, Rudern, Seitstütz auf den Knien",
+      "du 2 × 10 Wiederholungen sauber und ohne Warnzeichen schaffst"
+     ],
+     [
+      "4 · Belasten",
+      "dieselben Übungen mit Baby, Wasserflaschen oder Gewicht, einbeinige Varianten",
+      "du dich auch am nächsten Tag gut fühlst"
+     ],
+     [
+      "5 · Dynamik",
+      "schnellere Bewegungen, Hüpfen, Laufen (siehe Einheit 7)",
+      "der Belastungs-Check ohne Beschwerden gelingt"
+     ]
+    ]
+   },
+   {
+    "t": "tip",
+    "text": "Steigere immer nur eine Sache auf einmal. Entweder mehr Wiederholungen oder mehr Gewicht oder eine schwierigere Variante. Dann merkst du sofort, was dein Körper gerade gut verträgt."
+   },
+   {
+    "t": "h",
+    "text": "Die Ampel für deinen Körper"
+   },
+   {
+    "t": "table",
+    "title": "Meine Symptom-Ampel",
+    "cols": [
+     "Farbe",
+     "Was du bemerkst",
+     "Was du machst"
+    ],
+    "rows": [
+     [
+      "Grün",
+      "Muskeln sind angenehm müde, du fühlst dich danach wach und gut",
+      "weitermachen wie geplant"
+     ],
+     [
+      "Gelb",
+      "leichter Druck nach unten am Abend, ein paar Tropfen bei der letzten Wiederholung, etwas Coning",
+      "eine Stufe zurück, weniger Wiederholungen, mehr Pausen"
+     ],
+     [
+      "Rot",
+      "deutlicher Urinverlust, starkes Druckgefühl, Schmerzen, frische Blutung, Schwindel",
+      "Training beenden und mit Hebamme, Ärztin oder Physiotherapeutin sprechen"
+     ]
+    ]
+   },
+   {
+    "t": "fact",
+    "title": "Warum eine Pause manchmal das beste Training ist",
+    "text": "Muskeln werden in der Erholung stärker, nicht während der Übung selbst. Mit einem Baby ist Schlaf oft knapp, und dein Körper hat entsprechend weniger Reserven zum Regenerieren. Nach einer besonders unruhigen Nacht darfst du dein Training kürzer und sanfter gestalten oder ganz auf eine Atemübung beschränken. Das ist ein Zeichen von Körperwissen."
+   },
+   {
+    "t": "h",
+    "text": "Kraft von innen: Ernährung und Eisen"
+   },
+   {
+    "t": "fact",
+    "title": "Müde trotz allem? Denk an dein Eisen",
+    "text": "Durch den Blutverlust bei der Geburt haben viele Frauen danach zu wenig Eisen. Das kann sich als starke Müdigkeit, Kurzatmigkeit, Herzklopfen bei kleinen Anstrengungen, Haarausfall oder Schwindel bemerkbar machen, Zeichen, die man leicht dem Schlafmangel zuschreibt. Ein einfacher Bluttest bei deiner Ärztin bringt Klarheit. Nimm Eisenpräparate bitte nur nach Rücksprache ein, denn zu viel Eisen ist ebenfalls nicht gut."
+   },
+   {
+    "t": "fact",
+    "title": "Was dein Körper jetzt braucht",
+    "text": "Zum Heilen und zum Muskelaufbau braucht dein Körper genug Eiweiß, zum Beispiel aus Hülsenfrüchten, Eiern, Milchprodukten, Fisch oder Fleisch. Wenn du stillst, steigt dein Energiebedarf um etwa 500 Kilokalorien am Tag. Eine Diät ist in dieser Zeit keine gute Idee. Regelmäßige Mahlzeiten und ein paar vorbereitete Snacks helfen, dass du nicht erst merkst, wie hungrig du bist, wenn du schon völlig erschöpft bist. Ob du in der Stillzeit Nahrungsergänzungen wie Jod, Vitamin D oder Omega-3 brauchst, klärst du am besten mit deiner Ärztin."
+   },
+   {
+    "t": "tip",
+    "text": "Stell dir abends eine kleine Box für den nächsten Tag zusammen: ein paar Nüsse, ein gekochtes Ei, ein Stück Käse, etwas Obst. Wenn du mittags merkst, dass du noch gar nichts gegessen hast, greifst du einfach hinein."
+   },
+   {
+    "t": "h",
+    "text": "Dein Alltag als Training"
+   },
+   {
+    "t": "p",
+    "text": "Viele der Übungen, die wir machen, findest du in deinem Alltag wieder. Jedes Mal, wenn du dein Baby aus dem Bettchen hebst, machst du eine Kniebeuge. Wenn du die Babyschale trägst, trainierst du die Rumpfstabilität, und wenn du den Kinderwagen bergauf schiebst, arbeiten Beine und Po. Wenn du diese Momente bewusst mit dem Atem und dem Beckenboden verbindest, wird dein ganzer Tag zu einem sanften Training."
+   },
+   {
+    "t": "tracker",
+    "title": "Mein Kraft-Tracker",
+    "items": [
+     "10-Minuten-Programm (Kniebeugen, Brücke, Rudern)",
+     "Spaziergang mit Kinderwagen",
+     "bewusst aus den Knien gehoben",
+     "eiweißreich gegessen und genug getrunken",
+     "Erholungspause oder Mittagsruhe",
+     "Ampel heute: grün, gelb oder rot?"
+    ]
+   },
+   {
+    "t": "quote",
+    "text": "Ich werde stärker, in meinem Tempo und mit meinem Körper."
+   }
+  ]
+ },
+ "post6": {
+  "icon": "mond",
+  "title": "Gut zu wissen: Schlaf, Hormone und dein Kopf",
+  "intro": "Warum du dich gerade so fühlst, wie du dich fühlst, wie du in kurzen Nächten etwas mehr Erholung findest und wo du Hilfe bekommst, wenn es zu viel wird.",
+  "blocks": [
+   {
+    "t": "p",
+    "text": "Die Zeit nach der Geburt ist eine der größten hormonellen Umstellungen im Leben einer Frau. Gleichzeitig ist der Schlaf unterbrochen, der Alltag völlig neu, und du trägst die Verantwortung für einen kleinen Menschen, der rund um die Uhr Bedürfnisse hat. Wenn du dich dabei manchmal wie eine Fremde in deinem eigenen Leben fühlst, ist das sehr verständlich."
+   },
+   {
+    "t": "h",
+    "text": "Was die Hormone mit dir machen"
+   },
+   {
+    "t": "fact",
+    "title": "Der große Hormonabfall",
+    "text": "Während der Schwangerschaft sind Östrogen und Progesteron um ein Vielfaches erhöht. Innerhalb weniger Tage nach der Geburt fallen beide steil ab. Viele Fachleute sehen darin einen der Gründe für den Babyblues. Gleichzeitig steigt beim Stillen das Prolaktin, das die Milchbildung steuert und dich oft angenehm schläfrig macht, und Oxytocin sorgt bei jeder Stillmahlzeit für Momente von Nähe und Ruhe."
+   },
+   {
+    "t": "fact",
+    "title": "Babyschlaf ist anders",
+    "text": "Neugeborene schlafen viele Stunden am Tag, aber in kurzen Abschnitten, und ihre Schlafzyklen dauern nur etwa 45 bis 60 Minuten statt wie bei Erwachsenen etwa 90 Minuten. Häufiges Aufwachen ist in den ersten Monaten völlig normal und schützt dein Baby. Es ist kein Zeichen, dass du etwas falsch machst. Einen festen Rhythmus entwickeln die meisten Babys erst nach und nach im Laufe des ersten Lebensjahres."
+   },
+   {
+    "t": "h",
+    "text": "Etwas mehr Erholung in kurzen Nächten"
+   },
+   {
+    "t": "list",
+    "items": [
+     "Schlaft in Schichten, wenn es möglich ist. Einer übernimmt die ersten Stunden der Nacht, der andere die zweite Hälfte, so bekommt jeder einen längeren Block.",
+     "Leg dich tagsüber mindestens einmal hin, wenn dein Baby schläft, auch wenn du nicht einschläfst. Liegen mit geschlossenen Augen entspannt dein Nervensystem trotzdem.",
+     "Geh morgens möglichst bald nach draußen ans Tageslicht. Helles Licht am Morgen hilft deiner inneren Uhr, und auch dein Baby findet so leichter einen Tag-Nacht-Rhythmus.",
+     "Halte nachts das Licht gedämpft und sprich leise. Ein kleines Nachtlicht reicht zum Wickeln und Stillen.",
+     "Leg dein Handy in der Nacht weg oder stell es auf Nachtmodus, so schläfst du nach dem Stillen leichter wieder ein.",
+     "Koffein ist in der Stillzeit in Maßen in Ordnung. Als Orientierung gelten etwa zwei bis drei Tassen Kaffee am Tag, am besten nicht mehr am späten Nachmittag."
+    ]
+   },
+   {
+    "t": "tip",
+    "text": "Lass jede Person, die dir Hilfe anbietet, eine konkrete Aufgabe aussuchen, statt „Melde dich, wenn du etwas brauchst“ zu sagen. Ein Spaziergang mit dem Baby, während du schläfst, ist eines der schönsten Geschenke, die du dir wünschen kannst."
+   },
+   {
+    "t": "h",
+    "text": "Mental Load sichtbar machen"
+   },
+   {
+    "t": "p",
+    "text": "Mental Load ist mehr als die Aufgabe selbst. Es ist das Daran-Denken, das Planen, das Erinnern und das Überprüfen. Wer den Kinderarzttermin ausmacht, wer merkt, dass die Windeln ausgehen, wer weiß, welche Größe als Nächstes gebraucht wird. Diese Arbeit ist unsichtbar, solange man sie nicht aufschreibt. Ein hilfreicher Gedanke ist, Aufgaben vollständig abzugeben, also mit allem, was dazugehört, vom Daran-Denken bis zum Erledigen."
+   },
+   {
+    "t": "table",
+    "title": "Unsere Aufgabenverteilung",
+    "cols": [
+     "Aufgabe",
+     "Wer denkt daran?",
+     "Wer erledigt es?",
+     "Ab jetzt ganz bei"
+    ],
+    "rows": [
+     [
+      "Kinderarzt- und Impftermine",
+      "",
+      "",
+      ""
+     ],
+     [
+      "Windeln, Pflegeprodukte, Babykleidung",
+      "",
+      "",
+      ""
+     ],
+     [
+      "Einkauf und Essensplanung",
+      "",
+      "",
+      ""
+     ],
+     [
+      "Wäsche",
+      "",
+      "",
+      ""
+     ],
+     [
+      "Geschenke, Geburtstage, Familie",
+      "",
+      "",
+      ""
+     ],
+     [
+      "Behörden, Kinderbetreuungsgeld, Formulare",
+      "",
+      "",
+      ""
+     ],
+     [
+      "",
+      "",
+      "",
+      ""
+     ],
+     [
+      "",
+      "",
+      "",
+      ""
+     ]
+    ]
+   },
+   {
+    "t": "h",
+    "text": "Wenn es mehr ist als Müdigkeit"
+   },
+   {
+    "t": "p",
+    "text": "Etwa jede siebte bis zehnte Frau erlebt nach der Geburt eine Depression, viele weitere eine Angststörung. Beides ist gut behandelbar, und je früher du dir Hilfe holst, desto schneller geht es dir besser. Auch aufdringliche Gedanken, etwa die plötzliche Vorstellung, dem Baby könnte etwas passieren, sind nach der Geburt sehr häufig. Sie sind meist ein Zeichen großer Sorge und nicht von Gefahr. Wenn sie dich aber stark quälen, sprich bitte darüber."
+   },
+   {
+    "t": "checklist",
+    "title": "Hol dir bitte Unterstützung, wenn du über mehr als zwei Wochen",
+    "items": [
+     "dich fast jeden Tag traurig, leer oder hoffnungslos fühlst",
+     "dich über nichts mehr freuen kannst, auch nicht über dein Baby",
+     "kaum schlafen kannst, selbst wenn dein Baby schläft",
+     "ständig von Sorgen, Panik oder Angst begleitet wirst",
+     "das Gefühl hast, eine schlechte Mutter zu sein, oder starke Schuldgefühle hast",
+     "dich von deinem Baby, deinem Partner oder deinen Freundinnen zurückziehst"
+    ]
+   },
+   {
+    "t": "fact",
+    "title": "Wo du Hilfe bekommst",
+    "text": "Erste Ansprechpartnerinnen sind deine Hebamme, deine Gynäkologin oder deine Hausärztin. Sie können dich an Psychotherapeutinnen und Fachärztinnen weitervermitteln, die sich mit seelischen Krisen rund um die Geburt auskennen. In Österreich erreichst du die Telefonseelsorge rund um die Uhr kostenlos unter 142. Wenn du Gedanken hast, dir oder deinem Baby etwas anzutun, ruf bitte sofort den Notruf 144 oder lass dich in die nächste Klinik bringen. Du bist damit nicht allein, und du verdienst Hilfe."
+   },
+   {
+    "t": "scale",
+    "title": "Wie geht es mir gerade?",
+    "items": [
+     "Schlaf",
+     "Energie",
+     "Stimmung",
+     "Unterstützung im Alltag",
+     "Zeit für mich"
+    ],
+    "low": "kaum",
+    "high": "sehr gut"
+   },
+   {
+    "t": "quote",
+    "text": "Ich muss nicht alles allein tragen. Ich darf teilen, abgeben und mich ausruhen."
+   }
+  ]
+ },
+ "post7": {
+  "icon": "schritte",
+  "title": "Gut zu wissen: Zurück zu deinem Sport",
+  "intro": "Damit du gut vorbereitet und mit einem sicheren Gefühl zu Laufen, Yoga, Schwimmen oder deinem Lieblingssport zurückkehrst.",
+  "blocks": [
+   {
+    "t": "p",
+    "text": "Die Rückkehr zum Sport ist für viele Frauen ein großer Schritt, auf den sie sich sehr freuen. Gleichzeitig ist die Unsicherheit oft groß, weil man von allen Seiten etwas anderes hört. Die gute Nachricht ist, dass es inzwischen klare fachliche Empfehlungen gibt, an denen du dich orientieren kannst. Sie stammen von Physiotherapeutinnen, die sich auf Frauengesundheit spezialisiert haben, und setzen auf die Frage, was dein Körper schon kann."
+   },
+   {
+    "t": "fact",
+    "title": "Warum gerade Laufen und Springen so anspruchsvoll sind",
+    "text": "Beim Laufen wirkt bei jedem Schritt ein Vielfaches deines Körpergewichts auf Beine, Becken und Beckenboden ein. Der Beckenboden muss diese Stöße tausendfach hintereinander blitzschnell abfangen. Deshalb sind Laufen und Springen eine ganz andere Belastung als Kraftübungen, bei denen du dich langsam und kontrolliert bewegst. Fachleute empfehlen, frühestens etwa drei Monate nach der Geburt mit dem Laufen zu beginnen und vorher einige Kraft- und Belastungstests ohne Beschwerden zu schaffen."
+   },
+   {
+    "t": "h",
+    "text": "Bin ich bereit fürs Laufen?"
+   },
+   {
+    "t": "p",
+    "text": "Diese Übersicht orientiert sich an den gängigen Empfehlungen für den Wiedereinstieg ins Laufen nach der Geburt und verwendet die Übungen aus unserer Einheit. Nimm dir für den Check Zeit, mach ihn an einem Tag, an dem du einigermaßen ausgeschlafen bist, und achte bei jeder Übung darauf, ob du dicht bleibst, keinen Druck nach unten spürst und keine Schmerzen hast."
+   },
+   {
+    "t": "table",
+    "title": "Mein Belastungs-Check",
+    "cols": [
+     "Test",
+     "Ziel",
+     "Datum",
+     "Geschafft ohne Beschwerden?"
+    ],
+    "rows": [
+     [
+      "Zügig gehen",
+      "30 Minuten",
+      "",
+      ""
+     ],
+     [
+      "Einbeinstand",
+      "10 Sekunden je Seite, ruhig",
+      "",
+      ""
+     ],
+     [
+      "Einbeinige Kniebeuge am Stuhl",
+      "10 je Seite, Knie bleibt über dem Fuß",
+      "",
+      ""
+     ],
+     [
+      "Wadenheben einbeinig",
+      "15 bis 20 je Seite",
+      "",
+      ""
+     ],
+     [
+      "Einbeinige Schulterbrücke",
+      "15 bis 20 je Seite",
+      "",
+      ""
+     ],
+     [
+      "Zügiges Gehen auf der Stelle",
+      "1 Minute",
+      "",
+      ""
+     ],
+     [
+      "Leichtes Hüpfen auf beiden Beinen",
+      "10 Mal",
+      "",
+      ""
+     ]
+    ]
+   },
+   {
+    "t": "fact",
+    "title": "Wenn du beim Check Beschwerden hast",
+    "text": "Wenn bei einer Übung Urin abgeht, du Druck nach unten spürst oder Schmerzen hast, ist das eine wertvolle Information. Bleib dann bei den Kraftübungen, steigere dich dort weiter und wiederhole den Check nach einigen Wochen. Wenn sich nichts verändert, ist eine Beckenboden-Physiotherapeutin die richtige Ansprechpartnerin. Sie kann gezielt mit dir an genau der Stelle arbeiten, die noch Unterstützung braucht."
+   },
+   {
+    "t": "h",
+    "text": "Der Einstieg ins Laufen"
+   },
+   {
+    "t": "p",
+    "text": "Beginne mit Intervallen aus Gehen und lockerem Laufen, zum Beispiel eine Minute laufen und eine Minute gehen, insgesamt etwa zwanzig Minuten, an zwei bis drei nicht aufeinanderfolgenden Tagen pro Woche. Steigere die Laufabschnitte langsam von Woche zu Woche. Ebene, weiche Wege sind am Anfang angenehmer als steile Bergstrecken oder Asphalt. Achte auf gut gedämpfte Schuhe und einen festen Sport-BH, und still oder pump vorher ab, wenn du stillst, dann ist die Brust leichter."
+   },
+   {
+    "t": "tip",
+    "text": "Schreib nach jedem Lauf zwei Worte in deinen Kalender: wie es sich angefühlt hat und ob du Beschwerden hattest. Nach ein paar Wochen siehst du genau, wie weit du schon gekommen bist."
+   },
+   {
+    "t": "h",
+    "text": "Andere Sportarten"
+   },
+   {
+    "t": "table",
+    "title": "Orientierung für andere Sportarten",
+    "cols": [
+     "Sport",
+     "Worauf du achten kannst"
+    ],
+    "rows": [
+     [
+      "Schwimmen",
+      "erst, wenn der Wochenfluss versiegt ist und Geburtsverletzungen oder Narbe gut verheilt sind, meist nach etwa sechs Wochen, bitte vorher ärztlich abklären"
+     ],
+     [
+      "Radfahren",
+      "bei Dammverletzung erst nach vollständiger Heilung, ein weicher, breiter Sattel ist angenehmer"
+     ],
+     [
+      "Yoga und Pilates in der Gruppe",
+      "sag der Lehrerin, dass du vor kurzem entbunden hast, Übungen mit viel Druck auf die Bauchmitte und tiefe Dehnungen vorerst anpassen"
+     ],
+     [
+      "Wandern",
+      "langsam steigern, bergab ist für den Beckenboden oft anstrengender als bergauf, Stöcke entlasten"
+     ],
+     [
+      "Reiten, Tennis, Ballsport, Trampolin",
+      "erst, wenn du den Belastungs-Check sicher schaffst, weil hier viele Stöße und schnelle Richtungswechsel dazukommen"
+     ],
+     [
+      "Krafttraining im Studio",
+      "mit dem Atem in der Anstrengung und dem Knack, Gewichte schrittweise steigern, gut ist eine Trainerin mit Erfahrung in der Rückbildung"
+     ]
+    ]
+   },
+   {
+    "t": "checklist",
+    "title": "Hör auf und lass dich beraten, wenn du beim Sport",
+    "items": [
+     "Urin oder Stuhl verlierst",
+     "ein Druck- oder Schweregefühl im Becken spürst",
+     "Schmerzen im Becken, im Rücken oder an der Narbe hast",
+     "eine Vorwölbung an der Bauchmitte bemerkst",
+     "wieder stärker oder hellrot blutest"
+    ]
+   },
+   {
+    "t": "quote",
+    "text": "Ich kehre zurück zu dem, was ich liebe, mit einem Körper, der noch mehr kann als vorher."
+   }
+  ]
+ },
+ "post8": {
+  "icon": "schluessel",
+  "title": "Gut zu wissen: Dranbleiben, für dich",
+  "intro": "Damit das, was du in den letzten Wochen aufgebaut hast, ein Teil deines Lebens bleibt, und damit du weißt, wann du dir wieder Unterstützung holst.",
+  "blocks": [
+   {
+    "t": "p",
+    "text": "Viele Frauen sind nach einem Kurs voller Motivation und merken nach ein paar Wochen, dass der Alltag die guten Vorsätze langsam verdrängt. Das ist ganz normal und liegt nicht an fehlender Disziplin. Gewohnheiten halten dann am besten, wenn sie klein, konkret und mit etwas verbunden sind, das du ohnehin jeden Tag machst."
+   },
+   {
+    "t": "h",
+    "text": "So bleibt dein Programm in deinem Alltag"
+   },
+   {
+    "t": "fact",
+    "title": "Kleine Anker statt großer Pläne",
+    "text": "Verbinde deine Übungen mit festen Momenten in deinem Tag. Nach dem Zähneputzen am Morgen kommen fünf Atemzüge mit Beckenboden-Verbindung. Während dein Baby auf der Krabbeldecke liegt, machst du dein 15-Minuten-Programm daneben. Wenn du abends das Licht ausmachst, folgt deine Lieblingsatmung. Je fester ein Anker ist, desto weniger musst du daran denken."
+   },
+   {
+    "t": "fact",
+    "title": "Die Mindestversion",
+    "text": "Leg dir für dein Programm eine Mindestversion zurecht, die an wirklich jedem Tag möglich ist, zum Beispiel drei Minuten Atmung und zehn Kniebeugen. An guten Tagen machst du das ganze Programm, an schweren Tagen die Mindestversion. So reißt die Gewohnheit nicht ab, und du musst nie wieder ganz von vorn beginnen."
+   },
+   {
+    "t": "fact",
+    "title": "Wenn-dann-Pläne",
+    "text": "Überleg dir vorher, was du machst, wenn etwas dazwischenkommt. Wenn mein Baby beim Training aufwacht, mache ich den Rest mit ihm auf dem Arm oder am Abend. Wenn ich eine schlechte Nacht hatte, mache ich nur die Mindestversion. Solche Pläne klingen einfach, sie helfen aber nachweislich, dranzubleiben."
+   },
+   {
+    "t": "table",
+    "title": "Meine nächsten 12 Wochen",
+    "cols": [
+     "Woche",
+     "Wie oft geschafft?",
+     "Wie ging es mir?",
+     "Notiz"
+    ],
+    "rows": 12
+   },
+   {
+    "t": "tip",
+    "text": "Plane einmal im Monat einen kleinen Moment ein, in dem du dein Workbook durchblätterst und deinen Diastase- und Beckenboden-Protokollen eine neue Zeile gibst. Es ist erstaunlich, wie motivierend es ist, die eigenen Fortschritte schwarz auf weiß zu sehen."
+   },
+   {
+    "t": "h",
+    "text": "Dein Beckenboden begleitet dich ein Leben lang"
+   },
+   {
+    "t": "p",
+    "text": "Ein gut trainierter Beckenboden ist nicht nur in der Zeit nach der Geburt wichtig. Auch in den Wechseljahren, wenn der Östrogenspiegel sinkt, verändert sich das Bindegewebe noch einmal. Frauen, die ihren Beckenboden kennen und regelmäßig trainieren, haben dann einen echten Vorsprung. Schon zwei bis drei kurze Einheiten pro Woche helfen, die Kraft zu erhalten."
+   },
+   {
+    "t": "fact",
+    "title": "Zyklus, Verhütung und eine weitere Schwangerschaft",
+    "text": "Wann die Regelblutung zurückkommt, ist sehr unterschiedlich. Bei Frauen, die nicht stillen, oft nach sechs bis acht Wochen, bei voll stillenden Frauen manchmal erst nach vielen Monaten. Ein Eisprung kann aber schon vor der ersten Blutung stattfinden, und Stillen schützt nur unter ganz bestimmten Bedingungen zuverlässig vor einer Schwangerschaft. Sprich deshalb mit deiner Gynäkologin über eine passende Verhütung. Wenn du dir ein weiteres Kind wünschst, empfiehlt die Weltgesundheitsorganisation, zwischen einer Geburt und der nächsten Schwangerschaft mindestens zwei Jahre vergehen zu lassen, damit sich dein Körper gut erholen kann. Was für dich passt, besprichst du am besten mit deiner Ärztin."
+   },
+   {
+    "t": "checklist",
+    "title": "Hol dir wieder Unterstützung, wenn",
+    "items": [
+     "Beschwerden mit dem Beckenboden zurückkommen oder neu auftreten, zum Beispiel beim Sport oder während der Periode",
+     "sich deine Bauchmitte nach einigen Monaten nicht weiter verändert",
+     "Rücken, Nacken oder Becken dauerhaft schmerzen",
+     "du dich über längere Zeit erschöpft, traurig oder überfordert fühlst",
+     "du wieder schwanger bist und dich gut vorbereiten möchtest",
+     "du einfach das Gefühl hast, ein bisschen Begleitung würde dir guttun"
+    ]
+   },
+   {
+    "t": "tracker",
+    "title": "Meine Woche mit meinem Programm",
+    "items": [
+     "15-Minuten-Programm",
+     "Mindestversion",
+     "Lieblingsatmung",
+     "Bewegung draußen",
+     "etwas nur für mich"
+    ]
+   },
+   {
+    "t": "notes",
+    "title": "Was ich mir für die nächsten Monate vornehme",
+    "lines": 6
+   },
+   {
+    "t": "quote",
+    "text": "Ich bleibe bei mir, an leichten und an schweren Tagen."
+   }
+  ]
+ }
+}

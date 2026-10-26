@@ -1,0 +1,690 @@
+{
+  "key": "method-rueckzug",
+  "lang": "de",
+  "eyebrow": "Mindful Movement Method · Monat 1",
+  "title": "Rückzug & Ruhe",
+  "subtitle": "Kraft sammeln in der dunklen Jahreszeit",
+  "icon": "mond",
+  "letter": [
+    "Liebe du, willkommen in deinem ersten Monat. Draußen wird es früh dunkel, die Wiesen liegen still unter dem Schnee, und wenn ich am Morgen zu den Pferden hinausgehe, ist die Luft so klar und kalt, dass jeder Atemzug eine kleine Wolke macht. In dieser Zeit zieht sich die Natur zurück und sammelt Kraft für das nächste Jahr. Genau diese Bewegung möchte ich mit dir in den kommenden Wochen auf die Matte bringen.",
+    "Gleichzeitig weiß ich, dass der Dezember für viele von uns alles andere als still ist. Es gibt Weihnachtsfeiern in Schule und Kindergarten, Geschenke, Besuche, Plätzchen und eine lange Liste von Dingen, an die jemand denken muss. Unser Körper spürt diesen Widerspruch sehr genau. Er möchte langsamer werden, und wir verlangen von ihm, schneller zu sein. Vielleicht kennst du dieses Gefühl, abends müde und gleichzeitig zu unruhig zum Einschlafen zu sein.",
+    "Darum steht dieser Monat im Zeichen von Rückzug und Ruhe. Ich lade dich ein, dir kleine Inseln zu schaffen, auf denen du nichts leisten musst. Wir bewegen uns sanft, wir bauen eine Kraft auf, die dich trägt, ohne dich zu erschöpfen, und wir geben deinem Nervensystem immer wieder die Gelegenheit, zur Ruhe zu kommen.",
+    "In diesem Workbook findest du alles, was die zwölf Videos des Monats begleitet: Hintergrundwissen zu Box Breathing, Somatics, Mental Load, sanftem Krafttraining und Schlaf, Seiten zum Planen und Reflektieren und zum Schluss einen kleinen Küchenteil mit wärmenden Rezepten, die dir an vollen Wintertagen das Kochen leichter machen. Du musst nicht alles lesen und nicht alles ausfüllen. Nimm dir, was dir guttut, und lass den Rest liegen, bis du ihn brauchst.",
+    "Ich freue mich, dass du da bist, und wünsche dir einen ruhigen, warmen Monat. Deine Vivien"
+  ],
+  "overview": [
+    {"icon": "mond", "title": "Rückzug & Ruhe", "text": "Warum Ruhe eine Kraftquelle ist und was wir von den Zyklen der Natur lernen können."},
+    {"icon": "kalender", "title": "Dein Videoplan", "text": "Alle zwölf Videos des Monats auf einen Blick, zum Abhaken."},
+    {"icon": "sonne", "title": "Deine Flows und Bewegungsvideos", "text": "Was dich in den Bewegungsvideos erwartet und welche Übungen darin vorkommen."},
+    {"icon": "atem", "title": "Box Breathing", "text": "Vier gleiche Takte für volle Tage, mit Übung und Hintergrundwissen."},
+    {"icon": "schmetterling", "title": "Somatisches Loslassen", "text": "Was Somatics ist und wie du die Signale deines Körpers lesen lernst."},
+    {"icon": "kopf", "title": "Mental Load", "text": "Die unsichtbare Denkarbeit sichtbar machen, abgeben und darüber sprechen."},
+    {"icon": "berg", "title": "Kraft ohne Erschöpfung", "text": "Warum sanftes Krafttraining für Frauen so wertvoll ist."},
+    {"icon": "kerze", "title": "Abendroutine & Schlaf", "text": "Abend-Anker, Schlafhygiene und deine Abendmeditation."},
+    {"icon": "journal", "title": "Dein Planner", "text": "Wochenplaner, Monatsplan und deine Selbstfürsorge-Liste."},
+    {"icon": "topf", "title": "Meal-Prep für ruhige Wintertage", "text": "Ein einfacher Plan, eine Einkaufsliste und sechs wärmende Rezepte."},
+    {"icon": "spiegel", "title": "Dein Monatsrückblick", "text": "Was sich verändert hat und was du mitnehmen möchtest."}
+  ],
+  "chapters": [
+    {
+      "icon": "mond",
+      "kicker": "Das Monatsthema",
+      "title": "Rückzug & Ruhe",
+      "intro": "Der Winter ist die Jahreszeit des Innehaltens. In diesem Kapitel geht es darum, warum Ruhe keine verlorene Zeit ist und wie du sie dir erlauben kannst, auch wenn dein Alltag voll ist.",
+      "blocks": [
+        {"t": "p", "text": "Wenn du im Winter durch einen Wald gehst, wirkt auf den ersten Blick alles still und leblos. Die Bäume haben ihre Blätter abgeworfen, die Blumen sind verschwunden, und viele Tiere halten Winterruhe. Unter der Oberfläche passiert aber eine ganze Menge. Die Bäume ziehen ihre Nährstoffe in die Wurzeln zurück, Samen liegen geschützt in der Erde und warten auf die richtige Zeit, und in den Knospen sind die Blätter des nächsten Frühlings bereits angelegt. Der Winter ist also eine Phase, in der Kraft gesammelt wird."},
+        {"t": "p", "text": "Wir Menschen sind ebenfalls Teil dieser Natur, auch wenn unser Alltag das gern vergessen lässt. Unser Körper reagiert auf die kürzeren Tage, auf das fehlende Licht und auf die Kälte. Viele Frauen erzählen mir, dass sie im Winter mehr Schlaf brauchen, mehr Lust auf warmes Essen haben und sich abends früher zurückziehen möchten. Das ist ganz natürlich. Trotzdem leben wir im Dezember oft so, als wäre Hochsommer, mit vollen Terminkalendern, späten Abenden und wenig Pausen."},
+        {"t": "h", "text": "Ruhe als Kraftquelle"},
+        {"t": "p", "text": "Viele von uns haben früh gelernt, dass man sich eine Pause erst verdienen muss. Zuerst wird die Küche aufgeräumt, die Wäsche gefaltet und die Mail beantwortet, und erst dann, wenn alles erledigt ist, dürfen wir uns hinsetzen. Das Problem dabei ist, dass die Liste nie wirklich fertig wird. So verschieben wir die Pause immer weiter, bis wir abends erschöpft ins Bett fallen."},
+        {"t": "p", "text": "Ruhe ist aber die Voraussetzung dafür, dass wir überhaupt Kraft haben. Muskeln werden in den Erholungsphasen nach dem Training stärker, unser Gehirn sortiert im Schlaf, was wir tagsüber erlebt und gelernt haben, und unser Nervensystem braucht ruhige Phasen, um sich von Anspannung zu erholen. Wer sich Ruhe gönnt, sammelt also Energie für alles, was danach kommt."},
+        {"t": "fact", "title": "Dein Nervensystem im Wechsel", "text": "Das autonome Nervensystem steuert viele Abläufe im Körper, ohne dass wir darüber nachdenken müssen, etwa Herzschlag, Atmung und Verdauung. Vereinfacht gesagt gibt es einen Anteil, der uns aktiviert und für Leistung bereit macht, den Sympathikus, und einen Anteil, der Erholung, Verdauung und Regeneration unterstützt, den Parasympathikus. Beide sind wichtig und wechseln sich im gesunden Alltag ständig ab. Schwierig wird es, wenn wir über lange Zeit kaum noch in die Erholung finden. Langsame Bewegung, ein ruhiger Atem mit langer Ausatmung und echte Pausen können helfen, diesen Wechsel wieder anzustoßen."},
+        {"t": "h", "text": "Was wir von den Zyklen der Natur lernen können"},
+        {"t": "p", "text": "In der Natur hat alles seine Zeit. Auf das Wachsen im Frühling folgt die Fülle des Sommers, dann das Ernten und Loslassen im Herbst und schließlich die Ruhe im Winter. Kein Baum blüht das ganze Jahr, und niemand würde das von ihm erwarten. Von uns selbst erwarten wir aber oft genau das, nämlich dass wir jeden Tag gleich viel Energie haben, gleich produktiv sind und gleich gut gelaunt."},
+        {"t": "p", "text": "Wenn wir unser Leben als eine Abfolge von Zyklen sehen, wird vieles leichter. Es gibt Wochen, in denen wir viel schaffen, und Wochen, in denen wir vor allem Kraft sammeln müssen. Als Frau kennst du vielleicht auch den Zyklus innerhalb eines Monats, in dem sich Energie und Stimmung verändern können. Und es gibt Lebensphasen, etwa mit kleinen Kindern, in denen weniger Raum für uns selbst bleibt. Keine dieser Phasen ist besser oder schlechter als die andere. Sie gehören zusammen."},
+        {"t": "h", "text": "Warum Pausen produktiv sind"},
+        {"t": "p", "text": "Vielleicht hast du schon einmal erlebt, dass dir die Lösung für ein Problem genau dann eingefallen ist, als du gar nicht daran gedacht hast, unter der Dusche, beim Spazierengehen oder kurz vor dem Einschlafen. Das ist kein Zufall. Wenn wir uns von einer Aufgabe lösen, arbeitet unser Gehirn im Hintergrund weiter und verknüpft Gedanken neu. Kurze Pausen zwischen konzentrierten Phasen helfen vielen Menschen, über den Tag hinweg aufmerksamer und gelassener zu bleiben."},
+        {"t": "p", "text": "Eine Pause muss nicht lang sein. Schon ein paar bewusste Atemzüge, ein Blick aus dem Fenster oder fünf Minuten in der Kindhaltung können einen Unterschied machen. Entscheidend ist, dass du in diesem Moment wirklich pausierst und nicht nebenbei durch dein Handy scrollst, denn auch das ist für das Gehirn eine Form von Arbeit."},
+        {"t": "tip", "text": "Ich habe mir angewöhnt, an vollen Tagen eine kleine Pause genau dann zu machen, wenn ich merke, dass ich ungeduldig werde. Statt noch schnell die nächste Sache zu erledigen, setze ich mich für zwei Minuten hin, trinke einen Schluck Tee und atme. Danach geht das Nächste fast immer leichter."},
+        {"t": "h", "text": "Was dich in diesem Monat erwartet"},
+        {"t": "p", "text": "Die zwölf Videos dieses Monats begleiten dich vom ersten ruhigen Morgen-Flow bis zu einem kräftigenden Bewegungsvideo für Beine und Hüften am Ende. Dazwischen findest du Atemübungen für volle Tage, sanfte Somatics, ein Gespräch über Mental Load, ein Krafttraining, das dich stärkt, ohne dich auszulaugen, und eine Abendmeditation, die dir hilft, den Tag abzulegen. Jedes Video baut auf dem vorigen auf, und am Ende des Monats wirst du merken, wie viel Kraft in der Ruhe steckt."},
+        {"t": "prompts", "title": "Zum Einstieg", "items": [
+          "Wie fühlt sich der Winter in meinem Körper an? Wonach sehne ich mich in dieser Jahreszeit?",
+          "Wo in meinem Alltag verlange ich von mir, schneller zu sein, als mir guttut?",
+          "Wie könnte eine kleine Insel der Ruhe in meinem Alltag aussehen?"
+        ], "lines": 4},
+        {"t": "quote", "text": "Auch in der Stille wächst etwas in mir."}
+      ]
+    },
+    {
+      "icon": "kalender",
+      "kicker": "Überblick",
+      "title": "Dein Videoplan",
+      "intro": "Zwölf Videos begleiten dich durch diesen Monat. Hier siehst du sie auf einen Blick und kannst eintragen, wann du sie gemacht hast.",
+      "blocks": [
+        {"t": "p", "text": "Die Videos wechseln sich in einem festen Rhythmus ab. Nach dem Talking Head zum Monatsthema folgt immer ein Flow, bei dem ich dich mit meiner Stimme begleite, dann ein Bewegungsvideo ohne Sprechen mit Timer und eigener Musik und danach wieder ein Talking Head mit Wissen, einer Atemübung oder einer Meditation. Das nächste Video öffnet sich, sobald du das vorige ganz gemacht hast. Gedacht sind etwa drei Termine pro Woche, so kommst du in rund vier Wochen entspannt durch den Monat."},
+        {"t": "table", "title": "Monat 1 · Rückzug & Ruhe", "cols": ["Video", "Art", "erledigt am"], "rows": [
+          ["1 · Rückzug & Ruhe · Worum es diesen Monat geht", "Talking Head · ca. 5 Min.", ""],
+          ["2 · Morgen-Flow für dunkle Tage", "Flow · ca. 15 Min.", ""],
+          ["3 · Warm werden", "Bewegungsvideo · ca. 8 Min.", ""],
+          ["4 · Box Breathing für volle Tage", "Talking Head · Atem · ca. 5 Min.", ""],
+          ["5 · Somatisches Loslassen", "Flow · ca. 15 Min.", ""],
+          ["6 · Starke Mitte", "Bewegungsvideo · ca. 8 Min.", ""],
+          ["7 · Mental Load: Was du heute ablegen darfst", "Talking Head · ca. 6 Min.", ""],
+          ["8 · Kraft ohne Erschöpfung", "Flow · ca. 30 Min.", ""],
+          ["9 · Rücken und Schultern lösen", "Bewegungsvideo · ca. 8 Min.", ""],
+          ["10 · Abendmeditation: Rückzug", "Talking Head · Meditation · ca. 15 Min.", ""],
+          ["11 · Abendflow: Schwere ablegen", "Flow · ca. 20 Min.", ""],
+          ["12 · Beine und Hüften", "Bewegungsvideo · ca. 8 Min.", ""]
+        ]},
+        {"t": "h", "text": "So könnten deine vier Wochen aussehen"},
+        {"t": "table", "title": "Ein Vorschlag mit drei Terminen pro Woche", "cols": ["Woche", "Termin 1", "Termin 2", "Termin 3"], "rows": [
+          ["Woche 1", "Worum es geht + Morgen-Flow", "Warm werden", "Box Breathing"],
+          ["Woche 2", "Somatisches Loslassen", "Starke Mitte", "Mental Load"],
+          ["Woche 3", "Kraft ohne Erschöpfung", "Rücken und Schultern lösen", "Abendmeditation"],
+          ["Woche 4", "Abendflow: Schwere ablegen", "Beine und Hüften", "Lieblingsvideo wiederholen"]
+        ]},
+        {"t": "tip", "text": "Die kurzen Talking Heads und Bewegungsvideos lassen sich gut mit dem folgenden Video kombinieren, wenn du an einem Tag etwas mehr Zeit hast. Die Abendmeditation und den Abendflow machst du am schönsten am Abend, kurz bevor du ins Bett gehst. Plane sie deshalb an einem Tag ein, an dem du abends ein wenig Ruhe hast."},
+        {"t": "fact", "title": "Wenn du eine Pause machst", "text": "Wenn du eine Woche krank bist oder Besuch hast, wartet dein nächstes Video einfach auf dich. Es gibt keinen Rückstand. Dein nächster Monat öffnet sich frühestens an deinem Monatstag und erst, wenn du diesen Monat abgeschlossen hast, so dass dir nie etwas davonläuft."}
+      ]
+    },
+    {
+      "icon": "sonne",
+      "kicker": "Bewegung",
+      "title": "Deine Flows und Bewegungsvideos",
+      "intro": "In diesem Monat begegnen dir vier Flows und vier Bewegungsvideos. Hier erfährst du, worauf du jeweils achten kannst und welche Übungen darin vorkommen.",
+      "blocks": [
+        {"t": "h", "text": "Morgen-Flow für dunkle Tage"},
+        {"t": "p", "text": "Dieser Flow ist für die Morgen gedacht, an denen es draußen noch dunkel ist und dein Körper eigentlich noch nicht aufstehen möchte. Du kannst ihn sogar im Bett beginnen oder auf der Matte mit einer Decke um die Schultern. Wir starten im Liegen mit Beckenkippen (Pelvic Tilts), Happy Baby (Ananda Balasana) und einer Drehung in Rückenlage (Supta Matsyendrasana), wandern über Katze-Kuh, Thread the Needle und den Herabschauenden Hund in den Stand und enden mit Roll Up, Arm Circles und der Berghaltung mit den Händen am Herzen. Zum Schluss frage ich dich, was du heute brauchst, und du nimmst ein einziges Wort mit in deinen Tag."},
+        {"t": "h", "text": "Warm werden"},
+        {"t": "p", "text": "Dieses kurze Bewegungsvideo wärmt deinen Körper an kalten Tagen sanft auf. Es eignet sich wunderbar für den Morgen, bevor du aus dem Haus gehst, oder als Vorbereitung, wenn du danach noch spazieren gehen möchtest."},
+        {"t": "list", "items": [
+          "Ausschütteln (Shaking)",
+          "Armkreisen und Hüftkreise im Stand",
+          "Wirbelsäulenwelle im Stand (Body Roll)",
+          "Roll Down im Stand",
+          "Katze-Kuh",
+          "Thread the Needle",
+          "Herabschauender Hund (Adho Mukha Svanasana)",
+          "Tiefer Ausfallschritt (Anjaneyasana)",
+          "Kniebeuge (Squat)",
+          "Berghaltung (Tadasana)"
+        ]},
+        {"t": "h", "text": "Starke Mitte"},
+        {"t": "p", "text": "Eine starke Mitte bedeutet weit mehr als einen flachen Bauch. Gemeint ist das Zusammenspiel von tiefer Bauchmuskulatur, Rückenmuskeln, Zwerchfell und Beckenboden, das deine Wirbelsäule stützt, wenn du ein Kind hochhebst, Einkäufe trägst oder lange am Schreibtisch sitzt. In diesem Bewegungsvideo trainierst du diese Mitte ruhig und kontrolliert."},
+        {"t": "list", "items": [
+          "Beckenkippen (Pelvic Tilts)",
+          "Glute Bridge (Beckenheben)",
+          "Dead Bug",
+          "Bird Dog",
+          "Unterarmstütz (Forearm Plank)",
+          "Seitstütz auf dem Knie",
+          "Swimming (Pilates) in Bauchlage",
+          "Toe Taps",
+          "Kindhaltung (Balasana)"
+        ]},
+        {"t": "fact", "title": "Nach einer Geburt", "text": "Wenn du vor Kurzem ein Kind bekommen hast oder eine Rektusdiastase hast, also eine Lücke zwischen den geraden Bauchmuskeln, sprich bitte vorher mit deiner Ärztin, deiner Hebamme oder einer Physiotherapeutin. Übungen wie der Unterarmstütz sind dann oft noch nicht passend. Achte bei allen Übungen darauf, dass sich dein Bauch nicht nach vorne wölbt und du keinen Druck nach unten auf den Beckenboden spürst."},
+        {"t": "h", "text": "Rücken und Schultern lösen"},
+        {"t": "p", "text": "Dieses Video ist für alle Tage, an denen du viel getragen, gebückt und gesessen hast. Es öffnet deinen Brustkorb, mobilisiert die Brustwirbelsäule und lässt deine Schultern sinken. Für die Brustdehnung im Türrahmen und die Wall Angels brauchst du einen Türrahmen und ein Stück freie Wand."},
+        {"t": "list", "items": [
+          "Katze-Kuh",
+          "Thread the Needle",
+          "Open Book (Rotation der Brustwirbelsäule in Seitlage)",
+          "Sphinx (Salamba Bhujangasana)",
+          "Kleine Kobra (Bhujangasana)",
+          "Brustdehnung im Türrahmen",
+          "Wall Angels an der Wand",
+          "Kindhaltung (Balasana)",
+          "Drehung in Rückenlage (Supta Matsyendrasana)"
+        ]},
+        {"t": "h", "text": "Abendflow: Schwere ablegen"},
+        {"t": "p", "text": "Der Abendflow ist ein ruhiger Ausklang, der dir hilft, die Last des Tages abzulegen. Du beginnst mit den Händen auf Herz und Bauch, bewegst deinen Rücken in Katze-Kuh und Thread the Needle, sinkst in die Kindhaltung, öffnest deine Hüften in der Figur 4 in Rückenlage, drehst dich sanft in der Drehung in Rückenlage, wiegst dich in Happy Baby und legst schließlich die Beine an die Wand (Viparita Karani), bevor du in der Endentspannung (Savasana) ankommst. Leg dir eine Decke bereit, denn am Ende kühlt der Körper schnell aus."},
+        {"t": "h", "text": "Beine und Hüften"},
+        {"t": "p", "text": "Zum Abschluss des Monats bekommst du ein Bewegungsvideo für kräftige Beine und bewegliche Hüften, ganz ohne Hast."},
+        {"t": "list", "items": [
+          "Kniebeuge (Squat)",
+          "Ausfallschritt rückwärts (Reverse Lunge)",
+          "Seitlicher Ausfallschritt (Side Lunge)",
+          "Wadenheben",
+          "Clamshell",
+          "Seitliches Beinheben (Side Leg Lift)",
+          "Glute Bridge (Beckenheben)",
+          "Eidechse (Lizard Pose)",
+          "Figur 4 in Rückenlage"
+        ]},
+        {"t": "tip", "text": "Bei den Bewegungsvideos wählst du selbst, ob eine Übung 30 oder 45 Sekunden dauert. Wenn du neu einsteigst, beginne mit 30 Sekunden und gönn dir zwischen den Übungen einen ruhigen Atemzug. Sobald sich das leicht anfühlt, probierst du 45 Sekunden aus."},
+        {"t": "table", "title": "Meine Notizen zu den Bewegungsvideos", "cols": ["Video", "Timer", "Das fiel mir leicht", "Das war herausfordernd"], "rows": [
+          ["Warm werden", "", "", ""],
+          ["Starke Mitte", "", "", ""],
+          ["Rücken und Schultern lösen", "", "", ""],
+          ["Beine und Hüften", "", "", ""]
+        ]}
+      ]
+    },
+    {
+      "icon": "atem",
+      "kicker": "Video 4",
+      "title": "Box Breathing",
+      "intro": "Box Breathing ist eine einfache Atemtechnik mit vier gleich langen Phasen. Sie hilft dir, an vollen Tagen wieder in deine Mitte zu finden.",
+      "blocks": [
+        {"t": "p", "text": "Stell dir ein Quadrat mit vier gleich langen Seiten vor. Mit jeder Seite verbindest du eine Phase deines Atems: einatmen, halten, ausatmen, halten. Jede Phase dauert gleich lang, meist vier Zählzeiten. Durch das gleichmäßige Zählen bekommt dein Kopf eine klare, einfache Aufgabe, und dein Atem wird ganz von selbst langsamer und ruhiger."},
+        {"t": "breath", "title": "Box Breathing", "pattern": "4 · 4 · 4 · 4", "text": "Atme durch die Nase ein und zähl bis vier. Halte den Atem sanft und zähl bis vier. Atme langsam aus und zähl bis vier. Halte leer und zähl bis vier. Wiederhole das etwa acht Runden lang."},
+        {"t": "exercise", "title": "So übst du Box Breathing", "time": "5 Minuten", "intro": "Setz dich aufrecht hin, stell die Füße fest auf den Boden und leg die Hände auf die Oberschenkel.", "steps": [
+          "Atme einmal ganz natürlich aus und lass die Schultern sinken.",
+          "Atme durch die Nase ein und zähl dabei langsam bis vier. Stell dir vor, wie du die erste Seite des Quadrats entlangfährst.",
+          "Halte den Atem sanft, ohne Druck im Hals, und zähl bis vier.",
+          "Atme langsam durch die Nase aus und zähl bis vier.",
+          "Halte die Lunge leer und zähl wieder bis vier.",
+          "Wiederhole das etwa acht Runden. Lass danach das Zählen los und atme ganz natürlich weiter.",
+          "Spür einen Moment nach, wie sich dein Kopf und dein Körper jetzt anfühlen."
+        ]},
+        {"t": "fact", "title": "Was beim gleichmäßigen Atmen passiert", "text": "Im Ruhezustand atmen Erwachsene meist etwa zwölf bis achtzehn Mal pro Minute. Beim Box Breathing mit vier Zählzeiten pro Phase sind es nur noch drei bis vier Atemzüge pro Minute. Ein so langsamer, gleichmäßiger Atem wird von vielen Menschen als beruhigend erlebt, und erste Studien zu langsamer Atmung deuten darauf hin, dass sie kurzfristig helfen kann, Anspannung zu senken. Box Breathing ist außerdem ein Konzentrationsanker, weil das Zählen die Gedanken für einige Minuten bündelt."},
+        {"t": "h", "text": "Wann Box Breathing dir helfen kann"},
+        {"t": "list", "items": [
+          "Vor einem wichtigen Gespräch, etwa mit der Lehrerin deines Kindes oder deiner Chefin",
+          "Wenn dein Kopf am Morgen schon voller To-dos ist, bevor der Tag richtig begonnen hat",
+          "Im Auto vor dem Kindergarten, bevor du aussteigst",
+          "Wenn du merkst, dass du gleich laut wirst",
+          "Vor dem Einschlafen, wenn die Gedanken kreisen",
+          "Vor einer Entscheidung, die du nicht aus dem Bauch heraus treffen möchtest"
+        ]},
+        {"t": "h", "text": "Wenn das Halten schwerfällt"},
+        {"t": "p", "text": "Manche Frauen empfinden das Anhalten des Atems als unangenehm, besonders das Halten mit leerer Lunge. Dann darfst du die Haltephasen verkürzen, zum Beispiel auf zwei Zählzeiten, oder sie ganz weglassen. Du kannst auch mit drei Zählzeiten pro Seite beginnen. Wenn du schwanger bist, Bluthochdruck, eine Herz- oder Lungenerkrankung hast oder zu Panikattacken neigst, lass das Halten lieber weg und atme einfach gleichmäßig ein und aus. Bei Schwindel hörst du auf und atmest ganz normal weiter."},
+        {"t": "tip", "text": "Ich zeichne das Quadrat gern mit dem Zeigefinger auf meinen Oberschenkel, während ich zähle. So brauche ich mir nichts vorzustellen, und niemand bemerkt, dass ich gerade eine Atemübung mache, auch nicht in einem vollen Wartezimmer."},
+        {"t": "table", "title": "Mein Box-Breathing-Protokoll", "cols": ["Datum", "Situation", "Runden", "Wie ging es mir danach?"], "rows": 7}
+      ]
+    },
+    {
+      "icon": "schmetterling",
+      "kicker": "Video 5",
+      "title": "Somatisches Loslassen",
+      "intro": "Somatics lädt dich ein, deinen Körper von innen heraus wahrzunehmen. Statt eine Form von außen zu kopieren, spürst du, wie sich eine Bewegung anfühlt.",
+      "blocks": [
+        {"t": "p", "text": "Das Wort „Soma“ kommt aus dem Griechischen und bedeutet „Körper“. Der amerikanische Philosoph und Bewegungspädagoge Thomas Hanna prägte in den 1970er-Jahren den Begriff Somatics für Methoden, bei denen wir den Körper so erleben, wie er sich von innen anfühlt. Heute fasst man unter diesem Begriff viele achtsame Bewegungsformen zusammen, etwa Hanna Somatics, die Feldenkrais-Methode oder bestimmte Ansätze aus Tanz und Körperarbeit. Ihnen gemeinsam ist das langsame, aufmerksame Bewegen."},
+        {"t": "h", "text": "Was Somatics von gewöhnlicher Gymnastik unterscheidet"},
+        {"t": "p", "text": "In vielen Trainingsformen orientieren wir uns an einem Bild von außen. Wir wollen die Haltung so ausführen, wie die Trainerin sie zeigt, und achten auf Winkel, Wiederholungen und Tempo. In Somatics richtest du deine Aufmerksamkeit nach innen. Du bewegst dich so langsam, dass du jede kleine Veränderung spüren kannst, und das Loslassen ist dabei genauso wichtig wie das Anspannen."},
+        {"t": "fact", "title": "Anspannen, um loszulassen", "text": "Thomas Hanna beschrieb, dass Muskeln durch Stress und Gewohnheit dauerhaft angespannt bleiben können, ohne dass wir es noch bemerken. Er nannte das „sensomotorische Amnesie“. In Hanna Somatics wird ein Muskel deshalb zunächst bewusst und langsam angespannt und dann noch langsamer wieder losgelassen. Diese Technik heißt Pandikulation und ähnelt dem genüsslichen Strecken, das Katzen und Hunde nach dem Aufwachen ganz von selbst machen. Viele Menschen erleben danach ein deutliches Gefühl von Weite und Leichtigkeit."},
+        {"t": "h", "text": "Die Übungen in deinem Video"},
+        {"t": "list", "items": [
+          "Ausschütteln (Shaking): Du schüttelst erst die Hände, dann Arme, Schultern und Beine, bis dein ganzer Körper in Bewegung ist.",
+          "Nachspüren: Du stehst still und nimmst das Kribbeln und die Wärme in deinem Körper wahr.",
+          "Gewichtsverlagerung im Stand: Du wiegst dich sanft von einem Fuß auf den anderen.",
+          "Abklopfen (Body Tapping): Du klopfst Arme, Schultern, Rücken und Beine mit lockeren Händen ab.",
+          "Seitliches Zusammenziehen in Rückenlage: Du ziehst Hüfte und Schulter einer Seite langsam zueinander und lässt noch langsamer wieder los.",
+          "Beckenkippen mit langsamem Loslassen: Du drückst den unteren Rücken sanft in den Boden und löst die Spannung so langsam, wie du nur kannst.",
+          "Kopf rollen in Rückenlage: Du lässt den Kopf langsam von Seite zu Seite rollen.",
+          "Endentspannung (Savasana): Du lässt dich vom Boden tragen."
+        ]},
+        {"t": "fact", "title": "Warum Schütteln guttun kann", "text": "Viele Tiere schütteln sich nach einer Schrecksituation am ganzen Körper, bevor sie wieder in ihren Alltag zurückkehren. Der Traumaforscher Peter Levine hat diese Beobachtung bekannt gemacht und angeregt, dass auch Menschen von solchen Bewegungen profitieren können. Wissenschaftlich ist das noch wenig untersucht. Viele Frauen erleben das Ausschütteln aber als angenehme Möglichkeit, Anspannung aus dem Körper zu bewegen, vor allem nach einem hektischen Tag."},
+        {"t": "h", "text": "Körpersignale lesen lernen"},
+        {"t": "p", "text": "Unser Körper spricht ständig mit uns, nur hören wir im Alltag selten zu. Ein verspannter Kiefer, hochgezogene Schultern, ein flacher Atem oder ein flaues Gefühl im Bauch sind oft frühe Hinweise darauf, dass uns etwas belastet. Die Fähigkeit, solche inneren Signale wahrzunehmen, nennt man Interozeption. Sie lässt sich üben, und Somatics ist dafür eine wunderbare Schule."},
+        {"t": "exercise", "title": "Der kleine Körper-Check", "time": "3 Minuten", "intro": "Diesen Check kannst du mehrmals am Tag machen, im Sitzen, im Stehen oder sogar beim Kochen.", "steps": [
+          "Halte kurz inne und schließ die Augen, wenn es möglich ist.",
+          "Spür in deinen Kiefer. Sind deine Zähne aufeinandergepresst? Lass sie ein kleines Stück auseinandergehen.",
+          "Spür in deine Schultern. Sind sie Richtung Ohren gezogen? Lass sie mit dem Ausatmen sinken.",
+          "Spür in deinen Bauch. Ist er fest oder weich? Lass ihn mit dem nächsten Einatmen weit werden.",
+          "Spür in deine Hände. Sind sie zu Fäusten geballt oder locker?",
+          "Frag dich, was dein Körper dir gerade sagen möchte, und nimm die Antwort einfach zur Kenntnis."
+        ]},
+        {"t": "table", "title": "Meine Körpersignale", "cols": ["Signal", "Wann tritt es auf?", "Was könnte es mir sagen?", "Was hilft mir?"], "rows": [
+          ["Verspannter Kiefer", "", "", ""],
+          ["Hochgezogene Schultern", "", "", ""],
+          ["Flacher Atem", "", "", ""],
+          ["Unruhe im Bauch", "", "", ""],
+          ["Kopfschmerzen", "", "", ""],
+          ["", "", "", ""],
+          ["", "", "", ""]
+        ]},
+        {"t": "tip", "text": "Wenn beim Ausschütteln ein Ton aus dir heraus möchte, ein Seufzen oder ein Brummen, dann lass ihn ruhig kommen. Bei mir hilft das oft mehr als jede Dehnung. Falls du dich dabei beobachtet fühlst, mach die Übung einfach, wenn du allein zu Hause bist."},
+        {"t": "fact", "title": "Achtsam mit dir bleiben", "text": "Manchmal tauchen bei körperorientierten Übungen unerwartet starke Gefühle oder Erinnerungen auf. Das ist nichts Ungewöhnliches. Öffne dann die Augen, spür deine Füße auf dem Boden und schau dich im Raum um. Wenn dich etwas über längere Zeit stark belastet, hol dir bitte Unterstützung bei einer Therapeutin, die mit dir in einem geschützten Rahmen arbeiten kann."},
+        {"t": "prompts", "title": "Nach dem Video", "items": [
+          "Wo in meinem Körper habe ich nach dem Loslassen eine Veränderung gespürt?",
+          "Welches Körpersignal übersehe ich im Alltag am häufigsten?"
+        ], "lines": 3}
+      ]
+    },
+    {
+      "icon": "kopf",
+      "kicker": "Video 7",
+      "title": "Mental Load",
+      "intro": "Mental Load ist die unsichtbare Denkarbeit, die im Hintergrund ständig mitläuft. In diesem Kapitel machst du sie sichtbar und findest Wege, einen Teil davon abzugeben.",
+      "blocks": [
+        {"t": "p", "text": "Wenn du die Wäsche wäschst, ist das eine Aufgabe, die man sehen kann. Der Mental Load beginnt schon viel früher, bei dem Wissen, dass die Turnsachen bis Donnerstag trocken sein müssen, dass das Waschmittel fast leer ist und dass es auf die Einkaufsliste gehört. Dazu kommen der Zahnarzttermin, das Geschenk für den Kindergeburtstag, die Nachricht an die Lehrerin und die Frage, was es morgen zum Abendessen gibt. Jede dieser Kleinigkeiten wirkt für sich genommen harmlos. Zusammen ergeben sie eine Liste, die nie fertig wird und meistens in unserem Kopf wohnt."},
+        {"t": "fact", "title": "Planen, Erinnern, Überblicken", "text": "In der Forschung wird zwischen sichtbarer Hausarbeit und der kognitiven Arbeit dahinter unterschieden: Bedürfnisse vorhersehen, Möglichkeiten abwägen, Entscheidungen treffen und kontrollieren, ob alles erledigt wurde. Studien zeigen, dass diese Denkarbeit in vielen Familien überwiegend bei den Frauen liegt, auch dann, wenn beide Partner berufstätig sind und die sichtbaren Aufgaben ähnlich verteilt erscheinen. Weil sie unsichtbar ist, wird sie selten anerkannt."},
+        {"t": "h", "text": "Warum dein Körper den Mental Load spürt"},
+        {"t": "p", "text": "Unser Nervensystem unterscheidet nicht besonders genau zwischen einer echten Gefahr und einer langen Liste offener Dinge. Alles, was unerledigt ist, kann uns in einer leichten Alarmbereitschaft halten. Die Schultern ziehen nach oben, der Atem wird flach, der Kiefer spannt sich an, und abends sind wir müde und gleichzeitig zu unruhig, um gut einzuschlafen. Das ist kein Zeichen von Schwäche. Dein Körper reagiert sinnvoll auf eine Last, die schon zu lange auf ihm liegt."},
+        {"t": "h", "text": "Schritt 1 · Dein Mental-Load-Inventar"},
+        {"t": "p", "text": "Bevor du etwas abgeben kannst, musst du sehen, was du eigentlich alles trägst. Trag in die Tabelle ein, welche Aufgaben in deinem Alltag anfallen, wer daran denkt, wer sie erledigt und ob du dir vorstellen kannst, sie abzugeben. Die ersten Zeilen sind Beispiele, die du überschreiben oder ergänzen kannst."},
+        {"t": "table", "title": "Mein Mental-Load-Inventar", "cols": ["Aufgabe", "Wer denkt daran?", "Wer erledigt es?", "Abgeben möglich?"], "rows": [
+          ["Arzttermine der Kinder planen", "", "", ""],
+          ["Geschenke für Geburtstage besorgen", "", "", ""],
+          ["Wochenessen planen und einkaufen", "", "", ""],
+          ["Elternabende und Schulnachrichten im Blick behalten", "", "", ""],
+          ["Kleidung in passender Größe besorgen", "", "", ""],
+          ["Familientermine und Besuche koordinieren", "", "", ""],
+          ["Haushaltsvorräte nachkaufen", "", "", ""],
+          ["", "", "", ""],
+          ["", "", "", ""],
+          ["", "", "", ""],
+          ["", "", "", ""],
+          ["", "", "", ""]
+        ]},
+        {"t": "h", "text": "Schritt 2 · Der Brain Dump"},
+        {"t": "exercise", "title": "Alles aus dem Kopf aufs Papier", "time": "10 Minuten", "intro": "Diese Übung kennst du aus dem Video. Am besten machst du sie am Abend, wenn der Tag zur Ruhe kommt.", "steps": [
+          "Nimm dir ein leeres Blatt oder die Notizseite am Ende dieses Kapitels.",
+          "Schreib alles auf, was in deinem Kopf herumschwirrt, die großen Dinge genauso wie die kleinen, ohne Ordnung und ohne Bewertung.",
+          "Schreib so lange, bis dir nichts mehr einfällt. Erledigen musst du heute noch nichts davon.",
+          "Markiere danach die Dinge, die wirklich in den nächsten drei Tagen wichtig sind.",
+          "Streich alles durch, was eigentlich gar nicht nötig ist.",
+          "Kennzeichne die Dinge, die jemand anderes übernehmen könnte."
+        ]},
+        {"t": "h", "text": "Schritt 3 · Wirklich abgeben"},
+        {"t": "p", "text": "Wenn du eine Aufgabe abgibst, gib sie mit allem ab, was dazugehört, auch mit dem Daran-Denken. Das ist oft der schwierigste Teil, weil wir es gewohnt sind, im Hintergrund doch noch ein Auge darauf zu haben. Wer den Zahnarzttermin der Kinder übernimmt, schaut also selbst, wann die nächste Kontrolle fällig ist, ruft an, trägt den Termin ein und geht hin. Das bedeutet auch, dass es vielleicht anders gemacht wird, als du es machen würdest, und dass du das aushalten darfst."},
+        {"t": "list", "items": [
+          "Gib ganze Aufgabenbereiche ab statt einzelner Handgriffe, zum Beispiel alles rund um Sport und Vereine der Kinder.",
+          "Kläre, was das Ergebnis sein soll, und lass offen, wie es erreicht wird.",
+          "Ältere Kinder können Verantwortung für eigene Dinge übernehmen, etwa die Sportsachen packen oder die Brotdose vorbereiten.",
+          "Manche Dinge dürfen einfach wegfallen. In diesem Jahr müssen es vielleicht keine fünf Sorten Plätzchen sein.",
+          "Eine gemeinsame digitale Einkaufsliste oder ein Familienkalender entlastet, wenn alle ihn nutzen."
+        ]},
+        {"t": "h", "text": "Schritt 4 · Darüber sprechen"},
+        {"t": "p", "text": "Mental Load lässt sich selten allein lösen. Ein ruhiges Gespräch mit deinem Partner oder deiner Partnerin kann viel bewegen, wenn es gut vorbereitet ist. Dieser Leitfaden hilft dir dabei."},
+        {"t": "steps", "items": [
+          "Such einen ruhigen Moment, in dem ihr beide entspannt seid, und vermeide Gespräche zwischen Tür und Angel oder mitten in einem Streit.",
+          "Beginne mit deinem Erleben und sprich in der Ich-Form, zum Beispiel: „Ich merke, dass mein Kopf abends nicht zur Ruhe kommt, weil ich an so viele Dinge denke.“",
+          "Zeig dein Inventar. Viele Partner sind ehrlich überrascht, wie viele unsichtbare Aufgaben es gibt.",
+          "Sprecht darüber, welche Aufgaben euch beiden wichtig sind und welche vielleicht wegfallen können.",
+          "Verteilt ganze Bereiche mit voller Verantwortung, einschließlich Planen und Daran-Denken.",
+          "Vereinbart einen Termin in zwei bis vier Wochen, an dem ihr schaut, wie es läuft, und nachbessert."
+        ]},
+        {"t": "tip", "text": "Ein wöchentliches Familiengespräch von fünfzehn Minuten am Sonntagabend kann Wunder wirken. Ihr schaut gemeinsam auf die kommende Woche, wer welche Termine hat und wer sich um was kümmert. So wandert vieles aus deinem Kopf in einen gemeinsamen Plan."},
+        {"t": "h", "text": "Die Übergangspause"},
+        {"t": "p", "text": "Bevor du von einer Aufgabe zur nächsten wechselst, etwa vom Kochen zu den Hausaufgaben oder vom Laptop ins Auto, nimmst du drei bewusste Atemzüge. Spür deine Füße auf dem Boden, atme durch die Nase ein und lass den Atem langsam und etwas länger wieder ausströmen. Drei Atemzüge dauern vielleicht fünfzehn Sekunden und geben deinem Nervensystem ein kleines Signal, dass das eine abgeschlossen ist, bevor das Nächste beginnt."},
+        {"t": "prompts", "title": "Deine Journalfrage aus dem Video", "items": [
+          "Was trage ich gerade, das eigentlich gar nicht meins ist?",
+          "Welche eine Sache gebe ich in dieser Woche ab, und an wen?",
+          "Was darf in diesem Winter einfach wegfallen?"
+        ], "lines": 5},
+        {"t": "notes", "title": "Mein Brain Dump", "lines": 14},
+        {"t": "fact", "title": "Wenn es zu viel wird", "text": "Wenn du dich über Wochen erschöpft, gereizt oder leer fühlst, schlecht schläfst und kaum noch Freude empfindest, ist das ein Signal, das ernst genommen werden möchte. Sprich mit deiner Hausärztin oder hol dir Unterstützung bei einer Psychotherapeutin oder einer Beratungsstelle. Das ist ein Zeichen von Stärke und Fürsorge für dich selbst."}
+      ]
+    },
+    {
+      "icon": "berg",
+      "kicker": "Video 8",
+      "title": "Kraft ohne Erschöpfung",
+      "intro": "Krafttraining klingt für viele Frauen nach schweren Gewichten und Muskelkater. In der Method geht es um eine Kraft, die dich im Alltag trägt und dich nicht auslaugt.",
+      "blocks": [
+        {"t": "p", "text": "In deinem Flow „Kraft ohne Erschöpfung“ trainierst du rund dreißig Minuten mit deinem eigenen Körpergewicht. Du beginnst mit Box Breathing, mobilisierst deinen Körper mit Armkreisen, Hüftkreisen, Roll Down, Katze-Kuh und dem Herabschauenden Hund und arbeitest dann mit Kniebeugen, Reverse Lunges, Liegestützen an der Wand oder auf den Knien, Glute Bridges, Dead Bug und dem Unterarmstütz. Zum Ausklingen sinkst du in die Kindhaltung und die liegende Taube und kommst in der Endentspannung an."},
+        {"t": "h", "text": "Warum Muskeln für Frauen so wichtig sind"},
+        {"t": "p", "text": "Unsere Muskeln bewegen uns, und sie leisten noch viel mehr. Sie stützen unsere Gelenke und die Wirbelsäule, sie helfen, Stürzen vorzubeugen, und sie sind ein aktives Organ, das im Stoffwechsel eine wichtige Rolle spielt. Ab etwa dem dreißigsten Lebensjahr beginnt die Muskelmasse ohne Training langsam abzunehmen, und mit den Jahren kann sich dieser Prozess beschleunigen. Regelmäßiges Krafttraining wirkt dem entgegen, und zwar in jedem Alter. Auch wer mit sechzig oder siebzig beginnt, kann noch Kraft aufbauen."},
+        {"t": "fact", "title": "Was die Empfehlungen sagen", "text": "Die Weltgesundheitsorganisation empfiehlt Erwachsenen neben Ausdaueraktivität an mindestens zwei Tagen pro Woche muskelkräftigende Übungen, die alle großen Muskelgruppen beanspruchen. Das muss nicht im Fitnessstudio sein. Übungen mit dem eigenen Körpergewicht wie Kniebeugen, Ausfallschritte, Liegestütze an der Wand und Glute Bridges zählen ebenfalls dazu."},
+        {"t": "h", "text": "Knochen brauchen Belastung"},
+        {"t": "p", "text": "Unsere Knochen sind lebendiges Gewebe, das sich ein Leben lang erneuert. Sie reagieren auf Belastung: Wenn Muskeln an ihnen ziehen und wir unser Gewicht tragen, bekommen sie den Reiz, stabil zu bleiben. Bei Frauen erreicht die Knochendichte meist um das dreißigste Lebensjahr ihren Höhepunkt. In den Jahren rund um die Wechseljahre sinkt der Östrogenspiegel, und weil Östrogen am Knochenstoffwechsel beteiligt ist, nimmt die Knochendichte in dieser Zeit häufig schneller ab. Krafttraining und belastende Bewegungen wie Gehen oder Treppensteigen können helfen, die Knochen zu unterstützen."},
+        {"t": "fact", "title": "Hormone und Training", "text": "Hormone beeinflussen, wie wir uns im Laufe eines Monats und im Laufe des Lebens fühlen, und Bewegung kann sich umgekehrt auf unser Wohlbefinden auswirken. Viele Frauen erleben, dass regelmäßiges, moderates Krafttraining ihre Stimmung, ihren Schlaf und ihr Körpergefühl verbessert, gerade auch in den Wechseljahren. Wie stark solche Effekte sind, ist individuell sehr verschieden. Wenn du Fragen zu deinen Hormonen, zur Knochendichte oder zu den Wechseljahren hast, ist deine Frauenärztin die richtige Ansprechpartnerin."},
+        {"t": "h", "text": "Warum sanft manchmal stärker macht"},
+        {"t": "p", "text": "Viele Frauen glauben, dass ein Training nur dann etwas bringt, wenn sie danach völlig erschöpft sind. Für Muskeln und Knochen ist aber vor allem entscheidend, dass sie regelmäßig gefordert werden und genug Zeit zur Erholung bekommen. Gerade in einer Lebensphase mit wenig Schlaf und viel Verantwortung kann ein sehr hartes Training zusätzlichen Stress bedeuten. Ein ruhiges Krafttraining, bei dem du deinen Atem behältst und dich danach wach statt ausgelaugt fühlst, kannst du über Monate und Jahre durchhalten, und genau darin liegt seine Wirkung."},
+        {"t": "list", "items": [
+          "Langsame, kontrollierte Wiederholungen fordern deine Muskeln oft stärker als schnelle.",
+          "Atme in der Anstrengung aus, zum Beispiel beim Hochkommen aus der Kniebeuge.",
+          "Hör zwei bis drei Wiederholungen vor dem Punkt auf, an dem gar nichts mehr geht.",
+          "Wähle die leichtere Variante, wenn deine Technik nachlässt.",
+          "Gönn deinen Muskeln zwischen zwei Krafttrainings mindestens einen Tag Pause.",
+          "Ausreichend Schlaf, Wasser und Eiweiß aus deiner Ernährung unterstützen die Erholung."
+        ]},
+        {"t": "table", "title": "Meine Kraft-Notizen", "cols": ["Übung", "Variante", "Wiederholungen", "So fühlte es sich an"], "rows": [
+          ["Kniebeuge (Squat)", "", "", ""],
+          ["Ausfallschritt rückwärts (Reverse Lunge)", "", "", ""],
+          ["Liegestütz an der Wand oder auf den Knien", "", "", ""],
+          ["Glute Bridge (Beckenheben)", "", "", ""],
+          ["Dead Bug", "", "", ""],
+          ["Unterarmstütz (Forearm Plank)", "", "", ""]
+        ]},
+        {"t": "tip", "text": "Schreib dir beim ersten Mal auf, welche Variante du gewählt hast und wie viele Wiederholungen gut gingen. Wenn du den Flow in ein paar Wochen wiederholst, wirst du staunen, was sich verändert hat. Mich motiviert so eine kleine Notiz mehr als jede Waage."},
+        {"t": "fact", "title": "Bitte achte auf dich", "text": "Wenn du schwanger bist, gerade entbunden hast, Osteoporose, Gelenk- oder Rückenprobleme oder eine Herz-Kreislauf-Erkrankung hast, sprich vor dem Krafttraining mit deiner Ärztin oder Physiotherapeutin. Hör bei Schmerzen, Schwindel oder Atemnot sofort auf."},
+        {"t": "quote", "text": "Meine Kraft darf leise sein und mich trotzdem tragen."}
+      ]
+    },
+    {
+      "icon": "kerze",
+      "kicker": "Videos 10 und 11",
+      "title": "Abendroutine & Schlaf",
+      "intro": "Der Abend entscheidet oft darüber, wie wir schlafen. In diesem Kapitel geht es um kleine Anker, die deinem Körper zeigen, dass der Tag zu Ende geht.",
+      "blocks": [
+        {"t": "p", "text": "Viele Frauen erzählen mir, dass der Abend die einzige Zeit ist, in der sie endlich etwas für sich machen können. Die Kinder schlafen, das Haus ist still, und dann sitzen sie noch lange mit dem Handy auf dem Sofa, obwohl sie eigentlich todmüde sind. Das ist verständlich, denn wir sehnen uns nach Zeit, die nur uns gehört. Gleichzeitig fehlt uns dieser Schlaf am nächsten Morgen. Eine ruhige Abendroutine kann beides verbinden: Sie schenkt dir Zeit für dich und bereitet dich gleichzeitig auf einen erholsamen Schlaf vor."},
+        {"t": "fact", "title": "Wie Schlaf gesteuert wird", "text": "Unser Schlaf wird vor allem von zwei Prozessen gesteuert. Der eine ist der Schlafdruck, der sich über den Tag aufbaut, je länger wir wach sind. Der andere ist die innere Uhr, die sich am Licht orientiert. Wenn es abends dunkel wird, schüttet der Körper vermehrt das Hormon Melatonin aus, das uns auf die Nacht vorbereitet. Helles Licht am Abend, vor allem bläuliches Licht von Bildschirmen, kann diesen Prozess verzögern. Tageslicht am Morgen hilft dagegen, die innere Uhr zu stellen. Für Erwachsene werden meist sieben bis neun Stunden Schlaf empfohlen, wobei der Bedarf individuell verschieden ist."},
+        {"t": "h", "text": "Abend-Anker"},
+        {"t": "p", "text": "Abend-Anker sind kleine Handlungen, die du jeden Abend in derselben Reihenfolge wiederholst. Mit der Zeit verknüpft dein Körper sie mit dem Schlafengehen, und schon das erste Ritual signalisiert ihm, dass er langsam herunterfahren darf. Such dir zwei oder drei aus, die zu dir passen."},
+        {"t": "list", "items": [
+          "Ungefähr eine Stunde vor dem Schlafengehen das Licht dimmen und warme Lampen statt Deckenlicht einschalten",
+          "Das Handy an einem festen Platz außerhalb des Schlafzimmers laden",
+          "Eine Tasse Kräutertee oder goldene Milch trinken",
+          "Fünf Minuten den Abendflow oder ein paar Haltungen daraus machen",
+          "Die Beine an die Wand legen, während du ruhig atmest",
+          "Drei gute Dinge des Tages aufschreiben",
+          "Eine warme Dusche nehmen oder ein Fußbad machen",
+          "Ein paar Seiten in einem Buch auf Papier lesen",
+          "Die Abendmeditation im Bett anhören"
+        ]},
+        {"t": "h", "text": "Schlafhygiene in der Winterzeit"},
+        {"t": "checklist", "title": "Gut zu schlafen beginnt am Tag", "items": [
+          "Am Vormittag mindestens fünfzehn Minuten Tageslicht, auch bei bewölktem Himmel",
+          "Ungefähr zur gleichen Zeit aufstehen, auch am Wochenende",
+          "Koffein nach dem frühen Nachmittag meiden",
+          "Das letzte große Essen zwei bis drei Stunden vor dem Schlafengehen",
+          "Alkohol am Abend nur in Maßen, da er den Schlaf in der zweiten Nachthälfte stören kann",
+          "Schlafzimmer kühl halten, etwa 16 bis 19 Grad, und vor dem Schlafen kurz lüften",
+          "Das Schlafzimmer möglichst dunkel und ruhig gestalten",
+          "Warme Socken, wenn deine Füße kalt sind",
+          "Das Bett nur zum Schlafen und Entspannen nutzen, Arbeit und Laptop bleiben draußen"
+        ]},
+        {"t": "tip", "text": "Wenn ich nachts aufwache und die Gedanken zu kreisen beginnen, liegt neben meinem Bett ein kleiner Block. Ich schreibe auf, was mir durch den Kopf geht, und sage mir, dass es dort bis morgen sicher aufgehoben ist. Danach mache ich ein paar Runden der verlängerten Ausatmung, vier Zählzeiten ein und sechs aus."},
+        {"t": "h", "text": "Deine Abendmeditation"},
+        {"t": "p", "text": "Die Abendmeditation „Rückzug“ dauert etwa fünfzehn Minuten und ist dafür gedacht, dass du sie im Bett oder auf dem Sofa unter einer Decke anhörst. Sie beginnt mit einer verlängerten Ausatmung, führt dich in einem Body Scan langsam von den Füßen bis zur Stirn durch deinen Körper und lädt dich dann ein, eine Sache von heute abzulegen wie einen Mantel, den du am Abend ausziehst. Wenn du dabei einschläfst, ist das genau richtig."},
+        {"t": "exercise", "title": "Den Tag ablegen", "time": "5 Minuten", "intro": "Eine kurze Version der Meditation für Abende, an denen du nur wenig Zeit hast.", "steps": [
+          "Leg dich bequem hin, deck dich zu und mach das Licht aus.",
+          "Atme auf vier Zählzeiten durch die Nase ein und auf sechs Zählzeiten langsam aus. Wiederhole das fünf Mal.",
+          "Wandere mit deiner Aufmerksamkeit von den Füßen über die Beine, das Becken und den Bauch bis zu den Schultern und lass jeden Bereich schwer werden.",
+          "Lockere den Kiefer und glätte die Stirn.",
+          "Denk an eine Sache von heute, die du nicht mit in die Nacht nehmen möchtest. Stell dir vor, du legst sie neben dein Bett.",
+          "Bleib einfach liegen und atme ruhig weiter."
+        ]},
+        {"t": "h", "text": "Der Abendflow"},
+        {"t": "p", "text": "Auch der Abendflow „Schwere ablegen“ eignet sich als Teil deiner Abendroutine. Wenn dir die zwanzig Minuten an manchen Abenden zu lang sind, wähle zwei oder drei Haltungen aus, die dir besonders guttun, zum Beispiel die Kindhaltung, die Figur 4 in Rückenlage und Beine an der Wand, und bleib in jeder fünf bis zehn Atemzüge lang."},
+        {"t": "table", "title": "Mein Schlaf-Tagebuch", "cols": ["Datum", "Im Bett um", "Aufgestanden um", "Abend-Anker", "Schlafqualität (1 bis 10)"], "rows": 10},
+        {"t": "prompts", "title": "Mein Abend", "items": [
+          "Was hält mich abends am häufigsten davon ab, rechtzeitig ins Bett zu gehen?",
+          "Wie soll meine ideale Abendroutine aussehen, und was davon ist an einem normalen Abend wirklich machbar?"
+        ], "lines": 4},
+        {"t": "fact", "title": "Wenn der Schlaf dauerhaft schlecht ist", "text": "Wenn du über mehrere Wochen schlecht einschläfst, nachts oft lange wach liegst oder dich trotz ausreichend Schlaf ständig erschöpft fühlst, sprich bitte mit deiner Ärztin. Hinter Schlafproblemen können auch körperliche Ursachen stecken, etwa hormonelle Veränderungen, und es gibt gute Hilfen, die über eine Abendroutine hinausgehen."}
+      ]
+    },
+    {
+      "icon": "journal",
+      "kicker": "Planner",
+      "title": "Dein Planner",
+      "intro": "Auf den folgenden Seiten findest du einen Monatsplan, vier Wochenplaner und deine Selbstfürsorge-Liste. Sie helfen dir, deine Zeit für dich ganz selbstverständlich einzuplanen.",
+      "blocks": [
+        {"t": "p", "text": "Ein Plan ist im Winter etwas Tröstliches. Er nimmt dir Entscheidungen ab, schafft Überblick und zeigt dir, wo noch Raum für Ruhe ist. Trag am Anfang jeder Woche zuerst deine drei Termine für die Method und deine Selbstfürsorge ein, bevor sich der Kalender mit allem anderen füllt. So bekommt das, was dir guttut, einen festen Platz."},
+        {"t": "table", "title": "Mein Monatsplan", "cols": ["Woche", "Wichtige Termine", "Meine Method-Termine", "Meine Insel der Ruhe"], "rows": [
+          ["Woche 1", "", "", ""],
+          ["Woche 2", "", "", ""],
+          ["Woche 3", "", "", ""],
+          ["Woche 4", "", "", ""],
+          ["Woche 5", "", "", ""]
+        ]},
+        {"t": "prompts", "title": "Mein Fokus für diesen Monat", "items": [
+          "Worauf möchte ich in diesem Monat bewusst verzichten?",
+          "Was möchte ich mir in diesem Monat gönnen?"
+        ], "lines": 3},
+        {"t": "checklist", "title": "Meine Selbstfürsorge-Liste für den Winter", "items": [
+          "Ein Spaziergang bei Tageslicht, auch wenn es kalt ist",
+          "Eine Tasse Tee in Ruhe, ohne Handy",
+          "Ein warmes Bad oder Fußbad",
+          "Früher ins Bett gehen als sonst",
+          "Eine Freundin anrufen, die mir guttut",
+          "Eine Kerze anzünden und fünf Minuten nichts machen",
+          "Ein Buch lesen, einfach zum Vergnügen",
+          "Etwas mit den Händen machen, zum Beispiel stricken, backen oder töpfern",
+          "Musik hören, die mich glücklich macht",
+          "Eine Verabredung absagen, wenn ich Ruhe brauche",
+          "Einen Nachmittag ohne Termine einplanen",
+          "Mir selbst etwas Freundliches sagen, wenn ich müde bin"
+        ]},
+        {"t": "tip", "text": "Häng die Selbstfürsorge-Liste an den Kühlschrank oder fotografiere sie mit dem Handy. Wenn du an einem müden Nachmittag nicht weißt, was dir guttun könnte, suchst du dir einfach etwas davon aus, ohne lange zu überlegen."},
+        {"t": "planner", "title": "Wochenplaner · Woche 1"},
+        {"t": "planner", "title": "Wochenplaner · Woche 2"},
+        {"t": "planner", "title": "Wochenplaner · Woche 3"},
+        {"t": "planner", "title": "Wochenplaner · Woche 4"},
+        {"t": "tracker", "title": "Mein Winter-Tracker", "items": [
+          "Video aus der Method",
+          "Tageslicht am Vormittag",
+          "Atemübung",
+          "Warmes, selbst gekochtes Essen",
+          "Handy eine Stunde vor dem Schlafen weg",
+          "Abend-Anker",
+          "Etwas abgegeben oder weggelassen"
+        ]}
+      ]
+    },
+    {
+      "icon": "topf",
+      "kicker": "Küche",
+      "title": "Meal-Prep für ruhige Wintertage",
+      "intro": "Wenn um halb sechs alle hungrig sind und du noch keine Idee hast, kann Kochen zur Belastung werden. Ein wenig Vorbereitung am Wochenende schenkt dir unter der Woche Zeit und Ruhe.",
+      "blocks": [
+        {"t": "p", "text": "Meal-Prep bedeutet einfach, dass du einen Teil deiner Mahlzeiten im Voraus planst und vorbereitest. Es geht dabei nicht um perfekt portionierte Dosen oder eine Diät. In diesem Kapitel geht es um warmes, einfaches Essen aus saisonalen Zutaten, das die ganze Familie satt macht und dir die tägliche Frage „Was koche ich heute?“ abnimmt. Kalorien zählen wir hier nicht, und kein Rezept verspricht dir eine bestimmte Wirkung auf deine Gesundheit. Es soll dir schmecken, dich wärmen und dein Leben ein wenig leichter machen."},
+        {"t": "h", "text": "Drei Grundsätze"},
+        {"t": "list", "items": [
+          "Einfach: Wenige Zutaten, wenige Arbeitsschritte, ein Topf oder ein Blech, wann immer es geht.",
+          "Saisonal: Im Winter gibt es Wurzelgemüse, Kürbis, Kohl, Lauch, Äpfel und Hülsenfrüchte, die lange halten und günstig sind.",
+          "Entlastend: Du kochst einmal und isst zweimal, oder du bereitest Bausteine vor, aus denen unter der Woche schnell eine Mahlzeit wird."
+        ]},
+        {"t": "fact", "title": "Planen spart Denkarbeit", "text": "Die Frage nach dem Abendessen gehört für viele Frauen zu den hartnäckigsten Punkten des Mental Load. Wer am Wochenende einen groben Plan macht und einmal einkauft, muss unter der Woche deutlich weniger entscheiden. Das spart Zeit, Wege und Geld und hilft oft auch, weniger Lebensmittel wegzuwerfen."},
+        {"t": "h", "text": "Dein Meal-Prep-Plan"},
+        {"t": "p", "text": "Dieser Plan ist ein Vorschlag für eine Woche mit den sechs Rezepten aus dem nächsten Kapitel. Du brauchst dafür am Sonntag etwa eineinhalb bis zwei Stunden, in denen nebenbei vieles von allein im Ofen oder Topf gart. Unter der Woche bleiben dann jeweils nur noch zehn bis zwanzig Minuten."},
+        {"t": "table", "title": "Meal-Prep-Plan für eine Winterwoche", "cols": ["Wann", "Was du vorbereitest", "Wofür"], "rows": [
+          ["Samstagabend", "Rollgerste in kaltem Wasser einweichen", "Gemüse-Gerstensuppe"],
+          ["Sonntag", "Gemüse-Gerstensuppe in doppelter Menge kochen, Hälfte einfrieren", "Sonntagabend und eine Reserve für später"],
+          ["Sonntag", "Bratapfel-Kompott kochen und in ein Glas füllen", "Overnight Oats für die Woche"],
+          ["Sonntag", "Wurzelgemüse schälen, schneiden und in einer Dose im Kühlschrank lagern", "Ofengemüse am Dienstag"],
+          ["Sonntag", "Joghurt-Tahin-Sauce anrühren", "Ofengemüse am Dienstag"],
+          ["Sonntag", "Zwiebeln, Knoblauch und Ingwer für zwei Gerichte vorbereiten", "Linsen-Kokos-Suppe und Kürbis-Dal"],
+          ["Montag", "Linsen-Kokos-Suppe kochen, Rest für das Mittagessen am Dienstag", "Montagabend"],
+          ["Dienstag", "Ofengemüse mit Kichererbsen aufs Blech", "Dienstagabend"],
+          ["Mittwochabend", "Overnight Oats für Donnerstag und Freitag ansetzen", "Frühstück"],
+          ["Donnerstag", "Kürbis-Dal mit Reis kochen, Rest einfrieren", "Donnerstagabend"],
+          ["Freitag", "Reste-Abend oder eingefrorene Suppe aufwärmen", "Ein freier Abend in der Küche"],
+          ["Jeden Abend", "Goldene Milch als Abend-Anker", "Zum Ausklang des Tages"]
+        ]},
+        {"t": "tip", "text": "Ich koche Suppen und Eintöpfe fast immer in der doppelten Menge und friere die Hälfte in Gläsern ein. An den Tagen, an denen alles zu viel ist, bin ich jedes Mal dankbar dafür. Beschrifte die Gläser mit Inhalt und Datum, dann weißt du auch nach Wochen noch, was du vor dir hast."},
+        {"t": "h", "text": "Deine Einkaufsliste"},
+        {"t": "checklist", "title": "Gemüse und Obst", "items": [
+          "1 kleiner Hokkaido-Kürbis (etwa 800 g)",
+          "800 g Wurzelgemüse, zum Beispiel Karotten, Pastinaken und Süßkartoffel",
+          "4 weitere Karotten",
+          "1 Lauchstange",
+          "1 Stück Knollensellerie (etwa 150 g)",
+          "2 mittelgroße Kartoffeln",
+          "4 Zwiebeln und 1 rote Zwiebel",
+          "1 Knoblauchknolle",
+          "1 Stück frischer Ingwer (etwa 6 cm)",
+          "100 g Babyspinat",
+          "3 Äpfel",
+          "1 Zitrone und 1 Limette",
+          "Frische Petersilie und Schnittlauch"
+        ]},
+        {"t": "checklist", "title": "Vorrat", "items": [
+          "450 g rote Linsen",
+          "150 g Rollgerste",
+          "2 Dosen Kichererbsen (je 400 g)",
+          "2 Dosen gehackte Tomaten (je 400 g)",
+          "2 Dosen Kokosmilch (je 400 ml)",
+          "300 g Basmatireis",
+          "200 g zarte Haferflocken",
+          "30 g Rosinen und 40 g Walnüsse",
+          "Gemüsebrühe für etwa 3 Liter",
+          "Tahin (Sesammus)",
+          "Ahornsirup oder Honig",
+          "Olivenöl und neutrales Pflanzenöl",
+          "Gewürze: Kreuzkümmel, Paprika edelsüß, mildes Currypulver, Kurkuma, Garam Masala, Zimt, Lorbeer, Salz, Pfeffer"
+        ]},
+        {"t": "checklist", "title": "Kühlregal", "items": [
+          "450 g Naturjoghurt",
+          "1,5 l Milch oder Haferdrink",
+          "Butter",
+          "Optional 100 ml Schlagobers für die Gerstensuppe"
+        ]},
+        {"t": "table", "title": "Mein eigener Wochenplan", "cols": ["Tag", "Frühstück", "Mittag", "Abendessen", "Vorbereiten"], "rows": [
+          ["Montag", "", "", "", ""],
+          ["Dienstag", "", "", "", ""],
+          ["Mittwoch", "", "", "", ""],
+          ["Donnerstag", "", "", "", ""],
+          ["Freitag", "", "", "", ""],
+          ["Samstag", "", "", "", ""],
+          ["Sonntag", "", "", "", ""]
+        ]}
+      ]
+    },
+    {
+      "icon": "tee",
+      "kicker": "Küche",
+      "title": "Sechs wärmende Rezepte",
+      "intro": "Diese Rezepte sind einfach, saisonal und für vier Personen gedacht. Sie lassen sich gut vorbereiten und schmecken auch aufgewärmt noch wunderbar.",
+      "blocks": [
+        {"t": "recipe", "title": "Ofengemüse mit Kichererbsen und Joghurt-Tahin-Sauce", "time": "15 Minuten Vorbereitung, 40 Minuten im Ofen", "serves": "4 Personen", "ingredients": [
+          "800 g Wurzelgemüse, zum Beispiel Karotten, Pastinaken und Süßkartoffel",
+          "1 rote Zwiebel",
+          "2 Dosen Kichererbsen (je 400 g), abgetropft",
+          "3 EL Olivenöl",
+          "1 TL Kreuzkümmel",
+          "1 TL Paprika edelsüß",
+          "Salz und Pfeffer",
+          "Für die Sauce: 250 g Naturjoghurt, 2 EL Tahin, Saft einer halben Zitrone, 1 kleine Knoblauchzehe, Salz",
+          "Etwas frische Petersilie zum Bestreuen"
+        ], "steps": [
+          "Heize den Ofen auf 200 Grad Ober- und Unterhitze vor und lege ein Blech mit Backpapier aus.",
+          "Schäle das Gemüse und schneide es in etwa gleich große Stücke von zwei bis drei Zentimetern. Schneide die Zwiebel in Spalten.",
+          "Tupfe die Kichererbsen mit einem Küchentuch trocken, damit sie im Ofen schön knusprig werden.",
+          "Vermische Gemüse, Zwiebel und Kichererbsen auf dem Blech mit Olivenöl, Kreuzkümmel, Paprika, Salz und Pfeffer.",
+          "Backe alles 35 bis 40 Minuten, bis das Gemüse weich und an den Rändern leicht gebräunt ist. Wende es nach der Hälfte der Zeit einmal.",
+          "Verrühre in der Zwischenzeit Joghurt, Tahin, Zitronensaft und die fein geriebene Knoblauchzehe und schmecke die Sauce mit Salz ab.",
+          "Verteile das Gemüse auf Teller, gib einen großzügigen Klecks Sauce darüber und bestreue alles mit Petersilie."
+        ], "note": "Das geschnittene Gemüse hält sich in einer Dose im Kühlschrank zwei bis drei Tage, die Sauce etwa drei Tage. Dazu passt Fladenbrot oder Couscous."},
+        {"t": "recipe", "title": "Linsen-Kokos-Suppe", "time": "30 Minuten", "serves": "4 Personen", "ingredients": [
+          "250 g rote Linsen",
+          "1 Zwiebel",
+          "2 Knoblauchzehen",
+          "1 Stück Ingwer (etwa 2 cm)",
+          "2 Karotten",
+          "1 EL neutrales Pflanzenöl",
+          "1 EL mildes Currypulver",
+          "1 Dose gehackte Tomaten (400 g)",
+          "1 Dose Kokosmilch (400 ml)",
+          "800 ml Gemüsebrühe",
+          "Saft einer halben Limette",
+          "Salz und Pfeffer",
+          "Frische Petersilie oder Koriander zum Bestreuen"
+        ], "steps": [
+          "Spüle die Linsen in einem Sieb unter kaltem Wasser ab, bis das Wasser klar abläuft.",
+          "Würfle Zwiebel, Knoblauch und Ingwer fein und schneide die Karotten in kleine Würfel.",
+          "Erhitze das Öl in einem großen Topf und dünste Zwiebel, Knoblauch und Ingwer etwa drei Minuten glasig an.",
+          "Gib das Currypulver dazu und röste es unter Rühren eine halbe Minute mit, bis es duftet.",
+          "Füge Karotten, Linsen, Tomaten, Kokosmilch und Brühe hinzu und bring alles zum Kochen.",
+          "Lass die Suppe bei kleiner Hitze etwa 20 Minuten köcheln, bis die Linsen ganz weich sind. Rühre gelegentlich um.",
+          "Püriere die Suppe je nach Geschmack ganz oder nur teilweise und schmecke sie mit Limettensaft, Salz und Pfeffer ab."
+        ], "note": "Die Suppe dickt beim Stehen nach. Gib beim Aufwärmen einfach etwas Wasser oder Brühe dazu. Sie hält sich im Kühlschrank drei Tage und lässt sich gut einfrieren."},
+        {"t": "recipe", "title": "Overnight Oats mit Bratapfel", "time": "20 Minuten und eine Nacht im Kühlschrank", "serves": "4 Personen", "ingredients": [
+          "200 g zarte Haferflocken",
+          "500 ml Milch oder Haferdrink",
+          "200 g Naturjoghurt",
+          "1 EL Ahornsirup oder Honig",
+          "1 Prise Salz",
+          "Für den Bratapfel: 3 Äpfel, 1 EL Butter, 1 TL Zimt, 30 g Rosinen, 1 EL Ahornsirup",
+          "40 g Walnüsse, grob gehackt"
+        ], "steps": [
+          "Verrühre Haferflocken, Milch, Joghurt, Ahornsirup und Salz in einer Schüssel und verteile die Masse auf vier Gläser.",
+          "Stell die Gläser abgedeckt über Nacht in den Kühlschrank.",
+          "Schäle die Äpfel, entferne das Kerngehäuse und schneide sie in kleine Würfel.",
+          "Lass die Butter in einer Pfanne schmelzen und brate die Apfelwürfel darin etwa fünf Minuten bei mittlerer Hitze an.",
+          "Gib Zimt, Rosinen und Ahornsirup dazu und lass alles weitere fünf Minuten sanft schmoren, bis die Äpfel weich sind.",
+          "Röste die Walnüsse kurz in einer trockenen Pfanne, bis sie duften.",
+          "Gib am Morgen den Bratapfel und die Walnüsse auf die Oats. Wer es warm mag, erwärmt das Kompott kurz."
+        ], "note": "Das Bratapfel-Kompott hält sich in einem sauberen Glas im Kühlschrank etwa vier Tage. Die Oats schmecken am ersten und zweiten Tag am besten."},
+        {"t": "recipe", "title": "Kürbis-Dal mit Reis", "time": "40 Minuten", "serves": "4 Personen", "ingredients": [
+          "1 kleiner Hokkaido-Kürbis (etwa 800 g)",
+          "200 g rote Linsen",
+          "1 Zwiebel",
+          "2 Knoblauchzehen",
+          "1 Stück Ingwer (etwa 2 cm)",
+          "2 EL neutrales Pflanzenöl oder Butter",
+          "1 TL Kreuzkümmel",
+          "1 TL Kurkuma",
+          "1 TL Garam Masala",
+          "1 Dose gehackte Tomaten (400 g)",
+          "600 ml Gemüsebrühe",
+          "200 ml Kokosmilch",
+          "100 g Babyspinat",
+          "Salz und Saft einer halben Zitrone",
+          "300 g Basmatireis"
+        ], "steps": [
+          "Wasche den Kürbis, halbiere ihn, entferne die Kerne und schneide ihn mit Schale in Würfel von etwa zwei Zentimetern. Die Schale des Hokkaido wird beim Kochen weich.",
+          "Spüle die Linsen in einem Sieb gründlich ab. Würfle Zwiebel, Knoblauch und Ingwer fein.",
+          "Erhitze Öl oder Butter in einem großen Topf und dünste Zwiebel, Knoblauch und Ingwer an. Gib die Gewürze dazu und röste sie kurz mit.",
+          "Füge Kürbis, Linsen, Tomaten und Brühe hinzu, bring alles zum Kochen und lass es etwa 20 Minuten bei kleiner Hitze köcheln.",
+          "Koche in der Zwischenzeit den Reis nach Packungsangabe.",
+          "Rühre Kokosmilch und Spinat unter das Dal und lass es noch zwei bis drei Minuten ziehen, bis der Spinat zusammengefallen ist.",
+          "Schmecke das Dal mit Salz und Zitronensaft ab und serviere es mit dem Reis."
+        ], "note": "Für Kinder kannst du das Dal mild lassen und Erwachsene würzen am Tisch mit etwas Chili nach. Es lässt sich ohne Reis gut einfrieren."},
+        {"t": "recipe", "title": "Gemüse-Gerstensuppe", "time": "15 Minuten Vorbereitung, 60 Minuten Kochzeit", "serves": "4 Personen", "ingredients": [
+          "150 g Rollgerste, am Vorabend eingeweicht",
+          "1 Zwiebel",
+          "2 Karotten",
+          "1 Stück Knollensellerie (etwa 150 g)",
+          "1 Lauchstange",
+          "2 mittelgroße Kartoffeln",
+          "1 EL Butter",
+          "1,5 l Gemüsebrühe",
+          "1 Lorbeerblatt",
+          "Salz und Pfeffer",
+          "Optional 100 ml Schlagobers",
+          "Frische Petersilie und Schnittlauch"
+        ], "steps": [
+          "Gieße die eingeweichte Gerste in ein Sieb und spüle sie ab.",
+          "Würfle Zwiebel, Karotten, Sellerie und Kartoffeln klein und schneide den Lauch in feine Ringe.",
+          "Lass die Butter in einem großen Topf schmelzen und dünste Zwiebel, Karotten und Sellerie etwa fünf Minuten an.",
+          "Gib Gerste, Brühe und Lorbeerblatt dazu, bring alles zum Kochen und lass die Suppe zugedeckt etwa 40 Minuten bei kleiner Hitze köcheln.",
+          "Füge Kartoffeln und Lauch hinzu und koche die Suppe weitere 20 Minuten, bis Gerste und Gemüse weich sind.",
+          "Nimm das Lorbeerblatt heraus, rühre nach Wunsch das Schlagobers ein und schmecke mit Salz und Pfeffer ab.",
+          "Bestreue die Suppe vor dem Servieren mit Petersilie und Schnittlauch."
+        ], "note": "Diese Suppe ist an die Tiroler Gerstsuppe angelehnt, die traditionell oft mit Geselchtem gekocht wird. Wer mag, gibt ein Stück Selchfleisch mit in den Topf. Sie wird am zweiten Tag noch besser und lässt sich gut einfrieren."},
+        {"t": "recipe", "title": "Goldene Milch", "time": "10 Minuten", "serves": "4 Tassen", "ingredients": [
+          "1 l Milch oder Haferdrink",
+          "2 TL Kurkuma, gemahlen",
+          "1 TL Zimt",
+          "1 Stück frischer Ingwer (etwa 2 cm) oder ½ TL gemahlener Ingwer",
+          "1 Prise schwarzer Pfeffer",
+          "2 EL Honig oder Ahornsirup",
+          "Optional 1 TL Kokosöl oder Butter"
+        ], "steps": [
+          "Schäle den Ingwer und schneide ihn in dünne Scheiben.",
+          "Gib Milch, Kurkuma, Zimt, Ingwer, Pfeffer und nach Wunsch Kokosöl in einen Topf und verrühre alles mit einem Schneebesen.",
+          "Erhitze die Milch langsam, ohne sie kochen zu lassen, und lass sie etwa fünf Minuten sanft ziehen.",
+          "Gieße die Milch durch ein feines Sieb, um die Ingwerscheiben zu entfernen.",
+          "Süße sie erst jetzt mit Honig oder Ahornsirup und schäume sie nach Wunsch kurz mit dem Schneebesen auf."
+        ], "note": "Kurkuma färbt stark. Verwende am besten einen hellen Topf, den du gleich ausspülst. Honig ist nicht für Babys unter einem Jahr geeignet, für sie lässt du ihn einfach weg."},
+        {"t": "table", "title": "Meine Lieblingsrezepte", "cols": ["Rezept", "Wem hat es geschmeckt?", "Das ändere ich beim nächsten Mal"], "rows": 6}
+      ]
+    },
+    {
+      "icon": "spiegel",
+      "kicker": "Rückblick",
+      "title": "Dein Monatsrückblick",
+      "intro": "Ein Monat Rückzug und Ruhe liegt hinter dir. Nimm dir Zeit, zurückzuschauen, bevor du in den nächsten Monat gehst.",
+      "blocks": [
+        {"t": "p", "text": "Such dir für diesen Rückblick einen ruhigen Moment, vielleicht mit einer Tasse goldener Milch und einer Kerze. Blättere vorher noch einmal durch dieses Workbook und durch deine Notizen. Oft sehen wir erst im Rückblick, wie viel in einem Monat passiert ist, auch wenn es sich im Alltag gar nicht danach angefühlt hat. Wenn du magst, vergleiche deine Werte auch mit deiner Standortbestimmung aus dem Ankommen-Workbook."},
+        {"t": "scale", "title": "So geht es mir am Ende des Monats", "items": [
+          "Meine Energie im Alltag",
+          "Wie erholsam mein Schlaf ist",
+          "Wie ruhig ich mich innerlich fühle",
+          "Wie wohl ich mich in meinem Körper fühle",
+          "Wie kräftig ich mich fühle",
+          "Wie leicht mir Pausen fallen",
+          "Wie gut ich meine Körpersignale wahrnehme",
+          "Wie viel Mental Load ich gerade trage"
+        ], "low": "kaum", "high": "sehr"},
+        {"t": "prompts", "title": "Mein Rückblick", "items": [
+          "Welches Video hat mir in diesem Monat am meisten gutgetan, und warum?",
+          "Was hat sich in meinem Körper oder in meinem Alltag verändert?",
+          "Welche Atemübung oder welches Ritual möchte ich weiter mitnehmen?",
+          "Was habe ich abgegeben oder weggelassen, und wie fühlt sich das an?",
+          "Wofür bin ich mir selbst in diesem Monat dankbar?",
+          "Was wünsche ich mir für meinen nächsten Monat?"
+        ], "lines": 4},
+        {"t": "table", "title": "Was ich mitnehme", "cols": ["Das behalte ich bei", "Das lasse ich los", "Das probiere ich als Nächstes"], "rows": 5},
+        {"t": "notes", "title": "Ein Brief an mich selbst für den nächsten Winter", "lines": 12},
+        {"t": "quote", "text": "Ich habe Kraft gesammelt, und sie bleibt bei mir."}
+      ]
+    }
+  ],
+  "closing": "Danke, dass du dir diesen Monat Zeit für dich genommen hast. Die Ruhe, die du in diesen Wochen gesammelt hast, trägt dich weiter, und ich freue mich schon darauf, dich in deinen nächsten Monat zu begleiten."
+}

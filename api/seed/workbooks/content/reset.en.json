@@ -1,0 +1,200 @@
+{
+ "key": "reset",
+ "lang": "en",
+ "eyebrow": "My gift for you · 10 minutes",
+ "title": "Reset Routine for Tired Days",
+ "subtitle": "for the evenings you gave everything away",
+ "icon": "kerze",
+ "letter": [
+  "yes, you, reading this at the end of a long day.",
+  "I know that feeling. The day is over, everyone got what they needed from you, and there is nothing left for yourself. Not even the energy to decide what would actually be good for you.",
+  "That's why this isn't a workout, and nothing you have to do well. These are ten quiet minutes that belong only to you. You'll breathe, light a candle, let one thing go, wrap your hands around something warm and write a few honest lines.",
+  "Some evenings it will feel like a lot. Some evenings like nothing at all. Both are completely okay."
+ ],
+ "overview": [
+  {
+   "icon": "atem",
+   "title": "Step 1 · Arrive with your breath",
+   "text": "2 minutes"
+  },
+  {
+   "icon": "kerze",
+   "title": "Step 2 · A little ritual to let go",
+   "text": "3 minutes"
+  },
+  {
+   "icon": "tee",
+   "title": "Step 3 · Golden moon milk",
+   "text": "while it warms"
+  },
+  {
+   "icon": "journal",
+   "title": "Step 4 · A few honest lines",
+   "text": "3 minutes"
+  }
+ ],
+ "chapters": [
+  {
+   "icon": "nest",
+   "kicker": "Before you begin",
+   "title": "What you need",
+   "intro": "That's really all it takes.",
+   "blocks": [
+    {
+     "t": "checklist",
+     "title": "Your little reset corner",
+     "items": [
+      "a quiet corner",
+      "a blanket",
+      "a candle",
+      "a small piece of paper",
+      "a pen",
+      "your favourite cup",
+      "permission to take ten minutes for yourself"
+     ]
+    },
+    {
+     "t": "tip",
+     "text": "Put everything in a little basket once, ready to grab. Then on tired evenings there is nothing left to gather, and the first step is almost done."
+    }
+   ]
+  },
+  {
+   "icon": "atem",
+   "kicker": "Step one · 2 minutes",
+   "title": "Arrive with your breath",
+   "blocks": [
+    {
+     "t": "breath",
+     "title": "A longer exhale",
+     "pattern": "in 4 · out 6",
+     "text": "Sit or lie down so your shoulders can drop. One hand on your belly, one on your chest."
+    },
+    {
+     "t": "steps",
+     "items": [
+      "Breathe in through your nose and slowly count to four.",
+      "Breathe out through your mouth while you count to six, as if you were fogging up a window.",
+      "Do this about ten times. Let your belly rise first, and let every exhale take a little more of the day with it."
+     ]
+    },
+    {
+     "t": "fact",
+     "title": "Why a long exhale helps",
+     "text": "When you breathe out longer than you breathe in, you signal to your nervous system that there is no danger. The part responsible for rest and recovery can take over, your heartbeat slows and your shoulders let go. A longer exhale tells your body: the day is over, you're safe now."
+    }
+   ]
+  },
+  {
+   "icon": "kerze",
+   "kicker": "Step two · 3 minutes",
+   "title": "A little ritual to let go",
+   "blocks": [
+    {
+     "t": "steps",
+     "items": [
+      "Light a candle and look into the flame for a few breaths.",
+      "Write one thing on a small piece of paper that may leave you tonight. A worry, something someone said, the pressure to get everything done.",
+      "Fold it twice, hold it in your hands and quietly say the words below.",
+      "Put the paper aside, throw it away tomorrow morning, and blow out the candle when you're ready."
+     ]
+    },
+    {
+     "t": "quote",
+     "text": "“You may go now.”"
+    },
+    {
+     "t": "tip",
+     "text": "If nothing comes to mind, simply write “today” on the paper. A whole day may go, too."
+    }
+   ]
+  },
+  {
+   "icon": "tee",
+   "kicker": "Step three · while it warms",
+   "title": "Golden Moon Milk",
+   "intro": "My evening hug in a cup.",
+   "blocks": [
+    {
+     "t": "recipe",
+     "title": "Golden Moon Milk",
+     "time": "5 minutes",
+     "serves": "1 cup",
+     "ingredients": [
+      "250 ml oat milk, or any milk you like",
+      "½ tsp turmeric",
+      "½ tsp cinnamon",
+      "a pinch of ginger and black pepper",
+      "1 tsp honey or maple syrup"
+     ],
+     "steps": [
+      "Warm the milk gently in a small pot.",
+      "Whisk in the spices and let it steam for a few minutes without boiling.",
+      "Sweeten it at the end, pour it into your favourite cup and hold it with both hands while you write."
+     ],
+     "note": "No turmeric at home? Warm milk with cinnamon and honey is just as cosy."
+    }
+   ]
+  },
+  {
+   "icon": "journal",
+   "kicker": "Step four · 3 minutes",
+   "title": "A few honest lines",
+   "intro": "There are no right answers. Write the first thing that comes up, even if it's just one word.",
+   "blocks": [
+    {
+     "t": "prompts",
+     "items": [
+      "What drained me today?",
+      "What would refill me?",
+      "One small thing I'll do just for me tomorrow:"
+     ],
+     "lines": 3
+    },
+    {
+     "t": "tracker",
+     "title": "My reset evenings this week",
+     "items": [
+      "Breath",
+      "Letting go",
+      "Something warm",
+      "A few lines"
+     ]
+    }
+   ]
+  },
+  {
+   "icon": "stern",
+   "kicker": "Take this with you",
+   "title": "For tonight",
+   "blocks": [
+    {
+     "t": "quote",
+     "text": "I am allowed to rest. And I'm allowed to want more."
+    },
+    {
+     "t": "p",
+     "text": "Say it out loud before you fall asleep, or write it on a note for your mirror."
+    },
+    {
+     "t": "h",
+     "text": "Dear wild heart,"
+    },
+    {
+     "t": "p",
+     "text": "I'm Viv. I live in the Austrian mountains with my husband and our four kids, I run a little pottery studio and I teach movement. And I know those evenings, the ones where you've given everything and wonder where the real you went in all of it."
+    },
+    {
+     "t": "p",
+     "text": "That's exactly why the Wild Hearts Collective exists. So you never forget that you are a whole person too, even when you're always there for everyone else and holding it all together. Come and join us in our free community channel, I would truly love to meet you there."
+    },
+    {
+     "t": "fact",
+     "title": "Join us",
+     "text": "moveciamovement.com · @movementwithviv"
+    }
+   ]
+  }
+ ],
+ "closing": "We matter. We are here. And we are seen."
+}

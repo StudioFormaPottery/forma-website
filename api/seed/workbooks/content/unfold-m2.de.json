@@ -1,0 +1,1225 @@
+{
+ "key": "unfold-m2",
+ "lang": "de",
+ "eyebrow": "Unfold · Monat 2 · Woche 5–8",
+ "title": "Knospen",
+ "subtitle": "Selbstwert & Ideen",
+ "icon": "blume",
+ "letter": [
+  "Meine Liebe, ein ganzer Monat liegt hinter dir. Du hast hingeschaut, was dich müde macht, du hast deinen Mental Load einmal ganz aus dem Kopf aufs Papier geholt, du hast etwas über dein Nervensystem gelernt und vielleicht schon die eine oder andere Routine gefunden, die dir den Alltag leichter macht. Ganz egal, wie viel davon du geschafft hast und wie oft das Leben dazwischengekommen ist: Du bist noch da, und darauf darfst du stolz sein.",
+  "Im ersten Monat ging es um die Wurzeln, also um den Boden, auf dem du stehst. Jetzt, im zweiten Monat, schauen wir auf das, was aus diesem Boden wachsen möchte. Ich habe ihn „Knospen“ genannt, weil eine Knospe für mich genau diesen Zustand beschreibt: Es ist schon alles angelegt, die Farbe, die Form und die ganze Blüte, sie braucht nur Wärme, Licht und ein bisschen Zeit, um sich zu öffnen.",
+  "In den nächsten vier Wochen geht es um dich selbst. Wir sprechen darüber, warum es so schwer sein kann, Nein zu sagen, und wie du Grenzen ziehen kannst, ohne dich danach tagelang schlecht zu fühlen. Wir suchen gemeinsam nach deinen Stärken und Werten, nach dem, was dich wirklich ausmacht, wenn du einmal nicht Mama, Partnerin, Kollegin oder Organisatorin bist. Wir lernen die innere Kritikerin kennen, diese vertraute Stimme, die so oft das letzte Wort hat, und üben, ihr freundlich und bestimmt zu antworten. Und am Ende des Monats öffnen wir die Schleusen für deine Ideen, damit sie endlich Platz bekommen.",
+  "Ich weiß aus eigener Erfahrung, dass gerade diese Themen viel aufwühlen können. Wenn wir jahrelang vor allem für andere da waren, fühlt es sich manchmal fremd oder sogar egoistisch an, so viel Aufmerksamkeit auf uns selbst zu richten. Ich möchte dir deshalb gleich zu Beginn sagen, dass dein Selbstwert keine Belohnung ist, die du dir erst verdienen musst. Er ist schon da, manchmal nur ein wenig verschüttet unter Erwartungen, Pflichten und alten Sätzen, die gar nicht von dir stammen.",
+  "Nimm dir dieses Workbook so, wie es für dich passt. Du musst nicht jede Übung machen und nicht jede Zeile füllen. Manche Fragen werden dich sofort ansprechen, andere darfst du überspringen und vielleicht in ein paar Wochen wieder aufschlagen. Deine Bewegungsvideos begleiten dich weiter, montags mit einem Full-Day-Flow und donnerstags mit einem sanften Tired-Day-Flow, und in diesem Monat habe ich sie bewusst so ausgewählt, dass sie dich körperlich öffnen, aufrichten und stärken, passend zu dem, was innerlich passiert.",
+  "Ich freue mich so sehr darauf, diesen Monat mit dir zu gehen und in unseren Live-Calls zu hören, was in dir aufblüht. Bewegung beginnt bei dir, und manchmal beginnt sie mit einem einzigen ehrlichen Satz über dich selbst. Von Herzen, deine Vivien"
+ ],
+ "overview": [
+  {
+   "icon": "stimmung",
+   "title": "Zum Start · Wo du gerade stehst",
+   "text": "Ein kleiner Check-in nach dem ersten Monat, damit du siehst, was sich schon bewegt hat."
+  },
+  {
+   "icon": "schild",
+   "title": "Woche 5 · Grenzen ohne schlechtes Gewissen",
+   "text": "Warum Nein so schwer fällt, wie du freundlich und klar ablehnst und wozu du stattdessen Ja sagen möchtest."
+  },
+  {
+   "icon": "stern",
+   "title": "Woche 6 · Was dich ausmacht",
+   "text": "Deine Werte, deine Stärken und das, was dich lebendig macht, aus deiner Sicht und aus der Sicht vertrauter Menschen."
+  },
+  {
+   "icon": "spiegel",
+   "title": "Woche 7 · Die innere Kritikerin",
+   "text": "Woher die strenge Stimme kommt, wie du ihre Sätze erkennst und wie du ihr mit Selbstmitgefühl antwortest."
+  },
+  {
+   "icon": "rakete",
+   "title": "Woche 8 · Ideen dürfen sprudeln",
+   "text": "Kreative Übungen, Morgenseiten und eine Ideen-Sammelseite, damit deine Ideen endlich Raum bekommen."
+  },
+  {
+   "icon": "feier",
+   "title": "Monatsrückblick · Was aufgeblüht ist",
+   "text": "Du schaust zurück, sammelst deine Erkenntnisse und bereitest dich auf Monat 3 vor."
+  }
+ ],
+ "chapters": [
+  {
+   "icon": "stimmung",
+   "kicker": "Zum Start",
+   "title": "Wo du gerade stehst",
+   "intro": "Bevor wir in die neuen Themen gehen, halten wir kurz inne. Dieser Check-in zeigt dir, wo du nach dem ersten Monat stehst, und er wird am Ende dieses Monats zu einem schönen Vergleich.",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "Oft rennen wir von einem Thema ins nächste, ohne zu bemerken, was sich unterwegs schon verändert hat. Gerade Veränderungen, die von innen kommen, sind leise. Vielleicht atmest du abends etwas bewusster, vielleicht hast du eine Aufgabe abgegeben, die du früher selbstverständlich übernommen hättest, oder du bemerkst schneller, wann dein Akku leer wird. Solche Dinge fallen im Alltag kaum auf, und deshalb lohnt es sich, sie einmal bewusst aufzuschreiben."
+    },
+    {
+     "t": "p",
+     "text": "Beantworte die folgenden Fragen ehrlich und ohne Bewertung. Es gibt hier kein richtig oder falsch und auch kein „zu wenig“. Wenn ein Wert niedrig ist, dann ist das einfach eine wertvolle Information darüber, wo du in diesem Monat besonders gut für dich sorgen darfst."
+    },
+    {
+     "t": "scale",
+     "title": "So geht es mir gerade",
+     "items": [
+      "Meine Energie im Alltag",
+      "Wie gut ich schlafe",
+      "Wie leicht mir mein Mental Load im Moment fällt",
+      "Wie oft ich mir Zeit für mich nehme",
+      "Wie gut ich spüre, was ich brauche",
+      "Wie freundlich ich mit mir selbst spreche",
+      "Wie sehr ich mir selbst etwas zutraue",
+      "Wie viel Raum meine eigenen Ideen gerade haben"
+     ],
+     "low": "kaum",
+     "high": "sehr"
+    },
+    {
+     "t": "prompts",
+     "title": "Rückblick auf Monat 1",
+     "lines": 4,
+     "items": [
+      "Was hat sich seit dem Start von Unfold verändert, auch wenn es nur eine Kleinigkeit ist?",
+      "Welche Übung, welcher Gedanke oder welches Video aus dem ersten Monat ist bei mir hängen geblieben, und warum?",
+      "Was habe ich über meine Erschöpfung und meinen Mental Load gelernt, das ich vorher nicht wusste?",
+      "Welche neue Routine möchte ich in den zweiten Monat mitnehmen?"
+     ]
+    },
+    {
+     "t": "prompts",
+     "title": "Meine Wünsche für Monat 2",
+     "lines": 4,
+     "items": [
+      "Wenn ich an die Themen Grenzen, Selbstwert, innere Kritikerin und Ideen denke: Welches berührt mich am meisten, und was löst es in mir aus?",
+      "Wie möchte ich mich am Ende dieses Monats fühlen?",
+      "Was brauche ich in den nächsten vier Wochen von mir selbst und von den Menschen um mich herum?"
+     ]
+    },
+    {
+     "t": "tip",
+     "text": "Mach dir ein Foto von deinen Antworten auf dieser Seite oder setz ein Lesezeichen. Am Ende des Monats beantwortest du dieselbe Skala noch einmal, und es ist jedes Mal wieder berührend, die beiden Seiten nebeneinander zu legen."
+    },
+    {
+     "t": "p",
+     "text": "Damit die Rituale aus dem ersten Monat nicht einschlafen, findest du hier einen Wochen-Tracker. Du kannst ihn in jeder Woche dieses Monats neu nutzen, indem du einfach eine Farbe pro Woche wählst. Ein Kreuzchen bedeutet dabei nicht, dass du etwas perfekt gemacht hast, es reicht, dass du dir einen Moment dafür genommen hast."
+    },
+    {
+     "t": "tracker",
+     "title": "Meine Rituale in Monat 2",
+     "items": [
+      "Full-Day-Flow (Montag) oder Tired-Day-Flow (Donnerstag)",
+      "Fünf Minuten Journaling",
+      "Eine Atemübung oder Meditation",
+      "Draußen gewesen, im Tageslicht",
+      "Genug Wasser getrunken",
+      "Einmal Nein gesagt oder eine Grenze gehalten",
+      "Etwas Freundliches zu mir selbst gesagt",
+      "Eine Idee notiert"
+     ]
+    }
+   ]
+  },
+  {
+   "icon": "schild",
+   "kicker": "Woche 5",
+   "title": "Grenzen ohne schlechtes Gewissen",
+   "intro": "In dieser Woche schauen wir uns an, warum uns ein Nein oft so schwerfällt, woher das schlechte Gewissen kommt und wie du lernst, freundlich und klar für dich einzustehen.",
+   "blocks": [
+    {
+     "t": "h",
+     "text": "Dein Impuls für diese Woche"
+    },
+    {
+     "t": "p",
+     "text": "Kennst du diesen Moment, in dem jemand dich um etwas bittet und dein Mund schon Ja sagt, während dein Bauch noch protestiert? Die Lehrerin fragt, ob du beim Schulfest einen Kuchen backen und den Stand übernehmen kannst. Die Kollegin bittet dich, noch schnell eine Präsentation durchzusehen, obwohl du eigentlich pünktlich gehen wolltest. Die Schwiegermutter kündigt sich für das Wochenende an, an dem du dich so auf einen ruhigen Sonntag gefreut hattest. Und noch bevor du überhaupt nachgedacht hast, hörst du dich sagen: „Klar, kein Problem.“"
+    },
+    {
+     "t": "p",
+     "text": "Dass uns das so oft passiert, hat wenig mit Schwäche zu tun. Viele von uns haben sehr früh gelernt, dass wir gemocht werden, wenn wir hilfsbereit, unkompliziert und angenehm sind. Ein braves Mädchen widerspricht nicht, es teilt, es nimmt Rücksicht, und es stellt die eigenen Bedürfnisse hinten an. Diese Botschaften waren selten böse gemeint, und vieles daran ist ja auch wertvoll. Wir können uns gut in andere einfühlen, wir sehen, was gebraucht wird, und wir halten Familien, Teams und Freundschaften zusammen. Problematisch wird es erst dann, wenn diese Fähigkeit keinen Ausschalter mehr hat und wir uns selbst dabei verlieren."
+    },
+    {
+     "t": "p",
+     "text": "Für dieses Muster gibt es einen Begriff, der dir vielleicht schon begegnet ist: People Pleasing. Gemeint ist die tiefe Gewohnheit, es allen recht machen zu wollen, Konflikte um fast jeden Preis zu vermeiden und die eigenen Wünsche zurückzustellen, damit niemand enttäuscht ist. Von außen wirkt eine Frau, die so lebt, oft unglaublich stark und verlässlich. Innen fühlt es sich dagegen häufig nach Erschöpfung an, nach leiser Wut, die keinen Platz bekommt, und nach dem Gefühl, dass das eigene Leben eigentlich von den Erwartungen anderer bestimmt wird."
+    },
+    {
+     "t": "p",
+     "text": "Warum fühlt sich ein Nein dann so bedrohlich an? Für unser Gehirn ist Zugehörigkeit seit jeher überlebenswichtig. Über einen sehr langen Teil der Menschheitsgeschichte war es gefährlich, aus der Gruppe ausgeschlossen zu werden, und unser Nervensystem reagiert bis heute empfindlich auf alles, was nach Ablehnung oder Konflikt aussieht. Wenn du also Angst hast, jemanden zu enttäuschen, dann meldet sich ein uraltes Schutzprogramm. Es möchte dich in Sicherheit halten, auch wenn die Situation in Wirklichkeit völlig harmlos ist und die Kollegin ein Nein wahrscheinlich nach fünf Minuten vergessen hat."
+    },
+    {
+     "t": "p",
+     "text": "Das schlechte Gewissen, das nach einem Nein auftaucht, ist deshalb mit Vorsicht zu genießen. Es fühlt sich an wie ein Beweis dafür, dass du etwas falsch gemacht hast. In Wahrheit zeigt es dir oft nur, dass du gerade eine alte, unausgesprochene Regel gebrochen hast, etwa „Ich muss immer verfügbar sein“ oder „Die Bedürfnisse der anderen sind wichtiger als meine“. Ein Gefühl ist eine Information, und es lohnt sich, genau hinzuschauen, worüber es dich informiert. Manchmal hast du wirklich jemanden verletzt und möchtest etwas wiedergutmachen. Sehr oft aber übst du einfach etwas Neues, und Neues fühlt sich anfangs unbequem an."
+    },
+    {
+     "t": "p",
+     "text": "Ich stelle mir eine Grenze gern wie einen Gartenzaun mit einem Tor darin vor, viel freundlicher als eine Mauer, die du gegen andere Menschen errichtest. Der Zaun zeigt, wo dein Garten beginnt, was dir gehört und wofür du Verantwortung trägst. Das Tor kannst du öffnen, für wen und wann du möchtest. Ohne Zaun trampeln alle durch die Beete, meistens ganz ohne böse Absicht, weil schlicht niemand weiß, wo der Weg aufhört. Grenzen machen Beziehungen deshalb oft sogar leichter, weil die anderen wissen, woran sie bei dir sind, und weil dein Ja wieder echt wird."
+    },
+    {
+     "t": "p",
+     "text": "Es gibt verschiedene Arten von Grenzen, und es hilft, sie auseinanderzuhalten. Zeitliche Grenzen betreffen deine Stunden und Termine, also wann du erreichbar bist und wann nicht. Körperliche Grenzen betreffen deinen Körper, deinen Raum und dein Bedürfnis nach Ruhe oder Nähe. Emotionale Grenzen schützen dich davor, die Gefühle und Probleme anderer ungefragt zu deinen eigenen zu machen. Dann gibt es noch materielle Grenzen rund um Geld und Besitz und mentale Grenzen, bei denen es um deine Meinung, deine Überzeugungen und deine Energie für bestimmte Gespräche geht. Die meisten Frauen, mit denen ich arbeite, haben in einem oder zwei dieser Bereiche schon ein gutes Gespür und in anderen fast gar keins."
+    },
+    {
+     "t": "p",
+     "text": "Und dann gibt es noch die Grenzen, die wir uns selbst gegenüber setzen. Das ist der Moment, in dem du abends das Handy weglegst, obwohl du noch schnell die Mails checken könntest, oder in dem du dir erlaubst, den Wäschekorb einmal stehen zu lassen, weil du um zehn Uhr ins Bett möchtest. Auch das sind Grenzen, und sie sind mindestens genauso wichtig wie die nach außen."
+    },
+    {
+     "t": "p",
+     "text": "In dieser Woche möchte ich dich einladen, dein Ja wieder bewusst zu wählen, ohne dass du deshalb ab sofort zu allem Nein sagen musst. Jedes Ja zu etwas ist gleichzeitig ein Nein zu etwas anderem, oft zu deiner Ruhe, deiner Zeit mit den Kindern, deinem Schlaf oder deinen eigenen Projekten. Wenn du lernst, kurz innezuhalten, bevor du zusagst, gewinnst du jedes Mal ein kleines Stück Freiheit zurück. Du darfst langsam anfangen, mit kleinen Situationen, in denen wenig auf dem Spiel steht, und du darfst dabei unsicher sein. Grenzen setzen ist eine Fähigkeit wie Fahrradfahren, sie wird mit jeder Übung selbstverständlicher."
+    },
+    {
+     "t": "fact",
+     "title": "Warum wir manchmal „fawnen“",
+     "text": "Neben Kampf, Flucht und Erstarren beschreiben einige Fachleute, etwa der Psychotherapeut Pete Walker, eine vierte Stressreaktion, die im Englischen „fawn“ heißt. Gemeint ist das Beschwichtigen und Gefallenwollen, um eine Bedrohung abzuwenden. Wer früh gelernt hat, dass Anpassung Sicherheit bringt, greift unter Druck oft automatisch zu diesem Muster. Es ist eine Schutzstrategie, die einmal sinnvoll war, und sie lässt sich mit Geduld und Übung lockern."
+    },
+    {
+     "t": "fact",
+     "title": "Die Pause vor der Antwort",
+     "text": "Viele Zusagen entstehen in den ersten zwei, drei Sekunden, bevor der denkende Teil unseres Gehirns überhaupt mitreden kann. Schon ein kurzer Aufschub wie „Ich schaue kurz in meinen Kalender und melde mich bis morgen“ gibt dir Zeit, um zu spüren, was du wirklich möchtest. Diese Pause ist eines der wirksamsten Werkzeuge, um aus automatischen Mustern auszusteigen."
+    },
+    {
+     "t": "fact",
+     "title": "Ein Nein braucht keine lange Begründung",
+     "text": "Je mehr Gründe wir aufzählen, desto mehr laden wir das Gegenüber zum Verhandeln ein. Ein kurzes, freundliches Nein mit einem Satz Wertschätzung wird meist besser angenommen als eine lange Rechtfertigung. Du darfst Nein sagen, einfach weil du nicht möchtest oder keine Kapazität hast."
+    },
+    {
+     "t": "h",
+     "text": "Sätze, die dir beim Nein-Sagen helfen"
+    },
+    {
+     "t": "p",
+     "text": "Gerade am Anfang fehlen uns oft einfach die Worte. Deshalb habe ich dir eine Sammlung von Formulierungen zusammengestellt. Lies sie dir in Ruhe durch, markiere die, die sich nach dir anfühlen, und sprich sie ruhig ein paar Mal laut aus, damit sie dir im entscheidenden Moment leichter über die Lippen kommen."
+    },
+    {
+     "t": "list",
+     "items": [
+      "„Danke, dass du an mich denkst. Diesmal sage ich ab.“",
+      "„Das klingt nach einem schönen Projekt, aber ich habe gerade keine Kapazität dafür.“",
+      "„Ich schaue in meinen Kalender und gebe dir morgen Bescheid.“",
+      "„Das passt für mich nicht, und das ist völlig in Ordnung so.“",
+      "„Ich kann den Kuchen backen, den Stand übernehme ich diesmal nicht.“",
+      "„Heute nicht, aber am Donnerstag hätte ich eine halbe Stunde für dich.“",
+      "„Ich merke, dass ich mir zu viel vorgenommen habe, deshalb gebe ich diese Aufgabe zurück.“",
+      "„Darüber möchte ich gerade nicht sprechen.“",
+      "„Ich verstehe, dass dich das enttäuscht. Meine Antwort bleibt trotzdem Nein.“",
+      "„Nach 20 Uhr bin ich nicht mehr erreichbar, ich melde mich morgen früh.“",
+      "„Ich habe mir den Sonntag für die Familie freigehalten, deshalb passt euer Besuch an einem anderen Wochenende besser.“",
+      "„Ich helfe dir gern, wenn du mir sagst, welche andere Aufgabe ich dafür liegen lassen darf.“",
+      "„Nein, danke.“"
+     ]
+    },
+    {
+     "t": "tip",
+     "text": "Übe das Nein zuerst dort, wo wenig auf dem Spiel steht: beim Verkäufer, der dir eine Kundenkarte anbietet, oder bei der Frage, ob du noch einen Nachschlag möchtest. Dein Nervensystem lernt so in kleinen Dosen, dass nach einem Nein nichts Schlimmes passiert, und die großen Situationen werden mit der Zeit leichter."
+    },
+    {
+     "t": "exercise",
+     "title": "Meine Ja-Muster erkennen",
+     "time": "15 Min.",
+     "intro": "Bevor du etwas veränderst, lohnt es sich, ehrlich hinzuschauen, wann und bei wem du automatisch Ja sagst.",
+     "steps": [
+      "Denk an die letzten zwei Wochen zurück und schreib drei Situationen auf, in denen du Ja gesagt hast, obwohl du eigentlich Nein sagen wolltest.",
+      "Notiere zu jeder Situation, wer dich gefragt hat und wie du dich in dem Moment gefühlt hast, als du zugesagt hast.",
+      "Frag dich, was du befürchtet hast, falls du Nein gesagt hättest. Schreib die Befürchtung so ehrlich wie möglich auf, auch wenn sie dir übertrieben vorkommt.",
+      "Überlege, was dich das Ja gekostet hat: Zeit, Schlaf, Energie, Laune oder Zeit mit deinen Liebsten.",
+      "Suche nach einem gemeinsamen Muster. Sind es bestimmte Menschen, bestimmte Lebensbereiche oder bestimmte Situationen, etwa wenn du müde oder überrascht bist?",
+      "Formuliere zum Abschluss einen Satz, den du beim nächsten Mal in einer ähnlichen Situation sagen möchtest."
+     ]
+    },
+    {
+     "t": "prompts",
+     "title": "Meine Ja-Situationen",
+     "lines": 3,
+     "items": [
+      "Situation 1: Wer hat gefragt, was habe ich gesagt, und was hätte ich gern gesagt?",
+      "Situation 2: Wer hat gefragt, was habe ich gesagt, und was hätte ich gern gesagt?",
+      "Situation 3: Wer hat gefragt, was habe ich gesagt, und was hätte ich gern gesagt?",
+      "Das Muster, das ich erkenne:"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Deine Grenzen-Landkarte"
+    },
+    {
+     "t": "p",
+     "text": "Die folgende Tabelle hilft dir, einen Überblick zu bekommen, wo deine Grenzen schon gut gehalten werden und wo sie immer wieder übertreten werden, von anderen oder auch von dir selbst. Trage in jede Zeile ein, wie es dir in diesem Bereich gerade geht, und überlege dir eine kleine Grenze, die du in den nächsten Wochen ausprobieren möchtest."
+    },
+    {
+     "t": "table",
+     "title": "Grenzen-Landkarte",
+     "cols": [
+      "Bereich",
+      "Wo meine Grenze oft übertreten wird",
+      "Wie es sich anfühlt",
+      "Meine neue kleine Grenze"
+     ],
+     "rows": [
+      [
+       "Zeit & Termine",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Körper & Ruhe",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Gefühle & Gespräche",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Familie & Partnerschaft",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Arbeit & Kolleginnen",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Freundschaften",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Handy & Erreichbarkeit",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Geld & Besitz",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Grenzen mir selbst gegenüber",
+       "",
+       "",
+       ""
+      ]
+     ]
+    },
+    {
+     "t": "exercise",
+     "title": "Ein Nein im Körper spüren",
+     "time": "5 Min.",
+     "intro": "Grenzen beginnen im Körper. Diese kleine Übung hilft dir, den Unterschied zwischen einem echten Ja und einem gezwungenen Ja körperlich wahrzunehmen.",
+     "steps": [
+      "Setz dich aufrecht hin oder stell dich hüftbreit hin, spüre deine Füße auf dem Boden und nimm drei ruhige Atemzüge.",
+      "Denk an etwas, worauf du dich ehrlich freust, und sag innerlich Ja dazu. Achte darauf, was in deinem Brustkorb, deinem Bauch und deinen Schultern passiert.",
+      "Denk nun an eine Bitte, der du eigentlich nicht nachkommen möchtest, und sag innerlich trotzdem Ja. Spüre wieder nach, wo sich etwas verändert.",
+      "Sag jetzt zu derselben Bitte innerlich oder leise laut Nein. Beobachte, ob dein Atem sich verändert, ob du dich aufrichtest oder ob sich Unruhe meldet.",
+      "Schreib in ein, zwei Sätzen auf, woran du in Zukunft ein Ja erkennen kannst, das nicht wirklich von dir kommt."
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Deine Ja-zu-mir-Liste"
+    },
+    {
+     "t": "p",
+     "text": "Jedes Nein schafft Platz, und diesen Platz darfst du bewusst füllen. Vielleicht mit einer Stunde im Stall, einer Runde Spazierengehen ohne Kopfhörer, einem Buch, deinem Bewegungsvideo oder einfach einem Nachmittag, an dem nichts geplant ist. Schreib hier alles auf, wozu du in diesem Monat Ja sagen möchtest. Je konkreter, desto besser."
+    },
+    {
+     "t": "checklist",
+     "title": "Wozu ich Ja sagen möchte",
+     "items": [
+      "Meine Bewegungsvideos am Montag und Donnerstag",
+      "Mindestens einen Abend pro Woche, an dem ich früh ins Bett gehe",
+      "Zeit für ein Hobby, das nur mir gehört",
+      "Ein Treffen mit einer Freundin, die mir guttut",
+      "Eine halbe Stunde draußen an der frischen Luft, ohne Aufgabe",
+      "Hilfe annehmen, wenn sie mir angeboten wird",
+      "",
+      "",
+      "",
+      ""
+     ]
+    },
+    {
+     "t": "prompts",
+     "title": "Journaling zu Woche 5",
+     "lines": 4,
+     "items": [
+      "Welche Botschaften über das Nein-Sagen habe ich als Kind gehört, und welche davon möchte ich heute nicht mehr glauben?",
+      "Bei welchem Menschen fällt es mir am schwersten, eine Grenze zu ziehen, und was macht es gerade bei ihm so schwer?",
+      "Wie würde meine Woche aussehen, wenn ich nur noch Ja sage, wenn ich es wirklich meine?",
+      "Welche Grenze habe ich in dieser Woche gehalten, und wie habe ich mich danach gefühlt?"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Deine Bewegung diese Woche"
+    },
+    {
+     "t": "p",
+     "text": "Dein Full-Day-Flow am Montag heißt „Herz öffnen“. Er weitet deinen Brustkorb, deine Schultern und deinen Atemraum, damit du wieder aufrecht und offen stehen kannst. Mir gefällt diese Verbindung zum Thema Grenzen sehr, denn wer gut für sich einsteht, darf sich gleichzeitig offen und weich fühlen. Am Donnerstag wartet der Tired-Day-Flow „Wirbelsäule wecken“ auf dich, mit dem du deine Wirbelsäule ganz ohne Anstrengung in alle Richtungen bewegst. Achte bei beiden Videos darauf, wie es sich anfühlt, wenn du eine Position verlässt, sobald dein Körper sagt, dass es genug ist. Auch das ist eine Grenze, die du respektierst."
+    },
+    {
+     "t": "quote",
+     "text": "Mein Nein schützt mein Ja. Ich darf meine Zeit und meine Kraft dorthin geben, wo mein Herz ist."
+    }
+   ]
+  },
+  {
+   "icon": "stern",
+   "kicker": "Woche 6",
+   "title": "Was dich ausmacht",
+   "intro": "Wer bist du, wenn du gerade für niemanden etwas erledigen musst? In dieser Woche gehen wir auf die Suche nach deinen Werten, deinen Stärken und dem, was dich lebendig macht.",
+   "blocks": [
+    {
+     "t": "h",
+     "text": "Dein Impuls für diese Woche"
+    },
+    {
+     "t": "p",
+     "text": "Wenn ich Frauen in meinen Kursen bitte, sich kurz vorzustellen, passiert fast immer dasselbe. Sie erzählen, wie viele Kinder sie haben, wo sie arbeiten und vielleicht noch, wo sie wohnen. Wenn ich dann nachfrage, was sie selbst ausmacht, was sie gut können und was ihnen wirklich wichtig ist, entsteht oft eine lange Pause. Diese Pause zeigt mir jedes Mal, wie selten wir uns diese Frage stellen, wenn der Alltag aus Terminen, Einkaufslisten und den Bedürfnissen anderer besteht."
+    },
+    {
+     "t": "p",
+     "text": "Selbstwert hat viel mit Selbstkenntnis zu tun. Wer weiß, was ihm wichtig ist und was er gut kann, steht auf einem festeren Boden. Entscheidungen werden leichter, weil du einen inneren Kompass hast. Kritik trifft dich weniger tief, weil sie nicht gleich dein ganzes Bild von dir ins Wanken bringt. Und du verschwendest weniger Energie damit, ein Leben zu führen, das eigentlich zu jemand anderem passt. Genau deshalb steht diese Woche zwischen den Grenzen und der inneren Kritikerin, denn erst wenn du weißt, was du schützen möchtest, kannst du klar dafür einstehen."
+    },
+    {
+     "t": "p",
+     "text": "Fangen wir bei den Werten an. Werte sind die Dinge, die dir im Leben wirklich wichtig sind, unabhängig davon, ob sie gerade modern sind oder ob deine Familie sie teilt. Sie zeigen sich in deinen Entscheidungen, in dem, worüber du dich ärgerst, und in den Momenten, in denen du dich ganz bei dir fühlst. Eine Frau, für die Freiheit ein zentraler Wert ist, leidet unter einem durchgetakteten Kalender ganz anders als eine Frau, der Sicherheit und Ordnung besonders wichtig sind. Keine der beiden ist besser oder schlechter, sie brauchen einfach unterschiedliche Dinge, um sich wohlzufühlen."
+    },
+    {
+     "t": "p",
+     "text": "Spannend wird es dort, wo wir gegen unsere Werte leben, oft ohne es zu bemerken. Wenn dir Kreativität sehr viel bedeutet, du aber seit Jahren keinen Pinsel, keinen Ton und kein Notizbuch mehr in der Hand hattest, entsteht eine leise Unzufriedenheit, die schwer zu benennen ist. Wenn Ehrlichkeit für dich ganz oben steht und du in deiner Familie ständig Dinge herunterschluckst, um den Frieden zu wahren, kostet dich das enorm viel Kraft. Viele Gefühle von Leere oder Gereiztheit lassen sich besser verstehen, wenn wir sie mit unseren Werten abgleichen."
+    },
+    {
+     "t": "p",
+     "text": "Werte verändern sich übrigens im Laufe des Lebens. Mit Anfang zwanzig war dir vielleicht Abenteuer am wichtigsten, mit kleinen Kindern Geborgenheit und Stabilität, und jetzt meldet sich vielleicht wieder etwas, das lange geschlafen hat. Deshalb lohnt es sich, immer wieder neu hinzuschauen, statt an einem Bild von dir festzuhalten, das vor zehn Jahren gestimmt hat."
+    },
+    {
+     "t": "p",
+     "text": "Dann gibt es deine Stärken. Vielen von uns fällt es unglaublich schwer, die eigenen Stärken zu benennen. Das liegt zum einen daran, dass wir gelernt haben, bescheiden zu sein und uns nicht in den Vordergrund zu stellen. Zum anderen fallen uns unsere größten Stärken oft gar nicht auf, weil sie uns so leichtfallen. Wenn du ganz selbstverständlich den Überblick über fünf Terminkalender behältst, in Krisen ruhig bleibst oder spürst, wie es einem Menschen geht, bevor er etwas sagt, dann hältst du das wahrscheinlich für normal. Für viele andere ist es das ganz und gar nicht."
+    },
+    {
+     "t": "p",
+     "text": "In der Positiven Psychologie gibt es dazu einen schönen Gedanken: Es bringt uns oft weiter, unsere Stärken bewusst einzusetzen, als ständig an unseren Schwächen herumzufeilen. Das heißt nicht, dass Schwächen egal wären. Aber die Energie, mit der du dich seit Jahren dafür kritisierst, dass du nicht ordentlicher, schneller oder geduldiger bist, kannst du auch in das investieren, was dich ohnehin auszeichnet. Viele Frauen erleben in dem Moment, in dem sie ihre Stärken klar vor sich sehen, eine richtige Erleichterung."
+    },
+    {
+     "t": "p",
+     "text": "Und schließlich geht es diese Woche um das, was dich lebendig macht. Das sind die Momente, in denen du die Zeit vergisst, in denen du dich leicht und wach fühlst und nach denen du mehr Energie hast als vorher. Für die eine ist es das Arbeiten mit den Händen, für die andere ein tiefes Gespräch, für die nächste ein Ritt durch den Wald, Musik, Gartenarbeit oder das Organisieren eines Festes. Diese Momente sind wertvolle Hinweise auf deine Werte und Stärken, und sie werden im nächsten Monat eine große Rolle spielen, wenn du deine eine Idee auswählst."
+    },
+    {
+     "t": "p",
+     "text": "Ich lade dich ein, in dieser Woche neugierig zu sein, so wie du es bei einer neuen Freundin wärst, die du gerade erst kennenlernst. Frag dich selbst, hör dir zu und frag auch die Menschen, die dich gut kennen. Du wirst überrascht sein, wie viel da ist, wenn du einmal bewusst hinschaust."
+    },
+    {
+     "t": "fact",
+     "title": "Die 24 Charakterstärken",
+     "text": "Die Psychologen Christopher Peterson und Martin Seligman haben gemeinsam mit vielen Kolleginnen und Kollegen 24 Charakterstärken beschrieben, die sich in Kulturen auf der ganzen Welt wiederfinden, darunter Neugier, Freundlichkeit, Ausdauer, Humor, Dankbarkeit und Kreativität. Jeder Mensch trägt alle in sich, aber in unterschiedlicher Ausprägung. Wenn du Lust hast, tiefer einzusteigen, findest du online den kostenlosen VIA-Fragebogen, der dir deine persönlichen Top-Stärken zeigt."
+    },
+    {
+     "t": "fact",
+     "title": "Warum wir unsere Stärken übersehen",
+     "text": "Was uns leichtfällt, halten wir oft für selbstverständlich und gehen davon aus, dass es anderen genauso geht. Gleichzeitig nimmt unser Gehirn Fehler und Schwächen viel aufmerksamer wahr als das, was gut läuft. Ein Blick von außen ist deshalb so wertvoll: Menschen, die uns mögen, sehen unsere Stärken oft klarer als wir selbst."
+    },
+    {
+     "t": "fact",
+     "title": "Werte als Kompass",
+     "text": "Studien aus der Akzeptanz- und Commitment-Therapie und der Motivationsforschung zeigen, dass Ziele, die mit den eigenen Werten verbunden sind, länger verfolgt werden und mehr Zufriedenheit bringen als Ziele, die wir aus Pflichtgefühl oder für die Anerkennung anderer verfolgen. Deine Werte zu kennen, ist deshalb eine gute Vorbereitung auf Monat 3."
+    },
+    {
+     "t": "h",
+     "text": "Deine Werte finden"
+    },
+    {
+     "t": "p",
+     "text": "Lies dir die folgende Liste in Ruhe durch und kreuze alle Werte an, die dich ansprechen. Nimm dir dafür ruhig Zeit und gehe nach deinem Bauchgefühl. Wichtig ist allein, was in dir wirklich mitschwingt, ganz gleich, welche Werte gut klingen oder was eine gute Mutter angeblich wählen würde. Unten ist noch Platz für Werte, die dir fehlen."
+    },
+    {
+     "t": "checklist",
+     "title": "Werte-Auswahl",
+     "items": [
+      "Abenteuer",
+      "Achtsamkeit",
+      "Anerkennung",
+      "Authentizität",
+      "Balance",
+      "Begeisterung",
+      "Bildung",
+      "Dankbarkeit",
+      "Ehrlichkeit",
+      "Familie",
+      "Fairness",
+      "Freiheit",
+      "Freundschaft",
+      "Fürsorge",
+      "Geborgenheit",
+      "Gelassenheit",
+      "Gemeinschaft",
+      "Gerechtigkeit",
+      "Gesundheit",
+      "Glaube und Spiritualität",
+      "Großzügigkeit",
+      "Harmonie",
+      "Humor",
+      "Kreativität",
+      "Lebensfreude",
+      "Leichtigkeit",
+      "Liebe",
+      "Loyalität",
+      "Mitgefühl",
+      "Mut",
+      "Natur",
+      "Neugier",
+      "Offenheit",
+      "Ordnung",
+      "Respekt",
+      "Ruhe",
+      "Schönheit",
+      "Selbstbestimmung",
+      "Sicherheit",
+      "Sinn",
+      "Spaß",
+      "Stabilität",
+      "Tradition",
+      "Unabhängigkeit",
+      "Verantwortung",
+      "Verbundenheit",
+      "Vertrauen",
+      "Wachstum",
+      "Weisheit",
+      "Wertschätzung",
+      "Zugehörigkeit",
+      "Zuverlässigkeit",
+      "",
+      "",
+      "",
+      ""
+     ]
+    },
+    {
+     "t": "exercise",
+     "title": "Deine Top-5-Werte",
+     "time": "20 Min.",
+     "intro": "Aus deinen angekreuzten Werten wählst du nun Schritt für Schritt die fünf aus, die dir im Moment am wichtigsten sind.",
+     "steps": [
+      "Schau dir alle Werte an, die du angekreuzt hast, und streiche die, bei denen du beim zweiten Lesen zögerst.",
+      "Fasse ähnliche Werte zusammen, zum Beispiel Ruhe, Gelassenheit und Balance, und wähle für jede Gruppe das Wort, das sich am stimmigsten anfühlt.",
+      "Reduziere deine Liste auf zehn Werte. Das darf sich schwer anfühlen, denn du verlierst keinen Wert, du setzt nur Prioritäten für diese Lebensphase.",
+      "Stell dir bei jedem verbleibenden Paar die Frage, welchen der beiden Werte du behalten würdest, wenn du dich entscheiden müsstest, und streiche dich so auf fünf herunter.",
+      "Trage deine fünf Werte in die Tabelle unten ein und schreib zu jedem auf, was er ganz konkret für dich bedeutet.",
+      "Schätze ehrlich ein, wie sehr du diesen Wert im Moment lebst, auf einer Skala von 1 bis 10, und überlege dir einen kleinen Schritt, um ihm mehr Raum zu geben."
+     ]
+    },
+    {
+     "t": "table",
+     "title": "Meine Top-5-Werte",
+     "cols": [
+      "Wert",
+      "Was er für mich bedeutet",
+      "So sehr lebe ich ihn (1–10)",
+      "Ein kleiner Schritt"
+     ],
+     "rows": 5
+    },
+    {
+     "t": "tip",
+     "text": "Schreib deine fünf Werte auf ein kleines Kärtchen und stell es dorthin, wo du jeden Morgen vorbeikommst, an den Badezimmerspiegel oder neben die Kaffeemaschine. Wenn du vor einer Entscheidung stehst, frag dich kurz, welche Möglichkeit besser zu deinen Werten passt."
+    },
+    {
+     "t": "h",
+     "text": "Der Stärken-Spiegel"
+    },
+    {
+     "t": "p",
+     "text": "Für diese Übung brauchst du ein wenig Mut, denn du bittest drei Menschen, die dich gut kennen und denen du vertraust, dir etwas über dich zu erzählen. Das kann deine Partnerin oder dein Partner sein, eine Freundin, deine Schwester, eine Kollegin oder ein älteres Kind. Wähle Menschen, die es gut mit dir meinen. Du kannst die Fragen per Nachricht schicken, damit sie in Ruhe antworten können, oder sie bei einem Spaziergang stellen."
+    },
+    {
+     "t": "exercise",
+     "title": "Stärken-Spiegel: drei Menschen fragen",
+     "time": "über die Woche verteilt",
+     "intro": "Andere sehen oft, was wir an uns selbst übersehen. Mit diesen Fragen sammelst du einen liebevollen Blick von außen.",
+     "steps": [
+      "Wähle drei Menschen aus, die dich in unterschiedlichen Lebensbereichen erleben, zum Beispiel zu Hause, bei der Arbeit und im Freundeskreis.",
+      "Schreib ihnen eine kurze Nachricht, etwa: „Ich mache gerade ein Programm, in dem es um meine Stärken geht. Magst du mir ganz ehrlich ein paar Fragen beantworten? Es würde mir viel bedeuten.“",
+      "Stelle ihnen diese Fragen: Was kann ich deiner Meinung nach besonders gut? Wofür würdest du mich um Hilfe bitten? In welchen Momenten erlebst du mich ganz in meinem Element? Welche drei Wörter beschreiben mich am besten? Was traust du mir zu, was ich mir vielleicht selbst noch nicht zutraue?",
+      "Nimm die Antworten an, ohne sie kleinzureden oder sofort zu relativieren. Ein einfaches „Danke, das berührt mich“ reicht völlig.",
+      "Trage die Antworten in die Tabelle ein und markiere alles, was mehrfach genannt wurde.",
+      "Lies dir am Ende alles laut vor und spüre nach, welche Rückmeldung dich am meisten überrascht oder berührt hat."
+     ]
+    },
+    {
+     "t": "table",
+     "title": "Mein Stärken-Spiegel",
+     "cols": [
+      "Frage",
+      "Person 1",
+      "Person 2",
+      "Person 3"
+     ],
+     "rows": [
+      [
+       "Was kann ich besonders gut?",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Wofür würdest du mich um Hilfe bitten?",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Wann bin ich ganz in meinem Element?",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Drei Wörter, die mich beschreiben",
+       "",
+       "",
+       ""
+      ],
+      [
+       "Was traust du mir zu?",
+       "",
+       "",
+       ""
+      ]
+     ]
+    },
+    {
+     "t": "prompts",
+     "title": "Was der Spiegel mir zeigt",
+     "lines": 3,
+     "items": [
+      "Was wurde mehrfach genannt?",
+      "Was hat mich überrascht, und warum fällt es mir vielleicht schwer, es zu glauben?",
+      "Welche Stärke möchte ich in den nächsten Wochen bewusster einsetzen?"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Was mich lebendig macht"
+    },
+    {
+     "t": "exercise",
+     "title": "Spurensuche: Wann ich die Zeit vergesse",
+     "time": "20 Min.",
+     "intro": "Diese Übung führt dich zurück zu den Momenten, in denen du dich ganz lebendig gefühlt hast. Darin stecken wertvolle Hinweise auf das, was du brauchst und was du der Welt geben kannst.",
+     "steps": [
+      "Nimm dir ein Getränk, das du magst, setz dich an einen ruhigen Ort und atme ein paar Mal tief in den Bauch.",
+      "Erinnere dich an drei bis fünf Momente aus deinem Leben, in denen du die Zeit vergessen hast, egal ob aus der Kindheit, der Jugend oder der letzten Woche.",
+      "Schreib zu jedem Moment auf, was du gemacht hast, mit wem du dort warst und wo das war.",
+      "Frag dich, was genau dich daran so erfüllt hat: Hast du etwas erschaffen, hast du anderen geholfen, hast du etwas gelernt, warst du in der Natur oder hast du etwas organisiert?",
+      "Suche nach Gemeinsamkeiten und schreib sie in einem Satz auf, der mit „Ich fühle mich lebendig, wenn …“ beginnt."
+     ]
+    },
+    {
+     "t": "table",
+     "title": "Meine lebendigen Momente",
+     "cols": [
+      "Moment",
+      "Was ich gemacht habe",
+      "Was mich daran erfüllt hat"
+     ],
+     "rows": 5
+    },
+    {
+     "t": "prompts",
+     "title": "Journaling zu Woche 6",
+     "lines": 4,
+     "items": [
+      "Ich fühle mich lebendig, wenn …",
+      "Wer bin ich, wenn ich gerade für niemanden etwas erledigen muss?",
+      "Welcher meiner Werte kommt in meinem Alltag im Moment zu kurz, und was würde sich verändern, wenn er mehr Platz bekäme?",
+      "Worauf bin ich an mir stolz, ganz unabhängig von dem, was ich für andere leiste?"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Deine Bewegung diese Woche"
+    },
+    {
+     "t": "p",
+     "text": "Am Montag erwartet dich der Full-Day-Flow „Kraft in den Flanken“. Er stärkt deine seitliche Rumpfmuskulatur und deine Taille und schenkt dir Halt und Länge zugleich. Ich finde, das passt wunderbar zu einer Woche, in der du deine eigenen Stärken entdeckst. Am Donnerstag kommt mit „Schultern loslassen“ ein sanfter Tired-Day-Flow für Nacken und Schultern, die zu viel tragen. Vielleicht bemerkst du dabei, wie viel du jeden Tag schulterst, und darfst einen Teil davon für ein paar Minuten ablegen."
+    },
+    {
+     "t": "quote",
+     "text": "Ich muss mir meinen Wert nicht verdienen. Ich darf entdecken, wer ich schon bin."
+    }
+   ]
+  },
+  {
+   "icon": "spiegel",
+   "kicker": "Woche 7",
+   "title": "Die innere Kritikerin",
+   "intro": "Fast jede Frau kennt sie: die Stimme, die sagt, dass du nicht gut genug, nicht schlank genug oder nicht organisiert genug bist. In dieser Woche lernst du sie kennen und übst, ihr freundlich zu antworten.",
+   "blocks": [
+    {
+     "t": "h",
+     "text": "Dein Impuls für diese Woche"
+    },
+    {
+     "t": "p",
+     "text": "Stell dir vor, eine Freundin ruft dich an und erzählt, dass sie den Elternabend vergessen hat, dass das Abendessen angebrannt ist und dass sie sich heute einfach überfordert fühlt. Was würdest du ihr sagen? Wahrscheinlich etwas wie: „Das ist doch ganz normal bei allem, was du gerade stemmst. Mach dir einen Tee und sei nicht so streng mit dir.“ Und jetzt stell dir vor, dir selbst passiert genau dasselbe. Was sagst du dann zu dir? Bei vielen Frauen klingt es ganz anders: „Typisch, du bekommst einfach nichts auf die Reihe. Andere schaffen das doch auch.“"
+    },
+    {
+     "t": "p",
+     "text": "Diese Stimme nenne ich die innere Kritikerin. Sie ist der Teil in uns, der ständig bewertet, vergleicht und Fehler sucht. Sie meldet sich, wenn du in den Spiegel schaust, wenn du eine neue Idee hast, wenn du dich in einer Gruppe zu Wort melden möchtest oder wenn du abends auf den Tag zurückblickst. Bei manchen ist sie laut und harsch, bei anderen eher leise und subtil, wie ein ständiges Hintergrundrauschen aus Zweifeln."
+    },
+    {
+     "t": "p",
+     "text": "Woher kommt sie? Die innere Kritikerin entsteht nicht aus dem Nichts. Oft setzt sie sich aus Stimmen zusammen, die wir früher gehört haben, von Eltern, Lehrerinnen, Geschwistern oder Gleichaltrigen. Sätze wie „Stell dich nicht so an“, „Was sollen denn die Leute denken“ oder „Aus dir wird nie etwas“ graben sich tief ein, besonders wenn wir sie als Kinder oft gehört haben. Dazu kommen gesellschaftliche Botschaften, die Frauen ein Leben lang begleiten: wie wir auszusehen haben, wie eine gute Mutter sein sollte, wie viel wir leisten müssen, um etwas wert zu sein. Social Media verstärkt das noch, weil wir uns dort ständig mit sorgfältig ausgewählten Ausschnitten aus dem Leben anderer vergleichen."
+    },
+    {
+     "t": "p",
+     "text": "Das Überraschende ist, dass die innere Kritikerin in den meisten Fällen eigentlich etwas Gutes will. Sie möchte dich schützen. Sie hat irgendwann gelernt, dass du sicherer bist, wenn du keine Fehler machst, wenn du nicht auffällst und wenn du dich anstrengst, bevor jemand anderes dich kritisieren kann. Sie ist sozusagen ein übereifriger Bodyguard, der mit veralteten Methoden arbeitet. Das Problem ist nur, dass ihre Strategie dich heute eher klein hält als schützt. Sie verhindert, dass du Neues ausprobierst, dass du dich zeigst und dass du freundlich mit dir umgehst, wenn etwas schiefgeht."
+    },
+    {
+     "t": "p",
+     "text": "Aus der Forschung wissen wir inzwischen recht gut, dass harte Selbstkritik selten zu besseren Leistungen führt. Der britische Psychologe Paul Gilbert beschreibt, dass Selbstkritik in unserem Körper ähnlich wirken kann wie eine Bedrohung von außen. Das Stresssystem springt an, wir fühlen uns angespannt, beschämt und wollen uns am liebsten verstecken. In diesem Zustand fällt es schwer, klar zu denken, aus Fehlern zu lernen oder mutig etwas Neues zu wagen. Wer dagegen freundlich mit sich spricht, aktiviert eher das System, das für Beruhigung, Verbundenheit und Sicherheit zuständig ist, und genau aus diesem Zustand heraus wachsen wir."
+    },
+    {
+     "t": "p",
+     "text": "Viele Frauen haben Sorge, dass sie faul oder nachlässig werden, wenn sie die Kritikerin leiser drehen. „Wenn ich nicht streng mit mir bin, bekomme ich gar nichts mehr hin“, höre ich oft. Die Forschung der amerikanischen Psychologin Kristin Neff zeigt aber eher das Gegenteil. Menschen mit mehr Selbstmitgefühl übernehmen oft mehr Verantwortung für ihre Fehler, weil diese sie nicht mehr so tief erschüttern. Sie probieren nach einem Misserfolg eher wieder etwas aus und bleiben langfristig motivierter. Selbstmitgefühl ist also eine stabile Grundlage, auf der Verantwortung und Wachstum viel leichter werden."
+    },
+    {
+     "t": "p",
+     "text": "Der erste Schritt im Umgang mit der inneren Kritikerin ist, sie überhaupt zu bemerken. Ihre Sätze laufen oft so automatisch ab, dass wir sie für die Wahrheit halten. Wenn du anfängst, sie zu beobachten, entsteht ein kleiner Abstand. Du erkennst: Das bin nicht ich, das ist ein Gedanke, den ich schon tausendmal gedacht habe. Manchen Frauen hilft es, ihrer Kritikerin einen Namen zu geben oder sie sich als Figur vorzustellen, etwa als strenge Gouvernante mit Brille oder als nervöses kleines Wesen, das ständig Alarm schlägt. Das klingt vielleicht verspielt, aber es schafft genau diesen hilfreichen Abstand."
+    },
+    {
+     "t": "p",
+     "text": "Der zweite Schritt ist, ihr zu antworten, und zwar weder mit Gegenangriff noch mit Unterwerfung. Du musst nicht mit ihr streiten und sie auch nicht zum Schweigen bringen. Du darfst ihr zuhören, ihr für ihre Sorge danken und dann selbst entscheiden, was du glauben möchtest. Ein Satz wie „Ich höre dich, und ich weiß, dass du mich schützen willst. Ich probiere es trotzdem“ kann erstaunlich viel verändern."
+    },
+    {
+     "t": "p",
+     "text": "Sei geduldig mit dir in dieser Woche. Die innere Kritikerin hat oft Jahrzehnte Vorsprung, und sie wird sich nicht in sieben Tagen in eine liebevolle Begleiterin verwandeln. Aber jedes Mal, wenn du sie bemerkst und dich bewusst für einen freundlicheren Satz entscheidest, entsteht eine neue Spur in deinem Gehirn. Und Spuren, die wir oft gehen, werden mit der Zeit zu Wegen. Falls du merkst, dass dich die Stimme sehr stark belastet, dass sie dich lähmt oder dass dunkle Gedanken dazukommen, dann hol dir bitte Unterstützung bei einer Therapeutin oder Ärztin. Das ist ein Zeichen von Stärke und Selbstfürsorge."
+    },
+    {
+     "t": "fact",
+     "title": "Der Negativitätseffekt",
+     "text": "Unser Gehirn reagiert auf Negatives meist stärker als auf Positives. Kritik bleibt länger hängen als Lob, und ein unangenehmer Moment kann einen ganzen schönen Tag überschatten. Psychologinnen und Psychologen nennen das den Negativitätseffekt. Er war für unsere Vorfahren sinnvoll, um Gefahren schnell zu erkennen. Heute hilft es zu wissen, dass die innere Kritikerin von dieser eingebauten Tendenz profitiert und dass wir bewusst gegensteuern dürfen."
+    },
+    {
+     "t": "fact",
+     "title": "Die drei Bausteine des Selbstmitgefühls",
+     "text": "Kristin Neff beschreibt Selbstmitgefühl mit drei Elementen. Achtsamkeit bedeutet, den eigenen Schmerz wahrzunehmen, ohne ihn zu übergehen oder sich darin zu verlieren. Gemeinsames Menschsein bedeutet, sich daran zu erinnern, dass alle Menschen Fehler machen und leiden und dass du damit nicht allein bist. Freundlichkeit mit sich selbst bedeutet, sich so zu begegnen, wie man einer guten Freundin begegnen würde."
+    },
+    {
+     "t": "fact",
+     "title": "Die Kraft einer beruhigenden Berührung",
+     "text": "Eine warme Hand auf dem Herzen oder eine sanfte Umarmung kann dem Nervensystem Sicherheit signalisieren. Forschung zu Berührung legt nahe, dass dabei Prozesse in Gang kommen, die mit Beruhigung und Verbundenheit zu tun haben, etwa die Ausschüttung von Oxytocin. Das funktioniert auch, wenn du dich selbst berührst, und ist deshalb ein fester Teil der Selbstmitgefühls-Pause."
+    },
+    {
+     "t": "h",
+     "text": "Typische Sätze der inneren Kritikerin"
+    },
+    {
+     "t": "p",
+     "text": "Lies dir die folgende Liste durch und kreuze die Sätze an, die du von dir kennst. Unten ist Platz für ihre ganz persönlichen Lieblingssätze, denn jede Kritikerin hat ihre eigene Sprache."
+    },
+    {
+     "t": "checklist",
+     "title": "Kenne ich das?",
+     "items": [
+      "„Du bist nicht gut genug.“",
+      "„Andere schaffen das doch auch, warum du nicht?“",
+      "„Wer bist du schon, dass du das versuchen willst?“",
+      "„Das wird sowieso nichts.“",
+      "„Du bist eine schlechte Mutter, wenn du dir Zeit für dich nimmst.“",
+      "„Stell dich nicht so an.“",
+      "„Du siehst schrecklich aus.“",
+      "„Du hast schon wieder alles vergessen.“",
+      "„Was sollen die anderen von dir denken?“",
+      "„Das hättest du besser machen müssen.“",
+      "„Du bist zu alt, zu spät dran oder zu unerfahren dafür.“",
+      "„Erst wenn alles erledigt ist, darfst du dich ausruhen.“",
+      "„Du bist zu viel.“",
+      "„Du bist nicht genug.“",
+      "",
+      "",
+      ""
+     ]
+    },
+    {
+     "t": "exercise",
+     "title": "Deine Kritikerin kennenlernen",
+     "time": "20 Min.",
+     "intro": "Wenn du weißt, wie deine Kritikerin spricht, wann sie sich meldet und was sie eigentlich will, verliert sie einen Teil ihrer Macht.",
+     "steps": [
+      "Setz dich bequem hin, leg eine Hand auf deinen Bauch und nimm ein paar ruhige Atemzüge, bei denen die Ausatmung etwas länger ist als die Einatmung.",
+      "Stell dir deine innere Kritikerin als Figur vor. Wie sieht sie aus, wie alt ist sie, wie klingt ihre Stimme, und welche Kleidung trägt sie?",
+      "Gib ihr einen Namen, der dich vielleicht sogar ein wenig schmunzeln lässt.",
+      "Schreib auf, in welchen Situationen sie sich besonders oft meldet, zum Beispiel morgens vor dem Spiegel, in der Arbeit, beim Kochen oder wenn du an deine Ideen denkst.",
+      "Frag sie in Gedanken, wovor sie dich schützen möchte, und schreib die erste Antwort auf, die kommt.",
+      "Formuliere einen freundlichen Satz, mit dem du ihr ab jetzt antworten möchtest, etwa: „Danke, dass du auf mich aufpasst. Ich komme zurecht.“"
+     ]
+    },
+    {
+     "t": "prompts",
+     "title": "Meine Kritikerin",
+     "lines": 3,
+     "items": [
+      "So sieht sie aus, und so heißt sie:",
+      "Hier meldet sie sich besonders oft:",
+      "Ihre Lieblingssätze:",
+      "Wovor sie mich schützen möchte:",
+      "Mein freundlicher Antwortsatz:"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Dein Gedanken-Protokoll"
+    },
+    {
+     "t": "p",
+     "text": "Das Gedanken-Protokoll ist ein Werkzeug, das du die ganze Woche über nutzen kannst. Immer wenn du bemerkst, dass die Kritikerin laut wird, notierst du die Situation und ihren Satz. Dann stellst du dir vor, was eine liebevolle Freundin in derselben Situation zu dir sagen würde, und formulierst daraus einen neuen Satz, den du glauben kannst. Er muss nicht übertrieben positiv sein, er sollte sich einfach ehrlich und freundlich anfühlen. Das erste Beispiel habe ich dir schon ausgefüllt."
+    },
+    {
+     "t": "table",
+     "title": "Gedanken-Protokoll",
+     "cols": [
+      "Situation",
+      "Was die Kritikerin sagt",
+      "Was eine Freundin sagen würde",
+      "Mein neuer Satz"
+     ],
+     "rows": [
+      [
+       "Ich habe den Elternabend vergessen.",
+       "„Du bekommst einfach nichts auf die Reihe.“",
+       "„Du jonglierst gerade so viel, da rutscht auch mal etwas durch.“",
+       "„Ich habe etwas vergessen, und ich kann die Lehrerin morgen anrufen.“"
+      ],
+      [
+       "",
+       "",
+       "",
+       ""
+      ],
+      [
+       "",
+       "",
+       "",
+       ""
+      ],
+      [
+       "",
+       "",
+       "",
+       ""
+      ],
+      [
+       "",
+       "",
+       "",
+       ""
+      ],
+      [
+       "",
+       "",
+       "",
+       ""
+      ],
+      [
+       "",
+       "",
+       "",
+       ""
+      ],
+      [
+       "",
+       "",
+       "",
+       ""
+      ]
+     ]
+    },
+    {
+     "t": "tip",
+     "text": "Sprich deinen neuen Satz laut aus, am besten mit einer Hand auf dem Herzen. Es fühlt sich am Anfang vielleicht seltsam an, aber unser Gehirn nimmt Sätze, die wir laut hören, ganz anders auf als Gedanken, die nur durch den Kopf ziehen."
+    },
+    {
+     "t": "h",
+     "text": "Die Selbstmitgefühls-Pause"
+    },
+    {
+     "t": "p",
+     "text": "Diese kleine Übung geht auf Kristin Neff zurück, und ich habe sie dir hier in meinen eigenen Worten aufgeschrieben. Sie dauert nur ein bis zwei Minuten und lässt sich überall machen, im Auto vor dem Kindergarten, auf der Toilette in der Arbeit oder abends im Bett. Du kannst sie immer dann nutzen, wenn du merkst, dass dir etwas schwerfällt oder die Kritikerin laut wird."
+    },
+    {
+     "t": "exercise",
+     "title": "Selbstmitgefühls-Pause",
+     "time": "2 Min.",
+     "intro": "Drei kurze Sätze und eine Berührung, die dich in einem schwierigen Moment zu dir zurückholen.",
+     "steps": [
+      "Halte inne und nimm wahr, was gerade schwer ist. Sag dir innerlich einen Satz, der das anerkennt, zum Beispiel: „Das ist gerade wirklich anstrengend“ oder „Das tut weh.“",
+      "Erinnere dich daran, dass du damit nicht allein bist. Sag dir zum Beispiel: „Viele Frauen fühlen sich in solchen Momenten genauso“ oder „Fehler und Überforderung gehören zum Menschsein dazu.“",
+      "Leg eine oder beide Hände auf dein Herz, deinen Bauch oder an deine Wangen, dort, wo es sich für dich tröstlich anfühlt, und spüre die Wärme deiner Hände.",
+      "Sag dir einen freundlichen Satz, so als würdest du mit einer guten Freundin sprechen, etwa: „Ich darf freundlich mit mir sein“, „Ich gebe mein Bestes, und das reicht“ oder „Was brauche ich gerade?“",
+      "Bleib noch zwei, drei Atemzüge in dieser Haltung und spüre nach, ob sich in deinem Körper etwas verändert hat."
+     ]
+    },
+    {
+     "t": "breath",
+     "title": "Atmen mit langer Ausatmung",
+     "pattern": "4 · 6",
+     "text": "Atme vier Zähler lang durch die Nase ein und sechs Zähler lang sanft durch die Nase oder durch leicht geöffnete Lippen wieder aus. Eine Ausatmung, die etwas länger ist als die Einatmung, kann deinem Nervensystem helfen, vom Alarm in die Ruhe zu wechseln. Wiederhole das sechs bis zehn Runden lang, am besten direkt vor oder nach der Selbstmitgefühls-Pause. Wenn dir schwindelig wird, atme einfach wieder normal weiter."
+    },
+    {
+     "t": "exercise",
+     "title": "Ein Brief von deiner besten Freundin",
+     "time": "20 Min.",
+     "intro": "Bei dieser Übung schreibst du dir selbst einen Brief, aber aus der Sicht eines Menschen, der dich bedingungslos liebt und versteht.",
+     "steps": [
+      "Denk an etwas, wofür du dich im Moment kritisierst, etwa an deinen Körper, deine Geduld mit den Kindern oder ein Projekt, das du nicht beendet hast.",
+      "Stell dir eine Freundin vor, die dich vollkommen annimmt, mit allen Stärken und Schwächen. Das kann eine echte Person sein oder eine erdachte.",
+      "Schreib aus ihrer Sicht einen Brief an dich. Was würde sie über die Situation sagen? Wie würde sie dich daran erinnern, dass du ein Mensch bist? Was würde sie dir wünschen?",
+      "Leg den Brief für ein paar Stunden zur Seite und lies ihn dann langsam, am besten laut, und lass die Worte wirken.",
+      "Heb ihn auf, damit du ihn an schwierigen Tagen wieder hervorholen kannst."
+     ]
+    },
+    {
+     "t": "notes",
+     "title": "Mein Brief",
+     "lines": 18
+    },
+    {
+     "t": "prompts",
+     "title": "Journaling zu Woche 7",
+     "lines": 4,
+     "items": [
+      "Wessen Stimmen höre ich in meiner inneren Kritikerin, und welche davon gehören eigentlich gar nicht zu mir?",
+      "Wovon hat mich die Kritikerin in meinem Leben schon abgehalten?",
+      "Wie würde sich mein Alltag verändern, wenn ich so mit mir spreche wie mit einer guten Freundin?",
+      "In welchem Moment dieser Woche ist es mir gelungen, freundlich mit mir zu sein?"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Deine Bewegung diese Woche"
+    },
+    {
+     "t": "p",
+     "text": "Dein Full-Day-Flow am Montag heißt „Wachsen in die Länge“. Er richtet dich von den Füßen bis zum Scheitel auf und enthält eine Kraftrunde für deinen Rücken. Ich mag es sehr, in einer Woche, in der die innere Kritikerin dich klein machen möchte, ganz körperlich in die Größe zu gehen. Achte einmal darauf, wie sich deine Gedanken verändern, wenn du aufrecht und stabil stehst. Am Donnerstag folgt der Tired-Day-Flow „Drehen und lösen“ mit sanften Drehungen, die deinen Rumpf auswringen und deinen Kopf frei machen, genau richtig nach einem Tag voller kritischer Gedanken."
+    },
+    {
+     "t": "quote",
+     "text": "Ich darf mit mir sprechen wie mit einem Menschen, den ich liebe."
+    }
+   ]
+  },
+  {
+   "icon": "rakete",
+   "kicker": "Woche 8",
+   "title": "Ideen dürfen sprudeln",
+   "intro": "Jetzt, wo du Grenzen gezogen, deine Werte entdeckt und deiner Kritikerin geantwortet hast, ist Platz für das, was in dir wachsen möchte. In dieser Woche dürfen deine Ideen fließen, ohne dass du sie schon bewerten musst.",
+   "blocks": [
+    {
+     "t": "h",
+     "text": "Dein Impuls für diese Woche"
+    },
+    {
+     "t": "p",
+     "text": "Viele Frauen, die zu Unfold kommen, tragen eine Idee schon sehr lange mit sich herum. Manche haben einen ganzen Ordner voller Pläne, andere nur ein vages Gefühl, dass da noch etwas sein müsste. Manche wollen ein kleines Business gründen, andere ein Buch schreiben, eine Ausbildung machen, ein Ehrenamt übernehmen, einen Garten anlegen oder endlich wieder malen. Und dann gibt es Frauen, die sagen: „Ich habe eigentlich gar keine Ideen mehr, die sind irgendwo zwischen Wickeltisch und Steuererklärung verloren gegangen.“ Wenn das auf dich zutrifft, dann ist diese Woche ganz besonders für dich."
+    },
+    {
+     "t": "p",
+     "text": "Kreativität ist keine Gabe, die nur Künstlerinnen besitzen. Jeder Mensch ist kreativ, denn Kreativität bedeutet im Kern, Dinge neu zu verbinden und Lösungen zu finden. Du bist kreativ, wenn du aus drei Resten im Kühlschrank ein Abendessen zauberst, wenn du einen Streit zwischen deinen Kindern mit einem Spiel entschärfst oder wenn du einen Familienkalender so organisierst, dass alle Termine hineinpassen. Diese Fähigkeit ist da. Sie wurde vielleicht nur lange ausschließlich für die Bedürfnisse anderer eingesetzt."
+    },
+    {
+     "t": "p",
+     "text": "Was Kreativität am meisten bremst, ist meistens die zu frühe Bewertung unserer Ideen. Kaum taucht eine Idee auf, meldet sich schon die innere Kritikerin: „Das gibt es doch schon“, „Dafür hast du keine Zeit“ oder „Wer soll das denn kaufen?“ Und schon ist die Idee wieder verschwunden, bevor sie überhaupt atmen konnte. Deshalb ist es so gut, dass wir uns letzte Woche mit dieser Stimme beschäftigt haben. In dieser Woche darf sie Pause machen."
+    },
+    {
+     "t": "p",
+     "text": "In der Kreativitätsforschung unterscheidet man oft zwischen zwei Arten des Denkens. Das divergente Denken öffnet sich in alle Richtungen, sammelt, spinnt und verbindet, ohne zu urteilen. Das konvergente Denken sortiert, bewertet und wählt aus. Beide sind wichtig, aber sie funktionieren nicht gleichzeitig. Wenn du versuchst, Ideen zu sammeln und sie im selben Moment schon auf ihre Machbarkeit zu prüfen, ist das, als würdest du gleichzeitig Gas geben und bremsen. Diese Woche gehört deshalb ganz dem divergenten Denken. Das Auswählen kommt im nächsten Monat, wenn wir aus all deinen Ideen die eine finden, die jetzt dran ist."
+    },
+    {
+     "t": "p",
+     "text": "Ideen brauchen außerdem Raum, und zwar ganz praktisch. Die meisten guten Einfälle kommen nicht, wenn wir krampfhaft am Schreibtisch sitzen und nachdenken. Sie kommen unter der Dusche, beim Spazierengehen, beim Autofahren, beim Kneten von Ton oder beim Striegeln eines Pferdes. Das liegt daran, dass unser Gehirn in entspannten, wenig fordernden Momenten frei assoziieren kann. Verschiedene Netzwerke im Gehirn arbeiten dann auf eine Weise zusammen, die neue Verbindungen begünstigt. Wenn dein Alltag aber von morgens bis abends durchgetaktet ist und jede freie Minute mit dem Handy gefüllt wird, bleibt für diesen Prozess kaum Platz."
+    },
+    {
+     "t": "p",
+     "text": "Deshalb möchte ich dich einladen, in dieser Woche ein paar kleine Leerstellen in deinen Tag einzubauen. Geh einmal ohne Podcast spazieren, lass das Handy beim Warten in der Tasche und gönn dir zehn Minuten, in denen du einfach aus dem Fenster schaust. Das fühlt sich vielleicht zuerst ungewohnt oder sogar langweilig an. Langeweile ist für die Kreativität aber ein erstaunlich fruchtbarer Boden."
+    },
+    {
+     "t": "p",
+     "text": "Ein weiterer Schlüssel ist die Menge. Der Werbefachmann Alex Osborn, der das Brainstorming in den 1940er-Jahren bekannt gemacht hat, betonte schon damals, dass Quantität zu Qualität führt. Die ersten Ideen sind fast immer die naheliegenden, die, die jeder hätte. Erst wenn diese aufgeschrieben sind, kommen die überraschenden, mutigen und wirklich eigenen Einfälle. Deshalb wirst du in dieser Woche bewusst viele Ideen sammeln, auch alberne, unrealistische und scheinbar unwichtige."
+    },
+    {
+     "t": "p",
+     "text": "Und vergiss nicht, dass deine Ideen eng mit allem verbunden sind, was wir bisher erarbeitet haben. Die Werte und Stärken aus Woche 6 und die Momente, in denen du dich lebendig fühlst, sind wie Wegweiser. Ideen, die zu deinen Werten passen, tragen dich länger, weil sie aus dir selbst kommen. Es lohnt sich also, die Seiten aus den letzten Wochen in dieser Woche noch einmal aufzuschlagen und zu schauen, welche Hinweise darin stecken."
+    },
+    {
+     "t": "p",
+     "text": "Lass dich in dieser Woche überraschen. Vielleicht entsteht eine ganz neue Idee, vielleicht bekommt eine alte endlich wieder Farbe, und vielleicht merkst du, dass mehrere kleine Ideen eigentlich zusammengehören. Alles ist erlaubt, nichts muss sofort umgesetzt werden, und keine Idee ist zu klein, um aufgeschrieben zu werden."
+    },
+    {
+     "t": "fact",
+     "title": "Gehen macht kreativ",
+     "text": "In einer viel zitierten Studie der Stanford University aus dem Jahr 2014 hatten Teilnehmende beim Gehen deutlich mehr kreative Einfälle als im Sitzen, und der Effekt hielt sogar kurz danach noch an. Ein Spaziergang ist also eine wunderbare Ergänzung zu jeder Ideensammlung, ob auf der Wiese, im Wald oder einfach rund um den Block."
+    },
+    {
+     "t": "fact",
+     "title": "Die Zeit, in der Ideen reifen",
+     "text": "Die Kreativitätsforschung beschreibt eine Phase, die Inkubation genannt wird. Nachdem wir uns intensiv mit einer Frage beschäftigt haben, arbeitet unser Gehirn weiter daran, auch wenn wir längst etwas anderes machen. Deshalb tauchen Lösungen oft auf, wenn wir gar nicht mehr daran denken. Es ist also klug, Ideen zu sammeln, sie dann ruhen zu lassen und später wieder hinzuschauen."
+    },
+    {
+     "t": "fact",
+     "title": "Morgenseiten",
+     "text": "Die Autorin Julia Cameron hat in ihrem Buch „Der Weg des Künstlers“ eine Methode bekannt gemacht, die sie Morgenseiten nennt. Dabei schreibst du direkt nach dem Aufwachen drei Seiten mit der Hand, ohne Pause und ohne Zensur. Schöne Texte sind dabei völlig egal, es geht darum, den Kopf freizuschreiben. Viele Menschen berichten, dass dadurch mit der Zeit Platz für neue Gedanken und Ideen entsteht."
+    },
+    {
+     "t": "h",
+     "text": "Kreative Übungen"
+    },
+    {
+     "t": "exercise",
+     "title": "20 Ideen in 10 Minuten",
+     "time": "10 Min.",
+     "intro": "Diese Übung bringt dich schnell ins divergente Denken. Das Ziel ist Menge, die Qualität darf ruhig noch völlig egal sein.",
+     "steps": [
+      "Stell dir einen Wecker auf zehn Minuten und leg ein Blatt Papier und einen Stift bereit, mit dem du gern schreibst.",
+      "Schreib oben die Frage auf: „Was würde ich gern machen, ausprobieren, erschaffen oder verändern, wenn alles möglich wäre?“",
+      "Schreib so schnell wie möglich alles auf, was dir einfällt, und nummeriere deine Ideen dabei von 1 bis 20.",
+      "Wenn du ins Stocken kommst, schreib trotzdem weiter, auch absurde, lustige oder winzige Ideen. Gerade nach der Stelle, an der es schwierig wird, kommen oft die überraschendsten Einfälle.",
+      "Bewerte nichts und streiche nichts durch, solange der Wecker läuft.",
+      "Lies dir deine Liste nach Ablauf der Zeit einmal durch und markiere die drei Ideen, bei denen dein Herz ein kleines bisschen schneller schlägt oder bei denen du lächeln musst."
+     ]
+    },
+    {
+     "t": "notes",
+     "title": "Meine 20 Ideen",
+     "lines": 20
+    },
+    {
+     "t": "exercise",
+     "title": "Morgenseiten ausprobieren",
+     "time": "20–30 Min. am Morgen",
+     "intro": "Probiere die Morgenseiten in dieser Woche an mindestens drei Tagen aus. Wenn drei Seiten zu viel sind, beginne mit einer Seite oder zehn Minuten.",
+     "steps": [
+      "Leg am Abend ein Heft und einen Stift neben dein Bett oder an den Platz, an dem du morgens deinen Kaffee oder Tee trinkst.",
+      "Schreib direkt nach dem Aufstehen, bevor du dein Handy in die Hand nimmst, alles auf, was dir durch den Kopf geht.",
+      "Lass den Stift in Bewegung, auch wenn du nur schreibst: „Mir fällt nichts ein, ich bin müde, die Kinder schlafen noch.“",
+      "Lies das Geschriebene in den ersten Wochen nicht noch einmal durch. Es geht nur ums Schreiben selbst.",
+      "Notiere am Ende der Woche in ein paar Sätzen, ob sich in deinem Kopf oder in deinem Tag etwas verändert hat."
+     ]
+    },
+    {
+     "t": "tip",
+     "text": "Bei vier Kindern ist der Morgen bei mir selten ruhig, und ich weiß, dass das bei dir ähnlich sein kann. Wenn es morgens wirklich nicht klappt, schreib deine Seiten am Abend, in der Mittagspause oder im Auto, während du auf ein Kind wartest. Die Regelmäßigkeit ist viel wichtiger als die Uhrzeit."
+    },
+    {
+     "t": "exercise",
+     "title": "Deine Ideen-Mindmap",
+     "time": "20 Min.",
+     "intro": "Eine Mindmap hilft dir, eine Idee aus allen Richtungen zu betrachten und neue Verbindungen zu entdecken. Sie eignet sich besonders gut für eine der drei Ideen, die du in der 20-Ideen-Übung markiert hast.",
+     "steps": [
+      "Nimm ein großes Blatt im Querformat und schreib dein Thema oder deine Idee in die Mitte. Zeichne einen Kreis darum.",
+      "Zeichne vom Kreis aus vier bis sechs dicke Äste und beschrifte jeden mit einem Stichwort, zum Beispiel: Für wen? Warum mir das wichtig ist, Was ich dafür brauche, Erste Schritte, Was mich daran begeistert, Wer mir helfen könnte.",
+      "Lass von jedem Ast kleinere Zweige wachsen, an die du alles schreibst, was dir dazu einfällt. Arbeite mit einzelnen Wörtern statt mit ganzen Sätzen.",
+      "Nutze gern verschiedene Farben, kleine Zeichnungen oder Symbole. Unser Gehirn verknüpft Bilder und Farben besonders gut.",
+      "Wenn dir zwischen zwei Ästen eine Verbindung auffällt, zeichne einen Pfeil. Genau diese Verbindungen sind oft der spannendste Teil.",
+      "Schau dir die fertige Mindmap an und schreib unten in einem Satz auf, was du jetzt über deine Idee weißt, was dir vorher noch nicht klar war."
+     ]
+    },
+    {
+     "t": "notes",
+     "title": "Platz für deine Mindmap",
+     "lines": 22
+    },
+    {
+     "t": "exercise",
+     "title": "Die Kinder-Ich-Frage",
+     "time": "15 Min.",
+     "intro": "Als Kinder wissen wir oft noch ganz genau, was wir lieben. Diese Übung lädt dich ein, dich wieder mit diesem Teil von dir zu verbinden.",
+     "steps": [
+      "Schließ für einen Moment die Augen und stell dir dich selbst mit etwa acht Jahren vor. Wie sahst du aus, was hast du angehabt, wo hast du am liebsten gespielt?",
+      "Frag dieses Mädchen in Gedanken: „Was machst du am allerliebsten?“ und hör genau hin, was es antwortet.",
+      "Frag weiter: „Was wolltest du werden, als du groß warst?“ und „Wovon hast du geträumt?“",
+      "Schreib alle Antworten auf, auch wenn sie heute unrealistisch wirken, etwa Tierärztin, Prinzessin oder Zirkusreiterin.",
+      "Überlege, welche Sehnsucht hinter diesen Träumen steckt. Hinter dem Wunsch, Zirkusreiterin zu werden, kann zum Beispiel die Liebe zu Tieren, zur Bewegung oder zur Bühne stecken.",
+      "Notiere, wie diese Sehnsucht heute in deinem Leben Platz bekommen könnte, auch in einer ganz kleinen Form."
+     ]
+    },
+    {
+     "t": "prompts",
+     "title": "Mein Kinder-Ich",
+     "lines": 3,
+     "items": [
+      "Am allerliebsten habe ich als Kind …",
+      "Ich wollte werden …",
+      "Die Sehnsucht hinter diesen Träumen ist …",
+      "So könnte sie heute Platz in meinem Leben bekommen:"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Deine Ideen-Sammelseite"
+    },
+    {
+     "t": "p",
+     "text": "Hier sammelst du alle Ideen, die dir in dieser Woche begegnen, aus den Übungen, unter der Dusche, beim Spazierengehen oder mitten in der Nacht. Du musst sie noch nicht bewerten, aber die Spalten helfen dir, im nächsten Monat leichter auszuwählen. Kreuze bei „Passt zu meinen Werten“ einfach an, wenn du das Gefühl hast, dass die Idee zu deinen Top-5-Werten passt, und schätze bei „Energie“ ein, wie viel Freude du spürst, wenn du an die Idee denkst."
+    },
+    {
+     "t": "table",
+     "title": "Ideen-Sammelseite",
+     "cols": [
+      "Meine Idee",
+      "Woher sie kam",
+      "Passt zu meinen Werten",
+      "Energie (1–10)"
+     ],
+     "rows": 14
+    },
+    {
+     "t": "checklist",
+     "title": "Kleine Leerstellen für Ideen in dieser Woche",
+     "items": [
+      "Ein Spaziergang ohne Kopfhörer und ohne Handy",
+      "Zehn Minuten aus dem Fenster schauen",
+      "Etwas mit den Händen machen, zum Beispiel töpfern, backen, gärtnern oder malen",
+      "Eine Ausstellung, einen Markt oder einen Ort besuchen, an dem ich noch nie war",
+      "Ein Notizbuch oder eine Notiz-App für spontane Ideen immer dabei haben",
+      "Einen Abend ohne Bildschirm verbringen",
+      ""
+     ]
+    },
+    {
+     "t": "prompts",
+     "title": "Journaling zu Woche 8",
+     "lines": 4,
+     "items": [
+      "Welche Idee trage ich schon am längsten mit mir herum, und was hat mich bisher davon abgehalten, ihr Raum zu geben?",
+      "Wann und wo kommen mir die besten Ideen, und wie kann ich mir mehr solche Momente schaffen?",
+      "Welche Idee aus dieser Woche hat mich am meisten überrascht?",
+      "Wenn meine innere Kritikerin für ein Jahr Urlaub machen würde, was würde ich dann ausprobieren?"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Deine Bewegung diese Woche"
+    },
+    {
+     "t": "p",
+     "text": "Zur Mitte von Unfold wartet am Montag mit „Mut im Körper“ ein etwas kräftigerer Full-Day-Flow auf dich. Er lädt dich ein zu spüren, wie viel Kraft schon in dir steckt. Ich finde, es gibt kaum eine bessere Vorbereitung darauf, mutige Ideen zuzulassen. Am Donnerstag folgt der Tired-Day-Flow „Atem als Anker“ mit drei Atemübungen, eingebettet in sanfte Bewegung, die du überallhin mitnehmen kannst. Probier sie gern direkt vor einer kreativen Übung aus, denn ein ruhiger Atem schafft oft genau den Raum, in dem Ideen auftauchen."
+    },
+    {
+     "t": "quote",
+     "text": "Meine Ideen dürfen da sein, bevor sie perfekt sind."
+    }
+   ]
+  },
+  {
+   "icon": "feier",
+   "kicker": "Monatsrückblick",
+   "title": "Was aufgeblüht ist",
+   "intro": "Vier Wochen voller Themen liegen hinter dir. Bevor es in den letzten Monat geht, schaust du in Ruhe zurück, sammelst deine Erkenntnisse und feierst, was schon gewachsen ist.",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "Vielleicht hast du in diesem Monat zum ersten Mal seit langer Zeit bewusst Nein gesagt. Vielleicht hast du von einer Freundin etwas über dich gehört, das dich zu Tränen gerührt hat, oder du hast deiner inneren Kritikerin einen Namen gegeben und konntest ein paarmal über sie schmunzeln. Vielleicht ist deine Ideenliste länger geworden, als du gedacht hättest. Und vielleicht hast du auch gemerkt, wie schwer manche dieser Themen sind und wie viel Zeit sie brauchen. All das gehört dazu, und all das ist wertvoll."
+    },
+    {
+     "t": "p",
+     "text": "Nimm dir für diesen Rückblick eine ruhige halbe Stunde, gern mit einer Tasse Tee und deinem Workbook auf dem Schoß. Blättere vorher noch einmal durch die Seiten der letzten vier Wochen und schau dir an, was du geschrieben hast."
+    },
+    {
+     "t": "scale",
+     "title": "So geht es mir jetzt",
+     "items": [
+      "Meine Energie im Alltag",
+      "Wie gut ich schlafe",
+      "Wie leicht mir mein Mental Load im Moment fällt",
+      "Wie oft ich mir Zeit für mich nehme",
+      "Wie gut ich spüre, was ich brauche",
+      "Wie freundlich ich mit mir selbst spreche",
+      "Wie sehr ich mir selbst etwas zutraue",
+      "Wie viel Raum meine eigenen Ideen gerade haben"
+     ],
+     "low": "kaum",
+     "high": "sehr"
+    },
+    {
+     "t": "tip",
+     "text": "Leg jetzt die Skala vom Anfang dieses Monats daneben. Achte nicht nur auf die großen Sprünge, auch ein einziger Punkt mehr bei der Freundlichkeit mit dir selbst ist ein echter Schritt."
+    },
+    {
+     "t": "prompts",
+     "title": "Mein Rückblick auf Monat 2",
+     "lines": 4,
+     "items": [
+      "Was habe ich in diesem Monat über mich gelernt, das ich vorher nicht wusste?",
+      "Welche Grenze habe ich gezogen, und was hat sie verändert?",
+      "Meine fünf wichtigsten Werte und meine größten Stärken sind:",
+      "Wie spreche ich heute mit mir, wenn etwas schiefgeht, und was ist anders als vor vier Wochen?",
+      "Welche Ideen sind mir in diesem Monat besonders ans Herz gewachsen?",
+      "Worauf bin ich in diesem Monat stolz?",
+      "Was möchte ich aus diesem Monat unbedingt mitnehmen?"
+     ]
+    },
+    {
+     "t": "h",
+     "text": "Ausblick auf Monat 3 · Entfalten"
+    },
+    {
+     "t": "p",
+     "text": "Im dritten und letzten Monat von Unfold geht es ins Tun. Er heißt „Entfalten · Ins Tun kommen“, und wir beginnen ihn in Woche 9 mit einer großen und schönen Aufgabe: Aus all deinen Ideen wählst du die eine aus, die jetzt dran ist. Dafür brauchst du alles, was du in diesem Monat gesammelt hast, deine Werte, deine Stärken, das, was dich lebendig macht, und natürlich deine Ideen-Sammelseite."
+    },
+    {
+     "t": "p",
+     "text": "Danach schauen wir, wie aus guten Vorsätzen Gewohnheiten werden, die bleiben, wie du mutig sichtbar wirst und um Unterstützung bittest, wie du freundlich mit dir bleibst, wenn etwas nicht klappt, und am Ende feiern wir gemeinsam, was gewachsen ist. Du gehst mit einem Plan und viel Vertrauen in den Frühling."
+    },
+    {
+     "t": "exercise",
+     "title": "Deine Vorauswahl für Woche 9",
+     "time": "15 Min.",
+     "intro": "Damit du gut vorbereitet in den nächsten Monat startest, triffst du jetzt schon eine kleine, unverbindliche Vorauswahl.",
+     "steps": [
+      "Schlag deine Ideen-Sammelseite und deine Liste mit den 20 Ideen auf.",
+      "Markiere alle Ideen, die zu mindestens zwei deiner Top-5-Werte passen.",
+      "Wähle aus diesen Ideen höchstens drei aus, bei denen deine Energie am höchsten ist.",
+      "Schreib diese drei Ideen in die Tabelle unten und notiere, was dich daran reizt und was dich vielleicht noch zögern lässt.",
+      "Lass die Auswahl bis zu unserem ersten Live-Call im dritten Monat ruhen. Dein Gehirn arbeitet in der Zwischenzeit weiter daran."
+     ]
+    },
+    {
+     "t": "table",
+     "title": "Meine drei Favoriten",
+     "cols": [
+      "Idee",
+      "Was mich daran reizt",
+      "Was mich noch zögern lässt"
+     ],
+     "rows": 3
+    },
+    {
+     "t": "prompts",
+     "title": "Für den Übergang",
+     "lines": 3,
+     "items": [
+      "Was brauche ich, um gut in den dritten Monat zu starten?",
+      "Was darf ich loslassen, bevor es weitergeht?",
+      "Ein Satz, den ich mir für Monat 3 mitgeben möchte:"
+     ]
+    },
+    {
+     "t": "quote",
+     "text": "Alles, was aufblühen möchte, ist schon in mir angelegt."
+    }
+   ]
+  }
+ ],
+ "closing": "Eine Knospe öffnet sich in ihrem eigenen Tempo, wenn sie genug Wärme und Licht bekommt. Schenk dir diese Wärme auch weiterhin, ich freue mich auf alles, was in Monat 3 aus dir aufblüht."
+}

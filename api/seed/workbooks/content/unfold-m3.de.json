@@ -1,0 +1,1442 @@
+{
+  "key": "unfold-m3",
+  "lang": "de",
+  "eyebrow": "Unfold · Monat 3 · Woche 9–13",
+  "title": "Entfalten",
+  "subtitle": "Ins Tun kommen",
+  "icon": "schmetterling",
+  "letter": [
+    "Meine Liebe, jetzt sind wir tatsächlich im dritten Monat von Unfold angekommen, und ich freue mich von Herzen, dass du noch hier bist. Im ersten Monat hast du Wurzeln geschlagen: Du hast ehrlich hingeschaut, wo du stehst, hast deinen Mental Load sichtbar gemacht, verstanden, warum du manchmal so erschöpft bist, und dir mit kleinen Routinen mehr Luft im Alltag geschaffen. Im zweiten Monat durften deine Knospen wachsen, als du Grenzen gezogen, deine Stärken entdeckt, deiner inneren Kritikerin freundlich geantwortet und deinen Ideen endlich Platz gegeben hast.",
+    "Dieser letzte Monat trägt den Namen Entfalten, und er handelt vom Ins-Tun-Kommen. Du brauchst dafür weder einen großen Sprung noch einen perfekten Plan, den du ab morgen fehlerfrei umsetzen musst. Es geht um die kleinen, mutigen Schritte, mit denen eine Idee aus deinem Kopf in dein Leben wandert. Viele Frauen, mit denen ich arbeite, haben über Jahre hinweg wunderbare Ideen in sich getragen und dabei immer gewartet, bis die Kinder größer sind, bis mehr Zeit da ist oder bis sie sich endlich bereit fühlen. Ich möchte dir in den nächsten fünf Wochen zeigen, dass du nicht auf diesen einen richtigen Moment warten musst, weil Bewegung bei dir beginnt, genau in dem Leben, das du heute führst.",
+    "Wir gehen gemeinsam fünf Wochen lang einen Weg, der aufeinander aufbaut. Zuerst wählst du aus deinen vielen Ideen die eine, die jetzt dran ist, und bringst sie auf einen klaren Satz. Danach lernst du, wie Gewohnheiten im Gehirn entstehen und wie du aus deinem Vorhaben winzige Schritte machst, die auch an chaotischen Tagen in deinen Alltag passen. In der elften Woche geht es um Mut und Sichtbarkeit, also darum, wie du deine Angst besser verstehst, um Unterstützung bittest und deinen ersten Schritt nach außen planst. Die zwölfte Woche gehört dem Selbstmitgefühl, weil auf jedem echten Weg auch Tage kommen, an denen etwas nicht klappt. Und in der letzten Woche feiern wir, was in diesen drei Monaten gewachsen ist, und du gehst mit einem liebevollen 90-Tage-Plan in den Frühling.",
+    "Auch die Bewegungsvideos begleiten dich in diesem Monat ganz bewusst. Wir beginnen mit Gleichgewicht finden, wo du auf einem Bein stehst und merkst, dass Wackeln einfach dazugehört, und wir enden mit deinem Abschlussflow und einem kleinen Ritual für den Neubeginn, das du auch nach Unfold immer wieder machen kannst. Achte beim Üben gern darauf, wie sehr dein Körper die Themen der Woche spiegelt. Oft verstehen wir mit der Matte unter den Füßen schneller als mit dem Kopf, was Mut, Leichtigkeit oder Selbstmitgefühl eigentlich bedeuten.",
+    "Bitte nimm dieses Workbook als Begleiterin, die dich in deinem Tempo durch den Monat führt. Du musst nicht jede Übung machen und nicht jede Zeile füllen. Lies in deinem Tempo, nimm dir die Seiten, die dich ansprechen, und lass die anderen ruhig liegen, bis sie dran sind. Wenn dich ein Thema sehr aufwühlt oder du merkst, dass deine Erschöpfung oder Traurigkeit über längere Zeit nicht weniger wird, dann ist es ein Zeichen von Stärke, dir zusätzlich Unterstützung bei deiner Ärztin oder einer Therapeutin zu holen. Unfold kann dich begleiten, eine fachliche Behandlung ersetzt es nicht.",
+    "Ich bin so gespannt, was sich in den nächsten Wochen bei dir entfalten darf. Mach es dir gemütlich, koch dir einen Tee, und dann lass uns gemeinsam losgehen. Ich gehe jeden Schritt mit dir. Deine Vivien"
+  ],
+  "overview": [
+    {
+      "icon": "kompass",
+      "title": "Woche 9 · Klarheit für deine eine Idee",
+      "text": "Du bewertest deine Ideen ehrlich, wählst die eine, die jetzt in dein Leben passt, und fasst sie in einem einzigen Satz zusammen."
+    },
+    {
+      "icon": "schritte",
+      "title": "Woche 10 · Kleine Schritte, echte Gewohnheiten",
+      "text": "Du verstehst, wie Gewohnheiten entstehen, und baust mit Mini-Schritten, Habit Stacking und Wenn-dann-Plänen eine Routine, die bleibt."
+    },
+    {
+      "icon": "rakete",
+      "title": "Woche 11 · Mut und Sichtbarkeit",
+      "text": "Du lernst deine Angst kennen, steigst deine persönliche Mut-Leiter hinauf, bittest um Unterstützung und planst deinen ersten Schritt nach außen."
+    },
+    {
+      "icon": "umarmung",
+      "title": "Woche 12 · Selbstmitgefühl",
+      "text": "Du übst, freundlich mit dir zu bleiben, wenn etwas nicht klappt, und siehst Rückschläge als einen ganz normalen Teil deines Weges."
+    },
+    {
+      "icon": "feier",
+      "title": "Woche 13 · Feiern und weitergehen",
+      "text": "Du schaust auf drei Monate zurück, feierst jeden Erfolg und gehst mit einem 90-Tage-Plan und einem Abschiedsritual in den Frühling."
+    }
+  ],
+  "chapters": [
+    {
+      "icon": "stimmung",
+      "kicker": "Check-in",
+      "title": "Wie kommst du in Monat 3 an?",
+      "intro": "Bevor wir in die neuen Themen starten, nimm dir zehn Minuten für dich und schau, wie es dir heute wirklich geht.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "Zwei Monate liegen hinter dir, und vielleicht hat sich in dieser Zeit schon einiges verändert, während anderes noch genauso ist wie im Jänner. Beides ist in Ordnung. Dieser kleine Check-in hilft dir, ehrlich und ohne Bewertung festzuhalten, wo du gerade stehst, damit du am Ende des Monats sehen kannst, was sich bewegt hat. Kreise bei jeder Aussage die Zahl ein, die sich heute am stimmigsten anfühlt, und denk nicht zu lange darüber nach, denn dein erster Impuls ist meistens der ehrlichste."
+        },
+        {
+          "t": "scale",
+          "title": "So geht es mir heute",
+          "items": [
+            "Meine Energie im Alltag",
+            "Wie erholsam mein Schlaf ist",
+            "Wie leicht sich mein Kopf anfühlt",
+            "Wie klar ich weiß, was ich mir wünsche",
+            "Wie sehr ich mir selbst etwas zutraue",
+            "Wie freundlich ich mit mir umgehe"
+          ],
+          "low": "kaum",
+          "high": "sehr"
+        },
+        {
+          "t": "prompts",
+          "items": [
+            "Was hat sich seit dem Start von Unfold in meinem Alltag oder in meinem Inneren verändert, auch wenn es nur eine Kleinigkeit ist?",
+            "Welche Idee aus dem zweiten Monat geht mir seitdem nicht mehr aus dem Kopf?",
+            "Was wünsche ich mir von diesem letzten Monat, und woran werde ich am 11. April merken, dass er gut für mich war?"
+          ],
+          "lines": 4,
+          "title": "Meine Gedanken zum Start"
+        },
+        {
+          "t": "tip",
+          "text": "Schreib dir das Datum von heute neben deinen Check-in. In der dreizehnten Woche wirst du die gleichen Fragen noch einmal beantworten, und es ist ein wunderschöner Moment, wenn du dann zurückblättern und deine eigene Entwicklung schwarz auf weiß sehen kannst."
+        }
+      ]
+    },
+    {
+      "icon": "kompass",
+      "kicker": "Woche 9",
+      "title": "Klarheit für deine eine Idee",
+      "intro": "Aus vielen Ideen wählst du die eine, die jetzt dran ist. Die anderen bekommen einen guten Platz, an dem sie auf dich warten dürfen.",
+      "blocks": [
+        {
+          "t": "h",
+          "text": "Wenn viele Ideen dich eher lähmen als beflügeln"
+        },
+        {
+          "t": "p",
+          "text": "Vielleicht kennst du dieses Gefühl aus dem letzten Monat: Seit du deinen Ideen erlaubt hast zu sprudeln, sind es immer mehr geworden. Sie stehen in deinem Notizbuch, in der Notizen-App auf deinem Handy, auf kleinen Zetteln am Kühlschrank, und viele von ihnen tauchen genau dann auf, wenn du eigentlich einschlafen möchtest. Jede einzelne fühlt sich an wie ein kleines Versprechen, wie eine Tür zu einem Leben, das ein bisschen mehr nach dir aussieht. Und trotzdem passiert oft etwas Merkwürdiges, sobald es konkret werden soll, denn statt loszulegen, fühlst du dich plötzlich müde, zerrissen und ein wenig überfordert."
+        },
+        {
+          "t": "p",
+          "text": "Das liegt nicht an dir und schon gar nicht daran, dass dir Disziplin fehlt. Wenn wir zwischen sehr vielen Möglichkeiten wählen sollen, fällt uns die Entscheidung schwerer, wir schieben sie eher auf und zweifeln hinterher häufiger an der getroffenen Wahl. Dazu kommt, dass jede offene Idee ein kleines Stück deiner Aufmerksamkeit bindet. Du kennst das schon aus der zweiten Woche, als wir über Mental Load gesprochen haben: Alles, was unerledigt in deinem Kopf kreist, kostet Energie, auch wenn es etwas Schönes ist. Eine Frau, die ohnehin den Familienkalender, die Jause für die Schule, den Job und den Geburtstag der Schwiegermutter im Kopf trägt, hat einfach nicht unbegrenzt Platz für zwölf Herzensprojekte gleichzeitig."
+        },
+        {
+          "t": "h",
+          "text": "Eine Idee wählen und die anderen gut aufbewahren"
+        },
+        {
+          "t": "p",
+          "text": "Vielleicht spürst du beim Gedanken, dich für eine einzige Idee zu entscheiden, einen kleinen Widerstand. Viele Frauen haben die Sorge, dass sie mit dieser Wahl alle anderen Träume für immer begraben. Ich möchte dir diese Sorge gern abnehmen. Du wählst in dieser Woche die Idee, die für die nächsten Monate deine Aufmerksamkeit bekommt, und alle anderen ziehen in einen sogenannten Ideenpark um. Das ist eine eigene Seite in deinem Notizbuch, auf der sie sicher aufgehoben sind. Sie gehen dir dort nicht verloren, sie belasten dich aber auch nicht mehr, weil du weißt, wo sie sind und dass du jederzeit zu ihnen zurückkehren kannst."
+        },
+        {
+          "t": "p",
+          "text": "Eine Wahl zu treffen ist also ein Akt der Fürsorge für dich selbst. Du schenkst einer Idee deine volle Kraft, statt deine Energie auf viele kleine Anfänge zu verteilen, die alle nach wenigen Wochen wieder einschlafen. Und oft zeigt sich später, dass die gewählte Idee die anderen ganz natürlich mitzieht, weil du unterwegs Fähigkeiten, Kontakte und Selbstvertrauen sammelst, die dir bei allem Weiteren helfen."
+        },
+        {
+          "t": "h",
+          "text": "Was die richtige Idee für jetzt ausmacht"
+        },
+        {
+          "t": "p",
+          "text": "Die beste Idee ist selten die größte oder die vernünftigste. Es ist die Idee, die in dein jetziges Leben passt, in genau diese Lebensphase mit allem, was sie dir gerade abverlangt. Deshalb schauen wir in dieser Woche mit fünf Fragen auf deine Favoritinnen. Die erste Frage betrifft die Freude: Wie lebendig fühlst du dich, wenn du an diese Idee denkst, und hättest du auch dann Lust darauf, wenn niemand je davon erfahren würde? Die zweite betrifft deine Zeit, also ob du realistisch ein bis drei Stunden pro Woche dafür freimachen kannst, ohne dass dein Alltag zusammenbricht."
+        },
+        {
+          "t": "p",
+          "text": "Die dritte Frage gilt deiner Energie. Manche Ideen schenken uns Kraft, sobald wir uns mit ihnen beschäftigen, andere ziehen sie eher ab, weil sie mit Druck, Vergleich oder alten Erwartungen verbunden sind. Die vierte Frage ist das Geld, und zwar in beide Richtungen, denn es geht darum, was die Idee am Anfang kostet und ob sie dir später vielleicht etwas einbringen soll oder darf. Die fünfte Frage ist dein Bauchgefühl, diese leise, oft sehr klare Stimme, die sich meldet, bevor dein Kopf alle Argumente sortiert hat. Keine dieser Fragen ist allein entscheidend. Zusammen ergeben sie aber ein überraschend ehrliches Bild."
+        },
+        {
+          "t": "p",
+          "text": "Bitte bewerte dabei aus deinem echten Leben heraus und nicht aus dem Leben, das du gern hättest. Wenn du gerade ein Kleinkind hast, das nachts noch aufwacht, oder wenn im Job eine intensive Phase ansteht, dann darf das in deine Bewertung einfließen. Eine Idee, die zu deiner Lebensphase passt, wird viel eher wachsen als eine, für die du dein ganzes Leben umbauen müsstest."
+        },
+        {
+          "t": "h",
+          "text": "Klarheit entsteht auch im Körper"
+        },
+        {
+          "t": "p",
+          "text": "Im Full-Day-Video dieser Woche, Gleichgewicht finden, stehst du auf einem Bein, kräftigst deine Füße und suchst eine innere Ruhe, obwohl der Boden unter dir scheinbar ständig in Bewegung ist. Du wirst merken, dass du nie vollkommen still stehst. Dein Körper macht unzählige kleine Ausgleichsbewegungen, und genau diese Bewegungen halten dich im Gleichgewicht. Mit Entscheidungen verhält es sich ganz ähnlich. Du musst nicht hundertprozentig sicher sein, um dich für eine Idee zu entscheiden. Du darfst wackeln, nachjustieren und trotzdem stehen bleiben."
+        },
+        {
+          "t": "p",
+          "text": "Das Tired-Day-Video, Leicht werden, ist für die Abende gedacht, an denen dein Kopf schwer und voll ist. Leichte, schwingende Bewegung im Stehen hilft vielen Frauen, aus dem Gedankenkarussell auszusteigen. Probiere ruhig einmal aus, deine Ideen-Übungen direkt nach diesem kurzen Video zu machen. Oft fällt es dann viel leichter, auf das eigene Bauchgefühl zu hören, weil der Körper ein wenig zur Ruhe gekommen ist und die innere Stimme nicht mehr vom Lärm des Tages übertönt wird."
+        },
+        {
+          "t": "h",
+          "text": "Deine Idee in einem einzigen Satz"
+        },
+        {
+          "t": "p",
+          "text": "Am Ende dieser Woche steht ein einziger Satz, der deine Idee beschreibt. Das klingt vielleicht nach wenig, ist aber eines der kraftvollsten Werkzeuge, die ich kenne. Ein klarer Satz zwingt dich, das Wesentliche herauszufiltern, er gibt dir Orientierung an Tagen, an denen du zweifelst, und er macht es dir in der elften Woche viel leichter, anderen von deinem Vorhaben zu erzählen. Ein hilfreicher Aufbau lautet: Ich möchte etwas Bestimmtes für einen bestimmten Menschen oder für mich selbst erschaffen, weil es mir aus einem bestimmten Grund wichtig ist, und ich beginne mit einem ersten kleinen Schritt."
+        },
+        {
+          "t": "p",
+          "text": "Ein Beispiel könnte so klingen: Ich möchte einen kleinen Kreativ-Abend für Frauen aus meinem Ort anbieten, weil ich mir selbst so sehr eine Gemeinschaft wünsche, in der wir einfach gestalten dürfen, und ich beginne damit, drei Freundinnen zu einem Probeabend einzuladen. Ein anderes Beispiel: Ich möchte jeden Morgen zwanzig Minuten an meinem Kinderbuch schreiben, weil diese Geschichte schon seit Jahren in mir wohnt, und ich beginne damit, mir eine Ecke am Küchentisch dafür einzurichten. Dein Satz darf ganz anders klingen. Wichtig ist nur, dass du dich darin wiedererkennst und dass er dir ein kleines Lächeln ins Gesicht zaubert, wenn du ihn laut liest."
+        },
+        {
+          "t": "fact",
+          "title": "Zu viel Auswahl kann bremsen",
+          "text": "In der Entscheidungsforschung zeigt sich immer wieder, dass Menschen bei sehr vielen Wahlmöglichkeiten eher zögern und mit ihrer Entscheidung später manchmal weniger zufrieden sind. Wie stark dieser Effekt ist, hängt von der Situation ab. Für dich bedeutet das ganz praktisch: Wenn du deine Ideen erst auf drei bis fünf Favoritinnen eingrenzt und dann bewertest, wird die Wahl spürbar leichter."
+        },
+        {
+          "t": "fact",
+          "title": "Ein Plan beruhigt den Kopf",
+          "text": "Unerledigte Vorhaben drängen sich gern immer wieder in unsere Gedanken. Studien der Psychologen E. J. Masicampo und Roy Baumeister deuten darauf hin, dass schon das Festlegen eines konkreten Plans dieses Kreisen deutlich verringern kann, auch wenn das Vorhaben selbst noch nicht erledigt ist. Deine Ideen in den Ideenpark zu schreiben und für die gewählte Idee einen ersten Schritt festzulegen, entlastet also tatsächlich deinen Kopf."
+        },
+        {
+          "t": "fact",
+          "title": "Bauchgefühl ist gesammelte Erfahrung",
+          "text": "Intuition ist keine Magie. Fachleute wie der Psychologe Gerd Gigerenzer beschreiben sie als eine Form von Erfahrungswissen, bei der unser Gehirn blitzschnell Muster erkennt, die wir bewusst noch gar nicht benennen können. Dein Bauchgefühl verdient deshalb einen festen Platz in deiner Entscheidung, am besten gemeinsam mit einem ehrlichen Blick auf Zeit, Energie und Geld."
+        },
+        {
+          "t": "exercise",
+          "title": "Ideen-Inventur",
+          "time": "15 Minuten",
+          "intro": "Bevor du bewertest, holst du alle Ideen aus deinem Kopf und aus deinen Notizen des letzten Monats an einen Ort.",
+          "steps": [
+            "Nimm dir ein großes Blatt Papier oder eine Doppelseite in deinem Notizbuch und schreib wirklich jede Idee auf, die dir in den letzten Wochen gekommen ist, auch die ganz kleinen und die, die dir ein bisschen verrückt vorkommen.",
+            "Lies die Liste langsam durch und lege bei jeder Idee kurz die Hand auf deinen Bauch. Achte darauf, ob sich etwas weitet, warm wird oder eher zusammenzieht.",
+            "Markiere die drei bis fünf Ideen, bei denen du am deutlichsten ein Ja gespürt hast. Das sind deine Favoritinnen für die Bewertung auf der nächsten Seite.",
+            "Schreib alle anderen Ideen auf eine eigene Seite mit der Überschrift Mein Ideenpark und datiere sie. Sie sind dort sicher aufgehoben und dürfen auf dich warten."
+          ]
+        },
+        {
+          "t": "table",
+          "title": "Meine Ideen-Bewertung",
+          "cols": [
+            "Idee",
+            "Freude",
+            "Zeit",
+            "Energie",
+            "Geld",
+            "Bauchgefühl",
+            "Summe"
+          ],
+          "rows": 5
+        },
+        {
+          "t": "p",
+          "text": "Gib jeder deiner Favoritinnen in jeder Spalte einen Wert von 1 bis 5. Bei Freude, Energie und Bauchgefühl bedeutet 5, dass die Idee dich sehr erfüllt. Bei Zeit und Geld bedeutet 5, dass sie gut in dein aktuelles Leben und dein Budget passt. Rechne am Ende die Summe zusammen. Die Zahl ist eine Orientierung und kein Urteil. Wenn eine Idee mit niedrigerer Summe dein Herz trotzdem lauter schlagen lässt, nimm das ernst und frag dich, welche Hürde du vielleicht kleiner machen kannst."
+        },
+        {
+          "t": "exercise",
+          "title": "Die Zukunftsprobe",
+          "time": "10 Minuten",
+          "intro": "Mit dieser kleinen Vorstellungsübung prüfst du deine zwei stärksten Ideen mit deinem ganzen Körper statt nur mit dem Verstand.",
+          "steps": [
+            "Setz dich bequem hin, stell beide Füße auf den Boden und nimm drei ruhige Atemzüge, bei denen du etwas länger ausatmest als einatmest.",
+            "Stell dir vor, es ist ein Jahr später, und du hast dich für die erste Idee entschieden und bist drangeblieben. Wie sieht ein ganz normaler Dienstag in deinem Leben aus, was machst du, wie fühlt sich dein Körper an?",
+            "Öffne die Augen und notiere in zwei, drei Sätzen, was du gesehen und gespürt hast.",
+            "Wiederhole die Vorstellung mit der zweiten Idee und notiere auch hier deine Eindrücke.",
+            "Vergleiche beide Notizen und frag dich, bei welcher Vorstellung du dich freier, lebendiger oder einfach mehr wie du selbst gefühlt hast."
+          ]
+        },
+        {
+          "t": "tip",
+          "text": "Wenn du zwischen zwei Ideen hin- und hergerissen bist, wirf eine Münze und ordne jeder Seite eine Idee zu. Es geht dabei gar nicht darum, dem Ergebnis zu folgen. Achte genau auf den Moment, in dem die Münze in der Luft ist, und auf dein Gefühl, wenn sie gelandet ist. Erleichterung oder ein kleines Enttäuschtsein verraten dir oft in einer Sekunde, was du dir eigentlich längst wünschst."
+        },
+        {
+          "t": "prompts",
+          "items": [
+            "Welche Idee würde ich wählen, wenn ich sicher wüsste, dass ich nicht scheitern kann?",
+            "Welche Idee würde ich auch dann verfolgen, wenn niemand davon erfährt und niemand mich dafür lobt?",
+            "Bei welcher Idee spüre ich vor allem Druck, Pflicht oder die Erwartungen anderer, und was sagt mir das?",
+            "Was müsste ich in meinem Alltag weglassen oder abgeben, damit meine Favoritin Platz bekommt?",
+            "Wovor habe ich bei meiner Lieblingsidee am meisten Angst, und ist diese Angst ein Grund, sie nicht zu wählen, oder eher ein Zeichen, dass sie mir wichtig ist?"
+          ],
+          "lines": 4,
+          "title": "Meine Entscheidungsfragen"
+        },
+        {
+          "t": "exercise",
+          "title": "Meine Idee in einem Satz",
+          "time": "10 Minuten",
+          "intro": "Jetzt bringst du deine gewählte Idee auf den Punkt. Schreib ruhig mehrere Fassungen, bis sich eine richtig anfühlt.",
+          "steps": [
+            "Beginne mit dem Satzanfang Ich möchte und beschreibe, was du erschaffen, lernen oder verändern willst.",
+            "Ergänze, für wen du es machst, für dich selbst, für deine Familie oder für andere Frauen.",
+            "Schreib dazu, warum es dir wichtig ist. Das Warum wird dich an zähen Tagen tragen.",
+            "Schließe mit dem ersten kleinen Schritt, den du innerhalb der nächsten sieben Tage gehen kannst.",
+            "Lies deinen Satz laut vor. Wenn er sich zu groß, zu brav oder zu fremd anfühlt, verändere einzelne Wörter, bis er nach dir klingt."
+          ]
+        },
+        {
+          "t": "notes",
+          "lines": 6,
+          "title": "Meine Idee in einem Satz"
+        },
+        {
+          "t": "table",
+          "title": "Mein erster Schritt in dieser Woche",
+          "cols": [
+            "Was genau?",
+            "Wann?",
+            "Wie viel Zeit?",
+            "Erledigt am"
+          ],
+          "rows": 3
+        },
+        {
+          "t": "quote",
+          "text": "Ich darf mich für eine Idee entscheiden, ohne meine anderen Träume zu verlieren. Sie warten auf mich, und diese hier darf jetzt wachsen."
+        },
+        {
+          "t": "prompts",
+          "items": [
+            "Wie hat es sich angefühlt, mich für eine einzige Idee zu entscheiden?",
+            "Was habe ich beim Gleichgewicht-Üben über mich und meine Art zu entscheiden gelernt?",
+            "Wem könnte ich meinen Satz als Erstes vorlesen?"
+          ],
+          "lines": 4,
+          "title": "Rückblick auf Woche 9"
+        }
+      ]
+    },
+    {
+      "icon": "schritte",
+      "kicker": "Woche 10",
+      "title": "Kleine Schritte, echte Gewohnheiten",
+      "intro": "Du erfährst, wie aus einem Vorsatz eine Gewohnheit wird, die bleibt, und baust deiner Idee einen festen, kleinen Platz in deinem Alltag.",
+      "blocks": [
+        {
+          "t": "h",
+          "text": "Warum gute Vorsätze so oft verpuffen"
+        },
+        {
+          "t": "p",
+          "text": "Du hast dich in der letzten Woche für eine Idee entschieden, und vielleicht hast du sogar schon deinen ersten kleinen Schritt gemacht. Das ist wunderbar, und jetzt kommt die eigentliche Kunst, nämlich dranzubleiben, wenn die erste Begeisterung nachlässt, wenn ein Kind krank wird, der Job dich fordert oder du einfach müde bist. Die meisten von uns kennen das Muster aus vielen Jännern: Wir nehmen uns mit großem Schwung etwas vor, starten ehrgeizig, und nach zwei oder drei Wochen ist der Vorsatz leise verschwunden. Danach bleibt oft das unangenehme Gefühl, wieder einmal nicht durchgehalten zu haben."
+        },
+        {
+          "t": "p",
+          "text": "Ich möchte dir heute sagen, dass dieses Muster sehr wenig über deinen Charakter aussagt. Es entsteht vor allem dadurch, dass wir uns fast immer auf Motivation und Willenskraft verlassen, und beide schwanken von Tag zu Tag ganz natürlich. Gerade Frauen mit großem Mental Load verbrauchen ihre Willenskraft bereits für hundert kleine Entscheidungen, lange bevor sie am Abend endlich Zeit für sich hätten. Eine Gewohnheit dagegen braucht kaum noch Willenskraft. Sie läuft beinahe von allein, so wie Zähneputzen oder der Griff zur Kaffeemaschine am Morgen. Genau das wollen wir für deine Idee erreichen."
+        },
+        {
+          "t": "h",
+          "text": "Wie Gewohnheiten im Gehirn entstehen"
+        },
+        {
+          "t": "p",
+          "text": "Eine Gewohnheit folgt einem einfachen Kreislauf, den du sicher schon an dir beobachtet hast. Am Anfang steht ein Auslöser, also eine Situation, eine Uhrzeit, ein Ort, ein Gefühl oder eine vorangehende Handlung. Darauf folgt die Handlung selbst, und am Ende steht eine Belohnung, irgendein angenehmes Gefühl, das dein Gehirn sich merkt. Wenn dieser Kreislauf oft genug im gleichen Zusammenhang abläuft, verknüpft dein Gehirn Auslöser und Handlung immer enger, bis die Handlung fast automatisch abläuft. Fachleute sprechen dann von Automatisierung."
+        },
+        {
+          "t": "p",
+          "text": "Nimm als Beispiel das Handy am Abend. Der Auslöser ist vielleicht der Moment, in dem die Kinder endlich schlafen und du dich aufs Sofa setzt. Die Handlung ist das Scrollen, und die Belohnung ist ein kurzes Gefühl von Entspannung und Ablenkung nach einem vollen Tag. Dein Gehirn hat diesen Ablauf so oft erlebt, dass deine Hand schon zum Handy greift, bevor du überhaupt darüber nachgedacht hast. Das ist weder gut noch schlecht, es zeigt dir einfach, wie mächtig dieser Mechanismus ist. Wenn wir ihn verstehen, können wir ihn bewusst für das nutzen, was uns wirklich wichtig ist."
+        },
+        {
+          "t": "h",
+          "text": "Klein anfangen, wirklich klein"
+        },
+        {
+          "t": "p",
+          "text": "Der wichtigste Grundsatz dieser Woche lautet: Mach deinen Schritt so klein, dass du ihn auch an deinem schlechtesten Tag schaffst. Der Verhaltensforscher BJ Fogg von der Stanford University empfiehlt, neue Gewohnheiten zunächst in einer winzigen Version zu starten, die weniger als zwei Minuten dauert. Statt dir vorzunehmen, jeden Tag eine Stunde an deinem Projekt zu arbeiten, öffnest du jeden Morgen dein Notizbuch und schreibst einen einzigen Satz. Statt einer kompletten Website recherchierst du heute nur eine einzige Seite, die dir gefällt. Das klingt fast lächerlich wenig, und genau darin liegt die Kraft."
+        },
+        {
+          "t": "p",
+          "text": "Ein winziger Schritt umgeht nämlich den inneren Widerstand. Dein Nervensystem nimmt ihn nicht als Bedrohung oder Überforderung wahr, und du sammelst Tag für Tag kleine Erfolgserlebnisse. Oft wird aus dem einen Satz ganz von selbst eine halbe Seite, weil der Anfang geschafft ist. Wenn nicht, ist das ebenfalls völlig in Ordnung, denn du hast den Kreislauf trotzdem gestärkt. Es geht in den ersten Wochen viel mehr darum, die Gewohnheit zu verankern, als darum, viel zu schaffen."
+        },
+        {
+          "t": "h",
+          "text": "Habit Stacking: neue Gewohnheiten an alte knüpfen"
+        },
+        {
+          "t": "p",
+          "text": "Eine der einfachsten Möglichkeiten, einen guten Auslöser zu finden, ist das sogenannte Habit Stacking. Dabei hängst du deine neue Gewohnheit direkt an eine Gewohnheit, die bereits fest in deinem Tag verankert ist. Die Formel lautet: Nachdem ich eine bestimmte gewohnte Handlung gemacht habe, mache ich meinen Mini-Schritt. Zum Beispiel: Nachdem ich mir morgens meinen ersten Tee eingeschenkt habe, schreibe ich einen Satz für mein Projekt. Oder: Nachdem ich die Kinder in den Kindergarten gebracht habe, höre ich auf dem Heimweg zehn Minuten einen Podcast zu meinem Thema."
+        },
+        {
+          "t": "p",
+          "text": "Der Vorteil ist, dass du dir keine neue Uhrzeit merken musst und nicht auf den perfekten Moment wartest. Dein Alltag liefert dir die Auslöser bereits. Achte nur darauf, dass die alte Gewohnheit wirklich täglich und zuverlässig vorkommt und dass dein Mini-Schritt in diesem Moment auch praktisch möglich ist. Ein Schritt, für den du am Laptop sitzen musst, passt schlecht an das Zähneputzen, aber sehr gut an den Moment, in dem du dich nach dem Mittagessen an den Schreibtisch setzt."
+        },
+        {
+          "t": "h",
+          "text": "Wenn-dann-Pläne für schwierige Tage"
+        },
+        {
+          "t": "p",
+          "text": "Selbst die schönste Gewohnheit wird auf die Probe gestellt, und es ist hilfreich, sich darauf vorzubereiten, statt zu hoffen, dass es diesmal anders kommt. Hier kommen die Wenn-dann-Pläne ins Spiel, die der Psychologe Peter Gollwitzer erforscht hat. Du überlegst im Voraus, welche Hindernisse wahrscheinlich auftreten, und legst fest, wie du dann reagierst. Wenn ein Kind krank ist und ich morgens keine Ruhe habe, dann schreibe ich meinen Satz abends im Bett. Wenn ich zu müde für das Full-Day-Video bin, dann mache ich das Tired-Day-Video oder fünf Minuten Child’s Pose und Atem. Dein Gehirn hat damit schon eine Antwort parat, wenn der schwierige Moment kommt."
+        },
+        {
+          "t": "h",
+          "text": "Bewegung als Spiegel deiner Gewohnheit"
+        },
+        {
+          "t": "p",
+          "text": "Das Full-Day-Video dieser Woche heißt Fließen statt funktionieren. Es ist ein durchgehender Flow, in dem Yoga, Kraft und freie Bewegung ineinander übergehen. Ich habe es bewusst so gestaltet, weil es genau das zeigt, was wir mit Gewohnheiten erreichen wollen: Eine Bewegung führt ganz natürlich zur nächsten, ohne dass du jedes Mal neu überlegen und dich überwinden musst. Im Tired-Day-Video, Hüften befreien, hältst du längere Positionen wie Lizard und Garland. Viele Frauen erleben, dass sich beim langen Halten in den Hüften auch innerlich etwas löst. Vielleicht magst du dir nach diesem Video ein paar Minuten nehmen und aufschreiben, welche alten Gewohnheiten du eigentlich loslassen möchtest."
+        },
+        {
+          "t": "p",
+          "text": "Und noch etwas: Die beiden Videos pro Woche sind selbst schon eine wunderbare Übungsgewohnheit. Wenn du sie bisher eher unregelmäßig gemacht hast, nutze diese Woche, um ihnen mit Habit Stacking und einem Wenn-dann-Plan einen festen Platz zu geben. Du wirst merken, wie viel leichter es sich anfühlt, wenn du nicht jedes Mal neu entscheiden musst."
+        },
+        {
+          "t": "fact",
+          "title": "66 Tage im Durchschnitt, und Auslassen ist erlaubt",
+          "text": "In einer bekannten Studie des University College London unter der Leitung von Phillippa Lally dauerte es im Mittel etwa 66 Tage, bis eine neue Alltagshandlung sich automatisch anfühlte. Die Spanne war allerdings riesig und reichte von 18 bis über 200 Tage, je nach Mensch und Gewohnheit. Besonders tröstlich: Ein einzelner ausgelassener Tag hatte keinen messbaren Einfluss darauf, ob die Gewohnheit sich trotzdem festigte."
+        },
+        {
+          "t": "fact",
+          "title": "Wenn-dann-Pläne wirken",
+          "text": "Eine Übersichtsarbeit von Peter Gollwitzer und Paschal Sheeran, die fast hundert Studien zusammenfasste, kam zu dem Ergebnis, dass konkrete Wenn-dann-Pläne die Wahrscheinlichkeit, ein Vorhaben tatsächlich umzusetzen, deutlich erhöhen. Der Grund ist vermutlich, dass die Situation selbst zum Auslöser wird und du im entscheidenden Moment nicht mehr lange abwägen musst."
+        },
+        {
+          "t": "fact",
+          "title": "Dein Gehirn lernt durch gute Gefühle",
+          "text": "Gewohnheiten festigen sich besonders gut, wenn direkt nach der Handlung ein angenehmes Gefühl folgt. Eine Belohnung, die erst Monate später kommt, ist für dein Gehirn zu weit weg. Deshalb lohnt es sich, jeden Mini-Schritt sofort ein wenig zu feiern, mit einem Lächeln, einem Haken im Tracker oder einem bewussten Atemzug, in dem du dir sagst, dass du es geschafft hast."
+        },
+        {
+          "t": "exercise",
+          "title": "Eine alte Gewohnheit entschlüsseln",
+          "time": "10 Minuten",
+          "intro": "Bevor du eine neue Gewohnheit baust, schaust du dir eine bestehende genauer an. So verstehst du den Kreislauf an deinem eigenen Beispiel.",
+          "steps": [
+            "Wähle eine Gewohnheit, die du gern verändern möchtest, etwa das abendliche Scrollen, das Naschen am Nachmittag oder das Aufschieben deiner eigenen Projekte.",
+            "Schreib auf, was der Auslöser ist. Wann, wo, nach welcher Handlung und in welcher Stimmung passiert es meistens?",
+            "Beschreibe die Handlung so genau wie möglich, ohne sie zu bewerten.",
+            "Frag dich ehrlich, welche Belohnung du dir dabei holst. Ist es Ruhe, Ablenkung, Trost, Verbindung oder eine kleine Pause vom Funktionieren?",
+            "Überlege, welche andere Handlung dir eine ähnliche Belohnung schenken könnte. Diese Erkenntnis kannst du später für einen Wenn-dann-Plan nutzen."
+          ]
+        },
+        {
+          "t": "table",
+          "title": "Mein Gewohnheits-Kreislauf",
+          "cols": [
+            "",
+            "Alte Gewohnheit",
+            "Neue Gewohnheit"
+          ],
+          "rows": [
+            [
+              "Auslöser",
+              "",
+              ""
+            ],
+            [
+              "Handlung",
+              "",
+              ""
+            ],
+            [
+              "Belohnung",
+              "",
+              ""
+            ],
+            [
+              "Wie ich mich danach fühle",
+              "",
+              ""
+            ]
+          ]
+        },
+        {
+          "t": "exercise",
+          "title": "Den Mini-Schritt finden",
+          "time": "10 Minuten",
+          "intro": "Du schrumpfst den ersten Schritt deiner Idee so lange, bis er dir fast zu klein vorkommt.",
+          "steps": [
+            "Schreib auf, was du für deine Idee regelmäßig machen möchtest, so wie es dir spontan in den Sinn kommt.",
+            "Frag dich, wie die Hälfte davon aussehen würde, und schreib diese kleinere Version darunter.",
+            "Halbiere noch einmal und dann noch einmal, bis du bei einer Version angekommen bist, die weniger als zwei Minuten dauert.",
+            "Prüfe ehrlich, ob du diesen Mini-Schritt auch an einem Tag mit krankem Kind, wenig Schlaf und vollem Kalender schaffen würdest. Wenn nicht, mach ihn noch kleiner.",
+            "Schreib deinen Mini-Schritt groß auf einen Zettel und häng ihn dorthin, wo du ihn jeden Tag siehst."
+          ]
+        },
+        {
+          "t": "table",
+          "title": "Habit Stacking: meine Verknüpfungen",
+          "cols": [
+            "Nachdem ich …",
+            "mache ich …",
+            "Meine kleine Belohnung"
+          ],
+          "rows": [
+            [
+              "mir morgens meinen ersten Tee eingeschenkt habe,",
+              "einen Satz für mein Projekt in mein Notizbuch.",
+              "ein bewusster Schluck Tee und ein Lächeln"
+            ],
+            [
+              "die Kinder ins Bett gebracht habe,",
+              "zwei Minuten Atemübung auf der Matte.",
+              "ein Haken im Tracker"
+            ],
+            [
+              "",
+              "",
+              ""
+            ],
+            [
+              "",
+              "",
+              ""
+            ],
+            [
+              "",
+              "",
+              ""
+            ]
+          ]
+        },
+        {
+          "t": "table",
+          "title": "Meine Wenn-dann-Pläne",
+          "cols": [
+            "Wenn (Situation oder Hindernis) …",
+            "dann (mein Plan) …"
+          ],
+          "rows": [
+            [
+              "Wenn ein Kind krank ist und der Morgen chaotisch wird,",
+              "dann mache ich meinen Mini-Schritt abends, bevor ich das Licht ausmache."
+            ],
+            [
+              "Wenn ich zu müde für das Full-Day-Video bin,",
+              "dann mache ich das Tired-Day-Video oder fünf Minuten Child’s Pose mit ruhigem Atem."
+            ],
+            [
+              "Wenn ich einen Tag ausgelassen habe,",
+              "dann starte ich am nächsten Tag ganz ohne schlechtes Gewissen wieder mit meinem Mini-Schritt."
+            ],
+            [
+              "",
+              ""
+            ],
+            [
+              "",
+              ""
+            ],
+            [
+              "",
+              ""
+            ]
+          ]
+        },
+        {
+          "t": "tip",
+          "text": "Halte dich an die Regel, nie zweimal hintereinander auszulassen. Ein Tag Pause ist ganz normal und schadet deiner Gewohnheit nicht. Am zweiten Tag aber kehrst du zurück, und sei es mit der allerkleinsten Version deines Schritts. So verhinderst du, dass aus einer Pause unbemerkt ein Abschied wird."
+        },
+        {
+          "t": "tip",
+          "text": "Mach dir den Anfang leicht, indem du deine Umgebung vorbereitest. Lass die Yogamatte ausgerollt im Wohnzimmer liegen, leg das Notizbuch mit einem Stift auf deinen Frühstücksplatz oder speichere die Seite, an der du arbeitest, als erstes Lesezeichen in deinem Browser. Jeder Handgriff, den du dir sparst, macht es wahrscheinlicher, dass du beginnst."
+        },
+        {
+          "t": "tracker",
+          "title": "Mein Gewohnheits-Tracker für Woche 10",
+          "items": [
+            "Mein Mini-Schritt für meine Idee",
+            "Bewegung: Video, Spaziergang oder Stallrunde",
+            "Zwei Minuten Atem oder Meditation",
+            "Fünf Minuten Journaling",
+            "Rechtzeitig ins Bett",
+            "Ein Moment nur für mich"
+          ]
+        },
+        {
+          "t": "prompts",
+          "items": [
+            "Welche Gewohnheit in meinem Leben läuft bereits ganz automatisch, und wie ist sie damals entstanden?",
+            "Was hat mich in der Vergangenheit davon abgehalten, an Vorsätzen dranzubleiben, und was mache ich diesmal anders?",
+            "Welcher Moment in meinem Tag eignet sich am besten als Auslöser für meinen Mini-Schritt?",
+            "Wie möchte ich mich selbst belohnen, wenn ich meinen Schritt gemacht habe?",
+            "Wer möchte ich durch diese neue Gewohnheit werden?"
+          ],
+          "lines": 4,
+          "title": "Journal für Woche 10"
+        },
+        {
+          "t": "quote",
+          "text": "Ich muss heute nicht alles schaffen. Mein kleiner Schritt zählt, und er zählt jeden Tag ein bisschen mehr."
+        }
+      ]
+    },
+    {
+      "icon": "rakete",
+      "kicker": "Woche 11",
+      "title": "Mut und Sichtbarkeit",
+      "intro": "Du lernst deine Angst besser kennen, steigst Stufe für Stufe deine Mut-Leiter hinauf, bittest um Unterstützung und wagst deinen ersten Schritt nach außen.",
+      "blocks": [
+        {
+          "t": "h",
+          "text": "Der Moment, in dem es ernst wird"
+        },
+        {
+          "t": "p",
+          "text": "Solange deine Idee nur in deinem Notizbuch wohnt, ist sie sicher. Niemand kann sie kritisieren, niemand kann lachen, und niemand kann fragen, wie es denn damit vorangeht. Irgendwann aber kommt der Moment, in dem eine Idee nach außen will. Vielleicht möchtest du einer Freundin davon erzählen, deinen ersten Beitrag auf Instagram veröffentlichen, einen Flyer im Gemeindeamt aufhängen oder dich für einen Kurs anmelden. Und genau an dieser Stelle melden sich bei den meisten Frauen eine ganze Reihe unangenehmer Gefühle: Herzklopfen, ein flaues Gefühl im Magen, plötzlich tausend Gründe, warum jetzt doch nicht der richtige Zeitpunkt ist."
+        },
+        {
+          "t": "p",
+          "text": "Ich möchte dir als Erstes sagen, dass diese Gefühle völlig normal sind und dass sie nichts darüber aussagen, ob du für deine Idee geeignet bist. Fast jede Frau, die ich kenne und die etwas Eigenes aufgebaut hat, kennt diese Angst. Auch mutige Menschen spüren diese Angst, sie haben nur gelernt, mit ihr gemeinsam loszugehen."
+        },
+        {
+          "t": "h",
+          "text": "Angst ist eine alte Beschützerin"
+        },
+        {
+          "t": "p",
+          "text": "Um zu verstehen, warum Sichtbarkeit uns so viel Angst machen kann, lohnt sich ein Blick auf unser Nervensystem. Unser Gehirn hat sich über sehr lange Zeit in kleinen Gemeinschaften entwickelt, in denen die Zugehörigkeit zur Gruppe über das Überleben entschieden hat. Wer ausgeschlossen wurde, war in großer Gefahr. Bis heute reagiert unser Alarmsystem deshalb sehr empfindlich auf alles, was mit Bewertung, Ablehnung und dem Blick der anderen verbunden ist. Wenn du dich zeigst, schaltet dein Körper unter Umständen in eine Stressreaktion, so als stünde wirklich etwas Lebenswichtiges auf dem Spiel."
+        },
+        {
+          "t": "p",
+          "text": "Deine Angst möchte dich also beschützen. Sie meint es gut, auch wenn sie in diesem Fall ein wenig übertreibt. Statt gegen sie anzukämpfen, kannst du sie freundlich begrüßen und ihr sagen, dass du sie gehört hast und trotzdem einen kleinen Schritt gehen wirst. Vielleicht erinnerst du dich an die siebte Woche und die innere Kritikerin. Die Angst ist ihre enge Verwandte, und du kannst ihr auf ganz ähnliche Weise begegnen, mit Neugier und mit Wärme."
+        },
+        {
+          "t": "p",
+          "text": "Gerade an Orten, an denen jeder jeden kennt, ist die Sorge vor dem Gerede der anderen oft besonders groß. Was sagen die Nachbarinnen, die Eltern aus dem Kindergarten, die Kolleginnen von früher? Es hilft, sich bewusst zu machen, dass die meisten Menschen viel mehr mit ihrem eigenen Leben beschäftigt sind, als wir glauben, und dass viele von ihnen insgeheim bewundern, wenn eine Frau den Mut aufbringt, etwas Eigenes zu wagen."
+        },
+        {
+          "t": "h",
+          "text": "Mut wächst durch Erfahrung"
+        },
+        {
+          "t": "p",
+          "text": "Viele von uns warten darauf, sich endlich mutig und bereit zu fühlen, bevor sie einen Schritt wagen. Tatsächlich funktioniert es in den meisten Fällen genau andersherum. Das Gefühl von Selbstvertrauen entsteht durch die Erfahrung, etwas geschafft zu haben, und es wächst mit jedem kleinen Schritt, den du trotz deiner Aufregung gehst. Dein Nervensystem lernt bei jedem dieser Schritte, dass die befürchtete Katastrophe ausbleibt, und beim nächsten Mal wird die Reaktion schon ein wenig schwächer sein."
+        },
+        {
+          "t": "p",
+          "text": "Deshalb arbeiten wir in dieser Woche mit einer Mut-Leiter. Du beginnst ganz unten mit einem Schritt, der dich nur ein kleines bisschen aufregt, und steigst von dort aus Stufe für Stufe nach oben. Die unterste Stufe könnte sein, deinen Satz aus der neunten Woche deinem Partner vorzulesen. Eine mittlere Stufe könnte sein, einer Bekannten davon zu erzählen, und eine der oberen Stufen könnte dein erster öffentlicher Beitrag oder dein erstes kleines Angebot sein. Du entscheidest selbst, wie schnell du steigst, und du darfst auf jeder Stufe so lange verweilen, bis sie sich gut anfühlt."
+        },
+        {
+          "t": "h",
+          "text": "Sichtbar werden in deinem Tempo"
+        },
+        {
+          "t": "p",
+          "text": "Um sichtbar zu werden, musst du keineswegs dein ganzes Leben im Internet teilen. Sichtbar zu werden heißt in erster Linie, dass du deine Idee aus dem Verborgenen holst und anderen Menschen die Möglichkeit gibst, sie zu sehen, dich zu unterstützen oder davon zu profitieren. Für die eine Frau ist das ein Gespräch beim Elternabend, für die andere ein Profil auf Instagram, für die dritte ein Aushang im Dorfladen. Es gibt keinen richtigen oder falschen Weg, es gibt nur den Weg, der zu dir und deiner Idee passt."
+        },
+        {
+          "t": "p",
+          "text": "Im Full-Day-Video dieser Woche, Raum einnehmen, darfst du ganz bewusst groß werden. Mit weiten Haltungen wie Goddess, Warrior II und Triangle, mit kräftigen Beinen und Bewegungen, die den ganzen Raum nutzen, erlebst du im Körper, wie es sich anfühlt, Platz für dich zu beanspruchen. Ob solche Haltungen messbar etwas an unseren Hormonen verändern, wird in der Forschung kontrovers diskutiert. Viele Frauen erzählen mir aber, dass sie sich danach anders spüren, aufrechter, wacher und ein bisschen mehr bei sich. Probier es aus, vielleicht sogar direkt vor deinem ersten mutigen Schritt dieser Woche."
+        },
+        {
+          "t": "p",
+          "text": "Das Tired-Day-Video, Abends loslassen, ist dein Ausgleich. Nach einem Tag, an dem du dich gezeigt und deine Komfortzone verlassen hast, braucht dein Nervensystem Zeit, um wieder zur Ruhe zu kommen. Mit Legs up the Wall und einem sanften Body Scan schenkst du dir genau das. Mut und Erholung gehören zusammen, und je besser du dich nach einem aufregenden Schritt beruhigen kannst, desto leichter fällt dir der nächste."
+        },
+        {
+          "t": "h",
+          "text": "Um Unterstützung bitten"
+        },
+        {
+          "t": "p",
+          "text": "Viele Frauen, vor allem Mütter, haben über Jahre gelernt, alles allein zu schaffen. Um Hilfe zu bitten, fühlt sich für sie an wie ein Eingeständnis von Schwäche oder wie eine Last, die sie anderen nicht zumuten wollen. Dabei ist es eine der wichtigsten Fähigkeiten auf dem Weg zu einer eigenen Idee. Niemand baut etwas ganz allein auf. Du brauchst vielleicht jemanden, der am Samstagvormittag die Kinder übernimmt, eine Freundin, die deinen Text gegenliest, oder jemanden, der dich an deine Ziele erinnert, wenn du ins Zweifeln kommst."
+        },
+        {
+          "t": "p",
+          "text": "Eine gute Bitte ist konkret, freundlich und lässt dem anderen Menschen die Freiheit, auch Nein zu sagen. Statt eines vagen Satzes wie „Du könntest mich ja mal unterstützen“ sagst du lieber: „Ich möchte mir jeden Samstag von neun bis elf Uhr Zeit für mein Projekt nehmen. Würdest du in dieser Zeit mit den Kindern rausgehen?“ Je klarer du formulierst, was du brauchst, desto leichter fällt es den anderen, dir zu helfen. Und du wirst vermutlich überrascht sein, wie gern Menschen ihre Unterstützung anbieten, wenn sie erst einmal wissen, worum es geht."
+        },
+        {
+          "t": "fact",
+          "title": "Der Spotlight-Effekt",
+          "text": "In einer bekannten Studie von Thomas Gilovich und Kollegen mussten Studierende ein auffälliges T-Shirt tragen und schätzen, wie viele Personen im Raum es bemerkt hatten. Sie schätzten etwa die Hälfte, tatsächlich war es nur ungefähr ein Viertel. Wir überschätzen also regelmäßig, wie genau andere uns beobachten und bewerten. Das darf dich bei deinem ersten Schritt nach außen beruhigen."
+        },
+        {
+          "t": "fact",
+          "title": "Aufregung und Angst sind körperlich nah verwandt",
+          "text": "Herzklopfen, schnellere Atmung und Kribbeln im Bauch gehören sowohl zur Angst als auch zur Vorfreude. Die Forscherin Alison Wood Brooks fand Hinweise darauf, dass Menschen in Prüfungssituationen besser abschnitten, wenn sie sich vorher laut sagten, dass sie aufgeregt sind, statt sich zu befehlen, ruhig zu werden. Den eigenen Zustand als Aufregung zu deuten, kann dir also helfen, die Energie zu nutzen, statt sie zu bekämpfen."
+        },
+        {
+          "t": "fact",
+          "title": "Menschen helfen lieber, als wir denken",
+          "text": "Studien von Francis Flynn und Vanessa Lake zeigten, dass Menschen deutlich unterschätzen, wie bereit andere sind, ihnen zu helfen, wenn sie direkt fragen. In ihren Versuchen mussten die Teilnehmenden nur etwa halb so viele Menschen ansprechen, wie sie vorher vermutet hatten, um die gewünschte Unterstützung zu bekommen."
+        },
+        {
+          "t": "exercise",
+          "title": "Meine Angst kennenlernen",
+          "time": "15 Minuten",
+          "intro": "Mit dieser Übung holst du deine Angst aus dem Nebel und schaust sie dir in Ruhe an. Oft verliert sie dabei schon einen Teil ihrer Macht.",
+          "steps": [
+            "Schreib den Schritt auf, der dir bei deiner Idee gerade am meisten Angst macht.",
+            "Notiere, was im schlimmsten Fall passieren könnte, und zwar so konkret wie möglich.",
+            "Schreib darunter, was im besten Fall passieren könnte, und erlaube dir dabei, ruhig ein wenig zu träumen.",
+            "Überlege nun, was am wahrscheinlichsten passieren wird, wenn du ehrlich und realistisch auf die Situation schaust.",
+            "Frag dich zum Schluss, wie du mit dem schlimmsten Fall umgehen würdest, falls er doch eintritt, und wer oder was dir dann helfen könnte."
+          ]
+        },
+        {
+          "t": "table",
+          "title": "Meine Angst im Licht betrachtet",
+          "cols": [
+            "",
+            "Meine Gedanken"
+          ],
+          "rows": [
+            [
+              "Der Schritt, vor dem ich Angst habe",
+              ""
+            ],
+            [
+              "Im schlimmsten Fall",
+              ""
+            ],
+            [
+              "Im besten Fall",
+              ""
+            ],
+            [
+              "Am wahrscheinlichsten",
+              ""
+            ],
+            [
+              "Falls der schlimmste Fall eintritt, würde ich",
+              ""
+            ]
+          ]
+        },
+        {
+          "t": "tip",
+          "text": "Wenn vor einem mutigen Schritt dein Herz klopft, leg eine Hand auf deine Brust und sag leise zu dir: Ich bin aufgeregt, weil mir das wichtig ist. Atme danach zweimal tief in den Bauch und verlängere dabei die Ausatmung. Dieser kleine Moment hilft vielen Frauen, die Energie im Körper als Vorfreude zu erleben."
+        },
+        {
+          "t": "p",
+          "text": "Die Mut-Leiter auf der nächsten Seite hilft dir, deinen Weg nach außen in kleine, machbare Stufen zu teilen. Trag ganz unten den Schritt ein, der dich am wenigsten aufregt, und ganz oben den, der sich im Moment noch am größten anfühlt. Schätze bei jeder Stufe ein, wie aufgeregt du bist, und trag ein Datum ein, sobald du sie gegangen bist. Du darfst die Leiter jederzeit verändern und neue Stufen einfügen, wenn ein Schritt zu groß wirkt."
+        },
+        {
+          "t": "table",
+          "title": "Meine Mut-Leiter",
+          "cols": [
+            "Stufe",
+            "Mein Schritt",
+            "Aufregung (1–10)",
+            "Bis wann?",
+            "Geschafft am"
+          ],
+          "rows": [
+            [
+              "8 · der größte Schritt",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "7",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "6",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "5",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "4",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "3",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "1 · der kleinste Schritt",
+              "",
+              "",
+              "",
+              ""
+            ]
+          ]
+        },
+        {
+          "t": "h",
+          "text": "Formulierungen, die dir das Bitten leichter machen"
+        },
+        {
+          "t": "list",
+          "items": [
+            "„Ich habe ein Projekt, das mir sehr am Herzen liegt. Darf ich dir davon erzählen und deine ehrliche Meinung hören?“",
+            "„Ich möchte mir jede Woche zwei Stunden Zeit für meine Idee nehmen. Könntest du am Donnerstagabend die Kinder ins Bett bringen?“",
+            "„Du kennst dich so gut mit diesem Thema aus. Hättest du in den nächsten Wochen eine halbe Stunde Zeit für einen Kaffee und ein paar Fragen?“",
+            "„Würdest du meinen Text gegenlesen? Es ist völlig in Ordnung, wenn du gerade keine Zeit hast.“",
+            "„Ich habe mir vorgenommen, bis Ende des Monats meinen ersten Schritt zu gehen. Magst du mich in zwei Wochen fragen, wie es läuft?“",
+            "„Ich würde mich riesig freuen, wenn du meinen Beitrag teilst oder einer Freundin davon erzählst, die sich dafür interessieren könnte.“"
+          ]
+        },
+        {
+          "t": "exercise",
+          "title": "Meine Bitte formulieren",
+          "time": "10 Minuten",
+          "intro": "Du suchst dir eine Person aus und bereitest eine klare, freundliche Bitte vor.",
+          "steps": [
+            "Überlege, wobei du in den nächsten Wochen am dringendsten Unterstützung brauchst, sei es Zeit, Wissen, Ermutigung oder praktische Hilfe.",
+            "Schreib auf, wer dir dabei helfen könnte, und denk ruhig auch an Menschen, die du nicht jeden Tag siehst.",
+            "Formuliere deine Bitte in ein bis zwei Sätzen und mach sie so konkret wie möglich, mit Zeitpunkt, Dauer und genauer Aufgabe.",
+            "Füge einen Satz hinzu, der der anderen Person ausdrücklich erlaubt, Nein zu sagen. Das nimmt beiden den Druck.",
+            "Leg fest, wann du deine Bitte aussprichst, und trag es in deinen Kalender ein."
+          ]
+        },
+        {
+          "t": "table",
+          "title": "Wer kann mich unterstützen?",
+          "cols": [
+            "Person",
+            "Wobei kann sie mir helfen?",
+            "Meine Bitte",
+            "Ich frage bis"
+          ],
+          "rows": 4
+        },
+        {
+          "t": "h",
+          "text": "Mein erster Schritt nach außen"
+        },
+        {
+          "t": "p",
+          "text": "Jetzt wird es konkret. Wähle aus deiner Mut-Leiter einen Schritt aus der Mitte, der dich herausfordert und den du trotzdem in den nächsten zwei Wochen gehen kannst. Plane ihn mit den Fragen in der Tabelle so genau, dass dein Kopf keine Lücken mehr findet, durch die sich die Ausreden schleichen könnten."
+        },
+        {
+          "t": "table",
+          "title": "Mein Plan für den ersten Schritt nach außen",
+          "cols": [
+            "Frage",
+            "Meine Antwort"
+          ],
+          "rows": [
+            [
+              "Was genau mache ich?",
+              ""
+            ],
+            [
+              "Wann mache ich es (Tag und Uhrzeit)?",
+              ""
+            ],
+            [
+              "Wo oder über welchen Weg (persönlich, Instagram, Aushang, E-Mail)?",
+              ""
+            ],
+            [
+              "Wer erfährt davon?",
+              ""
+            ],
+            [
+              "Was bereite ich vorher vor?",
+              ""
+            ],
+            [
+              "Wer unterstützt mich dabei?",
+              ""
+            ],
+            [
+              "Was mache ich, wenn die Angst kurz vorher groß wird?",
+              ""
+            ],
+            [
+              "Wie belohne und beruhige ich mich danach?",
+              ""
+            ]
+          ]
+        },
+        {
+          "t": "tip",
+          "text": "Erzähl einer Frau aus unserer Unfold-Runde, wann du deinen Schritt gehen willst, und bitte sie, dir an dem Tag eine kurze Nachricht zu schreiben. Zu wissen, dass jemand an dich denkt und mitfiebert, macht unglaublich viel aus. Und im nächsten Live-Call feiern wir gemeinsam, wie es gelaufen ist."
+        },
+        {
+          "t": "prompts",
+          "items": [
+            "In welchen Momenten meines Lebens war ich schon einmal mutig, und was hat mir damals geholfen?",
+            "Wessen Meinung fürchte ich am meisten, und warum ist sie mir so wichtig?",
+            "Was würde ich einer Freundin sagen, die genau vor meinem Schritt steht?",
+            "Wie hat sich mein Körper bei Raum einnehmen angefühlt, und wo im Alltag möchte ich mehr Raum einnehmen?",
+            "Was ist mir leichtgefallen, als ich um Unterstützung gebeten habe, und was war schwer?"
+          ],
+          "lines": 4,
+          "title": "Journal für Woche 11"
+        },
+        {
+          "t": "quote",
+          "text": "Ich darf gesehen werden. Meine Idee verdient Raum, und ich verdiene Unterstützung auf meinem Weg."
+        }
+      ]
+    },
+    {
+      "icon": "umarmung",
+      "kicker": "Woche 12",
+      "title": "Selbstmitgefühl",
+      "intro": "Auf jedem echten Weg gibt es Tage, an denen etwas nicht klappt. In dieser Woche übst du, gerade dann freundlich mit dir zu bleiben.",
+      "blocks": [
+        {
+          "t": "h",
+          "text": "Wenn etwas nicht klappt"
+        },
+        {
+          "t": "p",
+          "text": "Vielleicht bist du in den letzten Wochen wunderbar vorangekommen, hast deinen Mini-Schritt jeden Tag gemacht und deinen ersten mutigen Schritt nach außen gewagt. Vielleicht ist es aber auch ganz anders gelaufen. Die Kinder waren krank, die Arbeit hat dich verschluckt, dein Tracker ist halb leer geblieben, und auf deinen ersten Beitrag hat kaum jemand reagiert. Vielleicht hast du eine Bitte ausgesprochen und ein Nein bekommen. Und vielleicht sitzt du jetzt da und hörst diese vertraute Stimme, die sagt, dass du es ja wieder einmal nicht geschafft hast und dass du es eigentlich gleich lassen könntest."
+        },
+        {
+          "t": "p",
+          "text": "Ich möchte, dass du weißt, dass solche Wochen absolut zu jedem Weg gehören. Es gibt niemanden, der etwas Neues aufbaut, ohne immer wieder ins Stolpern zu kommen. Der entscheidende Unterschied liegt darin, wie wir mit uns selbst sprechen, wenn es nicht so läuft wie geplant. Und genau darum geht es in dieser Woche, um das Selbstmitgefühl, eine Fähigkeit, die du lernen und üben kannst wie eine Yoga-Haltung."
+        },
+        {
+          "t": "h",
+          "text": "Was Selbstmitgefühl bedeutet"
+        },
+        {
+          "t": "p",
+          "text": "Die amerikanische Psychologin Kristin Neff, die seit vielen Jahren zu diesem Thema forscht, beschreibt Selbstmitgefühl mit drei Bausteinen. Der erste ist Freundlichkeit mit dir selbst. Du behandelst dich in einem schwierigen Moment so, wie du eine gute Freundin behandeln würdest, mit Wärme und Verständnis statt mit harter Kritik. Der zweite Baustein ist das Bewusstsein für unser gemeinsames Menschsein. Du erinnerst dich daran, dass Fehler, Schwächen und Rückschläge zum Leben jedes Menschen gehören und dass du mit deinem Schmerz nicht allein bist. Der dritte Baustein ist Achtsamkeit, also die Fähigkeit, deine Gefühle wahrzunehmen, ohne sie wegzudrücken und ohne dich völlig in ihnen zu verlieren."
+        },
+        {
+          "t": "p",
+          "text": "Vielleicht taucht bei dir an dieser Stelle ein Einwand auf, den ich sehr oft höre: Wenn ich zu nett zu mir bin, werde ich bequem und strenge mich gar nicht mehr an. Die Forschung zeichnet hier ein anderes Bild. Selbstmitgefühl bedeutet nämlich keineswegs, die eigenen Ansprüche aufzugeben oder sich alles schönzureden. Menschen, die freundlich mit sich umgehen, sind nach einem Misserfolg häufig sogar motivierter, es noch einmal zu versuchen, weil sie keine Angst haben müssen, sich selbst für jeden Fehler zu bestrafen. Harte Selbstkritik dagegen führt oft dazu, dass wir schwierige Dinge ganz vermeiden, um diesem inneren Urteil zu entgehen."
+        },
+        {
+          "t": "h",
+          "text": "Rückschläge sind ein Teil des Weges"
+        },
+        {
+          "t": "p",
+          "text": "Wenn du an einen Weg denkst, stellst du dir vielleicht eine gerade Linie vor, die stetig nach oben führt. Echte Entwicklung sieht aber eher aus wie ein Wanderweg in den Bergen. Er schlängelt sich, führt manchmal ein Stück bergab, verlangt Umwege und Pausen, und trotzdem kommst du dem Gipfel mit jedem Schritt näher. Ein Rückschlag ist also vor allem ein Zeichen dafür, dass du auf einem echten Weg unterwegs bist."
+        },
+        {
+          "t": "p",
+          "text": "Erinnerst du dich an die Gewohnheitsforschung aus der zehnten Woche? Ein einzelner ausgelassener Tag hatte keinen Einfluss darauf, ob sich eine Gewohnheit langfristig festigte. Was wirklich schadet, ist das Gefühl, versagt zu haben, und der Gedanke, dass jetzt ohnehin alles egal ist. Selbstmitgefühl ist genau das Gegenmittel gegen diesen Gedanken. Es erlaubt dir, kurz innezuhalten, deinen Schmerz anzuerkennen und dann freundlich wieder aufzustehen."
+        },
+        {
+          "t": "p",
+          "text": "Jeder Rückschlag enthält außerdem eine Information. Vielleicht war dein Mini-Schritt doch zu groß, vielleicht hat der Auslöser nicht zuverlässig funktioniert, oder vielleicht hast du dir in einer Phase zu viel vorgenommen, in der dein Leben ohnehin sehr voll war. Wenn du mit freundlichen Augen hinschaust, kannst du aus jedem Stolpern etwas lernen und deinen Plan anpassen, statt dich selbst infrage zu stellen."
+        },
+        {
+          "t": "h",
+          "text": "Selbstmitgefühl beginnt im Körper"
+        },
+        {
+          "t": "p",
+          "text": "Im Full-Day-Video dieser Woche, Kraft und Weichheit, wechselst du ganz bewusst zwischen Spannung und Loslassen. Auf einen Wall Sit folgt Ausschütteln, auf die Plank folgt Child’s Pose, auf die Glute Bridges folgt ein sanftes Lösen der Knie. Ich habe diesen Wechsel gewählt, weil Selbstmitgefühl genau so funktioniert. Es gibt Momente, in denen du deine Kraft brauchst, um dranzubleiben, und Momente, in denen du weich werden und dir eine Pause erlauben darfst. Beides gehört zusammen, und je besser du spürst, was gerade dran ist, desto liebevoller kannst du mit dir umgehen."
+        },
+        {
+          "t": "p",
+          "text": "Im Tired-Day-Video, Dankbar ankommen, bekommt jede Körperregion Aufmerksamkeit und ein Danke. Vielleicht kommt dir das am Anfang ein wenig ungewohnt vor. Viele von uns sind es gewohnt, ihren Körper vor allem kritisch zu betrachten, und nur selten danken wir ihm für alles, was er Tag für Tag für uns leistet. Diese kleine Praxis kann ein wunderschöner Einstieg in mehr Freundlichkeit mit dir selbst sein, und viele Frauen erzählen mir, dass sie danach ruhiger schlafen."
+        },
+        {
+          "t": "p",
+          "text": "Bitte achte gut auf dich, wenn du merkst, dass schwierige Gefühle in dieser Woche sehr groß werden oder dich über längere Zeit begleiten. Selbstmitgefühl kann dich wunderbar unterstützen, es ersetzt aber keine professionelle Hilfe. Wenn Traurigkeit, Erschöpfung oder Selbstzweifel dich über Wochen nicht loslassen, sprich bitte mit deiner Ärztin oder einer Psychotherapeutin. Auch das ist ein Akt von Selbstmitgefühl."
+        },
+        {
+          "t": "fact",
+          "title": "Freundlichkeit macht motivierter",
+          "text": "Die Psychologinnen Juliana Breines und Serena Chen von der University of California in Berkeley ließen Versuchspersonen über einen persönlichen Fehler nachdenken. Diejenigen, die angeleitet wurden, mit sich selbst mitfühlend umzugehen, waren anschließend motivierter, sich zu verbessern und den Fehler nicht zu wiederholen, als jene, die sich vor allem selbst aufwerten sollten."
+        },
+        {
+          "t": "fact",
+          "title": "Die drei Bausteine nach Kristin Neff",
+          "text": "Selbstmitgefühl besteht laut der Forscherin Kristin Neff aus Freundlichkeit mit sich selbst, dem Bewusstsein, dass Schwierigkeiten zum gemeinsamen Menschsein gehören, und achtsamer Wahrnehmung der eigenen Gefühle. Diese drei Bausteine findest du in der Selbstmitgefühls-Pause wieder, die du auf den nächsten Seiten kennenlernst."
+        },
+        {
+          "t": "fact",
+          "title": "Beruhigende Berührung",
+          "text": "Eine Hand auf dem Herzen, eine Umarmung oder sanftes Streichen über die Arme sind Gesten, die wir instinktiv nutzen, um andere zu trösten. Erste Studien deuten darauf hin, dass solche Berührungen auch dann beruhigend wirken können, wenn wir sie uns selbst schenken, etwa indem sie die Stressreaktion des Körpers etwas abschwächen. Probiere aus, welche Geste sich für dich stimmig anfühlt."
+        },
+        {
+          "t": "exercise",
+          "title": "Die Selbstmitgefühls-Pause",
+          "time": "5 Minuten",
+          "intro": "Diese kurze Übung geht auf Kristin Neff zurück. Du kannst sie überall machen, im Auto, auf der Toilette oder abends im Bett, immer dann, wenn du merkst, dass es dir gerade schwer ums Herz ist.",
+          "steps": [
+            "Denk an eine Situation, die dich gerade belastet, und spüre, wo im Körper du dieses Gefühl wahrnimmst, vielleicht als Enge in der Brust, als Druck im Bauch oder als Schwere in den Schultern.",
+            "Sag leise zu dir: Das ist gerade ein schwieriger Moment. Damit erkennst du achtsam an, dass es dir nicht gut geht.",
+            "Sag danach: Schwierige Momente gehören zum Leben, und viele andere Frauen fühlen sich gerade ganz ähnlich. Damit erinnerst du dich an das gemeinsame Menschsein.",
+            "Leg eine oder beide Hände auf dein Herz oder an eine andere Stelle, an der sich die Berührung tröstlich anfühlt, und spüre die Wärme deiner Hände.",
+            "Sag zum Schluss: Möge ich freundlich mit mir sein. Wenn dir andere Worte passender erscheinen, frag dich, was du gerade hören möchtest, etwa Ich bin für mich da oder Ich darf Fehler machen."
+          ]
+        },
+        {
+          "t": "breath",
+          "title": "Atem für einen weichen Moment",
+          "pattern": "4 · 6",
+          "text": "Atme vier Zähler lang ruhig durch die Nase ein und sechs Zähler lang langsam durch die Nase oder durch leicht geöffnete Lippen wieder aus. Eine Ausatmung, die etwas länger ist als die Einatmung, hilft vielen Menschen, zur Ruhe zu kommen. Leg dabei gern eine Hand auf dein Herz und eine auf deinen Bauch und wiederhole den Atemkreis sechs bis zehn Mal. Wenn dir die Zähler zu lang sind, verkürze sie einfach, wichtig ist nur, dass die Ausatmung etwas länger bleibt."
+        },
+        {
+          "t": "exercise",
+          "title": "Der freundliche Rückschlag-Check",
+          "time": "15 Minuten",
+          "intro": "Wenn etwas nicht geklappt hat, hilft dir dieser Check, mit klarem Blick und warmem Herzen hinzuschauen, ohne dich selbst zu verurteilen.",
+          "steps": [
+            "Beschreibe sachlich, was passiert ist, so wie eine neutrale Beobachterin es beschreiben würde.",
+            "Schreib auf, welche Gefühle diese Situation in dir auslöst, und erlaube dir, sie ganz ehrlich zu benennen.",
+            "Notiere, was deine innere Kritikerin dazu sagt, und schau dir diese Sätze einmal mit etwas Abstand an.",
+            "Frag dich, was eine liebevolle Freundin dir in dieser Situation sagen würde, und schreib ihre Worte auf.",
+            "Überlege, was du aus der Situation lernen kannst und was du beim nächsten Mal anders machen möchtest.",
+            "Leg den kleinsten nächsten Schritt fest, mit dem du wieder einsteigst, am besten noch heute oder morgen."
+          ]
+        },
+        {
+          "t": "table",
+          "title": "Mein Rückschlag-Check",
+          "cols": [
+            "Frage",
+            "Meine Antwort"
+          ],
+          "rows": [
+            [
+              "Was ist passiert?",
+              ""
+            ],
+            [
+              "Was fühle ich?",
+              ""
+            ],
+            [
+              "Was sagt meine innere Kritikerin?",
+              ""
+            ],
+            [
+              "Was würde eine liebevolle Freundin sagen?",
+              ""
+            ],
+            [
+              "Was lerne ich daraus?",
+              ""
+            ],
+            [
+              "Mein kleinster nächster Schritt",
+              ""
+            ]
+          ]
+        },
+        {
+          "t": "tip",
+          "text": "Stell dir vor, deine Tochter oder deine beste Freundin würde dir genau von deinem Rückschlag erzählen. Würdest du ihr sagen, dass sie es eben nicht kann? Ganz sicher nicht. Sprich mit dir selbst in diesem Ton, den du ihr schenken würdest. Am Anfang fühlt sich das vielleicht fremd an, mit der Zeit wird es zu einer wohltuenden Gewohnheit."
+        },
+        {
+          "t": "h",
+          "text": "Ein Brief an mich selbst"
+        },
+        {
+          "t": "p",
+          "text": "Diese Übung gehört zu den berührendsten des ganzen Monats. Du schreibst dir selbst einen Brief, so als würde eine Freundin dir schreiben, die dich bedingungslos liebt, die all deine Stärken und Schwächen kennt und die genau weiß, was du in den letzten Monaten alles getragen und geschafft hast. Nimm dir dafür einen ruhigen Moment, vielleicht nach dem Video Dankbar ankommen, zünde eine Kerze an und schreib ohne Zensur. Niemand außer dir wird diesen Brief lesen."
+        },
+        {
+          "t": "exercise",
+          "title": "Mein Brief an mich",
+          "time": "20 Minuten",
+          "intro": "Diese Fragen können dir beim Schreiben helfen. Du musst nicht alle beantworten, nimm einfach die, die dich ansprechen.",
+          "steps": [
+            "Beginne mit einer liebevollen Anrede, so wie du sie dir selbst wünschen würdest.",
+            "Schreib, was diese Freundin an dir sieht und bewundert, auch wenn es dir schwerfällt, es anzunehmen.",
+            "Erzähle, was sie über die schwierigen Momente der letzten Wochen denkt und wie sie dich darin sieht.",
+            "Schreib, was sie dir für die kommenden Monate wünscht und was sie dir mit auf den Weg geben möchte.",
+            "Schließe den Brief mit einem Satz, den du an schweren Tagen gern lesen möchtest."
+          ]
+        },
+        {
+          "t": "notes",
+          "lines": 24,
+          "title": "Mein Brief an mich selbst"
+        },
+        {
+          "t": "prompts",
+          "items": [
+            "Wie spreche ich normalerweise mit mir, wenn mir etwas misslingt, und woher kenne ich diesen Ton?",
+            "Welcher Rückschlag der letzten Wochen hat mir am meisten wehgetan, und was hat er mir gezeigt?",
+            "Wann habe ich mich schon einmal selbst getröstet, und wie hat sich das angefühlt?",
+            "Wofür möchte ich meinem Körper heute danken?",
+            "Was brauche ich, um an schwierigen Tagen freundlicher mit mir zu sein?"
+          ],
+          "lines": 4,
+          "title": "Journal für Woche 12"
+        },
+        {
+          "t": "quote",
+          "text": "Ich darf stolpern und trotzdem weitergehen. Ich bleibe an meiner Seite, gerade dann, wenn es schwer wird."
+        }
+      ]
+    },
+    {
+      "icon": "feier",
+      "kicker": "Woche 13",
+      "title": "Feiern und weitergehen",
+      "intro": "Wir schauen gemeinsam auf drei Monate zurück, feiern alles, was gewachsen ist, und du gehst mit deinem Plan und viel Vertrauen in den Frühling.",
+      "blocks": [
+        {
+          "t": "h",
+          "text": "Drei Monate, die zählen"
+        },
+        {
+          "t": "p",
+          "text": "Wir sind in der letzten Woche von Unfold angekommen, und ich spüre gerade so viele Gefühle gleichzeitig. Da ist Freude über alles, was in diesen Wochen bei dir gewachsen ist, ein bisschen Wehmut, weil unsere gemeinsame Zeit in dieser Form endet, und eine große Neugier auf das, was du als Nächstes erschaffen wirst. Als wir im Jänner gestartet sind, war draußen noch tiefer Winter. Jetzt wird es heller, die Tage sind länger, und das erste Grün zeigt sich. Ich finde es wunderschön, dass dein Weg in Unfold genau diesen Rhythmus der Natur begleitet hat, vom Ruhen über das Knospen bis zum Entfalten."
+        },
+        {
+          "t": "p",
+          "text": "Diese Woche ist dem Feiern und dem Weitergehen gewidmet. Beides ist gleich wichtig. Wenn wir nur weitergehen, ohne innezuhalten, übersehen wir allzu leicht, was wir bereits geschafft haben. Und wenn wir nur feiern, ohne einen Blick nach vorn zu werfen, verlieren wir nach dem Ende einer Begleitung schnell den Faden. Deshalb nimmst du dir in den nächsten Tagen Zeit für beides: für einen liebevollen Rückblick und für einen klaren, machbaren Plan für die nächsten 90 Tage."
+        },
+        {
+          "t": "h",
+          "text": "Warum Feiern kein Luxus ist"
+        },
+        {
+          "t": "p",
+          "text": "Vielen Frauen, mit denen ich arbeite, fällt es schwer, ihre eigenen Erfolge zu feiern. Sie haben gelernt, bescheiden zu sein, die Anerkennung lieber den anderen zu überlassen und bei jedem erreichten Ziel sofort das nächste anzusteuern. Vielleicht kennst du auch diesen Reflex, bei einem Lob sofort abzuwinken und zu sagen, dass es doch nichts Besonderes war. Ich möchte dich in dieser Woche einladen, diesen Reflex einmal bewusst zu unterbrechen."
+        },
+        {
+          "t": "p",
+          "text": "Unser Gehirn neigt dazu, Negatives deutlich stärker wahrzunehmen und länger abzuspeichern als Positives. Fachleute sprechen von einer negativen Verzerrung, die uns früher vermutlich geholfen hat, Gefahren nicht zu übersehen. Im Alltag führt sie aber dazu, dass wir uns an jeden Fehler erinnern und unsere Fortschritte kaum bemerken. Wenn du deine Erfolge bewusst wahrnimmst, aufschreibst und feierst, gleichst du diese Verzerrung ein Stück weit aus. Du stärkst dein Selbstvertrauen, und du gibst deinem Gehirn genau die Belohnung, die es braucht, um an deinen neuen Gewohnheiten dranzubleiben."
+        },
+        {
+          "t": "p",
+          "text": "Feiern muss dabei nichts Großes sein. Es kann ein besonderer Kaffee in deinem Lieblingscafé sein, ein Spaziergang ganz allein, ein Abend mit deiner besten Freundin, ein neues Notizbuch für dein Projekt oder einfach ein Moment, in dem du dich hinsetzt, die Hand aufs Herz legst und dir sagst, dass du stolz auf dich bist. Wichtig ist nur, dass du den Moment bewusst erlebst und ihn nicht im Trubel des Alltags untergehen lässt."
+        },
+        {
+          "t": "h",
+          "text": "Zurückschauen mit freundlichen Augen"
+        },
+        {
+          "t": "p",
+          "text": "Für deinen Rückblick lohnt es sich, die Workbooks der ersten beiden Monate noch einmal in die Hand zu nehmen. Blättere langsam durch deine Notizen aus Wurzeln und Knospen und lies, was du damals geschrieben hast. Vielleicht staunst du darüber, wie anders du heute auf manche Fragen antworten würdest. Vielleicht entdeckst du auch, dass einige Themen noch nicht abgeschlossen sind, und das ist vollkommen in Ordnung. Entwicklung ist kein Projekt, das an einem bestimmten Datum fertig ist, sie begleitet dich ein Leben lang."
+        },
+        {
+          "t": "p",
+          "text": "Achte bei deinem Rückblick bitte auch auf die kleinen, leisen Veränderungen. Vielleicht hast du keine Firma gegründet und kein Buch veröffentlicht, aber du sagst inzwischen öfter Nein, ohne dich stundenlang zu rechtfertigen. Vielleicht hast du entdeckt, wie wohltuend zwei Minuten Atem am Morgen für dich sind, oder du hast zum ersten Mal seit Jahren einer Freundin von deinem Traum erzählt. Gerade diese leisen Veränderungen sind oft das Fundament für alles, was später sichtbar wird."
+        },
+        {
+          "t": "h",
+          "text": "Was bleibt, wenn Unfold endet"
+        },
+        {
+          "t": "p",
+          "text": "Das Full-Day-Video dieser Woche heißt Entfaltet, dein Abschlussflow. Es bringt Elemente aus allen drei Monaten zusammen und endet mit einem stillen Moment nur für dich. Vielleicht erkennst du darin Bewegungen wieder, die dir im Jänner noch schwergefallen sind und die sich jetzt ganz vertraut anfühlen. Nimm dir Zeit für dieses Video, mach es an einem Tag, an dem du nicht gehetzt bist, und bleib am Ende ruhig etwas länger in Savasana liegen."
+        },
+        {
+          "t": "p",
+          "text": "Das Tired-Day-Video, Ritual für den Neubeginn, ist mein Geschenk an dich für die Zeit nach Unfold. Es ist ein kurzes Ritual aus Atem, Bewegung und Stille, das du immer wieder machen kannst, wann immer du einen neuen Abschnitt beginnst, dich neu ausrichten möchtest oder einfach zu dir zurückfinden willst. Du kannst es zum Beispiel am ersten Tag jedes Monats einplanen, als festen Termin mit dir selbst."
+        },
+        {
+          "t": "p",
+          "text": "Neben den Videos nimmst du noch so viel mehr mit: deine Gewohnheiten, deine Rituale aus Journaling, Meditation und Breathwork, deine Mut-Leiter, deinen Brief an dich selbst und vor allem die Erfahrung, dass du Schritt für Schritt etwas in Bewegung bringen kannst. Und du nimmst die Frauen aus unserer Runde mit, die deinen Weg begleitet haben und die sich bestimmt auch nach dem 11. April über eine Nachricht von dir freuen."
+        },
+        {
+          "t": "h",
+          "text": "Dein Frühling: der 90-Tage-Plan"
+        },
+        {
+          "t": "p",
+          "text": "Zum Schluss schauen wir nach vorn. Ein Zeitraum von 90 Tagen ist ideal, um eine Idee ein gutes Stück voranzubringen. Er ist lang genug, um echte Fortschritte zu erleben, und kurz genug, um überschaubar zu bleiben und nicht in ferner Zukunft zu verschwimmen. Dein Plan führt dich ungefähr von Mitte April bis Mitte Juli, also durch den ganzen Frühling bis in den Sommer hinein."
+        },
+        {
+          "t": "p",
+          "text": "Teile die 90 Tage in drei Abschnitte von etwa einem Monat. Überlege für jeden Abschnitt, was du erreichen möchtest, welche kleinen Schritte dich dorthin führen und wer oder was dich dabei unterstützen kann. Plane bitte großzügig und realistisch. Denk an Ferien, Feiertage, Geburtstage und all die Dinge, die im Frühling ohnehin auf dich zukommen. Ein Plan, der Puffer enthält, trägt dich viel weiter als ein Plan, der nur an perfekten Tagen funktioniert. Und denk daran, dass dein Plan jederzeit angepasst werden darf, wenn dein Leben sich verändert."
+        },
+        {
+          "t": "fact",
+          "title": "Das Fortschrittsprinzip",
+          "text": "Die Harvard-Forscherin Teresa Amabile wertete gemeinsam mit Steven Kramer tausende Tagebucheinträge von Berufstätigen aus. Sie fanden heraus, dass kaum etwas die Stimmung und Motivation so stark hob wie das Gefühl, bei einer sinnvollen Aufgabe vorangekommen zu sein, selbst wenn der Fortschritt klein war. Deine Erfolge bewusst wahrzunehmen, ist also eine echte Kraftquelle für alles, was noch vor dir liegt."
+        },
+        {
+          "t": "fact",
+          "title": "Die Peak-End-Regel",
+          "text": "Der Psychologe und Nobelpreisträger Daniel Kahneman beschrieb, dass wir Erlebnisse im Rückblick vor allem nach ihrem intensivsten Moment und nach ihrem Ende beurteilen. Ein bewusster, schöner Abschluss prägt also maßgeblich, wie du dich später an diese drei Monate erinnerst. Genau deshalb lohnt es sich, Unfold mit einem kleinen Ritual zu beenden."
+        },
+        {
+          "t": "fact",
+          "title": "Planen in überschaubaren Abschnitten",
+          "text": "Ziele, die in konkrete Zwischenschritte mit festen Zeitpunkten zerlegt werden, lassen sich in vielen Studien besser umsetzen als vage Vorsätze für ein ganzes Jahr. Ein Zeitraum von etwa drei Monaten ist für viele Menschen gut überschaubar und gibt trotzdem genug Raum für spürbare Veränderung."
+        },
+        {
+          "t": "exercise",
+          "title": "Mein Rückblick über drei Monate",
+          "time": "30 Minuten",
+          "intro": "Nimm dir für diesen Rückblick eine ruhige halbe Stunde und deine Workbooks aus Monat 1 und Monat 2.",
+          "steps": [
+            "Blättere durch dein Workbook Wurzeln und lies deine Antworten aus dem ersten Check-in. Notiere, was dir dabei auffällt.",
+            "Schau dir an, was du über deinen Mental Load und deine Erschöpfung geschrieben hast, und frag dich, was sich seitdem verändert hat.",
+            "Blättere durch dein Workbook Knospen und lies deine Gedanken zu Grenzen, Stärken, deiner inneren Kritikerin und deinen Ideen.",
+            "Lies deinen Check-in vom Anfang dieses Monats und vergleiche ihn mit deinem heutigen Gefühl.",
+            "Schreib die drei Momente auf, die dich in Unfold am meisten berührt oder verändert haben."
+          ]
+        },
+        {
+          "t": "prompts",
+          "items": [
+            "Wer war ich, als ich im Jänner mit Unfold begonnen habe, und wer bin ich heute?",
+            "Welcher Moment in diesen drei Monaten hat mich am meisten berührt?",
+            "Was habe ich über mich gelernt, das ich nie wieder vergessen möchte?",
+            "Welche Gewohnheit oder welches Ritual möchte ich auf jeden Fall beibehalten?"
+          ],
+          "lines": 4,
+          "title": "Mein Rückblick"
+        },
+        {
+          "t": "h",
+          "text": "Meine Erfolgsliste"
+        },
+        {
+          "t": "p",
+          "text": "Schreib hier alles auf, was du in den letzten drei Monaten geschafft, gelernt, gewagt oder verändert hast. Wirklich alles, auch die Dinge, die dir klein vorkommen. Ein Nein, das du ausgesprochen hast, zählt genauso wie ein erster Beitrag auf Instagram, und ein Abend, an dem du dir bewusst eine Pause gegönnt hast, zählt genauso wie ein abgeschlossenes Projekt. Versuche, mindestens zwanzig Punkte zu finden. Wenn dir nichts mehr einfällt, frag deinen Partner, eine Freundin oder die Frauen aus unserer Runde, was sie an dir beobachtet haben."
+        },
+        {
+          "t": "table",
+          "title": "Meine Erfolgsliste",
+          "cols": [
+            "Nr.",
+            "Das habe ich geschafft, gelernt oder gewagt",
+            "Wie ich mich dabei gefühlt habe"
+          ],
+          "rows": [
+            [
+              "1",
+              "",
+              ""
+            ],
+            [
+              "2",
+              "",
+              ""
+            ],
+            [
+              "3",
+              "",
+              ""
+            ],
+            [
+              "4",
+              "",
+              ""
+            ],
+            [
+              "5",
+              "",
+              ""
+            ],
+            [
+              "6",
+              "",
+              ""
+            ],
+            [
+              "7",
+              "",
+              ""
+            ],
+            [
+              "8",
+              "",
+              ""
+            ],
+            [
+              "9",
+              "",
+              ""
+            ],
+            [
+              "10",
+              "",
+              ""
+            ],
+            [
+              "11",
+              "",
+              ""
+            ],
+            [
+              "12",
+              "",
+              ""
+            ],
+            [
+              "13",
+              "",
+              ""
+            ],
+            [
+              "14",
+              "",
+              ""
+            ],
+            [
+              "15",
+              "",
+              ""
+            ],
+            [
+              "16",
+              "",
+              ""
+            ],
+            [
+              "17",
+              "",
+              ""
+            ],
+            [
+              "18",
+              "",
+              ""
+            ],
+            [
+              "19",
+              "",
+              ""
+            ],
+            [
+              "20",
+              "",
+              ""
+            ]
+          ]
+        },
+        {
+          "t": "tip",
+          "text": "Leg dir ein Erfolgsglas an. Das ist ein einfaches Schraubglas, in das du ab jetzt jeden kleinen Erfolg auf einem gefalteten Zettel wirfst. An Tagen, an denen du an dir zweifelst, nimmst du ein paar Zettel heraus und liest sie. Und am Ende des Jahres hast du einen ganzen Schatz an Beweisen dafür, wie viel du bewegen kannst. Für mich ist ein selbst getöpfertes Gefäß dafür natürlich die schönste Wahl, aber jedes Glas aus deiner Küche erfüllt diesen Zweck genauso gut."
+        },
+        {
+          "t": "h",
+          "text": "Vorher und nachher"
+        },
+        {
+          "t": "p",
+          "text": "Erinnerst du dich an deinen Check-in am Anfang dieses Monats? Jetzt beantwortest du die gleichen Fragen noch einmal. Kreise zuerst ein, wie es dir zu Beginn von Unfold im Jänner ging, so gut du dich daran erinnern kannst, und danach, wie es dir heute geht. Wenn sich manche Werte kaum verändert haben, sei bitte freundlich mit dir. Veränderung braucht Zeit, und manchmal zeigt sie sich erst Wochen später."
+        },
+        {
+          "t": "scale",
+          "title": "So ging es mir im Jänner",
+          "items": [
+            "Meine Energie im Alltag",
+            "Wie erholsam mein Schlaf ist",
+            "Wie leicht sich mein Kopf anfühlt",
+            "Wie klar ich weiß, was ich mir wünsche",
+            "Wie sehr ich mir selbst etwas zutraue",
+            "Wie freundlich ich mit mir umgehe"
+          ],
+          "low": "kaum",
+          "high": "sehr"
+        },
+        {
+          "t": "scale",
+          "title": "So geht es mir heute",
+          "items": [
+            "Meine Energie im Alltag",
+            "Wie erholsam mein Schlaf ist",
+            "Wie leicht sich mein Kopf anfühlt",
+            "Wie klar ich weiß, was ich mir wünsche",
+            "Wie sehr ich mir selbst etwas zutraue",
+            "Wie freundlich ich mit mir umgehe"
+          ],
+          "low": "kaum",
+          "high": "sehr"
+        },
+        {
+          "t": "prompts",
+          "items": [
+            "Wo sehe ich die größte Veränderung, und was hat sie möglich gemacht?",
+            "Wo wünsche ich mir noch Wachstum, und wie kann ich mich dabei in den nächsten Monaten unterstützen?"
+          ],
+          "lines": 4,
+          "title": "Was mir beim Vergleich auffällt"
+        },
+        {
+          "t": "h",
+          "text": "Mein 90-Tage-Plan für den Frühling"
+        },
+        {
+          "t": "p",
+          "text": "Bevor du die Tabelle ausfüllst, schreib noch einmal deinen Satz aus der neunten Woche ganz oben hin. Passt er noch, oder hat er sich durch die letzten Wochen verändert? Pass ihn ruhig an, wenn du inzwischen mehr Klarheit gewonnen hast. Danach planst du die drei Abschnitte deines Frühlings."
+        },
+        {
+          "t": "notes",
+          "lines": 3,
+          "title": "Meine Idee in einem Satz, Fassung Frühling"
+        },
+        {
+          "t": "table",
+          "title": "Mein 90-Tage-Plan",
+          "cols": [
+            "Abschnitt",
+            "Mein Ziel",
+            "Meine kleinen Schritte",
+            "Unterstützung und Hilfsmittel",
+            "Wie ich feiere"
+          ],
+          "rows": [
+            [
+              "Tag 1–30 · April bis Mai",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Tag 31–60 · Mai bis Juni",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Tag 61–90 · Juni bis Juli",
+              "",
+              "",
+              "",
+              ""
+            ]
+          ]
+        },
+        {
+          "t": "table",
+          "title": "Meine Gewohnheiten für den Frühling",
+          "cols": [
+            "Gewohnheit",
+            "Auslöser (nachdem ich …)",
+            "Mein Wenn-dann-Plan für schwierige Tage"
+          ],
+          "rows": 4
+        },
+        {
+          "t": "checklist",
+          "title": "Meine Termine mit mir selbst",
+          "items": [
+            "Ritual für den Neubeginn am ersten Tag jedes Monats im Kalender eingetragen",
+            "Ein fester Wochentermin für meine Idee im Familienkalender eingetragen",
+            "Zwei Bewegungseinheiten pro Woche eingeplant",
+            "Ein Termin am Tag 30, 60 und 90 für einen kurzen Rückblick eingetragen",
+            "Eine Frau aus der Unfold-Runde gefragt, ob wir uns weiter gegenseitig begleiten",
+            "Mein Erfolgsglas aufgestellt"
+          ]
+        },
+        {
+          "t": "p",
+          "text": "Auf der nächsten Seite findest du einen Wochenplaner für deine erste Woche nach Unfold. Trag darin deine Prioritäten ein, plane bewusst Zeit für deine Idee und für deine Selbstfürsorge ein, und denk daran, dass auch eine Woche mit nur einem einzigen kleinen Schritt eine gute Woche ist."
+        },
+        {
+          "t": "planner",
+          "title": "Meine erste Woche nach Unfold"
+        },
+        {
+          "t": "h",
+          "text": "Ein Abschiedsritual"
+        },
+        {
+          "t": "p",
+          "text": "Zum Abschluss lade ich dich zu einem kleinen Ritual ein. Rituale helfen uns, Übergänge bewusst zu gestalten, ein Kapitel liebevoll zu schließen und mit Klarheit in ein neues zu gehen. Du kannst es allein machen oder gemeinsam mit einer Freundin, und du kannst es ganz nach deinem Gefühl verändern."
+        },
+        {
+          "t": "exercise",
+          "title": "Mein Abschiedsritual für Unfold",
+          "time": "30 Minuten",
+          "intro": "Such dir einen ruhigen Abend aus, an dem du nicht gestört wirst. Lege dir eine Kerze, dein Workbook, einen Stift, ein schönes Blatt Papier und einen Umschlag bereit.",
+          "steps": [
+            "Mach zuerst das Video Ritual für den Neubeginn und komm über Atem, Bewegung und Stille ganz bei dir an.",
+            "Zünde die Kerze an und lies deinen Brief an dich selbst aus der zwölften Woche noch einmal langsam durch.",
+            "Schreib auf ein Blatt, was du aus diesen drei Monaten zurücklassen möchtest, zum Beispiel einen alten Glaubenssatz, eine Angst oder eine Gewohnheit, die dir nicht mehr dient. Du kannst das Blatt anschließend zerreißen oder an einem sicheren Ort, etwa in einem feuerfesten Gefäß im Freien, verbrennen.",
+            "Schreib auf ein zweites, schönes Blatt einen Brief an die Frau, die du in 90 Tagen sein wirst. Erzähl ihr, was du dir für sie wünschst, und steck den Brief in einen Umschlag mit dem Datum, an dem du ihn öffnen darfst.",
+            "Leg zum Schluss beide Hände auf dein Herz, sag dir leise Danke für alles, was du in diesen drei Monaten geleistet hast, und lass die Kerze noch eine Weile brennen, während du einfach nur da bist."
+          ]
+        },
+        {
+          "t": "notes",
+          "lines": 8,
+          "title": "Was ich nach dem Ritual fühle"
+        },
+        {
+          "t": "prompts",
+          "items": [
+            "Wofür bin ich mir selbst nach diesen drei Monaten am meisten dankbar?",
+            "Welchen Menschen in meinem Leben möchte ich für ihre Unterstützung danken?",
+            "Mit welchem Gefühl gehe ich in den Frühling?",
+            "Welchen Satz möchte ich mir für die nächsten 90 Tage an den Spiegel kleben?"
+          ],
+          "lines": 4,
+          "title": "Journal für Woche 13"
+        },
+        {
+          "t": "quote",
+          "text": "Ich habe mich entfaltet, Schritt für Schritt, in meinem Tempo. Bewegung beginnt bei mir, und ich gehe weiter."
+        }
+      ]
+    }
+  ],
+  "closing": "Meine Liebe, drei Monate liegen hinter uns, in denen du so viel mehr geschafft hast, als du vielleicht gerade siehst. Du hast im Winter Wurzeln geschlagen, deinen Knospen Raum gegeben und dich jetzt im beginnenden Frühling entfaltet, mit kleinen, mutigen Schritten, mit Tagen voller Schwung und mit Tagen, an denen du einfach nur freundlich mit dir geblieben bist. Ich danke dir von Herzen für dein Vertrauen, für deine Offenheit in unseren Live-Calls und für jeden Moment, den du dir in dieser Zeit für dich genommen hast. Bitte vergiss nie, dass deine Ideen, deine Wünsche und deine Bedürfnisse genauso wichtig sind wie die aller anderen Menschen in deinem Leben. Geh weiter in deinem Tempo, feiere jeden kleinen Schritt und komm immer wieder auf deine Matte und zu dir selbst zurück, denn Bewegung beginnt bei dir. Ich bin unendlich stolz auf dich und freue mich darauf, zu hören, was in deinem Frühling alles aufblüht. In Liebe, deine Vivien"
+}

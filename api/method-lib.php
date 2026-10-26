@@ -322,6 +322,44 @@ function mv_schema(PDO $pdo): void
     mv_scripts_sync($pdo);
     mv_prod_sync($pdo);
     mv_voice_migrate($pdo);
+    mv_workbooks_sync($pdo);
+}
+
+/**
+ * Workbooks für Method und Unfold (Vivien, 26.10.2026: alle Workbooks neu, sehr umfangreich, DE + EN).
+ * PDFs aus tools/workbooks/build.py liegen in api/seed/workbooks/pdf (gesperrt), werden in den Datei-Ordner kopiert
+ * und als Programm-Dateien eingetragen. Neue Fassung: Version hochzählen, dann werden die Dateien ersetzt.
+ */
+function mv_workbooks_sync(PDO $pdo): void
+{
+    $ver = 1;
+    $c = mm_cfg('workbooks') ?? [];
+    if ((int)($c['v'] ?? 0) >= $ver) return;
+    $src = __DIR__ . '/seed/workbooks/pdf/';
+    $map = [
+        ['method-ankommen', "audience = 'method' AND theme = 'ankommen'", 'Workbook · Ankommen', 'Workbook · Arrive'],
+        ['method-rueckzug', "audience = 'method' AND title_de LIKE '%Rückzug%'", 'Workbook · Rückzug & Ruhe', 'Workbook · Retreat & Rest'],
+        ['unfold-m1', "audience = 'unfold' AND title_de LIKE 'Monat 1%'", 'Workbook · Wurzeln', 'Workbook · Roots'],
+        ['unfold-m2', "audience = 'unfold' AND title_de LIKE 'Monat 2%'", 'Workbook · Knospen', 'Workbook · Buds'],
+        ['unfold-m3', "audience = 'unfold' AND title_de LIKE 'Monat 3%'", 'Workbook · Entfalten', 'Workbook · Unfold'],
+    ];
+    foreach ($map as $m) foreach (['de', 'en'] as $lang) if (!is_file($src . $m[0] . '.' . $lang . '.pdf')) return; // erst wenn alle Sprachen fertig sind
+    $done = 0;
+    foreach ($map as [$key, $where, $lde, $len]) {
+        $pid = (int)$pdo->query('SELECT id FROM mv_programs WHERE ' . $where . ' ORDER BY id LIMIT 1')->fetchColumn();
+        if (!$pid) continue;
+        foreach (['de', 'en'] as $lang) {
+            $file = $src . $key . '.' . $lang . '.pdf';
+            if (!is_file($file)) continue;
+            $name = 'wb-' . $key . '.' . $lang . '.pdf';
+            if (!@copy($file, mv_file_dir() . '/' . $name)) continue;
+            $q = $pdo->prepare('SELECT id FROM mv_files WHERE file = ?');
+            $q->execute([$name]);
+            if (!$q->fetchColumn()) $pdo->prepare('INSERT INTO mv_files (program_id, label_de, label_en, lang, file, created_at) VALUES (?,?,?,?,?,?)')->execute([$pid, $lde, $len, $lang, $name, date('c')]);
+            $done++;
+        }
+    }
+    if ($done) mm_save_cfg('workbooks', ['v' => $ver, 'files' => $done, 'at' => date('c')]);
 }
 
 // --- Konten ---------------------------------------------------------------------------------------

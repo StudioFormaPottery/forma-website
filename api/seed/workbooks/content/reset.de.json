@@ -1,0 +1,200 @@
+{
+ "key": "reset",
+ "lang": "de",
+ "eyebrow": "Mein Geschenk für dich · 10 Minuten",
+ "title": "Reset-Routine für müde Tage",
+ "subtitle": "für die Abende, an denen du alles gegeben hast",
+ "icon": "kerze",
+ "letter": [
+  "ja, genau du, die das gerade am Ende eines langen Tages liest.",
+  "Ich kenne dieses Gefühl. Der Tag ist vorbei, alle haben bekommen, was sie von dir gebraucht haben, und für dich selbst ist nichts mehr übrig. Nicht einmal die Kraft zu entscheiden, was dir jetzt eigentlich guttun würde.",
+  "Deshalb ist das hier kein Workout und nichts, was du gut machen musst. Es sind zehn stille Minuten, die nur dir gehören. Du atmest, zündest eine Kerze an, lässt eine Sache los, legst deine Hände um etwas Warmes und schreibst ein paar ehrliche Zeilen.",
+  "An manchen Abenden fühlt es sich nach viel an, an anderen nach gar nichts. Beides ist völlig in Ordnung."
+ ],
+ "overview": [
+  {
+   "icon": "atem",
+   "title": "Schritt 1 · Komm an mit deinem Atem",
+   "text": "2 Minuten"
+  },
+  {
+   "icon": "kerze",
+   "title": "Schritt 2 · Ein kleines Ritual zum Loslassen",
+   "text": "3 Minuten"
+  },
+  {
+   "icon": "tee",
+   "title": "Schritt 3 · Goldene Mondmilch",
+   "text": "während es warm wird"
+  },
+  {
+   "icon": "journal",
+   "title": "Schritt 4 · Ein paar ehrliche Zeilen",
+   "text": "3 Minuten"
+  }
+ ],
+ "chapters": [
+  {
+   "icon": "nest",
+   "kicker": "Bevor du beginnst",
+   "title": "Was du brauchst",
+   "intro": "Mehr braucht es wirklich nicht.",
+   "blocks": [
+    {
+     "t": "checklist",
+     "title": "Deine kleine Reset-Ecke",
+     "items": [
+      "eine ruhige Ecke",
+      "eine Decke",
+      "eine Kerze",
+      "einen kleinen Zettel",
+      "einen Stift",
+      "deine Lieblingstasse",
+      "die Erlaubnis, dir zehn Minuten für dich zu nehmen"
+     ]
+    },
+    {
+     "t": "tip",
+     "text": "Leg dir die Sachen einmal griffbereit in einen Korb. Dann musst du an müden Abenden nichts mehr zusammensuchen, und der erste Schritt ist schon fast gemacht."
+    }
+   ]
+  },
+  {
+   "icon": "atem",
+   "kicker": "Schritt eins · 2 Minuten",
+   "title": "Komm an mit deinem Atem",
+   "blocks": [
+    {
+     "t": "breath",
+     "title": "Verlängertes Ausatmen",
+     "pattern": "ein 4 · aus 6",
+     "text": "Setz oder leg dich so hin, dass deine Schultern sinken dürfen. Eine Hand auf den Bauch, eine auf die Brust."
+    },
+    {
+     "t": "steps",
+     "items": [
+      "Atme durch die Nase ein und zähle langsam bis vier.",
+      "Atme durch den Mund aus, während du bis sechs zählst, so als würdest du eine Fensterscheibe anhauchen.",
+      "Mach das etwa zehnmal. Lass zuerst den Bauch sich heben, und lass jedes Ausatmen ein bisschen mehr vom Tag mitnehmen."
+     ]
+    },
+    {
+     "t": "fact",
+     "title": "Warum das lange Ausatmen hilft",
+     "text": "Wenn du länger aus- als einatmest, sendest du deinem Nervensystem ein Signal, dass keine Gefahr besteht. Der Teil, der für Ruhe und Erholung zuständig ist, darf übernehmen, der Herzschlag wird ruhiger und die Schultern lassen los. Ein langes Ausatmen sagt deinem Körper: Der Tag ist vorbei, du bist jetzt sicher."
+    }
+   ]
+  },
+  {
+   "icon": "kerze",
+   "kicker": "Schritt zwei · 3 Minuten",
+   "title": "Ein kleines Ritual zum Loslassen",
+   "blocks": [
+    {
+     "t": "steps",
+     "items": [
+      "Zünde eine Kerze an und schau ein paar Atemzüge lang in die Flamme.",
+      "Schreib eine Sache auf einen kleinen Zettel, die heute Abend gehen darf. Eine Sorge, ein Satz, den jemand gesagt hat, der Druck, alles schaffen zu müssen.",
+      "Falte ihn zweimal, halte ihn in deinen Händen und sag leise den Satz unten.",
+      "Leg den Zettel zur Seite, wirf ihn morgen früh weg und blas die Kerze aus, wenn du so weit bist."
+     ]
+    },
+    {
+     "t": "quote",
+     "text": "„Du darfst jetzt gehen.“"
+    },
+    {
+     "t": "tip",
+     "text": "Wenn dir nichts einfällt, schreib einfach „heute“ auf den Zettel. Auch ein ganzer Tag darf gehen."
+    }
+   ]
+  },
+  {
+   "icon": "tee",
+   "kicker": "Schritt drei · während es warm wird",
+   "title": "Goldene Mondmilch",
+   "intro": "Meine Umarmung am Abend, in einer Tasse.",
+   "blocks": [
+    {
+     "t": "recipe",
+     "title": "Goldene Mondmilch",
+     "time": "5 Minuten",
+     "serves": "1 Tasse",
+     "ingredients": [
+      "250 ml Hafermilch oder eine Milch deiner Wahl",
+      "½ TL Kurkuma",
+      "½ TL Zimt",
+      "eine Prise Ingwer und schwarzer Pfeffer",
+      "1 TL Honig oder Ahornsirup"
+     ],
+     "steps": [
+      "Erwärme die Milch sanft in einem kleinen Topf.",
+      "Rühr die Gewürze ein und lass sie ein paar Minuten dampfen, ohne dass sie kocht.",
+      "Zum Schluss süßen, in deine Lieblingstasse gießen und mit beiden Händen halten, während du schreibst."
+     ],
+     "note": "Kein Kurkuma zu Hause? Warme Milch mit Zimt und Honig ist genauso kuschelig."
+    }
+   ]
+  },
+  {
+   "icon": "journal",
+   "kicker": "Schritt vier · 3 Minuten",
+   "title": "Ein paar ehrliche Zeilen",
+   "intro": "Es gibt keine richtigen Antworten. Schreib das Erste auf, was kommt, auch wenn es nur ein Wort ist.",
+   "blocks": [
+    {
+     "t": "prompts",
+     "items": [
+      "Was hat mich heute Kraft gekostet?",
+      "Was würde mich wieder auffüllen?",
+      "Eine kleine Sache, die ich morgen nur für mich mache:"
+     ],
+     "lines": 3
+    },
+    {
+     "t": "tracker",
+     "title": "Meine Reset-Abende diese Woche",
+     "items": [
+      "Atem",
+      "Loslassen",
+      "Etwas Warmes",
+      "Ein paar Zeilen"
+     ]
+    }
+   ]
+  },
+  {
+   "icon": "stern",
+   "kicker": "Nimm das mit",
+   "title": "Für heute Nacht",
+   "blocks": [
+    {
+     "t": "quote",
+     "text": "Ich darf ruhen. Und ich darf mehr wollen."
+    },
+    {
+     "t": "p",
+     "text": "Sag es laut, bevor du einschläfst, oder schreib es auf einen Zettel für deinen Spiegel."
+    },
+    {
+     "t": "h",
+     "text": "Liebes wildes Herz,"
+    },
+    {
+     "t": "p",
+     "text": "ich bin Viv. Ich lebe mit meinem Mann und unseren vier Kindern in den österreichischen Bergen, habe ein kleines Töpferstudio und unterrichte Bewegung. Und ich kenne diese Abende, an denen du alles gegeben hast und dich fragst, wo du selbst dabei geblieben bist."
+    },
+    {
+     "t": "p",
+     "text": "Genau deshalb gibt es das Wild Hearts Collective. Damit du nie vergisst, dass auch du ein ganzer Mensch bist, selbst wenn du immer für alle anderen da bist und alles zusammenhältst. Komm in unseren kostenlosen Community-Kanal, ich würde mich von Herzen freuen, dich dort kennenzulernen."
+    },
+    {
+     "t": "fact",
+     "title": "Komm dazu",
+     "text": "moveciamovement.com · @movementwithviv"
+    }
+   ]
+  }
+ ],
+ "closing": "Wir sind wichtig. Wir sind da. Und wir werden gesehen."
+}

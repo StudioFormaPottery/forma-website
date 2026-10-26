@@ -1,0 +1,303 @@
+{
+  "key": "method-ankommen",
+  "lang": "de",
+  "eyebrow": "Mindful Movement Method · Ankommen",
+  "title": "Ankommen",
+  "subtitle": "Deine ersten Schritte, dein Platz und deine ersten kleinen Rituale",
+  "icon": "nest",
+  "letter": [
+    "Liebe du, wie schön, dass du hier bist. Wenn du dieses Workbook gerade aufschlägst, hast du dich bereits für etwas entschieden, das im Alltag vieler Frauen viel zu kurz kommt, nämlich für ein bisschen Zeit, die ganz dir gehört. Vielleicht liegt neben dir noch die Einkaufsliste, vielleicht wartet ein Wäschekorb oder ein Kind, das gleich etwas von dir möchte. Das darf alles da sein, und trotzdem lade ich dich ein, für die nächsten Minuten einmal tief auszuatmen und bei dir anzukommen.",
+    "Ich lebe mit meinem Mann und unseren vier Kindern in den Bergen, und ich weiß, wie voll ein Tag werden kann und wie leise dabei die eigene Stimme manchmal wird. Zu mir selbst zurückgefunden habe ich über die Bewegung, und zwar über die ruhige Art, bei der man sich nichts beweisen muss. Ein paar langsame Minuten auf der Matte und ein bewusster Atemzug mit der Hand auf dem Bauch haben oft gereicht, damit wieder Raum in mir entstanden ist. Genau diese Erfahrung möchte ich mit dir teilen.",
+    "Die Mindful Movement Method ist so gebaut, dass sie dich begleitet, statt dich zu überfordern. Du beginnst mit dem Ankommen, danach öffnet sich Monat für Monat ein neues Programm mit seinem eigenen Thema. Du bewegst dich in deinem Tempo, und du musst dich mit niemandem vergleichen, auch nicht mit der Version von dir, die du vor ein paar Jahren warst.",
+    "Dieses Workbook ist dein Begleiter für die ersten Tage. Du findest darin Erklärungen, wie die Method funktioniert, Ideen für deinen Platz zu Hause, die wichtigsten Grundlagen für achtsame Bewegung und Seiten, auf denen du für dich festhalten kannst, wo du gerade stehst und wohin du möchtest. Schreib hinein, streich durch, mal an den Rand. Es ist dein Buch, und es muss nicht schön aussehen, um dir gutzutun.",
+    "Ich freue mich sehr, dass wir diesen Weg gemeinsam gehen. Nimm dir eine Tasse Tee, setz dich bequem hin, und dann fangen wir einfach an. Deine Vivien"
+  ],
+  "overview": [
+    {"icon": "kompass", "title": "So funktioniert die Method", "text": "Wie die Videos aufeinander aufbauen und warum du Schritt für Schritt gehst."},
+    {"icon": "schritte", "title": "Deine drei Ankommen-Videos", "text": "Was dich in deinem Willkommensvideo, deinem ersten Flow und deiner ersten Atemübung erwartet."},
+    {"icon": "home", "title": "Dein Platz zu Hause", "text": "Eine kleine Ecke, in der du gern auf die Matte gehst, und was du dafür brauchst."},
+    {"icon": "welle", "title": "Grundlagen achtsamer Bewegung", "text": "Atem, Tempo, Pausen und der Unterschied zwischen Dehnreiz und Schmerz."},
+    {"icon": "atem", "title": "Atem, der dich auffängt", "text": "Deine erste Atemübung zum Mitmachen, für jeden Moment, in dem es zu viel wird."},
+    {"icon": "spiegel", "title": "Wo stehst du gerade?", "text": "Eine ehrliche Standortbestimmung für Energie, Schlaf, Stress und Körpergefühl."},
+    {"icon": "stern", "title": "Deine Absicht", "text": "Was du dir für die nächsten Monate wünschst, in deinen eigenen Worten."},
+    {"icon": "kalender", "title": "Deine ersten Wochen", "text": "Ein Wochen-Tracker und ein einfacher Plan für deine drei Termine pro Woche."},
+    {"icon": "kerze", "title": "Erste kleine Rituale", "text": "Kleine Gewohnheiten, die gut in einen vollen Alltag passen."}
+  ],
+  "chapters": [
+    {
+      "icon": "kompass",
+      "kicker": "Kapitel 1",
+      "title": "So funktioniert die Method",
+      "intro": "Bevor du loslegst, möchte ich dir in Ruhe erklären, wie die Method aufgebaut ist. Wenn du weißt, was dich erwartet, fällt es dir leichter, dranzubleiben und dir dabei treu zu bleiben.",
+      "blocks": [
+        {"t": "p", "text": "Die Mindful Movement Method ist eine Mitgliedschaft, die dich Monat für Monat begleitet. Alle beginnen mit dem Modul „Ankommen“, das aus drei Videos besteht und sofort für dich offen ist. Danach öffnet sich dein erster Monat mit einem eigenen Programm aus zwölf Videos, und jeder weitere Monat bringt ein neues Thema, das zur Jahreszeit und zu dem passt, was viele Frauen in dieser Zeit beschäftigt. Der erste Monat heißt „Rückzug & Ruhe“ und begleitet dich durch die dunkle Winterzeit."},
+        {"t": "h", "text": "Schritt für Schritt durch dein Programm"},
+        {"t": "steps", "items": [
+          "Du startest mit dem Video „Willkommen in der Method“. Darin erzähle ich dir, warum es diesen Ort gibt und wie du dich hier zurechtfindest.",
+          "Die beiden anderen Ankommen-Videos, „Dein erster Flow“ und „Atem, der dich auffängt“, stehen dir jederzeit offen. Du kannst sie so oft wiederholen, wie du magst.",
+          "Sobald du das Willkommensvideo ganz angeschaut hast, öffnet sich das erste Video deines Monatsprogramms.",
+          "Jedes weitere Video schaltet sich frei, wenn du das vorige bis zum Ende gemacht hast. Du findest es dann gleich in deiner Bibliothek, auch noch am selben Tag.",
+          "Ein neuer Monat öffnet sich frühestens an deinem Monatstag. So bleibt genug Zeit, das aktuelle Programm in Ruhe zu erleben."
+        ]},
+        {"t": "h", "text": "Drei Termine pro Woche"},
+        {"t": "p", "text": "Gedacht ist, dass du dir etwa dreimal in der Woche Zeit für ein Video nimmst. Mit zwölf Videos pro Monat kommst du so gut durch dein Programm, ohne dass es sich nach einer zusätzlichen Pflicht anfühlt. Die meisten Videos dauern zwischen fünf und dreißig Minuten, sodass du sie am Morgen vor dem Frühstück, in der Mittagspause oder am Abend unterbringen kannst, wenn die Kinder schlafen. Möchtest du an einem Tag mehr machen, zum Beispiel nach einem Flow noch eine Atemübung anhängen, darfst du das natürlich gern."},
+        {"t": "fact", "title": "Warum gerade drei Termine?", "text": "Gewohnheiten entstehen durch Wiederholung in einem überschaubaren Rahmen. Drei feste Zeitfenster pro Woche sind für die meisten Frauen realistisch, auch in vollen Wochen, und sie sind häufig genug, damit dein Körper die Bewegungen wiedererkennt und du spürst, dass sich etwas verändert. Ein Plan, den du gut einhalten kannst, bringt dir auf Dauer mehr als ein ehrgeiziger Plan, den du nach zwei Wochen wieder aufgibst."},
+        {"t": "h", "text": "Drei Arten von Videos"},
+        {"t": "p", "text": "In jedem Monat wechseln sich drei Arten von Videos ab. Jede hat ihre eigene Aufgabe, und zusammen ergeben sie eine Mischung aus Bewegung, Kraft, Wissen und Ruhe."},
+        {"t": "list", "items": [
+          "Flow: Hier begleite ich dich mit meiner Stimme durch eine Abfolge von Übungen aus Yoga, Pilates und Somatics. Ich erzähle dir, wie du in eine Haltung hineinfindest, was du dabei spüren darfst und wie du wieder herauskommst. Du musst nicht auf den Bildschirm schauen und kannst ganz bei dir bleiben.",
+          "Bewegungsvideo: Diese Videos kommen ohne Sprechen aus. Du siehst eine Übung nach der anderen und bewegst dich zu einem Timer, bei dem du selbst wählst, ob eine Übung 30 oder 45 Sekunden dauern soll. Dazu kannst du deine eigene Lieblingsmusik laufen lassen.",
+          "Talking Head: Hier sitzen wir beisammen, als würden wir zusammen Tee trinken. Ich teile Wissen und Gedanken mit dir, etwa zum Mental Load, oder begleite dich durch eine Atemübung oder eine geführte Meditation."
+        ]},
+        {"t": "tip", "text": "Für die Bewegungsvideos lohnt es sich, eine eigene kleine Playlist anzulegen. Ich mag am Morgen ruhige Instrumentalmusik und am Nachmittag gern etwas mit mehr Rhythmus. Wenn du immer dieselbe Playlist startest, weiß dein Körper nach ein paar Mal schon beim ersten Lied, dass jetzt deine Zeit beginnt."},
+        {"t": "h", "text": "Warum du nicht vorspulen kannst"},
+        {"t": "p", "text": "Vielleicht wunderst du dich, dass du in der Method nicht einfach alle Videos auf einmal öffnen, vorspulen oder überspringen kannst. Ich habe mich ganz bewusst dafür entschieden. Wenn alles gleichzeitig vor uns liegt, klicken wir uns gern durch, finden keinen richtigen Anfang und bleiben am Ende nirgends dran. Ich kenne das von mir selbst sehr gut."},
+        {"t": "p", "text": "Wenn sich ein Video erst öffnet, nachdem du das vorige ganz gemacht hast, entsteht ein roter Faden. Du musst nicht überlegen, was als Nächstes dran ist, denn die Entscheidung ist schon getroffen. Das nimmt dir eine kleine, aber spürbare Last ab, gerade an Tagen, an denen dein Kopf ohnehin voller Entscheidungen ist. Außerdem bauen die Videos aufeinander auf: Was du in einem Flow übst, begegnet dir im Bewegungsvideo wieder, und die Atemübungen bereiten dich auf die Meditationen vor."},
+        {"t": "fact", "title": "Es gibt keinen Rückstand", "text": "Wenn du einen Tag nicht schaffst, oder auch eine ganze Woche, wartet dein nächstes Video einfach auf dich. Es gibt nichts aufzuholen und keine Liste, die sich auftürmt. Du machst genau dort weiter, wo du aufgehört hast."},
+        {"t": "quote", "text": "Ich gehe Schritt für Schritt, und jeder Schritt zählt."}
+      ]
+    },
+    {
+      "icon": "schritte",
+      "kicker": "Kapitel 2",
+      "title": "Deine drei Ankommen-Videos",
+      "intro": "Das Ankommen ist dein sanfter Einstieg. Die drei Videos gehören dir ab heute ganz, und du kannst jederzeit zu ihnen zurückkehren.",
+      "blocks": [
+        {"t": "h", "text": "Willkommen in der Method"},
+        {"t": "p", "text": "In diesem Talking Head erzähle ich dir, warum ich die Method gebaut habe und was dich in den kommenden Monaten erwartet. Du erfährst, wie die Videos aufgebaut sind, wo du dein Journal findest und warum ich mir wünsche, dass du sanft mit dir bist. Schau es dir am besten in einem ruhigen Moment an, vielleicht mit einer Tasse Tee auf dem Sofa. Erst wenn du dieses Video ganz angeschaut hast, öffnet sich dein erstes Monatsvideo."},
+        {"t": "h", "text": "Dein erster Flow"},
+        {"t": "p", "text": "Dein erster Flow dauert etwa fünfzehn Minuten und ist so sanft, dass er zu dir passt, ganz egal, wie lange du dich nicht mehr bewegt hast. Du beginnst im Liegen, wanderst über den Vierfüßlerstand langsam in den Stand und kommst am Ende wieder auf der Matte zur Ruhe. Diese Übungen begegnen dir darin:"},
+        {"t": "list", "items": [
+          "Atembeobachtung in Rückenlage",
+          "Beckenkippen (Pelvic Tilts)",
+          "Knie pendeln (Scheibenwischer)",
+          "Katze-Kuh",
+          "Kindhaltung (Balasana)",
+          "Herabschauender Hund (Adho Mukha Svanasana)",
+          "Roll Up in den Stand",
+          "Berghaltung (Tadasana)",
+          "Seitbeuge im Stand",
+          "Krieger 2 (Virabhadrasana II)",
+          "Endentspannung (Savasana)"
+        ]},
+        {"t": "tip", "text": "Viele dieser Übungen werden dich durch die ganze Method begleiten. Wenn du deinen ersten Flow zwei oder drei Mal machst, kennst du die Grundbewegungen bald so gut, dass du dich in späteren Videos ganz auf dein Gefühl konzentrieren kannst."},
+        {"t": "h", "text": "Atem, der dich auffängt"},
+        {"t": "p", "text": "Diese kurze Atemübung dauert nur etwa fünf Minuten und ist für alle Momente gedacht, in denen es zu viel wird. Du atmest auf vier Zählzeiten durch die Nase ein und auf sechs Zählzeiten langsam wieder aus. Du kannst sie im Sitzen, im Stehen oder im Liegen machen, im Auto vor dem Kindergarten genauso wie abends im Bett. In Kapitel 5 findest du die Übung zum Nachlesen und Mitmachen."},
+        {"t": "table", "title": "Mein Ankommen", "cols": ["Video", "gemacht am", "So habe ich mich danach gefühlt"], "rows": [
+          ["Willkommen in der Method", "", ""],
+          ["Dein erster Flow", "", ""],
+          ["Atem, der dich auffängt", "", ""],
+          ["Dein erster Flow (Wiederholung)", "", ""],
+          ["Atem, der dich auffängt (Wiederholung)", "", ""]
+        ]}
+      ]
+    },
+    {
+      "icon": "home",
+      "kicker": "Kapitel 3",
+      "title": "Dein Platz zu Hause",
+      "intro": "Du brauchst kein eigenes Studio und keinen perfekten Raum. Eine kleine Ecke, in der du gern bist, macht es dir aber viel leichter, regelmäßig auf die Matte zu gehen.",
+      "blocks": [
+        {"t": "p", "text": "Wenn deine Matte jedes Mal erst aus dem Keller geholt werden muss und du vorher noch Spielzeug zur Seite räumst, wird aus fünfzehn Minuten schnell eine halbe Stunde, und an vollen Tagen lässt du es dann lieber ganz bleiben. Ein fester Platz senkt diese Hürde. Er erinnert dich jeden Tag daran, dass hier etwas auf dich wartet, und dein Körper lernt mit der Zeit, an diesem Ort leichter zur Ruhe zu kommen."},
+        {"t": "h", "text": "So findest du deine Ecke"},
+        {"t": "list", "items": [
+          "Du brauchst etwa so viel Platz, wie deine Matte lang ist, und links und rechts davon jeweils eine Armlänge, damit du die Arme ausbreiten kannst.",
+          "Ein Stück freie Wand ist praktisch, denn manche Übungen, zum Beispiel Beine an der Wand oder Wall Angels, brauchen eine Wand im Rücken.",
+          "Achte auf einen Boden, auf dem du nicht rutschst. Auf Fliesen oder Parkett legst du am besten eine rutschfeste Matte oder einen Teppich unter.",
+          "Wenn möglich, wähle einen Platz mit Tageslicht oder einer warmen Lampe. Grelles Deckenlicht macht es schwerer, abends zur Ruhe zu kommen.",
+          "Stell Tablet oder Laptop so auf, dass du den Bildschirm von der Matte aus gut siehst, ohne den Kopf weit zu verdrehen."
+        ]},
+        {"t": "tip", "text": "Bei uns im Haus ist selten ein Raum ganz leer. Hilfreich ist eine kleine Kiste oder ein Korb, in dem Decke, Kissen und Block liegen. So ist in einer Minute alles vorbereitet, und ebenso schnell ist danach wieder aufgeräumt."},
+        {"t": "checklist", "title": "Das brauchst du", "items": [
+          "Eine Yogamatte oder einen weichen Teppich",
+          "Eine Wolldecke zum Unterlegen und Zudecken",
+          "Ein festes Kissen oder ein Meditationskissen zum Sitzen",
+          "Ein zweites Kissen oder ein gerolltes Handtuch für Knie und Kopf",
+          "Optional zwei Yogablöcke oder zwei dicke Bücher",
+          "Ein Glas Wasser oder eine Tasse Tee in Reichweite",
+          "Warme Socken für die Endentspannung",
+          "Bequeme Kleidung, in der du dich frei bewegen kannst",
+          "Dein Handy im Flugmodus oder in einem anderen Raum",
+          "Dieses Workbook und einen Stift"
+        ]},
+        {"t": "fact", "title": "Ein Ort als Signal", "text": "Unser Gehirn verknüpft Orte gern mit bestimmten Tätigkeiten. Wer immer am selben Platz übt, braucht oft weniger Anlauf, weil schon das Ausrollen der Matte zum Startsignal wird. Deshalb hilft es, deine Ecke möglichst nur für deine Zeit zu nutzen und sie nicht gleichzeitig zur Ablage für Wäsche oder Post zu machen."},
+        {"t": "prompts", "title": "Meine Ecke", "items": [
+          "Wo in meinem Zuhause fühle ich mich am wohlsten, und wo könnte meine Matte liegen?",
+          "Was müsste ich verändern, damit ich diesen Platz gern nutze?",
+          "Welche kleine Sache würde meine Ecke gemütlicher machen, etwa eine Kerze, eine Pflanze oder ein bestimmtes Kissen?"
+        ], "lines": 3}
+      ]
+    },
+    {
+      "icon": "welle",
+      "kicker": "Kapitel 4",
+      "title": "Grundlagen achtsamer Bewegung",
+      "intro": "Achtsame Bewegung bedeutet, dass du deinen Körper während der Übungen wirklich wahrnimmst. Diese Grundlagen helfen dir, sicher und mit Freude zu üben.",
+      "blocks": [
+        {"t": "p", "text": "Viele von uns haben gelernt, Bewegung mit Leistung zu verbinden. Wir zählen Wiederholungen, vergleichen uns mit anderen und machen weiter, auch wenn der Körper längst leise protestiert. In der Method geht es um etwas anderes. Du darfst neugierig sein, wie sich eine Bewegung heute anfühlt, und du darfst sie an deinen Tag anpassen. Das macht die Übungen keineswegs weniger wirksam. Im Gegenteil, wer achtsam übt, bewegt sich meist sauberer und verletzt sich seltener."},
+        {"t": "h", "text": "Dein Atem führt"},
+        {"t": "p", "text": "Atme während der Übungen möglichst durch die Nase und lass deinen Atem ruhig fließen. In vielen Flows verbinden wir eine Bewegung mit dem Atem, zum Beispiel öffnest du dich mit dem Einatmen und rundest dich mit dem Ausatmen. Wenn du merkst, dass du die Luft anhältst, ist das ein freundlicher Hinweis, die Bewegung etwas kleiner oder langsamer zu machen. Bei kräftigenden Übungen hilft es den meisten Frauen, in der Anstrengung auszuatmen, etwa beim Hochdrücken aus der Kniebeuge."},
+        {"t": "h", "text": "Langsam ist dein Tempo"},
+        {"t": "p", "text": "Langsame Bewegungen fordern deine Muskeln oft mehr, als du erwartest, und sie geben dir Zeit, zu spüren, was in deinem Körper passiert. Du musst nicht mit dem Tempo im Video mithalten. Wenn eine Übung im Bewegungsvideo für dich zu schnell wechselt, wähle den 45-Sekunden-Timer oder mach lieber eine Wiederholung weniger und dafür ganz bewusst."},
+        {"t": "h", "text": "Dehnreiz und Schmerz unterscheiden"},
+        {"t": "p", "text": "Eine Dehnung darf deutlich spürbar sein, sie sollte aber nie stechen oder dich zum Luftanhalten zwingen. Diese Übersicht hilft dir, die Signale deines Körpers einzuordnen:"},
+        {"t": "table", "title": "Was spüre ich?", "cols": ["Gutes Zeichen", "Achtung, lieber zurückgehen"], "rows": [
+          ["Ein ziehendes, gleichmäßiges Gefühl im Muskel", "Ein stechender, scharfer oder einschießender Schmerz"],
+          ["Wärme und leichtes Zittern bei Kraftübungen", "Schmerz im Gelenk, etwa im Knie oder in der Schulter"],
+          ["Das Gefühl lässt nach einigen Atemzügen etwas nach", "Kribbeln, Taubheit oder Schmerz, der ausstrahlt"],
+          ["Du kannst ruhig weiteratmen und sprechen", "Du hältst die Luft an oder verziehst das Gesicht"],
+          ["Nach der Übung fühlst du dich weiter und lockerer", "Schwindel, Übelkeit oder Druck im Kopf"]
+        ]},
+        {"t": "tip", "text": "Ich stelle mir gern eine Skala von eins bis zehn vor. Eine Dehnung darf sich bei vier bis sechs anfühlen. Alles darüber ist ein Zeichen, einen Schritt zurückzugehen, ein Knie zu beugen oder ein Kissen unterzulegen."},
+        {"t": "h", "text": "Pausen gehören dazu"},
+        {"t": "p", "text": "Du darfst jederzeit pausieren. Die Kindhaltung ist in jedem Video dein Rückzugsort, in den du sinken kannst, wenn du kurz durchatmen möchtest. Eine Pause ist kein Abbruch, und sie macht dein Training auch nicht schlechter. Oft ist gerade der Moment, in dem du innehältst und nachspürst, der wertvollste Teil einer Übung."},
+        {"t": "fact", "title": "Bitte vorher abklären", "text": "Wenn du schwanger bist, gerade ein Baby bekommen hast, nach einer Operation wieder einsteigst oder Beschwerden wie Rückenschmerzen, Bluthochdruck, Herz-Kreislauf-Probleme oder Gelenkprobleme hast, sprich bitte vor dem Start mit deiner Ärztin, deinem Arzt oder deiner Hebamme. Nimm bei jeder Übung die leichtere Variante, sobald sich etwas nicht gut anfühlt, und hör auf, wenn Schmerzen, Schwindel oder Atemnot auftreten. Die Videos der Method ersetzen keine medizinische Beratung und keine Therapie."},
+        {"t": "quote", "text": "Mein Körper darf mir heute sagen, was er braucht."}
+      ]
+    },
+    {
+      "icon": "atem",
+      "kicker": "Kapitel 5",
+      "title": "Atem, der dich auffängt",
+      "intro": "Diese Atemübung ist deine kleine Notfallapotheke für volle Momente. Sie dauert nur ein paar Minuten und funktioniert überall.",
+      "blocks": [
+        {"t": "p", "text": "Wenn wir unter Druck stehen, wird unser Atem oft flach und schnell, und wir atmen eher oben in den Brustkorb. Das passiert ganz automatisch, zum Beispiel wenn die Kinder streiten, das Telefon klingelt und gleichzeitig das Essen anbrennt. Umgekehrt können wir über einen bewusst langsamen Atem unserem Körper ein Signal geben, dass er wieder etwas ruhiger werden darf."},
+        {"t": "breath", "title": "Verlängerte Ausatmung", "pattern": "4 · 6", "text": "Atme durch die Nase ein und zähl dabei langsam bis vier. Atme dann durch den Mund oder die Nase aus und zähl dabei bis sechs. Wiederhole das etwa zehn Mal und lass danach das Zählen los."},
+        {"t": "exercise", "title": "So machst du die Übung", "time": "3 bis 5 Minuten", "intro": "Du kannst sitzen, stehen oder liegen. Wichtig ist nur, dass du einen Moment für dich hast.", "steps": [
+          "Leg eine Hand auf dein Herz und die andere auf deinen Bauch.",
+          "Lass deine Schultern sinken und löse den Kiefer, indem du die Zähne ein kleines Stück auseinandergehen lässt.",
+          "Atme durch die Nase ein und zähl dabei langsam bis vier. Spür, wie sich dein Bauch unter deiner Hand hebt.",
+          "Atme langsam aus und zähl bis sechs. Stell dir vor, du bläst sanft über eine heiße Tasse Tee.",
+          "Wiederhole das etwa zehn Mal. Wenn dir vier und sechs zu lang sind, beginne mit drei und fünf.",
+          "Lass das Zählen los, atme ganz natürlich weiter und spür einen Moment nach, wie es dir jetzt geht."
+        ]},
+        {"t": "fact", "title": "Warum die lange Ausatmung?", "text": "Beim Ausatmen verlangsamt sich der Herzschlag ganz natürlich ein wenig, beim Einatmen wird er etwas schneller. Wenn du die Ausatmung bewusst verlängerst, betonst du diese beruhigende Phase. Viele Menschen erleben langsames Atmen mit langer Ausatmung deshalb als entspannend. Es ist ein einfaches Werkzeug, das dir hilft, in einem vollen Moment wieder etwas Abstand zu gewinnen, auch wenn es die Ursachen von Stress natürlich nicht löst."},
+        {"t": "tip", "text": "Such dir einen festen Moment im Alltag, an dem du die Übung einbaust, zum Beispiel jedes Mal, wenn du ins Auto steigst, bevor du den Motor startest. So wird sie zur Gewohnheit, und an schwierigen Tagen erinnert sich dein Körper ganz von selbst daran."},
+        {"t": "table", "title": "Wann hat mir der Atem geholfen?", "cols": ["Datum", "Situation", "Vorher (1 bis 10)", "Nachher (1 bis 10)"], "rows": 6}
+      ]
+    },
+    {
+      "icon": "spiegel",
+      "kicker": "Kapitel 6",
+      "title": "Wo stehst du gerade?",
+      "intro": "Bevor du losgehst, lohnt sich ein ehrlicher Blick darauf, wie es dir gerade geht. Es gibt hier kein richtig und kein falsch, nur deinen heutigen Stand.",
+      "blocks": [
+        {"t": "p", "text": "Diese Standortbestimmung ist ein Foto von heute. In ein paar Monaten kannst du zurückblättern und vergleichen. Oft verändern sich Dinge so langsam, dass wir es im Alltag gar nicht bemerken, und erst der Blick zurück zeigt uns, wie weit wir gekommen sind. Nimm dir ein paar Minuten, atme einmal tief durch und kreise spontan ein, was für dich stimmt."},
+        {"t": "scale", "title": "So geht es mir heute", "items": [
+          "Meine Energie im Alltag",
+          "Wie erholsam mein Schlaf ist",
+          "Wie ruhig ich mich innerlich fühle",
+          "Wie wohl ich mich in meinem Körper fühle",
+          "Wie beweglich ich mich fühle",
+          "Wie kräftig ich mich fühle",
+          "Wie viel Zeit ich mir für mich nehme",
+          "Wie leicht mir Pausen fallen"
+        ], "low": "kaum", "high": "sehr"},
+        {"t": "scale", "title": "Mein Stress im Moment", "items": [
+          "Wie voll sich mein Kopf anfühlt",
+          "Wie angespannt meine Schultern und mein Nacken sind",
+          "Wie oft ich mich gehetzt fühle"
+        ], "low": "wenig", "high": "sehr viel"},
+        {"t": "prompts", "title": "Ein ehrlicher Blick", "items": [
+          "Wo in meinem Körper spüre ich gerade Spannung oder Müdigkeit?",
+          "Was raubt mir im Moment am meisten Kraft?",
+          "Wann habe ich mich zuletzt richtig wohl in meinem Körper gefühlt, und was war damals anders?",
+          "Was gibt mir an einem normalen Tag Energie zurück?"
+        ], "lines": 4},
+        {"t": "fact", "title": "Wenn die Werte lange niedrig sind", "text": "Fühlst du dich seit Wochen erschöpft, schläfst du dauerhaft schlecht oder fühlst du dich niedergeschlagen, dann nimm das bitte ernst. Bewegung und Atemübungen können dich begleiten, sie ersetzen aber keine Abklärung. Eine Ärztin kann zum Beispiel prüfen, ob körperliche Ursachen wie ein Eisenmangel oder eine Schilddrüsenerkrankung dahinterstecken, und bei seelischer Belastung ist eine Therapeutin eine gute Anlaufstelle."}
+      ]
+    },
+    {
+      "icon": "stern",
+      "kicker": "Kapitel 7",
+      "title": "Deine Absicht für die nächsten Monate",
+      "intro": "Eine Absicht ist wie ein Kompass. Sie gibt dir eine Richtung, ohne dir einen starren Weg vorzuschreiben.",
+      "blocks": [
+        {"t": "p", "text": "Viele von uns starten ins neue Jahr oder in ein neues Programm mit großen Zielen. Wir möchten fünf Kilo abnehmen, jeden Morgen um sechs Uhr Yoga machen und nie wieder gestresst sein. Solche Ziele setzen uns oft eher unter Druck, und wenn wir sie nicht erreichen, fühlen wir uns schlecht. Eine Absicht ist sanfter. Sie beschreibt, wie du dich fühlen möchtest und welche Haltung du dir selbst gegenüber einnehmen willst."},
+        {"t": "p", "text": "Eine Absicht könnte zum Beispiel so klingen: „Ich möchte mir dreimal in der Woche Zeit für mich nehmen, ohne schlechtes Gewissen.“ Oder: „Ich möchte meinen Rücken wieder besser spüren und abends leichter abschalten.“ Formuliere sie in deinen eigenen Worten, so dass sie sich für dich wahr anfühlt."},
+        {"t": "prompts", "title": "Was ich mir wünsche", "items": [
+          "Wie möchte ich mich in drei Monaten in meinem Körper fühlen?",
+          "Was soll sich in meinem Alltag verändern, wenn ich regelmäßig auf die Matte gehe?",
+          "Was hat mich bisher davon abgehalten, mir Zeit für mich zu nehmen?",
+          "Was darf ich mir in den nächsten Monaten erlauben, auch wenn es mir noch schwerfällt?",
+          "Wer oder was kann mich unterstützen, damit ich dranbleibe?"
+        ], "lines": 4},
+        {"t": "h", "text": "Meine Absicht in einem Satz"},
+        {"t": "notes", "title": "Schreib deine Absicht hier auf und lies sie vor jedem Video einmal leise für dich.", "lines": 4},
+        {"t": "tip", "text": "Schreib deine Absicht zusätzlich auf einen kleinen Zettel und leg ihn in deinen Korb mit Decke und Kissen. Wenn du ihn vor dem Üben findest, erinnert er dich daran, warum du diese Zeit für dich gewählt hast."},
+        {"t": "quote", "text": "Ich muss nicht alles auf einmal verändern. Es reicht, heute anzufangen."}
+      ]
+    },
+    {
+      "icon": "kalender",
+      "kicker": "Kapitel 8",
+      "title": "Deine ersten Wochen",
+      "intro": "Ein kleiner Plan hilft dir, die Method in deinen Alltag einzubauen. Trag deine drei Termine ein wie einen Arzttermin, den du nicht einfach verschiebst.",
+      "blocks": [
+        {"t": "p", "text": "Schau dir deine Woche an und überlege, wo es realistische Zeitfenster gibt. Vielleicht ist es der Montagmorgen, nachdem die Kinder aus dem Haus sind, der Mittwochabend, wenn dein Partner das Zubettbringen übernimmt, und der Samstagvormittag. Es müssen nicht jede Woche dieselben Tage sein, aber feste Anker machen es leichter."},
+        {"t": "table", "title": "Meine drei Termine pro Woche", "cols": ["Woche", "Termin 1", "Termin 2", "Termin 3"], "rows": [
+          ["Woche 1", "", "", ""],
+          ["Woche 2", "", "", ""],
+          ["Woche 3", "", "", ""],
+          ["Woche 4", "", "", ""]
+        ]},
+        {"t": "tracker", "title": "Mein Wochen-Tracker", "items": [
+          "Video aus der Method",
+          "Atem, der dich auffängt",
+          "Fünf Minuten draußen an der frischen Luft",
+          "Genug Wasser getrunken",
+          "Handy eine Stunde vor dem Schlafen weggelegt",
+          "Einen Moment nur für mich"
+        ]},
+        {"t": "tip", "text": "Der Tracker ist eine Einladung und keine Prüfung. Wenn in einer Woche nur zwei Kreuze stehen, sind das zwei Momente, die du dir geschenkt hast. Schau lieber darauf, was gelungen ist, als auf die leeren Felder."},
+        {"t": "prompts", "title": "Nach der ersten Woche", "items": [
+          "Welcher Zeitpunkt hat für mich am besten funktioniert?",
+          "Was hat mich gehindert, und wie kann ich es nächste Woche leichter machen?"
+        ], "lines": 3}
+      ]
+    },
+    {
+      "icon": "kerze",
+      "kicker": "Kapitel 9",
+      "title": "Erste kleine Rituale",
+      "intro": "Rituale sind kleine, wiederkehrende Momente, die dem Tag einen Rahmen geben. Sie brauchen kaum Zeit und wirken gerade deshalb, weil du sie oft wiederholst.",
+      "blocks": [
+        {"t": "p", "text": "Ein Ritual unterscheidet sich von einer gewöhnlichen Gewohnheit durch die Aufmerksamkeit, mit der du es begehst. Zähneputzen ist eine Gewohnheit. Wenn du aber morgens deine erste Tasse Tee mit beiden Händen hältst, ihre Wärme spürst und drei Atemzüge lang aus dem Fenster schaust, bevor der Tag beginnt, wird daraus ein Ritual. Such dir aus den folgenden Ideen ein oder zwei aus, die dich ansprechen, und probiere sie eine Woche lang aus."},
+        {"t": "exercise", "title": "Der Morgenanker", "time": "2 Minuten", "intro": "Für den Moment direkt nach dem Aufwachen, noch bevor du zum Handy greifst.", "steps": [
+          "Bleib nach dem Aufwachen noch einen Moment liegen und streck dich einmal so lang, wie du kannst.",
+          "Leg eine Hand auf deinen Bauch und nimm drei ruhige Atemzüge.",
+          "Frag dich leise, was du heute brauchst. Vielleicht ist die Antwort Geduld, Wärme oder eine Pause am Nachmittag.",
+          "Nimm dieses eine Wort mit in deinen Tag."
+        ]},
+        {"t": "exercise", "title": "Die Übergangspause", "time": "15 Sekunden", "intro": "Für die Momente zwischen zwei Aufgaben, wenn du von einer Rolle in die nächste wechselst.", "steps": [
+          "Bevor du die nächste Aufgabe beginnst, bleib kurz stehen und spür deine Füße auf dem Boden.",
+          "Atme drei Mal durch die Nase ein und lass den Atem jedes Mal etwas länger wieder ausströmen.",
+          "Dann beginnst du bewusst mit dem Nächsten."
+        ]},
+        {"t": "exercise", "title": "Der Abendabschluss", "time": "5 Minuten", "intro": "Für das Ende des Tages, wenn das Haus langsam still wird.", "steps": [
+          "Mach das Licht etwas gedämpfter und leg dein Handy außer Reichweite.",
+          "Schreib drei Dinge auf, die heute gut waren, auch wenn sie ganz klein sind.",
+          "Schreib eine Sache auf, die du morgen erledigen möchtest, damit sie nicht in deinem Kopf weiterkreist.",
+          "Leg dich hin, und mach ein paar Runden der verlängerten Ausatmung aus Kapitel 5."
+        ]},
+        {"t": "checklist", "title": "Meine Rituale für diese Woche", "items": [
+          "Morgenanker nach dem Aufwachen",
+          "Erste Tasse Tee oder Kaffee in Ruhe getrunken",
+          "Übergangspause zwischen zwei Aufgaben",
+          "Ein kurzer Spaziergang bei Tageslicht",
+          "Eine Kerze angezündet, bevor ich auf die Matte gehe",
+          "Abendabschluss mit drei guten Dingen",
+          "Eine Atemübung im Bett vor dem Einschlafen"
+        ]},
+        {"t": "tip", "text": "Verknüpfe ein neues Ritual mit etwas, das du ohnehin jeden Tag machst. Die Übergangspause passt wunderbar zu dem Moment, in dem du den Autoschlüssel in die Hand nimmst, und der Abendabschluss zu dem Moment, in dem du dein Handy an das Ladekabel hängst."},
+        {"t": "prompts", "title": "Rückblick auf deine erste Woche", "items": [
+          "Welches Ritual hat sich am natürlichsten angefühlt?",
+          "Was habe ich an mir oder an meinem Körper in dieser Woche neu bemerkt?",
+          "Worauf freue ich mich in meinem ersten Monat?"
+        ], "lines": 4},
+        {"t": "quote", "text": "Kleine Momente für mich sind kein Luxus. Sie tragen mich durch volle Tage."}
+      ]
+    }
+  ],
+  "closing": "Du hast den ersten Schritt gemacht, und der ist oft der schwerste. Ich freue mich darauf, dich durch deinen ersten Monat zu begleiten, ganz in deinem Tempo und mit so viel Ruhe, wie du gerade brauchst."
+}
