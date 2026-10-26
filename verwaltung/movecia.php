@@ -21,7 +21,7 @@ function mm_subnav(string $active): void
 .mvsub a.fo{background:transparent;border-color:transparent;color:#8C2C1D;padding-left:4px}
 .mvsub i{font-style:normal;display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:999px;background:#B5544A;color:#fff;font-size:12px;text-align:center}
 </style>
-<nav class="mvsub" aria-label="Movecia"><a class="fo" href="<?= forma_h($self) ?>">← FORMA</a><?php foreach ($tabs as [$k, $q, $t]): ?><a href="<?= forma_h($self) . $q ?>"<?= $k === $active ? ' class="on" aria-current="page"' : '' ?>><?= $t ?></a><?php endforeach; ?></nav>
+<nav class="mvsub" aria-label="Movecia"><?php foreach ($tabs as [$k, $q, $t]): ?><a href="<?= forma_h($self) . $q ?>"<?= $k === $active ? ' class="on" aria-current="page"' : '' ?>><?= $t ?></a><?php endforeach; ?></nav>
 <?php
 }
 try { mm_auto_setup($pdo); } catch (Throwable $e) { error_log('MM setup: ' . $e->getMessage()); }
@@ -267,6 +267,17 @@ body{background:var(--paper)}
 .mm-hero h1{color:#FBF5F7;font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:34px;margin:2px 0 4px;position:relative}
 .mm-hero p{position:relative;margin:0;color:#EADFDE}
 .mm-hero .eyebrow{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#E8D6CA}
+.mm-hero{margin:14px 0 4px}
+.mm-hero-sign{position:absolute;right:22px;top:20px;width:74px;height:74px;opacity:.9;z-index:1}
+.mm-hero-text{position:relative;z-index:1;padding-right:96px;max-width:620px}
+.mm-hero-stats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+.mm-hero-stats a{display:flex;flex-direction:column;background:rgba(251,245,247,.12);border:1px solid rgba(251,245,247,.25);border-radius:18px;padding:12px 14px;text-decoration:none;color:#FBF5F7}
+.mm-hero-stats a:hover{background:rgba(251,245,247,.2)}
+.mm-hero-stats b{font-family:"Bricolage Grotesque","Outfit",sans-serif;font-size:30px;line-height:1.1;color:#FBF5F7;font-weight:600}
+.mm-hero-stats span{font-size:14px;color:#EADFDE;line-height:1.3}
+@media (max-width:600px){main{zoom:1!important}}
+.mm-hero-stats span{overflow-wrap:anywhere;hyphens:auto}
+@media (max-width:520px){.mm-hero-stats{gap:8px}.mm-hero-stats a{padding:10px 11px}.mm-hero-sign{width:54px;height:54px}.mm-hero-text{padding-right:64px}.mm-hero h1{font-size:30px}}
 .mm-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
 .mm-stat{background:#FBF8F4;border:1px solid var(--line);border-radius:18px;padding:12px 14px;color:var(--ink);text-decoration:none;display:flex;flex-direction:column}
 .mm-stat b{font-family:"Bricolage Grotesque","Outfit",sans-serif;font-size:32px;line-height:1.1;color:#7D5E68}
@@ -284,12 +295,21 @@ body{background:var(--paper)}
 select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
 @media (min-width:700px){.mm-stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style>
-        <?php mm_subnav('movecia'); ?>
+        <?php $h = (int)date('G'); $hello = $h < 11 ? 'Guten Morgen' : ($h < 17 ? 'Hallo' : 'Guten Abend'); $natalReq = 0; try { $natalReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} ?>
         <section class="mm-hero">
-            <p class="eyebrow">Movecia Movement</p>
-            <h1>Movecia</h1>
-            <p>Dein eigener Bereich, getrennt von FORMA: Method &amp; Unfold, Prä- &amp; Postnatal, Gatherings, E-Mail-Liste und Videoraum.</p>
+            <img class="mm-hero-sign" src="/img/movecia/movecia-zeichen-hell.svg" alt="">
+            <div class="mm-hero-text">
+                <p class="eyebrow"><?= forma_h(forma_de_date(date('Y-m-d'))) ?></p>
+                <h1><?= $hello ?>, Vivien!</h1>
+                <p>Schön, dass du hier bist. Bereit für Bewegung? Hier ist alles, was in deinem Studio gerade los ist.</p>
+            </div>
+            <div class="mm-hero-stats">
+                <a href="<?= forma_h($self) ?>?view=natal"><b><?= $natalReq ?></b><span>Anfragen Prä- &amp; Postnatal</span></a>
+                <a href="#g<?= (int)($next['id'] ?? 0) ?>"><b><?= $nextSign ?></b><span>Anmeldungen nächstes Gathering</span></a>
+                <a href="#liste"><b><?= $subOk ?></b><span>auf der E-Mail-Liste</span></a>
+            </div>
         </section>
+        <?php mm_subnav('movecia'); ?>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
 <style>
 .qa{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0 4px}
@@ -317,8 +337,6 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <a href="<?= forma_h($self) ?>?view=method#bunny"><span class="ic">🎬</span><b>Bunny (Videos) <?= function_exists('mv_bunny_ok') && mv_bunny_ok() ? '✓' : 'verbinden' ?></b><span>Hier trägst du Library-ID, CDN Hostname, API Key und Token-Schlüssel ein</span></a>
         </div>
         <div class="mm-stats">
-            <a class="mm-stat" href="#liste"><b><?= $subOk ?></b><span>auf der E-Mail-Liste<?= $subOpen ? ' · ' . $subOpen . ' noch nicht bestätigt' : '' ?></span></a>
-            <a class="mm-stat" href="#g<?= (int)($next['id'] ?? 0) ?>"><b><?= $nextSign ?></b><span>fürs nächste Gathering angemeldet</span></a>
             <a class="mm-stat live" href="#g<?= (int)($next['id'] ?? 0) ?>"><b><?= $live ?></b><span>gerade im Videochat</span></a>
             <span class="mm-stat"><b><?= $joinedAll ?></b><span>waren schon bei einem Gathering dabei</span></span>
         </div>

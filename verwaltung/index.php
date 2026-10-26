@@ -2357,7 +2357,6 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
     <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
     <?php if (!forma_stripe_key()): ?><p class="alert">Die Online-Bezahlung ist noch nicht eingerichtet. Bis dahin werden alle Kurse ohne Bezahlung reserviert. <a href="<?= forma_h($self) ?>?view=einstellungen">Jetzt Stripe verbinden</a></p><?php endif; ?>
     <?php $natalReq = 0; try { $natalReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} ?>
-    <a class="mm-door" href="<?= forma_h($self) ?>?view=movecia"><span class="mm-dot" aria-hidden="true"><img src="/img/movecia/movecia-zeichen-hell.svg" alt="" style="width:78%;height:78%"></span><span><small>Getrennt von FORMA</small><strong>Movecia</strong><span><?= $natalReq ? ($natalReq === 1 ? '1 Terminanfrage wartet · ' : $natalReq . ' Terminanfragen warten · ') : '' ?>Method &amp; Unfold · Prä- &amp; Postnatal · Gatherings · Teleprompter</span></span><span class="mm-arrow" aria-hidden="true">→</span></a>
     <?php foreach ($minCourses as $mc): ?><a class="card notice" href="<?= forma_h($self) ?>?view=course&amp;id=<?= (int)$mc['id'] ?>"><span class="ic"><?= admin_icon('kalender') ?></span><span><strong>Zu wenige Anmeldungen: <?= forma_h($mc['title']) ?>, <?= forma_h(preg_replace('/\s*·.*$/u', '', (string)$mc['date_text'])) ?></strong><br><span class="muted small">Entscheide: findet statt oder Gäste informieren →</span></span></a><?php endforeach; ?>
     <?php if ($toPlan > 0): ?><a class="card notice" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('private') ?></span><span><strong><?= $toPlan === 1 ? '1 Private-Pottery-Buchung wartet' : $toPlan . ' Private-Pottery-Buchungen warten' ?> auf ihren Termin.</strong><br><span class="muted small">Im Kalender einplanen und Bestätigung schicken →</span></span></a><?php endif; ?>
     <div class="dash">
@@ -2468,9 +2467,9 @@ function render_page(string $title, callable $body): void
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title><?= forma_h($title) ?> · FORMA</title>
-<link rel="icon" type="image/png" href="/img/app/verwaltung-favicon.png">
-<link rel="manifest" href="/verwaltung/manifest.webmanifest">
-<link rel="apple-touch-icon" href="/img/app/verwaltung-180.png">
+<link rel="icon" type="image/png" href="/img/app/verwaltung-favicon.png?v=2">
+<link rel="manifest" href="/verwaltung/manifest.webmanifest?v=2">
+<link rel="apple-touch-icon" href="/img/app/verwaltung-180.png?v=2">
 <meta name="theme-color" content="#EEE2D4">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2535,6 +2534,20 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 @media (max-width:480px){.row{grid-template-columns:1fr}}
 /* Kopf & Saison-Icons */
 .head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.sw{display:flex;gap:6px;padding:5px;border-radius:999px;background:#FBF6F0;border:1px solid var(--line);flex:0 1 auto;min-width:0}
+.sw a{position:relative;display:flex;align-items:center;gap:9px;padding:6px 16px 6px 6px;border-radius:999px;text-decoration:none;color:#674B40;transition:background .2s,color .2s;min-width:0}
+.sw .sw-ic{flex:0 0 40px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#F1E3D3}
+.sw .sw-ic img{width:82%;height:82%;object-fit:contain}
+.sw .sw-m .sw-ic{background:#EFE4E6}
+.sw .sw-t{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.sw b{font-family:"Bricolage Grotesque","Outfit",sans-serif;font-weight:600;font-size:17px;letter-spacing:.02em}
+.sw small{font-size:12.5px;opacity:.85;white-space:nowrap}
+.sw a.on.sw-f{background:#8C2C1D;color:#FBF1EA}
+.sw a.on.sw-m{background:#7D5E68;color:#FBF5F7}
+.sw a.on .sw-ic{background:#FBF6F0}
+.sw a:not(.on):hover{background:#F1E3D3}
+.sw-badge{position:absolute;top:-4px;right:-2px;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#B5544A;color:#fff;font:600 12px/20px "Outfit",sans-serif;font-style:normal;text-align:center}
+@media (max-width:520px){.sw{width:100%}.sw a{flex:1 1 50%;padding-right:10px;gap:7px}.sw .sw-ic{flex-basis:34px;width:34px;height:34px}.sw b{font-size:15.5px}.sw small{font-size:11.5px}.head .head-deco{display:none}}
 .head-deco{display:flex;gap:6px}
 .deco-slot{display:inline-block;width:34px;height:34px;transform:rotate(var(--r,0deg));animation:sway 7s ease-in-out infinite alternate}
 .deco-slot svg{width:100%;height:100%;display:block;filter:drop-shadow(0 3px 6px rgba(103,48,30,.14))}
@@ -2721,7 +2734,8 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 </head>
 <body>
 <main>
-<header class="head"><a class="brand" href="<?= forma_h(strtok($_SERVER['REQUEST_URI'] ?? '/verwaltung/', '?') ?: '/verwaltung/') ?>"><img src="../img/forma-logo.png" alt=""><span>FORMA · Atelier-Verwaltung</span></a><span class="head-deco"><span class="deco-slot"></span><span class="deco-slot"></span><span class="deco-slot"></span></span></header>
+<?php $swSelf = strtok($_SERVER['REQUEST_URI'] ?? '/verwaltung/', '?') ?: '/verwaltung/'; $swMm = in_array((string)($GLOBALS['view'] ?? ''), ['movecia', 'natal', 'method', 'texte', 'presse', 'vorschau', 'videos', 'mediathek'], true); $swReq = 0; if (isset($GLOBALS['pdo'])) { try { $swReq = (int)$GLOBALS['pdo']->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} } ?>
+<header class="head"><nav class="sw" aria-label="Bereich wechseln"><a class="sw-f<?= $swMm ? '' : ' on' ?>" href="<?= forma_h($swSelf) ?>"<?= $swMm ? '' : ' aria-current="page"' ?>><span class="sw-ic"><img src="/img/forma-logo.png" alt=""></span><span class="sw-t"><b>FORMA</b><small>🏺 Atelierverwaltung</small></span></a><a class="sw-m<?= $swMm ? ' on' : '' ?>" href="<?= forma_h($swSelf) ?>?view=movecia"<?= $swMm ? ' aria-current="page"' : '' ?>><span class="sw-ic"><img src="/img/movecia/movecia-zeichen.svg" alt=""></span><span class="sw-t"><b>Movecia</b><small>🌿 Studioverwaltung</small></span><?php if ($swReq): ?><i class="sw-badge" title="Terminanfragen"><?= $swReq ?></i><?php endif; ?></a></nav><span class="head-deco"><span class="deco-slot"></span><span class="deco-slot"></span><span class="deco-slot"></span></span></header>
 <?php $body(); ?>
 </main>
 <script src="deko.js?v=1" defer></script>
