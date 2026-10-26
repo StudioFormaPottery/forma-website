@@ -111,7 +111,7 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
 </div></section>
 
 <section class="w sec" id="vivien"><div class="in about">
-  <div class="art arch tall rv"><img src="/img/wildhearts/viv-stretch.jpg" alt="Vivien" loading="lazy"></div>
+  <div class="art arch tall rv"><img src="/img/movecia/fotos/ev-ueber-mich.jpg?v=1" alt="Vivien beim Seitstretch in ihrem Studio mit Bergblick" loading="lazy"></div>
   <div class="rv">
     <p class="k"><span class="de">Hallo, ich bin Vivien</span><span class="en">Hi, I'm Vivien</span></p>
     <h2 style="margin-top:.6rem"><span class="de">Mama von vier Kindern, <em>Bewegungstrainerin</em> und Frau, die selbst neu anfangen musste.</span><span class="en">Mother of four, <em>movement teacher</em> and a woman who had to begin again herself.</span></h2>
