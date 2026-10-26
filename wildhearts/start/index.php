@@ -66,7 +66,7 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
       <p><span class="de">Achtsames Training in der Schwangerschaft und danach, mit Atem, Beckenboden und Impulsen für eine leichtere Geburt und ein sanftes Ankommen danach.</span><span class="en">Mindful training during pregnancy and after, with breath, pelvic floor work and guidance for an easier birth and a gentle arrival afterwards.</span></p>
       <div class="meta"><span class="chip"><span class="de">ab <?= $eu($natalMin) ?> pro Einheit</span><span class="en">from <?= $eu($natalMin) ?> per session</span></span><span class="chip"><span class="de">Kennenlernen gratis</span><span class="en">free intro call</span></span></div>
       <p class="more"><span class="de">Mehr erfahren</span><span class="en">Learn more</span> →</p></div></a>
-    <a class="offer rv" href="/gathering/"><div class="art"><img src="/img/movecia/fotos/ev-gathering.jpg" alt="" loading="lazy"></div><div class="tx">
+    <a class="offer rv" href="/gathering/"><div class="art paint" style="filter:hue-rotate(-12deg) saturate(.9)"></div><div class="tx">
       <p class="k"><span class="de">Live · kostenlos</span><span class="en">Live · free</span></p><h3>Gatherings</h3>
       <p><span class="de">Einmal im Monat treffen wir uns live: ein ruhiger Abend mit Bewegung, Atem und Gesprächen, offen für alle Frauen.</span><span class="en">Once a month we meet live: a calm evening with movement, breath and conversation, open to all women.</span></p>
       <div class="meta"><span class="chip"><?= $g ? '<span class="de">nächstes: ' . forma_h(mm_when_de($g)) . '</span><span class="en">next: ' . forma_h(mm_when($g)) . '</span>' : '<span class="de">monatlich</span><span class="en">monthly</span>' ?></span></div>
