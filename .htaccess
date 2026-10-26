@@ -12,6 +12,9 @@ Options -Indexes
 # Interne Dateien für die Gutscheine
 <IfModule mod_rewrite.c>
 RewriteEngine On
+# Movecia-Videos und -Fotos nicht direkt im Browser-Tab öffnen/speichern (Vivien, 26.10.2026); auf den Seiten laufen sie normal
+RewriteCond %{HTTP:Sec-Fetch-Dest} ^document$ [NC]
+RewriteRule ^(video/movecia/.+\.mp4|img/movecia/fotos/.+\.(jpe?g|webp|png))$ - [F,L]
 # moveciamovement.com: eigene robots.txt und Sitemap für Google (Vivien, 24.10.2026)
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^robots\.txt$ wildhearts/robots.txt [L]

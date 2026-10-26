@@ -3,7 +3,7 @@
    Schriften, Bilder und Styles werden zwischengespeichert und im Hintergrund aktualisiert.
    Buchungen, Zahlungen, Videoräume, Videos und die Verwaltung laufen nie über diesen Zwischenspeicher.
    Bei größeren Bild- oder Style-Änderungen VERSION hochzählen. */
-var VERSION = 'movecia-v10';
+var VERSION = 'movecia-v11';
 var STATIC = /^\/(fonts|img|wildhearts\/assets)\//;
 var SKIP = /^\/(api|verwaltung|video|tools|downloads|natal\/raum|unfold\/call|gathering)(\/|$)/;
 

@@ -194,6 +194,7 @@ a{color:var(--plum)}
 .frame iframe{width:100%;height:100%;border:0;border-radius:clamp(0px,1.4vw,20px);background:var(--deep);display:block}
 @media (max-width:560px){.bar .t span{display:none}.brand{font-size:1.5rem}}
 </style>
+<script src="/wildhearts/assets/schutz.js?v=1"></script>
 </head>
 <body>
 <?php if ($state === 'open'): ?>

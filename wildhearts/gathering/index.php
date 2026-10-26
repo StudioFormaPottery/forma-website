@@ -130,6 +130,7 @@ body.room{background:var(--earth)}
 .roombar a{color:var(--blush)}
 .roomwrap iframe{flex:1;width:100%;border:0;background:#2B1E23}
 </style>
+<script src="/wildhearts/assets/schutz.js?v=1"></script>
 </head>
 <?php if ($open): ?>
 <body class="room">

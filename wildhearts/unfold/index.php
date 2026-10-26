@@ -183,6 +183,7 @@ footer a{color:var(--muted)}
 body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .top-r{display:flex;align-items:center;gap:.5rem;margin-left:auto}@media(max-width:899px){header .lang{display:none}}
 </style>
+<script src="/wildhearts/assets/schutz.js?v=1"></script>
 </head>
 <body>
 <header class="w"><div class="in top">

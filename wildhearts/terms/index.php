@@ -68,6 +68,7 @@ details.old>summary{font-family:"Italiana",Georgia,serif;font-weight:400;font-si
 a{color:var(--wine)}
 @media (max-width:600px){body{font-size:17px}}
 </style>
+<script src="/wildhearts/assets/schutz.js?v=1"></script>
 </head>
 <body>
 <main>
