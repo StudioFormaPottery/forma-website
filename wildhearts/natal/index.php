@@ -216,6 +216,7 @@ body[data-mode=online] .m-studio,body[data-mode=studio] .m-online{display:none!i
 .mq-in span::after{content:"✦";font-style:normal;font-size:.55em;margin-left:2.4rem;opacity:.6;vertical-align:middle}
 @keyframes mq{to{transform:translateX(-50%)}}
 .two{display:grid;gap:16px;margin-top:2.6rem}
+.wide-pic{margin:16px 0 0;border-radius:24px;overflow:hidden;aspect-ratio:21/9;background:#E8D6CA}.wide-pic img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 55%}@media(max-width:700px){.wide-pic{aspect-ratio:4/3}}
 @media(min-width:900px){.two{grid-template-columns:1fr 1fr}}
 .card{background:var(--card);border-radius:var(--r);padding:clamp(1.5rem,3vw,2.4rem)}
 .card.pl{background:var(--plum);color:var(--on)}
@@ -440,7 +441,7 @@ footer summary{cursor:pointer}
 
     <div class="cta"><a class="btn" href="#pakete">Paket wählen <span aria-hidden="true">→</span></a><a class="btn line" href="#kennenlernen">Kostenlos kennenlernen</a></div>
   </div>
-  <figure class="hv"><div class="b1 blob" aria-hidden="true"></div><div class="b3" aria-hidden="true"></div><img src="/img/movecia/fotos/schwanger.jpg" alt="Vivien in ihrer Schwangerschaft" width="683" height="1024"><figcaption class="q">„Dein Körper leistet gerade Großes. Lass uns ihn gut begleiten.“<small>Vivien</small></figcaption></figure>
+  <figure class="hv"><div class="b1 blob" aria-hidden="true"></div><div class="b3" aria-hidden="true"></div><img src="/img/movecia/fotos/ev-natal.jpg" alt="Vivien in ihrer Schwangerschaft im lichten Studio" width="640" height="794"><figcaption class="q">„Dein Körper leistet gerade Großes. Lass uns ihn gut begleiten.“<small>Vivien</small></figcaption></figure>
 </section>
 <div class="mq" aria-hidden="true"><div class="mq-in"><?php for ($i = 0; $i < 2; $i++) foreach (['ankommen', 'atmen', 'spüren', 'stärken', 'loslassen', 'vertrauen', 'zurückfinden'] as $wd) echo '<span>' . $wd . '</span>'; ?></div></div>
 
@@ -459,6 +460,7 @@ footer summary{cursor:pointer}
       <li>Haltung und Rücken für Tragen und Stillen</li>
       <li>Schritt für Schritt zurück zu Kraft und Energie, dein Baby darf mitkommen</li></ul></div>
   </div>
+  <figure class="wide-pic"><img src="/img/movecia/fotos/ev-natal-sitzend.jpg" alt="Schwangere Frau sitzt ruhig atmend auf der Matte vor großen Fenstern mit Bergblick" width="1280" height="858" loading="lazy"></figure>
 </section>
 
 <section class="w" id="ablauf" style="padding-top:0">

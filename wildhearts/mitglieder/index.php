@@ -175,7 +175,7 @@ if (!$me && !$demo) {
 <body class="auth">
 <header class="w"><div class="in top"><a class="brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a><?= mv_lang_switch($lang, '', false) ?></div></header>
 <main class="w"><div class="in authgrid">
-  <div class="authpic"><img src="/img/wildhearts/cover.jpg" alt=""><span class="blob" style="width:120px;height:120px;right:-30px;top:-30px;background:var(--peach)"></span></div>
+  <div class="authpic"><img src="/img/movecia/fotos/ev-unfold-karte.jpg" alt=""><span class="blob" style="width:120px;height:120px;right:-30px;top:-30px;background:var(--peach)"></span></div>
   <div class="authbox">
     <?php if ($mode === 'new'): ?>
       <p class="k"><?= $L('Willkommen', 'Welcome') ?></p>

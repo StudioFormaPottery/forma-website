@@ -1,0 +1,72 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- Werbung im verträumten Everygen-Look (Vivien, 26.10.2026): ?p=method|unfold|natal|gathering, f=feed|story, l=de|en.
+     Per Playwright gegen den lokalen Server gerendert (render.py). Preise wie in mv_cfg_raw(); Gathering-Preise nie nennen. -->
+<style>
+@font-face{font-family:"Cormorant";font-weight:300 700;src:url(../../fonts/CormorantGaramond-VF.woff) format("woff")}
+@font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(../../fonts/CormorantGaramond-Italic-VF.woff) format("woff")}
+@font-face{font-family:"Hanken";font-weight:300 700;src:url(../../fonts/HankenGrotesk-VF.woff) format("woff")}
+*{box-sizing:border-box;margin:0}
+body{width:1080px;height:1350px;overflow:hidden;background:#F2ECE4;color:#2E2529;font-family:Hanken,sans-serif;position:relative}
+body.story{height:1920px}
+.story .ph{height:62%}
+.ph{position:absolute;left:0;right:0;top:0;height:74%;background-size:cover;background-position:50% 40%;filter:saturate(.92)}
+.ph::before{content:"";position:absolute;inset:0;background:rgba(234,223,222,.16);mix-blend-mode:multiply}
+.ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(242,236,228,.55) 0%,rgba(242,236,228,0) 16%,rgba(242,236,228,0) 55%,rgba(242,236,228,.9) 82%,#F2ECE4 100%)}
+.story .ph::after{background:linear-gradient(180deg,rgba(242,236,228,.55) 0%,rgba(242,236,228,0) 12%,rgba(242,236,228,0) 66%,rgba(242,236,228,.9) 88%,#F2ECE4 100%)}
+.wrap{position:absolute;inset:0;padding:70px 84px 80px;display:flex;flex-direction:column;z-index:1}
+.story .wrap{padding:160px 90px 200px}
+.top{display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:14px;font-family:Cormorant,serif;font-size:46px;color:#2E2529}
+.brand img{width:46px}.brand i{display:inline-block;width:10px;height:10px;border-radius:50%;background:#7D5E68;margin-left:2px}
+.pill{font-size:22px;letter-spacing:.18em;text-transform:uppercase;background:rgba(252,248,244,.88);color:#6B5658;border-radius:99px;padding:13px 24px}
+.body{margin-top:auto}
+.k{display:inline-block;font-size:23px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:#6B5658;background:rgba(252,248,244,.9);padding:11px 22px;border-radius:99px}
+h1{font-family:Cormorant,serif;font-weight:400;font-size:108px;line-height:.95;margin-top:16px;letter-spacing:-.01em}
+h1 em{color:#7D5E68}
+.story h1{font-size:124px}
+.sub{font-family:Cormorant,serif;font-style:italic;font-size:46px;color:#6B5658;margin-top:14px;line-height:1.15}
+.rows{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.rows span{background:#FCF8F4;border:1px solid #DDD2C6;border-radius:99px;padding:12px 24px;font-size:25px;color:#2E2529}
+.rows span.d{background:#7D5E68;border-color:#7D5E68;color:#FBF5F7}
+.foot{margin-top:38px;display:flex;justify-content:space-between;align-items:flex-end;gap:30px;border-top:1px solid #DDD2C6;padding-top:28px}
+.story .foot{margin-top:56px}
+.url{font-size:24px;color:#7D7076;letter-spacing:.04em}.url b{display:block;font-family:Cormorant,serif;font-weight:500;font-size:42px;color:#2E2529;letter-spacing:0}
+.btn{background:#4A3A41;color:#FBF5F7;border-radius:99px;padding:22px 36px;font-size:27px;white-space:nowrap}
+</style></head>
+<body>
+<div class="ph" id="ph"></div>
+<div class="wrap">
+  <div class="top"><div class="brand"><img src="../../img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></div><span class="pill" id="pill"></span></div>
+  <div class="body">
+    <p class="k" id="k"></p>
+    <h1 id="h"></h1>
+    <p class="sub" id="sub"></p>
+    <div class="rows" id="rows"></div>
+    <div class="foot"><div class="url"><span id="cta1"></span><b id="url"></b></div><span class="btn" id="btn"></span></div>
+  </div>
+</div>
+<script>
+const P=new URLSearchParams(location.search), p=P.get('p')||'unfold', f=P.get('f')||'feed', l=P.get('l')||'de';
+document.body.className=f+' '+p;
+const T={
+ method:{img:{feed:'ev-method-karte.jpg',story:'ev-method-karte.jpg'},pos:'50% 30%',
+  de:{pill:'Start 1. Dezember',k:'Mindful Movement Method · on demand',h:'Ein paar ruhige <em>Minuten</em> für dich.',sub:'Jeden Tag, bei dir zu Hause, so wie du dich gerade fühlst.',rows:[['d','Early-Bird € 29 im Monat bis 1.12.'],['','danach € 39'],['','Flows · Somatic · Breathwork'],['','Deutsch & English']],cta:'Jetzt Mitglied werden',url:'moveciamovement.com/method',btn:'Link in Bio →'},
+  en:{pill:'Starts 1 December',k:'Mindful Movement Method · on demand',h:'A few quiet <em>minutes</em> for you.',sub:'Every day, at home, just the way you feel right now.',rows:[['d','Early bird € 29 a month until 1 Dec'],['','then € 39'],['','Flows · somatic · breathwork'],['','English & Deutsch']],cta:'Become a member',url:'moveciamovement.com/method',btn:'Link in bio →'}},
+ unfold:{img:{feed:'ev-unfold-karte.jpg',story:'ev-unfold.jpg'},pos:'50% 85%',
+  de:{pill:'Nur 10 Plätze',k:'Unfold · The Mindful Becoming',h:'Drei Monate, um zu dir <em>zurückzukommen</em>.',sub:'Mit Bewegung, Ruhe im Kopf und Frauen an deiner Seite.',rows:[['d','Start 10. Jänner 2027'],['','wöchentlicher Live-Call'],['','2 Bewegungsvideos pro Woche'],['','Early-Bird € 450 bis 11.1.']],cta:'Jetzt Platz sichern',url:'moveciamovement.com/unfold',btn:'Link in Bio →'},
+  en:{pill:'Only 10 spots',k:'Unfold · The Mindful Becoming',h:'Three months to come <em>back to yourself</em>.',sub:'With movement, a quieter mind and women by your side.',rows:[['d','Starts 10 January 2027'],['','weekly live call'],['','2 movement videos a week'],['','Early bird € 450 until 11 Jan']],cta:'Book your spot',url:'moveciamovement.com/unfold',btn:'Link in bio →'}},
+ natal:{img:{feed:'ev-natal.jpg',story:'ev-natal.jpg'},pos:'50% 25%',
+  de:{pill:'1:1 · Studio & online',k:'Prä- & Postnatal Training',h:'Bewegt durch die <em>Schwangerschaft</em>.',sub:'Und sanft zurück zu dir, wenn dein Baby da ist.',rows:[['d','Kennenlernen kostenlos'],['','Beckenboden & Atem'],['','im Studio in Mathon'],['','oder live per Video']],cta:'Mehr erfahren',url:'moveciamovement.com/natal',btn:'Link in Bio →'},
+  en:{pill:'1:1 · studio & online',k:'Pre- & postnatal training',h:'Moving through your <em>pregnancy</em>.',sub:'And gently back to yourself once your baby is here.',rows:[['d','Free intro call'],['','pelvic floor & breath'],['','in the studio in Tyrol'],['','or live on video']],cta:'Learn more',url:'moveciamovement.com/natal',btn:'Link in bio →'}},
+ gathering:{img:{feed:'ev-start.jpg',story:'ev-start.jpg'},pos:'50% 50%',
+  de:{pill:'Live · kostenlos',k:'Movecia Gathering',h:'Ein Abend nur für <em>dich</em>.',sub:'Einmal im Monat bewegen, atmen und reden wir gemeinsam.',rows:[['d','offen für alle Frauen'],['','live per Video'],['','Deutsch & English']],cta:'Gratis dabei sein',url:'moveciamovement.com/gathering',btn:'Link in Bio →'},
+  en:{pill:'Live · free',k:'Movecia Gathering',h:'An evening just for <em>you</em>.',sub:'Once a month we move, breathe and talk together.',rows:[['d','open to all women'],['','live on video'],['','English & Deutsch']],cta:'Join for free',url:'moveciamovement.com/gathering',btn:'Link in bio →'}}
+};
+const t=T[p], c=t[l];
+const ph=document.getElementById('ph'); ph.style.backgroundImage='url(../../img/movecia/fotos/'+t.img[f]+')'; ph.style.backgroundPosition=t.pos;
+for (const id of ['pill','k','sub','btn','url']) document.getElementById(id).textContent=c[id];
+document.getElementById('h').innerHTML=c.h; document.getElementById('cta1').textContent=c.cta;
+document.getElementById('rows').innerHTML=c.rows.map(([cl,x])=>'<span class="'+cl+'">'+x+'</span>').join('');
+</script>
+</body></html>
