@@ -566,5 +566,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
 })();
 </script>
 <?php if ($me) { ?><script src="/wildhearts/assets/geraet.js?v=1" data-kind="mv" defer></script><?php } ?>
+<?php if ($me) echo mm_wm_script('mv', (int)$me['id'], $lang === 'en' ? 'en' : 'de', (string)($me['name'] ?? '')), "\n"; ?>
+<?php if (!$me && !empty($demo)) { ?><script src="/wildhearts/assets/wasserzeichen.js?v=1" data-code="MV-BEISPIEL" data-lang="<?= $lang === 'en' ? 'en' : 'de' ?>" defer></script><?php } ?>
 </body>
 </html>

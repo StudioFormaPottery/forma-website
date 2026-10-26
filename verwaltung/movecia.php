@@ -322,6 +322,14 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .qa .ic{font-size:26px;line-height:1}
 .qa .main{background:#7D5E68;border-color:#7D5E68}.qa .main b,.qa .main span{color:#FBF5F7}
 </style>
+        <?php $wmq = trim((string)($_GET['wm'] ?? '')); $wmHit = $wmq !== '' ? mm_wm_lookup($pdo, $wmq) : null; ?>
+        <form method="get" style="margin:16px 0;padding:14px 18px;border-radius:20px;background:#FBF8F4;border:1px solid #DDD2C6;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+            <input type="hidden" name="view" value="movecia">
+            <b style="font-size:16px;color:#4A3A41">🔎 Wasserzeichen-Code nachschlagen</b>
+            <input name="wm" value="<?= forma_h($wmq) ?>" placeholder="z. B. MV-3F9A1C" style="font-size:16px;padding:.5em .8em;border-radius:12px;border:1px solid #DDD2C6;min-width:12em">
+            <button type="submit" style="font-size:15px;padding:.55em 1.1em;border-radius:999px;border:0;background:#7D5E68;color:#FBF5F7">Suchen</button>
+            <?php if ($wmq !== ''): ?><span style="font-size:15px;color:#4A3A41;width:100%"><?= $wmHit ? 'Gehört zu <b>' . forma_h($wmHit['name'] ?: $wmHit['email']) . '</b> · ' . forma_h($wmHit['email']) . ' · ' . ($wmHit['kind'] === 'natal' ? 'Prä-/Postnatal' : 'Method/Unfold') : 'Kein Zugang mit diesem Code gefunden.' ?></span><?php endif; ?>
+        </form>
         <?php $devSus = []; try { $devSus = mm_dev_suspects($pdo); } catch (Throwable $e) {} if ($devSus): ?>
         <div style="margin:16px 0;padding:16px 18px;border-radius:20px;background:#F6E9E4;border:1px solid #E2C7BD">
             <b style="font-size:17px;color:#4A3A41">⚠ Vielleicht geteilte Zugänge</b>

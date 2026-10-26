@@ -31,6 +31,8 @@ function mm_dev_schema(PDO $pdo): void
         reason TEXT NOT NULL DEFAULT \'\'
     )');
     $pdo->exec('CREATE INDEX IF NOT EXISTS mm_devices_m ON mm_devices (kind, member_id)');
+    // Datensparsam: Geräte-Angaben spätestens 90 Tage nach der letzten Nutzung löschen
+    if (random_int(1, 50) === 1) $pdo->prepare('DELETE FROM mm_devices WHERE last_seen < ?')->execute([date('c', time() - 90 * 86400)]);
 }
 
 function mm_dev_label(): string

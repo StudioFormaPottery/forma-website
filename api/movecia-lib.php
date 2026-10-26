@@ -3,6 +3,7 @@
 // Gemeinsam genutzt wird nur die Datenbank-Datei und der MailerLite-Schlüssel des Kontos.
 declare(strict_types=1);
 require_once __DIR__ . '/mm-devices.inc.php';
+require_once __DIR__ . '/mm-wasserzeichen.inc.php';
 require_once __DIR__ . '/lib.php';
 
 const MM_FROM_EMAIL = 'hello@moveciamovement.com';

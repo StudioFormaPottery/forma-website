@@ -452,5 +452,6 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
 </script>
 <?php endif; ?>
 <?php if ($me && !$demo) { ?><script src="/wildhearts/assets/geraet.js?v=1" data-kind="natal" defer></script><?php } ?>
+<?php if ($me && !$demo && !empty($me['id'])) echo mm_wm_script('natal', (int)$me['id'], 'de', (string)($me['name'] ?? '')), "\n"; ?>
 </body>
 </html>
