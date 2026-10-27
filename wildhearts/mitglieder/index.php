@@ -565,8 +565,9 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
     }catch(e){}};document.head.appendChild(s);}
 })();
 </script>
-<?php if ($me) { ?><script src="/wildhearts/assets/geraet.js?v=1" data-kind="mv" defer></script><?php } ?>
-<?php if ($me) echo mm_wm_script('mv', (int)$me['id'], $lang === 'en' ? 'en' : 'de', (string)($me['name'] ?? '')), "\n"; ?>
-<?php if (!$me && !empty($demo)) { ?><script src="/wildhearts/assets/wasserzeichen.js?v=2" data-nocopy="1" data-name="Anna" data-lang="<?= $lang === 'en' ? 'en' : 'de' ?>" defer></script><?php } ?>
+<?php /* Beispielansicht hat kein echtes Konto: ohne diese Bedingung meldete die Geräteprüfung „abgemeldet“ und lud die Seite immer wieder neu (Flackern) */ ?>
+<?php if ($me && !$demo) { ?><script src="/wildhearts/assets/geraet.js?v=1" data-kind="mv" defer></script><?php } ?>
+<?php if ($me && !$demo) echo mm_wm_script('mv', (int)$me['id'], $lang === 'en' ? 'en' : 'de', (string)($me['name'] ?? '')), "\n"; ?>
+<?php if (!empty($demo)) { ?><script src="/wildhearts/assets/wasserzeichen.js?v=2" data-nocopy="1" data-name="Anna" data-lang="<?= $lang === 'en' ? 'en' : 'de' ?>" defer></script><?php } ?>
 </body>
 </html>
