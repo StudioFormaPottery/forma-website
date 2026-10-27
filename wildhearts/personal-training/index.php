@@ -1,5 +1,5 @@
 <?php
-// moveciamovement.com/personal-training – Personal Training 1:1 im Studio in Mathon (Vivien, 27.10.2026)
+// moveciamovement.com/personal-training – Personal Training (allein oder zu zweit, 75 Min.) im Studio in Mathon (Vivien, 27.10.2026)
 // Versteckt: nur per Link/QR vom Hotel-Flyer, nirgends verlinkt, noindex. Deutsch + Englisch (Umschalter oben).
 //   ohne Parameter      Angebot + Anfrage (1–4 Einheiten, je Wunschtag + Uhrzeit)
 //   ?o=ID&k=TOKEN       persönliche Seite des Gasts (Status, Termine, Bezahlen, Kalender)
@@ -18,7 +18,8 @@ if (isset($_GET['o'])) {
 }
 $badLink = isset($_GET['o']) && !$order;
 $cfg = ptb_cfg();
-$prices = ptb_price_table();
+$prices = ptb_price_table(1);
+$prices2 = ptb_price_table(2);
 $lang = ($_GET['lang'] ?? '') === 'en' ? 'en' : (($_GET['lang'] ?? '') === 'de' ? 'de' : ($order ? (string)$order['lang'] : ''));
 $cal = [
     'min' => date('Y-m-d', strtotime('+1 day')),
@@ -27,13 +28,15 @@ $cal = [
     'blocked' => $cfg['blocked'],
     'times' => ptb_times(),
     'busy' => ptb_busy($pdo, date('Y-m-d'), date('Y-m-d', strtotime('+6 months'))),
-    'prices' => $prices,
+    'prices' => [1 => $prices, 2 => $prices2],
+    'minutes' => PTB_MINUTES,
     'max_units' => PTB_MAX_UNITS,
 ];
 $sessions = $order ? ptb_sessions($pdo, (int)$order['id']) : [];
 $wa = 'https://wa.me/' . preg_replace('/\D/', '', NATAL_COMPANY['phone']);
 $L = fn(string $de, string $en) => '<span class="de">' . $de . '</span><span class="en">' . $en . '</span>';
 $single = $prices[1]['unit'];
+$two = $prices2[1]['unit'];
 $disc = $prices[PTB_MAX_UNITS]['unit'];
 ?><!doctype html>
 <html lang="de" data-l="de">
@@ -41,7 +44,7 @@ $disc = $prices[PTB_MAX_UNITS]['unit'];
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title><?= $order ? 'Deine Termine · Your sessions · Movecia' : 'Personal Training in Mathon · Movecia' ?></title>
-<meta name="description" content="Personal Training 1:1 mit Vivien im kleinen Studio in Mathon, wenige Minuten von Ischgl. 60 Minuten, ganz auf dich abgestimmt. One-to-one personal training in Mathon near Ischgl.">
+<meta name="description" content="Personal Training 1:1 mit Vivien im kleinen Studio in Mathon, wenige Minuten von Ischgl. 75 Minuten, ganz auf dich abgestimmt, allein oder zu zweit. Personal training in Mathon near Ischgl, one-to-one or for two.">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#F2ECE4">
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
@@ -127,6 +130,8 @@ section{padding-block:clamp(3.2rem,7vw,6rem)}
 /* Buchen */
 .packs{display:grid;gap:10px;margin-top:1.8rem;grid-template-columns:repeat(2,minmax(0,1fr))}
 @media(min-width:1000px){.packs{grid-template-columns:repeat(4,1fr);gap:14px}}
+@media(min-width:1000px){.packs.who{grid-template-columns:repeat(2,1fr);max-width:760px}}
+.pack [hidden]{display:none}
 .pack{position:relative;display:flex;flex-direction:column;gap:.3rem;background:var(--card);border-radius:var(--r);padding:1.3rem 1.3rem 1.2rem;cursor:pointer;border:2px solid transparent;transition:border-color .2s,transform .25s}
 .pack:hover{transform:translateY(-3px)}
 .pack input{position:absolute;opacity:0;pointer-events:none}
@@ -260,7 +265,7 @@ footer summary{cursor:pointer}
       <?php elseif ($st === 'bezahlt'): ?>
         <?php if (isset($_GET['danke'])): ?><p class="ok"><?= $L('Danke! Deine Zahlung ist angekommen, die Bestätigung ist per E-Mail unterwegs.', 'Thank you! Your payment has arrived and the confirmation is on its way by email.') ?></p><?php endif; ?>
         <h3><?= $L('Deine Termine', 'Your sessions') ?></h3>
-        <div class="sl"><?php foreach ($act as $s): $past = $s['status'] === 'erledigt'; ?><div class="si"><span><b><span class="de"><?= $h(ptb_when((string)$s['date'], (string)$s['start'])) ?></span><span class="en"><?= $h(ptb_when((string)$s['date'], (string)$s['start'], true)) ?></span></b><small>60 <?= $L('Minuten', 'minutes') ?> · Movecia Studio, <?= $h(NATAL_COMPANY['street'] . ', ' . NATAL_COMPANY['city']) ?></small></span>
+        <div class="sl"><?php foreach ($act as $s): $past = $s['status'] === 'erledigt'; ?><div class="si"><span><b><span class="de"><?= $h(ptb_when((string)$s['date'], (string)$s['start'])) ?></span><span class="en"><?= $h(ptb_when((string)$s['date'], (string)$s['start'], true)) ?></span></b><small><?= $L($h(ptb_kind($order, false, true)), $h(ptb_kind($order, true, true))) ?> · Movecia Studio, <?= $h(NATAL_COMPANY['street'] . ', ' . NATAL_COMPANY['city']) ?></small></span>
           <?php if ($past): ?><span class="chip"><?= $L('war schön', 'done') ?></span><?php else: ?><a class="chip fix" style="text-decoration:none" href="<?= $h(ptb_gcal($s, $en)) ?>" target="_blank" rel="noopener">+ Google</a><?php endif; ?></div><?php endforeach; ?></div>
         <div class="cta" style="margin-top:.4rem"><a class="btn" href="/api/ptb.php?ics=1&amp;o=<?= (int)$order['id'] ?>&amp;k=<?= $h($order['token']) ?>"><?= $L('In meinen Kalender', 'Add to my calendar') ?></a><a class="btn line" href="<?= $h($wa) ?>">WhatsApp</a></div>
         <p class="hint"><?= $L('Komm in bequemer Kleidung und bring eine Flasche Wasser mit. Verschieben oder absagen kannst du bis 24 Stunden vorher kostenlos, schreib mir dafür einfach.', 'Wear something comfortable and bring a bottle of water. You can reschedule or cancel free of charge up to 24 hours before, just send me a message.') ?></p>
@@ -270,10 +275,10 @@ footer summary{cursor:pointer}
       <?php endif; ?>
     </div>
     <aside class="side"><div class="bl blob"></div>
-      <p class="k">Personal Training 1:1</p>
-      <?php $n = count($act); $unit = $st === 'angebot' || $st === 'bezahlt' ? (int)$order['unit_cents'] : ptb_unit_cents(max(1, $n)); ?>
+      <p class="k">Personal Training <?= ptb_persons($order) === 2 ? $L('zu zweit', 'for two') : '1:1' ?></p>
+      <?php $n = count($act); $unit = $st === 'angebot' || $st === 'bezahlt' ? (int)$order['unit_cents'] : ptb_unit_cents(max(1, $n), ptb_persons($order)); ?>
       <div class="amt"><?= $h(forma_euro($unit * max(1, $n))) ?></div>
-      <div class="ln"><span><?= $L('Einheiten', 'Sessions') ?></span><span><?= $n ?> × 60 <?= $L('Min.', 'min') ?></span></div>
+      <div class="ln"><span><?= $L('Einheiten', 'Sessions') ?></span><span><?= $n ?> × <?= PTB_MINUTES ?> <?= $L('Min.', 'min') ?></span></div>
       <div class="ln"><span><?= $L('pro Einheit', 'per session') ?></span><span><?= $h(forma_euro($unit)) ?></span></div>
       <div class="ln"><span><?= $L('Status', 'Status') ?></span><span><?php if ($st === 'bezahlt'): ?><?= $L('bezahlt', 'paid') ?><?php elseif ($st === 'angebot'): ?><?= $L('bereit zum Buchen', 'ready to book') ?><?php elseif ($st === 'anfrage'): ?><?= $L('ich prüfe gerade', 'being checked') ?><?php elseif ($st === 'email'): ?><?= $L('E-Mail bestätigen', 'confirm email') ?><?php else: ?><?= $L('geschlossen', 'closed') ?><?php endif; ?></span></div>
       <?php if ($st === 'angebot'): ?>
@@ -292,10 +297,10 @@ footer summary{cursor:pointer}
   <section class="hero w">
     <div>
       <p class="k">Personal Training · Mathon · Paznaun</p>
-      <h1 style="margin-top:.8rem"><?= $L('Eine Stunde,<br>nur für <em>dich.</em>', 'One hour,<br>just for <em>you.</em>') ?></h1>
+      <h1 style="margin-top:.8rem"><?= $L('Zeit, die nur<br>dir <em>gehört.</em>', 'Time that is<br>all <em>yours.</em>') ?></h1>
       <p class="script"><?= $L('Bewegung, die sich gut anfühlt, mitten in deinem Urlaub.', 'Movement that feels good, right in the middle of your holiday.') ?></p>
       <p class="lead"><?= $L('Ganz persönlich auf deinen Körper und deinen Tag abgestimmt, ob du gerade von der Piste kommst oder einfach in Bewegung bleiben möchtest. In meinem kleinen, privaten Studio in Mathon, ruhig und ganz ohne Fitnessstudio-Trubel.', "Tailored to your body and your day, whether you've just come off the slopes or simply want to keep moving while you're away. In my small private studio in Mathon, calm and crowd-free.") ?></p>
-      <div class="facts"><span><b>60</b> <?= $L('Minuten, 1:1', 'minutes, 1:1') ?></span><span><b><?= $h(forma_euro($single)) ?></b> <?= $L('pro Einheit', 'per session') ?></span><span><?= $L('ab ' . PTB_MAX_UNITS . ' Einheiten <b>' . $h(forma_euro($disc)) . '</b>', 'from ' . PTB_MAX_UNITS . ' sessions <b>' . $h(forma_euro($disc)) . '</b>') ?></span></div>
+      <div class="facts"><span><b><?= PTB_MINUTES ?></b> <?= $L('Minuten', 'minutes') ?></span><span><b><?= $h(forma_euro($single)) ?></b> <?= $L('pro Einheit', 'per session') ?></span><span><b><?= $h(forma_euro($two)) ?></b> <?= $L('zu zweit', 'for two') ?></span></div>
       <div class="cta"><a class="btn" href="#buchen"><?= $L('Wunschtermin wählen', 'Choose your time') ?></a><a class="btn line" href="#so"><?= $L('So läuft es ab', 'How it works') ?></a></div>
     </div>
     <figure class="hv"><div class="b1 blob"></div><div class="b3"></div><img src="/img/movecia/fotos/pt-baum.jpg" alt="<?= $h('Vivien im Movecia Studio') ?>" width="940" height="1400" fetchpriority="high"><div class="q"><span class="de">„Du musst nichts können. Du darfst einfach ankommen.“</span><span class="en">“You don't need to be good at anything. Just come as you are.”</span><small>Vivien · Movecia</small></div></figure>
@@ -319,7 +324,7 @@ footer summary{cursor:pointer}
     <p class="k"><?= $L('So läuft es ab', 'How it works') ?></p>
     <h2 style="margin-top:.6rem"><?= $L('In vier kleinen Schritten', 'Four simple steps') ?></h2>
     <div class="steps">
-      <div class="step"><b><?= $L('Wunschtermine wählen', 'Pick your times') ?></b><p><?= $L('Wähl, wie viele Einheiten du möchtest, und für jede einen Tag und eine Uhrzeit.', 'Choose how many sessions you would like, and a day and time for each.') ?></p></div>
+      <div class="step"><b><?= $L('Wunschtermine wählen', 'Pick your times') ?></b><p><?= $L('Allein oder zu zweit? Wähl, wie viele Einheiten du möchtest, und für jede einen Tag und eine Uhrzeit.', 'On your own or for two? Choose how many sessions you would like, and a day and time for each.') ?></p></div>
       <div class="step"><b><?= $L('E-Mail bestätigen', 'Confirm your email') ?></b><p><?= $L('Ein Tipp in der Mail, die ich dir schicke, damit ich weiß, dass sie bei dir ankommt.', 'One tap in the email I send you, so I know it reaches you.') ?></p></div>
       <div class="step"><b><?= $L('Ich bestätige', 'I confirm') ?></b><p><?= $L('Ich schaue in meinen Kalender. Passt eine Zeit nicht, schlage ich dir eine andere vor.', "I check my calendar. If a time doesn't work, I suggest another.") ?></p></div>
       <div class="step"><b><?= $L('Bezahlen, fertig', 'Pay and you are set') ?></b><p><?= $L('Erst jetzt bezahlst du online. Danach sind deine Termine fix und kommen direkt in deinen Kalender.', 'Only now do you pay online. Then your times are fixed and go straight into your calendar.') ?></p></div>
@@ -328,16 +333,21 @@ footer summary{cursor:pointer}
 
   <section class="w" id="buchen" style="padding-top:0">
     <p class="k"><?= $L('Termin anfragen', 'Request your sessions') ?></p>
-    <h2 style="margin-top:.6rem"><?= $L('Wie viele Einheiten möchtest du?', 'How many sessions would you like?') ?></h2>
-    <div class="packs" role="radiogroup">
+    <h2 style="margin-top:.6rem"><?= $L('Allein oder zu zweit?', 'On your own or for two?') ?></h2>
+    <div class="packs who" role="radiogroup">
+      <label class="pack"><input type="radio" name="persons" value="1" checked><span class="t"><?= $L('Nur ich', 'Just me') ?></span><span class="u"><?= $L('1:1, ganz auf dich abgestimmt', 'One-to-one, tailored to you') ?></span><span class="p"><?= $h(forma_euro($single)) ?></span><span class="u"><?= $L('pro Einheit · ' . PTB_MINUTES . ' Min.', 'per session · ' . PTB_MINUTES . ' min') ?></span></label>
+      <label class="pack"><input type="radio" name="persons" value="2"><span class="t"><?= $L('Zu zweit', 'For two') ?></span><span class="u"><?= $L('mit Partner, Freundin oder Familie', 'with your partner, a friend or family') ?></span><span class="p"><?= $h(forma_euro($two)) ?></span><span class="u"><?= $L('pro Einheit für euch beide · ' . PTB_MINUTES . ' Min.', 'per session for both of you · ' . PTB_MINUTES . ' min') ?></span></label>
+    </div>
+    <h2 style="margin-top:2.4rem"><?= $L('Wie viele Einheiten möchtest du?', 'How many sessions would you like?') ?></h2>
+    <div class="packs" id="packs" role="radiogroup">
       <?php foreach ($prices as $n => $pr): ?>
         <label class="pack"><input type="radio" name="units" value="<?= $n ?>" <?= $n === 1 ? 'checked' : '' ?>>
-          <?php if ($pr['unit'] < $single): ?><span class="badge"><?= $L('Bestpreis', 'Best value') ?></span><?php endif; ?>
+          <?php if ($pr['unit'] < $single): ?><span class="badge" data-solo><?= $L('Bestpreis', 'Best value') ?></span><?php endif; ?>
           <span class="t"><?= $n ?> <?= $n === 1 ? $L('Einheit', 'session') : $L('Einheiten', 'sessions') ?></span>
-          <span class="u"><?= $n ?> × 60 <?= $L('Minuten', 'minutes') ?><?php if ($n > 1): ?>, <?= $L('gern an verschiedenen Tagen', 'on different days if you like') ?><?php endif; ?></span>
-          <?php if ($pr['unit'] < $single): ?><span class="was"><?= $h(forma_euro($single * $n)) ?></span><?php endif; ?>
-          <span class="p"><?= $h(forma_euro($pr['total'])) ?></span>
-          <span class="u"><?= $n > 1 ? $L('je ', '') . $h(forma_euro($pr['unit'])) . $L('', ' each') : '&nbsp;' ?></span>
+          <span class="u"><?= $n ?> × <?= PTB_MINUTES ?> <?= $L('Minuten', 'minutes') ?><?php if ($n > 1): ?>, <?= $L('gern an verschiedenen Tagen', 'on different days if you like') ?><?php endif; ?></span>
+          <?php if ($pr['unit'] < $single): ?><span class="was" data-solo><?= $h(forma_euro($single * $n)) ?></span><?php endif; ?>
+          <span class="p" data-total="<?= $n ?>"><?= $h(forma_euro($pr['total'])) ?></span>
+          <span class="u" data-each="<?= $n ?>"><?= $n > 1 ? $L('je ', '') . $h(forma_euro($pr['unit'])) . $L('', ' each') : '&nbsp;' ?></span>
         </label>
       <?php endforeach; ?>
     </div>
@@ -365,8 +375,9 @@ footer summary{cursor:pointer}
       <aside class="side"><div class="bl blob"></div>
         <p class="k"><?= $L('Deine Anfrage', 'Your request') ?></p>
         <div class="amt" id="sumamt"><?= $h(forma_euro($single)) ?></div>
-        <div class="ln"><span><?= $L('Einheiten', 'Sessions') ?></span><span id="sumn">1 × 60 <?= $L('Min.', 'min') ?></span></div>
+        <div class="ln"><span><?= $L('Einheiten', 'Sessions') ?></span><span id="sumn">1 × <?= PTB_MINUTES ?> <?= $L('Min.', 'min') ?></span></div>
         <div class="ln"><span><?= $L('pro Einheit', 'per session') ?></span><span id="sumu"><?= $h(forma_euro($single)) ?></span></div>
+        <div class="ln"><span><?= $L('Personen', 'People') ?></span><span id="sump">1</span></div>
         <div class="ln"><span><?= $L('Termine gewählt', 'Times chosen') ?></span><span id="sumt">0 / 1</span></div>
         <button class="btn" type="button" id="send"><?= $L('Anfrage senden', 'Send request') ?></button>
         <p class="err" id="err" hidden></p>
@@ -383,6 +394,7 @@ footer summary{cursor:pointer}
         <details><summary><?= $L('Muss ich fit sein?', 'Do I need to be fit?') ?></summary><p><?= $L('Nein. Wir starten genau dort, wo du gerade stehst. Jede Übung passe ich an deinen Körper und deine Tagesform an.', 'No. We start exactly where you are. I adapt every exercise to your body and how you feel that day.') ?></p></details>
         <details><summary><?= $L('Was soll ich mitbringen?', 'What should I bring?') ?></summary><p><?= $L('Bequeme Kleidung und eine Flasche Wasser. Matten, Gewichte und alles andere liegen im Studio bereit.', 'Comfortable clothes and a bottle of water. Mats, weights and everything else are ready in the studio.') ?></p></details>
         <details><summary><?= $L('Geht das Training auch auf Englisch?', 'Can we train in English?') ?></summary><p><?= $L('Ja, sehr gern. Ich unterrichte auf Deutsch und auf Englisch.', 'Of course. I teach in both English and German.') ?></p></details>
+        <details><summary><?= $L('Können wir auch zu zweit kommen?', 'Can two of us come together?') ?></summary><p><?= $L('Ja, gern. Zu zweit kostet eine Einheit ' . $h(forma_euro($two)) . ' für euch beide. Ich stimme das Training auf euch beide ab, ihr müsst also nicht gleich fit sein.', 'Yes, of course. For two, a session costs ' . $h(forma_euro($two)) . ' for both of you. I tailor the training to each of you, so you don\'t need to be at the same level.') ?></p></details>
         <details><summary><?= $L('Wann bezahle ich?', 'When do I pay?') ?></summary><p><?= $L('Erst, wenn ich deine Termine bestätigt habe. Dann bezahlst du alle Einheiten auf einmal online, mit Karte, Apple Pay oder Google Pay. Die Rechnung kommt per E-Mail.', 'Only once I have confirmed your times. Then you pay for all sessions at once online, by card, Apple Pay or Google Pay. Your invoice arrives by email.') ?></p></details>
         <details><summary><?= $L('Und wenn mir etwas dazwischenkommt?', 'What if something comes up?') ?></summary><p><?= $L('Bis 24 Stunden vor einem Termin kannst du kostenlos verschieben oder absagen, dann bekommst du das Geld für diese Einheit zurück. Schreib mir einfach per WhatsApp oder E-Mail.', 'You can reschedule or cancel free of charge up to 24 hours before a session, and you will get the money for that session back. Just message me on WhatsApp or by email.') ?></p></details>
       </div>
@@ -444,7 +456,7 @@ footer summary{cursor:pointer}
   const tEn = t => { let [h, m] = t.split(':').map(Number); const ap = h < 12 ? 'am' : 'pm'; h = h % 12 || 12; return h + (m ? ':' + String(m).padStart(2, '0') : '') + ap; };
   const euro = c => '€ ' + (c % 100 ? (c / 100).toFixed(2).replace('.', ',') : String(c / 100));
   const mins = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
-  let N = 1, picks = [{}], act = 0;
+  let N = 1, P = 1, picks = [{}], act = 0;
   let view = new Date(CAL.min + 'T12:00:00'); view.setDate(1);
   const grid = document.getElementById('cal'), title = document.getElementById('calt'), box = document.getElementById('units');
 
@@ -454,9 +466,9 @@ footer summary{cursor:pointer}
     return CAL.days.includes(wd) && freeTimes(s, -1).length > 0;
   }
   function timeFree(s, t, except) {
-    const a = mins(t), b = a + 60;
+    const a = mins(t), b = a + CAL.minutes;
     for (const [x, y] of (CAL.busy[s] || [])) if (a < y + 15 && b > x - 15) return false;
-    for (let i = 0; i < picks.length; i++) { if (i === except || picks[i].date !== s || !picks[i].time) continue; const x = mins(picks[i].time); if (a < x + 60 && b > x) return false; }
+    for (let i = 0; i < picks.length; i++) { if (i === except || picks[i].date !== s || !picks[i].time) continue; const x = mins(picks[i].time); if (a < x + CAL.minutes && b > x) return false; }
     return true;
   }
   function freeTimes(s, except) { return CAL.times.filter(t => timeFree(s, t, except)); }
@@ -493,10 +505,11 @@ footer summary{cursor:pointer}
     });
     box.innerHTML = html;
     const done = picks.filter(p => p.date && p.time).length;
-    const pr = CAL.prices[N];
+    const pr = CAL.prices[P][N];
     document.getElementById('sumamt').textContent = euro(pr.total);
     document.getElementById('sumu').textContent = euro(pr.unit);
-    document.getElementById('sumn').innerHTML = N + ' × 60 ' + L('Min.', 'min');
+    document.getElementById('sumn').innerHTML = N + ' × ' + CAL.minutes + ' ' + L('Min.', 'min');
+    document.getElementById('sump').innerHTML = P === 2 ? L('2 · zu zweit', '2 · for two') : '1';
     document.getElementById('sumt').textContent = done + ' / ' + N;
   }
   function draw() { drawCal(); drawUnits(); }
@@ -526,7 +539,17 @@ footer summary{cursor:pointer}
     const open = picks.findIndex(p => !p.time); act = open >= 0 ? open : Math.min(act, N - 1);
     draw();
   }));
+  function drawPacks() {
+    document.querySelectorAll('#packs [data-solo]').forEach(e => e.hidden = P === 2);
+    for (let n = 1; n <= CAL.max_units; n++) {
+      const pr = CAL.prices[P][n];
+      const t = document.querySelector('#packs [data-total="' + n + '"]'); if (t) t.textContent = euro(pr.total);
+      const e = document.querySelector('#packs [data-each="' + n + '"]'); if (e && n > 1) e.innerHTML = L('je ' + euro(pr.unit), euro(pr.unit) + ' each');
+    }
+  }
+  document.querySelectorAll('input[name=persons]').forEach(r => r.addEventListener('change', () => { P = Number(r.value); drawPacks(); draw(); }));
   document.addEventListener('mvlang', draw);
+  drawPacks();
   draw();
 
   const send = document.getElementById('send'), err = document.getElementById('err');
@@ -542,7 +565,7 @@ footer summary{cursor:pointer}
     else if (!document.getElementById('consent').checked) msg = en() ? 'Please confirm the terms and privacy notice.' : 'Bitte bestätige die Bedingungen und den Datenschutz.';
     if (msg) { err.textContent = msg; err.hidden = false; return; }
     send.disabled = true; send.innerHTML = L('Wird gesendet …', 'Sending …');
-    const j = await post({action: 'request', units: N, wishes: JSON.stringify(done), name: v('name'), email: v('email'), phone: v('phone'), hotel: v('hotel'), note: v('note'), consent: '1', website: v('website'), t: loaded});
+    const j = await post({action: 'request', units: N, persons: P, wishes: JSON.stringify(done), name: v('name'), email: v('email'), phone: v('phone'), hotel: v('hotel'), note: v('note'), consent: '1', website: v('website'), t: loaded});
     if (j.ok && j.redirect) { location.href = j.redirect; return; }
     err.textContent = j.error || '…'; err.hidden = false; send.disabled = false; send.innerHTML = L('Anfrage senden', 'Send request');
   });

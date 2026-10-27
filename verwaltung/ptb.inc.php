@@ -90,7 +90,8 @@ if (str_starts_with((string)$action, 'mm_ptb_')) {
     if ($action === 'mm_ptb_settings') {
         $c = mm_cfg('ptb') ?? [];
         $u = mm_euro_in((string)($_POST['unit'] ?? '')); if ($u > 0) $c['unit'] = $u;
-        $du = mm_euro_in((string)($_POST['disc_unit'] ?? '')); if ($du > 0) $c['disc_unit'] = $du;
+        $u2 = mm_euro_in((string)($_POST['unit2'] ?? '')); if ($u2 > 0) $c['unit2'] = $u2;
+        $c['disc_unit'] = max(0, mm_euro_in((string)($_POST['disc_unit'] ?? '')));
         $c['disc_from'] = max(2, min(PTB_MAX_UNITS, (int)($_POST['disc_from'] ?? 4)));
         $c['weekdays'] = array_values(array_map('intval', array_intersect(array_keys(PTB_WD_DE), array_map('intval', (array)($_POST['weekdays'] ?? []))))) ?: [1, 2, 3, 4, 5, 6];
         foreach (['from', 'to'] as $k) if (preg_match('/^\d{1,2}:\d{2}$/', (string)($_POST[$k] ?? ''))) $c[$k] = str_pad((string)$_POST[$k], 5, '0', STR_PAD_LEFT);
@@ -108,7 +109,7 @@ if (str_starts_with((string)$action, 'mm_ptb_')) {
         go($tBack . '#einstellungen', $action === 'mm_ptb_block' ? 'Der Tag ist gesperrt, Gäste können ihn nicht mehr wählen.' : 'Der Tag ist wieder frei.');
     }
     if ($action === 'mm_ptb_test') {
-        $o2 = ptb_test_create($pdo, trim((string)($_POST['email'] ?? '')), (string)($_POST['lang'] ?? 'de'), (int)($_POST['n'] ?? 2));
+        $o2 = ptb_test_create($pdo, trim((string)($_POST['email'] ?? '')), (string)($_POST['lang'] ?? 'de'), (int)($_POST['n'] ?? 2), (int)($_POST['persons'] ?? 1));
         go($tBack . ($o2 ? '#t' . (int)$o2['id'] : '#test'), $o2 ? 'Die Test-Anfrage ist angelegt (E-Mail gilt als bestätigt). Probier jetzt „passt“ / anderer Termin und „An Gast schicken“ – die Mails gehen an ' . $o2['email'] . '.' : 'Bitte eine gültige E-Mail-Adresse angeben.');
     }
     if ($action === 'mm_ptb_delete' && $o && ((int)$o['is_test'] === 1 || in_array($o['status'], ['abgesagt', 'abgelaufen', 'email'], true))) {
@@ -181,7 +182,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
 </style>
         <p><a href="<?= forma_h($self) ?>?view=movecia">← Movecia</a> · <a href="<?= forma_h($self) ?>">FORMA</a></p>
         <?php mm_subnav('training'); ?>
-        <section class="nh"><p class="eyebrow">Movecia · 1:1 im Studio in Mathon</p><h1>Personal Training</h1><p>Anfragen von Hotelgästen bestätigen, Ersatztermine vorschlagen, alles im Kalender.</p></section>
+        <section class="nh"><p class="eyebrow">Movecia · allein oder zu zweit im Studio in Mathon</p><h1>Personal Training</h1><p>Anfragen von Hotelgästen bestätigen, Ersatztermine vorschlagen, alles im Kalender.</p></section>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <div class="ns">
             <a href="#anfragen" class="<?= $reqs ? 'hot' : '' ?>"><b><?= count($reqs) ?></b><span>neue Anfragen</span></a>
@@ -202,7 +203,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
         <div class="list">
         <?php foreach ($reqs as $o): $ss = ptb_sessions($pdo, (int)$o['id']); $act = array_filter($ss, fn($s) => $s['status'] !== 'gestrichen'); $open = array_filter($ss, fn($s) => $s['status'] === 'offen'); $n = count($act); ?>
             <div class="card rq" id="t<?= (int)$o['id'] ?>">
-                <div class="who"><span><b><?= forma_h($o['name']) ?></b><?php if ((int)$o['is_test']): ?> <span class="chip">TEST</span><?php endif; ?> <span class="chip"><?= ptb_en($o) ? 'Englisch' : 'Deutsch' ?></span><br>
+                <div class="who"><span><b><?= forma_h($o['name']) ?></b><?php if ((int)$o['is_test']): ?> <span class="chip">TEST</span><?php endif; ?> <span class="chip"><?= ptb_en($o) ? 'Englisch' : 'Deutsch' ?></span><?php if (ptb_persons($o) === 2): ?> <span class="chip" style="background:#E8D6CA;color:#4A3A41">zu zweit</span><?php endif; ?><br>
                     <span class="small muted"><?= $o['hotel'] !== '' ? forma_h($o['hotel']) . ' · ' : '' ?><a href="mailto:<?= forma_h($o['email']) ?>"><?= forma_h($o['email']) ?></a><?php if ($o['phone'] !== ''): ?> · <a href="tel:<?= forma_h($o['phone']) ?>"><?= forma_h($o['phone']) ?></a> · <a href="<?= forma_h($wa((string)$o['phone'])) ?>" target="_blank" rel="noopener">WhatsApp</a><?php endif; ?></span></span>
                     <span class="small muted">angefragt am <?= forma_h(date('d. m., H:i', strtotime((string)($o['email_ok_at'] ?: $o['created_at'])))) ?></span></div>
                 <?php if ($o['note'] !== ''): ?><p class="small" style="background:#F2ECE4;border-radius:12px;padding:8px 12px;margin:0">„<?= forma_h($o['note']) ?>“</p><?php endif; ?>
@@ -226,7 +227,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
                 <?php endforeach; ?>
                 <form method="post" class="stack"><?= $csrf ?><input type="hidden" name="action" value="mm_ptb_send"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>">
                     <label>Persönliche Zeile für die Mail (optional)</label><textarea name="note" rows="2" placeholder="<?= forma_h(ptb_en($o) ? 'e.g. I look forward to meeting you! Parking is right in front of the house.' : 'z. B. Ich freu mich auf dich! Parken kannst du direkt vor dem Haus.') ?>"></textarea>
-                    <button class="btn big" type="submit"<?= $open ? ' disabled' : '' ?>><?= $open ? 'Erst bei jeder Einheit „passt“ oder eine andere Zeit wählen' : 'An Gast schicken · ' . $n . ' × ' . forma_h(forma_euro(ptb_unit_cents($n))) . ' = ' . forma_h(forma_euro(ptb_unit_cents($n) * $n)) ?></button>
+                    <button class="btn big" type="submit"<?= $open ? ' disabled' : '' ?>><?= $open ? 'Erst bei jeder Einheit „passt“ oder eine andere Zeit wählen' : 'An Gast schicken · ' . $n . ' × ' . forma_h(forma_euro(ptb_unit_cents($n, ptb_persons($o)))) . ' = ' . forma_h(forma_euro(ptb_unit_cents($n, ptb_persons($o)) * $n)) ?></button>
                     <span class="small muted">Der Gast bekommt eine Mail mit allen Terminen (Vorschläge sind markiert) und dem Bezahl-Knopf. Erst nach der Zahlung sind die Termine fix.</span></form>
                 <details class="more"><summary>Geht gar nicht? Anfrage absagen</summary>
                     <form method="post" class="stack" style="margin-top:8px"><?= $csrf ?><input type="hidden" name="action" value="mm_ptb_decline"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>">
@@ -309,10 +310,15 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
         <h2 id="einstellungen">Preise &amp; Zeiten</h2>
         <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_ptb_settings">
             <div class="grid-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px">
-                <div class="stack"><label>Preis pro Einheit (€)</label><input type="text" inputmode="decimal" name="unit" value="<?= $eu($cfg['unit']) ?>"></div>
-                <div class="stack"><label>Günstiger ab … Einheiten</label><input type="number" name="disc_from" min="2" max="<?= PTB_MAX_UNITS ?>" value="<?= (int)$cfg['disc_from'] ?>"></div>
-                <div class="stack"><label>dann pro Einheit (€)</label><input type="text" inputmode="decimal" name="disc_unit" value="<?= $eu($cfg['disc_unit']) ?>"></div>
+                <div class="stack"><label>Preis pro Einheit allein (€)</label><input type="text" inputmode="decimal" name="unit" value="<?= $eu($cfg['unit']) ?>"></div>
+                <div class="stack"><label>Preis pro Einheit zu zweit (€)</label><input type="text" inputmode="decimal" name="unit2" value="<?= $eu($cfg['unit2']) ?>"></div>
             </div>
+            <p class="small muted">Eine Einheit dauert <?= PTB_MINUTES ?> Minuten.</p>
+            <details class="more"><summary>Mengenpreis (gerade <?= $cfg['disc_unit'] > 0 && $cfg['disc_unit'] < $cfg['unit'] ? 'an: ab ' . (int)$cfg['disc_from'] . ' Einheiten ' . forma_h(forma_euro($cfg['disc_unit'])) : 'aus' ?>)</summary>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:8px">
+                <div class="stack"><label>Günstiger ab … Einheiten</label><input type="number" name="disc_from" min="2" max="<?= PTB_MAX_UNITS ?>" value="<?= (int)$cfg['disc_from'] ?>"></div>
+                <div class="stack"><label>dann pro Einheit allein (€, leer = aus)</label><input type="text" inputmode="decimal" name="disc_unit" value="<?= $cfg['disc_unit'] > 0 ? $eu($cfg['disc_unit']) : '' ?>"></div>
+            </div></details>
             <label>An diesen Tagen können Gäste Termine wünschen</label>
             <div style="display:flex;flex-wrap:wrap;gap:6px 14px"><?php foreach (PTB_WD_DE as $k => $w): ?><label class="check"><input type="checkbox" name="weekdays[]" value="<?= $k ?>"<?= in_array($k, $cfg['weekdays'], true) ? ' checked' : '' ?>> <?= $w ?></label><?php endforeach; ?></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:380px">
@@ -330,6 +336,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px">
                 <div class="stack"><label>Mails an</label><input type="email" name="email" value="<?= forma_h(natal_notify_email()) ?>" required></div>
                 <div class="stack"><label>Sprache</label><select name="lang"><option value="de">Deutsch</option><option value="en">Englisch</option></select></div>
+                <div class="stack"><label>Personen</label><select name="persons"><option value="1">allein</option><option value="2">zu zweit</option></select></div>
                 <div class="stack"><label>Einheiten</label><select name="n"><?php for ($i = 1; $i <= PTB_MAX_UNITS; $i++): ?><option<?= $i === 2 ? ' selected' : '' ?>><?= $i ?></option><?php endfor; ?></select></div>
             </div>
             <button class="btn btn-ghost" type="submit">Test-Anfrage anlegen</button>

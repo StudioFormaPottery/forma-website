@@ -44,6 +44,7 @@ if ($action === 'request') {
     $hotel = forma_clean((string)($in['hotel'] ?? ''), 120);
     $note = trim(mb_substr(preg_replace("/[\x00-\x09\x0B-\x1F\x7F]/u", '', (string)($in['note'] ?? '')) ?? '', 0, 1000));
     $want = max(1, min(PTB_MAX_UNITS, (int)($in['units'] ?? 1)));
+    $persons = (int)($in['persons'] ?? 1) >= 2 ? 2 : 1;
     $wishes = ptb_clean_wishes($pdo, (string)($in['wishes'] ?? '[]'));
     $err = [];
     if (count($wishes) < $want) $err[] = $t('Bitte wähl für jede Einheit einen Tag und eine Uhrzeit. Eine Zeit ist inzwischen vielleicht schon vergeben, dann nimm bitte eine andere.', 'Please choose a day and a time for each session. One of the times may have just been taken, so please pick another.');
@@ -59,10 +60,10 @@ if ($action === 'request') {
     $tok = bin2hex(random_bytes(16));
     $pdo->exec('BEGIN IMMEDIATE');
     try {
-        $pdo->prepare("INSERT INTO mm_ptb_orders (units, unit_cents, amount_cents, name, email, phone, hotel, note, lang, status, token, email_token, ip_hash, consent_terms, created_at) VALUES (?,?,?,?,?,?,?,?,?, 'email', ?, ?, ?, 1, ?)")
-            ->execute([$want, ptb_unit_cents($want), ptb_unit_cents($want) * $want, $name, $email, $phone, $hotel, $note, $en ? 'en' : 'de', $tok, bin2hex(random_bytes(16)), $ipHash, date('c')]);
+        $pdo->prepare("INSERT INTO mm_ptb_orders (units, persons, unit_cents, amount_cents, name, email, phone, hotel, note, lang, status, token, email_token, ip_hash, consent_terms, created_at) VALUES (?,?,?,?,?,?,?,?,?,?, 'email', ?, ?, ?, 1, ?)")
+            ->execute([$want, $persons, ptb_unit_cents($want, $persons), ptb_unit_cents($want, $persons) * $want, $name, $email, $phone, $hotel, $note, $en ? 'en' : 'de', $tok, bin2hex(random_bytes(16)), $ipHash, date('c')]);
         $oid = (int)$pdo->lastInsertId();
-        $ins = $pdo->prepare("INSERT INTO mm_ptb_sessions (order_id, pos, wish_date, wish_time, date, start, status, created_at) VALUES (?,?,?,?,?,?, 'offen', ?)");
+        $ins = $pdo->prepare("INSERT INTO mm_ptb_sessions (order_id, pos, wish_date, wish_time, date, start, minutes, status, created_at) VALUES (?,?,?,?,?,?," . PTB_MINUTES . ", 'offen', ?)");
         foreach ($wishes as $i => $w) $ins->execute([$oid, $i, $w['date'], $w['time'], $w['date'], $w['time'], date('c')]);
         $pdo->exec('COMMIT');
     } catch (Throwable $e) {

@@ -10,14 +10,15 @@
 //  4. Gast bezahlt alles auf einmal über Stripe → Status „bezahlt“, Termine fix, Mail mit Kalenderdatei, Rechnung
 //  5. Eine Stunde nach der letzten Einheit: Bitte um eine Google-Bewertung (wartet, solange kein Bewertungslink hinterlegt ist)
 //
-// Preise: € 89 pro Einheit, ab 4 Einheiten € 85 pro Einheit (in der Verwaltung änderbar). Brutto inkl. 20 % USt.
+// Preise (Vivien, 27.10.2026): 75 Min., € 85 pro Einheit allein, € 140 pro Einheit zu zweit (in der Verwaltung änderbar,
+// dort auch ein optionaler Mengenpreis ab x Einheiten, Standard aus). Brutto inkl. 20 % USt.
 // Keine 14-Tage-Rücktrittsfrist (Freizeit-Dienstleistung zu fixem Termin, § 18 Abs. 1 Z 10 FAGG), dafür kulant:
 // bis 24 Std. vorher kostenlos verschieben oder absagen (Geld zurück).
 declare(strict_types=1);
 require_once __DIR__ . '/natal-lib.php';
 
 const PTB_MAX_UNITS = 4;
-const PTB_MINUTES = 60;
+const PTB_MINUTES = 75;
 const PTB_WD_DE = [1 => 'Mo', 2 => 'Di', 3 => 'Mi', 4 => 'Do', 5 => 'Fr', 6 => 'Sa', 7 => 'So'];
 const PTB_WD_EN = [1 => 'Mon', 2 => 'Tue', 3 => 'Wed', 4 => 'Thu', 5 => 'Fri', 6 => 'Sat', 7 => 'Sun'];
 const PTB_MON_EN = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -62,10 +63,12 @@ function ptb_schema(PDO $pdo): void
         wish_time TEXT NOT NULL,
         date TEXT NOT NULL,
         start TEXT NOT NULL,
-        minutes INTEGER NOT NULL DEFAULT 60,
+        minutes INTEGER NOT NULL DEFAULT 75,
         status TEXT NOT NULL DEFAULT \'offen\',
         created_at TEXT NOT NULL
     )');
+    $cols = array_column($pdo->query('PRAGMA table_info(mm_ptb_orders)')->fetchAll(), 'name');
+    if (!in_array('persons', $cols, true)) $pdo->exec('ALTER TABLE mm_ptb_orders ADD COLUMN persons INTEGER NOT NULL DEFAULT 1');
 }
 
 // --- Einstellungen -------------------------------------------------------------------------
@@ -75,9 +78,10 @@ function ptb_cfg(): array
 {
     $c = mm_cfg('ptb') ?? [];
     return [
-        'unit' => max(100, (int)($c['unit'] ?? 8900)),
+        'unit' => max(100, (int)($c['unit'] ?? 8500)),
+        'unit2' => max(100, (int)($c['unit2'] ?? 14000)),
         'disc_from' => max(2, min(PTB_MAX_UNITS, (int)($c['disc_from'] ?? 4))),
-        'disc_unit' => max(100, (int)($c['disc_unit'] ?? 8500)),
+        'disc_unit' => max(0, (int)($c['disc_unit'] ?? 0)),
         'weekdays' => array_values(array_filter(array_map('intval', (array)($c['weekdays'] ?? [1, 2, 3, 4, 5, 6])), fn($d) => $d >= 1 && $d <= 7)) ?: [1, 2, 3, 4, 5, 6],
         'from' => preg_match('/^\d{2}:\d{2}$/', (string)($c['from'] ?? '')) ? $c['from'] : '07:00',
         'to' => preg_match('/^\d{2}:\d{2}$/', (string)($c['to'] ?? '')) ? $c['to'] : '19:00',
@@ -85,22 +89,37 @@ function ptb_cfg(): array
     ];
 }
 
-/** Preis pro Einheit bei $n Einheiten (ab disc_from Einheiten der günstigere Preis). */
-function ptb_unit_cents(int $n): int
+/** Preis pro Einheit bei $n Einheiten für $p Personen (1 oder 2). Mengenpreis nur allein und nur, wenn eingestellt. */
+function ptb_unit_cents(int $n, int $p = 1): int
 {
     $c = ptb_cfg();
-    return $n >= $c['disc_from'] ? $c['disc_unit'] : $c['unit'];
+    if ($p >= 2) return $c['unit2'];
+    return $c['disc_unit'] > 0 && $c['disc_unit'] < $c['unit'] && $n >= $c['disc_from'] ? $c['disc_unit'] : $c['unit'];
 }
 
 /** Alle Preisstufen für die Seite: [n => [unit, total]]. */
-function ptb_price_table(): array
+function ptb_price_table(int $p = 1): array
 {
     $out = [];
-    for ($n = 1; $n <= PTB_MAX_UNITS; $n++) $out[$n] = ['unit' => ptb_unit_cents($n), 'total' => ptb_unit_cents($n) * $n];
+    for ($n = 1; $n <= PTB_MAX_UNITS; $n++) $out[$n] = ['unit' => ptb_unit_cents($n, $p), 'total' => ptb_unit_cents($n, $p) * $n];
     return $out;
 }
 
-/** Mögliche Startzeiten (halbstündlich), letzte Einheit endet spätestens zur Endzeit + 60 Min. */
+/** Personen einer Buchung (1 oder 2). */
+function ptb_persons(array $o): int
+{
+    return (int)($o['persons'] ?? 1) >= 2 ? 2 : 1;
+}
+
+/** „75 Min., 1:1“ bzw. „75 Min., zu zweit“. */
+function ptb_kind(array $o, bool $en, bool $long = false): string
+{
+    $two = ptb_persons($o) === 2;
+    if ($en) return PTB_MINUTES . ($long ? ' minutes' : ' min') . ', ' . ($two ? 'for two' : '1:1');
+    return PTB_MINUTES . ($long ? ' Minuten' : ' Min.') . ', ' . ($two ? 'zu zweit' : '1:1');
+}
+
+/** Mögliche Startzeiten (halbstündlich), letzte Einheit beginnt spätestens zur Endzeit. */
 function ptb_times(): array
 {
     $c = ptb_cfg();
@@ -365,7 +384,7 @@ function ptb_email_ok(PDO $pdo, string $tok): ?array
         : ptb_mail_guest($o, 'Deine Anfrage ist angekommen · Personal Training bei Movecia', 'Danke, ' . $first, ["Hallo $first,", 'deine E-Mail-Adresse ist bestätigt und deine Anfrage ist bei mir. Das sind deine Wunschtermine:', $lines, 'Ich schaue in meinen Kalender und melde mich so schnell wie möglich, meistens innerhalb eines Tages. Passt ein Termin nicht, schlage ich dir einen anderen vor. Bezahlen musst du erst, wenn deine Termine bestätigt sind.'], [ptb_link($o), 'Meine Anfrage ansehen']);
     $v = ['Neue Anfrage Personal Training:', [
         $o['name'] . ' · ' . $o['email'] . ($o['phone'] !== '' ? ' · ' . $o['phone'] : ''),
-        ($o['hotel'] !== '' ? 'Unterkunft: ' . $o['hotel'] . ' · ' : '') . 'Sprache: ' . ($en ? 'Englisch' : 'Deutsch'),
+        (ptb_persons($o) === 2 ? 'Zu zweit (2 Personen) · ' : 'Allein (1:1) · ') . ($o['hotel'] !== '' ? 'Unterkunft: ' . $o['hotel'] . ' · ' : '') . 'Sprache: ' . ($en ? 'Englisch' : 'Deutsch'),
     ], "Wunschtermine:\n– " . implode("\n– ", array_map(fn($s) => ptb_when((string)$s['wish_date'], (string)$s['wish_time']), ptb_sessions($pdo, (int)$o['id'])))];
     if ($o['note'] !== '') $v[] = 'Nachricht: ' . $o['note'];
     $v[] = 'In der Verwaltung tippst du bei jedem Termin auf „passt“ oder schlägst eine andere Zeit vor, dann „An Gast schicken“. Der Gast bezahlt danach online, erst dann sind die Termine fix.';
@@ -382,7 +401,7 @@ function ptb_offer_send(PDO $pdo, array $o, string $note = ''): array
     if (!$act) return ['ok' => false, 'error' => 'Es ist kein Termin mehr übrig. Sag die Anfrage lieber ab.'];
     if (array_filter($act, fn($s) => $s['status'] === 'offen')) return ['ok' => false, 'error' => 'Bitte tipp zuerst bei jedem Termin auf „passt“ oder trag eine andere Zeit ein.'];
     $n = count($act);
-    $unit = ptb_unit_cents($n);
+    $unit = ptb_unit_cents($n, ptb_persons($o));
     $pdo->prepare("UPDATE mm_ptb_orders SET status = 'angebot', units = ?, unit_cents = ?, amount_cents = ?, offer_note = ?, offered_at = ?, stripe_session = '' WHERE id = ?")
         ->execute([$n, $unit, $unit * $n, mb_substr($note, 0, 800), date('c'), $o['id']]);
     $o = ptb_order($pdo, (int)$o['id']);
@@ -390,7 +409,7 @@ function ptb_offer_send(PDO $pdo, array $o, string $note = ''): array
     $first = forma_first_name((string)$o['name']);
     $changed = (bool)array_filter($act, fn($s) => $s['status'] === 'vorschlag');
     $dropped = count($ss) - $n;
-    $box = array_merge(ptb_session_lines($ss, $en), ['', '**' . ($en ? $n . ($n === 1 ? ' session' : ' sessions') . ' × 60 min, 1:1 · ' . forma_euro($unit * $n) . ($n > 1 ? ' (' . forma_euro($unit) . ' each)' : '') : $n . ($n === 1 ? ' Einheit' : ' Einheiten') . ' à 60 Min., 1:1 · ' . forma_euro($unit * $n) . ($n > 1 ? ' (je ' . forma_euro($unit) . ')' : ''))]);
+    $box = array_merge(ptb_session_lines($ss, $en), ['', '**' . ($en ? $n . ($n === 1 ? ' session' : ' sessions') . ' × ' . ptb_kind($o, true) . ' · ' . forma_euro($unit * $n) . ($n > 1 ? ' (' . forma_euro($unit) . ' each)' : '') : $n . ($n === 1 ? ' Einheit' : ' Einheiten') . ' à ' . ptb_kind($o, false) . ' · ' . forma_euro($unit * $n) . ($n > 1 ? ' (je ' . forma_euro($unit) . ')' : ''))]);
     if ($en) {
         $p = ["Hi $first,", $changed ? "I've looked at your preferred times. Not all of them work for me, so I've suggested a different time where needed:" : 'good news: your times work for me!', $box];
         if ($dropped > 0) $p[] = "Unfortunately I couldn't fit in every session, so I've only listed the times that work.";
@@ -440,7 +459,7 @@ function ptb_checkout(PDO $pdo, array $o): string
         'line_items' => [[
             'quantity' => (int)$o['units'],
             'price_data' => ['currency' => 'eur', 'unit_amount' => (int)$o['unit_cents'], 'product_data' => [
-                'name' => 'Movecia · Personal Training 1:1 (60 Min.)',
+                'name' => 'Movecia · Personal Training ' . (ptb_persons($o) === 2 ? 'zu zweit' : '1:1') . ' (' . PTB_MINUTES . ' Min.)',
                 'description' => mb_substr($dates, 0, 480) . ' · Mathon',
             ]],
         ]],
@@ -505,7 +524,7 @@ function ptb_paid_mails(PDO $pdo, array $o): void
             'Mit der angehängten Kalenderdatei übernimmst du alle Termine mit einem Tipp in deinen Kalender. Die Rechnung bekommst du in einer eigenen E-Mail.',
             'Musst du etwas ändern? Bis 24 Stunden vor einem Termin kannst du kostenlos verschieben oder absagen. Antworte einfach auf diese Mail oder schreib mir auf WhatsApp (' . NATAL_COMPANY['phone'] . ').',
             'Ich freue mich auf dich!'], [ptb_link($o), 'Meine Termine'], $ics);
-    $v = ['Bezahlt und fix:', [$o['name'] . ' · ' . $o['email'] . ($o['phone'] !== '' ? ' · ' . $o['phone'] : ''), (int)$o['units'] . ' × 60 Min. · ' . forma_euro((int)$o['amount_cents']) . ' (online bezahlt)'],
+    $v = ['Bezahlt und fix:', [$o['name'] . ' · ' . $o['email'] . ($o['phone'] !== '' ? ' · ' . $o['phone'] : ''), (int)$o['units'] . ' × ' . ptb_kind($o, false) . ' · ' . forma_euro((int)$o['amount_cents']) . ' (online bezahlt)'],
         "Termine:\n– " . implode("\n– ", ptb_session_lines($ss, false, false))];
     natal_mail(natal_notify_email(), 'Bezahlt: Personal Training ' . $o['name'] . ' · ' . forma_euro((int)$o['amount_cents']), 'Gebucht und bezahlt', $v, [ptb_admin_link($o), 'In der Verwaltung'], [['Personal-Training-' . preg_replace('/\W+/', '-', (string)$o['name']) . '.ics', ptb_ics($ss, false, (string)$o['name']), 'text/calendar; charset=utf-8; method=PUBLISH']]);
 }
@@ -526,8 +545,8 @@ function ptb_move(PDO $pdo, int $sid, string $date, string $time, bool $mail): ?
         $first = forma_first_name((string)$o['name']);
         $ics = [['Movecia-Termin.ics', ptb_ics([$s + ['status' => 'bestaetigt']], $en), 'text/calendar; charset=utf-8; method=PUBLISH']];
         $en
-            ? ptb_mail_guest($o, 'New time: ' . ptb_when($date, $time, true), 'Your new time', ["Hi $first,", 'as agreed, your session is now on:', [ptb_when($date, $time, true), '60 minutes, 1:1 · Movecia Studio, Mathon'], 'The attached calendar file has the new time.'], [ptb_link($o), 'My sessions'], $ics)
-            : ptb_mail_guest($o, 'Neuer Termin: ' . ptb_when($date, $time), 'Dein neuer Termin', ["Hallo $first,", 'wie besprochen ist deine Einheit jetzt am:', [ptb_when($date, $time), '60 Minuten, 1:1 · Movecia Studio, Mathon'], 'In der angehängten Kalenderdatei steht die neue Zeit.'], [ptb_link($o), 'Meine Termine'], $ics);
+            ? ptb_mail_guest($o, 'New time: ' . ptb_when($date, $time, true), 'Your new time', ["Hi $first,", 'as agreed, your session is now on:', [ptb_when($date, $time, true), ucfirst(ptb_kind($o, true, true)) . ' · Movecia Studio, Mathon'], 'The attached calendar file has the new time.'], [ptb_link($o), 'My sessions'], $ics)
+            : ptb_mail_guest($o, 'Neuer Termin: ' . ptb_when($date, $time), 'Dein neuer Termin', ["Hallo $first,", 'wie besprochen ist deine Einheit jetzt am:', [ptb_when($date, $time), ptb_kind($o, false, true) . ' · Movecia Studio, Mathon'], 'In der angehängten Kalenderdatei steht die neue Zeit.'], [ptb_link($o), 'Meine Termine'], $ics);
     }
     return $s;
 }
@@ -546,7 +565,7 @@ function ptb_ics(array $sessions, bool $en = false, string $who = ''): string
         $to = (clone $from)->modify('+' . (int)$s['minutes'] . ' minutes');
         $out .= "BEGIN:VEVENT\r\nUID:ptb-{$s['id']}@moveciamovement.com\r\nDTSTAMP:" . $f(new DateTime('now', $tz)) . "\r\nDTSTART:" . $f($from) . "\r\nDTEND:" . $f($to) . "\r\n"
             . 'SUMMARY:' . $esc('Movecia · Personal Training' . ($who !== '' ? ' · ' . $who : '')) . "\r\nLOCATION:" . $esc('Movecia Studio, ' . NATAL_COMPANY['street'] . ', ' . NATAL_COMPANY['city'])
-            . "\r\nDESCRIPTION:" . $esc(($en ? '1:1 with Vivien. Comfortable clothes and a bottle of water. Questions: ' : '1:1 mit Vivien. Bequeme Kleidung und eine Flasche Wasser mitbringen. Bei Fragen: ') . NATAL_COMPANY['phone']) . "\r\nEND:VEVENT\r\n";
+            . "\r\nDESCRIPTION:" . $esc(($en ? 'With Vivien. Comfortable clothes and a bottle of water. Questions: ' : 'Mit Vivien. Bequeme Kleidung und eine Flasche Wasser mitbringen. Bei Fragen: ') . NATAL_COMPANY['phone']) . "\r\nEND:VEVENT\r\n";
     }
     return $out . "END:VCALENDAR\r\n";
 }
@@ -605,7 +624,7 @@ function ptb_invoice_source(PDO $pdo, int $id): ?array
     $units = (int)$o['units'];
     return ['name' => $o['name'], 'email' => $o['email'], 'session' => (string)$o['stripe_session'],
         'service' => $ss ? implode(', ', array_unique(array_map(fn($s) => date('d.m.Y', strtotime((string)$s['date'])), $ss))) : 'laut Terminvereinbarung',
-        'items' => [['text' => 'Personal Training 1:1', 'detail' => ($units === 1 ? '1 Einheit' : $units . ' Einheiten') . ' à 60 Min. im Movecia Studio, Mathon · ' . $dates, 'qty' => $units, 'unit' => (int)$o['unit_cents']]],
+        'items' => [['text' => 'Personal Training ' . (ptb_persons($o) === 2 ? 'zu zweit (2 Personen)' : '1:1'), 'detail' => ($units === 1 ? '1 Einheit' : $units . ' Einheiten') . ' à ' . PTB_MINUTES . ' Min. im Movecia Studio, Mathon · ' . $dates, 'qty' => $units, 'unit' => (int)$o['unit_cents']]],
         'gross' => (int)$o['amount_cents'], 'paid' => $o['paid_at'], 'type' => 'Movecia',
         'pay_note' => 'Der Betrag wurde am ' . date('d.m.Y', strtotime((string)$o['paid_at'])) . ' online bezahlt (Kartenzahlung über Stripe, gemeinsames Konto FORMA & Movecia). Buchungsvermerk: Leistung von Movecia – Personal Fitness.'];
 }
@@ -613,16 +632,16 @@ function ptb_invoice_source(PDO $pdo, int $id): ?array
 // --- Testbuchung (Verwaltung → Personal Training → „Als Gast testen“) -----------------------
 
 /** Legt eine Test-Anfrage an, die gleich als bestätigte E-Mail gilt. Mails gehen an $email. */
-function ptb_test_create(PDO $pdo, string $email, string $lang, int $n): ?array
+function ptb_test_create(PDO $pdo, string $email, string $lang, int $n, int $persons = 1): ?array
 {
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return null;
     $n = max(1, min(PTB_MAX_UNITS, $n));
     $tok = bin2hex(random_bytes(16));
-    $pdo->prepare("INSERT INTO mm_ptb_orders (name, email, phone, hotel, note, lang, status, token, email_token, ip_hash, consent_terms, is_test, created_at) VALUES (?,?,?,?,?,?, 'email', ?, ?, '', 1, 1, ?)")
-        ->execute([$lang === 'en' ? 'Test Guest' : 'Test Gast', $email, '', 'Testhotel', 'TEST', $lang === 'en' ? 'en' : 'de', $tok, bin2hex(random_bytes(16)), date('c')]);
+    $pdo->prepare("INSERT INTO mm_ptb_orders (persons, name, email, phone, hotel, note, lang, status, token, email_token, ip_hash, consent_terms, is_test, created_at) VALUES (?,?,?,?,?,?,?, 'email', ?, ?, '', 1, 1, ?)")
+        ->execute([$persons >= 2 ? 2 : 1, $lang === 'en' ? 'Test Guest' : 'Test Gast', $email, '', 'Testhotel', 'TEST', $lang === 'en' ? 'en' : 'de', $tok, bin2hex(random_bytes(16)), date('c')]);
     $oid = (int)$pdo->lastInsertId();
     $times = ptb_times();
-    $ins = $pdo->prepare("INSERT INTO mm_ptb_sessions (order_id, pos, wish_date, wish_time, date, start, status, created_at) VALUES (?,?,?,?,?,?, 'offen', ?)");
+    $ins = $pdo->prepare("INSERT INTO mm_ptb_sessions (order_id, pos, wish_date, wish_time, date, start, minutes, status, created_at) VALUES (?,?,?,?,?,?," . PTB_MINUTES . ", 'offen', ?)");
     for ($i = 0; $i < $n; $i++) {
         $d = date('Y-m-d', strtotime('+' . (2 + $i) . ' days'));
         $t = $times[min(count($times) - 1, 4 + $i * 2)];
