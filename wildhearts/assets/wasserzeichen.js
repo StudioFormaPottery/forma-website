@@ -42,7 +42,7 @@
       box = document.createElement('div'); box.className = 'mvnfd'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true');
     }
     box.innerHTML = '<div><img src="/img/movecia/movecia-zeichen.svg" alt=""><h2>' + (en ? (nm ? 'Dear ' + nm + ',' : 'Hi lovely,') : (nm ? 'Liebe ' + nm + ',' : 'Hallo, meine Liebe,')) + '</h2><p>' +
-      (en ? 'this content is meant just for you, so it can’t be shared or recorded. Thank you for keeping it a protected space.' : 'dieser Inhalt ist nur für dich bestimmt und kann deshalb nicht geteilt oder aufgenommen werden. Danke, dass du ihn als geschützten Raum bewahrst.') +
+      (en ? 'this content is meant just for you, so it can’t be shared or recorded. Thank you for keeping it a protected space.' : 'dieser Inhalt ist nur für dich bestimmt und kann deshalb nicht geteilt oder aufgenommen werden. Danke, dass du ihn für dich behältst.') +
       '</p><p class="aff">' + aff + ' ♡</p><button type="button">' + (en ? 'Back to me' : 'Zurück zu mir') + '</button></div>';
     document.body.appendChild(box);
     document.querySelectorAll('video').forEach(function (v) { try { if (v.controls) v.pause(); } catch (e) {} });

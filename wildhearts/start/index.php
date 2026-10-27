@@ -72,7 +72,7 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
 
 <section class="w sec" id="angebote"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">So begleite ich dich</span><span class="en">Ways to move with me</span></p><h2 style="margin-top:.6rem"><span class="de">Für jeden <em>Moment</em> deines Lebens</span><span class="en">For every <em>season</em> of your life</span></h2></div>
-    <p><span class="de">Ob du jeden Tag ein paar ruhige Minuten für dich suchst, eine Begleitung über drei Monate oder Unterstützung rund um die Geburt: Hier findest du deinen Weg.</span><span class="en">Whether you are looking for a few quiet minutes every day, three months of guidance or support around birth, you will find your way here.</span></p></div>
+    <p><span class="de">Ob du jeden Tag ein paar ruhige Minuten für dich suchst, eine Begleitung über drei Monate oder Unterstützung rund um die Geburt: Hier findest du deinen Weg.</span><span class="en">Whether you are looking for a few quiet minutes every day, three months of guidance or support around the birth of your baby, you will find your way here.</span></p></div>
   <div class="offers">
     <a class="offer o-method rv" href="/method/"><span class="onum">01</span><div class="art"><img src="/img/movecia/fotos/ev-method-foto.jpg?v=3" alt="" loading="lazy"></div><?= mv_icons(['sonne','blatt','welle'], 'ico', 0) ?><div class="tx">
       <p class="k">On demand</p><h3>Mindful Movement Method</h3>

@@ -490,7 +490,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
       <p class="k"><?= $h($hello) ?>, <?= $h($first) ?></p>
       <h1 class="h"><?= $week > 0 ? sprintf($L('Diese Woche warst du %s bei dir.', 'This week you showed up for yourself %s.'), '<em>' . $week . '×</em>') : $L('Schön, dass du da bist.', 'So lovely to have you here.') ?></h1>
       <div class="week" aria-label="<?= $h($L('Tage diese Woche', 'Days this week')) ?>"><?php $dow = (int)$now->format('N'); for ($i = 1; $i <= 7; $i++): ?><span class="<?= $i <= $week ? 'on' : '' ?><?= $i === $dow ? ' today' : '' ?>"><?= ($lang === 'en' ? ['', 'M', 'T', 'W', 'T', 'F', 'S', 'S'] : ['', 'M', 'D', 'M', 'D', 'F', 'S', 'S'])[$i] ?></span><?php endfor; ?></div>
-      <p class="mut small"><?= $L('Kein Streak, kein Druck. Jeder Tag, an dem du dir Zeit schenkst, zählt.', 'No streaks, no pressure. Every day you give yourself time counts.') ?></p>
+      <p class="mut small"><?= $L('Kein Druck und keine Pflicht, jeden Tag dabei zu sein. Jeder Tag, an dem du dir Zeit schenkst, zählt.', 'No streaks, no pressure. Every day you give yourself time counts.') ?></p>
     </div>
     <?php if ($prelaunch): ?><div class="soon card"><p class="k"><?= $L('Bald', 'Soon') ?></p><h3><?= $L('Die Method öffnet am', 'The Method opens on') ?> <?= $h(mv_date($launch, $lang)) ?></h3><p class="mut small"><?= $L('Bis dahin kannst du mit dem Ankommen-Modul beginnen.', 'Until then you can begin with the welcome module.') ?></p><p class="count" data-t="<?= $launch ?>"></p></div>
     <?php elseif ($path && $path['current'] && isset($all[$path['current']])): $cl = $all[$path['current']]; ?><a class="soon card cur" href="?l=<?= (int)$path['current'] . $q ?>"> <p class="k"><?= (int)$path['current'] === (int)$path['start'] ? $L('Starte hier', 'Start here') : $L('Heute dran', 'Up today') ?> · <?= (int)$cl['p']['_n'] ? $L('Monat ', 'Month ') . (int)$cl['p']['_n'] : $L('Ankommen', 'Welcome') ?></p><h3><?= $h(mv_t($cl['l'], 'title', $lang)) ?></h3><p class="mut small"><?= (int)$path['current'] === (int)$path['start'] ? $L('Hier erkläre ich dir, wie die Method aufgebaut ist. Die drei Videos zum Ankommen sind schon alle für dich offen.', 'Here I explain how the Method works. All three welcome videos are already open for you.') : $L('Schritt für Schritt: Sobald du dieses Video ganz gemacht hast, öffnet sich das nächste.', 'Step by step: as soon as you have done this video all the way through, the next one opens.') ?></p><span class="btn sm">▶ <?= $L('Jetzt starten', 'Start now') ?></span></a>
@@ -539,7 +539,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
   document.querySelectorAll('form[data-ajax]').forEach(function(f){f.addEventListener('submit',function(ev){ev.preventDefault();
     var d=new FormData(f);d.append('ajax','1');var k=f.dataset.ajax,b=f.querySelector('button');
     fetch(location.pathname,{method:'POST',body:d,credentials:'same-origin'}).then(function(r){return r.json()}).then(function(j){
-      if(k==='done'){b.textContent=document.documentElement.dataset.l==='en'?'Lovely, you showed up ✓':'Schön, du warst bei dir ✓';}
+      if(k==='done'){b.textContent=document.documentElement.dataset.l==='en'?'Lovely, you showed up for yourself ✓':'Schön, dass du dir die Zeit genommen hast ✓';}
       if(k==='fav'){b.setAttribute('aria-pressed',j.on?'true':'false');b.querySelector('span').textContent=j.on?(document.documentElement.dataset.l==='en'?'Saved':'Gemerkt'):(document.documentElement.dataset.l==='en'?'Save':'Merken');}
       if(k==='journal'){var s=f.querySelector('.saved');s.textContent=document.documentElement.dataset.l==='en'?'Saved':'Gespeichert';setTimeout(function(){s.textContent=''},2500);}
     }).catch(function(){f.submit();});});});
@@ -551,7 +551,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
   // Erledigt wird nur, wer bis zum Ende dabei war (Vivien, 26.10.2026): Player-Ende oder Video bis zum Schluss
   var en=document.documentElement.dataset.l==='en',sent=false;
   function markDone(lid){if(sent||!lid)return;sent=true;var d=new FormData();d.append('a','done');d.append('l',lid);d.append('ajax','1');
-    fetch(location.pathname,{method:'POST',body:d,credentials:'same-origin'}).then(function(){var p=document.querySelector('[data-autodone]');if(p){p.className='autodone note';p.textContent=en?'✓ Lovely, you showed up for yourself. You have unlocked your next video. See you tomorrow ♡':'✓ Schön, du warst bei dir. Du hast dein nächstes Video freigeschaltet. Wir sehen uns morgen ♡';}}).catch(function(){sent=false});}
+    fetch(location.pathname,{method:'POST',body:d,credentials:'same-origin'}).then(function(){var p=document.querySelector('[data-autodone]');if(p){p.className='autodone note';p.textContent=en?'✓ Lovely, you showed up for yourself. You have unlocked your next video. See you tomorrow ♡':'✓ Schön, dass du dir die Zeit genommen hast. Du hast dein nächstes Video freigeschaltet. Wir sehen uns morgen ♡';}}).catch(function(){sent=false});}
   var fl=document.querySelector('[data-mv-flow]');if(fl)fl.addEventListener('mvflow:done',function(){markDone(fl.dataset.l)});
   var gv=document.querySelector('iframe[data-guard]');
   if(gv){var s=document.createElement('script');s.src='https://assets.mediadelivery.net/playerjs/player-0.1.0.min.js';s.onload=function(){try{

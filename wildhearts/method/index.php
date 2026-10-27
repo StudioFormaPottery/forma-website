@@ -50,8 +50,8 @@ mvl_head('Mindful Movement Method · Online Yoga, Somatic Movement & Breathwork 
 
 <section class="band"><div class="w"><div class="in">
   <p class="k"><span class="de">So funktioniert es</span><span class="en">How it works</span></p>
-  <blockquote><span class="de">Keine Serie, die du halten musst, kein Druck. Jeder Tag, an dem du dir Zeit schenkst, zählt.</span><span class="en">No streaks, no pressure. Every day you give yourself time counts.</span></blockquote>
-  <p class="after"><span class="de">Jede startet bei Monat 1, ganz egal, wann sie dazukommt. Dein nächster Monat öffnet sich genau an deinem Starttag im Folgemonat, mit neuen Videos und einem Workbook. So weißt du immer, wo du gerade bist und was als Nächstes kommt, und musst dich nie durch eine riesige Bibliothek kämpfen.</span><span class="en">Everyone starts with month 1, no matter when they join. Your next month opens exactly on your start day the following month, with new videos and a workbook. So you always know where you are and what comes next, and you never have to dig through a huge library.</span></p>
+  <blockquote><span class="de">Kein Druck und keine Pflicht, jeden Tag dabei zu sein. Jeder Tag, an dem du dir Zeit schenkst, zählt.</span><span class="en">No streaks, no pressure. Every day you give yourself time counts.</span></blockquote>
+  <p class="after"><span class="de">Jede startet bei Monat 1, ganz egal, wann sie dazukommt. Dein nächster Monat öffnet sich genau an deinem Starttag im Folgemonat, mit neuen Videos und einem Workbook. So weißt du immer, wo du gerade bist und was als Nächstes kommt, und musst dich nie durch eine riesige Bibliothek kämpfen.</span><span class="en">Everyone starts at month 1, no matter when they join. Your next month opens exactly on your start day the following month, with new videos and a workbook. So you always know where you are and what comes next, and you never have to dig through a huge library.</span></p>
 </div></div></section>
 
 <section class="w sec" id="buchen"><div class="in">
