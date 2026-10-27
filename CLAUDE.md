@@ -378,3 +378,9 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Musikkarte: Musikdienste als helle Felder mit Farbpunkt, Lieblings-Playlists als Karten, „Einfügen“ aus der Zwischenablage, Spotify als schmaler Player (80 px).
 - Mitgliederbereich: Flow-/Bewegungs-Lektionen einspaltig (`.lesson.flowl`), Beispielansicht zeigt den Player auch mit fehlenden Clips (Platzhalter, „weiter“ nur in der Vorschau). Geräteprüfung (`geraet.js`) nie in der Beispielansicht, sonst lädt die Seite ständig neu.
 - Mediathek ist nur Verwaltung, nicht unter „Als Teilnehmerin“.
+
+## Movecia · Handschrift (Vivien, 27.10.2026: „ich will das nicht jedes Mal extra sagen müssen“)
+- Alles für Movecia (Website, Workbooks, Templates, Pins, Werbung, Mails) immer von selbst cute, ästhetisch, modern und professionell, mit einer durchgehenden, wiedererkennbaren Movecia-Handschrift: Pflaume/Beige/Blush/Pfirsich, Cormorant + Hanken, fließende Wellen, Kiesel-Zeichen, Themen-Icons, weiche Formen. Nur die neuen generierten Fotos (Studio unterm Dachstuhl, cremefarbene Outfits).
+- Vivien findet die Seite insgesamt noch etwas altmodisch: lieber frischer und verspielter (bewegte Wellen, Blobs, Icons) als streng-klassisch.
+- Hauptseite oben (27.10.2026): `.hw` in `wildhearts/start/index.php` + `site.css` = drei driftende Wellen, feine Pflaume-Linien, atmender Kiesel, schwebende Punkte; am Handy Kiesel klein neben „Bewegung beginnt bei dir.“
+- Jede Website-Änderung am Handy (390 px) und am Computer prüfen: nichts verschoben, kein seitliches Scrollen.
