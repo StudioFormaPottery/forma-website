@@ -97,7 +97,7 @@ section{padding-block:clamp(3.2rem,7vw,6rem)}
 .facts span b{font-family:var(--serif);font-weight:500;font-size:1.15rem;color:var(--plum)}
 .cta{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:2rem}
 .hv{position:relative;justify-self:center;width:min(100%,460px);margin:0;padding:0 0 16% 0}
-.hv img{position:relative;display:block;width:82%;margin-left:12%;aspect-ratio:3/4;object-fit:cover;object-position:31% 50%;border-radius:240px 240px 24px 24px}
+.hv img{position:relative;display:block;width:82%;height:auto;margin-left:12%;aspect-ratio:3/4;object-fit:cover;object-position:50% 85%;border-radius:240px 240px 24px 24px}
 .hv .b1{position:absolute;inset:6% 0 20% 2%;background:var(--blush)}
 .hv .b3{position:absolute;width:22%;aspect-ratio:1;left:0;top:4%;background:var(--peach);border-radius:50%}
 .hv .q{position:absolute;left:0;right:12%;bottom:0;background:rgba(251,248,244,.96);border-radius:20px;padding:1rem 1.2rem;font-family:var(--serif);font-size:clamp(1.2rem,2vw,1.5rem);line-height:1.25;color:var(--ink);box-shadow:0 14px 30px -20px rgba(74,58,65,.5)}
@@ -116,6 +116,7 @@ section{padding-block:clamp(3.2rem,7vw,6rem)}
 .card .ic svg{width:22px;height:22px;stroke:var(--plum)}
 .card h3{font-size:1.5rem;margin-bottom:.5rem}
 .card p{color:var(--muted);font-size:.95rem}
+.pics{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.pics figure{margin:0;border-radius:24px;overflow:hidden;aspect-ratio:4/5;background:var(--peach)}.pics img{display:block;width:100%;height:100%;object-fit:cover}@media(min-width:1000px){.pics figure{aspect-ratio:16/11}.pics figure:first-child img{object-position:50% 60%}.pics figure:last-child img{object-position:50% 72%}}
 .wide-pic{margin:16px 0 0;border-radius:24px;overflow:hidden;aspect-ratio:21/8;background:var(--peach)}.wide-pic img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 60%}@media(max-width:700px){.wide-pic{aspect-ratio:4/3}}
 .steps{display:grid;gap:14px;margin-top:2.4rem;counter-reset:s}
 @media(min-width:900px){.steps{grid-template-columns:repeat(4,1fr)}}
@@ -297,7 +298,7 @@ footer summary{cursor:pointer}
       <div class="facts"><span><b>60</b> <?= $L('Minuten, 1:1', 'minutes, 1:1') ?></span><span><b><?= $h(forma_euro($single)) ?></b> <?= $L('pro Einheit', 'per session') ?></span><span><?= $L('ab ' . PTB_MAX_UNITS . ' Einheiten <b>' . $h(forma_euro($disc)) . '</b>', 'from ' . PTB_MAX_UNITS . ' sessions <b>' . $h(forma_euro($disc)) . '</b>') ?></span></div>
       <div class="cta"><a class="btn" href="#buchen"><?= $L('Wunschtermin wählen', 'Choose your time') ?></a><a class="btn line" href="#so"><?= $L('So läuft es ab', 'How it works') ?></a></div>
     </div>
-    <figure class="hv"><div class="b1 blob"></div><div class="b3"></div><img src="/img/movecia/fotos/reach.jpg" alt="<?= $h('Vivien im Movecia Studio in Mathon') ?>" width="1320" height="810" fetchpriority="high"><div class="q"><span class="de">„Du musst nichts können. Du darfst einfach ankommen.“</span><span class="en">“You don't need to be good at anything. Just come as you are.”</span><small>Vivien · Movecia</small></div></figure>
+    <figure class="hv"><div class="b1 blob"></div><div class="b3"></div><img src="/img/movecia/fotos/pt-baum.jpg" alt="<?= $h('Vivien im Movecia Studio') ?>" width="940" height="1400" fetchpriority="high"><div class="q"><span class="de">„Du musst nichts können. Du darfst einfach ankommen.“</span><span class="en">“You don't need to be good at anything. Just come as you are.”</span><small>Vivien · Movecia</small></div></figure>
   </section>
 
   <div class="mq" aria-hidden="true"><div class="mq-in"><?php for ($i = 0; $i < 2; $i++): ?><span class="de">Mobilität</span><span class="en">Mobility</span><span class="de">Kraft</span><span class="en">Strength</span><span class="de">Atem</span><span class="en">Breath</span><span class="de">Entspannung</span><span class="en">Relaxation</span><span class="de">Bewegung beginnt bei dir</span><span class="en">Movement begins with you</span><?php endfor; ?></div></div>
@@ -311,7 +312,7 @@ footer summary{cursor:pointer}
       <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round"><path d="M3 12c3-4 6-4 9 0s6 4 9 0"/><path d="M3 17c3-4 6-4 9 0s6 4 9 0" opacity=".5"/></svg></div><h3><?= $L('Atem und Entspannung', 'Breath and relaxation') ?></h3><p><?= $L('Runterkommen, durchatmen und den Kopf frei bekommen. Auch im Urlaub braucht das Nervensystem Pausen.', 'Slow down, breathe deeply and clear your head. Your nervous system needs a break on holiday too.') ?></p></div>
       <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="7" r="3"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg></div><h3><?= $L('Für jedes Level', 'For every level') ?></h3><p><?= $L('Egal, ob du lange nichts gemacht hast oder regelmäßig trainierst. Ich passe jede Übung an dich an.', "Whether you haven't exercised in a while or train regularly, I adapt every exercise to you.") ?></p></div>
     </div>
-    <figure class="wide-pic"><img src="/img/movecia/fotos/fold.jpg" alt="" width="1320" height="777" loading="lazy"></figure>
+    <div class="pics"><figure><img src="/img/movecia/fotos/pt-kamel.jpg" alt="" width="940" height="1400" loading="lazy"></figure><figure><img src="/img/movecia/fotos/pt-kind.jpg" alt="" width="940" height="1400" loading="lazy"></figure></div>
   </section>
 
   <section class="w" id="so" style="padding-top:0">
