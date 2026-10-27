@@ -2,7 +2,7 @@
  "key": "reset",
  "lang": "de",
  "eyebrow": "Mein Geschenk für dich · 10 Minuten",
- "title": "Reset-Routine für müde Tage",
+ "title": "Reset-Routine\nfür müde Tage",
  "subtitle": "für die Abende, an denen du alles gegeben hast",
  "icon": "kerze",
  "letter": [
@@ -177,6 +177,11 @@
      "text": "Sag es laut, bevor du einschläfst, oder schreib es auf einen Zettel für deinen Spiegel."
     },
     {
+     "t": "photo",
+     "src": "img/movecia/fotos/ev-ueber-mich.jpg",
+     "caption": "so bin ich ♡"
+    },
+    {
      "t": "h",
      "text": "Liebes wildes Herz,"
     },
@@ -196,5 +201,6 @@
    ]
   }
  ],
- "closing": "Wir sind wichtig. Wir sind da. Und wir werden gesehen."
+ "closing": "Wir sind wichtig. Wir sind da. Und wir werden gesehen.",
+ "photo": "img/movecia/fotos/ev-unfold-karte.jpg"
 }

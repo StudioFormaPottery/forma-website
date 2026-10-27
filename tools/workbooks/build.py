@@ -59,6 +59,15 @@ h1,h2,h3,h4{font-family:"Cormorant",serif;font-weight:500;margin:0;line-height:1
 .cover .logo{position:absolute;top:16mm;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:2mm;font-family:"Cormorant";font-size:16pt;color:var(--plum)}
 .cover .logo img{width:7mm;height:7mm}
 .cover .big svg{width:52mm;height:52mm}
+.cover.ph{justify-content:flex-start;padding-top:38mm}
+.cover .arch{position:relative;width:96mm;height:118mm;margin:0 auto}
+.cover .arch::before{content:"";position:absolute;inset:-7mm -12mm 4mm -4mm;background:var(--peach);border-radius:58% 42% 52% 48%/50% 56% 44% 50%;transform:rotate(-6deg)}
+.cover .arch::after{content:"";position:absolute;inset:-5mm -3mm -4mm -6mm;border:1.3px solid var(--plum);border-radius:50mm 50mm 10mm 10mm;transform:rotate(3deg);opacity:.6}
+.cover .arch img{position:relative;width:100%;height:100%;object-fit:cover;border-radius:48mm 48mm 8mm 8mm}
+.cover .arch .ic{position:absolute;right:-9mm;bottom:-6mm;width:24mm;height:24mm;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;z-index:2}
+.cover .arch .ic svg{width:15mm;height:15mm}
+.cover.ph .tape{margin-top:12mm}
+.cover.ph h1{font-size:38pt}
 .cover .tape{display:inline-block;margin:9mm 0 3mm;background:#fff;padding:1.6mm 5mm;font-size:8pt;letter-spacing:.16em;text-transform:uppercase;color:var(--plum);font-weight:600;transform:rotate(-2deg);border-radius:1mm}
 .cover h1{font-size:46pt;line-height:.98;max-width:150mm}
 .cover .sub{font-family:"Cormorant";font-style:italic;font-size:17pt;color:var(--plum);margin-top:3mm;max-width:130mm}
@@ -146,6 +155,9 @@ table.t td+td,table.t th+th{border-left:1px solid var(--line)}
 .recipe ul,.recipe ol{margin:0;padding-left:4.6mm;font-size:9.2pt}
 .recipe .note{font-family:"Cormorant";font-style:italic;font-size:11.5pt;color:var(--muted);margin-top:2mm}
 .notes{margin-top:4mm}
+.phot{margin:5mm auto;width:72mm;text-align:center;break-inside:avoid}
+.phot img{width:72mm;height:86mm;object-fit:cover;border-radius:36mm 36mm 6mm 6mm;border:2.4mm solid var(--bg)}
+.phot figcaption{font-family:"Hand";font-size:9pt;color:var(--plum);margin-top:2mm}
 /* Prä-/Postnatal-Übungen */
 .nex{display:flex;gap:4mm;padding:3.6mm 0;border-top:1.2px dashed var(--line);break-inside:avoid}
 .nex:first-of-type{border-top:0}
@@ -246,6 +258,9 @@ def block(b, L):
                 + (f'<p class="note">{e(b["note"])}</p>' if b.get('note') else '') + '</div>')
     if t == 'notes':
         return f'<div class="notes prompts"><h4>{icon("journal", 26)}{e(b.get("title") or L["notes"])}</h4>{lines(int(b.get("lines") or 6))}</div>'
+    if t == 'photo':
+        return (f'<figure class="phot"><img src="file://{os.path.join(ROOT, b["src"])}">'
+                + (f'<figcaption>{e(b["caption"])}</figcaption>' if b.get('caption') else '') + '</figure>')
     if t == 'pagebreak':
         return '<div style="break-after:page"></div>'
     # interne Blöcke für Prä-/Postnatal
@@ -273,9 +288,11 @@ def chapter(c, L):
 def render(wb, cover_svg=None, merk=None):
     L = T[wb.get('lang', 'de')]
     big = cover_svg or icon(wb.get('icon', 'stern'), 150)
-    cov = (f'<section class="cover"><span class="blob1"></span><span class="blob3"></span><span class="blob2"></span><span class="ring"></span>'
+    if wb.get('photo'):
+        big = f'<div class="arch"><img src="file://{os.path.join(ROOT, wb["photo"])}"><span class="ic">{icon(wb.get("icon", "stern"), 60)}</span></div>'
+    cov = (f'<section class="cover{" ph" if wb.get("photo") else ""}"><span class="blob1"></span><span class="blob3"></span><span class="blob2"></span><span class="ring"></span>'
            f'<div class="logo"><img src="{LOGO}">Movecia</div><span class="sp" style="left:34mm;top:60mm">✦</span><span class="sp" style="right:40mm;top:52mm;color:#D9B8B4;font-size:18pt">✧</span><span class="sp" style="right:52mm;top:128mm;color:#D9B8B4">♡</span>'
-           f'<div class="big">{big}</div><p class="tape">{e(wb.get("eyebrow"))}</p><h1>{e(wb["title"])}</h1>'
+           f'<div class="big">{big}</div><p class="tape">{e(wb.get("eyebrow"))}</p><h1>{e(wb["title"]).replace(chr(10), "<br>")}</h1>'
            + (f'<p class="sub">{e(wb["subtitle"])}</p>' if wb.get('subtitle') else '')
            + (f'<div class="merkbox"><p class="k">{L["merk"]}</p><ul>' + ''.join(f'<li>{icon("merk", 20)}<span>{e(m)}</span></li>' for m in merk) + '</ul></div>' if merk else '')
            + f'<p class="for">{L["for_"]} <span></span></p></section>')
@@ -321,7 +338,7 @@ def natal_books():
 def pdf(docs, path):
     from playwright.sync_api import sync_playwright
     cover, body = docs
-    title = re.search(r'<title>(.*?)</title>', body).group(1)
+    title = re.search(r'<title>(.*?)</title>', body, re.S).group(1).replace(chr(10), ' ')
     parts = []
     with sync_playwright() as p:
         b = p.chromium.launch()

@@ -2,7 +2,7 @@
  "key": "reset",
  "lang": "en",
  "eyebrow": "My gift for you · 10 minutes",
- "title": "Reset Routine for Tired Days",
+ "title": "Reset Routine\nfor Tired Days",
  "subtitle": "for the evenings you gave everything away",
  "icon": "kerze",
  "letter": [
@@ -177,6 +177,11 @@
      "text": "Say it out loud before you fall asleep, or write it on a note for your mirror."
     },
     {
+     "t": "photo",
+     "src": "img/movecia/fotos/ev-ueber-mich.jpg",
+     "caption": "the real me ♡"
+    },
+    {
      "t": "h",
      "text": "Dear wild heart,"
     },
@@ -196,5 +201,6 @@
    ]
   }
  ],
- "closing": "We matter. We are here. And we are seen."
+ "closing": "We matter. We are here. And we are seen.",
+ "photo": "img/movecia/fotos/ev-unfold-karte.jpg"
 }
