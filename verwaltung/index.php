@@ -246,6 +246,11 @@ if ($action === 'logout') {
 if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 'natal' || $view === 'method' || $view === 'texte' || $view === 'presse' || $view === 'vorschau' || $view === 'videos' || $view === 'mediathek' || $view === 'training') {
     require __DIR__ . '/movecia.php';
 }
+// Wintersaison 2026/27: Hotel-Flyer + Buchungsseiten (FORMA ?view=winter, Movecia ?view=winter_mm)
+if ($view === 'winter' || $view === 'winter_mm' || $action === 'winter_upload' || $action === 'winter_delete') {
+    if ($view === 'winter_mm' || ($_POST['b'] ?? '') === 'movecia') require_once __DIR__ . '/movecia.php';
+    require __DIR__ . '/winter.inc.php';
+}
 
 if ($action === 'save_course') {
     $id = (int)($_POST['id'] ?? 0);
@@ -2373,6 +2378,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
             <a class="tile hl" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('kalender') ?></span><strong>Kalender</strong><span class="muted small">Kurse &amp; Private Pottery</span></a>
             <a class="tile hl" href="<?= forma_h($self) ?>?view=kasse"><span class="ic"><?= admin_icon('kasse') ?></span><strong>Kasse</strong><span class="muted small">Pottery bemalen & Gutscheine<?= $kasseUnpaid ? ' · <b style="color:#8C2C1D">' . $kasseUnpaid . ' Bezahl-Link' . ($kasseUnpaid === 1 ? '' : 's') . ' offen</b>' : '' ?></span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=bestand"><span class="ic"><?= admin_icon('bestand') ?></span><strong>Bestand</strong><span class="muted small">Pottery bemalen · was ist da?</span></a>
+            <a class="tile hl" href="<?= forma_h($self) ?>?view=winter"><span class="ic"><?= admin_icon('winter') ?></span><strong>Wintersaison 26/27</strong><span class="muted small">Hotel-Flyer &amp; Buchungsseite</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=private"><span class="ic"><?= admin_icon('private') ?></span><strong>Private Pottery</strong><span class="muted small"><?= $privateOpen ?> offen</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=edit"><span class="ic"><?= admin_icon('plus') ?></span><strong>Einzeltermin</strong><span class="muted small">z. B. ein Special-Kurs</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=series"><span class="ic"><?= admin_icon('serie') ?></span><strong>Serientermine</strong><span class="muted small">z. B. jeden Mi &amp; Fr</span></a>
@@ -2454,6 +2460,7 @@ function admin_icon(string $k): string
         'team' => '<circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 20c.5-3.5 2.8-5.5 5.5-5.5s5 2 5.5 5.5M10.5 20c.5-3.5 2.8-5.5 5.5-5.5s5 2 5.5 5.5"/>',
         'bestand' => '<path d="M4 8l8-4 8 4v10l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v10"/>',
         'kasse' => '<rect x="3" y="10" width="18" height="11" rx="2"/><path d="M6 10V5h9v5M8 14h2M12 14h2M16 14h2M8 17h2M12 17h2M16 17h2"/>',
+        'winter' => '<path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7"/><path d="M9.5 3.5L12 6l2.5-2.5M9.5 20.5L12 18l2.5 2.5M3.6 10.4L6.8 9.5 5.9 6.3M18.1 17.7l-.9-3.2 3.2-.9M3.6 13.6l3.2.9-.9 3.2M18.1 6.3l-.9 3.2 3.2.9"/>',
         'settings' => '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
     ][$k] ?? '';
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $p . '</svg>';

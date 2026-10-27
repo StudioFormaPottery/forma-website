@@ -362,3 +362,7 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Bedingungen /terms#training: kein Rücktrittsrecht (Freizeit-Termin, § 18 Abs. 1 Z 10 FAGG), bis 24 Std. vorher kostenlos verschieben/absagen mit Geld zurück.
 - Code: `api/ptb-lib.php` (Tabellen `mm_ptb_orders`, `mm_ptb_sessions`), `api/ptb.php`, `api/ptb-bezahlt.php`, `verwaltung/ptb.inc.php` (`?view=training`, Reiter „Personal Training“ mit Zähler, Kachel im Movecia-Schnellzugriff, Monatskalender mit PT/Natal/FORMA, „Als Gast testen“). Nicht verwechseln mit `mm_pt_requests` (allgemeine PT-Anfragen von der Startseite).
 - Flyer (DE/EN, Pflaume, QR → /personal-training): A4/A5-PDF, 4:5, 9:16 – Quelle außerhalb des Repos; bei Preisänderung neu bauen.
+
+## Wintersaison 2026/27 in der Verwaltung (Vivien, 27.10.2026)
+- FORMA: Kachel „Wintersaison 26/27“ (`?view=winter`): Hotel-Buchungsseite /urlaub/ (DE/EN, Link kopieren, QR-Code als Bild), Angebot, Hotel-Flyer zum Hochladen. Movecia: Reiter „❄️ Winter 26/27“ und Kachel im Schnellzugriff (`?view=winter_mm`): /personal-training (Preise live aus `ptb_cfg()`), Personal-Fitness-Flyer aus `img/movecia/flyer/` (bei neuem Flyer dort ersetzen) plus Uploads.
+- Code `verwaltung/winter.inc.php`, Uploads in `../forma-data/winter/forma|movecia/` (nur angemeldet über `?view=winter&dl=`). Nächste Saison: `WINTER_SEASON` und Texte anpassen.
