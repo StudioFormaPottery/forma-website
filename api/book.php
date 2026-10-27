@@ -2,6 +2,7 @@
 // Nimmt eine Kursanmeldung entgegen, prüft freie Plätze und verschickt die E-Mails.
 declare(strict_types=1);
 require __DIR__ . '/lib.php';
+require_once __DIR__ . '/belegt.inc.php';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     forma_json(['ok' => false, 'error' => 'Ungültige Anfrage.'], 405);
@@ -78,11 +79,20 @@ try {
         $pdo->exec('ROLLBACK');
         forma_json(['ok' => false, 'error' => 'Für diesen Termin ist die Anmeldung schon geschlossen. Anmeldeschluss ist immer am Vorabend um 17 Uhr. Ruf mich gern an: ' . FORMA_PHONE], 409);
     }
+    // Gemeinsamer Kalender: Kurs hat noch niemanden, aber Vivien ist zu dieser Zeit schon anderswo gebucht
+    $vbSpan = vb_course_span((string)$course['date_text']);
+    if ($vbSpan && !forma_slot_hours($course) && forma_booked($pdo, $courseId) === 0 && !vb_free(vb_busy($pdo, (string)$course['start_date'], (string)$course['start_date'], ['forma']), (string)$course['start_date'], $vbSpan[0], $vbSpan[1] - $vbSpan[0])) {
+        $pdo->exec('ROLLBACK');
+        forma_json(['ok' => false, 'error' => 'Dieser Termin ist leider nicht mehr frei. Bitte wähl einen anderen Tag oder schreib mir: ' . FORMA_PHONE, 'free' => 0], 409);
+    }
     $isAtelier = forma_is_atelier($course);
     $hours = forma_slot_hours($course);
     $slots = [];
     if ($hours) {
         $slotFree = forma_slots_free($pdo, $course);
+        // Gemeinsamer Kalender: leere Stunde, in der Vivien woanders gebucht ist → nicht buchbar
+        $vbB = vb_busy($pdo, (string)$course['start_date'], (string)$course['start_date'], ['forma']);
+        foreach ($slotFree as $vh => $vf) if ($vf >= (int)$course['capacity'] && !vb_free($vbB, (string)$course['start_date'], (int)$vh * 60, 60)) $slotFree[$vh] = 0;
         $want = array_values(array_unique(array_map('intval', (array)($in['slots'] ?? []))));
         $slots = array_values(array_filter($hours, fn($h) => in_array($h, $want, true)));
         if (!$slots) {

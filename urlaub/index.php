@@ -4,11 +4,22 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/api/lib.php';
 header('X-Robots-Tag: noindex, nofollow');
 $en = ($_GET['lang'] ?? '') === 'en';
+require_once dirname(__DIR__) . '/api/belegt.inc.php';
 $spin = [];
+$ppBusy = [];
 try {
     $pdo = forma_db();
+    // gemeinsamer Kalender (Vivien, 27.10.2026): was schon belegt ist, kann hier nicht gewählt werden
+    $vbTo = date('Y-m-d', strtotime('+7 months'));
+    $vbOther = vb_busy($pdo, date('Y-m-d'), $vbTo, ['forma']);
+    $ppBusy = vb_busy($pdo, date('Y-m-d'), $vbTo);
     foreach (forma_upcoming_courses($pdo) as $c) {
-        if ($c['title'] === 'Spin & Go') $spin[] = ['id' => (int)$c['id'], 'd' => (string)$c['start_date'], 'free' => (int)$c['free'] > 0 ? 1 : 0];
+        if ($c['title'] !== 'Spin & Go') continue;
+        $free = (int)$c['free'] > 0 ? 1 : 0;
+        // Kurs noch ohne Anmeldung, aber Vivien hat zu dieser Zeit schon etwas anderes → nicht anbieten
+        $sp = vb_course_span((string)$c['date_text']);
+        if ($free && (int)$c['booked'] === 0 && $sp && !vb_free($vbOther, (string)$c['start_date'], $sp[0], $sp[1] - $sp[0])) $free = 0;
+        $spin[] = ['id' => (int)$c['id'], 'd' => (string)$c['start_date'], 'free' => $free];
         if (count($spin) >= 120) break;
     }
 } catch (Throwable $e) { error_log('FORMA urlaub: ' . $e->getMessage()); }
@@ -19,7 +30,7 @@ $T = $en ? [
     's_p' => '€ 70', 's_ps' => 'per person', 's_free' => 'places available', 's_btn' => 'Book a place', 'cal_hint' => 'Tap a highlighted day to choose it.', 'cal_full' => 'fully booked', 'cal_one' => 'places available', 'cal_many' => 'places available', 'months' => ['January','February','March','April','May','June','July','August','September','October','November','December'], 'wd' => ['Mo','Tu','We','Th','Fr','Sa','Su'], 'prev' => 'Previous month', 'next' => 'Next month', 'free_l' => 'free', 'full_l' => 'fully booked', 's_none' => 'No dates available at the moment. Send me a message on WhatsApp and we’ll find a time that works: ',
     'p_k' => '1:1 at the wheel · 2 hours', 'p_t' => 'Private Pottery', 'p_d' => 'Two hours just for you at the potter’s wheel, at your own pace, with a cup of coffee or tea.',
     'p_p' => '€ 130', 'p_ps' => 'for 2 hours', 'p_how' => 'Pay online, give me two preferred dates and times, and I’ll confirm your booking by email.',
-    'w1' => '1st preferred date', 'w2' => '2nd preferred date', 'time' => 'Time', 'name' => 'Full name', 'email' => 'Email', 'phone' => 'Phone / WhatsApp', 'opt' => '(optional)',
+    'pp_full' => 'Sorry, that day is fully booked. Please choose another day.', 'w1' => '1st preferred date', 'w2' => '2nd preferred date', 'time' => 'Time', 'name' => 'Full name', 'email' => 'Email', 'phone' => 'Phone / WhatsApp', 'opt' => '(optional)',
     'hotel' => 'Your hotel', 'consent' => 'I agree to my details being stored to process my booking.', 'privacy' => 'Privacy policy', 'gs' => 'Do you have a gift voucher?', 'gs_btn' => 'Check', 'gs_ok' => '✓ Voucher found: %s will be deducted from your booking.', 'post' => 'When you book, you’ll occasionally receive FORMA Post, my newsletter with news from the studio (in German). You can unsubscribe at any time with one click.', 'nopost' => 'No thanks, I don’t want to receive FORMA Post.', 'pay' => 'Continue to payment · € 130',
     'gut' => 'Good to know', 'gut_t' => 'Spin & Go is a purely hands-on workshop: the pieces you make can’t be taken home, as the focus is entirely on the experience and on learning the technique. If you’d like a keepsake to take home, you’ll find a small selection of handmade pieces from our studio to buy on site.',
     'err_d' => 'Please choose your 1st preferred date and time.', 'err_n' => 'Please enter your name.', 'err_e' => 'Please enter a valid email address.', 'err_c' => 'Please tick the privacy box.', 'wait' => 'One moment …', 'lang' => 'Deutsch', 'langurl' => '?', 'more' => 'Details & booking', 'less' => 'Close',
@@ -30,7 +41,7 @@ $T = $en ? [
     's_p' => '€ 70', 's_ps' => 'pro Person', 's_free' => 'Plätze frei', 's_btn' => 'Platz buchen', 'cal_hint' => 'Tipp auf einen markierten Tag, um ihn auszuwählen.', 'cal_full' => 'ausgebucht', 'cal_one' => 'Plätze frei', 'cal_many' => 'Plätze frei', 'months' => ['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'], 'wd' => ['Mo','Di','Mi','Do','Fr','Sa','So'], 'prev' => 'Vorheriger Monat', 'next' => 'Nächster Monat', 'free_l' => 'frei', 'full_l' => 'ausgebucht', 's_none' => 'Gerade sind keine Termine frei. Schreib mir per WhatsApp, dann finden wir gemeinsam einen Termin: ',
     'p_k' => '1:1 an der Drehscheibe · 2 Stunden', 'p_t' => 'Private Pottery', 'p_d' => '2 Stunden ganz für dich, in deinem Tempo an der Drehscheibe, gemütlich bei Kaffee oder Tee.',
     'p_p' => '€ 130', 'p_ps' => 'für 2 Stunden', 'p_how' => 'Du bezahlst gleich online, nennst mir zwei Wunschtermine mit Uhrzeit, und ich bestätige dir deinen Termin per E-Mail.',
-    'w1' => '1. Wunschtermin', 'w2' => '2. Wunschtermin', 'time' => 'Uhrzeit', 'name' => 'Vor- und Nachname', 'email' => 'E-Mail', 'phone' => 'Telefon / WhatsApp', 'opt' => '(optional)',
+    'pp_full' => 'An diesem Tag ist leider schon alles belegt. Wähl bitte einen anderen Tag.', 'w1' => '1. Wunschtermin', 'w2' => '2. Wunschtermin', 'time' => 'Uhrzeit', 'name' => 'Vor- und Nachname', 'email' => 'E-Mail', 'phone' => 'Telefon / WhatsApp', 'opt' => '(optional)',
     'hotel' => 'Dein Hotel', 'consent' => 'Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Buchung gespeichert werden.', 'privacy' => 'Datenschutz', 'gs' => 'Du hast einen Gutschein?', 'gs_btn' => 'Prüfen', 'gs_ok' => '✓ Gutschein gefunden: %s werden bei deiner Buchung abgezogen.', 'post' => 'Mit deiner Buchung bekommst du ab und zu die FORMA Post mit Neuem aus dem Atelier. Abmelden geht jederzeit mit einem Klick.', 'nopost' => 'Nein danke, ich möchte keine FORMA Post bekommen.', 'pay' => 'Weiter zur Bezahlung · € 130',
     'gut' => 'Gut zu wissen', 'gut_t' => 'Spin & Go ist ein reiner Praxisworkshop: Die Stücke, die dabei entstehen, können nicht mitgenommen werden, denn der Fokus liegt ganz auf dem Erlebnis und dem Erlernen der Technik. Wer sich ein Erinnerungsstück mit nach Hause nehmen möchte, findet vor Ort eine kleine Auswahl handgefertigter Stücke aus unserem Atelier zum Kaufen.',
     'err_d' => 'Bitte wähl deinen 1. Wunschtermin mit Uhrzeit.', 'err_n' => 'Bitte gib deinen Namen an.', 'err_e' => 'Bitte gib eine gültige E-Mail-Adresse an.', 'err_c' => 'Bitte bestätige noch den Datenschutz.', 'wait' => 'Einen Moment …', 'lang' => 'English', 'langurl' => '?lang=en', 'more' => 'Details & buchen', 'less' => 'Schließen',
@@ -47,6 +58,7 @@ $tomorrow = date('Y-m-d', strtotime('+1 day'));
 .slides{position:relative}.slides img{position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease}.slides img.on{opacity:1}
 .acc-btn{display:none}
 .two{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.pp-full{font-size:15px;color:#8C2C1D;margin:-4px 0 6px}
 input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;display:block;width:100%;min-width:0;max-width:100%;min-height:52px;text-align:left}
 input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and-time-value{text-align:left;margin:0}
 @media (max-width:820px){
@@ -97,8 +109,10 @@ input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and
     <input type="hidden" name="kind" value="buchung"><input type="hidden" name="hours" value="2"><input type="hidden" name="contact" value="email">
     <input type="hidden" name="t" id="t"><input type="hidden" name="project" id="project"><input type="hidden" name="wish_date" id="wish_date"><input type="hidden" name="wish" id="wish">
     <div style="position:absolute;left:-9999px" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
-    <label><?= $h($T['w1']) ?></label><div class="two"><input type="date" id="d1" min="<?= $tomorrow ?>"><input type="time" id="t1" step="900" placeholder="<?= $h($T['time']) ?>"></div>
-    <label><?= $h($T['w2']) ?> <span style="font-weight:400"><?= $h($T['opt']) ?></span></label><div class="two"><input type="date" id="d2" min="<?= $tomorrow ?>"><input type="time" id="t2" step="900"></div>
+    <label><?= $h($T['w1']) ?></label><div class="two"><input type="date" id="d1" min="<?= $tomorrow ?>" max="<?= date('Y-m-d', strtotime('+6 months')) ?>"><select id="t1" disabled><option value=""><?= $h($T['time']) ?></option></select></div>
+    <p class="pp-full" id="f1" hidden><?= $h($T['pp_full']) ?></p>
+    <label><?= $h($T['w2']) ?> <span style="font-weight:400"><?= $h($T['opt']) ?></span></label><div class="two"><input type="date" id="d2" min="<?= $tomorrow ?>" max="<?= date('Y-m-d', strtotime('+6 months')) ?>"><select id="t2" disabled><option value=""><?= $h($T['time']) ?></option></select></div>
+    <p class="pp-full" id="f2" hidden><?= $h($T['pp_full']) ?></p>
     <label for="name"><?= $h($T['name']) ?></label><input id="name" name="name" autocomplete="name">
     <label for="email"><?= $h($T['email']) ?></label><input id="email" name="email" type="email" autocomplete="email">
     <label for="phone"><?= $h($T['phone']) ?> <span style="font-weight:400"><?= $h($T['opt']) ?></span></label><input id="phone" name="phone" type="tel" autocomplete="tel">
@@ -161,6 +175,18 @@ input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and
 <script>
 (function(){
   var f=document.getElementById('pf'),err=document.getElementById('err'),go=document.getElementById('go');
+  var BUSY=<?= json_encode($ppBusy) ?>,TIMES=<?= json_encode(vb_private_times()) ?>,LEN=<?= VB_PRIVATE_MIN ?>,BUF=<?= VB_BUFFER ?>,TL=<?= json_encode($T['time']) ?>;
+  function mins(t){var p=t.split(':');return +p[0]*60+ +p[1];}
+  function freeAt(d,t,other){var a=mins(t),b=a+LEN,l=(BUSY[d]||[]).slice();if(other&&other.d===d&&other.t){var x=mins(other.t);l.push([x,x+LEN]);}
+    for(var i=0;i<l.length;i++){if(a<l[i][1]+BUF&&b>l[i][0]-BUF)return false;}return true;}
+  function fill(n){var d=document.getElementById('d'+n).value,sel=document.getElementById('t'+n),full=document.getElementById('f'+n),keep=sel.value,o=n===1?2:1;
+    var other={d:document.getElementById('d'+o).value,t:document.getElementById('t'+o).value};
+    sel.innerHTML='<option value="">'+TL+'</option>';full.hidden=true;
+    if(!d){sel.disabled=true;return;}
+    var ok=TIMES.filter(function(t){return freeAt(d,t,other);});
+    ok.forEach(function(t){var op=document.createElement('option');op.value=t;op.textContent=t;sel.appendChild(op);});
+    sel.disabled=!ok.length;full.hidden=!!ok.length;if(ok.indexOf(keep)>=0)sel.value=keep;}
+  [1,2].forEach(function(n){document.getElementById('d'+n).addEventListener('change',function(){fill(n);fill(n===1?2:1);});document.getElementById('t'+n).addEventListener('change',function(){fill(n===1?2:1);});});
   document.getElementById('t').value=Date.now();
   function fmt(d,t){if(!d)return '';var p=d.split('-');return p[2]+'.'+p[1]+'.'+p[0]+(t?' um '+t:'');}
   f.addEventListener('submit',function(e){

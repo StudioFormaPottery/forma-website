@@ -5,6 +5,7 @@
 // Flyer-Dateien: mitgelieferte im Repo (WINTER_FILES) plus eigene Uploads in ../forma-data/winter/<forma|movecia>/.
 // Eingebunden aus verwaltung/index.php (nur angemeldet, CSRF schon geprüft).
 declare(strict_types=1);
+require_once dirname(__DIR__) . '/api/belegt.inc.php';
 
 const WINTER_SEASON = 'Wintersaison 2026/27';
 const WINTER_FILES = [
@@ -98,7 +99,17 @@ if ($view === 'winter' || $view === 'winter_mm') {
     }
     $repo = WINTER_FILES[$wb];
     $ups = winter_uploads($wb);
-    render_page(WINTER_SEASON, function () use ($self, $flash, $isMm, $pages, $facts, $manage, $title, $repo, $ups, $wb) {
+    // Gemeinsamer Kalender FORMA + Movecia
+    $month = preg_match('/^\d{4}-\d{2}$/', (string)($_GET['m'] ?? '')) ? (string)$_GET['m'] : date('Y-m');
+    $mFrom = $month . '-01';
+    $mTo = date('Y-m-t', strtotime($mFrom));
+    $items = vb_items($pdo, $mFrom, $mTo);
+    $byDay = [];
+    foreach ($items as $it) $byDay[$it['date']][] = $it;
+    $conf = vb_conflicts($items);
+    $day = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_GET['d'] ?? '')) && str_starts_with((string)$_GET['d'], $month) ? (string)$_GET['d'] : (str_starts_with(date('Y-m-d'), $month) ? date('Y-m-d') : $mFrom);
+    $cal = compact('month', 'mFrom', 'mTo', 'byDay', 'conf', 'day');
+    render_page(WINTER_SEASON, function () use ($self, $flash, $isMm, $pages, $facts, $manage, $title, $repo, $ups, $wb, $cal) {
         $csrf = '<input type="hidden" name="csrf" value="' . forma_h(csrf()) . '"><input type="hidden" name="b" value="' . $wb . '">';
         $acc = $isMm ? '#7D5E68' : '#8C2C1D'; ?>
 <style>
@@ -121,6 +132,24 @@ if ($view === 'winter' || $view === 'winter_mm') {
 .ws .fl:first-child{border-top:0}
 .ws .fl span{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .ws .grid{display:grid;gap:14px}
+.vc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.vc-h a{font-size:22px;text-decoration:none;padding:4px 14px;border-radius:999px;border:1px solid rgba(0,0,0,.12);color:inherit}
+.vc-h b{font-size:20px;font-weight:500}
+.vc{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.vc .wd{text-align:center;font-size:13px;color:#8a7a72;padding:2px 0}
+.vc a.dy{display:flex;flex-direction:column;gap:3px;min-height:86px;padding:6px;border-radius:12px;background:#fff;text-decoration:none;color:inherit;border:2px solid transparent;overflow:hidden}
+.vc a.dy.sel{border-color:<?= $acc ?>}
+.vc a.dy.today .n{background:<?= $acc ?>;color:#fff}
+.vc a.dy.cf{background:#FBE3DE}
+.vc .n{align-self:flex-start;font-size:14px;min-width:24px;text-align:center;border-radius:999px;padding:1px 4px}
+.vc .c{display:block;font-size:11.5px;line-height:1.25;padding:2px 5px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k-forma{background:#8C2C1D;color:#fff}.k-forma0{background:#F1E1D6;color:#8C2C1D}.k-private{background:#B05A38;color:#fff}
+.k-pt{background:#7D5E68;color:#fff}.k-pt-wait{background:#EADFDE;color:#4A3A41}.k-natal{background:#4A3A41;color:#fff}.k-call{background:#E8D6CA;color:#4A3A41}
+.vc-leg{display:flex;flex-wrap:wrap;gap:6px 12px;margin:10px 0 0;font-size:14px}.vc-leg span{display:inline-flex;align-items:center;gap:5px}.vc-leg i{width:14px;height:14px;border-radius:4px;display:inline-block}
+.vc-day{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.vc-day .it{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;background:#fff;font-size:17px}
+.vc-day .it b{min-width:118px;font-variant-numeric:tabular-nums}
+@media(max-width:700px){.vc a.dy{min-height:58px;padding:4px}.vc .c{font-size:0;height:7px;padding:0}.vc .c.more{display:none}}
 @media(min-width:900px){.ws .grid{grid-template-columns:1.3fr 1fr}}
 </style>
 <div class="ws">
@@ -145,6 +174,31 @@ if ($view === 'winter' || $view === 'winter_mm') {
         <ul class="f"><?php foreach ($facts as $f): ?><li><?= forma_h($f) ?></li><?php endforeach; ?></ul>
         <p style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><?php foreach ($manage as [$q, $l]): ?><a class="bt" href="<?= forma_h($self . $q) ?>"><?= forma_h($l) ?></a><?php endforeach; ?></p>
     </div>
+    </div>
+
+    <div class="card" id="kalender">
+        <h2>Alle Termine · FORMA &amp; Movecia</h2>
+        <p class="muted small" style="margin:-.3rem 0 .8rem">Hier steht alles, was stattfindet. Was belegt ist, können Gäste auf den Hotel-Buchungsseiten (FORMA und Movecia) automatisch nicht mehr wählen, mit 15 Minuten Puffer. Kurse ohne Anmeldung sind hell und blockieren nichts. Rot hinterlegt = zwei Termine überschneiden sich.</p>
+        <?php extract($cal); $ts = strtotime($mFrom); $v = $self . '?view=' . ($isMm ? 'winter_mm' : 'winter');
+        $mn = ['', 'Jänner', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']; ?>
+        <div class="vc-h"><a href="<?= forma_h($v . '&m=' . date('Y-m', strtotime('-1 month', $ts))) ?>#kalender" aria-label="Vormonat">‹</a><b><?= $mn[(int)date('n', $ts)] . ' ' . date('Y', $ts) ?></b><a href="<?= forma_h($v . '&m=' . date('Y-m', strtotime('+1 month', $ts))) ?>#kalender" aria-label="Nächster Monat">›</a></div>
+        <div class="vc">
+            <?php foreach (['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'] as $w): ?><span class="wd"><?= $w ?></span><?php endforeach; ?>
+            <?php for ($i = 1; $i < (int)date('N', $ts); $i++): ?><span></span><?php endfor; ?>
+            <?php for ($dn = 1; $dn <= (int)date('t', $ts); $dn++): $d = $month . '-' . sprintf('%02d', $dn); $list = $byDay[$d] ?? []; ?>
+                <a class="dy<?= $d === $day ? ' sel' : '' ?><?= $d === date('Y-m-d') ? ' today' : '' ?><?= isset($conf[$d]) ? ' cf' : '' ?>" href="<?= forma_h($v . '&m=' . $month . '&d=' . $d) ?>#kalender"><span class="n"><?= $dn ?></span>
+                <?php foreach ($list as $k => $it): $kc = $it['kind'] === 'forma' && !$it['block'] ? 'forma0' : $it['kind']; ?><span class="c k-<?= $kc ?><?= $k >= 3 ? ' more' : '' ?>"><?= sprintf('%d:%02d', intdiv($it['a'], 60), $it['a'] % 60) ?> <?= forma_h($it['kind'] === 'forma' ? $it['title'] : ($it['kind'] === 'private' ? 'Private' : ($it['kind'] === 'call' ? 'Gespräch' : ($it['kind'] === 'natal' ? 'Natal' : 'PT')))) ?></span><?php endforeach; ?></a>
+            <?php endfor; ?>
+        </div>
+        <div class="vc-leg"><span><i class="k-forma"></i>FORMA-Kurs mit Anmeldung</span><span><i class="k-forma0"></i>FORMA-Kurs noch leer</span><span><i class="k-private"></i>Private Pottery</span><span><i class="k-pt"></i>Personal Training</span><span><i class="k-pt-wait"></i>PT wartet auf Zahlung</span><span><i class="k-natal"></i>Prä-/Postnatal</span><span><i class="k-call"></i>Kennenlerngespräch</span></div>
+        <div class="vc-day">
+            <p style="margin:0;font-size:18px"><b><?= forma_h(['', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'][(int)date('N', strtotime($day))] . ', ' . date('j. n. Y', strtotime($day))) ?></b><?= isset($conf[$day]) ? ' <span style="color:#B5544A">· ⚠ Überschneidung</span>' : '' ?></p>
+            <?php if (empty($byDay[$day])): ?><p class="muted" style="margin:0">An diesem Tag ist noch nichts eingetragen.</p><?php endif; ?>
+            <?php foreach ($byDay[$day] ?? [] as $it): $kc = $it['kind'] === 'forma' && !$it['block'] ? 'forma0' : $it['kind'];
+                $lnk = ['forma' => '?view=kalender', 'private' => '?view=private', 'pt' => '?view=training', 'pt-wait' => '?view=training', 'natal' => '?view=natal', 'call' => '?view=natal'][$it['kind']]; ?>
+                <a class="it" href="<?= forma_h($self . $lnk) ?>" style="text-decoration:none;color:inherit"><b><?= sprintf('%d:%02d–%d:%02d', intdiv($it['a'], 60), $it['a'] % 60, intdiv($it['b'], 60), $it['b'] % 60) ?></b><span class="c k-<?= $kc ?>" style="font-size:13px"><?= $it['kind'] === 'forma' || $it['kind'] === 'private' ? 'FORMA' : 'Movecia' ?></span><span><?= forma_h($it['title'] . ($it['who'] !== '' ? ' · ' . $it['who'] : '') . ($it['kind'] === 'forma' ? ' · ' . ($it['n'] ? $it['n'] . ' angemeldet' : 'noch niemand angemeldet') : '') . ($it['kind'] === 'pt-wait' ? ' · wartet auf Zahlung' : '')) ?></span></a>
+            <?php endforeach; ?>
+        </div>
     </div>
 
     <div class="card" id="flyer">

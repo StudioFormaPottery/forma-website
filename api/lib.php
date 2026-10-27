@@ -1006,6 +1006,14 @@ function forma_upcoming_courses(PDO $pdo, bool $onlyVisible = true): array
     if ($onlyVisible && date('Y-m-d') < '2026-10-19') {
         $rows = array_values(array_filter($rows, fn($r) => $r['title'] !== FORMA_SERIES['bemalen']['title']));
     }
+    // Gemeinsamer Kalender (Vivien, 27.10.2026): Kurs ohne Anmeldung, während Vivien schon anderswo gebucht ist → ausgebucht zeigen
+    $vbOther = [];
+    if ($onlyVisible && $rows) {
+        try {
+            require_once __DIR__ . '/belegt.inc.php';
+            $vbOther = vb_busy($pdo, (string)$rows[0]['start_date'], (string)end($rows)['start_date'], ['forma']);
+        } catch (Throwable $e) { error_log('FORMA belegt: ' . $e->getMessage()); }
+    }
     foreach ($rows as &$r) {
         $r['booked'] = forma_booked($pdo, (int)$r['id']);
         $r['free'] = max(0, (int)$r['capacity'] - $r['booked']);
@@ -1013,7 +1021,17 @@ function forma_upcoming_courses(PDO $pdo, bool $onlyVisible = true): array
             $r['slots'] = forma_slots_free($pdo, $r);
             $r['free'] = max($r['slots']);
         }
+        if ($vbOther && $r['booked'] === 0 && isset($vbOther[$r['start_date']]) && ($sp = vb_course_span((string)$r['date_text'])) && !vb_free($vbOther, (string)$r['start_date'], $sp[0], $sp[1] - $sp[0])) {
+            if (isset($r['slots'])) {
+                // stundenweise Kurse: nur die Stunden sperren, in denen Vivien woanders ist
+                foreach ($r['slots'] as $h => $f) if (!vb_free($vbOther, (string)$r['start_date'], (int)$h * 60, 60)) $r['slots'][$h] = 0;
+                $r['free'] = $r['slots'] ? max($r['slots']) : 0;
+            } else {
+                $r['free'] = 0;
+            }
+        }
     }
+    unset($r);
     return $rows;
 }
 

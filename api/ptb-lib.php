@@ -16,6 +16,7 @@
 // bis 24 Std. vorher kostenlos verschieben oder absagen (Geld zurück).
 declare(strict_types=1);
 require_once __DIR__ . '/natal-lib.php';
+require_once __DIR__ . '/belegt.inc.php';
 
 const PTB_MAX_UNITS = 4;
 const PTB_MINUTES = 75;
@@ -214,13 +215,8 @@ function ptb_busy(PDO $pdo, string $from, string $to, int $exceptOrder = 0): arr
         WHERE s.date BETWEEN ? AND ? AND o.id <> ? AND ((o.status = 'bezahlt' AND s.status IN ('bestaetigt','erledigt')) OR (o.status = 'angebot' AND s.status IN ('passt','vorschlag')))");
     $st->execute([$from, $to, $exceptOrder]);
     foreach ($st->fetchAll() as $r) $add($r['date'], $r['start'], (int)$r['minutes']);
-    try {
-        $st = $pdo->prepare("SELECT date, start, minutes FROM mm_natal_sessions WHERE date BETWEEN ? AND ? AND status IN ('bestaetigt','erledigt') AND start <> ''");
-        $st->execute([$from, $to]);
-        foreach ($st->fetchAll() as $r) $add($r['date'], $r['start'], (int)$r['minutes']);
-    } catch (Throwable $e) {}
-    // FORMA-Kurse mit Anmeldungen (Vivien steht dann im Atelier)
-    foreach (ptb_forma_courses($pdo, $from, $to, true) as $c) $busy[$c['date']][] = [$c['a'], $c['b']];
+    // alles andere aus dem gemeinsamen Kalender: FORMA-Kurse mit Anmeldungen, Private Pottery, Prä-/Postnatal, Kennenlerngespräche
+    foreach (vb_busy($pdo, $from, $to, ['pt', 'pt-wait']) as $d => $list) foreach ($list as $x) $busy[$d][] = $x;
     return $busy;
 }
 
