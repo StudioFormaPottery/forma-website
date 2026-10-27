@@ -371,3 +371,10 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 ## Mitarbeiter-Angebote Winter Paznaun (Vivien, 27.10.2026, über den Tourismusverband)
 - Movecia Personal Training: € 85 einzeln, € 140 zu zweit (ca. 75 Min.); exklusiv 10er-Block € 700 statt € 850 + kostenlose Kennenlern-/Anamneseeinheit 60 Min. FORMA Spin & Go für Mitarbeiter: Mo + Fr 9–11 Uhr, 10er-Block € 600 statt € 700.
 - Steht als Karte „Mitarbeiter-Angebote“ in der Wintersaison-Seite (`?view=winter` und `?view=winter_mm`). Buchung/Organisation erst bauen, wenn jemand bucht.
+
+## Movecia · Player neu gestaltet (Vivien, 27.10.2026: „richtig, richtig schön“)
+- `flow-player.js` v5: Startkarte warm (Creme mit Pfirsich-/Blush-Verlauf, Welle) mit Foto im Bogen (`data.photo`; Mitgliederbereich: Flow `ev-ueber-mich.jpg`, Bewegungsvideo `ev-method-karte.jpg`), Titel, Beschreibung (`data.intro` = Lektionstext), Chip „etwa X Minuten“, Übungsliste, Knopf „Los geht's“. Kein Satz „Ich begleite dich mit meiner Stimme“ und keine Übungsanzahl-Zeile (Vivien: unnütz).
+- Während der Übung: Video, runder Timer, darunter „Übung X von Y · noch N Min.“ mit Fortschrittslinie und „Als Nächstes“, runde Knöpfe Klang / Pause / Musik. Sprechtexte werden nirgends angezeigt, auch nicht in der Vorschau (dort nur kleiner Hinweis „Voice-over fehlt noch“).
+- Musikkarte: Musikdienste als helle Felder mit Farbpunkt, Lieblings-Playlists als Karten, „Einfügen“ aus der Zwischenablage, Spotify als schmaler Player (80 px).
+- Mitgliederbereich: Flow-/Bewegungs-Lektionen einspaltig (`.lesson.flowl`), Beispielansicht zeigt den Player auch mit fehlenden Clips (Platzhalter, „weiter“ nur in der Vorschau). Geräteprüfung (`geraet.js`) nie in der Beispielansicht, sonst lädt die Seite ständig neu.
+- Mediathek ist nur Verwaltung, nicht unter „Als Teilnehmerin“.
