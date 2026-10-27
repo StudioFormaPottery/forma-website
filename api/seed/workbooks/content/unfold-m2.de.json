@@ -50,7 +50,7 @@
    "icon": "stimmung",
    "kicker": "Zum Start",
    "title": "Wo du gerade stehst",
-   "intro": "Bevor wir in die neuen Themen gehen, halten wir kurz inne. Diese Standortbestimmung zeigt dir, wo du nach dem ersten Monat stehst, und er wird am Ende dieses Monats zu einem schönen Vergleich.",
+   "intro": "Bevor wir in die neuen Themen gehen, halten wir kurz inne. Diese Standortbestimmung zeigt dir, wo du nach dem ersten Monat stehst, und sie wird am Ende dieses Monats zu einem schönen Vergleich.",
    "blocks": [
     {
      "t": "p",

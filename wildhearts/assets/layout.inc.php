@@ -50,7 +50,7 @@ function mvl_foot(): void
     ?>
 <footer class="f w"><div class="in">
   <span>Movecia · Vivien Malonga · <span class="de">Mindful Movement aus den Tiroler Bergen</span><span class="en">Mindful movement from the Tyrolean mountains</span></span>
-  <span><a href="/mitglieder/"><span class="de">Mitgliederbereich</span><span class="en">Members area</span></a> · <a href="/terms/"><span class="de">Impressum &amp; Bedingungen</span><span class="en">Imprint &amp; terms</span></a> · <a href="/terms/#datenschutz"><span class="de">Datenschutz</span><span class="en">Privacy</span></a> · <a href="/withdraw/"><span class="de">Vertrag widerrufen</span><span class="en">Withdraw from contract</span></a> · <a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a></span>
+  <span><a href="/mitglieder/"><span class="de">Mitgliederbereich</span><span class="en">Members area</span></a> · <a href="/terms/"><span class="de">Impressum &amp; Bedingungen</span><span class="en">Legal notice &amp; terms</span></a> · <a href="/terms/#datenschutz"><span class="de">Datenschutz</span><span class="en">Privacy</span></a> · <a href="/withdraw/"><span class="de">Vertrag widerrufen</span><span class="en">Withdraw from contract</span></a> · <a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a></span>
 </div></footer>
 <script>
 (function(){

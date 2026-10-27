@@ -10,7 +10,8 @@ Aufruf: python3 tools/lektorat/build_map.py
 import json, os, subprocess, difflib
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-BASE = '5a437c7'
+BASES = ['5a437c7', '94e1ba5']  # vor dem Lektorat, nach der ersten Runde (für Datenbanken, die schon v1 bekommen haben)
+BASE = BASES[0]
 OUT = os.path.join(ROOT, 'api', 'seed', 'lektorat-2026-10-27.json')
 
 
@@ -41,36 +42,41 @@ def walk(a, b):
         pair(a, b)
 
 
-for p in ['api/seed/produktion.json', 'api/seed/lesson-scripts.json', 'api/seed/unfold-videos.json']:
-    walk(json.loads(old(p)), json.loads(new(p)))
+for BASE in BASES:
+    for p in ['api/seed/produktion.json', 'api/seed/lesson-scripts.json', 'api/seed/unfold-videos.json']:
+        walk(json.loads(old(p)), json.loads(new(p)))
 
-# Übungsnamen in den Schritten (Name DE, Name EN) getrennt führen
-o, n = json.loads(old('api/seed/produktion.json')), json.loads(new('api/seed/produktion.json'))
-def steps(j):
-    return list(j['steps'].values()) + [x.get('steps') or [] for x in j['new']]
-for sa, sb in zip(steps(o), steps(n)):
-    for x, y in zip(sa, sb):
-        if x[0] != y[0]: NAMES[x[0]] = y[0]
-        if x[1] != y[1]: NAMES[x[1]] = y[1]
-        M.pop(x[0], None); M.pop(x[1], None)
+    # Übungsnamen in den Schritten (Name DE, Name EN) getrennt führen
+    o, n = json.loads(old('api/seed/produktion.json')), json.loads(new('api/seed/produktion.json'))
+    def steps(j):
+        return list(j['steps'].values()) + [x.get('steps') or [] for x in j['new']]
+    for sa, sb in zip(steps(o), steps(n)):
+        for x, y in zip(sa, sb):
+            if x[0] != y[0]: NAMES[x[0]] = y[0]
+            if x[1] != y[1]: NAMES[x[1]] = y[1]
+            M.pop(x[0], None); M.pop(x[1], None)
 
-# PHP: String-Literale alt/neu paarweise (Lektionstexte im Seed, Gathering-Vorlagen, Teleprompter-Skripte)
-PHP = r'''$f = $argv[1]; $out = [];
-foreach (token_get_all(file_get_contents($f)) as $t)
-  if (is_array($t) && $t[0] === T_CONSTANT_ENCAPSED_STRING) { $s = $t[1];
-    $out[] = $s[0] === "'" ? str_replace(["\\'", '\\\\'], ["'", '\\'], substr($s, 1, -1)) : stripcslashes(substr($s, 1, -1)); }
-echo json_encode($out, JSON_UNESCAPED_UNICODE);'''
-def literals(src):
-    tmp = '/tmp/_lekt_src.php'
-    open(tmp, 'w', encoding='utf-8').write(src)
-    return json.loads(subprocess.check_output(['php', '-r', PHP, tmp]))
+    # PHP: String-Literale alt/neu paarweise (Lektionstexte im Seed, Gathering-Vorlagen, Teleprompter-Skripte)
+    PHP = r'''$f = $argv[1]; $out = [];
+    foreach (token_get_all(file_get_contents($f)) as $t)
+      if (is_array($t) && $t[0] === T_CONSTANT_ENCAPSED_STRING) { $s = $t[1];
+        $out[] = $s[0] === "'" ? str_replace(["\\'", '\\\\'], ["'", '\\'], substr($s, 1, -1)) : stripcslashes(substr($s, 1, -1)); }
+    echo json_encode($out, JSON_UNESCAPED_UNICODE);'''
+    def literals(src):
+        tmp = '/tmp/_lekt_src.php'
+        open(tmp, 'w', encoding='utf-8').write(src)
+        return json.loads(subprocess.check_output(['php', '-r', PHP, tmp]))
 
-for p in ['api/method-lib.php', 'api/movecia-lib.php', 'wildhearts/gathering/skripte.inc.php', 'wildhearts/gathering/skripte-de.inc.php']:
-    a, b = literals(old(p)), literals(new(p))
-    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes():
-        if tag == 'replace' and i2 - i1 == j2 - j1:
-            for x, y in zip(a[i1:i2], b[j1:j2]):
-                if len(x) > 12: pair(x, y)
+    for p in ['api/method-lib.php', 'api/movecia-lib.php', 'wildhearts/gathering/skripte.inc.php', 'wildhearts/gathering/skripte-de.inc.php']:
+        a, b = literals(old(p)), literals(new(p))
+        for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes():
+            if tag == 'replace' and i2 - i1 == j2 - j1:
+                for x, y in zip(a[i1:i2], b[j1:j2]):
+                    if len(x) > 12: pair(x, y)
 
-json.dump({'v': 1, 'map': M, 'names': NAMES}, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
+# Ketten auflösen: alter Text → endgültiger Text
+for k in list(M):
+    seen = 0
+    while M[k] in M and seen < 5: M[k] = M[M[k]]; seen += 1
+json.dump({'v': 2, 'map': M, 'names': NAMES}, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
 print(f'{len(M)} Texte, {len(NAMES)} Namen → {OUT}')

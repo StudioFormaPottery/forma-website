@@ -16,7 +16,7 @@ Und noch ein kleiner Hinweis für unsere gemeinsame Zeit: Bitte schaltet euer Mi
 
 Wenn du gerade noch deinen Platz suchst, lass dir Zeit. Vielleicht steht eine Tasse Tee neben dir, vielleicht hast du gerade ein Kind ins Bett gebracht, vielleicht trägst du noch deine Arbeitskleidung. Wie auch immer du heute angekommen bist, es ist genau richtig. Du musst nicht bereit sein, du musst nur hier sein.
 
-Das ist {title}, und in den nächsten fünfzehn Minuten gibt es nichts, was du tun, reparieren oder richtig machen musst. Wenn du lieber mit geschlossenen Augen zuhörst, ist auch das hier willkommen.
+Willkommen bei {title}. In den nächsten fünfzehn Minuten gibt es nichts, was du tun, reparieren oder richtig machen musst. Wenn du lieber mit geschlossenen Augen zuhörst, ist auch das hier willkommen.
 
 [Pause]
 
@@ -145,7 +145,7 @@ Und noch ein kleiner Hinweis für unsere gemeinsame Zeit: Bitte schaltet euer Mi
 
 Egal, von wo aus du heute dabei bist, ob vom Küchentisch, aus dem Bett oder aus dem Auto auf einem Parkplatz, weil das der einzige ruhige Ort war, den du finden konntest: Du bist hier genau so willkommen.
 
-Das ist {title}. Fünfzehn Minuten, die dir gehören. Du musst nichts leisten, und du musst nichts sagen, wenn du nicht möchtest. Sei einfach hier bei uns.
+Willkommen bei {title}. Fünfzehn Minuten, die dir gehören. Du musst nichts leisten, und du musst nichts sagen, wenn du nicht möchtest. Sei einfach hier bei uns.
 
 [Pause]
 
@@ -268,9 +268,9 @@ Bevor wir anfangen, stelle ich mich kurz für alle vor, die neu hier sind. Ich b
 
 Und noch ein kleiner Hinweis für unsere gemeinsame Zeit: Bitte schaltet euer Mikrofon stumm, damit wir einander gut hören. Eure Kamera darf gern an bleiben, sie muss es aber nicht. Ihr dürft sie jederzeit ausschalten, für eure Privatsphäre oder während der Atemübungen, wenn ihr ganz bei euch sein möchtet.
 
-Manche von euch begleiten mich schon seit Jahren, manche vielleicht seit meinen allerersten Trainings, und manche sind ganz neu. Wer auch immer du bist, du gehörst heute Abend in diesen Kreis.
+Manche von euch begleiten mich schon seit Jahren, manche vielleicht seit meinen allerersten Trainings, und manche sind ganz neu. Ganz gleich, wer du bist: Heute Abend bist du in diesem Kreis genau richtig.
 
-Das ist {title}. In den nächsten fünfzehn Minuten braucht niemand etwas von dir. Du kannst dich hinlegen oder dich mit einer Decke einkuscheln. Das ist deine Zeit.
+Willkommen bei {title}. In den nächsten fünfzehn Minuten braucht niemand etwas von dir. Du kannst dich hinlegen oder dich mit einer Decke einkuscheln. Das ist deine Zeit.
 
 [Pause]
 
@@ -294,7 +294,7 @@ Noch eine Runde, und lass bei diesem Ausatmen deine Schultern von den Ohren wegs
 
 [ausatmen]
 
-Ein längeres Ausatmen sagt deinem Nervensystem: Du bist gerade sicher. Du darfst ein bisschen loslassen.
+Ein längeres Ausatmen sagt deinem Nervensystem: Gerade ist alles gut. Du darfst ein bisschen loslassen.
 
 [3:00 · DAS THEMA HEUTE]
 
@@ -342,7 +342,7 @@ Und zweitens: Was braucht dein Körper heute Abend wirklich? Nicht, was er brauc
 
 [10:00 · EINE KLEINE ÜBUNG]
 
-Ich möchte dir die Frage schenken, die verändert hat, wie sich die Frauen in meinem Kreis bewegen.
+Ich möchte dir eine Frage mitgeben, die verändert hat, wie sich die Frauen in meinem Kreis bewegen.
 
 Früher haben sie mich gefragt: „Wie kann ich härter, schwerer, besser trainieren?“
 
@@ -403,7 +403,7 @@ Und noch ein kleiner Hinweis für unsere gemeinsame Zeit: Bitte schaltet euer Mi
 
 Vielleicht wärst du heute fast nicht gekommen. Vielleicht hast du gedacht: Ich bin zu müde, ich habe keine Zeit, ich schaue einfach beim nächsten Mal. Und du bist trotzdem gekommen. Danke, dass du dir diese fünfzehn Minuten für dich selbst genommen hast.
 
-Das ist {title}. Du musst heute Abend nichts mitbringen außer dich selbst. Augen offen oder geschlossen, ganz wie du magst.
+Willkommen bei {title}. Du musst heute Abend nichts mitbringen außer dich selbst. Augen offen oder geschlossen, ganz wie du magst.
 
 [Pause]
 
@@ -532,7 +532,7 @@ Bevor wir anfangen, stelle ich mich kurz für alle vor, die neu hier sind. Ich b
 
 Und noch ein kleiner Hinweis für unsere gemeinsame Zeit: Bitte schaltet euer Mikrofon stumm, damit wir einander gut hören. Eure Kamera darf gern an bleiben, sie muss es aber nicht. Ihr dürft sie jederzeit ausschalten, für eure Privatsphäre oder während der Atemübungen, wenn ihr ganz bei euch sein möchtet.
 
-Das ist {title}. In den nächsten zwanzig Minuten feiern wir gemeinsam die Wende des Jahres. Du musst nichts über Samhain wissen, und du musst an nichts Bestimmtes glauben. Komm einfach so, wie du bist.
+Willkommen bei {title}. In den nächsten zwanzig Minuten feiern wir gemeinsam die Wende des Jahres. Du musst nichts über Samhain wissen, und du musst an nichts Bestimmtes glauben. Komm einfach so, wie du bist.
 
 [Pause]
 
@@ -665,7 +665,7 @@ Lasst mich alle begrüßen, die heute dafür früh aufgestanden sind. {names}. I
 
 Vielleicht hast du noch deinen Pyjama an. Vielleicht hältst du deinen ersten Kaffee oder Tee in den Händen. Vielleicht ist es bei dir zu Hause noch ganz still, oder es ist schon laut und du hast dich für ein paar Minuten davongeschlichen. Jede Version von dir ist heute Morgen willkommen.
 
-Das ist {title}. Bevor der Tag an dir zu ziehen beginnt, nehmen wir uns fünfzehn Minuten, die nur dir gehören. Kamera an oder aus, im Sitzen oder im Liegen, alles ist gut.
+Willkommen bei {title}. Bevor der Tag an dir zu ziehen beginnt, nehmen wir uns fünfzehn Minuten, die nur dir gehören. Kamera an oder aus, im Sitzen oder im Liegen, alles ist gut.
 
 [Pause]
 
@@ -776,7 +776,7 @@ Lasst mich jeder von euch einen guten Morgen wünschen. {names}. Danke, dass ihr
 
 Vielleicht bist du heute vor allen anderen zu Hause aufgewacht, nur dafür. Vielleicht laufen im Hintergrund gerade Kinder herum. Vielleicht liegst du sogar noch im Bett. All das ist hier willkommen.
 
-Das ist {title}. In den nächsten dreißig Minuten atmen wir, bewegen uns ein bisschen und setzen eine Absicht für den Tag. Du brauchst keine Erfahrung, du musst nur da sein. Kamera an oder aus, ganz wie du magst.
+Willkommen bei {title}. In den nächsten dreißig Minuten atmen wir, bewegen uns ein bisschen und setzen eine Absicht für den Tag. Du brauchst keine Erfahrung, du musst nur da sein. Kamera an oder aus, ganz wie du magst.
 
 [Pause]
 
@@ -951,7 +951,7 @@ Lasst mich alle begrüßen, die heute Abend da sind. {names}. Ich freue mich so,
 
 Der Tag liegt jetzt hinter dir. Was auch immer heute passiert ist, was gut gelaufen ist und was nicht, du musst es nicht mit in diesen Raum tragen. Du darfst es an der Tür ablegen.
 
-Das ist {title}. Fünfzehn Minuten, um deinen Tag sanft abzuschließen. Dimm das Licht, wenn du kannst. Kamera an oder aus, ganz wie es sich gemütlich anfühlt.
+Willkommen bei {title}. Fünfzehn Minuten, um deinen Tag sanft abzuschließen. Dimm das Licht, wenn du kannst. Kamera an oder aus, ganz wie es sich gemütlich anfühlt.
 
 [Pause]
 
@@ -1062,7 +1062,7 @@ Lasst mich euch alle begrüßen. {names}. Es ist so schön, diesen Tag mit euch 
 
 Vielleicht schlafen die Kinder endlich. Vielleicht bist du gerade von der Arbeit heimgekommen. Vielleicht ist das der erste Moment heute, in dem du dich hinsetzt. Wie auch immer du heute Abend ankommst, du darfst den Tag jetzt loslassen. Du bist hier.
 
-Das ist {title}. In den nächsten dreißig Minuten schließen wir den Tag gemeinsam ab. Ein kleines Ritual, ein wenig sanfte Bewegung und zum Schluss eine tiefe Ruhe. Du kannst alles im Sitzen oder im Liegen mitmachen. Kamera an oder aus, so wie es sich am besten anfühlt.
+Willkommen bei {title}. In den nächsten dreißig Minuten schließen wir den Tag gemeinsam ab. Ein kleines Ritual, ein wenig sanfte Bewegung und zum Schluss eine tiefe Ruhe. Du kannst alles im Sitzen oder im Liegen mitmachen. Kamera an oder aus, so wie es sich am besten anfühlt.
 
 [Pause]
 
