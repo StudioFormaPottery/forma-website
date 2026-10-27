@@ -4,6 +4,7 @@
 // ?o=ID&k=TOKEN  persönliche Seite nach der Buchung (Einheiten, Termine, neue Wunschtermine)
 declare(strict_types=1);
 require dirname(__DIR__, 2) . '/api/natal-lib.php';
+require_once dirname(__DIR__) . '/assets/waves.inc.php';
 header('Cache-Control: no-store');
 $pdo = forma_db();
 natal_schema($pdo);
@@ -112,6 +113,7 @@ $seoDesc = 'Prä- und postnatales Training 1:1 mit Vivien Malonga: Schwangerscha
 <meta name="robots" content="noindex, nofollow">
 <?php endif; ?>
 <meta name="theme-color" content="#F2ECE4">
+<link rel="stylesheet" href="/wildhearts/assets/cute.css?v=4">
 <style>
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:normal;src:url(/fonts/CormorantGaramond-VF.woff) format("woff")}
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(/fonts/CormorantGaramond-Italic-VF.woff) format("woff")}
@@ -429,7 +431,7 @@ footer summary{cursor:pointer}
 <?php $news = (string)($_GET['news'] ?? ''); if (in_array($news, ['ok', 'ab', 'alt'], true)): ?>
 <div class="w" style="padding-top:1rem"><p class="newsbar"><?= $news === 'ok' ? 'Danke, deine Adresse ist bestätigt! Die Mail mit allen Paketen ist schon unterwegs zu dir. 🤍' : ($news === 'ab' ? 'Du bist abgemeldet und bekommst keine Mails mehr zum Prä- und Postnatal-Training.' : 'Dieser Link funktioniert nicht mehr. Trag dich unten einfach noch einmal ein.') ?></p></div>
 <?php endif; ?>
-<section class="hero w">
+<section class="hero w has-hw"><?= mv_waves(false) ?>
   <div>
     <p class="k">Prä- &amp; Postnatal Training · 1:1 im Studio oder online</p>
     <h1 style="margin-top:.8rem">Bewegt durch die <em>Schwangerschaft</em> &amp; das Wochenbett</h1>
@@ -467,7 +469,7 @@ footer summary{cursor:pointer}
 <section class="w" id="ablauf" style="padding-top:0">
   <p class="k">So läuft es ab</p>
   <h2 style="margin-top:.6rem">In drei <em>Schritten</em></h2>
-  <div class="steps">
+  <div class="steps cute-cards">
     <div class="step"><b>Paket wählen und bezahlen</b><p>Sicher online über Stripe. Danach bekommst du eine Bestätigung und deine Rechnung per E-Mail.</p></div>
     <div class="step"><b>Wunschtermine aussuchen</b><p>Im Kalender tippst du deine Wunschtage an und wählst Vormittag, Nachmittag oder Abend. Das geht gleich beim Buchen oder später auf deiner persönlichen Seite.</p></div>
     <div class="step"><b>Ich bestätige mit Uhrzeit</b><p>Du bekommst jeden Termin per E-Mail, mit Kalenderdatei für dein Handy<span class="m-online"> und dem Link zum Videoraum</span>. Weitere Termine fragst du jederzeit über deine Seite an.</p></div>
@@ -621,7 +623,7 @@ footer summary{cursor:pointer}
   </div>
 </section>
 
-<section class="w faq" style="padding-top:0">
+<section class="w faq cute-faq" style="padding-top:0">
   <p class="k">Gut zu wissen</p>
   <h2 style="margin-top:.6rem;margin-bottom:1.6rem">Häufige <em>Fragen</em></h2>
 <?php foreach (array_slice(natal_seo_faq(), 0, 3) as [$fq, $fa]): ?>  <details><summary><?= $h($fq) ?></summary><p><?= $h($fa) ?></p></details>

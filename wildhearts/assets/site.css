@@ -183,35 +183,6 @@ html,body{overflow-x:hidden;overflow-x:clip;max-width:100%}
 .soft{overflow:hidden!important}
 .soft video{transform:none!important}
 .vsolo.soft{max-width:100%}
-/* Bewegter Kopfbereich der Hauptseite (Vivien, 27.10.2026): fließende Wellen, feine Linien, atmender Movecia-Kiesel */
-.hero-x{position:relative;isolation:isolate}
-.hero-x>*:not(.hw){position:relative;z-index:1}
-.hw{position:absolute;z-index:0;top:-90px;-webkit-mask:linear-gradient(transparent,#000 110px);mask:linear-gradient(transparent,#000 110px);bottom:-1rem;left:50%;width:100vw;transform:translateX(-50%);overflow:hidden;pointer-events:none;
-  background:radial-gradient(45% 55% at 82% 38%,rgba(232,214,202,.75),transparent 70%),radial-gradient(35% 45% at 8% 12%,rgba(234,223,222,.8),transparent 70%)}
-.hw-wave,.hw-lines{position:absolute;left:0;width:200%;animation:hwdrift 34s linear infinite}
-.hw-wave svg,.hw-lines svg{display:block;width:100%;height:100%}
-.hw-wave{bottom:0;height:clamp(150px,24vw,330px);-webkit-mask:linear-gradient(#000 45%,transparent);mask:linear-gradient(#000 45%,transparent)}
-.hw-wave.w1 path{fill:#EADFDE}.hw-wave.w1{opacity:.95;animation-duration:38s}
-.hw-wave.w2 path{fill:#E8D6CA}.hw-wave.w2{opacity:.75;animation-duration:30s;animation-direction:reverse;height:clamp(130px,20vw,280px)}
-.hw-wave.w3 path{fill:#D9C3C3}.hw-wave.w3{opacity:.4;animation-duration:46s;height:clamp(110px,16vw,230px)}
-.hw-lines{top:34%;height:clamp(120px,22vw,300px);opacity:.5;animation-duration:52s;animation-direction:reverse}
-.hw-lines path{fill:none;stroke:var(--plum);stroke-width:1.2;vector-effect:non-scaling-stroke;opacity:.45}
-.hw-lines path:nth-child(2){opacity:.3}.hw-lines path:nth-child(3){opacity:.22;stroke-dasharray:2 7}
-@keyframes hwdrift{to{transform:translateX(-50%)}}
-.hw-pebble{position:absolute;right:clamp(18px,7vw,150px);top:52%;width:clamp(240px,25vw,430px);transform:translateY(-55%);overflow:visible}
-.hw-pebble .pb-soft{fill:#E8D6CA;transform-box:fill-box;transform-origin:center;animation:pbbreath 9s ease-in-out infinite alternate}
-.hw-pebble .pb-line{fill:none;stroke:var(--plum);stroke-width:1.6;opacity:.75;transform-box:fill-box;transform-origin:center;animation:pbturn 22s ease-in-out infinite alternate}
-.hw-pebble .pb-dot{fill:var(--plum);animation:pbdot 9s ease-in-out infinite alternate}
-@keyframes pbbreath{from{transform:translate(-6px,-4px) scale(.94)}to{transform:translate(-2px,0) scale(1.06)}}
-@keyframes pbturn{from{transform:translate(7px,4px) scale(.85) rotate(-6deg)}to{transform:translate(7px,4px) scale(.85) rotate(8deg)}}
-@keyframes pbdot{from{transform:translate(0,0)}to{transform:translate(-3px,3px)}}
-.hw-dot{position:absolute;border-radius:50%;background:var(--plum);opacity:.35;animation:hwfloat 11s ease-in-out infinite alternate}
-.hw-dot.d1{width:9px;height:9px;left:62%;top:22%}.hw-dot.d2{width:6px;height:6px;left:90%;top:70%;animation-delay:-4s;background:#B79AA2}
-.hw-dot.d3{width:12px;height:12px;left:4%;top:58%;background:#E8D6CA;opacity:.9;animation-delay:-7s}.hw-dot.d4{width:5px;height:5px;left:54%;top:66%;animation-delay:-2s}
-@keyframes hwfloat{to{transform:translate(14px,-22px)}}
-@media(max-width:1099px){.hw-pebble{top:96px;right:16px;width:clamp(110px,22vw,200px);transform:none;opacity:.6}.hw-dot.d1{left:72%;top:14%}}
-@media(max-width:699px){.hw{top:-70px}.hw-pebble{top:178px;right:14px;width:84px;opacity:.6}.hw-lines{top:70%;height:140px;width:400%}.hw-wave{width:400%}.hw-wave{height:150px}.hw-wave.w2{height:130px}.hw-wave.w3{height:110px}.hw-dot.d1{left:80%;top:9%}.hw-dot.d4{display:none}}
-@media(prefers-reduced-motion:reduce){.hw-wave,.hw-lines,.hw-dot,.hw-pebble *{animation:none!important}}
 /* Frischer, verspielter Look für die Hauptseite (Vivien, 27.10.2026: „etwas altmodisch“, immer cute) */
 .band{position:relative;overflow:hidden;isolation:isolate;margin-top:clamp(4rem,9vw,7.5rem)}
 .band::before,.band::after{content:"";position:absolute;left:0;right:0;height:clamp(28px,4vw,56px);background:var(--bg);z-index:1;

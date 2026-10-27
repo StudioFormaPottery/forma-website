@@ -3,6 +3,7 @@
 // 3 Monate Begleitung ab 10. Jänner 2027 (erster Live-Call), live online, Deutsch und Englisch. Seit 25.10.2026 sofort buchbar.
 declare(strict_types=1);
 require dirname(__DIR__, 2) . '/api/method-lib.php';
+require_once dirname(__DIR__) . '/assets/waves.inc.php';
 header('Cache-Control: no-store');
 $pdo = forma_db();
 mv_schema($pdo);
@@ -53,6 +54,7 @@ $ld = [
 ];
 foreach ($ld as $j) echo '<script type="application/ld+json">' . json_encode($j, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "</script>\n";
 ?>
+<link rel="stylesheet" href="/wildhearts/assets/cute.css?v=4">
 <style>
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:normal;src:url(/fonts/CormorantGaramond-VF.woff) format("woff")}
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(/fonts/CormorantGaramond-Italic-VF.woff) format("woff")}
@@ -195,7 +197,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
 </div></header>
 
 <main>
-<section class="w"><div class="in hero">
+<section class="w"><div class="in hero has-hw"><?= mv_waves(false) ?>
   <div>
     <p class="k"><span class="de">3 Monate Begleitung · live online</span><span class="en">3 months of guidance · live online</span></p>
     <h1 style="margin-top:.8rem">Unfold</h1>
@@ -230,7 +232,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
     <p><span class="de">Unfold verbindet sanfte Bewegung für deinen Körper mit Impulsen und Werkzeugen für deinen Kopf. Wir bewegen uns gemeinsam, ich motiviere dich, wir sprechen über das, was dich wirklich beschäftigt, und Schritt für Schritt wird es leichter.</span><span class="en">Unfold combines gentle movement for your body with talks and tools for your mind. We move together, I motivate you, we talk about what is really on your mind, and step by step things feel lighter.</span></p>
   </div>
 </div>
-<div class="in pillars">
+<div class="in pillars cute-cards">
   <div class="pl"><span class="pn">1</span><b><span class="de">Bewegung</span><span class="en">Movement</span></b><p><span class="de">Zwei Videos pro Woche: Yoga, Bodyweight, Somatic und freie Bewegung, für volle und für müde Tage.</span><span class="en">Two videos a week: yoga, bodyweight, somatic and free movement, for full days and tired days.</span></p></div>
   <div class="pl"><span class="pn">2</span><b><span class="de">Live-Call &amp; Impulsvortrag</span><span class="en">Live call &amp; talk</span></b><p><span class="de">Einmal pro Woche live: ein Thema, ein kurzer Vortrag, Austausch und gemeinsames Arbeiten wie in einem kleinen Seminar.</span><span class="en">Once a week live: one topic, a short talk, sharing and working together like in a small seminar.</span></p></div>
   <div class="pl"><span class="pn">3</span><b><span class="de">Workbooks</span><span class="en">Workbooks</span></b><p><span class="de">Zum Durcharbeiten, für deine mentale Gesundheit: Mental Load, bessere Organisation, Selbstwert, Grenzen und deine Ideen.</span><span class="en">Exercises to work through for your mental health: mental load, better organisation, self-worth, boundaries and your ideas.</span></p></div>
@@ -261,7 +263,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
   </div>
 
   <h2 style="margin-top:clamp(3rem,6vw,5rem)"><span class="de">Das ist <em>dabei</em></span><span class="en">What's <em>included</em></span></h2>
-  <div class="grid">
+  <div class="grid cute-cards">
     <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#7D5E68" stroke-width="1.6" stroke-linecap="round"><circle cx="17" cy="18" r="6"/><circle cx="31" cy="18" r="6"/><path d="M6 38c1.5-7 6-10 11-10s9.5 3 11 10M24 30c2-1.4 4.4-2 7-2 5 0 9.5 3 11 10"/></svg><b><span class="de">Wöchentlicher Live-Call</span><span class="en">Weekly live call</span></b><p><span class="de">Jede Woche treffen wir uns live in einer kleinen Runde, es gibt höchstens 10 Plätze. Es gibt immer einen Termin auf Deutsch und einen auf Englisch, du wählst einfach.</span><span class="en">Every week we meet live in a small circle, with no more than 10 spots. There is always one call in English and one in German, and you simply choose.</span></p></div>
     <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#7D5E68" stroke-width="1.6" stroke-linecap="round"><path d="M6 34c6-10 12-10 18 0s12 10 18 0"/><circle cx="24" cy="13" r="4"/></svg><b><span class="de">Zwei Bewegungsvideos pro Woche</span><span class="en">Two movement videos a week</span></b><p><span class="de">Jeden Montag ein Full-Day-Flow (ca. 30 Min.) und jeden Donnerstag ein sanfter Tired-Day-Flow (ca. 15 Min.), immer ein Mix aus Yoga, Bodyweight, Somatic und freier Bewegung. Du machst sie, wann es dir passt.</span><span class="en">Every Monday a Full Day flow (about 30 min.) and every Thursday a gentle Tired Day flow (about 15 min.), always a mix of yoga, bodyweight, somatic and free movement. You do them whenever it suits you.</span></p></div>
     <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#7D5E68" stroke-width="1.6" stroke-linecap="round"><rect x="9" y="7" width="30" height="34" rx="5"/><path d="M16 16h16M16 23h16M16 30h10"/></svg><b><span class="de">Monatliches Workbook</span><span class="en">Monthly workbook</span></b><p><span class="de">Zum Ausdrucken oder am iPad: Übungen zu Mindset, Selbstwert und deinen Ideen, mit Journaling-Fragen für jede Woche.</span><span class="en">Print it or use it on your tablet: exercises for mindset, self-worth and your ideas, with journaling prompts for every week.</span></p></div>
@@ -360,7 +362,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
 </div></section>
 
 <section class="w s"><div class="in me">
-  <img src="/img/wildhearts/viv.jpg" alt="Vivien">
+  <img src="/img/movecia/fotos/ev-profil.jpg" alt="Vivien">
   <div>
     <p class="k"><span class="de">Hallo, ich bin Vivien</span><span class="en">Hi, I'm Vivien</span></p>
     <p style="margin-top:.8rem"><span class="de">Ich bin Mama von vier Kindern, Bewegungstrainerin und habe mir in den Tiroler Bergen mein eigenes Atelier aufgebaut, mit vielen Umwegen, Zweifeln und Tagen, an denen ich nicht wusste, wo ich anfangen soll. Genau deshalb gibt es Unfold. Ich möchte dich auf dem Weg begleiten, den ich selbst gegangen bin: zurück zu dir und hinein in das, was du dir wirklich wünschst.</span><span class="en">I am a mother of four, a movement teacher, and I built my own studio in the Tyrolean mountains, with many detours, doubts and days when I didn't know where to begin. That is exactly why Unfold exists. I want to walk with you along the path I took myself: back to yourself and into what you truly want.</span></p>

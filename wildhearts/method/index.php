@@ -24,6 +24,7 @@ mvl_head('Mindful Movement Method · Online Yoga, Somatic Movement & Breathwork 
 <?php mvl_top('method'); ?>
 <main>
 <section class="w"><div class="in hero-x" style="display:grid;gap:2.4rem;align-items:center;grid-template-columns:minmax(0,1fr)">
+  <?= mv_waves(true, 'pb-desk') ?>
   <div>
     <p class="k"><span class="de">On demand · Deutsch &amp; Englisch</span><span class="en">On demand · English &amp; German</span></p>
     <h1><span class="de">Mindful<br><em>Movement</em> Method</span><span class="en">Mindful<br><em>Movement</em> Method</span></h1>
@@ -38,7 +39,7 @@ mvl_head('Mindful Movement Method · Online Yoga, Somatic Movement & Breathwork 
 <section class="w sec" id="inhalt"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">In der Bibliothek</span><span class="en">In the library</span></p><h2 style="margin-top:.6rem"><span class="de">Bewegung, die sich <em>gut</em> anfühlt</span><span class="en">Movement that feels <em>good</em></span></h2></div>
     <p><span class="de">Zwischen 5 und 30 Minuten, für volle und für müde Tage. Du filterst einfach nach dem, was du heute brauchst.</span><span class="en">Between 5 and 30 minutes, for full days and tired days. You simply filter by what you need today.</span></p></div>
-  <div class="cats">
+  <div class="cats cute-cards">
     <div class="cat rv"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 34c6-10 12-10 18 0s12 10 18 0"/><circle cx="24" cy="13" r="4"/></svg><b>Movecia Movement</b><p><span class="de">Sanft fließende Abfolgen aus Yoga und freier Bewegung, die dich beweglich und weich machen.</span><span class="en">Flowing sequences of yoga and free movement that leave you supple and soft.</span></p></div>
     <div class="cat rv"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M24 8c-7 6-7 14 0 20s7 14 0 20"/><path d="M14 18c4 3 4 9 0 12M34 18c-4 3-4 9 0 12"/></svg><b>Somatic Movement</b><p><span class="de">Langsame Bewegungen, die Spannung lösen und dein Nervensystem beruhigen.</span><span class="en">Slow movements that release tension and calm your nervous system.</span></p></div>
     <div class="cat rv"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M24 8v6M16 18h16M24 14v12l-6 14M24 26l6 14"/></svg><b><span class="de">Kraft ohne Erschöpfung</span><span class="en">Strength without exhaustion</span></b><p><span class="de">Training mit dem eigenen Körpergewicht für eine starke Mitte, ohne dich auszupowern.</span><span class="en">Bodyweight training for a strong centre, without wearing you out.</span></p></div>
