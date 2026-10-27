@@ -6,7 +6,7 @@
  "subtitle": "für die Abende, an denen du alles gegeben hast",
  "icon": "kerze",
  "letter": [
-  "ja, genau du, die das gerade am Ende eines langen Tages liest.",
+  "Ja, genau dich meine ich, die das gerade am Ende eines langen Tages liest.",
   "Ich kenne dieses Gefühl. Der Tag ist vorbei, alle haben bekommen, was sie von dir gebraucht haben, und für dich selbst ist nichts mehr übrig. Nicht einmal die Kraft zu entscheiden, was dir jetzt eigentlich guttun würde.",
   "Deshalb ist das hier kein Workout und nichts, was du gut machen musst. Es sind zehn stille Minuten, die nur dir gehören. Du atmest, zündest eine Kerze an, lässt eine Sache los, legst deine Hände um etwas Warmes und schreibst ein paar ehrliche Zeilen.",
   "An manchen Abenden fühlt es sich nach viel an, an anderen nach gar nichts. Beides ist völlig in Ordnung."
@@ -14,7 +14,7 @@
  "overview": [
   {
    "icon": "atem",
-   "title": "Schritt 1 · Komm an mit deinem Atem",
+   "title": "Schritt 1 · Komm mit deinem Atem an",
    "text": "2 Minuten"
   },
   {
@@ -62,26 +62,26 @@
   {
    "icon": "atem",
    "kicker": "Schritt eins · 2 Minuten",
-   "title": "Komm an mit deinem Atem",
+   "title": "Komm mit deinem Atem an",
    "blocks": [
     {
      "t": "breath",
      "title": "Verlängertes Ausatmen",
      "pattern": "ein 4 · aus 6",
-     "text": "Setz oder leg dich so hin, dass deine Schultern sinken dürfen. Eine Hand auf den Bauch, eine auf die Brust."
+     "text": "Setz oder leg dich so hin, dass deine Schultern sinken dürfen. Leg eine Hand auf den Bauch und eine auf die Brust."
     },
     {
      "t": "steps",
      "items": [
       "Atme durch die Nase ein und zähle langsam bis vier.",
       "Atme durch den Mund aus, während du bis sechs zählst, so als würdest du eine Fensterscheibe anhauchen.",
-      "Mach das etwa zehnmal. Lass zuerst den Bauch sich heben, und lass jedes Ausatmen ein bisschen mehr vom Tag mitnehmen."
+      "Mach das etwa zehnmal. Lass beim Einatmen zuerst den Bauch weit werden, und lass jedes Ausatmen ein bisschen mehr vom Tag mitnehmen."
      ]
     },
     {
      "t": "fact",
      "title": "Warum das lange Ausatmen hilft",
-     "text": "Wenn du länger aus- als einatmest, sendest du deinem Nervensystem ein Signal, dass keine Gefahr besteht. Der Teil, der für Ruhe und Erholung zuständig ist, darf übernehmen, der Herzschlag wird ruhiger und die Schultern lassen los. Ein langes Ausatmen sagt deinem Körper: Der Tag ist vorbei, du bist jetzt sicher."
+     "text": "Wenn du länger aus- als einatmest, sendest du deinem Nervensystem ein Signal, dass keine Gefahr besteht. Der Teil, der für Ruhe und Erholung zuständig ist, darf übernehmen, der Herzschlag wird ruhiger und die Schultern lassen los. Ein langes Ausatmen sagt deinem Körper: Der Tag ist vorbei, du bist jetzt in Sicherheit."
     }
    ]
   },
@@ -124,12 +124,12 @@
       "250 ml Hafermilch oder eine Milch deiner Wahl",
       "½ TL Kurkuma",
       "½ TL Zimt",
-      "eine Prise Ingwer und schwarzer Pfeffer",
+      "je eine Prise gemahlener Ingwer und schwarzer Pfeffer",
       "1 TL Honig oder Ahornsirup"
      ],
      "steps": [
       "Erwärme die Milch sanft in einem kleinen Topf.",
-      "Rühr die Gewürze ein und lass sie ein paar Minuten dampfen, ohne dass sie kocht.",
+      "Rühr die Gewürze ein und lass die Milch ein paar Minuten ziehen, ohne dass sie kocht.",
       "Zum Schluss süßen, in deine Lieblingstasse gießen und mit beiden Händen halten, während du schreibst."
      ],
      "note": "Kein Kurkuma zu Hause? Warme Milch mit Zimt und Honig ist genauso kuschelig."

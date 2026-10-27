@@ -3,13 +3,13 @@
  "lang": "en",
  "eyebrow": "My gift for you · 10 minutes",
  "title": "Reset Routine\nfor Tired Days",
- "subtitle": "for the evenings you gave everything away",
+ "subtitle": "for the evenings when you've given everything",
  "icon": "kerze",
  "letter": [
-  "yes, you, reading this at the end of a long day.",
+  "Yes, I mean you, reading this at the end of a long day.",
   "I know that feeling. The day is over, everyone got what they needed from you, and there is nothing left for yourself. Not even the energy to decide what would actually be good for you.",
-  "That's why this isn't a workout, and nothing you have to do well. These are ten quiet minutes that belong only to you. You'll breathe, light a candle, let one thing go, wrap your hands around something warm and write a few honest lines.",
-  "Some evenings it will feel like a lot. Some evenings like nothing at all. Both are completely okay."
+  "That's why this isn't a workout or anything you have to do well. These are ten quiet minutes that belong only to you. You'll breathe, light a candle, let one thing go, wrap your hands around something warm and write a few honest lines.",
+  "Some evenings it will feel like a lot, others like nothing at all. Both are completely okay."
  ],
  "overview": [
   {
@@ -68,7 +68,7 @@
      "t": "breath",
      "title": "A longer exhale",
      "pattern": "in 4 · out 6",
-     "text": "Sit or lie down so your shoulders can drop. One hand on your belly, one on your chest."
+     "text": "Sit or lie down so your shoulders can drop. Place one hand on your belly and one on your chest."
     },
     {
      "t": "steps",
@@ -94,18 +94,18 @@
      "t": "steps",
      "items": [
       "Light a candle and look into the flame for a few breaths.",
-      "Write one thing on a small piece of paper that may leave you tonight. A worry, something someone said, the pressure to get everything done.",
+      "On a small piece of paper, write down one thing that's allowed to go tonight. A worry, something someone said, the pressure to get everything done.",
       "Fold it twice, hold it in your hands and quietly say the words below.",
       "Put the paper aside, throw it away tomorrow morning, and blow out the candle when you're ready."
      ]
     },
     {
      "t": "quote",
-     "text": "“You may go now.”"
+     "text": "“You can go now.”"
     },
     {
      "t": "tip",
-     "text": "If nothing comes to mind, simply write “today” on the paper. A whole day may go, too."
+     "text": "If nothing comes to mind, simply write “today” on the paper. A whole day is allowed to go, too."
     }
    ]
   },
@@ -124,12 +124,12 @@
       "250 ml oat milk, or any milk you like",
       "½ tsp turmeric",
       "½ tsp cinnamon",
-      "a pinch of ginger and black pepper",
+      "a pinch each of ground ginger and black pepper",
       "1 tsp honey or maple syrup"
      ],
      "steps": [
       "Warm the milk gently in a small pot.",
-      "Whisk in the spices and let it steam for a few minutes without boiling.",
+      "Whisk in the spices and let the milk steep for a few minutes without letting it boil.",
       "Sweeten it at the end, pour it into your favourite cup and hold it with both hands while you write."
      ],
      "note": "No turmeric at home? Warm milk with cinnamon and honey is just as cosy."

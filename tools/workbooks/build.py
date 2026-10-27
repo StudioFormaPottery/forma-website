@@ -299,7 +299,7 @@ def render(wb, cover_svg=None, merk=None):
     body = ''
     if wb.get('letter'):
         ps = wb['letter']
-        body += (f'<section class="letter"><div class="chh"><span class="badge">{icon("herz")}</span><div><p class="k">{L["letter"]}</p><h2>{"Hallo, du" if L is T["de"] else "Hello, you"}</h2></div></div>'
+        body += (f'<section class="letter"><div class="chh"><span class="badge">{icon("herz")}</span><div><p class="k">{L["letter"]}</p><h2>{"Hallo, meine Liebe" if L is T["de"] else "Hi lovely"}</h2></div></div>'
                  + ''.join(f'<p>{e(p)}</p>' for p in ps) + '<p class="sig">♡ Vivien</p>')
         if wb.get('overview'):
             body += f'<p class="k" style="margin-top:7mm">{L["inhalt"]}</p><div class="ov">' + ''.join(

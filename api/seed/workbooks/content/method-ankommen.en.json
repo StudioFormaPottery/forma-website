@@ -6,8 +6,8 @@
   "subtitle": "Your first steps, your own space and your first little rituals",
   "icon": "nest",
   "letter": [
-    "Dear you, I'm so glad you're here. If you're opening this workbook right now, you've already chosen something that gets far too little room in most women's lives, namely a bit of time that belongs entirely to you. Maybe the shopping list is still lying next to you, maybe a laundry basket is waiting, or a child who's about to need something from you. All of that is allowed to be there, and still I'd like to invite you to breathe out deeply for the next few minutes and simply arrive with yourself.",
-    "I live in the mountains with my husband and our four children, and I know how full a day can get and how quiet your own voice can become along the way. I found my way back to myself through movement, and through the gentle kind where you don't have to prove anything. A few slow minutes on the mat and one conscious breath with my hand on my belly were often enough to make room inside me again. That's exactly the experience I want to share with you.",
+    "I'm so glad you're here. If you're opening this workbook right now, you've already chosen something that gets far too little room in many women's lives: a bit of time that belongs entirely to you. Maybe the shopping list is still lying next to you, maybe a laundry basket is waiting, or a child who's about to need something from you. All of that is allowed to be there, and still I'd like to invite you to breathe out deeply for the next few minutes and come back to yourself.",
+    "I live in the mountains with my husband and our four children, and I know how full a day can get and how quiet your own voice can become along the way. I found my way back to myself through movement, the gentle kind where you don't have to prove anything. A few slow minutes on the mat and one conscious breath with my hand on my belly were often enough to make room inside me again. That's exactly the experience I want to share with you.",
     "The Mindful Movement Method is built to walk beside you rather than overwhelm you. You begin with Arrive, and after that a new programme with its own theme opens up month by month. You move at your own pace, and you don't have to compare yourself with anyone, not even with the version of you from a few years ago.",
     "This workbook is your companion for the first few days. In it you'll find an explanation of how the Method works, ideas for your own space at home, the most important basics of mindful movement, and pages where you can write down where you are right now and where you'd like to go. Write in it, cross things out, doodle in the margins. It's your book, and it doesn't have to look pretty to do you good.",
     "I'm so happy that we're walking this path together. Make yourself a cup of tea, get comfortable, and then let's simply begin. With love, Vivien"
@@ -21,7 +21,7 @@
     {"icon": "spiegel", "title": "Where are you right now?", "text": "An honest check-in on your energy, sleep, stress and how you feel in your body."},
     {"icon": "stern", "title": "Your intention", "text": "What you wish for yourself over the coming months, in your own words."},
     {"icon": "kalender", "title": "Your first weeks", "text": "A weekly tracker and a simple plan for your three sessions a week."},
-    {"icon": "kerze", "title": "First little rituals", "text": "Small habits that fit easily into a busy everyday life."}
+    {"icon": "kerze", "title": "First little rituals", "text": "Small habits that fit easily into a busy life."}
   ],
   "chapters": [
     {
@@ -51,7 +51,7 @@
         ]},
         {"t": "tip", "text": "For the movement videos it's worth putting together a little playlist of your own. In the morning I love calm instrumental music, and in the afternoon something with a bit more rhythm. If you always start the same playlist, after a few times your body will know from the very first song that your time is beginning."},
         {"t": "h", "text": "Why you can't skip ahead"},
-        {"t": "p", "text": "You might be wondering why you can't simply open all the videos at once in the Method, fast-forward or skip ahead. I made that choice very deliberately. When everything lies in front of us at the same time, we tend to click around, never find a proper starting point and in the end don't stick with anything. I know that feeling very well from my own life."},
+        {"t": "p", "text": "You might be wondering why, in the Method, you can't simply open all the videos at once, fast-forward or skip ahead. I made that choice very deliberately. When everything lies in front of us at the same time, we tend to click around, never find a proper starting point and in the end don't stick with anything. I know that feeling very well from my own life."},
         {"t": "p", "text": "When a video only opens after you've fully completed the previous one, a clear thread runs through everything. You don't have to think about what comes next, because that decision has already been made. That takes a small but noticeable weight off your shoulders, especially on days when your mind is already full of decisions. The videos also build on each other: what you practise in a flow comes up again in a movement video, and the breathing practices prepare you for the meditations."},
         {"t": "fact", "title": "You can never fall behind", "text": "If you miss a day, or even a whole week, your next video simply waits for you. There's nothing to catch up on and no list piling up. You carry on exactly where you left off."},
         {"t": "quote", "text": "I go step by step, and every step counts."}
@@ -83,7 +83,7 @@
         {"t": "tip", "text": "Many of these exercises will stay with you throughout the whole Method. If you do your first flow two or three times, you'll soon know the basic movements so well that in later videos you can focus entirely on how things feel."},
         {"t": "h", "text": "Breath That Holds You"},
         {"t": "p", "text": "This short breathing practice takes only about five minutes and is meant for all the moments when things get too much. You breathe in through your nose for a count of four and slowly out again for a count of six. You can do it sitting, standing or lying down, in the car outside the nursery just as well as in bed at night. In Chapter 5 you'll find the practice written out so you can read it and follow along."},
-        {"t": "table", "title": "My Arrive", "cols": ["Video", "Done on", "How I felt afterwards"], "rows": [
+        {"t": "table", "title": "My Arrive videos", "cols": ["Video", "Done on", "How I felt afterwards"], "rows": [
           ["Welcome to the Method", "", ""],
           ["Your First Flow", "", ""],
           ["Breath That Holds You", "", ""],
@@ -134,11 +134,11 @@
       "title": "The basics of mindful movement",
       "intro": "Mindful movement means really noticing your body while you practise. These basics will help you move safely and with joy.",
       "blocks": [
-        {"t": "p", "text": "Many of us learned to link movement with performance. We count repetitions, compare ourselves with others and keep going even when our body has long been quietly protesting. The Method is about something different. You're allowed to be curious about how a movement feels today, and you're allowed to adapt it to your day. That doesn't make the exercises any less effective. Quite the opposite, because when you practise mindfully you usually move with better form and get injured less often."},
+        {"t": "p", "text": "Many of us learned to link movement with performance. We count repetitions, compare ourselves with others and keep going even when our body has long been quietly protesting. The Method is about something different. You're allowed to be curious about how a movement feels today, and you're allowed to adapt it to your day. That doesn't make the exercises any less effective. Quite the opposite: when you practise mindfully, you usually move with better form and get injured less often."},
         {"t": "h", "text": "Your breath leads the way"},
         {"t": "p", "text": "During the exercises, breathe through your nose if you can and let your breath flow calmly. In many flows we link a movement with the breath, for example opening up as you breathe in and rounding as you breathe out. If you notice you're holding your breath, take it as a friendly hint to make the movement a little smaller or slower. In strengthening exercises most women find it helps to breathe out during the effort, for instance as you press up out of a squat."},
         {"t": "h", "text": "Slow is your pace"},
-        {"t": "p", "text": "Slow movements often challenge your muscles more than you'd expect, and they give you time to feel what's happening in your body. You don't have to keep up with the pace in the video. If an exercise in a movement video changes too quickly for you, choose the 45-second timer, or do one repetition fewer and make it fully conscious instead."},
+        {"t": "p", "text": "Slow movements often challenge your muscles more than you'd expect, and they give you time to feel what's happening in your body. You don't have to keep up with the pace in the video. If an exercise in a movement video changes too quickly for you, choose the 45-second timer, or do one fewer repetition and make it really mindful instead."},
         {"t": "h", "text": "Telling a stretch from pain"},
         {"t": "p", "text": "A stretch can be clearly noticeable, but it should never feel sharp or make you hold your breath. This overview helps you make sense of your body's signals:"},
         {"t": "table", "title": "What am I feeling?", "cols": ["Good sign", "Careful, better ease off"], "rows": [
@@ -150,7 +150,7 @@
         ]},
         {"t": "tip", "text": "I like to picture a scale from one to ten. A stretch can feel like a four to six. Anything above that is a sign to take a step back, bend a knee or place a cushion underneath."},
         {"t": "h", "text": "Pauses are part of it"},
-        {"t": "p", "text": "You can pause at any time. Child's Pose is your place of retreat in every video, where you can sink down when you want to catch your breath. A pause isn't giving up, and it doesn't make your practice any worse. Often the moment when you stop and notice the after-effects is the most valuable part of an exercise."},
+        {"t": "p", "text": "You can pause at any time. Child's Pose is your place of retreat in every video, where you can sink down when you want to catch your breath. A pause isn't giving up, and it doesn't make your practice any worse. Often the moment when you pause and feel the effects is the most valuable part of an exercise."},
         {"t": "fact", "title": "Please check first", "text": "If you're pregnant, have recently had a baby, are getting back into exercise after surgery, or have conditions such as back pain, high blood pressure, heart or circulation problems or joint issues, please talk to your doctor or midwife before you begin. In every exercise, choose the easier variation as soon as something doesn't feel right, and stop if you feel pain, dizziness or shortness of breath. The Method videos are no substitute for medical advice or therapy."},
         {"t": "quote", "text": "Today my body is allowed to tell me what it needs."}
       ]
@@ -161,7 +161,7 @@
       "title": "Breath That Holds You",
       "intro": "This breathing practice is your little first-aid kit for overwhelming moments. It only takes a few minutes and works anywhere.",
       "blocks": [
-        {"t": "p", "text": "When we're under pressure, our breath often becomes shallow and fast, and we tend to breathe high up into the chest. That happens completely automatically, for example when the children are fighting, the phone rings and dinner is burning all at the same time. The other way round, a deliberately slow breath lets us send our body a signal that it can calm down a little again."},
+        {"t": "p", "text": "When we're under pressure, our breath often becomes shallow and fast, and we tend to breathe high up into the chest. That happens completely automatically, for example when the children are fighting, the phone rings and dinner is burning all at the same time. Conversely, a deliberately slow breath lets us send our body a signal that it can calm down a little again."},
         {"t": "breath", "title": "Extended exhale", "pattern": "4 · 6", "text": "Breathe in through your nose and slowly count to four. Then breathe out through your mouth or nose and count to six. Repeat this about ten times, then let go of the counting."},
         {"t": "exercise", "title": "How to do the practice", "time": "3 to 5 minutes", "intro": "You can sit, stand or lie down. All that matters is that you have a moment to yourself.", "steps": [
           "Place one hand on your heart and the other on your belly.",
@@ -182,7 +182,7 @@
       "title": "Where are you right now?",
       "intro": "Before you set off, it's worth taking an honest look at how you're doing right now. There's no right or wrong here, only where you stand today.",
       "blocks": [
-        {"t": "p", "text": "This check-in is a snapshot of today. In a few months you can flip back and compare. Things often change so slowly that we don't even notice it in everyday life, and only looking back shows us how far we've come. Take a few minutes, breathe deeply once and circle whatever feels true for you without overthinking it."},
+        {"t": "p", "text": "This check-in is a snapshot of today. In a few months you can flip back and compare. Things often change so slowly that we don't even notice it in everyday life, and only looking back shows us how far we've come. Take a few minutes, take one deep breath and circle whatever feels true for you without overthinking it."},
         {"t": "scale", "title": "How I'm doing today", "items": [
           "My energy in everyday life",
           "How restful my sleep is",

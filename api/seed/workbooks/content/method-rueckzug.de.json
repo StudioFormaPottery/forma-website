@@ -6,7 +6,7 @@
   "subtitle": "Kraft sammeln in der dunklen Jahreszeit",
   "icon": "mond",
   "letter": [
-    "Liebe du, willkommen in deinem ersten Monat. Draußen wird es früh dunkel, die Wiesen liegen still unter dem Schnee, und wenn ich am Morgen zu den Pferden hinausgehe, ist die Luft so klar und kalt, dass jeder Atemzug eine kleine Wolke macht. In dieser Zeit zieht sich die Natur zurück und sammelt Kraft für das nächste Jahr. Genau diese Bewegung möchte ich mit dir in den kommenden Wochen auf die Matte bringen.",
+    "Willkommen in deinem ersten Monat. Draußen wird es früh dunkel, die Wiesen liegen still unter dem Schnee, und wenn ich am Morgen zu den Pferden hinausgehe, ist die Luft so klar und kalt, dass jeder Atemzug eine kleine Wolke macht. In dieser Zeit zieht sich die Natur zurück und sammelt Kraft für das nächste Jahr. Genau diese Bewegung möchte ich mit dir in den kommenden Wochen auf die Matte bringen.",
     "Gleichzeitig weiß ich, dass der Dezember für viele von uns alles andere als still ist. Es gibt Weihnachtsfeiern in Schule und Kindergarten, Geschenke, Besuche, Plätzchen und eine lange Liste von Dingen, an die jemand denken muss. Unser Körper spürt diesen Widerspruch sehr genau. Er möchte langsamer werden, und wir verlangen von ihm, schneller zu sein. Vielleicht kennst du dieses Gefühl, abends müde und gleichzeitig zu unruhig zum Einschlafen zu sein.",
     "Darum steht dieser Monat im Zeichen von Rückzug und Ruhe. Ich lade dich ein, dir kleine Inseln zu schaffen, auf denen du nichts leisten musst. Wir bewegen uns sanft, wir bauen eine Kraft auf, die dich trägt, ohne dich zu erschöpfen, und wir geben deinem Nervensystem immer wieder die Gelegenheit, zur Ruhe zu kommen.",
     "In diesem Workbook findest du alles, was die zwölf Videos des Monats begleitet: Hintergrundwissen zu Box Breathing, Somatics, Mental Load, sanftem Krafttraining und Schlaf, Seiten zum Planen und Reflektieren und zum Schluss einen kleinen Küchenteil mit wärmenden Rezepten, die dir an vollen Wintertagen das Kochen leichter machen. Du musst nicht alles lesen und nicht alles ausfüllen. Nimm dir, was dir guttut, und lass den Rest liegen, bis du ihn brauchst.",
@@ -43,7 +43,7 @@
         {"t": "p", "text": "Wenn wir unser Leben als eine Abfolge von Zyklen sehen, wird vieles leichter. Es gibt Wochen, in denen wir viel schaffen, und Wochen, in denen wir vor allem Kraft sammeln müssen. Als Frau kennst du vielleicht auch den Zyklus innerhalb eines Monats, in dem sich Energie und Stimmung verändern können. Und es gibt Lebensphasen, etwa mit kleinen Kindern, in denen weniger Raum für uns selbst bleibt. Keine dieser Phasen ist besser oder schlechter als die andere. Sie gehören zusammen."},
         {"t": "h", "text": "Warum Pausen produktiv sind"},
         {"t": "p", "text": "Vielleicht hast du schon einmal erlebt, dass dir die Lösung für ein Problem genau dann eingefallen ist, als du gar nicht daran gedacht hast, unter der Dusche, beim Spazierengehen oder kurz vor dem Einschlafen. Das ist kein Zufall. Wenn wir uns von einer Aufgabe lösen, arbeitet unser Gehirn im Hintergrund weiter und verknüpft Gedanken neu. Kurze Pausen zwischen konzentrierten Phasen helfen vielen Menschen, über den Tag hinweg aufmerksamer und gelassener zu bleiben."},
-        {"t": "p", "text": "Eine Pause muss nicht lang sein. Schon ein paar bewusste Atemzüge, ein Blick aus dem Fenster oder fünf Minuten in der Kindhaltung können einen Unterschied machen. Entscheidend ist, dass du in diesem Moment wirklich pausierst und nicht nebenbei durch dein Handy scrollst, denn auch das ist für das Gehirn eine Form von Arbeit."},
+        {"t": "p", "text": "Eine Pause muss nicht lang sein. Schon ein paar bewusste Atemzüge, ein Blick aus dem Fenster oder fünf Minuten in der Kindhaltung können schon viel bewirken. Entscheidend ist, dass du in diesem Moment wirklich pausierst und nicht nebenbei durch dein Handy scrollst, denn auch das ist für das Gehirn eine Form von Arbeit."},
         {"t": "tip", "text": "Ich habe mir angewöhnt, an vollen Tagen eine kleine Pause genau dann zu machen, wenn ich merke, dass ich ungeduldig werde. Statt noch schnell die nächste Sache zu erledigen, setze ich mich für zwei Minuten hin, trinke einen Schluck Tee und atme. Danach geht das Nächste fast immer leichter."},
         {"t": "h", "text": "Was dich in diesem Monat erwartet"},
         {"t": "p", "text": "Die zwölf Videos dieses Monats begleiten dich vom ersten ruhigen Morgen-Flow bis zu einem kräftigenden Bewegungsvideo für Beine und Hüften am Ende. Dazwischen findest du Atemübungen für volle Tage, sanfte Somatics, ein Gespräch über Mental Load, ein Krafttraining, das dich stärkt, ohne dich auszulaugen, und eine Abendmeditation, die dir hilft, den Tag abzulegen. Jedes Video baut auf dem vorigen auf, und am Ende des Monats wirst du merken, wie viel Kraft in der Ruhe steckt."},
@@ -167,7 +167,7 @@
       "intro": "Box Breathing ist eine einfache Atemtechnik mit vier gleich langen Phasen. Sie hilft dir, an vollen Tagen wieder in deine Mitte zu finden.",
       "blocks": [
         {"t": "p", "text": "Stell dir ein Quadrat mit vier gleich langen Seiten vor. Mit jeder Seite verbindest du eine Phase deines Atems: einatmen, halten, ausatmen, halten. Jede Phase dauert gleich lang, meist vier Zählzeiten. Durch das gleichmäßige Zählen bekommt dein Kopf eine klare, einfache Aufgabe, und dein Atem wird ganz von selbst langsamer und ruhiger."},
-        {"t": "breath", "title": "Box Breathing", "pattern": "4 · 4 · 4 · 4", "text": "Atme durch die Nase ein und zähl bis vier. Halte den Atem sanft und zähl bis vier. Atme langsam aus und zähl bis vier. Halte leer und zähl bis vier. Wiederhole das etwa acht Runden lang."},
+        {"t": "breath", "title": "Box Breathing", "pattern": "4 · 4 · 4 · 4", "text": "Atme durch die Nase ein und zähl bis vier. Halte den Atem sanft und zähl bis vier. Atme langsam aus und zähl bis vier. Halte mit leerer Lunge an und zähl bis vier. Wiederhole das etwa acht Runden lang."},
         {"t": "exercise", "title": "So übst du Box Breathing", "time": "5 Minuten", "intro": "Setz dich aufrecht hin, stell die Füße fest auf den Boden und leg die Hände auf die Oberschenkel.", "steps": [
           "Atme einmal ganz natürlich aus und lass die Schultern sinken.",
           "Atme durch die Nase ein und zähl dabei langsam bis vier. Stell dir vor, wie du die erste Seite des Quadrats entlangfährst.",
@@ -177,7 +177,7 @@
           "Wiederhole das etwa acht Runden. Lass danach das Zählen los und atme ganz natürlich weiter.",
           "Spür einen Moment nach, wie sich dein Kopf und dein Körper jetzt anfühlen."
         ]},
-        {"t": "fact", "title": "Was beim gleichmäßigen Atmen passiert", "text": "Im Ruhezustand atmen Erwachsene meist etwa zwölf bis achtzehn Mal pro Minute. Beim Box Breathing mit vier Zählzeiten pro Phase sind es nur noch drei bis vier Atemzüge pro Minute. Ein so langsamer, gleichmäßiger Atem wird von vielen Menschen als beruhigend erlebt, und erste Studien zu langsamer Atmung deuten darauf hin, dass sie kurzfristig helfen kann, Anspannung zu senken. Box Breathing ist außerdem ein Konzentrationsanker, weil das Zählen die Gedanken für einige Minuten bündelt."},
+        {"t": "fact", "title": "Was beim gleichmäßigen Atmen passiert", "text": "Im Ruhezustand atmen Erwachsene meist etwa zwölf- bis achtzehnmal pro Minute. Beim Box Breathing mit vier Zählzeiten pro Phase sind es nur noch drei bis vier Atemzüge pro Minute. Ein so langsamer, gleichmäßiger Atem wird von vielen Menschen als beruhigend erlebt, und erste Studien zu langsamer Atmung deuten darauf hin, dass sie kurzfristig helfen kann, Anspannung zu senken. Box Breathing ist außerdem ein Konzentrationsanker, weil das Zählen die Gedanken für einige Minuten bündelt."},
         {"t": "h", "text": "Wann Box Breathing dir helfen kann"},
         {"t": "list", "items": [
           "Vor einem wichtigen Gespräch, etwa mit der Lehrerin deines Kindes oder deiner Chefin",
@@ -219,10 +219,10 @@
         {"t": "p", "text": "Unser Körper spricht ständig mit uns, nur hören wir im Alltag selten zu. Ein verspannter Kiefer, hochgezogene Schultern, ein flacher Atem oder ein flaues Gefühl im Bauch sind oft frühe Hinweise darauf, dass uns etwas belastet. Die Fähigkeit, solche inneren Signale wahrzunehmen, nennt man Interozeption. Sie lässt sich üben, und Somatics ist dafür eine wunderbare Schule."},
         {"t": "exercise", "title": "Der kleine Körper-Check", "time": "3 Minuten", "intro": "Diesen Check kannst du mehrmals am Tag machen, im Sitzen, im Stehen oder sogar beim Kochen.", "steps": [
           "Halte kurz inne und schließ die Augen, wenn es möglich ist.",
-          "Spür in deinen Kiefer. Sind deine Zähne aufeinandergepresst? Lass sie ein kleines Stück auseinandergehen.",
-          "Spür in deine Schultern. Sind sie Richtung Ohren gezogen? Lass sie mit dem Ausatmen sinken.",
-          "Spür in deinen Bauch. Ist er fest oder weich? Lass ihn mit dem nächsten Einatmen weit werden.",
-          "Spür in deine Hände. Sind sie zu Fäusten geballt oder locker?",
+          "Spür in deinen Kiefer hinein. Sind deine Zähne aufeinandergepresst? Lass sie ein kleines Stück auseinandergehen.",
+          "Spür in deine Schultern hinein. Sind sie Richtung Ohren gezogen? Lass sie mit dem Ausatmen sinken.",
+          "Spür in deinen Bauch hinein. Ist er fest oder weich? Lass ihn mit dem nächsten Einatmen weit werden.",
+          "Spür in deine Hände hinein. Sind sie zu Fäusten geballt oder locker?",
           "Frag dich, was dein Körper dir gerade sagen möchte, und nimm die Antwort einfach zur Kenntnis."
         ]},
         {"t": "table", "title": "Meine Körpersignale", "cols": ["Signal", "Wann tritt es auf?", "Was könnte es mir sagen?", "Was hilft mir?"], "rows": [
@@ -382,7 +382,7 @@
         {"t": "p", "text": "Die Abendmeditation „Rückzug“ dauert etwa fünfzehn Minuten und ist dafür gedacht, dass du sie im Bett oder auf dem Sofa unter einer Decke anhörst. Sie beginnt mit einer verlängerten Ausatmung, führt dich in einem Body Scan langsam von den Füßen bis zur Stirn durch deinen Körper und lädt dich dann ein, eine Sache von heute abzulegen wie einen Mantel, den du am Abend ausziehst. Wenn du dabei einschläfst, ist das genau richtig."},
         {"t": "exercise", "title": "Den Tag ablegen", "time": "5 Minuten", "intro": "Eine kurze Version der Meditation für Abende, an denen du nur wenig Zeit hast.", "steps": [
           "Leg dich bequem hin, deck dich zu und mach das Licht aus.",
-          "Atme auf vier Zählzeiten durch die Nase ein und auf sechs Zählzeiten langsam aus. Wiederhole das fünf Mal.",
+          "Atme auf vier Zählzeiten durch die Nase ein und auf sechs Zählzeiten langsam aus. Wiederhole das fünfmal.",
           "Wandere mit deiner Aufmerksamkeit von den Füßen über die Beine, das Becken und den Bauch bis zu den Schultern und lass jeden Bereich schwer werden.",
           "Lockere den Kiefer und glätte die Stirn.",
           "Denk an eine Sache von heute, die du nicht mit in die Nacht nehmen möchtest. Stell dir vor, du legst sie neben dein Bett.",
@@ -614,7 +614,7 @@
           "Koche in der Zwischenzeit den Reis nach Packungsangabe.",
           "Rühre Kokosmilch und Spinat unter das Dal und lass es noch zwei bis drei Minuten ziehen, bis der Spinat zusammengefallen ist.",
           "Schmecke das Dal mit Salz und Zitronensaft ab und serviere es mit dem Reis."
-        ], "note": "Für Kinder kannst du das Dal mild lassen und Erwachsene würzen am Tisch mit etwas Chili nach. Es lässt sich ohne Reis gut einfrieren."},
+        ], "note": "Für Kinder kannst du das Dal mild lassen, und Erwachsene würzen am Tisch mit etwas Chili nach. Es lässt sich ohne Reis gut einfrieren."},
         {"t": "recipe", "title": "Gemüse-Gerstensuppe", "time": "15 Minuten Vorbereitung, 60 Minuten Kochzeit", "serves": "4 Personen", "ingredients": [
           "150 g Rollgerste, am Vorabend eingeweicht",
           "1 Zwiebel",
