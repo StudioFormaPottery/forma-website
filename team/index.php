@@ -68,7 +68,7 @@ $I = [
     <label>Wünsche oder Fragen <span class="opt">(optional)</span></label><textarea name="note" rows="2" maxlength="800"></textarea>
     <?php if ($half && $canPay): ?><details class="gs-box"><summary><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-1-3-5-4-5-1.5S10 8 12 8zm0 0c1-3 5-4 5-1.5S14 8 12 8z"/></svg>Ihr habt einen Gutschein?</summary><div class="gs-row"><input name="voucher" class="gs-code" placeholder="FORMA-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Gutscheincode"><button type="button" class="btn gs-check" data-ok="✓ Gutschein gefunden: %s werden bei eurer Buchung abgezogen.">Prüfen</button></div><p class="gs-msg" role="status" hidden></p></details><?php endif; ?>
     <label class="consent"><input type="checkbox" name="consent" value="1"><span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung der Buchung gespeichert werden. <a href="../#datenschutz">Datenschutz</a></span></label>
-    <p class="post-note">Mit eurer Buchung bekommst du ab und zu die FORMA Post mit Neuem aus dem Atelier. Abmelden geht jederzeit mit einem Klick.</p><label class="consent"><input type="checkbox" name="no_post" value="1"><span>Nein danke, ich möchte keine FORMA Post bekommen.</span></label>
+    <p class="post-note">Mit der Buchung bekommst du ab und zu die FORMA Post mit Neuem aus dem Atelier. Abmelden geht jederzeit mit einem Klick.</p><label class="consent"><input type="checkbox" name="no_post" value="1"><span>Nein danke, ich möchte keine FORMA Post bekommen.</span></label>
     <p class="err" hidden></p>
     <button class="btn go" type="submit"><?= ($half && $canPay) ? 'Weiter zur Bezahlung' : 'Verbindlich anfragen' ?></button>
     <p class="hint" style="font-size:16px;margin:0"><?= ($half && $canPay) ? 'Ihr bezahlt jetzt online, die Rechnung kommt sofort per E-Mail. Den Termin bestätige ich euch persönlich per E-Mail.' : 'Ich melde mich mit der Bestätigung eures Wunschtermins und allen Details bei euch.' ?></p>
@@ -79,8 +79,8 @@ $I = [
  <?php endforeach; ?>
  </div>
  <div class="gut"><svg class="wv" aria-hidden="true"><path></path></svg><span class="gi"><?= $I['team'] ?></span>
-  <div><b>Perfekt für</b><p>Weihnachtsfeier oder Jahresabschluss, ein Dankeschön ans Team, Vereinsausflug, Geburtstage oder einen Tag mit Freundinnen. Eure Werkstücke sind nach 3–4 Wochen abholbereit.</p></div></div>
- <p class="foot">FORMA Earth &amp; Art · Silvrettastraße 58 · 6562 Mathon · <a href="tel:+4367763907080">+43 677 63 90 70 80</a> · <a href="mailto:hello@forma-pottery.com">hello@forma-pottery.com</a></p>
+  <div><b>Perfekt für</b><p>die Weihnachtsfeier oder den Jahresabschluss, ein Dankeschön ans Team, den Vereinsausflug, Geburtstage oder einen Tag mit Freundinnen. Eure Werkstücke sind nach 3–4 Wochen abholbereit.</p></div></div>
+ <p class="foot">FORMA Earth &amp; Art · Mathon im Paznaun · <a href="tel:+4367763907080">+43 677 63 90 70 80</a> · <a href="mailto:hello@forma-pottery.com">hello@forma-pottery.com</a></p>
 </div></main>
 <script src="../assets/gast.js?v=3"></script>
 <script>document.querySelectorAll('.fold-btn').forEach(function(b){b.addEventListener('click',function(){var f=b.nextElementSibling;f.classList.add('open');b.hidden=true;var s=f.querySelector('select');if(s)s.focus();});});</script>

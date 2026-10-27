@@ -129,7 +129,7 @@ $rest = $valid ? max(0, (int)$link['value_cents'] - (int)FORMA_SERIES['spin']['p
  </div>
 <?php endif; ?>
  <p class="foot-deco"><span class="deco-slot"></span><span class="deco-slot"></span><span class="deco-slot"></span></p>
- <p class="foot">FORMA Earth &amp; Art · Silvrettastraße 58 · 6562 Mathon · <a href="https://wa.me/4367763907080">+43 677 63 90 70 80</a> · <a href="../">forma-pottery.com</a></p>
+ <p class="foot">FORMA Earth &amp; Art · Mathon im Paznaun · <a href="https://wa.me/4367763907080">+43 677 63 90 70 80</a> · <a href="../">forma-pottery.com</a></p>
 </div></main>
 <script src="../assets/gast.js?v=3"></script>
 <script src="../verwaltung/deko.js?v=1" defer></script>
