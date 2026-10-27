@@ -24,7 +24,14 @@ Yoga für müde Tage · Mental Load & Selbstfürsorge für Mamas · Schwangersch
    Nur echte Übungen mit gängigen Namen (Katze-Kuh, Kindhaltung, Glute Bridge, Box Breathing …).
 3. Pin bauen: JSON wie ein Wochen-Post plus `file` = `img/pins/movecia/<datum>-<thema>.jpg`, lokalen Server starten
    (`FORMA_DATA_DIR=/tmp/x php -S 127.0.0.1:8765`), `python3 tools/pinterest-movecia/make_pin.py pin.json`, Bild ansehen.
-   Fotos nur aus `img/movecia/fotos/` (art-*.jpg bevorzugt). Für natal: `schwanger.jpg`/`art-schwanger.jpg`.
+   Fotos (Vivien, 27.10.2026): IMMER die neuen Bilder `img/movecia/fotos/ev-*.jpg` (heller Studio-Look mit Bergblick),
+   nie mehr art-*.jpg, fold.jpg, reach.jpg. Für natal: `ev-natal.jpg`/`ev-natal-sitzend.jpg`. Bevorzugt Bilder, auf denen
+   das Gesicht nicht erkennbar ist.
+   Neue Yoga-Bilder (27.10.2026, Everygen, Gesicht nicht erkennbar) – noch ins Repo holen, sobald media.viewmax.io erreichbar ist
+   (auf 1080 bzw. max. 1400 px Breite, als `ev-pin-kamel.jpg`, `ev-pin-baum.jpg`, `ev-pin-kind.jpg`):
+   Kamel (kniend, von hinten): https://media.viewmax.io/users/wLzJXedAfqnV6720mvoVrSCNPAyriMzN/generated/ac6a961f-5def-40c9-b7ff-bfb234a77055.jpg
+   Baum (von hinten vor dem Fenster): https://media.viewmax.io/users/wLzJXedAfqnV6720mvoVrSCNPAyriMzN/generated/a035d17e-0b0e-4aeb-9e8e-e9898860ae39.jpg
+   Kindhaltung (mit Decke und Tee): https://media.viewmax.io/users/wLzJXedAfqnV6720mvoVrSCNPAyriMzN/generated/59e65d5e-9fac-476c-8033-f4762a57157b.jpg
 4. Bild committen, auf `main` pushen, warten bis `https://moveciamovement.com/img/pins/movecia/<datei>` erreichbar ist.
 5. In **Chrome** (Claude in Chrome) zum Movecia-Profil wechseln und den Pin anlegen, wie in `tools/pinterest/README.md`
    Schritt 6 beschrieben (im Pin-JSON `"btn": "Mehr erfahren"` setzen; Pin-Builder-URL, richtige Pinnwand, danach Titel setzen). Titel mit Suchbegriffen
