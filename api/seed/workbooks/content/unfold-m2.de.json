@@ -17,7 +17,7 @@
   {
    "icon": "stimmung",
    "title": "Zum Start · Wo du gerade stehst",
-   "text": "Ein kleiner Check-in nach dem ersten Monat, damit du siehst, was sich schon bewegt hat."
+   "text": "Eine kleine Standortbestimmung nach dem ersten Monat, damit du siehst, was sich schon bewegt hat."
   },
   {
    "icon": "schild",
@@ -50,7 +50,7 @@
    "icon": "stimmung",
    "kicker": "Zum Start",
    "title": "Wo du gerade stehst",
-   "intro": "Bevor wir in die neuen Themen gehen, halten wir kurz inne. Dieser Check-in zeigt dir, wo du nach dem ersten Monat stehst, und er wird am Ende dieses Monats zu einem schönen Vergleich.",
+   "intro": "Bevor wir in die neuen Themen gehen, halten wir kurz inne. Diese Standortbestimmung zeigt dir, wo du nach dem ersten Monat stehst, und er wird am Ende dieses Monats zu einem schönen Vergleich.",
    "blocks": [
     {
      "t": "p",
@@ -58,7 +58,7 @@
     },
     {
      "t": "p",
-     "text": "Beantworte die folgenden Fragen ehrlich und ohne Bewertung. Es gibt hier kein richtig oder falsch und auch kein „zu wenig“. Wenn ein Wert niedrig ist, dann ist das einfach eine wertvolle Information darüber, wo du in diesem Monat besonders gut für dich sorgen darfst."
+     "text": "Beantworte die folgenden Fragen ehrlich und ohne Bewertung. Es gibt hier kein Richtig oder Falsch und auch kein „zu wenig“. Wenn ein Wert niedrig ist, dann ist das einfach eine wertvolle Information darüber, wo du in diesem Monat besonders gut für dich sorgen darfst."
     },
     {
      "t": "scale",
@@ -137,7 +137,7 @@
     },
     {
      "t": "p",
-     "text": "Dass uns das so oft passiert, hat wenig mit Schwäche zu tun. Viele von uns haben sehr früh gelernt, dass wir gemocht werden, wenn wir hilfsbereit, unkompliziert und angenehm sind. Ein braves Mädchen widerspricht nicht, es teilt, es nimmt Rücksicht, und es stellt die eigenen Bedürfnisse hinten an. Diese Botschaften waren selten böse gemeint, und vieles daran ist ja auch wertvoll. Wir können uns gut in andere einfühlen, wir sehen, was gebraucht wird, und wir halten Familien, Teams und Freundschaften zusammen. Problematisch wird es erst dann, wenn diese Fähigkeit keinen Ausschalter mehr hat und wir uns selbst dabei verlieren."
+     "text": "Dass uns das so oft passiert, hat wenig mit Schwäche zu tun. Viele von uns haben sehr früh gelernt, dass wir gemocht werden, wenn wir hilfsbereit, unkompliziert und angenehm sind. Ein braves Mädchen widerspricht nicht, es teilt, es nimmt Rücksicht, und es stellt die eigenen Bedürfnisse hintan. Diese Botschaften waren selten böse gemeint, und vieles daran ist ja auch wertvoll. Wir können uns gut in andere einfühlen, wir sehen, was gebraucht wird, und wir halten Familien, Teams und Freundschaften zusammen. Problematisch wird es erst dann, wenn diese Fähigkeit keinen Ausschalter mehr hat und wir uns selbst dabei verlieren."
     },
     {
      "t": "p",
@@ -389,7 +389,7 @@
     },
     {
      "t": "p",
-     "text": "Selbstwert hat viel mit Selbstkenntnis zu tun. Wer weiß, was ihm wichtig ist und was er gut kann, steht auf einem festeren Boden. Entscheidungen werden leichter, weil du einen inneren Kompass hast. Kritik trifft dich weniger tief, weil sie nicht gleich dein ganzes Bild von dir ins Wanken bringt. Und du verschwendest weniger Energie damit, ein Leben zu führen, das eigentlich zu jemand anderem passt. Genau deshalb steht diese Woche zwischen den Grenzen und der inneren Kritikerin, denn erst wenn du weißt, was du schützen möchtest, kannst du klar dafür einstehen."
+     "text": "Selbstwert hat viel mit Selbstkenntnis zu tun. Wenn du weißt, was dir wichtig ist und was du gut kannst, stehst du auf einem festeren Boden. Entscheidungen werden leichter, weil du einen inneren Kompass hast. Kritik trifft dich weniger tief, weil sie nicht gleich dein ganzes Bild von dir ins Wanken bringt. Und du verschwendest weniger Energie damit, ein Leben zu führen, das eigentlich zu jemand anderem passt. Genau deshalb steht diese Woche zwischen den Grenzen und der inneren Kritikerin, denn erst wenn du weißt, was du schützen möchtest, kannst du klar dafür einstehen."
     },
     {
      "t": "p",
@@ -512,8 +512,8 @@
      "steps": [
       "Schau dir alle Werte an, die du angekreuzt hast, und streiche die, bei denen du beim zweiten Lesen zögerst.",
       "Fasse ähnliche Werte zusammen, zum Beispiel Ruhe, Gelassenheit und Balance, und wähle für jede Gruppe das Wort, das sich am stimmigsten anfühlt.",
-      "Reduziere deine Liste auf zehn Werte. Das darf sich schwer anfühlen, denn du verlierst keinen Wert, du setzt nur Prioritäten für diese Lebensphase.",
-      "Stell dir bei jedem verbleibenden Paar die Frage, welchen der beiden Werte du behalten würdest, wenn du dich entscheiden müsstest, und streiche dich so auf fünf herunter.",
+      "Reduziere deine Liste auf zehn Werte. Das darf sich schwer anfühlen, aber du verlierst dabei keinen Wert, du setzt nur Prioritäten für diese Lebensphase.",
+      "Stell dir bei jedem verbleibenden Paar die Frage, welchen der beiden Werte du behalten würdest, wenn du dich entscheiden müsstest, und streiche deine Liste so auf fünf zusammen.",
       "Trage deine fünf Werte in die Tabelle unten ein und schreib zu jedem auf, was er ganz konkret für dich bedeutet.",
       "Schätze ehrlich ein, wie sehr du diesen Wert im Moment lebst, auf einer Skala von 1 bis 10, und überlege dir einen kleinen Schritt, um ihm mehr Raum zu geben."
      ]
@@ -683,7 +683,7 @@
     },
     {
      "t": "p",
-     "text": "Das Überraschende ist, dass die innere Kritikerin in den meisten Fällen eigentlich etwas Gutes will. Sie möchte dich schützen. Sie hat irgendwann gelernt, dass du sicherer bist, wenn du keine Fehler machst, wenn du nicht auffällst und wenn du dich anstrengst, bevor jemand anderes dich kritisieren kann. Sie ist sozusagen ein übereifriger Bodyguard, der mit veralteten Methoden arbeitet. Das Problem ist nur, dass ihre Strategie dich heute eher klein hält als schützt. Sie verhindert, dass du Neues ausprobierst, dass du dich zeigst und dass du freundlich mit dir umgehst, wenn etwas schiefgeht."
+     "text": "Das Überraschende ist, dass die innere Kritikerin in den meisten Fällen eigentlich etwas Gutes will. Sie möchte dich schützen. Sie hat irgendwann gelernt, dass du sicherer bist, wenn du keine Fehler machst, wenn du nicht auffällst und wenn du dich anstrengst, bevor jemand anderes dich kritisieren kann. Sie ist sozusagen ein übereifriger Bodyguard, der mit veralteten Methoden arbeitet. Das Problem ist nur, dass ihre Strategie dich heute eher klein hält als schützt. Sie verhindert, dass du Neues ausprobierst, dass du sichtbar wirst und dass du freundlich mit dir umgehst, wenn etwas schiefgeht."
     },
     {
      "t": "p",
@@ -726,7 +726,7 @@
     },
     {
      "t": "p",
-     "text": "Lies dir die folgende Liste durch und kreuze die Sätze an, die du von dir kennst. Unten ist Platz für ihre ganz persönlichen Lieblingssätze, denn jede Kritikerin hat ihre eigene Sprache."
+     "text": "Lies dir die folgende Liste durch und kreuze die Sätze an, die du von dir kennst. Unten ist Platz für die ganz persönlichen Lieblingssätze deiner Kritikerin, denn jede Kritikerin hat ihre eigene Sprache."
     },
     {
      "t": "checklist",
@@ -911,7 +911,7 @@
     },
     {
      "t": "p",
-     "text": "Dein Full-Day-Flow am Montag heißt „Wachsen in die Länge“. Er richtet dich von den Füßen bis zum Scheitel auf und enthält eine Kraftrunde für deinen Rücken. Ich mag es sehr, in einer Woche, in der die innere Kritikerin dich klein machen möchte, ganz körperlich in die Größe zu gehen. Achte einmal darauf, wie sich deine Gedanken verändern, wenn du aufrecht und stabil stehst. Am Donnerstag folgt der Tired-Day-Flow „Drehen und lösen“ mit sanften Drehungen, die deinen Rumpf auswringen und deinen Kopf frei machen, genau richtig nach einem Tag voller kritischer Gedanken."
+     "text": "Dein Full-Day-Flow am Montag heißt „Wachsen in die Länge“. Er richtet dich von den Füßen bis zum Scheitel auf und enthält eine Kraftrunde für deinen Rücken. Ich mag es sehr, wenn du dich in einer Woche, in der die innere Kritikerin dich klein machen möchte, ganz körperlich aufrichtest und groß machst. Achte einmal darauf, wie sich deine Gedanken verändern, wenn du aufrecht und stabil stehst. Am Donnerstag folgt der Tired-Day-Flow „Drehen und lösen“ mit sanften Drehungen, die deinen Rumpf auswringen und deinen Kopf frei machen, genau richtig nach einem Tag voller kritischer Gedanken."
     },
     {
      "t": "quote",
@@ -939,7 +939,7 @@
     },
     {
      "t": "p",
-     "text": "Was Kreativität am meisten bremst, ist meistens die zu frühe Bewertung unserer Ideen. Kaum taucht eine Idee auf, meldet sich schon die innere Kritikerin: „Das gibt es doch schon“, „Dafür hast du keine Zeit“ oder „Wer soll das denn kaufen?“ Und schon ist die Idee wieder verschwunden, bevor sie überhaupt atmen konnte. Deshalb ist es so gut, dass wir uns letzte Woche mit dieser Stimme beschäftigt haben. In dieser Woche darf sie Pause machen."
+     "text": "Was Kreativität am meisten bremst, ist oft die zu frühe Bewertung unserer Ideen. Kaum taucht eine Idee auf, meldet sich schon die innere Kritikerin: „Das gibt es doch schon“, „Dafür hast du keine Zeit“ oder „Wer soll das denn kaufen?“ Und schon ist die Idee wieder verschwunden, bevor sie überhaupt atmen konnte. Deshalb ist es so gut, dass wir uns letzte Woche mit dieser Stimme beschäftigt haben. In dieser Woche darf sie Pause machen."
     },
     {
      "t": "p",
@@ -1047,7 +1047,7 @@
      "steps": [
       "Schließ für einen Moment die Augen und stell dir dich selbst mit etwa acht Jahren vor. Wie sahst du aus, was hast du angehabt, wo hast du am liebsten gespielt?",
       "Frag dieses Mädchen in Gedanken: „Was machst du am allerliebsten?“ und hör genau hin, was es antwortet.",
-      "Frag weiter: „Was wolltest du werden, als du groß warst?“ und „Wovon hast du geträumt?“",
+      "Frag weiter: „Was willst du werden, wenn du groß bist?“ und „Wovon träumst du?“",
       "Schreib alle Antworten auf, auch wenn sie heute unrealistisch wirken, etwa Tierärztin, Prinzessin oder Zirkusreiterin.",
       "Überlege, welche Sehnsucht hinter diesen Träumen steckt. Hinter dem Wunsch, Zirkusreiterin zu werden, kann zum Beispiel die Liebe zu Tieren, zur Bewegung oder zur Bühne stecken.",
       "Notiere, wie diese Sehnsucht heute in deinem Leben Platz bekommen könnte, auch in einer ganz kleinen Form."
@@ -1113,7 +1113,7 @@
     },
     {
      "t": "p",
-     "text": "Zur Mitte von Unfold wartet am Montag mit „Mut im Körper“ ein etwas kräftigerer Full-Day-Flow auf dich. Er lädt dich ein zu spüren, wie viel Kraft schon in dir steckt. Ich finde, es gibt kaum eine bessere Vorbereitung darauf, mutige Ideen zuzulassen. Am Donnerstag folgt der Tired-Day-Flow „Atem als Anker“ mit drei Atemübungen, eingebettet in sanfte Bewegung, die du überallhin mitnehmen kannst. Probier sie gern direkt vor einer kreativen Übung aus, denn ein ruhiger Atem schafft oft genau den Raum, in dem Ideen auftauchen."
+     "text": "Zur Mitte von Unfold wartet am Montag mit „Mut im Körper“ ein etwas kräftigerer Full-Day-Flow auf dich. Er lädt dich ein zu spüren, wie viel Kraft schon in dir steckt. Ich finde, es gibt kaum eine bessere Vorbereitung darauf, mutige Ideen zuzulassen. Am Donnerstag folgt der Tired-Day-Flow „Atem als Anker“ mit drei Atemübungen, die du überallhin mitnehmen kannst, eingebettet in sanfte Bewegung. Probier sie gern direkt vor einer kreativen Übung aus, denn ein ruhiger Atem schafft oft genau den Raum, in dem Ideen auftauchen."
     },
     {
      "t": "quote",
