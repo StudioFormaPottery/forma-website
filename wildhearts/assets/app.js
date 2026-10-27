@@ -27,14 +27,14 @@
     de: {
       title: 'Movecia aufs Handy holen',
       lead: 'Mit dem Movecia-Icon auf deinem Home-Bildschirm bist du mit einem Tipp in deinem Mitgliederbereich, bei Unfold und den Gatherings. Ganz ohne App Store.',
-      ios: ['Tippe in Safari auf <b>Teilen</b> <span class="mva-ico">' + share() + '</span> (beim neuen Safari zuerst auf <b>•••</b>).', 'Wähle <b>„Zum Home-Bildschirm“</b>.', 'Tippe auf <b>„Hinzufügen“</b>. Fertig, Movecia liegt jetzt bei deinen Apps.'],
+      ios: ['Tippe in Safari auf <b>Teilen</b> <span class="mva-ico">' + share() + '</span> (beim neuen Safari zuerst auf <b>•••</b>).', 'Wähle <b>„Zum Home-Bildschirm“</b>.', 'Tippe auf <b>„Hinzufügen“</b>. Fertig, Movecia ist jetzt bei deinen Apps.'],
       other: ['Öffne das Browsermenü <b>⋮</b> oben rechts.', 'Wähle <b>„App installieren“</b> oder <b>„Zum Startbildschirm hinzufügen“</b>.', 'Bestätige mit <b>„Installieren“</b>.'],
       btn: 'Jetzt installieren', done: 'Schließen', iosHint: 'Auf dem iPhone geht das am besten in Safari.'
     },
     en: {
       title: 'Get Movecia on your phone',
-      lead: 'With the Movecia icon on your home screen you are one tap away from your members area, Unfold and the Gatherings. No app store needed.',
-      ios: ['In Safari tap <b>Share</b> <span class="mva-ico">' + share() + '</span> (in the new Safari tap <b>•••</b> first).', 'Choose <b>“Add to Home Screen”</b>.', 'Tap <b>“Add”</b>. Done, Movecia now sits with your apps.'],
+      lead: 'With the Movecia icon on your home screen, you are just one tap away from your members area, Unfold and the Gatherings. No app store needed.',
+      ios: ['In Safari tap <b>Share</b> <span class="mva-ico">' + share() + '</span> (in the new Safari tap <b>•••</b> first).', 'Choose <b>“Add to Home Screen”</b>.', 'Tap <b>“Add”</b>. That’s it: Movecia now sits alongside your other apps.'],
       other: ['Open the browser menu <b>⋮</b> at the top right.', 'Choose <b>“Install app”</b> or <b>“Add to Home screen”</b>.', 'Confirm with <b>“Install”</b>.'],
       btn: 'Install now', done: 'Close', iosHint: 'On iPhone this works best in Safari.'
     }

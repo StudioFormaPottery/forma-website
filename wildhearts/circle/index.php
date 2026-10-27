@@ -105,7 +105,7 @@ a{color:var(--wine)}
     <label class="f">Email<input type="email" name="email" autocomplete="email" required maxlength="160"></label>
     <div class="hp" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
     <?php if ($startTs): ?>
-    <label class="cons"><input type="checkbox" name="consent"><span>I book The Inner Circle with a binding commitment. It opens on <?= $h(mm_start_en($startTs)) ?>, and my first payment is taken then. <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation</a></span></label>
+    <label class="cons"><input type="checkbox" name="consent"><span>I am making a binding booking for The Inner Circle. It opens on <?= $h(mm_start_en($startTs)) ?>, and my first payment is taken then. <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation</a></span></label>
     <?php else: ?>
     <label class="cons"><input type="checkbox" name="consent"><span>I would like my access to start right away. I know that if I withdraw within 14 days, I pay only for the part already used. <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation</a></span></label>
     <?php endif; ?>
@@ -129,7 +129,7 @@ a{color:var(--wine)}
       if (!j.ok) throw new Error(j.error || '');
       if (j.redirect) { location.href = j.redirect; return; }
       fs.innerHTML = '<p style="font-family:Hand,cursive;color:#7D5E68;font-size:22px">thank you ♡</p><p>You are staying! Your circle price continues. A confirmation is on its way to your inbox.</p>';
-    } catch (err) { ms.hidden = false; ms.textContent = err.message || 'That did not work just now. Please try again.'; b.disabled = false; }
+    } catch (err) { ms.hidden = false; ms.textContent = err.message || 'Something went wrong just now. Please try again.'; b.disabled = false; }
   });
   const f = document.getElementById('f'), m = document.getElementById('m'), t0 = Date.now();
   const PL = <?= json_encode(array_column(array_map(fn($pp) => ['p' . $pp[0], mm_price_en($pp[1], 'once') . ($pp[0] === 12 ? ' / year' : ' / 6 months')], $o['periods']), 1, 0) + ['full' => $ref ? $sp : $reg], JSON_UNESCAPED_UNICODE) ?>;
@@ -142,7 +142,7 @@ a{color:var(--wine)}
       const j = await r.json();
       if (!j.ok) throw new Error(j.error || '');
       location.href = j.redirect;
-    } catch (err) { m.hidden = false; m.textContent = err.message || 'That did not work just now. Please try again.'; b.disabled = false; }
+    } catch (err) { m.hidden = false; m.textContent = err.message || 'Something went wrong just now. Please try again.'; b.disabled = false; }
   });
 })();
 </script>

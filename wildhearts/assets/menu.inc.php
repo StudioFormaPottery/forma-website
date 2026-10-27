@@ -22,8 +22,8 @@ function mv_menu_items(): array
         ['/method/', 'Method', 'Method', 'method', 'Mindful Movement on demand', 'Mindful movement on demand'],
         ['/unfold/', 'Unfold', 'Unfold', 'unfold', '3 Monate Begleitung' . ($u[0] ?? ''), '3 months of guidance' . ($u[1] ?? '')],
         ['/natal/', 'Prä- &amp; Postnatal', 'Pre- &amp; postnatal', 'natal', '1:1 im Studio &amp; online', '1:1 in the studio &amp; online'],
-        ['/gathering/', 'Gatherings', 'Gatherings', 'gathering', 'Kostenlos live, einmal im Monat', 'Free and live, once a month'],
-        ['/#vivien', 'Über mich', 'About me', 'about', 'Ich bin Vivien', 'I am Vivien'],
+        ['/gathering/', 'Gatherings', 'Gatherings', 'gathering', 'Live und kostenlos, einmal im Monat', 'Free and live, once a month'],
+        ['/#vivien', 'Über mich', 'About me', 'about', 'Ich bin Vivien', "Hi, I'm Vivien"],
     ];
 }
 
@@ -49,7 +49,7 @@ function mv_menu(string $active = '', array $o = []): void
   </nav>
   <div class="mvm-foot">
     <a class="mvm-login" href="/mitglieder/"><span class="de">Login Mitgliederbereich</span><span class="en">Log in to members area</span></a>
-    <a class="mvm-app" href="/?install=1" data-mv-app><img src="/img/movecia/movecia-app-192.png" alt="" width="34" height="34"><span><b><span class="de">Movecia als App</span><span class="en">Movecia as an app</span></b><small><span class="de">Aufs Handy holen, ohne App Store</span><span class="en">Add it to your phone, no app store</span></small></span></a>
+    <a class="mvm-app" href="/?install=1" data-mv-app><img src="/img/movecia/movecia-app-192.png" alt="" width="34" height="34"><span><b><span class="de">Movecia als App</span><span class="en">Movecia as an app</span></b><small><span class="de">Aufs Handy holen, ohne App Store</span><span class="en">Add it to your phone, no app store needed</span></small></span></a>
     <?php if ($lang): ?><div class="mvm-lang" role="group" aria-label="Sprache / Language"><button type="button" data-mvm-l="de">Deutsch</button><button type="button" data-mvm-l="en">English</button></div><?php endif; ?>
     <a class="mvm-mail" href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a>
   </div>

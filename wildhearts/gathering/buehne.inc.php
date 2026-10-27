@@ -46,10 +46,10 @@ button,label.btn{font:inherit;font-size:16px;padding:10px 16px;border-radius:999
 <div class="panel" id="panel">
   <h2>Video-Bühne</h2>
   <ol>
-    <li>Wähl unten ein oder mehrere Videos von deinem Gerät. Hochgeladen wird nichts, sie laufen nur hier.</li>
-    <li>Geh zurück in den Raum, tipp in Whereby auf <b>Bildschirm teilen</b> und wähl diesen Tab <b>„Video-Bühne“</b>.</li>
-    <li>Schalt in Whereby deine <b>Kamera aus</b>, das Mikro bleibt an. Die Frauen sehen dann nur das Video groß und hören dich live.</li>
-    <li>Hier auf <b>Abspielen</b> tippen und dazu sprechen. Danach Teilen beenden und Kamera wieder an.</li>
+    <li>Wähle unten ein oder mehrere Videos von deinem Gerät. Hochgeladen wird nichts, sie laufen nur hier.</li>
+    <li>Geh zurück in den Raum, tippe in Whereby auf <b>Bildschirm teilen</b> und wähle diesen Tab <b>„Video-Bühne“</b>.</li>
+    <li>Schalte in Whereby deine <b>Kamera aus</b>, das Mikro bleibt an. Die Frauen sehen dann nur das Video groß und hören dich live.</li>
+    <li>Tippe hier auf <b>Abspielen</b> und sprich dazu. Danach beendest du das Teilen und schaltest die Kamera wieder ein.</li>
   </ol>
   <label class="btn" style="margin-top:12px">Videos auswählen<input id="file" type="file" accept="video/*" multiple hidden></label>
   <div class="list" id="list"></div>
@@ -61,10 +61,10 @@ button,label.btn{font:inherit;font-size:16px;padding:10px 16px;border-radius:999
     <label class="chk"><input type="checkbox" id="snd"> Ton vom Video mit übertragen (z. B. Musik)</label>
   </div>
   <div class="row">
-    <label class="chk"><input type="checkbox" id="loop"> In Schleife abspielen</label>
+    <label class="chk"><input type="checkbox" id="loop"> Immer wieder von vorn abspielen</label>
   </div>
   <h2 style="margin-top:18px">Hintergrundmusik</h2>
-  <p style="font-size:15px;color:#E8DED2">Für Bewegungseinheiten: Musik ganz leise im Hintergrund. Wähl eine Musikdatei von deinem Gerät, teil diesen Tab in Whereby mit „Tab-Audio teilen“ und lass deine Kamera an. Die Frauen sehen dich und hören die Musik leise unter deiner Stimme.</p>
+  <p style="font-size:15px;color:#E8DED2">Für Bewegungseinheiten läuft die Musik ganz leise im Hintergrund. Wähle eine Musikdatei von deinem Gerät, teile diesen Tab in Whereby mit „Tab-Audio teilen“ und lass deine Kamera an. Die Frauen sehen dich und hören die Musik leise unter deiner Stimme.</p>
   <label class="btn" style="margin-top:10px">Musik auswählen<input id="mfile" type="file" accept="audio/*" multiple hidden></label>
   <p id="mname" style="font-size:14px;color:#C9B2B8;margin-top:6px"></p>
   <div class="row">

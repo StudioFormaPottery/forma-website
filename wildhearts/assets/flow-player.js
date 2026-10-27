@@ -129,7 +129,7 @@
     let prov = PROV[st.p] ? st.p : 'spotify';
     const provBtns = Object.keys(PROV).map(k => `<button type="button" data-pv="${k}">${PROV[k].n}</button>`).join('');
     box.querySelector('[data-mub]').innerHTML = `
-      <p class="mvf-note">${T('Such dir deinen Musikdienst aus und füg den Link zu deiner Playlist ein. Die Musik läuft hier neben den Übungen. Ganze Songs hörst du, wenn du bei deinem Anbieter angemeldet bist.', 'Pick your music service and paste the link to your playlist. The music plays right here next to the exercises. You hear full songs when you are logged in with your provider.')}${flow ? ' ' + T('Stell die Musik leise, damit du meine Stimme gut hörst.', 'Keep the music soft so you can hear my voice.') : ''}</p>
+      <p class="mvf-note">${T('Such dir deinen Musikdienst aus und füg den Link zu deiner Playlist ein. Die Musik läuft hier neben den Übungen. Ganze Songs hörst du, wenn du bei deinem Anbieter angemeldet bist.', 'Pick your music service and paste the link to your playlist. The music plays right here next to the exercises. You’ll hear full songs when you’re logged in to your music service.')}${flow ? ' ' + T('Stell die Musik leise, damit du meine Stimme gut hörst.', 'Keep the music soft so you can hear my voice.') : ''}</p>
       <div class="mvf-prov" role="group">${provBtns}</div>
       <div data-pbody></div>
       <p class="mvf-err" data-merr hidden></p>
@@ -149,7 +149,7 @@
       box.querySelectorAll('[data-pv]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pv === prov)));
       const P = PROV[prov];
       if (prov === 'amazon') {
-        pbody.innerHTML = `<p class="mvf-note">${T('Amazon Music lässt sich nicht direkt in andere Seiten einbauen. Öffne deine Playlist in der Amazon-Music-App oder in einem neuen Tab, starte sie dort und komm hierher zurück. Die Musik läuft weiter.', 'Amazon Music cannot be built into other pages. Open your playlist in the Amazon Music app or a new tab, start it there and come back here. The music keeps playing.')}</p>
+        pbody.innerHTML = `<p class="mvf-note">${T('Amazon Music lässt sich nicht direkt in andere Seiten einbauen. Öffne deine Playlist in der Amazon-Music-App oder in einem neuen Tab, starte sie dort und komm hierher zurück. Die Musik läuft weiter.', 'Amazon Music can’t be embedded in other websites. Open your playlist in the Amazon Music app or in a new tab, start it there and come back here. The music keeps playing.')}</p>
           <div class="mvf-row"><a href="${P.login}" target="_blank" rel="noopener">${T('Amazon Music öffnen', 'Open Amazon Music')} ↗</a></div>`;
         return;
       }
@@ -162,7 +162,7 @@
       const inp = pbody.querySelector('[data-murl]');
       pbody.querySelector('[data-mgo]').addEventListener('click', () => {
         const e = embedOf(inp.value);
-        if (!e) { err.textContent = T('Diesen Link kann ich leider nicht abspielen. Nimm bitte den Link über „Teilen → Link kopieren“.', 'I cannot play this link. Please use “Share → Copy link”.'); err.hidden = false; return; }
+        if (!e) { err.textContent = T('Diesen Link kann ich leider nicht abspielen. Nimm bitte den Link über „Teilen → Link kopieren“.', 'Sorry, I can’t play this link. Please use “Share → Copy link”.'); err.hidden = false; return; }
         err.hidden = true;
         if (e.p === 'amazon') { window.open(e.open, '_blank', 'noopener'); return; }
         prov = e.p; st = { p: e.p, url: inp.value.trim() }; save(); mount(); draw();
@@ -209,7 +209,7 @@
 <div class="mvf-play" data-p hidden>
   <div class="mvf-stage" data-st>
     <iframe data-if title="" allow="autoplay;encrypted-media;picture-in-picture" loading="eager"></iframe>
-    <div class="mvf-ph" data-ph hidden>${T('Clip folgt', 'Clip coming')}</div>
+    <div class="mvf-ph" data-ph hidden>${T('Clip folgt', 'Clip coming soon')}</div>
     <div class="mvf-sun"></div>
     <div class="mvf-name"><small data-tag></small><b data-nm></b></div>
     <div class="mvf-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="t" cx="60" cy="60" r="52"></circle><circle class="p" data-pr cx="60" cy="60" r="52"></circle></svg><div class="n"><b data-sec>30</b><span data-unit>${T('Sek.', 'sec')}</span></div></div>
@@ -225,7 +225,7 @@
   </div>
 </div>
 <div class="mvf-dock" data-dock hidden></div>
-<div class="mvf-done" data-done hidden><p class="mvf-k">${T('Geschafft', 'Done')}</p><h3>${T('Schön, dass du dir diese Zeit genommen hast.', 'Lovely that you took this time for yourself.')}</h3><p class="mvf-note" data-dt></p><button type="button" class="mvf-go" data-again>${T('Nochmal von vorn', 'Start again')}</button></div>`;
+<div class="mvf-done" data-done hidden><p class="mvf-k">${T('Geschafft', 'Done')}</p><h3>${T('Schön, dass du dir diese Zeit genommen hast.', 'I’m so glad you took this time for yourself.')}</h3><p class="mvf-note" data-dt></p><button type="button" class="mvf-go" data-again>${T('Nochmal von vorn', 'Start again')}</button></div>`;
     const q = s => root.querySelector(s);
     const pr = q('[data-pr]'); pr.style.strokeDasharray = C;
     musicBox(root, T, data.music || [], flow);
@@ -234,7 +234,7 @@
       const m = Math.max(1, Math.round(sum() / 60));
       q('[data-tot]').textContent = flow
         ? T(`${items.length} Übungen, zusammen etwa ${m} Minuten. Ich begleite dich mit meiner Stimme durch jede Übung.`, `${items.length} exercises, about ${m} minutes in total. My voice guides you through each one.`)
-        : T(`${items.length} Übungen à ${dur} Sekunden, zusammen etwa ${m} Minuten.`, `${items.length} exercises of ${dur} seconds, about ${m} minutes in total.`);
+        : T(`${items.length} Übungen à ${dur} Sekunden, zusammen etwa ${m} Minuten.`, `${items.length} exercises, ${dur} seconds each, about ${m} minutes in total.`);
     }
     root.querySelectorAll('[data-d]').forEach(b => b.addEventListener('click', () => { dur = +b.dataset.d; try { localStorage.setItem('mvf-dur', String(dur)); } catch (e) {} seg(); }));
     seg();

@@ -103,7 +103,7 @@ function natal_health_form(?array $d = null, string $due = ''): string
     $ph = $d['phase'] ?? ($due !== '' && $due < date('Y-m-d') ? 'post' : '');
     $chk = fn(bool $b) => $b ? ' checked' : '';
     $o = '<div class="hq" data-phase="' . $h($ph) . '">';
-    $o .= '<h3 style="margin-top:.6rem">Deine Gesundheit</h3><p class="mut" style="font-size:.92rem">Damit ich jede Einheit sicher und passend für dich gestalten kann. Deine Angaben sieht nur Vivien.</p>';
+    $o .= '<h3 style="margin-top:.6rem">Deine Gesundheit</h3><p class="mut" style="font-size:.92rem">Damit ich jede Einheit sicher und passend für dich gestalten kann. Deine Angaben sehe nur ich.</p>';
     $o .= '<div class="seg" role="radiogroup" aria-label="Schwanger oder Baby schon da">'
         . '<label><input type="radio" name="h_phase" value="prae"' . $chk($ph === 'prae') . '><span>Ich bin schwanger</span></label>'
         . '<label><input type="radio" name="h_phase" value="post"' . $chk($ph === 'post') . '><span>Mein Baby ist schon da</span></label></div>';

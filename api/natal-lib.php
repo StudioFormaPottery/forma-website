@@ -303,7 +303,7 @@ function natal_phase(array $o, string $date): string
 
 function natal_status_label(string $s): string
 {
-    return ['angefragt' => 'angefragt', 'bestaetigt' => 'bestätigt', 'erledigt' => 'war schon', 'abgesagt' => 'abgesagt'][$s] ?? $s;
+    return ['angefragt' => 'angefragt', 'bestaetigt' => 'bestätigt', 'erledigt' => 'stattgefunden', 'abgesagt' => 'abgesagt'][$s] ?? $s;
 }
 
 /** Wunschtermine prüfen: Datum ab übermorgen, erlaubter Wochentag, gültige Tageszeit. */
@@ -486,7 +486,7 @@ function natal_paid_mails(PDO $pdo, array $o, array $wishes): void
 {
     $first = forma_first_name((string)$o['name']);
     $wl = array_map(fn($w) => natal_when($w + ['start' => '']), $wishes);
-    $paras = ["Hallo $first,", 'danke für deine Buchung! Deine Zahlung ist angekommen und dein ' . $o['title'] . ' ist fix.',
+    $paras = ["Hallo $first,", 'danke für deine Buchung! Deine Zahlung ist angekommen, damit ist alles fix.',
         [$o['title'] . ' · ' . ((int)$o['units'] === 1 ? '1 Einheit' : $o['units'] . ' Einheiten') . ' à 60 Minuten, 1:1', 'Bezahlt: ' . forma_euro((int)$o['amount_cents']) . ' (inkl. 20 % USt.)', 'Gültig bis 6 Monate nach der Geburt']];
     $paras[] = $wl
         ? "Deine Wunschtermine habe ich bekommen:\n– " . implode("\n– ", $wl) . "\n\nIch schaue sie mir an und bestätige dir jeden Termin mit Uhrzeit per E-Mail."
@@ -916,8 +916,8 @@ function natal_book_call(PDO $pdo, array $in): array
     $first = forma_first_name((string)$c['name']);
     $p = ["Hallo $first,", 'schön, dass wir uns kennenlernen! Dein kostenloses Gespräch ist eingetragen:',
         [natal_call_when($c), '30 Minuten, online per Video'],
-        'Zum Gespräch tippst du einfach auf den Knopf unten. Der Raum öffnet 15 Minuten vorher, du brauchst keine App und kein Konto. Am besten mit Handy oder Laptop an einem ruhigen Platz.',
-        'Wir sprechen darüber, wie es dir gerade geht, was du dir wünschst und welches Paket zu dir passt. Es ist ganz unverbindlich. Die angehängte Kalenderdatei übernimmt den Termin in deinen Kalender.',
+        'Zum Gespräch tippst du einfach auf den Knopf unten. Der Raum öffnet 15 Minuten vorher, du brauchst keine App und kein Konto. Such dir dafür mit Handy oder Laptop am besten einen ruhigen Platz.',
+        'Wir sprechen darüber, wie es dir gerade geht, was du dir wünschst und welches Paket zu dir passt. Es ist ganz unverbindlich. Mit der angehängten Kalenderdatei übernimmst du den Termin in deinen Kalender.',
         'Kommt etwas dazwischen, antworte einfach auf diese E-Mail.'];
     natal_mail((string)$c['email'], 'Dein Kennenlerngespräch: ' . natal_call_when($c), 'Wir lernen uns kennen', $p, [$room, 'Zum Videogespräch'],
         [['Kennenlerngespraech-Movecia.ics', natal_call_ics($c), 'text/calendar; charset=utf-8; method=PUBLISH']]);

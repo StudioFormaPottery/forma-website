@@ -12,8 +12,8 @@
     return { name: t ? (t.dataset.name || '') : '', lang: t ? (t.dataset.lang || '') : '', nocopy: !!t };
   }
   function isEn() { var c = cfg(); return (c.lang || document.documentElement.lang || '').indexOf('en') === 0; }
-  var AFF_DE = ['Du darfst dir Zeit lassen', 'Dein Körper ist dein Zuhause', 'Du bist genug, so wie du bist', 'Atme, du bist da', 'Sanft ist auch stark', 'Dieser Moment gehört dir', 'Jede Bewegung zählt', 'Du darfst weich werden'];
-  var AFF_EN = ['You are allowed to take your time', 'Your body is your home', 'You are enough, just as you are', 'Breathe, you are here', 'Gentle is strong, too', 'This moment belongs to you', 'Every movement counts', 'You may soften'];
+  var AFF_DE = ['Du darfst dir Zeit lassen', 'Dein Körper ist dein Zuhause', 'Du bist gut so, wie du bist', 'Atme, du bist da', 'Sanft ist auch stark', 'Dieser Moment gehört dir', 'Jede Bewegung zählt', 'Du darfst weich werden'];
+  var AFF_EN = ['You are allowed to take your time', 'Your body is your home', 'You are enough, just as you are', 'Breathe, you are here', 'Gentle is strong, too', 'This moment belongs to you', 'Every movement counts', 'You are allowed to soften'];
 
   function nocopy() {
     if (!cfg().nocopy || document.getElementById('mvnc')) return;
@@ -41,7 +41,7 @@
       document.head.appendChild(st);
       box = document.createElement('div'); box.className = 'mvnfd'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true');
     }
-    box.innerHTML = '<div><img src="/img/movecia/movecia-zeichen.svg" alt=""><h2>' + (en ? (nm ? 'Dear ' + nm + ',' : 'Dear you,') : (nm ? 'Liebe ' + nm + ',' : 'Liebe du,')) + '</h2><p>' +
+    box.innerHTML = '<div><img src="/img/movecia/movecia-zeichen.svg" alt=""><h2>' + (en ? (nm ? 'Dear ' + nm + ',' : 'Hi lovely,') : (nm ? 'Liebe ' + nm + ',' : 'Hallo, meine Liebe,')) + '</h2><p>' +
       (en ? 'this content is meant just for you, so it can’t be shared or recorded. Thank you for keeping it a protected space.' : 'dieser Inhalt ist nur für dich bestimmt und kann deshalb nicht geteilt oder aufgenommen werden. Danke, dass du ihn als geschützten Raum bewahrst.') +
       '</p><p class="aff">' + aff + ' ♡</p><button type="button">' + (en ? 'Back to me' : 'Zurück zu mir') + '</button></div>';
     document.body.appendChild(box);

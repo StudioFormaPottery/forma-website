@@ -28,12 +28,12 @@ T = {
                home='Für zu Hause', journal='Dein Journal', imp='Impuls', imp_t='Worum es heute ging', think='Meine Gedanken dazu',
                merk='Das nimmst du mit', med_after='Nimm dir danach einen Moment, bevor du aufstehst.', round='ein Kreis pro Durchgang'),
     'en': dict(fact='Good to know', tip='My tip for you', notes='My notes', week=['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-               prio='My three most important things', care='What I do for myself', ingredients='Ingredients', steps='How to',
-               for_='for', page='Page', only='just for you', time='Time', serves='Serves', inhalt='What awaits you',
-               letter='A letter for you', mood='How am I today?', done='Done?', inhale='in', exhale='out',
-               breathcap='Breathe with the circle: in as it grows, out as it softly gets smaller.', exs='Your sequence',
-               home='At home', journal='Your journal', imp='Talk', imp_t='What today was about', think='My thoughts',
-               merk='What you take with you', med_after='Take a moment before you get up.', round='one circle per round'),
+               prio='My top three priorities', care='Something just for me', ingredients='Ingredients', steps='Method',
+               for_='for', page='Page', only='just for you', time='Time', serves='Serves', inhalt='What’s inside',
+               letter='A letter for you', mood='How am I feeling today?', done='Done?', inhale='in', exhale='out',
+               breathcap='Breathe with the circle: in as it grows, out as it gently gets smaller.', exs='Your sequence',
+               home='Your home practice', journal='Your journal', imp='Insight', imp_t='What we explored today', think='My thoughts',
+               merk='Key takeaways', med_after='Take a moment before you get up.', round='one circle per round'),
 }
 
 CSS = """

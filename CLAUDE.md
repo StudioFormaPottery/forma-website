@@ -2,6 +2,12 @@
 
 Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 
+## Sprachregel für ALLE Texte (Vivien, 27.10.2026, „solche Fehler müssen definitiv vermieden werden“)
+- Nie Wort für Wort übersetzen. Anlass: „Dear you,“ stand auf Deutsch als „Liebe du,“ (jetzt „Hallo, meine Liebe,“).
+- Englisch muss klingen wie von einer englischen Muttersprachlerin geschrieben (warm, natürlich, keine Germanismen wie „actual“ = aktuell, „eventually“ = eventuell, „make sport“, falsche Präpositionen).
+- Deutsch muss klingen wie von Anfang an auf Deutsch geschrieben: schönes, schlichtes Hochdeutsch, keine Calques aus dem Englischen („Liebe du“, „Das macht Sinn“, „Halte Raum“, „sich zeigen“ für „show up“, „Check-in“ usw.).
+- Gilt für Website, Mails, Workbooks, Teleprompter-/Sprechtexte, Social-Media- und Story-Texte, Pins und alles, was geplante Aufgaben erzeugen. DE und EN inhaltlich gleich, aber jeweils frei und idiomatisch formuliert. Vor dem Ausliefern jede Fassung einmal gezielt auf Übersetzungsfehler lesen.
+
 ## Veröffentlichung
 - Hosting: Hostinger, Webhosting-Paket. Hostinger übernimmt den Branch `main` automatisch nach `public_html` (Auto-Deployment).
 - Jede Änderung, die auf `main` gepusht wird, ist wenige Minuten später live. Es gibt keinen Build-Schritt.

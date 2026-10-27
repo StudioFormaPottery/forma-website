@@ -34,12 +34,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     if (!empty($_POST['website'])) $go();
     if ($a === 'login') {
         $email = strtolower(trim((string)($_POST['email'] ?? '')));
-        if (mv_throttled($pdo, $ip)) $err = $pl === 'en' ? 'Too many attempts. Please wait a quarter of an hour or reset your password.' : 'Zu viele Versuche. Bitte warte eine Viertelstunde oder setz dein Passwort neu.';
+        if (mv_throttled($pdo, $ip)) $err = $pl === 'en' ? 'Too many attempts. Please wait 15 minutes or reset your password.' : 'Zu viele Versuche. Bitte warte eine Viertelstunde oder setz dein Passwort neu.';
         else {
             $m = mv_member_by_email($pdo, $email);
             if ($m && $m['pass_hash'] !== '' && password_verify((string)($_POST['pw'] ?? ''), (string)$m['pass_hash'])) { mv_login($pdo, $m); $go(); }
             mv_fail($pdo, $ip);
-            $err = $pl === 'en' ? 'Email or password are not right. Try again or set a new password.' : 'E-Mail oder Passwort stimmen nicht. Versuch es noch einmal oder setz dein Passwort neu.';
+            $err = $pl === 'en' ? 'Your email or password is incorrect. Please try again or set a new password.' : 'E-Mail oder Passwort stimmen nicht. Versuch es noch einmal oder setz dein Passwort neu.';
         }
     }
     if ($a === 'setpw') {
@@ -50,14 +50,14 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             $r = mv_sub($pdo, (int)$_POST['s']);
             if ($r && hash_equals((string)$r['token'], (string)($_POST['k'] ?? '')) && $r['status'] === 'aktiv') {
                 $m = mv_member_ensure($pdo, (string)$r['email'], (string)$r['name'], (string)$r['lang']);
-                if ($m['pass_hash'] !== '') { $m = null; $err = $pl === 'en' ? 'You already have a password. Simply log in.' : 'Du hast schon ein Passwort. Melde dich einfach an.'; }
+                if ($m['pass_hash'] !== '') { $m = null; $err = $pl === 'en' ? 'You already have a password. Just log in.' : 'Du hast schon ein Passwort. Melde dich einfach an.'; }
                 elseif ((int)$m['email_ok'] !== 1) { $m = null; $err = $pl === 'en' ? 'Please confirm your email address first, the link is in your inbox.' : 'Bitte bestätige zuerst deine E-Mail-Adresse, der Link ist in deinem Postfach.'; }
             }
         }
         if ($err === '') {
             if (!$m) $err = $pl === 'en' ? 'This link no longer works. Request a new one below.' : 'Dieser Link funktioniert nicht mehr. Fordere unten einfach einen neuen an.';
             elseif (mb_strlen($pw) < 8) $err = $pl === 'en' ? 'Please choose a password with at least 8 characters.' : 'Bitte wähl ein Passwort mit mindestens 8 Zeichen.';
-            elseif ($pw !== (string)($_POST['pw2'] ?? '')) $err = $pl === 'en' ? 'The two passwords are not the same.' : 'Die beiden Passwörter sind nicht gleich.';
+            elseif ($pw !== (string)($_POST['pw2'] ?? '')) $err = $pl === 'en' ? 'The two passwords don’t match.' : 'Die beiden Passwörter stimmen nicht überein.';
             else { mv_login($pdo, mv_set_password($pdo, $m, $pw)); $go('?willkommen=1'); }
         }
     }
@@ -183,8 +183,8 @@ if (!$me && !$demo) {
   <div class="authbox">
     <?php if ($mode === 'new'): ?>
       <p class="k"><?= $L('Willkommen', 'Welcome') ?></p>
-      <h1 class="h"><?= $L('Schön, dass du da bist', 'So lovely that you are here') ?>, <em><?= $h(forma_first_name((string)$start['name'])) ?></em>.</h1>
-      <p class="mut"><?= $L('Deine Zahlung ist angekommen. Leg jetzt einmal dein Passwort fest, dann bist du sofort drin. Deine E-Mail:', 'Your payment arrived. Choose your password once and you are right in. Your email:') ?> <b><?= $h((string)$start['email']) ?></b></p>
+      <h1 class="h"><?= $L('Schön, dass du da bist', 'So lovely to have you here') ?>, <em><?= $h(forma_first_name((string)$start['name'])) ?></em>.</h1>
+      <p class="mut"><?= $L('Deine Zahlung ist angekommen. Leg jetzt einmal dein Passwort fest, dann bist du sofort drin. Deine E-Mail:', 'Your payment has come through. Just choose your password and you’re in. Your email:') ?> <b><?= $h((string)$start['email']) ?></b></p>
       <?php if ($err): ?><p class="err"><?= $h($err) ?></p><?php endif; ?>
       <form method="post" class="stack"><input type="hidden" name="a" value="setpw"><input type="hidden" name="lang" value="<?= $lang ?>"><input type="hidden" name="s" value="<?= (int)$start['id'] ?>"><input type="hidden" name="k" value="<?= $h((string)$start['token']) ?>">
         <div class="field"><label for="pw"><?= $L('Passwort (mind. 8 Zeichen)', 'Password (at least 8 characters)') ?></label><input id="pw" type="password" name="pw" autocomplete="new-password" required minlength="8"></div>
@@ -194,12 +194,12 @@ if (!$me && !$demo) {
     <?php elseif ($mode === 'confirm'): ?>
       <p class="k"><?= $L('Nur noch ein Klick', 'One last click') ?></p>
       <h1 class="h"><?= $L('Danke', 'Thank you') ?>, <em><?= $h(forma_first_name((string)$start['name'])) ?></em>. <?= $L('Bitte bestätige deine E-Mail.', 'Please confirm your email.') ?></h1>
-      <p class="mut"><?= $L('Deine Zahlung ist angekommen. Ich habe dir gerade eine kurze Mail an', 'Your payment arrived. I have just sent a short email to') ?> <b><?= $h((string)$start['email']) ?></b> <?= $L('geschickt. Klick dort auf „E-Mail bestätigen“, dann bekommst du deine Willkommensmail mit allen Infos, deiner Rechnung und deinem Zugang.', '. Click “Confirm my email” there, then you get your welcome email with all the information, your invoice and your access.') ?></p>
+      <p class="mut"><?= $L('Deine Zahlung ist angekommen. Ich habe dir gerade eine kurze Mail an', 'Your payment has come through. I have just sent a short email to') ?> <b><?= $h((string)$start['email']) ?></b> <?= $L('geschickt. Klick dort auf „E-Mail bestätigen“, dann bekommst du deine Willkommensmail mit allen Infos, deiner Rechnung und deinem Zugang.', '. Click “Confirm my email” in it, and you will then receive your welcome email with all the details, your invoice and your access.') ?></p>
       <p class="mut small"><?= $L('Nichts angekommen? Schau bitte auch im Spam- oder Werbung-Ordner nach.', 'Nothing there? Please also check your spam or promotions folder.') ?></p>
     <?php elseif ($mode === 'wait'): ?>
       <p class="k"><?= $L('Fast geschafft', 'Almost there') ?></p>
       <h1 class="h"><?= $L('Deine Zahlung wird gerade bestätigt', 'Your payment is being confirmed') ?></h1>
-      <p class="mut"><?= $L('Das dauert meist nur einen Moment. Diese Seite lädt sich gleich neu. Du bekommst außerdem eine E-Mail mit deinem Zugang.', 'This usually takes just a moment. This page reloads itself. You will also get an email with your access.') ?></p>
+      <p class="mut"><?= $L('Das dauert meist nur einen Moment. Diese Seite lädt sich gleich neu. Du bekommst außerdem eine E-Mail mit deinem Zugang.', 'This usually takes just a moment, and this page will refresh by itself. You will also get an email with your access.') ?></p>
       <script>setTimeout(()=>location.reload(),4000)</script>
     <?php elseif ($mode === 'reset'): ?>
       <p class="k"><?= $L('Passwort', 'Password') ?></p>
@@ -212,7 +212,7 @@ if (!$me && !$demo) {
         <div class="field"><label for="pw2"><?= $L('Passwort wiederholen', 'Repeat password') ?></label><input id="pw2" type="password" name="pw2" autocomplete="new-password" required minlength="8"></div>
         <button class="btn" type="submit"><?= $L('Speichern und anmelden', 'Save and log in') ?></button>
       </form>
-      <?php else: ?><p class="mut"><?= $L('Fordere einfach einen neuen Link an.', 'Simply request a new link.') ?></p><p><a class="btn line" href="?vergessen=1&amp;lang=<?= $lang ?>"><?= $L('Neuen Link anfordern', 'Request a new link') ?></a></p><?php endif; ?>
+      <?php else: ?><p class="mut"><?= $L('Fordere einfach einen neuen Link an.', 'Just request a new link.') ?></p><p><a class="btn line" href="?vergessen=1&amp;lang=<?= $lang ?>"><?= $L('Neuen Link anfordern', 'Request a new link') ?></a></p><?php endif; ?>
     <?php elseif ($mode === 'forgot'): ?>
       <p class="k"><?= $L('Passwort vergessen', 'Forgot password') ?></p>
       <h1 class="h"><?= $L('Kein Problem', 'No problem') ?></h1>
@@ -226,7 +226,7 @@ if (!$me && !$demo) {
     <?php else: ?>
       <p class="k"><?= $L('Mitgliederbereich', 'Members area') ?></p>
       <h1 class="h"><?= isset($_GET['bye']) ? $L('Bis bald', 'See you soon') : ($start ? $L('Willkommen zurück', 'Welcome back') : $L('Schön, dass du da bist', 'Lovely to see you')) ?></h1>
-      <p class="mut"><?= $start ? $L('Deine neue Buchung ist in deinem Konto. Melde dich einfach an.', 'Your new booking is in your account. Simply log in.') : $L('Melde dich mit deiner E-Mail und deinem Passwort an.', 'Log in with your email and password.') ?></p>
+      <p class="mut"><?= $start ? $L('Deine neue Buchung ist in deinem Konto. Melde dich einfach an.', 'Your new booking has been added to your account. Just log in.') : $L('Melde dich mit deiner E-Mail und deinem Passwort an.', 'Log in with your email and password.') ?></p>
       <?php if ($err): ?><p class="err"><?= $h($err) ?></p><?php endif; ?>
       <form method="post" class="stack"><input type="hidden" name="a" value="login"><input type="hidden" name="lang" value="<?= $lang ?>"><input class="sr" name="website" tabindex="-1" autocomplete="off">
         <div class="field"><label for="em">E-Mail</label><input id="em" type="email" name="email" autocomplete="email" required value="<?= $h($startMember['email'] ?? '') ?>"></div>
@@ -344,7 +344,7 @@ $card = function (array $l, array $p, bool $lock) use ($lang, $done, $favs, $q, 
     $bucket = $min === 0 ? '' : ($min <= 7 ? 's' : ($min <= 20 ? 'm' : 'l'));
     return '<a class="lc c-' . $h($l['cat']) . ($lock ? ' locked' : '') . ($isCur ? ' cur' : '') . '" href="' . ($lock ? '#' : '?l=' . (int)$l['id'] . $q) . '" data-cat="' . $h($l['cat']) . '" data-energy="' . $h($l['energy']) . '" data-len="' . $bucket . '" data-fav="' . (in_array((int)$l['id'], $favs, true) ? 1 : 0) . '">'
         . '<span class="th">' . ($th ? '<img src="' . $h($th) . '" alt="" loading="lazy">' : '<span class="ic">' . mv_icon($l['cat']) . '</span>')
-        . ($min ? '<span class="min">' . $min . ' Min.</span>' : '') . ($isDone ? '<span class="dn" title="' . $L('schon gemacht', 'done') . '">✓</span>' : '') . ($isCur ? '<span class="now">' . ((int)$l['id'] === (int)$path['start'] ? $L('Starte hier', 'Start here') : $L('Heute dran', 'Up today')) . '</span>' : '') . ($lock ? '<span class="lk">' . $h($lockLabel) . '</span>' : '') . (!$vid && !$lock ? '<span class="soon">' . $L('Video folgt', 'Video coming') . '</span>' : '') . '</span>'
+        . ($min ? '<span class="min">' . $min . ' Min.</span>' : '') . ($isDone ? '<span class="dn" title="' . $L('schon gemacht', 'done') . '">✓</span>' : '') . ($isCur ? '<span class="now">' . ((int)$l['id'] === (int)$path['start'] ? $L('Starte hier', 'Start here') : $L('Heute dran', 'Up today')) . '</span>' : '') . ($lock ? '<span class="lk">' . $h($lockLabel) . '</span>' : '') . (!$vid && !$lock ? '<span class="soon">' . $L('Video folgt', 'Video coming soon') . '</span>' : '') . '</span>'
         . '<span class="tx"><span class="cat">' . $h($cat[$lang === 'en' ? 1 : 0]) . ($l['energy'] !== 'any' ? ' · ' . $h($en[$lang === 'en' ? 1 : 0]) : '') . '</span><b>' . $h(mv_t($l, 'title', $lang)) . '</b></span></a>';
 };
 
@@ -368,15 +368,15 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
 <?php if (!$acc['method'] && !$acc['unfold'] && !empty($acc['pending'])): $oa = (int)$acc['open_at']; ?>
   <section class="hello"><div>
     <p class="k"><?= $h($hello) ?>, <?= $h($first) ?></p>
-    <h1 class="h"><?= $L('Schön, dass du da bist.', 'Lovely that you are here.') ?></h1>
+    <h1 class="h"><?= $L('Schön, dass du da bist.', 'So lovely to have you here.') ?></h1>
     <p class="mut lead"><?= $L('Gerade bereite ich noch alles für dich vor. Dein Zugang schaltet sich am ', 'I am still preparing everything for you. Your access unlocks on ') . '<strong>' . $h(mv_date($oa, $lang)) . '</strong>' . $L(' frei, dann bekommst du eine E-Mail und alles ist für dich offen.', '. You will get an email that day, and everything will be open for you.') ?></p>
-    <ul class="mut" style="margin-top:1rem;padding-left:1.1rem"><?php foreach ($acc['pending'] as $ps): ?><li><?= $ps['kind'] === 'unfold' ? 'Unfold – The Mindful Becoming' : 'Mindful Movement Method' ?> · <?= $L('Start', 'Start') ?> <?= $h(mv_date(mv_open_at($ps), $lang)) ?> · <?= $L('Rücktritt möglich bis', 'Withdrawal possible until') ?> <?= $h(mv_date(mv_withdraw_until($ps), $lang)) ?></li><?php endforeach; ?></ul>
+    <ul class="mut" style="margin-top:1rem;padding-left:1.1rem"><?php foreach ($acc['pending'] as $ps): ?><li><?= $ps['kind'] === 'unfold' ? 'Unfold – The Mindful Becoming' : 'Mindful Movement Method' ?> · <?= $L('Start', 'Start') ?> <?= $h(mv_date(mv_open_at($ps), $lang)) ?> · <?= $L('Rücktritt möglich bis', 'You can withdraw until') ?> <?= $h(mv_date(mv_withdraw_until($ps), $lang)) ?></li><?php endforeach; ?></ul>
   </div>
   <div class="soon card"><p class="k"><?= $L('Dein Start', 'Your start') ?></p><h3><?= $h(mv_date($oa, $lang)) ?></h3><p class="count" data-t="<?= $oa ?>"></p></div></section>
 
 <?php elseif (!$acc['method'] && !$acc['unfold']): ?>
   <section class="hello"><p class="k"><?= $h($hello) ?>, <?= $h($first) ?></p><h1 class="h"><?= $L('Deine Mitgliedschaft ist beendet', 'Your membership has ended') ?></h1>
-  <p class="mut lead"><?= $L('Schön, dass du da warst. Wenn du wieder einsteigen magst, ist die Bibliothek mit allen Monaten für dich bereit.', 'Lovely that you were here. If you would like to come back, the library with all months is ready for you.') ?></p>
+  <p class="mut lead"><?= $L('Schön, dass du da warst. Wenn du wieder einsteigen magst, ist die Bibliothek mit allen Monaten für dich bereit.', 'It was lovely having you here. If you would like to come back, the library with all the months is ready for you.') ?></p>
   <p style="margin-top:1.4rem"><a class="btn" href="/method/<?= $lang === 'en' ? '?lang=en' : '' ?>"><?= $L('Wieder einsteigen', 'Come back') ?></a></p></section>
 
 <?php elseif ($lesson): $l = $lesson['l']; $p = $lesson['p']; $vid = mv_video_for($l, $lang); $flow = $lesson['lock'] ? null : mv_flow_data($l, $lang); $isFav = in_array((int)$l['id'], $favs, true);
@@ -387,7 +387,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
     <?php if ($flow): ?><div data-mv-flow="<?= $h(json_encode($flow, JSON_UNESCAPED_UNICODE)) ?>" data-l="<?= (int)$l['id'] ?>"></div><script src="/wildhearts/assets/flow-player.js?v=3" defer></script>
     <?php else: ?><div class="player"><?php if ($lesson['lock']): $ps = $path['state'][(int)$l['id']] ?? null; ?><div class="ph"><p><?= $ps && !$ps['open'] && $ps['why'] !== 'starter' ? (($ps['why'] === 'date' ? $L('Dieser Monat öffnet sich am ', 'This month opens on ') . $h(mv_date((int)$ps['at'], $lang)) . '.' : $L('Dieses Video öffnet sich, sobald du das vorige ganz gemacht hast.', 'This video opens once you have done the previous one all the way through.'))) : $L('Dieses Video öffnet sich 14 Tage nach deiner Buchung.', 'This video opens 14 days after your booking.') ?></p></div>
       <?php elseif ($vid && mv_bunny()['lib'] !== ''): ?><iframe data-guard="<?= (int)$l['id'] ?>" src="<?= $h(mv_embed($vid)) ?>" loading="lazy" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen" allowfullscreen title="<?= $h(mv_t($l, 'title', $lang)) ?>"></iframe>
-      <?php else: ?><div class="ph"><span class="ic"><?= mv_icon($l['cat']) ?></span><p><?= $L('Dieses Video kommt bald. Schau gern bald wieder vorbei.', 'This video is coming soon. Come back soon.') ?></p></div><?php endif; ?></div><?php endif; ?>
+      <?php else: ?><div class="ph"><span class="ic"><?= mv_icon($l['cat']) ?></span><p><?= $L('Dieses Video kommt bald. Schau gern wieder vorbei.', 'This video is coming soon. Do check back.') ?></p></div><?php endif; ?></div><?php endif; ?>
     <div class="ltext">
       <p class="k"><?= $h((MV_CATS[$l['cat']] ?? MV_CATS['flow'])[$lang === 'en' ? 1 : 0]) ?><?= (int)$l['minutes'] ? ' · ' . (int)$l['minutes'] . ' Min.' : '' ?><?= $l['energy'] !== 'any' ? ' · ' . $h(MV_ENERGY[$l['energy']][$lang === 'en' ? 1 : 0]) : '' ?></p>
       <h1 class="h2"><?= $h(mv_t($l, 'title', $lang)) ?></h1>
@@ -395,7 +395,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
       <?php if ($flow): ?><?php elseif ($lang === 'en' && $l['video_en'] === '' && $l['video_de'] !== ''): ?><p class="mut small">This video is in German for now, the English version is coming.</p><?php elseif ($lang === 'de' && $l['video_de'] === '' && $l['video_en'] !== ''): ?><p class="mut small">Dieses Video gibt es gerade nur auf Englisch, die deutsche Fassung kommt.</p><?php endif; ?>
       <?php if (!$lesson['lock']): ?>
       <div class="acts">
-        <p class="autodone mut small" data-autodone><?= in_array((int)$l['id'], $done, true) ? '✓ ' . $L('Schon gemacht. Du kannst es so oft wiederholen, wie du magst.', 'Done. You can repeat it as often as you like.') : $L('Wird von selbst abgehakt, wenn du bis zum Ende dabei warst.', 'Ticked off by itself once you have stayed until the end.') ?></p>
+        <p class="autodone mut small" data-autodone><?= in_array((int)$l['id'], $done, true) ? '✓ ' . $L('Schon gemacht. Du kannst es so oft wiederholen, wie du magst.', 'Done. You can repeat it as often as you like.') : $L('Wird von selbst abgehakt, sobald du bis zum Ende dabei warst.', 'This is ticked off automatically once you have stayed until the end.') ?></p>
         <form method="post" data-ajax="fav"><input type="hidden" name="a" value="fav"><input type="hidden" name="l" value="<?= (int)$l['id'] ?>"><button class="btn line fav" type="submit" aria-pressed="<?= $isFav ? 'true' : 'false' ?>" <?= $demo ? 'disabled' : '' ?>>♡ <span><?= $isFav ? $L('Gemerkt', 'Saved') : $L('Merken', 'Save') ?></span></button></form>
       </div>
       <?php endif; ?>
@@ -412,7 +412,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
       <p class="k">Journal · <?= $h(mv_date(strtotime($day . ' 12:00'), $lang)) ?></p>
       <h1 class="h2"><?= $h(mv_prompt($day, $lang)) ?></h1>
       <form method="post" class="jform" data-ajax="journal"><input type="hidden" name="a" value="journal"><input type="hidden" name="day" value="<?= $h($day) ?>">
-        <textarea name="text" rows="12" placeholder="<?= $h($L('Schreib einfach los. Niemand außer dir liest das, auch ich nicht.', 'Simply start writing. Nobody but you reads this, not even me.')) ?>" <?= $demo ? 'disabled' : '' ?>><?= $h($txt) ?></textarea>
+        <textarea name="text" rows="12" placeholder="<?= $h($L('Schreib einfach los. Niemand außer dir liest das, auch ich nicht.', 'Just start writing. No one but you will read this, not even me.')) ?>" <?= $demo ? 'disabled' : '' ?>><?= $h($txt) ?></textarea>
         <div class="jrow"><span class="mut small saved" aria-live="polite"></span><button class="btn sm" type="submit" <?= $demo ? 'disabled' : '' ?>><?= $L('Speichern', 'Save') ?></button></div>
       </form>
       <p class="mut small">🔒 <?= $L('Dein Journal ist privat und verschlüsselt gespeichert. Es erscheint nirgends in meiner Verwaltung.', 'Your journal is private and stored encrypted. It never shows up in my admin area.') ?></p>
@@ -428,9 +428,9 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
     $s = $acc['sub']; $u = $acc['unfold']; ?>
   <section class="konto">
     <p class="k"><?= $L('Konto', 'Account') ?></p><h1 class="h2"><?= $h((string)$me['name']) ?></h1><p class="mut"><?= $h((string)$me['email']) ?></p>
-    <?php if (isset($_GET['gekuendigt'])): ?><p class="note"><?= $L('Deine Mitgliedschaft ist gekündigt. Du hast bis zum Ende des bezahlten Zeitraums vollen Zugang. Eine Bestätigung ist per E-Mail unterwegs.', 'Your membership is cancelled. You keep full access until the end of the paid period. A confirmation is on its way by email.') ?></p><?php endif; ?>
+    <?php if (isset($_GET['gekuendigt'])): ?><p class="note"><?= $L('Deine Mitgliedschaft ist gekündigt. Du hast bis zum Ende des bezahlten Zeitraums vollen Zugang. Eine Bestätigung ist per E-Mail unterwegs.', 'Your membership has been cancelled. You keep full access until the end of the paid period. A confirmation is on its way by email.') ?></p><?php endif; ?>
     <?php if (isset($_GET['weiter'])): ?><p class="note"><?= $L('Wie schön, du bleibst! Deine Mitgliedschaft läuft weiter.', 'How lovely, you are staying! Your membership continues.') ?></p><?php endif; ?>
-    <?php if (isset($_GET['fehler'])): ?><p class="err"><?= $L('Das hat gerade nicht geklappt. Bitte versuch es noch einmal oder schreib mir.', 'That did not work just now. Please try again or write to me.') ?></p><?php endif; ?>
+    <?php if (isset($_GET['fehler'])): ?><p class="err"><?= $L('Das hat gerade nicht geklappt. Bitte versuch es noch einmal oder schreib mir.', 'Something went wrong just now. Please try again or write to me.') ?></p><?php endif; ?>
     <div class="kgrid">
     <?php if ($s): $pl = mv_plans()[$s['plan']] ?? null; $end = max((int)$s['period_end'], (int)$s['bill_start']); ?>
       <div class="card"><h3>Mindful Movement Method</h3>
@@ -442,17 +442,17 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
           <form method="post"><input type="hidden" name="a" value="resume"><button class="btn sm" type="submit" <?= $demo ? 'disabled' : '' ?>><?= $L('Doch weitermachen', 'Keep my membership') ?></button></form>
         <?php else: ?>
           <details class="cancel"><summary><?= $L('Mitgliedschaft kündigen', 'Cancel membership') ?></summary>
-            <p class="mut small"><?= $L('Du behältst den Zugang bis zum Ende des bezahlten Zeitraums, danach wird nichts mehr abgebucht.', 'You keep access until the end of the paid period, nothing more will be charged.') ?></p>
+            <p class="mut small"><?= $L('Du behältst den Zugang bis zum Ende des bezahlten Zeitraums, danach wird nichts mehr abgebucht.', 'You keep access until the end of the paid period, and nothing more will be charged after that.') ?></p>
             <form method="post"><input type="hidden" name="a" value="cancel"><button class="btn line sm" type="submit" <?= $demo ? 'disabled' : '' ?>><?= $L('Ja, kündigen', 'Yes, cancel') ?></button></form></details>
         <?php endif; ?>
       </div>
     <?php endif; ?>
     <?php if ($u): ?>
-      <div class="card"><h3>Unfold – The Mindful Becoming</h3><p><?= $L('Start', 'Start') ?>: <?= $h(mv_date(mv_ts($c['u_start']), $lang)) ?> · <?= $L('Calls auf', 'Calls in') ?> <?= $u['call_lang'] === 'en' ? $L('Englisch', 'English') : $L('Deutsch', 'German') ?></p><p class="mut"><?= $L('Begleitung bis', 'Programme until') ?> <?= $h(mv_date(mv_unfold_end(), $lang)) ?></p></div>
+      <div class="card"><h3>Unfold – The Mindful Becoming</h3><p><?= $L('Start', 'Start') ?>: <?= $h(mv_date(mv_ts($c['u_start']), $lang)) ?> · <?= $L('Calls auf', 'Calls in') ?> <?= $u['call_lang'] === 'en' ? $L('Englisch', 'English') : $L('Deutsch', 'German') ?></p><p class="mut"><?= $L('Begleitung bis', 'Programme runs until') ?> <?= $h(mv_date(mv_unfold_end(), $lang)) ?></p></div>
     <?php endif; ?>
       <div class="card"><h3><?= $L('Passwort ändern', 'Change password') ?></h3>
         <?php if (isset($_GET['pwok'])): ?><p class="note"><?= $L('Neues Passwort gespeichert.', 'New password saved.') ?></p><?php endif; ?>
-        <?php if (isset($_GET['pwfehler'])): ?><p class="err"><?= $_GET['pwfehler'] === '1' ? $L('Das bisherige Passwort stimmt nicht.', 'Your current password is not right.') : $L('Bitte mindestens 8 Zeichen, beide gleich.', 'At least 8 characters, both the same please.') ?></p><?php endif; ?>
+        <?php if (isset($_GET['pwfehler'])): ?><p class="err"><?= $_GET['pwfehler'] === '1' ? $L('Das bisherige Passwort stimmt nicht.', 'Your current password is incorrect.') : $L('Bitte wähl mindestens 8 Zeichen und gib zweimal dasselbe Passwort ein.', 'Please use at least 8 characters and make sure both passwords match.') ?></p><?php endif; ?>
         <form method="post" class="stack"><input type="hidden" name="a" value="chpw">
           <input type="password" name="old" placeholder="<?= $h($L('Bisheriges Passwort', 'Current password')) ?>" autocomplete="current-password" required>
           <input type="password" name="pw" placeholder="<?= $h($L('Neues Passwort', 'New password')) ?>" autocomplete="new-password" minlength="8" required>
@@ -460,7 +460,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
           <button class="btn sm" type="submit" <?= $demo ? 'disabled' : '' ?>><?= $L('Speichern', 'Save') ?></button></form>
       </div>
     </div>
-    <p class="small mut" style="margin-top:1.4rem"><?= $L('Rechnungen bekommst du nach jeder Zahlung per E-Mail.', 'You receive an invoice by email after every payment.') ?> <a href="/terms/<?= $lang === 'en' ? '?lang=en' : '' ?>"><?= $L('Bedingungen', 'Terms') ?></a> · <a href="/withdraw/"><?= $L('Vertrag widerrufen', 'Withdraw from contract') ?></a></p>
+    <p class="small mut" style="margin-top:1.4rem"><?= $L('Rechnungen bekommst du nach jeder Zahlung per E-Mail.', 'You receive an invoice by email after every payment.') ?> <a href="/terms/<?= $lang === 'en' ? '?lang=en' : '' ?>"><?= $L('Bedingungen', 'Terms') ?></a> · <a href="/withdraw/"><?= $L('Vertrag widerrufen', 'Withdraw from the contract') ?></a></p>
     <form method="post" style="margin-top:1rem"><input type="hidden" name="a" value="logout"><button class="btn line sm" type="submit"><?= $L('Abmelden', 'Log out') ?></button></form>
   </section>
 
@@ -470,7 +470,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
     $wk = $tnow >= $ustart ? min(13, intdiv($tnow - $ustart, 7 * 86400) + 1) : 0; ?>
   <section class="uhero">
     <div><p class="k">Unfold · The Mindful Becoming</p><h1 class="h2"><?= $wk ? $L('Woche ', 'Week ') . $wk . $L(' von 13', ' of 13') : (time() < $ustart ? $L('Bald geht es los', 'We begin soon') : $L('Dein Weg in drei Monaten', 'Your path in three months')) ?></h1>
-      <p class="lead"><?= !$wk ? $L('Wir starten am ', 'We begin on ') . $h(mv_date($ustart, $lang)) . '. ' . $L('Bis dahin kannst du dich hier schon in Ruhe umsehen.', 'Until then, feel free to look around.') : $L('Jede Woche treffen wir uns live, und jeden Montag und Donnerstag kommt ein neues Bewegungsvideo dazu. Hier findest du außerdem deine Workbooks und den Link zum Call.', 'Every week we meet live, and every Monday and Thursday a new movement video arrives. Here you also find your workbooks and the link to the call.') ?></p></div>
+      <p class="lead"><?= !$wk ? $L('Wir starten am ', 'We begin on ') . $h(mv_date($ustart, $lang)) . '. ' . $L('Bis dahin kannst du dich hier schon in Ruhe umsehen.', 'Until then, feel free to look around.') : $L('Jede Woche treffen wir uns live, und jeden Montag und Donnerstag kommt ein neues Bewegungsvideo dazu. Hier findest du außerdem deine Workbooks und den Link zum Call.', 'Every week we meet live, and every Monday and Thursday a new movement video arrives. You will also find your workbooks and the link to the call here.') ?></p></div>
     <div class="ucall card"><p class="k"><?= $L('Dein Live-Call', 'Your live call') ?></p><h3><?= $h($u['call_lang'] === 'en' ? $c['u_call_en'] : $c['u_call_de']) ?></h3><p class="mut small"><?= $u['call_lang'] === 'en' ? $L('auf Englisch', 'in English') : $L('auf Deutsch', 'in German') ?></p>
       <?php if ($room !== '' && $tnow >= $ustart - 86400): ?><a class="btn" href="/unfold/call/" target="_blank" rel="noopener"><?= $L('Zum Call', 'Join the call') ?></a><?php else: ?><p class="mut small"><?= $L('Der Link zum Call erscheint hier vor dem Start.', 'The link to the call appears here before we start.') ?></p><?php endif; ?></div>
   </section>
@@ -488,7 +488,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
   <section class="hello">
     <div>
       <p class="k"><?= $h($hello) ?>, <?= $h($first) ?></p>
-      <h1 class="h"><?= $week > 0 ? sprintf($L('Diese Woche warst du %s bei dir.', 'This week you showed up for yourself %s.'), '<em>' . $week . '×</em>') : $L('Schön, dass du da bist.', 'Lovely that you are here.') ?></h1>
+      <h1 class="h"><?= $week > 0 ? sprintf($L('Diese Woche warst du %s bei dir.', 'This week you showed up for yourself %s.'), '<em>' . $week . '×</em>') : $L('Schön, dass du da bist.', 'So lovely to have you here.') ?></h1>
       <div class="week" aria-label="<?= $h($L('Tage diese Woche', 'Days this week')) ?>"><?php $dow = (int)$now->format('N'); for ($i = 1; $i <= 7; $i++): ?><span class="<?= $i <= $week ? 'on' : '' ?><?= $i === $dow ? ' today' : '' ?>"><?= ($lang === 'en' ? ['', 'M', 'T', 'W', 'T', 'F', 'S', 'S'] : ['', 'M', 'D', 'M', 'D', 'F', 'S', 'S'])[$i] ?></span><?php endfor; ?></div>
       <p class="mut small"><?= $L('Kein Streak, kein Druck. Jeder Tag, an dem du dir Zeit schenkst, zählt.', 'No streaks, no pressure. Every day you give yourself time counts.') ?></p>
     </div>
@@ -496,12 +496,12 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
     <?php elseif ($path && $path['current'] && isset($all[$path['current']])): $cl = $all[$path['current']]; ?><a class="soon card cur" href="?l=<?= (int)$path['current'] . $q ?>"> <p class="k"><?= (int)$path['current'] === (int)$path['start'] ? $L('Starte hier', 'Start here') : $L('Heute dran', 'Up today') ?> · <?= (int)$cl['p']['_n'] ? $L('Monat ', 'Month ') . (int)$cl['p']['_n'] : $L('Ankommen', 'Welcome') ?></p><h3><?= $h(mv_t($cl['l'], 'title', $lang)) ?></h3><p class="mut small"><?= (int)$path['current'] === (int)$path['start'] ? $L('Hier erkläre ich dir, wie die Method aufgebaut ist. Die drei Videos zum Ankommen sind schon alle für dich offen.', 'Here I explain how the Method works. All three welcome videos are already open for you.') : $L('Schritt für Schritt: Sobald du dieses Video ganz gemacht hast, öffnet sich das nächste.', 'Step by step: as soon as you have done this video all the way through, the next one opens.') ?></p><span class="btn sm">▶ <?= $L('Jetzt starten', 'Start now') ?></span></a>
     <?php elseif ($path): $nx = null; foreach ($path['order'] as $oid) if (!($path['state'][$oid]['open'] ?? false)) { $nx = $path['state'][$oid]; break; } ?><div class="soon card cur"><p class="k"><?= $L('Dein Stand', 'Where you are') ?></p><h3><?= $L('Alles gemacht, wunderbar ♡', 'All done, wonderful ♡') ?></h3><p class="mut small"><?= $nx && $nx['why'] === 'date' ? $L('Dein nächster Monat öffnet sich am ', 'Your next month opens on ') . $h(mv_date((int)$nx['at'], $lang)) . '. ' : '' ?><?= $L('Du kannst jedes Video, das du schon gemacht hast, so oft wiederholen, wie du magst.', 'You can repeat every video you have done as often as you like.') ?></p></div><?php endif; ?>
   </section>
-  <?php if ($acc['starter']): ?><p class="note"><?= $L('Du bist in den ersten 14 Tagen nach deiner Buchung und hast dein Rücktrittsrecht behalten. Bis dahin ist das Ankommen-Modul für dich offen, danach öffnet sich dein Monat 1 von selbst.', 'You are in the first 14 days after your booking and kept your right of withdrawal. Until then the welcome module is open for you, after that your month 1 opens by itself.') ?></p><?php endif; ?>
+  <?php if ($acc['starter']): ?><p class="note"><?= $L('Du bist in den ersten 14 Tagen nach deiner Buchung und hast dein Rücktrittsrecht behalten. Bis dahin ist das Ankommen-Modul für dich offen, danach öffnet sich dein Monat 1 von selbst.', 'You are in the first 14 days after your booking and have kept your right of withdrawal. Until then the welcome module is open for you, and after that month 1 opens automatically.') ?></p><?php endif; ?>
 
   <div class="filters" role="toolbar" aria-label="Filter">
     <div class="fg"><span class="fl"><?= $L('Wie viel Zeit hast du?', 'How much time do you have?') ?></span>
       <button class="chip" data-f="len" data-v="" aria-pressed="true"><?= $L('egal', 'any') ?></button><button class="chip" data-f="len" data-v="s" aria-pressed="false">≤ 5–7 Min.</button><button class="chip" data-f="len" data-v="m" aria-pressed="false">~15 Min.</button><button class="chip" data-f="len" data-v="l" aria-pressed="false">30 Min.</button></div>
-    <div class="fg"><span class="fl"><?= $L('Wie geht es dir heute?', 'How do you feel today?') ?></span>
+    <div class="fg"><span class="fl"><?= $L('Wie geht es dir heute?', 'How are you feeling today?') ?></span>
       <button class="chip" data-f="energy" data-v="" aria-pressed="true"><?= $L('alles', 'all') ?></button><button class="chip" data-f="energy" data-v="tired" aria-pressed="false">Tired Day</button><button class="chip" data-f="energy" data-v="full" aria-pressed="false">Full Day</button></div>
     <div class="fg"><span class="fl"><?= $L('Was magst du?', 'What would you like?') ?></span>
       <button class="chip" data-f="cat" data-v="" aria-pressed="true"><?= $L('alles', 'all') ?></button><?php foreach (MV_CATS as $k => $n): ?><button class="chip" data-f="cat" data-v="<?= $k ?>" aria-pressed="false"><?= $h($n[$lang === 'en' ? 1 : 0]) ?></button><?php endforeach; ?><button class="chip" data-f="fav" data-v="1" aria-pressed="false">♡ <?= $L('Gemerkt', 'Saved') ?></button></div>
@@ -517,7 +517,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
   <?php endforeach; ?>
   <?php if ($mNext): ?>
   <section class="prog nextm">
-    <div class="phead"><div><p class="k"><?= $L('Monat ', 'Month ') . (int)$mNext['n'] . ' · ' . $L('frühestens am ', 'from ') . $h(mv_date((int)$mNext['at'], $lang)) ?></p><h2 class="h3">🔒 <?= $h(mv_t($mNext['p'], 'title', $lang)) ?></h2><p class="mut pintro"><?= $L('Dein nächster Monat öffnet sich, wenn du alle Videos von diesem Monat gemacht hast, frühestens an deinem Monatstag. So bleibst du Schritt für Schritt dran.', 'Your next month opens once you have done every video of this month, at the earliest on your monthly date. That way you keep going step by step.') ?></p></div></div>
+    <div class="phead"><div><p class="k"><?= $L('Monat ', 'Month ') . (int)$mNext['n'] . ' · ' . $L('frühestens am ', 'at the earliest on ') . $h(mv_date((int)$mNext['at'], $lang)) ?></p><h2 class="h3">🔒 <?= $h(mv_t($mNext['p'], 'title', $lang)) ?></h2><p class="mut pintro"><?= $L('Dein nächster Monat öffnet sich, wenn du alle Videos von diesem Monat gemacht hast, frühestens an deinem Monatstag. So bleibst du Schritt für Schritt dran.', 'Your next month opens once you have done every video this month, but not before your monthly start date. That way you keep going, step by step.') ?></p></div></div>
   </section>
   <?php endif; ?>
 <?php endif; ?>

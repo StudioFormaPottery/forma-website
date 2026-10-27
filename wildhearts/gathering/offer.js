@@ -73,7 +73,7 @@ window.whOffer = function (opts) {
     const ab = document.createElement('button'); ab.type = 'button'; ab.className = 'wha'; ab.textContent = '♡ Ask anonymously';
     const af = document.createElement('form'); af.className = 'whf'; af.hidden = true;
     af.innerHTML = '<b>Ask a question</b><p>Viv will see it without your name and can answer it for everyone. Nobody knows it was you.</p><textarea maxlength="500" required placeholder="Your question …"></textarea>'
-      + (opts.k ? '<label><input type="checkbox"> I am happy to show my first name</label>' : '')
+      + (opts.k ? '<label><input type="checkbox"> I\'m happy for my first name to be shown</label>' : '')
       + '<div class="r"><button type="submit">Send</button><button type="button" class="g">Close</button></div><div class="m" hidden></div>';
     document.body.append(ab, af);
     ab.onclick = () => { af.hidden = false; ab.hidden = true; af.querySelector('textarea').focus(); };
@@ -87,7 +87,7 @@ window.whOffer = function (opts) {
         if (!j.ok) throw new Error(j.error || '');
         ta.value = ''; m.hidden = false; m.textContent = 'Thank you ♡ Your question is with Viv.';
         setTimeout(() => { m.hidden = true; af.hidden = true; ab.hidden = false; }, 2200);
-      } catch (err) { m.hidden = false; m.textContent = err.message || 'That did not work just now. Please try again.'; }
+      } catch (err) { m.hidden = false; m.textContent = err.message || 'That didn\'t work just now. Please try again.'; }
     };
   }
 
@@ -131,7 +131,7 @@ window.whOffer = function (opts) {
       + (live && cur.note ? '<p class="note" style="margin-top:2px">' + esc(cur.note) + '</p>' : '')
       + (cur.start ? '<p class="note start">' + esc(cur.start) + '</p>' : '')
       + (live ? '<div class="cd">Gathering price ends in <b>' + mmss(left()) + '</b></div>' : '')
-      + (cur.start ? '<label class="cons"><input type="checkbox" class="cb"><span>I book The Inner Circle with a binding commitment. It opens on ' + esc(cur.start.replace(/^Opens on /, '').split(' · ')[0]) + ', and my first payment is taken then. <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation</a></span></label>' : '')
+      + (cur.start ? '<label class="cons"><input type="checkbox" class="cb"><span>I am making a binding booking for The Inner Circle. It opens on ' + esc(cur.start.replace(/^Opens on /, '').split(' · ')[0]) + ', and my first payment is taken then. <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation</a></span></label>' : '')
       + (cur.start ? '' : cur.offer !== 'retreat' ? '<label class="cons"><input type="checkbox" class="cb"><span>' + (opts.k || opts.t ? '' : '') + 'I would like my access to start right away. I know that if I withdraw within 14 days, I pay only for the part already used. <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation</a></span></label>' + '<label class="cons"><input type="checkbox" class="cb2"><span>Optional: please unlock the course area and downloads right away. I understand that I lose my right of withdrawal for this digital content. Without this tick, I start with the starter section and everything unlocks after 14 days.</span></label>' : '<p class="note">Retreats take place on fixed dates, so there is no statutory right of withdrawal. <a href="/terms" target="_blank" rel="noopener">Cancellation policy</a></p>')
       + '<button class="go" type="button"' + (preview ? ' disabled' : '') + '>' + (preview ? 'Vorschau: so sehen es die Frauen' : (cur.offer === 'year' ? 'Apply · ' : 'Book now · ') + esc(live ? cur.special : cur.regular)) + '</button>'
       + (cur.inst || []).map(pl => '<button class="go2" type="button" data-plan="' + esc(pl.plan) + '"' + (preview ? ' disabled' : '') + '>' + (pl.label ? esc(pl.label) : 'or ' + pl.count + ' monthly payments of ' + esc(live && pl.special ? pl.special : pl.regular)) + '</button>').join('')
@@ -154,7 +154,7 @@ window.whOffer = function (opts) {
         if (w) w.location = j.redirect; else location.href = j.redirect;
       } catch (e) {
         if (w) w.close();
-        er.hidden = false; er.textContent = e.message || 'That did not work just now. Please try again.';
+        er.hidden = false; er.textContent = e.message || 'That didn\'t work just now. Please try again.';
       }
       go.disabled = false;
   };

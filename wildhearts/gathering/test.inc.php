@@ -141,7 +141,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     <h2><span class="step">1</span>Kamera &amp; Mikro</h2>
     <div class="preview"><video id="v" playsinline muted autoplay></video><p id="ph">Tippe auf „Kamera &amp; Mikro starten“ und erlaube den Zugriff.</p></div>
     <div class="meter" aria-hidden="true"><i id="lvl"></i></div>
-    <p class="status" id="st">Sprich etwas, sobald es läuft: Der grüne Balken schlägt dann aus.</p>
+    <p class="status" id="st">Sprich etwas, sobald es läuft: Der Balken schlägt dann aus.</p>
     <div class="row">
       <button id="go" type="button">Kamera &amp; Mikro starten</button>
     </div>
@@ -153,7 +153,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 
   <section class="card">
     <h2><span class="step">2</span>So klingst du</h2>
-    <p class="tip">Nimm 5 Sekunden auf und hör dir an, wie dich die Frauen hören werden. Am besten mit Kopfhörern oder leiser gestellt, damit es nicht hallt.</p>
+    <p class="tip">Nimm 5 Sekunden auf und hör dir an, wie die Frauen dich hören werden. Am besten mit Kopfhörern oder leiser gestellt, damit es nicht hallt.</p>
     <div class="row">
       <button id="rec" type="button" class="ghost" disabled>5 Sekunden aufnehmen</button>
       <button id="tone" type="button" class="ghost">Lautsprecher testen</button>
@@ -190,7 +190,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 <?php if (!$guest): ?>
   <section class="card">
     <h2><span class="step">3</span>Teleprompter</h2>
-    <p class="tip">Schreib oder kopier hier deinen Text hinein. Er wird automatisch gespeichert und läuft im Raum oben über dem Video, nah an der Kamera, damit dein Blick bei den Frauen bleibt. Nur du siehst ihn, er wird nicht übertragen. Leere Zeilen machen Absätze, so findest du leichter wieder hinein.</p>
+    <p class="tip">Schreibe deinen Text hier hinein oder kopiere ihn hinein. Er wird automatisch gespeichert und läuft im Raum oben über dem Video, nah an der Kamera, damit dein Blick bei den Frauen bleibt. Nur du siehst ihn, er wird nicht übertragen. Leere Zeilen machen Absätze, so findest du leichter wieder hinein.</p>
     <div class="row" style="align-items:flex-end">
       <label class="f" style="flex:1 1 260px">Skript<select id="plib"><option value="">Skript wählen …</option><?php foreach ($pLib as $st => $sx): ?><option value="<?= $h($st) ?>"<?= $st === $pPick ? ' selected' : '' ?>><?= $h($st) ?><?= isset($pDe[$st]) ? ' · DE' : '' ?></option><?php endforeach; ?></select></label>
       <label class="f" style="flex:0 0 auto">Sprache<select id="plang"><option value="en"<?= $pLang === 'en' ? ' selected' : '' ?>>English</option><option value="de"<?= $pLang === 'de' ? ' selected' : '' ?>>Deutsch</option></select></label>
@@ -207,7 +207,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
   <section class="card">
     <h2><span class="step"><?= $guest ? 3 : 4 ?></span><?= $gath ? 'In den Raum' : 'Testraum' ?></h2>
     <?php if ($ready): ?>
-      <p class="tip"><?= $gath ? 'Der Raum öffnet sich mit Gastgeber-Rechten. Whereby fragt dort noch einmal nach Kamera und Mikro, das ist normal.' : ($guest ? 'Jetzt geht es in denselben Raum, in dem Viv testet.' : 'Das ist ein echter Whereby-Raum auf deiner Website, genau wie bei einem Gathering. Whereby fragt dort noch einmal nach Kamera und Mikro, das ist normal. Wenn du mit einem zweiten Gerät oder einer Freundin testen willst, schick ihr den Gast-Link aus der Verwaltung.') ?></p>
+      <p class="tip"><?= $gath ? 'Der Raum öffnet sich mit Gastgeberrechten. Whereby fragt dort noch einmal nach Kamera und Mikro, das ist normal.' : ($guest ? 'Jetzt geht es in denselben Raum, in dem Viv testet.' : 'Das ist ein echter Whereby-Raum auf deiner Website, genau wie bei einem Gathering. Whereby fragt dort noch einmal nach Kamera und Mikro, das ist normal. Wenn du mit einem zweiten Gerät oder einer Freundin testen willst, schick ihr den Gast-Link aus der Verwaltung.') ?></p>
       <div class="row"><button id="enter" type="button"><?= $gath ? 'Als Gastgeberin in den Raum' : 'In den Testraum gehen' ?></button></div>
     <?php else: ?>
       <p class="tip">Der Testraum ist noch nicht da. Trag in der Verwaltung unter „Einstellungen für Movecia“ deinen Whereby-Schlüssel ein, dann entsteht er automatisch. Kamera und Mikro kannst du oben trotzdem schon prüfen.</p>
@@ -344,7 +344,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       raf = requestAnimationFrame(loop);
     };
     loop();
-    setTimeout(() => { if (!heard && stream) st.textContent = ctx && ctx.state !== 'running' ? 'Tippe einmal hier auf „Neu starten“, dann zeigt der Balken deine Stimme.' : 'Noch nichts gehört. Sprich etwas lauter, wähl unten ein anderes Mikrofon oder prüf es mit der 5-Sekunden-Aufnahme.'; }, 6000);
+    setTimeout(() => { if (!heard && stream) st.textContent = ctx && ctx.state !== 'running' ? 'Tippe einmal hier auf „Neu starten“, dann zeigt der Balken deine Stimme.' : 'Noch nichts gehört. Sprich etwas lauter, wähle unten ein anderes Mikrofon oder prüfe es mit der 5-Sekunden-Aufnahme.'; }, 6000);
     $('go').textContent = 'Neu starten';
     $('rec').disabled = !window.MediaRecorder;
     fill().catch(() => {});
@@ -399,7 +399,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       return t.replace(/\{names\}/g, list).replace(/\{title\}/g, title);
     };
     const escT = t => t.replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
-    const paint = () => { const raw = fillIn(ta.value.trim()) || 'Noch kein Text. Schreib ihn in das Feld „Teleprompter“.'; txt.innerHTML = escT(raw).replace(/\[([^\]]*)\]/g, '<span class="dir">[$1]</span>'); txt.style.fontSize = pSize + 'px'; $('pspd').textContent = 'Tempo ' + pSpeed; };
+    const paint = () => { const raw = fillIn(ta.value.trim()) || 'Noch kein Text. Schreibe ihn in das Feld „Teleprompter“.'; txt.innerHTML = escT(raw).replace(/\[([^\]]*)\]/g, '<span class="dir">[$1]</span>'); txt.style.fontSize = pSize + 'px'; $('pspd').textContent = 'Tempo ' + pSpeed; };
     // Skript-Bibliothek
     const LIB = <?= json_encode($pLib, JSON_UNESCAPED_UNICODE) ?>;
     const LIBDE = <?= json_encode($pDe, JSON_UNESCAPED_UNICODE) ?>;
@@ -485,7 +485,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     R.addEventListener('click', async () => {
       if (rRec) { rRec.stop(); return; }
       if (!window.MediaRecorder) { alert('Dieser Browser kann nicht aufnehmen. Bitte nimm Chrome, Edge oder Safari am Computer.'); return; }
-      if (!confirm('Aufnahme starten? Aufgenommen werden nur deine Kamera und dein Mikro, die Teilnehmerinnen sind nicht zu sehen. Lass dieses Fenster bis zum Ende offen und tipp dann auf Stopp, dann wird die Datei gespeichert.')) return;
+      if (!confirm('Aufnahme starten? Aufgenommen werden nur deine Kamera und dein Mikro, die Teilnehmerinnen sind nicht zu sehen. Lass dieses Fenster bis zum Ende offen und tippe dann auf Stopp, damit die Datei gespeichert wird.')) return;
       try {
         rStream = await navigator.mediaDevices.getUserMedia({video: {width: {ideal: 1280}, height: {ideal: 720}}, audio: {echoCancellation: true, noiseSuppression: true}});
       } catch (e) { alert('Kein Zugriff auf Kamera oder Mikro. Bitte im Browser erlauben.'); return; }
@@ -511,7 +511,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     const DEF = shuffle(WORLD);
     let rows = [];
     try { rows = JSON.parse(localStorage.getItem('wh-uebung') || 'null') || []; } catch (e) {}
-    const BUY = [['', 'bucht nichts'], ['unfold', 'bucht Unfold'], ['method', 'bucht die Method'], ['retreat', 'bucht Alpine Retreat']];
+    const BUY = [['', 'bucht nichts'], ['unfold', 'bucht Unfold'], ['method', 'bucht die Method'], ['retreat', 'bucht das Alpine Retreat']];
     if (!rows.length) rows = DEF.slice(0, 5).map((n, i) => ({name: n, color: SW[i % SW.length]}));
     const imgs = new Map();
     const store = () => { try { localStorage.setItem('wh-uebung', JSON.stringify(rows.map(r => ({name: r.name, color: r.color, buys: r.buys || ''})))); } catch (e) {} };

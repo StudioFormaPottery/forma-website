@@ -5,14 +5,14 @@
   var en = (document.documentElement.lang || '').indexOf('en') === 0;
   var T = en ? {
     busyH: 'Your access is open on another device',
-    busy: 'Right now your access is being used on another device{o}. Your access belongs to you alone and cannot be shared with other people. If that other device is yours, you can simply continue here and it will pause there.',
+    busy: 'Right now your access is being used on another device{o}. Your access belongs to you alone and cannot be shared with other people. If that other device is yours, just continue here and it will pause there.',
     pausedH: 'Paused on this device',
-    paused: 'Your access is now being used on another device{o}, so it is paused here. Your access cannot be shared with several people. If it is you, simply continue here.',
+    paused: 'Your access is now being used on another device{o}, so it is paused here. Your access cannot be shared with several people. If it’s you, just continue here.',
     go: 'Continue here'
   } : {
     busyH: 'Dein Zugang ist gerade woanders geöffnet',
     busy: 'Dein Zugang wird gerade auf einem anderen Gerät genutzt{o}. Er gehört nur dir und kann nicht mit anderen Personen geteilt werden. Wenn das andere Gerät deins ist, mach einfach hier weiter, dort pausiert es dann.',
-    pausedH: 'Hier pausiert',
+    pausedH: 'Hier ist dein Zugang pausiert',
     paused: 'Dein Zugang wird jetzt auf einem anderen Gerät genutzt{o}, deshalb ist er hier pausiert. Dein Zugang kann nicht mit mehreren Personen geteilt werden. Wenn du das bist, mach einfach hier weiter.',
     go: 'Hier weitermachen'
   };

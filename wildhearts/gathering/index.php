@@ -170,7 +170,7 @@ body.room{background:var(--earth)}
     tick(); setInterval(tick, 30000);
   })();
   </script>
-  <?php if (mm_room_open($g) && $g['room_url'] === ''): ?><p class="lead">The room is being prepared, please reload in a moment.</p><?php endif; ?>
+  <?php if (mm_room_open($g) && $g['room_url'] === ''): ?><p class="lead">The room is being prepared. Please reload the page in a moment.</p><?php endif; ?>
   <p style="margin-top:24px"><a class="btn ghost" href="<?= $h(MM_CHANNEL) ?>" target="_blank" rel="noopener">Say hi in the community channel →</a></p>
 <?php elseif ($g && !$over): ?>
   <p class="hand hi">come as you are ♡</p>
@@ -203,7 +203,7 @@ body.room{background:var(--earth)}
         show('Your seat is saved! 🤍 Your personal room link is on its way to your inbox. See you there.');
       } catch (err) {
         b.disabled = false;
-        show(err.message && err.message !== 'error' ? err.message : 'That did not work just now. Please try again or write to hello@moveciamovement.com.', true);
+        show(err.message && err.message !== 'error' ? err.message : 'That didn\'t work just now. Please try again or write to hello@moveciamovement.com.', true);
       }
     });
   })();
@@ -215,7 +215,7 @@ body.room{background:var(--earth)}
   <p style="margin-top:24px"><a class="btn" href="<?= $h(MM_CHANNEL) ?>" target="_blank" rel="noopener">Join the Wild Hearts Collective →</a></p>
 <?php endif; ?>
   <p class="hand sig">with love, Viv</p>
-  <p class="foot"><a href="/">moveciamovement.com</a> · Vivien Malonga, Movecia, Silvrettastraße 58, 6562 Mathon, Austria · <a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a><br>Your name and email are stored only on this website to send you the room link and reminders, and you can ask me to delete them at any time. The video room is provided by Whereby (Norway, EU/EEA).</p>
+  <p class="foot"><a href="/">moveciamovement.com</a> · Vivien Malonga, Movecia · <a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a><br>Your name and email are stored only on this website to send you the room link and reminders, and you can ask me to delete them at any time. The video room is provided by Whereby (Norway, EU/EEA).</p>
 </main>
 </body>
 <?php endif; ?>

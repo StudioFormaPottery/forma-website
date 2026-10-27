@@ -132,7 +132,7 @@ if ($action === 'pay') {
 }
 
 if ($action === 'health') {
-    if ($o['status'] !== 'bezahlt') forma_json(['ok' => false, 'error' => 'Das geht nach der Zahlung.'], 409);
+    if ($o['status'] !== 'bezahlt') forma_json(['ok' => false, 'error' => 'Das geht erst nach der Zahlung.'], 409);
     [$health, $hErr] = natal_health_clean($in);
     if ($hErr) forma_json(['ok' => false, 'error' => implode(' ', $hErr)], 422);
     $first = natal_health_get($o) === null;

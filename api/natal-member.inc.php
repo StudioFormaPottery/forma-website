@@ -349,7 +349,7 @@ function natal_birth_mail(array $o): array
     foreach (['wolke', 'schuh', 'herz', 'rassel', 'mobile'] as $i) $icons .= '<img src="' . $site . '/img/movecia/icons/' . $i . '.png" width="46" height="46" alt="" style="display:inline-block;width:46px;height:46px;margin:0 5px;border:0;">';
     $paras = [
         "Hallo $first,",
-        'Ich freue mich so sehr für dich und deine ganze Familie.',
+        'ich freue mich so sehr für dich und deine ganze Familie.',
         'Ich wünsche dir ganz, ganz viel Glück und eine wunderschöne, sanfte Kennenlernzeit. Jetzt zählt nur das Ankommen: du, dein Kind und deine Familie. Gönn dir Ruhe, lass dich umsorgen und nimm dir alle Zeit, die ihr braucht.',
         'Um unsere Einheiten musst du dich gerade gar nicht kümmern. Deine restlichen Einheiten sind jetzt Rückbildungseinheiten. Wenn du so weit bist, meist nach der Nachuntersuchung etwa sechs bis acht Wochen nach der Geburt, suchst du dir einfach neue Wunschtermine aus, und wir beginnen ganz behutsam wieder.',
         'Und wenn du in der Zwischenzeit etwas brauchst, eine Frage hast oder einfach erzählen magst, melde dich jederzeit bei mir. Ich bin für dich da.',
@@ -359,7 +359,7 @@ function natal_birth_mail(array $o): array
         . '<p style="margin:0 0 22px;text-align:center;font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-size:19px;color:#7D5E68;">Willkommen auf der Welt, kleines Wunder.</p>';
     foreach (array_slice($paras, 1) as $i => $p) $html .= '<p style="margin:0 0 14px;">' . ($i === 0 ? '<strong>' . forma_h('Liebe ' . $first . ',') . '</strong><br>' : '') . forma_h($p) . '</p>';
     $html .= natal_btn(natal_link($o), 'Meine Termine');
-    $text = "Hurra, dein Baby ist da!\n\n" . implode("\n\n", $paras) . "\n\nMeine Termine: " . natal_link($o) . "\n\nAlles Liebe,\nVivien";
+    $text = "Hurra, dein Baby ist da!\n\n" . implode("\n\n", $paras) . "\n\nMeine Termine: " . natal_link($o) . "\n\nBis bald,\nVivien";
     return ['subject' => 'Hurra, dein Baby ist da! 🤍', 'text' => $text, 'html' => natal_mail_html('Hurra, dein Baby ist da!', $html)];
 }
 

@@ -72,7 +72,7 @@ $tips = $room && $room['kind'] === 's' ? [
     'Schalte dein Handy auf lautlos. Diese halbe Stunde gehört dir.',
 ];
 $affirm = [
-    'Mein Körper weiß, was er tut.',
+    'Mein Körper weiß, wie es geht.',
     'Ich darf mir Zeit nehmen, für mich und für mein Baby.',
     'Mit jedem Atemzug komme ich mehr bei mir an.',
     'Ich bin stark, auch an weichen Tagen.',
@@ -222,7 +222,7 @@ a{color:var(--plum)}
 </div>
 <script>
 (function(){const s=<?= (int)$room['start'] ?>*1000,e=<?= (int)$room['end'] ?>*1000,el=document.getElementById('clock');
-function t(){const n=Date.now();let m;if(n<s){m=Math.ceil((s-n)/60000);el.textContent='Beginn in '+m+' Min.';}else if(n<e){m=Math.ceil((e-n)/60000);el.textContent='noch '+m+' Min.';}else el.textContent='Zeit ist um';}
+function t(){const n=Date.now();let m;if(n<s){m=Math.ceil((s-n)/60000);el.textContent='Beginn in '+m+' Min.';}else if(n<e){m=Math.ceil((e-n)/60000);el.textContent='noch '+m+' Min.';}else el.textContent='Die Zeit ist um';}
 t();setInterval(t,15000);
 const N=<?= json_encode($notes, JSON_UNESCAPED_UNICODE) ?>,k=document.getElementById('tick');let i=0;
 function nx(){if(!N.length||Date.now()>=s){k.style.opacity=0;return;}k.style.opacity=0;setTimeout(()=>{k.textContent=N[i%N.length][1];k.style.opacity=1;i++;},800);}
@@ -365,7 +365,7 @@ document.getElementById('test').addEventListener('click',async function(){const 
   const an=ac.createAnalyser();an.fftSize=512;ac.createMediaStreamSource(st).connect(an);const buf=new Uint8Array(an.fftSize);
   (function loop(){an.getByteTimeDomainData(buf);let s=0;for(const x of buf){const y=(x-128)/128;s+=y*y;}l.firstChild.style.width=Math.min(100,Math.sqrt(s/buf.length)*700)+'%';requestAnimationFrame(loop);})();
   msg.textContent='Wunderbar, ich sehe und höre dich. Sag etwas, dann bewegt sich der Balken.';this.style.display='none';
- }catch(e){msg.textContent='Kamera oder Mikro sind gesperrt. Erlaube den Zugriff in deinem Browser (oben in der Adresszeile) und versuch es nochmal.';}
+ }catch(e){msg.textContent='Kamera oder Mikro sind gesperrt. Erlaube den Zugriff in deinem Browser (oben in der Adresszeile) und versuch es noch einmal.';}
 });})();
 </script>
 <?php endif; ?>

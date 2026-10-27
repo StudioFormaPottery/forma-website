@@ -10,7 +10,7 @@ if (!empty($in['website'])) forma_json(['ok' => true]);
 $en = ($in['lang'] ?? '') === 'en';
 $E = fn(string $de, string $enT) => $en ? $enT : $de;
 $loaded = (int)($in['t'] ?? 0);
-if ($loaded > 0 && ((int)(microtime(true) * 1000) - $loaded) < 3000) forma_json(['ok' => false, 'error' => $E('Einen Moment bitte, dann versuch es noch einmal.', 'Just a moment, then please try again.')], 429);
+if ($loaded > 0 && ((int)(microtime(true) * 1000) - $loaded) < 3000) forma_json(['ok' => false, 'error' => $E('Einen Moment bitte, dann versuch es noch einmal.', 'One moment, please try again in a few seconds.')], 429);
 
 $pdo = forma_db();
 mm_schema($pdo);
@@ -18,7 +18,7 @@ mm_pt_schema($pdo);
 $ip = hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? '') . date('Y-m-d') . 'pt');
 $q = $pdo->prepare('SELECT COUNT(*) FROM mm_pt_requests WHERE ip_hash = ? AND created_at >= ?');
 $q->execute([$ip, date('c', time() - 3600)]);
-if ((int)$q->fetchColumn() >= 5) forma_json(['ok' => false, 'error' => $E('Du hast schon mehrere Anfragen geschickt. Ich melde mich bald bei dir.', 'You have already sent several requests. I will get back to you soon.')], 429);
+if ((int)$q->fetchColumn() >= 5) forma_json(['ok' => false, 'error' => $E('Du hast schon mehrere Anfragen geschickt. Ich melde mich bald bei dir.', 'You’ve already sent a few requests. I’ll be in touch soon.')], 429);
 
 $name = forma_clean((string)($in['name'] ?? ''), 80);
 $email = strtolower(forma_clean((string)($in['email'] ?? ''), 160));
@@ -31,7 +31,7 @@ $times = $pick('times', MM_PT_TIMES);
 
 if (mb_strlen($name) < 2) forma_json(['ok' => false, 'error' => $E('Bitte gib deinen Namen ein.', 'Please enter your name.')], 422);
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) forma_json(['ok' => false, 'error' => $E('Bitte prüf deine E-Mail-Adresse.', 'Please check your email address.')], 422);
-if ($goals === '' && $msg === '') forma_json(['ok' => false, 'error' => $E('Kreuz bitte an, was du dir wünschst, oder schreib mir ein paar Worte.', 'Please tick what you would like or write me a few words.')], 422);
+if ($goals === '' && $msg === '') forma_json(['ok' => false, 'error' => $E('Kreuz bitte an, was du dir wünschst, oder schreib mir ein paar Worte.', 'Please choose what you’re looking for or write me a few words.')], 422);
 
 $pdo->prepare('INSERT INTO mm_pt_requests (name, email, phone, goals, places, times, message, lang, ip_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)')
     ->execute([$name, $email, $phone, $goals, $places, $times, $msg, $en ? 'en' : 'de', $ip, date('c')]);
@@ -39,11 +39,11 @@ $pdo->prepare('INSERT INTO mm_pt_requests (name, email, phone, goals, places, ti
 $lang = $en ? 'en' : 'de';
 $lines = function (string $l) use ($goals, $places, $times, $msg, $phone): array {
     $r = [];
-    if ($g = mm_pt_labels($goals, MM_PT_GOALS, $l)) $r[] = [$l === 'en' ? 'I would like' : 'Ich wünsche mir', implode(', ', $g)];
+    if ($g = mm_pt_labels($goals, MM_PT_GOALS, $l)) $r[] = [$l === 'en' ? 'What you’re looking for' : 'Ich wünsche mir', implode(', ', $g)];
     if ($p = mm_pt_labels($places, MM_PT_PLACES, $l)) $r[] = [$l === 'en' ? 'Where' : 'Wo', implode(', ', $p)];
     if ($t = mm_pt_labels($times, MM_PT_TIMES, $l)) $r[] = [$l === 'en' ? 'When' : 'Wann', implode(', ', $t)];
     if ($phone !== '') $r[] = [$l === 'en' ? 'Phone' : 'Telefon', $phone];
-    if ($msg !== '') $r[] = [$l === 'en' ? 'Your words' : 'Deine Nachricht', $msg];
+    if ($msg !== '') $r[] = [$l === 'en' ? 'Your message' : 'Deine Nachricht', $msg];
     return $r;
 };
 $tbl = function (array $rows): string {
@@ -56,8 +56,8 @@ $first = trim((string)strtok($name, ' '));
 // Eingangsbestätigung an die Interessentin
 try {
     $html = $en
-        ? '<p>Dear ' . forma_h($first) . ',</p><p>thank you so much for your request for 1:1 personal training. I have received it and will get back to you personally within the next few days so we can find out together what is right for you.</p>' . $tbl($lines('en')) . '<p>If anything else comes to mind, simply reply to this email.</p>'
-        : '<p>Liebe ' . forma_h($first) . ',</p><p>danke dir von Herzen für deine Anfrage zum 1:1 Personal Training. Sie ist gut bei mir angekommen, und ich melde mich in den nächsten Tagen persönlich bei dir, damit wir gemeinsam schauen, was für dich passt.</p>' . $tbl($lines('de')) . '<p>Wenn dir noch etwas einfällt, antworte einfach auf diese Mail.</p>';
+        ? '<p>Hi ' . forma_h($first) . ',</p><p>thank you so much for reaching out about 1:1 personal training. Your request has arrived safely, and I’ll get back to you personally in the next few days so we can figure out together what’s right for you.</p>' . $tbl($lines('en')) . '<p>If anything else comes to mind, just reply to this email.</p>'
+        : '<p>Hallo ' . forma_h($first) . ',</p><p>danke dir von Herzen für deine Anfrage zum 1:1 Personal Training. Sie ist gut bei mir angekommen, und ich melde mich in den nächsten Tagen persönlich bei dir, damit wir gemeinsam schauen, was für dich passt.</p>' . $tbl($lines('de')) . '<p>Wenn dir noch etwas einfällt, antworte einfach auf diese Mail.</p>';
     $text = strip_tags(str_replace(['</p>', '</tr>'], ["\n\n", "\n"], $html));
     mm_mail($email, $E('Deine Anfrage für Personal Training', 'Your personal training request'), $text, mm_mail_html($E('Deine Anfrage', 'Your request'), $html, $lang));
 } catch (Throwable $e) { error_log('PT Bestätigung: ' . $e->getMessage()); }

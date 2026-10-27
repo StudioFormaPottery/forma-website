@@ -47,8 +47,8 @@ $units = [
         ['Tiefe Bauchmuskeln und Rektusdiastase', 'Die Bauchmitte sanft und Schritt für Schritt wieder schließen.', ['Rückbildung', 'Kräftigung']],
         ['Haltung, Tragen und Stillen', 'Nacken und Schultern entlasten und ergonomisch heben.', ['Haltung', 'Mobilisation']],
         ['Kraft für den Alltag mit Baby', 'Die Belastung behutsam steigern und spüren, was dir guttut.', ['Kräftigung', 'Ausdauer']],
-        ['Nervensystem, Schlafmangel und Mental Load', 'Bewusst ruhig, mit viel Zeit für Entspannung.', ['Breathwork', 'Yoga Nidra']],
-        ['Zurück zur Lieblingsbewegung', 'Wann Laufen und Sport wieder gehen und wie du gut zurückfindest.', ['Belastungs-Check', 'Ganzkörper']],
+        ['Nervensystem, Schlafmangel und Mental Load', 'Eine bewusst ruhige Einheit mit viel Zeit für Entspannung.', ['Breathwork', 'Yoga Nidra']],
+        ['Zurück zur Lieblingsbewegung', 'Wann Laufen und Sport wieder möglich sind und wie du gut zurückfindest.', ['Belastungstest', 'Ganzkörper']],
         ['Dein Programm für zu Hause', 'Ein Rückblick und dein persönliches 15-Minuten-Programm.', ['Abschluss', 'Ritual']],
     ],
 ];
@@ -469,7 +469,7 @@ footer summary{cursor:pointer}
   <h2 style="margin-top:.6rem">In drei <em>Schritten</em></h2>
   <div class="steps">
     <div class="step"><b>Paket wählen und bezahlen</b><p>Sicher online über Stripe. Danach bekommst du eine Bestätigung und deine Rechnung per E-Mail.</p></div>
-    <div class="step"><b>Wunschtermine aussuchen</b><p>Im Kalender tippst du deine Wunschtage an und wählst Vormittag, Nachmittag oder Abend. Gleich beim Buchen oder später auf deiner persönlichen Seite.</p></div>
+    <div class="step"><b>Wunschtermine aussuchen</b><p>Im Kalender tippst du deine Wunschtage an und wählst Vormittag, Nachmittag oder Abend. Das geht gleich beim Buchen oder später auf deiner persönlichen Seite.</p></div>
     <div class="step"><b>Ich bestätige mit Uhrzeit</b><p>Du bekommst jeden Termin per E-Mail, mit Kalenderdatei für dein Handy<span class="m-online"> und dem Link zum Videoraum</span>. Weitere Termine fragst du jederzeit über deine Seite an.</p></div>
   </div>
 </section>
@@ -480,7 +480,7 @@ footer summary{cursor:pointer}
       <div>
         <p class="k">Vor der Buchung · freiwillig</p>
         <h2 style="margin-top:.5rem;font-size:clamp(2rem,4vw,3.2rem)">Erst einmal <em>kennenlernen</em>?</h2>
-        <p class="mut" style="margin-top:.8rem;max-width:34em">Buch dir ein kostenloses Gespräch von 30 Minuten, online per Video. Wir sprechen darüber, wie es dir geht, was du dir wünschst und welches Paket zu dir passt. Ganz unverbindlich. Du bekommst den Termin mit Kalenderdatei und Link per E-Mail.</p>
+        <p class="mut" style="margin-top:.8rem;max-width:34em">Buch dir ein kostenloses Gespräch von 30 Minuten, online per Video. Wir sprechen darüber, wie es dir geht, was du dir wünschst und welches Paket zu dir passt, ganz unverbindlich. Du bekommst den Termin mit Kalenderdatei und Link per E-Mail.</p>
       </div>
       <p class="kltimes"><b>Mo–Fr</b>8:00–8:30 Uhr<br>oder 19:00–19:30 Uhr</p>
     </div>
@@ -512,7 +512,7 @@ footer summary{cursor:pointer}
     <button type="button" role="tab" aria-selected="false" data-tab="post">Postnatal · 8</button>
     <button type="button" role="tab" aria-selected="false" data-tab="kombi">Kombi · 14</button>
   </div>
-  <?php foreach (['prae' => 'Ideal einmal pro Woche, gern ab der 28. bis 32. Schwangerschaftswoche.', 'post' => 'Nach der ärztlichen Freigabe, meist 6 bis 8 Wochen nach der Geburt. Die ersten vier Einheiten wöchentlich, danach alle ein bis zwei Wochen. Dein Baby darf immer dabei sein.'] as $tk => $intro): ?>
+  <?php foreach (['prae' => 'Ideal ist einmal pro Woche, am besten mit Beginn zwischen der 28. und 32. Schwangerschaftswoche.', 'post' => 'Nach der ärztlichen Freigabe, meist 6 bis 8 Wochen nach der Geburt. Die ersten vier Einheiten wöchentlich, danach alle ein bis zwei Wochen. Dein Baby darf immer dabei sein.'] as $tk => $intro): ?>
   <div class="epanel" role="tabpanel" data-panel="<?= $tk ?>"<?= $tk === 'prae' ? '' : ' hidden' ?>>
     <p class="intro"><?= $h($intro) ?></p>
     <div class="ulist">
@@ -617,7 +617,7 @@ footer summary{cursor:pointer}
   <h2 style="margin-top:.6rem">Im Paznaun oder <em>überall</em> online</h2>
   <div class="two">
     <div class="card"><h3>Im Studio in Mathon</h3><p style="margin-top:.6rem">Mein Studio liegt in Mathon im Paznaun, mitten in Tirol. Hierher kommen Schwangere und junge Mamas aus Ischgl, Galtür, Kappl, See und dem ganzen Paznaun, aber auch aus Landeck und Zams. Schwangerschaftstraining, Geburtsvorbereitung, Beckenboden- und Rückbildungstraining finden hier immer 1:1 statt, ohne Gruppe und ohne Vergleich.</p></div>
-    <div class="card pl"><h3>Online, wo immer du bist</h3><p style="margin-top:.6rem">Du wohnst weiter weg, in Innsbruck, Vorarlberg, Deutschland oder der Schweiz, oder willst nach der Geburt einfach nicht aus dem Haus? Dann trainieren wir live per Video. Ich sehe dich, leite dich an und korrigiere dich wie im Studio, dein Baby kann einfach neben dir liegen.</p></div>
+    <div class="card pl"><h3>Online, wo immer du bist</h3><p style="margin-top:.6rem">Du wohnst weiter weg, in Innsbruck, Vorarlberg, Deutschland oder der Schweiz, oder willst nach der Geburt einfach nicht aus dem Haus? Dann trainieren wir live per Video. Ich sehe dich, leite dich an und korrigiere dich wie im Studio. Dein Baby kann einfach neben dir liegen.</p></div>
   </div>
 </section>
 
