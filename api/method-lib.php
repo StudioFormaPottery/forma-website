@@ -322,7 +322,64 @@ function mv_schema(PDO $pdo): void
     mv_scripts_sync($pdo);
     mv_prod_sync($pdo);
     mv_voice_migrate($pdo);
+    mv_lektorat_sync($pdo);
     mv_workbooks_sync($pdo);
+}
+
+/**
+ * Sprach-Lektorat (Vivien, 27.10.2026: „Solche Fehler müssen definitiv vermieden werden“, nie wörtlich übersetzen).
+ * api/seed/lektorat-2026-10-27.json (gebaut von tools/lektorat/build_map.py) = alter Seed-Text → korrigierter Text.
+ * Ersetzt nur Felder, die noch genau den alten Text enthalten (eigene Änderungen bleiben), Voice-over-Texte nur,
+ * wenn für diese Übung noch keine eigene Aufnahme existiert. Läuft einmal (mm_cfg('lektorat')).
+ */
+function mv_lektorat_sync(PDO $pdo): void
+{
+    $c = mm_cfg('lektorat') ?? [];
+    $j = json_decode((string)@file_get_contents(__DIR__ . '/seed/lektorat-2026-10-27.json'), true);
+    if (!$j || (int)($c['v'] ?? 0) >= (int)$j['v']) return;
+    if ((int)$pdo->query('SELECT COUNT(*) FROM mv_lessons')->fetchColumn() === 0) return;
+    $map = $j['map'] ?? [];
+    $names = $j['names'] ?? [];
+    $fix = fn($v) => is_string($v) && isset($map[$v]) ? $map[$v] : $v;
+    $n = 0;
+    $u = $pdo->prepare('UPDATE mv_lessons SET title_en = ?, text_de = ?, text_en = ?, script_de = ?, script_en = ?, steps = ?, ex = ? WHERE id = ?');
+    foreach ($pdo->query('SELECT * FROM mv_lessons')->fetchAll() as $l) {
+        $row = [$fix($l['title_en']), $fix($l['text_de']), $fix($l['text_en']), $fix($l['script_de']), $fix($l['script_en'])];
+        $st = json_decode((string)($l['steps'] ?? ''), true);
+        $stOut = (string)($l['steps'] ?? '');
+        $exOut = (string)($l['ex'] ?? '');
+        if (is_array($st) && $st) {
+            foreach ($st as $i => &$x) {
+                if (!is_array($x)) continue;
+                if (isset($names[$x[0] ?? ''])) $x[0] = $names[$x[0]];
+                if (isset($names[$x[1] ?? ''])) $x[1] = $names[$x[1]];
+                if (!glob(mv_voice_dir() . '/L' . (int)$l['id'] . '-' . $i . '-de.*')) $x[2] = $fix($x[2] ?? '');
+                if (!glob(mv_voice_dir() . '/L' . (int)$l['id'] . '-' . $i . '-en.*')) $x[3] = $fix($x[3] ?? '');
+            }
+            unset($x);
+            $stOut = json_encode($st, JSON_UNESCAPED_UNICODE);
+            $exOut = json_encode(array_map(fn($x) => [$x[0], $x[1]], $st), JSON_UNESCAPED_UNICODE);
+        }
+        $old = [$l['title_en'], $l['text_de'], $l['text_en'], $l['script_de'], $l['script_en'], (string)($l['steps'] ?? ''), (string)($l['ex'] ?? '')];
+        $neu = [...$row, $stOut, $exOut];
+        if ($neu !== $old) { $u->execute([...$neu, $l['id']]); $n++; }
+    }
+    $u = $pdo->prepare('UPDATE mv_programs SET title_en = ?, intro_de = ?, intro_en = ? WHERE id = ?');
+    foreach ($pdo->query('SELECT id, title_en, intro_de, intro_en FROM mv_programs')->fetchAll() as $p) {
+        $neu = [$fix($p['title_en']), $fix($p['intro_de']), $fix($p['intro_en'])];
+        if ($neu !== [$p['title_en'], $p['intro_de'], $p['intro_en']]) { $u->execute([...$neu, $p['id']]); $n++; }
+    }
+    if ($pdo->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'mm_gatherings'")->fetchColumn()) {
+        $u = $pdo->prepare('UPDATE mm_gatherings SET description = ?, script = ? WHERE id = ?');
+        foreach ($pdo->query('SELECT id, description, script FROM mm_gatherings')->fetchAll() as $g) {
+            $neu = [$fix($g['description']), $fix($g['script'])];
+            if ($neu !== [$g['description'], $g['script']]) { $u->execute([...$neu, $g['id']]); $n++; }
+        }
+    }
+    $c['v'] = (int)$j['v'];
+    $c['n'] = $n;
+    $c['at'] = date('c');
+    mm_save_cfg('lektorat', $c);
 }
 
 /**
