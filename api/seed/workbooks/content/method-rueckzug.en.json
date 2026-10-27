@@ -9,16 +9,16 @@
     "Welcome to your first month. Outside it gets dark early, the meadows lie still under the snow, and when I head out to the horses in the morning, the air is so clear and cold that every breath makes a little cloud. At this time of year nature withdraws and gathers strength for the year ahead. That's exactly the movement I'd love to bring onto the mat with you over the coming weeks.",
     "At the same time, I know that for many of us December is anything but quiet. There are Christmas parties at school and nursery, presents, visits, biscuits and a long list of things someone has to remember. Our body feels this contradiction very clearly. It wants to slow down, and we ask it to go faster. Maybe you know the feeling of being tired in the evening and yet too restless to fall asleep.",
     "That's why this month is all about retreat and rest. I invite you to create little islands for yourself where you don't have to achieve anything. We move gently, we build a strength that carries you without wearing you out, and again and again we give your nervous system the chance to settle.",
-    "In this workbook you'll find everything that goes with the twelve videos of the month: the science behind Box Breathing, somatics, mental load, gentle strength training and sleep, pages for planning and reflecting, and at the end a little kitchen section with warming recipes that make cooking easier on busy winter days. You don't have to read everything or fill everything in. Take what does you good and leave the rest until you need it.",
+    "In this workbook you'll find everything that goes with the twelve videos of the month: background on Box Breathing, somatics, mental load, gentle strength training and sleep, pages for planning and reflecting, and at the end a little kitchen section with warming recipes that make cooking easier on busy winter days. You don't have to read everything or fill everything in. Take what does you good and leave the rest until you need it.",
     "I'm so glad you're here, and I wish you a calm, warm month. With love, Vivien"
   ],
   "overview": [
     {"icon": "mond", "title": "Retreat & Rest", "text": "Why rest is a source of strength and what we can learn from the cycles of nature."},
     {"icon": "kalender", "title": "Your video plan", "text": "All twelve videos of the month at a glance, ready to tick off."},
     {"icon": "sonne", "title": "Your flows and movement videos", "text": "What to expect in the movement videos and which exercises they include."},
-    {"icon": "atem", "title": "Box Breathing", "text": "Four equal counts for full days, with a practice and the background behind it."},
+    {"icon": "atem", "title": "Box Breathing", "text": "Four equal counts for busy days, with a practice and the science behind it."},
     {"icon": "schmetterling", "title": "Somatic Release", "text": "What somatics is and how you learn to read your body's signals."},
-    {"icon": "kopf", "title": "Mental load", "text": "Making the invisible mental work visible, handing it over and talking about it."},
+    {"icon": "kopf", "title": "Mental load", "text": "Making the invisible load visible, handing some of it over and talking about it."},
     {"icon": "berg", "title": "Strength Without Exhaustion", "text": "Why gentle strength training is so valuable for women."},
     {"icon": "kerze", "title": "Evening routine & sleep", "text": "Evening anchors, sleep hygiene and your evening meditation."},
     {"icon": "journal", "title": "Your planner", "text": "Weekly planner, monthly plan and your self-care list."},
@@ -30,23 +30,23 @@
       "icon": "mond",
       "kicker": "This month's theme",
       "title": "Retreat & Rest",
-      "intro": "Winter is the season of pausing. This chapter is about why rest isn't wasted time and how you can allow yourself to have it, even when your everyday life is full.",
+      "intro": "Winter is the season of pausing. This chapter is about why rest isn't wasted time and how you can give yourself permission to rest, even when your everyday life is full.",
       "blocks": [
-        {"t": "p", "text": "When you walk through a forest in winter, at first glance everything seems still and lifeless. The trees have shed their leaves, the flowers have disappeared, and many animals are resting for the winter. Beneath the surface, though, a great deal is going on. The trees draw their nutrients back into their roots, seeds lie protected in the earth waiting for the right moment, and next spring's leaves are already formed inside the buds. So winter is a phase in which strength is gathered."},
+        {"t": "p", "text": "When you walk through a forest in winter, at first glance everything seems still and lifeless. The trees have shed their leaves, the flowers have disappeared, and many animals are resting for the winter. Beneath the surface, though, a great deal is going on. The trees draw their nutrients back into their roots, seeds lie protected in the earth waiting for the right moment, and next spring's leaves are already formed inside the buds. So winter is a time of gathering strength."},
         {"t": "p", "text": "We humans are part of this natural world too, even if our everyday lives make it easy to forget. Our body responds to the shorter days, the lack of light and the cold. Many women tell me that in winter they need more sleep, crave warm food more and want to withdraw earlier in the evening. That's completely natural. And yet in December we often live as if it were midsummer, with packed calendars, late nights and few breaks."},
         {"t": "h", "text": "Rest as a source of strength"},
         {"t": "p", "text": "Many of us learned early on that a break has to be earned first. First the kitchen gets tidied, the laundry folded and the email answered, and only then, once everything is done, are we allowed to sit down. The trouble is that the list is never really finished. So we keep postponing the break until we fall into bed exhausted at night."},
         {"t": "p", "text": "Yet rest is what makes it possible for us to have strength at all. Muscles grow stronger in the recovery phases after training, our brain sorts through what we've experienced and learned during the day while we sleep, and our nervous system needs calm phases to recover from tension. So when you allow yourself rest, you're gathering energy for everything that comes after."},
-        {"t": "fact", "title": "Your nervous system in balance", "text": "The autonomic nervous system controls many processes in the body without us having to think about them, such as heartbeat, breathing and digestion. Put simply, there's one branch that activates us and gets us ready to perform, the sympathetic nervous system, and one that supports recovery, digestion and regeneration, the parasympathetic nervous system. Both are important and constantly alternate in a healthy everyday life. It becomes difficult when, over a long period, we hardly ever find our way into recovery. Slow movement, a calm breath with a long exhale and real breaks can help get this alternation going again."},
+        {"t": "fact", "title": "Your nervous system in balance", "text": "The autonomic nervous system controls many processes in the body without us having to think about them, such as heartbeat, breathing and digestion. Put simply, there's one branch that activates us and gets us ready to perform, the sympathetic nervous system, and one that supports recovery, digestion and regeneration, the parasympathetic nervous system. Both are important and, in a healthy daily rhythm, constantly take turns. It becomes difficult when, over a long period, we hardly ever find our way into recovery. Slow movement, a calm breath with a long exhale and real breaks can help restore this natural back-and-forth."},
         {"t": "h", "text": "What we can learn from the cycles of nature"},
         {"t": "p", "text": "In nature, everything has its time. Growth in spring is followed by the abundance of summer, then harvesting and letting go in autumn, and finally rest in winter. No tree blossoms all year round, and nobody would expect it to. Yet that's exactly what we often expect of ourselves: to have the same amount of energy every day and to be equally productive and equally cheerful."},
-        {"t": "p", "text": "When we see our life as a series of cycles, a lot becomes easier. There are weeks when we get a great deal done and weeks when above all we need to gather strength. As a woman you may also know the cycle within a month, in which energy and mood can shift. And there are phases of life, such as when children are small, when there's less room left for ourselves. None of these phases is better or worse than another. They belong together."},
+        {"t": "p", "text": "When we see our life as a series of cycles, a lot becomes easier. There are weeks when we get a great deal done and weeks when above all we need to gather strength. As a woman, you may also know your monthly cycle, during which energy and mood can shift. And there are phases of life, such as when children are small, when there's less room left for ourselves. None of these phases is better or worse than another. They belong together."},
         {"t": "h", "text": "Why breaks are productive"},
-        {"t": "p", "text": "Maybe you've experienced the solution to a problem coming to you precisely when you weren't thinking about it at all, in the shower, on a walk or just before falling asleep. That's no coincidence. When we step away from a task, our brain keeps working in the background and makes new connections between thoughts. Short breaks between focused phases help many people stay more attentive and more relaxed throughout the day."},
-        {"t": "p", "text": "A break doesn't have to be long. Just a few conscious breaths, a glance out of the window or five minutes in Child's Pose can make a difference. What matters is that you really pause in that moment rather than scrolling through your phone at the same time, because for the brain that's a form of work too."},
-        {"t": "tip", "text": "On full days I've got into the habit of taking a little break exactly when I notice I'm getting impatient. Instead of quickly getting the next thing done, I sit down for two minutes, have a sip of tea and breathe. Afterwards the next thing almost always goes more easily."},
+        {"t": "p", "text": "Maybe you've noticed that the solution to a problem came to you precisely when you weren't thinking about it at all, in the shower, on a walk or just before falling asleep. That's no coincidence. When we step away from a task, our brain keeps working in the background and makes new connections between thoughts. Short breaks between focused phases help many people stay more attentive and more relaxed throughout the day."},
+        {"t": "p", "text": "A break doesn't have to be long. Just a few conscious breaths, a glance out of the window or five minutes in Child's Pose can make a big difference. What matters is that you really pause in that moment rather than scrolling through your phone at the same time, because for the brain that's a form of work too."},
+        {"t": "tip", "text": "On busy days I've got into the habit of taking a little break exactly when I notice I'm getting impatient. Instead of quickly getting the next thing done, I sit down for two minutes, have a sip of tea and breathe. Afterwards the next thing almost always goes more easily."},
         {"t": "h", "text": "What's waiting for you this month"},
-        {"t": "p", "text": "The twelve videos of this month take you from the first calm morning flow all the way to a strengthening movement video for legs and hips at the end. In between you'll find breathing practices for full days, gentle somatics, a conversation about mental load, a strength session that builds you up without draining you, and an evening meditation that helps you put the day down. Each video builds on the one before, and by the end of the month you'll notice how much strength there is in rest."},
+        {"t": "p", "text": "The twelve videos of this month take you from the first calm morning flow all the way to a strengthening movement video for legs and hips at the end. In between you'll find breathing practices for busy days, gentle somatics, a conversation about mental load, a strength session that builds you up without draining you, and an evening meditation that helps you let go of the day. Each video builds on the one before, and by the end of the month you'll notice how much strength there is in rest."},
         {"t": "prompts", "title": "To begin", "items": [
           "How does winter feel in my body? What do I long for at this time of year?",
           "Where in my everyday life do I expect myself to go faster than is good for me?",
@@ -69,7 +69,7 @@
           ["4 · Box Breathing for Full Days", "Talking head · breath · approx. 5 min.", ""],
           ["5 · Somatic Release", "Flow · approx. 15 min.", ""],
           ["6 · A strong centre", "Movement video · approx. 8 min.", ""],
-          ["7 · Mental load: what you may put down today", "Talking head · approx. 6 min.", ""],
+          ["7 · Mental load: what you can let go of today", "Talking head · approx. 6 min.", ""],
           ["8 · Strength Without Exhaustion", "Flow · approx. 30 min.", ""],
           ["9 · Releasing back and shoulders", "Movement video · approx. 8 min.", ""],
           ["10 · Evening Meditation: Retreat", "Talking head · meditation · approx. 15 min.", ""],
@@ -83,8 +83,8 @@
           ["Week 3", "Strength Without Exhaustion", "Releasing back and shoulders", "Evening Meditation"],
           ["Week 4", "Evening flow: letting go of the heaviness", "Legs and hips", "Repeat your favourite video"]
         ]},
-        {"t": "tip", "text": "The short talking heads and movement videos combine nicely with the video that follows when you have a bit more time on a given day. The evening meditation and the evening flow are loveliest in the evening, just before you go to bed. So plan them for a day when you have a little peace in the evening."},
-        {"t": "fact", "title": "If you take a break", "text": "If you're ill for a week or have visitors, your next video simply waits for you. You can never fall behind. Your next month opens on your monthly start date at the earliest, and only once you've completed this month, so you'll never miss out on anything."}
+        {"t": "tip", "text": "The short talking heads and movement videos combine nicely with the video that follows when you have a bit more time on a given day. The evening meditation and the evening flow are best done in the evening, just before you go to bed. So plan them for a day when you can expect a quiet evening."},
+        {"t": "fact", "title": "If you take a break", "text": "If you're ill for a week or have visitors, your next video simply waits for you. You can never fall behind. Your next month opens no earlier than your monthly start date, and only once you've completed this month, so you'll never miss out on anything."}
       ]
     },
     {
@@ -110,7 +110,7 @@
           "Mountain Pose (Tadasana)"
         ]},
         {"t": "h", "text": "A strong centre"},
-        {"t": "p", "text": "A strong centre means far more than a flat stomach. It's about the interplay of your deep abdominal muscles, back muscles, diaphragm and pelvic floor that supports your spine when you lift a child, carry shopping or sit at a desk for a long time. In this movement video you train this centre in a calm, controlled way."},
+        {"t": "p", "text": "A strong centre means far more than a flat stomach. It's about the interplay of your deep abdominal muscles, back muscles, diaphragm and pelvic floor that supports your spine when you lift a child, carry shopping or sit at a desk for a long time. In this movement video you strengthen this centre in a calm, controlled way."},
         {"t": "list", "items": [
           "Pelvic Tilts",
           "Glute Bridge",
@@ -124,7 +124,7 @@
         ]},
         {"t": "fact", "title": "After giving birth", "text": "If you've recently had a baby or have diastasis recti, meaning a gap between the two sides of your rectus abdominis, the “six-pack” muscle, please talk to your doctor, midwife or a physiotherapist first. Exercises like the Forearm Plank are often not yet suitable then. In all exercises, make sure your belly doesn't dome forwards and that you don't feel any downward pressure on your pelvic floor."},
         {"t": "h", "text": "Releasing back and shoulders"},
-        {"t": "p", "text": "This video is for all the days when you've done a lot of carrying, bending and sitting. It opens your chest, mobilises your upper back and lets your shoulders drop. For the Doorway Chest Stretch and Wall Angels you'll need a door frame and a bit of free wall."},
+        {"t": "p", "text": "This video is for all the days when you've done a lot of carrying, bending and sitting. It opens your chest, mobilises your upper back and lets your shoulders drop. For the Doorway Chest Stretch and Wall Angels you'll need a door frame and a clear bit of wall."},
         {"t": "list", "items": [
           "Cat-Cow",
           "Thread the Needle",
@@ -139,7 +139,7 @@
         {"t": "h", "text": "Evening flow: letting go of the heaviness"},
         {"t": "p", "text": "The evening flow is a calm way to end the day that helps you set down its weight. You begin with your hands on your heart and belly, move your back through Cat-Cow and Thread the Needle, sink into Child's Pose, open your hips in a Supine Figure Four, twist gently in a Supine Twist, rock in Happy Baby and finally rest your legs up the wall (Viparita Karani) before you arrive in final relaxation (Savasana). Keep a blanket ready, because your body cools down quickly at the end."},
         {"t": "h", "text": "Legs and hips"},
-        {"t": "p", "text": "To round off the month you get a movement video for strong legs and mobile hips, entirely without hurry."},
+        {"t": "p", "text": "To round off the month you get a movement video for strong legs and mobile hips, without any rush."},
         {"t": "list", "items": [
           "Squat",
           "Reverse Lunge",
@@ -151,7 +151,7 @@
           "Lizard Pose",
           "Supine Figure Four"
         ]},
-        {"t": "tip", "text": "In the movement videos you choose yourself whether an exercise lasts 30 or 45 seconds. If you're just starting out, begin with 30 seconds and give yourself a calm breath between exercises. Once that feels easy, try 45 seconds."},
+        {"t": "tip", "text": "In the movement videos you decide whether an exercise lasts 30 or 45 seconds. If you're just starting out, begin with 30 seconds and give yourself a calm breath between exercises. Once that feels easy, try 45 seconds."},
         {"t": "table", "title": "My notes on the movement videos", "cols": ["Video", "Timer", "What felt easy", "What was challenging"], "rows": [
           ["Warming up", "", "", ""],
           ["A strong centre", "", "", ""],
@@ -164,12 +164,12 @@
       "icon": "atem",
       "kicker": "Video 4",
       "title": "Box Breathing",
-      "intro": "Box Breathing is a simple breathing technique with four phases of equal length. It helps you find your way back to your centre on full days.",
+      "intro": "Box Breathing is a simple breathing technique with four phases of equal length. It helps you find your way back to your centre on busy days.",
       "blocks": [
         {"t": "p", "text": "Picture a square with four sides of equal length. You link each side with one phase of your breath: breathe in, hold, breathe out, hold. Each phase lasts the same amount of time, usually four counts. The steady counting gives your mind a clear, simple task, and your breath becomes slower and calmer all by itself."},
         {"t": "breath", "title": "Box Breathing", "pattern": "4 · 4 · 4 · 4", "text": "Breathe in through your nose and count to four. Hold your breath gently and count to four. Breathe out slowly and count to four. Hold with empty lungs and count to four. Repeat this for about eight rounds."},
         {"t": "exercise", "title": "How to practise Box Breathing", "time": "5 minutes", "intro": "Sit up tall, place your feet firmly on the floor and rest your hands on your thighs.", "steps": [
-          "Breathe out once quite naturally and let your shoulders drop.",
+          "Breathe out naturally once and let your shoulders drop.",
           "Breathe in through your nose and slowly count to four. Imagine tracing along the first side of the square.",
           "Hold your breath gently, without pressure in your throat, and count to four.",
           "Breathe out slowly through your nose and count to four.",
@@ -177,7 +177,7 @@
           "Repeat this for about eight rounds. Then let go of the counting and keep breathing naturally.",
           "Take a moment to notice how your mind and your body feel now."
         ]},
-        {"t": "fact", "title": "What happens when you breathe evenly", "text": "At rest, adults usually breathe about twelve to eighteen times a minute. With Box Breathing at four counts per phase, it's only three to four breaths a minute. Many people experience such a slow, even breath as calming, and early studies on slow breathing suggest it may help reduce tension in the short term. Box Breathing is also an anchor for concentration, because the counting gathers your thoughts for a few minutes."},
+        {"t": "fact", "title": "What happens when you breathe evenly", "text": "At rest, adults usually breathe about twelve to eighteen times a minute. With Box Breathing at four counts per phase, it's only three to four breaths a minute. Many people experience such a slow, even breath as calming, and early studies on slow breathing suggest it may help reduce tension in the short term. Box Breathing is also an anchor for concentration, because the counting focuses your thoughts for a few minutes."},
         {"t": "h", "text": "When Box Breathing can help you"},
         {"t": "list", "items": [
           "Before an important conversation, for example with your child's teacher or your boss",
@@ -197,15 +197,15 @@
       "icon": "schmetterling",
       "kicker": "Video 5",
       "title": "Somatic Release",
-      "intro": "Somatics invites you to sense your body from the inside. Instead of copying a shape from the outside, you feel how a movement feels.",
+      "intro": "Somatics invites you to sense your body from the inside. Instead of copying a shape from the outside, you notice how a movement feels.",
       "blocks": [
         {"t": "p", "text": "The word “soma” comes from Greek and means “body”. In the 1970s the American philosopher and movement educator Thomas Hanna coined the term somatics for methods in which we experience the body as it feels from within. Today the term covers many mindful forms of movement, such as Hanna Somatics, the Feldenkrais Method or certain approaches from dance and bodywork. What they have in common is moving slowly and attentively."},
         {"t": "h", "text": "How somatics differs from ordinary exercise"},
-        {"t": "p", "text": "In many forms of training we orient ourselves by an image from the outside. We want to do the pose the way the instructor shows it and pay attention to angles, repetitions and pace. In somatics you turn your attention inwards. You move so slowly that you can feel every little change, and letting go matters just as much as engaging."},
+        {"t": "p", "text": "In many forms of training we go by what a movement looks like from the outside. We want to do the pose the way the instructor shows it and pay attention to angles, repetitions and pace. In somatics you turn your attention inwards. You move so slowly that you can feel every little change, and letting go matters just as much as engaging."},
         {"t": "fact", "title": "Engaging in order to let go", "text": "Thomas Hanna described how muscles can stay permanently tense through stress and habit without us noticing any more. He called this “sensory-motor amnesia”. In Hanna Somatics, a muscle is therefore first engaged consciously and slowly, and then released even more slowly. This technique is called pandiculation and resembles the luxurious stretch that cats and dogs do all by themselves after waking up. Many people experience a clear sense of spaciousness and lightness afterwards."},
         {"t": "h", "text": "The exercises in your video"},
         {"t": "list", "items": [
-          "Shaking: You shake out first your hands, then your arms, shoulders and legs, until your whole body is moving.",
+          "Shaking: First you shake out your hands, then your arms, shoulders and legs, until your whole body is moving.",
           "Noticing: You stand still and sense the tingling and warmth in your body.",
           "Standing weight shift: You sway gently from one foot to the other.",
           "Body Tapping: You tap your arms, shoulders, back and legs with loose hands.",
@@ -229,7 +229,7 @@
           ["Tight jaw", "", "", ""],
           ["Raised shoulders", "", "", ""],
           ["Shallow breathing", "", "", ""],
-          ["Restlessness in my stomach", "", "", ""],
+          ["An unsettled stomach", "", "", ""],
           ["Headaches", "", "", ""],
           ["", "", "", ""],
           ["", "", "", ""]
@@ -246,10 +246,10 @@
       "icon": "kopf",
       "kicker": "Video 7",
       "title": "Mental load",
-      "intro": "Mental load is the invisible mental work that's constantly running in the background. In this chapter you make it visible and find ways to hand some of it over.",
+      "intro": "Mental load is the invisible thinking and planning that's constantly running in the background. In this chapter you make it visible and find ways to hand some of it over.",
       "blocks": [
-        {"t": "p", "text": "When you do the laundry, that's a task people can see. The mental load starts much earlier, with knowing that the PE kit has to be dry by Thursday, that the detergent is almost empty and needs to go on the shopping list. Then there's the dentist appointment, the present for a child's birthday party, the message to the teacher and the question of what's for dinner tomorrow. Each of these little things seems harmless on its own. Together they make up a list that's never finished and usually lives in our head."},
-        {"t": "fact", "title": "Planning, remembering, keeping track", "text": "Research distinguishes between visible housework and the cognitive work behind it: anticipating needs, weighing up options, making decisions and checking that everything has been done. Studies show that in many families this thinking work falls mostly to women, even when both partners work and the visible tasks appear to be shared fairly evenly. Because it's invisible, it's rarely acknowledged."},
+        {"t": "p", "text": "When you do the laundry, that's a task people can see. The mental load starts much earlier, with knowing that the PE kit has to be dry by Thursday, that you're almost out of detergent and it needs to go on the shopping list. Then there's the dentist appointment, the present for a child's birthday party, the message to the teacher and the question of what's for dinner tomorrow. Each of these little things seems harmless on its own. Together they make up a list that's never finished and usually lives in our head."},
+        {"t": "fact", "title": "Planning, remembering, keeping track", "text": "Research distinguishes between visible housework and the cognitive work behind it: anticipating needs, weighing up options, making decisions and checking that everything has been done. Studies show that in many families this invisible work falls mostly to women, even when both partners work and the visible tasks appear to be shared fairly evenly. Because it's invisible, it's rarely acknowledged."},
         {"t": "h", "text": "Why your body feels the mental load"},
         {"t": "p", "text": "Our nervous system doesn't distinguish very precisely between real danger and a long list of open tasks. Everything that's unfinished can keep us in a state of mild alert. Our shoulders creep up, our breath becomes shallow, our jaw tightens, and in the evening we're tired and yet too restless to fall asleep easily. That's not a sign of weakness. Your body is responding sensibly to a load that has been resting on it for too long."},
         {"t": "h", "text": "Step 1 · Your mental load inventory"},
@@ -278,10 +278,10 @@
           "Highlight the things someone else could take on."
         ]},
         {"t": "h", "text": "Step 3 · Really handing it over"},
-        {"t": "p", "text": "When you hand over a task, hand it over with everything that belongs to it, including the remembering. That's often the hardest part, because we're used to still keeping one eye on it in the background. So whoever takes over the children's dentist appointments checks for themselves when the next check-up is due, calls, puts the appointment in the calendar and goes. It also means it might be done differently from how you'd do it, and that you can let that be."},
+        {"t": "p", "text": "When you hand over a task, hand it over with everything that belongs to it, including the remembering. That's often the hardest part, because we're used to still keeping one eye on it in the background. So whoever takes over the children's dentist appointments checks for themselves when the next check-up is due, calls, puts the appointment in the calendar and goes. It also means it might be done differently from how you'd do it, and that you can live with that."},
         {"t": "list", "items": [
           "Hand over whole areas of responsibility rather than individual chores, for example everything to do with the children's sports and clubs.",
-          "Agree on what the result should be, and leave open how it gets achieved.",
+          "Agree on the result you want, and leave the how up to them.",
           "Older children can take responsibility for their own things, such as packing their sports kit or getting their lunchbox ready.",
           "Some things can simply be dropped. Maybe this year it doesn't have to be five kinds of Christmas biscuits.",
           "A shared digital shopping list or family calendar takes weight off, as long as everyone uses it."
@@ -289,7 +289,7 @@
         {"t": "h", "text": "Step 4 · Talking about it"},
         {"t": "p", "text": "Mental load can rarely be solved on your own. A calm conversation with your partner can change a lot if it's well prepared. This guide will help you."},
         {"t": "steps", "items": [
-          "Find a quiet moment when you're both relaxed, and avoid conversations in passing or in the middle of an argument.",
+          "Find a quiet moment when you're both relaxed, and avoid quick chats in passing or in the middle of an argument.",
           "Start with your own experience and speak in the first person, for example: “I notice my mind doesn't settle in the evening because I'm thinking about so many things.”",
           "Show your inventory. Many partners are genuinely surprised by how many invisible tasks there are.",
           "Talk about which tasks matter to both of you and which ones could perhaps be dropped.",
@@ -322,11 +322,11 @@
         {"t": "p", "text": "Our bones are living tissue that renews itself throughout our lives. They respond to load: when muscles pull on them and we carry our own weight, they get the stimulus to stay strong. In women, bone density usually peaks around the age of thirty. In the years around menopause, oestrogen levels fall, and because oestrogen is involved in bone metabolism, bone density often declines faster during this time. Strength training and weight-bearing movement such as walking or climbing stairs can help support your bones."},
         {"t": "fact", "title": "Hormones and training", "text": "Hormones influence how we feel over the course of a month and over the course of our lives, and movement in turn can affect our wellbeing. Many women find that regular, moderate strength training improves their mood, their sleep and how they feel in their body, including during menopause. How strong such effects are varies greatly from person to person. If you have questions about your hormones, bone density or menopause, your gynaecologist is the right person to ask."},
         {"t": "h", "text": "Why gentle sometimes makes you stronger"},
-        {"t": "p", "text": "Many women believe a workout only counts if they're completely exhausted afterwards. For muscles and bones, though, what matters most is that they're challenged regularly and get enough time to recover. Especially in a phase of life with little sleep and a lot of responsibility, very hard training can mean extra stress. A calm strength session where you keep your breath and feel awake rather than drained afterwards is something you can keep up for months and years, and that's exactly where its power lies."},
+        {"t": "p", "text": "Many women believe a workout only counts if they're completely exhausted afterwards. For muscles and bones, though, what matters most is that they're challenged regularly and get enough time to recover. Especially in a phase of life with little sleep and a lot of responsibility, very hard training can mean extra stress. A calm strength session where you can still breathe steadily and feel awake rather than drained afterwards is something you can keep up for months and years, and that's exactly where its power lies."},
         {"t": "list", "items": [
           "Slow, controlled repetitions often challenge your muscles more than fast ones.",
           "Breathe out during the effort, for example as you come up out of a squat.",
-          "Stop two to three repetitions before the point where nothing more is possible.",
+          "Stop two or three repetitions short of the point where you couldn't do another one.",
           "Choose the easier variation when your technique starts to slip.",
           "Give your muscles at least one day off between two strength sessions.",
           "Enough sleep, water and protein from your diet support recovery."
@@ -379,9 +379,9 @@
         ]},
         {"t": "tip", "text": "When I wake up at night and my thoughts start circling, there's a little notepad next to my bed. I write down what's going through my head and tell myself it's safely kept there until morning. Then I do a few rounds of the extended exhale, breathing in for four counts and out for six."},
         {"t": "h", "text": "Your evening meditation"},
-        {"t": "p", "text": "The evening meditation “Retreat” lasts about fifteen minutes and is meant for listening to in bed or on the sofa under a blanket. It begins with an extended exhale, guides you slowly through your body in a body scan from your feet up to your forehead, and then invites you to set down one thing from today like a coat you take off in the evening. If you fall asleep along the way, that's exactly right."},
+        {"t": "p", "text": "The evening meditation “Retreat” lasts about fifteen minutes and is designed to be listened to in bed or on the sofa under a blanket. It begins with an extended exhale, guides you slowly through your body in a body scan from your feet up to your forehead, and then invites you to set down one thing from today like a coat you take off in the evening. If you fall asleep along the way, that's exactly right."},
         {"t": "exercise", "title": "Setting down the day", "time": "5 minutes", "intro": "A short version of the meditation for evenings when you only have a little time.", "steps": [
-          "Lie down comfortably, cover yourself and switch off the light.",
+          "Lie down comfortably, pull up the covers and switch off the light.",
           "Breathe in through your nose for four counts and slowly out for six. Repeat this five times.",
           "Move your attention from your feet up through your legs, pelvis and belly to your shoulders, and let each area grow heavy.",
           "Soften your jaw and smooth your forehead.",
@@ -389,7 +389,7 @@
           "Simply stay lying there and keep breathing calmly."
         ]},
         {"t": "h", "text": "The evening flow"},
-        {"t": "p", "text": "The evening flow “Letting go of the heaviness” also works well as part of your evening routine. If the twenty minutes feel too long on some evenings, choose two or three poses that do you particular good, such as Child's Pose, Supine Figure Four and Legs Up the Wall, and stay in each for five to ten breaths."},
+        {"t": "p", "text": "The evening flow “Letting go of the heaviness” also works well as part of your evening routine. If the twenty minutes feel too long on some evenings, choose two or three poses that feel especially good, such as Child's Pose, Supine Figure Four and Legs Up the Wall, and stay in each for five to ten breaths."},
         {"t": "table", "title": "My sleep diary", "cols": ["Date", "In bed at", "Got up at", "Evening anchor", "Sleep quality (1 to 10)"], "rows": 10},
         {"t": "prompts", "title": "My evening", "items": [
           "What most often keeps me from going to bed on time in the evening?",
@@ -413,7 +413,7 @@
           ["Week 5", "", "", ""]
         ]},
         {"t": "prompts", "title": "My focus for this month", "items": [
-          "What do I want to consciously do without this month?",
+          "What do I want to consciously go without this month?",
           "What do I want to treat myself to this month?"
         ], "lines": 3},
         {"t": "checklist", "title": "My winter self-care list", "items": [
@@ -459,7 +459,7 @@
           "Seasonal: In winter there are root vegetables, squash, cabbage, leeks, apples and pulses, which keep well and are inexpensive.",
           "Lightening the load: You cook once and eat twice, or you prepare building blocks that quickly become a meal during the week."
         ]},
-        {"t": "fact", "title": "Planning saves thinking work", "text": "For many women, the question of what to have for dinner is one of the most stubborn parts of the mental load. If you make a rough plan at the weekend and do one big shop, you have far fewer decisions to make during the week. That saves time, trips and money, and often helps you throw away less food as well."},
+        {"t": "fact", "title": "Planning saves mental energy", "text": "For many women, the question of what to have for dinner is one of the most stubborn parts of the mental load. If you make a rough plan at the weekend and do one big shop, you have far fewer decisions to make during the week. That saves time, trips and money, and often helps you throw away less food as well."},
         {"t": "h", "text": "Your meal prep plan"},
         {"t": "p", "text": "This plan is a suggestion for one week using the six recipes from the next chapter. You'll need about one and a half to two hours on Sunday, during which a lot simmers or roasts away on its own. During the week, each meal then only takes ten to twenty minutes."},
         {"t": "table", "title": "Meal prep plan for a winter week", "cols": ["When", "What you prepare", "What for"], "rows": [

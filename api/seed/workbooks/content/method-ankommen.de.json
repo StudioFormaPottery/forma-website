@@ -159,7 +159,7 @@
       "icon": "atem",
       "kicker": "Kapitel 5",
       "title": "Atem, der dich auffängt",
-      "intro": "Diese Atemübung ist deine kleine Notfallapotheke für volle Momente. Sie dauert nur ein paar Minuten und funktioniert überall.",
+      "intro": "Diese Atemübung ist deine kleine Notfallapotheke für Momente, in denen alles zu viel wird. Sie dauert nur ein paar Minuten und funktioniert überall.",
       "blocks": [
         {"t": "p", "text": "Wenn wir unter Druck stehen, wird unser Atem oft flach und schnell, und wir atmen eher oben in den Brustkorb. Das passiert ganz automatisch, zum Beispiel wenn die Kinder streiten, das Telefon klingelt und gleichzeitig das Essen anbrennt. Umgekehrt können wir über einen bewusst langsamen Atem unserem Körper ein Signal geben, dass er wieder etwas ruhiger werden darf."},
         {"t": "breath", "title": "Verlängerte Ausatmung", "pattern": "4 · 6", "text": "Atme durch die Nase ein und zähl dabei langsam bis vier. Atme dann durch den Mund oder die Nase aus und zähl dabei bis sechs. Wiederhole das etwa zehnmal und lass danach das Zählen los."},
@@ -171,7 +171,7 @@
           "Wiederhole das etwa zehnmal. Wenn dir vier und sechs zu lang sind, beginne mit drei und fünf.",
           "Lass das Zählen los, atme ganz natürlich weiter und spür einen Moment nach, wie es dir jetzt geht."
         ]},
-        {"t": "fact", "title": "Warum die lange Ausatmung?", "text": "Beim Ausatmen verlangsamt sich der Herzschlag ganz natürlich ein wenig, beim Einatmen wird er etwas schneller. Wenn du die Ausatmung bewusst verlängerst, betonst du diese beruhigende Phase. Viele Menschen erleben langsames Atmen mit langer Ausatmung deshalb als entspannend. Es ist ein einfaches Werkzeug, das dir hilft, in einem vollen Moment wieder etwas Abstand zu gewinnen, auch wenn es die Ursachen von Stress natürlich nicht löst."},
+        {"t": "fact", "title": "Warum die lange Ausatmung?", "text": "Beim Ausatmen verlangsamt sich der Herzschlag ganz natürlich ein wenig, beim Einatmen wird er etwas schneller. Wenn du die Ausatmung bewusst verlängerst, betonst du diese beruhigende Phase. Viele Menschen erleben langsames Atmen mit langer Ausatmung deshalb als entspannend. Es ist ein einfaches Werkzeug, das dir hilft, in einem hektischen Moment wieder etwas Abstand zu gewinnen, auch wenn es die Ursachen von Stress natürlich nicht löst."},
         {"t": "tip", "text": "Such dir einen festen Moment im Alltag, an dem du die Übung einbaust, zum Beispiel jedes Mal, wenn du ins Auto steigst, bevor du den Motor startest. So wird sie zur Gewohnheit, und an schwierigen Tagen erinnert sich dein Körper ganz von selbst daran."},
         {"t": "table", "title": "Wann hat mir der Atem geholfen?", "cols": ["Datum", "Situation", "Vorher (1 bis 10)", "Nachher (1 bis 10)"], "rows": 6}
       ]
@@ -180,9 +180,9 @@
       "icon": "spiegel",
       "kicker": "Kapitel 6",
       "title": "Wo stehst du gerade?",
-      "intro": "Bevor du losgehst, lohnt sich ein ehrlicher Blick darauf, wie es dir gerade geht. Es gibt hier kein richtig und kein falsch, nur deinen heutigen Stand.",
+      "intro": "Bevor du losgehst, lohnt sich ein ehrlicher Blick darauf, wie es dir gerade geht. Es gibt hier kein Richtig und kein Falsch, nur deinen heutigen Stand.",
       "blocks": [
-        {"t": "p", "text": "Diese Standortbestimmung ist ein Foto von heute. In ein paar Monaten kannst du zurückblättern und vergleichen. Oft verändern sich Dinge so langsam, dass wir es im Alltag gar nicht bemerken, und erst der Blick zurück zeigt uns, wie weit wir gekommen sind. Nimm dir ein paar Minuten, atme einmal tief durch und kreise spontan ein, was für dich stimmt."},
+        {"t": "p", "text": "Diese Standortbestimmung ist eine Momentaufnahme von heute. In ein paar Monaten kannst du zurückblättern und vergleichen. Oft verändern sich Dinge so langsam, dass wir es im Alltag gar nicht bemerken, und erst der Blick zurück zeigt uns, wie weit wir gekommen sind. Nimm dir ein paar Minuten, atme einmal tief durch und kreise spontan ein, was für dich stimmt."},
         {"t": "scale", "title": "So geht es mir heute", "items": [
           "Meine Energie im Alltag",
           "Wie erholsam mein Schlaf ist",

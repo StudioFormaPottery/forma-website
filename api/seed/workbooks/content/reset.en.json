@@ -1,13 +1,13 @@
 {
  "key": "reset",
  "lang": "en",
- "eyebrow": "My gift for you · 10 minutes",
+ "eyebrow": "My gift to you · 10 minutes",
  "title": "Reset Routine\nfor Tired Days",
  "subtitle": "for the evenings when you've given everything",
  "icon": "kerze",
  "letter": [
   "Yes, I mean you, reading this at the end of a long day.",
-  "I know that feeling. The day is over, everyone got what they needed from you, and there is nothing left for yourself. Not even the energy to decide what would actually be good for you.",
+  "I know that feeling. The day is over, everyone got what they needed from you, and there is nothing left for you. Not even the energy to decide what would actually be good for you.",
   "That's why this isn't a workout or anything you have to do well. These are ten quiet minutes that belong only to you. You'll breathe, light a candle, let one thing go, wrap your hands around something warm and write a few honest lines.",
   "Some evenings it will feel like a lot, others like nothing at all. Both are completely okay."
  ],
@@ -25,7 +25,7 @@
   {
    "icon": "tee",
    "title": "Step 3 · Golden moon milk",
-   "text": "while it warms"
+   "text": "while it warms up"
   },
   {
    "icon": "journal",
@@ -55,7 +55,7 @@
     },
     {
      "t": "tip",
-     "text": "Put everything in a little basket once, ready to grab. Then on tired evenings there is nothing left to gather, and the first step is almost done."
+     "text": "Gather everything in a little basket once, so it's ready to grab. Then on tired evenings there is nothing left to gather, and the first step is almost done."
     }
    ]
   },
@@ -75,7 +75,7 @@
      "items": [
       "Breathe in through your nose and slowly count to four.",
       "Breathe out through your mouth while you count to six, as if you were fogging up a window.",
-      "Do this about ten times. Let your belly rise first, and let every exhale take a little more of the day with it."
+      "Do this about ten times. As you breathe in, let your belly rise first, and let every exhale take a little more of the day with it."
      ]
     },
     {
@@ -93,7 +93,7 @@
     {
      "t": "steps",
      "items": [
-      "Light a candle and look into the flame for a few breaths.",
+      "Light a candle and gaze into the flame for a few breaths.",
       "On a small piece of paper, write down one thing that's allowed to go tonight. A worry, something someone said, the pressure to get everything done.",
       "Fold it twice, hold it in your hands and quietly say the words below.",
       "Put the paper aside, throw it away tomorrow morning, and blow out the candle when you're ready."
@@ -111,7 +111,7 @@
   },
   {
    "icon": "tee",
-   "kicker": "Step three · while it warms",
+   "kicker": "Step three · while it warms up",
    "title": "Golden Moon Milk",
    "intro": "My evening hug in a cup.",
    "blocks": [
@@ -191,7 +191,7 @@
     },
     {
      "t": "p",
-     "text": "That's exactly why the Wild Hearts Collective exists. So you never forget that you are a whole person too, even when you're always there for everyone else and holding it all together. Come and join us in our free community channel, I would truly love to meet you there."
+     "text": "That's exactly why the Wild Hearts Collective exists: so you never forget that you matter too, even when you're always there for everyone else and holding it all together. Come and join us in our free community channel. I would truly love to meet you there."
     },
     {
      "t": "fact",
