@@ -34,6 +34,15 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
 <?php mvl_top(); ?>
 <main>
 <section class="w"><div class="in hero-x">
+  <!-- Bewegter Hintergrund oben (Vivien, 27.10.2026: „sieht so langweilig aus, gern Wellen“): fließende Wellen, feine Linien, Movecia-Kiesel -->
+  <div class="hw" aria-hidden="true">
+    <svg class="hw-pebble" viewBox="17 14 94 94"><path class="pb-soft" d="M56 32 C 76 29, 92 44, 91 64 C 90 84, 72 96, 53 92 C 34 88, 25 72, 29 53 C 32 40, 43 33, 56 32 Z" transform="translate(-6 -4)"/><path class="pb-line" d="M44 30 C 62 20, 90 28, 98 50 C 104 68, 92 78, 84 88 C 76 100, 50 98, 36 88 C 22 78, 22 58, 28 46 C 32 38, 38 33, 44 30 Z" transform="translate(7 4) translate(63 60) scale(0.85) translate(-63 -60)"/><circle class="pb-dot" cx="81" cy="54" r="10"/></svg>
+    <div class="hw-lines"><svg viewBox="0 0 2880 300" preserveAspectRatio="none"><path d="M0 150 C240 70 480 70 720 150 S1200 230 1440 150 S1920 70 2160 150 S2640 230 2880 150"/><path d="M0 190 C240 120 480 120 720 190 S1200 260 1440 190 S1920 120 2160 190 S2640 260 2880 190"/><path d="M0 110 C240 40 480 40 720 110 S1200 180 1440 110 S1920 40 2160 110 S2640 180 2880 110"/></svg></div>
+    <div class="hw-wave w1"><svg viewBox="0 0 2880 320" preserveAspectRatio="none"><path d="M0 150 C240 70 480 70 720 150 S1200 230 1440 150 S1920 70 2160 150 S2640 230 2880 150 V320 H0Z"/></svg></div>
+    <div class="hw-wave w2"><svg viewBox="0 0 2880 320" preserveAspectRatio="none"><path d="M0 170 C240 240 480 240 720 170 S1200 100 1440 170 S1920 240 2160 170 S2640 100 2880 170 V320 H0Z"/></svg></div>
+    <div class="hw-wave w3"><svg viewBox="0 0 2880 320" preserveAspectRatio="none"><path d="M0 200 C240 140 480 140 720 200 S1200 260 1440 200 S1920 140 2160 200 S2640 260 2880 200 V320 H0Z"/></svg></div>
+    <span class="hw-dot d1"></span><span class="hw-dot d2"></span><span class="hw-dot d3"></span><span class="hw-dot d4"></span>
+  </div>
   <p class="k"><span class="de">Mindful Movement · Yoga · Somatic · Breathwork</span><span class="en">Mindful movement · yoga · somatic · breathwork</span></p>
   <h1><span class="de"><em>Ich bin Movecia.</em></span><span class="en"><em>I am Movecia.</em></span></h1>
   <p class="sub"><span class="de">Bewegung beginnt bei dir.</span><span class="en">Movement begins with you.</span></p>
