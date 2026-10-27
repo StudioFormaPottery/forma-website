@@ -178,8 +178,8 @@ input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and
     setTimeout(function(){
       fetch('../api/private.php',{method:'POST',body:new FormData(f)}).then(function(r){return r.json().catch(function(){return {ok:false};});}).then(function(d){
         if(d&&d.ok&&d.redirect){location.href=d.redirect;return;}
-        err.textContent=(d&&d.error)||'Das hat leider nicht geklappt. Bitte versuch es noch einmal.';err.hidden=false;go.disabled=false;go.textContent=<?= json_encode($T['pay']) ?>;
-      }).catch(function(){err.textContent='Keine Verbindung.';err.hidden=false;go.disabled=false;go.textContent=<?= json_encode($T['pay']) ?>;});
+        err.textContent=(d&&d.error)||<?= json_encode($en ? 'Sorry, something went wrong. Please try again.' : 'Das hat leider nicht geklappt. Bitte versuch es noch einmal.') ?>;err.hidden=false;go.disabled=false;go.textContent=<?= json_encode($T['pay']) ?>;
+      }).catch(function(){err.textContent=<?= json_encode($en ? 'No connection. Please check your internet and try again.' : 'Keine Verbindung. Bitte prüfe dein Internet und versuch es noch einmal.') ?>;err.hidden=false;go.disabled=false;go.textContent=<?= json_encode($T['pay']) ?>;});
     },Math.max(0,wait));
   });
 })();
