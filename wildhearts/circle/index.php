@@ -67,7 +67,7 @@ a{color:var(--wine)}
 <body>
 <div class="bg" aria-hidden="true"><span style="width:420px;height:420px;right:-200px;top:-150px;background:#E8DED2"></span><span style="width:300px;height:300px;left:-190px;bottom:-60px;background:#E8D6CA;opacity:.6"></span></div>
 <main>
-  <div class="pol"><img src="/img/wildhearts/viv-stretch.jpg" alt="Viv stretching"><span>back to you ♡</span></div>
+  <div class="pol"><img src="/img/movecia/fotos/ev-ueber-mich.jpg" alt="Viv stretching"><span>back to you ♡</span></div>
   <?php if ($stay): ?><br><span class="invite">your gift: <?= $h($stayCode) ?> ♡</span><?php elseif ($ref): ?><br><span class="invite"><?= $h(forma_first_name((string)$ref['name'] ?: 'A friend')) ?> invited you ♡</span><?php endif; ?>
   <p class="hand"><?= $stay ? 'so happy you are staying' : ($ref ? 'a gift from a friend' : 'your monthly circle') ?></p>
   <h1><?= $h($o['title']) ?></h1>
