@@ -36,11 +36,11 @@ body{background:#F2ECE4}main{max-width:900px}
   <span class="pv-l"><a href="?view=videos&amp;play=<?= $id ?>&amp;lang=de"<?= $lg === 'de' ? ' class="on"' : '' ?>>Deutsch</a><a href="?view=videos&amp;play=<?= $id ?>&amp;lang=en"<?= $lg === 'en' ? ' class="on"' : '' ?>>Englisch</a></span></div>
 <h1 class="pv-t"><?= $h(mv_t($l, 'title', $lg)) ?></h1>
 <p class="pv-n">👁 So sieht es die Teilnehmerin im Mitgliederbereich. Nur hier in der Vorschau kannst du mit „Überspringen“ weiterklicken, die Teilnehmerinnen nicht.
-<?php if ($fd && !$st['done']): ?> Noch nicht alles da: Wo ein Clip fehlt, steht „Clip folgt“, wo dein Voice-over fehlt, siehst du den Sprechtext.<?php endif; ?></p>
+<?php if ($fd && !$st['done']): ?> Noch nicht alles da: Wo ein Clip fehlt, steht „Clip folgt“, wo dein Voice-over fehlt, steht oben im Bild ein kleiner Hinweis. Den Sprechtext sehen Teilnehmerinnen nie.<?php endif; ?></p>
 <div class="pv-w">
 <?php if ($fd): ?>
   <div data-mv-flow="<?= $h(json_encode($fd, JSON_UNESCAPED_UNICODE)) ?>"></div>
-  <script src="/wildhearts/assets/flow-player.js?v=4"></script>
+  <script src="/wildhearts/assets/flow-player.js?v=5"></script>
 <?php else: ?>
   <div class="pv-v"><?php if ($vid !== '' && mv_bunny()['lib'] !== ''): ?><iframe src="<?= $h(mv_embed($vid)) ?>" allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe><?php else: ?><div class="pv-e">Das Video ist noch nicht hochgeladen. Sobald es da ist, läuft es hier.</div><?php endif; ?></div>
 <?php endif; ?>

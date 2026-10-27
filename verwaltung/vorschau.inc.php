@@ -63,7 +63,6 @@ body{background:#F2ECE4}h1,h2{color:#6B5658}
 <?php
         if ($pFlow) $tile($self . '?view=videos&play=' . (int)$pFlow['id'], '🌊', 'Flow mit Voice-over', $h($pFlow['title_de']) . ' · jede Übung so lange wie eingestellt, deine Stimme dazu');
         if ($pMove) $tile($self . '?view=videos&play=' . (int)$pMove['id'], '⏱', 'Bewegungsvideo 30/45 Sek.', $h($pMove['title_de']) . ' · ohne Sprechen, Timer nach Wahl');
-        $tile($self . '?view=mediathek', '📚', 'Mediathek', 'Alle Übungen, nach Jahreszeit und Stil');
 ?>
 </div></section>
 

@@ -107,3 +107,8 @@ body.auth{min-height:100vh}
 .uhero{display:grid;gap:1.6rem;padding-top:clamp(1.6rem,4vw,3rem);align-items:end}
 @media(min-width:960px){.uhero{grid-template-columns:1.4fr .8fr;gap:3rem}}
 .ucall{background:var(--deep);color:var(--on)}.ucall .k{color:var(--peach)}.ucall .mut{color:#D9C9CE}.ucall h3{margin:.3rem 0}.ucall .btn{margin-top:1rem;background:var(--peach);color:var(--deep)}
+/* Flow / Bewegungsvideo: Player über die ganze Breite, darunter Merken und Als Nächstes (27.10.2026) */
+.lesson.flowl{grid-template-columns:1fr!important;max-width:1240px;gap:1.2rem}
+.lesson.flowl .ltext{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
+.lesson.flowl .acts{margin-top:0;align-items:center}
+.lesson.flowl .nextl{margin-top:0;min-width:240px}
