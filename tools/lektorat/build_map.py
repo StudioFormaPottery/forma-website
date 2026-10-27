@@ -10,7 +10,7 @@ Aufruf: python3 tools/lektorat/build_map.py
 import json, os, subprocess, difflib
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-BASES = ['5a437c7', '94e1ba5']  # vor dem Lektorat, nach der ersten Runde (für Datenbanken, die schon v1 bekommen haben)
+BASES = ['5a437c7', '94e1ba5', '37fd142']  # vor dem Lektorat, nach der ersten Runde (für Datenbanken, die schon v1 bekommen haben)
 BASE = BASES[0]
 OUT = os.path.join(ROOT, 'api', 'seed', 'lektorat-2026-10-27.json')
 
@@ -78,5 +78,5 @@ for BASE in BASES:
 for k in list(M):
     seen = 0
     while M[k] in M and seen < 5: M[k] = M[M[k]]; seen += 1
-json.dump({'v': 2, 'map': M, 'names': NAMES}, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
+json.dump({'v': 3, 'map': M, 'names': NAMES}, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
 print(f'{len(M)} Texte, {len(NAMES)} Namen → {OUT}')
