@@ -270,15 +270,18 @@ function mm_review_mail(string $to, string $name, string $lang, string $what, bo
     if ($url === '' || trim($to) === '') return false;
     $en = $lang === 'en';
     $first = forma_first_name($name ?: ($en ? 'friend' : 'meine Liebe'));
-    $thing = ['unfold' => $en ? 'our three months of Unfold' : 'unsere drei Monate Unfold', 'natal' => $en ? 'our sessions together' : 'unsere gemeinsamen Einheiten', 'natal1' => $en ? 'our session' : 'unsere Einheit'][$what] ?? ($en ? 'our time together' : 'unsere gemeinsame Zeit');
+    $thing = ['unfold' => $en ? 'our three months of Unfold' : 'unsere drei Monate Unfold', 'natal' => $en ? 'our sessions together' : 'unsere gemeinsamen Einheiten', 'natal1' => $en ? 'our session' : 'unsere Einheit',
+        'pt' => $en ? 'training with me' : 'unsere gemeinsamen Trainings', 'pt1' => $en ? 'training with me' : 'unser gemeinsames Training'][$what] ?? ($en ? 'our time together' : 'unsere gemeinsame Zeit');
+    // Personal Training (Vivien, 27.10.2026): Hotelgäste, auch Männer → neutral formuliert
+    $pt = str_starts_with($what, 'pt');
     $lines = $en ? [
-        "Dear $first,",
-        "Thank you so much for $thing. It meant a lot to me that you were there and gave yourself this time.",
-        'May I ask you a small favour? A short Google review helps other women find Movecia. Just a sentence or two about how it felt for you is plenty.',
+        $pt ? "Hi $first," : "Dear $first,",
+        $pt ? "Thank you so much for $thing during your holiday. I really enjoyed our time and I hope your body is thanking you too." : "Thank you so much for $thing. It meant a lot to me that you were there and gave yourself this time.",
+        $pt ? 'May I ask you a small favour? A short Google review helps other guests find Movecia. Just a sentence or two about how it felt for you is plenty.' : 'May I ask you a small favour? A short Google review helps other women find Movecia. Just a sentence or two about how it felt for you is plenty.',
     ] : [
         "Hallo $first,",
-        "danke von Herzen für $thing. Es hat mir viel bedeutet, dass du dabei warst und dir diese Zeit geschenkt hast.",
-        'Darf ich dich um einen kleinen Gefallen bitten? Eine kurze Bewertung auf Google hilft anderen Frauen, Movecia zu finden. Zwei Sätze dazu, wie es sich für dich angefühlt hat, reichen völlig.',
+        $pt ? "danke dir für $thing in deinem Urlaub. Mir hat es richtig Freude gemacht und ich hoffe, dein Körper sagt auch danke." : "danke von Herzen für $thing. Es hat mir viel bedeutet, dass du dabei warst und dir diese Zeit geschenkt hast.",
+        $pt ? 'Darf ich dich um einen kleinen Gefallen bitten? Eine kurze Bewertung auf Google hilft anderen Gästen, Movecia zu finden. Zwei Sätze dazu, wie es für dich war, reichen völlig.' : 'Darf ich dich um einen kleinen Gefallen bitten? Eine kurze Bewertung auf Google hilft anderen Frauen, Movecia zu finden. Zwei Sätze dazu, wie es sich für dich angefühlt hat, reichen völlig.',
     ];
     $btn = $en ? 'Write a review ★★★★★' : 'Jetzt bewerten ★★★★★';
     $after = $en ? 'Thank you, it really means a lot to me.' : 'Danke dir, das bedeutet mir wirklich viel.';

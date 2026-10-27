@@ -6,6 +6,8 @@
 declare(strict_types=1);
 require dirname(__DIR__, 2) . '/api/natal-lib.php';
 require_once dirname(__DIR__, 2) . '/api/method-lib.php';
+require_once dirname(__DIR__, 2) . '/api/ptb-lib.php';
+$ptc = ptb_cfg();
 $mvc = mv_cfg();
 header('Cache-Control: no-cache');
 $o = mm_offers();
@@ -84,6 +86,7 @@ a{color:var(--wine)}
     <a href="#method">Method</a>
     <a href="#unfold">Unfold</a>
     <a href="#natal"><span class="en">Prenatal &amp; postnatal</span><span class="de">Prä- &amp; Postnatal</span></a>
+    <a href="#training">Personal Training</a>
     <a href="#retreat">Retreat</a>
     <a href="#free"><span class="en">Free offers</span><span class="de">Kostenlos</span></a>
     <a href="#withdrawal"><span class="en">Right of withdrawal</span><span class="de">Rücktrittsrecht</span></a>
@@ -133,6 +136,16 @@ a{color:var(--wine)}
     <li><span class="en"><strong>Members area (packages):</strong> with a package you get a members area with email and password. After each session you find your workbook there and, for online sessions, a recording that only shows me. During your first 14 days you can preview the first third of your first workbook on screen; after that everything is unlocked, including downloads. One month after your last session (at the latest six months plus one month after the due date) your access ends and your account, all recordings and your health details are deleted automatically.</span><span class="de"><strong>Mitgliederbereich (Pakete):</strong> Mit einem Paket bekommst du einen Mitgliederbereich mit E-Mail und Passwort. Dort findest du nach jeder Einheit dein Workbook und bei Online-Einheiten eine Aufnahme, auf der nur ich zu sehen bin. In deinen ersten 14 Tagen kannst du das erste Drittel deines ersten Workbooks am Bildschirm ansehen, danach ist alles offen, auch zum Herunterladen. Einen Monat nach deiner letzten Einheit (spätestens sechs Monate plus einen Monat nach dem Geburtstermin) endet dein Zugang, und dein Konto, alle Aufnahmen und deine Gesundheitsangaben werden automatisch gelöscht.</span></li>
     <li><span class="en"><strong>Health questionnaire:</strong> when booking you answer a few questions about your health so I can plan every session safely. You give your explicit consent for this; the details are only visible to me and are deleted together with your access.</span><span class="de"><strong>Gesundheitsfragebogen:</strong> Beim Buchen beantwortest du ein paar Fragen zu deiner Gesundheit, damit ich jede Einheit sicher planen kann. Dafür gibst du deine ausdrückliche Einwilligung. Die Angaben sehe nur ich, und sie werden zusammen mit deinem Zugang gelöscht.</span></li>
     <li><span class="en">You have a 14-day right of withdrawal, see <a href="#withdrawal">below</a>.</span><span class="de">Du hast ein 14-tägiges Rücktrittsrecht, siehe <a href="#withdrawal">unten</a>.</span></li>
+  </ul>
+
+  <h2 id="training">Personal Training</h2>
+  <p><span class="price"><span class="en">1 session</span><span class="de">1 Einheit</span> <?= $eur($ptc['unit']) ?></span><span class="price"><span class="en">from <?= (int)$ptc['disc_from'] ?> sessions, each</span><span class="de">ab <?= (int)$ptc['disc_from'] ?> Einheiten je</span> <?= $eur($ptc['disc_unit']) ?></span></p>
+  <ul>
+    <li><span class="en">Every session is 60 minutes, one to one with me, in the Movecia studio in Mathon. You can request up to <?= PTB_MAX_UNITS ?> sessions at once, each with a preferred day and time.</span><span class="de">Jede Einheit dauert 60 Minuten und findet 1:1 mit mir im Movecia Studio in Mathon statt. Du kannst bis zu <?= PTB_MAX_UNITS ?> Einheiten auf einmal anfragen, jede mit Wunschtag und Uhrzeit.</span></li>
+    <li><span class="en">Your request is not yet a booking. First you confirm your email address, then I check your times and either confirm them or suggest another time. The contract is concluded when you pay online for all confirmed sessions; only then are the times reserved for you. You then receive your confirmation with a calendar file and your invoice by email.</span><span class="de">Deine Anfrage ist noch keine Buchung. Zuerst bestätigst du deine E-Mail-Adresse, dann prüfe ich deine Termine und bestätige sie oder schlage dir eine andere Zeit vor. Der Vertrag kommt zustande, wenn du alle bestätigten Einheiten online bezahlst. Erst dann sind die Termine fix für dich reserviert. Danach bekommst du Bestätigung mit Kalenderdatei und Rechnung per E-Mail.</span></li>
+    <li><span class="en">The sessions are leisure services on fixed dates, so there is no statutory right of withdrawal (§ 18 (1) 10 FAGG). Instead: you can reschedule or cancel any session free of charge up to 24 hours before it starts, and you get the money for a cancelled session back. For later cancellations or if you do not come, the session cannot be refunded.</span><span class="de">Die Einheiten sind Freizeitdienstleistungen zu fest vereinbarten Terminen, deshalb gibt es kein gesetzliches Rücktrittsrecht (§ 18 Abs. 1 Z 10 FAGG). Stattdessen gilt: Bis 24 Stunden vor Beginn kannst du jede Einheit kostenlos verschieben oder absagen und bekommst das Geld für eine abgesagte Einheit zurück. Bei späterer Absage oder wenn du nicht kommst, kann die Einheit leider nicht erstattet werden.</span></li>
+    <li><span class="en">If I cannot hold a session (for example because I am ill), we arrange a new time. If that is not possible during your stay, you get the money for that session back.</span><span class="de">Kann ich eine Einheit nicht halten (zum Beispiel weil ich krank bin), vereinbaren wir eine neue Zeit. Geht das während deines Aufenthalts nicht mehr, bekommst du das Geld für diese Einheit zurück.</span></li>
+    <li><span class="en">Please tell me about any injuries, health problems or pregnancy before your first session. The training is movement guidance and does not replace medical advice.</span><span class="de">Bitte erzähl mir vor der ersten Einheit von Verletzungen, gesundheitlichen Beschwerden oder einer Schwangerschaft. Das Training ist Bewegungsanleitung und ersetzt keine ärztliche Beratung.</span></li>
   </ul>
 
   <h2 id="retreat"><?= $h($r['title']) ?></h2>

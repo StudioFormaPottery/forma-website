@@ -11,7 +11,8 @@ function mm_subnav(string $active): void
     global $pdo;
     $self = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?');
     $req = 0; try { $req = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {}
-    $tabs = [['movecia', '?view=movecia', 'Übersicht'], ['videos', '?view=videos', '🎬 Videos hochladen'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['method', '?view=method', 'Method &amp; Unfold'], ['natal', '?view=natal', 'Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', 'Live-Texte'], ['presse', '?view=presse', 'Presse'], ['einst', '?view=movecia#einstellungen', 'Einstellungen']]; ?>
+    $ptReq = 0; try { $ptReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); } catch (Throwable $e) {}
+    $tabs = [['movecia', '?view=movecia', 'Übersicht'], ['videos', '?view=videos', '🎬 Videos hochladen'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['method', '?view=method', 'Method &amp; Unfold'], ['natal', '?view=natal', 'Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['training', '?view=training', 'Personal Training' . ($ptReq ? ' <i>' . $ptReq . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', 'Live-Texte'], ['presse', '?view=presse', 'Presse'], ['einst', '?view=movecia#einstellungen', 'Einstellungen']]; ?>
 <style>
 .mvsub{position:sticky;top:0;z-index:40;margin:-8px -16px 16px;padding:10px 16px;background:rgba(242,236,228,.96);border-bottom:1px solid #DDD2C6;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .mvsub::-webkit-scrollbar{display:none}
@@ -38,6 +39,8 @@ require __DIR__ . '/videos.inc.php';
 require __DIR__ . '/mediathek.inc.php';
 // Als Teilnehmerin ansehen (?view=vorschau)
 require __DIR__ . '/vorschau.inc.php';
+// Personal Training für Hotelgäste (?view=training, Vivien 27.10.2026)
+require __DIR__ . '/ptb.inc.php';
 
 $mmBack = $self . '?view=movecia';
 
@@ -364,6 +367,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <?php if ($next): ?><a href="<?= forma_h($GLOBALS['mmHostLink']((int)$next['id'])) ?>" target="_blank" rel="noopener"><span class="ic">✨</span><b>Nächstes Gathering öffnen</b><span>Als Gastgeberin: <?= forma_h($next['title']) ?></span></a><?php else: ?><a href="#neu"><span class="ic">✨</span><b>Gathering anlegen</b><span>Noch keines geplant</span></a><?php endif; ?>
             <a class="main" href="<?= forma_h($self) ?>?view=videos"><span class="ic">🎬</span><b>Videos hochladen</b><span>Clips filmen, Voice-over einsprechen, Talking Heads – mit Zeitplan</span></a>
             <a class="main" href="<?= forma_h($self) ?>?view=mediathek"><span class="ic">📚</span><b>Mediathek</b><span>Jede Übung einmal gefilmt, nach Jahreszeit und Stil sortiert</span></a>
+            <a class="main" href="<?= forma_h($self) ?>?view=training"><span class="ic">🏔️</span><b>Personal Training<?php $ptN = 0; try { $ptN = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); } catch (Throwable $e) {} ?><?= $ptN ? ' · ' . $ptN . ' neu' : '' ?></b><span>Hotelgäste: Anfragen bestätigen, Ersatztermine, Kalender</span></a>
             <a href="<?= forma_h($self) ?>?view=vorschau"><span class="ic">👁</span><b>Als Teilnehmerin ansehen</b><span>Alle Seiten und Programme so, wie deine Teilnehmerinnen sie sehen</span></a>
             <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/?demo=prae" target="_blank" rel="noopener"><span class="ic">🌿</span><b>Mitgliederbereich ansehen</b><span>So sieht ihn eine Kundin mit Paket (Beispiel Pränatal, auch <u>post</u> unter Prä- &amp; Postnatal)</span></a>
             <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/" target="_blank" rel="noopener"><span class="ic">🔑</span><b>Login für Kundinnen</b><span>moveciamovement.com/natal/mitglied – diesen Link bekommen sie auch per Mail</span></a>
