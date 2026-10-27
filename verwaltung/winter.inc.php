@@ -8,7 +8,17 @@ declare(strict_types=1);
 
 const WINTER_SEASON = 'Wintersaison 2026/27';
 const WINTER_FILES = [
-    'forma' => [],
+    'forma' => [
+        ['/img/forma-flyer/FORMA_Winter_Hotelgaeste_DE_A4.pdf', 'Deutsch · A4 (PDF, zum Drucken)'],
+        ['/img/forma-flyer/FORMA_Winter_Hotelgaeste_DE_A5.pdf', 'Deutsch · A5 (PDF, zum Drucken)'],
+        ['/img/forma-flyer/FORMA_Winter_HotelGuests_EN_A4.pdf', 'Englisch · A4 (PDF, zum Drucken)'],
+        ['/img/forma-flyer/FORMA_Winter_HotelGuests_EN_A5.pdf', 'Englisch · A5 (PDF, zum Drucken)'],
+        ['/img/forma-flyer/FORMA_Winter_Hotelgaeste_DE_Instagram_4x5.png', 'Deutsch · Instagram 4:5 (PNG)'],
+        ['/img/forma-flyer/FORMA_Winter_Hotelgaeste_DE_WhatsApp_9x16.png', 'Deutsch · WhatsApp-Status 9:16 (PNG)'],
+        ['/img/forma-flyer/FORMA_Winter_HotelGuests_EN_Instagram_4x5.png', 'Englisch · Instagram 4:5 (PNG)'],
+        ['/img/forma-flyer/FORMA_Winter_HotelGuests_EN_WhatsApp_9x16.png', 'Englisch · WhatsApp-Status 9:16 (PNG)'],
+        ['/img/forma-flyer/FORMA_Winter_Hotelflyer.zip', 'Alles zusammen (ZIP)'],
+    ],
     'movecia' => [
         ['/img/movecia/flyer/Movecia_PersonalTraining_A4.pdf', 'Flyer A4 (PDF, zum Drucken)'],
         ['/img/movecia/flyer/Movecia_PersonalTraining_A5.pdf', 'Flyer A5 (PDF, zum Drucken)'],
@@ -78,7 +88,7 @@ if ($view === 'winter' || $view === 'winter_mm') {
         $pages = [['Deutsch', $base], ['Englisch', $base . '?lang=en']];
         $facts = [PTB_MINUTES . ' Minuten pro Einheit', forma_euro($c['unit']) . ' pro Einheit allein', forma_euro($c['unit2']) . ' pro Einheit zu zweit', '1–' . PTB_MAX_UNITS . ' Einheiten, Wunschtag und Uhrzeit frei wählbar', 'Gast bestätigt die E-Mail, du bestätigst die Zeiten, dann zahlt der Gast online'];
         $manage = [['?view=training', 'Anfragen & Termine'], ['?view=training#einstellungen', 'Preise & Zeiten'], ['?view=training#test', 'Als Gast testen']];
-        $title = 'Personal Fitness für Hotelgäste';
+        $title = 'Personal Training · Flyer & Buchungslink';
     } else {
         $base = forma_site_url() . '/urlaub/';
         $pages = [['Deutsch', $base], ['Englisch', $base . '?lang=en']];
@@ -114,7 +124,7 @@ if ($view === 'winter' || $view === 'winter_mm') {
 @media(min-width:900px){.ws .grid{grid-template-columns:1.3fr 1fr}}
 </style>
 <div class="ws">
-    <?php if ($isMm) mm_subnav('winter'); else { ?><p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p><?php } ?>
+    <?php if ($isMm) { mm_subnav('training'); ?><p><a href="<?= forma_h($self) ?>?view=training">← Zurück zu Personal Training</a></p><?php } else { ?><p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p><?php } ?>
     <p class="eyebrow">❄️ <?= WINTER_SEASON ?> · <?= $isMm ? 'Movecia' : 'FORMA' ?></p>
     <h1><?= forma_h($title) ?></h1>
     <p class="muted">Buchungsseite und Flyer für die Hotels an einem Ort. Die Seite ist nur über den Link bzw. den QR-Code auf dem Flyer erreichbar, Google zeigt sie nicht an.</p>

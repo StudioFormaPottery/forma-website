@@ -191,6 +191,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <span class="st"><b><?= forma_h(forma_euro($revenue)) ?></b><span>Umsatz brutto</span></span>
         </div>
         <div class="nl">
+            <a href="<?= forma_h($self) ?>?view=winter_mm" style="background:#7D5E68;color:#FBF5F7;border-color:#7D5E68">❄️ Flyer, Link &amp; QR-Code</a>
             <a href="<?= forma_h(mm_site()) ?>/personal-training/" target="_blank" rel="noopener">Seite ansehen (wie der QR-Code)</a>
             <a href="#kalender">Kalender</a>
             <a href="#einstellungen">Preise &amp; Zeiten</a>
