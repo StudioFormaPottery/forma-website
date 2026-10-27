@@ -176,6 +176,18 @@ if ($view === 'winter' || $view === 'winter_mm') {
     </div>
     </div>
 
+    <div class="card" id="mitarbeiter" style="background:#FBF1EA;border:1.5px dashed <?= $isMm ? '#C9B3BA' : '#DDBFA8' ?>">
+        <h2>📌 Mitarbeiter-Angebote · Winter Paznaun</h2>
+        <p class="muted small" style="margin:-.3rem 0 .6rem">Nur für dich: so beim Tourismusverband eingetragen. Organisation und Buchung bauen wir erst, wenn jemand bucht.</p>
+        <?php if (!$isMm): ?>
+        <ul class="f"><li>Spin &amp; Go für Mitarbeiter: <b>Montag und Freitag, 9–11 Uhr</b></li><li>Exklusiv für Mitarbeiter: 10er-Block <b>€ 600</b> statt € 700</li></ul>
+        <p class="small muted" style="margin:.6rem 0 0">Movecia Personal Training für Mitarbeiter: € 85 einzeln, € 140 zu zweit, 10er-Block € 700 statt € 850 (mit kostenloser Kennenlern- und Anamneseeinheit, 60 Min.).</p>
+        <?php else: ?>
+        <ul class="f"><li>Einzeltraining (ca. 75 Min.) <b>€ 85</b>, zwei Mitarbeiter gemeinsam <b>€ 140</b></li><li>Exklusiv für Mitarbeiter: 10er-Block <b>€ 700</b> statt € 850 (€ 70 pro Einheit)</li><li>Dazu eine kostenlose Kennenlern- und Anamneseeinheit (60 Min.)</li></ul>
+        <p class="small muted" style="margin:.6rem 0 0">FORMA Spin &amp; Go für Mitarbeiter: Mo + Fr 9–11 Uhr, 10er-Block € 600 statt € 700.</p>
+        <?php endif; ?>
+    </div>
+
     <div class="card" id="kalender">
         <h2>Alle Termine · FORMA &amp; Movecia</h2>
         <p class="muted small" style="margin:-.3rem 0 .8rem">Hier steht alles, was stattfindet. Was belegt ist, können Gäste auf den Hotel-Buchungsseiten (FORMA und Movecia) automatisch nicht mehr wählen, mit 15 Minuten Puffer. Kurse ohne Anmeldung sind hell und blockieren nichts. Rot hinterlegt = zwei Termine überschneiden sich.</p>
