@@ -25,7 +25,7 @@ $email = forma_clean((string)($in['buyer_email'] ?? ''), 160);
 
 $errors = [];
 if (!isset(FORMA_VOUCHERS[$product])) $errors[] = 'Bitte wähle einen Gutschein.';
-if ($qty < 1 || $qty > 10) $errors[] = 'Bitte wähle 1 bis 10 Einheiten.';
+if ($qty < 1 || $qty > 10) $errors[] = 'Bitte wähle eine Anzahl zwischen 1 und 10.';
 if (mb_strlen($name) < 2) $errors[] = 'Bitte gib deinen Namen an.';
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Bitte gib eine gültige E-Mail-Adresse an.';
 if (empty($in['consent'])) $errors[] = 'Bitte bestätige noch die Hinweise zum Datenschutz.';

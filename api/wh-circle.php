@@ -21,7 +21,7 @@ if (($in['action'] ?? '') === 'stay') {
         $out(['ok' => true] + $res);
     } catch (Throwable $e) {
         error_log('MM stay: ' . $e->getMessage());
-        $out(['ok' => false, 'error' => 'That did not work just now. Please try again in a moment.'], 502);
+        $out(['ok' => false, 'error' => 'Something went wrong just now. Please try again in a moment.'], 502);
     }
 }
 if ((int)($in['elapsed'] ?? 0) < 2500) $out(['ok' => false, 'error' => 'One moment please, then try again.'], 400);
@@ -29,7 +29,7 @@ $name = trim(mb_substr((string)($in['name'] ?? ''), 0, 80));
 $email = strtolower(trim(mb_substr((string)($in['email'] ?? ''), 0, 160)));
 if (mb_strlen($name) < 2) $out(['ok' => false, 'error' => 'Please add your first name.'], 400);
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $out(['ok' => false, 'error' => 'Please check your email address.'], 400);
-if (empty($in['consent'])) $out(['ok' => false, 'error' => 'Please tick the first box, so your access can start right away.'], 400);
+if (empty($in['consent'])) $out(['ok' => false, 'error' => 'Please tick the first box so your access can start right away.'], 400);
 if (!forma_stripe_key()) $out(['ok' => false, 'error' => 'Online payment is not set up yet. Please write to ' . MM_FROM_EMAIL . '.'], 400);
 $o = mm_offers()['circle'];
 $ref = mm_ref_order($pdo, (string)($in['ref'] ?? ''));

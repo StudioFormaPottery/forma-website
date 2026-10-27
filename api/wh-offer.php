@@ -80,7 +80,7 @@ if ($act === 'show' || $act === 'hide') {
 if ($act === 'ask') {
     if ($host) $out(['ok' => false], 403);
     $text = trim(preg_replace('/\s+/u', ' ', (string)($in['text'] ?? '')));
-    if (mb_strlen($text) < 3) $out(['ok' => false, 'error' => 'Please write your question first.'], 400);
+    if (mb_strlen($text) < 3) $out(['ok' => false, 'error' => 'Please type your question first.'], 400);
     $asker = $me ? 's' . (int)$me['id'] : 'gast';
     $c = $pdo->prepare('SELECT COUNT(*) FROM mm_questions WHERE asker = ? AND created_at >= ?');
     $c->execute([$asker, date('c', time() - 600)]);
@@ -115,7 +115,7 @@ if ($act === 'buy') {
     try {
         $item = (string)($in['item'] ?? '');
         $which = $sp['offer'] === 'all' ? $item : $sp['offer'];
-        if ($which !== 'retreat' && empty($in['consent'])) $out(['ok' => false, 'error' => 'Please tick the box first, so your access can start right away.'], 400);
+        if ($which !== 'retreat' && empty($in['consent'])) $out(['ok' => false, 'error' => 'Please tick the box first so your access can start right away.'], 400);
         $url = mm_order_checkout($pdo, $sp, $me ? (string)$me['name'] : '', $me ? (string)$me['email'] : '', $item, (string)($in['plan'] ?? 'full'), empty($in['consent']) ? 0 : 1, $which !== 'retreat' && !empty($in['digital']) ? 1 : 0);
         $out(['ok' => true, 'redirect' => $url]);
     } catch (Throwable $e) {

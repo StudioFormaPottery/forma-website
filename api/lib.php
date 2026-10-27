@@ -1113,7 +1113,7 @@ function forma_mail_html(string $text): string
             $u = htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
             $out .= '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:6px 0 4px"><tr><td style="border-radius:999px;background:#8C2C1D">'
                 . '<a href="' . $u . '" style="display:inline-block;padding:13px 28px;font-family:Arial,Helvetica,sans-serif;font-size:16px;color:#FBF1EA;text-decoration:none;border-radius:999px">' . htmlspecialchars($label($t), ENT_QUOTES, 'UTF-8') . '</a></td></tr></table>'
-                . '<p style="margin:0 0 4px;font-size:12px;color:#674B40;word-break:break-all">Falls der Button nicht geht: <a href="' . $u . '" style="color:#8C2C1D">' . $u . '</a></p>';
+                . '<p style="margin:0 0 4px;font-size:12px;color:#674B40;word-break:break-all">Falls der Button nicht funktioniert: <a href="' . $u . '" style="color:#8C2C1D">' . $u . '</a></p>';
             continue;
         }
         $h = htmlspecialchars($line, ENT_QUOTES, 'UTF-8');
@@ -1552,7 +1552,7 @@ function forma_send_booking_mails(PDO $pdo, int $bookingId): void
         . $restNote
         . $calTxt
         . "\nBitte komm in Kleidung, die schmutzig werden darf. Schürzen und Werkzeug habe ich im Studio.\n"
-        . "\nFalls doch etwas dazwischenkommt: Bis 48 Stunden vor Kursbeginn kannst du kostenlos stornieren. Danach werden 50 % der Kursgebühr fällig, wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit bei mir, gemeinsam finden wir bestimmt eine Lösung.\n"
+        . "\nFalls doch etwas dazwischenkommt: Bis 48 Stunden vor Kursbeginn kannst du kostenlos stornieren. Danach werden 50 % der Kursgebühr fällig, und wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit bei mir, gemeinsam finden wir bestimmt eine Lösung.\n"
         . "\nFalls du Fragen hast oder doch verhindert bist, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n"
         . forma_newsletter_note($unsub);
 
@@ -2069,7 +2069,7 @@ function forma_private_mails(PDO $pdo, int $id): void
     forma_mail($b['email'], $isTeam ? 'Euer Teambuilding-Event ist gebucht' : 'Deine Private Pottery Stunden sind gebucht', "Hallo $first,\n\n" . ($isTeam ? 'wie schön, dass ihr gemeinsam töpfern kommt!' : 'wie schön, dass wir dein Projekt gemeinsam umsetzen!') . " Deine Zahlung ist angekommen.\n\n"
         . "Gebucht: $what\nBezahlt: $amount\n" . ($isTeam ? '' : "Dein Projekt: {$b['project']}\n") . "Wunschtermin: $wish\n\n"
         . "Ich schaue mir deinen Wunschtermin an und schicke dir eine eigene Bestätigung, sobald dein Termin fix ist. Deine Stunden können wir auch gern auf mehrere Tage aufteilen, du bekommst dann für jeden Termin eine Bestätigung.\n"
-        . "Falls doch etwas dazwischenkommt: Bis 48 Stunden vor unserem Termin kannst du kostenlos stornieren, danach werden 50 % fällig, wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit, gemeinsam finden wir eine Lösung.\n\n"
+        . "Falls doch etwas dazwischenkommt: Bis 48 Stunden vor unserem Termin kannst du kostenlos stornieren, danach werden 50 % fällig, und wenn du ohne Absage nicht kommst, der volle Betrag. Melde dich aber bitte trotzdem jederzeit, gemeinsam finden wir eine Lösung.\n\n"
         . "Bis bald im Studio!\nVivien\nFORMA Earth & Art\n$phone\nwww.forma-pottery.com\n" . forma_newsletter_note($unsub));
     forma_mail(FORMA_NOTIFY_EMAIL, ($isTeam ? 'Teambuilding gebucht: ' . $persons : 'Private Pottery gebucht: ' . $hours) . ' (' . $b['name'] . ')', ($isTeam ? "Neue bezahlte Buchung Teambuilding\n" : "Neue bezahlte Buchung Private Pottery\n") . "$contactLine\n\n$hours · $amount bezahlt über Stripe\nPersonen: $persons\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\n\nProjekt:\n{$b['project']}\n\nWunschtermin: $wish\n\nJetzt im Kalender einplanen (Gast bekommt automatisch die Bestätigung): $planUrl\n", $b['email']);
     forma_invoice_for($pdo, 'private', $id);
@@ -2211,9 +2211,9 @@ function forma_template_order_paid(PDO $pdo, int $id): void
         if ((string)$fn !== '' && is_file($path) && ($size += filesize($path)) < 15 * 1024 * 1024) $att[] = ['FORMA-Template-' . $slug . $suf . '.pdf', (string)file_get_contents($path), 'application/pdf'];
     }
     forma_mail($o['email'], 'Dein FORMA Template: ' . $o['title'], "Hallo $first,\n\nvielen Dank für deinen Kauf! "
-        . ($att ? 'Dein Template hängt direkt an dieser E-Mail' . (count($att) > 1 ? ' (auf Deutsch und auf Englisch)' : '') . ". Speicher es dir am besten gleich ab.\n\nZusätzlich kannst du es " . FORMA_TEMPLATE_LINK_DAYS . " Tage lang hier herunterladen:\n$link\n\n"
+        . ($att ? 'Dein Template hängt direkt an dieser E-Mail' . (count($att) > 1 ? ' (auf Deutsch und auf Englisch)' : '') . ". Speichere es dir am besten gleich ab.\n\nZusätzlich kannst du es " . FORMA_TEMPLATE_LINK_DAYS . " Tage lang hier herunterladen:\n$link\n\n"
             : "Hier kannst du dein Template " . FORMA_TEMPLATE_LINK_DAYS . " Tage lang herunterladen" . (($o['file_en'] ?? '') !== '' ? ' (auf Deutsch und auf Englisch)' : '') . ":\n\n$link\n\n")
-        . "Template: {$o['title']}\nBezahlt: $amount\n\nViel Freude beim Töpfern! Ich freu mich, wenn du mir dein Ergebnis auf Instagram zeigst: @forma.potteryartcraft\n\nBis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n", null, $att);
+        . "Template: {$o['title']}\nBezahlt: $amount\n\nViel Freude beim Töpfern! Ich freue mich, wenn du mir dein Ergebnis auf Instagram zeigst: @forma.potteryartcraft\n\nBis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n", null, $att);
     forma_mail(FORMA_NOTIFY_EMAIL, 'Template verkauft: ' . $o['title'] . ' (' . $amount . ')', "Ein Template wurde verkauft.\n\nTemplate: {$o['title']}\nBetrag: $amount\nKäufer:in: {$o['name']}\nE-Mail: {$o['email']}\n\nAlle Verkäufe: " . forma_site_url() . "/verwaltung/?view=templates\n", $o['email']);
     forma_invoice_for($pdo, 'template', $id);
 }
@@ -2631,7 +2631,7 @@ function forma_private_confirm_mail(PDO $pdo, int $pid, string $note = ''): bool
         . ($rest > 0 ? "\nDu hast dann noch " . forma_hours_text($rest) . " offen, die planen wir gemeinsam ein, wann es dir passt.\n" : '')
         . (trim($note) !== '' ? "\n" . trim($note) . "\n" : '')
         . $calTxt
-        . "\nBitte komm in Kleidung, die schmutzig werden darf. Schürzen, Werkzeug und Ton habe ich alles im Studio.\n"
+        . "\nBitte komm in Kleidung, die schmutzig werden darf. Schürzen, Werkzeug und Ton habe ich im Studio.\n"
         . "\nFalls doch etwas dazwischenkommt: Bis 48 Stunden vorher kannst du kostenlos verschieben oder stornieren. Melde dich einfach, antworte auf diese E-Mail oder ruf mich an: $phone\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n";
     $unsub = '';
     if (empty($b['no_post'])) try { $unsub = forma_auto_subscribe($pdo, (string)$b['email'], (string)$b['name'], 'Buchung: Private Pottery'); } catch (Throwable $e) { error_log('FORMA auto newsletter: ' . $e->getMessage()); }

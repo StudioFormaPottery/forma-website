@@ -78,7 +78,7 @@ try {
         'client_reference_id' => 'private-' . $id, 'metadata' => ['private_id' => (string)$id],
         'line_items' => $vUse > 0 ? [['quantity' => 1, 'price_data' => ['currency' => 'eur', 'unit_amount' => $cash,
             'product_data' => ['name' => 'Teambuilding Halbtages-Event · Restbetrag', 'description' => $persons . ' Personen · Gesamt ' . forma_euro($amount) . ', davon ' . forma_euro($vUse) . ' mit Gutschein bezahlt']]]] : [['quantity' => $persons, 'price_data' => ['currency' => 'eur', 'unit_amount' => FORMA_TEAM_HALBTAG,
-            'product_data' => ['name' => 'Teambuilding Halbtages-Event', 'description' => '4 Stunden töpfern im FORMA Studio, Mathon · pro Person · Termin nach Bestätigung']]]],
+            'product_data' => ['name' => 'Teambuilding Halbtages-Event', 'description' => '4 Stunden Töpfern im FORMA Studio, Mathon · pro Person · Termin nach Bestätigung']]]],
         'payment_intent_data' => ['description' => 'Teambuilding Halbtag · ' . $persons . ' Personen · ' . $name],
         'expires_at' => time() + 31 * 60,
         'success_url' => $site . '/api/private-bezahlt.php?b=' . $id . '&k=' . $token,

@@ -142,7 +142,7 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
         $ss = function_exists('forma_private_sessions') ? forma_private_sessions($pdo, (int)$b['id']) : [];
         $service = $ss ? implode(', ', array_map(fn($x) => date('d.m.Y', strtotime((string)$x['date'])), $ss)) : 'nach Vereinbarung';
         $src = ['name' => $b['name'], 'email' => $b['email'], 'session' => $b['stripe_session'], 'service' => $service,
-            'items' => $team ? [['text' => str_contains((string)$b['project'], 'Wochenende') ? 'Teambuilding Töpfer-Wochenende (2 × 3 Stunden Töpfern)' : 'Teambuilding Halbtages-Event (4 Stunden)', 'detail' => 'inkl. Material, Fertigstellung und ein Werkstück pro Person' . (str_contains((string)$b['project'], 'Wochenende') ? ' · ohne Übernachtung (separate Rechnung Heindalishof)' : ''), 'qty' => max(1, (int)$b['persons']), 'unit' => (int)round((int)$b['amount_cents'] / max(1, (int)$b['persons']))]] : [floor((float)$b['hours']) == (float)$b['hours']
+            'items' => $team ? [['text' => str_contains((string)$b['project'], 'Wochenende') ? 'Teambuilding Töpfer-Wochenende (2 × 3 Stunden Töpfern)' : 'Teambuilding Halbtages-Event (4 Stunden)', 'detail' => 'inkl. Material, Fertigstellung und eines Werkstücks pro Person' . (str_contains((string)$b['project'], 'Wochenende') ? ' · ohne Übernachtung (separate Rechnung Heindalishof)' : ''), 'qty' => max(1, (int)$b['persons']), 'unit' => (int)round((int)$b['amount_cents'] / max(1, (int)$b['persons']))]] : [floor((float)$b['hours']) == (float)$b['hours']
                 ? ['text' => ($team ? 'Teambuilding/Event' : 'Private Pottery – Handbuilding') . ' (Stunden)', 'detail' => (int)$b['persons'] > 1 ? $b['persons'] . ' Personen, inkl. Material und Fertigstellung' : 'inkl. Material und Fertigstellung', 'qty' => (int)$b['hours'] * max(1, (int)$b['persons']), 'unit' => FORMA_PRIVATE_HOUR]
                 : ['text' => ($team ? 'Teambuilding/Event' : 'Private Pottery – Handbuilding') . ' (' . forma_hours_text((float)$b['hours']) . ')', 'detail' => 'inkl. Material und Fertigstellung', 'qty' => 1, 'unit' => (int)$b['amount_cents']]],
             'gross' => (int)$b['amount_cents'], 'paid' => $b['paid_at'], 'type' => 'Private Pottery'];
@@ -440,7 +440,7 @@ function forma_invoice_mailtext(array $inv): string
     $cash = forma_invoice_is_cash($inv);
     return "Hallo $first,\n\n" . ($vg ? 'für deine Unterlagen findest du im Anhang die Rechnung' : 'vielen Dank für deine Zahlung! Im Anhang findest du deine Rechnung') . " {$inv['nr']} als PDF.\n\n"
         . 'Rechnungsbetrag: ' . forma_cents_de((int)$inv['gross_cents']) . ($vg ? " (bereits mit deinem Gutschein bezahlt, du musst nichts mehr überweisen)\n\n" : ($cash ? " (bar im Atelier bezahlt)\n\n" : " (bereits bezahlt)\n\n"))
-        . "Bewahre sie gern für deine Unterlagen auf. Bei Fragen antworte einfach auf diese E-Mail.\n\nBis bald,\nVivien\n";
+        . "Bewahre sie am besten gut auf. Bei Fragen antworte einfach auf diese E-Mail.\n\nBis bald,\nVivien\n";
 }
 
 /** Rechnung mit einem alten Gutschein bezahlt (kein neuer Zahlungseingang). */

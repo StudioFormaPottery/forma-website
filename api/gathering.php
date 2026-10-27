@@ -35,7 +35,7 @@ if (!empty($in['website'])) $out(['ok' => true]); // Honeypot
 if ((int)($in['elapsed'] ?? 0) < 3000) $out(['ok' => false, 'error' => 'One moment please, then try again.'], 400);
 if (mb_strlen($name) < 2) $out(['ok' => false, 'error' => 'Please add your first name.'], 400);
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $out(['ok' => false, 'error' => 'Please check your email address.'], 400);
-if (empty($in['consent'])) $out(['ok' => false, 'error' => 'Please tick the box so I am allowed to email you about the Gathering.'], 400);
+if (empty($in['consent'])) $out(['ok' => false, 'error' => 'Please tick the box so I can email you about the Gathering.'], 400);
 $g = mm_next_gathering($pdo);
 if (!$g) $out(['ok' => false, 'error' => 'There is no Gathering planned right now. Join the community channel and you will hear about the next one first.'], 400);
 

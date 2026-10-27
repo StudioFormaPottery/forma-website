@@ -59,7 +59,7 @@ $paid = (int)$b['amount_cents'] > 0 || (int)($b['voucher_cents'] ?? 0) > 0;
  <div class="hero" style="grid-template-columns:1fr"><div>
   <p class="kick"><?= $h($b['title']) ?> · <?= $h($b['date_text']) ?></p>
   <h1><?= $done ? 'Alles erledigt' : 'Was ist dir lieber?' ?></h1>
-  <?php if (!$done): ?><p class="lead">Hallo <?= $h(forma_first_name((string)$b['name'])) ?>, dieses Mal sind leider zu wenige Anmeldungen zusammengekommen, damit der Kurs stattfinden kann. Das tut mir leid! Such dir einfach einen neuen Termin aus oder storniere ganz unkompliziert.</p><?php endif; ?>
+  <?php if (!$done): ?><p class="lead">Hallo <?= $h(forma_first_name((string)$b['name'])) ?>, dieses Mal sind leider nicht genug Anmeldungen zusammengekommen, damit der Kurs stattfinden kann. Das tut mir leid! Such dir einfach einen neuen Termin aus oder storniere ganz unkompliziert.</p><?php endif; ?>
  </div></div>
 </div></div>
 <main><div class="wrap">

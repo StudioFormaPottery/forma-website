@@ -19,7 +19,7 @@ if ($m['file'] === '' || !is_file($file)) {
 $lang = (string)($_GET['lang'] ?? '');
 if ((string)$m['file_en'] !== '' && $lang === '') {
     $base = '/api/maker-download.php?t=' . rawurlencode($token);
-    forma_message_page('Dein Gratis-Template', "„{$m['title']}“ gibt es auf Deutsch und auf Englisch. Lade dir die Version herunter, die du brauchst, oder gleich beide. Viel Freude beim Töpfern!\n\nYour free template is available in German and English.", 'Deutsch herunterladen', $base . '&lang=de', 'English download', $base . '&lang=en');
+    forma_message_page('Dein Gratis-Template', "„{$m['title']}“ gibt es auf Deutsch und auf Englisch. Lade dir die Version herunter, die du brauchst, oder gleich beide. Viel Freude beim Töpfern!\n\nYour free template is available in German and English.", 'Deutsch herunterladen', $base . '&lang=de', 'Download in English', $base . '&lang=en');
 }
 $useEn = $lang === 'en' && (string)$m['file_en'] !== '';
 if ($useEn) {

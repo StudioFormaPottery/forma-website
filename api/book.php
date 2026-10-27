@@ -72,7 +72,7 @@ try {
     }
     if ($course['title'] === FORMA_SERIES['bemalen']['title'] && date('Y-m-d') < '2026-10-19') {
         $pdo->exec('ROLLBACK');
-        forma_json(['ok' => false, 'error' => 'Pottery bemalen ist ab 19. Oktober buchbar. Trag dich gern in den Newsletter ein, dann sag ich dir Bescheid.'], 409);
+        forma_json(['ok' => false, 'error' => 'Pottery bemalen ist ab 19. Oktober buchbar. Trag dich gern in den Newsletter ein, dann sage ich dir Bescheid.'], 409);
     }
     if ($course['start_date'] < forma_first_bookable_date()) {
         $pdo->exec('ROLLBACK');

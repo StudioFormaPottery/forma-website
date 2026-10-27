@@ -20,7 +20,7 @@ if (!empty($in['website'])) $out(['ok' => true]); // Honeypot
 if ((int)($in['elapsed'] ?? 0) < 2000) $out(['ok' => false, 'error' => ($de ? 'Einen Moment bitte, dann versuch es noch einmal.' : 'One moment please, then try again.')], 400);
 if (mb_strlen($name) < 2) $out(['ok' => false, 'error' => ($de ? 'Bitte gib deinen Vornamen ein.' : 'Please add your first name.')], 400);
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $out(['ok' => false, 'error' => ($de ? 'Bitte prüf deine E-Mail-Adresse.' : 'Please check your email address.')], 400);
-if (empty($in['consent'])) $out(['ok' => false, 'error' => ($de ? 'Bitte setz das Häkchen, damit ich dir schreiben darf.' : 'Please tick the box so I am allowed to email you.')], 400);
+if (empty($in['consent'])) $out(['ok' => false, 'error' => ($de ? 'Bitte setz das Häkchen, damit ich dir schreiben darf.' : 'Please tick the box so I can email you.')], 400);
 
 $ip = hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? '') . date('Y-m-d'));
 $c = $pdo->prepare('SELECT COUNT(*) FROM mm_subscribers WHERE ip_hash = ? AND created_at >= ?');

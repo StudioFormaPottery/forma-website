@@ -273,8 +273,8 @@ function mm_review_mail(string $to, string $name, string $lang, string $what, bo
     $thing = ['unfold' => $en ? 'our three months of Unfold' : 'unsere drei Monate Unfold', 'natal' => $en ? 'our sessions together' : 'unsere gemeinsamen Einheiten', 'natal1' => $en ? 'our session' : 'unsere Einheit'][$what] ?? ($en ? 'our time together' : 'unsere gemeinsame Zeit');
     $lines = $en ? [
         "Dear $first,",
-        "thank you so much for $thing. It meant a lot to me that you were there and gave yourself this time.",
-        'May I ask you a small favour? A short Google review helps other women find Movecia. Two sentences about how it felt for you are completely enough.',
+        "Thank you so much for $thing. It meant a lot to me that you were there and gave yourself this time.",
+        'May I ask you a small favour? A short Google review helps other women find Movecia. Just a sentence or two about how it felt for you is plenty.',
     ] : [
         "Hallo $first,",
         "danke von Herzen für $thing. Es hat mir viel bedeutet, dass du dabei warst und dir diese Zeit geschenkt hast.",
@@ -406,12 +406,12 @@ function mm_mail_signup(array $g, array $s): bool
     $first = forma_first_name($s['name']);
     $link = mm_room_link($s);
     $when = mm_when($g);
-    $text = "Hey $first,\n\nyou're in! I've saved your spot for our Wild Hearts Gathering:\n\n{$g['title']}\n$when\n\nThis is your personal link to the room. It opens 15 minutes before we start, right on my website, no app or Zoom needed:\n$link\n\nI'll send you a little reminder the day before and one hour before we start.\n\nWith love, Viv\n\nYou get this email because you signed up for this Gathering on moveciamovement.com.\nVivien Malonga, Movecia – Personal Fitness, Silvrettastraße 58, 6562 Mathon, Austria";
+    $text = "Hey $first,\n\nYou're in! I've saved your spot for our Wild Hearts Gathering:\n\n{$g['title']}\n$when\n\nThis is your personal link to the room. It opens 15 minutes before we start, right on my website, no app or Zoom needed:\n$link\n\nI'll send you a little reminder the day before and another one an hour before we start.\n\nWith love, Viv\n\nYou're receiving this email because you signed up for this Gathering on moveciamovement.com.\nVivien Malonga, Movecia – Personal Fitness, Silvrettastraße 58, 6562 Mathon, Austria";
     $html = '<p style="margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#7D5E68;">Hey ' . forma_h($first) . ',</p>'
-        . '<p style="margin:14px 0 0;">you\'re in! I\'ve saved your spot for our Wild Hearts Gathering.</p>'
+        . '<p style="margin:14px 0 0;">You\'re in! I\'ve saved your spot for our Wild Hearts Gathering.</p>'
         . '<p style="margin:16px 0 0;padding:16px 18px;background:#EADFDE;border-radius:16px;"><strong>' . forma_h($g['title']) . '</strong><br>' . forma_h($when) . '</p>'
         . '<p style="margin:16px 0 0;">This is your personal link to the room. It opens 15 minutes before we start, right on my website, no app or Zoom needed.</p>'
-        . mm_button($link, 'My room link') . '<p style="margin:14px 0 0;">I\'ll send you a little reminder the day before and one hour before we start.</p>';
+        . mm_button($link, 'My room link') . '<p style="margin:14px 0 0;">I\'ll send you a little reminder the day before and another one an hour before we start.</p>';
     return mm_mail($s['email'], 'Your spot is saved: ' . $g['title'] . ' 🌙', $text, mm_mail_html($g['title'], $html));
 }
 
@@ -419,8 +419,8 @@ function mm_mail_reminder(array $g, array $s, bool $soon): bool
 {
     $first = forma_first_name($s['name']);
     $link = mm_room_link($s);
-    $intro = $soon ? 'we start in one hour. Grab something warm to drink, find a cosy spot and come as you are.' : 'tomorrow is our Wild Hearts Gathering, and I am so looking forward to seeing you.';
-    $text = "Hey $first,\n\n$intro\n\n{$g['title']}\n" . mm_when($g) . "\n\nYour room link (opens 15 minutes before):\n$link\n\nWith love, Viv";
+    $intro = $soon ? 'We start in one hour. Grab something warm to drink, find a cosy spot and come as you are.' : 'Tomorrow is our Wild Hearts Gathering, and I\'m so looking forward to seeing you.';
+    $text = "Hey $first,\n\n$intro\n\n{$g['title']}\n" . mm_when($g) . "\n\nYour room link (it opens 15 minutes before we start):\n$link\n\nWith love, Viv";
     $html = '<p style="margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#7D5E68;">Hey ' . forma_h($first) . ',</p>'
         . '<p style="margin:14px 0 0;">' . forma_h($intro) . '</p>'
         . '<p style="margin:16px 0 0;padding:16px 18px;background:#EADFDE;border-radius:16px;"><strong>' . forma_h($g['title']) . '</strong><br>' . forma_h(mm_when($g)) . '</p>'
@@ -499,33 +499,33 @@ function mm_mail_confirm(array $sub): bool
     if (($sub['source'] ?? '') === 'unfold') {
         // Unfold-Infoliste (Vivien, 24.10.2026): erst bestätigen, dann kommen alle Infos, bevor Unfold offiziell gepostet wird
         if ($de) {
-            $text = "Hey $first,\n\ndanke, dass du dich für Unfold – The Mindful Becoming eingetragen hast!\n\nBitte bestätige zuerst deine E-Mail-Adresse:\n$link\n\nAnschließend schicke ich dir alle Infos, noch bevor ich offiziell poste, wann Unfold startet. Es gibt höchstens 10 Plätze.\n\nFalls du dich nicht eingetragen hast, ignoriere diese Mail einfach.\n\nAlles Liebe, Viv";
-            $html = '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
+            $text = "Hallo $first,\n\ndanke, dass du dich für Unfold – The Mindful Becoming eingetragen hast!\n\nBitte bestätige zuerst deine E-Mail-Adresse:\n$link\n\nAnschließend schicke ich dir alle Infos, noch bevor ich offiziell poste, wann Unfold startet. Es gibt höchstens 10 Plätze.\n\nFalls du dich nicht eingetragen hast, ignoriere diese Mail einfach.\n\nAlles Liebe, Viv";
+            $html = '<p style="' . $hand . '">Hallo ' . forma_h($first) . ',</p>'
                 . '<p style="margin:14px 0 0;">danke, dass du dich für <strong>Unfold – The Mindful Becoming</strong> eingetragen hast!</p>'
                 . '<p style="margin:14px 0 0;">Bitte bestätige zuerst deine E-Mail-Adresse. Anschließend schicke ich dir alle Infos, noch bevor ich offiziell poste, wann Unfold startet. Es gibt höchstens 10 Plätze.</p>'
                 . mm_button($link, 'Ja, ich bestätige meine E-Mail')
                 . '<p style="margin:16px 0 0;font-size:14px;color:#7D7076;">Falls du dich nicht eingetragen hast, ignoriere diese Mail einfach.</p>';
             return mm_mail($sub['email'], 'Bitte bestätige deine E-Mail für Unfold 🌿', $text, mm_mail_html('E-Mail bestätigen', $html, 'de'));
         }
-        $text = "Hey $first,\n\nthank you for joining the list for Unfold – The Mindful Becoming!\n\nPlease confirm your email address first:\n$link\n\nRight after that I'll send you all the details, before I officially share when Unfold starts. There are no more than 10 spots.\n\nIf you didn't sign up, simply ignore this email.\n\nWith love, Viv";
+        $text = "Hey $first,\n\nThank you for joining the list for Unfold – The Mindful Becoming!\n\nPlease confirm your email address first:\n$link\n\nRight after that, I'll send you all the details, even before I officially announce when Unfold starts. There are only 10 spots.\n\nIf you didn't sign up, simply ignore this email.\n\nWith love, Viv";
         $html = '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
-            . '<p style="margin:14px 0 0;">thank you for joining the list for <strong>Unfold – The Mindful Becoming</strong>!</p>'
-            . '<p style="margin:14px 0 0;">Please confirm your email address first. Right after that I\'ll send you all the details, before I officially share when Unfold starts. There are no more than 10 spots.</p>'
+            . '<p style="margin:14px 0 0;">Thank you for joining the list for <strong>Unfold – The Mindful Becoming</strong>!</p>'
+            . '<p style="margin:14px 0 0;">Please confirm your email address first. Right after that, I\'ll send you all the details, even before I officially announce when Unfold starts. There are only 10 spots.</p>'
             . mm_button($link, 'Yes, confirm my email')
             . '<p style="margin:16px 0 0;font-size:14px;color:#7D7076;">If you didn\'t sign up, simply ignore this email.</p>';
         return mm_mail($sub['email'], 'Please confirm your email for Unfold 🌿', $text, mm_mail_html('Confirm your email', $html));
     }
     if ($de) {
-        $text = "Hey $first,\n\nnur noch ein Klick, dann bist du dabei. Bitte bestätige hier deine E-Mail-Adresse:\n$link\n\nGleich danach wartet deine Reset-Routine für müde Tage auf dich, auf Deutsch und Englisch.\n\nFalls du dich nicht angemeldet hast, ignoriere diese Mail einfach. Dann hörst du nichts mehr von mir.\n\nAlles Liebe, Viv";
-        $html = '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
+        $text = "Hallo $first,\n\nnur noch ein Klick, dann bist du dabei. Bitte bestätige hier deine E-Mail-Adresse:\n$link\n\nGleich danach wartet deine Reset-Routine für müde Tage auf dich, auf Deutsch und Englisch.\n\nFalls du dich nicht angemeldet hast, ignoriere diese Mail einfach. Dann hörst du nichts mehr von mir.\n\nAlles Liebe, Viv";
+        $html = '<p style="' . $hand . '">Hallo ' . forma_h($first) . ',</p>'
             . '<p style="margin:14px 0 0;">nur noch ein Klick, dann bist du dabei. Bitte bestätige deine E-Mail-Adresse. Gleich danach wartet deine <strong>Reset-Routine für müde Tage</strong> auf dich, auf Deutsch und Englisch.</p>'
             . mm_button($link, 'Ja, ich bestätige meine E-Mail')
             . '<p style="margin:16px 0 0;font-size:14px;color:#7D7076;">Falls du dich nicht angemeldet hast, ignoriere diese Mail einfach. Dann hörst du nichts mehr von mir.</p>';
         return mm_mail($sub['email'], 'Ein Klick, und du bist dabei 🌙', $text, mm_mail_html('E-Mail bestätigen', $html, 'de'));
     }
-    $text = "Hey $first,\n\none click and you're in. Please confirm your email address here:\n$link\n\nRight after that your Reset Routine for Tired Days is ready for you, in English and Deutsch.\n\nIf you didn't sign up, simply ignore this email and you won't hear from me again.\n\nWith love, Viv";
+    $text = "Hey $first,\n\nOne click and you're in. Please confirm your email address here:\n$link\n\nRight after that, your Reset Routine for Tired Days is ready for you, in English and German.\n\nIf you didn't sign up, simply ignore this email and you won't hear from me again.\n\nWith love, Viv";
     $html = '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
-        . '<p style="margin:14px 0 0;">one click and you\'re in. Please confirm your email address, and right after that your <strong>Reset Routine for Tired Days</strong> is ready for you, in English and Deutsch.</p>'
+        . '<p style="margin:14px 0 0;">One click and you\'re in. Please confirm your email address, and right after that your <strong>Reset Routine for Tired Days</strong> is ready for you, in English and German.</p>'
         . mm_button($link, 'Yes, confirm my email')
         . '<p style="margin:16px 0 0;font-size:14px;color:#7D7076;">If you didn\'t sign up, simply ignore this email and you won\'t hear from me again.</p>';
     return mm_mail($sub['email'], "One click and you're in 🌙", $text, mm_mail_html('Confirm your email', $html));
@@ -555,23 +555,23 @@ function mm_mail_unfold_info(array $sub): bool
     $li = fn(array $xs) => '<ul style="margin:10px 0 0;padding-left:20px;">' . implode('', array_map(fn($x) => '<li style="margin:4px 0;">' . forma_h($x) . '</li>', $xs)) . '</ul>';
     $L = fn(string $d, string $e) => $de ? $d : $e;
     $intro = $L("Unfold ist dein 3-Monats-Begleiter für Mindful Movement, denn Bewegung beginnt bei dir. Wir bewegen uns gemeinsam, ich gebe dir jede Woche einen Impuls zu einem Thema, das dich wirklich beschäftigt, und Schritt für Schritt wird es leichter. Der erste Live-Call ist am $st.",
-        "Unfold is your 3-month companion for mindful movement, because movement begins with you. We move together, every week I give you a talk on a topic that really matters to you, and step by step it gets lighter. The first live call is on $st.");
+        "Unfold is your 3-month companion for mindful movement, because movement begins with you. We move together, each week I share a short talk on a topic that really matters to you, and step by step things feel lighter. The first live call is on $st.");
     $chap = $L("Woche 1–4 · Wurzeln: Mental Load, Erschöpfung verstehen, Organisation\nWoche 5–8 · Knospen: Grenzen, Selbstwert, innere Kritikerin, Ideen\nWoche 9–13 · Entfalten: Klarheit, Gewohnheiten, Mut, feiern",
         "Weeks 1–4 · Roots: mental load, understanding exhaustion, organisation\nWeeks 5–8 · Buds: boundaries, self-worth, inner critic, ideas\nWeeks 9–13 · Unfold: clarity, habits, courage, celebrating");
-    $items = $de ? ['Jede Woche ein Live-Call mit Impulsvortrag in kleiner Runde (Deutsch oder Englisch)', 'Zwei Bewegungsvideos pro Woche: Yoga, Bodyweight, Somatic und freie Bewegung', 'Workbooks für deine Mental Health: Mental Load, Organisation, Selbstwert, Journaling', 'Meditation und Breathwork als kleine Rituale für den Alltag', 'Alle Aufnahmen der Live-Calls']
+    $items = $de ? ['Jede Woche ein Live-Call mit Impulsvortrag in kleiner Runde (Deutsch oder Englisch)', 'Zwei Bewegungsvideos pro Woche: Yoga, Bodyweight, Somatic und freie Bewegung', 'Workbooks für deine mentale Gesundheit: Mental Load, Organisation, Selbstwert, Journaling', 'Meditation und Breathwork als kleine Rituale für den Alltag', 'Alle Aufnahmen der Live-Calls']
         : ['A weekly live call with a short talk in a small circle (English or German)', 'Two movement videos a week: yoga, bodyweight, somatic and free movement', 'Workbooks for your mental health: mental load, organisation, self-worth, journaling', 'Meditation and breathwork as small everyday rituals', 'All recordings of the live calls'];
-    $price = $L('Höchstens ' . $c['u_seats'] . ' Plätze, ab sofort buchbar. Preis: ' . $eu($c['u_once']) . ' auf einmal oder ' . $c['u_n'] . ' × ' . $eu($c['u_inst']) . '. Vor dem Start gibt es ein kostenloses Info-Gathering (30 Minuten), den Termin schicke ich dir rechtzeitig.',
-        'No more than ' . $c['u_seats'] . ' spots, bookable now. Price: ' . $eu($c['u_once']) . ' at once or ' . $c['u_n'] . ' × ' . $eu($c['u_inst']) . '. Before the start there is a free Info Gathering (30 minutes), I will send you the date in good time.');
-    $text = "Hey $first,\n\n" . $L('schön, dass du dabei bist! Hier sind alle Infos zu Unfold – The Mindful Becoming.', 'so lovely to have you! Here is everything about Unfold – The Mindful Becoming.') . "\n\n$intro\n\n$chap\n\n" . $L('Dabei:', 'Included:') . "\n– " . implode("\n– ", $items) . "\n\n$price\n\n" . $L('Platz sichern', 'Book your spot') . ": $page\n\n" . $L('Alles Liebe, Viv', 'With love, Viv') . "\n\n" . $L('Abmelden', 'Unsubscribe') . ": $out";
-    $html = $img . '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
-        . '<p style="margin:14px 0 0;">' . $L('schön, dass du dabei bist! Hier sind alle Infos zu <strong>Unfold – The Mindful Becoming</strong>.', 'so lovely to have you! Here is everything about <strong>Unfold – The Mindful Becoming</strong>.') . '</p>'
+    $price = $L('Höchstens ' . $c['u_seats'] . ' Plätze, ab sofort buchbar. Preis: ' . $eu($c['u_once']) . ' auf einmal oder ' . $c['u_n'] . ' × ' . $eu($c['u_inst']) . '. Vor dem Start gibt es ein kostenloses Info-Gathering (30 Minuten). Den Termin schicke ich dir rechtzeitig.',
+        'Only ' . $c['u_seats'] . ' spots, bookable now. Price: ' . $eu($c['u_once']) . ' in one payment or ' . $c['u_n'] . ' × ' . $eu($c['u_inst']) . '. Before we start, there is a free 30-minute Info Gathering. I will send you the date in good time.');
+    $text = $L('Hallo', 'Hey') . " $first,\n\n" . $L('schön, dass du dabei bist! Hier sind alle Infos zu Unfold – The Mindful Becoming.', 'So lovely to have you! Here is everything you need to know about Unfold – The Mindful Becoming.') . "\n\n$intro\n\n$chap\n\n" . $L('Das ist dabei:', 'What\'s included:') . "\n– " . implode("\n– ", $items) . "\n\n$price\n\n" . $L('Platz sichern', 'Book your spot') . ": $page\n\n" . $L('Alles Liebe, Viv', 'With love, Viv') . "\n\n" . $L('Abmelden', 'Unsubscribe') . ": $out";
+    $html = $img . '<p style="' . $hand . '">' . $L('Hallo', 'Hey') . ' ' . forma_h($first) . ',</p>'
+        . '<p style="margin:14px 0 0;">' . $L('schön, dass du dabei bist! Hier sind alle Infos zu <strong>Unfold – The Mindful Becoming</strong>.', 'So lovely to have you! Here is everything you need to know about <strong>Unfold – The Mindful Becoming</strong>.') . '</p>'
         . '<p style="margin:14px 0 0;">' . forma_h($intro) . '</p>'
         . '<p style="margin:16px 0 0;">' . nl2br(forma_h($chap)) . '</p>'
         . '<p style="margin:16px 0 0;">' . $L('Das ist dabei:', 'What\'s included:') . '</p>' . $li($items)
         . '<p style="margin:16px 0 0;background:#F2ECE4;border-radius:14px;padding:14px 16px;">' . forma_h($price) . '</p>'
         . mm_button($page, $L('Platz sichern', 'Book my spot'))
-        . '<p style="margin:22px 0 0;font-size:12px;color:#7D7076;">' . $L('Du bekommst diese E-Mail, weil du dich auf moveciamovement.com eingetragen hast.', 'You get this email because you signed up on moveciamovement.com.') . ' <a href="' . forma_h($out) . '" style="color:#7D7076;">' . $L('Abmelden', 'Unsubscribe') . '</a></p>';
-    return mm_mail($sub['email'], $L('Unfold – The Mindful Becoming: alle Infos für dich 🌿', 'Unfold – The Mindful Becoming: everything for you 🌿'), $text, mm_mail_html('Unfold · The Mindful Becoming', $html, $de ? 'de' : 'en'));
+        . '<p style="margin:22px 0 0;font-size:12px;color:#7D7076;">' . $L('Du bekommst diese E-Mail, weil du dich auf moveciamovement.com eingetragen hast.', 'You\'re receiving this email because you signed up on moveciamovement.com.') . ' <a href="' . forma_h($out) . '" style="color:#7D7076;">' . $L('Abmelden', 'Unsubscribe') . '</a></p>';
+    return mm_mail($sub['email'], $L('Unfold – The Mindful Becoming: alle Infos für dich 🌿', 'Unfold – The Mindful Becoming: all the details for you 🌿'), $text, mm_mail_html('Unfold · The Mindful Becoming', $html, $de ? 'de' : 'en'));
 }
 
 function mm_mail_welcome(array $sub): bool
@@ -583,26 +583,26 @@ function mm_mail_welcome(array $sub): bool
     $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#7D5E68;';
     $img = '<img src="' . mm_site() . '/img/wildhearts/cover.jpg" width="500" alt="" style="display:block;width:100%;max-width:500px;height:auto;max-height:360px;object-fit:cover;border-radius:16px;margin:0 0 20px;">';
     if ($de) {
-        $text = "Hey $first,\n\ndu hast es geschafft, du bist dabei. Willkommen im Wild Hearts Collective.\n\nHier ist mein kleines Geschenk für dich: die Reset-Routine für müde Tage. Zehn stille Minuten für die Abende, an denen du alles gegeben hast.\n\nDownload (Deutsch oder Englisch): $dl\n\nDas Wild Hearts Collective gibt es, damit du nie vergisst, dass auch du ein ganzer Mensch bist, selbst wenn du immer für alle anderen da bist. Wir sind wichtig. Wir sind da. Und wir werden gesehen.\n\nKomm in unseren kostenlosen Community-Kanal auf Instagram: " . MM_CHANNEL . "\nDort schreiben wir auf Englisch, aber du bist von Herzen willkommen. Unser erstes Live-Gathering findet im Dezember statt.\n\nAlles Liebe, Viv\n\nAbmelden: $out";
-        $html = $img . '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
+        $text = "Hallo $first,\n\ndu hast es geschafft, du bist dabei. Willkommen im Wild Hearts Collective.\n\nHier ist mein kleines Geschenk für dich: die Reset-Routine für müde Tage. Zehn stille Minuten für die Abende, an denen du alles gegeben hast.\n\nDownload (Deutsch oder Englisch): $dl\n\nDas Wild Hearts Collective gibt es, damit du nie vergisst, dass auch du ein ganzer Mensch bist, selbst wenn du immer für alle anderen da bist. Wir sind wichtig. Wir sind da. Und wir werden gesehen.\n\nKomm in unseren kostenlosen Community-Kanal auf Instagram: " . MM_CHANNEL . "\nDort schreiben wir auf Englisch, aber du bist von Herzen willkommen. Unser erstes Live-Gathering findet im Dezember statt.\n\nAlles Liebe, Viv\n\nAbmelden: $out";
+        $html = $img . '<p style="' . $hand . '">Hallo ' . forma_h($first) . ',</p>'
             . '<p style="margin:14px 0 0;">du hast es geschafft, du bist dabei. Willkommen im Wild Hearts Collective.</p>'
             . '<p style="margin:14px 0 0;">Hier ist mein kleines Geschenk für dich: die <strong>Reset-Routine für müde Tage</strong>. Zehn stille Minuten für die Abende, an denen du alles gegeben hast. Ein bewusster Atemzug, ein kleines Ritual zum Loslassen, eine warme Tasse Goldene Mondmilch und ein paar ehrliche Zeilen, nur für dich.</p>'
             . mm_button($dl, 'Zu meiner Reset-Routine')
             . '<p style="margin:8px 0 0;font-size:14px;color:#7D7076;text-align:center;">Auf der Seite wählst du Deutsch oder Englisch.</p>'
             . '<p style="margin:20px 0 0;">Das Wild Hearts Collective gibt es, damit du nie vergisst, dass auch du ein ganzer Mensch bist, selbst wenn du immer für alle anderen da bist. Wir sind wichtig. Wir sind da. Und wir werden gesehen.</p>'
-            . '<p style="margin:14px 0 0;">Komm und sag Hallo in unserem kostenlosen <a href="' . MM_CHANNEL . '" style="color:#7D5E68;">Community-Kanal auf Instagram</a>. Dort schreiben wir auf Englisch, aber du bist von Herzen willkommen. Unser erstes Live-Gathering findet im Dezember statt.</p>'
+            . '<p style="margin:14px 0 0;">Schau vorbei und sag Hallo in unserem kostenlosen <a href="' . MM_CHANNEL . '" style="color:#7D5E68;">Community-Kanal auf Instagram</a>. Dort schreiben wir auf Englisch, aber du bist von Herzen willkommen. Unser erstes Live-Gathering findet im Dezember statt.</p>'
             . '<p style="margin:22px 0 0;font-size:12px;color:#7D7076;">Du bekommst diese E-Mail, weil du dich auf moveciamovement.com angemeldet hast. <a href="' . forma_h($out) . '" style="color:#7D7076;">Abmelden</a></p>';
         return mm_mail($sub['email'], 'Deine Reset-Routine für müde Tage 🌙', $text, mm_mail_html('Deine Reset-Routine', $html, 'de'));
     }
-    $text = "Hey $first,\n\nyou did it, you're in. Welcome to the Wild Hearts Collective.\n\nHere is my little gift for you: the Reset Routine for Tired Days. Ten quiet minutes for the evenings you gave everything away.\n\nDownload (English or Deutsch): $dl\n\nThe Wild Hearts Collective exists so you never forget that you are a whole person too, even when you're always there for everyone else. We matter. We are here. And we are seen.\n\nCome and say hi in our free community channel on Instagram: " . MM_CHANNEL . "\nOur first live Wild Hearts Gathering is in December.\n\nWith love, Viv\n\nUnsubscribe: $out";
+    $text = "Hey $first,\n\nYou did it, you're in. Welcome to the Wild Hearts Collective.\n\nHere is my little gift for you: the Reset Routine for Tired Days. Ten quiet minutes for the evenings when you've given everything.\n\nDownload (English or German): $dl\n\nThe Wild Hearts Collective exists so you never forget that you are a whole person too, even when you're always there for everyone else. We matter. We are here. And we are seen.\n\nCome and say hi in our free community channel on Instagram: " . MM_CHANNEL . "\nOur first live Wild Hearts Gathering is in December.\n\nWith love, Viv\n\nUnsubscribe: $out";
     $html = $img . '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
-        . '<p style="margin:14px 0 0;">you did it, you\'re in. Welcome to the Wild Hearts Collective.</p>'
-        . '<p style="margin:14px 0 0;">Here is my little gift for you: the <strong>Reset Routine for Tired Days</strong>. Ten quiet minutes for the evenings you gave everything away. A breath, a small ritual to let go, a warm cup of Golden Moon Milk and a few honest lines, just for you.</p>'
+        . '<p style="margin:14px 0 0;">You did it, you\'re in. Welcome to the Wild Hearts Collective.</p>'
+        . '<p style="margin:14px 0 0;">Here is my little gift for you: the <strong>Reset Routine for Tired Days</strong>. Ten quiet minutes for the evenings when you\'ve given everything. A mindful breath, a small ritual to let go, a warm cup of Golden Moon Milk and a few honest lines, just for you.</p>'
         . mm_button($dl, 'Get my Reset Routine')
-        . '<p style="margin:8px 0 0;font-size:14px;color:#7D7076;text-align:center;">English or Deutsch, you choose on the page.</p>'
+        . '<p style="margin:8px 0 0;font-size:14px;color:#7D7076;text-align:center;">Choose English or German on the page.</p>'
         . '<p style="margin:20px 0 0;">The Wild Hearts Collective exists so you never forget that you are a whole person too, even when you\'re always there for everyone else. We matter. We are here. And we are seen.</p>'
         . '<p style="margin:14px 0 0;">Come and say hi in our free <a href="' . MM_CHANNEL . '" style="color:#7D5E68;">community channel on Instagram</a>. Our first live Wild Hearts Gathering is in December.</p>'
-        . '<p style="margin:22px 0 0;font-size:12px;color:#7D7076;">You get this email because you signed up on moveciamovement.com. <a href="' . forma_h($out) . '" style="color:#7D7076;">Unsubscribe</a></p>';
+        . '<p style="margin:22px 0 0;font-size:12px;color:#7D7076;">You\'re receiving this email because you signed up on moveciamovement.com. <a href="' . forma_h($out) . '" style="color:#7D7076;">Unsubscribe</a></p>';
     return mm_mail($sub['email'], 'Your Reset Routine for Tired Days 🌙', $text, mm_mail_html('Your Reset Routine', $html));
 }
 
@@ -723,7 +723,7 @@ function mm_offers(): array
     require_once __DIR__ . '/method-lib.php';
     $mc = mv_cfg();
     $def = [
-        'method' => ['price' => $mc['m1'], 'special' => $mc['g_m1'], 'title' => 'Movecia Mindful Movement Method', 'billing' => 'monthly', 'intro' => 1, 'text' => 'Your on-demand library: gentle flows, somatic movement, breathwork, meditation and a new programme with workbook every month. In English and German.'],
+        'method' => ['price' => $mc['m1'], 'special' => $mc['g_m1'], 'title' => 'Movecia Mindful Movement Method', 'billing' => 'monthly', 'intro' => 1, 'text' => 'Your on-demand library: gentle flows, somatic movement, breathwork, meditation and a new programme with a workbook every month. In English and German.'],
         'unfold' => ['price' => $mc['u_once'], 'special' => $mc['g_u_once'], 'plans' => [[$mc['u_n'], $mc['u_inst'], 0]], 'title' => 'Unfold – The Mindful Becoming', 'billing' => 'once', 'text' => '13 weeks for you: a weekly live call, two movement videos a week, workbooks, rituals and recordings. Starts ' . mv_date(mv_ts($mc['u_start']), 'en') . '.'],
         'circle' => ['price' => 3900, 'special' => 2900, 'periods' => [[6, 17400], [12, 31200]], 'title' => 'The Inner Circle', 'billing' => 'monthly', 'text' => 'Your monthly circle: live gatherings, breathwork, gentle movement and a members area with rituals and affirmations. A space where women support each other and come back to themselves.'],
         'year' => ['price' => 240000, 'special' => 199000, 'plans' => [[3, 80000, 66400], [6, 40000, 33200]], 'title' => 'The Year Circle', 'billing' => 'once', 'text' => 'Twelve months together: The Inner Circle plus 1:1 mentoring for the idea that is close to your heart. Like a best friend who walks the whole year with you.'],
@@ -1056,11 +1056,11 @@ function mm_order_check(PDO $pdo, array $o): string
                   : 'You did not choose immediate access to the course area: you start with the starter section, and the full course area and downloads unlock 14 days after your booking. ')
               . "Terms, cancellation policy and the withdrawal form: $site/terms");
         $startNote = (int)($o['bill_start'] ?? 0) > time() ? 'The Inner Circle opens on ' . mm_start_en((int)$o['bill_start']) . '. Nothing has been charged yet, your first payment is taken on that day.' : '';
-        $t = "Dear $first,\n\nthank you so much, you are in! Your booking for {$o['title']} ($price) is confirmed." . ($startNote ? "\n\n$startNote" : '') . "\n\nI will write to you personally in the next days with everything you need for the start. If you have any questions, simply reply to this email.\n\nI am so happy to walk this way with you.\n\n$legal\nWithdraw from the contract: $site/withdraw";
+        $t = "Dear $first,\n\nThank you so much, you're in! Your booking for {$o['title']} ($price) is confirmed." . ($startNote ? "\n\n$startNote" : '') . "\n\nI will write to you personally in the next few days with everything you need for the start. If you have any questions, simply reply to this email.\n\nI am so happy to walk this path with you.\n\n$legal\nWithdraw from the contract: $site/withdraw";
         $html = '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#7D5E68;">you are in ♡</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:30px;color:#6B5658;margin:0 0 14px;">' . forma_h($o['title']) . '</h1>'
-            . '<p>Dear ' . forma_h($first) . ',</p><p>thank you so much, your booking for <strong>' . forma_h($o['title']) . '</strong> (' . forma_h($price) . ') is confirmed.</p>' . ($startNote ? '<p>' . forma_h($startNote) . '</p>' : '') . '<p>I will write to you personally in the next days with everything you need for the start. If you have any questions, simply reply to this email.</p><p>I am so happy to walk this way with you.</p>'
+            . '<p>Dear ' . forma_h($first) . ',</p><p>Thank you so much, your booking for <strong>' . forma_h($o['title']) . '</strong> (' . forma_h($price) . ') is confirmed.</p>' . ($startNote ? '<p>' . forma_h($startNote) . '</p>' : '') . '<p>I will write to you personally in the next few days with everything you need for the start. If you have any questions, simply reply to this email.</p><p>I am so happy to walk this path with you.</p>'
             . '<p style="font-size:13px;color:#7D7076;border-top:1px solid #DDD2C6;padding-top:12px;margin-top:22px;">' . forma_h($legal) . '<br><a href="' . forma_h($site . '/withdraw') . '" style="color:#7D5E68;">Withdraw from the contract</a></p>';
-        if ($email !== '') mm_mail($email, ($o['test'] ? '[TEST] ' : '') . 'You are in: ' . $o['title'], $t, mm_mail_html('You are in', $html));
+        if ($email !== '') mm_mail($email, ($o['test'] ? '[TEST] ' : '') . 'You\'re in: ' . $o['title'], $t, mm_mail_html('You are in', $html));
         $v = "Hallo Viv,\n\n" . ($name ?: 'Jemand') . " ($email) hat gerade {$o['title']} gebucht" . ((int)($o['bill_start'] ?? 0) > time() ? ' (Abbuchung ab ' . date('d.m.Y', (int)$o['bill_start']) . ')' : ' und bezahlt') . ": $price" . ($o['special'] ? ' (Gathering-Preis)' : ' (regulärer Preis)') . ".\n" . ($o['test'] ? "\nDas war eine Testbuchung aus dem Testraum.\n" : '') . "\nDu siehst alle Buchungen in der Verwaltung unter Movecia Movement → Angebote.\n";
         mm_mail(MM_FROM_EMAIL, ($o['test'] ? '[TEST] ' : '') . 'Neue Buchung: ' . $o['title'] . ' · ' . ($name ?: $email), $v, mm_mail_html('Neue Buchung', nl2br(forma_h($v)), 'de'));
         if ((int)($o['referred_by'] ?? 0)) { try { mm_ref_reward($pdo, (int)$o['referred_by'], $name ?: 'a friend'); } catch (Throwable $e) { error_log('MM ref reward: ' . $e->getMessage()); } }
@@ -1126,11 +1126,11 @@ function mm_gathering_presets(): array
         ['label' => 'Morgen · 30 Min', 'title' => 'Morning Gathering · Breathwork & Intention', 'minutes' => 30, 'time' => '08:00', 'script' => 'Morning · 30 min · Breathwork & intention',
          'text' => "Thirty minutes to begin your day softly: calming breathwork, a humming breath, gentle movement and an intention for the day. No experience needed. Have a pen and paper ready."],
         ['label' => 'Abend · 15 Min', 'title' => 'Evening Gathering · Smoke & Release', 'minutes' => 15, 'time' => '19:00', 'script' => 'Evening · 15 min · Smoke & release ritual',
-         'text' => "Close your day with a small cleansing ritual. Bring a candle, or herbs or incense if you like, and we let go of the day together. Fifteen minutes, then off to rest."],
+         'text' => "Close your day with a small cleansing ritual. Bring a candle, or herbs or incense if you like, and we'll let go of the day together. Fifteen minutes, then off to rest."],
         ['label' => 'Abend · 30 Min', 'title' => 'Evening Gathering · Ritual & Deep Rest', 'minutes' => 30, 'time' => '19:30', 'script' => 'Evening · 30 min · Ritual & deep rest',
          'text' => "Thirty minutes to end your day: a candle ritual to clear the day, gentle stretches and a deep guided rest. Have a blanket, a pillow and a pen ready. You can fall asleep right after."],
         ['label' => 'Samhain · 20 Min', 'title' => 'Samhain Gathering · The Old New Year', 'minutes' => 20, 'time' => '19:00', 'date' => '2026-10-31', 'script' => 'Samhain · 20 min · Free gathering',
-         'text' => "On the 31st of October we celebrate Samhain, the old New Year in the Wheel of the Year. A free 20-minute circle by candlelight: we honour the women before us, let go of what is finished and choose a seed to carry through winter. Bring a candle, a pen and paper."],
+         'text' => "On the 31st of October we celebrate Samhain, the old New Year in the Wheel of the Year. A free 20-minute circle by candlelight: we honour the women who came before us, let go of what is finished and choose a seed to carry through winter. Bring a candle, a pen and paper."],
     ];
 }
 
@@ -1188,8 +1188,8 @@ function mm_send_ref_mails(PDO $pdo): void
         $link = mm_site() . '/circle/?ref=' . $r['ref_code'];
         $sp = mm_price_en((int)$o['special_cents'], 'monthly');
         $more = ((int)$r['special_months'] < $o['max_months']) ? "and you get {$o['ref_months']} more months at $sp yourself" : 'as a little gift from you';
-        $t = "Dear $first,\n\nyou have been part of The Inner Circle for two months now, and I am so grateful you are here.\n\nIs there a friend who would love this circle too? Here is your personal invitation link:\n$link\n\nWith your link, your friend gets her first {$o['intro_months']} months at $sp, $more.\n\nWith love\nViv";
-        $html = '<p>Dear ' . forma_h($first) . ',</p><p>you have been part of The Inner Circle for two months now, and I am so grateful you are here.</p><p>Is there a friend who would love this circle too? Share your personal invitation link with her:</p>'
+        $t = "Dear $first,\n\nYou have been part of The Inner Circle for two months now, and I am so grateful you are here.\n\nIs there a friend who would love this circle too? Here is your personal invitation link:\n$link\n\nWith your link, your friend gets her first {$o['intro_months']} months at $sp, $more.\n\nWith love\nViv";
+        $html = '<p>Dear ' . forma_h($first) . ',</p><p>You have been part of The Inner Circle for two months now, and I am so grateful you are here.</p><p>Is there a friend who would love this circle too? Share your personal invitation link with her:</p>'
             . mm_button($link, 'Your invitation link') . '<p style="font-size:14px;word-break:break-all;color:#7D7076;">' . forma_h($link) . '</p>'
             . '<p>With your link, your friend gets her first ' . (int)$o['intro_months'] . ' months at ' . forma_h($sp) . ', ' . forma_h($more) . '.</p>';
         mm_mail((string)$r['email'], ($r['test'] ? '[TEST] ' : '') . 'Invite a friend to The Inner Circle', $t, mm_mail_html('Invite a friend', $html));
@@ -1294,13 +1294,13 @@ function mm_send_stay_mails(PDO $pdo): void
         $link = mm_site() . '/circle/?stay=' . $code;
         $ref = $r['ref_code'] !== '' ? mm_site() . '/circle/?ref=' . $r['ref_code'] : '';
         $date = date('j F Y', $until);
-        $t = "Dear $first,\n\nI really hope you have enjoyed your first months in The Inner Circle. It means so much to me that you are part of it.\n\nYour circle price is coming to an end now. If you would like to stay, here is a little gift for you: $months more months at $sp, right after your first ones.\n\nYour personal code: $code\nKeep your circle price: $link\n\nThe code is only valid if you use it straight away, until $date. After that, the regular price of $reg applies.\n"
+        $t = "Dear $first,\n\nI really hope you have enjoyed your first months in The Inner Circle. It means so much to me that you are part of it.\n\nYour circle price is coming to an end now. If you would like to stay, here is a little gift for you: $months more months at $sp, right after your first ones.\n\nYour personal code: $code\nKeep your circle price: $link\n\nThe code is only valid for a short time, until $date. After that, the regular price of $reg applies.\n"
             . ($ref ? "\nAnd if a friend would love the circle too, your invitation link still works: $ref\nShe gets her first {$o['intro_months']} months at $sp.\n" : '') . "\nWith love\nViv";
         $html = '<p>Dear ' . forma_h($first) . ',</p><p>I really hope you have enjoyed your first months in The Inner Circle. It means so much to me that you are part of it.</p>'
             . '<p>Your circle price is coming to an end now. If you would like to stay, here is a little gift for you: <strong>' . $months . ' more months at ' . forma_h($sp) . '</strong>, right after your first ones.</p>'
             . '<p style="font-size:22px;letter-spacing:.08em;color:#6B5658;margin:18px 0 6px;">' . forma_h($code) . '</p>'
             . mm_button($link, 'Keep my circle price')
-            . '<p style="font-size:14px;color:#7D7076;">The code is only valid if you use it straight away, until ' . forma_h($date) . '. After that, the regular price of ' . forma_h($reg) . ' applies.</p>'
+            . '<p style="font-size:14px;color:#7D7076;">The code is only valid for a short time, until ' . forma_h($date) . '. After that, the regular price of ' . forma_h($reg) . ' applies.</p>'
             . ($ref ? '<p>And if a friend would love the circle too, your invitation link still works. She gets her first ' . (int)$o['intro_months'] . ' months at ' . forma_h($sp) . ':</p>' . mm_button($ref, 'Invite a friend') : '');
         mm_mail((string)$r['email'], ($r['test'] ? '[TEST] ' : '') . 'A little gift, if you would like to stay', $t, mm_mail_html('Stay with us', $html));
     }
@@ -1335,7 +1335,7 @@ function mm_stay_redeem(PDO $pdo, array $r, int $consent, int $digital): array
         forma_stripe('POST', '/v1/subscriptions/' . rawurlencode((string)$r['sub_id']), ['discounts' => [['coupon' => $coupon]], 'cancel_at_period_end' => 'false']);
         $pdo->prepare('UPDATE mm_orders SET stay_used = 1, special_months = special_months + ? WHERE id = ?')->execute([$months, $r['id']]);
         $first = forma_first_name((string)$r['name'] ?: 'love');
-        $t = "Dear $first,\n\nhow lovely that you are staying! Your circle price of " . mm_price_en((int)$o['special_cents'], 'monthly') . " continues for $months more months, then the regular price of " . mm_price_en((int)$o['price_cents'], 'monthly') . " applies. You can still cancel at any time, effective at the end of the month you have paid.\n\nWith love\nViv";
+        $t = "Dear $first,\n\nHow lovely that you're staying! Your circle price of " . mm_price_en((int)$o['special_cents'], 'monthly') . " continues for $months more months, then the regular price of " . mm_price_en((int)$o['price_cents'], 'monthly') . " applies. You can still cancel at any time, effective at the end of the month you have paid for.\n\nWith love\nViv";
         mm_mail((string)$r['email'], ($r['test'] ? '[TEST] ' : '') . 'You are staying in The Inner Circle', $t, mm_mail_html('You are staying', nl2br(forma_h($t))));
         mm_mail(MM_FROM_EMAIL, 'Bleibt im Inner Circle: ' . ($r['name'] ?: $r['email']), "Hallo Viv,\n\n" . ($r['name'] ?: 'Jemand') . " ({$r['email']}) hat ihren Bleibe-Code eingelöst und zahlt $months weitere Monate den Gathering-Preis.\n", mm_mail_html('Bleibt im Inner Circle', nl2br(forma_h(($r['name'] ?: 'Jemand') . " ({$r['email']}) hat ihren Bleibe-Code eingelöst und zahlt $months weitere Monate den Gathering-Preis.")), 'de'));
         return ['done' => true];

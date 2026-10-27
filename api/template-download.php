@@ -20,7 +20,7 @@ if ($o['status'] === 'bezahlt' && $o['paid_at'] && strtotime((string)$o['paid_at
 $lang = (string)($_GET['lang'] ?? '');
 if ($o['status'] === 'bezahlt' && (string)$o['file_en'] !== '' && $lang === '') {
     $base = '/api/template-download.php?o=' . $id . '&k=' . rawurlencode($token);
-    forma_message_page('Dein Template ist bereit', "„{$o['title']}“ gibt es auf Deutsch und auf Englisch. Lade dir die Version herunter, die du brauchst, oder gleich beide.\n\nYour template is available in German and English.", 'Deutsch herunterladen', $base . '&lang=de', 'English download', $base . '&lang=en');
+    forma_message_page('Dein Template ist bereit', "„{$o['title']}“ gibt es auf Deutsch und auf Englisch. Lade dir die Version herunter, die du brauchst, oder gleich beide.\n\nYour template is available in German and English.", 'Deutsch herunterladen', $base . '&lang=de', 'Download in English', $base . '&lang=en');
 }
 $useEn = $lang === 'en' && (string)$o['file_en'] !== '';
 $file = forma_template_dir() . '/' . basename((string)($useEn ? $o['file_en'] : $o['file']));
