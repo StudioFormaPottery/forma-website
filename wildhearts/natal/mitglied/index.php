@@ -415,7 +415,7 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
 </div></footer>
 
 <?php if ($me): ?>
-<script src="/wildhearts/assets/flow-player.js?v=3"></script>
+<script src="/wildhearts/assets/flow-player.js?v=4"></script>
 <script>
 (() => {
   const DEMO = <?= json_encode($demo) ?>;

@@ -232,8 +232,9 @@
     function seg() {
       root.querySelectorAll('[data-d]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.d === dur)));
       const m = Math.max(1, Math.round(sum() / 60));
-      q('[data-tot]').textContent = flow
-        ? T(`${items.length} Übungen, zusammen etwa ${m} Minuten. Ich begleite dich mit meiner Stimme durch jede Übung.`, `${items.length} exercises, about ${m} minutes in total. My voice guides you through each one.`)
+      const tot = q('[data-tot]');
+      tot.hidden = flow;
+      tot.textContent = flow ? ''
         : T(`${items.length} Übungen à ${dur} Sekunden, zusammen etwa ${m} Minuten.`, `${items.length} exercises, ${dur} seconds each, about ${m} minutes in total.`);
     }
     root.querySelectorAll('[data-d]').forEach(b => b.addEventListener('click', () => { dur = +b.dataset.d; try { localStorage.setItem('mvf-dur', String(dur)); } catch (e) {} seg(); }));
