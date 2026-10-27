@@ -16,7 +16,7 @@ Und noch ein kleiner Hinweis für unsere gemeinsame Zeit: Bitte schaltet euer Mi
 
 Wenn du gerade noch deinen Platz suchst, lass dir Zeit. Vielleicht steht eine Tasse Tee neben dir, vielleicht hast du gerade ein Kind ins Bett gebracht, vielleicht trägst du noch deine Arbeitskleidung. Wie auch immer du heute angekommen bist, es ist genau richtig. Du musst nicht bereit sein, du musst nur hier sein.
 
-Willkommen bei {title}. In den nächsten fünfzehn Minuten gibt es nichts, was du tun, reparieren oder richtig machen musst. Wenn du lieber mit geschlossenen Augen zuhörst, ist auch das hier willkommen.
+Willkommen bei {title}. In den nächsten fünfzehn Minuten gibt es nichts, was du tun, in Ordnung bringen oder richtig machen musst. Wenn du lieber mit geschlossenen Augen zuhörst, ist auch das völlig in Ordnung.
 
 [Pause]
 
@@ -52,7 +52,7 @@ Ich kenne dieses Gefühl sehr gut. Und heute möchte ich dir erzählen, warum ic
 
 [4:30 · MEINE GESCHICHTE]
 
-Ich bin Mama von vier Kindern. Mein Ältestes ist schon ein Teenager, mein Jüngstes ist noch nicht einmal zwei, und dazwischen gibt es noch zwei kleine Menschen, die mich auf ganz unterschiedliche Weise brauchen. Wir leben in den Bergen in Tirol, die Eltern meines Mannes wohnen gleich nebenan, und wir helfen mit, einen kleinen Hof zu versorgen.
+Ich bin Mama von vier Kindern. Mein ältestes Kind ist schon ein Teenager, mein jüngstes ist noch nicht einmal zwei, und dazwischen gibt es noch zwei kleine Menschen, die mich auf ganz unterschiedliche Weise brauchen. Wir leben in den Bergen in Tirol, die Eltern meines Mannes wohnen gleich nebenan, und wir helfen mit, einen kleinen Hof zu versorgen.
 
 Meine Tage sind also voll, manchmal so voll, dass ich gar nicht merke, wie sie vergehen.
 
@@ -68,7 +68,7 @@ Aber eines Abends habe ich etwas anderes ausprobiert. Statt der Liste mit allem,
 
 Ich bin in der Nacht für ein Baby aufgestanden. Ich habe Frühstück für vier Kinder gemacht, die alle etwas anderes wollten. Ich habe den verlorenen Schuh gefunden. Ich habe mir eine Geschichte über eine Freundschaft in der Schule angehört, die wirklich wichtig war. Ich habe jemanden getröstet, der traurig war, und an einen Termin gedacht, an den sonst niemand gedacht hat. Ich habe gearbeitet und gekocht, und ich habe öfter „Ich hab dich lieb“ gesagt, als ich zählen konnte.
 
-Und dann saß ich da und dachte: Das ist nicht nichts. Das ist ein ganzes Leben, das zusammengehalten wird, von mir.
+Und dann saß ich da und dachte: Das ist nicht nichts. Damit halte ich ein ganzes Leben zusammen.
 
 Das Problem war nie, dass ich zu wenig geschafft habe. Das Problem war, dass niemand diese Art von Arbeit zählt, und deshalb habe ich irgendwann selbst aufgehört, sie zu zählen.
 
@@ -76,7 +76,7 @@ Das Problem war nie, dass ich zu wenig geschafft habe. Das Problem war, dass nie
 
 Deshalb möchte ich dich einladen, das jetzt gemeinsam mit mir auszuprobieren.
 
-Denk an deinen heutigen Tag. Nicht an das, was du nicht geschafft hast, sondern an das, was du getan hast, auch an die unsichtbaren Dinge. Das, was du getragen hast. Den Menschen, den du gehalten hast. Den Moment, in dem du weitergemacht hast, obwohl du eigentlich aufhören wolltest.
+Denk an deinen heutigen Tag. Nicht an das, was du nicht geschafft hast, sondern an das, was du getan hast, auch an die unsichtbaren Dinge. Das, was du getragen hast. Den Menschen, für den du da warst. Den Moment, in dem du weitergemacht hast, obwohl du eigentlich aufhören wolltest.
 
 Und wenn du magst, schreib eines davon in den Chat. Nur eines, und es darf ganz klein sein. „Ich war pünktlich in der Arbeit.“ „Ich habe heute nicht geschimpft.“ „Ich habe meine Mama angerufen.“ Hier zählt alles.
 
@@ -116,7 +116,7 @@ Das verstehe ich gut. An manchen Tagen müssen die wichtigen Dinge warten, und s
 
 [13:30 · EINE EINLADUNG]
 
-Genau das tun wir in diesem Kreis. Wir kommen zusammen, wir atmen, wir sagen die Wahrheit, und wir erinnern einander daran, was wir tragen, und wer wir unter all dem sind.
+Genau dafür gibt es diesen Kreis. Wir kommen zusammen, wir atmen, wir sagen die Wahrheit, und wir erinnern einander daran, was wir tragen, und wer wir unter all dem sind.
 
 Wenn sich der heutige Abend gut für dich angefühlt hat, würde ich mich so freuen, dich beim nächsten Gathering wiederzusehen. Und wenn du mehr davon möchtest, jeden Monat und mit einem echten Kreis von Frauen um dich herum, dann schau dir Unfold an, meine dreimonatige Begleitung ab dem 10. Jänner. Ich habe sie genau dafür entwickelt, für Frauen, die so viel geben und einen Ort brauchen, an dem sie zu sich zurückfinden.
 
@@ -128,7 +128,7 @@ Bevor ihr geht, lasst uns noch einen letzten gemeinsamen Atemzug nehmen. Ein dur
 
 Danke, dass ihr da wart. Danke für alles, was ihr heute getan habt, für das, was alle gesehen haben, und für das, was niemand gesehen hat.
 
-Du hinkst nicht hinterher. Du trägst viel, und du tust es mit Liebe.
+Du hinkst nicht hinterher. Du trägst viel, und du trägst es mit Liebe.
 
 Schlaft gut, ihr wilden Herzen. Bis bald.',
   'Themed · 15 min · Starting over' => '[0:00 · ANKOMMEN]
@@ -197,11 +197,11 @@ Und ich erinnere mich noch genau an mein allererstes Personal Training. Ich habe
 
 Ich erzähle dir das, weil ich damals beim Umzug dachte, ich hätte etwas verloren. Und das hatte ich auch. Aber ich habe auch etwas gefunden, das ich nie gefunden hätte, wenn alles beim Alten geblieben wäre.
 
-Neu anzufangen bedeutet nicht, dass du gescheitert bist. Manchmal ist es der Anfang der ehrlichsten Version von dir.
+Neu anzufangen bedeutet nicht, dass du gescheitert bist. Manchmal fängst du genau dann an, ganz ehrlich du selbst zu sein.
 
 [8:00 · DU BIST DRAN]
 
-Deshalb möchte ich dich etwas fragen, und du kannst im Chat antworten oder einfach in deinem Herzen.
+Deshalb möchte ich dich etwas fragen, und du kannst im Chat antworten oder ganz still für dich.
 
 Wo in deinem Leben fängst du gerade neu an? Oder wo wünschst du dir, du könntest es?
 
@@ -241,7 +241,7 @@ Ganz ehrlich? Ich habe mich nicht mutig gefühlt, sondern müde und ein bisschen
 
 [13:30 · EINE EINLADUNG]
 
-Genau das tun wir im Wild Hearts Collective. Wir schaffen Raum für Frauen, die gerade mitten in etwas stecken, und wir begleiten einander.
+Genau dafür gibt es das Wild Hearts Collective. Wir schaffen Raum für Frauen, die gerade mitten in etwas stecken, und wir begleiten einander.
 
 Wenn du weitermachen möchtest, komm zum nächsten Gathering. Und wenn du am Anfang von etwas stehst, das dir wirklich wichtig ist, einer Idee, einem Projekt, einem neuen Kapitel, dann schau dir Unfold an. Das sind drei Monate gemeinsam ab dem 10. Jänner, für Frauen, die zu sich zurückfinden und die ersten echten Schritte zu ihrer Idee gehen möchten, mit jemandem an ihrer Seite, den ganzen Weg lang.
 
@@ -318,7 +318,7 @@ Und so oft habe ich zu Beginn einer Stunde einen Satz wie diesen gehört:
 
 Dieser Satz ist mir geblieben. Denn da habe ich verstanden: Diese Frauen hatten kein Workout gebucht. Sie hatten jemanden gebucht, der sie sieht. Jemanden, der bemerkt, ob sie geschlafen haben, ob sie traurig sind und ob heute ein Tag für ein hartes Training ist oder für etwas Sanftes.
 
-Also habe ich angefangen, mich anzupassen. An manchen Tagen haben wir hart trainiert, an anderen haben wir vor allem geredet, geatmet und uns ganz sanft bewegt. Und die Frauen sind wiedergekommen, nicht weil ich die strengste Trainerin war, sondern weil sie sich gesehen gefühlt haben.
+Also habe ich angefangen, mich anzupassen. An manchen Tagen haben wir hart trainiert, an anderen haben wir vor allem geredet, geatmet und uns ganz sanft bewegt. Und die Frauen sind wiedergekommen, nicht weil ich die strengste Trainerin war, sondern weil sie sich wahrgenommen gefühlt haben.
 
 [dein Detail: ein Moment mit einer Kundin, an den du dich erinnerst, ohne ihren Namen, zum Beispiel eine Stunde, die ganz anders endete als geplant]
 
@@ -332,7 +332,7 @@ So ist das Wild Hearts Collective entstanden: Schritt für Schritt, ein Gespräc
 
 Deshalb möchte ich dich heute zwei Dinge fragen, und du kannst im Chat antworten oder einfach darüber nachdenken.
 
-Erstens: Wann hast du dich zuletzt wirklich gesehen gefühlt? Nicht bewertet, nicht gemessen, sondern gesehen.
+Erstens: Wann hast du dich zuletzt wirklich wahrgenommen gefühlt? Nicht bewertet, nicht gemessen, sondern wahrgenommen.
 
 Und zweitens: Was braucht dein Körper heute Abend wirklich? Nicht, was er brauchen sollte, sondern was er braucht.
 
@@ -386,7 +386,7 @@ Lasst uns noch einen letzten gemeinsamen Atemzug nehmen. Ein auf vier … und au
 
 Danke, dass ich euch heute Abend sehen durfte.
 
-Du musst dir Ruhe nicht verdienen, und du musst es dir nicht verdienen, gesehen zu werden. Du darfst beides haben, heute.
+Du musst dir Ruhe nicht verdienen, und du musst es dir nicht verdienen, wahrgenommen zu werden. Du darfst beides haben, heute.
 
 Gute Nacht, ihr wilden Herzen. Bis bald.',
   'Themed · 15 min · Come back to you' => '[0:00 · ANKOMMEN]
@@ -517,7 +517,7 @@ Lasst uns noch einmal mit unseren Wurzeln schließen. Spür deine Füße … atm
 
 Danke, dass ihr da wart und heute Abend so ehrlich wart.
 
-Du darfst aus Dingen herauswachsen, und du darfst dich für dich selbst entscheiden. Die richtigen Menschen werden dir dort begegnen.
+Du darfst aus Dingen herauswachsen, und du darfst dich für dich selbst entscheiden. Und auf diesem Weg werden dir die richtigen Menschen begegnen.
 
 Schlaft gut, ihr wilden Herzen. Bis bald.',
   'Samhain · 20 min · Free gathering' => '[0:00 · ANKOMMEN]
@@ -532,7 +532,7 @@ Bevor wir anfangen, stelle ich mich kurz für alle vor, die neu hier sind. Ich b
 
 Und noch ein kleiner Hinweis für unsere gemeinsame Zeit: Bitte schaltet euer Mikrofon stumm, damit wir einander gut hören. Eure Kamera darf gern an bleiben, sie muss es aber nicht. Ihr dürft sie jederzeit ausschalten, für eure Privatsphäre oder während der Atemübungen, wenn ihr ganz bei euch sein möchtet.
 
-Willkommen bei {title}. In den nächsten zwanzig Minuten feiern wir gemeinsam die Wende des Jahres. Du musst nichts über Samhain wissen, und du musst an nichts Bestimmtes glauben. Komm einfach so, wie du bist.
+Willkommen bei {title}. In den nächsten zwanzig Minuten feiern wir gemeinsam diesen Übergang im Jahreskreis. Du musst nichts über Samhain wissen, und du musst an nichts Bestimmtes glauben. Komm einfach so, wie du bist.
 
 [Pause]
 
@@ -582,7 +582,7 @@ Was hat sie getragen? Was hat sie dir geschenkt, ohne es überhaupt zu wissen?
 
 [Pause, etwa dreißig Sekunden Stille]
 
-Wenn du magst, schreib ihren Namen in den Chat. Lasst uns sie heute Abend gemeinsam ehren.
+Wenn du magst, schreib ihren Namen in den Chat. Lasst sie uns heute Abend gemeinsam ehren.
 
 [warten und einige Namen leise vorlesen]
 
@@ -634,7 +634,7 @@ Unser nächstes Gathering kommt bald, und natürlich ist es kostenlos. Das Datum
 
 Und für die Frauen, die tiefer gehen möchten, gibt es Unfold, meine dreimonatige Begleitung ab dem 10. Jänner: ein wöchentlicher Live-Call, zwei Bewegungsvideos pro Woche und Workbooks für deinen Mental Load, deinen Selbstwert und deine Ideen. Es gibt nur zehn Plätze.
 
-Und jetzt verrate ich euch noch etwas, weil ihr heute Abend da seid: Meine Mindful Movement Method öffnet am 1. Dezember. Yoga-Flows, Somatic Movement, Atemarbeit und Meditation zum Abrufen, von fünf bis dreißig Minuten, für volle und für müde Tage, und jeden Monat ein neues Programm mit Workbook. Genau rechtzeitig zum neuen Jahr, damit du mit deinen Vorsätzen nicht allein bist.
+Und jetzt verrate ich euch noch etwas, weil ihr heute Abend da seid: Meine Mindful Movement Method öffnet am 1. Dezember. Yoga-Flows, somatische Bewegung, Atemarbeit und Meditation zum Abrufen, von fünf bis dreißig Minuten, für volle und für müde Tage, und jeden Monat ein neues Programm mit Workbook. Genau rechtzeitig zum neuen Jahr, damit du mit deinen Vorsätzen nicht allein bist.
 
 Heute Abend kannst du dir deinen Platz schon zum Gathering-Preis sichern, deinen ersten Monat für 19 statt 29 Euro. Heute wird nichts abgebucht. Die erste Zahlung kommt erst am 1. Dezember, wenn die Method öffnet.
 
@@ -663,7 +663,7 @@ Guten Morgen, ihr wilden Herzen. Guten Morgen.
 
 Lasst mich alle begrüßen, die heute dafür früh aufgestanden sind. {names}. Ich freue mich so, dass ihr da seid.
 
-Vielleicht hast du noch deinen Pyjama an. Vielleicht hältst du deinen ersten Kaffee oder Tee in den Händen. Vielleicht ist es bei dir zu Hause noch ganz still, oder es ist schon laut und du hast dich für ein paar Minuten davongeschlichen. Jede Version von dir ist heute Morgen willkommen.
+Vielleicht hast du noch deinen Pyjama an. Vielleicht hältst du deinen ersten Kaffee oder Tee in den Händen. Vielleicht ist es bei dir zu Hause noch ganz still, oder es ist schon laut und du hast dich für ein paar Minuten davongeschlichen. Du bist heute Morgen genau so willkommen, wie du bist.
 
 Willkommen bei {title}. Bevor der Tag an dir zu ziehen beginnt, nehmen wir uns fünfzehn Minuten, die nur dir gehören. Kamera an oder aus, im Sitzen oder im Liegen, alles ist gut.
 
@@ -749,7 +749,7 @@ Was für schöne Worte. Lasst sie uns mitnehmen.
 
 Eine Frage, die ich oft höre, lautet: „Und wenn ich morgens keine fünfzehn Minuten habe?“
 
-Dann nimm dir eine Minute. Vier Runden Box Breathing dauern ungefähr eine Minute. Das reicht, um deinem Körper zu sagen: Ich bin da, ich bin sicher, ich schaffe diesen Tag. Klein und oft ist so viel wirkungsvoller als perfekt und selten.
+Dann nimm dir eine Minute. Vier Runden Box Breathing dauern ungefähr eine Minute. Das reicht, um deinem Körper zu sagen: Ich bin da, ich bin in Sicherheit, ich schaffe diesen Tag. Klein und oft ist so viel wirkungsvoller als perfekt und selten.
 
 [12:30 · EINE EINLADUNG]
 
@@ -776,7 +776,7 @@ Lasst mich jeder von euch einen guten Morgen wünschen. {names}. Danke, dass ihr
 
 Vielleicht bist du heute vor allen anderen zu Hause aufgewacht, nur dafür. Vielleicht laufen im Hintergrund gerade Kinder herum. Vielleicht liegst du sogar noch im Bett. All das ist hier willkommen.
 
-Willkommen bei {title}. In den nächsten dreißig Minuten atmen wir, bewegen uns ein bisschen und setzen eine Absicht für den Tag. Du brauchst keine Erfahrung, du musst nur da sein. Kamera an oder aus, ganz wie du magst.
+Willkommen bei {title}. In den nächsten dreißig Minuten atmen wir, bewegen uns ein bisschen und suchen uns eine Absicht für den Tag aus. Du brauchst keine Erfahrung, du musst nur da sein. Kamera an oder aus, ganz wie du magst.
 
 [Pause]
 
@@ -910,7 +910,7 @@ Und wenn du magst, schreib dein Wort in den Chat, dann tragen wir heute die Absi
 
 Eine Frage, die ich oft höre, lautet: „Wie bleibe ich an ganz normalen Morgen dran, wenn kein Gathering ist?“
 
-Fang winzig an. Such dir eine einzige Übung von heute Morgen aus. Vielleicht den summenden Atem, während das Teewasser kocht. Vielleicht fünf Atemzüge ein auf fünf und aus auf fünf, bevor du aufstehst. Eine Minute am Tag, die du wirklich machst, ist so viel mehr wert als dreißig Minuten, die du nur planst.
+Fang ganz klein an. Such dir eine einzige Übung von heute Morgen aus. Vielleicht den summenden Atem, während das Teewasser kocht. Vielleicht fünf Atemzüge ein auf fünf und aus auf fünf, bevor du aufstehst. Eine Minute am Tag, die du wirklich machst, ist so viel mehr wert als dreißig Minuten, die du nur planst.
 
 [24:30 · EINE GESCHICHTE ZUM MITNEHMEN]
 
@@ -951,7 +951,7 @@ Lasst mich alle begrüßen, die heute Abend da sind. {names}. Ich freue mich so,
 
 Der Tag liegt jetzt hinter dir. Was auch immer heute passiert ist, was gut gelaufen ist und was nicht, du musst es nicht mit in diesen Raum tragen. Du darfst es an der Tür ablegen.
 
-Willkommen bei {title}. Fünfzehn Minuten, um deinen Tag sanft abzuschließen. Dimm das Licht, wenn du kannst. Kamera an oder aus, ganz wie es sich gemütlich anfühlt.
+Willkommen bei {title}. Fünfzehn Minuten, um deinen Tag sanft abzuschließen. Dimm das Licht, wenn du kannst. Kamera an oder aus, ganz wie es für dich gemütlicher ist.
 
 [Pause]
 

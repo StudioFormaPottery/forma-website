@@ -74,7 +74,7 @@ In our house, mornings can be a lot. Four children, breakfasts, school bags, som
 
 What helps me on the hard days is not a perfect routine. It\'s the things I learned and teach: slowing my breath, a little gentle movement, a small ritual just for me. A few breaths before I open the door to the day.
 
-The day is still full. But I\'m in it differently. A little more me, a little less rushing.
+The day is still full. But I move through it differently. A little more me, a little less rushing.
 
 [10:00 · YOUR INTENTION]
 
