@@ -10,7 +10,7 @@ Let me say hello to everyone who woke up early for this. {names}. I\'m so happy 
 
 Maybe you\'re still in your pyjamas. Maybe you have your first coffee or tea in your hands. Maybe the house is still quiet, or maybe it\'s already loud and you just snuck away for a few minutes. Every version of you is welcome this morning.
 
-This is {title}. Before the day starts pulling at you, we take fifteen minutes that are only yours. Camera on or off, sitting or lying down, it\'s all fine.
+This is {title}. Before the day starts pulling at you, we\'re taking fifteen minutes that are only yours. Camera on or off, sitting or lying down, it\'s all fine.
 
 [pause]
 
@@ -30,11 +30,11 @@ You don\'t need to change anything. Just notice it, and say good morning to your
 
 This morning we\'re going to do a short breathwork practice together. Nothing wild, nothing intense. Just your breath, a little slower and a little deeper than usual.
 
-The way we breathe tells our nervous system how safe we are. When we start the day already rushing, our breath becomes short and high, up in the chest. And our body thinks: something is wrong, hurry.
+The way we breathe tells our nervous system how safe we are. When we start the day already rushing, our breath gets short and shallow, high up in the chest. And our body thinks: something is wrong, hurry.
 
 So we\'re going to tell it something different this morning.
 
-One small note before we start: if you feel dizzy at any point, just go back to your normal breath. Your body always knows best. And if you\'re pregnant, keep everything soft and gentle, no holding of the breath.
+One small note before we start: if you feel dizzy at any point, just go back to your normal breath. Your body always knows best. And if you\'re pregnant, keep everything soft and gentle, with no breath holds.
 
 [3:30 · BREATHWORK: ARRIVING BREATH]
 
@@ -82,9 +82,9 @@ Before we close, I\'d love you to choose one word for today. One word for how yo
 
 Calm. Gentle. Brave. Present. Soft. Strong.
 
-If you like, write your word into the chat, so we can carry each other\'s words today.
+If you like, write your word in the chat, so we can carry each other\'s words today.
 
-[wait, and read some words out loud with the names]
+[wait, and read some words out loud with their names]
 
 What beautiful words. Let\'s keep them with us.
 
@@ -131,7 +131,7 @@ Let\'s make your space cosy.
 
 Find a seat where your back can be long, on a chair, on the sofa, or on the floor with a cushion under you. Have something to drink next to you, and if you like, a pen and a piece of paper for later.
 
-Wrap a blanket around you if it\'s cold where you are. Here in the mountains, the mornings are already very fresh.
+Wrap a blanket around you if it\'s cold where you are. Here in the mountains, the mornings are already really chilly.
 
 [pause]
 
@@ -141,7 +141,7 @@ And now just notice how you arrived this morning. Your body. Your mood. Your tho
 
 I want to say something about breathwork before we begin.
 
-Over the years I\'ve done more than eleven hundred hours of training. Yoga, Pilates, rehab, nervous system regulation, Yoga Nidra. And still, the most important things I learned didn\'t come from any course. They came from my own hardest days. The days when I was tired in a way sleep doesn\'t fix, with four children and a full life around me.
+Over the years I\'ve done 1,150 hours of training. Yoga, Pilates, rehab, nervous system regulation, Yoga Nidra. And still, the most important things I learned didn\'t come from any course. They came from my own hardest days. The days when I was tired in a way sleep doesn\'t fix, with four children and a full life around me.
 
 On those days, my breath was always the first thing I could change. Before my thoughts, before my mood, before anything else.
 
@@ -197,7 +197,7 @@ As you breathe out, round your back and let your chin come towards your chest.
 
 [guide five slow rounds]
 
-Now lift your right arm up and lean gently to the left. Feel the long side of your body. Breathe into your ribs.
+Now lift your right arm up and lean gently to the left. Feel the whole side of your body lengthen. Breathe into your ribs.
 
 [hold three breaths]
 
@@ -243,9 +243,9 @@ Write down one sentence. Or just one word.
 
 [give them about one minute in silence]
 
-And if you\'d like, write your word into the chat, so we can carry each other\'s intentions today.
+And if you\'d like, write your word in the chat, so we can carry each other\'s intentions today.
 
-[wait, and read some words out loud with the names]
+[wait, and read some words out loud with their names]
 
 [react warmly, for example:] Look at these words. What a beautiful way to start a day.
 
@@ -304,7 +304,7 @@ This is {title}. Fifteen minutes to close your day gently. Dim the lights if you
 
 Tonight we\'re going to do a little cleansing ritual together, to clear the day and make space for rest.
 
-If you have something to burn gently, like a bundle of herbs, a little rosemary, or a stick of incense, you can have it ready now with a lighter and a fireproof bowl. Please open a window a little, and never leave the smoke unattended.
+If you have something for smoke cleansing, like a bundle of herbs, a sprig of rosemary, or a stick of incense, you can have it ready now with a lighter and a fireproof bowl. Please open a window a little, and never leave the smoke unattended.
 
 And if you don\'t have anything like that, or you don\'t want smoke at home, a candle is perfect. And if you have nothing at all, your breath is enough. Truly.
 
@@ -364,7 +364,7 @@ And one more time. In … and let it go.
 
 [10:00 · YOUR TURN]
 
-If you like, write into the chat one word for what you\'re letting go of tonight. Or one word for what you want to feel instead.
+If you like, write one word in the chat for what you\'re letting go of tonight. Or one word for what you want to feel instead.
 
 [wait, and read some words gently, with the names]
 
@@ -380,11 +380,11 @@ It\'s lovely to choose something you like the smell of. Rosemary, lavender, a li
 
 [12:00 · AN INVITATION]
 
-If tonight helped you to close your day, come back next time. We\'ll do this together again.
+If tonight helped you close your day, come back next time. We\'ll do this together again.
 
 And if you\'d like rituals like this every month, for the mornings, the evenings and the hard days in between, my Mindful Movement Method opens on the 1st of December, and you can already book your place.
 
-[If you show an offer tonight: show it now, and say:] I\'ve put something on your screen for you. Read it in peace, there\'s no rush.
+[If you show an offer tonight: show it now, and say:] I\'ve put something on your screen for you. Read it whenever you\'re ready, there\'s no rush.
 
 [13:30 · CLOSING]
 
@@ -479,11 +479,11 @@ Again. Breathe in … and let it go a little more.
 
 [pause]
 
-If you like, fold the paper and put it aside. You can tear up the last line tomorrow, or simply throw it away. And keep the three good things.
+If you like, fold the paper and put it aside. You can tear off the last line tomorrow, or simply throw it away. And keep the three good things.
 
 [11:30 · YOUR TURN]
 
-If you\'d like to share, write one of your good things into the chat. Let\'s fill this room with the small good moments of today.
+If you\'d like to share, write one of your good things in the chat. Let\'s fill this room with the small good moments of today.
 
 [wait, and read some out loud with the names]
 
@@ -569,7 +569,7 @@ And if you need to get up again, roll onto your side first, rest there for a bre
 
 [softly]
 
-If tonight did you good, come back to the next Gathering. They\'re free, and you\'ll find the date on moveciamovement.com.
+If tonight was good for you, come back to the next Gathering. They\'re free, and you\'ll find the date on moveciamovement.com.
 
 And if you want evenings like this as part of your life, with deep rest, breathwork and gentle movement whenever you need it, my Mindful Movement Method opens on the 1st of December, and you can already book your place.
 
@@ -594,7 +594,13 @@ Good evening, wild hearts, and welcome to our Samhain Gathering.
 
 Let me greet everyone who has gathered tonight. {names}. I\'m so happy you\'re here on this special night.
 
-This is {title}. For the next twenty minutes, we\'ll mark the turning of the year together. You don\'t need to know anything about Samhain, and you don\'t need to believe anything in particular. Just come as you are. Camera on or off, completely up to you.
+Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, Pilates and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
+
+[optional: one more sentence about you, for example why you started this circle]
+
+And one small note for our time together: please mute your microphone so we can all hear each other well. You\'re welcome to keep your camera on, but you don\'t have to. You can switch it off at any time, for your privacy or during the breathing practices, if you\'d like to turn inwards completely.
+
+This is {title}. For the next twenty minutes, we\'ll mark the turning of the year together. You don\'t need to know anything about Samhain, and you don\'t need to believe anything in particular. Just come as you are.
 
 [pause]
 
@@ -608,7 +614,7 @@ If you\'d like to work with smoke tonight, have your herbs or incense and a fire
 
 [3:00 · WHAT IS SAMHAIN]
 
-Tonight, on the 31st of October, many people around the world celebrate Halloween. But long before that, the old Celtic people celebrated Samhain.
+Tonight, on the 31st of October, many people around the world celebrate Halloween. But long before that, the ancient Celts celebrated Samhain.
 
 In the Wheel of the Year, Samhain is the end of the harvest and the beginning of the dark half of the year. For many, it\'s the old New Year. The fields are empty, the leaves have fallen, and nature pulls back into the earth to rest.
 
@@ -644,7 +650,7 @@ What did she carry? What did she give you, without even knowing it?
 
 [pause, about thirty seconds in silence]
 
-If you like, write her name into the chat. Let\'s honour them together tonight.
+If you like, write her name in the chat. Let\'s honour them together tonight.
 
 [wait, and read some names softly]
 
@@ -686,7 +692,7 @@ If you\'d like, share your seed in the chat, just one word or one sentence.
 
 A question I often get is: "Why do I feel so tired and quiet at this time of year?"
 
-Because you\'re part of nature. The trees let go of their leaves, the animals slow down, and so do we. The dark half of the year invites us to rest more, sleep more, and go inwards. That isn\'t weakness. It\'s a rhythm much older than our to-do lists. Allow yourself to follow it a little.
+Because you\'re part of nature. The trees let go of their leaves, the animals slow down, and so do we. The dark half of the year invites us to rest more, sleep more, and turn inwards. That isn\'t weakness. It\'s a rhythm much older than our to-do lists. Allow yourself to follow it a little.
 
 [16:30 · AN INVITATION]
 
@@ -696,7 +702,7 @@ Our next Gathering is coming up soon, and of course it\'s free. You\'ll always f
 
 And for the women who want to go deeper, there is Unfold, my three months of guidance from the 10th of January: a weekly live call, two movement videos a week and workbooks for your mental load, your worth and your ideas. There are only ten places.
 
-And now a little secret, because you are here tonight: my Mindful Movement Method opens on the 1st of December. Yoga flows, somatic movement, breathwork and meditation on demand, from five to thirty minutes, for full days and for tired days, and every month a new programme with a workbook. Just in time for the new year, so your intentions don\'t stay alone.
+And now a little secret, because you are here tonight: my Mindful Movement Method opens on the 1st of December. Yoga flows, somatic movement, breathwork and meditation on demand, from five to thirty minutes, for full days and for tired days, and every month a new programme with a workbook. Just in time for the new year, so you\'re not on your own with your New Year\'s intentions.
 
 Tonight you can already book your place at the Gathering price, your first month for 19 euros instead of 29. Nothing is charged today. Your first payment is only taken on the 1st of December, when the Method opens.
 
@@ -716,7 +722,7 @@ Now blow out your candle, and let your herbs rest safely until they\'re complete
 
 [blow yours out]
 
-Happy Samhain, wild hearts. Happy New Year in the Wheel of the Year. Thank you for being here tonight.
+Happy Samhain, wild hearts. Happy New Year on the Wheel of the Year. Thank you for being here tonight.
 
 Good night.'],
     ['Themed · 15 min · More than you think', '[0:00 · ARRIVING]
@@ -725,9 +731,15 @@ Hi, and welcome. Come in, come in.
 
 I can see you arriving one by one, and I want to say hello to each of you properly. {names}. I\'m so glad you\'re here.
 
+Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, Pilates and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
+
+[optional: one more sentence about you, for example why you started this circle]
+
+And one small note for our time together: please mute your microphone so we can all hear each other well. You\'re welcome to keep your camera on, but you don\'t have to. You can switch it off at any time, for your privacy or during the breathing practices, if you\'d like to turn inwards completely.
+
 If you\'re still finding your spot, take your time. Maybe you have a cup of tea next to you, maybe you just put a child to bed, maybe you\'re still in your work clothes. However you arrived tonight is exactly right. You don\'t have to be ready for this. You only have to be here.
 
-This is {title}, and for the next fifteen minutes there is nothing you need to do, nothing you need to fix, and nothing you need to get right. Your camera can be on or off, whatever feels good for you. If you\'d rather listen with your eyes closed, that is welcome here too.
+This is {title}, and for the next fifteen minutes there is nothing you need to do, nothing you need to fix, and nothing you need to get right. If you\'d rather listen with your eyes closed, that is welcome here too.
 
 [pause]
 
@@ -789,7 +801,7 @@ So I want to invite you to try this with me right now.
 
 Think about your day today. Not the things you didn\'t do. The things you did, the invisible ones too. The thing you carried. The person you held. The moment you kept going when you really wanted to stop.
 
-And if you\'d like, write one of them into the chat. Just one. It can be tiny. "I made it to work on time." "I didn\'t shout today." "I called my mum." It all counts here.
+And if you\'d like, write one of them in the chat. Just one. It can be tiny. "I made it to work on time." "I didn\'t shout today." "I called my mum." It all counts here.
 
 [wait, and read some answers out loud gently, with the names if they are not anonymous]
 
@@ -848,7 +860,13 @@ Hello, hello. Welcome, wild hearts.
 
 Let me say hi to everyone who is here tonight. {names}. It is so good to see you.
 
-Wherever you are joining from, whether it\'s your kitchen table, your bed, or your car in a parking lot because that was the only quiet place you could find, you are welcome here exactly like that.
+Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, Pilates and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
+
+[optional: one more sentence about you, for example why you started this circle]
+
+And one small note for our time together: please mute your microphone so we can all hear each other well. You\'re welcome to keep your camera on, but you don\'t have to. You can switch it off at any time, for your privacy or during the breathing practices, if you\'d like to turn inwards completely.
+
+Wherever you are joining from, whether it\'s your kitchen table, your bed, or your car in a car park because that was the only quiet place you could find, you are welcome here exactly like that.
 
 This is {title}. Fifteen minutes that belong to you. You don\'t need to perform anything, you don\'t need to say anything if you don\'t want to. Just be here with us.
 
@@ -878,7 +896,7 @@ Good. You\'re here.
 
 Tonight I want to talk about starting over.
 
-About those moments in life when everything changes, and you suddenly don\'t really know who you are anymore. A move, a baby, a new job, a breakup, a body that feels different than it used to. Maybe you\'re in one of those moments right now.
+About those moments in life when everything changes, and you suddenly don\'t really know who you are anymore. A move, a baby, a new job, a breakup, a body that doesn\'t feel the way it used to. Maybe you\'re in one of those moments right now.
 
 And I want to tell you about mine.
 
@@ -888,13 +906,13 @@ In 2019 I moved to Tyrol. I was pregnant, I was in a new place, in the mountains
 
 In this valley, a lot of people work in tourism, in the hotels. And I knew one thing very clearly: that was not my path. But I didn\'t know yet what my path was.
 
-Then my daughter was born. And in that first time with a newborn, I started going to yoga classes. Not because I had a big plan. I went because I needed something that was just for me. One hour where nobody needed anything from me, where I could feel my own body again after pregnancy and birth.
+Then my daughter was born. And in those first months with a newborn, I started going to yoga classes. Not because I had a big plan. I went because I needed something that was just for me. One hour where nobody needed anything from me, where I could feel my own body again after pregnancy and birth.
 
 [your detail: how you felt in those first classes, maybe what your body felt like, or a moment you remember]
 
 And slowly, something came back. Not my old self. Something new.
 
-About a year later I started my yoga teacher training. It was in the middle of Covid, so a lot of it happened online. I had a lot of time at home, and the whole world was standing still. And from there, one step led to the next. More trainings. Pilates. Somatic work, nervous system regulation, Yoga Nidra, prenatal and postnatal yoga.
+About a year later I started my yoga teacher training. It was in the middle of Covid, so a lot of it happened online. I had a lot of time at home, and the whole world was standing still. And from there, one step led to the next. More courses. Pilates. Somatic work, nervous system regulation, Yoga Nidra, prenatal and postnatal yoga.
 
 And I still remember my very first personal training session. I charged twenty-five euros for the hour. I was nervous and so proud at the same time.
 
@@ -942,15 +960,15 @@ And then slowly come back to stillness. Notice how your body feels now. Even a t
 
 A question I often get is: "How did you find the courage to start something new with small children?"
 
-And honestly? I didn\'t feel courageous. I felt tired, and a bit lost. I didn\'t wait until I felt ready. I took one small step, and then the next one. One yoga class. One training. One client. Courage often comes after the first step, not before it.
+And honestly? I didn\'t feel courageous. I felt tired, and a bit lost. I didn\'t wait until I felt ready. I took one small step, and then the next one. One yoga class. One course. One client. Courage often comes after the first step, not before it.
 
 [13:30 · AN INVITATION]
 
-This is what we do in the Wild Hearts Collective. We make space for women who are in the middle of something, and we walk next to each other.
+This is what we do in the Wild Hearts Collective. We make space for women who are in the middle of something, and we walk alongside each other.
 
-If you\'d like to keep going, come to the next Gathering. And if you\'re standing at the beginning of something that really matters to you, an idea, a project, a new chapter, then have a look at Unfold. It\'s three months together, from the 10th of January, for women who want to come back to themselves and take the first real steps towards their idea, with someone next to them the whole way.
+If you\'d like to keep going, come to the next Gathering. And if you\'re standing at the beginning of something that really matters to you, an idea, a project, a new chapter, then have a look at Unfold. It\'s three months together, from the 10th of January, for women who want to come back to themselves and take the first real steps towards their idea, with someone by their side the whole way.
 
-[If you show an offer tonight: show it now, and say:] I\'ve put it on your screen right now, so you can read about it in peace.
+[If you show an offer tonight: show it now, and say:] I\'ve put it on your screen right now, so you can read about it in your own time.
 
 [14:30 · CLOSING]
 
@@ -967,9 +985,15 @@ Hi everyone, welcome. I\'m so happy to see you.
 
 Let me greet you one by one. {names}. Thank you for coming tonight.
 
+Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, Pilates and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
+
+[optional: one more sentence about you, for example why you started this circle]
+
+And one small note for our time together: please mute your microphone so we can all hear each other well. You\'re welcome to keep your camera on, but you don\'t have to. You can switch it off at any time, for your privacy or during the breathing practices, if you\'d like to turn inwards completely.
+
 Some of you have been with me for years, some of you maybe since my very first training sessions, and some of you are completely new. Whoever you are, you belong in this circle tonight.
 
-This is {title}. For the next fifteen minutes, nobody needs anything from you. You can keep your camera on or turn it off, you can lie down, you can sit with a blanket. This is your time.
+This is {title}. For the next fifteen minutes, nobody needs anything from you. You can lie down, or sit wrapped in a blanket. This is your time.
 
 [pause]
 
@@ -999,11 +1023,11 @@ A longer out-breath tells your nervous system: you are safe right now. You can l
 
 Tonight I want to tell you how this whole circle actually started. Because it didn\'t start with a big plan. It started with something I noticed in my work, again and again, until I couldn\'t ignore it anymore.
 
-The title I would give it is: it was never just about fitness.
+If I had to give it a title, it would be: it was never just about fitness.
 
 [4:30 · MY STORY]
 
-My very first personal training session cost twenty-five euros. I remember how excited I was. I had all my trainings behind me, more than eleven hundred hours of yoga, Pilates, rehab and nervous system work, and I thought: now I know exactly what to do. My job is to get women moving.
+My very first personal training session cost twenty-five euros. I remember how excited I was. I had finished all my training, 1,150 hours of yoga, Pilates, rehab and nervous system work, and I thought: now I know exactly what to do. My job is to get women moving.
 
 And I was only half right.
 
@@ -1094,9 +1118,15 @@ Hello, wild hearts. Welcome, welcome.
 
 Let me see who\'s here tonight. {names}. I\'m really glad you made it.
 
+Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, Pilates and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
+
+[optional: one more sentence about you, for example why you started this circle]
+
+And one small note for our time together: please mute your microphone so we can all hear each other well. You\'re welcome to keep your camera on, but you don\'t have to. You can switch it off at any time, for your privacy or during the breathing practices, if you\'d like to turn inwards completely.
+
 Maybe you almost didn\'t come. Maybe you thought: I\'m too tired, I have no time, I\'ll just watch the next one. And you came anyway. Thank you for choosing yourself for these fifteen minutes.
 
-This is {title}. There is nothing you need to bring tonight except yourself. Camera on or off, eyes open or closed, completely up to you.
+This is {title}. There is nothing you need to bring tonight except yourself. Eyes open or closed, completely up to you.
 
 [pause]
 
@@ -1132,7 +1162,7 @@ It\'s about letting go. Of things, and sometimes of people, that don\'t fit you 
 
 For a long time, I held on to friendships that didn\'t feel good anymore. I think many of us do this. We learned that this is what you do. You stay. You make it work. You don\'t make a fuss.
 
-Even when someone keeps crossing your values. Even when you leave a conversation feeling smaller than before. Even when deep down, you already know: I\'m done here.
+Even when someone keeps disregarding your values. Even when you leave a conversation feeling smaller than before. Even when deep down, you already know: I\'m done here.
 
 [your detail: what it felt like for you, for example the moment you noticed it, without naming anyone]
 
@@ -1196,13 +1226,13 @@ I understand that fear so well. And sometimes there is a quiet time in between, 
 
 [13:30 · AN INVITATION]
 
-And if there\'s an idea in you that keeps spinning around, a project, a dream, a new chapter, then I want you to know that change is possible, and I\'d love to walk that way with you.
+And if there\'s an idea in you that keeps spinning around, a project, a dream, a new chapter, then I want you to know that change is possible, and I\'d love to walk that path with you.
 
 That\'s what Unfold is for. Three months together from the 10th of January, with only ten places, for women who want to turn their idea into something real. And if you simply want to come back to yourself in nature, keep an eye on our Wild Hearts Alpine Retreat here in the Tyrolean mountains, planned for 2028.
 
 And of course, the next Gathering is always free. I\'d love to see you there.
 
-[If you show an offer tonight: show it now, and say:] I\'ve put it on your screen for you now. Read it in peace, and only if it feels right.
+[If you show an offer tonight: show it now, and say:] I\'ve put it on your screen for you now. Read it in your own time, and only if it feels right.
 
 [14:30 · CLOSING]
 

@@ -22,7 +22,7 @@ Das ist {title}, und in den nächsten fünfzehn Minuten gibt es nichts, was du t
 
 [1:30 · LANDEN]
 
-Bevor wir sprechen, lasst uns gemeinsam landen.
+Bevor wir sprechen, lasst uns gemeinsam ankommen.
 
 Lass deine Schultern ein kleines bisschen sinken und deinen Kiefer weich werden. Wenn du magst, leg eine Hand auf deine Brust.
 
@@ -102,7 +102,7 @@ Und jetzt klopf mit deinen Händen sanft deine Arme ab, von den Schultern bis zu
 
 Dann lass deine Hände wieder ruhen und schließ die Augen, wenn du magst.
 
-Und sag dir leise: Ich habe heute genug getan. Ich bin heute genug.
+Und sag dir leise: Ich habe heute genug getan. So, wie ich heute bin, ist es gut.
 
 [Pause, ein paar Atemzüge]
 
@@ -112,15 +112,15 @@ Und sag dir leise: Ich habe heute genug getan. Ich bin heute genug.
 
 Eine Frage, die ich oft bekomme, ist: „Viv, aber was ist, wenn ich die wichtigen Dinge wirklich nicht geschafft habe?“
 
-Das verstehe ich gut. Manche Tage lassen die wichtigen Dinge warten, und sie sind morgen auch noch da. Aber dein Wert wird nicht von deiner To-do-Liste bestimmt. Du kannst eine Frau sein, die ihre Liste nicht geschafft hat, und trotzdem eine Frau, die heute viel Gutes getan hat. Beides ist gleichzeitig wahr.
+Das verstehe ich gut. An manchen Tagen müssen die wichtigen Dinge warten, und sie sind morgen auch noch da. Aber dein Wert wird nicht von deiner To-do-Liste bestimmt. Du kannst eine Frau sein, die ihre Liste nicht geschafft hat, und trotzdem eine Frau, die heute viel Gutes getan hat. Beides ist gleichzeitig wahr.
 
 [13:30 · EINE EINLADUNG]
 
 Genau das tun wir in diesem Kreis. Wir kommen zusammen, wir atmen, wir sagen die Wahrheit, und wir erinnern einander daran, was wir tragen, und wer wir unter all dem sind.
 
-Wenn sich der heutige Abend gut für dich angefühlt hat, würde ich mich so freuen, dich beim nächsten Gathering wiederzusehen. Und wenn du mehr davon möchtest, jeden Monat und mit einem echten Kreis von Frauen um dich herum, dann schau dir Unfold an, meine dreimonatige Begleitung ab dem 10. Jänner. Ich habe sie genau dafür gebaut, für Frauen, die so viel geben und einen Ort brauchen, an dem sie zu sich zurückfinden.
+Wenn sich der heutige Abend gut für dich angefühlt hat, würde ich mich so freuen, dich beim nächsten Gathering wiederzusehen. Und wenn du mehr davon möchtest, jeden Monat und mit einem echten Kreis von Frauen um dich herum, dann schau dir Unfold an, meine dreimonatige Begleitung ab dem 10. Jänner. Ich habe sie genau dafür entwickelt, für Frauen, die so viel geben und einen Ort brauchen, an dem sie zu sich zurückfinden.
 
-[Wenn du heute ein Angebot zeigst: jetzt einblenden und sagen:] Ich habe dir gerade etwas auf den Bildschirm gelegt. Schau es dir in Ruhe an, ganz ohne Druck.
+[Wenn du heute ein Angebot zeigst: jetzt einblenden und sagen:] Ich habe dir gerade etwas eingeblendet. Schau es dir in Ruhe an, ganz ohne Druck.
 
 [14:30 · ABSCHLUSS]
 
@@ -128,7 +128,7 @@ Bevor ihr geht, lasst uns noch einen letzten gemeinsamen Atemzug nehmen. Ein dur
 
 Danke, dass ihr da wart. Danke für alles, was ihr heute getan habt, für das, was alle gesehen haben, und für das, was niemand gesehen hat.
 
-Du bist nicht im Rückstand. Du trägst viel, und du tust es mit Liebe.
+Du hinkst nicht hinterher. Du trägst viel, und du tust es mit Liebe.
 
 Schlaft gut, ihr wilden Herzen. Bis bald.',
   'Themed · 15 min · Starting over' => '[0:00 · ANKOMMEN]
@@ -241,11 +241,11 @@ Ganz ehrlich? Ich habe mich nicht mutig gefühlt, sondern müde und ein bisschen
 
 [13:30 · EINE EINLADUNG]
 
-Genau das tun wir im Wild Hearts Collective. Wir schaffen Raum für Frauen, die gerade mitten in etwas stecken, und wir gehen nebeneinander her.
+Genau das tun wir im Wild Hearts Collective. Wir schaffen Raum für Frauen, die gerade mitten in etwas stecken, und wir begleiten einander.
 
 Wenn du weitermachen möchtest, komm zum nächsten Gathering. Und wenn du am Anfang von etwas stehst, das dir wirklich wichtig ist, einer Idee, einem Projekt, einem neuen Kapitel, dann schau dir Unfold an. Das sind drei Monate gemeinsam ab dem 10. Jänner, für Frauen, die zu sich zurückfinden und die ersten echten Schritte zu ihrer Idee gehen möchten, mit jemandem an ihrer Seite, den ganzen Weg lang.
 
-[Wenn du heute ein Angebot zeigst: jetzt einblenden und sagen:] Ich habe es dir gerade auf den Bildschirm gelegt, damit du in Ruhe darüber lesen kannst.
+[Wenn du heute ein Angebot zeigst: jetzt einblenden und sagen:] Ich habe es dir gerade eingeblendet, damit du es in Ruhe lesen kannst.
 
 [14:30 · ABSCHLUSS]
 
@@ -255,7 +255,7 @@ Danke, dass ihr heute Abend da wart und so ehrlich mit euch selbst.
 
 Wo auch immer du gerade neu anfängst, du fängst nicht bei null an. Du fängst mit allem an, was du bis jetzt gelebt hast.
 
-Kommt gut nach Hause, ihr wilden Herzen. Bis bald.',
+Passt gut auf euch auf, ihr wilden Herzen. Bis bald.',
   'Themed · 15 min · It was never just about fitness' => '[0:00 · ANKOMMEN]
 
 Hallo ihr Lieben, herzlich willkommen. Ich freue mich so, euch zu sehen.
@@ -270,7 +270,7 @@ Und noch ein kleiner Hinweis für unsere gemeinsame Zeit: Bitte schaltet euer Mi
 
 Manche von euch begleiten mich schon seit Jahren, manche vielleicht seit meinen allerersten Trainings, und manche sind ganz neu. Wer auch immer du bist, du gehörst heute Abend in diesen Kreis.
 
-Das ist {title}. In den nächsten fünfzehn Minuten braucht niemand etwas von dir. Das ist deine Zeit.
+Das ist {title}. In den nächsten fünfzehn Minuten braucht niemand etwas von dir. Du kannst dich hinlegen oder dich mit einer Decke einkuscheln. Das ist deine Zeit.
 
 [Pause]
 
@@ -304,11 +304,11 @@ Wenn ich der Geschichte einen Titel geben müsste, dann diesen: Es ging nie nur 
 
 [4:30 · MEINE GESCHICHTE]
 
-Mein allererstes Personal Training hat fünfundzwanzig Euro gekostet. Ich weiß noch, wie aufgeregt ich war. Ich hatte meine ganzen Ausbildungen hinter mir, mehr als elfhundert Stunden Yoga, Pilates, Rehabilitation und Arbeit mit dem Nervensystem, und ich dachte: Jetzt weiß ich genau, was zu tun ist. Meine Aufgabe ist es, Frauen in Bewegung zu bringen.
+Mein allererstes Personal Training hat fünfundzwanzig Euro gekostet. Ich weiß noch, wie aufgeregt ich war. Ich hatte meine ganzen Ausbildungen hinter mir, 1.150 Stunden Yoga, Pilates, Rehabilitation und Arbeit mit dem Nervensystem, und ich dachte: Jetzt weiß ich genau, was zu tun ist. Meine Aufgabe ist es, Frauen in Bewegung zu bringen.
 
 Und damit hatte ich nur zur Hälfte recht.
 
-Denn fast jede Frau, mit der ich trainiert habe, hat mir früher oder später erzählt, wie erschöpft sie ist. Nicht müde nach einer schlechten Nacht, sondern erschöpft, obwohl sie gut geschlafen hatte. Müde auf eine Art, die Schlaf nicht wieder gutmacht, mit einer To-do-Liste, die einfach nie endet.
+Denn fast jede Frau, mit der ich trainiert habe, hat mir früher oder später erzählt, wie erschöpft sie ist. Nicht müde nach einer schlechten Nacht, sondern erschöpft, obwohl sie gut geschlafen hatte. Müde auf eine Art, gegen die kein Schlaf hilft, mit einer To-do-Liste, die einfach nie endet.
 
 Und so oft habe ich zu Beginn einer Stunde einen Satz wie diesen gehört:
 
@@ -322,7 +322,7 @@ Also habe ich angefangen, mich anzupassen. An manchen Tagen haben wir hart train
 
 [dein Detail: ein Moment mit einer Kundin, an den du dich erinnerst, ohne ihren Namen, zum Beispiel eine Stunde, die ganz anders endete als geplant]
 
-Und jetzt kommt der ehrliche Teil: Ich habe solche Tage auch. Ich bin Mama von vier Kindern, und es gibt Tage, an denen ich down bin und genau auf diese Art müde. An diesen Tagen habe ich das gemacht, was ich gelernt hatte: atmen, sanfte Bewegung, kleine Rituale, um mich selbst zu regulieren. Und genau diese Dinge habe ich dann an die Frauen weitergegeben, mit denen ich gearbeitet habe.
+Und jetzt kommt der ehrliche Teil: Ich habe solche Tage auch. Ich bin Mama von vier Kindern, und es gibt Tage, an denen es mir nicht gut geht und ich genau auf diese Art müde bin. An diesen Tagen habe ich das gemacht, was ich gelernt hatte: atmen, sanfte Bewegung, kleine Rituale, um mich selbst zu regulieren. Und genau diese Dinge habe ich dann an die Frauen weitergegeben, mit denen ich gearbeitet habe.
 
 Und es hat funktioniert, immer wieder, seit 2019.
 
@@ -368,17 +368,17 @@ Vielleicht darf Müdigkeit sein, vielleicht Traurigkeit, vielleicht Freude. Was 
 
 [Wenn im Chat oder in deinem Fragen-Feld eine Frage steht, beantworte sie hier. Sonst nimm diese:]
 
-Eine Frage, die ich oft bekomme, ist: „Aber Viv, muss ich mich nicht pushen, um Ergebnisse zu sehen?“
+Eine Frage, die ich oft bekomme, ist: „Aber Viv, muss ich mich nicht richtig fordern, um Ergebnisse zu sehen?“
 
-Manchmal schon. Es gibt Tage zum Pushen, und das kann sich großartig anfühlen. Aber wenn du einen Körper pushst, der schon erschöpft ist, wirst du nicht stärker, sondern leerer. Das eigentliche Ergebnis ist ein Körper, in dem du gern lebst, und eine Frau, die nicht auf Reserve läuft. Und das beginnt oft damit, zuerst sanft zu sein.
+Manchmal schon. Es gibt Tage, an denen du dich fordern darfst, und das kann sich großartig anfühlen. Aber wenn du einen Körper antreibst, der schon erschöpft ist, wirst du nicht stärker, sondern leerer. Das eigentliche Ergebnis ist ein Körper, in dem du gern lebst, und eine Frau, die nicht auf Reserve läuft. Und das beginnt oft damit, zuerst sanft zu sein.
 
 [13:30 · EINE EINLADUNG]
 
 Diesen Kreis gibt es, weil sich so viele Frauen mit ihrer Erschöpfung allein fühlen. Und wenn eine andere Frau sagt „mir geht es genauso“, kann das einen ganzen Tag verändern.
 
-Wenn dir der heutige Abend auch nur ein bisschen gutgetan hat, komm zum nächsten Gathering wieder. Und wenn du das jeden Monat möchtest, mit Ritualen, Atemarbeit, kurzen Bewegungseinheiten und einem kleinen Kreis von Frauen, die einander halten, dann ist Unfold für dich. Es beginnt am 10. Jänner, und du kannst dir deinen Platz schon jetzt sichern.
+Wenn dir der heutige Abend auch nur ein bisschen gutgetan hat, komm zum nächsten Gathering wieder. Und wenn du das jeden Monat möchtest, mit Ritualen, Atemarbeit, kurzen Bewegungseinheiten und einem kleinen Kreis von Frauen, die einander Halt geben, dann ist Unfold für dich. Es beginnt am 10. Jänner, und du kannst dir deinen Platz schon jetzt sichern.
 
-[Wenn du heute ein Angebot zeigst: jetzt einblenden und sagen:] Ich habe es dir auf den Bildschirm gelegt, damit du es dir anschauen kannst, während wir zum Abschluss kommen.
+[Wenn du heute ein Angebot zeigst: jetzt einblenden und sagen:] Ich habe es dir eingeblendet, damit du es dir anschauen kannst, während wir zum Abschluss kommen.
 
 [14:30 · ABSCHLUSS]
 
@@ -401,9 +401,9 @@ Bevor wir anfangen, stelle ich mich kurz für alle vor, die neu hier sind. Ich b
 
 Und noch ein kleiner Hinweis für unsere gemeinsame Zeit: Bitte schaltet euer Mikrofon stumm, damit wir einander gut hören. Eure Kamera darf gern an bleiben, sie muss es aber nicht. Ihr dürft sie jederzeit ausschalten, für eure Privatsphäre oder während der Atemübungen, wenn ihr ganz bei euch sein möchtet.
 
-Vielleicht wärst du heute fast nicht gekommen. Vielleicht hast du gedacht: Ich bin zu müde, ich habe keine Zeit, ich schaue einfach beim nächsten Mal. Und du bist trotzdem gekommen. Danke, dass du dich für diese fünfzehn Minuten selbst gewählt hast.
+Vielleicht wärst du heute fast nicht gekommen. Vielleicht hast du gedacht: Ich bin zu müde, ich habe keine Zeit, ich schaue einfach beim nächsten Mal. Und du bist trotzdem gekommen. Danke, dass du dir diese fünfzehn Minuten für dich selbst genommen hast.
 
-Das ist {title}. Du musst heute Abend nichts mitbringen außer dich selbst.
+Das ist {title}. Du musst heute Abend nichts mitbringen außer dich selbst. Augen offen oder geschlossen, ganz wie du magst.
 
 [Pause]
 
@@ -439,7 +439,7 @@ Es geht ums Loslassen, um Dinge und manchmal auch um Menschen, die nicht mehr zu
 
 Lange Zeit habe ich an Freundschaften festgehalten, die sich nicht mehr gut angefühlt haben. Ich glaube, viele von uns tun das. Wir haben gelernt, dass man das so macht: Man bleibt, man sorgt dafür, dass es funktioniert, und man macht kein großes Theater.
 
-Auch dann, wenn jemand immer wieder deine Werte übergeht. Auch dann, wenn du nach einem Gespräch kleiner bist als vorher. Auch dann, wenn du tief in dir schon weißt: Für mich ist das hier vorbei.
+Auch dann, wenn sich jemand immer wieder über deine Werte hinwegsetzt. Auch dann, wenn du dich nach einem Gespräch kleiner fühlst als vorher. Auch dann, wenn du tief in dir schon weißt: Für mich ist das hier vorbei.
 
 [dein Detail: wie sich das für dich angefühlt hat, zum Beispiel der Moment, in dem du es gemerkt hast, ohne jemanden zu nennen]
 
@@ -509,7 +509,7 @@ Genau dafür gibt es Unfold. Drei Monate gemeinsam ab dem 10. Jänner, mit nur z
 
 Und natürlich ist das nächste Gathering immer kostenlos. Ich würde mich freuen, dich dort zu sehen.
 
-[Wenn du heute ein Angebot zeigst: jetzt einblenden und sagen:] Ich habe es dir gerade auf den Bildschirm gelegt. Lies es in Ruhe, und nur, wenn es sich richtig anfühlt.
+[Wenn du heute ein Angebot zeigst: jetzt einblenden und sagen:] Ich habe es dir gerade eingeblendet. Lies es in Ruhe, und nur, wenn es sich richtig anfühlt.
 
 [14:30 · ABSCHLUSS]
 
@@ -517,7 +517,7 @@ Lasst uns noch einmal mit unseren Wurzeln schließen. Spür deine Füße … atm
 
 Danke, dass ihr da wart und heute Abend so ehrlich wart.
 
-Du darfst aus Dingen herauswachsen, und du darfst dich selbst wählen. Die richtigen Menschen werden dir dort begegnen.
+Du darfst aus Dingen herauswachsen, und du darfst dich für dich selbst entscheiden. Die richtigen Menschen werden dir dort begegnen.
 
 Schlaft gut, ihr wilden Herzen. Bis bald.',
   'Samhain · 20 min · Free gathering' => '[0:00 · ANKOMMEN]
@@ -634,11 +634,11 @@ Unser nächstes Gathering kommt bald, und natürlich ist es kostenlos. Das Datum
 
 Und für die Frauen, die tiefer gehen möchten, gibt es Unfold, meine dreimonatige Begleitung ab dem 10. Jänner: ein wöchentlicher Live-Call, zwei Bewegungsvideos pro Woche und Workbooks für deinen Mental Load, deinen Selbstwert und deine Ideen. Es gibt nur zehn Plätze.
 
-Und jetzt verrate ich euch noch etwas, weil ihr heute Abend da seid: Meine Mindful Movement Method öffnet am 1. Dezember. Yoga-Flows, Somatic Movement, Atemarbeit und Meditation zum Abrufen, von fünf bis dreißig Minuten, für volle und für müde Tage, und jeden Monat ein neues Programm mit Workbook. Genau rechtzeitig zum neuen Jahr, damit deine Vorsätze nicht allein bleiben.
+Und jetzt verrate ich euch noch etwas, weil ihr heute Abend da seid: Meine Mindful Movement Method öffnet am 1. Dezember. Yoga-Flows, Somatic Movement, Atemarbeit und Meditation zum Abrufen, von fünf bis dreißig Minuten, für volle und für müde Tage, und jeden Monat ein neues Programm mit Workbook. Genau rechtzeitig zum neuen Jahr, damit du mit deinen Vorsätzen nicht allein bist.
 
 Heute Abend kannst du dir deinen Platz schon zum Gathering-Preis sichern, deinen ersten Monat für 19 statt 29 Euro. Heute wird nichts abgebucht. Die erste Zahlung kommt erst am 1. Dezember, wenn die Method öffnet.
 
-[jetzt das Method-Angebot einblenden und sagen:] Ich habe es dir auf den Bildschirm gelegt. Lies es in Ruhe, und nur, wenn es sich richtig anfühlt.
+[jetzt das Method-Angebot einblenden und sagen:] Ich habe es dir eingeblendet. Lies es in Ruhe, und nur, wenn es sich richtig anfühlt.
 
 [18:30 · ABSCHLUSS]
 
@@ -723,13 +723,13 @@ Und lass den Rhythmus wieder los. Atme ganz natürlich.
 
 Ich möchte dir erzählen, warum ich das am Morgen so gern mache.
 
-Bei uns zu Hause können die Morgen ganz schön viel sein. Vier Kinder, Frühstück, Schultaschen, einer findet seinen Schuh nicht, eine will sich nicht anziehen. Und ich glaube, so viele von uns kennen das: direkt aus dem Bett in all das hinein, und man fühlt sich schon im Rückstand, bevor der Tag überhaupt angefangen hat.
+Bei uns zu Hause ist morgens oft ganz schön viel los. Vier Kinder, Frühstück, Schultaschen, einer findet seinen Schuh nicht, eine will sich nicht anziehen. Und ich glaube, so viele von uns kennen das: direkt aus dem Bett in all das hinein, und man fühlt sich schon im Rückstand, bevor der Tag überhaupt angefangen hat.
 
 [dein Detail: wie ein echter Morgen bei dir aussieht, ein kleiner Moment]
 
 Was mir an den schweren Tagen hilft, ist keine perfekte Routine. Es sind die Dinge, die ich gelernt habe und weitergebe: meinen Atem verlangsamen, ein wenig sanfte Bewegung, ein kleines Ritual nur für mich. Ein paar Atemzüge, bevor ich dem Tag die Tür öffne.
 
-Der Tag ist danach immer noch voll. Aber ich bin anders darin. Ein bisschen mehr bei mir und ein bisschen weniger gehetzt.
+Der Tag ist danach immer noch voll. Aber ich erlebe ihn anders. Ein bisschen mehr bei mir und ein bisschen weniger gehetzt.
 
 [10:00 · DEINE ABSICHT]
 
@@ -755,9 +755,9 @@ Dann nimm dir eine Minute. Vier Runden Box Breathing dauern ungefähr eine Minut
 
 Wenn sich dieser Morgen gut angefühlt hat, komm beim nächsten Mal wieder. Dann atmen wir wieder gemeinsam.
 
-Und wenn du dir für jeden Tag ein bisschen Unterstützung wünschst: Meine Reset Routine für müde Tage gibt es kostenlos auf moveciamovement.com, und meine Mindful Movement Method öffnet am 1. Dezember, mit kurzen Morgeneinheiten wie dieser, ganz wann es dir passt. Du kannst dir deinen Platz schon jetzt sichern.
+Und wenn du dir für jeden Tag ein bisschen Unterstützung wünschst: Meine Reset Routine für müde Tage gibt es kostenlos auf moveciamovement.com, und meine Mindful Movement Method öffnet am 1. Dezember, mit kurzen Morgeneinheiten wie dieser, wann immer es dir passt. Du kannst dir deinen Platz schon jetzt sichern.
 
-[Wenn du heute Morgen ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir etwas auf den Bildschirm gelegt. Schau es dir an, wann immer es dir passt.
+[Wenn du heute Morgen ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir etwas eingeblendet. Schau es dir an, wann immer es dir passt.
 
 [13:30 · ABSCHLUSS]
 
@@ -767,7 +767,7 @@ Leg deine Hand auf dein Herz und sag dir dein Wort ganz still noch einmal vor.
 
 Danke, dass du deinen Tag mit uns begonnen hast.
 
-Geh sanft in deinen Morgen, ihr wilden Herzen. Habt einen wunderschönen Tag.',
+Geht sanft in euren Morgen, ihr wilden Herzen. Habt einen wunderschönen Tag.',
   'Morning · 30 min · Breathwork & intention' => '[0:00 · ANKOMMEN]
 
 Guten Morgen, ihr wilden Herzen. Herzlich willkommen.
@@ -784,9 +784,9 @@ Das ist {title}. In den nächsten dreißig Minuten atmen wir, bewegen uns ein bi
 
 Lass uns deinen Platz gemütlich machen.
 
-Such dir einen Sitz, in dem dein Rücken lang sein darf, auf einem Stuhl, auf dem Sofa oder auf dem Boden mit einem Kissen unter dir. Stell dir etwas zu trinken daneben, und wenn du magst, einen Stift und einen Zettel für später.
+Such dir einen Platz, an dem dein Rücken lang sein darf, auf einem Stuhl, auf dem Sofa oder auf dem Boden mit einem Kissen unter dir. Stell dir etwas zu trinken daneben, und wenn du magst, einen Stift und einen Zettel für später.
 
-Wickel dich in eine Decke, wenn es bei dir kalt ist. Hier in den Bergen sind die Morgen schon ganz schön frisch.
+Wickle dich in eine Decke, wenn es bei dir kalt ist. Hier in den Bergen sind die Morgen schon ganz schön frisch.
 
 [Pause]
 
@@ -796,7 +796,7 @@ Und jetzt spür einfach nach, wie du heute Morgen angekommen bist. In deinem Kö
 
 Bevor wir anfangen, möchte ich dir noch etwas über Breathwork sagen.
 
-Über die Jahre habe ich mehr als elfhundert Stunden Ausbildung gemacht. Yoga, Pilates, Rehabilitation, Regulation des Nervensystems, Yoga Nidra. Und trotzdem habe ich das Wichtigste nicht in einem Kurs gelernt, sondern an meinen eigenen schwersten Tagen. An den Tagen, an denen ich auf eine Art müde war, gegen die kein Schlaf hilft, mit vier Kindern und einem vollen Leben um mich herum.
+Über die Jahre habe ich 1.150 Stunden Ausbildung gemacht. Yoga, Pilates, Rehabilitation, Regulation des Nervensystems, Yoga Nidra. Und trotzdem habe ich das Wichtigste nicht in einem Kurs gelernt, sondern an meinen eigenen schwersten Tagen. An den Tagen, an denen ich auf eine Art müde war, gegen die kein Schlaf hilft, mit vier Kindern und einem vollen Leben um mich herum.
 
 An diesen Tagen war mein Atem immer das Erste, was ich verändern konnte. Noch vor meinen Gedanken, vor meiner Stimmung und vor allem anderen.
 
@@ -852,7 +852,7 @@ Mit dem Ausatmen rundest du den Rücken und lässt das Kinn Richtung Brust sinke
 
 [fünf langsame Runden anleiten]
 
-Jetzt hebst du den rechten Arm und neigst dich sanft nach links. Spür die lange Seite deines Körpers und atme in deine Rippen.
+Jetzt hebst du den rechten Arm und neigst dich sanft nach links. Spür, wie die ganze Seite deines Körpers lang wird, und atme in deine Rippen.
 
 [drei Atemzüge halten]
 
@@ -928,7 +928,7 @@ Wenn du immer wieder zu Morgen wie diesem zurückkommen möchtest, sei beim näc
 
 Und wenn du das als Teil deines Lebens möchtest, mit Atemarbeit, kurzen Bewegungseinheiten und jeden Monat einem neuen Programm, dann öffnet meine Mindful Movement Method am 1. Dezember, und du kannst dir deinen Platz schon jetzt sichern.
 
-[Wenn du heute Morgen ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir jetzt etwas auf den Bildschirm gelegt. Schau es dir in Ruhe an.
+[Wenn du heute Morgen ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir jetzt etwas eingeblendet. Schau es dir in Ruhe an.
 
 [28:00 · ABSCHLUSS]
 
@@ -938,7 +938,7 @@ Lasst uns mit drei gemeinsamen Atemzügen schließen. Ein auf fünf … aus auf 
 
 Leg deine Hände auf dein Herz und sag dir deine Absicht noch einmal ganz still vor.
 
-Danke, dass du deinen Tag mit mir und miteinander begonnen hast.
+Danke, dass ihr euren Tag mit mir und miteinander begonnen habt.
 
 Ich wünsche dir, dass du dich heute Abend genau so fühlst, wie du es dir heute Morgen gewünscht hast.
 
@@ -967,7 +967,7 @@ Und wenn du nichts davon hast oder zu Hause keinen Rauch möchtest, ist eine Ker
 
 [3:00 · LANDEN]
 
-Lass uns zuerst landen.
+Lass uns zuerst ankommen.
 
 Setz dich bequem hin und lass deine Hände in deinem Schoß ruhen.
 
@@ -1039,7 +1039,7 @@ Wenn dir der heutige Abend geholfen hat, deinen Tag abzuschließen, komm beim n�
 
 Und wenn du dir solche Rituale jeden Monat wünschst, für die Morgen, für die Abende und für die schweren Tage dazwischen, dann öffnet meine Mindful Movement Method am 1. Dezember, und du kannst dir deinen Platz schon jetzt sichern.
 
-[Wenn du heute Abend ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir etwas auf den Bildschirm gelegt. Lies es in Ruhe, es eilt nicht.
+[Wenn du heute Abend ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir etwas eingeblendet. Lies es in Ruhe, es eilt nicht.
 
 [13:30 · ABSCHLUSS]
 
@@ -1228,7 +1228,7 @@ Wenn dir der heutige Abend gutgetan hat, komm zum nächsten Gathering. Die Gathe
 
 Und wenn du solche Abende als Teil deines Lebens möchtest, mit tiefer Ruhe, Atemarbeit und sanfter Bewegung, immer dann, wenn du sie brauchst, dann öffnet meine Mindful Movement Method am 1. Dezember, und du kannst dir deinen Platz schon jetzt sichern.
 
-[Wenn du heute Abend ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir etwas auf den Bildschirm gelegt. Schau es dir morgen an, wenn du ausgeruht bist. Es eilt nicht.
+[Wenn du heute Abend ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir etwas eingeblendet. Schau es dir morgen an, wenn du ausgeruht bist. Es eilt nicht.
 
 [28:30 · ABSCHLUSS]
 
