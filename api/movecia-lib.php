@@ -269,7 +269,7 @@ function mm_review_mail(string $to, string $name, string $lang, string $what, bo
     $url = mm_review_url();
     if ($url === '' || trim($to) === '') return false;
     $en = $lang === 'en';
-    $first = forma_first_name($name ?: ($en ? 'love' : 'du'));
+    $first = forma_first_name($name ?: ($en ? 'friend' : 'meine Liebe'));
     $thing = ['unfold' => $en ? 'our three months of Unfold' : 'unsere drei Monate Unfold', 'natal' => $en ? 'our sessions together' : 'unsere gemeinsamen Einheiten', 'natal1' => $en ? 'our session' : 'unsere Einheit'][$what] ?? ($en ? 'our time together' : 'unsere gemeinsame Zeit');
     $lines = $en ? [
         "Dear $first,",

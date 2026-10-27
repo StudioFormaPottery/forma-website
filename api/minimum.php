@@ -118,7 +118,7 @@ function forma_booking_move(PDO $pdo, int $bookingId, int $newCourseId): string
     [$calTxt, $calAtt] = forma_cal_block($pdo, 'b', $bookingId);
     forma_mail((string)$b['email'], 'Dein neuer Termin: ' . $n['title'] . ' ' . preg_replace('/\s*·.*$/u', '', (string)$n['date_text']),
         "Hallo $first,\n\nwie schön, dass du dabei bleibst! Dein Platz ist jetzt umgebucht:\n\nKurs: {$n['title']}\nNeuer Termin: {$n['date_text']}\nOrt: FORMA Töpferstudio, Silvrettastraße 58, 6562 Mathon\n"
-        . $calTxt . "\nBezahlt ist schon alles, du musst nichts weiter tun.\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n", null, $calAtt);
+        . $calTxt . "\nBezahlt ist schon alles, du musst dich um nichts mehr kümmern.\n\nBis bald im Studio!\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n", null, $calAtt);
     forma_mail(FORMA_NOTIFY_EMAIL, 'Umgebucht: ' . $b['name'] . ' auf ' . preg_replace('/\s*·.*$/u', '', (string)$n['date_text']),
         "{$b['name']} wechselt wegen zu weniger Anmeldungen von {$b['date_text']} auf {$n['date_text']} ({$n['title']}).\n\nDer Platz ist dort schon eingetragen.\n\n" . forma_site_url() . '/verwaltung/?view=course&id=' . (int)$n['id'] . "\n", (string)$b['email']);
     return '';

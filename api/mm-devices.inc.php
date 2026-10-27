@@ -190,6 +190,6 @@ function mm_dev_kicked_text(string $lang = 'de'): string
 {
     if (($GLOBALS['mm_dev_kicked'] ?? '') === '') return '';
     return $lang === 'en'
-        ? 'You were signed out here because your access was used on too many devices. Your access belongs to you alone and cannot be shared with other people. Simply sign in again.'
-        : 'Du wurdest hier abgemeldet, weil dein Zugang auf zu vielen Geräten genutzt wurde. Dein Zugang gehört nur dir und kann nicht mit anderen Personen geteilt werden. Melde dich einfach wieder an.';
+        ? 'You have been signed out on this device because your access was used on too many devices. Your access is just for you and cannot be shared with other people. Simply sign in again.'
+        : 'Du wurdest auf diesem Gerät abgemeldet, weil dein Zugang auf zu vielen Geräten genutzt wurde. Dein Zugang gehört nur dir und kann nicht mit anderen Personen geteilt werden. Melde dich einfach wieder an.';
 }

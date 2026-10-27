@@ -15,7 +15,7 @@ const MM_PT_GOALS = [
 const MM_PT_PLACES = [
     'studio' => ['Im Studio in Mathon', 'In the studio in Mathon'],
     'natur' => ['Draußen in der Natur', 'Outdoors in nature'],
-    'online' => ['Online per Video', 'Online via video'],
+    'online' => ['Online per Video', 'Online by video'],
 ];
 const MM_PT_TIMES = [
     'vormittag' => ['Vormittag', 'Morning'],

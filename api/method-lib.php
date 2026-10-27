@@ -405,12 +405,12 @@ function mv_confirm_ok(PDO $pdo, int $id, int $exp, string $k): ?array
 function mv_send_confirm(PDO $pdo, array $m, array $r, bool $reminder = false): void
 {
     $en = ($r['lang'] ?? $m['lang']) === 'en';
-    $first = forma_first_name((string)($r['name'] ?: $m['name']) ?: ($en ? 'love' : 'du'));
+    $first = forma_first_name((string)($r['name'] ?: $m['name']) ?: ($en ? 'friend' : 'meine Liebe'));
     $title = $r['kind'] === 'unfold' ? 'Unfold – The Mindful Becoming' : 'Movecia Mindful Movement Method';
     $lines = $en ? [
         "Dear $first,",
-        ($reminder ? 'a gentle reminder: ' : '') . "thank you for booking $title! Your payment has arrived.",
-        'Please confirm your email address with one click. Only then will I send you your welcome email with all the information, your invoice and your access.',
+        ($reminder ? 'a gentle reminder: ' : '') . "thank you for booking $title! Your payment has come through.",
+        'Please confirm your email address with one click. As soon as you do, I will send you your welcome email with all the information, your invoice and your access details.',
     ] : [
         "Hallo $first,",
         ($reminder ? 'eine kleine Erinnerung: ' : '') . "danke für deine Buchung von $title! Deine Zahlung ist angekommen.",
@@ -533,11 +533,11 @@ function mv_send_reset(PDO $pdo, string $email): void
     if (!$m || !mv_subs_of($pdo, (string)$m['email'], true)) return;
     $en = $m['lang'] === 'en';
     $link = mv_pw_link($pdo, $m, 1);
-    $first = forma_first_name((string)$m['name'] ?: 'du');
-    $t = $en ? "Hi $first,\n\nhere you can choose a new password for your Movecia members area. The link is valid for one hour.\n\n$link\n\nIf you did not ask for this, simply ignore this email."
+    $first = forma_first_name((string)$m['name'] ?: ($en ? 'there' : 'meine Liebe'));
+    $t = $en ? "Hi $first,\n\nHere you can choose a new password for your Movecia members area. The link is valid for one hour.\n\n$link\n\nIf you didn't request this, you can simply ignore this email."
         : "Hallo $first,\n\nhier kannst du dir ein neues Passwort für deinen Movecia-Mitgliederbereich aussuchen. Der Link gilt eine Stunde.\n\n$link\n\nWenn du das nicht angefordert hast, ignorier diese E-Mail einfach.";
     $html = '<p>' . ($en ? 'Hi ' : 'Hallo ') . forma_h($first) . ',</p><p>' . ($en ? 'here you can choose a new password for your Movecia members area. The link is valid for one hour.' : 'hier kannst du dir ein neues Passwort für deinen Movecia-Mitgliederbereich aussuchen. Der Link gilt eine Stunde.') . '</p>'
-        . mm_button($link, $en ? 'Choose a new password' : 'Neues Passwort wählen') . '<p style="font-size:13px;color:#7D7076;">' . ($en ? 'If you did not ask for this, simply ignore this email.' : 'Wenn du das nicht angefordert hast, ignorier diese E-Mail einfach.') . '</p>';
+        . mm_button($link, $en ? 'Choose a new password' : 'Neues Passwort wählen') . '<p style="font-size:13px;color:#7D7076;">' . ($en ? 'If you didn\'t request this, you can simply ignore this email.' : 'Wenn du das nicht angefordert hast, ignorier diese E-Mail einfach.') . '</p>';
     mm_mail((string)$m['email'], $en ? 'Your new Movecia password' : 'Dein neues Passwort für Movecia', $t, mm_mail_html($en ? 'New password' : 'Neues Passwort', $html, $m['lang']), [], 'Vivien · Movecia');
 }
 
@@ -712,19 +712,19 @@ function mv_checkout(PDO $pdo, array $in, bool $special = false, string $source 
     $live = !empty($in['live']) ? 1 : 0;
     // Eine klare Wahl (Vivien, 25.10.2026): Verzicht auf das Rücktrittsrecht ja oder nein
     if (isset($in['wr'])) {
-        if (!in_array($in['wr'], ['verzicht', 'behalten'], true)) throw new RuntimeException($en ? 'Please choose whether you keep your right of withdrawal.' : 'Bitte wähle, ob du dein Rücktrittsrecht behältst.');
+        if (!in_array($in['wr'], ['verzicht', 'behalten'], true)) throw new RuntimeException($en ? 'Please choose whether you want to keep your right of withdrawal.' : 'Bitte wähle, ob du dein Rücktrittsrecht behalten möchtest.');
         $digital = $in['wr'] === 'verzicht' ? 1 : 0;
         $live = 1;
     }
     $callLang = in_array($in['call_lang'] ?? '', ['de', 'en'], true) ? $in['call_lang'] : $lang;
     if ($p['kind'] === 'unfold') {
         if (!$c['u_open']) throw new RuntimeException($en ? 'Unfold is not open for booking right now.' : 'Unfold ist gerade nicht buchbar.');
-        if (mv_unfold_free($pdo) <= 0) throw new RuntimeException($en ? 'Unfold is fully booked. Join the list and I will let you know about the next round.' : 'Unfold ist ausgebucht. Trag dich in die Liste ein, dann sag ich dir Bescheid, wenn die nächste Runde startet.');
-        if (!$live) throw new RuntimeException($en ? 'Please confirm the box about the start of your access.' : 'Bitte bestätige das Kästchen zum Beginn deines Zugangs.');
+        if (mv_unfold_free($pdo) <= 0) throw new RuntimeException($en ? 'Unfold is fully booked. Join the list and I\'ll let you know when the next round starts.' : 'Unfold ist ausgebucht. Trag dich in die Liste ein, dann sage ich dir Bescheid, wenn die nächste Runde startet.');
+        if (!$live) throw new RuntimeException($en ? 'Please tick the box about when your access starts.' : 'Bitte setz das Häkchen zum Beginn deines Zugangs.');
         // Schon gebucht?
-        if ($email !== '') foreach (mv_subs_of($pdo, $email) as $s) if ($s['kind'] === 'unfold') throw new RuntimeException($en ? 'You are already booked for Unfold. Log in to your members area.' : 'Du bist für Unfold schon angemeldet. Melde dich einfach im Mitgliederbereich an.');
+        if ($email !== '') foreach (mv_subs_of($pdo, $email) as $s) if ($s['kind'] === 'unfold') throw new RuntimeException($en ? 'You are already booked onto Unfold. Simply log in to your members area.' : 'Du bist für Unfold schon angemeldet. Melde dich einfach im Mitgliederbereich an.');
     } else {
-        if ($email !== '') foreach (mv_subs_of($pdo, $email) as $s) if ($s['kind'] === 'method') throw new RuntimeException($en ? 'You already have a membership. Log in to your members area.' : 'Du hast schon eine Mitgliedschaft. Melde dich einfach im Mitgliederbereich an.');
+        if ($email !== '') foreach (mv_subs_of($pdo, $email) as $s) if ($s['kind'] === 'method') throw new RuntimeException($en ? 'You already have a membership. Simply log in to your members area.' : 'Du hast schon eine Mitgliedschaft. Melde dich einfach im Mitgliederbereich an.');
     }
     $special = $special && $p['g'] > 0 && $p['g'] < $p['cents'];
     $first = $special ? $p['g'] : $p['cents'];
@@ -759,7 +759,7 @@ function mv_checkout(PDO $pdo, array $in, bool $special = false, string $source 
     if ($p['kind'] === 'method' && $launch > time() + 50 * 3600) {
         $params['subscription_data']['trial_end'] = $launch;
         $params['payment_method_collection'] = 'always';
-        $params['custom_text']['submit']['message'] = ($en ? 'Nothing is charged today. The Method opens on ' . mv_date($launch, 'en') . ', your first payment is taken then. ' : 'Heute wird nichts abgebucht. Die Method startet am ' . mv_date($launch) . ', dann wird die erste Zahlung eingezogen. ') . $terms;
+        $params['custom_text']['submit']['message'] = ($en ? 'You won\'t be charged today. The Method opens on ' . mv_date($launch, 'en') . ', and your first payment will be taken then. ' : 'Heute wird nichts abgebucht. Die Method startet am ' . mv_date($launch) . ', dann wird die erste Zahlung eingezogen. ') . $terms;
         $pdo->prepare('UPDATE mv_subs SET bill_start = ? WHERE id = ?')->execute([$launch, $sid]);
     }
     if ($special) $params['discounts'] = [['coupon' => mv_coupon_once($p['cents'] - $p['g'])]];
@@ -876,10 +876,10 @@ function mv_cancel(PDO $pdo, array $r, bool $cancel): void
     $end = max((int)$r['period_end'], (int)$r['bill_start']);
     mm_mail(MM_FROM_EMAIL, ($cancel ? 'Kündigung: ' : 'Kündigung zurückgenommen: ') . 'Method · ' . ($r['name'] ?: $r['email']), ($r['name'] ?: 'Jemand') . ' (' . $r['email'] . ') hat die Method-Mitgliedschaft ' . ($cancel ? 'gekündigt, Zugang bis ' . date('d.m.Y', $end) : 'doch weiterlaufen lassen') . '.', mm_mail_html('Method', '<p>' . forma_h(($r['name'] ?: 'Jemand') . ' (' . $r['email'] . ') hat die Method-Mitgliedschaft ' . ($cancel ? 'gekündigt, Zugang bis ' . date('d.m.Y', $end) : 'doch weiterlaufen lassen') . '.') . '</p>', 'de'));
     if ($cancel) {
-        $first = forma_first_name((string)$r['name'] ?: 'du');
-        $t = $en ? "Hi $first,\n\nyour Method membership is cancelled. You keep full access until " . mv_date($end, 'en') . ", nothing more will be charged.\n\nIf you change your mind, you can simply continue in your members area.\n\nThank you for moving with me."
+        $first = forma_first_name((string)$r['name'] ?: ($en ? 'there' : 'meine Liebe'));
+        $t = $en ? "Hi $first,\n\nYour Method membership has been cancelled. You'll keep full access until " . mv_date($end, 'en') . ", and you won't be charged again.\n\nIf you change your mind, you can simply continue in your members area.\n\nThank you for moving with me."
             : "Hallo $first,\n\ndeine Method-Mitgliedschaft ist gekündigt. Du hast noch bis " . mv_date($end) . " vollen Zugang, danach wird nichts mehr abgebucht.\n\nWenn du es dir anders überlegst, kannst du im Mitgliederbereich einfach weitermachen.\n\nDanke, dass du dich mit mir bewegt hast.";
-        mm_mail((string)$r['email'], $en ? 'Your Method membership is cancelled' : 'Deine Method-Mitgliedschaft ist gekündigt', $t, mm_mail_html('Method', nl2br(forma_h($t)), $r['lang']), [], 'Vivien · Movecia');
+        mm_mail((string)$r['email'], $en ? 'Your Method membership has been cancelled' : 'Deine Method-Mitgliedschaft ist gekündigt', $t, mm_mail_html('Method', nl2br(forma_h($t)), $r['lang']), [], 'Vivien · Movecia');
     }
 }
 
@@ -898,20 +898,20 @@ function mv_legal(array $r): string
     if (!$isU && (int)$r['bill_start'] > time()) $x .= $en ? 'Nothing is charged before the start. ' : 'Vor dem Start wird nichts abgebucht. ';
     // Rücktrittsfrist (Vivien, 25.10.2026): bei Vorab-Buchung erst ab dem Start, also bis 14 Tage nach dem Start
     $x .= $pre
-        ? ($en ? 'Your right of withdrawal: because your access only starts on ' . $d($open) . ', your 14-day withdrawal period only starts then too. You can withdraw without giving reasons until ' . $d($until) . '. If you withdraw before the start, you get everything back. '
+        ? ($en ? 'Your right of withdrawal: because your access only starts on ' . $d($open) . ', your 14-day withdrawal period only starts then too. You can withdraw without giving a reason until ' . $d($until) . '. If you withdraw before the start, you will get a full refund. '
                : 'Dein Rücktrittsrecht: Weil dein Zugang erst am ' . $d($open) . ' beginnt, beginnt auch deine 14-tägige Rücktrittsfrist erst an diesem Tag. Du kannst also bis ' . $d($until) . ' ohne Angabe von Gründen zurücktreten. Trittst du vor dem Start zurück, bekommst du alles zurück. ')
-        : ($en ? 'You can withdraw from your booking without giving reasons until ' . $d($until) . '. ' : 'Du kannst bis ' . $d($until) . ' ohne Angabe von Gründen von deiner Buchung zurücktreten. ');
-    if ($isU) $x .= $en ? 'Once the programme has started, you pay only for the part already used if you withdraw. ' : 'Ab dem Start zahlst du bei einem Rücktritt nur den Teil, der bis dahin genutzt wurde. ';
-    else $x .= $en ? 'You can cancel your membership at any time to the end of the paid period, right in your members area. ' : 'Du kannst deine Mitgliedschaft jederzeit zum Ende des bezahlten Zeitraums kündigen, direkt im Mitgliederbereich. ';
+        : ($en ? 'You can withdraw from your booking without giving a reason until ' . $d($until) . '. ' : 'Du kannst bis ' . $d($until) . ' ohne Angabe von Gründen von deiner Buchung zurücktreten. ');
+    if ($isU) $x .= $en ? 'If you withdraw after the programme has started, you only pay for the part already used. ' : 'Ab dem Start zahlst du bei einem Rücktritt nur den Teil, der bis dahin genutzt wurde. ';
+    else $x .= $en ? 'You can cancel your membership at any time, effective at the end of the period you have paid for, right in your members area. ' : 'Du kannst deine Mitgliedschaft jederzeit zum Ende des bezahlten Zeitraums kündigen, direkt im Mitgliederbereich. ';
     if ($isU) $x .= (int)$r['consent_digital'] === 1
         ? ($en ? 'Your choice: you waive your right of withdrawal and use everything from the start, including all videos and workbooks (§ 18 (1) 11 FAGG). '
                : 'Deine Wahl: Du verzichtest auf dein Rücktrittsrecht und nutzt ab dem Start gleich alles, auch alle Videos und Workbooks (§ 18 Abs. 1 Z 11 FAGG). ')
-        : ($en ? 'Your choice: you keep your right of withdrawal. Live calls and videos start as planned, the workbook downloads unlock on ' . $d($until + 60) . '. '
+        : ($en ? 'Your choice: you keep your right of withdrawal. Live calls and videos start as planned, and the workbook downloads unlock on ' . $d($until + 60) . '. '
                : 'Deine Wahl: Du behältst dein Rücktrittsrecht. Live-Calls und Videos starten wie geplant, die Workbook-Downloads öffnen sich am ' . $d($until + 60) . '. ');
     else $x .= (int)$r['consent_digital'] === 1
         ? ($en ? 'Confirmation: you expressly agreed that each of your monthly programmes with videos and downloads (digital content) is unlocked in full as soon as it opens, starting with month 1 ' . ($pre ? 'on ' . $d($open) : 'today') . ', and you acknowledged that you lose your right of withdrawal for this digital content with the unlocking (§ 18 (1) 11 FAGG). You made this choice once for the whole membership, renewals do not start a new withdrawal period. '
                : 'Bestätigung: Du hast ausdrücklich zugestimmt, dass deine Monatsprogramme mit Videos und Downloads (digitale Inhalte) jeweils gleich ganz freigeschaltet werden, beginnend mit Monat 1 ' . ($pre ? 'am ' . $d($open) : 'ab heute') . ', und zur Kenntnis genommen, dass du dein Rücktrittsrecht für diese digitalen Inhalte mit der Freischaltung verlierst (§ 18 Abs. 1 Z 11 FAGG). Diese Wahl gilt einmal für die ganze Mitgliedschaft, Verlängerungen lösen keine neue Rücktrittsfrist aus. ')
-        : ($en ? 'You kept your right of withdrawal: you start with the welcome module, your month 1 unlocks after your withdrawal period on ' . $d($until + 60) . '. This applies once, renewals do not start a new withdrawal period. '
+        : ($en ? 'You kept your right of withdrawal: you start with the welcome module, and your month 1 unlocks once your withdrawal period has ended, on ' . $d($until + 60) . '. This choice applies once, and renewals do not start a new withdrawal period. '
                : 'Du hast dein Rücktrittsrecht behalten: Du startest mit dem Ankommen-Modul, dein Monat 1 öffnet sich nach deiner Rücktrittsfrist am ' . $d($until + 60) . '. Das gilt einmal, Verlängerungen lösen keine neue Rücktrittsfrist aus. ');
     return $x . ($en ? 'Terms, cancellation policy and withdrawal form: ' : 'Bedingungen, Rücktritt und Widerrufsformular: ') . $site . '/terms · ' . ($en ? 'Withdraw: ' : 'Vertrag widerrufen: ') . $site . '/withdraw';
 }
@@ -922,7 +922,7 @@ function mv_welcome(PDO $pdo, array $r): void
     $pdo->prepare('UPDATE mv_subs SET mailed = 1 WHERE id = ?')->execute([$r['id']]);
     $en = $r['lang'] === 'en';
     $m = mv_member_ensure($pdo, (string)$r['email'], (string)$r['name'], (string)$r['lang']);
-    $first = forma_first_name((string)$r['name'] ?: ($en ? 'love' : 'du'));
+    $first = forma_first_name((string)$r['name'] ?: ($en ? 'friend' : 'meine Liebe'));
     $p = mv_plans()[$r['plan']];
     $c = mv_cfg();
     $price = mv_eur((int)$r['first_cents']) . ($r['plan'] === 'u1' ? '' : ' ' . ($en ? $p['per_en'] : $p['per_de']));
@@ -939,17 +939,17 @@ function mv_welcome(PDO $pdo, array $r): void
         $pdo->prepare('UPDATE mv_subs SET open_mailed = 0 WHERE id = ?')->execute([$r['id']]);
         $lines = $en ? [
             "Dear $first,",
-            "thank you so much, you are in! Your booking for $title ($price) is confirmed" . ((int)$r['bill_start'] > time() ? ', and nothing is charged until the start' : '') . '.',
-            'Right now I am preparing everything for you, so there is nothing to see yet. Your account unlocks on ' . mv_date($open, 'en') . '. That day you will receive an email with your link to the members area, and from then on everything is open for you.',
+            "thank you so much, you're in! Your booking for $title ($price) is confirmed" . ((int)$r['bill_start'] > time() ? ', and nothing will be charged until the start' : '') . '.',
+            'I am still getting everything ready for you, so there is nothing to see just yet. Your access opens on ' . mv_date($open, 'en') . '. On that day you will receive an email with your link to the members area, and from then on everything is open to you.',
         ] : [
             "Hallo $first,",
             "danke von Herzen, du bist dabei! Deine Buchung für $title ($price) ist bestätigt" . ((int)$r['bill_start'] > time() ? ', abgebucht wird erst am Starttag' : '') . '.',
             'Gerade bereite ich noch alles für dich vor, deshalb gibt es jetzt noch nichts zu sehen. Dein Zugang schaltet sich am ' . mv_date($open) . ' frei. An diesem Tag bekommst du eine E-Mail mit deinem Link zum Mitgliederbereich, und ab dann ist alles für dich offen.',
         ];
         if ($isU) $lines[] = $en ? 'Our first live call: ' . mv_date(mv_ts($c['u_start']), 'en') . ', ' . $call . '.' : 'Unser erster Live-Call: ' . mv_date(mv_ts($c['u_start'])) . ', ' . $call . '.';
-        $lines[] = $en ? 'Your 14-day right of withdrawal only begins with the start, so you can withdraw until ' . mv_date(mv_withdraw_until($r), 'en') . '.' : 'Dein 14-tägiges Rücktrittsrecht beginnt erst mit dem Start, du kannst also bis ' . mv_date(mv_withdraw_until($r)) . ' zurücktreten.';
+        $lines[] = $en ? 'Your 14-day withdrawal period only begins when your access starts, so you can withdraw until ' . mv_date(mv_withdraw_until($r), 'en') . '.' : 'Deine 14-tägige Rücktrittsfrist beginnt erst mit dem Start, du kannst also bis ' . mv_date(mv_withdraw_until($r)) . ' zurücktreten.';
         $btn = ''; $link = '';
-        $subj = $en ? 'Thank you, you are in: ' : 'Danke, du bist dabei: ';
+        $subj = $en ? 'Thank you, you\'re in: ' : 'Danke, du bist dabei: ';
     } else {
         $pdo->prepare('UPDATE mv_subs SET open_mailed = 1 WHERE id = ?')->execute([$r['id']]);
         $hasPw = $m['pass_hash'] !== '';
@@ -957,8 +957,8 @@ function mv_welcome(PDO $pdo, array $r): void
         $btn = $hasPw ? ($en ? 'Open my members area' : 'Zum Mitgliederbereich') : ($en ? 'Choose my password' : 'Passwort festlegen');
         $lines = $en ? [
             "Dear $first,",
-            "how lovely, you are in! Your booking for $title ($price) is confirmed.",
-            $isU ? 'Your weekly live call: ' . $call . '. Your members area with the Unfold videos, workbooks and recordings is open for you until ' . mv_date(mv_unfold_end(), 'en') . '.' : 'You can start right now with month 1, your members area is ready. Your next month opens on ' . mv_date(mv_month_at(mv_open_at($r), 1), 'en') . '.',
+            "how lovely, you're in! Your booking for $title ($price) is confirmed.",
+            $isU ? 'Your weekly live call: ' . $call . '. Your members area with the Unfold videos, workbooks and recordings is open to you until ' . mv_date(mv_unfold_end(), 'en') . '.' : 'Your members area is ready, so you can start month 1 right away. Your next month opens on ' . mv_date(mv_month_at(mv_open_at($r), 1), 'en') . '.',
             $hasPw ? 'Log in with your email and your password.' : 'Choose your password once, then you can log in from any device with your email.',
         ] : [
             "Hallo $first,",
@@ -966,9 +966,9 @@ function mv_welcome(PDO $pdo, array $r): void
             $isU ? 'Dein wöchentlicher Live-Call: ' . $call . '. Dein Mitgliederbereich mit den Unfold-Videos, Workbooks und Aufnahmen ist bis ' . mv_date(mv_unfold_end()) . ' für dich offen.' : 'Du kannst sofort mit Monat 1 loslegen, dein Mitgliederbereich ist bereit. Dein nächster Monat öffnet sich am ' . mv_date(mv_month_at(mv_open_at($r), 1)) . '.',
             $hasPw ? 'Melde dich einfach mit deiner E-Mail und deinem Passwort an.' : 'Leg einmal dein Passwort fest, danach meldest du dich auf jedem Gerät mit deiner E-Mail an.',
         ];
-        $subj = $en ? 'You are in: ' : 'Du bist dabei: ';
+        $subj = $en ? 'You\'re in: ' : 'Du bist dabei: ';
     }
-    mv_send_member_mail($r, $pfx . $subj . $title, $en ? 'you are in ♡' : 'du bist dabei ♡', $title, $lines, $link, $btn, $legal);
+    mv_send_member_mail($r, $pfx . $subj . $title, $en ? 'you\'re in ♡' : 'du bist dabei ♡', $title, $lines, $link, $btn, $legal);
 }
 
 /** Info an Vivien gleich nach der Zahlung (auch wenn die Kundin ihre Adresse noch nicht bestätigt hat). */
@@ -1009,7 +1009,7 @@ function mv_open_mail(PDO $pdo, array $r): void
     $en = $r['lang'] === 'en';
     $c = mv_cfg();
     $m = mv_member_ensure($pdo, (string)$r['email'], (string)$r['name'], (string)$r['lang']);
-    $first = forma_first_name((string)$r['name'] ?: ($en ? 'love' : 'du'));
+    $first = forma_first_name((string)$r['name'] ?: ($en ? 'friend' : 'meine Liebe'));
     $isU = $r['kind'] === 'unfold';
     $title = $isU ? 'Unfold – The Mindful Becoming' : 'Movecia Mindful Movement Method';
     $hasPw = $m['pass_hash'] !== '';
@@ -1019,8 +1019,8 @@ function mv_open_mail(PDO $pdo, array $r): void
     $until = mv_withdraw_until($r);
     $lines = $en ? [
         "Dear $first,",
-        "today is the day: your access to $title is open!",
-        $isU ? 'In your members area you will find the Unfold videos, your workbooks, the link to our live call (' . $call . ') and every recording.' : 'You begin with month 1, it is waiting for you in your members area. Your next month opens on ' . mv_date(mv_month_at(mv_open_at($r), 1), 'en') . ', and so on every month on your start day.',
+        "today is the day: your access to $title is now open!",
+        $isU ? 'In your members area you will find the Unfold videos, your workbooks, the link to our live call (' . $call . ') and all the recordings.' : 'You begin with month 1, which is waiting for you in your members area. Your next month opens on ' . mv_date(mv_month_at(mv_open_at($r), 1), 'en') . ', and from then on a new month opens on the same day each month.',
         $hasPw ? 'Log in with your email and your password.' : 'Choose your password once, then you can log in from any device with your email.',
         'As promised, your 14-day withdrawal period starts today and runs until ' . mv_date($until, 'en') . '.',
     ] : [
@@ -1030,9 +1030,9 @@ function mv_open_mail(PDO $pdo, array $r): void
         $hasPw ? 'Melde dich einfach mit deiner E-Mail und deinem Passwort an.' : 'Leg einmal dein Passwort fest, danach meldest du dich auf jedem Gerät mit deiner E-Mail an.',
         'Wie versprochen beginnt deine 14-tägige Rücktrittsfrist heute und läuft bis ' . mv_date($until) . '.',
     ];
-    if ((int)$r['consent_digital'] !== 1 && !$isU) $lines[] = $en ? 'Until then you begin with the welcome module, after that your month 1 opens by itself.' : 'Bis dahin beginnst du mit dem Ankommen-Modul, danach öffnet sich dein Monat 1 von selbst.';
+    if ((int)$r['consent_digital'] !== 1 && !$isU) $lines[] = $en ? 'Until then, you begin with the welcome module, and after that your month 1 opens automatically.' : 'Bis dahin beginnst du mit dem Ankommen-Modul, danach öffnet sich dein Monat 1 von selbst.';
     $pfx = (int)$r['test'] === 1 ? '[TEST] ' : '';
-    mv_send_member_mail($r, $pfx . ($en ? 'Your access is open: ' : 'Dein Zugang ist offen: ') . $title, $en ? 'it begins ♡' : 'es geht los ♡', $title, $lines, $link, $btn, mv_legal($r));
+    mv_send_member_mail($r, $pfx . ($en ? 'Your access is open: ' : 'Dein Zugang ist offen: ') . $title, $en ? 'here we go ♡' : 'es geht los ♡', $title, $lines, $link, $btn, mv_legal($r));
 }
 
 /** Bewertungs-Mail am Morgen nach dem Ende von Unfold (10 Uhr), genau einmal, sobald ein Bewertungslink hinterlegt ist. */
@@ -1233,12 +1233,12 @@ function mv_month_run(PDO $pdo): void
         $months = $months ?? mv_method_months($pdo)['months'];
         $p = $months[$mm['n'] - 1] ?? null;
         $en = $s['lang'] === 'en';
-        $first = forma_first_name((string)$s['name'] ?: ($en ? 'love' : 'du'));
+        $first = forma_first_name((string)$s['name'] ?: ($en ? 'friend' : 'meine Liebe'));
         $pt = $p ? mv_t($p, 'title', $en ? 'en' : 'de') : '';
         $lines = $en ? [
             "Dear $first,",
-            'your month ' . $mm['n'] . ' is here' . ($pt !== '' ? ': ' . $pt : '') . '. It is waiting for you in your members area, together with its workbook.',
-            'Just begin with the first video. One small step is enough.',
+            'your month ' . $mm['n'] . ' is here' . ($pt !== '' ? ': ' . $pt : '') . '. It is waiting for you in your members area, along with its workbook.',
+            'Just start with the first video. One small step is enough.',
         ] : [
             "Hallo $first,",
             'dein Monat ' . $mm['n'] . ' ist da' . ($pt !== '' ? ': ' . $pt : '') . '. Er wartet in deinem Mitgliederbereich auf dich, zusammen mit dem Workbook.',
@@ -1302,20 +1302,20 @@ function mv_seed(PDO $pdo): void
     if ((int)$pdo->query('SELECT COUNT(*) FROM mv_programs')->fetchColumn() > 0) return;
     $now = date('c');
     $ins = $pdo->prepare('INSERT INTO mv_programs (audience, title_de, title_en, intro_de, intro_en, theme, unlock, sort, created_at) VALUES (?,?,?,?,?,?,?,?,?)');
-    $ins->execute(['method', 'Ankommen', 'Arrive', 'Schön, dass du da bist. Hier lernst du die Method kennen, findest deinen Platz und deine ersten kleinen Rituale. Fang einfach an, es gibt kein Zu-spät.', 'So lovely that you are here. This is where you get to know the Method, find your spot and your first small rituals. Simply begin, there is no too late.', 'ankommen', '', 0, $now]);
+    $ins->execute(['method', 'Ankommen', 'Arrive', 'Schön, dass du da bist. Hier lernst du die Method kennen, findest deinen Platz und deine ersten kleinen Rituale. Fang einfach an, es ist nie zu spät.', 'I am so glad you are here. This is where you get to know the Method and find your place and your first small rituals. Simply begin, it is never too late.', 'ankommen', '', 0, $now]);
     $a = (int)$pdo->lastInsertId();
-    $ins->execute(['method', 'Rückzug & Ruhe', 'Retreat & Rest', 'Manche Wochen sind laut und voll. Dieses Programm schenkt dir kleine, ruhige Inseln: sanfte Flows für müde Tage, Atem für volle Tage und Momente nur für dich.', 'Some weeks are loud and full. This programme gives you small, quiet islands: gentle flows for tired days, breath for full days and moments just for you.', 'winter', '2026-12-01', 1, $now]);
+    $ins->execute(['method', 'Rückzug & Ruhe', 'Retreat & Rest', 'Manche Wochen sind laut und voll. Dieses Programm schenkt dir kleine, ruhige Inseln: sanfte Flows für müde Tage, Atem für volle Tage und Momente nur für dich.', 'Some weeks are loud and full. This programme gives you little islands of calm: gentle flows for tired days, breath for full days and moments just for you.', 'winter', '2026-12-01', 1, $now]);
     $d = (int)$pdo->lastInsertId();
     $l = $pdo->prepare('INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)');
     foreach ([
-        [$a, 'Willkommen in der Method', 'Welcome to the Method', 'Ein paar Worte von mir: was dich hier erwartet und wie du die Bibliothek für dich nutzt.', 'A few words from me: what awaits you here and how to use the library for yourself.', 'talk', 'any', 6],
+        [$a, 'Willkommen in der Method', 'Welcome to the Method', 'Ein paar Worte von mir: was dich hier erwartet und wie du die Bibliothek für dich nutzt.', 'A few words from me: what is waiting for you here and how to make the library your own.', 'talk', 'any', 6],
         [$a, 'Dein erster Flow', 'Your first flow', 'Ein sanfter Einstieg, bei dem du deinen Körper wieder spürst.', 'A gentle start to feel your body again.', 'flow', 'any', 15],
-        [$a, 'Atem, der dich auffängt', 'Breath that holds you', 'Eine kurze Atemübung für jeden Moment, in dem es zu viel wird.', 'A short breathing practice for every moment when it gets too much.', 'breath', 'tired', 5],
+        [$a, 'Atem, der dich auffängt', 'Breath that holds you', 'Eine kurze Atemübung für jeden Moment, in dem es zu viel wird.', 'A short breathing practice for any moment when it all gets too much.', 'breath', 'tired', 5],
         [$d, 'Morgen-Flow für dunkle Tage', 'Morning flow for dark days', 'Langsam wach werden, Wärme in den Körper bringen.', 'Waking up slowly, bringing warmth into the body.', 'flow', 'tired', 15],
-        [$d, 'Somatisches Loslassen', 'Somatic release', 'Schütteln, Wiegen, Nachspüren: Spannung darf gehen.', 'Shaking, swaying, noticing: tension may leave.', 'somatic', 'tired', 15],
-        [$d, 'Kraft ohne Erschöpfung', 'Strength without exhaustion', 'Bodyweight in deinem Tempo, du bleibst bei dir.', 'Bodyweight at your pace, you stay with yourself.', 'body', 'full', 30],
+        [$d, 'Somatisches Loslassen', 'Somatic release', 'Schütteln, Wiegen, Nachspüren: Spannung darf gehen.', 'Shaking, swaying, noticing: letting tension go.', 'somatic', 'tired', 15],
+        [$d, 'Kraft ohne Erschöpfung', 'Strength without exhaustion', 'Bodyweight in deinem Tempo, du bleibst bei dir.', 'Bodyweight training at your own pace, staying connected to yourself.', 'body', 'full', 30],
         [$d, 'Box Breathing für volle Tage', 'Box breathing for full days', 'Vier Takte, die dein Nervensystem beruhigen.', 'Four counts that calm your nervous system.', 'breath', 'full', 5],
-        [$d, 'Abendmeditation: Rückzug', 'Evening meditation: retreat', 'Den Tag ablegen und weich werden.', 'Putting the day down and softening.', 'meditation', 'tired', 15],
+        [$d, 'Abendmeditation: Rückzug', 'Evening meditation: retreat', 'Den Tag ablegen und weich werden.', 'Letting go of the day and softening.', 'meditation', 'tired', 15],
     ] as $i => $x) $l->execute([...$x, $i, $now]);
     mv_seed_unfold($pdo);
     mv_scripts_sync($pdo, true);
@@ -1809,8 +1809,8 @@ function mv_journal_days(PDO $pdo, int $mid): array
 /** Eine Frage pro Tag (wiederholt sich nach der Liste). */
 function mv_prompt(string $day, string $lang): string
 {
-    $de = ['Was hat dein Körper heute gebraucht, und hast du es ihm gegeben?', 'Wofür bist du heute dankbar, auch wenn es klein ist?', 'Was darfst du heute loslassen?', 'Wann hast du dich heute ganz bei dir gefühlt?', 'Was würdest du tun, wenn niemand zuschaut?', 'Welcher Gedanke kam heute immer wieder? Stimmt er?', 'Was gibt dir gerade Energie, und was nimmt sie dir?', 'Welche kleine Sache möchtest du morgen für dich tun?', 'Wo sagst du Ja, obwohl du Nein meinst?', 'Was würdest du deiner besten Freundin heute sagen?', 'Wie fühlt sich dein Atem gerade an?', 'Was ist heute gelungen?', 'Welche Idee lässt dich nicht los?', 'Wann hast du zuletzt laut gelacht?', 'Was brauchst du, um dich sicher zu fühlen?', 'Worauf freust du dich diese Woche?', 'Was willst du dir selbst verzeihen?', 'Welche Bewegung hat sich heute gut angefühlt?', 'Was hast du heute über dich gelernt?', 'Wenn dein Körper sprechen könnte, was würde er sagen?', 'Welche Grenze möchtest du liebevoll ziehen?'];
-    $en = ['What did your body need today, and did you give it?', 'What are you grateful for today, even if it is small?', 'What may you let go of today?', 'When did you feel fully yourself today?', 'What would you do if nobody was watching?', 'Which thought kept coming back today? Is it true?', 'What gives you energy right now, and what takes it?', 'Which small thing would you like to do for yourself tomorrow?', 'Where do you say yes although you mean no?', 'What would you tell your best friend today?', 'How does your breath feel right now?', 'What went well today?', 'Which idea will not let you go?', 'When did you last laugh out loud?', 'What do you need to feel safe?', 'What are you looking forward to this week?', 'What would you like to forgive yourself for?', 'Which movement felt good today?', 'What did you learn about yourself today?', 'If your body could speak, what would it say?', 'Which boundary would you like to set lovingly?'];
+    $de = ['Was hat dein Körper heute gebraucht, und hast du es ihm gegeben?', 'Wofür bist du heute dankbar, auch wenn es klein ist?', 'Was darfst du heute loslassen?', 'Wann hast du dich heute ganz bei dir gefühlt?', 'Was würdest du tun, wenn niemand zuschaut?', 'Welcher Gedanke kam heute immer wieder? Stimmt er?', 'Was gibt dir gerade Energie, und was nimmt sie dir?', 'Welche kleine Sache möchtest du morgen für dich tun?', 'Wo sagst du Ja, obwohl du Nein meinst?', 'Was würdest du deiner besten Freundin heute sagen?', 'Wie fühlt sich dein Atem gerade an?', 'Was ist heute gelungen?', 'Welche Idee lässt dich nicht los?', 'Wann hast du zuletzt laut gelacht?', 'Was brauchst du, um dich sicher zu fühlen?', 'Worauf freust du dich diese Woche?', 'Was möchtest du dir selbst verzeihen?', 'Welche Bewegung hat sich heute gut angefühlt?', 'Was hast du heute über dich gelernt?', 'Wenn dein Körper sprechen könnte, was würde er sagen?', 'Welche Grenze möchtest du liebevoll ziehen?'];
+    $en = ['What did your body need today, and did you give it?', 'What are you grateful for today, even if it is small?', 'What can you let go of today?', 'When did you feel fully yourself today?', 'What would you do if nobody was watching?', 'Which thought kept coming back today? Is it true?', 'What gives you energy right now, and what takes it?', 'What small thing would you like to do for yourself tomorrow?', 'Where do you say yes when you mean no?', 'What would you tell your best friend today?', 'How does your breath feel right now?', 'What went well today?', 'Which idea won\'t let you go?', 'When did you last laugh out loud?', 'What do you need to feel safe?', 'What are you looking forward to this week?', 'What would you like to forgive yourself for?', 'Which movement felt good today?', 'What did you learn about yourself today?', 'If your body could speak, what would it say?', 'Which boundary would you like to set lovingly?'];
     $list = $lang === 'en' ? $en : $de;
     return $list[(int)floor(strtotime($day . ' 12:00') / 86400) % count($list)];
 }
