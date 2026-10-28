@@ -1215,7 +1215,7 @@ function natal_seo_jsonld(): string
     $biz = [
         '@type' => ['LocalBusiness', 'SportsActivityLocation'],
         '@id' => $base . '/#movecia',
-        'name' => 'Movecia – Yoga, Pilates & Mindful Movement',
+        'name' => 'Movecia – Yoga, Bodyweight & Mindful Movement',
         'alternateName' => 'Movecia Personal Fitness',
         'url' => $base . '/',
         'logo' => $base . '/img/movecia/movecia-zeichen-1024.png',
@@ -1228,14 +1228,14 @@ function natal_seo_jsonld(): string
             array_map(fn($c) => ['@type' => 'City', 'name' => $c], ['Mathon', 'Ischgl', 'Galtür', 'Kappl', 'See', 'Landeck', 'Pians', 'Zams']),
             [['@type' => 'AdministrativeArea', 'name' => 'Paznaun'], ['@type' => 'AdministrativeArea', 'name' => 'Tirol'], ['@type' => 'Country', 'name' => 'Österreich'], ['@type' => 'Country', 'name' => 'Deutschland'], ['@type' => 'Country', 'name' => 'Schweiz']]
         ),
-        'founder' => ['@type' => 'Person', 'name' => 'Vivien Malonga', 'jobTitle' => 'Personal Trainerin für Yoga, Pilates und prä-/postnatales Training'],
+        'founder' => ['@type' => 'Person', 'name' => 'Vivien Malonga', 'jobTitle' => 'Personal Trainerin für Yoga, Bodyweight-Training und prä-/postnatales Training'],
         'sameAs' => ['https://www.instagram.com/movementwithviv/'],
     ];
     $service = [
         '@type' => 'Service',
         '@id' => $base . '/natal/#service',
         'name' => 'Prä- & Postnatal Training 1:1',
-        'alternateName' => ['Schwangerschaftstraining', 'Rückbildungstraining', 'Beckenbodentraining nach der Geburt', 'Geburtsvorbereitung', 'Pränatal Pilates', 'Postnatal Training online'],
+        'alternateName' => ['Schwangerschaftstraining', 'Rückbildungstraining', 'Beckenbodentraining nach der Geburt', 'Geburtsvorbereitung', 'Postnatal Training online'],
         'serviceType' => 'Prä- und postnatales Personal Training',
         'description' => 'Einzeltraining in der Schwangerschaft und nach der Geburt: Mobilisation, Atemarbeit, Beckenboden, Geburtsvorbereitung, Rückbildung und Kräftigung. Im Studio in Mathon (Paznaun, Tirol) oder live online per Video.',
         'provider' => ['@id' => $base . '/#movecia'],

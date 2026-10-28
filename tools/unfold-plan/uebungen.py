@@ -288,7 +288,7 @@ U = {
     'In Seitlage ist das untere Bein gebeugt, das obere gestreckt. Du hebst das obere Bein auf Hüfthöhe und senkst es kontrolliert.',
     'Fußspitze zeigt nach vorne. 10 je Seite.',
     'Kleinere Höhe.'),
-'w_swim': ('Swimming (Pilates) in Bauchlage', 'Bodyweight',
+'w_swim': ('Swimming in Bauchlage', 'Bodyweight',
     'In Bauchlage, Stirn auf den Händen. Du hebst Brustbein und Arme ein kleines Stück, dann abwechselnd einen Arm und das gegenüberliegende Bein, langsam.',
     'Nacken lang, Blick zum Boden. 8 je Seite.',
     'Nur die Beine abwechselnd heben.'),

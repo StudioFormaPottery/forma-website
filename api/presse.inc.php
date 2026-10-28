@@ -41,7 +41,7 @@ function presse_release(string $brand): array
     return [
         'title' => 'Bewegung beginnt bei dir: Paznaunerin startet Online-Programm für Frauen mit vollem Kopf',
         'paras' => [
-            'Mathon, Oktober 2026. Familie, Arbeit, der ganze unsichtbare Mental Load: Viele Frauen kommen im Alltag selbst zu kurz. Die Bewegungstrainerin Vivien Malonga aus Mathon im Paznaun bringt deshalb mit Movecia ihr Wissen aus Yoga, Pilates, Somatic Movement und Breathwork online, damit Frauen zu Hause in wenigen Minuten am Tag wieder bei sich ankommen.',
+            'Mathon, Oktober 2026. Familie, Arbeit, der ganze unsichtbare Mental Load: Viele Frauen kommen im Alltag selbst zu kurz. Die Bewegungstrainerin Vivien Malonga aus Mathon im Paznaun bringt deshalb mit Movecia ihr Wissen aus Yoga, Bodyweight-Training, Somatic Movement und Breathwork online, damit Frauen zu Hause in wenigen Minuten am Tag wieder bei sich ankommen.',
             'Am 1. Dezember startet die Mindful Movement Method, eine Online-Mitgliedschaft mit Videos für müde und für volle Tage. Jede Teilnehmerin beginnt bei Monat 1 und bekommt jeden Monat ein neues Programm mit Workbook, auf Deutsch und Englisch. Am 10. Jänner 2027 beginnt außerdem „Unfold – The Mindful Becoming“, eine dreimonatige Begleitung in kleiner Runde mit höchstens zehn Frauen, wöchentlichem Live-Call, Bewegungsvideos und Workbooks zu Mental Load und Organisation.',
             'Vor Ort im Studio und online bietet Vivien Malonga zudem Prä- und Postnatal-Training an, also Begleitung durch die Schwangerschaft und die Rückbildung danach.',
             '„Ich habe selbst vier Kinder und weiß, wie schnell man sich vergisst. Bewegung muss nicht anstrengend sein, sie darf sich gut anfühlen“, sagt die Gründerin.',
@@ -62,7 +62,7 @@ function presse_intro(string $brand, string $to): array
     $f = $brand === 'forma';
     $who = $f
         ? 'mein Name ist Vivien Malonga, ich lebe mit meiner Familie in Mathon. In diesem Herbst habe ich hier das Studio FORMA eröffnet, ein Workshop-Atelier, in dem Einheimische und Gäste selbst an der Töpferscheibe arbeiten und ihre eigenen Stücke gestalten.'
-        : 'mein Name ist Vivien Malonga, ich lebe mit meiner Familie in Mathon und begleite Frauen mit Yoga, Pilates, Somatic Movement und Breathwork. Mit Movecia bringe ich dieses Angebot jetzt auch online, damit Frauen im ganzen Tal und darüber hinaus mitmachen können.';
+        : 'mein Name ist Vivien Malonga, ich lebe mit meiner Familie in Mathon und begleite Frauen mit Yoga, Bodyweight-Training, Somatic Movement und Breathwork. Mit Movecia bringe ich dieses Angebot jetzt auch online, damit Frauen im ganzen Tal und darüber hinaus mitmachen können.';
     $ask = match ($t['kind']) {
         'gemeinde' => 'Ich würde mich sehr freuen, wenn Sie in der nächsten Gemeindezeitung oder auf der Website der Gemeinde kurz darauf hinweisen könnten. Den Text unten dürfen Sie gern kürzen oder anpassen, die Fotos im Anhang sind zur freien Verwendung. Und falls es einen Redaktionsschluss für die nächste Ausgabe gibt, sagen Sie mir gern Bescheid.',
         'meinbezirk' => 'Vielleicht ist das eine Geschichte für die Ausgabe Landeck. Unten finden Sie einen kurzen Pressetext, im Anhang Fotos zur freien Verwendung. Falls jemand anderer in Ihrem Team für den Bezirk Landeck zuständig ist, leiten Sie meine Nachricht sehr gern weiter.',

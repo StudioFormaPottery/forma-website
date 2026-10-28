@@ -141,7 +141,7 @@ And now just notice how you arrived this morning. Your body. Your mood. Your tho
 
 I want to say something about breathwork before we begin.
 
-Over the years I\'ve done 1,150 hours of training. Yoga, Pilates, rehab, nervous system regulation, Yoga Nidra. And still, the most important things I learned didn\'t come from any course. They came from my own hardest days. The days when I was tired in a way sleep doesn\'t fix, with four children and a full life around me.
+Over the years I\'ve done 1,150 hours of training. Yoga, bodyweight training, rehab, nervous system regulation, Yoga Nidra. And still, the most important things I learned didn\'t come from any course. They came from my own hardest days. The days when I was tired in a way sleep doesn\'t fix, with four children and a full life around me.
 
 On those days, my breath was always the first thing I could change. Before my thoughts, before my mood, before anything else.
 
@@ -594,7 +594,7 @@ Good evening, wild hearts, and welcome to our Samhain Gathering.
 
 Let me greet everyone who has gathered tonight. {names}. I\'m so happy you\'re here on this special night.
 
-Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, Pilates and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
+Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, bodyweight training and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
 
 [optional: one more sentence about you, for example why you started this circle]
 
@@ -731,7 +731,7 @@ Hi, and welcome. Come in, come in.
 
 I can see you arriving one by one, and I want to say hello to each of you properly. {names}. I\'m so glad you\'re here.
 
-Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, Pilates and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
+Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, bodyweight training and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
 
 [optional: one more sentence about you, for example why you started this circle]
 
@@ -860,7 +860,7 @@ Hello, hello. Welcome, wild hearts.
 
 Let me say hi to everyone who is here tonight. {names}. It is so good to see you.
 
-Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, Pilates and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
+Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, bodyweight training and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
 
 [optional: one more sentence about you, for example why you started this circle]
 
@@ -912,7 +912,7 @@ Then my daughter was born. And in those first months with a newborn, I started g
 
 And slowly, something came back. Not my old self. Something new.
 
-About a year later I started my yoga teacher training. It was in the middle of Covid, so a lot of it happened online. I had a lot of time at home, and the whole world was standing still. And from there, one step led to the next. More courses. Pilates. Somatic work, nervous system regulation, Yoga Nidra, prenatal and postnatal yoga.
+About a year later I started my yoga teacher training. It was in the middle of Covid, so a lot of it happened online. I had a lot of time at home, and the whole world was standing still. And from there, one step led to the next. More courses. Bodyweight training. Somatic work, nervous system regulation, Yoga Nidra, prenatal and postnatal yoga.
 
 And I still remember my very first personal training session. I charged twenty-five euros for the hour. I was nervous and so proud at the same time.
 
@@ -985,7 +985,7 @@ Hi everyone, welcome. I\'m so happy to see you.
 
 Let me greet you one by one. {names}. Thank you for coming tonight.
 
-Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, Pilates and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
+Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, bodyweight training and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
 
 [optional: one more sentence about you, for example why you started this circle]
 
@@ -1027,7 +1027,7 @@ If I had to give it a title, it would be: it was never just about fitness.
 
 [4:30 · MY STORY]
 
-My very first personal training session cost twenty-five euros. I remember how excited I was. I had finished all my training, 1,150 hours of yoga, Pilates, rehab and nervous system work, and I thought: now I know exactly what to do. My job is to get women moving.
+My very first personal training session cost twenty-five euros. I remember how excited I was. I had finished all my training, 1,150 hours of yoga, bodyweight training, rehab and nervous system work, and I thought: now I know exactly what to do. My job is to get women moving.
 
 And I was only half right.
 
@@ -1118,7 +1118,7 @@ Hello, wild hearts. Welcome, welcome.
 
 Let me see who\'s here tonight. {names}. I\'m really glad you made it.
 
-Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, Pilates and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
+Before we start, let me quickly introduce myself to everyone who\'s new. I\'m Vivien, but please just call me Viv. I teach yoga, bodyweight training and mindful movement here in the Tyrolean mountains, I\'m a mum of four, and this circle is very close to my heart.
 
 [optional: one more sentence about you, for example why you started this circle]
 
