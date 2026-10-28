@@ -231,7 +231,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
       ['7:30', 'Morgenpraxis', 'Mindful Movement zum Ankommen im letzten Tag.'],
       ['8:15', 'Frühstück', ''],
       ['9:15', 'Lehrproben · Runde 4', 'Die letzten Einheiten. Danach hast du es geschafft.'],
-      ['11:30', 'Dein Weg danach', 'Prüfung, Zertifikat und deine Selbstständigkeit: alle Fragen auf den Tisch.'],
+      ['11:30', 'Fragerunde: Dein Weg danach', 'An diesem Wochenende gibt es keine Prüfung. Hier ist Raum für all deine Fragen zur Online-Prüfung, zum Zertifikat und zu deiner Selbstständigkeit.'],
       ['12:30', 'Mittagessen', ''],
       ['14:00', 'Rituelle Abschlusszeremonie', 'Wir würdigen gemeinsam, was in diesen elf Monaten in dir gewachsen ist.'],
       ['15:30', 'Abschlusskreis', 'Ein letztes Mal zusammen, bevor wir uns verabschieden.'],
