@@ -326,7 +326,9 @@ void main(){
       const [aw, ah] = this.s.aspect === '9:16' ? [9, 16] : this.s.aspect === '1:1' ? [1, 1] : [16, 9];
       let cw = vw, ch = vw * ah / aw; if (ch > vh) { ch = vh; cw = vh * aw / ah; }
       this.crop = [(vw - cw) / 2 / vw, (vh - ch) / 2 / vh, cw / vw, ch / vh];
-      const long = this.opts.maxLong || (Math.max(cw, ch) >= 1700 ? 1920 : 1280);
+      // Handys und langsame Geräte rechnen in 1280 (sonst hakt das Bild), schnelle Computer in 1920
+      const mobile = /iPhone|iPad|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform || ''));
+      const long = this.opts.maxLong || this.autoLong || (Math.max(cw, ch) >= 1700 && !mobile ? 1920 : 1280);
       const sc = Math.min(1, long / Math.max(cw, ch));
       const W = Math.round(cw * sc / 2) * 2, H = Math.round(ch * sc / 2) * 2;
       if (this.canvas.width !== W || this.canvas.height !== H) { this.canvas.width = W; this.canvas.height = H; }
@@ -357,8 +359,12 @@ void main(){
     setStatus(t) { this.status = t; this.emit('status'); }
     analyse(now) {
       const v = this.video, T = window.TalkCam._test;
-      if (this.needSeg()) {
-        let arr = null, w = 0, h = 0;
+      // Hintergrund-Erkennung nur so oft wie das Gerät schafft (die Maske bleibt dazwischen stehen); bei langsamen Geräten
+      // wechseln sich Gesicht und Hintergrund ab, damit das Bild flüssig bleibt (Vivien, 28.10.2026: „die Kamera hakt“)
+      const busy = (this.ft || 0) + (this.st || 0), every = busy > 34 ? 3 : busy > 18 ? 2 : 1;
+      const segNow = every === 1 || this.frame % every === 0 || !this.hasMask;
+      if (this.needSeg() && segNow) {
+        let arr = null, w = 0, h = 0; const s0 = performance.now();
         if (T && T.mask) { const r = T.mask(v); arr = r.data; w = r.w; h = r.h; }
         else if (this.seg) {
           try {
@@ -377,10 +383,11 @@ void main(){
           gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, w, h, 0, gl.RED, gl.UNSIGNED_BYTE, b);
           this.hasMask = true;
         }
+        const sd = performance.now() - s0; this.st = (this.st || sd) * .9 + sd * .1;
       }
       if (this.needFace()) {
         // jedes Bild erkennen; ist ein Gerät zu langsam (> 30 ms), nur jedes zweite und dazwischen vorhersagen
-        const skip = this.slow && this.frame % 2 === 1;
+        const skip = every > 1 && this.needSeg() ? segNow && this.hasMask : (this.slow && this.frame % 2 === 1);
         let lm = null;
         if (!skip) {
           const t0 = performance.now();
@@ -461,6 +468,9 @@ void main(){
       gl.bindTexture(gl.TEXTURE_2D, this.tVid); gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
       try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, v); } catch (e) { return; }
       if (s.on && !this.compare) this.analyse(now);
+      // Hält das Gerät nicht mit, einmalig auf 1280 herunter (nur in den ersten Sekunden, nie während einer Aufnahme)
+      const fd = performance.now() - now; this.fms = (this.fms || fd) * .95 + fd * .05;
+      if (!this.autoLong && !this.opts.maxLong && this.frame > 60 && this.frame < 400 && this.fms > 26 && Math.max(W, H) > 1300) { this.autoLong = 1280; this.layout(); return; }
       const crop = this.crop;
       // 1. Ausschnitt
       const base = this.fbo('base', W, H);

@@ -1,0 +1,131 @@
+{
+  "_info": "Fertige Talking-Head-Texte für Instagram täglich (Vivien, 28.10.2026). kind: story (kurz) oder reel (mit Einstieg, der hängen bleibt). Leerzeile = neuer Absatz (Absatz für Absatz im Studio). DE und EN frei formuliert, nie wörtlich übersetzt.",
+  "list": [
+    {
+      "id": "allein-sein",
+      "kind": "story",
+      "topic": "Alleinsein",
+      "de_t": "Allein sein darf schön sein",
+      "de": "Heute Morgen war es im ganzen Haus still. Kein Rufen, kein Klappern, nur ich und eine Tasse Tee.\n\nFrüher hätte ich diese Stille sofort mit irgendetwas gefüllt. Heute bleibe ich einfach sitzen und merke, wie gut sie mir tut.\n\nAllein sein ist nicht dasselbe wie einsam sein. Gönn dir heute fünf Minuten nur für dich.",
+      "en_t": "Being alone can feel good",
+      "en": "This morning the whole house was quiet. No shouting, no clattering, just me and a cup of tea.\n\nI used to fill that silence straight away with something, anything. Now I just sit with it and notice how much I needed it.\n\nBeing alone isn't the same as being lonely. Give yourself five minutes today that belong only to you."
+    },
+    {
+      "id": "mental-load-liste",
+      "kind": "reel",
+      "topic": "Mental Load",
+      "de_t": "Die Liste in deinem Kopf",
+      "de": "Kennst du das? Du liegst im Bett, und dein Kopf schreibt noch die Einkaufsliste, denkt an den Elternabend und an das Geschenk für Samstag.\n\nDas ist Mental Load. Die unsichtbare Arbeit, die niemand sieht, die aber unglaublich viel Kraft kostet.\n\nMein kleiner Trick: Bevor ich schlafen gehe, schreibe ich alles auf einen Zettel. Wirklich alles. Und dann darf der Zettel die Arbeit machen, nicht mein Kopf.\n\nProbier es heute Abend aus und erzähl mir, wie du geschlafen hast.",
+      "en_t": "The list in your head",
+      "en": "Do you know that feeling? You're lying in bed and your mind is still writing the shopping list, remembering the school meeting and the birthday present for Saturday.\n\nThat's the mental load. The invisible work nobody sees, but that drains so much of your energy.\n\nMy little trick: before I go to sleep, I write everything down on a piece of paper. Really everything. Then the paper gets to hold it, not my head.\n\nTry it tonight and tell me how you slept."
+    },
+    {
+      "id": "nervensystem-atem",
+      "kind": "reel",
+      "topic": "Nervensystem beruhigen",
+      "de_t": "Dreißig Sekunden für dein Nervensystem",
+      "de": "Wenn alles gleichzeitig auf dich einprasselt, brauchst du keine Stunde Yoga. Du brauchst dreißig Sekunden.\n\nAtme durch die Nase ein, ganz ruhig. Und dann atme doppelt so lang wieder aus, als würdest du durch einen Strohhalm pusten.\n\nDas lange Ausatmen sagt deinem Körper: Du bist in Sicherheit. Dein Herz wird langsamer, deine Schultern sinken.\n\nMach es dreimal hintereinander. Und speichere dir dieses Video für den nächsten chaotischen Moment.",
+      "en_t": "Thirty seconds for your nervous system",
+      "en": "When everything hits you at once, you don't need an hour of yoga. You need thirty seconds.\n\nBreathe in through your nose, nice and slow. Then breathe out twice as long, as if you were blowing through a straw.\n\nThat long exhale tells your body: you're safe. Your heart slows down, your shoulders drop.\n\nDo it three times in a row. And save this video for the next chaotic moment."
+    },
+    {
+      "id": "mama-sein",
+      "kind": "story",
+      "topic": "Moms",
+      "de_t": "Eine gute Mama sein",
+      "de": "Heute ist bei uns nicht alles rund gelaufen. Zu spät aufgestanden, ein Streit am Frühstückstisch, eine vergessene Turnhose.\n\nUnd trotzdem habe ich mich hingesetzt, meine Kinder umarmt und gesagt: Wir fangen einfach nochmal an.\n\nDu musst nicht perfekt sein, um eine gute Mama zu sein. Du darfst einfach wieder anfangen.",
+      "en_t": "Being a good mum",
+      "en": "Today didn't go smoothly at our house. We overslept, there was an argument at breakfast, and someone forgot their gym kit.\n\nBut I still sat down, hugged my kids and said: let's just start again.\n\nYou don't have to be perfect to be a good mum. You're allowed to simply start again."
+    },
+    {
+      "id": "nein-sagen",
+      "kind": "reel",
+      "topic": "Grenzen",
+      "de_t": "Nein ist ein ganzer Satz",
+      "de": "Ich habe lange gebraucht, um das zu lernen: Nein ist ein ganzer Satz.\n\nFrüher habe ich zu allem Ja gesagt. Zu jedem Gefallen, jedem Termin, jeder Bitte. Und am Abend war von mir selbst nichts mehr übrig.\n\nHeute frage ich mich zuerst: Habe ich dafür gerade wirklich Kraft? Wenn nicht, sage ich freundlich Nein. Ohne lange Erklärung.\n\nWorauf sagst du diese Woche Nein, damit du zu dir selbst Ja sagen kannst?",
+      "en_t": "No is a complete sentence",
+      "en": "It took me a long time to learn this: no is a complete sentence.\n\nI used to say yes to everything. Every favour, every appointment, every request. And by evening there was nothing left of me.\n\nNow I ask myself first: do I really have the energy for this right now? If not, I say no, kindly. Without a long explanation.\n\nWhat are you saying no to this week, so you can say yes to yourself?"
+    },
+    {
+      "id": "langsamer-morgen",
+      "kind": "story",
+      "topic": "Morgenroutine",
+      "de_t": "Mein langsamer Morgen",
+      "de": "Guten Morgen aus den Bergen. Draußen liegt noch Nebel über dem Tal, und ich nehme mir zehn Minuten, bevor der Tag losgeht.\n\nEin Glas warmes Wasser, ein paar Mal tief durchatmen, die Arme lang strecken.\n\nMehr braucht es oft gar nicht, um sich selbst wieder zu spüren. Wie beginnt dein Morgen heute?",
+      "en_t": "My slow morning",
+      "en": "Good morning from the mountains. The fog is still sitting over the valley, and I'm taking ten minutes before the day begins.\n\nA glass of warm water, a few deep breaths, a long stretch through my arms.\n\nOften that's all it takes to feel like myself again. How is your morning starting today?"
+    },
+    {
+      "id": "ruhetag",
+      "kind": "story",
+      "topic": "Pause",
+      "de_t": "Heute ist Ruhetag",
+      "de": "Heute mache ich bewusst nichts Großes. Kein Training, keine To-do-Liste, die ich unbedingt schaffen muss.\n\nIch habe lange geglaubt, ein Ruhetag sei ein verlorener Tag. Heute weiß ich: An diesen Tagen sammelt mein Körper die Kraft für alles andere.\n\nWenn du heute müde bist, bist du nicht faul. Du brauchst einfach eine Pause.",
+      "en_t": "Today is a rest day",
+      "en": "Today I'm deliberately doing nothing big. No workout, no to-do list I absolutely have to finish.\n\nFor a long time I believed a rest day was a wasted day. Now I know these are the days my body gathers strength for everything else.\n\nIf you're tired today, you're not lazy. You simply need a break."
+    },
+    {
+      "id": "freundschaften",
+      "kind": "reel",
+      "topic": "Loslassen",
+      "de_t": "Wenn Freundschaften leiser werden",
+      "de": "Nicht jede Freundschaft ist für immer. Und das ist in Ordnung.\n\nAls ich nach Tirol gezogen bin, sind manche Menschen leiser geworden. Das hat wehgetan. Ich habe mich gefragt, was ich falsch gemacht habe.\n\nHeute sehe ich es anders. Manche Menschen begleiten uns ein Stück, und dann geht jede ihren eigenen Weg. Dafür darf man dankbar sein, ohne festzuhalten.\n\nUnd plötzlich ist Platz für Menschen, die genau jetzt zu dir passen.",
+      "en_t": "When friendships grow quiet",
+      "en": "Not every friendship lasts forever. And that's okay.\n\nWhen I moved to Tyrol, some people slowly went quiet. It hurt. I kept asking myself what I'd done wrong.\n\nNow I see it differently. Some people walk part of the way with us, and then each of us takes her own path. You can be grateful for that without holding on.\n\nAnd suddenly there's room for the people who fit your life right now."
+    },
+    {
+      "id": "koerper-freundlich",
+      "kind": "reel",
+      "topic": "Körper",
+      "de_t": "Sprich freundlich mit deinem Körper",
+      "de": "Wie sprichst du eigentlich mit deinem Körper, wenn du in den Spiegel schaust?\n\nIch habe mir früher Dinge gesagt, die ich nie zu einer Freundin sagen würde. Zu dick, zu müde, zu wenig.\n\nDieser Körper hat vier Kinder getragen. Er trägt mich jeden Tag durch die Berge und durch alles, was das Leben bringt.\n\nSag ihm heute einmal Danke. Ganz laut, auch wenn es sich am Anfang komisch anfühlt.",
+      "en_t": "Speak kindly to your body",
+      "en": "How do you actually talk to your body when you look in the mirror?\n\nI used to say things to myself I would never say to a friend. Too big, too tired, not enough.\n\nThis body carried four children. It carries me through the mountains every day, and through everything life brings.\n\nSay thank you to it today. Out loud, even if it feels strange at first."
+    },
+    {
+      "id": "kleine-bewegung",
+      "kind": "story",
+      "topic": "Bewegung",
+      "de_t": "Bewegung muss nicht lang sein",
+      "de": "Ich habe heute nur zwölf Minuten Zeit gehabt. Und genau die habe ich mir genommen.\n\nEin paar Mal Katze-Kuh, ein tiefer Ausfallschritt, die Arme hoch zum Himmel.\n\nBewegung muss nicht lang sein, um gut zu tun. Sie muss sich nur nach dir anfühlen.",
+      "en_t": "Movement doesn't have to be long",
+      "en": "I only had twelve minutes today. So I took exactly those twelve minutes for myself.\n\nA few rounds of Cat-Cow, a deep lunge, arms reaching up to the sky.\n\nMovement doesn't have to be long to do you good. It just has to feel like yours."
+    },
+    {
+      "id": "winterlicht",
+      "kind": "story",
+      "topic": "Jahreszeit",
+      "de_t": "Wenn es früh dunkel wird",
+      "de": "Jetzt wird es wieder früh dunkel, und ich merke, wie mein Körper langsamer werden möchte.\n\nIch kämpfe nicht mehr dagegen an. Ich zünde am Nachmittag eine Kerze an, mache den Abend ruhiger und gehe früher schlafen.\n\nDie dunkle Jahreszeit lädt uns ein, nach innen zu schauen. Wie geht es dir gerade damit?",
+      "en_t": "When it gets dark early",
+      "en": "It's getting dark early again, and I can feel my body wanting to slow down.\n\nI've stopped fighting it. I light a candle in the afternoon, keep my evenings quieter and go to bed earlier.\n\nThe dark season invites us to turn inwards. How are you feeling about it right now?"
+    },
+    {
+      "id": "gut-genug",
+      "kind": "reel",
+      "topic": "Selbstwert",
+      "de_t": "Du bist genug, auch an schweren Tagen",
+      "de": "Das hier ist für dich, wenn heute einer dieser Tage ist.\n\nDu hast das Gefühl, du schaffst nichts. Du bist hinterher mit allem, mit dem Haushalt, der Arbeit, mit dir selbst.\n\nIch möchte dir etwas sagen: Dein Wert hängt nicht davon ab, was du heute geschafft hast. Du bist genug, auch an Tagen, an denen du nur durchkommst.\n\nAtme einmal tief durch. Und dann mach nur den nächsten kleinen Schritt.",
+      "en_t": "You are enough, even on hard days",
+      "en": "This one's for you if today is one of those days.\n\nYou feel like you're getting nothing done. You're behind on everything, the house, work, yourself.\n\nI want to tell you something: your worth doesn't depend on what you managed today. You are enough, even on the days you're just getting through.\n\nTake one deep breath. Then take just the next small step."
+    },
+    {
+      "id": "studio-einblick",
+      "kind": "story",
+      "topic": "Einblick",
+      "de_t": "Ein Blick in mein Studio",
+      "de": "Ich nehme dich heute mit in mein kleines Studio unterm Dach. Hier entstehen meine Videos, meine Flows und so viele Ideen.\n\nEs ist nicht groß und nicht perfekt. Aber es ist der Ort, an dem ich am meisten bei mir bin.\n\nHast du so einen Ort für dich? Und wenn nicht, welche Ecke in deinem Zuhause könnte er werden?",
+      "en_t": "A peek into my studio",
+      "en": "Today I'm taking you into my little studio under the roof. This is where my videos, my flows and so many ideas come to life.\n\nIt's not big and it's not perfect. But it's the place where I feel most like myself.\n\nDo you have a place like that? And if not, which corner of your home could become one?"
+    },
+    {
+      "id": "schultern-runter",
+      "kind": "reel",
+      "topic": "Nervensystem beruhigen",
+      "de_t": "Wo sind gerade deine Schultern?",
+      "de": "Kurze Frage: Wo sind gerade deine Schultern?\n\nWahrscheinlich irgendwo bei den Ohren. Bei mir sind sie dort ganz oft, ohne dass ich es merke.\n\nZieh sie jetzt einmal ganz bewusst noch höher, halte kurz, und dann lass sie mit dem Ausatmen fallen. Nochmal. Und ein drittes Mal.\n\nDein Körper merkt sich Stress in den Schultern. Und er merkt sich genauso, wenn du ihn wieder loslässt.",
+      "en_t": "Where are your shoulders right now?",
+      "en": "Quick question: where are your shoulders right now?\n\nProbably somewhere up near your ears. Mine are there all the time without me noticing.\n\nLift them up even higher on purpose, hold for a moment, then let them drop as you breathe out. Again. And one more time.\n\nYour body stores stress in your shoulders. And it remembers just as well when you let it go."
+    }
+  ]
+}

@@ -126,6 +126,13 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 .own[hidden]{display:none}
 .prc{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .prc button{font:inherit;font-size:17px;padding:10px 16px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer;min-height:46px}
+.side .box>h2{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0;user-select:none}
+.side .box>h2::after{content:"";flex:0 0 auto;width:9px;height:9px;border-right:2px solid #7D5E68;border-bottom:2px solid #7D5E68;transform:rotate(-135deg) translate(-2px,-2px);transition:transform .2s}
+.side .box.shut>h2::after{transform:rotate(45deg) translate(-2px,-2px)}
+.side .box:not(.shut)>h2{margin-bottom:12px}
+.side .box.shut{padding-top:12px;padding-bottom:12px}
+.side .box.shut>:not(h2){display:none!important}
+.sp-l{font-size:16px;color:#4A3A41;min-width:110px;text-align:center}
 .prc button[aria-pressed=true]{background:#7D5E68;border-color:#7D5E68;color:#fff}
 .chk{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:400;margin-top:10px}.chk input{width:24px;height:24px;padding:0;accent-color:#7D5E68}
 .dev{display:flex;flex-direction:column;gap:10px}.dev label{font-size:16px;color:#6B5658;font-weight:400;display:flex;flex-direction:column;gap:4px}
@@ -207,6 +214,35 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
 .pk-tabs button[aria-selected=true]{background:#4A3A41;border-color:#4A3A41;color:#fff}.pk-tabs button[aria-selected=true] span{background:rgba(255,255,255,.18)}
 .pk-pane{max-height:min(62vh,640px);overflow:auto;padding:4px 2px 6px;margin-top:8px;overscroll-behavior:contain}
 .pk-days{display:flex;flex-direction:column;gap:8px}
+/* Kalender in der Auswahl */
+.pkc-pane{max-height:none!important;overflow:visible!important}
+.pkc-wrap{display:grid;grid-template-columns:minmax(260px,330px) minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:760px){.pkc-wrap{grid-template-columns:1fr}}
+.pkc{background:#fff;border:1.5px solid #E6DCD2;border-radius:22px;padding:10px 10px 8px}
+.pkc-h{display:flex;align-items:center;justify-content:space-between;margin:0 2px 6px}
+.pkc-h b{font:500 22px/1 "Cormorant Garamond",Georgia,serif;color:#4A3A41}
+.pkc-nav{width:36px;height:36px;border-radius:50%;border:1.5px solid #E6DCD2;background:#FBF8F4;color:#4A3A41;font-size:18px;cursor:pointer}
+.pkc-g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.pkc-g .wd{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#7D7076;text-align:center;padding:2px 0 4px}
+.pkc-g .d{position:relative;aspect-ratio:1;border-radius:12px;border:0;background:none;font:inherit;font-size:15px;color:#4A3A41;cursor:default;display:flex;align-items:center;justify-content:center;padding:0}
+.pkc-g .d.out{color:#C9BEC1}
+.pkc-g .d.today{box-shadow:0 0 0 1.5px #7D5E68 inset}
+.pkc-g .d.has{cursor:pointer;font-weight:500}
+.pkc-g .d.u0{background:#7D5E68;color:#fff}.pkc-g .d.u1{background:#9B7B87;color:#fff}.pkc-g .d.u2{background:#E3CFD7;color:#4A3A41}.pkc-g .d.u3{background:#F3EAEE;color:#4A3A41}
+.pkc-g .d.late{background:#6B3F4E;color:#fff}
+.pkc-g .d.sel{outline:2.5px solid #4A3A41;outline-offset:1px}
+.pkc-g .d i{position:absolute;top:2px;right:3px;font-style:normal;font-size:10px;line-height:15px;min-width:15px;padding:0 3px;border-radius:999px;background:rgba(255,255,255,.9);color:#4A3A41}
+.pkc-leg{display:flex;flex-wrap:wrap;gap:4px 12px;margin:8px 2px 0;font-size:12px;color:#7D7076}.pkc-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertipkc-align:-1px}
+.pkc-leg .u0{background:#7D5E68}.pkc-leg .u2{background:#E3CFD7}.pkc-leg .u3{background:#F3EAEE;border:1px solid #E6DCD2}
+.pkc-list{min-width:0}
+.pkc-dt{font:500 22px/1.2 "Cormorant Garamond",Georgia,serif;color:#4A3A41;margin:2px 2px 10px}
+.pkc-tiles{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.pkc-tiles .pk-t{min-height:0;padding:9px 10px}
+.pkc-tiles .pk-t>i{width:36px;height:36px;font-size:18px;border-radius:12px}
+.pkc-tiles .pk-t b{font-size:16px}
+.pkc-cl{margin-top:10px}.pkc-cl>summary{cursor:pointer;font-size:16px;color:#6B5658;padding:6px 2px;list-style:none}.pkc-cl>summary::-webkit-details-marker{display:none}
+.pkc-cl[open]>summary{margin-bottom:8px}
+.pkc-hint{font-size:16px;color:#7D7076;margin:6px 2px}
 /* Tage als kleine zugeklappte Boxen in Movecia-Farben (Vivien, 28.10.2026) */
 .pk-day{border-radius:20px;border:1.5px solid transparent;background:#F6EEEC;transition:box-shadow .2s}
 .pk-day.c1{background:#F4E9E1}.pk-day.c2{background:#F1ECE4}.pk-day.c3{background:#EFE6EB}
@@ -282,18 +318,41 @@ $groups = function (array $list, bool $withDone = false) use ($dayLong, $pill, $
 $open = array_values(array_filter($tiles, fn($t) => !$t['ok'] && $t['ty'] !== 'ig'));
 $igT = array_values(array_filter($tiles, fn($t) => $t['ty'] === 'ig'));
 $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig'));
+// Kalender (Vivien, 28.10.2026: „Kalendertool statt großer Liste, dringend = kräftiges Pflaume“): je Fälligkeitstag die offenen Videos
+$calOpen = array_merge($open, array_values(array_filter($igT, fn($t) => !$t['ok'])));
+$calBy = []; foreach ($calOpen as $t) $calBy[$t['due'] === '' ? 'ohne' : $t['due']][] = $t;
+ksort($calBy);
+$calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'ig' => count(array_filter($l, fn($t) => $t['ty'] === 'ig')), 'th' => count(array_filter($l, fn($t) => $t['ty'] === 'talk')), 'cl' => count(array_filter($l, fn($t) => $t['ty'] === 'clip'))];
 ?>
 <section class="pk" id="pk">
   <div class="pk-now"><i id="pkI">🗣</i><div class="pk-nt"><small>Du nimmst gerade auf</small><b id="pkT">…</b><span id="pkS"></span></div>
     <button type="button" class="pk-btn" id="pkToggle" aria-expanded="false">Anderes Video wählen</button></div>
   <div class="pk-body" id="pkBody" hidden>
     <div class="pk-tabs" role="tablist">
-      <button type="button" data-tab="next" aria-selected="true">📅 Als Nächstes <span><?= count($open) ?></span></button>
+      <button type="button" data-tab="next" aria-selected="true">📅 Kalender <span><?= count($calOpen) ?></span></button>
       <?php if ($igT): ?><button type="button" data-tab="ig" aria-selected="false">📱 Instagram <span><?= count($igT) ?></span></button><?php endif; ?>
       <button type="button" data-tab="free" aria-selected="false">✍️ Frei aufnehmen</button>
       <?php if ($done): ?><button type="button" data-tab="done" aria-selected="false">✓ Schon fertig <span><?= count($done) ?></span></button><?php endif; ?>
     </div>
-    <div class="pk-pane" data-pane="next"><?= $open ? $groups($open) : '<p class="pk-empty">Alles aufgenommen. Wunderbar ♡</p>' ?></div>
+    <div class="pk-pane pkc-pane" data-pane="next"><?php if (!$calOpen): ?><p class="pk-empty">Alles aufgenommen. Wunderbar ♡</p><?php else: ?>
+      <div class="pkc-wrap">
+        <div class="pkc">
+          <div class="pkc-h"><button type="button" class="pkc-nav" data-cm="-1" aria-label="Monat davor">‹</button><b id="calM"></b><button type="button" class="pkc-nav" data-cm="1" aria-label="nächster Monat">›</button></div>
+          <div class="pkc-g" id="calG"></div>
+          <div class="pkc-leg"><span><i class="u0"></i>überfällig / diese Woche</span><span><i class="u2"></i>bis 3 Wochen</span><span><i class="u3"></i>später</span></div>
+        </div>
+        <div class="pkc-list">
+          <?php foreach ($calBy as $d => $l): $tl = array_filter($l, fn($t) => $t['ty'] !== 'clip'); $cl = array_filter($l, fn($t) => $t['ty'] === 'clip'); ?>
+          <div class="pkc-day" data-d="<?= $h($d) ?>" hidden>
+            <p class="pkc-dt"><?= $d === 'ohne' ? 'Noch ohne Datum' : 'Fertig bis ' . $h($dayLong($d)) ?></p>
+            <?php if ($tl): ?><div class="pk-tiles pkc-tiles"><?= implode('', array_map($tile, $tl)) ?></div><?php endif; ?>
+            <?php if ($cl): ?><details class="pkc-cl"<?= $tl ? '' : ' open' ?>><summary>🧘 <?= count($cl) ?> Übung<?= count($cl) > 1 ? 'en' : '' ?> filmen</summary><div class="pk-tiles pkc-tiles"><?= implode('', array_map($tile, $cl)) ?></div></details><?php endif; ?>
+          </div>
+          <?php endforeach; ?>
+          <p class="pkc-hint" id="calHint">Tippe auf einen farbigen Tag.</p>
+        </div>
+      </div>
+    <?php endif; ?></div>
     <?php if ($igT): ?><div class="pk-pane" data-pane="ig" hidden><?= $groups($igT) ?><p class="pk-sub"><a href="<?= $h($self) ?>?view=insta">Alle Storys &amp; Reels planen →</a></p></div><?php endif; ?>
     <div class="pk-pane" data-pane="free" hidden><div class="pk-tiles">
       <?= $tile(['v' => '0', 'ty' => 'own', 'ok' => false, 'n' => 'Eigener Text', 'k' => 'Talking Head', 'x' => 'z. B. Story oder Reel, nur herunterladen']) ?>
@@ -361,12 +420,12 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
       <div class="cl-all"><button type="button" class="main" id="subAll">💬 Untertitel für alle Clips erstellen</button></div>
       <div class="prog" id="subProg" hidden><i></i></div>
     </div>
-    <div class="box" id="prBox"><h2>Teleprompter</h2>
+    <div class="box" id="prBox"><h2>📝 Teleprompter</h2>
       <div class="own" id="own" hidden><textarea id="ownT" placeholder="Hier deinen Text einfügen, z. B. die Story von heute."></textarea>
         <p class="tip" id="ownHint" style="margin:6px 0 10px">Eine Leerzeile trennt die Absätze. Bei „Absatz für Absatz“ wird jeder Absatz ein eigener Clip. Oben bei Deutsch/Englisch kannst du den Text in beiden Sprachen hinterlegen (für Untertitel in der anderen Sprache).</p></div>
       <div class="prc">
         <button type="button" id="prOn" aria-pressed="true">Text an</button>
-        <button type="button" data-sp="-1" aria-label="langsamer">langsamer</button><button type="button" data-sp="1" aria-label="schneller">schneller</button>
+        <button type="button" data-sp="-1" aria-label="langsamer">− langsamer</button><span class="sp-l" id="spL"></span><button type="button" data-sp="1" aria-label="schneller">schneller +</button>
         <button type="button" data-fs="-3" aria-label="Schrift kleiner">A−</button><button type="button" data-fs="3" aria-label="Schrift größer">A+</button>
         <button type="button" id="prTop" aria-label="zum Anfang">⟲ Anfang</button>
       </div>
@@ -390,7 +449,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   <button type="button" data-sheet="more">⚙️ Mehr</button>
 </nav>
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
-<script src="/wildhearts/assets/talkcam.js?v=2"></script>
+<script src="/wildhearts/assets/talkcam.js?v=3"></script>
 <script src="studio-edit.js?v=4"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
@@ -430,7 +489,11 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   function toggle(){run=!run}
   pr.addEventListener('click',toggle);
   document.addEventListener('keydown',e=>{if(e.code==='Space'&&!/INPUT|TEXTAREA|SELECT|BUTTON/.test(document.activeElement.tagName)){e.preventDefault();toggle()}});
-  document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{sp=Math.max(10,Math.min(160,sp+(+b.dataset.sp)*8));ls.set('st-sp',sp)});
+  // Tempo in 10 deutlich spürbaren Stufen (Vivien, 28.10.2026: „langsamer/schneller funktioniert nicht“ – die alten Schritte waren zu klein)
+  const SPS=[10,15,21,28,36,45,56,70,88,110];let spLv=SPS.reduce((b,v,i)=>Math.abs(v-sp)<Math.abs(SPS[b]-sp)?i:b,0);sp=SPS[spLv];
+  document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;if(e.code==='ArrowUp'||e.code==='ArrowDown'){e.preventDefault();const b=document.querySelector('[data-sp="'+(e.code==='ArrowUp'?1:-1)+'"]');if(b)b.click()}});
+  function spUi(){const l=$('spL');if(l)l.textContent='Tempo '+(spLv+1)+' von 10'}spUi();
+  document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{spLv=Math.max(0,Math.min(9,spLv+(+b.dataset.sp)));sp=SPS[spLv];ls.set('st-sp',sp);spUi()});
   document.querySelectorAll('[data-fs]').forEach(b=>b.onclick=()=>{fs=Math.max(18,Math.min(60,fs+(+b.dataset.fs)));pr.style.setProperty('--fs',fs+'px');ls.set('st-fs',fs)});
   $('prTop').onclick=()=>{prMove(0,true);run=false};
   $('prOn').onclick=()=>{pr.hidden=!pr.hidden;$('prOn').setAttribute('aria-pressed',String(!pr.hidden));$('prOn').textContent=pr.hidden?'Text aus':'Text an'};
@@ -458,6 +521,24 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
     if(fromFile&&blob)tgt=mv?{clip:mv}:(ig?{ig:ig}:(cur?{t:cur,lang:lang}:null));
     setText();showAfter();clipUi();subPreview();}
   $('what').onchange=choose;
+  // ---- Kästen rechts einklappbar, Zustand wird gemerkt (Vivien, 28.10.2026) ----
+  const SHUT_DEF={lookBox:1,devBox:1};
+  document.querySelectorAll('.side .box').forEach(bx=>{const h=bx.querySelector(':scope>h2');if(!h||!bx.id)return;const k='st-shut-'+bx.id,v=ls.get(k,null);
+    bx.classList.toggle('shut',v===null?!!SHUT_DEF[bx.id]:v==='1');h.setAttribute('role','button');h.tabIndex=0;
+    const t=()=>{bx.classList.toggle('shut');ls.set(k,bx.classList.contains('shut')?'1':'0')};h.onclick=t;h.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();t()}}});
+  // ---- Kalender ----
+  const CAL=<?= json_encode($calMeta) ?>;let calY,calMo,calSel='';
+  (function(){const ks=Object.keys(CAL).filter(k=>k!=='ohne').sort(),td=new Date().toISOString().slice(0,10),first=ks.find(k=>k>=td)||ks[ks.length-1]||td;const d=new Date(first+'T12:00:00');calY=d.getFullYear();calMo=d.getMonth();calSel=first&&CAL[first]?first:''})();
+  function urg(d){const n=Math.round((new Date(d+'T12:00:00')-new Date(new Date().toDateString()+' 12:00'))/864e5);return n<0?'late':n<=7?'u0':n<=14?'u1':n<=21?'u2':'u3'}
+  function calDraw(){const g=$('calG');if(!g)return;const MO2=['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];$('calM').textContent=MO2[calMo]+' '+calY;
+    const f=new Date(calY,calMo,1),off=(f.getDay()+6)%7,days=new Date(calY,calMo+1,0).getDate(),td=new Date().toISOString().slice(0,10);let h=['Mo','Di','Mi','Do','Fr','Sa','So'].map(x=>'<span class="wd">'+x+'</span>').join('');
+    for(let i=0;i<off;i++)h+='<span></span>';
+    for(let d=1;d<=days;d++){const k=calY+'-'+String(calMo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'),m=CAL[k];
+      h+='<button type="button" class="d'+(m?' has '+urg(k):'')+(k===td?' today':'')+(k===calSel?' sel':'')+'" data-cd="'+k+'"'+(m?' aria-label="'+d+'.: '+m.n+' Videos"':' tabindex="-1"')+'>'+d+(m?'<i>'+m.n+'</i>':'')+'</button>'}
+    g.innerHTML=h;g.querySelectorAll('.d.has').forEach(b=>b.onclick=()=>{calSel=b.dataset.cd;calDraw();calShow()})}
+  function calShow(){document.querySelectorAll('.pkc-day').forEach(x=>x.hidden=x.dataset.d!==calSel);const hint=$('calHint');if(hint)hint.hidden=!!document.querySelector('.pkc-day:not([hidden])')}
+  document.querySelectorAll('[data-cm]').forEach(b=>b.onclick=()=>{calMo+=+b.dataset.cm;if(calMo<0){calMo=11;calY--}if(calMo>11){calMo=0;calY++}calDraw()});
+  calDraw();calShow();
   // ---- Kachel-Auswahl ----
   const pkBody=$('pkBody'),pkTg=$('pkToggle');
   function pkOpen(o){pkBody.hidden=!o;pkTg.setAttribute('aria-expanded',String(o));pkTg.textContent=o?'Schließen':'Anderes Video wählen'}
