@@ -1,6 +1,6 @@
 <?php
 // moveciamovement.com/academy/teacher-training – The Mindful Becoming Teacher Training (Vivien, 28.10.2026, Runde 2)
-// 550 Std. inkl. vollständiger 200-Std.-Yogalehrerausbildung, 11 Monate hybrid, Start Mi 3.11.2027, nur alle 2 Jahre, max. 10 Plätze.
+// 550 Std. inkl. vollständiger 200-Std.-Yogalehrerausbildung, 11 Monate hybrid, Start Mi 3.11.2027, jährlich, max. 10 Plätze.
 // Ende: Präsenzwochenende September 2028 (Lehrprobe) → Online-Abschlussprüfung mit Kamera → Zertifikat.
 // Buchung: 50 % Anzahlung, Rest auf einmal / in 2 / in 3 Zahlungen bis 15.9.2027. Early-Bird € 3.590 bis 31.3.2027, danach € 4.500.
 // ?danke=1 nach der Zahlung, ?angebot=TOKEN = persönlicher Kennenlern-Preis aus dem Gespräch (20 Min. Countdown, nie öffentlich).
@@ -68,7 +68,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   <?= mv_waves(false) ?>
   <div class="ac-hero-tx">
     <?= ac_seal('herom') ?>
-    <p class="ac-kick"><?= ac_seal('mini') ?><span><a href="/academy/">Movecia Academy</a><small><span class="de">Teacher Training 2027 · nur alle 2 Jahre</span><span class="en">Teacher Training 2027 · every two years</span></small></span></p>
+    <p class="ac-kick"><?= ac_seal('mini') ?><span><a href="/academy/">Movecia Academy</a><small><span class="de">Teacher Training · Start November 2027</span><span class="en">Teacher Training · starts November 2027</span></small></span></p>
     <h1>The Mindful Becoming <em>Teacher Training</em></h1>
     <p class="sub"><span class="de">200 Std. Yoga Teacher · Somatic Movement · Mindful Movement &amp; Mindset</span><span class="en">200 h Yoga Teacher · Somatic Movement · Mindful Movement &amp; Mindset</span></p>
     <p class="lead"><span class="de">Andere begleiten und dabei bei dir selbst bleiben. Eine Ausbildung für Frauen, die Menschen wirklich sehen möchten: zuhören, Körper lesen, das Nervensystem beruhigen. Mit einer vollständigen 200-Stunden-Yogalehrerausbildung inklusive und allem, was ich mir in meinen eigenen Ausbildungen immer gewünscht habe.</span><span class="en">Guide others and stay close to yourself while you do. A training for women who want to truly see people: listening, reading bodies, calming the nervous system. With a complete 200-hour yoga teacher training included, and everything I always wished for in my own trainings.</span></p>
@@ -90,11 +90,11 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
     <?= $spark('s1') . $spark('s2') . $spark('s3') ?>
     <div class="pic"><img src="/img/movecia/fotos/ev-lunge.jpg?v=1" alt="Vivien in einem tiefen Ausfallschritt mit erhobenen Armen in ihrem hellen Studio unter dem Dachstuhl" fetchpriority="high"></div>
     <?= ac_seal('big') ?>
-    <p class="stamp"><small><span class="de">Nur 10 Plätze</span><span class="en">Only 10 places</span></small><span class="de">und nur alle zwei Jahre</span><span class="en">and only every two years</span></p>
+    <p class="stamp"><small><span class="de">Nur 10 Plätze</span><span class="en">Only 10 places</span></small><span class="de">für eine kleine, persönliche Gruppe</span><span class="en">for a small, personal group</span></p>
   </div>
 </div></section>
 
-<div class="ac-ribbon" aria-hidden="true"><div class="rb-in"><?php for ($i = 0; $i < 2; $i++): ?><span><span class="de">nur 10 Plätze</span><span class="en">only 10 places</span></span><i>✦</i><span><span class="de">nur alle 2 Jahre</span><span class="en">only every 2 years</span></span><i>✦</i><span><?= AC_HOURS ?> <span class="de">Stunden</span><span class="en">hours</span></span><i>✦</i><span><span class="de">inkl. 200-Std.-Yogalehrerausbildung</span><span class="en">incl. 200-hour yoga teacher training</span></span><i>✦</i><span><span class="de">Präsenzwochenende in den Tiroler Alpen</span><span class="en">in-person weekend in the Tyrolean Alps</span></span><i>✦</i><?php endfor; ?></div></div>
+<div class="ac-ribbon" aria-hidden="true"><div class="rb-in"><?php for ($i = 0; $i < 2; $i++): ?><span><span class="de">nur 10 Plätze</span><span class="en">only 10 places</span></span><i>✦</i><span><?= AC_HOURS ?> <span class="de">Stunden</span><span class="en">hours</span></span><i>✦</i><span><span class="de">inkl. 200-Std.-Yogalehrerausbildung</span><span class="en">incl. 200-hour yoga teacher training</span></span><i>✦</i><span><span class="de">Präsenzwochenende in den Tiroler Alpen</span><span class="en">in-person weekend in the Tyrolean Alps</span></span><i>✦</i><?php endfor; ?></div></div>
 
 <section class="band" id="herz"><span class="band-blob b1" aria-hidden="true"></span><span class="band-blob b2" aria-hidden="true"></span><div class="w"><div class="in">
   <p class="k"><span class="de">Das Herzstück</span><span class="en">The heart of it</span></p>

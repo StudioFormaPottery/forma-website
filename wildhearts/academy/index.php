@@ -23,7 +23,7 @@ $ld = [
     ['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => [['@type' => 'ListItem', 'position' => 1, 'name' => 'Movecia', 'item' => $site . '/'], ['@type' => 'ListItem', 'position' => 2, 'name' => 'Academy', 'item' => $site . '/academy/']]],
 ];
 $css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=8">';
-mvl_head('Movecia Academy · Yogalehrerausbildung auf Deutsch, Tirol & online', 'Ausbildungen der Movecia Academy mit Vivien Malonga, ausschließlich auf Deutsch, für Österreich, Deutschland, die Schweiz und Südtirol: das Mindful Becoming Teacher Training mit 550 Stunden, inkl. vollständiger 200-Stunden-Yogalehrerausbildung, Somatic Movement und Breathwork. Hybrid, mit Präsenzwochenende in den Tiroler Alpen. Nur alle 2 Jahre, nur 10 Plätze, Start November 2027.', $site . '/academy/', '/img/movecia/og-academy.jpg', $css, $ld);
+mvl_head('Movecia Academy · Yogalehrerausbildung auf Deutsch, Tirol & online', 'Ausbildungen der Movecia Academy mit Vivien Malonga, ausschließlich auf Deutsch, für Österreich, Deutschland, die Schweiz und Südtirol: das Mindful Becoming Teacher Training mit 550 Stunden, inkl. vollständiger 200-Stunden-Yogalehrerausbildung, Somatic Movement und Breathwork. Hybrid, mit Präsenzwochenende in den Tiroler Alpen. Nur 10 Plätze, Start November 2027.', $site . '/academy/', '/img/movecia/og-academy.jpg', $css, $ld);
 ?>
 <body class="acad">
 <?php mvl_top('academy'); ?>
@@ -33,14 +33,14 @@ mvl_head('Movecia Academy · Yogalehrerausbildung auf Deutsch, Tirol & online', 
 <section class="w"><div class="in hero-x ac-hero">
   <?= mv_waves(false) ?>
   <div>
-    <div class="ac-head"><?= ac_seal() ?><p class="k" style="margin:0"><span class="de">Movecia Academy · Ausbildungen</span><span class="en">Movecia Academy · trainings</span><br><span class="de" style="color:var(--muted)">klein, persönlich, nur alle zwei Jahre</span><span class="en" style="color:var(--muted)">small, personal, only every two years</span></p></div>
+    <div class="ac-head"><?= ac_seal() ?><p class="k" style="margin:0"><span class="de">Movecia Academy · Ausbildungen</span><span class="en">Movecia Academy · trainings</span><br><span class="de" style="color:var(--muted)">klein und persönlich</span><span class="en" style="color:var(--muted)">small and personal</span></p></div>
     <h1><span class="de">Lernen, <em>andere</em> zu begleiten.</span><span class="en">Learn to <em>guide</em> others.</span></h1>
     <p class="sub"><span class="de">Ohne dich selbst dabei zu verlieren.</span><span class="en">Without losing yourself along the way.</span></p>
     <p class="lead"><span class="de">In der Movecia Academy gebe ich weiter, was ich in vielen Jahren Unterricht gelernt habe: Mindful Movement, Yoga, Somatic Movement und Breathwork, verbunden zu einer Praxis, die Körper und Kopf spürbar stärkt. Für Frauen, die selbst schon eine Weile in Bewegung sind und spüren, dass sie das weitergeben möchten. Alle Ausbildungen finden auf Deutsch statt, online aus Österreich, Deutschland, der Schweiz und Südtirol, mit Präsenzzeit in Tirol.</span><span class="en">In the Movecia Academy I pass on what many years of teaching have taught me: mindful movement, yoga, somatic movement and breathwork, woven into one practice that leaves body and mind noticeably stronger. For women who have been moving for a while themselves and feel that they want to share it.</span></p>
     <div class="cta"><a class="btn" href="/academy/teacher-training/"><span class="de">Zum Teacher Training</span><span class="en">See the teacher training</span> →</a><a class="btn line" href="#ausbildungen"><span class="de">Alle Ausbildungen</span><span class="en">All trainings</span></a></div>
   </div>
 </div></section>
-<div class="ac-ribbon" aria-hidden="true"><div class="rb-in"><?php for ($i = 0; $i < 2; $i++): ?><span><span class="de">nur 10 Plätze</span><span class="en">only 10 places</span></span><i>✦</i><span><span class="de">nur alle 2 Jahre</span><span class="en">only every 2 years</span></span><i>✦</i><span><?= AC_HOURS ?> <span class="de">Stunden</span><span class="en">hours</span></span><i>✦</i><span><span class="de">inkl. 200-Std.-Yogalehrerausbildung</span><span class="en">incl. 200-hour yoga teacher training</span></span><i>✦</i><?php endfor; ?></div></div>
+<div class="ac-ribbon" aria-hidden="true"><div class="rb-in"><?php for ($i = 0; $i < 2; $i++): ?><span><span class="de">nur 10 Plätze</span><span class="en">only 10 places</span></span><i>✦</i><span><?= AC_HOURS ?> <span class="de">Stunden</span><span class="en">hours</span></span><i>✦</i><span><span class="de">inkl. 200-Std.-Yogalehrerausbildung</span><span class="en">incl. 200-hour yoga teacher training</span></span><i>✦</i><?php endfor; ?></div></div>
 
 <section class="w sec tint t1" id="ausbildungen"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">Ausbildungen</span><span class="en">Trainings</span></p><h2 style="margin-top:.6rem"><span class="de">Dein nächster <em>Schritt</em></span><span class="en">Your next <em>step</em></span></h2></div>
