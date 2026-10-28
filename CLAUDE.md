@@ -472,3 +472,7 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Untertitel einbrennen läuft noch in Echtzeit.
 ## Shop-Fotogalerie (Vivien, 28.10.2026)
 - Ein Klick/Tipp auf ein Produktbild im Shop (Karte oder großes Bild im Kauf-Fenster) öffnet die Galerie `#lb` (Lightbox): Bild groß, Wischen/Pfeile/Pfeiltasten, Miniaturen unten, Zähler „2 / 3“, Schließen per X, Esc oder Tipp daneben. Kleine Lupe oben rechts am Bild zeigt, dass man es vergrößern kann. Bilder nicht per Rechtsklick/langem Drücken speicherbar.
+
+## Movecia · Teacher Training & Pinterest (Vivien, 28.10.2026)
+- Mindful Movement Teacher Training: Start November 2027, 200-Stunden-Ausbildung in Yoga, Somatic Movement und Bodyweight. Beim Teacher Training nie „Pilates“ nennen (Pins, Seite, Werbung). Teaser darf gezeigt werden (ersetzt „Teacher Training wird NICHT gezeigt“), Link auf die Hauptseite, bis eine eigene Seite live ist.
+- Pinterest-Profil Movecia: pinterest.at/moveciamovement, Ablauf in `tools/pinterest-movecia/README.md`.
