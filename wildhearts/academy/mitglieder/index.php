@@ -3,11 +3,13 @@
 // Zugang gleich nach der Anzahlung (gleiche Konten wie Method/Unfold: mv_members, Cookie, höchstens 3 Geräte, eins gleichzeitig).
 // Countdown bis 3.11.2027, Willkommensvideo (Studio-Lektion academy:welcome), Workbook „Schön, dass du da bist“ (kommt bald),
 // private Notizen (verschlüsselt), Fragen & Antworten, persönlicher Chat mit Vivien, Zahlungsübersicht mit Bezahl-Knopf.
-// ?demo=1 Beispielansicht ohne Konto (&lang=en). noindex.
+// Nur Deutsch (Vivien, 28.10.2026). ?demo=1 Beispielansicht ohne Konto. noindex.
 declare(strict_types=1);
 require_once __DIR__ . '/../../assets/icons.inc.php';
 require dirname(__DIR__, 3) . '/api/academy-lib.php';
 require __DIR__ . '/../../assets/layout.inc.php';
+$GLOBALS['mvl_de_only'] = true; // Ausbildung nur auf Deutsch (Vivien, 28.10.2026)
+ob_start('mv_strip_en');
 header('Cache-Control: no-store');
 header('X-Robots-Tag: noindex, nofollow');
 $GLOBALS['mvl_noindex'] = true;
@@ -21,9 +23,7 @@ $go = function (string $q = '') use ($self) { header('Location: ' . $self . $q, 
 $me = mv_current($pdo);
 $r = $me ? ac_booking_of($pdo, (string)$me['email']) : null;
 $demo = !$r && isset($_GET['demo']);
-$gl = (string)($_GET['lang'] ?? '');
-$lang = $gl === 'en' || $gl === 'de' ? $gl : ($me ? (string)$me['lang'] : '');
-if ($lang === '') $lang = str_starts_with(strtolower((string)($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? 'de')), 'en') ? 'en' : 'de';
+$lang = 'de'; // nur Deutsch; wer mit Englisch kommt, sieht oben einen kurzen Hinweis (mvl_head, .en-note)
 $L = fn(string $de, string $en) => ($lang === 'en' ? $en : $de);
 $err = ''; $note = '';
 if (!$me && ($kt = mm_dev_kicked_text($lang)) !== '') $err = $kt;
@@ -66,10 +66,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $note = $L('Wenn es für diese E-Mail einen Platz im Teacher Training gibt, ist der Link jetzt unterwegs. Schau auch im Spam-Ordner nach.', 'If there is a Teacher Training place for this email, the link is on its way. Please also check your spam folder.');
     }
     if ($me && $a === 'logout') { mm_dev_logout($pdo); mv_logout(); $go('?bye=1'); }
-    if ($me && $a === 'lang') { $pl = ($_POST['lang'] ?? '') === 'en' ? 'en' : 'de'; $pdo->prepare('UPDATE mv_members SET lang = ? WHERE id = ?')->execute([$pl, $me['id']]); $go('?lang=' . $pl); }
 }
-$_GET['lang'] = $lang; // für mvl_head (data-l)
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=3">';
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=5">';
 
 // --- Nicht angemeldet ---------------------------------------------------------------------------
 if (!$r && !$demo) {
@@ -79,8 +77,10 @@ if (!$r && !$demo) {
     if ($me && !$r) $err = $L('Für dein Konto gibt es noch keinen Platz im Teacher Training. Schreib mir gern, wenn das nicht stimmt.', 'There is no Teacher Training place for your account yet. Please write to me if that is not right.');
     mvl_head($L('Teacher Training · Mitgliederbereich', 'Teacher Training · Members area') . ' | Movecia Academy', '', mm_site() . $self, '/img/movecia/og-academy.jpg', $css);
     ?>
-<body class="acm-auth">
-<header class="w site-top"><div class="in top"><a class="brand" href="/academy/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a><div class="top-r acm-lang"><a href="?lang=de" aria-pressed="<?= $lang === 'de' ? 'true' : 'false' ?>">DE</a><a href="?lang=en" aria-pressed="<?= $lang === 'en' ? 'true' : 'false' ?>">EN</a></div></div></header>
+<body class="acad acm-auth">
+<header class="w site-top"><div class="in top"><a class="brand" href="/academy/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a><div class="top-r acm-lang"></div></div></header>
+<p class="en-note">This training is held in German only.</p>
+<?= ac_band('Mitgliederbereich') ?>
 <main class="w"><div class="in acm-authbox">
   <?= ac_seal('acm-sealbig') ?>
   <p class="k">Teacher Training 2027</p>
@@ -142,15 +142,15 @@ $hello = $hr < 11 ? $L('Guten Morgen', 'Good morning') : ($hr < 17 ? $L('Hallo',
 $spark = fn(string $cls) => '<svg class="spk ' . $cls . '" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1c1 6 5 10 11 11-6 1-10 5-11 11-1-6-5-10-11-11 6-1 10-5 11-11z"/></svg>';
 mvl_head($L('Teacher Training · Mitgliederbereich', 'Teacher Training · Members area') . ' | Movecia Academy', '', mm_site() . $self, '/img/movecia/og-academy.jpg', $css);
 ?>
-<body class="acm">
+<body class="acad acm">
 <header class="w site-top"><div class="in top">
   <a class="brand" href="/academy/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a>
   <div class="top-r acm-lang">
-    <?php if ($demo): ?><a href="?demo=1&amp;lang=de" aria-pressed="<?= $lang === 'de' ? 'true' : 'false' ?>">DE</a><a href="?demo=1&amp;lang=en" aria-pressed="<?= $lang === 'en' ? 'true' : 'false' ?>">EN</a>
-    <?php else: ?><form method="post"><input type="hidden" name="a" value="lang"><button name="lang" value="de" aria-pressed="<?= $lang === 'de' ? 'true' : 'false' ?>">DE</button><button name="lang" value="en" aria-pressed="<?= $lang === 'en' ? 'true' : 'false' ?>">EN</button></form>
-    <form method="post"><input type="hidden" name="a" value="logout"><button class="acm-out" type="submit"><?= $L('Abmelden', 'Log out') ?></button></form><?php endif; ?>
+    <?php if (!$demo): ?><form method="post"><input type="hidden" name="a" value="logout"><button class="acm-out" type="submit">Abmelden</button></form><?php endif; ?>
   </div>
 </div></header>
+<p class="en-note">This training is held in German only.</p>
+<?= ac_band('Mitgliederbereich') ?>
 <main>
 <?php if ($demo): ?><p class="acm-demo w"><?= $L('Beispielansicht · so sieht der Mitgliederbereich für eine Teilnehmerin aus', 'Example view · this is what a participant sees') ?></p><?php endif; ?>
 
@@ -199,7 +199,7 @@ mvl_head($L('Teacher Training · Mitgliederbereich', 'Teacher Training · Member
 
   <div class="acm-col">
     <section class="acm-card acm-chat" id="chat">
-      <div class="acm-chathead"><img src="/img/movecia/fotos/ev-profil.jpg" alt=""><div><p class="k"><?= $L('Dein Draht zu mir', 'Your line to me') ?></p><h2><?= $L('Schreib <em>mir</em>', 'Write to <em>me</em>') ?></h2></div></div>
+      <div class="acm-chathead"><img src="/img/movecia/fotos/ev-profil.jpg" alt=""><div><p class="k"><?= $L('Dein Draht zu mir', 'Your line to me') ?></p><h2><?= $L('Schreib <em>mir</em>', 'Write to <em>me</em>') ?></h2></div><?= ac_birds() ?></div>
       <div class="acm-msgs" id="acMsgs" aria-live="polite"></div>
       <div class="acm-sugg" id="acSugg" hidden><p class="small"><b><?= $L('Vielleicht hilft dir das schon:', 'Maybe this already helps:') ?></b></p><div id="acSuggList"></div></div>
       <form id="acChat" class="acm-send"><textarea id="acText" rows="2" maxlength="2000" placeholder="<?= $L('Deine Nachricht an Vivien …', 'Your message to Vivien …') ?>" required></textarea><button class="btn" type="submit"><?= $L('Senden', 'Send') ?></button></form>
@@ -220,7 +220,7 @@ mvl_head($L('Teacher Training · Mitgliederbereich', 'Teacher Training · Member
   </div>
 </div></div>
 
-<section class="w acm-faq"><div class="in">
+<section class="w acm-faq tint t3"><div class="in">
   <p class="k"><?= $L('Fragen & Antworten', 'Questions & answers') ?></p>
   <h2><?= $L('Was du vielleicht <em>wissen möchtest</em>', 'What you might <em>like to know</em>') ?></h2>
   <div class="cute-faq">

@@ -275,7 +275,9 @@ function ac_booking(PDO $pdo, int $id): ?array
 {
     $q = $pdo->prepare('SELECT * FROM ac_bookings WHERE id = ?');
     $q->execute([$id]);
-    return $q->fetch() ?: null;
+    $r = $q->fetch() ?: null;
+    if ($r) $r['lang'] = 'de'; // Ausbildung, Mails, Rechnungen nur auf Deutsch
+    return $r;
 }
 
 /** Bezahlte (Anzahlung da) Buchung zu einer E-Mail-Adresse. */
@@ -284,7 +286,9 @@ function ac_booking_of(PDO $pdo, string $email): ?array
     ac_schema($pdo);
     $q = $pdo->prepare("SELECT * FROM ac_bookings WHERE lower(email) = ? AND status = 'bezahlt' ORDER BY id DESC LIMIT 1");
     $q->execute([strtolower(trim($email))]);
-    return $q->fetch() ?: null;
+    $r = $q->fetch() ?: null;
+    if ($r) $r['lang'] = 'de';
+    return $r;
 }
 
 /** Belegte Plätze: bezahlt + offene Zahlungen in der Haltezeit (Testbuchungen zählen nicht). */
@@ -383,7 +387,7 @@ function ac_checkout(PDO $pdo, array $in, string $ipHash = ''): string
 {
     ac_schema($pdo);
     $c = ac_cfg();
-    $en = ($in['lang'] ?? 'de') === 'en';
+    $en = false; // Ausbildung nur auf Deutsch (Vivien, 28.10.2026)
     $name = forma_clean((string)($in['name'] ?? ''), 80);
     $email = strtolower(trim((string)($in['email'] ?? '')));
     $phone = forma_clean((string)($in['phone'] ?? ''), 40);
@@ -442,9 +446,12 @@ function ac_check_part(PDO $pdo, array $r, int $n): bool
         $pdo->prepare('UPDATE ac_bookings SET parts = ? WHERE id = ?')->execute([json_encode($parts), $r['id']]);
     }
     $r = ac_booking($pdo, (int)$r['id']);
+    // Rechnung wie gewohnt (Nummernkreis, Movecia-Design, Kopie an hello@, Google-Tabelle), das PDF aber als Anhang der Academy-Mail statt eigener Mail
+    $GLOBALS['ac_inv_capture'] = [];
     ac_payment($pdo, $r, 'cs:' . $parts[$i]['session'], (int)($s['amount_total'] ?? $parts[$i]['cents']), $n);
-    if ($first) ac_after_paid($pdo, $r);
-    else { try { ac_mail_part_thanks($r, $n); } catch (Throwable $e) { error_log('AC part thanks: ' . $e->getMessage()); } }
+    $att = $GLOBALS['ac_inv_capture']; unset($GLOBALS['ac_inv_capture']);
+    if ($first) ac_after_paid($pdo, $r, $att);
+    else { try { ac_mail_part_thanks($r, $n, $att); } catch (Throwable $e) { error_log('AC part thanks: ' . $e->getMessage()); } }
     return true;
 }
 
@@ -524,12 +531,12 @@ function ac_legal(array $r): string
         . 'Bedingungen und Widerrufsformular: ' . $site . '/terms#teacher · Vertrag widerrufen: ' . $site . '/withdraw?v=teacher';
 }
 
-function ac_after_paid(PDO $pdo, array $r): void
+function ac_after_paid(PDO $pdo, array $r, array $att = []): void
 {
     $u = $pdo->prepare('UPDATE ac_bookings SET mailed = 1 WHERE id = ? AND mailed = 0');
     $u->execute([$r['id']]);
     if ($u->rowCount() !== 1) return;
-    try { ac_mail_welcome($pdo, $r); } catch (Throwable $e) { error_log('AC welcome: ' . $e->getMessage()); }
+    try { ac_mail_welcome($pdo, $r, $att); } catch (Throwable $e) { error_log('AC welcome: ' . $e->getMessage()); }
     try { ac_notify_viv($pdo, $r); } catch (Throwable $e) { error_log('AC notify: ' . $e->getMessage()); }
 }
 
@@ -556,10 +563,16 @@ function ac_account_link(PDO $pdo, array $r): array
 /** Gemeinsamer Mail-Aufbau Academy: Konfetti-Kopf (Bild), Handschrift-Zeile, Titel, Absätze, Listen, Knopf, Rechtliches. */
 function ac_mail_html(array $r, string $hand, string $title, array $blocks, string $link, string $btn, string $legal, bool $confetti = false): string
 {
-    $html = $confetti ? '<p style="margin:0 0 14px;"><img src="' . forma_h(mm_site()) . '/img/movecia/mail-academy-konfetti.png" width="500" alt="" style="display:block;width:100%;max-width:500px;height:auto;border:0;border-radius:18px;"></p>' : '';
+    // Academy-Mails mit eigenem Kopf (Pflaume-Band mit Academy-Logo) bzw. Konfetti-Bild (Vivien, 28.10.2026)
+    $html = '<p style="margin:0 0 16px;"><img src="' . forma_h(mm_site()) . '/img/movecia/' . ($confetti ? 'mail-academy-konfetti.png' : 'mail-academy-kopf.png') . '?v=3" width="500" alt="Movecia Academy" style="display:block;width:100%;max-width:500px;height:auto;border:0;border-radius:18px;"></p>';
     $html .= '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#7D5E68;">' . forma_h($hand) . '</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:28px;line-height:1.2;color:#6B5658;margin:0 0 14px;">' . forma_h($title) . '</h1>';
     foreach ($blocks as $b) {
         if (is_array($b) && isset($b['h'])) $html .= '<h2 style="font-family:Georgia,serif;font-weight:400;font-size:21px;color:#6B5658;margin:24px 0 6px;">' . forma_h($b['h']) . '</h2>';
+        elseif (is_array($b) && isset($b['plan'])) {
+            $html .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:0 6px;margin:8px 0;">';
+            foreach ($b['plan'] as $x) $html .= '<tr><td style="background:' . ($x['paid'] ? '#EADFDE' : '#FBF8F4') . ';border-radius:14px 0 0 14px;padding:10px 0 10px 14px;width:26px;font-size:16px;color:#7D5E68;">' . ($x['paid'] ? '✓' : '○') . '</td><td style="background:' . ($x['paid'] ? '#EADFDE' : '#FBF8F4') . ';padding:10px 8px;"><b style="font-weight:600;color:#2E2529;">' . forma_h($x['lab']) . '</b><br><span style="font-size:13px;color:#7D7076;">' . forma_h($x['when']) . '</span></td><td align="right" style="background:' . ($x['paid'] ? '#EADFDE' : '#FBF8F4') . ';border-radius:0 14px 14px 0;padding:10px 14px 10px 8px;white-space:nowrap;font-size:16px;color:#2E2529;">' . forma_h($x['amt']) . '</td></tr>';
+            $html .= '</table><p style="font-size:13px;color:#7D7076;margin:2px 0 10px;">' . forma_h($b['sum']) . '</p>';
+        }
         elseif (is_array($b) && isset($b['box'])) $html .= '<div style="background:#FBF8F4;border-radius:16px;padding:14px 18px;margin:12px 0;">' . implode('', array_map(fn($x) => '<p style="margin:4px 0;">' . forma_h($x) . '</p>', $b['box'])) . '</div>';
         elseif (is_array($b)) $html .= '<ul style="padding-left:20px;margin:8px 0;">' . implode('', array_map(fn($x) => '<li style="margin:5px 0;">' . forma_h($x) . '</li>', $b)) . '</ul>';
         else $html .= '<p>' . forma_h($b) . '</p>';
@@ -574,6 +587,7 @@ function ac_mail_text(array $blocks, string $link, string $btn, string $legal, b
     $t = [];
     foreach ($blocks as $b) {
         if (is_array($b) && isset($b['h'])) $t[] = strtoupper($b['h']);
+        elseif (is_array($b) && isset($b['plan'])) $t[] = implode("\n", array_map(fn($x) => ($x['paid'] ? '✓ ' : '○ ') . $x['lab'] . ': ' . $x['amt'] . ' (' . $x['when'] . ')', $b['plan'])) . "\n" . $b['sum'];
         elseif (is_array($b) && isset($b['box'])) $t[] = implode("\n", $b['box']);
         elseif (is_array($b)) $t[] = implode("\n", array_map(fn($x) => '· ' . $x, $b));
         else $t[] = $b;
@@ -581,84 +595,77 @@ function ac_mail_text(array $blocks, string $link, string $btn, string $legal, b
     return implode("\n\n", $t) . ($link !== '' ? "\n\n$btn: $link" : '') . ($en ? "\n\nWith love,\nVivien" : "\n\nAlles Liebe,\nVivien") . ($legal !== '' ? "\n\n$legal" : '');
 }
 
-/** Die Konfetti-Mail nach der Anzahlung (Vivien, 28.10.2026): warm, ausführlich, wie an die beste Freundin, aber professionell. */
-function ac_welcome_blocks(PDO $pdo, array $r): array
+/** Zahlungsplan als Block für Mails: jede Zahlung mit Betrag, Art, Fälligkeit, bezahlt/offen, dazu Summen. */
+function ac_plan_block(array $r): array
 {
-    $en = $r['lang'] === 'en';
+    $rows = [];
+    foreach (ac_parts($r) as $p) {
+        $paid = $p['paid'] !== '';
+        $rows[] = ['amt' => ac_eur((int)$p['cents']), 'lab' => ac_part_label($r, (int)$p['n']), 'paid' => $paid,
+            'when' => $paid ? 'bezahlt am ' . mv_date(strtotime((string)$p['paid'])) : ($p['due'] === '' ? 'jetzt fällig' : 'fällig bis ' . ac_d((string)$p['due']))];
+    }
+    $paid = ac_paid_cents($r);
+    return ['plan' => $rows, 'sum' => 'Gesamtpreis ' . ac_eur((int)$r['total_cents']) . ((int)$r['eb'] ? ' (Early Bird)' : '') . ' · bezahlt ' . ac_eur($paid) . ' · offen ' . ac_eur((int)$r['total_cents'] - $paid)];
+}
+
+/** Die Konfetti-Mail nach der Anzahlung (Vivien, 28.10.2026): warm, ausführlich, wie an die beste Freundin, aber professionell. Nur Deutsch. */
+function ac_welcome_blocks(PDO $pdo, array $r, string $invNr = ''): array
+{
     $c = ac_cfg();
-    $first = forma_first_name((string)$r['name'] ?: ($en ? 'lovely' : 'meine Liebe'));
-    $start = mv_date($c['start_ts'], $en ? 'en' : 'de');
+    $first = forma_first_name((string)$r['name']) ?: 'meine Liebe';
     $next = ac_next_part($r);
-    $plan = ac_parts_lines($r, $en ? 'en' : 'de');
-    if ($en) return [
-        "Hey $first,",
-        'confetti, confetti! You have secured your place on the Movecia Mindful Movement Teacher Training 2027, and I am honestly sitting here with the biggest smile on my face.',
-        'There are only ten places, and the training only runs every two years. So the fact that one of those places is now yours means a great deal to me. This training is my heart project. I have packed into it everything I always wished for in my own trainings and so often missed: time to really arrive, a small group where you are seen, and a teacher who has your back.',
-        'We follow the international 200-hour yoga teacher training curriculum, so you won\'t miss a thing: a complete 200-hour yoga teacher training is included. On top of that come somatic movement, breathwork and meditation, sequencing, anatomy and body scanning (very close to my heart), mindful touch and rituals, mental load and the nervous system, and a module on building your own business, where I help you personally with your first steps.',
-        ['h' => 'What happens next'],
-        ['Your members area is open from today. Log in with the button below and choose your password.', 'There you will find the countdown to our start, your welcome video and soon the intro workbook "So glad you\'re here", with intentions, affirmations and a little positivity for the months ahead.', 'You have your own private notes for questions, ideas and intentions. Only you can see them.', 'And there is a personal chat with me. Write to me whenever something is on your mind; I answer personally.'],
-        ['h' => 'Your payment plan'],
-        ['box' => $plan],
-        $next ? 'I will send you a payment link about ten days before each due date, and you can pay at any time in your members area too. Everything is fully paid by ' . ac_d($c['due_final'], 'en') . '.' : 'Everything is paid in full, thank you so much.',
-        ['h' => 'When we begin'],
-        'Module 1 opens on ' . $start . ', right after the autumn school holidays. From then on a new module opens on the 1st of every month, we meet live every week, and in September 2028 we come together for our weekend in the Tyrolean Alps. I will let you know the exact date as soon as it is fixed.',
-        'Your invoice comes in a separate email. And if anything at all is unclear, simply reply to this email or write to me in the chat.',
-        'I can\'t wait to meet you.',
-    ];
     return [
-        "Hey $first,",
+        "Hallo $first,",
         'Konfetti, Konfetti! Du hast dir deinen Platz im Movecia Mindful Movement Teacher Training 2027 gesichert, und ich sitze gerade hier und strahle über das ganze Gesicht.',
         'Es gibt nur zehn Plätze, und die Ausbildung findet nur alle zwei Jahre statt. Dass einer dieser Plätze jetzt dir gehört, bedeutet mir wirklich viel. Diese Ausbildung ist mein Herzensprojekt. Ich habe alles hineingepackt, was ich mir in meinen eigenen Ausbildungen immer gewünscht und so oft vermisst habe: Zeit, um wirklich anzukommen, eine kleine Gruppe, in der du gesehen wirst, und eine Ausbilderin, die hinter dir steht.',
         'Wir folgen dem internationalen 200-Stunden-Curriculum für Yogalehrerausbildungen, damit dir nichts fehlt: Eine vollständige 200-Stunden-Yogalehrerausbildung ist inklusive. Dazu kommen Somatic Movement, Breathwork und Meditation, Sequencing, Anatomie und Body Scanning (das liegt mir besonders am Herzen), achtsame Berührung und Rituale, Mental Load und Nervensystem und ein Modul für deine Selbstständigkeit, in dem ich dir bei deinen ersten Schritten persönlich helfe.',
         ['h' => 'Wie es jetzt weitergeht'],
         ['Dein Mitgliederbereich ist ab heute offen. Melde dich über den Knopf unten an und leg dein Passwort fest.', 'Dort findest du den Countdown bis zu unserem Start, dein Willkommensvideo und bald das Einstiegs-Workbook „Schön, dass du da bist“ mit Intentionen, Affirmationen und ganz viel Vorfreude.', 'Du hast deine eigenen privaten Notizen für Fragen, Ideen und Intentionen. Die siehst nur du.', 'Und es gibt einen persönlichen Chat mit mir. Schreib mir, wann immer dich etwas beschäftigt, ich antworte dir persönlich.'],
         ['h' => 'Dein Zahlungsplan'],
-        ['box' => $plan],
-        $next ? 'Etwa zehn Tage vor jedem Termin schicke ich dir einen Bezahl-Link, und in deinem Mitgliederbereich kannst du jederzeit selbst bezahlen. Bis ' . ac_d($c['due_final']) . ' ist alles beglichen.' : 'Alles ist schon bezahlt, danke dir von Herzen.',
+        ac_plan_block($r),
+        $next ? 'Etwa zehn Tage vor jedem offenen Termin schicke ich dir einen Bezahl-Link, und in deinem Mitgliederbereich kannst du jederzeit selbst bezahlen. Bis ' . ac_d($c['due_final']) . ' ist alles beglichen. Es gibt keinen Aufschlag, dein Preis bleibt genau so.' : 'Alles ist schon bezahlt, danke dir von Herzen.',
+        $invNr !== '' ? 'Die Rechnung ' . $invNr . ' über ' . ($next ? 'deine Anzahlung' : 'den Gesamtbetrag') . ' hängt als PDF an dieser Mail.' : 'Deine Rechnung bekommst du als PDF.',
         ['h' => 'Wann wir starten'],
-        'Modul 1 öffnet sich am ' . $start . ', gleich nach den Herbstferien. Danach kommt jeweils am 1. des Monats ein neues Modul dazu, wir treffen uns jede Woche live, und im September 2028 sehen wir uns zu unserem Wochenende in den Tiroler Alpen. Den genauen Termin sage ich dir, sobald er fix ist.',
-        'Deine Rechnung bekommst du in einer eigenen E-Mail. Und wenn irgendetwas unklar ist, antworte einfach auf diese Mail oder schreib mir im Chat.',
+        'Modul 1 öffnet sich am ' . mv_date($c['start_ts']) . ', gleich nach den Herbstferien. Danach kommt jeweils am 1. des Monats ein neues Modul dazu, wir treffen uns jede Woche live, und im September 2028 sehen wir uns zu unserem Wochenende in den Tiroler Alpen. Den genauen Termin sage ich dir, sobald er fix ist.',
+        'Wenn irgendetwas unklar ist, antworte einfach auf diese Mail oder schreib mir im Chat.',
         'Ich freu mich so auf dich.',
     ];
 }
 
-function ac_mail_welcome(PDO $pdo, array $r): void
+/** $att = Rechnungs-PDF(s) aus ac_payment() als Anhang. */
+function ac_mail_welcome(PDO $pdo, array $r, array $att = []): void
 {
-    $en = $r['lang'] === 'en';
     [$link, $btn] = ac_account_link($pdo, $r);
-    $blocks = ac_welcome_blocks($pdo, $r);
+    $blocks = ac_welcome_blocks($pdo, $r, (string)($att[0][3] ?? ''));
     $legal = ac_legal($r);
-    $title = $en ? 'Your place is yours' : 'Dein Platz ist dir sicher';
     $pfx = (int)$r['test'] === 1 ? '[TEST] ' : '';
-    $subj = $pfx . ($en ? 'Confetti, confetti! Your place on the Teacher Training 2027 🎉' : 'Konfetti, Konfetti! Dein Platz im Teacher Training 2027 🎉');
-    mm_mail((string)$r['email'], $subj, ac_mail_text($blocks, $link, $btn, $legal, $en), ac_mail_html($r, $en ? 'welcome to the Academy ♡' : 'willkommen in der Academy ♡', $title, $blocks, $link, $btn, $legal, true), [], 'Vivien · Movecia Academy');
+    mm_mail((string)$r['email'], $pfx . 'Konfetti, Konfetti! Dein Platz im Teacher Training 2027 🎉', ac_mail_text($blocks, $link, $btn, $legal, false),
+        ac_mail_html($r, 'willkommen in der Academy ♡', 'Dein Platz ist dir sicher', $blocks, $link, $btn, $legal, true), array_map(fn($a) => [$a[0], $a[1], $a[2]], $att), 'Vivien · Movecia Academy');
 }
 
 /** Bezahl-Link bzw. Erinnerung für eine spätere Teilzahlung. */
 function ac_mail_due(array $r, array $p, bool $remind): void
 {
-    $en = $r['lang'] === 'en';
     $first = forma_first_name((string)$r['name']);
-    $amt = ac_eur((int)$p['cents'], $en ? 'en' : 'de');
-    $lab = ac_part_label($r, (int)$p['n'], $en ? 'en' : 'de');
-    $blocks = $en
-        ? ["Dear $first,", $remind ? "a gentle reminder: your $lab of $amt for the Teacher Training is due today (" . ac_d($p['due'], 'en') . '). If you have already paid, thank you, and please ignore this email.' : "your $lab of $amt for the Teacher Training is due on " . ac_d($p['due'], 'en') . '. You can pay it right now with the button below, or any time in your members area.', 'If anything has changed for you, simply reply to this email and we will find a way together.']
-        : ["Hallo $first,", $remind ? "eine liebe Erinnerung: Deine $lab über $amt fürs Teacher Training ist heute fällig (" . ac_d($p['due']) . '). Wenn du schon bezahlt hast, danke dir, dann ignorier diese Mail einfach.' : "deine $lab über $amt fürs Teacher Training ist am " . ac_d($p['due']) . ' fällig. Du kannst sie gleich über den Knopf unten bezahlen oder jederzeit in deinem Mitgliederbereich.', 'Wenn sich bei dir etwas verändert hat, antworte einfach auf diese Mail, dann finden wir gemeinsam eine Lösung.'];
-    $btn = $en ? 'Pay ' . $amt : $amt . ' bezahlen';
+    $amt = ac_eur((int)$p['cents']);
+    $lab = ac_part_label($r, (int)$p['n']);
+    $blocks = ["Hallo $first,", $remind ? "eine liebe Erinnerung: Deine $lab über $amt fürs Teacher Training ist heute fällig (" . ac_d($p['due']) . '). Wenn du schon bezahlt hast, danke dir, dann ignorier diese Mail einfach.' : "deine $lab über $amt fürs Teacher Training ist am " . ac_d($p['due']) . ' fällig. Du kannst sie gleich über den Knopf unten bezahlen oder jederzeit in deinem Mitgliederbereich.',
+        ['h' => 'Dein Zahlungsplan'], ac_plan_block($r), 'Wenn sich bei dir etwas verändert hat, antworte einfach auf diese Mail, dann finden wir gemeinsam eine Lösung.'];
+    $btn = $amt . ' bezahlen';
     $pfx = (int)$r['test'] === 1 ? '[TEST] ' : '';
-    $subj = $pfx . ($remind ? ($en ? 'Reminder: your payment for the Teacher Training' : 'Erinnerung: deine Zahlung fürs Teacher Training') : ($en ? 'Your next payment for the Teacher Training' : 'Deine nächste Zahlung fürs Teacher Training'));
-    mm_mail((string)$r['email'], $subj, ac_mail_text($blocks, ac_pay_link($r), $btn, '', $en), ac_mail_html($r, $en ? 'a little note ♡' : 'kurz zur Info ♡', AC_SHORT, $blocks, ac_pay_link($r), $btn, ''), [], 'Vivien · Movecia Academy');
+    mm_mail((string)$r['email'], $pfx . ($remind ? 'Erinnerung: deine Zahlung fürs Teacher Training' : 'Deine nächste Zahlung fürs Teacher Training'), ac_mail_text($blocks, ac_pay_link($r), $btn, '', false), ac_mail_html($r, 'kurz zur Info ♡', AC_SHORT, $blocks, ac_pay_link($r), $btn, ''), [], 'Vivien · Movecia Academy');
 }
 
-function ac_mail_part_thanks(array $r, int $n): void
+/** Danke-Mail für eine spätere Teilzahlung, mit aktuellem Zahlungsplan und Rechnung als Anhang. */
+function ac_mail_part_thanks(array $r, int $n, array $att = []): void
 {
-    $en = $r['lang'] === 'en';
     $first = forma_first_name((string)$r['name']);
-    $lines = ac_parts_lines($r, $en ? 'en' : 'de');
-    $blocks = $en ? ["Dear $first,", 'thank you, your payment has arrived. Here is your payment plan as it stands now:', ['box' => $lines], 'Your invoice comes in a separate email.']
-        : ["Hallo $first,", 'danke dir, deine Zahlung ist angekommen. So sieht dein Zahlungsplan jetzt aus:', ['box' => $lines], 'Deine Rechnung bekommst du in einer eigenen E-Mail.'];
+    $nr = (string)($att[0][3] ?? '');
+    $p = null; foreach (ac_parts($r) as $x) if ((int)$x['n'] === $n) $p = $x;
+    $blocks = ["Hallo $first,", 'danke dir, deine ' . ac_part_label($r, $n) . ($p ? ' über ' . ac_eur((int)$p['cents']) : '') . ' ist angekommen. So sieht dein Zahlungsplan jetzt aus:', ac_plan_block($r),
+        $nr !== '' ? 'Die Rechnung ' . $nr . ' hängt als PDF an dieser Mail.' : 'Deine Rechnung bekommst du als PDF.', ac_next_part($r) ? 'Für die nächste Zahlung schicke ich dir rechtzeitig wieder einen Bezahl-Link.' : 'Damit ist alles bezahlt. Danke dir von Herzen ♡'];
     $pfx = (int)$r['test'] === 1 ? '[TEST] ' : '';
-    mm_mail((string)$r['email'], $pfx . ($en ? 'Thank you, your payment has arrived' : 'Danke, deine Zahlung ist angekommen'), ac_mail_text($blocks, ac_area($r['lang']), $en ? 'Members area' : 'Mitgliederbereich', '', $en), ac_mail_html($r, $en ? 'thank you ♡' : 'danke ♡', AC_SHORT, $blocks, ac_area($r['lang']), $en ? 'Members area' : 'Zum Mitgliederbereich', ''), [], 'Vivien · Movecia Academy');
+    mm_mail((string)$r['email'], $pfx . 'Danke, deine Zahlung ist angekommen', ac_mail_text($blocks, ac_area(), 'Mitgliederbereich', '', false), ac_mail_html($r, 'danke ♡', AC_SHORT, $blocks, ac_area(), 'Zum Mitgliederbereich', ''), array_map(fn($a) => [$a[0], $a[1], $a[2]], $att), 'Vivien · Movecia Academy');
 }
 
 function ac_practice_label(string $k): string
@@ -696,7 +703,8 @@ function ac_invoice_source(PDO $pdo, int $payId): ?array
     $r = ac_booking($pdo, (int)$p['bid']);
     $c = ac_cfg();
     $cnt = count(ac_parts($r));
-    $text = AC_TITLE . ' · ' . ac_part_label($r, (int)$p['n']) . ($cnt > 1 ? ' (' . (int)$p['n'] . '/' . $cnt . ')' : '');
+    $lab = ac_part_label($r, (int)$p['n']);
+    $text = AC_TITLE . ' · ' . $lab . ($cnt > 1 && !str_contains($lab, ' von ') ? ' (' . (int)$p['n'] . '. von ' . $cnt . ' Zahlungen)' : '');
     $detail = 'Ausbildung, ' . AC_HOURS . ' Std. inkl. 200-Std.-Yogalehrerausbildung, hybrid, ' . date('d.m.Y', $c['start_ts']) . ' bis September 2028, inkl. Präsenzwochenende mit Unterkunft und Verpflegung, Abschlussprüfung und Zertifikat'
         . ' · Gesamtpreis ' . mv_eur((int)$r['total_cents']) . ((int)$r['eb'] ? ' (Early-Bird)' : '') . ($cnt > 1 ? ', davon mit dieser Zahlung ' . mv_eur((int)$p['cents']) : '');
     return ['name' => $r['name'], 'email' => $r['email'], 'session' => '', 'address' => $r['address'], 'country' => $r['country'] ?: 'AT', 'service' => date('d.m.Y', $c['start_ts']),
@@ -739,7 +747,7 @@ function ac_call_when(array $c, string $lang = 'de'): string
 function ac_call_request(PDO $pdo, array $in, string $ipHash): array
 {
     ac_schema($pdo);
-    $en = ($in['lang'] ?? '') === 'en';
+    $en = false; // nur Deutsch
     $date = (string)($in['date'] ?? '');
     $slot = (string)($in['slot'] ?? '');
     $ok = false;
@@ -819,15 +827,20 @@ function ac_welcome_lesson(PDO $pdo): ?array
     $q = $pdo->prepare("SELECT * FROM mv_lessons WHERE ukey = 'academy:welcome'");
     $q->execute();
     $l = $q->fetch();
+    if ($l && ($l['script_en'] !== '' || $l['title_en'] !== '')) { // nur Deutsch (Vivien, 28.10.2026)
+        $pdo->prepare("UPDATE mv_lessons SET script_en = '', title_en = '', text_en = '' WHERE id = ?")->execute([$l['id']]);
+        $pdo->prepare("UPDATE mv_programs SET title_en = '' WHERE audience = 'academy'")->execute();
+        $q->execute(); $l = $q->fetch();
+    }
     if ($l) return $l;
     $pid = (int)($pdo->query("SELECT id FROM mv_programs WHERE audience = 'academy' ORDER BY id LIMIT 1")->fetchColumn() ?: 0);
     if (!$pid) {
-        $pdo->prepare("INSERT INTO mv_programs (audience, title_de, title_en, intro_de, intro_en, theme, sort, visible, created_at) VALUES ('academy', 'Teacher Training · vor dem Start', 'Teacher Training · before we begin', '', '', 'academy', 0, 1, ?)")->execute([date('c')]);
+        $pdo->prepare("INSERT INTO mv_programs (audience, title_de, title_en, intro_de, intro_en, theme, sort, visible, created_at) VALUES ('academy', 'Teacher Training · vor dem Start', '', '', '', 'academy', 0, 1, ?)")->execute([date('c')]);
         $pid = (int)$pdo->lastInsertId();
     }
     [$de, $en] = ac_welcome_script();
     $pdo->prepare("INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, visible, created_at, script_de, script_en, ukey, due) VALUES (?,?,?,?,?,'talk','any',4,0,1,?,?,?,'academy:welcome','2026-11-08')")
-        ->execute([$pid, 'Willkommen im Teacher Training', 'Welcome to the Teacher Training', 'Mein Willkommen an dich, bevor wir starten.', 'My welcome to you before we begin.', date('c'), $de, $en]);
+        ->execute([$pid, 'Willkommen im Teacher Training', '', 'Mein Willkommen an dich, bevor wir starten.', '', date('c'), $de, '']);
     $q->execute();
     return $q->fetch() ?: null;
 }
@@ -866,6 +879,7 @@ function ac_member_faq(): array
         ['Wann ist das Präsenzwochenende?', 'Im September 2028 in den Tiroler Alpen, von Freitag 8:30 Uhr bis Sonntag 17:30 Uhr. Den genauen Termin gebe ich bekannt, sobald er fix ist, gut ein Jahr im Voraus. Unterkunft und Verpflegung sind inklusive.', 'When is the in-person weekend?', 'In September 2028 in the Tyrolean Alps, from Friday 8:30 am to Sunday 5:30 pm. I will announce the exact date as soon as it is fixed, well over a year in advance. Accommodation and meals are included.'],
         ['Was ist die Lehrprobe?', 'Im Modul Sequencing entwickelst du deine eigene Einheit von etwa 25 Minuten und unterrichtest sie beim Wochenende. Das ist keine Prüfung, sondern dein Moment. Aufgeregt sein ist ganz normal, und wir üben vorher viel gemeinsam.', 'What is the teaching practice?', 'In the sequencing module you create your own session of about 25 minutes and teach it at the weekend. It is not an exam, it is your moment. Feeling nervous is completely normal, and we practise a lot together beforehand.'],
         ['Wie läuft die Abschlussprüfung?', 'Nach dem Präsenzwochenende beantwortest du online Multiple-Choice-Fragen, zu Hause mit eingeschalteter Kamera in unserem Prüfungsraum. Danach, mit ca. 100 dokumentierten Praxisstunden, bekommst du dein Zertifikat.', 'How does the final exam work?', 'After the in-person weekend you answer multiple-choice questions online, at home with your camera on in our exam room. After that, with around 100 documented practice hours, you receive your certificate.'],
+        ['Ich wohne in Deutschland, der Schweiz oder Südtirol. Passt das?', 'Natürlich. Alles außer dem Präsenzwochenende läuft online, und bezahlt wird in Euro, auch aus der Schweiz ganz einfach per Karte. Die Ausbildung findet ausschließlich auf Deutsch statt.', '', ''],
         ['Brauche ich Vorkenntnisse?', 'Etwa eineinhalb Jahre eigene Praxis sind ideal. Wenn du dir unsicher bist, schreib mir im Chat, dann schauen wir gemeinsam, was dir jetzt noch guttut.', 'Do I need experience?', 'About a year and a half of your own practice is ideal. If you are unsure, write to me in the chat and we will look together at what would help you now.'],
     ];
 }
@@ -952,6 +966,10 @@ function ac_faq(): array
         ['Für wen ist die Ausbildung?', 'For whom is the training?',
          'Für Frauen, die selbst schon eine Weile achtsam in Bewegung sind und andere begleiten möchten. Ideal sind etwa eineinhalb Jahre eigene Praxis, zum Beispiel mit der Method, mit Unfold oder in den Gatherings. Du musst keine Sportlerin sein, wichtiger sind Neugier und Freude am Zuhören.',
          'For women who have been moving mindfully for a while themselves and want to guide others. About a year and a half of your own practice is ideal, for example with the Method, Unfold or the Gatherings. You don\'t need to be athletic; curiosity and a love of listening matter more.'],
+        ['In welcher Sprache findet die Ausbildung statt?', '',
+         'Die Ausbildung findet ausschließlich auf Deutsch statt: Videos, Workbooks, Live-Calls, Lerngruppen, das Präsenzwochenende und die Abschlussprüfung. Du solltest Deutsch gut verstehen und sprechen, damit du dich in der Gruppe wohlfühlst und später selbst auf Deutsch unterrichten kannst.', ''],
+        ['Kann ich aus Deutschland, der Schweiz oder Südtirol teilnehmen?', '',
+         'Ja, sehr gerne. Die Ausbildung ist für Teilnehmerinnen aus Österreich, Deutschland, der Schweiz und Südtirol gedacht. Module, Live-Calls, Coworking und Lerngruppen machst du online von zu Hause aus, nur zum Präsenzwochenende kommst du nach Tirol. Bezahlt wird in Euro, auch aus der Schweiz ganz einfach per Karte.', ''],
         ['Ist eine Yogalehrerausbildung enthalten?', 'Does it include a yoga teacher training?',
          'Ja. Du bekommst eine vollständige 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum inklusive. Insgesamt umfasst die Ausbildung ' . AC_HOURS . ' Stunden, mit Somatic Movement, Breathwork und Meditation, Anatomie und Body Scanning, achtsamer Berührung und Ritualen, Mental Load und Nervensystem, der Movecia Movement Method und deiner Selbstständigkeit.',
          'Yes. A complete 200-hour yoga teacher training following an international curriculum is included. In total the training covers ' . AC_HOURS . ' hours, with somatic movement, breathwork and meditation, anatomy and body scanning, mindful touch and rituals, mental load and the nervous system, the Movecia Movement Method and building your own business.'],
@@ -965,7 +983,7 @@ function ac_faq(): array
          'Nach dem Präsenzwochenende legst du online die Multiple-Choice-Abschlussprüfung ab, zu Hause mit eingeschalteter Kamera in unserem Prüfungsraum. Mit bestandener Prüfung und ca. 100 dokumentierten Praxisstunden bekommst du dein Zertifikat der Movecia Academy.',
          'After the in-person weekend you take the online multiple-choice final exam at home, with your camera on in our exam room. Once you have passed and documented around 100 practice hours, you receive your Movecia Academy certificate.'],
         ['Was kostet die Ausbildung und wie zahle ich?', 'How much does it cost and how do I pay?',
-         'Early-Bird bis ' . mv_date($c['eb_end']) . ': ' . mv_eur($c['eb_total']) . ', danach ' . mv_eur($c['r_total']) . '. Bei der Buchung zahlst du 50 % an, den Rest auf einmal oder in Teilen bis 15. September 2027, ohne Aufschlag. Je früher du buchst, desto mehr Zahlungsmöglichkeiten hast du: Bis 15. Juni 2027 kannst du in drei Teilen zahlen, bis 31. August 2027 in zwei, danach zahlst du auf einmal. Unterkunft und Verpflegung am Präsenzwochenende, Prüfung und Zertifikat sind inklusive. Die Ausbildung findet nur alle zwei Jahre statt, mit höchstens ' . $c['seats'] . ' Plätzen.',
+         'Early-Bird bis ' . mv_date($c['eb_end']) . ': ' . mv_eur($c['eb_total']) . ', danach ' . mv_eur($c['r_total']) . '. Alle Preise sind in Euro, bezahlt wird online per Karte (auch aus der Schweiz). Bei der Buchung zahlst du 50 % an, den Rest auf einmal oder in Teilen bis 15. September 2027, ohne Aufschlag. Je früher du buchst, desto mehr Zahlungsmöglichkeiten hast du: Bis 15. Juni 2027 kannst du in drei Teilen zahlen, bis 31. August 2027 in zwei, danach zahlst du auf einmal. Unterkunft und Verpflegung am Präsenzwochenende, Prüfung und Zertifikat sind inklusive. Die Ausbildung findet nur alle zwei Jahre statt, mit höchstens ' . $c['seats'] . ' Plätzen.',
          'Early bird until ' . mv_date($c['eb_end'], 'en') . ': ' . ac_eur($c['eb_total'], 'en') . ', then ' . ac_eur($c['r_total'], 'en') . '. You pay a 50 % deposit when you book and the rest at once or in parts by 15 September 2027, with no surcharge. The earlier you book, the more ways you have to pay: until 15 June 2027 you can pay in three parts, until 31 August 2027 in two, and after that in one go. Accommodation and meals at the in-person weekend, the exam and the certificate are included. The training only runs every two years, with no more than ' . $c['seats'] . ' places.'],
     ];
 }
@@ -978,13 +996,15 @@ function ac_jsonld(PDO $pdo): array
     $free = ac_free($pdo);
     $avail = $free > 0 ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/SoldOut';
     $org = ['@type' => 'EducationalOrganization', '@id' => $site . '/academy/#org', 'name' => 'Movecia Academy', 'url' => $site . '/academy/', 'logo' => $site . '/img/movecia/movecia-zeichen-1024.png', 'parentOrganization' => ['@id' => $site . '/#movecia'],
-        'founder' => ['@type' => 'Person', 'name' => 'Vivien Malonga'], 'areaServed' => [['@type' => 'Country', 'name' => 'Österreich'], ['@type' => 'Country', 'name' => 'Deutschland'], ['@type' => 'Country', 'name' => 'Schweiz'], ['@type' => 'Place', 'name' => 'Online']]];
+        'founder' => ['@type' => 'Person', 'name' => 'Vivien Malonga'], 'areaServed' => [['@type' => 'Country', 'name' => 'Österreich'], ['@type' => 'Country', 'name' => 'Deutschland'], ['@type' => 'Country', 'name' => 'Schweiz'], ['@type' => 'AdministrativeArea', 'name' => 'Südtirol']]];
+    $area = [['@type' => 'Country', 'name' => 'Österreich', 'identifier' => 'AT'], ['@type' => 'Country', 'name' => 'Deutschland', 'identifier' => 'DE'], ['@type' => 'Country', 'name' => 'Schweiz', 'identifier' => 'CH'], ['@type' => 'AdministrativeArea', 'name' => 'Südtirol', 'containedInPlace' => ['@type' => 'Country', 'name' => 'Italien', 'identifier' => 'IT']]];
     $offers = [];
-    if ($c['eb']) $offers[] = ['@type' => 'Offer', 'name' => 'Early Bird', 'price' => number_format($c['eb_total'] / 100, 2, '.', ''), 'priceCurrency' => 'EUR', 'validThrough' => $c['eb_until'], 'availability' => $avail, 'url' => $url . '#buchen', 'category' => 'Paid'];
-    $offers[] = ['@type' => 'Offer', 'name' => 'Regulär', 'price' => number_format($c['r_total'] / 100, 2, '.', ''), 'priceCurrency' => 'EUR', 'availability' => $avail, 'url' => $url . '#buchen', 'category' => 'Paid'] + ($c['eb'] ? ['validFrom' => date('Y-m-d', $c['eb_end'] + 86400)] : []);
+    if ($c['eb']) $offers[] = ['@type' => 'Offer', 'name' => 'Early Bird', 'price' => number_format($c['eb_total'] / 100, 2, '.', ''), 'priceCurrency' => 'EUR', 'validThrough' => $c['eb_until'], 'availability' => $avail, 'url' => $url . '#buchen', 'category' => 'Paid', 'areaServed' => $area, 'eligibleRegion' => $area];
+    $offers[] = ['@type' => 'Offer', 'name' => 'Regulär', 'price' => number_format($c['r_total'] / 100, 2, '.', ''), 'priceCurrency' => 'EUR', 'availability' => $avail, 'url' => $url . '#buchen', 'category' => 'Paid', 'areaServed' => $area, 'eligibleRegion' => $area] + ($c['eb'] ? ['validFrom' => date('Y-m-d', $c['eb_end'] + 86400)] : []);
     $course = ['@context' => 'https://schema.org', '@type' => 'Course', '@id' => $url . '#course', 'name' => AC_TITLE,
-        'description' => AC_HOURS . '-Stunden-Ausbildung (hybrid, 11 Monate) inkl. vollständiger 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum, Somatic Movement, Breathwork & Meditation, Anatomie & Body Scanning, achtsame Berührung & Rituale, Mental Load & Nervensystem, Selbstständigkeit. Online-Module, wöchentlicher Live-Call, Lerngruppen und Präsenzwochenende in den Tiroler Alpen. Nur alle 2 Jahre, max. 10 Plätze.',
-        'provider' => $org, 'inLanguage' => 'de', 'image' => $site . '/img/movecia/og-academy.jpg', 'url' => $url,
+        'description' => AC_HOURS . '-Stunden-Ausbildung ausschließlich auf Deutsch (hybrid, 11 Monate, online aus Österreich, Deutschland, der Schweiz und Südtirol) inkl. vollständiger 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum, Somatic Movement, Breathwork & Meditation, Anatomie & Body Scanning, achtsame Berührung & Rituale, Mental Load & Nervensystem, Selbstständigkeit. Online-Module, wöchentlicher Live-Call, Lerngruppen und Präsenzwochenende in den Tiroler Alpen. Nur alle 2 Jahre, max. 10 Plätze.',
+        'provider' => $org, 'inLanguage' => 'de', 'availableLanguage' => ['@type' => 'Language', 'name' => 'Deutsch', 'alternateName' => 'de'],
+        'audience' => ['@type' => 'Audience', 'audienceType' => 'Deutschsprachige Teilnehmerinnen aus Österreich, Deutschland, der Schweiz und Südtirol', 'geographicArea' => $area], 'image' => $site . '/img/movecia/og-academy.jpg', 'url' => $url,
         'educationalCredentialAwarded' => 'Zertifikat der Movecia Academy (' . AC_HOURS . ' Stunden)', 'timeRequired' => 'P11M', 'numberOfCredits' => AC_HOURS,
         'coursePrerequisites' => 'Etwa 1,5 Jahre eigene Bewegungspraxis empfohlen',
         'teaches' => array_map(fn($h) => $h[0], ac_hours()),
@@ -1000,19 +1020,86 @@ function ac_jsonld(PDO $pdo): array
 
 // --- Gemeinsame Gestaltung: Academy-Siegel, Early-Bird-Vögel ------------------------------------------
 
-/** Academy-Siegel (Kiesel im Bogen mit Lorbeer, „Academy“ im Kreis). $cls für Größe/Farbe. */
-function ac_seal(string $cls = ''): string
+// --- Academy-Logo (Vivien, 28.10.2026, Runde 3: eigenes Untermarken-Logo, keine Vögel) -------------------
+// Drei Entwürfe: 'bogen' (Kiesel in einem Torbogen = Schwelle in die Ausbildung, Standard), 'zwei' (zwei Kiesel:
+// Lehrerin und Schülerin), 'ring' (Siegel mit ACADEMY / MOVECIA im Kreis). AC_LOGO wählt den Standard.
+const AC_LOGO = 'bogen';
+
+/** Movecia-Kiesel (weiche Form, Umriss, Punkt) als <g>, zentriert auf (cx, cy), Breite w. */
+function ac_pebble(float $cx, float $cy, float $w, string $line, string $soft, string $dot, float $sw = 3.6, bool $withSoft = true): string
 {
-    $leaf = fn(float $a, int $side) => '<ellipse cx="0" cy="-6" rx="3.2" ry="7.5" transform="translate(' . (60 + $side * 41 * sin(deg2rad($a))) . ' ' . (64 - 41 * cos(deg2rad($a))) . ') rotate(' . ($side * $a + ($side > 0 ? 28 : -28)) . ')"/>';
-    $leaves = '';
-    foreach ([120, 140, 160, 180, 200] as $a) { $leaves .= $leaf((float)$a, 1) . $leaf((float)$a, -1); }
-    return '<svg class="ac-seal ' . $cls . '" viewBox="0 0 120 120" aria-hidden="true">'
-        . '<defs><path id="acArc" d="M 22 62 A 38 38 0 0 1 98 62"/></defs>'
-        . '<circle cx="60" cy="60" r="57" class="s-bg"/><circle cx="60" cy="60" r="52" class="s-ring"/>'
-        . '<g class="s-leaf">' . $leaves . '</g>'
-        . '<text class="s-txt"><textPath href="#acArc" startOffset="50%" text-anchor="middle">ACADEMY</textPath></text>'
-        . '<g transform="translate(36 52) scale(.38)"><path class="s-soft" d="M56 32 C 76 29, 92 44, 91 64 C 90 84, 72 96, 53 92 C 34 88, 25 72, 29 53 C 32 40, 43 33, 56 32 Z" transform="translate(-6 -4)"/><path class="s-line" d="M44 30 C 62 20, 90 28, 98 50 C 104 68, 92 78, 84 88 C 76 100, 50 98, 36 88 C 22 78, 22 58, 28 46 C 32 38, 38 33, 44 30 Z" transform="translate(7 4) translate(63 60) scale(0.85) translate(-63 -60)"/><circle class="s-dot" cx="81" cy="54" r="10"/></g>'
-        . '<text x="60" y="98" class="s-yr" text-anchor="middle">2027</text></svg>';
+    $k = $w / 94;
+    return '<g transform="translate(' . round($cx - 64 * $k, 2) . ' ' . round($cy - 61 * $k, 2) . ') scale(' . round($k, 4) . ')">'
+        . ($withSoft ? '<path fill="' . $soft . '" d="M56 32 C 76 29, 92 44, 91 64 C 90 84, 72 96, 53 92 C 34 88, 25 72, 29 53 C 32 40, 43 33, 56 32 Z" transform="translate(-6 -4)"/>' : '')
+        . '<path fill="none" stroke="' . $line . '" stroke-width="' . $sw . '" stroke-linejoin="round" d="M44 30 C 62 20, 90 28, 98 50 C 104 68, 92 78, 84 88 C 76 100, 50 98, 36 88 C 22 78, 22 58, 28 46 C 32 38, 38 33, 44 30 Z" transform="translate(7 4) translate(63 60) scale(0.85) translate(-63 -60)"/>'
+        . '<circle fill="' . $dot . '" cx="81" cy="54" r="9"/></g>';
+}
+
+/** Farben hell (auf Beige) oder auf Pflaume. */
+function ac_logo_colors(bool $onPlum): array
+{
+    return $onPlum ? ['line' => '#FBF5F7', 'soft' => 'rgba(232,214,202,.55)', 'dot' => '#F3E2D8', 'fill' => 'rgba(251,245,247,.10)', 'thin' => 'rgba(251,245,247,.55)', 'text' => '#FBF5F7', 'sub' => '#EADFDE']
+        : ['line' => '#7D5E68', 'soft' => '#E8D6CA', 'dot' => '#7D5E68', 'fill' => '#F6EAE6', 'thin' => '#C9A3AE', 'text' => '#4A3A41', 'sub' => '#7D5E68'];
+}
+
+/** Nur das Zeichen (ohne Schrift). Gibt [innerSVG, breite, höhe] zurück. */
+function ac_logo_mark(string $v, bool $onPlum = false): array
+{
+    $c = ac_logo_colors($onPlum);
+    if ($v === 'zwei') {
+        $o = '<g transform="rotate(-8 70 62)">' . ac_pebble(56, 60, 82, $c['line'], $c['soft'], $c['dot'], 3.4, false) . '</g>'
+           . ac_pebble(92, 70, 56, $c['line'], $c['soft'], $c['dot'], 4.2, true);
+        return [$o, 140, 124];
+    }
+    if ($v === 'ring') {
+        static $n = 0; $n++;
+        $o = '<defs><path id="acT' . $n . '" d="M 33 100 A 67 67 0 0 1 167 100"/><path id="acB' . $n . '" d="M 38 100 A 62 62 0 0 0 162 100"/></defs>'
+           . '<circle cx="100" cy="100" r="96" fill="' . $c['fill'] . '" stroke="' . $c['line'] . '" stroke-width="1.6"/>'
+           . '<circle cx="100" cy="100" r="86" fill="none" stroke="' . $c['thin'] . '" stroke-width="1"/>'
+           . '<text font-family="Hanken, Hanken Grotesk, Helvetica, Arial, sans-serif" font-size="15" font-weight="500" letter-spacing="5.6" fill="' . $c['line'] . '"><textPath href="#acT' . $n . '" startOffset="50.7%" text-anchor="middle">ACADEMY</textPath></text>'
+           . '<text font-family="Cormorant, Cormorant Garamond, Georgia, serif" font-style="italic" font-size="17" fill="' . $c['line'] . '" letter-spacing="1.5"><textPath href="#acB' . $n . '" startOffset="50%" text-anchor="middle" dominant-baseline="hanging">Movecia</textPath></text>'
+           . '<circle cx="34" cy="100" r="2.2" fill="' . $c['thin'] . '"/><circle cx="166" cy="100" r="2.2" fill="' . $c['thin'] . '"/>'
+           . ac_pebble(100, 100, 62, $c['line'], $c['soft'], $c['dot'], 3.8);
+        return [$o, 200, 200];
+    }
+    // 'bogen': Torbogen mit Schwelle, innen ein zweiter feiner Bogen, Kiesel in der Tür, kleiner Stern über dem Scheitel
+    $o = '<path d="M16 150 V66 A46 46 0 0 1 108 66 V150" fill="' . $c['fill'] . '" stroke="' . $c['line'] . '" stroke-width="2.6" stroke-linecap="round"/>'
+       . '<path d="M26 150 V68 A36 36 0 0 1 98 68 V150" fill="none" stroke="' . $c['thin'] . '" stroke-width="1.2" stroke-dasharray="0.1 4.4" stroke-linecap="round"/>'
+       . '<path d="M6 150 H118" stroke="' . $c['line'] . '" stroke-width="2.6" stroke-linecap="round"/>'
+       . ac_pebble(62, 104, 56, $c['line'], $c['soft'], $c['dot'], 4.0)
+       . '<path transform="translate(62 6)" d="M0 -6c.6 3.4 2.6 5.4 6 6-3.4.6-5.4 2.6-6 6-.6-3.4-2.6-5.4-6-6 3.4-.6 5.4-2.6 6-6z" fill="' . $c['thin'] . '"/>';
+    return [$o, 124, 156];
+}
+
+/** Zeichen als SVG-Element (für Seiten). $cls für Größe/Position. */
+function ac_seal(string $cls = '', ?string $v = null, bool $onPlum = false): string
+{
+    [$o, $w, $h] = ac_logo_mark($v ?? AC_LOGO, $onPlum);
+    return '<svg class="ac-seal ac-mark-' . ($v ?? AC_LOGO) . ' ' . forma_h($cls) . '" viewBox="0 0 ' . $w . ' ' . $h . '" aria-hidden="true">' . $o . '</svg>';
+}
+
+/** Logo als eigenständige SVG-Datei: 'mark' oder 'stack' (Zeichen über Schriftzug „Movecia / ACADEMY / Mindful Movement Teacher Training“). */
+function ac_logo_file(string $v, string $layout = 'stack', bool $onPlum = false): string
+{
+    [$o, $w, $h] = ac_logo_mark($v, $onPlum);
+    $c = ac_logo_colors($onPlum);
+    if ($layout === 'mark') return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="' . (int)round(1024 * $h / $w) . '" viewBox="0 0 ' . $w . ' ' . $h . '">' . $o . '</svg>';
+    $W = 420; $mw = $v === 'ring' ? 150 : ($v === 'zwei' ? 150 : 118); $mh = $mw * $h / $w;
+    $y = 20 + $mh;
+    $txt = '<text x="' . ($W / 2) . '" y="' . ($y + 66) . '" text-anchor="middle" font-family="Cormorant, Cormorant Garamond, Georgia, serif" font-weight="500" font-size="62" fill="' . $c['text'] . '">Movecia<tspan fill="' . $c['dot'] . '">.</tspan></text>'
+        . '<text x="' . ($W / 2 + 6) . '" y="' . ($y + 104) . '" text-anchor="middle" font-family="Hanken, Hanken Grotesk, Helvetica, Arial, sans-serif" font-weight="500" font-size="21" letter-spacing="12" fill="' . $c['sub'] . '">ACADEMY</text>'
+        . '<path d="M' . ($W / 2 - 70) . ' ' . ($y + 122) . ' H' . ($W / 2 + 70) . '" stroke="' . $c['thin'] . '" stroke-width="1"/>'
+        . '<text x="' . ($W / 2 + 1.5) . '" y="' . ($y + 146) . '" text-anchor="middle" font-family="Hanken, Hanken Grotesk, Helvetica, Arial, sans-serif" font-size="12.5" letter-spacing="3" fill="' . $c['sub'] . '">MINDFUL MOVEMENT TEACHER TRAINING</text>';
+    $H = (int)round($y + 166);
+    return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<svg xmlns="http://www.w3.org/2000/svg" width="' . $W * 2 . '" height="' . $H * 2 . '" viewBox="0 0 ' . $W . ' ' . $H . '">'
+        . '<svg x="' . (($W - $mw) / 2) . '" y="20" width="' . $mw . '" height="' . round($mh, 2) . '" viewBox="0 0 ' . $w . ' ' . $h . '">' . $o . '</svg>' . $txt . '</svg>';
+}
+
+/** Academy-Kopfband (Pflaume) mit Logo für alle Academy-Seiten. */
+function ac_band(string $sub = 'Mindful Movement Teacher Training'): string
+{
+    return '<div class="acband"><div class="acband-in"><a href="/academy/" class="acband-l">' . ac_seal('acband-mark', null, true)
+        . '<span><b>Movecia <i>Academy</i></b><small>' . forma_h($sub) . '</small></span></a><span class="acband-r">nur 10 Plätze · nur alle 2 Jahre</span></div></div>';
 }
 
 /** Kleine handgezeichnete Vögel fürs Early-Bird-Abzeichen. */

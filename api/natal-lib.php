@@ -826,6 +826,9 @@ function natal_invoice_mail(array $inv, string $pdf): void
             ["Hi $first,", $storno ? 'attached is credit note ' . $inv['nr'] . ' for your records. The amount of ' . forma_cents_de(-(int)$inv['gross_cents']) . ' will be refunded to you.'
                 : 'attached is your invoice ' . $inv['nr'] . ' as a PDF. Amount: ' . forma_cents_de((int)$inv['gross_cents']) . ' (already paid).', 'If you have any questions, just reply to this email.'],
             null, [[$file, $pdf, 'application/pdf']]);
+    } elseif (str_starts_with((string)($inv['kind'] ?? ''), 'ac_') && isset($GLOBALS['ac_inv_capture']) && is_array($GLOBALS['ac_inv_capture'])) {
+        // Academy (Vivien, 28.10.2026): PDF hängt an der Bestätigungs-/Danke-Mail, keine eigene Rechnungsmail an die Teilnehmerin
+        $GLOBALS['ac_inv_capture'][] = [$file, $pdf, 'application/pdf', (string)$inv['nr']];
     } elseif (trim((string)$inv['email']) !== '') {
         $storno = (int)$inv['gross_cents'] < 0;
         natal_mail((string)$inv['email'], ($storno ? 'Deine Stornorechnung ' : 'Deine Rechnung ') . $inv['nr'] . ' von Movecia', $storno ? 'Deine Stornorechnung' : 'Deine Rechnung',

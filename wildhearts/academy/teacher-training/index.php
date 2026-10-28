@@ -8,6 +8,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/../../assets/icons.inc.php';
 require dirname(__DIR__, 3) . '/api/academy-lib.php';
 require __DIR__ . '/../../assets/layout.inc.php';
+$GLOBALS['mvl_de_only'] = true; // Ausbildung nur auf Deutsch (Vivien, 28.10.2026)
+ob_start('mv_strip_en');
 header('Cache-Control: no-store');
 $pdo = forma_db();
 ac_schema($pdo);
@@ -26,9 +28,9 @@ $ee = fn(int $x) => ac_eur($x, 'en');
 $dd = fn(string $ymd) => ac_d($ymd);
 $de2 = fn(string $ymd) => ac_d($ymd, 'en');
 if ($offer || isset($_GET['danke']) || isset($_GET['abbruch'])) $GLOBALS['mvl_noindex'] = true;
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=3">';
-mvl_head('Mindful Movement Teacher Training · Yogalehrerausbildung ' . AC_HOURS . ' Std. hybrid, Tirol | Movecia Academy',
-    'The Movecia Method: ' . AC_HOURS . '-Stunden-Ausbildung mit Vivien Malonga, inklusive vollständiger 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum, Somatic Movement, Breathwork, Anatomie & Body Scanning, achtsame Berührung, Mental Load & Nervensystem. 11 Monate hybrid mit Präsenzwochenende in Tirol, Start ' . mv_date($st) . '. Nur alle 2 Jahre, nur 10 Plätze.' . ($c['eb'] ? ' Early-Bird bis ' . mv_date($c['eb_end']) . '.' : ''),
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=5">';
+mvl_head('Yogalehrerausbildung auf Deutsch · Mindful Movement Teacher Training ' . AC_HOURS . ' Std. | Movecia Academy Tirol',
+    'Die ' . AC_HOURS . '-Stunden-Ausbildung mit Vivien Malonga, ausschließlich auf Deutsch: vollständige 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum, Somatic Movement, Breathwork, Anatomie & Body Scanning, Mental Load & Nervensystem. 11 Monate hybrid, online aus Österreich, Deutschland, der Schweiz und Südtirol, Präsenzwochenende in Tirol. Start ' . mv_date($st) . ', nur 10 Plätze.' . ($c['eb'] ? ' Early-Bird bis ' . mv_date($c['eb_end']) . '.' : ''),
     $site . '/academy/teacher-training/', '/img/movecia/og-academy.jpg', $css, ac_jsonld($pdo));
 $hours = ac_hours();
 $pr = ['lt1' => ['weniger als 1 Jahr', 'less than a year'], '1to2' => ['1–2 Jahre', '1–2 years'], 'gt2' => ['mehr als 2 Jahre', 'more than 2 years'], 'teach' => ['ich unterrichte schon', 'I already teach']];
@@ -49,8 +51,10 @@ $plans = ac_plans_open();
 $defPlan = isset($plans['two']) ? 'two' : 'full';
 $sched = fn(string $k) => ac_schedule($p['total'], $k);
 ?>
-<body>
+<body class="acad">
 <?php mvl_top('academy'); ?>
+<p class="en-note">This training is held in German only.</p>
+<?= ac_band('Mindful Movement Teacher Training') ?>
 <main id="top">
 <?php if ($offerLive): ?>
 <div class="w"><div class="offerbar" id="offerbar" data-until="<?= (int)$offer['offer_until'] ?>" data-now="<?= time() ?>">
@@ -71,6 +75,8 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
       <span><span class="de"><?= AC_HOURS ?> Stunden inkl. 200 Std. Yoga</span><span class="en"><?= AC_HOURS ?> hours incl. 200 h yoga</span></span>
       <span><span class="de">11 Monate · hybrid</span><span class="en">11 months · hybrid</span></span>
       <span><span class="de">Start <?= mv_date($st) ?></span><span class="en">Starts <?= mv_date($st, 'en') ?></span></span>
+      <span><span class="de">ausschließlich auf Deutsch</span></span>
+      <span><span class="de">für Österreich, Deutschland, Schweiz &amp; Südtirol</span></span>
       <span class="chip ok"><?= $free ? '<span class="de">Plätze frei</span><span class="en">Places available</span>' : '<span class="de">ausgebucht</span><span class="en">fully booked</span>' ?></span>
     </div>
     <?php if ($c['eb']): ?>
@@ -100,7 +106,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   </div>
 </div></div></section>
 
-<section class="w sec" id="wunsch"><div class="in">
+<section class="w sec tint t1" id="wunsch"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">Was du bekommst</span><span class="en">What you get</span></p><h2 style="margin-top:.6rem"><span class="de">Alles, was ich mir selbst <em>gewünscht</em> hätte</span><span class="en">Everything I wish I'd been <em>given</em></span></h2></div>
     <p><span class="de">Du bekommst eine vollständige 200-Stunden-Yogalehrerausbildung inklusive. Und dazu all das, was ich in meinen eigenen Ausbildungen so oft vermisst habe.</span><span class="en">You get a complete 200-hour yoga teacher training included. And on top of it, everything I so often missed in my own trainings.</span></p></div>
   <div class="wish cute-cards">
@@ -149,7 +155,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   </div>
 </div></section>
 
-<section class="w sec" id="ablauf"><div class="in">
+<section class="w sec tint t3" id="ablauf"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">So lernst du</span><span class="en">How you learn</span></p><h2 style="margin-top:.6rem"><span class="de">Elf Monate, <em>nie allein</em></span><span class="en">Eleven months, <em>never alone</em></span></h2></div>
     <p><span class="de">Jeden Monat öffnet sich ein neues Modul, immer am 1., nur das erste startet am Mittwoch, <?= mv_date($st) ?>. Plan etwa 10 bis 12 Stunden pro Woche ein, für Videos, Workbook, deine eigene Praxis, den Live-Call und deine Lerngruppe.</span><span class="en">A new module opens every month, always on the 1st; only the first opens on Wednesday, <?= mv_date($st, 'en') ?>. Allow about 10 to 12 hours a week for videos, workbook, your own practice, the live call and your learning group.</span></p></div>
   <div class="how6 cute-cards">
@@ -196,7 +202,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   </div>
 </div></section>
 
-<section class="w sec" id="weg"><div class="in">
+<section class="w sec tint t4" id="weg"><div class="in">
   <div class="rv" style="text-align:center"><p class="k"><span class="de">Dein Weg</span><span class="en">Your path</span></p><h2 style="margin-top:.6rem"><span class="de">Von der eigenen Praxis zum <em>Zertifikat</em></span><span class="en">From your own practice to your <em>certificate</em></span></h2></div>
   <div class="path">
     <div class="pst rv"><span class="dot"><?= mv_icon_svg('welle') ?></span><div><span class="wd"><span class="de">Vorher · empfohlen</span><span class="en">Beforehand · recommended</span></span><b><span class="de">Etwa 1,5 Jahre eigene Praxis</span><span class="en">About 1.5 years of your own practice</span></b><p><span class="de">Mit der <a href="/method/">Method</a>, mit <a href="/unfold/">Unfold</a> oder in den <a href="/gathering/">Gatherings</a> lernst du die Movecia-Art zu bewegen von innen kennen.</span><span class="en">With the <a href="/method/">Method</a>, <a href="/unfold/">Unfold</a> or the <a href="/gathering/">Gatherings</a> you get to know the Movecia way of moving from the inside.</span></p></div></div>
@@ -210,7 +216,23 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   </div>
 </div></section>
 
-<section class="w sec" id="gespraech"><div class="in">
+<section class="w sec tint t2" id="wo"><div class="in wo">
+  <div class="wo-t">
+    <p class="k">Sprache &amp; Region</p>
+    <h2>Auf Deutsch, <em>von überall</em></h2>
+    <p class="lead">Die Ausbildung findet ausschließlich auf Deutsch statt. Sie ist für Teilnehmerinnen aus Österreich, Deutschland, der Schweiz und Südtirol gedacht: Module, Live-Calls, Coworking und Lerngruppen machst du online, ganz gleich, wo du wohnst. Nur zum Präsenzwochenende kommen wir in den Tiroler Alpen zusammen.</p>
+    <p class="mut">Wenn du eine Yogalehrerausbildung auf Deutsch suchst, die du großteils online machen kannst und die sich trotzdem persönlich und nah anfühlt, bist du hier richtig, egal ob du in Wien, München, Zürich oder Bozen zu Hause bist.</p>
+  </div>
+  <ul class="wo-l">
+    <li><b>🇦🇹 Österreich</b><span>Yogalehrerausbildung in Tirol, hybrid</span></li>
+    <li><b>🇩🇪 Deutschland</b><span>online dabei, Wochenende in Tirol</span></li>
+    <li><b>🇨🇭 Schweiz</b><span>online dabei, bezahlt wird in Euro</span></li>
+    <li><b>Südtirol</b><span>online dabei, Wochenende gleich ums Eck</span></li>
+  </ul>
+  <?= ac_birds() ?>
+</div></section>
+
+<section class="w sec tint t1" id="gespraech"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">Kostenlos &amp; unverbindlich</span><span class="en">Free &amp; no obligation</span></p><h2 style="margin-top:.6rem"><span class="de">Lass uns <em>reden</em></span><span class="en">Let's <em>talk</em></span></h2></div>
     <p><span class="de">In 30 Minuten per Video lernen wir uns kennen, und du kannst alles fragen, was dir auf dem Herzen liegt. Das Gespräch ist freiwillig, du kannst auch direkt buchen.</span><span class="en">In 30 minutes by video we get to know each other, and you can ask me anything that is on your mind. The call is optional; you can also book straight away.</span></p></div>
   <div class="callbox rv">
@@ -299,7 +321,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   </div>
 </div></section>
 
-<section class="w sec"><div class="in fq">
+<section class="w sec tint t3" id="faq"><div class="in fq">
   <p class="k"><span class="de">Fragen</span><span class="en">Questions</span></p>
   <h2 style="margin:.6rem 0 1rem"><span class="de">Gut zu <em>wissen</em></span><span class="en">Good to <em>know</em></span></h2>
   <div class="cute-faq">
