@@ -1,0 +1,183 @@
+/* Movecia Academy (Vivien, 28.10.2026): Übersicht /academy und Teacher Training. Baut auf mv.css, site.css und cute.css auf. */
+.ac-hero{display:grid;gap:2.4rem;align-items:center}
+@media(min-width:1000px){.ac-hero.two{grid-template-columns:1.1fr .9fr;gap:4rem}}
+.ac-hero h1{font-size:clamp(3rem,7.6vw,6.8rem)}
+.ac-hero .pic{position:relative;aspect-ratio:4/5;max-width:520px;width:100%;justify-self:center;border-radius:260px 260px 28px 28px;overflow:hidden;background:var(--peach)}
+.ac-hero .pic img{width:100%;height:100%;object-fit:cover;display:block}
+.ac-hero .pic .stamp{position:absolute;left:14px;right:14px;bottom:14px;background:rgba(251,248,244,.93);border-radius:20px;padding:.9rem 1.1rem;font-family:var(--serif);font-size:1.25rem;line-height:1.25}
+.ac-hero .pic .stamp small{display:block;font-family:var(--sans);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--plum);margin-bottom:.2rem}
+.chip.ok{background:#EFE3E0;border-color:#C9B0B8;color:var(--deep)}
+.chip.ok::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--plum)}
+.ebadge{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.3rem .7rem;margin-top:1.4rem;background:var(--deep);color:var(--on);border-radius:999px;padding:.55em 1.2em .55em .6em;font-size:.95rem}
+.ebadge b{background:var(--peach);color:var(--deep);border-radius:999px;padding:.2em .8em;font-weight:500;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase}
+@media(max-width:520px){.ebadge{border-radius:20px}}
+/* Übersicht */
+.ac-list{display:grid;gap:22px}
+@media(min-width:960px){.ac-list{grid-template-columns:1.6fr 1fr}}
+.ac-card{position:relative;display:grid;background:#F1E4DA;border-radius:32px;overflow:hidden;text-decoration:none;color:var(--ink);isolation:isolate;transition:transform .5s ease,box-shadow .5s ease}
+a.ac-card:hover{transform:translateY(-4px);box-shadow:0 18px 40px -24px rgba(74,58,65,.45)}
+@media(min-width:700px){a.ac-card{grid-template-columns:.9fr 1.1fr}}
+.ac-pic{position:relative;min-height:280px;background:var(--peach)}
+.ac-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ac-tx{padding:1.6rem 1.6rem 1.8rem;display:flex;flex-direction:column;gap:.55rem}
+.ac-tx .ico{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.7);color:var(--plum)}
+.ac-tx h3{font-size:clamp(2rem,3vw,2.6rem);font-weight:400}
+.ac-sub{font-family:var(--serif);font-style:italic;font-size:1.35rem;color:var(--plum);margin-top:-.3rem!important}
+.ac-tx p{color:var(--muted)}.ac-tx .k{color:var(--plum)}
+.ac-tx .meta{display:flex;flex-wrap:wrap;gap:.4rem}
+.ac-eb{color:var(--deep)!important;font-weight:500}
+.ac-tx .more{color:var(--plum);font-weight:500;margin-top:.3rem}
+.ac-soon{background:transparent;border:1.5px dashed #C9B0B8;place-items:center;text-align:center;min-height:260px}
+.ac-soon-in{padding:2rem 1.6rem;display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.ac-soon h3{font-weight:400;font-size:2rem}.ac-soon p{color:var(--muted);max-width:28em}
+.ac-soon .ico{width:64px;height:64px;border-radius:50%;background:var(--card);color:var(--plum)}
+.ib{display:grid}.ib svg{width:36px;height:36px}
+/* Teacher Training: Herzstück */
+.heart{display:grid;gap:14px;margin-top:2.2rem}
+@media(min-width:900px){.heart{grid-template-columns:repeat(3,1fr)}}
+.heart>div{background:rgba(251,245,247,.1);border:1px solid rgba(251,245,247,.22);border-radius:24px;padding:1.4rem 1.4rem 1.5rem;text-align:left}
+.heart b{display:block;font-family:var(--serif);font-weight:400;font-size:1.7rem;line-height:1.1;margin:.6rem 0 .4rem;color:var(--on)}
+.heart p{color:#EFE3E5}
+.heart .ib{width:56px;height:56px;place-items:center;border-radius:50%;background:rgba(251,245,247,.14);color:var(--peach)}
+.notx{display:grid;gap:10px;margin:2rem auto 0;max-width:900px;text-align:left}
+@media(min-width:760px){.notx{grid-template-columns:1fr 1fr}}
+.notx div{border-radius:20px;padding:1rem 1.2rem;font-size:.98rem}
+.notx .no{background:rgba(46,37,41,.18);color:#E3D6DA}.notx .no b{color:#F3E4DA}
+.notx .yes{background:var(--on);color:var(--deep)}.notx .yes b{color:var(--plum)}
+.notx b{display:block;font-family:var(--serif);font-weight:500;font-size:1.3rem;margin-bottom:.15rem}
+/* Stunden */
+.hours{display:grid;gap:14px;margin-top:2rem}
+@media(min-width:1000px){.hours{grid-template-columns:1.25fr .75fr;align-items:start}}
+.hbars{background:var(--card);border-radius:28px;padding:clamp(1.2rem,3vw,2rem)}
+.hb{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.2rem 1rem;align-items:baseline;padding:.75rem 0;border-bottom:1px solid var(--line)}
+.hb:last-child{border-bottom:0}
+.hb .t{font-family:var(--serif);font-size:clamp(1.25rem,1.7vw,1.5rem);line-height:1.15}
+.hb .h{font-family:var(--serif);font-size:clamp(1.3rem,1.8vw,1.6rem);color:var(--plum);white-space:nowrap}
+.hb .bar{grid-column:1/-1;height:10px;border-radius:99px;background:var(--bg);overflow:hidden}
+.hb .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#C9B0B8,var(--plum));width:var(--w);transform-origin:left;transform:scaleX(0);transition:transform 1.4s cubic-bezier(.3,.7,.2,1)}
+.hbars.in-view .bar i{transform:none}
+@media(prefers-reduced-motion:reduce){.hb .bar i{transform:none;transition:none}}
+.hb .s{grid-column:1/-1;font-size:.9rem;color:var(--muted)}
+.hb.star .t::after{content:"Herzensthema";display:inline-block;vertical-align:middle;margin-left:.6rem;font-family:var(--sans);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;background:var(--peach);color:var(--deep);border-radius:99px;padding:.25em .7em}
+html[data-l=en] .hb.star .t::after{content:"Close to my heart"}
+.hb.star .bar i{background:linear-gradient(90deg,var(--peach),#9A6F7A)}
+.hsum{display:flex;justify-content:space-between;align-items:baseline;margin-top:.6rem;padding-top:.9rem;border-top:2px solid var(--plum);font-family:var(--serif);font-size:1.6rem}
+.anat{position:relative;background:#EEDFE0;border-radius:28px;overflow:hidden;display:flex;flex-direction:column}
+.anat img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;object-position:50% 70%}
+.anat .tx{padding:1.4rem 1.5rem 1.6rem}
+.anat h3{font-weight:400;font-size:clamp(1.8rem,2.4vw,2.3rem);margin:.4rem 0 .5rem}
+.anat p{color:var(--muted)}
+.anat ul{margin:.8rem 0 0;padding:0;list-style:none;display:grid;gap:.4rem}
+.anat li{display:flex;gap:.6rem;align-items:flex-start;font-size:.95rem}
+.anat li::before{content:"";flex:0 0 8px;height:8px;border-radius:50%;background:var(--plum);margin-top:.55em}
+/* Module */
+.mods{display:grid;gap:12px;margin-top:2rem;grid-template-columns:1fr}
+@media(min-width:640px){.mods{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1100px){.mods{grid-template-columns:repeat(4,1fr)}}
+.mod{background:var(--card);border-radius:22px;padding:1.1rem 1.2rem 1.2rem;position:relative;overflow:hidden}
+.mod .n{position:absolute;right:1rem;top:.5rem;font-family:var(--serif);font-size:3.2rem;line-height:1;color:var(--blush)}
+.mod .d{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--plum)}
+.mod b{display:block;font-family:var(--serif);font-weight:500;font-size:1.4rem;line-height:1.15;margin-top:.35rem;padding-right:2.4rem;position:relative}
+.mod.hl{background:#EEDFE0}.mod.last{background:var(--deep);color:var(--on)}.mod.last .d{color:var(--peach)}.mod.last .n{color:#5d4a53}
+.mod.wk{background:transparent;border:1.5px dashed var(--plum)}
+/* Ablauf: drei Bausteine */
+.how{display:grid;gap:14px;margin-top:2rem}
+@media(min-width:900px){.how{grid-template-columns:repeat(3,1fr)}}
+/* Präsenzwochenende + Abschluss */
+.duo{display:grid;gap:14px;margin-top:2rem}
+@media(min-width:960px){.duo{grid-template-columns:1fr 1fr}}
+.wkd{position:relative;border-radius:30px;overflow:hidden;background:var(--deep);color:var(--on);display:flex;flex-direction:column}
+.wkd img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+.wkd .tx{padding:1.5rem 1.6rem 1.8rem}
+.wkd .k{color:var(--peach)}.wkd h3{font-weight:400;font-size:clamp(1.9rem,2.6vw,2.4rem);margin:.4rem 0 .6rem;color:var(--on)}
+.wkd p{color:#E3D6DA}.wkd p+p{margin-top:.7rem}
+.wkd .facts>span{background:rgba(251,245,247,.1);border-color:rgba(251,245,247,.25);color:var(--on)}
+.wkd .must{margin-top:1rem;background:rgba(232,214,202,.16);border-radius:16px;padding:.8rem 1rem;color:#F3E4DA;font-size:.95rem}
+.fin{background:var(--card);border-radius:30px;padding:1.6rem;display:flex;flex-direction:column}
+.fin h3{font-weight:400;font-size:clamp(1.9rem,2.6vw,2.4rem);margin:.4rem 0 .6rem}
+.fin ol{list-style:none;margin:.6rem 0 0;padding:0;display:grid;gap:12px;counter-reset:f}
+.fin li{display:grid;grid-template-columns:48px 1fr;gap:.9rem;align-items:start;background:var(--bg);border-radius:20px;padding:1rem}
+.fin li .ib{width:48px;height:48px;place-items:center;border-radius:50%;background:#fff;color:var(--plum)}
+.fin li .ib svg{width:28px;height:28px}
+.fin li b{display:block;font-family:var(--serif);font-weight:500;font-size:1.35rem;line-height:1.15}
+.fin li p{color:var(--muted);font-size:.95rem;margin-top:.2rem}
+.fin .room{margin-top:14px;display:grid;grid-template-columns:96px 1fr;gap:1rem;align-items:center;background:#F3E2D8;border-radius:20px;padding:.8rem}
+.fin .room img{width:96px;height:96px;object-fit:cover;border-radius:16px}
+.fin .room p{font-size:.92rem;color:var(--deep)}
+/* Dein Weg (Zeitstrahl) */
+.path{position:relative;margin-top:2.4rem;display:grid;gap:0}
+.path::before{content:"";position:absolute;left:27px;top:10px;bottom:10px;width:2px;background:repeating-linear-gradient(var(--plum) 0 4px,transparent 4px 11px);opacity:.5}
+.pst{position:relative;display:grid;grid-template-columns:56px 1fr;gap:1rem;padding:.7rem 0}
+.pst .dot{position:relative;z-index:1;width:56px;height:56px;border-radius:46% 54% 60% 40%/50% 42% 58% 50%;background:var(--peach);display:grid;place-items:center;color:var(--plum)}
+.pst .dot svg{width:30px;height:30px}
+.pst:nth-child(3n+2) .dot{background:var(--blush)}.pst:nth-child(3n) .dot{background:#EFE3E0}
+.pst.big .dot{background:var(--plum);color:var(--on)}
+.pst .wd{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--plum);padding:0}
+.pst b{display:block;font-family:var(--serif);font-weight:500;font-size:clamp(1.35rem,2vw,1.65rem);line-height:1.15}
+.pst p{color:var(--muted);font-size:.95rem;margin-top:.15rem;max-width:40em}
+.pst .opt{display:inline-block;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--line);border-radius:99px;padding:.1em .6em;margin-left:.4rem;vertical-align:middle;color:var(--muted);font-family:var(--sans)}
+@media(min-width:1100px){
+  .path{grid-template-columns:repeat(4,1fr);gap:18px 14px}
+  .path::before{display:none}
+  .pst{grid-template-columns:1fr;background:var(--card);border-radius:24px;padding:1.2rem 1.2rem 1.3rem;align-content:start}
+  .pst.big{background:#EEDFE0}
+}
+/* Kennenlerngespräch */
+.callbox{display:grid;gap:1.6rem;background:var(--card);border-radius:30px;padding:clamp(1.3rem,3vw,2.4rem);margin-top:2rem}
+@media(min-width:960px){.callbox{grid-template-columns:.9fr 1.1fr;gap:3rem}}
+.slots{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.4rem;max-height:280px;overflow:auto;padding:2px}
+.slot{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:.5em .8em;cursor:pointer;color:var(--ink);text-align:left;line-height:1.25}
+.slot small{display:block;color:var(--muted);font-size:.78rem}
+.slot[aria-pressed=true]{background:var(--plum);border-color:var(--plum);color:var(--on)}.slot[aria-pressed=true] small{color:#EADFDE}
+.form{display:grid;gap:.8rem}
+.form label.f{display:grid;gap:.3rem;font-size:.88rem;color:var(--muted)}
+.form textarea{min-height:110px;resize:vertical}
+.okmsg{background:var(--blush);border-radius:18px;padding:1rem 1.2rem}
+/* Preis & Buchung */
+.pricebox{display:grid;gap:1.6rem;background:var(--plum);color:var(--on);border-radius:34px;padding:clamp(1.4rem,4vw,3rem);margin-top:2rem;position:relative;overflow:hidden;isolation:isolate}
+.pricebox::after{content:"";position:absolute;right:-90px;top:-110px;width:320px;height:320px;border-radius:46% 54% 60% 40%/50% 42% 58% 50%;background:var(--peach);opacity:.16;z-index:-1;animation:mvblob 18s ease-in-out infinite alternate}
+@media(min-width:960px){.pricebox{grid-template-columns:1fr 1fr;align-items:start}}
+.pricebox .k{color:var(--peach)}.pricebox h2{color:var(--on)}
+.pricebox .amt{font-family:var(--serif);font-size:clamp(3.4rem,8vw,5rem);line-height:1;margin-top:.8rem}
+.pricebox .amt s{font-size:.45em;opacity:.6;margin-left:.3em}
+.pricebox .incl{margin:1rem 0 0;padding:0;list-style:none;display:grid;gap:.45rem}
+.pricebox .incl li{display:flex;gap:.6rem;align-items:flex-start;color:#F3E9EC}
+.pricebox .incl li::before{content:"✓";flex:0 0 1.4rem;height:1.4rem;border-radius:50%;background:rgba(251,245,247,.18);display:grid;place-items:center;font-size:.75rem;margin-top:.15em}
+.pricebox .ebn{margin-top:1.2rem;background:rgba(251,245,247,.12);border-radius:18px;padding:.9rem 1.1rem;font-size:.95rem}
+.pricebox .ebn b{font-family:var(--serif);font-weight:500;font-size:1.3rem;display:block}
+.bookf{background:var(--bg);color:var(--ink);border-radius:26px;padding:clamp(1.1rem,3vw,1.8rem);display:grid;gap:.85rem}
+.bookf .k{color:var(--plum)}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+@media(max-width:420px){.plans{grid-template-columns:1fr}}
+.plan{position:relative;display:grid;gap:.15rem;align-content:start;background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:1.3rem 1rem 1rem;cursor:pointer}
+.plan input{position:absolute;opacity:0;pointer-events:none}
+.plan .pt{font-size:.85rem;color:var(--muted)}.plan .pa{font-family:var(--serif);font-size:1.75rem;line-height:1.1}.plan .ps{font-size:.8rem;color:var(--muted)}
+.plan .badge{position:absolute;top:-.7rem;left:1rem;background:var(--plum);color:var(--on);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;padding:.28rem .7rem;border-radius:99px}
+.plan:has(input:checked){border-color:var(--plum);box-shadow:0 8px 24px -14px rgba(74,58,65,.45)}
+.plan:has(input:checked)::after{content:"✓";position:absolute;top:.7rem;right:.8rem;width:1.35rem;height:1.35rem;border-radius:50%;background:var(--plum);color:#fff;font-size:.75rem;display:grid;place-items:center}
+.bookf fieldset{border:0;padding:0;margin:0;display:grid;gap:.45rem}
+.bookf legend{font-size:.88rem;color:var(--muted);margin-bottom:.35rem;padding:0}
+.prc{display:flex;flex-wrap:wrap;gap:.4rem}
+.prc label{display:inline-flex;align-items:center;gap:.45rem;background:#fff;border:1px solid var(--line);border-radius:999px;padding:.45em .95em;font-size:.9rem;cursor:pointer}
+.prc input{accent-color:var(--plum)}
+.prc label:has(input:checked){border-color:var(--plum);background:#FBF5F7}
+.bookf .wro{background:#fff}
+.chk{display:flex;gap:.65rem;align-items:flex-start;font-size:.88rem;color:var(--muted);line-height:1.45;cursor:pointer}
+.chk input{width:19px;height:19px;flex:0 0 19px;margin-top:2px;accent-color:var(--plum)}
+.offerbar{position:sticky;top:76px;z-index:20;margin:1rem auto 0;max-width:760px;background:var(--deep);color:var(--on);border-radius:22px;padding:.9rem 1.2rem;display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:center;justify-content:space-between;box-shadow:0 18px 40px -24px rgba(46,37,41,.7)}
+.offerbar b{font-family:var(--serif);font-weight:500;font-size:1.3rem}
+.offerbar .cd{font-variant-numeric:tabular-nums;background:var(--peach);color:var(--deep);border-radius:99px;padding:.2em .9em;font-weight:500}
+.thanks{background:var(--blush);border-radius:26px;padding:1.4rem 1.6rem;margin-top:1.4rem}
+.thanks b{font-family:var(--serif);font-weight:500;font-size:1.6rem;display:block}
+.me2{display:grid;gap:1.6rem;align-items:center}
+@media(min-width:800px){.me2{grid-template-columns:260px 1fr;gap:3rem}}
+.me2 img{width:100%;max-width:260px;aspect-ratio:1;object-fit:cover;border-radius:50%;display:block}
+.me2 .hand{font-family:var(--serif);font-style:italic;font-size:1.6rem;color:var(--plum);margin-top:1rem}
+.fq{max-width:980px}
+/* .facts: nur die äußere Pille gestalten (innen liegen die de/en-Spans) */
+.ac-hero .facts span span,.wkd .facts span span{background:none;border:0;padding:0;border-radius:0;font-size:inherit;color:inherit}
+.ac-hero .facts>span.chip.ok{padding:.4em 1em;font-size:.88rem}
+.bookf label.f{display:grid;gap:.3rem;font-size:.88rem;color:var(--muted)}
+.bookf textarea{min-height:110px;resize:vertical}
+.ac-hero:not(.two)>div:not(.hw){max-width:860px}
+.ac-eb,.ebadge,.pricebox p{font-variant-numeric:lining-nums}

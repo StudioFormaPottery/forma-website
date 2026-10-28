@@ -2,7 +2,7 @@
 // moveciamovement.com – Hauptseite Movecia (Vivien, 25.10.2026): Überschrift nur „Ich bin Movecia.“
 // Ruhig nach Vorbild Mindful Body: große feine Schrift, Mauve-Band, weich verschwommene Bilder.
 // Die Bilder sind vorerst Viviens eigene Fotos (künstlerisch weichgezeichnet) und gemalte Platzhalter,
-// später kommen Everygen-Bilder (Liste der Bildideen in CLAUDE.md). Teacher Training wird bewusst nicht gezeigt.
+// später kommen Everygen-Bilder (Liste der Bildideen in CLAUDE.md). Teacher Training steht seit 28.10.2026 als Academy-Leiste unter den Angeboten.
 declare(strict_types=1);
 require_once __DIR__ . '/../assets/icons.inc.php';
 require dirname(__DIR__, 2) . '/api/method-lib.php';
@@ -13,6 +13,8 @@ $pdo = forma_db();
 mv_schema($pdo);
 try { mv_tick($pdo); } catch (Throwable $e) { error_log('MV tick: ' . $e->getMessage()); } // u. a. Freischalt-Mails am Starttag
 $c = mv_cfg();
+require_once dirname(__DIR__, 2) . '/api/academy-lib.php';
+$acc = ac_cfg();
 $eu = fn(int $x) => '€ ' . number_format($x / 100, 0, ',', '.');
 $natalMin = PHP_INT_MAX;
 foreach (natal_packages() as $p) $natalMin = min($natalMin, (int)round($p['cents'] / max(1, $p['units'])));
@@ -97,6 +99,9 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
       <div class="meta"><span class="chip"><?= $g ? '<span class="de">nächstes: ' . forma_h(mm_when_de($g)) . '</span><span class="en">next: ' . forma_h(mm_when($g)) . '</span>' : '<span class="de">monatlich</span><span class="en">monthly</span>' ?></span></div>
       <p class="more"><span class="de">Dabei sein</span><span class="en">Join</span> →</p></div></a>
   </div>
+  <!-- Movecia Academy (Vivien, 28.10.2026): Teacher Training als eigene Leiste unter den Angeboten -->
+  <a class="acad rv" href="/academy/teacher-training/"><img src="/img/movecia/fotos/ev-lunge.jpg?v=1" alt="" loading="lazy"><span class="acad-tx"><span class="k">Movecia Academy · <span class="de">Ausbildung ab <?= mv_date($acc['start_ts']) ?></span><span class="en">training from <?= mv_date($acc['start_ts'], 'en') ?></span></span><b>Mindful Movement Teacher Training</b><span class="acad-p"><span class="de">500 Stunden inkl. Yogalehrerausbildung, hybrid mit Präsenzwochenende in den Tiroler Alpen. Für Frauen, die andere begleiten möchten.</span><span class="en">500 hours incl. a yoga teacher training, hybrid with an in-person weekend in the Tyrolean Alps. For women who want to guide others.</span></span></span><span class="acad-go"><span class="de">Zur Ausbildung</span><span class="en">See the training</span> →</span></a>
+  <style>.acad{display:grid;grid-template-columns:1fr;gap:0;margin-top:26px;background:var(--deep);color:var(--on);border-radius:32px;overflow:hidden;text-decoration:none;align-items:center;transition:transform .5s ease}.acad:hover{transform:translateY(-3px)}.acad img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}.acad-tx{display:flex;flex-direction:column;gap:.35rem;padding:1.4rem 1.5rem .4rem}.acad .k{color:var(--peach)}.acad b{font-family:var(--serif);font-weight:400;font-size:clamp(1.8rem,3vw,2.6rem);line-height:1.05}.acad-p{color:#E3D6DA}.acad-go{padding:.6rem 1.5rem 1.5rem;color:var(--peach);font-weight:500}@media(min-width:900px){.acad{grid-template-columns:300px 1fr auto}.acad img{height:100%;aspect-ratio:auto;min-height:200px}.acad-tx{padding:1.6rem 2rem}.acad-go{padding:0 2rem}}</style>
 </div></section>
 
 <section class="w sec"><div class="in">

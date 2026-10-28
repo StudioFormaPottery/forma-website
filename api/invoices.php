@@ -68,7 +68,7 @@ function forma_invoice_next(PDO $pdo, int $year): array
 /** Rechnungen im Movecia-Design: Prä-/Postnatal (natal*) sowie Method und Unfold (mv_*). */
 function forma_invoice_movecia(string $kind): bool
 {
-    return str_starts_with($kind, 'natal') || str_starts_with($kind, 'mv_') || str_starts_with($kind, 'ptb');
+    return str_starts_with($kind, 'natal') || str_starts_with($kind, 'mv_') || str_starts_with($kind, 'ptb') || str_starts_with($kind, 'ac_');
 }
 
 /** Steuersatz: Kurse finden in Mathon statt → immer AT 20 %. Digitale Templates: Wohnsitz der Käuferin. */
@@ -205,6 +205,11 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
         // Movecia · Method / Unfold (je Zahlung eine Rechnung, Movecia-Design)
         require_once __DIR__ . '/method-lib.php';
         return mv_invoice_source($pdo, $kind, $refId);
+    }
+    if ($kind === 'ac_tt') {
+        // Movecia Academy · Teacher Training (je Zahlung bzw. Rate eine Rechnung, Movecia-Design)
+        require_once __DIR__ . '/academy-lib.php';
+        return ac_invoice_source($pdo, $refId);
     }
     if ($kind === 'template') {
         $st = $pdo->prepare("SELECT * FROM template_orders WHERE id = ? AND status = 'bezahlt'");
@@ -552,7 +557,7 @@ function forma_sheet_sync(PDO $pdo): void
                 $g = (int)$it['unit'] * (int)$it['qty'];
                 $n = (int)round($g / (1 + $rate / 100));
                 $svc = preg_match('/^\d\d\.\d\d\.\d{4}$/', $inv['service_date']) ? $inv['service_date'] : $date;
-                $rowsPos[] = [$isNatal ? 'Movecia' : 'Forma', $inv['nr'], '', $date, $svc, (int)substr($svc, 3, 2), $isNatal ? (str_starts_with((string)$inv['kind'], 'ptb') ? 'Personal Training (online)' : (str_starts_with((string)$inv['kind'], 'mv_') ? ($inv['kind'] === 'mv_unfold' ? 'Unfold (online)' : 'Method (online)') : 'Prä-/Postnatal (online)')) : ($inv['kind'] === 'template' ? 'Template (online)' : ($inv['kind'] === 'kasse' ? (forma_invoice_is_cash($inv) ? 'Atelier-Kasse (bar)' : 'Atelier-Kasse (Bezahl-Link)') : (forma_invoice_is_voucher($inv) ? 'Gutschein-Einlösung' : 'Online-Buchung'))),
+                $rowsPos[] = [$isNatal ? 'Movecia' : 'Forma', $inv['nr'], '', $date, $svc, (int)substr($svc, 3, 2), $isNatal ? (str_starts_with((string)$inv['kind'], 'ac_') ? 'Academy Teacher Training (online)' : (str_starts_with((string)$inv['kind'], 'ptb') ? 'Personal Training (online)' : (str_starts_with((string)$inv['kind'], 'mv_') ? ($inv['kind'] === 'mv_unfold' ? 'Unfold (online)' : 'Method (online)') : 'Prä-/Postnatal (online)'))) : ($inv['kind'] === 'template' ? 'Template (online)' : ($inv['kind'] === 'kasse' ? (forma_invoice_is_cash($inv) ? 'Atelier-Kasse (bar)' : 'Atelier-Kasse (Bezahl-Link)') : (forma_invoice_is_voucher($inv) ? 'Gutschein-Einlösung' : 'Online-Buchung'))),
                     trim($it['text']), $inv['name'], $inv['country'], (int)$it['qty'], $eur((int)$it['unit']),
                     $inv['kind'] === 'template' || str_contains($it['text'], 'zum Bemalen') || ($it['kasse'] ?? '') === 'stueck' ? 0 : (int)$it['qty'], $eur($g), $eur($n), $eur($g - $n)];
             }

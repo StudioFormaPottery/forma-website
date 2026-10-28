@@ -23,6 +23,8 @@ function mv_menu_items(): array
         ['/unfold/', 'Unfold', 'Unfold', 'unfold', '3 Monate Begleitung' . ($u[0] ?? ''), '3 months of guidance' . ($u[1] ?? '')],
         ['/natal/', 'Prä- &amp; Postnatal', 'Pre- &amp; postnatal', 'natal', '1:1 im Studio &amp; online', '1:1 in the studio &amp; online'],
         ['/gathering/', 'Gatherings', 'Gatherings', 'gathering', 'Live und kostenlos, einmal im Monat', 'Free and live, once a month'],
+        // Movecia Academy (Vivien, 28.10.2026): Ausbildungen, zuerst das Teacher Training
+        ['/academy/', 'Academy', 'Academy', 'academy', 'Ausbildungen · Teacher Training ab Nov. 2027', 'Trainings · teacher training from Nov 2027'],
         ['/#vivien', 'Über mich', 'About me', 'about', 'Ich bin Vivien', "Hi, I'm Vivien"],
     ];
 }

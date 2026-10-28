@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset="utf-8">
-<!-- Vorschaubilder 1200×630 für Google/Teilen (Vivien, 25.10.2026): ?p=start|unfold|method -->
+<!-- Vorschaubilder 1200×630 für Google/Teilen (Vivien, 25.10.2026): ?p=start|unfold|method|academy (academy seit 28.10.2026 mit neuem Foto) -->
 <style>
 @font-face{font-family:"Cormorant";font-weight:300 700;src:url(../../fonts/CormorantGaramond-VF.woff)}
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(../../fonts/CormorantGaramond-Italic-VF.woff)}
@@ -19,6 +19,7 @@ const p=new URLSearchParams(location.search).get('p')||'start';
 const D={
  start:['art-reach.jpg','Mindful Movement · Yoga · Somatic','Movecia','Bewegung beginnt bei dir.',['online on demand','live','Paznaun, Tirol']],
  unfold:['reach.jpg','3 Monate Begleitung · live online','Unfold','The Mindful Becoming',['Start 10. Jänner','wöchentlicher Live-Call','2 Videos pro Woche']],
+ academy:['ev-lunge.jpg','Movecia Academy · 500 Stunden · hybrid','Mindful Movement Teacher Training','Lernen, andere zu begleiten.',['inkl. 200 Std. Yoga','Start Nov. 2027','Tiroler Alpen']],
  method:['art-fold.jpg','On demand · Deutsch & English','Mindful Movement Method','Ein paar ruhige Minuten für dich.',['ab € 20 im Monat','Breathwork','Somatic Movement']]}[p];
 document.body.innerHTML=`<div class="ph" style="background-image:url(../../img/movecia/fotos/${D[0]})"></div><div class="t"><div class="brand"><img src="../../img/movecia/movecia-zeichen-klein.svg"><span>Movecia<i></i></span></div><p class="k">${D[1]}</p><h1 style="${D[2].length>12?'font-size:80px':''}">${D[2]}</h1><p class="sub">${D[3]}</p><div class="f">${D[4].map(x=>'<span>'+x+'</span>').join('')}</div></div>`;
 </script></body></html>

@@ -11,8 +11,9 @@ function mm_subnav(string $active): void
     global $pdo;
     $self = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?');
     $req = 0; try { $req = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {}
+    $acReq = 0; try { $acReq = (int)$pdo->query("SELECT COUNT(*) FROM ac_calls WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {}
     $ptReq = 0; try { $ptReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); } catch (Throwable $e) {}
-    $tabs = [['movecia', '?view=movecia', '🏡 Übersicht'], ['studio', '?view=studio', '🎥 Studio'], ['videos', '?view=videos', '🎬 Videos hochladen'], ['insta', '?view=insta', '📱 Instagram täglich'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['musik', '?view=musik', '🎵 Musik'], ['method', '?view=method', '🌱 Method &amp; Unfold'], ['natal', '?view=natal', '🤰 Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['training', '?view=training', '🏔️ Personal Training' . ($ptReq ? ' <i>' . $ptReq . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', '🎙️ Live-Texte'], ['presse', '?view=presse', '📰 Presse'], ['einst', '?view=movecia#einstellungen', '⚙️ Einstellungen']]; ?>
+    $tabs = [['movecia', '?view=movecia', '🏡 Übersicht'], ['studio', '?view=studio', '🎥 Studio'], ['videos', '?view=videos', '🎬 Videos hochladen'], ['insta', '?view=insta', '📱 Instagram täglich'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['musik', '?view=musik', '🎵 Musik'], ['method', '?view=method', '🌱 Method &amp; Unfold'], ['natal', '?view=natal', '🤰 Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['training', '?view=training', '🏔️ Personal Training' . ($ptReq ? ' <i>' . $ptReq . '</i>' : '')], ['academy', '?view=academy', '🎓 Academy' . ($acReq ? ' <i>' . $acReq . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', '🎙️ Live-Texte'], ['presse', '?view=presse', '📰 Presse'], ['einst', '?view=movecia#einstellungen', '⚙️ Einstellungen']]; ?>
 <style>
 .mvsub{position:sticky;top:0;z-index:40;margin:-8px -16px 16px;padding:10px 16px;background:rgba(242,236,228,.96);border-bottom:1px solid #DDD2C6;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .mvsub::-webkit-scrollbar{display:none}
@@ -62,6 +63,8 @@ require __DIR__ . '/mediathek.inc.php';
 require __DIR__ . '/vorschau.inc.php';
 // Personal Training für Hotelgäste (?view=training, Vivien 27.10.2026)
 require __DIR__ . '/ptb.inc.php';
+// Movecia Academy · Teacher Training (?view=academy, Vivien 28.10.2026)
+require __DIR__ . '/academy.inc.php';
 
 $mmBack = $self . '?view=movecia';
 

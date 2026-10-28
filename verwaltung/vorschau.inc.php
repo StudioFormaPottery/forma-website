@@ -71,6 +71,8 @@ body{background:#F2ECE4}h1,h2{color:#6B5658}
         $tile($site . '/', '🏠', 'Hauptseite', 'moveciamovement.com');
         $tile($site . '/method/', '🌱', 'Method', 'Verkaufsseite der Mitgliedschaft mit Preisen');
         $tile($site . '/unfold/', '🌸', 'Unfold', 'Seite und Buchung des 3-Monats-Programms');
+        $tile($site . '/academy/', '🎓', 'Academy', 'Übersicht der Ausbildungen');
+        $tile($site . '/academy/teacher-training/', '🧘', 'Teacher Training', 'Seite, Kennenlerngespräch und Buchung');
         $tile($site . '/natal/', '🤰', 'Prä- &amp; Postnatal · Studio', 'Angebot, Einheiten, Kennenlerngespräch, Buchung');
         $tile($site . '/natal/online/', '💻', 'Prä- &amp; Postnatal · Online', 'Gleiche Seite, startet auf Online');
         $tile($site . '/gathering/', '✨', 'Gathering-Anmeldung', 'Anmeldeseite fürs nächste kostenlose Gathering');

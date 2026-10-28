@@ -243,7 +243,7 @@ if ($action === 'logout') {
 }
 
 // Movecia Movement / Wild Hearts: eigener Bereich (verwaltung/movecia.php)
-if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 'natal' || $view === 'method' || $view === 'texte' || $view === 'presse' || $view === 'vorschau' || $view === 'videos' || $view === 'mediathek' || $view === 'studio' || $view === 'insta' || $view === 'musik' || $view === 'training') {
+if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 'natal' || $view === 'method' || $view === 'texte' || $view === 'presse' || $view === 'vorschau' || $view === 'videos' || $view === 'mediathek' || $view === 'studio' || $view === 'insta' || $view === 'musik' || $view === 'training' || $view === 'academy') {
     require __DIR__ . '/movecia.php';
 }
 // Wintersaison 2026/27: Hotel-Flyer + Buchungsseiten (FORMA ?view=winter, Movecia ?view=winter_mm)
