@@ -28,7 +28,7 @@ Yoga für müde Tage · Mental Load & Selbstfürsorge für Mamas · Schwangersch
    | Breathwork-Übung | https://moveciamovement.com/method/ | Breathwork & Atemübungen |
    | Yoga/Somatic-Übung für müde Tage | https://moveciamovement.com/method/ | Yoga für müde Tage |
    | Journaling-Frage | https://moveciamovement.com/unfold/ | Journaling-Fragen |
-   | The Mindful Becoming Teacher Training (Start 3.11.2027, 550 Std., buchbar; Early-Bird € 3.590 statt € 4.500 bis 31.3.2027; nie Pilates; Preis im Kennenlerngespräch nie nennen) | https://moveciamovement.com/academy/teacher-training/ | The Mindful Becoming Teacher Training |
+   | The Mindful Becoming Teacher Training (Start 3.11.2027, 550 Std., buchbar; Early-Bird € 3.890 statt € 4.900 bis 31.3.2027, max. 14 Plätze; nie Pilates; Preis im Kennenlerngespräch nie nennen) | https://moveciamovement.com/academy/teacher-training/ | The Mindful Becoming Teacher Training |
    Preise immer live aus `api/method-lib.php` (`mv_cfg_raw`), abgelaufene Early-Birds nie nennen, Gathering-Preise nie.
    Nur echte Übungen mit gängigen Namen (Katze-Kuh, Kindhaltung, Glute Bridge, Box Breathing …).
 3. Pin bauen (Look automatisch wie Website und Wochenbilder, siehe `tools/movecia-week/README.md` „Look“): JSON wie ein Wochen-Post plus `file` = `img/pins/movecia/<datum>-<thema>.jpg`, lokalen Server starten

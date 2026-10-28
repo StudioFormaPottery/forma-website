@@ -58,11 +58,11 @@ function mv_next_popup(): void
         $a = ac_cfg();
         $full = true; try { $full = ac_free(forma_db()) <= 0; } catch (Throwable $e) {}
         $eua = fn(int $x) => '€ ' . number_format($x / 100, 0, ',', '.');
-        $kde = $full ? 'Movecia Academy · Warteliste' : ($a['eb'] ? 'Movecia Academy · Early Bird bis ' . $short($a['eb_end'], 'de') : 'Movecia Academy · nur 10 Plätze');
+        $kde = $full ? 'Movecia Academy · Warteliste' : ($a['eb'] ? 'Movecia Academy · Early Bird bis ' . $short($a['eb_end'], 'de') : 'Movecia Academy · nur 14 Plätze');
         $p = ['img' => '/img/movecia/fotos/ev-lunge.jpg', 'pos' => '42% 55%', 'href' => $full ? '/academy/teacher-training/#liste' : '/academy/teacher-training/',
             'k' => [$kde, $kde . ' · in German'],
             'h' => ['The Mindful Becoming <em>Teacher Training</em>', 'The Mindful Becoming <em>Teacher Training</em>'],
-            't' => ['Andere begleiten und dabei bei dir selbst bleiben: ' . AC_HOURS . ' Stunden inklusive vollständiger 200-Stunden-Yogalehrerausbildung, 11 Monate hybrid, nur zehn Plätze.', 'A ' . AC_HOURS . '-hour Mindful Becoming Teacher Training including a full 200-hour yoga teacher training. Held in German only.'],
+            't' => ['Andere begleiten und dabei bei dir selbst bleiben: ' . AC_HOURS . ' Stunden inklusive vollständiger 200-Stunden-Yogalehrerausbildung, 11 Monate hybrid, nur vierzehn Plätze.', 'A ' . AC_HOURS . '-hour Mindful Becoming Teacher Training including a full 200-hour yoga teacher training. Held in German only.'],
             'price' => $full ? null : ($a['eb'] ? ['Early Bird ' . $eua($a['eb_total']) . ' statt ' . $eua($a['r_total']), 'Early bird ' . $eua($a['eb_total']) . ' instead of ' . $eua($a['r_total'])] : [$eua($a['r_total']), $eua($a['r_total'])]),
             'btn' => $full ? ['Auf die Warteliste', 'Join the waiting list'] : ['Zur Ausbildung', 'See the training']];
     }

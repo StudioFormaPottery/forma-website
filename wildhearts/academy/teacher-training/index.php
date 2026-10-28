@@ -1,8 +1,8 @@
 <?php
 // moveciamovement.com/academy/teacher-training – The Mindful Becoming Teacher Training (Vivien, 28.10.2026, Runde 2)
-// 550 Std. inkl. vollständiger 200-Std.-Yogalehrerausbildung, 11 Monate hybrid, Start Mi 3.11.2027, jährlich, max. 10 Plätze.
+// 550 Std. inkl. vollständiger 200-Std.-Yogalehrerausbildung, 11 Monate hybrid, Start Mi 3.11.2027, jährlich, max. 14 Plätze.
 // Ende: Präsenzwochenende September 2028 (Lehrprobe) → Online-Abschlussprüfung mit Kamera → Zertifikat.
-// Buchung: 50 % Anzahlung, Rest auf einmal / in 2 / in 3 Zahlungen bis 15.9.2027. Early-Bird € 3.590 bis 31.3.2027, danach € 4.500.
+// Buchung: 50 % Anzahlung, Rest auf einmal / in 2 / in 3 Zahlungen bis 15.9.2027. Early-Bird € 3.890 bis 31.3.2027, danach € 4.900.
 // ?danke=1 nach der Zahlung, ?angebot=TOKEN = persönlicher Kennenlern-Preis aus dem Gespräch (20 Min. Countdown, nie öffentlich).
 declare(strict_types=1);
 require_once __DIR__ . '/../../assets/icons.inc.php';
@@ -30,7 +30,7 @@ $de2 = fn(string $ymd) => ac_d($ymd, 'en');
 if ($offer || isset($_GET['danke']) || isset($_GET['abbruch'])) $GLOBALS['mvl_noindex'] = true;
 $css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=8">';
 mvl_head('Yogalehrerausbildung auf Deutsch · Mindful Becoming Teacher Training ' . AC_HOURS . ' Std. | Movecia Academy Tirol',
-    'Die ' . AC_HOURS . '-Stunden-Ausbildung mit Vivien Malonga, ausschließlich auf Deutsch: vollständige 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum, Somatic Movement, Breathwork, Anatomie & Body Scanning, Mental Load & Nervensystem. 11 Monate hybrid, online aus Österreich, Deutschland, der Schweiz und Südtirol, Präsenzwochenende in Tirol. Start ' . mv_date($st) . ', nur 10 Plätze.' . ($c['eb'] ? ' Early-Bird bis ' . mv_date($c['eb_end']) . '.' : ''),
+    'Die ' . AC_HOURS . '-Stunden-Ausbildung mit Vivien Malonga, ausschließlich auf Deutsch: vollständige 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum, Somatic Movement, Breathwork, Anatomie & Body Scanning, Mental Load & Nervensystem. 11 Monate hybrid, online aus Österreich, Deutschland, der Schweiz und Südtirol, Präsenzwochenende in Tirol. Start ' . mv_date($st) . ', nur 14 Plätze.' . ($c['eb'] ? ' Early-Bird bis ' . mv_date($c['eb_end']) . '.' : ''),
     $site . '/academy/teacher-training/', '/img/movecia/og-academy.jpg', $css, ac_jsonld($pdo));
 $hours = ac_hours();
 $pr = ['lt1' => ['weniger als 1 Jahr', 'less than a year'], '1to2' => ['1–2 Jahre', '1–2 years'], 'gt2' => ['mehr als 2 Jahre', 'more than 2 years'], 'teach' => ['ich unterrichte schon', 'I already teach']];
@@ -90,11 +90,11 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
     <?= $spark('s1') . $spark('s2') . $spark('s3') ?>
     <div class="pic"><img src="/img/movecia/fotos/ev-lunge.jpg?v=1" alt="Vivien in einem tiefen Ausfallschritt mit erhobenen Armen in ihrem hellen Studio unter dem Dachstuhl" fetchpriority="high"></div>
     <?= ac_seal('big') ?>
-    <p class="stamp"><small><span class="de">Nur 10 Plätze</span><span class="en">Only 10 places</span></small><span class="de">für eine kleine, persönliche Gruppe</span><span class="en">for a small, personal group</span></p>
+    <p class="stamp"><small><span class="de">Nur 14 Plätze</span><span class="en">Only 14 places</span></small><span class="de">für eine kleine, persönliche Gruppe</span><span class="en">for a small, personal group</span></p>
   </div>
 </div></section>
 
-<div class="ac-ribbon" aria-hidden="true"><div class="rb-in"><?php for ($i = 0; $i < 2; $i++): ?><span><span class="de">nur 10 Plätze</span><span class="en">only 10 places</span></span><i>✦</i><span><?= AC_HOURS ?> <span class="de">Stunden</span><span class="en">hours</span></span><i>✦</i><span><span class="de">inkl. 200-Std.-Yogalehrerausbildung</span><span class="en">incl. 200-hour yoga teacher training</span></span><i>✦</i><span><span class="de">Präsenzwochenende in den Tiroler Alpen</span><span class="en">in-person weekend in the Tyrolean Alps</span></span><i>✦</i><?php endfor; ?></div></div>
+<div class="ac-ribbon" aria-hidden="true"><div class="rb-in"><?php for ($i = 0; $i < 2; $i++): ?><span><span class="de">nur 14 Plätze</span><span class="en">only 14 places</span></span><i>✦</i><span><?= AC_HOURS ?> <span class="de">Stunden</span><span class="en">hours</span></span><i>✦</i><span><span class="de">inkl. 200-Std.-Yogalehrerausbildung</span><span class="en">incl. 200-hour yoga teacher training</span></span><i>✦</i><span><span class="de">Präsenzwochenende in den Tiroler Alpen</span><span class="en">in-person weekend in the Tyrolean Alps</span></span><i>✦</i><?php endfor; ?></div></div>
 
 <section class="band" id="herz"><span class="band-blob b1" aria-hidden="true"></span><span class="band-blob b2" aria-hidden="true"></span><div class="w"><div class="in">
   <p class="k"><span class="de">Das Herzstück</span><span class="en">The heart of it</span></p>
@@ -265,7 +265,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   <div class="liste-t rv">
     <p class="k"><?= $free ? 'Noch nicht so weit?' : 'Ausgebucht' ?></p>
     <h2><?= $free ? 'Setz deinen Namen <em>auf die Liste</em>' : 'Trag dich auf die <em>Warteliste</em> ein' ?></h2>
-    <p class="lead"><?= $free ? 'Du spürst, dass dich die Ausbildung ruft, aber du möchtest noch in Ruhe überlegen? Trag dich ein, dann schicke ich dir alle Infos und sag dir rechtzeitig Bescheid, bevor der Early-Bird-Preis endet.' : 'Gerade sind alle zehn Plätze vergeben. Trag dich ein, dann erfährst du als Erste, wenn ein Platz frei wird, und bist bei der nächsten Runde ganz vorne dabei.' ?></p>
+    <p class="lead"><?= $free ? 'Du spürst, dass dich die Ausbildung ruft, aber du möchtest noch in Ruhe überlegen? Trag dich ein, dann schicke ich dir alle Infos und sag dir rechtzeitig Bescheid, bevor der Early-Bird-Preis endet.' : 'Gerade sind alle vierzehn Plätze vergeben. Trag dich ein, dann erfährst du als Erste, wenn ein Platz frei wird, und bist bei der nächsten Runde ganz vorne dabei.' ?></p>
     <?= ac_birds() ?>
   </div>
   <form class="form liste-f rv" id="lf" novalidate>
@@ -288,7 +288,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
     <?= $spark('s5') . $spark('s6') ?>
     <div>
       <p class="k"><span class="de">Dein Platz</span><span class="en">Your place</span></p>
-      <h2 style="margin-top:.5rem"><span class="de">Einer von nur zehn</span><span class="en">One of only ten</span></h2>
+      <h2 style="margin-top:.5rem"><span class="de">Einer von nur vierzehn</span><span class="en">One of only fourteen</span></h2>
       <?php if (!empty($p['call'])): ?><p class="ebird on-plum"><?= ac_birds() ?><b>Kennenlern-Preis</b><span class="eb-p"><?= $e($p['total']) ?></span><span class="eb-d"><span class="de">nur für dich, aus unserem Gespräch · statt <?= $e($c['price']) ?></span></span></p>
       <?php elseif ($p['eb']): ?><p class="ebird on-plum"><?= ac_birds() ?><b>Early Bird</b><span class="eb-p"><?= $e($p['total']) ?></span><span class="eb-d"><span class="de"><?= 'bis ' . mv_date($c['eb_end']) . ' · danach ' . $e($c['r_total']) ?></span><span class="en"><?= 'until ' . mv_date($c['eb_end'], 'en') . ' · then ' . $ee($c['r_total']) ?></span></span></p>
       <?php else: ?><p class="amt"><?= $e($p['total']) ?></p><?php endif; ?>
@@ -329,7 +329,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
       <?php if (isset($_GET['abbruch'])): ?><p class="note"><span class="de">Die Zahlung wurde abgebrochen, es wurde nichts abgebucht.</span><span class="en">The payment was cancelled; nothing was charged.</span></p><?php endif; ?>
       <?php else: ?>
       <p class="k"><span class="de">Ausgebucht</span><span class="en">Fully booked</span></p>
-      <p>Alle zehn Plätze sind vergeben. Trag dich auf die Warteliste ein, dann erfährst du als Erste, wenn ein Platz frei wird.</p>
+      <p>Alle vierzehn Plätze sind vergeben. Trag dich auf die Warteliste ein, dann erfährst du als Erste, wenn ein Platz frei wird.</p>
       <p><a class="btn" href="#liste">Auf die Warteliste</a></p>
       <?php endif; ?>
     </form>
