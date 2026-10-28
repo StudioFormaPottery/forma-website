@@ -91,7 +91,7 @@ if ($view === 'academy') {
     $offerLink = (string)($_SESSION['ac_offer_link'] ?? ''); unset($_SESSION['ac_offer_link']);
     $interest = ac_interest_list($pdo);
     $ebAt = ac_eb_reminder_at(); $ebSt = mm_cfg('academy-mails') ?? [];
-    render_page('Academy · Teacher Training', function () use ($self, $flash, $c, $rows, $paidN, $free, $calls, $offerLink, $chats, $openChats, $interest, $ebAt, $ebSt) {
+    render_page('Academy · The Mindful Becoming Teacher Training', function () use ($self, $flash, $c, $rows, $paidN, $free, $calls, $offerLink, $chats, $openChats, $interest, $ebAt, $ebSt) {
         $csrf = '<input type="hidden" name="csrf" value="' . forma_h(csrf()) . '">';
         $d = fn(string $ymd) => date('j.n.Y', strtotime($ymd)); ?>
 <style>
@@ -133,7 +133,7 @@ details.why{margin-top:6px;font-size:16px;color:#4A3A41}details.why summary{curs
 </style>
 <?php mm_subnav('academy'); ?>
 <div class="ah">
-  <h1>Teacher Training 2027</h1>
+  <h1>The Mindful Becoming Teacher Training · 2027</h1>
   <p>Start <?= mv_date($c['start_ts']) ?> · <?= $c['eb'] ? 'Early-Bird ' . mv_eur($c['eb_total']) . ' bis ' . mv_date($c['eb_end']) . ', danach ' . mv_eur($c['r_total']) : mv_eur($c['r_total']) ?></p>
   <div class="big4">
     <div><b><?= $paidN ?></b><span>gebucht</span></div>

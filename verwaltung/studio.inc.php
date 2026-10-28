@@ -39,7 +39,7 @@ if ($view === 'studio') {
     mv_schema($pdo);
     try { require_once dirname(__DIR__) . '/api/academy-lib.php'; ac_schema($pdo); } catch (Throwable $e) {} // legt das Academy-Willkommensvideo an
     $talks = [];
-    foreach (['academy' => 'Teacher Training', 'method' => 'Method', 'unfold' => 'Unfold', 'natal' => 'Prä- & Postnatal'] as $aud => $an) {
+    foreach (['academy' => 'Academy', 'method' => 'Method', 'unfold' => 'Unfold', 'natal' => 'Prä- & Postnatal'] as $aud => $an) {
         foreach (mv_programs($pdo, $aud) as $p) foreach (mv_lessons($pdo, (int)$p['id']) as $l) {
             if (mv_lesson_is_clips($l)) continue;
             $talks[] = ['id' => (int)$l['id'], 'g' => $an, 't' => (string)$l['title_de'], 'te' => (string)($l['title_en'] ?: $l['title_de']),
@@ -71,7 +71,7 @@ if ($view === 'studio') {
     $dShort = fn(string $d) => $d === '' ? '' : $wd[(int)date('w', strtotime($d))] . ' ' . date('j.n.', strtotime($d));
     $queue = [];
     foreach ($talks as $t) $queue[] = ['v' => (string)$t['id'], 'ok' => $t['vde'] && $t['ven'], 'due' => $t['due'], 'ico' => '🗣', 'k' => $t['k'], 'n' => $t['t'],
-        'x' => $t['vde'] && $t['ven'] ? '' : ($t['g'] === 'Teacher Training' ? ' (nur Deutsch)' : ($t['vde'] ? ' (Englisch fehlt)' : ($t['ven'] ? ' (Deutsch fehlt)' : ' (DE + EN)'))), 'g' => $t['g']];
+        'x' => $t['vde'] && $t['ven'] ? '' : ($t['g'] === 'Academy' ? ' (nur Deutsch)' : ($t['vde'] ? ' (Englisch fehlt)' : ($t['ven'] ? ' (Deutsch fehlt)' : ' (DE + EN)'))), 'g' => $t['g']];
     foreach ($moves as $m) $queue[] = ['v' => 'c' . $m['id'], 'ok' => $m['ok'], 'due' => $m['due'], 'ico' => '🧘', 'k' => $m['k'], 'n' => $m['n'],
         'x' => $m['for'] ? ' · für ' . $m['for'][0] . (count($m['for']) > 1 ? ' +' . (count($m['for']) - 1) : '') : '', 'g' => ''];
     // Academy-Willkommensvideo ganz oben, solange es fehlt (Vivien, 28.10.2026)
@@ -393,7 +393,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
       <button type="button" data-tab="free" aria-selected="false">✍️ Frei aufnehmen</button>
       <?php if ($done): ?><button type="button" data-tab="done" aria-selected="false">✓ Schon fertig <span><?= count($done) ?></span></button><?php endif; ?>
     </div>
-    <div class="pk-pane pkc-pane" data-pane="next"><?php $acT = array_values(array_filter($open, fn($t) => ($t['g'] ?? '') === 'Academy')); if ($acT): ?><div class="pk-first"><p class="pk-sub">🎓 Zuerst · für dein Teacher Training</p><div class="pk-tiles"><?= implode('', array_map($tile, $acT)) ?></div></div><?php endif; ?><?php if (!$calOpen): ?><p class="pk-empty">Alles aufgenommen. Wunderbar ♡</p><?php else: ?>
+    <div class="pk-pane pkc-pane" data-pane="next"><?php $acT = array_values(array_filter($open, fn($t) => ($t['g'] ?? '') === 'Academy')); if ($acT): ?><div class="pk-first"><p class="pk-sub">🎓 Zuerst · für dein Mindful Becoming Teacher Training</p><div class="pk-tiles"><?= implode('', array_map($tile, $acT)) ?></div></div><?php endif; ?><?php if (!$calOpen): ?><p class="pk-empty">Alles aufgenommen. Wunderbar ♡</p><?php else: ?>
       <div class="pkc-wrap">
         <div class="pkc">
           <div class="pkc-h"><button type="button" class="pkc-nav" data-cm="-1" aria-label="Monat davor">‹</button><b id="calM"></b><button type="button" class="pkc-nav" data-cm="1" aria-label="nächster Monat">›</button></div>
