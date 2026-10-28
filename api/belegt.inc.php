@@ -81,6 +81,13 @@ function vb_items(PDO $pdo, string $from, string $to): array
             $out[] = ['date' => (string)$c['date'], 'a' => $a, 'b' => $a + 30, 'kind' => 'call', 'title' => 'Kennenlerngespräch (online)', 'who' => (string)$c['name'], 'n' => 0, 'block' => true, 'id' => (int)$c['id']];
         }
     } catch (Throwable $e) {}
+    // Gruppen-Angebote (api/angebote.inc.php): bestätigt = belegt; offene Angebote halten den Termin ebenfalls frei
+    foreach (forma_offer_events($pdo, $from, $to) as $e) {
+        if ($e['from'] === '') continue;
+        $a = vb_min($e['from']);
+        $b = $e['to'] !== '' ? vb_min($e['to']) : $a + 120;
+        $out[] = ['date' => $e['date'], 'a' => $a, 'b' => $b, 'kind' => 'angebot', 'title' => (string)$e['o']['title'], 'who' => (string)$e['o']['org'], 'n' => $e['kids'], 'block' => true, 'id' => (int)$e['o']['id']];
+    }
     $out = array_values(array_filter($out, fn($it) => $it['date'] >= $from && $it['date'] <= $to));
     usort($out, fn($x, $y) => strcmp($x['date'] . sprintf('%04d', $x['a']), $y['date'] . sprintf('%04d', $y['a'])));
     return $out;

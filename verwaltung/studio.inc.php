@@ -6,6 +6,34 @@
 // ?view=studio[&l=ID][&lang=de|en]. Ohne Lektion: eigener Text (z. B. tägliche Story), Format 9:16 wählbar.
 declare(strict_types=1);
 
+// „💛 Meine Looks“ (Vivien, 28.10.2026: „Filter speichern“): eigene Kamera-Looks / Bearbeiten-Filter auf dem Server,
+// damit sie am Handy und am Computer (beide Domains) gleich da sind. slot: cam (Talking Head), move (Übungen), edit (Bearbeiten).
+if ($action === 'mm_looks_get' || $action === 'mm_looks_set') {
+    header('Content-Type: application/json; charset=utf-8');
+    $slot = in_array($_POST['slot'] ?? '', ['cam', 'move', 'edit'], true) ? (string)$_POST['slot'] : 'cam';
+    $key = 'studio_looks_' . $slot;
+    if ($action === 'mm_looks_set') {
+        $in = json_decode((string)($_POST['list'] ?? '[]'), true);
+        $clean = [];
+        foreach (is_array($in) ? array_slice($in, 0, 40) : [] as $x) {
+            if (!is_array($x) || !is_array($x['s'] ?? null)) continue;
+            $n = trim(mb_substr(strip_tags((string)($x['n'] ?? '')), 0, 40));
+            if ($n === '') continue;
+            $v = [];
+            foreach ($x['s'] as $k => $val) {
+                if (!preg_match('/^[a-zA-Z]{1,20}$/', (string)$k)) continue;
+                if (is_int($val) || is_float($val) || is_bool($val) || (is_string($val) && preg_match('/^[a-z0-9:.]{0,16}$/', $val))) $v[$k] = $val;
+            }
+            $clean[] = ['n' => $n, 's' => $v];
+        }
+        forma_set_setting($pdo, $key, json_encode($clean, JSON_UNESCAPED_UNICODE));
+        echo json_encode(['ok' => 1, 'list' => $clean], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    echo json_encode(['list' => json_decode(forma_setting($pdo, $key) ?? '[]', true) ?: []], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 if ($view === 'studio') {
     require_once dirname(__DIR__) . '/api/method-lib.php';
     mv_schema($pdo);
@@ -100,13 +128,20 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 .box{background:#FBF8F4;border:1.5px solid #DDD2C6;border-radius:24px;padding:16px}
 .box>h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:26px;color:#4A3A41;margin:0 0 12px}
 #stage{position:relative}
-.pr{position:absolute;left:0;right:0;top:0;height:36%;overflow:hidden;background:linear-gradient(rgba(46,37,41,.72),rgba(46,37,41,.55) 80%,rgba(46,37,41,0));color:#FBF5F7;z-index:3;pointer-events:auto;cursor:pointer;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+.pr{position:absolute;left:0;right:0;top:0;height:42%;min-height:120px;overflow:hidden;background:rgba(36,28,32,.8);color:#FBF5F7;z-index:7;pointer-events:auto;cursor:pointer;border-radius:22px 22px 0 0}
+.pr::after{content:'';position:absolute;left:0;right:0;bottom:0;height:30%;background:linear-gradient(rgba(36,28,32,0),rgba(36,28,32,.95));pointer-events:none}
 .pr[hidden]{display:none}
-.pr-t{padding:14px 6% 60%;white-space:pre-wrap;font:400 var(--fs,30px)/1.45 "Hanken Grotesk","Outfit",system-ui,sans-serif;text-align:center}
+/* An der Kamera (Vivien, 28.10.2026: „sieht aus, als würde ich nach unten schauen“): während der Aufnahme ganz oben, mittig unter der Linse, schmal, 3 Zeilen */
+body.prtop .pr.top{display:block;position:fixed;top:0;left:50%;right:auto;transform:translateX(-50%);width:min(560px,94vw);height:calc(var(--fs,30px) * 1.4 * 3 + 22px + env(safe-area-inset-top,0px));min-height:0;padding-top:env(safe-area-inset-top,0px);border-radius:0 0 22px 22px;z-index:200;background:rgba(36,28,32,.94);box-shadow:0 8px 24px -10px rgba(0,0,0,.5)}
+body.prtop .pr.top .pr-t{padding:10px 3% 60%;line-height:1.4}
+body.prtop .pr.top::after{height:34%}
+body.prtop .mtools{visibility:hidden}
+body.recording .tc-st,body.recording .tc-hint,body.recording .tc-guide{display:none!important}
+.pr-t{position:relative;padding:14px 6% 60%;white-space:pre-wrap;font:400 var(--fs,30px)/1.45 "Hanken Grotesk","Outfit",system-ui,sans-serif;text-align:center}
 .pr-t .hint{color:#C9B7BD;font-size:.6em}
-.cd{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:500 min(30vw,180px)/1 "Cormorant Garamond",Georgia,serif;color:#fff;text-shadow:0 2px 30px rgba(0,0,0,.5);z-index:5;pointer-events:none}
+.cd{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:500 min(30vw,180px)/1 "Cormorant Garamond",Georgia,serif;color:#fff;text-shadow:0 2px 30px rgba(0,0,0,.5);z-index:8;pointer-events:none}
 .cd:empty{display:none}
-.recdot{position:absolute;right:14px;top:14px;z-index:4;display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(160,65,59,.92);color:#fff;font:500 18px/1.2 "Hanken Grotesk","Outfit",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.recdot{position:absolute;right:14px;bottom:14px;z-index:8;display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(160,65,59,.92);color:#fff;font:500 18px/1.2 "Hanken Grotesk","Outfit",system-ui,sans-serif;font-variant-numeric:tabular-nums}
 .recdot[hidden]{display:none}.recdot i{width:10px;height:10px;border-radius:50%;background:#fff;animation:bl 1s infinite}
 @keyframes bl{50%{opacity:.2}}
 .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
@@ -115,6 +150,7 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 .bar .stop{background:#4A3A41;color:#fff}
 .bar .up{background:#3F6B3E;border-color:#3F6B3E;color:#fff}
 .bar .sm{min-height:48px;font-size:17px;padding:10px 18px;border-color:#DDD2C6}
+.bar .del,.clip .cb button.del{color:#A0413B;border-color:#E6C3BF}
 .bar [hidden]{display:none!important}
 .msg{font-size:18px;color:#6B5658;margin:10px 2px 0}
 .msg.ok{color:#3F6B3E;font-weight:500}
@@ -126,6 +162,13 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 .own[hidden]{display:none}
 .prc{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .prc button{font:inherit;font-size:17px;padding:10px 16px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer;min-height:46px}
+.side .box>h2{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0;user-select:none}
+.side .box>h2::after{content:"";flex:0 0 auto;width:9px;height:9px;border-right:2px solid #7D5E68;border-bottom:2px solid #7D5E68;transform:rotate(-135deg) translate(-2px,-2px);transition:transform .2s}
+.side .box.shut>h2::after{transform:rotate(45deg) translate(-2px,-2px)}
+.side .box:not(.shut)>h2{margin-bottom:12px}
+.side .box.shut{padding-top:12px;padding-bottom:12px}
+.side .box.shut>:not(h2){display:none!important}
+.sp-l{font-size:16px;color:#4A3A41;min-width:110px;text-align:center}
 .prc button[aria-pressed=true]{background:#7D5E68;border-color:#7D5E68;color:#fff}
 .chk{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:400;margin-top:10px}.chk input{width:24px;height:24px;padding:0;accent-color:#7D5E68}
 .dev{display:flex;flex-direction:column;gap:10px}.dev label{font-size:16px;color:#6B5658;font-weight:400;display:flex;flex-direction:column;gap:4px}
@@ -190,6 +233,7 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
  body.editing .mtools,body.editing .msheet{display:none!important}
  body.rec-ui.editing{overflow:auto}
  body.rec-ui .pr-t{padding-left:5%;padding-right:5%}
+ body.rec-ui .pr{height:50%;min-height:150px;border-radius:0}
 }
 .pk{background:#FBF8F4;border:1.5px solid #DDD2C6;border-radius:28px;padding:14px;margin-bottom:12px;box-shadow:0 14px 30px -24px rgba(74,58,65,.45)}
 .pk-now{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
@@ -207,6 +251,35 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
 .pk-tabs button[aria-selected=true]{background:#4A3A41;border-color:#4A3A41;color:#fff}.pk-tabs button[aria-selected=true] span{background:rgba(255,255,255,.18)}
 .pk-pane{max-height:min(62vh,640px);overflow:auto;padding:4px 2px 6px;margin-top:8px;overscroll-behavior:contain}
 .pk-days{display:flex;flex-direction:column;gap:8px}
+/* Kalender in der Auswahl */
+.pkc-pane{max-height:none!important;overflow:visible!important}
+.pkc-wrap{display:grid;grid-template-columns:minmax(260px,330px) minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:760px){.pkc-wrap{grid-template-columns:1fr}}
+.pkc{background:#fff;border:1.5px solid #E6DCD2;border-radius:22px;padding:10px 10px 8px}
+.pkc-h{display:flex;align-items:center;justify-content:space-between;margin:0 2px 6px}
+.pkc-h b{font:500 22px/1 "Cormorant Garamond",Georgia,serif;color:#4A3A41}
+.pkc-nav{width:36px;height:36px;border-radius:50%;border:1.5px solid #E6DCD2;background:#FBF8F4;color:#4A3A41;font-size:18px;cursor:pointer}
+.pkc-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+.pkc-g .wd{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#7D7076;text-align:center;padding:2px 0 4px}
+.pkc-g .d{position:relative;aspect-ratio:1;border-radius:12px;border:0;background:none;font:inherit;font-size:15px;color:#4A3A41;cursor:default;display:flex;align-items:center;justify-content:center;padding:0}
+.pkc-g .d.out{color:#C9BEC1}
+.pkc-g .d.today{box-shadow:0 0 0 1.5px #7D5E68 inset}
+.pkc-g .d.has{cursor:pointer;font-weight:500}
+.pkc-g .d.u0{background:#7D5E68;color:#fff}.pkc-g .d.u1{background:#9B7B87;color:#fff}.pkc-g .d.u2{background:#E3CFD7;color:#4A3A41}.pkc-g .d.u3{background:#F3EAEE;color:#4A3A41}
+.pkc-g .d.late{background:#6B3F4E;color:#fff}
+.pkc-g .d.sel{outline:2.5px solid #4A3A41;outline-offset:1px}
+.pkc-g .d i{position:absolute;top:2px;right:3px;font-style:normal;font-size:10px;line-height:15px;min-width:15px;padding:0 3px;border-radius:999px;background:rgba(255,255,255,.9);color:#4A3A41}
+.pkc-leg{display:flex;flex-wrap:wrap;gap:4px 12px;margin:8px 2px 0;font-size:12px;color:#7D7076}.pkc-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertipkc-align:-1px}
+.pkc-leg .u0{background:#7D5E68}.pkc-leg .u2{background:#E3CFD7}.pkc-leg .u3{background:#F3EAEE;border:1px solid #E6DCD2}
+.pkc-list{min-width:0}
+.pkc-dt{font:500 22px/1.2 "Cormorant Garamond",Georgia,serif;color:#4A3A41;margin:2px 2px 10px}
+.pkc-tiles{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.pkc-tiles .pk-t{min-height:0;padding:9px 10px}
+.pkc-tiles .pk-t>i{width:36px;height:36px;font-size:18px;border-radius:12px}
+.pkc-tiles .pk-t b{font-size:16px}
+.pkc-cl{margin-top:10px}.pkc-cl>summary{cursor:pointer;font-size:16px;color:#6B5658;padding:6px 2px;list-style:none}.pkc-cl>summary::-webkit-details-marker{display:none}
+.pkc-cl[open]>summary{margin-bottom:8px}
+.pkc-hint{font-size:16px;color:#7D7076;margin:6px 2px}
 /* Tage als kleine zugeklappte Boxen in Movecia-Farben (Vivien, 28.10.2026) */
 .pk-day{border-radius:20px;border:1.5px solid transparent;background:#F6EEEC;transition:box-shadow .2s}
 .pk-day.c1{background:#F4E9E1}.pk-day.c2{background:#F1ECE4}.pk-day.c3{background:#EFE6EB}
@@ -282,18 +355,41 @@ $groups = function (array $list, bool $withDone = false) use ($dayLong, $pill, $
 $open = array_values(array_filter($tiles, fn($t) => !$t['ok'] && $t['ty'] !== 'ig'));
 $igT = array_values(array_filter($tiles, fn($t) => $t['ty'] === 'ig'));
 $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig'));
+// Kalender (Vivien, 28.10.2026: „Kalendertool statt großer Liste, dringend = kräftiges Pflaume“): je Fälligkeitstag die offenen Videos
+$calOpen = array_merge($open, array_values(array_filter($igT, fn($t) => !$t['ok'])));
+$calBy = []; foreach ($calOpen as $t) $calBy[$t['due'] === '' ? 'ohne' : $t['due']][] = $t;
+ksort($calBy);
+$calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'ig' => count(array_filter($l, fn($t) => $t['ty'] === 'ig')), 'th' => count(array_filter($l, fn($t) => $t['ty'] === 'talk')), 'cl' => count(array_filter($l, fn($t) => $t['ty'] === 'clip'))];
 ?>
 <section class="pk" id="pk">
   <div class="pk-now"><i id="pkI">🗣</i><div class="pk-nt"><small>Du nimmst gerade auf</small><b id="pkT">…</b><span id="pkS"></span></div>
     <button type="button" class="pk-btn" id="pkToggle" aria-expanded="false">Anderes Video wählen</button></div>
   <div class="pk-body" id="pkBody" hidden>
     <div class="pk-tabs" role="tablist">
-      <button type="button" data-tab="next" aria-selected="true">📅 Als Nächstes <span><?= count($open) ?></span></button>
+      <button type="button" data-tab="next" aria-selected="true">📅 Kalender <span><?= count($calOpen) ?></span></button>
       <?php if ($igT): ?><button type="button" data-tab="ig" aria-selected="false">📱 Instagram <span><?= count($igT) ?></span></button><?php endif; ?>
       <button type="button" data-tab="free" aria-selected="false">✍️ Frei aufnehmen</button>
       <?php if ($done): ?><button type="button" data-tab="done" aria-selected="false">✓ Schon fertig <span><?= count($done) ?></span></button><?php endif; ?>
     </div>
-    <div class="pk-pane" data-pane="next"><?= $open ? $groups($open) : '<p class="pk-empty">Alles aufgenommen. Wunderbar ♡</p>' ?></div>
+    <div class="pk-pane pkc-pane" data-pane="next"><?php if (!$calOpen): ?><p class="pk-empty">Alles aufgenommen. Wunderbar ♡</p><?php else: ?>
+      <div class="pkc-wrap">
+        <div class="pkc">
+          <div class="pkc-h"><button type="button" class="pkc-nav" data-cm="-1" aria-label="Monat davor">‹</button><b id="calM"></b><button type="button" class="pkc-nav" data-cm="1" aria-label="nächster Monat">›</button></div>
+          <div class="pkc-g" id="calG"></div>
+          <div class="pkc-leg"><span><i class="u0"></i>überfällig / diese Woche</span><span><i class="u2"></i>bis 3 Wochen</span><span><i class="u3"></i>später</span></div>
+        </div>
+        <div class="pkc-list">
+          <?php foreach ($calBy as $d => $l): $tl = array_filter($l, fn($t) => $t['ty'] !== 'clip'); $cl = array_filter($l, fn($t) => $t['ty'] === 'clip'); ?>
+          <div class="pkc-day" data-d="<?= $h($d) ?>" hidden>
+            <p class="pkc-dt"><?= $d === 'ohne' ? 'Noch ohne Datum' : 'Fertig bis ' . $h($dayLong($d)) ?></p>
+            <?php if ($tl): ?><div class="pk-tiles pkc-tiles"><?= implode('', array_map($tile, $tl)) ?></div><?php endif; ?>
+            <?php if ($cl): ?><details class="pkc-cl"<?= $tl ? '' : ' open' ?>><summary>🧘 <?= count($cl) ?> Übung<?= count($cl) > 1 ? 'en' : '' ?> filmen</summary><div class="pk-tiles pkc-tiles"><?= implode('', array_map($tile, $cl)) ?></div></details><?php endif; ?>
+          </div>
+          <?php endforeach; ?>
+          <p class="pkc-hint" id="calHint">Tippe auf einen farbigen Tag.</p>
+        </div>
+      </div>
+    <?php endif; ?></div>
     <?php if ($igT): ?><div class="pk-pane" data-pane="ig" hidden><?= $groups($igT) ?><p class="pk-sub"><a href="<?= $h($self) ?>?view=insta">Alle Storys &amp; Reels planen →</a></p></div><?php endif; ?>
     <div class="pk-pane" data-pane="free" hidden><div class="pk-tiles">
       <?= $tile(['v' => '0', 'ty' => 'own', 'ok' => false, 'n' => 'Eigener Text', 'k' => 'Talking Head', 'x' => 'z. B. Story oder Reel, nur herunterladen']) ?>
@@ -337,6 +433,8 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
       <button type="button" class="next" id="edit" hidden>✂️ Bearbeiten · Licht, Ausschnitt, Musik</button>
       <a class="b" id="dl" hidden download>⬇ Herunterladen</a>
       <button type="button" class="sm" id="again" hidden>↺ Nochmal aufnehmen</button>
+      <button type="button" class="sm del" id="del" hidden>🗑 Löschen</button>
+      <button type="button" class="sm del" id="cdel" hidden>🗑 Letzten Absatz löschen</button>
       <button type="button" class="go" id="cgo" hidden>● Absatz 1 aufnehmen</button>
       <button type="button" class="next" id="cnext" hidden>✓ Fertig · nächster Absatz</button>
       <button type="button" class="sm" id="credo" hidden>↺ Absatz nochmal</button>
@@ -361,16 +459,17 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
       <div class="cl-all"><button type="button" class="main" id="subAll">💬 Untertitel für alle Clips erstellen</button></div>
       <div class="prog" id="subProg" hidden><i></i></div>
     </div>
-    <div class="box" id="prBox"><h2>Teleprompter</h2>
+    <div class="box" id="prBox"><h2>📝 Teleprompter</h2>
       <div class="own" id="own" hidden><textarea id="ownT" placeholder="Hier deinen Text einfügen, z. B. die Story von heute."></textarea>
         <p class="tip" id="ownHint" style="margin:6px 0 10px">Eine Leerzeile trennt die Absätze. Bei „Absatz für Absatz“ wird jeder Absatz ein eigener Clip. Oben bei Deutsch/Englisch kannst du den Text in beiden Sprachen hinterlegen (für Untertitel in der anderen Sprache).</p></div>
       <div class="prc">
         <button type="button" id="prOn" aria-pressed="true">Text an</button>
-        <button type="button" data-sp="-1" aria-label="langsamer">langsamer</button><button type="button" data-sp="1" aria-label="schneller">schneller</button>
+        <button type="button" data-sp="-1" aria-label="langsamer">− langsamer</button><span class="sp-l" id="spL"></span><button type="button" data-sp="1" aria-label="schneller">schneller +</button>
         <button type="button" data-fs="-3" aria-label="Schrift kleiner">A−</button><button type="button" data-fs="3" aria-label="Schrift größer">A+</button>
         <button type="button" id="prTop" aria-label="zum Anfang">⟲ Anfang</button>
       </div>
       <label class="chk"><input type="checkbox" id="prAuto" checked> Text läuft mit der Aufnahme los</label>
+      <label class="chk"><input type="checkbox" id="prCam" checked> Beim Aufnehmen ganz oben an der Kamera (Blick in die Linse)</label>
       <p class="tip" style="margin-top:8px">Tippen auf den Text oder Leertaste: Pause und weiter.</p>
     </div>
     <div class="box" id="lookBox"><h2>✨ Kamera-Look</h2><div id="panel"></div></div>
@@ -390,8 +489,8 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   <button type="button" data-sheet="more">⚙️ Mehr</button>
 </nav>
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
-<script src="/wildhearts/assets/talkcam.js?v=2"></script>
-<script src="studio-edit.js?v=4"></script>
+<script src="/wildhearts/assets/talkcam.js?v=4"></script>
+<script src="studio-edit.js?v=5"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
@@ -403,6 +502,9 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   const csrf=<?= json_encode(csrf()) ?>, BUNNY=<?= $bunny ? 'true' : 'false' ?>;
   const $=id=>document.getElementById(id), esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   function post(a,d){const f=new FormData();f.append('csrf',csrf);f.append('action',a);for(const k in d)f.append(k,d[k]);return fetch(location.pathname,{method:'POST',body:f,credentials:'same-origin'}).then(r=>r.json())}
+  // „💛 Meine Looks“ auf dem Server (gleich auf Handy und Computer), auch für „Bearbeiten“ (Slot edit)
+  const looksStore={get:slot=>post('mm_looks_get',{slot}).then(j=>j.list||[]),set:(slot,list)=>post('mm_looks_set',{slot,list:JSON.stringify(list)}).then(j=>{if(!j.ok)throw 0;return j.list})};
+  if(window.TalkCam)TalkCam.store=looksStore;
   let clipm=false, cs=null, clips=[];
   let lang=<?= json_encode($lang) ?>, cur=null, tgt=null, tc=null, raw=null, rec=null, chunks=[], blob=null, saved=true, t0=0, tick=0, lock=null;
   const ls={get:(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
@@ -411,7 +513,14 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   const pr=document.createElement('div');pr.className='pr';pr.innerHTML='<div class="pr-t" id="prT"></div>';
   const slab=document.createElement('div');slab.className='slab';slab.hidden=true;
   // Am iPhone geht ein Bruchteil-Pixel beim Scrollen verloren (scrollTop wird abgerundet) → eigener Zähler (Vivien, 28.10.2026: Teleprompter lief am Handy nicht)
-  let prPos=0;function prMove(d,reset){prPos=reset?0:Math.max(0,Math.min(prPos+d,pr.scrollHeight-pr.clientHeight));pr.scrollTop=prPos}
+  // Weich gleitend statt in ganzen Pixel-Sprüngen (Vivien, 28.10.2026: Text ruckelte am Handy und MacBook): Verschiebung per GPU-transform mit Kommastellen
+  let prPos=0;const prT=()=>pr.querySelector('.pr-t');const prMax=()=>Math.max(0,(prT()?prT().offsetHeight:0)-pr.clientHeight*.6);
+  // Der Lauf selbst ist eine CSS-Animation (läuft auf der Grafikkarte weiter, auch wenn die Kamera-Filter viel rechnen)
+  // Neu (Vivien, 28.10.2026: „der Teleprompter funktioniert gar nicht“): kein CSS-Übergang und keine Maske mehr
+  // (iPhone-Safari zeichnete den Text über dem Kamerabild teils nicht), sondern jedes Bild per transform mit Kommastellen.
+  function prSet(){const t=prT();if(t)t.style.transform='translate3d(0,'+(-prPos).toFixed(2)+'px,0)'}
+  function prPlay(){} function prPause(){} function prNow(){return prPos}
+  function prMove(d,reset){prPos=reset?0:Math.max(0,Math.min(prPos+d,prMax()));pr.scrollTop=0;prSet()}
   let sp=+ls.get('st-sp',40), fs=+ls.get('st-fs',innerWidth<700?20:30), run=false, last=0;
   pr.style.setProperty('--fs',fs+'px');
   function textHtml(t){return esc(t||'').replace(/\[([^\]]+)\]/g,'<span class="hint">[$1]</span>')}
@@ -419,14 +528,24 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   function paras(lg){return String(textOf(lg)||'').split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean)}
   function setText(){if(clipm){showSlide();return}const t=cur?(lang==='en'?cur.en:cur.de):$('ownT').value;
     pr.querySelector('.pr-t').innerHTML=t.trim()?textHtml(t):'<span class="hint">'+(cur?'Für diese Lektion gibt es noch keinen '+(lang==='en'?'englischen':'deutschen')+' Text.':'Füge deinen Text beim Teleprompter ein.')+'</span>';prMove(0,true);}
-  function prLoop(ts){if(run){prMove(sp*Math.min(100,ts-last)/1000)}last=ts;requestAnimationFrame(prLoop)}requestAnimationFrame(prLoop);
+  let prLast=0;function prLoop(ts){if(run&&!pr.hidden){const dt=prLast?Math.min(.1,(ts-prLast)/1000):0,m=prMax();if(prPos<m){prPos=Math.min(m,prPos+sp*dt);prSet()}}prLast=ts;requestAnimationFrame(prLoop)}requestAnimationFrame(prLoop);
   function toggle(){run=!run}
   pr.addEventListener('click',toggle);
   document.addEventListener('keydown',e=>{if(e.code==='Space'&&!/INPUT|TEXTAREA|SELECT|BUTTON/.test(document.activeElement.tagName)){e.preventDefault();toggle()}});
-  document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{sp=Math.max(10,Math.min(160,sp+(+b.dataset.sp)*8));ls.set('st-sp',sp)});
+  // Tempo in 10 deutlich spürbaren Stufen (Vivien, 28.10.2026: „langsamer/schneller funktioniert nicht“ – die alten Schritte waren zu klein)
+  const SPS=[10,15,21,28,36,45,56,70,88,110];let spLv=SPS.reduce((b,v,i)=>Math.abs(v-sp)<Math.abs(SPS[b]-sp)?i:b,0);sp=SPS[spLv];
+  document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;if(e.code==='ArrowUp'||e.code==='ArrowDown'){e.preventDefault();const b=document.querySelector('[data-sp="'+(e.code==='ArrowUp'?1:-1)+'"]');if(b)b.click()}});
+  function spUi(){const l=$('spL');if(l)l.textContent='Tempo '+(spLv+1)+' von 10'}spUi();
+  document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{spLv=Math.max(0,Math.min(9,spLv+(+b.dataset.sp)));sp=SPS[spLv];ls.set('st-sp',sp);spUi()});
   document.querySelectorAll('[data-fs]').forEach(b=>b.onclick=()=>{fs=Math.max(18,Math.min(60,fs+(+b.dataset.fs)));pr.style.setProperty('--fs',fs+'px');ls.set('st-fs',fs)});
   $('prTop').onclick=()=>{prMove(0,true);run=false};
   $('prOn').onclick=()=>{pr.hidden=!pr.hidden;$('prOn').setAttribute('aria-pressed',String(!pr.hidden));$('prOn').textContent=pr.hidden?'Text aus':'Text an'};
+  // Text beim Aufnehmen ganz oben an der Kamera (eigenes Element am <body>, damit nichts verschiebt)
+  try{$('prCam').checked=ls.get('st-prcam','1')!=='0'}catch(e){}
+  $('prCam').onchange=()=>ls.set('st-prcam',$('prCam').checked?'1':'0');
+  function prTop(on){on=on&&$('prCam').checked&&!pr.hidden;if(on===pr.classList.contains('top'))return;
+    if(on){document.body.appendChild(pr);pr.classList.add('top')}else{pr.classList.remove('top');const st=$('stage');st&&st.insertBefore(pr,st.querySelector('.cd'))}
+    document.body.classList.toggle('prtop',on);prMove(0,true)}
   // eigener Text je Sprache (für Untertitel in der anderen Sprache)
   if(ls.get('st-own-de',null)===null&&ls.get('st-own',''))ls.set('st-own-de',ls.get('st-own',''));
   const ownOf=lg=>ls.get('st-own-'+lg,'');
@@ -451,6 +570,24 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
     if(fromFile&&blob)tgt=mv?{clip:mv}:(ig?{ig:ig}:(cur?{t:cur,lang:lang}:null));
     setText();showAfter();clipUi();subPreview();}
   $('what').onchange=choose;
+  // ---- Kästen rechts einklappbar, Zustand wird gemerkt (Vivien, 28.10.2026) ----
+  const SHUT_DEF={lookBox:1,devBox:1};
+  document.querySelectorAll('.side .box').forEach(bx=>{const h=bx.querySelector(':scope>h2');if(!h||!bx.id)return;const k='st-shut-'+bx.id,v=ls.get(k,null);
+    bx.classList.toggle('shut',v===null?!!SHUT_DEF[bx.id]:v==='1');h.setAttribute('role','button');h.tabIndex=0;
+    const t=()=>{bx.classList.toggle('shut');ls.set(k,bx.classList.contains('shut')?'1':'0')};h.onclick=t;h.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();t()}}});
+  // ---- Kalender ----
+  const CAL=<?= json_encode($calMeta) ?>;let calY,calMo,calSel='';
+  (function(){const ks=Object.keys(CAL).filter(k=>k!=='ohne').sort(),td=new Date().toISOString().slice(0,10),first=ks.find(k=>k>=td)||ks[ks.length-1]||td;const d=new Date(first+'T12:00:00');calY=d.getFullYear();calMo=d.getMonth();calSel=first&&CAL[first]?first:''})();
+  function urg(d){const n=Math.round((new Date(d+'T12:00:00')-new Date(new Date().toDateString()+' 12:00'))/864e5);return n<0?'late':n<=7?'u0':n<=14?'u1':n<=21?'u2':'u3'}
+  function calDraw(){const g=$('calG');if(!g)return;const MO2=['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];$('calM').textContent=MO2[calMo]+' '+calY;
+    const f=new Date(calY,calMo,1),off=(f.getDay()+6)%7,days=new Date(calY,calMo+1,0).getDate(),td=new Date().toISOString().slice(0,10);let h=['Mo','Di','Mi','Do','Fr','Sa','So'].map(x=>'<span class="wd">'+x+'</span>').join('');
+    for(let i=0;i<off;i++)h+='<span></span>';
+    for(let d=1;d<=days;d++){const k=calY+'-'+String(calMo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'),m=CAL[k];
+      h+='<button type="button" class="d'+(m?' has '+urg(k):'')+(k===td?' today':'')+(k===calSel?' sel':'')+'" data-cd="'+k+'"'+(m?' aria-label="'+d+'.: '+m.n+' Videos"':' tabindex="-1"')+'>'+d+(m?'<i>'+m.n+'</i>':'')+'</button>'}
+    g.innerHTML=h;g.querySelectorAll('.d.has').forEach(b=>b.onclick=()=>{calSel=b.dataset.cd;calDraw();calShow()})}
+  function calShow(){document.querySelectorAll('.pkc-day').forEach(x=>x.hidden=x.dataset.d!==calSel);const hint=$('calHint');if(hint)hint.hidden=!!document.querySelector('.pkc-day:not([hidden])')}
+  document.querySelectorAll('[data-cm]').forEach(b=>b.onclick=()=>{calMo+=+b.dataset.cm;if(calMo<0){calMo=11;calY--}if(calMo>11){calMo=0;calY++}calDraw()});
+  calDraw();calShow();
   // ---- Kachel-Auswahl ----
   const pkBody=$('pkBody'),pkTg=$('pkToggle');
   function pkOpen(o){pkBody.hidden=!o;pkTg.setAttribute('aria-expanded',String(o));pkTg.textContent=o?'Schließen':'Anderes Video wählen'}
@@ -503,12 +640,12 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   // ---- Aufnahme ----
   const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
   function mime(){const ts=['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4;codecs=avc1,mp4a','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];return ts.find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||''}
-  function showAfter(){if(clipm){clipUi();return}const has=!!blob;if(tgt)$('up').textContent=tgt.ig?'💾 Für '+tgt.ig.l.split(' · ')[0]+' speichern ('+(tgt.ig.kind==='reel'?'Reel':'Story')+')':tgt.clip?'⬆ Als Clip „'+tgt.clip.n+'“ hochladen':'⬆ In „'+tgt.t.t+'“ hochladen ('+(tgt.lang==='de'?'Deutsch':'Englisch')+')';$('go').hidden=has||(rec&&rec.state==='recording');$('again').hidden=!has;$('dl').hidden=!has;$('edit').hidden=!has;$('up').hidden=!has||!tgt||(!BUNNY&&!tgt.ig);
+  function showAfter(){if(clipm){clipUi();return}const has=!!blob;if(tgt)$('up').textContent=tgt.ig?'💾 Für '+tgt.ig.l.split(' · ')[0]+' speichern ('+(tgt.ig.kind==='reel'?'Reel':'Story')+')':tgt.clip?'⬆ Als Clip „'+tgt.clip.n+'“ hochladen':'⬆ In „'+tgt.t.t+'“ hochladen ('+(tgt.lang==='de'?'Deutsch':'Englisch')+')';$('go').hidden=has||(rec&&rec.state==='recording');$('again').hidden=!has;$('del').hidden=!has;$('dl').hidden=!has;$('edit').hidden=!has;$('up').hidden=!has||!tgt||(!BUNNY&&!tgt.ig);
     $('play').hidden=!has;$('stage').style.display=has?'none':'';}
   $('go').onclick=async()=>{
     if(!tc){$('msg').textContent='Die Kamera läuft noch nicht.';return}
     if(!window.MediaRecorder){$('msg').textContent='Dieser Browser kann nicht aufnehmen. Bitte Chrome oder Safari nehmen.';return}
-    $('go').hidden=true;$('msg').textContent='';
+    $('go').hidden=true;$('msg').textContent='';prTop(true);
     for(const n of [3,2,1]){$('cd').textContent=n;await new Promise(r=>setTimeout(r,800))}$('cd').textContent='';
     const mt=mime(),big=tc.canvas.width*tc.canvas.height>1.5e6;
     rec=new MediaRecorder(tc.stream(30),Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:big?8000000:5000000,audioBitsPerSecond:160000}));
@@ -517,16 +654,24 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
       const url=URL.createObjectURL(blob);$('play').src=url;const ext=blob.type.includes('mp4')?'mp4':'webm';
       const d=new Date(),stamp=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+'-'+String(d.getMinutes()).padStart(2,'0');
       $('dl').href=url;$('dl').download=(tgt&&tgt.ig?tgt.ig.day+'_'+(tgt.ig.kind==='reel'?'Reel':'Story')+'_'+tgt.ig.t.slice(0,30):tgt&&tgt.clip?'Uebung_'+tgt.clip.n+'_'+stamp:(mvFree?'Bewegung_'+stamp:'TalkingHead_'+(tgt?tgt.t.t:'Eigener-Text')+'_'+(tgt?tgt.lang:lang).toUpperCase()+'_'+stamp)).replace(/[^\wäöüÄÖÜß-]+/g,'-')+'.'+ext;
-      $('rd').hidden=true;$('stop').hidden=true;run=false;showAfter();
+      $('rd').hidden=true;$('stop').hidden=true;run=false;document.body.classList.remove('recording');prTop(false);showAfter();
       $('msg').className='msg';$('msg').textContent='Schau es dir kurz an. Passt es, '+(tgt&&BUNNY?'tippe auf „Hochladen“ oder lade es herunter.':'lade es herunter.');
       if(lock){lock.release().catch(()=>{});lock=null}};
     fromFile=false;tgt=mv?{clip:mv}:(ig?{ig:ig}:(cur?{t:cur,lang:lang}:null));rec.start(1000);t0=performance.now();$('stop').hidden=false;$('rd').hidden=false;
-    if($('prAuto').checked&&!pr.hidden){run=true}
+    document.body.classList.add('recording');prMove(0,true);
+    if($('prAuto').checked&&!pr.hidden){const R=rec;setTimeout(()=>{if(rec===R&&R.state==='recording')run=true},1200)}
     try{lock=await navigator.wakeLock.request('screen')}catch(e){}
     (function loop(){if(!rec||rec.state!=='recording')return;$('rt').textContent=fmt((performance.now()-t0)/1000);tick=requestAnimationFrame(loop)})();
   };
   $('stop').onclick=()=>{if(rec&&rec.state==='recording')rec.stop()};
   $('again').onclick=()=>{if(!saved&&!confirm('Die Aufnahme ist noch nicht gespeichert. Trotzdem neu aufnehmen?'))return;blob=null;saved=true;$('play').removeAttribute('src');$('msg').textContent='';$('prog').hidden=true;prMove(0,true);showAfter();};
+  // Sofort löschen (Vivien, 28.10.2026): ohne Nachfrage, kurz rückgängig machbar
+  let undo=null;
+  $('del').onclick=()=>{if(!blob)return;undo={b:blob,src:$('play').src,href:$('dl').href,name:$('dl').download,saved:saved,tgt:tgt};
+    blob=null;saved=true;$('play').removeAttribute('src');$('prog').hidden=true;prMove(0,true);showAfter();
+    $('msg').className='msg';$('msg').innerHTML='🗑 Aufnahme gelöscht. <button type="button" class="sm" id="undo" style="margin-left:6px">Rückgängig</button>';
+    $('undo').onclick=()=>{if(!undo)return;blob=undo.b;$('play').src=undo.src;$('dl').href=undo.href;$('dl').download=undo.name;saved=undo.saved;tgt=undo.tgt;undo=null;$('msg').textContent='Aufnahme ist wieder da.';showAfter()};
+    const U=undo;setTimeout(()=>{if(undo===U){undo=null;if($('undo'))$('msg').textContent=''}},8000)};
   $('dl').addEventListener('click',()=>{saved=true});
   window.addEventListener('beforeunload',e=>{if(blob&&!saved){e.preventDefault();e.returnValue=''}});
   $('up').onclick=()=>{
@@ -557,7 +702,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   // =================== Bearbeiten ===================
   let edOpen=null,fromFile=false;
   // Welche Musik passt? (Stichwörter aus dem Musik-Ordner, nach Titel/Text des Videos)
-  function musicHint(){if(mv||mvFree)return [];if(ig)return ig.kind==='reel'?['reel','lebendig','morgen']:['reel','morgen'];
+  function musicHint(){if(mv||mvFree)return [];const wi=[10,11].includes(new Date().getMonth())&&new Date().getDate()>=(new Date().getMonth()===10?15:1);if(ig)return wi?['winter','reel']:(ig.kind==='reel'?['reel','lebendig','morgen']:['reel','morgen']);
     const t=((cur&&cur.t)||'')+' '+String((cur&&(lang==='en'?cur.en:cur.de))||$('ownT').value||'').slice(0,300);
     if(/abend|nacht|schlaf|meditation|atem|breath|ruhe|loslassen|savasana|evening|sleep/i.test(t))return ['meditation','abend'];
     if(/morgen|morning|willkommen|welcome|start|ankommen/i.test(t))return ['morgen','reel'];
@@ -566,7 +711,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
     if(typeof StudioEdit==='undefined'){$('msg').textContent='Der Bearbeiten-Baustein konnte nicht laden. Bitte Seite neu laden (vorher herunterladen!).';return}
     document.body.classList.add('editing');$('edWrap').hidden=false;$('edInfo').textContent=info||'';window.scrollTo({top:0,behavior:'smooth'});
     const back=()=>{document.body.classList.remove('editing');$('edWrap').hidden=true;edOpen=null};
-    edOpen=StudioEdit.open({blob:b,dur:dur,mount:$('ed'),musicHint:musicHint(),seed:(cur&&cur.id)||(ig&&ig.id)||Date.now(),onDone:(nb,inf)=>{back();done(nb,inf)},onCancel:back});}
+    edOpen=StudioEdit.open({store:looksStore,blob:b,dur:dur,mount:$('ed'),musicHint:musicHint(),seed:(cur&&cur.id)||(ig&&ig.id)||Date.now(),onDone:(nb,inf)=>{back();done(nb,inf)},onCancel:back});}
   function setBlob(nb,suffix){blob=nb;saved=false;const url=URL.createObjectURL(nb);$('play').src=url;const ext=nb.type.includes('mp4')?'mp4':'webm';
     $('dl').href=url;$('dl').download=String($('dl').download||'Video').replace(/(_bearbeitet)?\.\w+$/,'')+(suffix||'')+'.'+ext;$('prog').hidden=true;showAfter();}
   $('edit').onclick=()=>{if(!blob)return;const d=$('play').duration;
@@ -581,7 +726,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   window.addEventListener('beforeunload',e=>{if(edOpen){e.preventDefault();e.returnValue=''}});
 
   // Instagram: Video in 8-MB-Stücken auf den eigenen Server, am Tag dann unter „Instagram täglich“ teilen
-  async function igSave(G){const b=blob,CH=8*1024*1024,n=Math.max(1,Math.ceil(b.size/CH)),fill=$('prog').querySelector('i'),ext=b.type.includes('webm')?'webm':'mp4';
+  async function igSave(G){const b=blob,CH=1536*1024,n=Math.max(1,Math.ceil(b.size/CH)),fill=$('prog').querySelector('i'),ext=b.type.includes('webm')?'webm':'mp4';
     $('up').disabled=true;$('prog').hidden=false;$('msg').className='msg';
     try{for(let i=0;i<n;i++){const f=new FormData();f.append('csrf',csrf);f.append('action','mm_ig_up');f.append('id',G.id);f.append('n',i);f.append('ext',ext);if(i===n-1)f.append('last','1');
         f.append('b',b.slice(i*CH,(i+1)*CH),'teil');
@@ -628,7 +773,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
     slab.hidden=!P.length;slab.textContent='Absatz '+Math.min(i+1,P.length)+' von '+P.length;}
   function clipUi(){
     const P=paras(lang),n=P.length,recIng=!!(cs&&cs.rec);
-    ['go','stop','up','dl','again','edit'].forEach(id=>{if(clipm)$(id).hidden=true});if(clipm){$('play').hidden=true;$('stage').style.display=''}
+    ['go','stop','up','dl','again','edit','del'].forEach(id=>{if(clipm)$(id).hidden=true});$('cdel').hidden=!clipm||recIng||lastClip<0||!clips[lastClip];if(!$('cdel').hidden)$('cdel').textContent='🗑 Absatz '+(lastClip+1)+' löschen';if(clipm){$('play').hidden=true;$('stage').style.display=''}
     $('cgo').hidden=!clipm||recIng;$('cnext').hidden=!clipm||!recIng;$('credo').hidden=!clipm||!recIng;$('cend').hidden=!clipm||!recIng;
     if(clipm&&!recIng){const first=clips.findIndex((c,i)=>i<n&&!c);const start=clips.length&&first<0&&clips.filter(Boolean).length>=n?-1:(first<0?Math.min(clips.length,n):first);
       $('cgo').dataset.start=Math.max(0,start);$('cgo').textContent=n?(start<0?'● Alles nochmal ab Absatz 1':'● Absatz '+(start+1)+' von '+n+' aufnehmen'):'● Aufnehmen';if(start<0)$('cgo').dataset.start=0;}
@@ -644,7 +789,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
     if(!tc){$('msg').textContent='Die Kamera läuft noch nicht.';return}
     if(!baseName)baseName=slug(cur?cur.t:'Story')+'_'+lang.toUpperCase()+'_'+stamp();
     meter();cs={i:i,single:!!single,rec:null,discard:false};setText();clipUi();
-    $('cgo').hidden=true;$('msg').textContent='';
+    $('cgo').hidden=true;$('msg').textContent='';prTop(true);
     for(const n of [3,2,1]){$('cd').textContent=n;await new Promise(r=>setTimeout(r,650))}$('cd').textContent='';
     if(!cs)return;
     const mt=mime(),big=tc.canvas.width*tc.canvas.height>1.5e6,ch=[];
@@ -656,17 +801,20 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
       const type=(r.mimeType||mt||'video/webm').split(';')[0],b=new Blob(ch,{type}),ext=type.includes('mp4')?'mp4':'webm';
       const old=clips[me.i];if(old){URL.revokeObjectURL(old.url);if(old.sub)URL.revokeObjectURL(old.sub.url)}
       clips[me.i]={i:me.i,blob:b,url:URL.createObjectURL(b),ext:ext,dur:dur,s:st.s==null?.2:Math.max(0,st.s-.15),e:st.e==null?dur-.2:Math.min(dur,st.e+.25),lang:lang,text:paras(lang)[me.i]||'',sub:null,saved:false};
-      renderClips();clipUi();};
-    r._cs=cs;cs.rec=r;r.start(1000);st.t0=performance.now();$('rd').hidden=false;clipUi();
+      lastClip=me.i;renderClips();clipUi();};
+    r._cs=cs;cs.rec=r;r.start(1000);st.t0=performance.now();$('rd').hidden=false;document.body.classList.add('recording');clipUi();
     try{if(!lock)lock=await navigator.wakeLock.request('screen')}catch(e){}
     (function loop(){if(!cs||cs.rec!==r||r.state!=='recording')return;const t=(performance.now()-st.t0)/1000;$('rt').textContent=fmt(t);
       if(an){an.getFloatTimeDomainData(abuf);let q=0;for(const v of abuf)q+=v*v;const rms=Math.sqrt(q/abuf.length);if(rms>.02){if(st.s==null)st.s=t;st.e=t}}
       // langer Absatz: Text läuft sanft mit
-      if(pr.scrollHeight>pr.clientHeight+4&&!pr.hidden)prMove(sp/60);
+      if(t>1.2&&prMax()>4&&!pr.hidden&&!run)run=true;
       requestAnimationFrame(loop)})();
   }
-  function stopRec(discard){if(cs&&cs.rec&&cs.rec.state==='recording'){cs.rec._cs.discard=!!discard;cs.rec.stop()}$('rd').hidden=true}
-  function finish(){stopRec(false);cs=null;slab.hidden=false;showSlide();slab.textContent='Fertig ✓';if(lock){lock.release().catch(()=>{});lock=null}clipUi();
+  let lastClip=-1;
+  function stopRec(discard){if(cs&&cs.rec&&cs.rec.state==='recording'){cs.rec._cs.discard=!!discard;cs.rec.stop()}$('rd').hidden=true;run=false;document.body.classList.remove('recording')}
+  function delClip(i){const c=clips[i];if(!c)return;URL.revokeObjectURL(c.url);if(c.sub)URL.revokeObjectURL(c.sub.url);clips[i]=null;if(lastClip===i)lastClip=-1;renderClips();clipUi();$('msg').className='msg';$('msg').textContent='🗑 Absatz '+(i+1)+' gelöscht. Nimm ihn einfach neu auf.'}
+  $('cdel').onclick=()=>{if(cs&&cs.rec)return;delClip(lastClip)};
+  function finish(){stopRec(false);prTop(false);cs=null;slab.hidden=false;showSlide();slab.textContent='Fertig ✓';if(lock){lock.release().catch(()=>{});lock=null}clipUi();
     const n=clips.filter(Boolean).length;$('msg').className='msg ok';$('msg').textContent=n?'✓ '+n+' Clip'+(n>1?'s':'')+' fertig. Rechts kannst du sie ansehen, neu aufnehmen, sichern oder Untertitel dazu machen.':'';}
   $('cgo').onclick=()=>startClip(+($('cgo').dataset.start||0));
   $('cnext').onclick=()=>{if(!cs)return;const i=cs.i,single=cs.single;stopRec(false);const n=paras(lang).length;
@@ -684,8 +832,9 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
         +(c&&c.sub?'<a class="sub" href="'+c.sub.url+'" download="'+esc(fileName(c,c.sub.lang))+'" data-saved="'+i+'">⬇ mit Untertitel</a>':'')
         +(c?'<button type="button" class="ed" data-edit="'+i+'">✂️ Bearbeiten</button>':'')
         +(c&&canShare([c.blob])?'<button type="button" data-share="'+i+'">📲 Sichern</button>':'')
-        +'<button type="button" data-retake="'+i+'">'+(c?'↺ Neu aufnehmen':'● Aufnehmen')+'</button></div></div></div>';}
+        +'<button type="button" data-retake="'+i+'">'+(c?'↺ Neu aufnehmen':'● Aufnehmen')+'</button>'+(c?'<button type="button" class="del" data-del="'+i+'">🗑 Löschen</button>':'')+'</div></div></div>';}
     box.innerHTML=h;const any=clips.some(Boolean);$('clAll').hidden=!any;$('shareAll').hidden=!any||!canShare(clips.filter(Boolean).map(c=>c.blob));$('zipSub').hidden=!clips.some(c=>c&&c.sub);
+    box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(cs&&cs.rec)return;delClip(+b.dataset.del)});
     box.querySelectorAll('[data-retake]').forEach(b=>b.onclick=()=>{if(cs&&cs.rec)return;startClip(+b.dataset.retake,true);window.scrollTo({top:0,behavior:'smooth'})});
     box.querySelectorAll('[data-saved]').forEach(a=>a.addEventListener('click',()=>{const c=clips[+a.dataset.saved];if(c)c.saved=true}));
     box.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>shareFiles([clips[+b.dataset.share]]));

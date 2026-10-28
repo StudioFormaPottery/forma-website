@@ -110,7 +110,10 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
   <details class="tc-g" open><summary>☀️ Licht &amp; Farbe</summary><div class="tc-gb">
     <button type="button" class="se-b pl" data-k="auto">✨ Automatisch verbessern</button>
     <div data-sl="ex"></div><div data-sl="sh"></div><div data-sl="hi"></div><div data-sl="con"></div><div data-sl="wm"></div><div data-sl="sat"></div>
-    <button type="button" class="se-b" data-k="resetLight">Licht zurücksetzen</button></div></details>
+    <button type="button" class="se-b" data-k="resetLight">Licht zurücksetzen</button>
+    <div class="tc-mine"><h3>💛 Meine Filter</h3><div class="tc-chips" data-k="mine"></div>
+      <div class="tc-mine-f" data-k="mform" hidden><input type="text" maxlength="40" data-k="mname2" aria-label="Name für deinen Filter"><button type="button" class="tc-save" data-k="mok">Speichern</button><button type="button" class="tc-save lite" data-k="mno">Abbrechen</button></div>
+      <div data-k="mrow"><button type="button" class="tc-save" data-k="msave">＋ So wie jetzt speichern</button></div><p class="tc-mmsg" data-k="mmsg"></p></div></div></details>
   <details class="tc-g" open><summary>🖼 Ausschnitt &amp; Ausrichtung</summary><div class="tc-gb">
     <div class="tc-chips" data-k="fmts"></div>
     <div data-sl="zoom"></div><div data-sl="ox"></div><div data-sl="oy"></div><div data-sl="rot"></div>
@@ -213,7 +216,7 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
       el.className = 'tc-sl'; el.innerHTML = '<label><span>' + d[0] + '</span><small></small></label><input type="range" min="' + d[1] + '" max="' + d[2] + '" step="' + d[3] + '">';
       const inp = el.querySelector('input'), sm = el.querySelector('small'); inputs[k] = inp;
       inp.value = obj[k]; sm.textContent = d[4](+obj[k]);
-      inp.oninput = () => { obj[k] = +inp.value; sm.textContent = d[4](obj[k]); if (isM) { ls.set('se-mus', { vol: mus.vol, voice: mus.voice, duck: mus.duck, fade: mus.fade }); if (k === 'from') syncMusic(); } draw(); };
+      inp.oninput = () => { obj[k] = +inp.value; sm.textContent = d[4](obj[k]); if (isM) { ls.set('se-mus', { vol: mus.vol, voice: mus.voice, duck: mus.duck, fade: mus.fade }); if (k === 'from') syncMusic(); } else if (curMine) { curMine = ''; drawMine(); } draw(); };
       inp.ondblclick = () => { obj[k] = isM ? ({ vol: .18, voice: 1, from: 0 })[k] : DEF[k]; sync(); draw(); };
     });
     function sync() { Object.keys(inputs).forEach(k => { const obj = ['vol', 'voice', 'from'].includes(k) ? mus : st; inputs[k].value = obj[k]; inputs[k].previousElementSibling.querySelector('small').textContent = SL[k][4](+obj[k]); });
@@ -225,7 +228,35 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
     K('fmts').querySelectorAll('button').forEach(b2 => b2.onclick = () => { st.fmt = b2.dataset.f; sync(); draw(); });
     K('duck').onchange = () => { mus.duck = K('duck').checked; ls.set('se-mus', mus); };
     K('fade').onchange = () => { mus.fade = K('fade').checked; ls.set('se-mus', mus); };
-    K('resetLight').onclick = () => { ['ex', 'con', 'wm', 'sat', 'sh', 'hi'].forEach(k => st[k] = DEF[k]); sync(); draw(); };
+    K('resetLight').onclick = () => { ['ex', 'con', 'wm', 'sat', 'sh', 'hi'].forEach(k => st[k] = DEF[k]); curMine = ''; sync(); drawMine(); draw(); };
+    // ---- 💛 Meine Filter (Vivien, 28.10.2026): Licht & Farbe speichern, antippen = übernehmen, × = löschen ----
+    const LK = ['ex', 'con', 'wm', 'sat', 'sh', 'hi'], store = o.store || { get: () => Promise.resolve(ls.get('se-mine', [])), set: (sl, l) => Promise.resolve(l) };
+    let mine = ls.get('se-mine', []), curMine = '';
+    const mmsg = K('mmsg');
+    function drawMine() {
+      K('mine').innerHTML = mine.length ? mine.map((m, i) => `<span class="tc-mc"><button type="button" data-mi="${i}" aria-pressed="${String(curMine === m.n)}">${esc(m.n)}</button><button type="button" class="tc-x" data-mx="${i}" aria-label="${esc(m.n)} löschen" title="löschen">×</button></span>`).join('')
+        : '<p class="tc-mmsg" style="margin:0">Stell Licht &amp; Farbe so ein, wie es dir gefällt, und speichere es hier. Beim nächsten Video ist dein Filter mit einem Tipp wieder da.</p>';
+      K('mine').querySelectorAll('[data-mi]').forEach(b2 => b2.onclick = () => { const m = mine[+b2.dataset.mi]; if (!m) return; LK.forEach(k => { if (typeof m.s[k] === 'number') st[k] = m.s[k]; }); curMine = m.n; sync(); drawMine(); draw(); mmsg.textContent = '✓ „' + m.n + '“ ist eingestellt.'; });
+      K('mine').querySelectorAll('[data-mx]').forEach(b2 => b2.onclick = () => { const m = mine[+b2.dataset.mx]; if (!m || !confirm('„' + m.n + '“ löschen?')) return; mine.splice(+b2.dataset.mx, 1); if (curMine === m.n) curMine = ''; putMine('„' + m.n + '“ gelöscht.'); });
+    }
+    function putMine(ok) {
+      ls.set('se-mine', mine); drawMine(); mmsg.textContent = 'Wird gespeichert …';
+      store.set('edit', mine).then(l => { if (Array.isArray(l)) { mine = l; ls.set('se-mine', mine); drawMine(); } mmsg.textContent = ok; })
+        .catch(() => { mmsg.textContent = ok + ' (Nur auf diesem Gerät – die Verbindung hat gerade nicht geklappt.)'; });
+    }
+    const closeMine = () => { K('mform').hidden = true; K('mrow').hidden = false; };
+    K('msave').onclick = () => { let n = 1; while (mine.some(m => m.n === 'Mein Filter ' + n)) n++; K('mname2').value = curMine || 'Mein Filter ' + n; K('mform').hidden = false; K('mrow').hidden = true; mmsg.textContent = ''; K('mname2').focus(); K('mname2').select(); };
+    K('mno').onclick = closeMine;
+    K('mname2').onkeydown = e => { e.stopPropagation(); if (e.key === 'Enter') { e.preventDefault(); K('mok').click(); } if (e.key === 'Escape') closeMine(); };
+    K('mok').onclick = () => {
+      const n = K('mname2').value.trim().slice(0, 40); if (!n) { K('mname2').focus(); return; }
+      const v = {}; LK.forEach(k => v[k] = +st[k]);
+      const i = mine.findIndex(m => m.n === n), had = i >= 0;
+      if (had) mine[i] = { n, s: v }; else mine.push({ n, s: v });
+      curMine = n; closeMine(); putMine(had ? '✓ „' + n + '“ ist aktualisiert.' : '✓ „' + n + '“ ist gespeichert.');
+    };
+    drawMine();
+    store.get('edit').then(l => { if (!Array.isArray(l)) return; if (!l.length && mine.length) { store.set('edit', mine).catch(() => {}); return; } mine = l; ls.set('se-mine', mine); drawMine(); }).catch(() => {});
     K('resetFrame').onclick = () => { ['fmt', 'zoom', 'ox', 'oy', 'rot'].forEach(k => st[k] = DEF[k]); sync(); draw(); };
 
     // Musik

@@ -181,6 +181,10 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
             'gross' => (int)$k['amount_cents'], 'paid' => $k['paid_at'], 'type' => 'Pottery bemalen',
             'pay_note' => $k['method'] === 'bar' ? 'Der Betrag wurde am ' . $day . ' bar im Atelier bezahlt.' : ''];
     }
+    if ($kind === 'angebot') {
+        // Gruppen-Angebot (Schulgruppe o. Ä.), bar oder online bezahlt: api/angebote.inc.php
+        return forma_offer_invoice_source($pdo, $refId);
+    }
     if ($kind === 'gutschein') {
         $st = $pdo->prepare("SELECT * FROM vouchers WHERE id = ? AND status IN ('bezahlt','eingeloest') AND kind = 'kauf'");
         $st->execute([$refId]);
@@ -355,7 +359,8 @@ function forma_invoice_pdf(array $inv): string
     $pdf->AddFont('Outfit', '', 'Outfit-Regular.json', $fd);
     $pdf->AddFont('Outfit', 'B', 'Outfit-Bold.json', $fd);
     $pdf->AddFont('Brico', 'B', 'BricolageGrotesque-Bold.json', $fd);
-    $pdf->SetTitle($t('Rechnung ' . $inv['nr']));
+    $vorab = ($inv['doc'] ?? '') === 'vorab';
+    $pdf->SetTitle($t(($vorab ? 'Vorabrechnung ' : 'Rechnung ') . $inv['nr']));
     $pdf->SetAuthor($t($co['firma']));
     $pdf->SetAutoPageBreak(false);
     $pdf->SetMargins(18, 16, 18);
@@ -372,8 +377,10 @@ function forma_invoice_pdf(array $inv): string
     $logo = dirname(__DIR__) . '/img/forma-logo.png';
     if (is_file($logo)) $pdf->Image($logo, 92, 14, 26);
     $pdf->SetTextColor(...$clay); $pdf->SetFont('Brico', 'B', 20);
-    $pdf->SetXY(122, 18); $pdf->Cell(70, 9, (int)$inv['gross_cents'] < 0 ? 'STORNORECHNUNG' : 'RECHNUNG', 0, 2, 'R');
-    $meta = [['Rechnungsnr.', $inv['nr']], ['Rechnungsdatum', date('d.m.Y', strtotime($inv['issued_at']))], ['Leistungsdatum', $inv['service_date']]];
+    $pdf->SetXY(122, 18); $pdf->Cell(70, 9, $vorab ? 'VORABRECHNUNG' : ((int)$inv['gross_cents'] < 0 ? 'STORNORECHNUNG' : 'RECHNUNG'), 0, 2, 'R');
+    $meta = $vorab
+        ? [['Angebotsnr.', $inv['nr']], ['Datum', date('d.m.Y', strtotime($inv['issued_at']))], ['Leistungsdatum', $inv['service_date']], ['Status', 'noch nicht bezahlt']]
+        : [['Rechnungsnr.', $inv['nr']], ['Rechnungsdatum', date('d.m.Y', strtotime($inv['issued_at']))], ['Leistungsdatum', $inv['service_date']]];
     $y = 30;
     foreach ($meta as [$k, $v]) {
         $pdf->SetTextColor(...$soft); $pdf->SetFont('Outfit', '', 8.5); $pdf->SetXY(122, $y); $pdf->Cell(32, 5, $t($k));
@@ -425,8 +432,26 @@ function forma_invoice_pdf(array $inv): string
         ? 'Der Betrag wurde am ' . date('d.m.Y', strtotime($inv['issued_at'])) . ' auf das Zahlungsmittel zurückerstattet, mit dem bezahlt wurde.'
         : (($inv['pay_note'] ?? '') !== '' ? (string)$inv['pay_note'] : 'Der Betrag wurde am ' . date('d.m.Y', strtotime($inv['issued_at'])) . ' online bezahlt (Kartenzahlung über Stripe).');
     if ($inv['vat_note'] !== '') $paidLine .= "\n" . $inv['vat_note'];
+    if ($vorab && ($inv['pay_qr'] ?? '') !== '') {
+        // Vorabrechnung: Zahlungshinweis links, QR-Code zum Online-Bezahlen rechts
+        $pdf->SetXY(18, $y); $pdf->SetTextColor(...$ink); $pdf->SetFont('Outfit', 'B', 10.5); $pdf->Cell(120, 6, $t('Noch nicht bezahlt'), 0, 2);
+        $pdf->SetTextColor(...$soft); $pdf->SetFont('Outfit', '', 9.5);
+        $pdf->MultiCell(120, 5, $t("Bitte bar vor Ort bezahlen oder online: QR-Code scannen oder diesen Link öffnen\n" . $inv['pay_qr'] . "\nDie fertige Rechnung kommt nach der Zahlung."));
+        try {
+            $m = forma_qr_matrix((string)$inv['pay_qr']);
+            $n = count($m); $size = 34; $px = $size / ($n + 4); $qx = 192 - $size; $qy = $y - 2;
+            $pdf->SetFillColor(255, 255, 255); $pdf->Rect($qx, $qy, $size, $size, 'F');
+            $pdf->SetFillColor(...$ink);
+            foreach ($m as $r => $row) for ($c = 0; $c < $n; $c++) if ($row[$c] === '1') $pdf->Rect($qx + ($c + 2) * $px, $qy + ($r + 2) * $px, $px + .02, $px + .02, 'F');
+            $pdf->SetFont('Outfit', '', 7.5); $pdf->SetXY($qx, $qy + $size); $pdf->Cell($size, 4, $t('Online bezahlen'), 0, 0, 'C');
+        } catch (Throwable $e) {
+            error_log('FORMA qr: ' . $e->getMessage());
+        }
+        $pdf->SetTextColor(...$clay); $pdf->SetFont('Outfit', 'B', 10.5); $pdf->SetXY(18, $y + 40); $pdf->Cell(174, 7, $t('Ich freu mich auf euch!'), 0, 1, 'C');
+    } else {
     $pdf->SetXY(30, $y); $pdf->MultiCell(150, 5, $t($paidLine), 0, 'C');
     $pdf->SetTextColor(...$clay); $pdf->SetFont('Outfit', 'B', 10.5); $pdf->SetX(30); $pdf->Cell(150, 7, $t('Vielen Dank!'), 0, 1, 'C');
+    }
 
     // Fußzeile
     $fy = 258;
@@ -443,13 +468,15 @@ function forma_invoice_pdf(array $inv): string
 function forma_invoice_mailtext(array $inv): string
 {
     $first = forma_first_name($inv['name']);
+    // Gruppen-Angebot: Rechnung an die Organisation, Anrede an die Ansprechperson („z. H. Carmen Egger“)
+    if (($inv['kind'] ?? '') === 'angebot' && preg_match('/^z\. H\. (.+)$/mu', (string)$inv['address'], $zm)) $first = forma_first_name(trim($zm[1]));
     if ((int)$inv['gross_cents'] < 0) {
         return "Hallo $first,\n\nim Anhang findest du die Stornorechnung {$inv['nr']} für deine Unterlagen. Der Betrag von " . forma_cents_de(-(int)$inv['gross_cents']) . " wird dir zurückerstattet.\n\nBis bald,\nVivien\n";
     }
     $vg = forma_invoice_is_voucher($inv);
     $cash = forma_invoice_is_cash($inv);
     return "Hallo $first,\n\n" . ($vg ? 'für deine Unterlagen findest du im Anhang die Rechnung' : 'vielen Dank für deine Zahlung! Im Anhang findest du deine Rechnung') . " {$inv['nr']} als PDF.\n\n"
-        . 'Rechnungsbetrag: ' . forma_cents_de((int)$inv['gross_cents']) . ($vg ? " (bereits mit deinem Gutschein bezahlt, du musst nichts mehr überweisen)\n\n" : ($cash ? " (bar im Atelier bezahlt)\n\n" : " (bereits bezahlt)\n\n"))
+        . 'Rechnungsbetrag: ' . forma_cents_de((int)$inv['gross_cents']) . ($vg ? " (bereits mit deinem Gutschein bezahlt, du musst nichts mehr überweisen)\n\n" : ($cash ? (($inv['kind'] ?? '') === 'angebot' ? " (bar bezahlt)\n\n" : " (bar im Atelier bezahlt)\n\n") : " (bereits bezahlt)\n\n"))
         . "Bewahre sie am besten gut auf. Bei Fragen antworte einfach auf diese E-Mail.\n\nBis bald,\nVivien\n";
 }
 

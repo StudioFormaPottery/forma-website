@@ -18,7 +18,7 @@ function mm_subnav(string $active): void
 .mvsub{position:sticky;top:0;z-index:40;margin:-8px -16px 16px;padding:10px 16px;background:rgba(242,236,228,.96);border-bottom:1px solid #DDD2C6;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .mvsub::-webkit-scrollbar{display:none}
 .mvsub a{flex:0 0 auto;padding:10px 16px;border-radius:999px;border:1px solid #DDD2C6;background:#FBF8F4;color:#6B5658;text-decoration:none;font-size:17px;white-space:nowrap}
-<?= !in_array($active, ['videos', 'mediathek', 'studio'], true) ? 'main{zoom:1.12}' : '' ?>
+<?= !in_array($active, ['videos', 'mediathek', 'studio'], true) ? '@media(min-width:900px){main{zoom:1.12}}' : '' ?>
 .mvsub a.on{background:#7D5E68;border-color:#7D5E68;color:#FBF5F7}
 .mvsub a.fo{background:transparent;border-color:transparent;color:#8C2C1D;padding-left:4px}
 .mvsub i{font-style:normal;display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:999px;background:#B5544A;color:#fff;font-size:12px;text-align:center}
