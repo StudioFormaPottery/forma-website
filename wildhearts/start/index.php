@@ -2,7 +2,7 @@
 // moveciamovement.com – Hauptseite Movecia (Vivien, 25.10.2026): Überschrift nur „Ich bin Movecia.“
 // Ruhig nach Vorbild Mindful Body: große feine Schrift, Mauve-Band, weich verschwommene Bilder.
 // Die Bilder sind vorerst Viviens eigene Fotos (künstlerisch weichgezeichnet) und gemalte Platzhalter,
-// später kommen Everygen-Bilder (Liste der Bildideen in CLAUDE.md). Teacher Training wird bewusst nicht gezeigt.
+// später kommen Everygen-Bilder (Liste der Bildideen in CLAUDE.md). Teacher Training: Teaser-Seite /teacher-training/ mit Warteliste (Vivien, 28.10.2026).
 declare(strict_types=1);
 require_once __DIR__ . '/../assets/icons.inc.php';
 require dirname(__DIR__, 2) . '/api/method-lib.php';
@@ -154,6 +154,7 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
 </div></section>
 </main>
 <?php mvl_foot(); ?>
+<?php require_once __DIR__ . '/../assets/next-popup.inc.php'; mv_next_popup(); ?>
 <?php require_once dirname(__DIR__, 2) . '/api/mm-pt.inc.php';
 $ptChips = function (string $name, array $map, string $type = 'checkbox') { foreach ($map as $k => [$de, $en]) echo '<label class="ptc"><input type="' . $type . '" name="' . $name . '[]" value="' . $k . '"><span><span class="de">' . htmlspecialchars($de) . '</span><span class="en">' . htmlspecialchars($en) . '</span></span></label>'; }; ?>
 <!-- 1:1 Personal Training anfragen (Vivien, 26.10.2026): Formular statt E-Mail, landet in der Verwaltung -->

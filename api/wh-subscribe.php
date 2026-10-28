@@ -13,7 +13,7 @@ $in = json_decode((string)file_get_contents('php://input'), true);
 if (!is_array($in)) $in = $_POST;
 $name = trim((string)($in['name'] ?? ''));
 $email = strtolower(trim((string)($in['email'] ?? '')));
-$source = in_array($in['source'] ?? '', ['reset', 'circle', 'mentoring', 'year', 'retreat', 'unfold'], true) ? $in['source'] : 'link';
+$source = in_array($in['source'] ?? '', ['reset', 'circle', 'mentoring', 'year', 'retreat', 'unfold', 'teacher'], true) ? $in['source'] : 'link';
 $lang = ($in['lang'] ?? '') === 'de' ? 'de' : 'en';
 $de = $lang === 'de';
 if (!empty($in['website'])) $out(['ok' => true]); // Honeypot
@@ -33,7 +33,9 @@ $sub = $s->fetch();
 if ($sub && $sub['status'] === 'bestaetigt') {
     if ($sub['source'] !== $source && $source !== 'link') $pdo->prepare('UPDATE mm_subscribers SET source = ? WHERE id = ?')->execute([$source, $sub['id']]);
     // schon dabei: Willkommensmail (bzw. Unfold-Infos) einfach noch einmal schicken
-    if ($source === 'unfold') { $sub['lang'] = $lang; mm_mail_unfold_info($sub); mm_notify_interest($sub, 'unfold'); } else mm_mail_welcome($sub);
+    if ($source === 'unfold') { $sub['lang'] = $lang; mm_mail_unfold_info($sub); mm_notify_interest($sub, 'unfold'); }
+    elseif ($source === 'teacher') { $sub['lang'] = $lang; $sub['source'] = 'teacher'; mm_mail_teacher_info($sub); mm_notify_interest($sub, 'teacher'); mm_ml_push($pdo, $sub); }
+    else mm_mail_welcome($sub);
     $out(['ok' => true, 'already' => true]);
 }
 if ($sub) {

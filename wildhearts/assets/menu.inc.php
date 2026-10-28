@@ -22,6 +22,7 @@ function mv_menu_items(): array
         ['/method/', 'Method', 'Method', 'method', 'Mindful Movement on demand', 'Mindful movement on demand'],
         ['/unfold/', 'Unfold', 'Unfold', 'unfold', '3 Monate Begleitung' . ($u[0] ?? ''), '3 months of guidance' . ($u[1] ?? '')],
         ['/natal/', 'Prä- &amp; Postnatal', 'Pre- &amp; postnatal', 'natal', '1:1 im Studio &amp; online', '1:1 in the studio &amp; online'],
+        ['/teacher-training/', 'Teacher Training', 'Teacher Training', 'teacher', 'Ab November 2027 · Warteliste', 'From November 2027 · waiting list'],
         ['/gathering/', 'Gatherings', 'Gatherings', 'gathering', 'Live und kostenlos, einmal im Monat', 'Free and live, once a month'],
         ['/#vivien', 'Über mich', 'About me', 'about', 'Ich bin Vivien', "Hi, I'm Vivien"],
     ];

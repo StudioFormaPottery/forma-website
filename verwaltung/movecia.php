@@ -309,7 +309,7 @@ if ($view === 'movecia') {
         $subs = $pdo->query("SELECT * FROM mm_subscribers ORDER BY created_at DESC")->fetchAll();
         $subOk = count(array_filter($subs, fn($x) => $x['status'] === 'bestaetigt'));
         $subOpen = count(array_filter($subs, fn($x) => $x['status'] === 'offen'));
-        $srcName = ['reset' => 'Reset Routine', 'circle' => 'Interesse Inner Circle', 'mentoring' => 'Interesse Mentoring', 'year' => 'Interesse Jahreskreis', 'retreat' => 'Interesse Alpine Retreat', 'unfold' => 'Interesse Unfold', 'link' => 'Link in Bio'];
+        $srcName = ['reset' => 'Reset Routine', 'circle' => 'Interesse Inner Circle', 'mentoring' => 'Interesse Mentoring', 'year' => 'Interesse Jahreskreis', 'retreat' => 'Interesse Alpine Retreat', 'unfold' => 'Interesse Unfold', 'teacher' => 'Interesse Teacher Training', 'link' => 'Link in Bio'];
         $live = $next ? mm_live_count($pdo, (int)$next['id']) : 0;
         $joinedAll = (int)$pdo->query('SELECT COUNT(*) FROM mm_signups WHERE joined_at IS NOT NULL')->fetchColumn();
         $d = $edit ?: ['id' => 0, 'title' => 'Wild Hearts Gathering', 'starts_at' => '', 'minutes' => 30, 'description' => '', 'script' => ''];
