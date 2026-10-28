@@ -1,6 +1,6 @@
 <?php
 // moveciamovement.com/academy – Movecia Academy (Vivien, 28.10.2026): Übersicht der Ausbildungen.
-// Zurzeit eine Ausbildung: The Movecia Method – Mindful Movement Teacher Training (Start 3.11.2027).
+// Zurzeit eine Ausbildung: The Mindful Becoming Teacher Training (Start 3.11.2027).
 // Platz für weitere Ausbildungen ist vorgesehen (zweite Karte „in Vorbereitung“), aber noch nichts gebaut.
 declare(strict_types=1);
 require_once __DIR__ . '/../assets/icons.inc.php';
@@ -23,7 +23,7 @@ $ld = [
     ['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => [['@type' => 'ListItem', 'position' => 1, 'name' => 'Movecia', 'item' => $site . '/'], ['@type' => 'ListItem', 'position' => 2, 'name' => 'Academy', 'item' => $site . '/academy/']]],
 ];
 $css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=7">';
-mvl_head('Movecia Academy · Yogalehrerausbildung auf Deutsch, Tirol & online', 'Ausbildungen der Movecia Academy mit Vivien Malonga, ausschließlich auf Deutsch, für Österreich, Deutschland, die Schweiz und Südtirol: das Mindful Movement Teacher Training mit 550 Stunden, inkl. vollständiger 200-Stunden-Yogalehrerausbildung, Somatic Movement und Breathwork. Hybrid, mit Präsenzwochenende in den Tiroler Alpen. Nur alle 2 Jahre, nur 10 Plätze, Start November 2027.', $site . '/academy/', '/img/movecia/og-academy.jpg', $css, $ld);
+mvl_head('Movecia Academy · Yogalehrerausbildung auf Deutsch, Tirol & online', 'Ausbildungen der Movecia Academy mit Vivien Malonga, ausschließlich auf Deutsch, für Österreich, Deutschland, die Schweiz und Südtirol: das Mindful Becoming Teacher Training mit 550 Stunden, inkl. vollständiger 200-Stunden-Yogalehrerausbildung, Somatic Movement und Breathwork. Hybrid, mit Präsenzwochenende in den Tiroler Alpen. Nur alle 2 Jahre, nur 10 Plätze, Start November 2027.', $site . '/academy/', '/img/movecia/og-academy.jpg', $css, $ld);
 ?>
 <body class="acad">
 <?php mvl_top('academy'); ?>
@@ -51,8 +51,8 @@ mvl_head('Movecia Academy · Yogalehrerausbildung auf Deutsch, Tirol & online', 
       <div class="ac-tx">
         <?= mv_icons(['spirale', 'atem', 'herz'], 'ico', 0) ?>
         <p class="k"><span class="de"><?= AC_HOURS ?> Stunden · hybrid · 11 Monate</span><span class="en"><?= AC_HOURS ?> hours · hybrid · 11 months</span></p>
-        <h3>The Movecia Method</h3>
-        <p class="ac-sub">Mindful Movement Teacher Training</p>
+        <h3>The Mindful Becoming Teacher Training</h3>
+        <p class="ac-sub"><span class="de">200 Std. Yoga Teacher · Somatic Movement · Mindful Movement &amp; Mindset</span><span class="en">200 h Yoga Teacher · Somatic Movement · Mindful Movement &amp; Mindset</span></p>
         <p><span class="de">Andere begleiten und dabei bei dir selbst bleiben. Mit einer vollständigen 200-Stunden-Yogalehrerausbildung inklusive, dazu Somatic Movement, Breathwork, Anatomie und Body Scanning, achtsame Berührung und Rituale, Mental Load und Nervensystem und deine Selbstständigkeit.</span><span class="en">Guide others and stay close to yourself while you do. A complete 200-hour yoga teacher training is included, plus somatic movement, breathwork, anatomy and body scanning, mindful touch and rituals, mental load and the nervous system, and building your own business.</span></p>
         <div class="meta">
           <span class="chip"><span class="de">Start <?= mv_date($st) ?></span><span class="en">Starts <?= mv_date($st, 'en') ?></span></span>

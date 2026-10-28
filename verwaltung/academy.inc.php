@@ -66,7 +66,7 @@ if ($view === 'academy' && isset($_GET['mail'])) {
     $m = (string)$_GET['mail'];
     if ($m === 'eb2w') echo ac_mail_html($r, 'noch zwei Wochen ♡', 'Noch 2 Wochen Early Bird', ac_eb_reminder_blocks($demo), $link, 'Platz sichern', $legal);
     elseif ($m === 'konfetti') { $b = ac_demo_booking(); echo ac_mail_html($b, 'willkommen in der Academy ♡', 'Dein Platz ist dir sicher', ac_welcome_blocks($pdo, $b, 'FO-2026-016'), '#', 'Passwort festlegen & loslegen', ac_legal($b), true); }
-    else echo ac_mail_html($r, 'schön, dass du da bist ♡', 'Movecia Mindful Movement Teacher Training', ac_interest_info_blocks($demo), $link, 'Zur Ausbildung & zum Kennenlerngespräch', $legal);
+    else echo ac_mail_html($r, 'schön, dass du da bist ♡', 'Mindful Becoming Teacher Training', ac_interest_info_blocks($demo), $link, 'Zur Ausbildung & zum Kennenlerngespräch', $legal);
     exit;
 }
 if ($view === 'academy') {

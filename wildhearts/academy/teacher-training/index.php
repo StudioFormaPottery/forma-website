@@ -1,5 +1,5 @@
 <?php
-// moveciamovement.com/academy/teacher-training – The Movecia Method · Mindful Movement Teacher Training (Vivien, 28.10.2026, Runde 2)
+// moveciamovement.com/academy/teacher-training – The Mindful Becoming Teacher Training (Vivien, 28.10.2026, Runde 2)
 // 550 Std. inkl. vollständiger 200-Std.-Yogalehrerausbildung, 11 Monate hybrid, Start Mi 3.11.2027, nur alle 2 Jahre, max. 10 Plätze.
 // Ende: Präsenzwochenende September 2028 (Lehrprobe) → Online-Abschlussprüfung mit Kamera → Zertifikat.
 // Buchung: 50 % Anzahlung, Rest auf einmal / in 2 / in 3 Zahlungen bis 15.9.2027. Early-Bird € 3.390 bis 31.3.2027, danach € 4.500.
@@ -29,7 +29,7 @@ $dd = fn(string $ymd) => ac_d($ymd);
 $de2 = fn(string $ymd) => ac_d($ymd, 'en');
 if ($offer || isset($_GET['danke']) || isset($_GET['abbruch'])) $GLOBALS['mvl_noindex'] = true;
 $css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=7">';
-mvl_head('Yogalehrerausbildung auf Deutsch · Mindful Movement Teacher Training ' . AC_HOURS . ' Std. | Movecia Academy Tirol',
+mvl_head('Yogalehrerausbildung auf Deutsch · Mindful Becoming Teacher Training ' . AC_HOURS . ' Std. | Movecia Academy Tirol',
     'Die ' . AC_HOURS . '-Stunden-Ausbildung mit Vivien Malonga, ausschließlich auf Deutsch: vollständige 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum, Somatic Movement, Breathwork, Anatomie & Body Scanning, Mental Load & Nervensystem. 11 Monate hybrid, online aus Österreich, Deutschland, der Schweiz und Südtirol, Präsenzwochenende in Tirol. Start ' . mv_date($st) . ', nur 10 Plätze.' . ($c['eb'] ? ' Early-Bird bis ' . mv_date($c['eb_end']) . '.' : ''),
     $site . '/academy/teacher-training/', '/img/movecia/og-academy.jpg', $css, ac_jsonld($pdo));
 $hours = ac_hours();
@@ -54,7 +54,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
 <body class="acad">
 <?php mvl_top('academy'); ?>
 <p class="en-note">This training is held in German only.</p>
-<?= ac_band('Mindful Movement Teacher Training') ?>
+<?= ac_band('Mindful Becoming Teacher Training') ?>
 <main id="top">
 <?php if ($offerLive): ?>
 <div class="w"><div class="offerbar" id="offerbar" data-until="<?= (int)$offer['offer_until'] ?>" data-now="<?= time() ?>">
@@ -69,8 +69,8 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   <div class="ac-hero-tx">
     <?= ac_seal('herom') ?>
     <p class="ac-kick"><?= ac_seal('mini') ?><span><a href="/academy/">Movecia Academy</a><small><span class="de">Teacher Training 2027 · nur alle 2 Jahre</span><span class="en">Teacher Training 2027 · every two years</span></small></span></p>
-    <h1>The Movecia <em>Method</em></h1>
-    <p class="sub">Mindful Movement Teacher Training</p>
+    <h1>The Mindful Becoming <em>Teacher Training</em></h1>
+    <p class="sub"><span class="de">200 Std. Yoga Teacher · Somatic Movement · Mindful Movement &amp; Mindset</span><span class="en">200 h Yoga Teacher · Somatic Movement · Mindful Movement &amp; Mindset</span></p>
     <p class="lead"><span class="de">Andere begleiten und dabei bei dir selbst bleiben. Eine Ausbildung für Frauen, die Menschen wirklich sehen möchten: zuhören, Körper lesen, das Nervensystem beruhigen. Mit einer vollständigen 200-Stunden-Yogalehrerausbildung inklusive und allem, was ich mir in meinen eigenen Ausbildungen immer gewünscht habe.</span><span class="en">Guide others and stay close to yourself while you do. A training for women who want to truly see people: listening, reading bodies, calming the nervous system. With a complete 200-hour yoga teacher training included, and everything I always wished for in my own trainings.</span></p>
     <div class="facts">
       <span><span class="de"><?= AC_HOURS ?> Stunden inkl. 200 Std. Yoga</span><span class="en"><?= AC_HOURS ?> hours incl. 200 h yoga</span></span>
@@ -122,7 +122,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
 
 <section class="w sec" id="inhalte"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">Inhalte &amp; Stunden</span><span class="en">Content &amp; hours</span></p><h2 style="margin-top:.6rem"><span class="de"><?= AC_HOURS ?> Stunden, die <em>zusammengehören</em></span><span class="en"><?= AC_HOURS ?> hours that <em>belong together</em></span></h2></div>
-    <p><span class="de">Die vollständige 200-Stunden-Yogalehrerausbildung ist das Fundament. Alles andere macht daraus die Movecia Method.</span><span class="en">The complete 200-hour yoga teacher training is the foundation. Everything else turns it into the Movecia Method.</span></p></div>
+    <p><span class="de">Die vollständige 200-Stunden-Yogalehrerausbildung ist das Fundament. Alles andere macht daraus dein Mindful Becoming.</span><span class="en">The complete 200-hour yoga teacher training is the foundation. Everything else turns it into your mindful becoming.</span></p></div>
   <div class="comp rv">
     <div class="donut-w"><?= $donut ?><div class="donut-c"><b><?= AC_HOURS ?></b><span><span class="de">Stunden</span><span class="en">hours</span></span><small><span class="de">ca. 10–12 Std. pro&nbsp;Woche</span><span class="en">about 10–12 h a&nbsp;week</span></small></div><?= $spark('s4') ?></div>
     <ul class="legend">

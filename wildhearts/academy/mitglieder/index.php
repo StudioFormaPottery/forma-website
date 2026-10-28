@@ -162,7 +162,7 @@ mvl_head($L('Teacher Training · Mitgliederbereich', 'Teacher Training · Member
   <div class="acm-hello">
     <?= ac_seal('acm-seal') ?>
     <div>
-      <p class="k">Movecia Mindful Movement Teacher Training 2027</p>
+      <p class="k">Mindful Becoming Teacher Training 2027</p>
       <h1><?= $h($hello) ?>, <em><?= $h($first) ?></em></h1>
       <p class="acm-lead"><?= isset($_GET['willkommen']) ? $L('Dein Zugang ist eingerichtet. Willkommen in deinem Teacher-Training-Zuhause ♡', 'Your access is all set. Welcome to your Teacher Training home ♡') : (isset($_GET['bezahlt']) ? $L('Danke dir, deine Zahlung ist angekommen ♡', 'Thank you, your payment has come through ♡') : $L('Hier wartet alles auf dich, bis wir gemeinsam starten.', 'Everything is waiting for you here until we begin together.')) ?></p>
     </div>

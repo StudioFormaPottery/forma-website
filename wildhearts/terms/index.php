@@ -141,7 +141,7 @@ a{color:var(--wine)}
     <li><span class="en">You have a 14-day right of withdrawal, see <a href="#withdrawal">below</a>.</span><span class="de">Du hast ein 14-tägiges Rücktrittsrecht, siehe <a href="#withdrawal">unten</a>.</span></li>
   </ul>
 
-  <h2 id="teacher"><span>Movecia Academy: Mindful Movement Teacher Training</span></h2>
+  <h2 id="teacher"><span>Movecia Academy: Mindful Becoming Teacher Training</span></h2>
   <p class="note"><span class="en">This training is held in German only, so these terms are in German.</span><span class="de">Die Ausbildung findet ausschließlich auf Deutsch statt.</span></p>
   <?php if ($acc['eb']): ?><p><span>Early-Bird bei Buchung bis <?= mv_date($acc['eb_end']) ?>:</span> <span class="price"><?= $eur($acc['eb_total']) ?></span></p><?php endif; ?>
   <p><?php if ($acc['eb']): ?><span>Ab <?= mv_date($acc['eb_end'] + 86400) ?>:</span> <?php endif; ?><span class="price"><?= $eur($acc['r_total']) ?></span></p>

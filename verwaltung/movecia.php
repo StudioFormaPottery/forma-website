@@ -459,7 +459,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                 <a href="<?= forma_h($self) ?>?view=natal"><span class="ic">🤰</span><b>Prä- &amp; Postnatal<?= $natalReq ? ' · ' . $natalReq . ' neu' : '' ?></b><span>Anfragen, Termine, Pakete</span></a>
                 <a href="<?= forma_h($self) ?>?view=training"><span class="ic">🏔️</span><b>Personal Training<?= $ptAll ? ' · ' . $ptAll . ' neu' : '' ?></b><span>Hotelgäste und 1:1-Anfragen</span></a>
                 <a href="<?= forma_h($self) ?>?view=movecia&amp;p=gatherings"><span class="ic">✨</span><b>Gatherings</b><span><?= $next ? 'Nächstes: ' . forma_h(date('d. m.', strtotime((string)$next['starts_at']))) . ' · ' . $nextSign . ' angemeldet' : 'Anlegen und Angebot einblenden' ?></span></a>
-                <a class="soon" href="https://moveciamovement.com/" target="_blank" rel="noopener"><span class="ic">🎓</span><b>Teacher Training</b><span>Start November 2027 · in Vorbereitung</span></a>
+                <a href="<?= forma_h($self) ?>?view=academy"><span class="ic">🎓</span><b>Academy<?= $acReq ? ' · ' . $acReq . ' neu' : '' ?></b><span>Teacher Training: Buchungen, Zahlungen, Chat</span></a>
             </div>
         </section>
         <section class="qg test">

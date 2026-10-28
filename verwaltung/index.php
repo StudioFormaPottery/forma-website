@@ -22,11 +22,11 @@ unset($_SESSION['flash']);
 // Neu-Boxen: 'b' => 'movecia' erscheint nur auf der Movecia-Übersicht, sonst nur bei FORMA (Vivien, 28.10.2026).
 const FORMA_ADMIN_NEWS = [
     ['b' => 'movecia', 'until' => '2026-11-30', 'title' => 'Neu: ✦ Kennenlern-Preis im Gespräch', 'text' => 'Im Kennenlerngespräch einmal „✦ Angebot zeigen“ tippen: Sie sieht in ihrem Gesprächsraum sofort die Karte mit dem Kennenlern-Preis (20 Min.) und bekommt ihn per Mail. Preis unter Academy → Kennenlerngespräche änderbar.', 'link' => '?view=academy#kennenlernpreis'],
-    ['b' => 'movecia', 'until' => '2026-11-30', 'title' => 'Neu: 🎓 Academy · Teacher Training', 'text' => 'Buchungen mit Zahlungsplan, Chat mit Teilnehmerinnen, Kennenlerngespräche, Willkommensvideo im Studio', 'link' => '?view=academy'],
     ['b' => 'movecia', 'until' => '2026-11-20', 'title' => 'Neu im Studio: 📜 Nur Teleprompter', 'text' => 'Du filmst mit der Kamera-App am iPhone, am MacBook läuft nur der Text ganz oben unter der Linse. Danach das Video über „🎞 Video vom Gerät bearbeiten“ holen', 'link' => '?view=studio'],
     ['b' => 'movecia', 'until' => '2026-11-20', 'title' => 'Neu im Studio: iPhone als Kamera', 'text' => 'Unter dem Kamerabild „📱 iPhone als Kamera“ tippen: dein iPhone filmt, Teleprompter und alles andere bleiben am MacBook', 'link' => '?view=studio'],
     ['b' => 'movecia', 'until' => '2026-11-15', 'title' => 'Neu im Studio: 4K, Teleprompter an der Kamera, schnelleres Speichern', 'text' => 'Bildqualität 4K/2K unter „Kamera & Mikrofon“, Text beim Aufnehmen direkt unter der Linse, „🗑 Löschen“ nach jeder Aufnahme, „💛 Meine Looks“ zum Speichern deiner Filter, Bearbeiten speichert viel schneller', 'link' => '?view=studio'],
     ['until' => '2026-11-15', 'title' => 'Aufgeräumt: weniger Knöpfe', 'text' => 'Einzeltermin + Serientermine = „Neuer Termin“, Bestand liegt in der Kasse, Testbuchungen und E-Mail-Liste in den Einstellungen. Bei Movecia nur noch 8 Reiter', 'link' => '?view=edit'],
+    ['b' => 'movecia', 'until' => '2026-11-30', 'title' => 'Neu und live: 🎓 Academy · Teacher Training', 'text' => 'Die Ausbildung steht jetzt auf moveciamovement.com/academy und ist buchbar (50 % Anzahlung). Buchungen, Zahlungsplan, Chat und Kennenlerngespräche im Reiter „🎓 Academy“', 'link' => '?view=academy'],
     ['until' => '2026-11-15', 'title' => 'Neu: Angebote für Gruppen & Schulen', 'text' => 'Angebot anlegen, per WhatsApp schicken, Bestätigung und Vorabrechnung laufen automatisch', 'link' => '?view=angebote'],
 ];
 

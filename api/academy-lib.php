@@ -1,6 +1,6 @@
 <?php
 // Movecia Academy (Vivien, 28.10.2026): Ausbildungen auf moveciamovement.com/academy.
-// Erste Ausbildung: The Movecia Method – Mindful Movement Teacher Training (550 Std., 11 Monate, hybrid, nur alle 2 Jahre, max. 10 Plätze).
+// Erste Ausbildung: The Mindful Becoming Teacher Training (550 Std., 11 Monate, hybrid, nur alle 2 Jahre, max. 10 Plätze).
 // Runde 2 (28.10.2026): Buchung = 50 % Anzahlung über Stripe, Rest auf einmal, in 2 oder 3 Zahlungen bis 15.9.2027 (Bezahl-Links per Mail),
 // Rücktritt 14 Tage ab Buchung, Storno-Staffel, Konfetti-Mail, Mitgliederbereich vor dem Start (/academy/mitglieder/) mit Countdown,
 // Willkommensvideo, Notizen (verschlüsselt), Fragen & Antworten und persönlichem Chat mit Vivien.
@@ -8,8 +8,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/method-lib.php';
 
 const AC_HOLD = 40 * 60;                 // so lange hält eine offene Zahlung einen Platz
-const AC_TITLE = 'The Movecia Method – Mindful Movement Teacher Training';
-const AC_SHORT = 'Mindful Movement Teacher Training';
+const AC_TITLE = 'The Mindful Becoming Teacher Training';
+const AC_SHORT = 'Mindful Becoming Teacher Training';
 const AC_HOURS = 550;
 // Kennenlerngespräch (Vivien): Mi/Do/Fr 8:00, Mi/Do 18:30, 30 Minuten, online per Video
 const AC_CALL_SLOTS = [3 => ['08:00', '18:30'], 4 => ['08:00', '18:30'], 5 => ['08:00']];
@@ -364,7 +364,7 @@ function ac_offer_blocks(array $c, int $until): array
     $first = forma_first_name((string)$c['name']);
     return [
         'Hallo ' . $first . ',',
-        'danke für unser Gespräch ♡ Wie versprochen bekommst du für die nächsten ' . AC_OFFER_MINUTES . ' Minuten deinen persönlichen Kennenlern-Preis für das Mindful Movement Teacher Training.',
+        'danke für unser Gespräch ♡ Wie versprochen bekommst du für die nächsten ' . AC_OFFER_MINUTES . ' Minuten deinen persönlichen Kennenlern-Preis für das Mindful Becoming Teacher Training.',
         ['box' => ['Dein Kennenlern-Preis: ' . ac_eur($p['total']) . ' statt ' . ac_eur($cfg['price']), 'gilt bis ' . date('G:i', $until) . ' Uhr', 'bei der Buchung 50 % Anzahlung (' . ac_eur(intdiv($p['total'], 2)) . '), den Rest auf einmal oder in Teilen bis ' . mv_date(mv_ts($cfg['due_final'], '12:00')) . ', ohne Aufschlag']],
         'Über den Knopf kommst du direkt zur Anmeldung, der Preis ist dort schon eingetragen. Wenn du noch Zeit zum Nachdenken brauchst, ist das völlig in Ordnung. Dann gilt einfach wieder der normale Preis.',
     ];
@@ -680,7 +680,7 @@ function ac_welcome_blocks(PDO $pdo, array $r, string $invNr = ''): array
     $next = ac_next_part($r);
     return [
         "Hallo $first,",
-        'Konfetti, Konfetti! Du hast dir deinen Platz im Movecia Mindful Movement Teacher Training 2027 gesichert, und ich sitze gerade hier und strahle über das ganze Gesicht.',
+        'Konfetti, Konfetti! Du hast dir deinen Platz im Mindful Becoming Teacher Training 2027 gesichert, und ich sitze gerade hier und strahle über das ganze Gesicht.',
         'Es gibt nur zehn Plätze, und die Ausbildung findet nur alle zwei Jahre statt. Dass einer dieser Plätze jetzt dir gehört, bedeutet mir wirklich viel. Diese Ausbildung ist mein Herzensprojekt. Ich habe alles hineingepackt, was ich mir in meinen eigenen Ausbildungen immer gewünscht und so oft vermisst habe: Zeit, um wirklich anzukommen, eine kleine Gruppe, in der du gesehen wirst, und eine Ausbilderin, die hinter dir steht.',
         'Wir folgen dem internationalen 200-Stunden-Curriculum für Yogalehrerausbildungen, damit dir nichts fehlt: Eine vollständige 200-Stunden-Yogalehrerausbildung ist inklusive. Dazu kommen Somatic Movement, Breathwork und Meditation, Sequencing, Anatomie und Body Scanning (das liegt mir besonders am Herzen), achtsame Berührung und Rituale, Mental Load und Nervensystem und ein Modul für deine Selbstständigkeit, in dem ich dir bei deinen ersten Schritten persönlich helfe.',
         ['h' => 'Wie es jetzt weitergeht'],
@@ -850,8 +850,8 @@ function ac_call_request(PDO $pdo, array $in, string $ipHash): array
     $c = ac_call($pdo, $id);
     $first = forma_first_name($name);
     $r = ['lang' => $en ? 'en' : 'de', 'email' => $email];
-    $lines = $en ? ["Dear $first,", 'thank you for your interest in the Mindful Movement Teacher Training! Your preferred time for our free 30-minute call is: ' . ac_call_when($c, 'en') . '.', 'I will confirm the time by email within the next day or two, together with the link to our video room. You don\'t need an app or an account for it.']
-        : ["Hallo $first,", 'schön, dass du dich für das Mindful Movement Teacher Training interessierst! Dein Wunschtermin für unser kostenloses 30-Minuten-Gespräch: ' . ac_call_when($c) . '.', 'Ich bestätige dir den Termin in den nächsten ein, zwei Tagen per E-Mail, zusammen mit dem Link zu unserem Videoraum. Du brauchst dafür keine App und kein Konto.'];
+    $lines = $en ? ["Dear $first,", 'thank you for your interest in the Mindful Becoming Teacher Training! Your preferred time for our free 30-minute call is: ' . ac_call_when($c, 'en') . '.', 'I will confirm the time by email within the next day or two, together with the link to our video room. You don\'t need an app or an account for it.']
+        : ["Hallo $first,", 'schön, dass du dich für das Mindful Becoming Teacher Training interessierst! Dein Wunschtermin für unser kostenloses 30-Minuten-Gespräch: ' . ac_call_when($c) . '.', 'Ich bestätige dir den Termin in den nächsten ein, zwei Tagen per E-Mail, zusammen mit dem Link zu unserem Videoraum. Du brauchst dafür keine App und kein Konto.'];
     mv_send_member_mail($r, $en ? 'Your call about the Teacher Training' : 'Dein Kennenlerngespräch zum Teacher Training', $en ? 'let\'s talk ♡' : 'lass uns reden ♡', AC_SHORT, $lines, '', '', '');
     $v = "Hallo Viv,\n\nneuer Gesprächswunsch zum Teacher Training:\n\n" . ac_call_when($c) . "\n" . $name . ' · ' . $email . ($phone !== '' ? ' · ' . $phone : '') . ($note !== '' ? "\n\nIhre Nachricht: " . $note : '') . "\n\nBitte in der Verwaltung bestätigen: " . forma_site_url() . "/verwaltung/?view=academy\n";
     mm_mail(natal_notify_email_safe(), 'Kennenlerngespräch Teacher Training: ' . $name, $v, mm_mail_html('Gesprächswunsch', nl2br(forma_h($v)), 'de'));
@@ -923,14 +923,14 @@ function ac_welcome_lesson(PDO $pdo): ?array
 /** Teleprompter-Entwurf fürs Willkommensvideo (DE + EN, ca. 3–4 Min., Viviens Ton, fließende Sätze). */
 function ac_welcome_script(): array
 {
-    $de = "Hallo, meine Liebe, und herzlich willkommen im Movecia Mindful Movement Teacher Training. Ich freue mich so sehr, dass du hier bist, und ich möchte dir in diesen paar Minuten erzählen, warum mir diese Ausbildung so am Herzen liegt und was dich in den nächsten Monaten erwartet.\n\n"
+    $de = "Hallo, meine Liebe, und herzlich willkommen im Mindful Becoming Teacher Training. Ich freue mich so sehr, dass du hier bist, und ich möchte dir in diesen paar Minuten erzählen, warum mir diese Ausbildung so am Herzen liegt und was dich in den nächsten Monaten erwartet.\n\n"
         . "Als ich selbst meine ersten Ausbildungen gemacht habe, war ich oft beeindruckt von dem vielen Wissen, aber ich habe mich auch oft ein bisschen verloren gefühlt. Es ging viel um Haltungen, um Abläufe und um Programme, und viel zu wenig um den Menschen, der vor einem auf der Matte liegt. Genau das wollte ich anders machen. Deshalb gibt es diese Ausbildung nur alle zwei Jahre und nur mit zehn Plätzen, damit ich jede von euch wirklich sehen und begleiten kann.\n\n"
         . "Du bekommst bei mir eine vollständige 200-Stunden-Yogalehrerausbildung nach dem internationalen Curriculum, und dazu alles, was ich mir selbst immer gewünscht habe: Somatic Movement, Breathwork und Meditation, achtsame Berührung und Rituale, ganz viel Anatomie und Body Scanning, und das Wissen darüber, was Mental Load mit unserem Nervensystem macht. Und weil so viele von uns irgendwann ihre eigenen Stunden geben möchten, begleite ich dich auch beim Schritt in die Selbstständigkeit, ganz persönlich.\n\n"
         . "Bis zu unserem Start am dritten November 2027 ist noch ein bisschen Zeit, und das ist gut so. Oben siehst du den Countdown, und ich lade dich ein, diese Zeit bewusst zu nutzen. In deinen Notizen kannst du alles festhalten, was dir einfällt: deine Fragen, deine Wünsche, deine Intentionen für dieses Jahr. Die Notizen gehören nur dir, niemand sonst kann sie lesen.\n\n"
         . "Und wenn dich etwas beschäftigt, schreib mir einfach im Chat. Die Nachricht landet direkt bei mir, und ich antworte dir persönlich. Es gibt keine Frage, die zu klein ist.\n\n"
         . "Bald findest du hier auch dein erstes Workbook, „Schön, dass du da bist“. Darin setzen wir gemeinsam deine Intentionen, und du bekommst ein paar Affirmationen, die dich bis zum Start begleiten.\n\n"
         . "Ich danke dir von Herzen für dein Vertrauen. Mach es dir bis dahin schön, beweg dich, atme, und dann sehen wir uns am dritten November. Ich freue mich riesig auf dich.";
-    $en = "Hello, lovely, and a very warm welcome to the Movecia Mindful Movement Teacher Training. I am so happy you are here, and in these few minutes I would like to tell you why this training means so much to me and what is waiting for you over the coming months.\n\n"
+    $en = "Hello, lovely, and a very warm welcome to the Mindful Becoming Teacher Training. I am so happy you are here, and in these few minutes I would like to tell you why this training means so much to me and what is waiting for you over the coming months.\n\n"
         . "When I did my own first trainings, I was often amazed by how much I learnt, but I also often felt a little lost. So much of it was about poses, sequences and programmes, and far too little about the person lying on the mat in front of you. That is exactly what I wanted to do differently. It is why this training only runs every two years and only has ten places, so that I can truly see and support each one of you.\n\n"
         . "With me you get a complete 200-hour yoga teacher training following the international curriculum, and on top of that everything I always wished I had been given: somatic movement, breathwork and meditation, mindful touch and rituals, plenty of anatomy and body scanning, and an understanding of what mental load does to our nervous system. And because so many of us dream of teaching our own classes one day, I will also walk with you, very personally, as you take your first steps into working for yourself.\n\n"
         . "There is still a little time until we begin on the third of November 2027, and that is a good thing. You can see the countdown at the top, and I invite you to use this time mindfully. In your notes you can write down anything that comes to mind: your questions, your hopes, your intentions for this year. Your notes belong to you alone, nobody else can read them.\n\n"
@@ -1179,7 +1179,7 @@ function ac_seal(string $cls = '', ?string $v = null, bool $onPlum = false): str
     return '<svg class="ac-seal ac-mark-' . $v . ' ' . forma_h($cls) . '" viewBox="0 0 ' . $w . ' ' . $h . '" aria-hidden="true">' . $o . '</svg>';
 }
 
-/** Logo als eigenständige SVG-Datei: 'mark' oder 'stack' (Zeichen über Schriftzug „Movecia / ACADEMY / Mindful Movement Teacher Training“). */
+/** Logo als eigenständige SVG-Datei: 'mark' oder 'stack' (Zeichen über Schriftzug „Movecia / ACADEMY / Mindful Becoming Teacher Training“). */
 function ac_logo_file(string $v, string $layout = 'stack', bool $onPlum = false): string
 {
     [$o, $w, $h] = ac_logo_mark($v, $onPlum);
@@ -1190,14 +1190,14 @@ function ac_logo_file(string $v, string $layout = 'stack', bool $onPlum = false)
     $txt = '<text x="' . ($W / 2) . '" y="' . ($y + 66) . '" text-anchor="middle" font-family="Cormorant, Cormorant Garamond, Georgia, serif" font-weight="500" font-size="62" fill="' . $c['text'] . '">Movecia<tspan fill="' . $c['dot'] . '">.</tspan></text>'
         . '<text x="' . ($W / 2 + 6) . '" y="' . ($y + 104) . '" text-anchor="middle" font-family="Hanken, Hanken Grotesk, Helvetica, Arial, sans-serif" font-weight="500" font-size="21" letter-spacing="12" fill="' . $c['sub'] . '">ACADEMY</text>'
         . '<path d="M' . ($W / 2 - 70) . ' ' . ($y + 122) . ' H' . ($W / 2 + 70) . '" stroke="' . $c['thin'] . '" stroke-width="1"/>'
-        . '<text x="' . ($W / 2 + 1.5) . '" y="' . ($y + 146) . '" text-anchor="middle" font-family="Hanken, Hanken Grotesk, Helvetica, Arial, sans-serif" font-size="12.5" letter-spacing="3" fill="' . $c['sub'] . '">MINDFUL MOVEMENT TEACHER TRAINING</text>';
+        . '<text x="' . ($W / 2 + 1.5) . '" y="' . ($y + 146) . '" text-anchor="middle" font-family="Hanken, Hanken Grotesk, Helvetica, Arial, sans-serif" font-size="12.5" letter-spacing="3" fill="' . $c['sub'] . '">MINDFUL BECOMING TEACHER TRAINING</text>';
     $H = (int)round($y + 166);
     return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<svg xmlns="http://www.w3.org/2000/svg" width="' . $W * 2 . '" height="' . $H * 2 . '" viewBox="0 0 ' . $W . ' ' . $H . '">'
         . '<svg x="' . (($W - $mw) / 2) . '" y="20" width="' . $mw . '" height="' . round($mh, 2) . '" viewBox="0 0 ' . $w . ' ' . $h . '">' . $o . '</svg>' . $txt . '</svg>';
 }
 
 /** Academy-Kopfband (Pflaume) mit Logo für alle Academy-Seiten. */
-function ac_band(string $sub = 'Mindful Movement Teacher Training'): string
+function ac_band(string $sub = 'Mindful Becoming Teacher Training'): string
 {
     return '<div class="acband"><div class="acband-in"><a href="/academy/" class="acband-l">' . ac_seal('acband-mark', null, true)
         . '<span><b>Movecia <i>Academy</i></b><small>' . forma_h($sub) . '</small></span></a><span class="acband-r">nur 10 Plätze · nur alle 2 Jahre</span></div></div>';
@@ -1227,7 +1227,7 @@ function ac_interest_confirm_mail(array $sub, string $link): bool
 {
     $first = forma_first_name((string)$sub['name']) ?: 'meine Liebe';
     $r = ['lang' => 'de', 'test' => 0];
-    $blocks = ["Hallo $first,", 'schön, dass du dich für das Movecia Mindful Movement Teacher Training interessierst! Bitte bestätige noch kurz deine E-Mail-Adresse, dann schicke ich dir gleich alle Infos zur Ausbildung.', 'Falls du dich nicht eingetragen hast, ignorier diese Mail einfach.'];
+    $blocks = ["Hallo $first,", 'schön, dass du dich für das Mindful Becoming Teacher Training interessierst! Bitte bestätige noch kurz deine E-Mail-Adresse, dann schicke ich dir gleich alle Infos zur Ausbildung.', 'Falls du dich nicht eingetragen hast, ignorier diese Mail einfach.'];
     return mm_mail((string)$sub['email'], 'Bitte bestätige deine E-Mail fürs Teacher Training 🌿', ac_mail_text($blocks, $link, 'Ja, ich bestätige meine E-Mail', '', false),
         ac_mail_html($r, 'nur noch ein Klick ♡', 'Teacher Training 2027', $blocks, $link, 'Ja, ich bestätige meine E-Mail', ''), [], 'Vivien · Movecia Academy');
 }
@@ -1240,7 +1240,7 @@ function ac_interest_info_blocks(array $sub): array
     $first = forma_first_name((string)$sub['name']) ?: 'meine Liebe';
     return [
         "Hallo $first,",
-        $full ? 'danke, dass du dich auf die Warteliste fürs Teacher Training 2027 gesetzt hast. Gerade sind alle zehn Plätze vergeben. Wird ein Platz frei, erfährst du es als Erste.' : 'wie schön, dass du dich für das Movecia Mindful Movement Teacher Training interessierst! Hier ist alles, was du wissen musst, ganz in Ruhe zum Nachlesen.',
+        $full ? 'danke, dass du dich auf die Warteliste fürs Teacher Training 2027 gesetzt hast. Gerade sind alle zehn Plätze vergeben. Wird ein Platz frei, erfährst du es als Erste.' : 'wie schön, dass du dich für das Mindful Becoming Teacher Training interessierst! Hier ist alles, was du wissen musst, ganz in Ruhe zum Nachlesen.',
         ['h' => 'Was dich erwartet'],
         ['Eine Ausbildung mit ' . AC_HOURS . ' Stunden, inklusive vollständiger 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum', 'Somatic Movement, Breathwork und Meditation, ganz viel Anatomie und Body Scanning, achtsame Berührung und Rituale', 'Mental Load und Nervensystem, und wie du Stunden hältst, ohne deine eigene Energie zu verbrennen', 'Deine Selbstständigkeit: faire Preise, sichtbar werden, mit meiner persönlichen Hilfe', '11 Monate hybrid ab ' . mv_date($c['start_ts']) . ', wöchentlicher Live-Call, Coworking und Lerngruppen, ein Präsenzwochenende in den Tiroler Alpen', 'Ausschließlich auf Deutsch, online aus Österreich, Deutschland, der Schweiz und Südtirol'],
         ['h' => 'Preis'],
@@ -1257,7 +1257,7 @@ function ac_interest_info_mail(array $sub): bool
     $link = mm_site() . '/academy/teacher-training/#buchen';
     $legal = 'Du bekommst diese E-Mail, weil du dich auf moveciamovement.com für das Teacher Training eingetragen hast. Abmelden: ' . ac_interest_unsub($sub);
     return mm_mail((string)$sub['email'], 'Teacher Training 2027: alle Infos für dich 🌿', ac_mail_text($blocks, $link, 'Zur Ausbildung', $legal, false),
-        ac_mail_html($r, 'schön, dass du da bist ♡', 'Movecia Mindful Movement Teacher Training', $blocks, $link, 'Zur Ausbildung & zum Kennenlerngespräch', $legal), [], 'Vivien · Movecia Academy');
+        ac_mail_html($r, 'schön, dass du da bist ♡', 'Mindful Becoming Teacher Training', $blocks, $link, 'Zur Ausbildung & zum Kennenlerngespräch', $legal), [], 'Vivien · Movecia Academy');
 }
 
 /** „Noch 2 Wochen Early Bird“ (Vivien, 28.10.2026): am 17.3.2027 um 10:00 Wien, an bestätigte Interessentinnen ohne Buchung, genau einmal. */

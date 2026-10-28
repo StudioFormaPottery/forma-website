@@ -24,7 +24,7 @@ function mv_menu_items(): array
         ['/natal/', 'Prä- &amp; Postnatal', 'Pre- &amp; postnatal', 'natal', '1:1 im Studio &amp; online', '1:1 in the studio &amp; online'],
         ['/gathering/', 'Gatherings', 'Gatherings', 'gathering', 'Live und kostenlos, einmal im Monat', 'Free and live, once a month'],
         // Movecia Academy (Vivien, 28.10.2026): Ausbildungen, zuerst das Teacher Training
-        ['/academy/', 'Academy', 'Academy', 'academy', 'Ausbildungen · Teacher Training ab Nov. 2027', 'Trainings · teacher training from Nov 2027'],
+        ['/academy/', 'Academy', 'Academy', 'academy', 'Teacher Training ab Nov. 2027 · jetzt buchbar', 'Teacher training from Nov 2027 · open now'],
         ['/#vivien', 'Über mich', 'About me', 'about', 'Ich bin Vivien', "Hi, I'm Vivien"],
     ];
 }
@@ -40,6 +40,7 @@ function mv_menu(string $active = '', array $o = []): void
 <?php endif; ?>
 <button class="mvm-btn" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mvm-panel"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14"/></svg></button>
 <?php if ($assets) return; $assets = true; ?>
+<script src="/wildhearts/assets/musik.js?v=1" defer></script>
 <div class="mvm" id="mvm-panel" role="dialog" aria-modal="true" aria-label="Menü" hidden>
   <div class="mvm-top">
     <a class="mvm-brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt="" width="28" height="28">Movecia<i></i></a>

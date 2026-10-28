@@ -109,7 +109,7 @@ mvl_head('Kennenlerngespräch · Movecia Academy', '', mm_site() . '/academy/ges
 <div class="offer" id="offer" role="dialog" aria-live="polite" aria-label="Dein Kennenlern-Preis" hidden>
   <div class="o-top"><?= ac_seal('mini', null, true) ?><div><p class="o-k">nur für dich, nur jetzt</p><p class="o-t">Dein Kennenlern-Preis</p></div><button class="o-x" type="button" id="ox" aria-label="Kleiner machen">–</button></div>
   <div class="o-p"><b id="op">–</b><s id="ob"></s><em id="os"></em></div>
-  <p class="o-d">Mindful Movement Teacher Training · <?= AC_HOURS ?> Stunden · Start <?= mv_date(ac_cfg()['start_ts']) ?><br>50 % Anzahlung (<span id="odp"></span>), den Rest auf einmal oder in Teilen, ohne Aufschlag.</p>
+  <p class="o-d">Mindful Becoming Teacher Training · <?= AC_HOURS ?> Stunden · Start <?= mv_date(ac_cfg()['start_ts']) ?><br>50 % Anzahlung (<span id="odp"></span>), den Rest auf einmal oder in Teilen, ohne Aufschlag.</p>
   <div class="o-row"><span class="o-cd"><span id="ocd">20:00</span><small>Min. übrig</small></span><a class="o-go" id="ogo" href="#" target="_blank" rel="noopener">Jetzt Platz sichern →</a></div>
 </div>
 <button class="offer-pill" id="opill" type="button">✦ Dein Kennenlern-Preis · <span id="opcd"></span></button>
