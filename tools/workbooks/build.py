@@ -56,6 +56,10 @@ h1,h2,h3,h4{font-family:"Cormorant",serif;font-weight:500;margin:0;line-height:1
 .cover .blob3{position:absolute;width:60mm;height:60mm;left:-18mm;bottom:40mm;background:var(--blush);border-radius:46% 54% 50% 50%;opacity:.4}
 .cover .ring{position:absolute;width:118mm;height:100mm;left:44mm;top:40mm;border:1.4px solid var(--plum);border-radius:52% 48% 46% 54%/56% 46% 54% 44%;transform:rotate(9deg);opacity:.55}
 .cover>*{position:relative}
+.cover .cwaves{position:absolute!important;left:0;right:0;bottom:0;width:100%;height:58mm;z-index:0}
+.cover.mk{padding-top:30mm}.cover.mk .arch{width:70mm;height:86mm}.cover.mk .arch .ic{width:18mm;height:18mm;right:-7mm}.cover.mk .arch .ic svg{width:11mm;height:11mm}.cover.mk .tape{margin-top:8mm}.cover.mk h1{font-size:32pt}.cover.mk .merkbox{margin-top:6mm;padding:4mm 5mm}.cover.mk .for{margin-top:7mm}
+.cover .cwaves .w1{fill:var(--blush)}.cover .cwaves .w2{fill:var(--peach);opacity:.8}.cover .cwaves .w3{fill:#F6EEE7}
+.cover .for{z-index:1}
 .cover .logo{position:absolute;top:16mm;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:2mm;font-family:"Cormorant";font-size:16pt;color:var(--plum)}
 .cover .logo img{width:7mm;height:7mm}
 .cover .big svg{width:52mm;height:52mm}
@@ -82,8 +86,10 @@ h1,h2,h3,h4{font-family:"Cormorant",serif;font-weight:500;margin:0;line-height:1
 .ch{break-before:page}
 .ch.first{break-before:auto}
 .ch.cont{break-before:auto;margin-top:10mm}
-.chh{display:flex;align-items:center;gap:5mm;margin-bottom:5mm;padding-bottom:4mm;border-bottom:1.3px dashed var(--line)}
-.badge{flex:0 0 19mm;height:19mm;border-radius:46% 54% 50% 50%/55% 45% 55% 45%;background:var(--bg);display:flex;align-items:center;justify-content:center;border:1.2px dashed var(--rose)}
+.chh{display:flex;align-items:center;gap:5mm;margin-bottom:6mm;padding-bottom:5mm;position:relative}
+.chh::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3.2mm;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 10' preserveAspectRatio='none'%3E%3Cpath d='M0 5 C10 0 20 0 30 5 S50 10 60 5 S80 0 90 5 S110 10 120 5' fill='none' stroke='%23C9AFB5' stroke-width='1.2'/%3E%3C/svg%3E") 0 0/24mm 100% repeat-x}
+.badge{flex:0 0 19mm;height:19mm;border-radius:46% 54% 50% 50%/55% 45% 55% 45%;background:var(--peach);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1.6mm #fff,0 0 0 2.2mm var(--blush)}
+.ch:nth-of-type(3n+1) .badge{background:var(--blush)}.ch:nth-of-type(3n+2) .badge{background:#F8EFE7}
 .badge svg{width:13mm;height:13mm}
 .chh h2{font-size:24pt;margin-top:.6mm}
 .chintro{font-family:"Cormorant";font-style:italic;font-size:13.5pt;color:var(--plum);line-height:1.35;margin:0 0 4mm}
@@ -93,7 +99,9 @@ ul.l li,ol.l li{margin:.8mm 0}
 ul.l li::marker{color:var(--rose)}
 ol.l li::marker{color:var(--plum);font-family:"Cormorant";font-weight:600}
 .box{break-inside:avoid;border-radius:4.5mm;padding:4mm 5mm;margin:3.5mm 0}
-.fact{background:var(--bg)}
+.fact{background:var(--bg);position:relative;overflow:hidden}
+.fact::after{content:"";position:absolute;right:-14mm;bottom:-16mm;width:40mm;height:40mm;border-radius:46% 54% 60% 40%/50% 42% 58% 50%;background:var(--plum);opacity:.05}
+.ch .fact:nth-of-type(2n){background:#F3E2D8}.ch .fact:nth-of-type(3n){background:#EEDFE0}
 .fact .bh{display:flex;align-items:center;gap:2.4mm;margin-bottom:1.4mm}
 .fact .bh svg{width:7mm;height:7mm}
 .fact h4{font-size:13pt}
@@ -285,12 +293,34 @@ def chapter(c, L):
             + (f'<p class="chintro">{e(c["intro"])}</p>' if c.get('intro') else '') + ''.join(block(b, L) for b in c.get('blocks', [])) + '</section>')
 
 
+# Deckblatt-Fotos (Vivien, 28.10.2026: jedes Workbook mit einem der neuen Fotos im Bogen, alles eine Handschrift)
+COVER_PHOTOS = {'method-ankommen': 'ev-method-foto.jpg', 'method-rueckzug': 'ev-platz-quadrat.jpg', 'unfold-m1': 'ev-unfold-karte.jpg',
+                'unfold-m2': 'ev-method-karte.jpg', 'unfold-m3': 'ev-ueber-mich.jpg'}
+
+
+def cover_photo(key):
+    k = re.sub(r'\.(de|en)$', '', key or '')
+    if k in COVER_PHOTOS: return 'img/movecia/fotos/' + COVER_PHOTOS[k]
+    m = re.match(r'natal-(prae|post)(\d+)', k)
+    if m:
+        n = int(m.group(2))
+        if m.group(1) == 'prae': return 'img/movecia/fotos/' + ('ev-natal.jpg' if n % 2 else 'ev-natal-sitzend.jpg')
+        return 'img/movecia/fotos/' + ('ev-platz-quadrat.jpg' if n % 2 else 'ev-gathering.jpg')
+    return None
+
+
+COVER_WAVES = '<svg class="cwaves" viewBox="0 0 800 220" preserveAspectRatio="none"><path class="w1" d="M0 90 C130 40 260 40 400 90 S660 140 800 80 V220 H0Z"/><path class="w2" d="M0 130 C150 175 280 175 420 130 S660 85 800 135 V220 H0Z"/><path class="w3" d="M0 170 C160 140 300 140 440 170 S690 200 800 165 V220 H0Z"/></svg>'
+
+
 def render(wb, cover_svg=None, merk=None):
     L = T[wb.get('lang', 'de')]
+    if not wb.get('photo'):
+        cp = cover_photo(wb.get('key'))
+        if cp: wb = dict(wb, photo=cp)
     big = cover_svg or icon(wb.get('icon', 'stern'), 150)
     if wb.get('photo'):
         big = f'<div class="arch"><img src="file://{os.path.join(ROOT, wb["photo"])}"><span class="ic">{icon(wb.get("icon", "stern"), 60)}</span></div>'
-    cov = (f'<section class="cover{" ph" if wb.get("photo") else ""}"><span class="blob1"></span><span class="blob3"></span><span class="blob2"></span><span class="ring"></span>'
+    cov = (f'<section class="cover{" ph" if wb.get("photo") else ""}{" mk" if merk and wb.get("photo") else ""}"><span class="blob1"></span><span class="blob3"></span><span class="blob2"></span><span class="ring"></span>{COVER_WAVES}'
            f'<div class="logo"><img src="{LOGO}">Movecia</div><span class="sp" style="left:34mm;top:60mm">✦</span><span class="sp" style="right:40mm;top:52mm;color:#D9B8B4;font-size:18pt">✧</span><span class="sp" style="right:52mm;top:128mm;color:#D9B8B4">♡</span>'
            f'<div class="big">{big}</div><p class="tape">{e(wb.get("eyebrow"))}</p><h1>{e(wb["title"]).replace(chr(10), "<br>")}</h1>'
            + (f'<p class="sub">{e(wb["subtitle"])}</p>' if wb.get('subtitle') else '')
