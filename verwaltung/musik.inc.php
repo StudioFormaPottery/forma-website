@@ -27,11 +27,16 @@ function mu_title(string $fn): string
     return trim($t) !== '' ? trim($t) : 'Lied';
 }
 /** Stichwörter aus dem Titel vorschlagen */
+function mu_map(): array
+{
+    static $map = null; if ($map === null) { $map = json_decode((string)@file_get_contents(__DIR__ . '/musik-ordner.json'), true) ?: []; }
+    return $map;
+}
+function mu_song(string $t): string { return trim(mb_strtolower(explode(' – ', $t)[0])); }
 function mu_guess(string $t): array
 {
     // Automatisch einsortieren nach Wörtern im Titel (Vivien, 28.10.2026: Ordner sollen sich selbst füllen)
-    $song = trim(mb_strtolower(explode(' – ', $t)[0]));
-    static $map = null; if ($map === null) { $map = json_decode((string)@file_get_contents(__DIR__ . '/musik-ordner.json'), true) ?: []; }
+    $song = mu_song($t); $map = mu_map();
     if (isset($map[$song]) && is_array($map[$song])) return array_values(array_filter($map[$song], fn($x) => isset(MU_TAGS[$x])));
     $l = ' ' . $song . ' '; $g = [];
     $re = ['morgen' => 'morning|sunrise|daylight|dawn|morgen|coffee|bright|new day|awake|wake|sunny|hello|brave|hope',
@@ -114,6 +119,12 @@ if ($view === 'musik' || str_starts_with((string)$action, 'mm_mu_')) {
     }
 
     if ($view === 'musik') {
+        // Noch nicht einsortierte Lieder: hat Claude sie inzwischen in musik-ordner.json eingetragen? Dann jetzt einsortieren.
+        $map = mu_map(); $upd = $pdo->prepare('UPDATE mm_music SET tags = ? WHERE id = ?');
+        foreach ($pdo->query("SELECT id, title FROM mm_music WHERE tags = ''")->fetchAll() as $r) {
+            $m = $map[mu_song($r['title'])] ?? null;
+            if (is_array($m) && ($m = array_values(array_filter($m, fn($x) => isset(MU_TAGS[$x]))))) $upd->execute([implode(',', $m), $r['id']]);
+        }
         $list = $pdo->query('SELECT * FROM mm_music ORDER BY title COLLATE NOCASE')->fetchAll();
         $self = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?');
         render_page('Musik', function () use ($list, $self) {
@@ -172,6 +183,8 @@ main{max-width:1240px}
 .del{flex:0 0 auto;width:34px;height:34px;border-radius:50%;border:0;background:none;color:#B3A3A8;font-size:16px;cursor:pointer}
 .del:hover{background:#F3D9D5;color:#A0413B}
 .tip{font-size:16px;color:#7D7076;line-height:1.5}
+.ask{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:#F4E9E3;border-radius:16px;padding:10px 12px;font-size:16px;color:#4A3A41}
+.ask button{font:inherit;font-size:16px;min-height:44px;padding:8px 16px;border-radius:999px;border:0;background:#7D5E68;color:#fff;cursor:pointer}
 @media(max-width:640px){.fold>summary{gap:10px;padding:10px}.fic{width:46px;height:46px;font-size:22px}.fdt b{font-size:21px}.fdt small{display:none}}
 </style>
 <?php mm_subnav('musik'); ?>
@@ -186,7 +199,7 @@ main{max-width:1240px}
 <?php $c = 0; foreach ($folders as $k => [$ic, $nm, $ds]): $l = $in[$k] ?? []; if ($k === '' && !$l) continue; ?>
   <details class="fold <?= $k === '' ? 'inbox' : 'c' . ($c++ % 4) ?>" data-fold="<?= $h($k) ?>"<?= $k === '' ? ' open' : '' ?>>
     <summary><span class="fic"><?= $ic ?></span><span class="fdt"><b><?= $h($nm) ?></b><small><?= $h($ds) ?></small></span><span class="fcnt"><?= count($l) ?> <?= count($l) === 1 ? 'Lied' : 'Lieder' ?></span><span class="chev" aria-hidden="true"></span></summary>
-    <div class="fbody"><?= $l ? implode('', array_map($row, $l)) : '<p class="fempty">Noch leer. Zieh Lieder direkt auf diesen Ordner oder wähle oben „Neue Lieder kommen in: ' . $h($nm) . '“.</p>' ?></div>
+    <div class="fbody"><?php if ($k === '' && $l): ?><div class="ask"><span>Schick mir die Liste, dann sortiere ich die Lieder für dich ein.</span><button type="button" id="copyU" data-list="<?= $h(implode("\n", array_map(fn($r) => '• ' . $r['title'], $l))) ?>">📋 Liste für Claude kopieren</button></div><?php endif; ?><?= $l ? implode('', array_map($row, $l)) : '<p class="fempty">Noch leer. Zieh Lieder direkt auf diesen Ordner oder wähle oben „Neue Lieder kommen in: ' . $h($nm) . '“.</p>' ?></div>
   </details>
 <?php endforeach; ?>
 </div>
@@ -212,6 +225,8 @@ main{max-width:1240px}
     el.addEventListener('drop',e=>upload(e.dataTransfer.files,tag()))};
   dz(drop,()=>into);
   document.querySelectorAll('.fold[data-fold]').forEach(f=>{if(f.dataset.fold)dz(f,()=>f.dataset.fold)});
+  const cu=$('copyU');if(cu)cu.onclick=async()=>{const t='Bitte sortier diese Lieder in meine Musik-Ordner:\n'+cu.dataset.list;
+    try{await navigator.clipboard.writeText(t);cu.textContent='✓ Kopiert – jetzt bei Claude einfügen'}catch(e){prompt('Kopieren und bei Claude einfügen:',t)}};
   const au=new Audio();let playing=0;
   document.querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>{const id=+b.dataset.play;document.querySelectorAll('[data-play]').forEach(x=>{x.textContent='▶';x.classList.remove('on')});
     if(playing===id){au.pause();playing=0;return}au.src='?view=musik&dl='+id;au.play().catch(()=>{});playing=id;document.querySelectorAll('[data-play="'+id+'"]').forEach(x=>{x.textContent='❚❚';x.classList.add('on')})});
