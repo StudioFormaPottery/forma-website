@@ -2816,6 +2816,14 @@ function forma_template_slides(string $file): array
     return $out;
 }
 
+/** Foto-Titelbild für den Shop (Vivien, 28.10.2026): img/shop/<key>-1.jpg ersetzt das Vektor-Cover, falls vorhanden. */
+function forma_template_cover(string $file): string
+{
+    if (!preg_match('/^seed-(.+)-de\.pdf$/', $file, $m)) return '';
+    $f = "img/shop/{$m[1]}-1.jpg";
+    return is_file(__DIR__ . '/../' . $f) ? $f . '?v=' . filemtime(__DIR__ . '/../' . $f) : '';
+}
+
 require_once __DIR__ . '/invoices.php';
 require_once __DIR__ . '/kasse.php';
 require_once __DIR__ . '/minimum.php';

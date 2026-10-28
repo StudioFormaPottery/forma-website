@@ -10,7 +10,7 @@ try {
         $out[] = ['id' => (int)$t['id'], 'title' => $t['title'], 'description' => $t['description'], 'season' => $t['season'],
             'season_label' => FORMA_SEASONS[$t['season']] ?? '', 'age' => $t['age'], 'age_label' => FORMA_AGES[$t['age']] ?? '',
             'level' => (int)$t['level'], 'price_cents' => (int)$t['price_cents'],
-            'image' => $t['image'] !== '' ? 'api/template-image.php?id=' . (int)$t['id'] . '&v=' . substr(md5($t['image'] . '|' . (string)@filemtime(forma_template_dir() . '/' . basename((string)$t['image']))), 0, 8) : '', 'buyable' => $online && $t['file'] !== '', 'langs' => $t['file_en'] !== '' ? 'Deutsch & Englisch' : '', 'slides' => forma_template_slides((string)$t['file'])];
+            'image' => forma_template_cover((string)$t['file']) ?: ($t['image'] !== '' ? 'api/template-image.php?id=' . (int)$t['id'] . '&v=' . substr(md5($t['image'] . '|' . (string)@filemtime(forma_template_dir() . '/' . basename((string)$t['image']))), 0, 8) : ''), 'buyable' => $online && $t['file'] !== '', 'langs' => $t['file_en'] !== '' ? 'Deutsch & Englisch' : '', 'slides' => forma_template_slides((string)$t['file'])];
     }
     $m = forma_maker($pdo);
     forma_json(['ok' => true, 'templates' => $out, 'maker' => ['title' => $m['title'], 'text' => $m['text'],
