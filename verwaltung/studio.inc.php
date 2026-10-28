@@ -131,6 +131,13 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 .pr{position:absolute;left:0;right:0;top:0;height:42%;min-height:120px;overflow:hidden;background:rgba(36,28,32,.8);color:#FBF5F7;z-index:7;pointer-events:auto;cursor:pointer;border-radius:22px 22px 0 0}
 .pr::after{content:'';position:absolute;left:0;right:0;bottom:0;height:30%;background:linear-gradient(rgba(36,28,32,0),rgba(36,28,32,.95));pointer-events:none}
 .pr[hidden]{display:none}
+/* iPhone als Kamera (Continuity-Kamera, Vivien 28.10.2026) */
+.iph{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px}
+.iph button{font:inherit;font-size:17px;padding:10px 18px;border-radius:999px;border:1.5px solid #7D5E68;background:#FBF5F7;color:#7D5E68;cursor:pointer;min-height:46px}
+.iph button.on{background:#7D5E68;color:#fff}
+.iph-help{margin-top:10px;padding:14px 16px;border-radius:18px;background:#FBF1F0;border:1.5px solid #F0DCDA;font-size:16px;line-height:1.5;color:#4A3A41}
+.iph-help ol{margin:8px 0 0 20px;padding:0}.iph-help li{margin:4px 0}
+body.recording .iph,body.recording .iph-help,body.rec-ui .iph,body.rec-ui .iph-help{display:none}
 /* An der Kamera (Vivien, 28.10.2026: „sieht aus, als würde ich nach unten schauen“): während der Aufnahme ganz oben, mittig unter der Linse, schmal, 3 Zeilen */
 body.prtop .pr.top{display:block;position:fixed;top:0;left:50%;right:auto;transform:translateX(-50%);width:min(560px,94vw);height:calc(var(--fs,30px) * 1.4 * 3 + 22px + env(safe-area-inset-top,0px));min-height:0;padding-top:env(safe-area-inset-top,0px);border-radius:0 0 22px 22px;z-index:200;background:rgba(36,28,32,.94);box-shadow:0 8px 24px -10px rgba(0,0,0,.5)}
 body.prtop .pr.top .pr-t{padding:10px 3% 60%;line-height:1.4}
@@ -426,6 +433,8 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   <div class="view">
     <div id="stage" class="tc-stage" style="aspect-ratio:16/9"><div class="tc-st">Kamera startet … Bitte erlaube Kamera und Mikrofon.</div></div>
     <video id="play" controls playsinline hidden></video>
+    <div class="iph" id="iph" hidden><button type="button" id="iphBtn">📱 iPhone als Kamera</button><span class="hint" id="iphInfo" style="font-size:15px;color:#7D7076"></span></div>
+    <div class="iph-help" id="iphHelp" hidden></div>
     <div class="bar">
       <button type="button" class="go" id="go">● Aufnahme starten</button>
       <button type="button" class="stop" id="stop" hidden>■ Stopp</button>
@@ -642,7 +651,31 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     devices();
     try{$('qual').value=qual();$('qual').onchange=()=>{ls.set('st-qual',$('qual').value);startCam()};tc.on(t=>{if(t==='layout')qShow()})}catch(e){}
   }
-  async function devices(){try{const ds=await navigator.mediaDevices.enumerateDevices();
+  // ---- iPhone als Kamera (Apples Continuity-Kamera): das iPhone filmt, Teleprompter und alles andere bleiben am MacBook ----
+  const isMacDesk=/Macintosh/.test(navigator.userAgent)&&!(navigator.maxTouchPoints>1);
+  const isIph=l=>/iphone/i.test(l||'');
+  function iphUi(ds){const box=$('iph');if(!box)return;box.hidden=!isMacDesk;if(!isMacDesk)return;
+    const cur=(raw&&raw.getVideoTracks()[0])||null,on=!!(cur&&isIph(cur.label));
+    $('iphBtn').classList.toggle('on',on);$('iphBtn').textContent=on?'📱 iPhone filmt · zurück zur Mac-Kamera':'📱 iPhone als Kamera';
+    $('iphInfo').textContent=on?'Der Teleprompter steht oben am Bildschirm, direkt unter deinem iPhone.':(ds&&ds.some(d=>d.kind==='videoinput'&&isIph(d.label))?'Dein iPhone ist bereit.':'')}
+  function iphHelp(){const h=$('iphHelp');h.hidden=false;h.innerHTML='<b>Dein iPhone wird gerade nicht gefunden.</b> So klappt es (einmal einrichten, danach geht es mit einem Klick):'
+    +'<ol><li>iPhone und MacBook sind mit derselben Apple-ID angemeldet, WLAN und Bluetooth sind an beiden an.</li>'
+    +'<li>Am iPhone: Einstellungen → Allgemein → AirPlay &amp; Continuity → <b>Continuity-Kamera</b> einschalten.</li>'
+    +'<li>iPhone sperren und ruhig hinstellen, am besten quer mit einer Halterung oben mittig am MacBook-Bildschirm, Rückkamera zu dir.</li>'
+    +'<li>Hier nochmal auf „📱 iPhone als Kamera“ tippen. Beim ersten Mal fragt das iPhone kurz nach, das bestätigst du einmal.</li></ol>'
+    +'<span style="color:#7D7076">Braucht macOS Ventura und iOS 16 oder neuer.</span> <button type="button" id="iphX" style="font:inherit;border:0;background:none;color:#7D5E68;text-decoration:underline;cursor:pointer">schließen</button>';
+    $('iphX').onclick=()=>{h.hidden=true}}
+  async function useIphone(){let ds=[];try{ds=await navigator.mediaDevices.enumerateDevices()}catch(e){}
+    const d=ds.find(x=>x.kind==='videoinput'&&isIph(x.label));
+    if(!d){iphHelp();return}
+    $('iphHelp').hidden=true;ls.set('st-cam',d.deviceId);
+    // auch das iPhone-Mikrofon nehmen, wenn vorhanden (näher am Gesicht als das MacBook)
+    const m=ds.find(x=>x.kind==='audioinput'&&isIph(x.label));if(m)ls.set('st-mic',m.deviceId);
+    $('msg').className='msg';$('msg').textContent='📱 iPhone-Kamera wird verbunden …';await startCam();
+    const on=raw&&raw.getVideoTracks()[0]&&isIph(raw.getVideoTracks()[0].label);
+    $('msg').className='msg'+(on?' ok':'');$('msg').textContent=on?'✓ Dein iPhone filmt jetzt. Schau beim Sprechen in die iPhone-Linse, der Text steht direkt darunter.':'Das iPhone hat sich nicht gemeldet. Ist es gesperrt und in der Nähe? Dann nochmal tippen.';}
+  $('iphBtn').onclick=()=>{const cur=raw&&raw.getVideoTracks()[0];if(cur&&isIph(cur.label)){ls.set('st-cam','');ls.set('st-mic','');startCam();return}useIphone()};
+  async function devices(){try{const ds=await navigator.mediaDevices.enumerateDevices();iphUi(ds);
     const fill=(sel,kind,key,label)=>{const curId=(raw.getTracks().find(t=>t.kind===kind.replace('input',''))||{getSettings:()=>({})}).getSettings().deviceId;
       sel.innerHTML=ds.filter(d=>d.kind===kind).map((d,i)=>'<option value="'+esc(d.deviceId)+'"'+(d.deviceId===curId?' selected':'')+'>'+esc(d.label||label+' '+(i+1))+'</option>').join('');
       sel.onchange=()=>{ls.set(key,sel.value);startCam()}};

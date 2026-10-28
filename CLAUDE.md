@@ -481,3 +481,8 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Studio → Kamera & Mikrofon → „Bildqualität“ 4K (Standard) / 2K / Full HD (`QUAL`, localStorage `st-qual`): getUserMedia `ideal` in dieser Größe, `TalkCam.create(…, {maxLong})` rechnet in dieser Größe (auch am Handy, statt fest 1280). Darunter `#qInfo`: was die Kamera wirklich liefert und in welcher Größe aufgenommen wird (Laptop-Kameras können oft nur Full HD/HD).
 - Kommt ein Gerät in den ersten Sekunden nicht mit, stuft TalkCam einmal eine Stufe herunter (4K → 2K → Full HD) und sagt es im Status.
 - Datenrate nach Größe (`vbr` im Studio, `brate` im Editor): 4K 40 Mbit/s, 2K 20, Full HD 12, HD 8. Editor (`outSize`) bis 3840 statt 1920.
+
+## Studio · iPhone als Kamera (Vivien, 28.10.2026: „mit der Handykamera aufnehmen, Teleprompter am MacBook“)
+- Lösung über Apples Continuity-Kamera (kein eigenes Streaming): Knopf „📱 iPhone als Kamera“ unter dem Kamerabild (`#iph`, nur am Mac-Computer, nicht am Handy und nicht während der Aufnahme). Sucht in `enumerateDevices` eine Kamera mit „iPhone“ im Namen, merkt sie als `st-cam` (und das iPhone-Mikrofon als `st-mic`, falls vorhanden) und startet die Kamera neu. Nochmal tippen = zurück zur Mac-Kamera.
+- Wird kein iPhone gefunden, erscheint `#iphHelp` mit der Einrichtung (gleiche Apple-ID, WLAN + Bluetooth, Einstellungen → Allgemein → AirPlay & Continuity → Continuity-Kamera, iPhone gesperrt quer oben mittig am MacBook, Rückkamera zur Person; macOS Ventura / iOS 16).
+- Der Teleprompter steht beim Aufnehmen ohnehin oben mittig am Bildschirm (`prTop`), also direkt unter dem iPhone.

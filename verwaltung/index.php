@@ -20,6 +20,7 @@ unset($_SESSION['flash']);
  * Jede neue Funktion hier mit Titel, einem Satz und Link eintragen, damit Vivien nicht suchen muss.
  */
 const FORMA_ADMIN_NEWS = [
+    ['until' => '2026-11-20', 'title' => 'Neu im Studio: iPhone als Kamera', 'text' => 'Unter dem Kamerabild „📱 iPhone als Kamera“ tippen: dein iPhone filmt, Teleprompter und alles andere bleiben am MacBook', 'link' => '?view=studio'],
     ['until' => '2026-11-15', 'title' => 'Neu im Studio: 4K, Teleprompter an der Kamera, schnelleres Speichern', 'text' => 'Bildqualität 4K/2K unter „Kamera & Mikrofon“, Text beim Aufnehmen direkt unter der Linse, „🗑 Löschen“ nach jeder Aufnahme, „💛 Meine Looks“ zum Speichern deiner Filter, Bearbeiten speichert viel schneller', 'link' => '?view=studio'],
     ['until' => '2026-11-15', 'title' => 'Neu: Angebote für Gruppen & Schulen', 'text' => 'Angebot anlegen, per WhatsApp schicken, Bestätigung und Vorabrechnung laufen automatisch', 'link' => '?view=angebote'],
 ];
