@@ -14,19 +14,46 @@ if ($view === 'studio') {
         foreach (mv_programs($pdo, $aud) as $p) foreach (mv_lessons($pdo, (int)$p['id']) as $l) {
             if (mv_lesson_is_clips($l)) continue;
             $talks[] = ['id' => (int)$l['id'], 'g' => $an, 't' => (string)$l['title_de'], 'te' => (string)($l['title_en'] ?: $l['title_de']),
-                'de' => (string)$l['script_de'], 'en' => (string)$l['script_en'], 'vde' => $l['video_de'] !== '', 'ven' => $l['video_en'] !== '', 'due' => (string)$l['due']];
+                'de' => (string)$l['script_de'], 'en' => (string)$l['script_en'], 'vde' => $l['video_de'] !== '', 'ven' => $l['video_en'] !== '', 'due' => (string)$l['due'],
+                'k' => ['breath' => 'Atem-Video', 'meditation' => 'Meditation'][$l['cat']] ?? 'Talking Head'];
         }
     }
     $sel = (int)($_GET['l'] ?? 0);
     // Übungs-Clips für Flows und Bewegungsvideos (Vivien, 28.10.2026: dort nur Hintergrund weich + Belichtung, keine Gesichtsfilter)
     $moves = [];
-    foreach (mv_clips_all($pdo, true) as $c) $moves[] = ['id' => (int)$c['id'], 'n' => (string)$c['name_de'], 'ok' => (string)$c['guid'] !== ''];
+    // Wofür wird die Übung gebraucht (Flow / Bewegungsvideo) und bis wann? (Vivien, 28.10.2026: „damit ich genau weiß, wann ich was aufnehmen soll“)
+    $use = [];
+    foreach ($pdo->query("SELECT * FROM mv_lessons WHERE visible = 1 AND cat NOT IN ('talk','breath','meditation')")->fetchAll() as $l) {
+        if (!mv_lesson_is_clips($l)) continue;
+        foreach (mv_lesson_steps($l) as $x) $use[mv_clip_key($x['de'])][] = ['t' => (string)$l['title_de'], 'm' => mv_lesson_mode($l), 'due' => (string)$l['due']];
+    }
+    foreach (mv_clips_all($pdo, true) as $k => $c) {
+        $u = $use[$k] ?? [];
+        usort($u, fn($a, $b) => [$a['due'] === '' ? '9' : $a['due'], $a['t']] <=> [$b['due'] === '' ? '9' : $b['due'], $b['t']]);
+        $ms = array_unique(array_column($u, 'm'));
+        $moves[] = ['id' => (int)$c['id'], 'n' => (string)$c['name_de'], 'ok' => (string)$c['guid'] !== '', 'due' => $u[0]['due'] ?? '',
+            'k' => count($ms) > 1 ? 'Übung für Flow & Bewegungsvideo' : (($ms[0] ?? '') === 'move' ? 'Übung für Bewegungsvideo' : (($ms[0] ?? '') === 'flow' ? 'Übung für Flow' : 'Übung')),
+            'for' => array_map(fn($x) => ($x['m'] === 'move' ? 'Bewegungsvideo' : 'Flow') . ' „' . $x['t'] . '“', $u)];
+    }
     usort($moves, fn($a, $b) => [$a['ok'], $a['n']] <=> [$b['ok'], $b['n']]);
+    // Eine Liste nach Datum: was als Nächstes dran ist, oben
+    $today = date('Y-m-d');
+    $wd = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+    $dShort = fn(string $d) => $d === '' ? '' : $wd[(int)date('w', strtotime($d))] . ' ' . date('j.n.', strtotime($d));
+    $queue = [];
+    foreach ($talks as $t) $queue[] = ['v' => (string)$t['id'], 'ok' => $t['vde'] && $t['ven'], 'due' => $t['due'], 'ico' => '🗣', 'k' => $t['k'], 'n' => $t['t'],
+        'x' => $t['vde'] && $t['ven'] ? '' : ($t['vde'] ? ' (Englisch fehlt)' : ($t['ven'] ? ' (Deutsch fehlt)' : ' (DE + EN)')), 'g' => $t['g']];
+    foreach ($moves as $m) $queue[] = ['v' => 'c' . $m['id'], 'ok' => $m['ok'], 'due' => $m['due'], 'ico' => '🧘', 'k' => $m['k'], 'n' => $m['n'],
+        'x' => $m['for'] ? ' · für ' . $m['for'][0] . (count($m['for']) > 1 ? ' +' . (count($m['for']) - 1) : '') : '', 'g' => ''];
+    usort($queue, fn($a, $b) => [$a['due'] === '' ? '9' : $a['due'], $a['ico'], $a['n']] <=> [$b['due'] === '' ? '9' : $b['due'], $b['ico'], $b['n']]);
+    foreach ($queue as &$q) $q['l'] = ($q['due'] === '' ? 'ohne Datum' : (!$q['ok'] && $q['due'] < $today ? '⚠ überfällig · ' . $dShort($q['due']) : 'bis ' . $dShort($q['due'])))
+        . ' · ' . $q['ico'] . ' ' . $q['k'] . ' · ' . $q['n'] . ($q['g'] !== '' ? ' (' . $q['g'] . ')' : '') . $q['x'];
+    unset($q);
     $selC = (int)($_GET['c'] ?? 0);
     $lang = ($_GET['lang'] ?? '') === 'en' ? 'en' : 'de';
     $bunny = mv_bunny_ok();
 
-    render_page('Talking-Head-Studio', function () use ($self, $talks, $sel, $lang, $bunny, $moves, $selC) {
+    render_page('Talking-Head-Studio', function () use ($self, $talks, $sel, $lang, $bunny, $moves, $selC, $queue) {
         $h = 'forma_h'; ?>
 <style>
 body{background:#F2ECE4}
@@ -100,6 +127,12 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
 .subprev{margin-top:8px;border-radius:14px;overflow:hidden;background:#2E2529}
 .subprev canvas{display:block;width:100%}
 [hidden]{display:none!important}
+.what-i{flex-basis:100%;margin:2px 4px 0;font-size:18px;line-height:1.45;color:#4A3A41}.what-i b{font-weight:500}.what-i .late{color:#A0413B}.what-i small{display:block;font-size:16px;color:#7D7076}
+.what-i:empty{display:none}
+.seg-f{font-size:17px!important;padding:10px 16px;border-radius:999px;border:1.5px solid #7D5E68;background:#FBF5F7;color:#7D5E68!important;cursor:pointer;min-height:48px;display:inline-flex;align-items:center}
+#edWrap .ed-h{margin-bottom:12px}#edWrap h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:32px;color:#4A3A41;margin:0}
+body.editing .grid{display:none}
+.clip .cb .ed{border-color:#7D5E68;background:#7D5E68;color:#fff}
 </style>
 <?php mm_subnav('studio'); ?>
 <div class="sh"><div><h1>🎥 Talking-Head-Studio</h1>
@@ -109,19 +142,23 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
 <div class="pick">
   <label for="what">Was nimmst du auf?</label>
   <select id="what">
-    <option value="0">✍️ Eigener Text (z. B. Story, Reel)</option>
-    <?php $lastG = ''; foreach ($talks as $t): if ($t['g'] !== $lastG): if ($lastG !== '') echo '</optgroup>'; $lastG = $t['g']; ?><optgroup label="<?= $h($t['g']) ?>"><?php endif; ?>
-    <option value="<?= $t['id'] ?>"<?= $t['id'] === $sel ? ' selected' : '' ?>><?= $h($t['t']) ?><?= $t['vde'] && $t['ven'] ? ' ✓' : '' ?></option>
-    <?php endforeach; if ($lastG !== '') echo '</optgroup>'; ?>
-    <optgroup label="🧘 Flow &amp; Bewegungsvideo · Übung filmen (ohne Gesichtsfilter)">
-      <option value="m"<?= isset($_GET['move']) ? ' selected' : '' ?>>🧘 Bewegungs-Clip (frei, nur herunterladen)</option>
-      <?php foreach ($moves as $m): ?><option value="c<?= $m['id'] ?>"<?= $m['id'] === $selC ? ' selected' : '' ?>><?= $h($m['n']) ?><?= $m['ok'] ? ' ✓' : '' ?></option><?php endforeach; ?>
+    <option value="0">✍️ Eigener Text (z. B. Story, Reel) · Talking Head</option>
+    <option value="m"<?= isset($_GET['move']) ? ' selected' : '' ?>>🧘 Bewegungs-Clip frei (nur herunterladen)</option>
+    <?php $isSel = fn($q) => $q['v'] === (string)$sel || $q['v'] === 'c' . $selC;
+    foreach ([['📅 Als Nächstes dran · nach Datum', false], ['✓ Schon fertig (neu aufnehmen ersetzt es)', true]] as [$gl, $ok]): if (!array_filter($queue, fn($q) => $q['ok'] === $ok)) continue; ?>
+    <optgroup label="<?= $h($gl) ?>">
+      <?php foreach ($queue as $q): if ($q['ok'] !== $ok) continue; ?><option value="<?= $h($q['v']) ?>"<?= $isSel($q) ? ' selected' : '' ?>><?= $h($q['l']) ?></option><?php endforeach; ?>
     </optgroup>
+    <?php endforeach; ?>
   </select>
   <div class="seg" id="langSeg" role="group" aria-label="Sprache"><button type="button" data-lang="de" aria-pressed="<?= $lang === 'de' ? 'true' : 'false' ?>">Deutsch</button><button type="button" data-lang="en" aria-pressed="<?= $lang === 'en' ? 'true' : 'false' ?>">Englisch</button></div>
   <div class="seg" id="modeSeg" role="group" aria-label="Aufnahme-Art"><button type="button" data-mode="ganz">Am Stück</button><button type="button" data-mode="clips">Absatz für Absatz</button></div>
+  <label class="seg-f" title="Ein Video vom Handy oder Computer öffnen und bearbeiten">🎞 Video vom Gerät bearbeiten<input type="file" id="openF" accept="video/*" hidden></label>
   <span class="done-l" id="doneL"></span>
+  <p class="what-i" id="whatI"></p>
 </div>
+
+<div id="edWrap" hidden><div class="ed-h"><h2>✂️ Video bearbeiten</h2><p class="tip" id="edInfo"></p></div><div id="ed"></div></div>
 
 <div class="grid">
   <div class="view">
@@ -131,6 +168,7 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
       <button type="button" class="go" id="go">● Aufnahme starten</button>
       <button type="button" class="stop" id="stop" hidden>■ Stopp</button>
       <button type="button" class="up" id="up" hidden>⬆ In die Lektion hochladen</button>
+      <button type="button" class="next" id="edit" hidden>✂️ Bearbeiten · Licht, Ausschnitt, Musik</button>
       <a class="b" id="dl" hidden download>⬇ Herunterladen</a>
       <button type="button" class="sm" id="again" hidden>↺ Nochmal aufnehmen</button>
       <button type="button" class="go" id="cgo" hidden>● Absatz 1 aufnehmen</button>
@@ -178,6 +216,7 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
 </div>
 
 <script src="/wildhearts/assets/talkcam.js?v=2"></script>
+<script src="studio-edit.js?v=1"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
@@ -226,10 +265,21 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
     const lh=$('panel').closest('.box').querySelector('h2');lh.textContent=isMove?'☀️ Hintergrund & Licht':'✨ Kamera-Look';
     if(tc&&tc.profile!==profile())startCam();
     document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===lang)));
+    whatInfo();
     $('doneL').textContent=mv?(mv.ok?'✓ Diese Übung ist schon gefilmt (eine neue Aufnahme ersetzt den Clip überall)':'Nur Hintergrund weich und Licht, keine Gesichtsfilter.'):(mvFree?'Nur Hintergrund weich und Licht, keine Gesichtsfilter.':(cur?((lang==='de'?cur.vde:cur.ven)?'✓ '+(lang==='de'?'Deutsch':'Englisch')+' ist schon hochgeladen (eine neue Aufnahme ersetzt es)':''):''));
     const u=new URL(location.href);['l','c','move'].forEach(k=>u.searchParams.delete(k));if(cur)u.searchParams.set('l',cur.id);if(mv)u.searchParams.set('c',mv.id);if(mvFree)u.searchParams.set('move','1');u.searchParams.set('lang',lang);history.replaceState(null,'',u);
+    if(fromFile&&blob)tgt=mv?{clip:mv}:(cur?{t:cur,lang:lang}:null);
     setText();showAfter();clipUi();subPreview();}
   $('what').onchange=choose;
+  const WD=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],MO=['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  function dLong(d){if(!d)return '';const x=new Date(d+'T12:00:00');return WD[x.getDay()]+', '+x.getDate()+'. '+MO[x.getMonth()]+' '+x.getFullYear()}
+  function dueTxt(d,ok){if(!d)return 'noch kein Datum';const days=Math.round((new Date(d+'T12:00:00')-new Date(new Date().toDateString()+' 12:00'))/864e5);
+    return (!ok&&days<0?'<span class="late">⚠ überfällig, war fällig am ':'fertig bis ')+'<b>'+dLong(d)+'</b>'+(ok?'':days>1?' (in '+days+' Tagen)':days===1?' (morgen)':days===0?' (heute)':'')+(!ok&&days<0?'</span>':'')}
+  function whatInfo(){const el=$('whatI');
+    if(mv){el.innerHTML='🧘 <b>'+esc(mv.k)+'</b> · '+dueTxt(mv.due,mv.ok)+'<small>'+(mv.for.length?'Kommt vor in: '+esc(mv.for.join(', '))+'. ':'')+'Einmal filmen, der Clip steckt dann automatisch in allen diesen Videos. '+(/Flow/.test(mv.k)?'Ohne Sprechen filmen, die Stimme sprichst du beim Flow später extra ein.':'Ohne Sprechen filmen, Bewegungsvideos laufen nur mit Timer und Musik.')+'</small>';return}
+    if(mvFree){el.innerHTML='🧘 <b>Bewegungs-Clip frei</b><small>Nur Hintergrund weich und Licht. Wird nicht hochgeladen, nur heruntergeladen.</small>';return}
+    if(cur){const ok=cur.vde&&cur.ven;el.innerHTML='🗣 <b>'+esc(cur.k)+'</b> · '+esc(cur.g)+' · '+dueTxt(cur.due,ok)+'<small>Ein ganzes Video je Sprache mit Teleprompter. Deutsch '+(cur.vde?'✓ hochgeladen':'fehlt noch')+' · Englisch '+(cur.ven?'✓ hochgeladen':'fehlt noch')+'.</small>';return}
+    el.innerHTML='🗣 <b>Talking Head mit eigenem Text</b><small>Für Storys und Reels. Wird nicht hochgeladen, nur heruntergeladen.</small>';}
   document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;choose()});
 
   // ---- Kamera ----
@@ -257,7 +307,7 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
   // ---- Aufnahme ----
   const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
   function mime(){const ts=['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4;codecs=avc1,mp4a','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];return ts.find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||''}
-  function showAfter(){if(clipm){clipUi();return}const has=!!blob;if(tgt)$('up').textContent=tgt.clip?'⬆ Als Clip „'+tgt.clip.n+'“ hochladen':'⬆ In „'+tgt.t.t+'“ hochladen ('+(tgt.lang==='de'?'Deutsch':'Englisch')+')';$('go').hidden=has||(rec&&rec.state==='recording');$('again').hidden=!has;$('dl').hidden=!has;$('up').hidden=!has||!tgt||!BUNNY;
+  function showAfter(){if(clipm){clipUi();return}const has=!!blob;if(tgt)$('up').textContent=tgt.clip?'⬆ Als Clip „'+tgt.clip.n+'“ hochladen':'⬆ In „'+tgt.t.t+'“ hochladen ('+(tgt.lang==='de'?'Deutsch':'Englisch')+')';$('go').hidden=has||(rec&&rec.state==='recording');$('again').hidden=!has;$('dl').hidden=!has;$('edit').hidden=!has;$('up').hidden=!has||!tgt||!BUNNY;
     $('play').hidden=!has;$('stage').style.display=has?'none':'';}
   $('go').onclick=async()=>{
     if(!tc){$('msg').textContent='Die Kamera läuft noch nicht.';return}
@@ -274,7 +324,7 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
       $('rd').hidden=true;$('stop').hidden=true;run=false;showAfter();
       $('msg').className='msg';$('msg').textContent='Schau es dir kurz an. Passt es, '+(tgt&&BUNNY?'tippe auf „Hochladen“ oder lade es herunter.':'lade es herunter.');
       if(lock){lock.release().catch(()=>{});lock=null}};
-    tgt=mv?{clip:mv}:(cur?{t:cur,lang:lang}:null);rec.start(1000);t0=performance.now();$('stop').hidden=false;$('rd').hidden=false;
+    fromFile=false;tgt=mv?{clip:mv}:(cur?{t:cur,lang:lang}:null);rec.start(1000);t0=performance.now();$('stop').hidden=false;$('rd').hidden=false;
     if($('prAuto').checked&&!pr.hidden){run=true}
     try{lock=await navigator.wakeLock.request('screen')}catch(e){}
     (function loop(){if(!rec||rec.state!=='recording')return;$('rt').textContent=fmt((performance.now()-t0)/1000);tick=requestAnimationFrame(loop)})();
@@ -307,6 +357,26 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
       up.start()}).catch(()=>{$('msg').textContent='Das hat nicht geklappt. Bitte herunterladen und später hochladen.';$('up').disabled=false});
   };
 
+  // =================== Bearbeiten ===================
+  let edOpen=null,fromFile=false;
+  function editor(b,dur,info,done){
+    if(typeof StudioEdit==='undefined'){$('msg').textContent='Der Bearbeiten-Baustein konnte nicht laden. Bitte Seite neu laden (vorher herunterladen!).';return}
+    document.body.classList.add('editing');$('edWrap').hidden=false;$('edInfo').textContent=info||'';window.scrollTo({top:0,behavior:'smooth'});
+    const back=()=>{document.body.classList.remove('editing');$('edWrap').hidden=true;edOpen=null};
+    edOpen=StudioEdit.open({blob:b,dur:dur,mount:$('ed'),onDone:(nb,inf)=>{back();done(nb,inf)},onCancel:back});}
+  function setBlob(nb,suffix){blob=nb;saved=false;const url=URL.createObjectURL(nb);$('play').src=url;const ext=nb.type.includes('mp4')?'mp4':'webm';
+    $('dl').href=url;$('dl').download=String($('dl').download||'Video').replace(/(_bearbeitet)?\.\w+$/,'')+(suffix||'')+'.'+ext;$('prog').hidden=true;showAfter();}
+  $('edit').onclick=()=>{if(!blob)return;const d=$('play').duration;
+    editor(blob,isFinite(d)?d:0,tgt?(tgt.clip?'Übung „'+tgt.clip.n+'“':'„'+tgt.t.t+'“ · '+(tgt.lang==='de'?'Deutsch':'Englisch'))+'. Danach kannst du direkt hochladen.':'Danach herunterladen.',(nb,inf)=>{
+      setBlob(nb,'_bearbeitet');$('msg').className='msg ok';$('msg').textContent='✓ Bearbeitet ('+fmt(inf.dur)+(inf.music?', mit Musik':'')+'). Schau es dir an, dann '+(tgt&&BUNNY?'hochladen oder herunterladen.':'herunterladen.');});};
+  $('openF').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+    if(blob&&!saved&&!confirm('Die letzte Aufnahme ist noch nicht gespeichert. Trotzdem ein anderes Video öffnen?'))return;
+    if(clipm)setMode('ganz');fromFile=true;tgt=mv?{clip:mv}:(cur?{t:cur,lang:lang}:null);
+    $('dl').download=f.name.replace(/\.\w+$/,'')+'.mp4';setBlob(f,'');saved=true;
+    $('msg').className='msg';$('msg').textContent=tgt?'Das Video gehört dann zu: '+(tgt.clip?'Übung „'+tgt.clip.n+'“':'„'+tgt.t.t+'“ ('+(lang==='de'?'Deutsch':'Englisch')+')')+'. Oben bei „Was nimmst du auf?“ kannst du das noch ändern.':'';
+    $('edit').click();};
+  window.addEventListener('beforeunload',e=>{if(edOpen){e.preventDefault();e.returnValue=''}});
+
   // Vorschau bleibt beim Einstellen immer sichtbar (oben fixiert), am Handy kleiner
   function vh(){return matchMedia('(max-width:980px)').matches?36:66}
   addEventListener('resize',()=>{if(tc){tc.opts.maxVh=vh();tc.emit('layout')}});
@@ -326,7 +396,7 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
     slab.hidden=!P.length;slab.textContent='Absatz '+Math.min(i+1,P.length)+' von '+P.length;}
   function clipUi(){
     const P=paras(lang),n=P.length,recIng=!!(cs&&cs.rec);
-    ['go','stop','up','dl','again'].forEach(id=>{if(clipm)$(id).hidden=true});if(clipm){$('play').hidden=true;$('stage').style.display=''}
+    ['go','stop','up','dl','again','edit'].forEach(id=>{if(clipm)$(id).hidden=true});if(clipm){$('play').hidden=true;$('stage').style.display=''}
     $('cgo').hidden=!clipm||recIng;$('cnext').hidden=!clipm||!recIng;$('credo').hidden=!clipm||!recIng;$('cend').hidden=!clipm||!recIng;
     if(clipm&&!recIng){const first=clips.findIndex((c,i)=>i<n&&!c);const start=clips.length&&first<0&&clips.filter(Boolean).length>=n?-1:(first<0?Math.min(clips.length,n):first);
       $('cgo').dataset.start=Math.max(0,start);$('cgo').textContent=n?(start<0?'● Alles nochmal ab Absatz 1':'● Absatz '+(start+1)+' von '+n+' aufnehmen'):'● Aufnehmen';if(start<0)$('cgo').dataset.start=0;}
@@ -380,12 +450,18 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
         +'<div><b>Absatz '+(i+1)+(c?' · '+fmt(c.dur):'')+'</b><p>'+esc((c?c.text:P[i])||'')+'</p><div class="cb">'
         +(c?'<a href="'+c.url+'" download="'+esc(fileName(c))+'" data-saved="'+i+'">⬇ Laden</a>':'')
         +(c&&c.sub?'<a class="sub" href="'+c.sub.url+'" download="'+esc(fileName(c,c.sub.lang))+'" data-saved="'+i+'">⬇ mit Untertitel</a>':'')
+        +(c?'<button type="button" class="ed" data-edit="'+i+'">✂️ Bearbeiten</button>':'')
         +(c&&canShare([c.blob])?'<button type="button" data-share="'+i+'">📲 Sichern</button>':'')
         +'<button type="button" data-retake="'+i+'">'+(c?'↺ Neu aufnehmen':'● Aufnehmen')+'</button></div></div></div>';}
     box.innerHTML=h;const any=clips.some(Boolean);$('clAll').hidden=!any;$('shareAll').hidden=!any||!canShare(clips.filter(Boolean).map(c=>c.blob));$('zipSub').hidden=!clips.some(c=>c&&c.sub);
     box.querySelectorAll('[data-retake]').forEach(b=>b.onclick=()=>{if(cs&&cs.rec)return;startClip(+b.dataset.retake,true);window.scrollTo({top:0,behavior:'smooth'})});
     box.querySelectorAll('[data-saved]').forEach(a=>a.addEventListener('click',()=>{const c=clips[+a.dataset.saved];if(c)c.saved=true}));
-    box.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>shareFiles([clips[+b.dataset.share]]));}
+    box.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>shareFiles([clips[+b.dataset.share]]));
+    box.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{const c=clips[+b.dataset.edit];if(!c||(cs&&cs.rec))return;
+      editor(c.blob,c.dur,'Absatz '+(c.i+1)+': Licht, Ausschnitt, Musik. Danach ersetzt die bearbeitete Fassung den Clip.',(nb,inf)=>{
+        URL.revokeObjectURL(c.url);if(c.sub){URL.revokeObjectURL(c.sub.url);c.sub=null}
+        c.blob=nb;c.url=URL.createObjectURL(nb);c.ext=nb.type.includes('mp4')?'mp4':'webm';c.s=Math.max(0,c.s-inf.a);c.e=Math.max(c.s+.3,Math.min(inf.dur,c.e-inf.a));c.dur=inf.dur;c.saved=false;
+        renderClips();clipUi();$('msg').className='msg ok';$('msg').textContent='✓ Absatz '+(c.i+1)+' ist bearbeitet.'+(clips.some(x=>x&&x.sub===null)&&!$('subBox').hidden?' Untertitel bei Bedarf neu erstellen.':'');});});}
   function asFile(c,sub){const b=sub?c.sub.blob:c.blob;return new File([b],fileName(c,sub?c.sub.lang:''),{type:b.type})}
   function canShare(blobs){try{return !!(navigator.canShare&&navigator.canShare({files:blobs.map((b,i)=>new File([b],'c'+i+'.mp4',{type:b.type}))}))}catch(e){return false}}
   async function shareFiles(list){const files=list.map(c=>asFile(c,!!c.sub));try{await navigator.share({files:files});list.forEach(c=>c.saved=true)}catch(e){}}
@@ -427,7 +503,7 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
   function subPreview(){const cv=$('subPrev');if(!cv||!tc)return;const W=tc.canvas.width||1280,H=tc.canvas.height||720,k=Math.min(1,640/Math.max(W,H));
     cv.width=Math.round(W*k);cv.height=Math.round(H*k);const g=cv.getContext('2d');g.fillStyle='#6B5658';g.fillRect(0,0,cv.width,cv.height);
     try{g.drawImage(tc.canvas,0,0,cv.width,cv.height)}catch(e){}
-    const t=clean(subText(0)||(subLang==='en'?'This is how your subtitles will look.':'So sehen deine Untertitel aus.'));
+    const t=clean(subText(0))||(subLang==='en'?'This is how your subtitles will look.':'So sehen deine Untertitel aus.');
     fontReady.then(()=>drawCue(g,cv.width,cv.height,cues(t,0,1,port()?24:38)[0].t));
     const a=paras(lang).length,b=paras(subLang).length;
     $('subHint').textContent=subLang!==lang&&a!==b?'Achtung: Der '+(subLang==='en'?'englische':'deutsche')+' Text hat '+b+' Absätze, aufgenommen sind '+a+'. Bitte die Absätze gleich aufteilen (oben bei '+(subLang==='en'?'Englisch':'Deutsch')+').':(subLang!==lang?'Die Untertitel nehmen den Absatz mit derselben Nummer aus dem '+(subLang==='en'?'englischen':'deutschen')+' Text.':'');}
