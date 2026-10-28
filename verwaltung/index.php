@@ -243,7 +243,7 @@ if ($action === 'logout') {
 }
 
 // Movecia Movement / Wild Hearts: eigener Bereich (verwaltung/movecia.php)
-if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 'natal' || $view === 'method' || $view === 'texte' || $view === 'presse' || $view === 'vorschau' || $view === 'videos' || $view === 'mediathek' || $view === 'studio' || $view === 'training') {
+if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 'natal' || $view === 'method' || $view === 'texte' || $view === 'presse' || $view === 'vorschau' || $view === 'videos' || $view === 'mediathek' || $view === 'studio' || $view === 'insta' || $view === 'training') {
     require __DIR__ . '/movecia.php';
 }
 // Wintersaison 2026/27: Hotel-Flyer + Buchungsseiten (FORMA ?view=winter, Movecia ?view=winter_mm)
@@ -2741,7 +2741,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 </head>
 <body>
 <main>
-<?php $swSelf = strtok($_SERVER['REQUEST_URI'] ?? '/verwaltung/', '?') ?: '/verwaltung/'; $swMm = in_array((string)($GLOBALS['view'] ?? ''), ['movecia', 'natal', 'method', 'texte', 'presse', 'vorschau', 'videos', 'mediathek', 'studio'], true); $swReq = 0; if (isset($GLOBALS['pdo'])) { try { $swReq = (int)$GLOBALS['pdo']->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} } ?>
+<?php $swSelf = strtok($_SERVER['REQUEST_URI'] ?? '/verwaltung/', '?') ?: '/verwaltung/'; $swMm = in_array((string)($GLOBALS['view'] ?? ''), ['movecia', 'natal', 'method', 'texte', 'presse', 'vorschau', 'videos', 'mediathek', 'studio', 'insta'], true); $swReq = 0; if (isset($GLOBALS['pdo'])) { try { $swReq = (int)$GLOBALS['pdo']->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} } ?>
 <header class="head"><nav class="sw" aria-label="Bereich wechseln"><a class="sw-f<?= $swMm ? '' : ' on' ?>" href="<?= forma_h($swSelf) ?>"<?= $swMm ? '' : ' aria-current="page"' ?>><span class="sw-ic"><img src="/img/forma-logo.png" alt=""></span><span class="sw-t"><b>FORMA</b><small>🏺 Atelierverwaltung</small></span></a><a class="sw-m<?= $swMm ? ' on' : '' ?>" href="<?= forma_h($swSelf) ?>?view=movecia"<?= $swMm ? ' aria-current="page"' : '' ?>><span class="sw-ic"><img src="/img/movecia/movecia-zeichen.svg" alt=""></span><span class="sw-t"><b>Movecia</b><small>🌿 Studioverwaltung</small></span><?php if ($swReq): ?><i class="sw-badge" title="Terminanfragen"><?= $swReq ?></i><?php endif; ?></a></nav><span class="head-deco"><span class="deco-slot"></span><span class="deco-slot"></span><span class="deco-slot"></span></span></header>
 <?php $body(); ?>
 </main>

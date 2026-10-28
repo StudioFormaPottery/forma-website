@@ -52,8 +52,15 @@ if ($view === 'studio') {
     $selC = (int)($_GET['c'] ?? 0);
     $lang = ($_GET['lang'] ?? '') === 'en' ? 'en' : 'de';
     $bunny = mv_bunny_ok();
+    // Instagram täglich (Storys & Reels, ?view=insta): alles ab gestern, was noch nicht gepostet ist
+    ig_schema($pdo);
+    $igs = [];
+    $s = $pdo->prepare("SELECT * FROM mm_insta WHERE day >= ? AND status <> 'gepostet' ORDER BY day, kind DESC, id LIMIT 90"); $s->execute([date('Y-m-d', strtotime('-1 day'))]);
+    foreach ($s->fetchAll() as $r) $igs[] = ['id' => (int)$r['id'], 'day' => $r['day'], 'kind' => $r['kind'], 'acc' => IG_ACC[$r['acc']] ?? 'Privat', 't' => ig_title($r),
+        'text' => (string)$r['text'], 'music' => (string)$r['music'], 'has' => $r['file'] !== '', 'l' => ig_wd($r['day']) . ' · ' . ($r['kind'] === 'reel' ? '🎬 Reel' : '⭕ Story') . ' · ' . ig_title($r) . ($r['file'] !== '' ? ' ✓' : '')];
+    $selI = (int)($_GET['ig'] ?? 0);
 
-    render_page('Talking-Head-Studio', function () use ($self, $talks, $sel, $lang, $bunny, $moves, $selC, $queue) {
+    render_page('Talking-Head-Studio', function () use ($self, $talks, $sel, $lang, $bunny, $moves, $selC, $queue, $igs, $selI) {
         $h = 'forma_h'; ?>
 <style>
 body{background:#F2ECE4}
@@ -144,6 +151,9 @@ body.editing .grid{display:none}
   <select id="what">
     <option value="0">✍️ Eigener Text (z. B. Story, Reel) · Talking Head</option>
     <option value="m"<?= isset($_GET['move']) ? ' selected' : '' ?>>🧘 Bewegungs-Clip frei (nur herunterladen)</option>
+    <?php if ($igs): ?><optgroup label="📱 Instagram täglich · Storys &amp; Reels">
+      <?php foreach ($igs as $g): ?><option value="i<?= $g['id'] ?>"<?= $g['id'] === $selI ? ' selected' : '' ?>><?= $h($g['l']) ?></option><?php endforeach; ?>
+    </optgroup><?php endif; ?>
     <?php $isSel = fn($q) => $q['v'] === (string)$sel || $q['v'] === 'c' . $selC;
     foreach ([['📅 Als Nächstes dran · nach Datum', false], ['✓ Schon fertig (neu aufnehmen ersetzt es)', true]] as [$gl, $ok]): if (!array_filter($queue, fn($q) => $q['ok'] === $ok)) continue; ?>
     <optgroup label="<?= $h($gl) ?>">
@@ -223,6 +233,7 @@ body.editing .grid{display:none}
 (function(){
   const MOVES=<?= json_encode($moves, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
   let mv=null, mvFree=false;
+  const IGS=<?= json_encode($igs, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;let ig=null;
   const TALKS=<?= json_encode(array_values($talks), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
   const csrf=<?= json_encode(csrf()) ?>, BUNNY=<?= $bunny ? 'true' : 'false' ?>;
   const $=id=>document.getElementById(id), esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -257,8 +268,10 @@ body.editing .grid{display:none}
   // ---- Auswahl ----
   const profile=()=>(mv||mvFree)?'move':'talk';
   function choose(){const val=$('what').value;mv=val[0]==='c'?(MOVES.find(m=>m.id===+val.slice(1))||null):null;mvFree=val==='m';
-    const id=+val;cur=(mv||mvFree)?null:(TALKS.find(t=>t.id===id)||null);$('own').hidden=!!cur;$('ownT').value=ownOf(lang);
-    const isMove=!!(mv||mvFree);$('prBox').hidden=isMove;$('langSeg').hidden=isMove;$('modeSeg').hidden=isMove;pr.hidden=isMove||$('prOn').getAttribute('aria-pressed')==='false';
+    const wasIg=!!ig;ig=val[0]==='i'?(IGS.find(x=>x.id===+val.slice(1))||null):null;
+    const id=+val;cur=(mv||mvFree)?null:(ig?{ig:ig,id:'i'+ig.id,t:ig.l,de:ig.text,en:ig.text,vde:ig.has,ven:ig.has,g:'Instagram',k:ig.kind==='reel'?'Reel':'Story',due:ig.day}:(TALKS.find(t=>t.id===id)||null));$('own').hidden=!!cur;$('ownT').value=ownOf(lang);
+    const isMove=!!(mv||mvFree);$('prBox').hidden=isMove;$('langSeg').hidden=isMove||!!ig;
+    if(tc&&!isMove&&ig!==null!==wasIg){tc.set({aspect:ig?'9:16':'16:9'});TalkCam.panel(tc,$('panel'))}$('modeSeg').hidden=isMove;pr.hidden=isMove||$('prOn').getAttribute('aria-pressed')==='false';
     if(isMove&&clipm)setMode('ganz');
     document.querySelector('.sh h1').textContent=isMove?'🧘 Studio · Übung filmen':'🎥 Talking-Head-Studio';
     const sp=document.querySelector('.sh p');if(!sp.dataset.t)sp.dataset.t=sp.textContent;sp.textContent=isMove?'Für Flows und Bewegungsvideos: Kamera aufstellen, Raster nutzen, aufnehmen. Hier gibt es nur Hintergrund weich und Belichtung, keine Gesichtsfilter.':sp.dataset.t;
@@ -266,9 +279,9 @@ body.editing .grid{display:none}
     if(tc&&tc.profile!==profile())startCam();
     document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===lang)));
     whatInfo();
-    $('doneL').textContent=mv?(mv.ok?'✓ Diese Übung ist schon gefilmt (eine neue Aufnahme ersetzt den Clip überall)':'Nur Hintergrund weich und Licht, keine Gesichtsfilter.'):(mvFree?'Nur Hintergrund weich und Licht, keine Gesichtsfilter.':(cur?((lang==='de'?cur.vde:cur.ven)?'✓ '+(lang==='de'?'Deutsch':'Englisch')+' ist schon hochgeladen (eine neue Aufnahme ersetzt es)':''):''));
-    const u=new URL(location.href);['l','c','move'].forEach(k=>u.searchParams.delete(k));if(cur)u.searchParams.set('l',cur.id);if(mv)u.searchParams.set('c',mv.id);if(mvFree)u.searchParams.set('move','1');u.searchParams.set('lang',lang);history.replaceState(null,'',u);
-    if(fromFile&&blob)tgt=mv?{clip:mv}:(cur?{t:cur,lang:lang}:null);
+    $('doneL').textContent=ig?(ig.has?'✓ Schon aufgenommen (eine neue Aufnahme ersetzt es)':''):mv?(mv.ok?'✓ Diese Übung ist schon gefilmt (eine neue Aufnahme ersetzt den Clip überall)':'Nur Hintergrund weich und Licht, keine Gesichtsfilter.'):(mvFree?'Nur Hintergrund weich und Licht, keine Gesichtsfilter.':(cur?((lang==='de'?cur.vde:cur.ven)?'✓ '+(lang==='de'?'Deutsch':'Englisch')+' ist schon hochgeladen (eine neue Aufnahme ersetzt es)':''):''));
+    const u=new URL(location.href);['l','c','move','ig'].forEach(k=>u.searchParams.delete(k));if(ig)u.searchParams.set('ig',ig.id);else if(cur)u.searchParams.set('l',cur.id);if(mv)u.searchParams.set('c',mv.id);if(mvFree)u.searchParams.set('move','1');u.searchParams.set('lang',lang);history.replaceState(null,'',u);
+    if(fromFile&&blob)tgt=mv?{clip:mv}:(ig?{ig:ig}:(cur?{t:cur,lang:lang}:null));
     setText();showAfter();clipUi();subPreview();}
   $('what').onchange=choose;
   const WD=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],MO=['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
@@ -278,6 +291,7 @@ body.editing .grid{display:none}
   function whatInfo(){const el=$('whatI');
     if(mv){el.innerHTML='🧘 <b>'+esc(mv.k)+'</b> · '+dueTxt(mv.due,mv.ok)+'<small>'+(mv.for.length?'Kommt vor in: '+esc(mv.for.join(', '))+'. ':'')+'Einmal filmen, der Clip steckt dann automatisch in allen diesen Videos. '+(/Flow/.test(mv.k)?'Ohne Sprechen filmen, die Stimme sprichst du beim Flow später extra ein.':'Ohne Sprechen filmen, Bewegungsvideos laufen nur mit Timer und Musik.')+'</small>';return}
     if(mvFree){el.innerHTML='🧘 <b>Bewegungs-Clip frei</b><small>Nur Hintergrund weich und Licht. Wird nicht hochgeladen, nur heruntergeladen.</small>';return}
+    if(ig){el.innerHTML='📱 <b>'+(ig.kind==='reel'?'🎬 Reel':'⭕ Story')+' für Instagram</b> · '+esc(ig.acc)+' · posten am <b>'+dLong(ig.day)+'</b>'+(ig.music?'<small>🎵 Musik: '+esc(ig.music)+' (in Instagram dazu wählen, oder unter „Bearbeiten“ eine eigene Datei darunterlegen)</small>':'<small>Hochformat 9:16. Nach der Aufnahme auf „💾 Speichern“ tippen, dann am Tag unter „Instagram täglich“ nur noch teilen.</small>');return}
     if(cur){const ok=cur.vde&&cur.ven;el.innerHTML='🗣 <b>'+esc(cur.k)+'</b> · '+esc(cur.g)+' · '+dueTxt(cur.due,ok)+'<small>Ein ganzes Video je Sprache mit Teleprompter. Deutsch '+(cur.vde?'✓ hochgeladen':'fehlt noch')+' · Englisch '+(cur.ven?'✓ hochgeladen':'fehlt noch')+'.</small>';return}
     el.innerHTML='🗣 <b>Talking Head mit eigenem Text</b><small>Für Storys und Reels. Wird nicht hochgeladen, nur heruntergeladen.</small>';}
   document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;choose()});
@@ -295,6 +309,7 @@ body.editing .grid{display:none}
     const rd=document.createElement('div');rd.className='recdot';rd.id='rd';rd.hidden=true;rd.innerHTML='<i></i><span id="rt">0:00</span>';$('stage').appendChild(rd);
     $('stage').appendChild(slab);
     tc.on(t=>{if(t==='layout')subPreview()});
+    if(ig&&tc.s&&tc.s.aspect!=='9:16'){tc.set({aspect:'9:16'})}
     TalkCam.panel(tc,$('panel'));
     devices();
   }
@@ -307,7 +322,7 @@ body.editing .grid{display:none}
   // ---- Aufnahme ----
   const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
   function mime(){const ts=['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4;codecs=avc1,mp4a','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];return ts.find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||''}
-  function showAfter(){if(clipm){clipUi();return}const has=!!blob;if(tgt)$('up').textContent=tgt.clip?'⬆ Als Clip „'+tgt.clip.n+'“ hochladen':'⬆ In „'+tgt.t.t+'“ hochladen ('+(tgt.lang==='de'?'Deutsch':'Englisch')+')';$('go').hidden=has||(rec&&rec.state==='recording');$('again').hidden=!has;$('dl').hidden=!has;$('edit').hidden=!has;$('up').hidden=!has||!tgt||!BUNNY;
+  function showAfter(){if(clipm){clipUi();return}const has=!!blob;if(tgt)$('up').textContent=tgt.ig?'💾 Für '+tgt.ig.l.split(' · ')[0]+' speichern ('+(tgt.ig.kind==='reel'?'Reel':'Story')+')':tgt.clip?'⬆ Als Clip „'+tgt.clip.n+'“ hochladen':'⬆ In „'+tgt.t.t+'“ hochladen ('+(tgt.lang==='de'?'Deutsch':'Englisch')+')';$('go').hidden=has||(rec&&rec.state==='recording');$('again').hidden=!has;$('dl').hidden=!has;$('edit').hidden=!has;$('up').hidden=!has||!tgt||(!BUNNY&&!tgt.ig);
     $('play').hidden=!has;$('stage').style.display=has?'none':'';}
   $('go').onclick=async()=>{
     if(!tc){$('msg').textContent='Die Kamera läuft noch nicht.';return}
@@ -320,11 +335,11 @@ body.editing .grid{display:none}
     rec.onstop=()=>{blob=new Blob(chunks,{type:(rec.mimeType||mt||'video/webm').split(';')[0]});saved=false;
       const url=URL.createObjectURL(blob);$('play').src=url;const ext=blob.type.includes('mp4')?'mp4':'webm';
       const d=new Date(),stamp=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+'-'+String(d.getMinutes()).padStart(2,'0');
-      $('dl').href=url;$('dl').download=(tgt&&tgt.clip?'Uebung_'+tgt.clip.n+'_'+stamp:(mvFree?'Bewegung_'+stamp:'TalkingHead_'+(tgt?tgt.t.t:'Eigener-Text')+'_'+(tgt?tgt.lang:lang).toUpperCase()+'_'+stamp)).replace(/[^\wäöüÄÖÜß-]+/g,'-')+'.'+ext;
+      $('dl').href=url;$('dl').download=(tgt&&tgt.ig?tgt.ig.day+'_'+(tgt.ig.kind==='reel'?'Reel':'Story')+'_'+tgt.ig.t.slice(0,30):tgt&&tgt.clip?'Uebung_'+tgt.clip.n+'_'+stamp:(mvFree?'Bewegung_'+stamp:'TalkingHead_'+(tgt?tgt.t.t:'Eigener-Text')+'_'+(tgt?tgt.lang:lang).toUpperCase()+'_'+stamp)).replace(/[^\wäöüÄÖÜß-]+/g,'-')+'.'+ext;
       $('rd').hidden=true;$('stop').hidden=true;run=false;showAfter();
       $('msg').className='msg';$('msg').textContent='Schau es dir kurz an. Passt es, '+(tgt&&BUNNY?'tippe auf „Hochladen“ oder lade es herunter.':'lade es herunter.');
       if(lock){lock.release().catch(()=>{});lock=null}};
-    fromFile=false;tgt=mv?{clip:mv}:(cur?{t:cur,lang:lang}:null);rec.start(1000);t0=performance.now();$('stop').hidden=false;$('rd').hidden=false;
+    fromFile=false;tgt=mv?{clip:mv}:(ig?{ig:ig}:(cur?{t:cur,lang:lang}:null));rec.start(1000);t0=performance.now();$('stop').hidden=false;$('rd').hidden=false;
     if($('prAuto').checked&&!pr.hidden){run=true}
     try{lock=await navigator.wakeLock.request('screen')}catch(e){}
     (function loop(){if(!rec||rec.state!=='recording')return;$('rt').textContent=fmt((performance.now()-t0)/1000);tick=requestAnimationFrame(loop)})();
@@ -334,7 +349,8 @@ body.editing .grid{display:none}
   $('dl').addEventListener('click',()=>{saved=true});
   window.addEventListener('beforeunload',e=>{if(blob&&!saved){e.preventDefault();e.returnValue=''}});
   $('up').onclick=()=>{
-    if(!blob||!tgt)return;if(typeof tus==='undefined'){$('msg').textContent='Der Upload konnte nicht laden. Bitte Seite neu laden (vorher herunterladen!).';return}
+    if(!blob||!tgt)return;if(typeof tus==='undefined'&&!tgt.ig){$('msg').textContent='Der Upload konnte nicht laden. Bitte Seite neu laden (vorher herunterladen!).';return}
+    if(tgt.ig){igSave(tgt.ig);return}
     $('up').disabled=true;$('msg').className='msg';$('msg').textContent='Wird vorbereitet …';
     if(tgt.clip){const C=tgt.clip,fill2=$('prog').querySelector('i');
       post('mm_mv_clip_new',{c:C.id}).then(j=>{if(j.error){$('msg').textContent=j.error;$('up').disabled=false;return}
@@ -367,15 +383,29 @@ body.editing .grid{display:none}
   function setBlob(nb,suffix){blob=nb;saved=false;const url=URL.createObjectURL(nb);$('play').src=url;const ext=nb.type.includes('mp4')?'mp4':'webm';
     $('dl').href=url;$('dl').download=String($('dl').download||'Video').replace(/(_bearbeitet)?\.\w+$/,'')+(suffix||'')+'.'+ext;$('prog').hidden=true;showAfter();}
   $('edit').onclick=()=>{if(!blob)return;const d=$('play').duration;
-    editor(blob,isFinite(d)?d:0,tgt?(tgt.clip?'Übung „'+tgt.clip.n+'“':'„'+tgt.t.t+'“ · '+(tgt.lang==='de'?'Deutsch':'Englisch'))+'. Danach kannst du direkt hochladen.':'Danach herunterladen.',(nb,inf)=>{
+    editor(blob,isFinite(d)?d:0,tgt?(tgt.ig?'Instagram '+(tgt.ig.kind==='reel'?'Reel':'Story')+' für '+tgt.ig.l.split(' · ')[0]+'. Tipp: Format „Hoch 9:16“.':tgt.clip?'Übung „'+tgt.clip.n+'“':'„'+tgt.t.t+'“ · '+(tgt.lang==='de'?'Deutsch':'Englisch'))+'. Danach kannst du direkt hochladen.':'Danach herunterladen.',(nb,inf)=>{
       setBlob(nb,'_bearbeitet');$('msg').className='msg ok';$('msg').textContent='✓ Bearbeitet ('+fmt(inf.dur)+(inf.music?', mit Musik':'')+'). Schau es dir an, dann '+(tgt&&BUNNY?'hochladen oder herunterladen.':'herunterladen.');});};
   $('openF').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
     if(blob&&!saved&&!confirm('Die letzte Aufnahme ist noch nicht gespeichert. Trotzdem ein anderes Video öffnen?'))return;
-    if(clipm)setMode('ganz');fromFile=true;tgt=mv?{clip:mv}:(cur?{t:cur,lang:lang}:null);
+    if(clipm)setMode('ganz');fromFile=true;tgt=mv?{clip:mv}:(ig?{ig:ig}:(cur?{t:cur,lang:lang}:null));
     $('dl').download=f.name.replace(/\.\w+$/,'')+'.mp4';setBlob(f,'');saved=true;
-    $('msg').className='msg';$('msg').textContent=tgt?'Das Video gehört dann zu: '+(tgt.clip?'Übung „'+tgt.clip.n+'“':'„'+tgt.t.t+'“ ('+(lang==='de'?'Deutsch':'Englisch')+')')+'. Oben bei „Was nimmst du auf?“ kannst du das noch ändern.':'';
+    $('msg').className='msg';$('msg').textContent=tgt?'Das Video gehört dann zu: '+(tgt.ig?'Instagram '+tgt.ig.l:tgt.clip?'Übung „'+tgt.clip.n+'“':'„'+tgt.t.t+'“ ('+(lang==='de'?'Deutsch':'Englisch')+')')+'. Oben bei „Was nimmst du auf?“ kannst du das noch ändern.':'';
     $('edit').click();};
   window.addEventListener('beforeunload',e=>{if(edOpen){e.preventDefault();e.returnValue=''}});
+
+  // Instagram: Video in 8-MB-Stücken auf den eigenen Server, am Tag dann unter „Instagram täglich“ teilen
+  async function igSave(G){const b=blob,CH=8*1024*1024,n=Math.max(1,Math.ceil(b.size/CH)),fill=$('prog').querySelector('i'),ext=b.type.includes('webm')?'webm':'mp4';
+    $('up').disabled=true;$('prog').hidden=false;$('msg').className='msg';
+    try{for(let i=0;i<n;i++){const f=new FormData();f.append('csrf',csrf);f.append('action','mm_ig_up');f.append('id',G.id);f.append('n',i);f.append('ext',ext);if(i===n-1)f.append('last','1');
+        f.append('b',b.slice(i*CH,(i+1)*CH),'teil');
+        let j=null;for(let t=0;t<3&&!j;t++){try{j=await fetch(location.pathname,{method:'POST',body:f,credentials:'same-origin'}).then(r=>r.json())}catch(e){await new Promise(r=>setTimeout(r,2000))}}
+        if(!j||j.error)throw new Error(j?j.error:'Netz');
+        fill.style.width=Math.round((i+1)/n*100)+'%';$('msg').textContent='Wird gespeichert … '+Math.round((i+1)/n*100)+' %';}
+      saved=true;G.has=true;$('up').hidden=true;$('prog').hidden=true;$('msg').className='msg ok';
+      $('msg').innerHTML='✓ Gespeichert für '+esc(G.l.split(' · ')[0])+' Am Tag selbst unter <a href="?view=insta#e'+G.id+'">📱 Instagram täglich</a> auf „Teilen“ tippen. Nächsten Tag oben auswählen.';
+      const o=document.querySelector('#what option[value="i'+G.id+'"]');if(o&&!/✓$/.test(o.textContent))o.textContent+=' ✓';}
+    catch(e){$('msg').textContent='Speichern hat nicht geklappt'+(e.message&&e.message!=='Netz'?' ('+e.message+')':'')+'. Bitte nochmal tippen oder herunterladen.';}
+    $('up').disabled=false;}
 
   // Vorschau bleibt beim Einstellen immer sichtbar (oben fixiert), am Handy kleiner
   function vh(){return matchMedia('(max-width:980px)').matches?36:66}
