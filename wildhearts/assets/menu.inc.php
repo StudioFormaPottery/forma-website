@@ -72,6 +72,11 @@ html:not([data-l=en]):not([lang=en]) .mvm .en,html:not([data-l=en]):not([lang=en
 .mvm-brand{display:flex;align-items:center;gap:.5rem;font-family:"Cormorant",Georgia,serif;font-size:1.75rem;color:#2E2529;text-decoration:none;line-height:1}
 .mvm-brand i{display:inline-block;width:.3em;height:.3em;border-radius:50%;background:#7D5E68;margin-left:.04em}
 .mvm-x{display:grid;place-items:center;width:44px;height:44px;border:1px solid #DDD2C6;background:#FBF8F4;color:#2E2529;border-radius:999px;cursor:pointer;padding:0}
+/* Menüknopf in der Kieselform des Movecia-Logos (Vivien, 28.10.2026, Vorbild: Hotel mit Logo-Form um die drei Striche) */
+.mvm-btn,.mvm-x{width:50px;height:50px;flex:0 0 50px;border:0!important;border-radius:0!important;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='17 14 94 94'%3E%3Cpath d='M56 32 C 76 29, 92 44, 91 64 C 90 84, 72 96, 53 92 C 34 88, 25 72, 29 53 C 32 40, 43 33, 56 32 Z' fill='%23E8D6CA' transform='translate%28-2 0%29'/%3E%3Cpath d='M44 30 C 62 20, 90 28, 98 50 C 104 68, 92 78, 84 88 C 76 100, 50 98, 36 88 C 22 78, 22 58, 28 46 C 32 38, 38 33, 44 30 Z' fill='none' stroke='%237D5E68' stroke-width='2.6' stroke-linejoin='round' transform='translate%283 2%29 translate%2863 60%29 scale%280.85%29 translate%28-63 -60%29'/%3E%3C/svg%3E") center/100% 100% no-repeat!important;color:#4A3A41!important;transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
+.mvm-btn:hover,.mvm-x:hover{transform:rotate(-8deg) scale(1.05)}
+.mvm-btn svg,.mvm-x svg{translate:1px 1px}
+
 .mvm-list{display:flex;flex-direction:column;margin-top:6px}
 .mvm-list a{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:1rem;padding:15px 4px;border-bottom:1px solid #DDD2C6;color:#2E2529;text-decoration:none}
 .mvm-list b{font-family:"Cormorant",Georgia,serif;font-weight:500;font-size:1.85rem;line-height:1.1}
