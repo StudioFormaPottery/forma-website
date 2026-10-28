@@ -102,7 +102,7 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 #stage{position:relative}
 .pr{position:absolute;left:0;right:0;top:0;height:36%;overflow:hidden;background:linear-gradient(rgba(46,37,41,.72),rgba(46,37,41,.55) 80%,rgba(46,37,41,0));color:#FBF5F7;z-index:3;pointer-events:auto;cursor:pointer;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
 .pr[hidden]{display:none}
-.pr-t{padding:14px 6% 60%;white-space:pre-wrap;font:400 var(--fs,30px)/1.45 "Hanken Grotesk","Outfit",system-ui,sans-serif;text-align:center}
+.pr-t{will-change:transform;backface-visibility:hidden;padding:14px 6% 60%;white-space:pre-wrap;font:400 var(--fs,30px)/1.45 "Hanken Grotesk","Outfit",system-ui,sans-serif;text-align:center}
 .pr-t .hint{color:#C9B7BD;font-size:.6em}
 .cd{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:500 min(30vw,180px)/1 "Cormorant Garamond",Georgia,serif;color:#fff;text-shadow:0 2px 30px rgba(0,0,0,.5);z-index:5;pointer-events:none}
 .cd:empty{display:none}
@@ -411,7 +411,14 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   const pr=document.createElement('div');pr.className='pr';pr.innerHTML='<div class="pr-t" id="prT"></div>';
   const slab=document.createElement('div');slab.className='slab';slab.hidden=true;
   // Am iPhone geht ein Bruchteil-Pixel beim Scrollen verloren (scrollTop wird abgerundet) → eigener Zähler (Vivien, 28.10.2026: Teleprompter lief am Handy nicht)
-  let prPos=0;function prMove(d,reset){prPos=reset?0:Math.max(0,Math.min(prPos+d,pr.scrollHeight-pr.clientHeight));pr.scrollTop=prPos}
+  // Weich gleitend statt in ganzen Pixel-Sprüngen (Vivien, 28.10.2026: Text ruckelte am Handy und MacBook): Verschiebung per GPU-transform mit Kommastellen
+  let prPos=0;const prT=()=>pr.querySelector('.pr-t');const prMax=()=>Math.max(0,(prT()?prT().offsetHeight:0)-pr.clientHeight*.6);
+  // Der Lauf selbst ist eine CSS-Animation (läuft auf der Grafikkarte weiter, auch wenn die Kamera-Filter viel rechnen)
+  function prSet(){const t=prT();if(!t)return;t.style.transition='none';t.style.transform='translate3d(0,'+(-prPos).toFixed(2)+'px,0)';void t.offsetHeight}
+  function prPlay(){const t=prT();if(!t)return;const max=prMax(),rem=max-prPos;if(rem<=0.5)return;t.style.transition='transform '+(rem/Math.max(5,sp)).toFixed(2)+'s linear';t.style.transform='translate3d(0,'+(-max).toFixed(2)+'px,0)'}
+  function prNow(){const t=prT();if(!t)return prPos;const m=getComputedStyle(t).transform;if(!m||m==='none')return 0;const v=m.match(/matrix(3d)?\(([^)]+)\)/);if(!v)return prPos;const a=v[2].split(',').map(Number);return -(v[1]?a[13]:a[5])}
+  function prPause(){prPos=Math.max(0,prNow());prSet()}
+  function prMove(d,reset){if(run)prPos=prNow();prPos=reset?0:Math.max(0,Math.min(prPos+d,prMax()));pr.scrollTop=0;prSet();if(run)prPlay()}
   let sp=+ls.get('st-sp',40), fs=+ls.get('st-fs',innerWidth<700?20:30), run=false, last=0;
   pr.style.setProperty('--fs',fs+'px');
   function textHtml(t){return esc(t||'').replace(/\[([^\]]+)\]/g,'<span class="hint">[$1]</span>')}
@@ -419,7 +426,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   function paras(lg){return String(textOf(lg)||'').split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean)}
   function setText(){if(clipm){showSlide();return}const t=cur?(lang==='en'?cur.en:cur.de):$('ownT').value;
     pr.querySelector('.pr-t').innerHTML=t.trim()?textHtml(t):'<span class="hint">'+(cur?'Für diese Lektion gibt es noch keinen '+(lang==='en'?'englischen':'deutschen')+' Text.':'Füge deinen Text beim Teleprompter ein.')+'</span>';prMove(0,true);}
-  function prLoop(ts){if(run){prMove(sp*Math.min(100,ts-last)/1000)}last=ts;requestAnimationFrame(prLoop)}requestAnimationFrame(prLoop);
+  let prWas=false,prSp=sp;function prLoop(){if(run!==prWas){prWas=run;run?prPlay():prPause()}else if(run&&sp!==prSp){prPause();prPlay()}prSp=sp;requestAnimationFrame(prLoop)}requestAnimationFrame(prLoop);
   function toggle(){run=!run}
   pr.addEventListener('click',toggle);
   document.addEventListener('keydown',e=>{if(e.code==='Space'&&!/INPUT|TEXTAREA|SELECT|BUTTON/.test(document.activeElement.tagName)){e.preventDefault();toggle()}});
@@ -662,10 +669,10 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
     (function loop(){if(!cs||cs.rec!==r||r.state!=='recording')return;const t=(performance.now()-st.t0)/1000;$('rt').textContent=fmt(t);
       if(an){an.getFloatTimeDomainData(abuf);let q=0;for(const v of abuf)q+=v*v;const rms=Math.sqrt(q/abuf.length);if(rms>.02){if(st.s==null)st.s=t;st.e=t}}
       // langer Absatz: Text läuft sanft mit
-      if(pr.scrollHeight>pr.clientHeight+4&&!pr.hidden)prMove(sp/60);
+      if(prMax()>4&&!pr.hidden&&!run)run=true;
       requestAnimationFrame(loop)})();
   }
-  function stopRec(discard){if(cs&&cs.rec&&cs.rec.state==='recording'){cs.rec._cs.discard=!!discard;cs.rec.stop()}$('rd').hidden=true}
+  function stopRec(discard){if(cs&&cs.rec&&cs.rec.state==='recording'){cs.rec._cs.discard=!!discard;cs.rec.stop()}$('rd').hidden=true;run=false}
   function finish(){stopRec(false);cs=null;slab.hidden=false;showSlide();slab.textContent='Fertig ✓';if(lock){lock.release().catch(()=>{});lock=null}clipUi();
     const n=clips.filter(Boolean).length;$('msg').className='msg ok';$('msg').textContent=n?'✓ '+n+' Clip'+(n>1?'s':'')+' fertig. Rechts kannst du sie ansehen, neu aufnehmen, sichern oder Untertitel dazu machen.':'';}
   $('cgo').onclick=()=>startClip(+($('cgo').dataset.start||0));

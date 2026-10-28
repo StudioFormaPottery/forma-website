@@ -73,6 +73,29 @@ if ($view === 'musik' || str_starts_with((string)$action, 'mm_mu_')) {
             ->execute([$title, $file, filesize(mu_dir() . '/' . $file), max(0, (float)($_POST['dur'] ?? 0)), implode(',', $tags), date('c')]);
         $muJson(['ok' => 1, 'id' => (int)$pdo->lastInsertId(), 'title' => $title]);
     }
+    // Lieder-Paket von Claude: der Server holt das Lied selbst bei Epidemic (signierter Link, nur audiocdn.epidemicsound.com)
+    if ($action === 'mm_mu_fetch') {
+        $url = trim((string)($_POST['url'] ?? '')); $title = trim((string)($_POST['title'] ?? ''));
+        if (!preg_match('~^https://audiocdn\.epidemicsound\.com/~', $url) || $title === '') $muJson(['error' => 'Ungültige Zeile.']);
+        $ex = $pdo->prepare('SELECT id FROM mm_music WHERE lower(title) = lower(?)'); $ex->execute([$title]);
+        if ($ex->fetchColumn()) $muJson(['ok' => 1, 'skip' => 1]);
+        @set_time_limit(180);
+        $file = 'mu-' . bin2hex(random_bytes(6)) . '.mp3'; $dest = mu_dir() . '/' . $file; $okDl = false;
+        if (function_exists('curl_init')) {
+            $fh = fopen($dest, 'wb'); $ch = curl_init($url);
+            curl_setopt_array($ch, [CURLOPT_FILE => $fh, CURLOPT_FOLLOWLOCATION => true, CURLOPT_TIMEOUT => 150, CURLOPT_CONNECTTIMEOUT => 15, CURLOPT_FAILONERROR => true]);
+            $okDl = curl_exec($ch) !== false && curl_getinfo($ch, CURLINFO_HTTP_CODE) < 400; curl_close($ch); fclose($fh);
+        } else {
+            $data = @file_get_contents($url, false, stream_context_create(['http' => ['timeout' => 150]]));
+            $okDl = $data !== false && strlen($data) > 10000 && file_put_contents($dest, $data) !== false;
+        }
+        if (!$okDl || !is_file($dest) || filesize($dest) < 10000) { @unlink($dest); $muJson(['error' => 'Der Link ist abgelaufen oder nicht erreichbar.']); }
+        $tags = array_values(array_filter(explode(',', (string)($_POST['tags'] ?? '')), fn($x) => isset(MU_TAGS[$x])));
+        if (!$tags) $tags = mu_guess($title);
+        $pdo->prepare('INSERT INTO mm_music (title, file, size, dur, tags, created_at) VALUES (?,?,?,?,?,?)')
+            ->execute([$title, $file, filesize($dest), max(0, (float)($_POST['dur'] ?? 0)), implode(',', $tags), date('c')]);
+        $muJson(['ok' => 1, 'id' => (int)$pdo->lastInsertId()]);
+    }
     if ($action === 'mm_mu_tag') {
         $r = mu_get($pdo, (int)($_POST['id'] ?? 0)); $t = (string)($_POST['tag'] ?? '');
         if (!$r || !isset(MU_TAGS[$t])) $muJson(['error' => 'Fehlt.']);
@@ -183,6 +206,11 @@ main{max-width:1240px}
 .del{flex:0 0 auto;width:34px;height:34px;border-radius:50%;border:0;background:none;color:#B3A3A8;font-size:16px;cursor:pointer}
 .del:hover{background:#F3D9D5;color:#A0413B}
 .tip{font-size:16px;color:#7D7076;line-height:1.5}
+.pack{background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:22px;padding:4px 16px;margin:0 0 12px}
+.pack>summary{cursor:pointer;list-style:none;padding:12px 0;font:500 22px/1.2 "Cormorant Garamond",Georgia,serif;color:#4A3A41}.pack>summary::-webkit-details-marker{display:none}
+.pack p{margin:0 0 10px;font-size:16px;color:#6B5658;line-height:1.5}
+.pack textarea{width:100%;font:inherit;font-size:14px;border:1.5px solid #DDD2C6;border-radius:14px;padding:10px;background:#fff;box-sizing:border-box}
+.pack button{font:inherit;font-size:17px;min-height:48px;padding:10px 22px;border-radius:999px;border:0;background:#7D5E68;color:#fff;cursor:pointer;margin:10px 0 14px}
 .ask{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:#F4E9E3;border-radius:16px;padding:10px 12px;font-size:16px;color:#4A3A41}
 .ask button{font:inherit;font-size:16px;min-height:44px;padding:8px 16px;border-radius:999px;border:0;background:#7D5E68;color:#fff;cursor:pointer}
 @media(max-width:640px){.fold>summary{gap:10px;padding:10px}.fic{width:46px;height:46px;font-size:22px}.fdt b{font-size:21px}.fdt small{display:none}}
@@ -191,6 +219,11 @@ main{max-width:1240px}
 <div class="mh"><h1>🎵 Deine Musik</h1>
   <p>Dein Musik-Ordner, z. B. für die Lieder von Epidemic Sound. Neue Lieder sortieren sich nach dem Titel selbst ein, oder du ziehst sie direkt auf den passenden Ordner. Im Studio legt das Bearbeiten-Fenster dann von selbst ein Lied aus dem passenden Ordner unter dein Video.</p></div>
 <label class="drop" id="drop"><i>🎵</i><b>Lieder hierher ziehen oder antippen</b><span>MP3, M4A oder WAV · gern mehrere auf einmal</span><input type="file" id="muF" accept="audio/*,.mp3,.m4a,.wav,.aac,.ogg" multiple hidden></label>
+<details class="pack" id="pack"><summary>📦 Lieder-Paket von Claude einfügen</summary>
+  <p>Füge hier die Liste ein, die dir Claude im Chat gibt. Dein Server holt die Lieder dann selbst bei Epidemic Sound und sortiert sie gleich in die Ordner, du musst nichts herunterladen. Die Links gelten nur kurz, also am besten gleich einfügen.</p>
+  <textarea id="packT" rows="5" placeholder="Titel – Künstler | Ordner | Dauer | Link"></textarea>
+  <button type="button" id="packGo">Lieder holen</button>
+</details>
 <div class="into" id="into"><span>Neue Lieder kommen in:</span><button type="button" data-into="" aria-pressed="true">✨ automatisch</button>
   <?php foreach (MU_TAGS as $k => $n): ?><button type="button" data-into="<?= $k ?>" aria-pressed="false"><?= $h($n) ?></button><?php endforeach; ?></div>
 <div class="prog" id="prog" hidden><i></i></div>
@@ -225,6 +258,14 @@ main{max-width:1240px}
     el.addEventListener('drop',e=>upload(e.dataTransfer.files,tag()))};
   dz(drop,()=>into);
   document.querySelectorAll('.fold[data-fold]').forEach(f=>{if(f.dataset.fold)dz(f,()=>f.dataset.fold)});
+  $('packGo').onclick=async()=>{const L=$('packT').value.split(/\n/).map(x=>x.trim()).filter(x=>x&&x.includes('https://')).map(x=>{const p=x.split('|').map(y=>y.trim());return {title:p[0].replace(/^[•\-\d.\s]+/,''),tags:p[1]||'',dur:p[2]||0,url:p.slice(3).join('|')||p[p.length-1]}});
+    if(!L.length){$('msg').className='msg';$('msg').textContent='In der Liste ist kein Lied. Bitte die ganze Liste von Claude einfügen.';return}
+    const bar=$('prog'),fill=bar.querySelector('i');bar.hidden=false;$('packGo').disabled=true;let ok=0,skip=0,bad=[];
+    for(let i=0;i<L.length;i++){$('msg').className='msg';$('msg').textContent='Hole Lied '+(i+1)+' von '+L.length+': '+L[i].title+' …';
+      try{const j=await post('mm_mu_fetch',L[i]);if(j.skip)skip++;else if(j.ok)ok++;else bad.push(L[i].title)}catch(e){bad.push(L[i].title)}fill.style.width=Math.round((i+1)/L.length*100)+'%'}
+    bar.hidden=true;$('packGo').disabled=false;
+    $('msg').className=bad.length?'msg':'msg ok';$('msg').textContent='✓ '+ok+' Lieder geholt und einsortiert'+(skip?', '+skip+' waren schon da':'')+'.'+(bad.length?' Nicht geklappt: '+bad.join(', ')+'. Sag Claude „neue Links“, dann bekommst du frische.':'');
+    if(!bad.length)setTimeout(()=>location.reload(),1200)};
   const cu=$('copyU');if(cu)cu.onclick=async()=>{const t='Bitte sortier diese Lieder in meine Musik-Ordner:\n'+cu.dataset.list;
     try{await navigator.clipboard.writeText(t);cu.textContent='✓ Kopiert – jetzt bei Claude einfügen'}catch(e){prompt('Kopieren und bei Claude einfügen:',t)}};
   const au=new Audio();let playing=0;

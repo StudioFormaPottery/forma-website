@@ -1,9 +1,68 @@
 {
   "_info": "Lieder, die Claude bei Epidemic Sound ausgesucht hat, und ihre Ordner (Titel ohne Künstler, klein geschrieben). Neue Vorschläge hier ergänzen.",
-  "stay brave": ["morgen", "reel"],
-  "misty blue": ["morgen", "reel"],
-  "caught up in a dream": ["morgen", "reel"],
-  "laisse moi partir": ["abend", "meditation"],
-  "daylight": ["abend", "meditation"],
-  "pines": ["meditation", "abend"]
+  "stay brave": [
+    "morgen",
+    "reel"
+  ],
+  "misty blue": [
+    "morgen",
+    "reel"
+  ],
+  "caught up in a dream": [
+    "morgen",
+    "reel"
+  ],
+  "laisse moi partir": [
+    "abend",
+    "meditation"
+  ],
+  "daylight": [
+    "abend",
+    "meditation"
+  ],
+  "pines": [
+    "meditation",
+    "abend"
+  ],
+  "sweet deluxe": [
+    "flow"
+  ],
+  "candle": [
+    "flow",
+    "morgen"
+  ],
+  "the spring": [
+    "flow",
+    "morgen"
+  ],
+  "show me life": [
+    "lebendig",
+    "reel"
+  ],
+  "melody": [
+    "lebendig",
+    "reel"
+  ],
+  "let us run away": [
+    "reel",
+    "morgen"
+  ],
+  "standing wave": [
+    "meditation"
+  ],
+  "alonia": [
+    "meditation",
+    "abend"
+  ],
+  "fiction": [
+    "morgen",
+    "flow"
+  ],
+  "akebono": [
+    "abend",
+    "meditation"
+  ],
+  "anemoia": [
+    "abend"
+  ]
 }
