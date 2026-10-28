@@ -20,6 +20,8 @@
   const MP = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
   const SEG_MODEL = 'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite';
   const FACE_MODEL = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
+  // Ganzkörper (Flows, Bewegungsvideos): Mehrklassen-Modell erkennt den ganzen Körper auch auf Abstand besser
+  const SEG_BODY = 'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite';
   const KEY = 'mv-talkcam';
   const DEF = { on: true, look: 'natur', beauty: 35, eyes: 45, blur: 0, light: 0, ring: 25, warm: 8, contrast: 0, blush: 0, eyeBig: 0, eyeBright: 20, lashes: 15, brows: 15, lipColor: 'rose', lip: 0, lipBig: 0, filter: 'none', filterAmt: 70, guide: 'oval', mirror: true, aspect: '16:9' };
   // Looks setzen Haut, Augen, Lippen und Farbfilter auf einmal (danach frei anpassbar)
@@ -42,8 +44,33 @@
     mono: ['Schwarz-Weiß', { sat: 1, con: 1.12, fade: .04, sh: [0, 0, 0], hi: [.02, .015, 0], bw: 1 }],
   };
 
-  function load() { try { return Object.assign({}, DEF, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { return Object.assign({}, DEF); } }
-  function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+  // Profil „move“ (Flows, Bewegungsvideos): nur Hintergrund weich und Belichtung, KEINE Gesichtsfilter
+  const FACE_KEYS = ['beauty', 'eyes', 'ring', 'blush', 'eyeBig', 'eyeBright', 'lashes', 'brows', 'lip', 'lipBig'];
+  const DEF_MOVE = { on: true, blur: 35, light: 0, warm: 0, contrast: 0, filter: 'none', filterAmt: 70, guide: 'raster', mirror: true, aspect: '16:9' };
+  function load(profile) {
+    const move = profile === 'move', def = move ? DEF_MOVE : DEF;
+    let s; try { s = Object.assign({}, def, JSON.parse(localStorage.getItem(KEY + (move ? '-move' : '')) || '{}')); } catch (e) { s = Object.assign({}, def); }
+    if (move) { FACE_KEYS.forEach(k => s[k] = 0); if (s.guide === 'oval') s.guide = 'raster'; }
+    return s;
+  }
+  function save(s, profile) { try { localStorage.setItem(KEY + (profile === 'move' ? '-move' : ''), JSON.stringify(s)); } catch (e) {} }
+  // Glätten ohne Nachziehen (One-Euro-Filter): ruhig, wenn du still bist, sofort mit, wenn du dich bewegst
+  class OneEuro {
+    constructor(minCut, beta) { this.mc = minCut; this.b = beta; this.x = null; this.dx = 0; this.t = 0; }
+    f(x, t) {
+      if (this.x === null) { this.x = x; this.t = t; return x; }
+      const dt = Math.max(1e-3, (t - this.t) / 1000); this.t = t;
+      const a = c => { const r = 2 * Math.PI * c * dt; return r / (r + 1); };
+      const dx = (x - this.x) / dt; this.dx += a(1.2) * (dx - this.dx);
+      this.x += a(this.mc + this.b * Math.abs(this.dx)) * (x - this.x);
+      return this.x;
+    }
+    // Vorhersage für Bilder ohne neue Erkennung
+    at(t) { return this.x === null ? null : this.x + this.dx * Math.min(.06, Math.max(0, (t - this.t) / 1000)); }
+  }
+  const USED = [10, 152, 234, 454, 33, 133, 145, 362, 263, 374, 159, 386, 468, 473, 61, 291, 0, 17, 205, 50, 425, 280,
+    146, 91, 181, 84, 314, 405, 321, 375, 409, 270, 269, 267, 37, 39, 40, 185, 78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308, 415, 310, 311, 312, 13, 82, 81, 80, 191,
+    70, 63, 105, 66, 107, 55, 65, 52, 53, 46, 300, 293, 334, 296, 336, 285, 295, 282, 283, 276, 246, 161, 160, 158, 157, 173, 466, 388, 387, 385, 384, 398];
 
   // ---------- MediaPipe (einmal laden, von allen Kameras geteilt) ----------
   let mpPromise = null, segPromise = null, facePromise = null;
@@ -53,13 +80,17 @@
   }
   async function makeTask(kind) {
     const { m, files } = await vision();
-    const opts = d => kind === 'seg'
-      ? { baseOptions: { modelAssetPath: SEG_MODEL, delegate: d }, runningMode: 'VIDEO', outputCategoryMask: false, outputConfidenceMasks: true }
+    const opts = d => kind === 'seg' || kind === 'body'
+      ? { baseOptions: { modelAssetPath: kind === 'body' ? SEG_BODY : SEG_MODEL, delegate: d }, runningMode: 'VIDEO', outputCategoryMask: false, outputConfidenceMasks: true }
       : { baseOptions: { modelAssetPath: FACE_MODEL, delegate: d }, runningMode: 'VIDEO', numFaces: 1 };
-    const C = kind === 'seg' ? m.ImageSegmenter : m.FaceLandmarker;
+    const C = kind === 'face' ? m.FaceLandmarker : m.ImageSegmenter;
     try { return await C.createFromOptions(files, opts('GPU')); } catch (e) { return await C.createFromOptions(files, opts('CPU')); }
   }
-  function segmenter() { if (!segPromise) segPromise = makeTask('seg').catch(e => { segPromise = null; throw e; }); return segPromise; }
+  let bodyPromise = null;
+  function segmenter(body) {
+    if (body) { if (!bodyPromise) bodyPromise = makeTask('body').then(t => (t._body = true, t)).catch(() => (bodyPromise = null, segmenter(false))); return bodyPromise; }
+    if (!segPromise) segPromise = makeTask('seg').catch(e => { segPromise = null; throw e; }); return segPromise;
+  }
   function faceTask() { if (!facePromise) facePromise = makeTask('face').catch(e => { facePromise = null; throw e; }); return facePromise; }
 
   // ---------- Shader ----------
@@ -238,7 +269,8 @@ void main(){
   // ---------- Kamera mit Look ----------
   class Cam {
     constructor(raw, opts) {
-      this.raw = raw; this.opts = opts || {}; this.s = load();
+      this.raw = raw; this.opts = opts || {}; this.profile = this.opts.profile === 'move' ? 'move' : 'talk'; this.s = load(this.profile);
+      this.oe = {}; this.fa = 0; this.lastFaceAt = 0;
       if (this.opts.aspect) this.s.aspect = this.opts.aspect;
       this.listeners = []; this.face = null; this.faceT = 0; this.maskArr = null; this.frame = 0; this.dead = false;
       this.status = ''; this.compare = false; this.fps = 30;
@@ -302,20 +334,20 @@ void main(){
     }
     set(patch) {
       const aspectBefore = this.s.aspect;
-      Object.assign(this.s, patch); if (!this.opts.noSave) save(this.s);
+      Object.assign(this.s, patch); if (this.profile === 'move') FACE_KEYS.forEach(k => this.s[k] = 0); if (!this.opts.noSave) save(this.s, this.profile);
       if (this.s.aspect !== aspectBefore) this.layout();
       this.ensureModels(); this.emit('change');
     }
     on(f) { this.listeners.push(f); }
     emit(t) { this.listeners.forEach(f => { try { f(t, this); } catch (e) {} }); }
-    needFace() { const s = this.s; return s.on && (s.eyes > 0 || s.ring > 0 || s.beauty > 0 || s.blush > 0 || s.eyeBig > 0 || s.eyeBright > 0 || s.lashes > 0 || s.brows > 0 || s.lip > 0 || s.lipBig > 0) || s.guide === 'oval'; }
+    needFace() { const s = this.s; if (this.profile === 'move') return false; return s.on && (s.eyes > 0 || s.ring > 0 || s.beauty > 0 || s.blush > 0 || s.eyeBig > 0 || s.eyeBright > 0 || s.lashes > 0 || s.brows > 0 || s.lip > 0 || s.lipBig > 0) || s.guide === 'oval'; }
     needSeg() { return this.s.on && this.s.blur > 0; }
     ensureModels() {
       if (!this.ok) return;
       const T = window.TalkCam._test;
       if (this.needSeg() && !this.seg && !this.segLoading && !(T && T.mask)) {
         this.segLoading = true; this.setStatus('Hintergrund-Erkennung lädt …');
-        segmenter().then(s => { this.seg = s; this.setStatus(''); }).catch(e => { console.warn(e); this.setStatus('Der Hintergrund-Weichzeichner konnte nicht laden. Bitte Seite neu laden oder Chrome/Safari verwenden.'); }).finally(() => { this.segLoading = false; });
+        segmenter(this.profile === 'move').then(s => { this.seg = s; this.setStatus(''); }).catch(e => { console.warn(e); this.setStatus('Der Hintergrund-Weichzeichner konnte nicht laden. Bitte Seite neu laden oder Chrome/Safari verwenden.'); }).finally(() => { this.segLoading = false; });
       }
       if (this.needFace() && !this.fl && !this.faceLoading && !(T && T.face)) {
         this.faceLoading = true;
@@ -332,30 +364,49 @@ void main(){
           try {
             const res = this.seg.segmentForVideo(v, now);
             const mk = res.confidenceMasks && res.confidenceMasks[0];
-            if (mk) { arr = mk.getAsFloat32Array(); w = mk.width; h = mk.height; }
+            if (mk) { arr = mk.getAsFloat32Array(); w = mk.width; h = mk.height; if (this.seg._body) { const bg = arr; arr = new Float32Array(bg.length); for (let i = 0; i < bg.length; i++) arr[i] = 1 - bg[i]; } }
             if (res.close) res.close();
           } catch (e) { console.warn(e); }
         }
         if (arr) {
           if (!this.maskArr || this.maskArr.length !== w * h) { this.maskArr = new Float32Array(arr); this.mask8 = new Uint8Array(w * h); }
           const a = this.maskArr, b = this.mask8;
-          for (let i = 0; i < a.length; i++) { a[i] = a[i] * .45 + arr[i] * .55; b[i] = a[i] * 255; }
+          // nur kleine Unterschiede glätten (gegen Flimmern), echte Bewegung sofort übernehmen (kein Schatten/Rand)
+          for (let i = 0; i < a.length; i++) { const d = Math.abs(arr[i] - a[i]); a[i] = d > .25 ? arr[i] : a[i] * .35 + arr[i] * .65; b[i] = a[i] * 255; }
           const gl = this.gl; gl.bindTexture(gl.TEXTURE_2D, this.tMask); gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
           gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, w, h, 0, gl.RED, gl.UNSIGNED_BYTE, b);
           this.hasMask = true;
         }
       }
-      if (this.needFace() && this.frame % 2 === 0) {
+      if (this.needFace()) {
+        // jedes Bild erkennen; ist ein Gerät zu langsam (> 30 ms), nur jedes zweite und dazwischen vorhersagen
+        const skip = this.slow && this.frame % 2 === 1;
         let lm = null;
-        if (T && T.face) lm = T.face(v);
-        else if (this.fl) { try { const r = this.fl.detectForVideo(v, now); lm = r.faceLandmarks && r.faceLandmarks[0]; } catch (e) { console.warn(e); } }
-        if (lm) { this.faceT = now; this.updFace(lm); } else if (now - this.faceT > 700) this.face = null;
+        if (!skip) {
+          const t0 = performance.now();
+          if (T && T.face) lm = T.face(v);
+          else if (this.fl) { try { const r = this.fl.detectForVideo(v, now); lm = r.faceLandmarks && r.faceLandmarks[0]; } catch (e) { console.warn(e); } }
+          const dt = performance.now() - t0; this.ft = (this.ft || dt) * .9 + dt * .1; this.slow = this.ft > 30;
+        }
+        if (lm) { this.faceT = now; this.updFace(lm, now); }
+        else if (skip && this.face && now - this.faceT < 200) this.updFace(null, now);
+        // weich ein- und ausblenden statt hart an/aus
+        const want = now - this.faceT < 250 ? 1 : 0, dtf = Math.min(.1, (now - (this.faT || now)) / 1000); this.faT = now;
+        this.fa += (want - this.fa) * Math.min(1, dtf * (want ? 8 : 5));
+        if (this.fa < .01 && !want) { this.fa = 0; this.face = null; }
       }
     }
-    updFace(lm) {
-      // in Ausgabe-Koordinaten (0..1, oben links), geglättet
-      const [cx, cy, cw, ch] = this.crop, W = this.canvas.width, H = this.canvas.height;
-      const P = i => ({ x: (lm[i].x - cx) / cw, y: (lm[i].y - cy) / ch });
+    updFace(lm, now) {
+      // alle benutzten Punkte in Ausgabe-Pixeln filtern; Maske und Effekte nehmen dieselben Punkte → alles bleibt deckungsgleich
+      const [cx, cy, cw, ch] = this.crop, W = this.canvas.width, H = this.canvas.height, sm = {};
+      const iris = lm ? lm.length > 473 : this.hasIris; this.hasIris = iris;
+      for (const i of USED) {
+        if (lm && !lm[i]) continue;
+        const o = this.oe[i] || (this.oe[i] = { x: new OneEuro(1.6, .012), y: new OneEuro(1.6, .012) });
+        if (lm) sm[i] = { x: o.x.f((lm[i].x - cx) / cw * W, now) / W, y: o.y.f((lm[i].y - cy) / ch * H, now) / H };
+        else { const x = o.x.at(now), y = o.y.at(now); if (x !== null) sm[i] = { x: x / W, y: y / H }; }
+      }
+      const P = i => sm[i] || { x: .5, y: .5 };
       const top = P(10), chin = P(152), lc = P(234), rc = P(454);
       const eyeOut = (a, b, lid) => { const A = P(a), Bp = P(b), L = P(lid); const ew = Math.hypot((A.x - Bp.x) * W, (A.y - Bp.y) * H); return { x: (A.x + Bp.x) / 2 * .4 + L.x * .6, y: L.y + ew * .32 / H, ew }; };
       const el = eyeOut(33, 133, 145), er = eyeOut(362, 263, 374);
@@ -366,15 +417,12 @@ void main(){
       };
       // Augenmitten (Iris, wenn vorhanden), Lippen, Wangen
       const mid = (a, b) => { const A = P(a), Bp = P(b); return { x: (A.x + Bp.x) / 2, y: (A.y + Bp.y) / 2 }; };
-      f.cl = lm.length > 473 ? P(468) : mid(33, 133); f.cr = lm.length > 473 ? P(473) : mid(362, 263);
+      f.cl = iris ? P(468) : mid(33, 133); f.cr = iris ? P(473) : mid(362, 263);
       const ml = P(61), mr = P(291), mt = P(0), mb = P(17);
       f.lc = { x: (ml.x + mr.x) / 2, y: (mt.y + mb.y) / 2 }; f.lrx = Math.hypot((mr.x - ml.x) * W, (mr.y - ml.y) * H) / 2; f.lry = Math.abs(mb.y - mt.y) * H / 2;
       f.chl = mid(205, 50); f.chr = mid(425, 280);
       this.drawFaceMask(P, W, H, f.ew);
-      const o = this.face; if (!o) { this.face = f; return; }
-      const k = .45, L = (a, b) => a + (b - a) * k, LP = (a, b) => ({ x: L(a.x, b.x), y: L(a.y, b.y) });
-      this.face = { cx: L(o.cx, f.cx), cy: L(o.cy, f.cy), rx: L(o.rx, f.rx), ry: L(o.ry, f.ry), ew: L(o.ew, f.ew), eyeY: L(o.eyeY, f.eyeY),
-        el: LP(o.el, el), er: LP(o.er, er), cl: LP(o.cl, f.cl), cr: LP(o.cr, f.cr), lc: LP(o.lc, f.lc), lrx: L(o.lrx, f.lrx), lry: L(o.lry, f.lry), chl: LP(o.chl, f.chl), chr: LP(o.chr, f.chr) };
+      this.face = f;
     }
     drawFaceMask(P, W, H, ew) {
       const s = this.s; if (!(s.lip > 0 || s.brows > 0 || s.lashes > 0)) return;
@@ -448,14 +496,15 @@ void main(){
       gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, this.tFace); gl.uniform1i(u.fmask, 3);
       gl.uniform4fv(u.crop, crop); gl.uniform2f(u.res, W, H);
       const f = this.face, hasFace = f ? 1 : 0;
-      for (const k of ['blush', 'eyeBig', 'eyeBright', 'lashes', 'brows', 'lip', 'lipBig']) gl.uniform1f(u[k], (s[k] || 0) / 100);
+      const ffa = f ? this.fa : 0;   // Gesichts-Effekte weich ein-/ausblenden, wenn das Gesicht kurz verloren geht
+      for (const k of ['blush', 'eyeBig', 'eyeBright', 'lashes', 'brows', 'lip', 'lipBig']) gl.uniform1f(u[k], (s[k] || 0) / 100 * ffa);
       gl.uniform3fv(u.lipCol, (LIPS[s.lipColor] || LIPS.rose)[1]);
       const F = (FILTERS[s.filter] || FILTERS.none)[1], fa = s.filter === 'none' ? 0 : (s.filterAmt == null ? 70 : s.filterAmt) / 100;
       gl.uniform1f(u.fSat, 1 + (F.sat - 1) * fa); gl.uniform1f(u.fCon, 1 + (F.con - 1) * fa); gl.uniform1f(u.fFade, F.fade * fa); gl.uniform1f(u.fBW, F.bw * fa);
       gl.uniform3f(u.fSh, F.sh[0] * fa, F.sh[1] * fa, F.sh[2] * fa); gl.uniform3f(u.fHi, F.hi[0] * fa, F.hi[1] * fa, F.hi[2] * fa);
       gl.uniform1f(u.bypass, on ? 0 : 1);
-      gl.uniform1f(u.beauty, s.beauty / 100); gl.uniform1f(u.eyes, s.eyes / 100); gl.uniform1f(u.blur, useMask ? blur : 0);
-      gl.uniform1f(u.light, s.light / 100); gl.uniform1f(u.ring, s.ring / 100); gl.uniform1f(u.warm, s.warm / 100); gl.uniform1f(u.contrast, s.contrast / 100);
+      gl.uniform1f(u.beauty, (s.beauty || 0) / 100); gl.uniform1f(u.eyes, (s.eyes || 0) / 100 * (f ? this.fa : 0)); gl.uniform1f(u.blur, useMask ? blur : 0);
+      gl.uniform1f(u.light, s.light / 100); gl.uniform1f(u.ring, (s.ring || 0) / 100); gl.uniform1f(u.warm, s.warm / 100); gl.uniform1f(u.contrast, s.contrast / 100);
       gl.uniform1f(u.useMask, useMask); gl.uniform1f(u.hasFace, hasFace);
       if (f) {
         gl.uniform2f(u.eyeL, f.el.x, f.el.y); gl.uniform2f(u.eyeR, f.er.x, f.er.y);
@@ -615,7 +664,16 @@ void main(){
     css(); opts = opts || {};
     const sl = (k, label, min, max) => `<div class="tc-sl"><label for="tc-${k}"><span>${label}</span><small data-v="${k}"></small></label><input id="tc-${k}" type="range" min="${min}" max="${max}" step="1" data-k="${k}"></div>`;
     const grp = (id, title, body, open) => `<details class="tc-g" data-grp="${id}"${open ? ' open' : ''}><summary>${title}</summary><div class="tc-gb">${body}</div></details>`;
-    el.innerHTML = `<div class="tc-p">
+    const move = tc.profile === 'move';
+    el.innerHTML = move ? `<div class="tc-p">
+  <label class="tc-sw"><span>✨ Hintergrund &amp; Licht an</span><input type="checkbox" data-on></label>
+  <p style="margin:0;font-size:16px;line-height:1.5;color:#7D7076">Für Flows und Bewegungsvideos: nur Hintergrund weich und Belichtung, keine Gesichtsfilter.</p>
+  ${sl('blur', 'Hintergrund weich', 0, 100)}${sl('light', 'Helligkeit', -50, 50)}${sl('warm', 'Wärme', -50, 50)}${sl('contrast', 'Kontrast', -50, 50)}
+  <div><h3>Hilfe für die Position</h3><div class="tc-chips" data-guides><button type="button" data-g="raster">Raster</button><button type="button" data-g="kreuz">Kreuz</button><button type="button" data-g="aus">Aus</button></div></div>
+  ${opts.aspect === false ? '' : `<div><h3>Format</h3><div class="tc-chips" data-aspects><button type="button" data-a="16:9">Quer 16:9</button><button type="button" data-a="9:16">Hoch 9:16</button></div></div>`}
+  <label class="tc-sw"><span>Vorschau spiegeln</span><input type="checkbox" data-mir></label>
+  <div><button type="button" class="tc-cmp" data-cmp>👁 Gedrückt halten: ohne</button></div>
+</div>` : `<div class="tc-p">
   <label class="tc-sw"><span>✨ Kamera-Look an</span><input type="checkbox" data-on></label>
   <div><h3>Look</h3><div class="tc-chips" data-looks>${Object.keys(LOOKS).map(k => `<button type="button" data-look="${k}">${LOOKS[k].label}</button>`).join('')}</div></div>
   ${grp('haut', '🌸 Haut', sl('beauty', 'Haut weich', 0, 100) + sl('eyes', 'Augenringe aufhellen', 0, 100) + sl('ring', 'Glow (Gesicht aufhellen)', 0, 100) + sl('blush', 'Rouge', 0, 100), true)}

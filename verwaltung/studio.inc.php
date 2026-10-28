@@ -18,10 +18,15 @@ if ($view === 'studio') {
         }
     }
     $sel = (int)($_GET['l'] ?? 0);
+    // Übungs-Clips für Flows und Bewegungsvideos (Vivien, 28.10.2026: dort nur Hintergrund weich + Belichtung, keine Gesichtsfilter)
+    $moves = [];
+    foreach (mv_clips_all($pdo, true) as $c) $moves[] = ['id' => (int)$c['id'], 'n' => (string)$c['name_de'], 'ok' => (string)$c['guid'] !== ''];
+    usort($moves, fn($a, $b) => [$a['ok'], $a['n']] <=> [$b['ok'], $b['n']]);
+    $selC = (int)($_GET['c'] ?? 0);
     $lang = ($_GET['lang'] ?? '') === 'en' ? 'en' : 'de';
     $bunny = mv_bunny_ok();
 
-    render_page('Talking-Head-Studio', function () use ($self, $talks, $sel, $lang, $bunny) {
+    render_page('Talking-Head-Studio', function () use ($self, $talks, $sel, $lang, $bunny, $moves, $selC) {
         $h = 'forma_h'; ?>
 <style>
 body{background:#F2ECE4}
@@ -108,9 +113,13 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
     <?php $lastG = ''; foreach ($talks as $t): if ($t['g'] !== $lastG): if ($lastG !== '') echo '</optgroup>'; $lastG = $t['g']; ?><optgroup label="<?= $h($t['g']) ?>"><?php endif; ?>
     <option value="<?= $t['id'] ?>"<?= $t['id'] === $sel ? ' selected' : '' ?>><?= $h($t['t']) ?><?= $t['vde'] && $t['ven'] ? ' ✓' : '' ?></option>
     <?php endforeach; if ($lastG !== '') echo '</optgroup>'; ?>
+    <optgroup label="🧘 Flow &amp; Bewegungsvideo · Übung filmen (ohne Gesichtsfilter)">
+      <option value="m"<?= isset($_GET['move']) ? ' selected' : '' ?>>🧘 Bewegungs-Clip (frei, nur herunterladen)</option>
+      <?php foreach ($moves as $m): ?><option value="c<?= $m['id'] ?>"<?= $m['id'] === $selC ? ' selected' : '' ?>><?= $h($m['n']) ?><?= $m['ok'] ? ' ✓' : '' ?></option><?php endforeach; ?>
+    </optgroup>
   </select>
-  <div class="seg" role="group" aria-label="Sprache"><button type="button" data-lang="de" aria-pressed="<?= $lang === 'de' ? 'true' : 'false' ?>">Deutsch</button><button type="button" data-lang="en" aria-pressed="<?= $lang === 'en' ? 'true' : 'false' ?>">Englisch</button></div>
-  <div class="seg" role="group" aria-label="Aufnahme-Art"><button type="button" data-mode="ganz">Am Stück</button><button type="button" data-mode="clips">Absatz für Absatz</button></div>
+  <div class="seg" id="langSeg" role="group" aria-label="Sprache"><button type="button" data-lang="de" aria-pressed="<?= $lang === 'de' ? 'true' : 'false' ?>">Deutsch</button><button type="button" data-lang="en" aria-pressed="<?= $lang === 'en' ? 'true' : 'false' ?>">Englisch</button></div>
+  <div class="seg" id="modeSeg" role="group" aria-label="Aufnahme-Art"><button type="button" data-mode="ganz">Am Stück</button><button type="button" data-mode="clips">Absatz für Absatz</button></div>
   <span class="done-l" id="doneL"></span>
 </div>
 
@@ -148,7 +157,7 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
       <div class="cl-all"><button type="button" class="main" id="subAll">💬 Untertitel für alle Clips erstellen</button></div>
       <div class="prog" id="subProg" hidden><i></i></div>
     </div>
-    <div class="box"><h2>Teleprompter</h2>
+    <div class="box" id="prBox"><h2>Teleprompter</h2>
       <div class="own" id="own" hidden><textarea id="ownT" placeholder="Hier deinen Text einfügen, z. B. die Story von heute."></textarea>
         <p class="tip" id="ownHint" style="margin:6px 0 10px">Eine Leerzeile trennt die Absätze. Bei „Absatz für Absatz“ wird jeder Absatz ein eigener Clip. Oben bei Deutsch/Englisch kannst du den Text in beiden Sprachen hinterlegen (für Untertitel in der anderen Sprache).</p></div>
       <div class="prc">
@@ -173,6 +182,8 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
 (function(){
+  const MOVES=<?= json_encode($moves, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+  let mv=null, mvFree=false;
   const TALKS=<?= json_encode(array_values($talks), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
   const csrf=<?= json_encode(csrf()) ?>, BUNNY=<?= $bunny ? 'true' : 'false' ?>;
   const $=id=>document.getElementById(id), esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -205,10 +216,18 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
   $('ownT').addEventListener('input',()=>{ls.set('st-own-'+lang,$('ownT').value);setText();subPreview()});
 
   // ---- Auswahl ----
-  function choose(){const id=+$('what').value;cur=TALKS.find(t=>t.id===id)||null;$('own').hidden=!!cur;$('ownT').value=ownOf(lang);
+  const profile=()=>(mv||mvFree)?'move':'talk';
+  function choose(){const val=$('what').value;mv=val[0]==='c'?(MOVES.find(m=>m.id===+val.slice(1))||null):null;mvFree=val==='m';
+    const id=+val;cur=(mv||mvFree)?null:(TALKS.find(t=>t.id===id)||null);$('own').hidden=!!cur;$('ownT').value=ownOf(lang);
+    const isMove=!!(mv||mvFree);$('prBox').hidden=isMove;$('langSeg').hidden=isMove;$('modeSeg').hidden=isMove;pr.hidden=isMove||$('prOn').getAttribute('aria-pressed')==='false';
+    if(isMove&&clipm)setMode('ganz');
+    document.querySelector('.sh h1').textContent=isMove?'🧘 Studio · Übung filmen':'🎥 Talking-Head-Studio';
+    const sp=document.querySelector('.sh p');if(!sp.dataset.t)sp.dataset.t=sp.textContent;sp.textContent=isMove?'Für Flows und Bewegungsvideos: Kamera aufstellen, Raster nutzen, aufnehmen. Hier gibt es nur Hintergrund weich und Belichtung, keine Gesichtsfilter.':sp.dataset.t;
+    const lh=$('panel').closest('.box').querySelector('h2');lh.textContent=isMove?'☀️ Hintergrund & Licht':'✨ Kamera-Look';
+    if(tc&&tc.profile!==profile())startCam();
     document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===lang)));
-    $('doneL').textContent=cur?((lang==='de'?cur.vde:cur.ven)?'✓ '+(lang==='de'?'Deutsch':'Englisch')+' ist schon hochgeladen (eine neue Aufnahme ersetzt es)':''):'';
-    const u=new URL(location.href);if(cur)u.searchParams.set('l',cur.id);else u.searchParams.delete('l');u.searchParams.set('lang',lang);history.replaceState(null,'',u);
+    $('doneL').textContent=mv?(mv.ok?'✓ Diese Übung ist schon gefilmt (eine neue Aufnahme ersetzt den Clip überall)':'Nur Hintergrund weich und Licht, keine Gesichtsfilter.'):(mvFree?'Nur Hintergrund weich und Licht, keine Gesichtsfilter.':(cur?((lang==='de'?cur.vde:cur.ven)?'✓ '+(lang==='de'?'Deutsch':'Englisch')+' ist schon hochgeladen (eine neue Aufnahme ersetzt es)':''):''));
+    const u=new URL(location.href);['l','c','move'].forEach(k=>u.searchParams.delete(k));if(cur)u.searchParams.set('l',cur.id);if(mv)u.searchParams.set('c',mv.id);if(mvFree)u.searchParams.set('move','1');u.searchParams.set('lang',lang);history.replaceState(null,'',u);
     setText();showAfter();clipUi();subPreview();}
   $('what').onchange=choose;
   document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;choose()});
@@ -221,7 +240,7 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
     const a={echoCancellation:true,noiseSuppression:true,autoGainControl:true};if(mid)a.deviceId={exact:mid};
     try{raw=await navigator.mediaDevices.getUserMedia({video:v,audio:a})}
     catch(e){try{raw=await navigator.mediaDevices.getUserMedia({video:true,audio:true});ls.set('st-cam','');ls.set('st-mic','')}catch(e2){$('stage').innerHTML='<div class="tc-st">Kamera oder Mikrofon sind gesperrt. Bitte im Browser oben bei der Adresse erlauben und die Seite neu laden.</div>';return}}
-    tc=await TalkCam.create(raw,{mount:$('stage'),maxVh:vh()});
+    tc=await TalkCam.create(raw,{mount:$('stage'),maxVh:vh(),profile:profile()});
     $('stage').appendChild(pr);$('stage').appendChild(Object.assign(document.createElement('div'),{className:'cd',id:'cd'}));
     const rd=document.createElement('div');rd.className='recdot';rd.id='rd';rd.hidden=true;rd.innerHTML='<i></i><span id="rt">0:00</span>';$('stage').appendChild(rd);
     $('stage').appendChild(slab);
@@ -238,7 +257,7 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
   // ---- Aufnahme ----
   const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
   function mime(){const ts=['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4;codecs=avc1,mp4a','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];return ts.find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||''}
-  function showAfter(){if(clipm){clipUi();return}const has=!!blob;if(tgt)$('up').textContent='⬆ In „'+tgt.t.t+'“ hochladen ('+(tgt.lang==='de'?'Deutsch':'Englisch')+')';$('go').hidden=has||(rec&&rec.state==='recording');$('again').hidden=!has;$('dl').hidden=!has;$('up').hidden=!has||!tgt||!BUNNY;
+  function showAfter(){if(clipm){clipUi();return}const has=!!blob;if(tgt)$('up').textContent=tgt.clip?'⬆ Als Clip „'+tgt.clip.n+'“ hochladen':'⬆ In „'+tgt.t.t+'“ hochladen ('+(tgt.lang==='de'?'Deutsch':'Englisch')+')';$('go').hidden=has||(rec&&rec.state==='recording');$('again').hidden=!has;$('dl').hidden=!has;$('up').hidden=!has||!tgt||!BUNNY;
     $('play').hidden=!has;$('stage').style.display=has?'none':'';}
   $('go').onclick=async()=>{
     if(!tc){$('msg').textContent='Die Kamera läuft noch nicht.';return}
@@ -251,11 +270,11 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
     rec.onstop=()=>{blob=new Blob(chunks,{type:(rec.mimeType||mt||'video/webm').split(';')[0]});saved=false;
       const url=URL.createObjectURL(blob);$('play').src=url;const ext=blob.type.includes('mp4')?'mp4':'webm';
       const d=new Date(),stamp=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+'-'+String(d.getMinutes()).padStart(2,'0');
-      $('dl').href=url;$('dl').download=('TalkingHead_'+(tgt?tgt.t.t:'Eigener-Text')+'_'+(tgt?tgt.lang:lang).toUpperCase()+'_'+stamp).replace(/[^\wäöüÄÖÜß-]+/g,'-')+'.'+ext;
+      $('dl').href=url;$('dl').download=(tgt&&tgt.clip?'Uebung_'+tgt.clip.n+'_'+stamp:(mvFree?'Bewegung_'+stamp:'TalkingHead_'+(tgt?tgt.t.t:'Eigener-Text')+'_'+(tgt?tgt.lang:lang).toUpperCase()+'_'+stamp)).replace(/[^\wäöüÄÖÜß-]+/g,'-')+'.'+ext;
       $('rd').hidden=true;$('stop').hidden=true;run=false;showAfter();
       $('msg').className='msg';$('msg').textContent='Schau es dir kurz an. Passt es, '+(tgt&&BUNNY?'tippe auf „Hochladen“ oder lade es herunter.':'lade es herunter.');
       if(lock){lock.release().catch(()=>{});lock=null}};
-    tgt=cur?{t:cur,lang:lang}:null;rec.start(1000);t0=performance.now();$('stop').hidden=false;$('rd').hidden=false;
+    tgt=mv?{clip:mv}:(cur?{t:cur,lang:lang}:null);rec.start(1000);t0=performance.now();$('stop').hidden=false;$('rd').hidden=false;
     if($('prAuto').checked&&!pr.hidden){run=true}
     try{lock=await navigator.wakeLock.request('screen')}catch(e){}
     (function loop(){if(!rec||rec.state!=='recording')return;$('rt').textContent=fmt((performance.now()-t0)/1000);tick=requestAnimationFrame(loop)})();
@@ -266,7 +285,17 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
   window.addEventListener('beforeunload',e=>{if(blob&&!saved){e.preventDefault();e.returnValue=''}});
   $('up').onclick=()=>{
     if(!blob||!tgt)return;if(typeof tus==='undefined'){$('msg').textContent='Der Upload konnte nicht laden. Bitte Seite neu laden (vorher herunterladen!).';return}
-    $('up').disabled=true;$('msg').className='msg';$('msg').textContent='Wird vorbereitet …';const T=tgt.t,id=T.id,lg=tgt.lang,fill=$('prog').querySelector('i');
+    $('up').disabled=true;$('msg').className='msg';$('msg').textContent='Wird vorbereitet …';
+    if(tgt.clip){const C=tgt.clip,fill2=$('prog').querySelector('i');
+      post('mm_mv_clip_new',{c:C.id}).then(j=>{if(j.error){$('msg').textContent=j.error;$('up').disabled=false;return}
+        $('prog').hidden=false;new tus.Upload(blob,{endpoint:j.endpoint,retryDelays:[0,3000,10000,30000,60000],chunkSize:50*1024*1024,
+          headers:{AuthorizationSignature:j.sig,AuthorizationExpire:String(j.expire),VideoId:j.guid,LibraryId:String(j.lib)},metadata:{filetype:blob.type,title:$('dl').download},
+          onError:()=>{$('msg').textContent='Upload unterbrochen. Tipp nochmal auf „Hochladen“ (oder lade es herunter).';$('up').disabled=false},
+          onProgress:(a,t)=>{const p=Math.round(a/t*100);fill2.style.width=p+'%';$('msg').textContent='Lädt hoch … '+p+' % (Seite offen lassen)'},
+          onSuccess:()=>{post('mm_mv_clip_set',{c:C.id,guid:j.guid}).then(r=>{saved=true;C.ok=true;$('up').disabled=false;$('up').hidden=true;$('prog').hidden=true;
+            $('msg').className='msg ok';$('msg').textContent='✓ Clip hochgeladen. Er steckt jetzt in '+(r.used||1)+(r.used===1?' Video':' Videos')+'. Nächste Übung oben auswählen.';})}}).start()})
+        .catch(()=>{$('msg').textContent='Das hat nicht geklappt. Bitte herunterladen und später hochladen.';$('up').disabled=false});return}
+    const T=tgt.t,id=T.id,lg=tgt.lang,fill=$('prog').querySelector('i');
     post('mm_mv_video_new',{id:id,lang:lg}).then(j=>{if(j.error){$('msg').textContent=j.error;$('up').disabled=false;return}
       $('prog').hidden=false;const up=new tus.Upload(blob,{endpoint:j.endpoint,retryDelays:[0,3000,10000,30000,60000],chunkSize:50*1024*1024,
         headers:{AuthorizationSignature:j.sig,AuthorizationExpire:String(j.expire),VideoId:j.guid,LibraryId:String(j.lib)},metadata:{filetype:blob.type,title:$('dl').download},
@@ -429,6 +458,7 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
       try{if(await burn(list[k],subLang))ok++}catch(e){console.warn(e)}fill.style.width=Math.round((k+1)/list.length*100)+'%';}
     bar.hidden=true;$('subAll').disabled=false;renderClips();$('msg').className='msg ok';$('msg').textContent='✓ Untertitel fertig ('+ok+' Clips). Bei jedem Clip gibt es jetzt „⬇ mit Untertitel“.';};
   subChips();document.body.classList.toggle('clipm',clipm);setMode(clipm?'clips':'ganz');
+  window.__studio=()=>tc;
   choose();startCam();
 })();
 </script>

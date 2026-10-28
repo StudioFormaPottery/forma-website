@@ -116,6 +116,7 @@ if ($view === 'videos') {
               <span class="lab">📹 Clip</span>
               <span class="msg"><?= $g ? '✓ da' . ($used > 1 ? ' · steckt in ' . $used . ' Videos' : '') : 'fehlt noch' ?></span>
               <?php if ($bunny): ?><label class="up<?= $g ? ' again' : '' ?>"><input type="file" accept="video/*" class="vfile"><span><?= $g ? 'Neu hochladen' : 'Clip hochladen' ?></span></label><?php endif; ?>
+              <a class="up again" style="text-decoration:none" href="<?= $u('view=studio&c=' . (int)$c['id']) ?>">🧘 Im Studio filmen</a>
               <span class="bar" hidden><i></i></span>
             </div>
             <?php foreach (['de' => [$vd, 'Deutsch'], 'en' => [$ve, 'Englisch']] as $vg => [$vu, $vn]): $own = (bool)glob(mv_voice_dir() . '/L' . $id . '-' . $i . '-' . $vg . '.*'); $nt = (int)($vcount[$c['ckey']][$vg] ?? 0); ?>
