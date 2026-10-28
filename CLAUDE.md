@@ -506,3 +506,4 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 
 ## Studio · Teacher-Training-Willkommensvideo (Vivien, 28.10.2026: „gleich mitfilmen“)
 - `studio.inc.php` legt einmal die Lektion `ukey = 'academy:welcome'` an (Programm audience `academy` „Teacher Training · vor dem Start“, fällig 8.11.2026, Sprechtext DE aus dem Academy-Entwurf, kein EN, weil die Ausbildung nur auf Deutsch ist). Studio-Liste nimmt audience `academy` mit (Gruppe „Teacher Training“, Etikett „(nur Deutsch)“, fertig sobald DE hochgeladen). Gleicher Schlüssel wie `ac_welcome_lesson()` im Branch `academy-entwurf`, dort wird die Lektion wiederverwendet.
+- Pop-up nächstes Angebot (`next-popup.inc.php`): kein Mitbewegen mit der Maus mehr (Vivien, 28.10.2026: „wackelt komisch“), nur noch das sanfte Einblenden.

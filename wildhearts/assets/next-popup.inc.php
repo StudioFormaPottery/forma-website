@@ -140,8 +140,7 @@ function mv_next_popup(): void
   if(seen&&!force)return;
   if(/[#&]anfrage/.test(location.hash)&&!force)return;
   var stage=p.querySelector('.npop-stage');
-  function move(e){var r=stage.getBoundingClientRect();stage.style.setProperty('--mx',((e.clientX-r.left)/r.width*2-1).toFixed(3));stage.style.setProperty('--my',((e.clientY-r.top)/r.height*2-1).toFixed(3))}
-  if(matchMedia('(hover:hover)').matches&&!matchMedia('(prefers-reduced-motion: reduce)').matches)p.addEventListener('pointermove',move);
+  // Kein Mitwackeln mit der Maus (Vivien, 28.10.2026: „dass er so komisch wackelt, muss nicht sein“)
   function close(){p.classList.remove('on');setTimeout(function(){p.hidden=true},450);try{sessionStorage.setItem(key,'1')}catch(e){}document.removeEventListener('keydown',esc)}
   function esc(e){if(e.key==='Escape')close()}
   p.addEventListener('click',function(e){if(e.target===p||e.target.closest('.npop-x,.npop-later'))close()});
