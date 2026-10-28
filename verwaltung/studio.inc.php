@@ -35,7 +35,9 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 .seg{display:flex;gap:6px}.seg button{font:inherit;font-size:18px;padding:10px 18px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer;min-height:48px}
 .seg button[aria-pressed=true]{background:#7D5E68;border-color:#7D5E68;color:#fff}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,400px);gap:20px;align-items:start}
-@media(max-width:980px){.grid{grid-template-columns:1fr}}
+.view{position:sticky;top:72px;z-index:6;align-self:start;background:#F2ECE4;padding-bottom:6px}
+@media(max-width:980px){.grid{grid-template-columns:1fr}.view{top:60px;margin:0 -12px;padding:6px 12px 8px;box-shadow:0 10px 18px -14px rgba(46,37,41,.45)}
+ .view .bar{margin-top:8px}.view .bar button,.view .bar a.b{min-height:48px;font-size:17px;padding:10px 18px}.view .msg{font-size:15px;margin-top:6px}}
 .side{display:flex;flex-direction:column;gap:16px}
 .box{background:#FBF8F4;border:1.5px solid #DDD2C6;border-radius:24px;padding:16px}
 .box>h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:26px;color:#4A3A41;margin:0 0 12px}
@@ -91,7 +93,7 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 </div>
 
 <div class="grid">
-  <div>
+  <div class="view">
     <div id="stage" class="tc-stage" style="aspect-ratio:16/9"><div class="tc-st">Kamera startet … Bitte erlaube Kamera und Mikrofon.</div></div>
     <video id="play" controls playsinline hidden></video>
     <div class="bar">
@@ -141,7 +143,7 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
   pr.style.setProperty('--fs',fs+'px');
   function textHtml(t){return esc(t||'').replace(/\[([^\]]+)\]/g,'<span class="hint">[$1]</span>')}
   function setText(){const t=cur?(lang==='en'?cur.en:cur.de):$('ownT').value;
-    pr.querySelector('.pr-t').innerHTML=t.trim()?textHtml(t):'<span class="hint">'+(cur?'Für diese Lektion gibt es noch keinen '+(lang==='en'?'englischen':'deutschen')+' Text.':'Füge rechts deinen Text ein.')+'</span>';pr.scrollTop=0;}
+    pr.querySelector('.pr-t').innerHTML=t.trim()?textHtml(t):'<span class="hint">'+(cur?'Für diese Lektion gibt es noch keinen '+(lang==='en'?'englischen':'deutschen')+' Text.':'Füge deinen Text beim Teleprompter ein.')+'</span>';pr.scrollTop=0;}
   function prLoop(ts){if(run){pr.scrollTop+=sp*(ts-last)/1000}last=ts;requestAnimationFrame(prLoop)}requestAnimationFrame(prLoop);
   function toggle(){run=!run}
   pr.addEventListener('click',toggle);
@@ -169,7 +171,7 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
     const a={echoCancellation:true,noiseSuppression:true,autoGainControl:true};if(mid)a.deviceId={exact:mid};
     try{raw=await navigator.mediaDevices.getUserMedia({video:v,audio:a})}
     catch(e){try{raw=await navigator.mediaDevices.getUserMedia({video:true,audio:true});ls.set('st-cam','');ls.set('st-mic','')}catch(e2){$('stage').innerHTML='<div class="tc-st">Kamera oder Mikrofon sind gesperrt. Bitte im Browser oben bei der Adresse erlauben und die Seite neu laden.</div>';return}}
-    tc=await TalkCam.create(raw,{mount:$('stage')});
+    tc=await TalkCam.create(raw,{mount:$('stage'),maxVh:vh()});
     $('stage').appendChild(pr);$('stage').appendChild(Object.assign(document.createElement('div'),{className:'cd',id:'cd'}));
     const rd=document.createElement('div');rd.className='recdot';rd.id='rd';rd.hidden=true;rd.innerHTML='<i></i><span id="rt">0:00</span>';$('stage').appendChild(rd);
     TalkCam.panel(tc,$('panel'));
@@ -224,6 +226,10 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
       up.start()}).catch(()=>{$('msg').textContent='Das hat nicht geklappt. Bitte herunterladen und später hochladen.';$('up').disabled=false});
   };
 
+  // Vorschau bleibt beim Einstellen immer sichtbar (oben fixiert), am Handy kleiner
+  function vh(){return matchMedia('(max-width:980px)').matches?36:66}
+  addEventListener('resize',()=>{if(tc){tc.opts.maxVh=vh();tc.emit('layout')}});
+  $('play').style.maxHeight=vh()+'vh';
   choose();startCam();
 })();
 </script>
