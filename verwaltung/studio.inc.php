@@ -131,6 +131,18 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 .pr{position:absolute;left:0;right:0;top:0;height:42%;min-height:120px;overflow:hidden;background:rgba(36,28,32,.8);color:#FBF5F7;z-index:7;pointer-events:auto;cursor:pointer;border-radius:22px 22px 0 0}
 .pr::after{content:'';position:absolute;left:0;right:0;bottom:0;height:30%;background:linear-gradient(rgba(36,28,32,0),rgba(36,28,32,.95));pointer-events:none}
 .pr[hidden]{display:none}
+/* Nur Teleprompter (Vivien, 28.10.2026: filmt mit der iPhone-Kamera-App, liest am MacBook) */
+#tpo{position:fixed;inset:0;z-index:190;background:#1F191C;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:20px 16px calc(24px + env(safe-area-inset-bottom))}
+#tpo[hidden]{display:none}
+.tpo-cd{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:500 min(30vw,200px)/1 "Cormorant Garamond",Georgia,serif;color:#fff;pointer-events:none}
+.tpo-cd:empty{display:none}
+.tpo-bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.tpo-bar button{font:inherit;font-size:17px;min-height:48px;padding:10px 18px;border-radius:999px;border:1.5px solid rgba(251,248,244,.4);background:rgba(251,248,244,.1);color:#fff;cursor:pointer}
+.tpo-bar button.main{background:#FBF5F7;color:#4A3A41;border-color:#FBF5F7;min-width:150px}
+.tpo-bar span{color:#E8D6CA;font-size:16px}
+.tpo-tip{margin:12px 0 0;color:rgba(251,248,244,.6);font-size:15px;text-align:center}
+.tpo-hint{position:absolute;top:26%;left:50%;transform:translate(-50%,0);max-width:520px;width:90%;text-align:center;color:rgba(251,248,244,.75);font-size:18px;line-height:1.5}
+body.tponly .pr.top{width:min(680px,94vw)}
 /* iPhone als Kamera (Continuity-Kamera, Vivien 28.10.2026) */
 .iph{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px}
 .iph button{font:inherit;font-size:17px;padding:10px 18px;border-radius:999px;border:1.5px solid #7D5E68;background:#FBF5F7;color:#7D5E68;cursor:pointer;min-height:46px}
@@ -437,6 +449,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     <div class="iph-help" id="iphHelp" hidden></div>
     <div class="bar">
       <button type="button" class="go" id="go">● Aufnahme starten</button>
+      <button type="button" class="sm" id="tpOnly" title="Du filmst mit der Kamera-App am Handy, hier läuft nur der Text">📜 Nur Teleprompter</button>
       <button type="button" class="stop" id="stop" hidden>■ Stopp</button>
       <button type="button" class="up" id="up" hidden>⬆ In die Lektion hochladen</button>
       <button type="button" class="next" id="edit" hidden>✂️ Bearbeiten · Licht, Ausschnitt, Musik</button>
@@ -557,6 +570,32 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   function prTop(on){on=on&&$('prCam').checked&&!pr.hidden;if(on===pr.classList.contains('top'))return;
     if(on){document.body.appendChild(pr);pr.classList.add('top')}else{pr.classList.remove('top');const st=$('stage');st&&st.insertBefore(pr,st.querySelector('.cd'))}
     document.body.classList.toggle('prtop',on);prMove(0,true)}
+  // ---- Nur Teleprompter: nichts aufnehmen, Text ganz oben unter der Handy-Linse, Rest dunkel ----
+  const tpo=document.createElement('div');tpo.id='tpo';tpo.hidden=true;
+  tpo.innerHTML='<div class="tpo-cd" id="tpoCd"></div><p class="tpo-hint" id="tpoHint">Starte jetzt die Aufnahme am Handy.<br>Der Text läuft gleich los.</p>'
+    +'<div class="tpo-bar"><button type="button" class="main" data-t="pp">⏸ Pause</button><button type="button" data-t="slow">− langsamer</button><span id="tpoSp"></span><button type="button" data-t="fast">schneller +</button>'
+    +'<button type="button" data-t="sm">A−</button><button type="button" data-t="lg">A+</button><button type="button" data-t="top">⟲ Anfang</button><button type="button" data-t="x">✕ Beenden</button></div>'
+    +'<p class="tpo-tip">Leertaste oder Tippen auf den Text: Pause und weiter · ↑ ↓ Tempo · Esc: beenden</p>';
+  document.body.appendChild(tpo);let tpOn=false;
+  const tpUi=()=>{$('tpoSp').textContent='Tempo '+(spLv+1)+' von 10';tpo.querySelector('[data-t="pp"]').textContent=run?'⏸ Pause':'▶ Weiter'};
+  async function tpStart(){const t=String(textOf(lang)||'').trim();if(!t){$('msg').className='msg';$('msg').textContent='Füge zuerst deinen Text beim Teleprompter ein.';return}
+    tpOn=true;run=false;pr.querySelector('.pr-t').innerHTML=textHtml(t);pr.hidden=false;tpo.hidden=false;document.body.classList.add('tponly','prtop');
+    document.body.appendChild(pr);pr.classList.add('top');prMove(0,true);$('tpoHint').hidden=false;tpUi();
+    try{if(!lock)lock=await navigator.wakeLock.request('screen')}catch(e){}
+    for(const n of [3,2,1]){if(!tpOn)return;$('tpoCd').textContent=n;await new Promise(r=>setTimeout(r,900))}$('tpoCd').textContent='';
+    if(!tpOn)return;$('tpoHint').hidden=true;run=true;tpUi()}
+  function tpEnd(){if(!tpOn)return;tpOn=false;run=false;$('tpoCd').textContent='';tpo.hidden=true;document.body.classList.remove('tponly');
+    pr.classList.add('top');prTop(false);pr.hidden=!!(mv||mvFree)||$('prOn').getAttribute('aria-pressed')==='false';setText();if(lock){lock.release().catch(()=>{});lock=null}}
+  tpo.addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b)return;b.blur();const k=b.dataset.t;
+    if(k==='pp'){$('tpoCd').textContent='';$('tpoHint').hidden=true;toggle()}
+    else if(k==='slow'||k==='fast'){const x=document.querySelector('[data-sp="'+(k==='fast'?1:-1)+'"]');x&&x.click()}
+    else if(k==='sm'||k==='lg'){const x=document.querySelector('[data-fs="'+(k==='lg'?3:-3)+'"]');x&&x.click()}
+    else if(k==='top'){prMove(0,true)}
+    else if(k==='x'){tpEnd();return}
+    tpUi()});
+  document.addEventListener('keydown',e=>{if(!tpOn)return;if(e.key==='Escape'){e.preventDefault();tpEnd()}else setTimeout(tpUi,0)});
+  pr.addEventListener('click',()=>{if(tpOn){$('tpoHint').hidden=true;setTimeout(tpUi,0)}});
+  $('tpOnly').onclick=()=>{if((rec&&rec.state==='recording')||(cs&&cs.rec))return;tpStart()};
   // eigener Text je Sprache (für Untertitel in der anderen Sprache)
   if(ls.get('st-own-de',null)===null&&ls.get('st-own',''))ls.set('st-own-de',ls.get('st-own',''));
   const ownOf=lg=>ls.get('st-own-'+lg,'');
@@ -568,7 +607,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     const wasIg=!!ig;ig=val[0]==='i'?(IGS.find(x=>x.id===+val.slice(1))||null):null;
     const id=+val;cur=(mv||mvFree)?null:(ig?{ig:ig,id:'i'+ig.id,t:ig.l,de:ig.text,en:ig.text,vde:ig.has,ven:ig.has,g:'Instagram',k:ig.kind==='reel'?'Reel':'Story',due:ig.day}:(TALKS.find(t=>t.id===id)||null));$('own').hidden=!!cur;$('ownT').value=ownOf(lang);
     const isMove=!!(mv||mvFree);$('prBox').hidden=isMove;$('mtPr').hidden=isMove;$('langSeg').hidden=isMove||!!ig;
-    if(tc&&!isMove&&ig!==null!==wasIg){tc.set({aspect:ig?'9:16':'16:9'});TalkCam.panel(tc,$('panel'))}$('modeSeg').hidden=isMove;pr.hidden=isMove||$('prOn').getAttribute('aria-pressed')==='false';
+    if(tc&&!isMove&&ig!==null!==wasIg){tc.set({aspect:ig?'9:16':'16:9'});TalkCam.panel(tc,$('panel'))}$('modeSeg').hidden=isMove;if($('tpOnly'))$('tpOnly').hidden=isMove;pr.hidden=isMove||$('prOn').getAttribute('aria-pressed')==='false';
     if(isMove&&clipm)setMode('ganz');
     document.querySelector('.sh h1').textContent=isMove?'🧘 Studio · Übung filmen':'🎥 Talking-Head-Studio';
     const sp=document.querySelector('.sh p');if(!sp.dataset.t)sp.dataset.t=sp.textContent;sp.textContent=isMove?'Für Flows und Bewegungsvideos: Kamera aufstellen, Raster nutzen, aufnehmen. Hier gibt es nur Hintergrund weich und Belichtung, keine Gesichtsfilter.':sp.dataset.t;

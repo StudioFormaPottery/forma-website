@@ -21,6 +21,7 @@ unset($_SESSION['flash']);
  */
 // Neu-Boxen: 'b' => 'movecia' erscheint nur auf der Movecia-Übersicht, sonst nur bei FORMA (Vivien, 28.10.2026).
 const FORMA_ADMIN_NEWS = [
+    ['b' => 'movecia', 'until' => '2026-11-20', 'title' => 'Neu im Studio: 📜 Nur Teleprompter', 'text' => 'Du filmst mit der Kamera-App am iPhone, am MacBook läuft nur der Text ganz oben unter der Linse. Danach das Video über „🎞 Video vom Gerät bearbeiten“ holen', 'link' => '?view=studio'],
     ['b' => 'movecia', 'until' => '2026-11-20', 'title' => 'Neu im Studio: iPhone als Kamera', 'text' => 'Unter dem Kamerabild „📱 iPhone als Kamera“ tippen: dein iPhone filmt, Teleprompter und alles andere bleiben am MacBook', 'link' => '?view=studio'],
     ['b' => 'movecia', 'until' => '2026-11-15', 'title' => 'Neu im Studio: 4K, Teleprompter an der Kamera, schnelleres Speichern', 'text' => 'Bildqualität 4K/2K unter „Kamera & Mikrofon“, Text beim Aufnehmen direkt unter der Linse, „🗑 Löschen“ nach jeder Aufnahme, „💛 Meine Looks“ zum Speichern deiner Filter, Bearbeiten speichert viel schneller', 'link' => '?view=studio'],
     ['until' => '2026-11-15', 'title' => 'Aufgeräumt: weniger Knöpfe', 'text' => 'Einzeltermin + Serientermine = „Neuer Termin“, Bestand liegt in der Kasse, Testbuchungen und E-Mail-Liste in den Einstellungen. Bei Movecia nur noch 8 Reiter', 'link' => '?view=edit'],
