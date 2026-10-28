@@ -243,3 +243,8 @@ h1{font-size:clamp(2.6rem,7vw,5.6rem)}h2{font-size:clamp(1.85rem,3.8vw,3rem)}h3{
 details.q summary{font-size:1.22rem}
 .f-lab{font-size:clamp(1.2rem,2vw,1.6rem)}
 .vside figcaption{font-size:clamp(1.45rem,2.2vw,2rem)}
+/* Method-Kopf: Text links, Hochformat-Foto im Bogen rechts (28.10.2026) */
+.mhero{display:grid;gap:2.2rem;align-items:center;grid-template-columns:minmax(0,1fr)}
+.mhero-pic{width:min(100%,420px);justify-self:center}
+.mhero-pic img{object-position:50% 70%}
+@media(min-width:900px){.mhero{grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:3.5rem}.mhero-pic{width:min(100%,480px);justify-self:end}}
