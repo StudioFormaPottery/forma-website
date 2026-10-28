@@ -12,7 +12,7 @@ function mm_subnav(string $active): void
     $self = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?');
     $req = 0; try { $req = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {}
     $ptReq = 0; try { $ptReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); } catch (Throwable $e) {}
-    $tabs = [['movecia', '?view=movecia', 'Übersicht'], ['videos', '?view=videos', '🎬 Videos hochladen'], ['studio', '?view=studio', '🎥 Studio'], ['insta', '?view=insta', '📱 Instagram täglich'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['method', '?view=method', 'Method &amp; Unfold'], ['natal', '?view=natal', 'Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['training', '?view=training', 'Personal Training' . ($ptReq ? ' <i>' . $ptReq . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', 'Live-Texte'], ['presse', '?view=presse', 'Presse'], ['einst', '?view=movecia#einstellungen', 'Einstellungen']]; ?>
+    $tabs = [['movecia', '?view=movecia', '🏡 Übersicht'], ['studio', '?view=studio', '🎥 Studio'], ['videos', '?view=videos', '🎬 Videos hochladen'], ['insta', '?view=insta', '📱 Instagram täglich'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['method', '?view=method', '🌱 Method &amp; Unfold'], ['natal', '?view=natal', '🤰 Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['training', '?view=training', '🏔️ Personal Training' . ($ptReq ? ' <i>' . $ptReq . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', '🎙️ Live-Texte'], ['presse', '?view=presse', '📰 Presse'], ['einst', '?view=movecia#einstellungen', '⚙️ Einstellungen']]; ?>
 <style>
 .mvsub{position:sticky;top:0;z-index:40;margin:-8px -16px 16px;padding:10px 16px;background:rgba(242,236,228,.96);border-bottom:1px solid #DDD2C6;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .mvsub::-webkit-scrollbar{display:none}
@@ -21,6 +21,21 @@ function mm_subnav(string $active): void
 .mvsub a.on{background:#7D5E68;border-color:#7D5E68;color:#FBF5F7}
 .mvsub a.fo{background:transparent;border-color:transparent;color:#8C2C1D;padding-left:4px}
 .mvsub i{font-style:normal;display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:999px;background:#B5544A;color:#fff;font-size:12px;text-align:center}
+/* Movecia-Verwaltung einheitlich und ruhiger (Vivien, 28.10.2026): Überschriften in Cormorant statt fetter Grotesk,
+   weiche Karten, sanfte Schatten, Knöpfe als Pillen */
+body{background:#F2ECE4}
+.mvsub{background:rgba(242,236,228,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.mvsub a{transition:background .15s,border-color .15s,color .15s,box-shadow .15s}
+.mvsub a:hover{border-color:#C9B0B8;color:#4A3A41}
+.mvsub a.on{box-shadow:0 8px 18px -12px rgba(74,58,65,.7)}
+main h1,main h2,main h3{font-family:"Cormorant Garamond",Georgia,serif!important;font-weight:500!important;color:#4A3A41;letter-spacing:0}
+main h1{font-size:clamp(34px,3.6vw,46px)}
+main h2{font-size:clamp(26px,2.6vw,32px)}
+main h3{font-size:24px}
+main .card{background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:24px;box-shadow:0 14px 30px -26px rgba(74,58,65,.55)}
+main input[type=text],main input[type=email],main input[type=number],main input[type=date],main input[type=time],main input[type=url],main input[type=password],main input:not([type]),main select,main textarea{border-radius:14px;border:1.5px solid #DDD2C6;background:#fff}
+main input:focus,main select:focus,main textarea:focus{outline:2px solid #C9B0B8;outline-offset:1px;border-color:#7D5E68}
+main b,main strong{font-weight:500}
 </style>
 <nav class="mvsub" aria-label="Movecia"><?php foreach ($tabs as [$k, $q, $t]): ?><a href="<?= forma_h($self) . $q ?>"<?= $k === $active ? ' class="on" aria-current="page"' : '' ?>><?= $t ?></a><?php endforeach; ?></nav>
 <?php

@@ -59,8 +59,27 @@ if ($view === 'studio') {
     foreach ($s->fetchAll() as $r) $igs[] = ['id' => (int)$r['id'], 'day' => $r['day'], 'kind' => $r['kind'], 'acc' => IG_ACC[$r['acc']] ?? 'Privat', 't' => ig_title($r),
         'text' => (string)$r['text'], 'music' => (string)$r['music'], 'has' => $r['file'] !== '', 'l' => ig_wd($r['day']) . ' · ' . ($r['kind'] === 'reel' ? '🎬 Reel' : '⭕ Story') . ' · ' . ig_title($r) . ($r['file'] !== '' ? ' ✓' : '')];
     $selI = (int)($_GET['ig'] ?? 0);
+    // Kachel-Auswahl (Vivien, 28.10.2026: „nach Tagen zusammengefasst, hübsche Knöpfe statt Liste“)
+    $tiles = [];
+    $mvBy = []; foreach ($moves as $m) $mvBy['c' . $m['id']] = $m;
+    $shortT = fn(string $t) => preg_replace('/\s*·\s*(Bewegungsvideo|Flow|Vertiefung)$/u', '', $t);
+    foreach ($queue as $q) {
+        $isT = $q['ico'] === '🗣';
+        $tiles[] = ['v' => $q['v'], 'ty' => $isT ? 'talk' : 'clip', 'ok' => $q['ok'], 'due' => $q['due'], 'n' => $q['n'],
+            'k' => $isT ? $q['k'] . ($q['g'] !== '' ? ' · ' . $q['g'] : '') : $q['k'],
+            'x' => $isT ? ($q['ok'] ? 'Deutsch und Englisch ✓' : (trim($q['x'], ' ()') === 'DE + EN' ? 'Deutsch und Englisch fehlen' : trim($q['x'], ' ()'))) : ltrim($q['x'], ' ·')];
+        if (!$isT && isset($mvBy[$q['v']])) {
+            $m = $mvBy[$q['v']]; $k = &$tiles[count($tiles) - 1];
+            $k['k'] = str_contains($m['k'], '&') ? 'Übung · Flow & Bewegung' : (str_contains($m['k'], 'Bewegungsvideo') ? 'Übung · Bewegungsvideo' : (str_contains($m['k'], 'Flow') ? 'Übung · Flow' : 'Übung'));
+            $names = array_values(array_unique(array_map(fn($f) => $shortT(preg_replace('/^(Flow|Bewegungsvideo) „(.*)“$/u', '$2', $f)), $m['for'])));
+            $k['x'] = $q['ok'] ? 'schon gefilmt ✓' : ($names ? 'für „' . $names[0] . '“' . (count($names) > 1 ? ' und ' . (count($names) - 1) . ' weitere' : '') : '');
+            unset($k);
+        } elseif ($isT) { $tiles[count($tiles) - 1]['k'] = $q['k']; $tiles[count($tiles) - 1]['g'] = $q['g']; }
+    }
+    foreach ($igs as $g) $tiles[] = ['v' => 'i' . $g['id'], 'ty' => 'ig', 'ok' => $g['has'], 'due' => $g['day'], 'n' => $g['t'],
+        'k' => ($g['kind'] === 'reel' ? 'Reel' : 'Story') . ' · ' . $g['acc'], 'x' => $g['has'] ? 'schon aufgenommen ✓' : ($g['music'] !== '' ? '🎵 ' . $g['music'] : '')];
 
-    render_page('Talking-Head-Studio', function () use ($self, $talks, $sel, $lang, $bunny, $moves, $selC, $queue, $igs, $selI) {
+    render_page('Talking-Head-Studio', function () use ($self, $talks, $sel, $lang, $bunny, $moves, $selC, $queue, $igs, $selI, $tiles) {
         $h = 'forma_h'; ?>
 <style>
 body{background:#F2ECE4}
@@ -134,8 +153,45 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
 .subprev{margin-top:8px;border-radius:14px;overflow:hidden;background:#2E2529}
 .subprev canvas{display:block;width:100%}
 [hidden]{display:none!important}
+.pk{background:#FBF8F4;border:1.5px solid #DDD2C6;border-radius:28px;padding:14px;margin-bottom:12px;box-shadow:0 14px 30px -24px rgba(74,58,65,.45)}
+.pk-now{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pk-now>i{width:60px;height:60px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:30px;font-style:normal;background:#EADFDE;flex:0 0 auto}
+.pk-nt{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.pk-nt>small{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#7D7076}
+.pk-nt b{font:500 clamp(24px,2.6vw,30px)/1.15 "Cormorant Garamond",Georgia,serif;color:#4A3A41}
+.pk-nt span{font-size:17px;color:#6B5658}
+.pk-btn{font:inherit;font-size:18px;min-height:52px;padding:10px 22px;border-radius:999px;border:1.5px solid #7D5E68;background:#7D5E68;color:#fff;cursor:pointer}
+.pk-btn[aria-expanded=true]{background:#fff;color:#7D5E68}
+.pk-body{margin-top:14px;border-top:1px solid #EADFDE;padding-top:12px}
+.pk-tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}.pk-tabs::-webkit-scrollbar{display:none}
+.pk-tabs button{flex:0 0 auto;font:inherit;font-size:17px;padding:10px 18px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer;min-height:48px}
+.pk-tabs button span{display:inline-block;min-width:24px;margin-left:6px;padding:1px 8px;border-radius:999px;background:#F2ECE4;font-size:14px}
+.pk-tabs button[aria-selected=true]{background:#4A3A41;border-color:#4A3A41;color:#fff}.pk-tabs button[aria-selected=true] span{background:rgba(255,255,255,.18)}
+.pk-pane{max-height:min(62vh,640px);overflow:auto;padding:4px 2px 6px;margin-top:8px;overscroll-behavior:contain}
+.pk-day{margin:6px 0 18px}
+.pk-dh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 2px 10px;position:sticky;top:0;background:#FBF8F4;padding:6px 0;z-index:1}
+.pk-dh b{font:500 25px/1.1 "Cormorant Garamond",Georgia,serif;color:#4A3A41}
+.pill{font-size:14px;padding:3px 12px;border-radius:999px;background:#EADFDE;color:#6B5658}.pill.soon{background:#E8D6CA;color:#4A3A41}.pill.late{background:#F3D9D5;color:#A0413B}
+.pk-dh .cnt{margin-left:auto;font-size:15px;color:#7D7076}
+.pk-sub{font-size:15px;color:#7D7076;margin:12px 2px 8px}.pk-sub a{color:#7D5E68}
+.pk-empty{font-size:19px;color:#6B5658;padding:12px}
+.pk-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.pk-t{display:flex;gap:12px;align-items:flex-start;text-align:left;font:inherit;padding:12px;border-radius:20px;border:1.5px solid #E6DCD2;background:#fff;color:#2E2529;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;min-height:84px}
+.pk-t:hover{transform:translateY(-2px);box-shadow:0 10px 22px -16px rgba(74,58,65,.6);border-color:#C9B0B8}
+.pk-t[aria-current=true]{border-color:#7D5E68;box-shadow:0 0 0 2px #7D5E68 inset}
+.pk-t>i{flex:0 0 auto;width:44px;height:44px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:22px;font-style:normal}
+.ty-talk>i,.ty-own>i{background:#EADFDE}.ty-clip>i,.ty-free>i{background:#E8D6CA}.ty-ig>i{background:#E3D3DB}
+.pk-t span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.pk-t em{font-style:normal;font-size:13px;color:#6B5658;background:#F2ECE4;border-radius:999px;padding:2px 10px;align-self:flex-start;margin-bottom:3px;display:inline-block}
+.pk-t em.g{background:none;padding:0 2px;color:#7D5E68;margin:-2px 0 2px}
+.ty-talk em:not(.g),.ty-own em{background:#EADFDE}.ty-clip em,.ty-free em{background:#F1E4DA}.ty-ig em{background:#EBDDE4}
+.pk-t b{font-weight:500;font-size:17px;line-height:1.3;color:#2E2529}
+.pk-t small{font-size:14px;color:#7D7076;line-height:1.35}
+.pk-t.ok{background:#F6F8F3}.pk-t.ok>i{background:#DDE6D6}
+@media(max-width:640px){.pk-now{align-items:flex-start}.pk{padding:12px;border-radius:22px}.pk-now>i{width:48px;height:48px;font-size:24px;border-radius:18px}.pk-btn{width:100%}.pk-tiles{grid-template-columns:1fr}.pk-pane{max-height:58vh}}
 .what-i{flex-basis:100%;margin:2px 4px 0;font-size:18px;line-height:1.45;color:#4A3A41}.what-i b{font-weight:500}.what-i .late{color:#A0413B}.what-i small{display:block;font-size:16px;color:#7D7076}
 .what-i:empty{display:none}
+.pk-nt span b{font:inherit;font-weight:500;color:#4A3A41}.pk-nt span small{display:block;font-size:15px;color:#7D7076;margin-top:2px;line-height:1.45}.pk-nt .late{color:#A0413B}
 .seg-f{font-size:17px!important;padding:10px 16px;border-radius:999px;border:1.5px solid #7D5E68;background:#FBF5F7;color:#7D5E68!important;cursor:pointer;min-height:48px;display:inline-flex;align-items:center}
 #edWrap .ed-h{margin-bottom:12px}#edWrap h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:32px;color:#4A3A41;margin:0}
 body.editing .grid{display:none}
@@ -146,9 +202,48 @@ body.editing .grid{display:none}
   <p>Kamera an, Look wählen, ins Oval setzen, aufnehmen. Der Text läuft oben im Bild, ganz nah an der Kamera, so schaust du automatisch in die Linse. Hilfslinien und Text sind nie in der Aufnahme.</p></div>
   <a href="<?= $h($self) ?>?view=videos" style="font-size:18px;color:#6B5658">← zu „Videos hochladen“</a></div>
 
+<?php
+$dayLong = function (string $d): string { $t = strtotime($d); return ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'][(int)date('w', $t)] . ', ' . date('j', $t) . '. ' . ['Jänner', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'][(int)date('n', $t) - 1]; };
+$pill = function (string $d, bool $ok): array { if ($d === '') return ['', '']; $n = (int)round((strtotime($d . ' 12:00') - strtotime(date('Y-m-d') . ' 12:00')) / 86400);
+    if ($n < 0) return [$ok ? '' : 'late', $n === -1 ? 'seit gestern fällig' : 'seit ' . -$n . ' Tagen fällig']; return [$n <= 3 ? 'soon' : '', $n === 0 ? 'heute' : ($n === 1 ? 'morgen' : 'in ' . $n . ' Tagen')]; };
+$tile = function (array $t) use ($h) { $ico = ['talk' => '🗣', 'clip' => '🧘', 'ig' => '📱', 'own' => '✍️', 'free' => '🎞'][$t['ty']];
+    return '<button type="button" class="pk-t ty-' . $t['ty'] . ($t['ok'] ? ' ok' : '') . '" data-v="' . $h($t['v']) . '"><i>' . $ico . '</i><span><em>' . $h($t['k']) . (($t['g'] ?? '') !== '' ? '</em><em class="g">' . $h($t['g']) : '') . '</em><b>' . $h($t['n']) . '</b>' . ($t['x'] !== '' ? '<small>' . $h($t['x']) . '</small>' : '') . '</span></button>'; };
+$groups = function (array $list, bool $withDone = false) use ($dayLong, $pill, $tile, $h) {
+    $by = []; foreach ($list as $t) $by[$t['due']][] = $t; uksort($by, fn($a, $b) => ($a === '' ? '9' : $a) <=> ($b === '' ? '9' : $b));
+    $o = '';
+    foreach ($by as $d => $l) { [$pc, $pt] = $pill((string)$d, false);
+        $tl = array_filter($l, fn($t) => $t['ty'] !== 'clip'); $cl = array_filter($l, fn($t) => $t['ty'] === 'clip');
+        $o .= '<div class="pk-day"><div class="pk-dh"><b>' . ($d === '' ? 'Noch ohne Datum' : $h($dayLong((string)$d))) . '</b>' . ($pt !== '' ? '<span class="pill ' . $pc . '">' . $h($pt) . '</span>' : '') . '<span class="cnt">' . count($l) . ' ' . (count($l) === 1 ? 'Video' : 'Videos') . '</span></div>';
+        if ($tl) $o .= '<div class="pk-tiles">' . implode('', array_map($tile, $tl)) . '</div>';
+        if ($cl) $o .= ($tl ? '<p class="pk-sub">🧘 Übungen filmen · ' . count($cl) . '</p>' : '') . '<div class="pk-tiles">' . implode('', array_map($tile, $cl)) . '</div>';
+        $o .= '</div>'; }
+    return $o; };
+$open = array_values(array_filter($tiles, fn($t) => !$t['ok'] && $t['ty'] !== 'ig'));
+$igT = array_values(array_filter($tiles, fn($t) => $t['ty'] === 'ig'));
+$done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig'));
+?>
+<section class="pk" id="pk">
+  <div class="pk-now"><i id="pkI">🗣</i><div class="pk-nt"><small>Du nimmst gerade auf</small><b id="pkT">…</b><span id="pkS"></span></div>
+    <button type="button" class="pk-btn" id="pkToggle" aria-expanded="false">Anderes Video wählen</button></div>
+  <div class="pk-body" id="pkBody" hidden>
+    <div class="pk-tabs" role="tablist">
+      <button type="button" data-tab="next" aria-selected="true">📅 Als Nächstes <span><?= count($open) ?></span></button>
+      <?php if ($igT): ?><button type="button" data-tab="ig" aria-selected="false">📱 Instagram <span><?= count($igT) ?></span></button><?php endif; ?>
+      <button type="button" data-tab="free" aria-selected="false">✍️ Frei aufnehmen</button>
+      <?php if ($done): ?><button type="button" data-tab="done" aria-selected="false">✓ Schon fertig <span><?= count($done) ?></span></button><?php endif; ?>
+    </div>
+    <div class="pk-pane" data-pane="next"><?= $open ? $groups($open) : '<p class="pk-empty">Alles aufgenommen. Wunderbar ♡</p>' ?></div>
+    <?php if ($igT): ?><div class="pk-pane" data-pane="ig" hidden><?= $groups($igT) ?><p class="pk-sub"><a href="<?= $h($self) ?>?view=insta">Alle Storys &amp; Reels planen →</a></p></div><?php endif; ?>
+    <div class="pk-pane" data-pane="free" hidden><div class="pk-tiles">
+      <?= $tile(['v' => '0', 'ty' => 'own', 'ok' => false, 'n' => 'Eigener Text', 'k' => 'Talking Head', 'x' => 'z. B. Story oder Reel, nur herunterladen']) ?>
+      <?= $tile(['v' => 'm', 'ty' => 'free', 'ok' => false, 'n' => 'Bewegungs-Clip', 'k' => 'Bewegung, ohne Gesichtsfilter', 'x' => 'nur herunterladen']) ?>
+    </div></div>
+    <?php if ($done): ?><div class="pk-pane" data-pane="done" hidden><p class="pk-sub">Eine neue Aufnahme ersetzt die alte.</p><div class="pk-tiles"><?= implode('', array_map($tile, $done)) ?></div></div><?php endif; ?>
+  </div>
+</section>
+
 <div class="pick">
-  <label for="what">Was nimmst du auf?</label>
-  <select id="what">
+  <select id="what" hidden>
     <option value="0">✍️ Eigener Text (z. B. Story, Reel) · Talking Head</option>
     <option value="m"<?= isset($_GET['move']) ? ' selected' : '' ?>>🧘 Bewegungs-Clip frei (nur herunterladen)</option>
     <?php if ($igs): ?><optgroup label="📱 Instagram täglich · Storys &amp; Reels">
@@ -165,8 +260,8 @@ body.editing .grid{display:none}
   <div class="seg" id="modeSeg" role="group" aria-label="Aufnahme-Art"><button type="button" data-mode="ganz">Am Stück</button><button type="button" data-mode="clips">Absatz für Absatz</button></div>
   <label class="seg-f" title="Ein Video vom Handy oder Computer öffnen und bearbeiten">🎞 Video vom Gerät bearbeiten<input type="file" id="openF" accept="video/*" hidden></label>
   <span class="done-l" id="doneL"></span>
-  <p class="what-i" id="whatI"></p>
 </div>
+<p class="what-i" id="whatI" hidden></p>
 
 <div id="edWrap" hidden><div class="ed-h"><h2>✂️ Video bearbeiten</h2><p class="tip" id="edInfo"></p></div><div id="ed"></div></div>
 
@@ -278,12 +373,26 @@ body.editing .grid{display:none}
     const lh=$('panel').closest('.box').querySelector('h2');lh.textContent=isMove?'☀️ Hintergrund & Licht':'✨ Kamera-Look';
     if(tc&&tc.profile!==profile())startCam();
     document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===lang)));
-    whatInfo();
+    whatInfo();pkNow();
     $('doneL').textContent=ig?(ig.has?'✓ Schon aufgenommen (eine neue Aufnahme ersetzt es)':''):mv?(mv.ok?'✓ Diese Übung ist schon gefilmt (eine neue Aufnahme ersetzt den Clip überall)':'Nur Hintergrund weich und Licht, keine Gesichtsfilter.'):(mvFree?'Nur Hintergrund weich und Licht, keine Gesichtsfilter.':(cur?((lang==='de'?cur.vde:cur.ven)?'✓ '+(lang==='de'?'Deutsch':'Englisch')+' ist schon hochgeladen (eine neue Aufnahme ersetzt es)':''):''));
     const u=new URL(location.href);['l','c','move','ig'].forEach(k=>u.searchParams.delete(k));if(ig)u.searchParams.set('ig',ig.id);else if(cur)u.searchParams.set('l',cur.id);if(mv)u.searchParams.set('c',mv.id);if(mvFree)u.searchParams.set('move','1');u.searchParams.set('lang',lang);history.replaceState(null,'',u);
     if(fromFile&&blob)tgt=mv?{clip:mv}:(ig?{ig:ig}:(cur?{t:cur,lang:lang}:null));
     setText();showAfter();clipUi();subPreview();}
   $('what').onchange=choose;
+  // ---- Kachel-Auswahl ----
+  const pkBody=$('pkBody'),pkTg=$('pkToggle');
+  function pkOpen(o){pkBody.hidden=!o;pkTg.setAttribute('aria-expanded',String(o));pkTg.textContent=o?'Schließen':'Anderes Video wählen'}
+  pkTg.onclick=()=>pkOpen(pkBody.hidden);
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
+    document.querySelectorAll('[data-pane]').forEach(p=>p.hidden=p.dataset.pane!==b.dataset.tab)});
+  document.querySelectorAll('.pk-t').forEach(t=>t.onclick=()=>{if((rec&&rec.state==='recording')||(cs&&cs.rec))return;
+    if(blob&&!saved&&!confirm('Die letzte Aufnahme ist noch nicht gespeichert. Trotzdem wechseln?'))return;
+    $('what').value=t.dataset.v;if($('what').value!==t.dataset.v)return;choose();pkOpen(false);$('pk').scrollIntoView({behavior:'smooth',block:'start'})});
+  function pkNow(){const v=$('what').value,t=document.querySelector('.pk-t[data-v="'+CSS.escape(v)+'"]');
+    document.querySelectorAll('.pk-t').forEach(x=>x.setAttribute('aria-current',String(x.dataset.v===v)));
+    $('pkI').textContent=t?t.querySelector('i').textContent:'🗣';$('pkI').style.background=t?getComputedStyle(t.querySelector('i')).backgroundColor:'';
+    $('pkT').textContent=t?t.querySelector('b').textContent:'Eigener Text';
+    $('pkS').innerHTML=$('whatI').innerHTML.replace(/^\S+\s/,'');}
   const WD=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],MO=['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
   function dLong(d){if(!d)return '';const x=new Date(d+'T12:00:00');return WD[x.getDay()]+', '+x.getDate()+'. '+MO[x.getMonth()]+' '+x.getFullYear()}
   function dueTxt(d,ok){if(!d)return 'noch kein Datum';const days=Math.round((new Date(d+'T12:00:00')-new Date(new Date().toDateString()+' 12:00'))/864e5);
@@ -566,6 +675,7 @@ body.editing .grid{display:none}
   subChips();document.body.classList.toggle('clipm',clipm);setMode(clipm?'clips':'ganz');
   window.__studio=()=>tc;
   choose();startCam();
+  if(!/[?&](l|c|ig|move)=/.test(location.search))pkOpen(true);
 })();
 </script>
 <?php
