@@ -70,15 +70,45 @@ $stripe = (bool)forma_stripe_key();
 @font-face{font-family:"Outfit";src:url(/fonts/Outfit-Regular.woff) format("woff");font-weight:400;font-display:swap}
 @font-face{font-family:"Outfit";src:url(/fonts/Outfit-Bold.woff) format("woff");font-weight:600;font-display:swap}
 @font-face{font-family:"Bricolage Grotesque";src:url(/fonts/BricolageGrotesque-Regular.woff) format("woff");font-weight:400;font-display:swap}
-@font-face{font-family:"Bricolage Grotesque";src:url(/fonts/BricolageGrotesque-Bold.woff) format("woff");font-weight:600;font-display:swap}
+@font-face{font-family:"Bricolage Grotesque";src:url(/fonts/BricolageGrotesque-Bold.woff) format("woff");font-weight:600 800;font-display:swap}
+@font-face{font-family:"Italiana";src:url(/fonts/Italiana-Regular.woff) format("woff");font-weight:400;font-display:swap}
 :root{--sand:#EEE2D4;--hafer:#E4D2BF;--ton:#DDBFA8;--paper:#FBF6F0;--rot:#8C2C1D;--braun:#674B40;--text:#33211B;--muted:#7A6258;--line:#E2D2C2;--ok:#4F6B3F;--okbg:#E3EAD9;
   --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;--body:"Outfit","Avenir Next",system-ui,sans-serif}
 *{box-sizing:border-box}
-body{margin:0;background:var(--sand);color:var(--text);font:400 17px/1.6 var(--body);
-  padding:28px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+body{margin:0;background:var(--sand);color:var(--text);font:400 17px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+.pad{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+/* Kopf wie auf der Startseite */
+.top{background:var(--ton)}
+.top .in{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:12px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text)}
+.brand img{width:60px;height:60px;object-fit:contain}
+.brand span{font-size:13px;font-weight:400;letter-spacing:.16em;text-transform:uppercase}
+.top .nr{font-size:14px;color:var(--braun);text-align:right;line-height:1.4}
+.top .nr b{font-weight:600;color:var(--text);white-space:nowrap}
+@media (min-width:861px){.brand img{width:96px;height:96px}.brand span{font-size:16px}}
+/* Kopfbereich mit Foto im Bogen */
+.hero{background:var(--ton);position:relative;overflow:hidden}
+.hero .in{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(20px,5vw,64px);align-items:center;padding-block:clamp(14px,3vw,36px) 0;position:relative;z-index:1}
+.kicker{font-family:"Italiana",Georgia,serif;font-size:clamp(26px,3vw,34px);line-height:1.15;color:var(--rot)}
+.hero h1{font:650 clamp(36px,5.4vw,66px)/1.04 var(--display);letter-spacing:-.025em;color:var(--rot);margin:6px 0 14px;text-wrap:balance}
+.for{font:600 clamp(18px,2vw,22px)/1.3 var(--display);color:var(--text)}
+.to{font-size:16px;color:var(--braun);margin-top:2px}
+.hero .lead{margin-top:14px;max-width:46ch}
+.art{position:relative;justify-self:center;width:min(100%,300px);padding:10px 0 26px}
+.art::before{content:"";position:absolute;inset:6% -10% 4% -6%;background:var(--hafer);border-radius:58% 42% 47% 53%/52% 46% 54% 48%;animation:morph 14s ease-in-out infinite alternate}
+.art img{position:relative;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:999px 999px 26px 26px;border:6px solid #FBF1EA;box-shadow:0 18px 40px rgba(51,33,27,.18)}
+.spark{position:absolute;z-index:2;width:26px;animation:twinkle 3.6s ease-in-out infinite}
+.spark path{fill:var(--rot)}
+.spark.s1{left:-6px;top:18%}.spark.s2{right:-4px;bottom:22%;width:18px;animation-delay:1.2s}
+@keyframes morph{to{border-radius:46% 54% 56% 44%/44% 56% 46% 54%}}
+@keyframes twinkle{50%{transform:scale(.6) rotate(20deg);opacity:.5}}
+.wave{display:block;width:100%;height:clamp(40px,6vw,90px);margin-top:-1px}
+.wave path{fill:var(--sand)}
+@media (max-width:700px){.hero .in{grid-template-columns:1fr}.art{width:min(46%,170px);order:-1;padding:4px 0 0}.hero h1{font-size:clamp(32px,9vw,40px)}}
+/* Inhalt */
 .wrap{max-width:760px;margin:0 auto}
-.sheet{background:var(--paper);border-radius:28px;padding:clamp(22px,5vw,44px);display:grid;gap:26px;position:relative;overflow:hidden}
-.sheet::after{content:"";position:absolute;right:-60px;top:-70px;width:220px;height:200px;background:var(--hafer);border-radius:58% 42% 55% 45%/50% 60% 40% 50%;opacity:.7;pointer-events:none}
+@media (min-width:900px){.wrap{max-width:920px}body{font-size:18px}.when b{font-size:21px}}
+.sheet{display:grid;gap:26px;padding-block:6px 48px}
 .head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;position:relative;z-index:1}
 .logo{display:flex;align-items:center;gap:12px;color:var(--rot);text-decoration:none}
 .logo img{width:54px;height:auto}
@@ -91,11 +121,15 @@ section{position:relative;z-index:1}
 h1{font:600 clamp(30px,6vw,44px)/1.08 var(--display);margin:6px 0 12px;text-wrap:balance;letter-spacing:-.01em}
 .lead{margin:0;max-width:60ch;white-space:pre-line}
 .facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.chip{border:1.5px dashed var(--ton);border-radius:999px;padding:3px 12px;font-size:14px;color:var(--braun)}
-h2{font:600 22px/1.2 var(--display);margin:0 0 4px}
+.chip{background:#FBF1EA;border-radius:999px;padding:4px 14px;font-size:14px;color:var(--braun)}
+h2{font:650 clamp(24px,3vw,30px)/1.15 var(--display);letter-spacing:-.02em;color:var(--rot);margin:0 0 4px}
+.date{position:relative}
+.badge{width:56px;height:56px;border-radius:50%;background:var(--rot);color:#FBF1EA;display:grid;place-items:center;align-content:center;line-height:1;flex:none}
+.badge b{font:650 22px var(--display)}.badge small{font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-top:2px}
+.whenrow{display:flex;gap:14px;align-items:center}
 .dates{display:grid;gap:12px;margin-top:12px}
-.date{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 18px;align-items:center;border:1px solid var(--line);border-radius:20px;padding:16px 18px;background:var(--paper)}
-.when b{font:600 19px/1.2 var(--display);display:block}
+.date{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 18px;align-items:center;border-radius:26px;padding:16px 18px;background:var(--paper);box-shadow:0 6px 18px rgba(103,48,30,.06)}
+.when b{font:600 19px/1.2 var(--display);display:block;color:var(--text)}
 .when span{font-size:15px;color:var(--muted)}
 .step{display:flex;align-items:center;gap:6px}
 .step button{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--rot);background:transparent;color:var(--rot);font:400 22px/1 var(--body);cursor:pointer;touch-action:manipulation}
@@ -120,7 +154,7 @@ textarea{width:100%;min-height:84px;border-radius:16px;border:1px solid var(--li
 .fine{font-size:14px;color:var(--muted);margin:10px 0 0;text-align:center}
 .done{border-radius:22px;background:var(--okbg);color:var(--ok);padding:18px 20px;font-size:16px}
 .done b{display:block;font:600 20px var(--display);margin-bottom:4px}
-.pay{display:flex;gap:18px;align-items:center;flex-wrap:wrap;background:var(--hafer);border-radius:22px;padding:18px 20px;font-size:15px}
+.pay{display:flex;gap:18px;align-items:center;flex-wrap:wrap;background:var(--paper);border-radius:22px;padding:18px 20px;font-size:15px}
 .pay b{font:600 18px var(--display)}
 .pay .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .qr{width:128px;height:128px;flex:none;border-radius:14px;background:#fff;padding:8px;line-height:0}
@@ -151,17 +185,17 @@ textarea{width:100%;min-height:84px;border-radius:16px;border:1px solid var(--li
 </style>
 </head>
 <body>
-<div class="wrap">
-<article class="sheet">
-  <header class="head">
-    <a class="logo" href="/"><img src="/img/forma-logo.png" alt="FORMA Earth &amp; Art"><span>EARTH &amp; ART<br>MATHON</span></a>
-    <div class="meta">Angebot <b><?= $h($o['nr']) ?></b><br>vom <?= $h($created) ?><?= $valid !== '' && $open ? ' · gültig bis ' . $h($valid) : '' ?></div>
-  </header>
-
-  <section>
-    <div class="eyebrow"><?= $open ? 'Unverbindliches Angebot' : ($o['status'] === 'bezahlt' ? 'Bestätigt und bezahlt' : 'Bestätigtes Angebot') ?> · <?= $h($o['org']) ?></div>
-    <?php if ($o['contact'] !== ''): ?><div class="to">z. H. <?= $h($o['contact']) ?></div><?php endif; ?>
+<header class="top"><div class="in pad">
+  <a class="brand" href="/"><img src="/img/forma-logo.png" alt="FORMA Earth &amp; Art Logo"><span>Töpferstudio Mathon</span></a>
+  <div class="nr">Angebot <b><?= $h($o['nr']) ?></b><br>vom <?= $h($created) ?><?= $valid !== '' && $open ? '<br>gültig bis ' . $h($valid) : '' ?></div>
+</div></header>
+<section class="hero">
+  <div class="in pad">
+  <div>
+    <div class="kicker"><?= $open ? 'Unverbindliches Angebot' : ($o['status'] === 'bezahlt' ? 'Bestätigt und bezahlt' : 'Bestätigtes Angebot') ?></div>
     <h1><?= $h($o['title']) ?></h1>
+    <div class="for">für <?= $h($o['org']) ?></div>
+    <?php if ($o['contact'] !== ''): ?><div class="to">z. H. <?= $h($o['contact']) ?></div><?php endif; ?>
     <?php if ($open): ?>
       <p class="lead"><?= $o['intro'] !== '' ? $h($o['intro']) : $h(($first !== '' ? "Liebe $first" : 'Hallo') . ', schön, dass ihr zu uns ins Atelier kommt! Trag einfach ein, wie viele Kinder pro Termin dabei sind, und bestätige mit einem Klick.') ?></p>
     <?php endif; ?>
@@ -170,7 +204,17 @@ textarea{width:100%;min-height:84px;border-radius:16px;border:1px solid var(--li
       <span class="chip">Farben &amp; Fertigstellung inklusive</span>
       <span class="chip"><?= $h($eurShort($unit)) ?> pro Kind</span>
     </div>
-  </section>
+  </div>
+  <div class="art">
+    <svg class="spark s1" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg>
+    <svg class="spark s2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg>
+    <img src="/img/bemalen-hand.jpg" alt="Eine Hand bemalt eine Tasse mit Pinsel und Farbe" width="560" height="700">
+  </div>
+  </div>
+  <svg class="wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 64c120-34 248-52 384-30s246 70 392 66 266-62 412-70 192 14 252 30v60H0z"/></svg>
+</section>
+<div class="wrap pad">
+<article class="sheet">
 
   <?php if (!empty($_GET['leer']) && $open): ?><p class="alert">Bitte trag bei mindestens einem Termin die Anzahl Kinder ein und füll aus, an wen die Rechnung geht (Name und Adresse).</p><?php endif; ?>
 
@@ -182,7 +226,7 @@ textarea{width:100%;min-height:84px;border-radius:16px;border:1px solid var(--li
       <div class="dates">
         <?php foreach ($dates as $i => $d): $k = (int)($d['kids'] ?? 0); $label = date('j. n.', strtotime($d['date'])); ?>
         <div class="date">
-          <div class="when"><b><?= $h(forma_offer_day($d['date'])) ?></b><span><?= $h(forma_offer_when($d) ?: 'Uhrzeit nach Absprache') ?></span></div>
+          <div class="whenrow"><span class="badge" aria-hidden="true"><b><?= date('j', strtotime($d['date'])) ?></b><small><?= ['Jän','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'][(int)date('n', strtotime($d['date'])) - 1] ?></small></span><div class="when"><b><?= $h(forma_offer_day($d['date'])) ?></b><span><?= $h(forma_offer_when($d) ?: 'Uhrzeit nach Absprache') ?></span></div></div>
           <div class="step">
             <button type="button" data-i="<?= $i ?>" data-s="-1" aria-label="Ein Kind weniger am <?= $h($label) ?>">−</button>
             <input id="kids-<?= $i ?>" name="kids[<?= $i ?>]" type="number" inputmode="numeric" min="0" max="<?= FORMA_OFFER_MAX_KIDS ?>" value="<?= $k ?>" aria-label="Kinder am <?= $h($label) ?>">
@@ -235,7 +279,7 @@ textarea{width:100%;min-height:84px;border-radius:16px;border:1px solid var(--li
     <div class="dates">
       <?php foreach ($dates as $d): $k = forma_offer_bill_kids($d); ?>
       <div class="date fixed">
-        <div class="when"><b><?= $h(forma_offer_day($d['date'])) ?></b><span><?= $h(forma_offer_when($d) ?: 'Uhrzeit nach Absprache') ?></span></div>
+        <div class="whenrow"><span class="badge" aria-hidden="true"><b><?= date('j', strtotime($d['date'])) ?></b><small><?= ['Jän','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'][(int)date('n', strtotime($d['date'])) - 1] ?></small></span><div class="when"><b><?= $h(forma_offer_day($d['date'])) ?></b><span><?= $h(forma_offer_when($d) ?: 'Uhrzeit nach Absprache') ?></span></div></div>
         <div class="count"><?= $k ?> Kinder<small><?= $h($eur($k * $unit)) ?></small></div>
       </div>
       <?php endforeach; ?>
