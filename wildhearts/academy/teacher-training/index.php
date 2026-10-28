@@ -2,7 +2,7 @@
 // moveciamovement.com/academy/teacher-training – The Mindful Becoming Teacher Training (Vivien, 28.10.2026, Runde 2)
 // 550 Std. inkl. vollständiger 200-Std.-Yogalehrerausbildung, 11 Monate hybrid, Start Mi 3.11.2027, nur alle 2 Jahre, max. 10 Plätze.
 // Ende: Präsenzwochenende September 2028 (Lehrprobe) → Online-Abschlussprüfung mit Kamera → Zertifikat.
-// Buchung: 50 % Anzahlung, Rest auf einmal / in 2 / in 3 Zahlungen bis 15.9.2027. Early-Bird € 3.390 bis 31.3.2027, danach € 4.500.
+// Buchung: 50 % Anzahlung, Rest auf einmal / in 2 / in 3 Zahlungen bis 15.9.2027. Early-Bird € 3.590 bis 31.3.2027, danach € 4.500.
 // ?danke=1 nach der Zahlung, ?angebot=TOKEN = persönlicher Kennenlern-Preis aus dem Gespräch (20 Min. Countdown, nie öffentlich).
 declare(strict_types=1);
 require_once __DIR__ . '/../../assets/icons.inc.php';
