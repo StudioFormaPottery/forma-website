@@ -264,7 +264,7 @@ main{max-width:1240px}
     for(let i=0;i<L.length;i++){$('msg').className='msg';$('msg').textContent='Hole Lied '+(i+1)+' von '+L.length+': '+L[i].title+' …';
       try{const j=await post('mm_mu_fetch',L[i]);if(j.skip)skip++;else if(j.ok)ok++;else bad.push(L[i].title)}catch(e){bad.push(L[i].title)}fill.style.width=Math.round((i+1)/L.length*100)+'%'}
     bar.hidden=true;$('packGo').disabled=false;
-    $('msg').className=bad.length?'msg':'msg ok';$('msg').textContent='✓ '+ok+' Lieder geholt und einsortiert'+(skip?', '+skip+' waren schon da':'')+'.'+(bad.length?' Nicht geklappt: '+bad.join(', ')+'. Sag Claude „neue Links“, dann bekommst du frische.':'');
+    $('msg').className=bad.length||!ok?'msg':'msg ok';$('msg').textContent=(ok?'✓ '+ok+(ok===1?' Lied':' Lieder')+' geholt und einsortiert':'Keine neuen Lieder geholt')+(skip?', '+(skip===1?'1 war':skip+' waren')+' schon da':'')+'.'+(bad.length?' Nicht geklappt: '+bad.join(', ')+'. Sag Claude „neue Links“, dann bekommst du frische.':'');
     if(!bad.length)setTimeout(()=>location.reload(),1200)};
   const cu=$('copyU');if(cu)cu.onclick=async()=>{const t='Bitte sortier diese Lieder in meine Musik-Ordner:\n'+cu.dataset.list;
     try{await navigator.clipboard.writeText(t);cu.textContent='✓ Kopiert – jetzt bei Claude einfügen'}catch(e){prompt('Kopieren und bei Claude einfügen:',t)}};
