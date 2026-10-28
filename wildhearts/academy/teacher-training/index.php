@@ -3,7 +3,7 @@
 // 550 Std. inkl. vollständiger 200-Std.-Yogalehrerausbildung, 11 Monate hybrid, Start Mi 3.11.2027, nur alle 2 Jahre, max. 10 Plätze.
 // Ende: Präsenzwochenende September 2028 (Lehrprobe) → Online-Abschlussprüfung mit Kamera → Zertifikat.
 // Buchung: 50 % Anzahlung, Rest auf einmal / in 2 / in 3 Zahlungen bis 15.9.2027. Early-Bird € 3.390 bis 31.3.2027, danach € 4.500.
-// ?danke=1 nach der Zahlung, ?angebot=TOKEN = persönliches Angebot aus dem Kennenlerngespräch (Countdown, Early-Bird-Preis).
+// ?danke=1 nach der Zahlung, ?angebot=TOKEN = persönlicher Kennenlern-Preis aus dem Gespräch (20 Min. Countdown, nie öffentlich).
 declare(strict_types=1);
 require_once __DIR__ . '/../../assets/icons.inc.php';
 require dirname(__DIR__, 3) . '/api/academy-lib.php';
@@ -28,7 +28,7 @@ $ee = fn(int $x) => ac_eur($x, 'en');
 $dd = fn(string $ymd) => ac_d($ymd);
 $de2 = fn(string $ymd) => ac_d($ymd, 'en');
 if ($offer || isset($_GET['danke']) || isset($_GET['abbruch'])) $GLOBALS['mvl_noindex'] = true;
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=6">';
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=7">';
 mvl_head('Yogalehrerausbildung auf Deutsch · Mindful Movement Teacher Training ' . AC_HOURS . ' Std. | Movecia Academy Tirol',
     'Die ' . AC_HOURS . '-Stunden-Ausbildung mit Vivien Malonga, ausschließlich auf Deutsch: vollständige 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum, Somatic Movement, Breathwork, Anatomie & Body Scanning, Mental Load & Nervensystem. 11 Monate hybrid, online aus Österreich, Deutschland, der Schweiz und Südtirol, Präsenzwochenende in Tirol. Start ' . mv_date($st) . ', nur 10 Plätze.' . ($c['eb'] ? ' Early-Bird bis ' . mv_date($c['eb_end']) . '.' : ''),
     $site . '/academy/teacher-training/', '/img/movecia/og-academy.jpg', $css, ac_jsonld($pdo));
@@ -58,7 +58,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
 <main id="top">
 <?php if ($offerLive): ?>
 <div class="w"><div class="offerbar" id="offerbar" data-until="<?= (int)$offer['offer_until'] ?>" data-now="<?= time() ?>">
-  <span><span class="de">Dein Angebot aus unserem Gespräch:</span><span class="en">Your offer from our call:</span> <b><?= $e($p['total']) ?></b><?= !$c['eb'] ? ' <s style="opacity:.6">' . $e($c['r_total']) . '</s>' : '' ?></span>
+  <span><span class="de">Dein Kennenlern-Preis aus unserem Gespräch:</span><span class="en">Your price from our call:</span> <b><?= $e($p['total']) ?></b> <s style="opacity:.6"><?= $e($c['price']) ?></s></span>
   <span><span class="de">gilt noch</span><span class="en">valid for</span> <span class="cd" id="offercd">–</span></span>
   <a class="btn light sm" href="#buchen"><span class="de">Jetzt Platz sichern</span><span class="en">Book my place</span></a>
 </div></div>
@@ -289,7 +289,8 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
     <div>
       <p class="k"><span class="de">Dein Platz</span><span class="en">Your place</span></p>
       <h2 style="margin-top:.5rem"><span class="de">Einer von nur zehn</span><span class="en">One of only ten</span></h2>
-      <?php if ($p['eb']): ?><p class="ebird on-plum"><?= ac_birds() ?><b>Early Bird</b><span class="eb-p"><?= $e($p['total']) ?></span><span class="eb-d"><span class="de"><?= $offerLive && !$c['eb'] ? 'dein Angebot aus unserem Gespräch' : 'bis ' . mv_date($c['eb_end']) . ' · danach ' . $e($c['r_total']) ?></span><span class="en"><?= $offerLive && !$c['eb'] ? 'your offer from our call' : 'until ' . mv_date($c['eb_end'], 'en') . ' · then ' . $ee($c['r_total']) ?></span></span></p>
+      <?php if (!empty($p['call'])): ?><p class="ebird on-plum"><?= ac_birds() ?><b>Kennenlern-Preis</b><span class="eb-p"><?= $e($p['total']) ?></span><span class="eb-d"><span class="de">nur für dich, aus unserem Gespräch · statt <?= $e($c['price']) ?></span></span></p>
+      <?php elseif ($p['eb']): ?><p class="ebird on-plum"><?= ac_birds() ?><b>Early Bird</b><span class="eb-p"><?= $e($p['total']) ?></span><span class="eb-d"><span class="de"><?= 'bis ' . mv_date($c['eb_end']) . ' · danach ' . $e($c['r_total']) ?></span><span class="en"><?= 'until ' . mv_date($c['eb_end'], 'en') . ' · then ' . $ee($c['r_total']) ?></span></span></p>
       <?php else: ?><p class="amt"><?= $e($p['total']) ?></p><?php endif; ?>
       <ul class="incl">
         <li><span class="de"><?= AC_HOURS ?> Stunden inkl. vollständiger 200-Std.-Yogalehrerausbildung</span><span class="en"><?= AC_HOURS ?> hours incl. a complete 200-hour yoga teacher training</span></li>

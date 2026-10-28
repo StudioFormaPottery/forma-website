@@ -67,7 +67,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     }
     if ($me && $a === 'logout') { mm_dev_logout($pdo); mv_logout(); $go('?bye=1'); }
 }
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=6">';
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=7">';
 
 // --- Nicht angemeldet ---------------------------------------------------------------------------
 if (!$r && !$demo) {
@@ -136,6 +136,9 @@ $msgs = $demo ? [
     ['who' => 'viv', 'text' => $L('Hallo Lena, wie schön! Eine Matte reicht für den Anfang völlig. Blöcke, Gurt und Polster kommen erst in Modul 3 dazu, eine Liste bekommst du rechtzeitig ♡', 'Hi Lena, how lovely! A mat is all you need to begin. Blocks, a strap and a bolster only come in with module 3, and you will get a list in good time ♡'), 'created_at' => date('c', time() - 80000)],
 ] : ac_msgs($pdo, (int)$r['id']);
 $faq = array_map(fn($q) => $lang === 'en' ? [$q[2], $q[3]] : [$q[0], $q[1]], ac_member_faq());
+// „Häufig gefragt“-Chips im Chat → Index in $faq
+$chips = [];
+foreach (ac_member_chips() as [$lab, $q]) { foreach ($faq as $i => $f) if ($f[0] === $q) { $chips[] = [$lab, $i]; break; } }
 $hours = ac_hours();
 $hr = (int)(new DateTimeImmutable('now', new DateTimeZone('Europe/Vienna')))->format('G');
 $hello = $hr < 11 ? $L('Guten Morgen', 'Good morning') : ($hr < 17 ? $L('Hallo', 'Hello') : $L('Guten Abend', 'Good evening'));
@@ -200,6 +203,9 @@ mvl_head($L('Teacher Training · Mitgliederbereich', 'Teacher Training · Member
   <div class="acm-col">
     <section class="acm-card acm-chat" id="chat">
       <div class="acm-chathead"><img src="/img/movecia/fotos/ev-profil.jpg" alt=""><div><p class="k"><?= $L('Dein Draht zu mir', 'Your line to me') ?></p><h2><?= $L('Schreib <em>mir</em>', 'Write to <em>me</em>') ?></h2></div><?= ac_birds() ?></div>
+      <div class="acm-chips" role="group" aria-label="Häufig gefragt"><p class="acm-chips-k">Häufig gefragt</p><div class="acm-chips-r" id="acChips">
+        <?php foreach ($chips as [$lab, $fi]): ?><button type="button" class="acm-chip" data-f="<?= (int)$fi ?>"><?= $h($lab) ?></button><?php endforeach; ?>
+      </div></div>
       <div class="acm-msgs" id="acMsgs" aria-live="polite"></div>
       <div class="acm-sugg" id="acSugg" hidden><p class="small"><b><?= $L('Vielleicht hilft dir das schon:', 'Maybe this already helps:') ?></b></p><div id="acSuggList"></div></div>
       <form id="acChat" class="acm-send"><textarea id="acText" rows="2" maxlength="2000" placeholder="<?= $L('Deine Nachricht an Vivien …', 'Your message to Vivien …') ?>" required></textarea><button class="btn" type="submit"><?= $L('Senden', 'Send') ?></button></form>
@@ -224,7 +230,7 @@ mvl_head($L('Teacher Training · Mitgliederbereich', 'Teacher Training · Member
   <p class="k"><?= $L('Fragen & Antworten', 'Questions & answers') ?></p>
   <h2><?= $L('Was du vielleicht <em>wissen möchtest</em>', 'What you might <em>like to know</em>') ?></h2>
   <div class="cute-faq">
-    <?php foreach ($faq as $q): ?><details><summary><?= $h($q[0]) ?></summary><p><?= $h($q[1]) ?></p></details><?php endforeach; ?>
+    <?php foreach ($faq as $i => $q): ?><details id="faq-<?= $i ?>"><summary><?= $h($q[0]) ?></summary><p><?= $h($q[1]) ?></p></details><?php endforeach; ?>
   </div>
   <p class="mut small" style="margin-top:1.2rem"><a href="/terms/#teacher"><?= $L('Bedingungen & Rücktrittsrecht', 'Terms & right of withdrawal') ?></a> · <a href="/academy/teacher-training/<?= $lang === 'en' ? '?lang=en' : '' ?>"><?= $L('Alles über die Ausbildung', 'All about the training') ?></a></p>
 </div></section>
@@ -249,9 +255,21 @@ mvl_head($L('Teacher Training · Mitgliederbereich', 'Teacher Training · Member
   var box=document.getElementById('acMsgs'),first=<?= json_encode($first) ?>;
   function esc(s){return s.replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function when(iso){var d=new Date(iso);return d.toLocaleDateString(en?'en-GB':'de-AT',{day:'numeric',month:'short'})+' · '+d.toLocaleTimeString(en?'en-GB':'de-AT',{hour:'2-digit',minute:'2-digit'})}
-  function draw(){if(!msgs.length){box.innerHTML='<p class="acm-empty">'+T('Noch keine Nachrichten. Schreib mir einfach, ich freu mich auf dich ♡','No messages yet. Just write to me, I would love to hear from you ♡')+'</p>';return}
-    box.innerHTML=msgs.map(function(m){return '<div class="bub '+m.who+'">'+esc(m.text).replace(/\n/g,'<br>')+'<small>'+(m.who==='viv'?'Vivien':esc(first))+' · '+when(m.at)+'</small></div>'}).join('');box.scrollTop=box.scrollHeight}
+  // Antworten auf „Häufig gefragt“ (nur hier im Browser, gehen nicht an Vivien)
+  var faqA=[];
+  function faqHtml(a){var f=faq[a.f];return '<div class="bub q">'+esc(a.lab)+'</div><div class="bub viv fa" data-i="'+a.f+'"><span class="fa-k">'+T('Häufig gefragt','Often asked')+'</span>'+esc(f[1])
+    +'<a class="fa-more" href="#faq-'+a.f+'">'+T('Mehr in Fragen &amp; Antworten','More in questions &amp; answers')+' →</a>'
+    +(a.ok?'<span class="fa-ok">'+T('Schön, dass es dir hilft ♡','So glad it helps ♡')+'</span>':'<span class="fa-b"><button type="button" class="fa-yes">'+T('Danke, das hilft ✓','Thanks, that helps ✓')+'</button><button type="button" class="fa-ask">'+T('Ich möchte Vivien direkt schreiben','I want to write to Vivien')+'</button></span>')+'</div>'}
+  function draw(){var h=msgs.map(function(m){return '<div class="bub '+m.who+'">'+esc(m.text).replace(/\n/g,'<br>')+'<small>'+(m.who==='viv'?'Vivien':esc(first))+' · '+when(m.at)+'</small></div>'}).join('')+faqA.map(faqHtml).join('');
+    box.innerHTML=h||('<p class="acm-empty">'+T('Noch keine Nachrichten. Schreib mir einfach, ich freu mich auf dich ♡','No messages yet. Just write to me, I would love to hear from you ♡')+'</p>');box.scrollTop=box.scrollHeight}
   draw();
+  document.getElementById('acChips').addEventListener('click',function(e){var b=e.target.closest('.acm-chip');if(!b)return;var f=+b.dataset.f;
+    faqA=faqA.filter(function(a){return a.f!==f});faqA.push({f:f,lab:b.textContent,ok:false});b.classList.add('done');draw();
+    var qs=box.querySelectorAll('.bub.q');if(qs.length)box.scrollTop=qs[qs.length-1].offsetTop-box.offsetTop-8});
+  box.addEventListener('click',function(e){var bub=e.target.closest('.fa');if(!bub)return;var i=+bub.dataset.i,a=faqA.filter(function(x){return x.f===i})[0];
+    if(e.target.closest('.fa-yes')){a.ok=true;draw()}
+    else if(e.target.closest('.fa-ask')){ta.value=a.lab+' ';ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);ta.scrollIntoView({block:'center',behavior:'smooth'})}
+    else if(e.target.closest('.fa-more')){e.preventDefault();var d=document.getElementById('faq-'+i);if(d){d.open=true;d.classList.add('hl');d.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){d.classList.remove('hl')},2400)}}});
   if(!demo)setInterval(function(){if(document.hidden)return;api({action:'chat_get'}).then(function(j){if(j.ok&&j.msgs.length!==msgs.length){msgs=j.msgs.map(function(m){return{who:m.who,text:m.text,at:m.created_at}});draw()}}).catch(function(){})},20000);
   // Vorschläge aus den Fragen & Antworten, bevor man schickt
   var ta=document.getElementById('acText'),sg=document.getElementById('acSugg'),sl=document.getElementById('acSuggList');

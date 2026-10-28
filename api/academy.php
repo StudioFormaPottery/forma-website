@@ -21,6 +21,20 @@ if (isset($_GET['paid'])) {
     exit;
 }
 
+// Gesprächsraum (Kennenlerngespräch): fragt alle paar Sekunden, ob Vivien das Angebot gezeigt hat.
+// Preis und Link kommen nur hierher, wenn das Angebot für genau dieses Gespräch läuft (nie öffentlich).
+if (isset($_GET['call'])) {
+    $c = ac_call_by_link($pdo, (int)$_GET['call'], (string)($_GET['k'] ?? ''));
+    if (!$c) forma_json(['ok' => false], 404);
+    $out = ['ok' => true, 'now' => time(), 'offer' => null];
+    if (ac_offer_live($c)) {
+        $cfg = ac_cfg(); $p = ac_prices($c);
+        $out['offer'] = ['until' => (int)$c['offer_until'], 'total' => ac_eur($p['total']), 'before' => ac_eur($cfg['price']), 'deposit' => ac_eur(intdiv($p['total'], 2)),
+            'save' => ac_eur($cfg['price'] - $p['total']), 'link' => ac_offer_link((string)$c['offer_token']), 'free' => ac_free($pdo) > 0];
+    }
+    forma_json($out);
+}
+
 // Nächste offene Teilzahlung bezahlen (Link in Mail und im Mitgliederbereich)
 if (isset($_GET['pay'])) {
     $r = ac_booking($pdo, (int)$_GET['pay']);

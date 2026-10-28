@@ -14,7 +14,7 @@ const AC_HOURS = 550;
 // Kennenlerngespräch (Vivien): Mi/Do/Fr 8:00, Mi/Do 18:30, 30 Minuten, online per Video
 const AC_CALL_SLOTS = [3 => ['08:00', '18:30'], 4 => ['08:00', '18:30'], 5 => ['08:00']];
 const AC_CALL_MINUTES = 30;
-const AC_OFFER_MINUTES = 30;             // so lange gilt das Angebot aus dem Gespräch
+const AC_OFFER_MINUTES = 20;             // so lange gilt der Kennenlern-Preis aus dem Gespräch (Vivien, 28.10.2026, Runde 4)
 const AC_MAIL_BEFORE = 10;               // Bezahl-Link so viele Tage vor dem Fälligkeitstag
 
 // --- Einstellungen ------------------------------------------------------------------------------
@@ -34,6 +34,8 @@ function ac_cfg_raw(): array
         'due_mid' => '2027-06-15', 'due_final' => '2027-09-15',
         'two_until' => '2027-08-31', // ab 16.6. nur noch auf einmal oder 2 Zahlungen, ab 1.9. nur auf einmal
         'storno1' => '2027-06-30',
+        // Kennenlern-Preis (Runde 4): nur im Kennenlerngespräch, 20 Minuten, auch nach dem Early-Bird. Nie öffentlich nennen.
+        'call_total' => 319000,
     ];
     $c = mm_cfg('academy') ?? [];
     foreach ($def as $k => $v) $def[$k] = is_int($v) ? (int)($c[$k] ?? $v) : (string)($c[$k] ?? $v);
@@ -268,6 +270,11 @@ function ac_schema(PDO $pdo): void
         seen INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL
     )');
+    // Kennenlern-Preis (Runde 4): Buchung zum Preis aus dem Gespräch
+    $bc = array_column($pdo->query('PRAGMA table_info(ac_bookings)')->fetchAll(), 'name');
+    if (!in_array('call_price', $bc, true)) $pdo->exec('ALTER TABLE ac_bookings ADD COLUMN call_price INTEGER NOT NULL DEFAULT 0');
+    $cc = array_column($pdo->query('PRAGMA table_info(ac_calls)')->fetchAll(), 'name');
+    if (!in_array('offer_mailed', $cc, true)) $pdo->exec('ALTER TABLE ac_calls ADD COLUMN offer_mailed INTEGER NOT NULL DEFAULT 0');
     ac_welcome_lesson($pdo);
 }
 
@@ -334,16 +341,62 @@ function ac_offer_start(PDO $pdo, int $callId, int $minutes = AC_OFFER_MINUTES):
     $c = ac_call($pdo, $callId);
     if (!$c) throw new RuntimeException('Gespräch nicht gefunden.');
     $tok = $c['offer_token'] !== '' ? $c['offer_token'] : bin2hex(random_bytes(12));
-    $pdo->prepare('UPDATE ac_calls SET offer_token = ?, offer_until = ? WHERE id = ?')->execute([$tok, time() + max(5, min(180, $minutes)) * 60, $callId]);
-    return mm_site() . '/academy/teacher-training/?angebot=' . $tok . ($c['lang'] === 'en' ? '&lang=en' : '') . '#buchen';
+    $until = time() + max(5, min(180, $minutes)) * 60;
+    $pdo->prepare('UPDATE ac_calls SET offer_token = ?, offer_until = ? WHERE id = ?')->execute([$tok, $until, $callId]);
+    $link = ac_offer_link($tok);
+    // Zur Sicherheit auch per Mail (falls sie den Gesprächsraum schon geschlossen hat oder ihr Browser die Karte nicht zeigt)
+    $c = ac_call($pdo, $callId);
+    try { ac_offer_mail($c, $link, $until); $pdo->prepare('UPDATE ac_calls SET offer_mailed = offer_mailed + 1 WHERE id = ?')->execute([$callId]); }
+    catch (Throwable $e) { error_log('AC offer mail: ' . $e->getMessage()); }
+    return $link;
 }
 
-/** Gesamtpreis für eine Buchung: Early-Bird solange er gilt oder solange das Angebot aus dem Gespräch läuft. */
+function ac_offer_link(string $tok): string
+{
+    return mm_site() . '/academy/teacher-training/?angebot=' . $tok . '#buchen';
+}
+
+/** Persönliche Mail mit dem Kennenlern-Preis (nur an die Frau aus dem Gespräch, nie an die Liste). */
+function ac_offer_blocks(array $c, int $until): array
+{
+    $cfg = ac_cfg();
+    $p = ac_prices(array_merge($c, ['offer_until' => $until]));
+    $first = forma_first_name((string)$c['name']);
+    return [
+        'Hallo ' . $first . ',',
+        'danke für unser Gespräch ♡ Wie versprochen bekommst du für die nächsten ' . AC_OFFER_MINUTES . ' Minuten deinen persönlichen Kennenlern-Preis für das Mindful Movement Teacher Training.',
+        ['box' => ['Dein Kennenlern-Preis: ' . ac_eur($p['total']) . ' statt ' . ac_eur($cfg['price']), 'gilt bis ' . date('G:i', $until) . ' Uhr', 'bei der Buchung 50 % Anzahlung (' . ac_eur(intdiv($p['total'], 2)) . '), den Rest auf einmal oder in Teilen bis ' . mv_date(mv_ts($cfg['due_final'], '12:00')) . ', ohne Aufschlag']],
+        'Über den Knopf kommst du direkt zur Anmeldung, der Preis ist dort schon eingetragen. Wenn du noch Zeit zum Nachdenken brauchst, ist das völlig in Ordnung. Dann gilt einfach wieder der normale Preis.',
+    ];
+}
+
+function ac_offer_mail(array $c, string $link, int $until): void
+{
+    $blocks = ac_offer_blocks($c, $until);
+    $r = ['lang' => 'de', 'email' => (string)$c['email'], 'name' => (string)$c['name']];
+    $html = ac_mail_html($r, 'nur für dich ♡', 'Dein Kennenlern-Preis', $blocks, $link, 'Jetzt Platz sichern', '', false);
+    mm_mail((string)$c['email'], 'Dein persönlicher Kennenlern-Preis · Movecia Academy', ac_mail_text($blocks, $link, 'Jetzt Platz sichern', '', false), $html, [], 'Vivien · Movecia Academy');
+}
+
+/** Persönlicher Gesprächsraum (Movecia-Seite mit eingebettetem Videoraum und Angebotskarte). */
+function ac_call_room_link(array $c): string
+{
+    return mm_site() . '/academy/gespraech/?c=' . (int)$c['id'] . '&k=' . $c['token'];
+}
+
+function ac_call_by_link(PDO $pdo, int $id, string $k): ?array
+{
+    ac_schema($pdo);
+    $c = ac_call($pdo, $id);
+    return $c && $k !== '' && hash_equals((string)$c['token'], $k) ? $c : null;
+}
+
+/** Gesamtpreis für eine Buchung: Kennenlern-Preis solange das Angebot aus dem Gespräch läuft, sonst Early-Bird bzw. regulär. Immer am Server. */
 function ac_prices(?array $offer = null): array
 {
     $c = ac_cfg();
-    $eb = $c['eb'] || ac_offer_live($offer);
-    return ['eb' => $eb, 'total' => $eb ? $c['eb_total'] : $c['r_total']];
+    if (ac_offer_live($offer)) return ['eb' => false, 'call' => true, 'total' => min($c['call_total'], $c['price'])];
+    return ['eb' => $c['eb'], 'call' => false, 'total' => $c['eb'] ? $c['eb_total'] : $c['r_total']];
 }
 
 // --- Buchung über Stripe --------------------------------------------------------------------------
@@ -354,7 +407,7 @@ function ac_part_checkout(PDO $pdo, array $r, array $part): string
     $en = $r['lang'] === 'en';
     $site = mm_site();
     $c = ac_cfg();
-    $label = AC_TITLE . ' · ' . ac_part_label($r, (int)$part['n'], $r['lang']) . ((int)$r['eb'] ? ' · Early Bird' : '');
+    $label = AC_TITLE . ' · ' . ac_part_label($r, (int)$part['n'], $r['lang']) . ((int)$r['eb'] ? ' · Early Bird' : ((int)($r['call_price'] ?? 0) ? ' · Kennenlern-Preis' : ''));
     $first = (int)$part['n'] === 1;
     $msg = ($en ? 'Your training starts on ' . mv_date($c['start_ts'], 'en') . '. ' : 'Deine Ausbildung startet am ' . mv_date($c['start_ts']) . '. ')
         . ($en ? 'Terms and cancellation: ' : 'Bedingungen und Storno: ') . $site . '/terms#teacher';
@@ -410,8 +463,8 @@ function ac_checkout(PDO $pdo, array $in, string $ipHash = ''): string
     $p = ac_prices($offer);
     $parts = ac_schedule($p['total'], $plan);
     $tok = bin2hex(random_bytes(16));
-    $pdo->prepare('INSERT INTO ac_bookings (plan, eb, total_cents, parts, name, email, phone, practice, practice_note, why, lang, consent, call_id, token, test, ip_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
-        ->execute([$plan, $p['eb'] ? 1 : 0, $p['total'], json_encode($parts), $name, $email, $phone, $practice, $note, $why, $en ? 'en' : 'de', 1, $offer ? (int)$offer['id'] : null, $tok, forma_stripe_test_mode() ? 1 : 0, $ipHash, date('c')]);
+    $pdo->prepare('INSERT INTO ac_bookings (plan, eb, call_price, total_cents, parts, name, email, phone, practice, practice_note, why, lang, consent, call_id, token, test, ip_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
+        ->execute([$plan, $p['eb'] ? 1 : 0, !empty($p['call']) ? 1 : 0, $p['total'], json_encode($parts), $name, $email, $phone, $practice, $note, $why, $en ? 'en' : 'de', 1, $offer ? (int)$offer['id'] : null, $tok, forma_stripe_test_mode() ? 1 : 0, $ipHash, date('c')]);
     $r = ac_booking($pdo, (int)$pdo->lastInsertId());
     return ac_part_checkout($pdo, $r, $parts[0]);
 }
@@ -616,7 +669,7 @@ function ac_plan_block(array $r): array
             'when' => $paid ? 'bezahlt am ' . mv_date(strtotime((string)$p['paid'])) : ($p['due'] === '' ? 'jetzt fällig' : 'fällig bis ' . ac_d((string)$p['due']))];
     }
     $paid = ac_paid_cents($r);
-    return ['plan' => $rows, 'sum' => 'Gesamtpreis ' . ac_eur((int)$r['total_cents']) . ((int)$r['eb'] ? ' (Early Bird)' : '') . ' · bezahlt ' . ac_eur($paid) . ' · offen ' . ac_eur((int)$r['total_cents'] - $paid)];
+    return ['plan' => $rows, 'sum' => 'Gesamtpreis ' . ac_eur((int)$r['total_cents']) . ((int)$r['eb'] ? ' (Early Bird)' : ((int)($r['call_price'] ?? 0) ? ' (Kennenlern-Preis)' : '')) . ' · bezahlt ' . ac_eur($paid) . ' · offen ' . ac_eur((int)$r['total_cents'] - $paid)];
 }
 
 /** Die Konfetti-Mail nach der Anzahlung (Vivien, 28.10.2026): warm, ausführlich, wie an die beste Freundin, aber professionell. Nur Deutsch. */
@@ -690,7 +743,7 @@ function ac_notify_viv(PDO $pdo, array $r): void
 {
     $c = ac_cfg();
     $pfx = (int)$r['test'] === 1 ? '[TEST] ' : '';
-    $v = "Hallo Viv,\n\n" . $r['name'] . ' (' . $r['email'] . ', ' . $r['phone'] . ') hat sich gerade einen Platz im Teacher Training gesichert: ' . mv_eur((int)$r['total_cents']) . ((int)$r['eb'] ? ' (Early-Bird)' : '') . ', ' . ac_plan_label((string)$r['plan']) . ($r['call_id'] ? ', aus dem Kennenlerngespräch' : '')
+    $v = "Hallo Viv,\n\n" . $r['name'] . ' (' . $r['email'] . ', ' . $r['phone'] . ') hat sich gerade einen Platz im Teacher Training gesichert: ' . mv_eur((int)$r['total_cents']) . ((int)$r['eb'] ? ' (Early-Bird)' : ((int)($r['call_price'] ?? 0) ? ' (Kennenlern-Preis)' : '')) . ', ' . ac_plan_label((string)$r['plan']) . ($r['call_id'] ? ', aus dem Kennenlerngespräch' : '')
         . ". Noch " . ac_free($pdo) . ' von ' . $c['seats'] . " Plätzen frei.\n\nZahlungsplan:\n" . implode("\n", ac_parts_lines($r)) . "\n\nEigene Praxis: " . ac_practice_label((string)$r['practice']) . ($r['practice_note'] !== '' ? "\n" . $r['practice_note'] : '')
         . "\n\nWarum sie die Ausbildung machen möchte:\n" . $r['why'] . "\n\nRücktritt möglich bis " . date('d.m.Y', ac_withdraw_until($r)) . "\n\nAlle Buchungen: " . forma_site_url() . "/verwaltung/?view=academy\n";
     mm_mail(natal_notify_email_safe(), $pfx . 'Neue Buchung: Teacher Training · ' . $r['name'], $v, mm_mail_html('Neue Buchung', nl2br(forma_h($v)), 'de'));
@@ -717,7 +770,7 @@ function ac_invoice_source(PDO $pdo, int $payId): ?array
     $lab = ac_part_label($r, (int)$p['n']);
     $text = AC_TITLE . ' · ' . $lab . ($cnt > 1 && !str_contains($lab, ' von ') ? ' (' . (int)$p['n'] . '. von ' . $cnt . ' Zahlungen)' : '');
     $detail = 'Ausbildung, ' . AC_HOURS . ' Std. inkl. 200-Std.-Yogalehrerausbildung, hybrid, ' . date('d.m.Y', $c['start_ts']) . ' bis September 2028, inkl. Präsenzwochenende mit Unterkunft und Verpflegung, Abschlussprüfung und Zertifikat'
-        . ' · Gesamtpreis ' . mv_eur((int)$r['total_cents']) . ((int)$r['eb'] ? ' (Early-Bird)' : '') . ($cnt > 1 ? ', davon mit dieser Zahlung ' . mv_eur((int)$p['cents']) : '');
+        . ' · Gesamtpreis ' . mv_eur((int)$r['total_cents']) . ((int)$r['eb'] ? ' (Early-Bird)' : ((int)($r['call_price'] ?? 0) ? ' (Kennenlern-Preis)' : '')) . ($cnt > 1 ? ', davon mit dieser Zahlung ' . mv_eur((int)$p['cents']) : '');
     return ['name' => $r['name'], 'email' => $r['email'], 'session' => '', 'address' => $r['address'], 'country' => $r['country'] ?: 'AT', 'service' => date('d.m.Y', $c['start_ts']),
         'items' => [['text' => $text, 'detail' => $detail, 'qty' => 1, 'unit' => (int)$p['cents']]],
         'gross' => (int)$p['cents'], 'paid' => $p['paid_at'], 'type' => 'Movecia',
@@ -790,7 +843,7 @@ function ac_call_request(PDO $pdo, array $in, string $ipHash): array
         ac_call_confirm($pdo, $id);
         $c = ac_call($pdo, $id);
         $v = "Hallo Viv,\n\nneues Kennenlerngespräch zum Teacher Training, schon fix eingetragen:\n\n" . ac_call_when($c) . "\n" . $name . ' · ' . $email . ($phone !== '' ? ' · ' . $phone : '') . ($note !== '' ? "\n\nIhre Nachricht: " . $note : '')
-            . "\n\nDein Gastgeberinnen-Link: " . ($c['host_url'] ?: $c['room_url']) . "\nIm Gespräch kannst du ihr in der Verwaltung mit „✦ Angebot zeigen“ den Early-Bird-Preis für 30 Minuten freischalten: " . forma_site_url() . "/verwaltung/?view=academy#gespraeche\n";
+            . "\n\nDein Gastgeberinnen-Link: " . ($c['host_url'] ?: $c['room_url']) . "\nIm Gespräch tippst du in der Verwaltung einmal auf „✦ Angebot zeigen“: Sie sieht dann sofort in ihrem Gesprächsraum den Kennenlern-Preis (" . mv_eur(ac_cfg()['call_total']) . ") für " . AC_OFFER_MINUTES . " Minuten und bekommt ihn zusätzlich per Mail: " . forma_site_url() . "/verwaltung/?view=academy#gespraeche\n";
         try { mm_mail(natal_notify_email_safe(), 'Kennenlerngespräch Teacher Training: ' . $name . ' · ' . ac_call_when($c), $v, mm_mail_html('Kennenlerngespräch', nl2br(forma_h($v)), 'de'), [['Kennenlerngespraech.ics', ac_call_ics($c, true), 'text/calendar']]); } catch (Throwable $e) { error_log('AC call viv: ' . $e->getMessage()); }
         return ['ok' => true, 'fixed' => true, 'when' => ac_call_when($c)];
     }
@@ -822,7 +875,9 @@ function ac_call_confirm(PDO $pdo, int $id): string
     $first = forma_first_name((string)$c['name']);
     $lines = $en ? ["Dear $first,", 'our call is confirmed: ' . ac_call_when($c, 'en') . ', 30 minutes, online by video.', $url !== '' ? 'Simply tap the button below at the time. The room works in your browser on your phone or laptop.' : 'I will send you the link to our video room before the call.', 'We will talk about your practice, what you are hoping for and whether the training is right for you. It is completely free and without obligation.']
         : ["Hallo $first,", 'unser Gespräch ist fix: ' . ac_call_when($c) . ', 30 Minuten, online per Video.', $url !== '' ? 'Tipp zur Uhrzeit einfach auf den Knopf unten. Der Raum läuft im Browser, am Handy oder am Laptop.' : 'Den Link zu unserem Videoraum schicke ich dir vor dem Gespräch.', 'Wir sprechen über deine Praxis, über deine Wünsche und darüber, ob die Ausbildung zu dir passt. Ganz kostenlos und unverbindlich.'];
-    mv_send_member_mail(['lang' => $c['lang'], 'email' => $c['email']], $en ? 'Confirmed: our call about the Teacher Training' : 'Bestätigt: unser Gespräch zum Teacher Training', $en ? 'see you soon ♡' : 'bis bald ♡', AC_SHORT, $lines, $url, $url !== '' ? ($en ? 'Join the video call' : 'Zum Videogespräch') : '', '');
+    // Sie kommt über unseren eigenen Gesprächsraum (Movecia-Seite mit eingebettetem Videoraum), dort erscheint auch das Angebot
+    $join = $url !== '' ? ac_call_room_link(ac_call($pdo, $id)) : '';
+    mv_send_member_mail(['lang' => $c['lang'], 'email' => $c['email']], $en ? 'Confirmed: our call about the Teacher Training' : 'Bestätigt: unser Gespräch zum Teacher Training', $en ? 'see you soon ♡' : 'bis bald ♡', AC_SHORT, $lines, $join, $join !== '' ? ($en ? 'Join the video call' : 'Zum Videogespräch') : '', '');
     return $url !== '' ? 'Bestätigt, die Mail mit dem Videoraum ist unterwegs.' : 'Bestätigt. Es ist noch kein Whereby-Schlüssel hinterlegt, bitte schick ihr den Link zum Gespräch selbst.';
 }
 
@@ -886,6 +941,21 @@ function ac_welcome_script(): array
 }
 
 /** Fragen & Antworten im Mitgliederbereich (auch Vorschläge im Chat). [de-Frage, de-Antwort, en-Frage, en-Antwort] */
+/** „Häufig gefragt“ im Chat (Vivien, 28.10.2026, Runde 4): kurzer Text für den Chip → Frage aus ac_member_faq(). */
+function ac_member_chips(): array
+{
+    return [
+        ['Wie viel Zeit pro Woche?', 'Wie viel Zeit brauche ich pro Woche?'],
+        ['Wann zahle ich die Rate?', 'Wann zahle ich den Rest?'],
+        ['Was, wenn ich krank bin?', 'Was ist, wenn ich mal krank bin?'],
+        ['Bekomme ich ein Zertifikat?', 'Bekomme ich ein Zertifikat?'],
+        ['Brauche ich Vorerfahrung?', 'Brauche ich Vorkenntnisse?'],
+        ['Wo ist das Präsenzwochenende?', 'Wann ist das Präsenzwochenende?'],
+        ['Wann ist der Live-Call?', 'Wann ist der Live-Call?'],
+        ['Wann geht es los?', 'Wann geht es los?'],
+    ];
+}
+
 function ac_member_faq(): array
 {
     $c = ac_cfg();
@@ -900,6 +970,8 @@ function ac_member_faq(): array
         ['Was ist die Lehrprobe?', 'Im Modul Sequencing entwickelst du deine eigene Einheit von etwa 25 Minuten und unterrichtest sie beim Wochenende. Das ist keine Prüfung, sondern dein Moment. Aufgeregt sein ist ganz normal, und wir üben vorher viel gemeinsam.', 'What is the teaching practice?', 'In the sequencing module you create your own session of about 25 minutes and teach it at the weekend. It is not an exam, it is your moment. Feeling nervous is completely normal, and we practise a lot together beforehand.'],
         ['Wie läuft die Abschlussprüfung?', 'Nach dem Präsenzwochenende beantwortest du online Multiple-Choice-Fragen, zu Hause mit eingeschalteter Kamera in unserem Prüfungsraum. Danach, mit ca. 100 dokumentierten Praxisstunden, bekommst du dein Zertifikat.', 'How does the final exam work?', 'After the in-person weekend you answer multiple-choice questions online, at home with your camera on in our exam room. After that, with around 100 documented practice hours, you receive your certificate.'],
         ['Ich wohne in Deutschland, der Schweiz oder Südtirol. Passt das?', 'Natürlich. Alles außer dem Präsenzwochenende läuft online, und bezahlt wird in Euro, auch aus der Schweiz ganz einfach per Karte. Die Ausbildung findet ausschließlich auf Deutsch statt.', '', ''],
+        ['Was ist, wenn ich mal krank bin?', 'Dann ruh dich zuerst aus. Videos und Workbooks kannst du jederzeit nachholen, und jeder Live-Call wird aufgenommen. Gib mir einfach im Chat Bescheid, dann schauen wir gemeinsam, wie du gut wieder reinkommst. Nur das Präsenzwochenende lässt sich nicht nachholen, dafür empfehle ich eine Seminar- oder Reisestornoversicherung.', '', ''],
+        ['Bekomme ich ein Zertifikat?', 'Ja. Wenn du die Lehrprobe beim Präsenzwochenende, die Online-Abschlussprüfung und deine etwa 100 dokumentierten Praxisstunden gemacht hast, bekommst du das Zertifikat der Movecia Academy über ' . AC_HOURS . ' Stunden, inklusive der vollständigen 200-Stunden-Yogalehrerausbildung.', '', ''],
         ['Brauche ich Vorkenntnisse?', 'Etwa eineinhalb Jahre eigene Praxis sind ideal. Wenn du dir unsicher bist, schreib mir im Chat, dann schauen wir gemeinsam, was dir jetzt noch guttut.', 'Do I need experience?', 'About a year and a half of your own practice is ideal. If you are unsure, write to me in the chat and we will look together at what would help you now.'],
     ];
 }
@@ -1242,7 +1314,7 @@ function ac_call_ics(array $c, bool $host = false): string
     $esc = fn(string $v) => str_replace(["\\", ';', ',', "\n"], ['\\\\', '\;', '\\,', '\\n'], $v);
     $from = new DateTime($c['date'] . ' ' . $c['slot'], $tz);
     $to = (clone $from)->modify('+' . AC_CALL_MINUTES . ' minutes');
-    $where = $host ? ((string)$c['host_url'] ?: (string)$c['room_url']) : (string)$c['room_url'];
+    $where = $host ? ((string)$c['host_url'] ?: (string)$c['room_url']) : ((string)$c['room_url'] !== '' ? ac_call_room_link($c) : '');
     $sum = $host ? 'Kennenlerngespräch Teacher Training: ' . $c['name'] : 'Kennenlerngespräch mit Vivien (Movecia Academy)';
     return "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Movecia//Academy//DE\r\nMETHOD:PUBLISH\r\nBEGIN:VEVENT\r\nUID:ac-call-{$c['id']}@moveciamovement.com\r\nDTSTAMP:" . $f(new DateTime('now', $tz))
         . "\r\nDTSTART:" . $f($from) . "\r\nDTEND:" . $f($to) . "\r\nSUMMARY:" . $esc($sum) . "\r\nLOCATION:" . $esc($where ?: 'Online per Video')

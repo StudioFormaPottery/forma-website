@@ -11,8 +11,15 @@ $acBack = $self . '?view=academy';
 if ($action === 'mm_ac_call_ok') { go($acBack . '#gespraeche', ac_call_confirm($pdo, (int)($_POST['id'] ?? 0))); }
 if ($action === 'mm_ac_call_no') { ac_call_cancel($pdo, (int)($_POST['id'] ?? 0)); go($acBack . '#gespraeche', 'Abgesagt, sie hat eine Mail mit einem Link für einen neuen Termin bekommen.'); }
 if ($action === 'mm_ac_offer') {
-    try { $link = ac_offer_start($pdo, (int)($_POST['id'] ?? 0)); $_SESSION['ac_offer_link'] = $link; go($acBack . '#gespraeche', 'Das Angebot läuft jetzt ' . AC_OFFER_MINUTES . ' Minuten. Schick ihr den Link unten im Chat des Videoraums.'); }
+    try { $link = ac_offer_start($pdo, (int)($_POST['id'] ?? 0)); $_SESSION['ac_offer_link'] = $link; go($acBack . '#gespraeche', 'Das Angebot läuft jetzt ' . AC_OFFER_MINUTES . ' Minuten. Sie sieht die Karte mit dem Kennenlern-Preis in wenigen Sekunden in ihrem Gesprächsraum und hat ihn zusätzlich per Mail.'); }
     catch (Throwable $e) { go($acBack . '#gespraeche', $e->getMessage()); }
+}
+// Preis im Kennenlerngespräch (Vivien, 28.10.2026, Runde 4): ein Feld, Standard € 3.190, nie öffentlich
+if ($action === 'mm_ac_callprice') {
+    $eur = (int)round((float)str_replace(['.', ','], ['', '.'], preg_replace('/[^0-9.,]/', '', (string)($_POST['eur'] ?? ''))) * 100);
+    if ($eur < 50000 || $eur > 1000000) go($acBack . '#gespraeche', 'Bitte einen Betrag zwischen € 500 und € 10.000 eingeben.');
+    mm_save_cfg('academy', array_merge(mm_cfg('academy') ?? [], ['call_total' => $eur]));
+    go($acBack . '#gespraeche', 'Gespeichert: Preis im Kennenlerngespräch ' . mv_eur($eur) . '.');
 }
 if ($action === 'mm_popup_mode') {
     mm_save_cfg('popup', ['mode' => ($_POST['mode'] ?? '') === 'off' ? 'off' : 'auto']);
@@ -107,6 +114,14 @@ if ($view === 'academy') {
 @media(max-width:600px){.money{grid-template-columns:1fr}}
 .ac-row form{display:inline}.ac-row .btn{font-size:16px}
 .btn{background:#7D5E68;border-color:#7D5E68;color:#FBF5F7}.btn-ghost{background:transparent;color:#7D5E68}
+.cprice{margin-top:16px;background:#F2ECE4;border-radius:18px;padding:16px;display:grid;gap:10px;align-items:center;grid-template-columns:1fr auto auto}
+.cprice label b{display:block;font-size:20px;font-weight:500;color:#2E2529}.cprice label span{display:block;font-size:15px;color:#7D7076;margin-top:2px}
+.cprice .cp-in{display:flex;align-items:center;gap:6px;background:#FBF8F4;border:1px solid #DDD2C6;border-radius:14px;padding:4px 12px;font-size:22px;color:#7D5E68}
+.cprice .cp-in{min-width:0}.cprice input{width:5.2em;min-width:0;max-width:100%;border:0!important;background:transparent!important;box-shadow:none!important;font-size:24px;padding:6px 0;color:#2E2529}
+@media(max-width:640px){.cprice input{width:100%}}
+.cprice small{grid-column:1/-1;font-size:15px;color:#7D7076}
+@media(max-width:640px){.cprice{grid-template-columns:1fr auto}.cprice label{grid-column:1/-1}}
+.offlive{display:inline-block;background:#7D5E68;color:#FBF5F7;border-radius:99px;padding:4px 12px;font-size:15px;margin-left:6px}
 .olink{background:#EADFDE;border-radius:16px;padding:14px;font-size:16px;word-break:break-all}
 details.why{margin-top:6px;font-size:16px;color:#4A3A41}details.why summary{cursor:pointer;color:#7D5E68}
 .chatc{border-top:1px solid #DDD2C6;padding:16px 0}.chatc:first-child{border-top:0}
@@ -149,7 +164,7 @@ details.why{margin-top:6px;font-size:16px;color:#4A3A41}details.why summary{curs
   <?php foreach ($rows as $r): $paid = ac_paid_cents($r); $next = ac_next_part($r); ?>
   <div class="ac-row">
     <span><span class="nm"><?= forma_h($r['name']) ?></span><span class="sm"><?= date('d.m.Y', strtotime((string)($r['paid_at'] ?: $r['created_at']))) ?> · <?= forma_h($r['email']) ?> · <?= forma_h($r['phone']) ?> · <?= forma_h(ac_plan_label((string)$r['plan'])) ?></span></span>
-    <span><?= $r['status'] === 'bezahlt' ? '<span class="tag ok">Platz sicher</span>' : '<span class="tag open">Zahlung offen</span>' ?><?= (int)$r['eb'] ? '<span class="tag eb">Early-Bird</span>' : '' ?><?= (int)$r['test'] ? '<span class="tag test">Test</span>' : '' ?></span>
+    <span><?= $r['status'] === 'bezahlt' ? '<span class="tag ok">Platz sicher</span>' : '<span class="tag open">Zahlung offen</span>' ?><?= (int)$r['eb'] ? '<span class="tag eb">Early-Bird</span>' : ((int)($r['call_price'] ?? 0) ? '<span class="tag eb">Kennenlern-Preis</span>' : '') ?><?= (int)$r['test'] ? '<span class="tag test">Test</span>' : '' ?></span>
     <div class="money"><div>bezahlt<b><?= mv_eur($paid) ?></b></div><div>offen<b><?= mv_eur((int)$r['total_cents'] - $paid) ?></b></div><div>nächste Zahlung<b><?= $next ? ($next['due'] === '' ? 'jetzt' : $d($next['due'])) . ' · ' . mv_eur((int)$next['cents']) : '✓ alles bezahlt' ?></b></div></div>
     <details class="why"><summary>Fragebogen &amp; Zahlungsplan</summary>Praxis: <?= forma_h(ac_practice_label((string)$r['practice'])) ?><?= $r['practice_note'] !== '' ? '<br>' . nl2br(forma_h($r['practice_note'])) : '' ?><br><br>Warum: <?= nl2br(forma_h($r['why'])) ?><br><br><?= implode('<br>', array_map('forma_h', ac_parts_lines($r))) ?><?php if ($r['status'] === 'bezahlt' && $next): ?><br><br>Bezahl-Link für sie: <span class="sel"><?= forma_h(ac_pay_link($r)) ?></span><?php endif; ?>
     <?php if ($r['status'] === 'bezahlt'): [$sug, $why] = ac_storno_suggest($r); ?>
@@ -173,7 +188,7 @@ details.why{margin-top:6px;font-size:16px;color:#4A3A41}details.why summary{curs
 </div>
 
 <h2 id="gespraeche">Kennenlerngespräche</h2>
-<?php if ($offerLink !== ''): ?><div class="olink"><b>Link fürs Angebot (30 Min.):</b><br><span class="sel"><?= forma_h($offerLink) ?></span><br><button class="btn" type="button" style="margin-top:8px" onclick="navigator.clipboard.writeText(<?= forma_h(json_encode($offerLink)) ?>);this.textContent='Kopiert ✓'">Link kopieren</button></div><?php endif; ?>
+<?php if ($offerLink !== ''): ?><div class="olink"><b>Link zum Kennenlern-Preis (<?= AC_OFFER_MINUTES ?> Min., hat sie auch per Mail):</b><br><span class="sel"><?= forma_h($offerLink) ?></span><br><button class="btn" type="button" style="margin-top:8px" onclick="navigator.clipboard.writeText(<?= forma_h(json_encode($offerLink)) ?>);this.textContent='Kopiert ✓'">Link kopieren</button></div><?php endif; ?>
 <div class="card">
   <?php if (!$calls): ?><p style="font-size:19px">Gerade keine Gespräche.</p><?php endif; ?>
   <?php foreach ($calls as $x): ?>
@@ -184,13 +199,21 @@ details.why{margin-top:6px;font-size:16px;color:#4A3A41}details.why summary{curs
         <form method="post"><?= $csrf ?><input type="hidden" name="action" value="mm_ac_call_ok"><input type="hidden" name="id" value="<?= (int)$x['id'] ?>"><button class="btn" type="submit">✓ Passt</button></form>
       <?php else: ?>
         <?php if ($x['host_url'] !== ''): ?><a class="btn" href="<?= forma_h($x['host_url']) ?>" target="_blank" rel="noopener">Zum Gespräch</a><?php endif; ?>
+        <?php if (ac_offer_live($x)): ?><span class="offlive" data-until="<?= (int)$x['offer_until'] ?>">✦ Angebot läuft · noch <?= (int)ceil(((int)$x['offer_until'] - time()) / 60) ?> Min.</span><?php else: ?>
         <form method="post"><?= $csrf ?><input type="hidden" name="action" value="mm_ac_offer"><input type="hidden" name="id" value="<?= (int)$x['id'] ?>"><button class="btn btn-ghost" type="submit">✦ Angebot zeigen</button></form>
+        <?php endif; ?>
       <?php endif; ?>
       <form method="post" onsubmit="return confirm('Gespräch absagen? Sie bekommt eine Mail mit einem Link für einen neuen Termin.')"><?= $csrf ?><input type="hidden" name="action" value="mm_ac_call_no"><input type="hidden" name="id" value="<?= (int)$x['id'] ?>"><button class="btn btn-ghost" type="submit">absagen</button></form>
     </span>
   </div>
   <?php endforeach; ?>
-  <p class="muted small" style="margin-top:10px">„✦ Angebot zeigen“ im Gespräch: Für 30 Minuten bekommt sie über ihren Link den Early-Bird-Preis (<?= mv_eur($c['eb_total']) ?>) mit Countdown, auch wenn der Early-Bird schon vorbei ist. Den Link schickst du ihr im Chat des Videoraums.</p>
+  <p class="muted small" style="margin-top:10px">Im Gespräch tippst du einmal auf „✦ Angebot zeigen“: In ihrem Gesprächsraum erscheint sofort eine Karte mit dem Kennenlern-Preis und <?= AC_OFFER_MINUTES ?> Minuten Countdown, „Jetzt Platz sichern“ führt direkt zur Anmeldung. Zur Sicherheit bekommt sie den Link auch per Mail.</p>
+  <form method="post" class="cprice" id="kennenlernpreis"><?= $csrf ?><input type="hidden" name="action" value="mm_ac_callprice">
+    <label for="cpeur"><b>Preis im Kennenlerngespräch</b><span>gilt <?= AC_OFFER_MINUTES ?> Minuten nach „✦ Angebot zeigen“, auch nach dem Early-Bird. Steht nirgends öffentlich.</span></label>
+    <span class="cp-in"><span>€</span><input id="cpeur" name="eur" inputmode="numeric" value="<?= (int)($c['call_total'] / 100) ?>" aria-label="Preis im Kennenlerngespräch in Euro"></span>
+    <button class="btn" type="submit">Speichern</button>
+    <small>jetzt: <?= mv_eur($c['call_total']) ?> statt <?= mv_eur($c['price']) ?><?= $c['call_total'] >= $c['price'] ? ' · Achtung: nicht günstiger als der aktuelle Preis' : ' · sie spart ' . mv_eur($c['price'] - $c['call_total']) ?></small>
+  </form>
 </div>
 <?php });
     exit;
