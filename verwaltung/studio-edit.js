@@ -14,7 +14,8 @@
 @media(max-width:980px){.se{display:flex;flex-direction:column;align-items:stretch;gap:12px}.se-l{position:static;background:none;padding:0}
  .se>.se-pv{position:sticky;top:60px;z-index:7;margin:0 -12px;border-radius:0;box-shadow:0 10px 18px -14px rgba(46,37,41,.55)}
  .se-row .se-b{min-height:42px;font-size:16px;padding:8px 13px}}
-.se-pv{position:relative;border-radius:22px;overflow:hidden;background:#2E2529;display:flex;justify-content:center;touch-action:none;cursor:grab}
+.se-pv{position:relative;border-radius:22px;overflow:hidden;background:#2E2529;display:flex;justify-content:center;cursor:grab}
+@media(pointer:fine){.se-pv{touch-action:none}}
 .se-pv canvas{display:block;max-width:100%;max-height:var(--mh,66vh);width:auto;height:auto}
 .se-pv .se-big{position:absolute;inset:0;margin:auto;width:84px;height:84px;border-radius:50%;border:0;background:rgba(251,245,247,.88);color:#4A3A41;font-size:34px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .se-pv .se-big[hidden]{display:none}
@@ -113,7 +114,7 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
   <details class="tc-g" open><summary>🖼 Ausschnitt &amp; Ausrichtung</summary><div class="tc-gb">
     <div class="tc-chips" data-k="fmts"></div>
     <div data-sl="zoom"></div><div data-sl="ox"></div><div data-sl="oy"></div><div data-sl="rot"></div>
-    <p class="se-note">Tipp: Du kannst das Bild in der Vorschau auch mit dem Finger oder der Maus verschieben.</p>
+    <p class="se-note">Tipp: Am Computer kannst du das Bild in der Vorschau auch mit der Maus verschieben.</p>
     <button type="button" class="se-b" data-k="resetFrame">Ausschnitt zurücksetzen</button></div></details>
   <details class="tc-g" open><summary>🎵 Musik darunter</summary><div class="tc-gb">
     <div class="se-file"><b data-k="mname">Noch keine Musik</b>
@@ -291,7 +292,7 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
 
     // Bild in der Vorschau verschieben
     let drag = null;
-    q('.se-pv').addEventListener('pointerdown', e => { if (e.target === big || busy) return; const g = geo(); drag = { x: e.clientX, y: e.clientY, ox: st.ox, oy: st.oy, g, k: cv.width / cv.getBoundingClientRect().width }; q('.se-pv').setPointerCapture(e.pointerId); });
+    q('.se-pv').addEventListener('pointerdown', e => { if (e.target === big || busy || e.pointerType === 'touch') return; const g = geo(); drag = { x: e.clientX, y: e.clientY, ox: st.ox, oy: st.oy, g, k: cv.width / cv.getBoundingClientRect().width }; q('.se-pv').setPointerCapture(e.pointerId); });
     q('.se-pv').addEventListener('pointermove', e => { if (!drag) return; const g = drag.g, dx = (e.clientX - drag.x) * drag.k / g.sc, dy = (e.clientY - drag.y) * drag.k / g.sc;
       if (g.mx > 0) st.ox = Math.max(-1, Math.min(1, drag.ox - dx / g.mx)); if (g.my > 0) st.oy = Math.max(-1, Math.min(1, drag.oy - dy / g.my)); sync(); draw(); });
     q('.se-pv').addEventListener('pointerup', () => { drag = null; });

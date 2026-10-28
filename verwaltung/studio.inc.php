@@ -153,6 +153,44 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
 .subprev{margin-top:8px;border-radius:14px;overflow:hidden;background:#2E2529}
 .subprev canvas{display:block;width:100%}
 [hidden]{display:none!important}
+/* Handy: fester Aufnahme-Bildschirm (Vivien, 28.10.2026: Bild soll fix sein, nichts verschieben, alles auf einem Bildschirm) */
+.mtools,.msheet{display:none}
+@media(max-width:760px),(max-height:520px) and (pointer:coarse){
+ html,body{overflow-x:hidden;max-width:100%}
+ body.rec-ui{overflow:hidden;overscroll-behavior:none}
+ body.rec-ui .view{position:fixed;inset:0;height:100vh;height:100dvh;max-height:none;z-index:80;margin:0;padding:calc(64px + env(safe-area-inset-top)) 0 calc(96px + env(safe-area-inset-bottom));background:#1F191C;box-shadow:none;overflow:hidden;touch-action:manipulation;display:flex;flex-direction:column;justify-content:flex-start}
+ body.rec-ui.sheet-open .view{justify-content:flex-start;padding-bottom:0}
+ body.rec-ui #stage{margin:0 auto}
+ body.rec-ui #play{max-height:calc(100dvh - 200px)!important;width:auto;max-width:100%;border-radius:0}
+ body.rec-ui.sheet-open #play{max-height:calc(44dvh - 72px)!important}
+ body.rec-ui .view .bar{position:fixed;left:0;right:0;bottom:0;z-index:84;margin:0;padding:14px 12px calc(14px + env(safe-area-inset-bottom));justify-content:center;background:linear-gradient(rgba(31,25,28,0),rgba(31,25,28,.94) 30%)}
+ body.rec-ui .view .bar .sm,body.rec-ui .view .bar a.b{background:rgba(251,248,244,.12);border-color:rgba(251,248,244,.4);color:#fff}
+ body.rec-ui .view .bar{gap:8px}
+ body.rec-ui .view .bar button,body.rec-ui .view .bar a.b{min-height:46px;font-size:16px;padding:8px 16px}
+ body.rec-ui .view .bar .go,body.rec-ui .view .bar .next{min-width:62%;min-height:60px;font-size:19px}
+ body.rec-ui .view .msg{position:fixed;left:10px;right:10px;top:calc(70px + env(safe-area-inset-top));z-index:85;color:#fff;font-size:15px;line-height:1.4;margin:0;text-align:center;background:rgba(31,25,28,.82);border-radius:16px;padding:8px 12px}
+ body.rec-ui .view .msg:empty{display:none}
+ body.rec-ui .view .msg a{color:#fff}
+ body.rec-ui .view .prog{position:fixed;left:18px;right:18px;top:calc(62px + env(safe-area-inset-top));z-index:86;max-width:none;margin:0}
+ body.rec-ui.sheet-open .view .bar,body.rec-ui.sheet-open .view .msg,body.rec-ui.sheet-open .view .prog{display:none}
+ body.rec-ui .mtools{display:flex;position:fixed;top:0;left:0;right:0;z-index:86;gap:6px;padding:calc(10px + env(safe-area-inset-top)) 10px 10px;overflow-x:auto;scrollbar-width:none;background:#1F191C}
+ body.rec-ui .mtools::-webkit-scrollbar{display:none}
+ .mtools button,.mtools a{flex:0 0 auto;font:inherit;font-size:15px;min-height:44px;padding:8px 13px;border-radius:999px;border:1px solid rgba(251,248,244,.3);background:rgba(251,248,244,.1);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+ .mtools [aria-pressed=true]{background:#FBF8F4;border-color:#FBF8F4;color:#4A3A41}
+ body.rec-ui .msheet{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:90;height:56dvh;background:#F2ECE4;border-radius:24px 24px 0 0;box-shadow:0 -14px 30px -10px rgba(0,0,0,.45);flex-direction:column}
+ body.rec-ui .msheet[hidden]{display:none!important}
+ .msh-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid #DDD2C6}
+ .msh-h b{font:500 24px/1.1 "Cormorant Garamond",Georgia,serif;color:#4A3A41}
+ .msh-h button{font:inherit;font-size:16px;min-height:44px;padding:8px 18px;border-radius:999px;border:0;background:#7D5E68;color:#fff;cursor:pointer}
+ .msh-b{overflow:auto;padding:12px;flex:1;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+ .msh-b>*{margin:0 0 12px!important}
+ .msh-b .box>h2{display:none}
+ .msh-b .pk-pane{max-height:none}
+ .msh-b .pk-btn{display:none}
+ body.editing .mtools,body.editing .msheet{display:none!important}
+ body.rec-ui.editing{overflow:auto}
+ body.rec-ui .pr-t{padding-left:5%;padding-right:5%}
+}
 .pk{background:#FBF8F4;border:1.5px solid #DDD2C6;border-radius:28px;padding:14px;margin-bottom:12px;box-shadow:0 14px 30px -24px rgba(74,58,65,.45)}
 .pk-now{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .pk-now>i{width:60px;height:60px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:30px;font-style:normal;background:#EADFDE;flex:0 0 auto}
@@ -168,9 +206,25 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
 .pk-tabs button span{display:inline-block;min-width:24px;margin-left:6px;padding:1px 8px;border-radius:999px;background:#F2ECE4;font-size:14px}
 .pk-tabs button[aria-selected=true]{background:#4A3A41;border-color:#4A3A41;color:#fff}.pk-tabs button[aria-selected=true] span{background:rgba(255,255,255,.18)}
 .pk-pane{max-height:min(62vh,640px);overflow:auto;padding:4px 2px 6px;margin-top:8px;overscroll-behavior:contain}
-.pk-day{margin:6px 0 18px}
-.pk-dh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 2px 10px;position:sticky;top:0;background:#FBF8F4;padding:6px 0;z-index:1}
-.pk-dh b{font:500 25px/1.1 "Cormorant Garamond",Georgia,serif;color:#4A3A41}
+.pk-days{display:flex;flex-direction:column;gap:8px}
+/* Tage als kleine zugeklappte Boxen in Movecia-Farben (Vivien, 28.10.2026) */
+.pk-day{border-radius:20px;border:1.5px solid transparent;background:#F6EEEC;transition:box-shadow .2s}
+.pk-day.c1{background:#F4E9E1}.pk-day.c2{background:#F1ECE4}.pk-day.c3{background:#EFE6EB}
+.pk-day[open]{background:#FBF8F4;border-color:#E6DCD2;box-shadow:0 12px 26px -22px rgba(74,58,65,.6)}
+.pk-day>summary{list-style:none;display:flex;align-items:center;gap:12px;padding:10px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pk-day>summary::-webkit-details-marker{display:none}
+.pk-cal{flex:0 0 auto;width:48px;height:52px;border-radius:15px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 10px -8px rgba(74,58,65,.6);line-height:1}
+.pk-cal small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#7D5E68;margin-bottom:3px}
+.pk-cal b{font:500 24px/1 "Cormorant Garamond",Georgia,serif;color:#4A3A41}
+.pk-day.late .pk-cal small{color:#A0413B}
+.pk-dt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.pk-dt>b{font:500 21px/1.15 "Cormorant Garamond",Georgia,serif;color:#4A3A41}
+.pk-mini{display:flex;flex-wrap:wrap;gap:4px 10px}.pk-mini em{font-style:normal;font-size:14px;color:#6B5658}
+.pk-chev{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.75);position:relative}
+.pk-chev::after{content:"";position:absolute;left:10px;top:9px;width:8px;height:8px;border-right:2px solid #7D5E68;border-bottom:2px solid #7D5E68;transform:rotate(45deg);transition:transform .2s}
+.pk-day[open] .pk-chev::after{transform:translateY(4px) rotate(-135deg)}
+.pk-dayb{padding:2px 10px 12px}
+@media(max-width:640px){.pk-day>summary .pill:not(.late):not(.soon){display:none}.pk-dt>b{font-size:19px}}
 .pill{font-size:14px;padding:3px 12px;border-radius:999px;background:#EADFDE;color:#6B5658}.pill.soon{background:#E8D6CA;color:#4A3A41}.pill.late{background:#F3D9D5;color:#A0413B}
 .pk-dh .cnt{margin-left:auto;font-size:15px;color:#7D7076}
 .pk-sub{font-size:15px;color:#7D7076;margin:12px 2px 8px}.pk-sub a{color:#7D5E68}
@@ -211,13 +265,20 @@ $tile = function (array $t) use ($h) { $ico = ['talk' => '🗣', 'clip' => '🧘
 $groups = function (array $list, bool $withDone = false) use ($dayLong, $pill, $tile, $h) {
     $by = []; foreach ($list as $t) $by[$t['due']][] = $t; uksort($by, fn($a, $b) => ($a === '' ? '9' : $a) <=> ($b === '' ? '9' : $b));
     $o = '';
+    $o = '<div class="pk-days">'; $i = 0;
     foreach ($by as $d => $l) { [$pc, $pt] = $pill((string)$d, false);
         $tl = array_filter($l, fn($t) => $t['ty'] !== 'clip'); $cl = array_filter($l, fn($t) => $t['ty'] === 'clip');
-        $o .= '<div class="pk-day"><div class="pk-dh"><b>' . ($d === '' ? 'Noch ohne Datum' : $h($dayLong((string)$d))) . '</b>' . ($pt !== '' ? '<span class="pill ' . $pc . '">' . $h($pt) . '</span>' : '') . '<span class="cnt">' . count($l) . ' ' . (count($l) === 1 ? 'Video' : 'Videos') . '</span></div>';
+        $nT = count(array_filter($l, fn($t) => $t['ty'] === 'talk' || $t['ty'] === 'own')); $nC = count($cl); $nI = count(array_filter($l, fn($t) => $t['ty'] === 'ig'));
+        $ts = $d === '' ? 0 : strtotime((string)$d);
+        $o .= '<details class="pk-day c' . ($i++ % 4) . ($pc === 'late' ? ' late' : '') . '"><summary>'
+            . '<span class="pk-cal">' . ($ts ? '<small>' . ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][(int)date('w', $ts)] . '</small><b>' . date('j', $ts) . '</b>' : '<b>?</b>') . '</span>'
+            . '<span class="pk-dt"><b>' . ($d === '' ? 'Noch ohne Datum' : $h($dayLong((string)$d))) . '</b><span class="pk-mini">'
+            . ($nT ? '<em>🗣 ' . $nT . ' Talking Head' . ($nT > 1 ? 's' : '') . '</em>' : '') . ($nC ? '<em>🧘 ' . $nC . ' Übung' . ($nC > 1 ? 'en' : '') . '</em>' : '') . ($nI ? '<em>📱 ' . $nI . '</em>' : '') . '</span></span>'
+            . ($pt !== '' ? '<span class="pill ' . $pc . '">' . $h($pt) . '</span>' : '') . '<span class="pk-chev" aria-hidden="true"></span></summary><div class="pk-dayb">';
         if ($tl) $o .= '<div class="pk-tiles">' . implode('', array_map($tile, $tl)) . '</div>';
         if ($cl) $o .= ($tl ? '<p class="pk-sub">🧘 Übungen filmen · ' . count($cl) . '</p>' : '') . '<div class="pk-tiles">' . implode('', array_map($tile, $cl)) . '</div>';
-        $o .= '</div>'; }
-    return $o; };
+        $o .= '</div></details>'; }
+    return $o . '</div>'; };
 $open = array_values(array_filter($tiles, fn($t) => !$t['ok'] && $t['ty'] !== 'ig'));
 $igT = array_values(array_filter($tiles, fn($t) => $t['ty'] === 'ig'));
 $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig'));
@@ -312,16 +373,25 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
       <label class="chk"><input type="checkbox" id="prAuto" checked> Text läuft mit der Aufnahme los</label>
       <p class="tip" style="margin-top:8px">Tippen auf den Text oder Leertaste: Pause und weiter.</p>
     </div>
-    <div class="box"><h2>✨ Kamera-Look</h2><div id="panel"></div></div>
-    <div class="box"><h2>Kamera &amp; Mikrofon</h2>
+    <div class="box" id="lookBox"><h2>✨ Kamera-Look</h2><div id="panel"></div></div>
+    <div class="box" id="devBox"><h2>Kamera &amp; Mikrofon</h2>
       <div class="dev"><label>Kamera<select id="cam"></select></label><label>Mikrofon<select id="mic"></select></label></div>
       <p class="tip" style="margin-top:10px">Tipp: Licht von vorne (Fenster vor dir, nicht hinter dir), Kamera auf Augenhöhe, Handy quer für Videos und hoch für Storys.</p>
     </div>
   </div>
 </div>
 
+<nav class="mtools" id="mtools" aria-label="Studio">
+  <a href="?view=movecia" aria-label="Zurück zur Übersicht">⌂</a>
+  <button type="button" data-sheet="pk">☰ Video</button>
+  <button type="button" data-sheet="pr" id="mtPr">📝 Text</button>
+  <button type="button" data-sheet="look" id="mtLook">✨ Look</button>
+  <button type="button" data-sheet="clips" id="mtClips" hidden>🎬 Clips</button>
+  <button type="button" data-sheet="more">⚙️ Mehr</button>
+</nav>
+<div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
 <script src="/wildhearts/assets/talkcam.js?v=2"></script>
-<script src="studio-edit.js?v=2"></script>
+<script src="studio-edit.js?v=3"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
@@ -340,20 +410,22 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   // ---- Teleprompter ----
   const pr=document.createElement('div');pr.className='pr';pr.innerHTML='<div class="pr-t" id="prT"></div>';
   const slab=document.createElement('div');slab.className='slab';slab.hidden=true;
+  // Am iPhone geht ein Bruchteil-Pixel beim Scrollen verloren (scrollTop wird abgerundet) → eigener Zähler (Vivien, 28.10.2026: Teleprompter lief am Handy nicht)
+  let prPos=0;function prMove(d,reset){prPos=reset?0:Math.max(0,Math.min(prPos+d,pr.scrollHeight-pr.clientHeight));pr.scrollTop=prPos}
   let sp=+ls.get('st-sp',40), fs=+ls.get('st-fs',innerWidth<700?20:30), run=false, last=0;
   pr.style.setProperty('--fs',fs+'px');
   function textHtml(t){return esc(t||'').replace(/\[([^\]]+)\]/g,'<span class="hint">[$1]</span>')}
   function textOf(lg){return cur?(lg==='en'?cur.en:cur.de):ownOf(lg)}
   function paras(lg){return String(textOf(lg)||'').split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean)}
   function setText(){if(clipm){showSlide();return}const t=cur?(lang==='en'?cur.en:cur.de):$('ownT').value;
-    pr.querySelector('.pr-t').innerHTML=t.trim()?textHtml(t):'<span class="hint">'+(cur?'Für diese Lektion gibt es noch keinen '+(lang==='en'?'englischen':'deutschen')+' Text.':'Füge deinen Text beim Teleprompter ein.')+'</span>';pr.scrollTop=0;}
-  function prLoop(ts){if(run){pr.scrollTop+=sp*(ts-last)/1000}last=ts;requestAnimationFrame(prLoop)}requestAnimationFrame(prLoop);
+    pr.querySelector('.pr-t').innerHTML=t.trim()?textHtml(t):'<span class="hint">'+(cur?'Für diese Lektion gibt es noch keinen '+(lang==='en'?'englischen':'deutschen')+' Text.':'Füge deinen Text beim Teleprompter ein.')+'</span>';prMove(0,true);}
+  function prLoop(ts){if(run){prMove(sp*Math.min(100,ts-last)/1000)}last=ts;requestAnimationFrame(prLoop)}requestAnimationFrame(prLoop);
   function toggle(){run=!run}
   pr.addEventListener('click',toggle);
   document.addEventListener('keydown',e=>{if(e.code==='Space'&&!/INPUT|TEXTAREA|SELECT|BUTTON/.test(document.activeElement.tagName)){e.preventDefault();toggle()}});
   document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{sp=Math.max(10,Math.min(160,sp+(+b.dataset.sp)*8));ls.set('st-sp',sp)});
   document.querySelectorAll('[data-fs]').forEach(b=>b.onclick=()=>{fs=Math.max(18,Math.min(60,fs+(+b.dataset.fs)));pr.style.setProperty('--fs',fs+'px');ls.set('st-fs',fs)});
-  $('prTop').onclick=()=>{pr.scrollTop=0;run=false};
+  $('prTop').onclick=()=>{prMove(0,true);run=false};
   $('prOn').onclick=()=>{pr.hidden=!pr.hidden;$('prOn').setAttribute('aria-pressed',String(!pr.hidden));$('prOn').textContent=pr.hidden?'Text aus':'Text an'};
   // eigener Text je Sprache (für Untertitel in der anderen Sprache)
   if(ls.get('st-own-de',null)===null&&ls.get('st-own',''))ls.set('st-own-de',ls.get('st-own',''));
@@ -365,7 +437,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   function choose(){const val=$('what').value;mv=val[0]==='c'?(MOVES.find(m=>m.id===+val.slice(1))||null):null;mvFree=val==='m';
     const wasIg=!!ig;ig=val[0]==='i'?(IGS.find(x=>x.id===+val.slice(1))||null):null;
     const id=+val;cur=(mv||mvFree)?null:(ig?{ig:ig,id:'i'+ig.id,t:ig.l,de:ig.text,en:ig.text,vde:ig.has,ven:ig.has,g:'Instagram',k:ig.kind==='reel'?'Reel':'Story',due:ig.day}:(TALKS.find(t=>t.id===id)||null));$('own').hidden=!!cur;$('ownT').value=ownOf(lang);
-    const isMove=!!(mv||mvFree);$('prBox').hidden=isMove;$('langSeg').hidden=isMove||!!ig;
+    const isMove=!!(mv||mvFree);$('prBox').hidden=isMove;$('mtPr').hidden=isMove;$('langSeg').hidden=isMove||!!ig;
     if(tc&&!isMove&&ig!==null!==wasIg){tc.set({aspect:ig?'9:16':'16:9'});TalkCam.panel(tc,$('panel'))}$('modeSeg').hidden=isMove;pr.hidden=isMove||$('prOn').getAttribute('aria-pressed')==='false';
     if(isMove&&clipm)setMode('ganz');
     document.querySelector('.sh h1').textContent=isMove?'🧘 Studio · Übung filmen':'🎥 Talking-Head-Studio';
@@ -387,7 +459,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
     document.querySelectorAll('[data-pane]').forEach(p=>p.hidden=p.dataset.pane!==b.dataset.tab)});
   document.querySelectorAll('.pk-t').forEach(t=>t.onclick=()=>{if((rec&&rec.state==='recording')||(cs&&cs.rec))return;
     if(blob&&!saved&&!confirm('Die letzte Aufnahme ist noch nicht gespeichert. Trotzdem wechseln?'))return;
-    $('what').value=t.dataset.v;if($('what').value!==t.dataset.v)return;choose();pkOpen(false);$('pk').scrollIntoView({behavior:'smooth',block:'start'})});
+    $('what').value=t.dataset.v;if($('what').value!==t.dataset.v)return;choose();if(sheetK){closeSheet();return}pkOpen(false);$('pk').scrollIntoView({behavior:'smooth',block:'start'})});
   function pkNow(){const v=$('what').value,t=document.querySelector('.pk-t[data-v="'+CSS.escape(v)+'"]');
     document.querySelectorAll('.pk-t').forEach(x=>x.setAttribute('aria-current',String(x.dataset.v===v)));
     $('pkI').textContent=t?t.querySelector('i').textContent:'🗣';$('pkI').style.background=t?getComputedStyle(t.querySelector('i')).backgroundColor:'';
@@ -454,7 +526,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
     (function loop(){if(!rec||rec.state!=='recording')return;$('rt').textContent=fmt((performance.now()-t0)/1000);tick=requestAnimationFrame(loop)})();
   };
   $('stop').onclick=()=>{if(rec&&rec.state==='recording')rec.stop()};
-  $('again').onclick=()=>{if(!saved&&!confirm('Die Aufnahme ist noch nicht gespeichert. Trotzdem neu aufnehmen?'))return;blob=null;saved=true;$('play').removeAttribute('src');$('msg').textContent='';$('prog').hidden=true;pr.scrollTop=0;showAfter();};
+  $('again').onclick=()=>{if(!saved&&!confirm('Die Aufnahme ist noch nicht gespeichert. Trotzdem neu aufnehmen?'))return;blob=null;saved=true;$('play').removeAttribute('src');$('msg').textContent='';$('prog').hidden=true;prMove(0,true);showAfter();};
   $('dl').addEventListener('click',()=>{saved=true});
   window.addEventListener('beforeunload',e=>{if(blob&&!saved){e.preventDefault();e.returnValue=''}});
   $('up').onclick=()=>{
@@ -517,8 +589,23 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
     $('up').disabled=false;}
 
   // Vorschau bleibt beim Einstellen immer sichtbar (oben fixiert), am Handy kleiner
-  function vh(){return matchMedia('(max-width:980px)').matches?36:66}
-  addEventListener('resize',()=>{if(tc){tc.opts.maxVh=vh();tc.emit('layout')}});
+  const PH=matchMedia('(max-width:760px),(max-height:520px) and (pointer:coarse)');
+  function vh(){if(PH.matches){const H=innerHeight||700;return document.body.classList.contains('sheet-open')?Math.max(20,Math.floor((H*.44-72)/H*100)):Math.max(30,Math.floor((H-180)/H*100))}return matchMedia('(max-width:980px)').matches?36:66}
+  // ---- Handy: Einstellungen als Fenster von unten, das Kamerabild bleibt stehen ----
+  const SHEETS={pk:['Welches Video?',()=>[$('pk')]],pr:['Teleprompter',()=>[$('prBox')]],look:['Kamera-Look',()=>[$('lookBox')]],clips:['Deine Clips',()=>[$('clipBox'),$('subBox')]],more:['Mehr',()=>[document.querySelector('.pick'),$('devBox')]]};
+  let sheetK='',sheetNodes=[];
+  function relayout(){if(tc){tc.opts.maxVh=vh();tc.emit('layout')}$('play').style.maxHeight=PH.matches?'':vh()+'vh'}
+  function closeSheet(){if(!sheetK)return;sheetNodes.forEach(([n,ph])=>{ph.parentNode.insertBefore(n,ph);ph.remove()});sheetNodes=[];sheetK='';$('msheet').hidden=true;document.body.classList.remove('sheet-open');
+    document.querySelectorAll('[data-sheet]').forEach(b=>b.setAttribute('aria-pressed','false'));relayout()}
+  function openSheet(k){if(sheetK===k){closeSheet();return}closeSheet();const d=SHEETS[k];if(!d)return;sheetK=k;$('mshT').textContent=d[0];
+    d[1]().forEach(n=>{if(!n)return;const ph=document.createComment('sheet');n.parentNode.insertBefore(ph,n);$('mshB').appendChild(n);sheetNodes.push([n,ph])});
+    if(k==='pk')pkOpen(true);$('msheet').hidden=false;document.body.classList.add('sheet-open');$('mshB').scrollTop=0;
+    document.querySelectorAll('[data-sheet]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sheet===k)));relayout()}
+  document.querySelectorAll('[data-sheet]').forEach(b=>b.onclick=()=>openSheet(b.dataset.sheet));
+  $('mshX').onclick=closeSheet;
+  function applyPhone(){const on=PH.matches;document.body.classList.toggle('rec-ui',on);if(!on)closeSheet();$('mtClips').hidden=!clipm;$('mtPr').hidden=!!(mv||mvFree);relayout()}
+  PH.addEventListener?PH.addEventListener('change',applyPhone):PH.addListener(applyPhone);
+  addEventListener('resize',relayout);
   $('play').style.maxHeight=vh()+'vh';
   // =================== Absatz für Absatz ===================
   // Text an Leerzeilen in Absätze teilen, je Absatz ein kurzer Clip. Die Stimme wird mitgemessen
@@ -531,7 +618,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   const slug=t=>String(t).normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/ß/g,'ss').replace(/[^A-Za-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)||'Clip';
   let baseName='';
   function showSlide(){const P=paras(lang),i=cs?cs.i:0,t=P[i]||'';
-    pr.querySelector('.pr-t').innerHTML=t?textHtml(t):'<span class="hint">'+(P.length?'Fertig ✓':'Füge deinen Text beim Teleprompter ein. Eine Leerzeile trennt die Absätze.')+'</span>';pr.scrollTop=0;
+    pr.querySelector('.pr-t').innerHTML=t?textHtml(t):'<span class="hint">'+(P.length?'Fertig ✓':'Füge deinen Text beim Teleprompter ein. Eine Leerzeile trennt die Absätze.')+'</span>';prMove(0,true);
     slab.hidden=!P.length;slab.textContent='Absatz '+Math.min(i+1,P.length)+' von '+P.length;}
   function clipUi(){
     const P=paras(lang),n=P.length,recIng=!!(cs&&cs.rec);
@@ -542,7 +629,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
     if(clipm&&recIng)$('cnext').textContent=cs.i+1<n?'✓ Fertig · Absatz '+(cs.i+2)+' ›':'✓ Fertig · letzter Absatz';
     $('clipBox').hidden=!clipm;$('subBox').hidden=!clipm||!clips.some(Boolean);
     $('clipInfo').textContent=clipm?(n?n+' Absätze im Text. Du liest einen Absatz, tippst auf „Fertig“ und der nächste startet nach 3-2-1 von selbst. Leertaste oder → geht auch.':'Noch kein Text. Füge ihn beim Teleprompter ein, eine Leerzeile trennt die Absätze.'):'';
-    renderClips();}
+    renderClips();$('mtClips').hidden=!clipm;}
   // Stimme messen
   let ac=null,an=null,abuf=null;
   function meter(){try{if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)();}ac.resume();if(!an&&raw&&raw.getAudioTracks().length){const src=ac.createMediaStreamSource(new MediaStream(raw.getAudioTracks()));an=ac.createAnalyser();an.fftSize=1024;src.connect(an);abuf=new Float32Array(an.fftSize)}}catch(e){an=null}}
@@ -569,7 +656,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
     (function loop(){if(!cs||cs.rec!==r||r.state!=='recording')return;const t=(performance.now()-st.t0)/1000;$('rt').textContent=fmt(t);
       if(an){an.getFloatTimeDomainData(abuf);let q=0;for(const v of abuf)q+=v*v;const rms=Math.sqrt(q/abuf.length);if(rms>.02){if(st.s==null)st.s=t;st.e=t}}
       // langer Absatz: Text läuft sanft mit
-      if(pr.scrollHeight>pr.clientHeight+4&&!pr.hidden)pr.scrollTop+=sp/60;
+      if(pr.scrollHeight>pr.clientHeight+4&&!pr.hidden)prMove(sp/60);
       requestAnimationFrame(loop)})();
   }
   function stopRec(discard){if(cs&&cs.rec&&cs.rec.state==='recording'){cs.rec._cs.discard=!!discard;cs.rec.stop()}$('rd').hidden=true}
@@ -675,7 +762,8 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   subChips();document.body.classList.toggle('clipm',clipm);setMode(clipm?'clips':'ganz');
   window.__studio=()=>tc;
   choose();startCam();
-  if(!/[?&](l|c|ig|move)=/.test(location.search))pkOpen(true);
+  applyPhone();
+  if(!/[?&](l|c|ig|move)=/.test(location.search)){if(PH.matches)openSheet('pk');else pkOpen(true)}
 })();
 </script>
 <?php

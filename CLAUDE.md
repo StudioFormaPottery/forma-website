@@ -425,3 +425,9 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Movecia-Reiter „🎵 Musik“ (`?view=musik`, `verwaltung/musik.inc.php`, Tabelle `mm_music`: title, file, dur, tags): Lieder (z. B. Epidemic Sound) per Ziehen/Antippen hochladen (8-MB-Stücke, `mm_mu_up`), Titel aus dem Dateinamen („ES_… - Künstler“ → „… – Künstler“), Stichwörter Morgen/Abend/Flow & Bewegung/Meditation & Atem/Reel & Story/Lebendig. Dateien in `../forma-data/musik/`, nur angemeldet abrufbar (`&dl=ID`). Gekaufte Musik nie ins Repo (öffentlich).
 - Studio → Bearbeiten → „🎵 Musik darunter“ zeigt „Aus deiner Musik“ (reinhören, „Nehmen“), daneben „Andere Datei vom Gerät“.
 - Epidemic-Connector in Claude ist verbunden (Suche, Kürzen auf Länge). Downloads erreichen die Cloud-Arbeitsumgebung nicht (Proxy 403): Claude sucht aus und gibt Vivien Download-Links, sie zieht die Dateien in „🎵 Musik“.
+
+## Studio am Handy (Vivien, 28.10.2026: „Bild fix, nichts verschieben, alles auf einem Bildschirm“)
+- Unter 760 px Breite (oder Handy quer) ist das Studio ein fester Aufnahme-Bildschirm (`body.rec-ui`): Kamerabild oben fix (nah an der Handykamera, wegen Teleprompter), Seite scrollt nicht, oben dunkle Leiste ⌂ · ☰ Video · 📝 Text · ✨ Look · 🎬 Clips · ⚙️ Mehr, unten die Aufnahme-Knöpfe. Einstellungen öffnen als Fenster von unten (`openSheet`, die vorhandenen Kästen werden hineingehängt), das Bild wird dabei kleiner und bleibt sichtbar. Meldungen oben als Hinweis.
+- Teleprompter läuft über einen eigenen Zähler (`prMove`), weil iPhone-Safari kleine scrollTop-Schritte abrundet (lief am Handy sonst nicht).
+- Im Editor verschiebt Wischen am Handy das Bild nicht mehr (nur Maus am Computer).
+- Auswahl „Als Nächstes“: jeder Tag als kleine zugeklappte Box (`details.pk-day`, Pastell im Wechsel, Kalenderblatt mit Tag, „🗣 2 Talking Heads · 🧘 15 Übungen“, „in 11 Tagen“ bzw. rot überfällig).
