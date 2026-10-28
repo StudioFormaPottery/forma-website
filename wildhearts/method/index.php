@@ -23,7 +23,7 @@ mvl_head('Mindful Movement Method · Online Yoga, Somatic Movement & Breathwork 
 <body>
 <?php mvl_top('method'); ?>
 <main>
-<section class="w"><div class="in hero-x" style="display:grid;gap:2.4rem;align-items:center;grid-template-columns:minmax(0,1fr)">
+<section class="w"><div class="in hero-x mhero">
   <?= mv_waves(true, 'pb-desk') ?>
   <div>
     <p class="k"><span class="de">On demand · Deutsch &amp; Englisch</span><span class="en">On demand · English &amp; German</span></p>
@@ -33,8 +33,10 @@ mvl_head('Mindful Movement Method · Online Yoga, Somatic Movement & Breathwork 
     <div class="cta"><a class="btn" href="#buchen"><span class="de">Mitglied werden</span><span class="en">Become a member</span> →</a><a class="btn line" href="#inhalt"><span class="de">Was dich erwartet</span><span class="en">What's inside</span></a></div>
     <?php if ($pre): ?><div class="facts"><span><span class="de">Start am <?= mv_date($launch) ?></span><span class="en">Opens on <?= mv_date($launch, 'en') ?></span></span><span><span class="de">jetzt buchen, bezahlt wird erst ab dem Start</span><span class="en">book now, pay once it opens</span></span></div><?php endif; ?>
   </div>
+  <!-- Statt des unscharfen Breitbilds (Vivien, 28.10.2026): scharfes Hochformat-Foto im Bogen neben dem Text -->
+  <div class="art arch tall mhero-pic rv"><img src="/img/movecia/fotos/pt-kind.jpg?v=1" alt="Vivien ruht in der Kindhaltung auf ihrer Matte, daneben eine Decke und eine Tasse Tee" fetchpriority="high"></div>
 </div>
-<div class="in"><div class="art wide rv"><img src="/img/movecia/fotos/ev-method.jpg?v=10" alt="" fetchpriority="high"></div></div></section>
+</section>
 
 <section class="w sec" id="inhalt"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">In der Bibliothek</span><span class="en">In the library</span></p><h2 style="margin-top:.6rem"><span class="de">Bewegung, die sich <em>gut</em> anfühlt</span><span class="en">Movement that feels <em>good</em></span></h2></div>
