@@ -19,9 +19,10 @@ unset($_SESSION['flash']);
  * „Neu von Claude“: kleine Box oben auf der Startseite, bis zum angegebenen Tag (Vivien, 28.10.2026).
  * Jede neue Funktion hier mit Titel, einem Satz und Link eintragen, damit Vivien nicht suchen muss.
  */
+// Neu-Boxen: 'b' => 'movecia' erscheint nur auf der Movecia-Übersicht, sonst nur bei FORMA (Vivien, 28.10.2026).
 const FORMA_ADMIN_NEWS = [
-    ['until' => '2026-11-20', 'title' => 'Neu im Studio: iPhone als Kamera', 'text' => 'Unter dem Kamerabild „📱 iPhone als Kamera“ tippen: dein iPhone filmt, Teleprompter und alles andere bleiben am MacBook', 'link' => '?view=studio'],
-    ['until' => '2026-11-15', 'title' => 'Neu im Studio: 4K, Teleprompter an der Kamera, schnelleres Speichern', 'text' => 'Bildqualität 4K/2K unter „Kamera & Mikrofon“, Text beim Aufnehmen direkt unter der Linse, „🗑 Löschen“ nach jeder Aufnahme, „💛 Meine Looks“ zum Speichern deiner Filter, Bearbeiten speichert viel schneller', 'link' => '?view=studio'],
+    ['b' => 'movecia', 'until' => '2026-11-20', 'title' => 'Neu im Studio: iPhone als Kamera', 'text' => 'Unter dem Kamerabild „📱 iPhone als Kamera“ tippen: dein iPhone filmt, Teleprompter und alles andere bleiben am MacBook', 'link' => '?view=studio'],
+    ['b' => 'movecia', 'until' => '2026-11-15', 'title' => 'Neu im Studio: 4K, Teleprompter an der Kamera, schnelleres Speichern', 'text' => 'Bildqualität 4K/2K unter „Kamera & Mikrofon“, Text beim Aufnehmen direkt unter der Linse, „🗑 Löschen“ nach jeder Aufnahme, „💛 Meine Looks“ zum Speichern deiner Filter, Bearbeiten speichert viel schneller', 'link' => '?view=studio'],
     ['until' => '2026-11-15', 'title' => 'Neu: Angebote für Gruppen & Schulen', 'text' => 'Angebot anlegen, per WhatsApp schicken, Bestätigung und Vorabrechnung laufen automatisch', 'link' => '?view=angebote'],
 ];
 
@@ -2579,7 +2580,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
     <?php $natalReq = 0; try { $natalReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} ?>
     <?php foreach ($minCourses as $mc): ?><a class="card notice" href="<?= forma_h($self) ?>?view=course&amp;id=<?= (int)$mc['id'] ?>"><span class="ic"><?= admin_icon('kalender') ?></span><span><strong>Zu wenige Anmeldungen: <?= forma_h($mc['title']) ?>, <?= forma_h(preg_replace('/\s*·.*$/u', '', (string)$mc['date_text'])) ?></strong><br><span class="muted small">Entscheide: findet statt oder Gäste informieren →</span></span></a><?php endforeach; ?>
     <?php // Kleine Boxen ganz oben (Vivien, 28.10.2026: „direkt auf der Hauptseite als kleine Box, damit ich nicht suchen muss“)
-    foreach (FORMA_ADMIN_NEWS as $nw): if (date('Y-m-d') > $nw['until']) continue; ?>
+    foreach (FORMA_ADMIN_NEWS as $nw): if (date('Y-m-d') > $nw['until'] || ($nw['b'] ?? 'forma') !== 'forma') continue; ?>
         <a class="card notice news" href="<?= forma_h($self . $nw['link']) ?>"><span class="ic">✨</span><span><strong><?= forma_h($nw['title']) ?></strong><br><span class="muted small"><?= forma_h($nw['text']) ?> →</span></span></a>
     <?php endforeach; ?>
     <?php foreach (forma_offers($pdo) as $of): if (!in_array($of['status'], ['offen', 'bestaetigt'], true)) continue;

@@ -486,3 +486,6 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Lösung über Apples Continuity-Kamera (kein eigenes Streaming): Knopf „📱 iPhone als Kamera“ unter dem Kamerabild (`#iph`, nur am Mac-Computer, nicht am Handy und nicht während der Aufnahme). Sucht in `enumerateDevices` eine Kamera mit „iPhone“ im Namen, merkt sie als `st-cam` (und das iPhone-Mikrofon als `st-mic`, falls vorhanden) und startet die Kamera neu. Nochmal tippen = zurück zur Mac-Kamera.
 - Wird kein iPhone gefunden, erscheint `#iphHelp` mit der Einrichtung (gleiche Apple-ID, WLAN + Bluetooth, Einstellungen → Allgemein → AirPlay & Continuity → Continuity-Kamera, iPhone gesperrt quer oben mittig am MacBook, Rückkamera zur Person; macOS Ventura / iOS 16).
 - Der Teleprompter steht beim Aufnehmen ohnehin oben mittig am Bildschirm (`prTop`), also direkt unter dem iPhone.
+
+## Neu-Boxen nach Bereich (Vivien, 28.10.2026: „das brauche ich in Movecia und nicht in FORMA“)
+- `FORMA_ADMIN_NEWS` in `verwaltung/index.php`: Einträge für Movecia (Studio, Videos, Method, Natal, Personal Training …) bekommen `'b' => 'movecia'` und erscheinen nur auf der Movecia-Übersicht; ohne `b` nur auf der FORMA-Hauptseite.
