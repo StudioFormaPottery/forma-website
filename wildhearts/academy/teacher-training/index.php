@@ -171,7 +171,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
     <?php foreach ($mods as $m): ?>
     <div class="mod rv<?= in_array($m['n'], [2, 7], true) ? ' hl' : '' ?><?= $m['n'] === 11 ? ' last' : '' ?>"><span class="n"><?= $m['n'] ?></span><span class="d"><span class="de"><?= $m['n'] === 1 ? mv_date($st) : 'ab ' . ac_month($m['date']) ?></span><span class="en"><?= $m['n'] === 1 ? mv_date($st, 'en') : 'from ' . ac_month($m['date'], 'en') ?></span></span><b><span class="de"><?= forma_h($m['de']) ?></span><span class="en"><?= forma_h($m['en']) ?></span></b></div>
     <?php endforeach; ?>
-    <div class="mod wk rv"><span class="d"><span class="de">September 2028</span><span class="en">September 2028</span></span><b><span class="de">Präsenzwochenende in den Tiroler Alpen</span><span class="en">In-person weekend in the Tyrolean Alps</span></b></div>
+    <div class="mod wk rv"><span class="d"><span class="de">September 2028</span><span class="en">September 2028</span></span><b><span class="de">Präsenzwochenende in den Tiroler Alpen</span><span class="en">In-person weekend in the Tyrolean Alps</span></b><a class="lu-link" href="#line-up">Zum Line-up ↓</a></div>
   </div>
 </div></section>
 
@@ -184,9 +184,9 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
       <div class="tx">
         <p class="k"><span class="de">Präsenzwochenende · September 2028</span><span class="en">In-person weekend · September 2028</span></p>
         <h3><span class="de">Drei Tage in den Tiroler Alpen</span><span class="en">Three days in the Tyrolean Alps</span></h3>
-        <p><span class="de">Von Freitag 8:30 Uhr bis Sonntag 17:30 Uhr üben, unterrichten und lernen wir gemeinsam. Zwei Nächte mit Unterkunft und Verpflegung sind im Preis enthalten. Der genaue Termin und der Ort werden noch bekannt gegeben.</span><span class="en">From Friday 8:30 am to Sunday 5:30 pm we practise, teach and learn together. Two nights with accommodation and meals are included in the price. The exact date and venue will be announced.</span></p>
+        <p><span class="de">Von Freitag 9:00 Uhr bis Sonntag 16:00 Uhr üben, unterrichten und lernen wir gemeinsam. Zwei Nächte mit Unterkunft und Verpflegung sind im Preis enthalten. Der genaue Termin und der Ort werden noch bekannt gegeben. <a href="#line-up" class="lu-link">So sieht dein Wochenende aus ↓</a></span><span class="en">From Friday 9 am to Sunday 4 pm we practise, teach and learn together. Two nights with accommodation and meals are included in the price. The exact date and venue will be announced.</span></p>
         <div class="lp"><b><span class="de">Deine Lehrprobe</span><span class="en">Your teaching practice</span></b><p><span class="de">Im Modul Unterrichten &amp; Sequencing entwickelst du deine eigene Einheit von etwa 25 Minuten, und am Wochenende unterrichtest du sie. Aufgeregt? Das ist ganz normal und sogar ein gutes Zeichen. Wir üben vorher viel gemeinsam, deine Lerngruppe kennt deine Stunde schon, und am Wochenende sitzen Frauen vor dir, die dir alles Gute wünschen. Das ist keine Prüfung, sondern dein Moment, in dem alles zusammenkommt.</span><span class="en">In the teaching &amp; sequencing module you create your own session of about 25 minutes, and at the weekend you teach it. Nervous? That is completely normal, and actually a good sign. We practise a lot together beforehand, your learning group already knows your class, and at the weekend you will be teaching women who are rooting for you. It is not an exam; it is your moment, when everything comes together.</span></p></div>
-        <div class="facts"><span><span class="de">Fr 8:30 – So 17:30</span><span class="en">Fri 8:30 am – Sun 5:30 pm</span></span><span><span class="de">2 Nächte inklusive</span><span class="en">2 nights included</span></span><span><span class="de">Verpflegung inklusive</span><span class="en">Meals included</span></span></div>
+        <div class="facts"><span><span class="de">Fr 9:00 – So 16:00</span><span class="en">Fri 9 am – Sun 4 pm</span></span><span><span class="de">2 Nächte inklusive</span><span class="en">2 nights included</span></span><span><span class="de">Verpflegung inklusive</span><span class="en">Meals included</span></span></div>
         <p class="must"><span class="de">Die Termine stehen gut ein Jahr im Voraus fest. Bitte plan das Wochenende fix ein, es kann nicht nachgeholt werden.</span><span class="en">The dates are fixed well over a year in advance. Please plan for the weekend, as it cannot be made up later.</span></p>
       </div>
     </div>
@@ -201,6 +201,55 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
       <div class="room"><img src="/img/movecia/fotos/ev-gathering.jpg?v=1" alt="" loading="lazy"><p><span class="de"><b>Der Prüfungsraum</b> ist wie ein ruhiger Online-Coworking-Raum: Ihr sitzt mit Live-Kamera jeweils bei euch zu Hause, und ich bin die ganze Zeit dabei.</span><span class="en"><b>The exam room</b> is like a quiet online co-working space: each of you sits at home with your camera on, and I am there the whole time.</span></p></div>
     </div>
   </div>
+
+  <?php
+  // Ablauf des Präsenzwochenendes (Vivien, 28.10.2026): Fr 9:00 – So 16:00, Lehrproben in vier Runden, Kochworkshop mit der Ernährungstrainerin, Abschluss am Feuer.
+  $lu = [
+    ['Freitag', 'Ankommen', 'berg', [
+      ['8:30', 'Ankommen bei Tee und Obst', 'Zimmer beziehen, durchatmen, die anderen endlich in echt sehen.'],
+      ['9:00', 'Eröffnungskreis', 'Wir kommen an und setzen gemeinsam eine Intention fürs Wochenende.'],
+      ['9:45', 'Morgenpraxis mit Vivien', 'Yoga Flow und Breathwork, damit der Körper mitkommt.'],
+      ['11:15', 'Anatomie zum Anfassen', 'Body Scanning zu zweit: spüren, was du bisher nur gelesen hast.'],
+      ['12:30', 'Mittagessen', ''],
+      ['14:00', 'Lehrproben · Runde 1', 'Die ersten Einheiten, jeweils mit liebevollem Feedback aus der Gruppe.'],
+      ['16:30', 'Achtsame Berührung', 'Sanfte Hands-on-Hilfen üben, mit Einverständnis und Gefühl.'],
+      ['18:30', 'Abendessen', ''],
+      ['20:00', 'Abendmeditation & Journaling', 'Ein ruhiger Ausklang für den ersten Tag.'],
+    ]],
+    ['Samstag', 'Unterrichten', 'herz', [
+      ['7:30', 'Sanftes Erwachen', 'Somatic Movement für alle, die mögen.'],
+      ['8:15', 'Frühstück', ''],
+      ['9:15', 'Lehrproben · Runde 2', 'Du unterrichtest, die anderen üben mit und geben dir Rückmeldung.'],
+      ['12:00', 'Kochworkshop', 'Mit unserer Ernährungstrainerin kochen wir zusammen das Mittagessen und lernen, was dem Nervensystem guttut.'],
+      ['13:30', 'Gemeinsames Mittagessen', ''],
+      ['15:00', 'Lehrproben · Runde 3', 'Weitere Einheiten aus eurem Sequencing-Modul.'],
+      ['17:00', 'Zeit für dich', 'Garten, Spaziergang in den Bergen oder einfach Ruhe.'],
+      ['18:30', 'Abendessen', ''],
+      ['20:00', 'Yin & Klang', 'Ausklang mit ruhigen Haltungen und Klangschalen.'],
+    ]],
+    ['Sonntag', 'Abschluss', 'bluete', [
+      ['7:30', 'Morgenpraxis', 'Mindful Movement zum Ankommen im letzten Tag.'],
+      ['8:15', 'Frühstück', ''],
+      ['9:15', 'Lehrproben · Runde 4', 'Die letzten Einheiten. Danach hast du es geschafft.'],
+      ['11:30', 'Dein Weg danach', 'Prüfung, Zertifikat und deine Selbstständigkeit: alle Fragen auf den Tisch.'],
+      ['12:30', 'Mittagessen', ''],
+      ['14:00', 'Abschlusszeremonie am Feuer', 'Wir würdigen, was in diesen elf Monaten gewachsen ist.'],
+      ['15:30', 'Abschlusskreis', 'Ein letztes Mal zusammen, bevor wir uns verabschieden.'],
+      ['16:00', 'Heimreise', ''],
+    ]],
+  ];
+  ?>
+  <div class="lineup rv" id="line-up">
+    <div class="lu-h"><p class="k">Dein Wochenende</p><h3>So sieht dein <em>Line-up</em> aus</h3><p>Drei Tage, an denen alles zusammenkommt: Praxis, deine Lehrprobe, gutes Essen und Zeit miteinander.</p></div>
+    <div class="lu-tabs" role="tablist"><?php foreach ($lu as $i => $d): ?><button type="button" role="tab" data-d="<?= $i ?>" aria-selected="<?= $i ? 'false' : 'true' ?>"><?= $d[0] ?></button><?php endforeach; ?></div>
+    <div class="lu-days"><?php foreach ($lu as $i => $d): ?>
+      <div class="lu-day<?= $i ? '' : ' on' ?>" data-d="<?= $i ?>">
+        <div class="lu-dh"><span class="ib"><?= mv_icon_svg($d[2]) ?></span><div><b><?= $d[0] ?></b><small><?= $d[1] ?></small></div></div>
+        <ol><?php foreach ($d[3] as $it): ?><li class="<?= $it[2] === '' ? 'meal' : '' ?>"><time><?= $it[0] ?></time><div><b><?= $it[1] ?></b><?php if ($it[2] !== ''): ?><p><?= $it[2] ?></p><?php endif; ?></div></li><?php endforeach; ?></ol>
+      </div><?php endforeach; ?></div>
+    <p class="lu-note">Frühstück, Mittag- und Abendessen, Snacks, Obst und Getränke sind inklusive, regional und überwiegend vegetarisch. Kleine Änderungen im Ablauf sind möglich, den genauen Termin und den Ort bekommst du rechtzeitig.</p>
+  </div>
+  <script>(function(){var w=document.getElementById('line-up');if(!w)return;w.querySelectorAll('.lu-tabs button').forEach(function(b){b.addEventListener('click',function(){var d=b.dataset.d;w.querySelectorAll('.lu-tabs button').forEach(function(x){x.setAttribute('aria-selected',x===b?'true':'false')});w.querySelectorAll('.lu-day').forEach(function(x){x.classList.toggle('on',x.dataset.d===d)})})})})();</script>
 </div></section>
 
 <section class="w sec tint t4" id="weg"><div class="in">

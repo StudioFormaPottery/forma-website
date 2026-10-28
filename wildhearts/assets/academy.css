@@ -473,3 +473,29 @@ body.acad .site-top{background:rgba(242,227,222,.93)}
 .acm-msgs .fa-ok{display:block;margin-top:.6rem;font-size:.88rem;color:var(--plum)}
 .acm-faq details.hl{box-shadow:0 0 0 3px var(--plum)!important;transition:box-shadow .3s}
 .acm-msgs{max-height:min(72vh,620px)}
+/* Line-up Präsenzwochenende (Vivien, 28.10.2026) */
+.lu-link{display:inline-block;margin-top:.5rem;color:var(--peach);text-decoration:underline;text-underline-offset:3px;font-size:.95rem}
+.mod .lu-link{display:block;color:var(--plum);font-size:.9rem;margin-top:.35rem}
+.lineup{margin-top:2.4rem;background:linear-gradient(160deg,#FBF5F0,#F3E6E4);border-radius:30px;padding:clamp(1.4rem,3.5vw,2.4rem);scroll-margin-top:90px}
+.lu-h{text-align:center;max-width:38em;margin:0 auto}
+.lu-h h3{font-weight:400;font-size:clamp(1.9rem,3.2vw,2.6rem);margin:.4rem 0 .5rem}
+.lu-h h3 em{color:var(--plum)}.lu-h p:last-child{color:var(--muted)}
+.lu-tabs{display:flex;justify-content:center;gap:.5rem;margin:1.4rem 0 1rem}
+.lu-tabs button{font:inherit;border:1px solid var(--line,#DDD2C6);background:#FFFDFB;color:var(--ink,#2E2529);border-radius:99px;padding:.55rem 1.2rem;cursor:pointer}
+.lu-tabs button[aria-selected=true]{background:var(--plum);border-color:var(--plum);color:#fff}
+.lu-day{display:none;background:#FFFDFB;border-radius:24px;padding:1.2rem 1.2rem 1.4rem}
+.lu-day.on{display:block}
+.lu-dh{display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem}
+.lu-dh .ib{width:44px;height:44px;border-radius:50%;background:#F1E3DC;display:grid;place-items:center;flex:none}
+.lu-dh .ib svg{width:24px;height:24px}
+.lu-dh b{display:block;font-family:var(--serif);font-weight:500;font-size:1.5rem;line-height:1}
+.lu-dh small{color:var(--plum);letter-spacing:.14em;text-transform:uppercase;font-size:.72rem}
+.lu-day ol{list-style:none;margin:0;padding:0}
+.lu-day li{display:grid;grid-template-columns:3.4rem 1fr;gap:.7rem;padding:.65rem 0;border-top:1px dashed #E6D8CF}
+.lu-day li:first-child{border-top:0}
+.lu-day time{font-variant-numeric:tabular-nums;color:var(--plum);font-weight:500;padding-top:.05rem}
+.lu-day li b{font-weight:500}
+.lu-day li p{color:var(--muted);font-size:.93rem;margin-top:.15rem;line-height:1.45}
+.lu-day li.meal b{font-weight:400;color:var(--muted)}
+.lu-note{margin:1.2rem auto 0;max-width:46em;text-align:center;color:var(--muted);font-size:.92rem}
+@media(min-width:900px){.lu-tabs{display:none}.lu-days{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.lu-day{display:block}}
