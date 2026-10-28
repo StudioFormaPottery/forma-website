@@ -22,6 +22,7 @@ Jeden **Sonntag** kommt das Paket für die **kommende Woche Montag bis Sonntag**
 - Sprache: schönes, schlichtes Hochdeutsch, warm, fließende ganze Sätze. Keine Floskeln, keine Dreierketten, keine „nicht X, sondern Y“-Sätze, keine Gedankenstriche-Ketten, keine Therapie-Sprache, keine erfundenen Geschichten.
 - Hashtags: 8–10 pro Caption, Mischung aus groß (#mindfulmovement, #yogafürfrauen) und Nische (#tiredday, #mentalload), immer #movecia.
 - Bereits verwendete Themen in `history.md` eintragen und nicht wiederholen.
+- Neue Fotos (28.10.2026, Everygen, von Vivien hochgeladen): `ev-katze-kuh.jpg` (Katze-Kuh), `ev-lunge.jpg` (Crescent Lunge, Arme hoch), `ev-savasana.jpg` (Savasana am Abend mit Kerzen), `ev-post-baby.jpg` (mit Neugeborenem im Arm, Gesicht erkennbar: nicht für die Website), `ev-post-trage.jpg` (von hinten mit Baby in der Trage), `ev-post-bauch.jpg` (Hände auf dem Bauch, ohne Gesicht). Fotos abwechseln, damit sich nichts ständig wiederholt.
 - Fotos nur die neuen Bilder `img/movecia/fotos/ev-*.jpg` bzw. `pt-*.jpg` (heller Studio-Look unterm Dachstuhl, cremefarbene Outfits), nie art-*, fold, reach, keine Fotos vom Töpfern. Alte Pfade ersetzt `make_week.py` automatisch und meldet es.
 
 ## Look (Vivien, 27.10.2026: alles cute, modern, eine Movecia-Handschrift)

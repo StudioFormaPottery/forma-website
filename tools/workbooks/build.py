@@ -294,7 +294,7 @@ def chapter(c, L):
 
 
 # Deckblatt-Fotos (Vivien, 28.10.2026: jedes Workbook mit einem der neuen Fotos im Bogen, alles eine Handschrift)
-COVER_PHOTOS = {'method-ankommen': 'ev-method-foto.jpg', 'method-rueckzug': 'ev-platz-quadrat.jpg', 'unfold-m1': 'ev-unfold-karte.jpg',
+COVER_PHOTOS = {'method-ankommen': 'ev-lunge.jpg', 'method-rueckzug': 'ev-savasana.jpg', 'unfold-m1': 'ev-unfold-karte.jpg',
                 'unfold-m2': 'ev-method-karte.jpg', 'unfold-m3': 'ev-ueber-mich.jpg'}
 
 
@@ -305,7 +305,7 @@ def cover_photo(key):
     if m:
         n = int(m.group(2))
         if m.group(1) == 'prae': return 'img/movecia/fotos/' + ('ev-natal.jpg' if n % 2 else 'ev-natal-sitzend.jpg')
-        return 'img/movecia/fotos/' + ('ev-platz-quadrat.jpg' if n % 2 else 'ev-gathering.jpg')
+        return 'img/movecia/fotos/' + ['ev-post-baby.jpg', 'ev-post-trage.jpg', 'ev-post-bauch.jpg'][(n - 1) % 3]
     return None
 
 
