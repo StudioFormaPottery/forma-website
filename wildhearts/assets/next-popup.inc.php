@@ -6,6 +6,7 @@
 
 function mv_next_popup_phase(): string
 {
+    if ((string)((mm_cfg('popup') ?? [])['mode'] ?? 'auto') === 'off') return ''; // Verwaltung → Movecia: Pop-up aus
     $c = mv_cfg();
     $now = time();
     if ($now < mv_ts($c['launch'])) return 'method';
@@ -15,14 +16,21 @@ function mv_next_popup_phase(): string
         try { $free = mv_unfold_free(forma_db()); } catch (Throwable $e) {}
         if ($free > 0) return 'unfold';
     }
-    return 'teacher';
+    // Teacher Training (Movecia Academy) bis zum Start, danach nichts
+    require_once dirname(__DIR__, 2) . '/api/academy-lib.php';
+    $a = ac_cfg();
+    return $a['open'] && $now < $a['start_ts'] ? 'teacher' : '';
 }
 
 function mv_next_popup(): void
 {
     $c = mv_cfg();
-    $force = in_array($_GET['popup'] ?? '', ['method', 'unfold', 'teacher'], true) ? $_GET['popup'] : '';
+    $gp = (string)($_GET['popup'] ?? ''); if ($gp === 'academy') $gp = 'teacher';
+    $force = in_array($gp, ['method', 'unfold', 'teacher'], true) ? $gp : '';
+    require_once dirname(__DIR__, 2) . '/api/academy-lib.php';
+    try { $pdoA = forma_db(); ac_schema($pdoA); ac_tick($pdoA); } catch (Throwable $e) {} // Academy-Automatik auch über Startseiten-Aufrufe
     $ph = $force ?: mv_next_popup_phase();
+    if ($ph === '') return;
     $eu = fn(int $x) => '€ ' . number_format($x / 100, 0, ',', '.');
     $ml = mv_ts($c['launch']);
     $us = mv_ts($c['u_start']);
@@ -46,21 +54,21 @@ function mv_next_popup(): void
             'price' => $c['eb_u'] ? ['Early-Bird bis ' . $short($c['eb_u_end'], 'de') . ': ' . $eu($c['u_once']) . ' statt ' . $eu($c['r_u_once']), 'Early bird until ' . $short($c['eb_u_end'], 'en') . ': ' . $eu($c['u_once']) . ' instead of ' . $eu($c['r_u_once'])] : [$eu($c['u_once']) . ' oder ' . (int)$c['u_n'] . ' × ' . $eu($c['u_inst']), $eu($c['u_once']) . ' or ' . (int)$c['u_n'] . ' × ' . $eu($c['u_inst'])],
             'btn' => ['Platz sichern', 'Save my spot']];
     } else {
-        // Teacher Training ist seit 28.10.2026 als Movecia Academy buchbar, Preis immer aus ac_cfg() (Server)
-        require_once dirname(__DIR__, 2) . '/api/academy-lib.php';
-        $ac = ac_cfg();
-        $p = ['img' => '/img/movecia/fotos/ev-lunge.jpg', 'pos' => '42% 55%', 'href' => '/academy/teacher-training/',
-            'k' => ['Movecia Academy · Start ' . $short($ac['start_ts'], 'de') . ' 2027 · nur ' . (int)$ac['seats'] . ' Plätze', 'Movecia Academy · starts ' . $short($ac['start_ts'], 'en') . ' 2027 · only ' . (int)$ac['seats'] . ' places'],
+        // Movecia Academy (Vivien, 28.10.2026): echte Seite /academy/teacher-training/, Preise aus ac_cfg(), nur Deutsch; ausgebucht → Warteliste
+        $a = ac_cfg();
+        $full = true; try { $full = ac_free(forma_db()) <= 0; } catch (Throwable $e) {}
+        $eua = fn(int $x) => '€ ' . number_format($x / 100, 0, ',', '.');
+        $kde = $full ? 'Movecia Academy · Warteliste' : ($a['eb'] ? 'Movecia Academy · Early Bird bis ' . $short($a['eb_end'], 'de') : 'Movecia Academy · nur 10 Plätze');
+        $p = ['img' => '/img/movecia/fotos/ev-lunge.jpg', 'pos' => '42% 55%', 'href' => $full ? '/academy/teacher-training/#liste' : '/academy/teacher-training/',
+            'k' => [$kde, $kde . ' · in German'],
             'h' => ['The Mindful Becoming <em>Teacher Training</em>', 'The Mindful Becoming <em>Teacher Training</em>'],
-            't' => ['550 Stunden inklusive einer vollständigen 200-Stunden-Yogalehrerausbildung, hybrid mit einem Präsenzwochenende in den Tiroler Alpen. Nur alle zwei Jahre.', '550 hours including a complete 200-hour yoga teacher training, hybrid with an in-person weekend in the Tyrolean Alps. Only every two years.'],
-            'price' => $ac['eb'] ? ['Early-Bird bis ' . $short($ac['eb_end'], 'de') . ': ' . $eu($ac['price']) . ' statt ' . $eu($ac['r_total']), 'Early bird until ' . $short($ac['eb_end'], 'en') . ': ' . ac_eur($ac['price'], 'en') . ' instead of ' . ac_eur($ac['r_total'], 'en')] : [$eu($ac['price']) . ', zur Buchung 50 % Anzahlung', ac_eur($ac['price'], 'en') . ', 50 % deposit to book'],
-            'btn' => ['Zur Ausbildung', 'See the training']];
-        $acStart = (int)$ac['start_ts'];
-        $acEb = (int)$ac['eb'];
+            't' => ['Andere begleiten und dabei bei dir selbst bleiben: ' . AC_HOURS . ' Stunden inklusive vollständiger 200-Stunden-Yogalehrerausbildung, 11 Monate hybrid, nur alle zwei Jahre.', 'A ' . AC_HOURS . '-hour Mindful Becoming Teacher Training including a full 200-hour yoga teacher training. Held in German only.'],
+            'price' => $full ? null : ($a['eb'] ? ['Early Bird ' . $eua($a['eb_total']) . ' statt ' . $eua($a['r_total']), 'Early bird ' . $eua($a['eb_total']) . ' instead of ' . $eua($a['r_total'])] : [$eua($a['r_total']), $eua($a['r_total'])]),
+            'btn' => $full ? ['Auf die Warteliste', 'Join the waiting list'] : ['Zur Ausbildung', 'See the training']];
     }
-    $startTs = $ph === 'method' ? $ml : ($ph === 'unfold' ? $us : ($acStart ?? 0));
+    $startTs = $ph === 'method' ? $ml : ($ph === 'unfold' ? $us : (int)ac_cfg()['start_ts']);
     // Schlüssel fürs „schon gesehen“: ändert sich mit Angebot und Preisstufe → neues Angebot oder Ende des Early-Bird zeigt das Pop-up wieder
-    $ver = $ph . '-' . ($ph === 'method' ? (int)$c['eb_m'] : ($ph === 'unfold' ? (int)$c['eb_u'] : 'ac' . ($acEb ?? 0)));
+    $ver = $ph . '-' . ($ph === 'method' ? (int)$c['eb_m'] : ($ph === 'unfold' ? (int)$c['eb_u'] : (int)ac_cfg()['eb']));
     ?>
 <!-- Kiesel-Pop-up (Vivien, 28.10.2026: „voll langweilig, lieber rund, in der Form vom Logo“): weiche Kieselform mit versetztem Pflaume-Umriss wie im Logo,
      Foto als Kiesel, Pflaume-Punkt mit Countdown bis zum Start. Bewegt sich ganz leicht mit der Maus, atmet langsam. -->
@@ -166,7 +174,9 @@ function mv_next_popup(): void
   function esc(e){if(e.key==='Escape')close()}
   p.addEventListener('click',function(e){if(e.target===p||e.target.closest('.npop-x,.npop-later'))close()});
   p.querySelector('.npop-cta .btn').addEventListener('click',function(){try{sessionStorage.setItem(key,'1')}catch(e){}});
-  setTimeout(function(){p.hidden=false;requestAnimationFrame(function(){p.classList.add('on')});document.addEventListener('keydown',esc)},force?300:3500);
+  function trap(e){if(e.key!=='Tab')return;var f=p.querySelectorAll('a[href],button'),a=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}}
+  document.addEventListener('keydown',function(e){if(!p.hidden)trap(e)});
+  setTimeout(function(){p.hidden=false;requestAnimationFrame(function(){p.classList.add('on');var b=p.querySelector('.npop-cta .btn');if(b)b.focus({preventScroll:true})});document.addEventListener('keydown',esc)},force?300:3500);
 })();
 </script>
 <?php

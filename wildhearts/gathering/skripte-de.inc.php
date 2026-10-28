@@ -8,7 +8,7 @@ Hallo, und herzlich willkommen. Kommt rein, kommt rein.
 
 Ich sehe euch nach und nach ankommen und möchte jede von euch richtig begrüßen. {names}. Ich freue mich so, dass ihr da seid.
 
-Bevor wir anfangen, stelle ich mich kurz für alle vor, die neu hier sind. Ich bin Vivien, aber sagt gern einfach Viv zu mir. Ich unterrichte Yoga, Pilates und achtsame Bewegung hier in den Tiroler Bergen, ich bin Mama von vier Kindern, und dieser Kreis liegt mir sehr am Herzen.
+Bevor wir anfangen, stelle ich mich kurz für alle vor, die neu hier sind. Ich bin Vivien, aber sagt gern einfach Viv zu mir. Ich unterrichte Yoga, Bodyweight-Training und achtsame Bewegung hier in den Tiroler Bergen, ich bin Mama von vier Kindern, und dieser Kreis liegt mir sehr am Herzen.
 
 [optional: noch ein Satz über dich, zum Beispiel warum du diesen Kreis begonnen hast]
 
@@ -137,7 +137,7 @@ Hallo, hallo. Herzlich willkommen, ihr wilden Herzen.
 
 Ich möchte alle begrüßen, die heute Abend da sind. {names}. Es ist so schön, euch zu sehen.
 
-Bevor wir anfangen, stelle ich mich kurz für alle vor, die neu hier sind. Ich bin Vivien, aber sagt gern einfach Viv zu mir. Ich unterrichte Yoga, Pilates und achtsame Bewegung hier in den Tiroler Bergen, ich bin Mama von vier Kindern, und dieser Kreis liegt mir sehr am Herzen.
+Bevor wir anfangen, stelle ich mich kurz für alle vor, die neu hier sind. Ich bin Vivien, aber sagt gern einfach Viv zu mir. Ich unterrichte Yoga, Bodyweight-Training und achtsame Bewegung hier in den Tiroler Bergen, ich bin Mama von vier Kindern, und dieser Kreis liegt mir sehr am Herzen.
 
 [optional: noch ein Satz über dich, zum Beispiel warum du diesen Kreis begonnen hast]
 
@@ -189,7 +189,7 @@ Dann kam meine Tochter auf die Welt. Und in dieser ersten Zeit mit einem Neugebo
 
 Und langsam ist etwas zurückgekommen. Nicht mein altes Ich, sondern etwas Neues.
 
-Ungefähr ein Jahr später habe ich meine Yogalehrerausbildung begonnen. Das war mitten in der Coronazeit, deshalb lief vieles online. Ich hatte viel Zeit zu Hause, und die ganze Welt stand still. Von da an hat ein Schritt zum nächsten geführt: weitere Ausbildungen, Pilates, somatische Arbeit, Regulation des Nervensystems, Yoga Nidra, Yoga in der Schwangerschaft und nach der Geburt.
+Ungefähr ein Jahr später habe ich meine Yogalehrerausbildung begonnen. Das war mitten in der Coronazeit, deshalb lief vieles online. Ich hatte viel Zeit zu Hause, und die ganze Welt stand still. Von da an hat ein Schritt zum nächsten geführt: weitere Ausbildungen, Bodyweight-Training, somatische Arbeit, Regulation des Nervensystems, Yoga Nidra, Yoga in der Schwangerschaft und nach der Geburt.
 
 Und ich erinnere mich noch genau an mein allererstes Personal Training. Ich habe fünfundzwanzig Euro für die Stunde verlangt und war gleichzeitig nervös und so stolz.
 
@@ -262,7 +262,7 @@ Hallo ihr Lieben, herzlich willkommen. Ich freue mich so, euch zu sehen.
 
 Ich möchte euch eine nach der anderen begrüßen. {names}. Danke, dass ihr heute Abend gekommen seid.
 
-Bevor wir anfangen, stelle ich mich kurz für alle vor, die neu hier sind. Ich bin Vivien, aber sagt gern einfach Viv zu mir. Ich unterrichte Yoga, Pilates und achtsame Bewegung hier in den Tiroler Bergen, ich bin Mama von vier Kindern, und dieser Kreis liegt mir sehr am Herzen.
+Bevor wir anfangen, stelle ich mich kurz für alle vor, die neu hier sind. Ich bin Vivien, aber sagt gern einfach Viv zu mir. Ich unterrichte Yoga, Bodyweight-Training und achtsame Bewegung hier in den Tiroler Bergen, ich bin Mama von vier Kindern, und dieser Kreis liegt mir sehr am Herzen.
 
 [optional: noch ein Satz über dich, zum Beispiel warum du diesen Kreis begonnen hast]
 
@@ -304,7 +304,7 @@ Wenn ich der Geschichte einen Titel geben müsste, dann diesen: Es ging nie nur 
 
 [4:30 · MEINE GESCHICHTE]
 
-Mein allererstes Personal Training hat fünfundzwanzig Euro gekostet. Ich weiß noch, wie aufgeregt ich war. Ich hatte meine ganzen Ausbildungen hinter mir, 1.150 Stunden Yoga, Pilates, Rehabilitation und Arbeit mit dem Nervensystem, und ich dachte: Jetzt weiß ich genau, was zu tun ist. Meine Aufgabe ist es, Frauen in Bewegung zu bringen.
+Mein allererstes Personal Training hat fünfundzwanzig Euro gekostet. Ich weiß noch, wie aufgeregt ich war. Ich hatte meine ganzen Ausbildungen hinter mir, 1.150 Stunden Yoga, Bodyweight-Training, Rehabilitation und Arbeit mit dem Nervensystem, und ich dachte: Jetzt weiß ich genau, was zu tun ist. Meine Aufgabe ist es, Frauen in Bewegung zu bringen.
 
 Und damit hatte ich nur zur Hälfte recht.
 
@@ -395,7 +395,7 @@ Hallo, ihr wilden Herzen. Herzlich willkommen.
 
 Lasst mich schauen, wer heute Abend da ist. {names}. Ich freue mich wirklich, dass ihr es geschafft habt.
 
-Bevor wir anfangen, stelle ich mich kurz für alle vor, die neu hier sind. Ich bin Vivien, aber sagt gern einfach Viv zu mir. Ich unterrichte Yoga, Pilates und achtsame Bewegung hier in den Tiroler Bergen, ich bin Mama von vier Kindern, und dieser Kreis liegt mir sehr am Herzen.
+Bevor wir anfangen, stelle ich mich kurz für alle vor, die neu hier sind. Ich bin Vivien, aber sagt gern einfach Viv zu mir. Ich unterrichte Yoga, Bodyweight-Training und achtsame Bewegung hier in den Tiroler Bergen, ich bin Mama von vier Kindern, und dieser Kreis liegt mir sehr am Herzen.
 
 [optional: noch ein Satz über dich, zum Beispiel warum du diesen Kreis begonnen hast]
 
@@ -526,7 +526,7 @@ Guten Abend, ihr wilden Herzen, und herzlich willkommen zu unserem Samhain-Gathe
 
 Lasst mich alle begrüßen, die heute Abend zusammengekommen sind. {names}. Ich freue mich so, dass ihr in dieser besonderen Nacht da seid.
 
-Bevor wir anfangen, stelle ich mich kurz für alle vor, die neu hier sind. Ich bin Vivien, aber sagt gern einfach Viv zu mir. Ich unterrichte Yoga, Pilates und achtsame Bewegung hier in den Tiroler Bergen, ich bin Mama von vier Kindern, und dieser Kreis liegt mir sehr am Herzen.
+Bevor wir anfangen, stelle ich mich kurz für alle vor, die neu hier sind. Ich bin Vivien, aber sagt gern einfach Viv zu mir. Ich unterrichte Yoga, Bodyweight-Training und achtsame Bewegung hier in den Tiroler Bergen, ich bin Mama von vier Kindern, und dieser Kreis liegt mir sehr am Herzen.
 
 [optional: noch ein Satz über dich, zum Beispiel warum du diesen Kreis begonnen hast]
 
@@ -796,7 +796,7 @@ Und jetzt spür einfach nach, wie du heute Morgen angekommen bist. In deinem Kö
 
 Bevor wir anfangen, möchte ich dir noch etwas über Breathwork sagen.
 
-Über die Jahre habe ich 1.150 Stunden Ausbildung gemacht. Yoga, Pilates, Rehabilitation, Regulation des Nervensystems, Yoga Nidra. Und trotzdem habe ich das Wichtigste nicht in einem Kurs gelernt, sondern an meinen eigenen schwersten Tagen. An den Tagen, an denen ich auf eine Art müde war, gegen die kein Schlaf hilft, mit vier Kindern und einem vollen Leben um mich herum.
+Über die Jahre habe ich 1.150 Stunden Ausbildung gemacht. Yoga, Bodyweight-Training, Rehabilitation, Regulation des Nervensystems, Yoga Nidra. Und trotzdem habe ich das Wichtigste nicht in einem Kurs gelernt, sondern an meinen eigenen schwersten Tagen. An den Tagen, an denen ich auf eine Art müde war, gegen die kein Schlaf hilft, mit vier Kindern und einem vollen Leben um mich herum.
 
 An diesen Tagen war mein Atem immer das Erste, was ich verändern konnte. Noch vor meinen Gedanken, vor meiner Stimmung und vor allem anderen.
 

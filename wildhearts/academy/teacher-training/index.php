@@ -1,13 +1,15 @@
 <?php
-// moveciamovement.com/academy/teacher-training – The Movecia Method · Mindful Becoming Teacher Training (Vivien, 28.10.2026, Runde 2)
+// moveciamovement.com/academy/teacher-training – The Mindful Becoming Teacher Training (Vivien, 28.10.2026, Runde 2)
 // 550 Std. inkl. vollständiger 200-Std.-Yogalehrerausbildung, 11 Monate hybrid, Start Mi 3.11.2027, nur alle 2 Jahre, max. 10 Plätze.
 // Ende: Präsenzwochenende September 2028 (Lehrprobe) → Online-Abschlussprüfung mit Kamera → Zertifikat.
 // Buchung: 50 % Anzahlung, Rest auf einmal / in 2 / in 3 Zahlungen bis 15.9.2027. Early-Bird € 3.390 bis 31.3.2027, danach € 4.500.
-// ?danke=1 nach der Zahlung, ?angebot=TOKEN = persönliches Angebot aus dem Kennenlerngespräch (Countdown, Early-Bird-Preis).
+// ?danke=1 nach der Zahlung, ?angebot=TOKEN = persönlicher Kennenlern-Preis aus dem Gespräch (20 Min. Countdown, nie öffentlich).
 declare(strict_types=1);
 require_once __DIR__ . '/../../assets/icons.inc.php';
 require dirname(__DIR__, 3) . '/api/academy-lib.php';
 require __DIR__ . '/../../assets/layout.inc.php';
+$GLOBALS['mvl_de_only'] = true; // Ausbildung nur auf Deutsch (Vivien, 28.10.2026)
+ob_start('mv_strip_en');
 header('Cache-Control: no-store');
 $pdo = forma_db();
 ac_schema($pdo);
@@ -26,9 +28,9 @@ $ee = fn(int $x) => ac_eur($x, 'en');
 $dd = fn(string $ymd) => ac_d($ymd);
 $de2 = fn(string $ymd) => ac_d($ymd, 'en');
 if ($offer || isset($_GET['danke']) || isset($_GET['abbruch'])) $GLOBALS['mvl_noindex'] = true;
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=3">';
-mvl_head('The Mindful Becoming Teacher Training · Yogalehrerausbildung ' . AC_HOURS . ' Std. hybrid, Tirol | Movecia Academy',
-    'The Mindful Becoming Teacher Training: ' . AC_HOURS . '-Stunden-Ausbildung mit Vivien Malonga, inklusive vollständiger 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum, Somatic Movement, Breathwork, Anatomie & Body Scanning, achtsame Berührung, Mental Load & Nervensystem. 11 Monate hybrid mit Präsenzwochenende in Tirol, Start ' . mv_date($st) . '. Nur alle 2 Jahre, nur 10 Plätze.' . ($c['eb'] ? ' Early-Bird bis ' . mv_date($c['eb_end']) . '.' : ''),
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=7">';
+mvl_head('Yogalehrerausbildung auf Deutsch · Mindful Becoming Teacher Training ' . AC_HOURS . ' Std. | Movecia Academy Tirol',
+    'Die ' . AC_HOURS . '-Stunden-Ausbildung mit Vivien Malonga, ausschließlich auf Deutsch: vollständige 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum, Somatic Movement, Breathwork, Anatomie & Body Scanning, Mental Load & Nervensystem. 11 Monate hybrid, online aus Österreich, Deutschland, der Schweiz und Südtirol, Präsenzwochenende in Tirol. Start ' . mv_date($st) . ', nur 10 Plätze.' . ($c['eb'] ? ' Early-Bird bis ' . mv_date($c['eb_end']) . '.' : ''),
     $site . '/academy/teacher-training/', '/img/movecia/og-academy.jpg', $css, ac_jsonld($pdo));
 $hours = ac_hours();
 $pr = ['lt1' => ['weniger als 1 Jahr', 'less than a year'], '1to2' => ['1–2 Jahre', '1–2 years'], 'gt2' => ['mehr als 2 Jahre', 'more than 2 years'], 'teach' => ['ich unterrichte schon', 'I already teach']];
@@ -49,12 +51,14 @@ $plans = ac_plans_open();
 $defPlan = isset($plans['two']) ? 'two' : 'full';
 $sched = fn(string $k) => ac_schedule($p['total'], $k);
 ?>
-<body>
+<body class="acad">
 <?php mvl_top('academy'); ?>
+<p class="en-note">This training is held in German only.</p>
+<?= ac_band('Mindful Becoming Teacher Training') ?>
 <main id="top">
 <?php if ($offerLive): ?>
 <div class="w"><div class="offerbar" id="offerbar" data-until="<?= (int)$offer['offer_until'] ?>" data-now="<?= time() ?>">
-  <span><span class="de">Dein Angebot aus unserem Gespräch:</span><span class="en">Your offer from our call:</span> <b><?= $e($p['total']) ?></b><?= !$c['eb'] ? ' <s style="opacity:.6">' . $e($c['r_total']) . '</s>' : '' ?></span>
+  <span><span class="de">Dein Kennenlern-Preis aus unserem Gespräch:</span><span class="en">Your price from our call:</span> <b><?= $e($p['total']) ?></b> <s style="opacity:.6"><?= $e($c['price']) ?></s></span>
   <span><span class="de">gilt noch</span><span class="en">valid for</span> <span class="cd" id="offercd">–</span></span>
   <a class="btn light sm" href="#buchen"><span class="de">Jetzt Platz sichern</span><span class="en">Book my place</span></a>
 </div></div>
@@ -63,6 +67,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
 <section class="w"><div class="in hero-x ac-hero two">
   <?= mv_waves(false) ?>
   <div class="ac-hero-tx">
+    <?= ac_seal('herom') ?>
     <p class="ac-kick"><?= ac_seal('mini') ?><span><a href="/academy/">Movecia Academy</a><small><span class="de">Teacher Training 2027 · nur alle 2 Jahre</span><span class="en">Teacher Training 2027 · every two years</span></small></span></p>
     <h1>The Mindful Becoming <em>Teacher Training</em></h1>
     <p class="sub"><span class="de">200 Std. Yoga Teacher · Somatic Movement · Mindful Movement &amp; Mindset</span><span class="en">200 h Yoga Teacher · Somatic Movement · Mindful Movement &amp; Mindset</span></p>
@@ -71,6 +76,8 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
       <span><span class="de"><?= AC_HOURS ?> Stunden inkl. 200 Std. Yoga</span><span class="en"><?= AC_HOURS ?> hours incl. 200 h yoga</span></span>
       <span><span class="de">11 Monate · hybrid</span><span class="en">11 months · hybrid</span></span>
       <span><span class="de">Start <?= mv_date($st) ?></span><span class="en">Starts <?= mv_date($st, 'en') ?></span></span>
+      <span><span class="de">ausschließlich auf Deutsch</span></span>
+      <span><span class="de">für Österreich, Deutschland, Schweiz &amp; Südtirol</span></span>
       <span class="chip ok"><?= $free ? '<span class="de">Plätze frei</span><span class="en">Places available</span>' : '<span class="de">ausgebucht</span><span class="en">fully booked</span>' ?></span>
     </div>
     <?php if ($c['eb']): ?>
@@ -100,7 +107,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   </div>
 </div></div></section>
 
-<section class="w sec" id="wunsch"><div class="in">
+<section class="w sec tint t1" id="wunsch"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">Was du bekommst</span><span class="en">What you get</span></p><h2 style="margin-top:.6rem"><span class="de">Alles, was ich mir selbst <em>gewünscht</em> hätte</span><span class="en">Everything I wish I'd been <em>given</em></span></h2></div>
     <p><span class="de">Du bekommst eine vollständige 200-Stunden-Yogalehrerausbildung inklusive. Und dazu all das, was ich in meinen eigenen Ausbildungen so oft vermisst habe.</span><span class="en">You get a complete 200-hour yoga teacher training included. And on top of it, everything I so often missed in my own trainings.</span></p></div>
   <div class="wish cute-cards">
@@ -149,7 +156,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   </div>
 </div></section>
 
-<section class="w sec" id="ablauf"><div class="in">
+<section class="w sec tint t3" id="ablauf"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">So lernst du</span><span class="en">How you learn</span></p><h2 style="margin-top:.6rem"><span class="de">Elf Monate, <em>nie allein</em></span><span class="en">Eleven months, <em>never alone</em></span></h2></div>
     <p><span class="de">Jeden Monat öffnet sich ein neues Modul, immer am 1., nur das erste startet am Mittwoch, <?= mv_date($st) ?>. Plan etwa 10 bis 12 Stunden pro Woche ein, für Videos, Workbook, deine eigene Praxis, den Live-Call und deine Lerngruppe.</span><span class="en">A new module opens every month, always on the 1st; only the first opens on Wednesday, <?= mv_date($st, 'en') ?>. Allow about 10 to 12 hours a week for videos, workbook, your own practice, the live call and your learning group.</span></p></div>
   <div class="how6 cute-cards">
@@ -196,7 +203,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   </div>
 </div></section>
 
-<section class="w sec" id="weg"><div class="in">
+<section class="w sec tint t4" id="weg"><div class="in">
   <div class="rv" style="text-align:center"><p class="k"><span class="de">Dein Weg</span><span class="en">Your path</span></p><h2 style="margin-top:.6rem"><span class="de">Von der eigenen Praxis zum <em>Zertifikat</em></span><span class="en">From your own practice to your <em>certificate</em></span></h2></div>
   <div class="path">
     <div class="pst rv"><span class="dot"><?= mv_icon_svg('welle') ?></span><div><span class="wd"><span class="de">Vorher · empfohlen</span><span class="en">Beforehand · recommended</span></span><b><span class="de">Etwa 1,5 Jahre eigene Praxis</span><span class="en">About 1.5 years of your own practice</span></b><p><span class="de">Mit der <a href="/method/">Method</a>, mit <a href="/unfold/">Unfold</a> oder in den <a href="/gathering/">Gatherings</a> lernst du die Movecia-Art zu bewegen von innen kennen.</span><span class="en">With the <a href="/method/">Method</a>, <a href="/unfold/">Unfold</a> or the <a href="/gathering/">Gatherings</a> you get to know the Movecia way of moving from the inside.</span></p></div></div>
@@ -210,13 +217,29 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   </div>
 </div></section>
 
-<section class="w sec" id="gespraech"><div class="in">
+<section class="w sec tint t2" id="wo"><div class="in wo">
+  <div class="wo-t">
+    <p class="k">Sprache &amp; Region</p>
+    <h2>Auf Deutsch, <em>von überall</em></h2>
+    <p class="lead">Die Ausbildung findet ausschließlich auf Deutsch statt. Sie ist für Teilnehmerinnen aus Österreich, Deutschland, der Schweiz und Südtirol gedacht: Module, Live-Calls, Coworking und Lerngruppen machst du online, ganz gleich, wo du wohnst. Nur zum Präsenzwochenende kommen wir in den Tiroler Alpen zusammen.</p>
+    <p class="mut">Wenn du eine Yogalehrerausbildung auf Deutsch suchst, die du großteils online machen kannst und die sich trotzdem persönlich und nah anfühlt, bist du hier richtig, egal ob du in Wien, München, Zürich oder Bozen zu Hause bist.</p>
+  </div>
+  <ul class="wo-l">
+    <li><b>🇦🇹 Österreich</b><span>Yogalehrerausbildung in Tirol, hybrid</span></li>
+    <li><b>🇩🇪 Deutschland</b><span>online dabei, Wochenende in Tirol</span></li>
+    <li><b>🇨🇭 Schweiz</b><span>online dabei, bezahlt wird in Euro</span></li>
+    <li><b>Südtirol</b><span>online dabei, Wochenende gleich ums Eck</span></li>
+  </ul>
+  <?= ac_birds() ?>
+</div></section>
+
+<section class="w sec tint t1" id="gespraech"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">Kostenlos &amp; unverbindlich</span><span class="en">Free &amp; no obligation</span></p><h2 style="margin-top:.6rem"><span class="de">Lass uns <em>reden</em></span><span class="en">Let's <em>talk</em></span></h2></div>
     <p><span class="de">In 30 Minuten per Video lernen wir uns kennen, und du kannst alles fragen, was dir auf dem Herzen liegt. Das Gespräch ist freiwillig, du kannst auch direkt buchen.</span><span class="en">In 30 minutes by video we get to know each other, and you can ask me anything that is on your mind. The call is optional; you can also book straight away.</span></p></div>
   <div class="callbox rv">
     <div>
       <p class="k"><span class="de">Wunschtermin wählen</span><span class="en">Choose a time</span></p>
-      <p class="mut" style="margin-top:.4rem;font-size:.95rem"><span class="de">Mittwoch, Donnerstag und Freitag um 8:00 Uhr, Mittwoch und Donnerstag auch um 18:30 Uhr. Ich bestätige dir den Termin per E-Mail.</span><span class="en">Wednesday, Thursday and Friday at 8:00 am, and Wednesday and Thursday at 6:30 pm too (Vienna time). I will confirm the time by email.</span></p>
+      <p class="mut" style="margin-top:.4rem;font-size:.95rem"><span class="de">Mittwoch, Donnerstag und Freitag um 8:00 Uhr, Mittwoch und Donnerstag auch um 18:30 Uhr. <?= mm_whereby_key() !== '' ? 'Du bekommst sofort die Bestätigung mit dem Link zum Videoraum.' : 'Ich bestätige dir den Termin per E-Mail.' ?></span><span class="en">Wednesday, Thursday and Friday at 8:00 am, and Wednesday and Thursday at 6:30 pm too (Vienna time). I will confirm the time by email.</span></p>
       <div class="slots" id="slots" role="group" aria-label="Termine">
         <?php foreach (array_slice($slots, 0, 24) as $s): $t = strtotime($s['date']); ?>
         <button type="button" class="slot" data-d="<?= $s['date'] ?>" data-s="<?= $s['slot'] ?>" aria-pressed="false"><span class="de"><?= $wdDe[(int)date('N', $t)] ?>, <?= date('j', $t) ?>. <?= $mDe[(int)date('n', $t)] ?></span><span class="en"><?= date('D j M', $t) ?></span><small><span class="de"><?= $s['slot'] ?> Uhr</span><span class="en"><?= date('g:i a', strtotime('2000-01-01 ' . $s['slot'])) ?></span></small></button>
@@ -231,11 +254,33 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
       <label class="f"><span><span class="de">Was möchtest du mich fragen? (freiwillig)</span><span class="en">What would you like to ask me? (optional)</span></span><textarea name="note" maxlength="600"></textarea></label>
       <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <p class="mut" style="font-size:.82rem"><span class="de">Deine Angaben nutze ich nur für unser Gespräch, mehr dazu im <a href="/terms/#datenschutz">Datenschutz</a>.</span><span class="en">I only use your details for our call; see the <a href="/terms/#datenschutz">privacy notice</a>.</span></p>
-      <div><button class="btn" type="submit" id="cb"><span class="de">Termin anfragen</span><span class="en">Request this time</span></button></div>
+      <div><button class="btn" type="submit" id="cb"><?= mm_whereby_key() !== '' ? 'Termin buchen' : 'Termin anfragen' ?></button></div>
       <p class="err" id="ce" hidden></p>
       <div class="okmsg" id="co" hidden></div>
     </form>
   </div>
+</div></section>
+
+<section class="w sec tint t2" id="liste"><div class="in liste">
+  <div class="liste-t rv">
+    <p class="k"><?= $free ? 'Noch nicht so weit?' : 'Ausgebucht' ?></p>
+    <h2><?= $free ? 'Setz deinen Namen <em>auf die Liste</em>' : 'Trag dich auf die <em>Warteliste</em> ein' ?></h2>
+    <p class="lead"><?= $free ? 'Du spürst, dass dich die Ausbildung ruft, aber du möchtest noch in Ruhe überlegen? Trag dich ein, dann schicke ich dir alle Infos und sag dir rechtzeitig Bescheid, bevor der Early-Bird-Preis endet.' : 'Gerade sind alle zehn Plätze vergeben. Trag dich ein, dann erfährst du als Erste, wenn ein Platz frei wird, und bist bei der nächsten Runde ganz vorne dabei.' ?></p>
+    <?= ac_birds() ?>
+  </div>
+  <form class="form liste-f rv" id="lf" novalidate>
+    <?php if (isset($_GET['liste'])): ?><div class="okmsg">Danke, deine E-Mail ist bestätigt ♡ Die Infos sind schon in deinem Postfach.</div><?php endif; ?>
+    <label class="f"><span>Vorname</span><input type="text" name="name" autocomplete="given-name" required maxlength="60"></label>
+    <label class="f"><span>E-Mail</span><input type="email" name="email" autocomplete="email" required maxlength="160"></label>
+    <fieldset><legend>Wie lange praktizierst du schon? (freiwillig)</legend>
+      <div class="prc"><?php foreach ($pr as $k => [$de, $en]): ?><label><input type="radio" name="practice" value="<?= $k ?>"><span><?= $de ?></span></label><?php endforeach; ?></div>
+    </fieldset>
+    <label class="chk"><input type="checkbox" name="consent" value="1"><span>Ja, schick mir Infos zum Teacher Training per E-Mail. Abmelden geht jederzeit mit einem Klick (<a href="/terms/#datenschutz">Datenschutz</a>).</span></label>
+    <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div><button class="btn" type="submit" id="lb"><?= $free ? 'Auf die Liste setzen' : 'Auf die Warteliste' ?></button></div>
+    <p class="err" id="le" hidden></p>
+    <div class="okmsg" id="lo" hidden>Fast geschafft: Ich habe dir gerade eine E-Mail geschickt. Bitte bestätige kurz deine Adresse, dann kommen alle Infos.</div>
+  </form>
 </div></section>
 
 <section class="w sec" id="buchen"><div class="in">
@@ -244,7 +289,8 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
     <div>
       <p class="k"><span class="de">Dein Platz</span><span class="en">Your place</span></p>
       <h2 style="margin-top:.5rem"><span class="de">Einer von nur zehn</span><span class="en">One of only ten</span></h2>
-      <?php if ($p['eb']): ?><p class="ebird on-plum"><?= ac_birds() ?><b>Early Bird</b><span class="eb-p"><?= $e($p['total']) ?></span><span class="eb-d"><span class="de"><?= $offerLive && !$c['eb'] ? 'dein Angebot aus unserem Gespräch' : 'bis ' . mv_date($c['eb_end']) . ' · danach ' . $e($c['r_total']) ?></span><span class="en"><?= $offerLive && !$c['eb'] ? 'your offer from our call' : 'until ' . mv_date($c['eb_end'], 'en') . ' · then ' . $ee($c['r_total']) ?></span></span></p>
+      <?php if (!empty($p['call'])): ?><p class="ebird on-plum"><?= ac_birds() ?><b>Kennenlern-Preis</b><span class="eb-p"><?= $e($p['total']) ?></span><span class="eb-d"><span class="de">nur für dich, aus unserem Gespräch · statt <?= $e($c['price']) ?></span></span></p>
+      <?php elseif ($p['eb']): ?><p class="ebird on-plum"><?= ac_birds() ?><b>Early Bird</b><span class="eb-p"><?= $e($p['total']) ?></span><span class="eb-d"><span class="de"><?= 'bis ' . mv_date($c['eb_end']) . ' · danach ' . $e($c['r_total']) ?></span><span class="en"><?= 'until ' . mv_date($c['eb_end'], 'en') . ' · then ' . $ee($c['r_total']) ?></span></span></p>
       <?php else: ?><p class="amt"><?= $e($p['total']) ?></p><?php endif; ?>
       <ul class="incl">
         <li><span class="de"><?= AC_HOURS ?> Stunden inkl. vollständiger 200-Std.-Yogalehrerausbildung</span><span class="en"><?= AC_HOURS ?> hours incl. a complete 200-hour yoga teacher training</span></li>
@@ -283,7 +329,8 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
       <?php if (isset($_GET['abbruch'])): ?><p class="note"><span class="de">Die Zahlung wurde abgebrochen, es wurde nichts abgebucht.</span><span class="en">The payment was cancelled; nothing was charged.</span></p><?php endif; ?>
       <?php else: ?>
       <p class="k"><span class="de">Ausgebucht</span><span class="en">Fully booked</span></p>
-      <p><span class="de">Alle Plätze sind vergeben. Schreib mir gern an <a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a>, dann melde ich mich, wenn ein Platz frei wird.</span><span class="en">All places are taken. Write to me at <a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a> and I'll let you know if a place opens up.</span></p>
+      <p>Alle zehn Plätze sind vergeben. Trag dich auf die Warteliste ein, dann erfährst du als Erste, wenn ein Platz frei wird.</p>
+      <p><a class="btn" href="#liste">Auf die Warteliste</a></p>
       <?php endif; ?>
     </form>
   </div>
@@ -299,7 +346,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   </div>
 </div></section>
 
-<section class="w sec"><div class="in fq">
+<section class="w sec tint t3" id="faq"><div class="in fq">
   <p class="k"><span class="de">Fragen</span><span class="en">Questions</span></p>
   <h2 style="margin:.6rem 0 1rem"><span class="de">Gut zu <em>wissen</em></span><span class="en">Good to <em>know</em></span></h2>
   <div class="cute-faq">
@@ -325,7 +372,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
     if(cf.name.value.trim().length<2||cf.email.value.indexOf('@')<1){ce.textContent=en?'Please enter your name and email.':'Bitte gib deinen Namen und deine E-Mail an.';ce.hidden=false;return}
     var d=Object.fromEntries(new FormData(cf));d.action='call';d.date=pick.dataset.d;d.slot=pick.dataset.s;d.lang=L();d.t=T;cb.disabled=true;
     try{var r=await fetch('/api/academy.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});var j=await r.json();
-      if(j.ok){cf.querySelectorAll('label,button').forEach(function(x){x.hidden=true});co.textContent=(en?'Thank you! Your preferred time: ':'Danke! Dein Wunschtermin: ')+j.when+(en?'. I will confirm it by email shortly.':'. Ich bestätige ihn dir in Kürze per E-Mail.');co.hidden=false;pick.disabled=true;return}
+      if(j.ok){cf.querySelectorAll('label,button').forEach(function(x){x.hidden=true});co.textContent=j.fixed?('Wunderbar, unser Gespräch ist fix: '+j.when+'. Die Bestätigung mit dem Link zum Videoraum ist schon in deinem Postfach ♡'):('Danke! Dein Wunschtermin: '+j.when+'. Ich bestätige ihn dir in Kürze per E-Mail.');co.hidden=false;pick.disabled=true;return}
       ce.textContent=j.error||'…';ce.hidden=false}catch(x){ce.textContent=en?'Something went wrong. Please try again.':'Das hat gerade nicht geklappt. Bitte versuch es noch einmal.';ce.hidden=false}
     cb.disabled=false});
   var bf=document.getElementById('bf'),be=document.getElementById('be'),bb=document.getElementById('bb');
@@ -340,6 +387,15 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
     try{var r=await fetch('/api/academy.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});var j=await r.json();
       if(j.url){location.href=j.url;return}be.textContent=j.error||'…';be.hidden=false}catch(x){be.textContent=en?'Something went wrong. Please try again.':'Das hat gerade nicht geklappt. Bitte versuch es noch einmal.';be.hidden=false}
     bb.disabled=false});
+})();
+</script>
+<script>
+(function(){var f=document.getElementById('lf');if(!f)return;var t0=Date.now();
+f.addEventListener('submit',function(e){e.preventDefault();var b=document.getElementById('lb'),er=document.getElementById('le'),ok=document.getElementById('lo');er.hidden=true;
+ var d={name:f.name.value.trim(),email:f.email.value.trim(),practice:(f.querySelector('[name=practice]:checked')||{}).value||'',consent:f.consent.checked?1:0,website:f.website.value,elapsed:Date.now()-t0,source:'academy',lang:'de'};
+ b.disabled=true;fetch('/api/wh-subscribe.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(function(r){return r.json()}).then(function(j){b.disabled=false;
+  if(j.ok){ok.hidden=false;if(j.already)ok.textContent='Du bist schon auf der Liste ♡ Ich habe dir die Infos gerade noch einmal geschickt.';f.querySelectorAll('label.f,fieldset,label.chk').forEach(function(x){x.style.display='none'});b.parentNode.style.display='none'}
+  else{er.textContent=j.error||'Das hat nicht geklappt. Bitte versuch es noch einmal.';er.hidden=false}}).catch(function(){b.disabled=false;er.textContent='Bitte prüf deine Verbindung.';er.hidden=false})});
 })();
 </script>
 </body>

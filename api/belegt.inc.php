@@ -81,6 +81,14 @@ function vb_items(PDO $pdo, string $from, string $to): array
             $out[] = ['date' => (string)$c['date'], 'a' => $a, 'b' => $a + 30, 'kind' => 'call', 'title' => 'Kennenlerngespräch (online)', 'who' => (string)$c['name'], 'n' => 0, 'block' => true, 'id' => (int)$c['id']];
         }
     } catch (Throwable $e) {}
+    try { // Academy-Kennenlerngespräche (Teacher Training)
+        $st = $pdo->prepare("SELECT id, date, slot, name FROM ac_calls WHERE date BETWEEN ? AND ? AND status IN ('angefragt','bestaetigt')");
+        $st->execute([$from, $to]);
+        foreach ($st->fetchAll() as $c) {
+            $a = vb_min((string)$c['slot']);
+            $out[] = ['date' => (string)$c['date'], 'a' => $a, 'b' => $a + 30, 'kind' => 'call', 'title' => 'Kennenlerngespräch Teacher Training', 'who' => (string)$c['name'], 'n' => 0, 'block' => true, 'id' => (int)$c['id']];
+        }
+    } catch (Throwable $e) {}
     // Gruppen-Angebote (api/angebote.inc.php): bestätigt = belegt; offene Angebote halten den Termin ebenfalls frei
     foreach (forma_offer_events($pdo, $from, $to) as $e) {
         if ($e['from'] === '') continue;

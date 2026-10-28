@@ -140,8 +140,8 @@ _c('Hoher Ausfallschritt (Crescent Lunge)', 'Crescent lunge', 'High Lunge', 'Hig
 _c('Ausfallschritt rückwärts (Reverse Lunge)', 'Reverse lunge', 'Reverse Lunge', 'Ausfallschritt rückwärts')
 _c('Seitlicher Ausfallschritt (Side Lunge)', 'Side lunge', 'Side Lunge', 'Side Lunge (seitlicher Ausfallschritt)', 'Seitlicher Ausfallschritt')
 _c('Kniebeuge (Squat)', 'Squat', 'Kniebeuge', 'Kniebeugen')
-_c('Clamshell', 'Clamshell', 'Clamshell (Pilates)', 'Clamshell (Pilates) in Seitlage')
-_c('Seitliches Beinheben (Side Leg Lift)', 'Side-lying leg lift', 'Side Leg Lift (Pilates)', 'Seitliches Beinheben')
+_c('Clamshell', 'Clamshell', 'Clamshell', 'Clamshell in Seitlage')
+_c('Seitliches Beinheben (Side Leg Lift)', 'Side-lying leg lift', 'Side Leg Lift', 'Seitliches Beinheben')
 _c('Eidechse (Lizard Pose)', 'Lizard pose', 'Eidechse (Utthan Pristhasana)')
 _c('Figur 4 in Rückenlage', 'Supine figure four', 'Liegende Taube (Figure Four)')
 _c('Seitlicher Winkel (Parsvakonasana)', 'Extended side angle', 'Extended Side Angle')
@@ -160,7 +160,7 @@ _c('Hip Hinge im Stand', 'Standing hip hinge', 'Hip Hinge (Good Morning)')
 _c('Beckenkippen (Pelvic Tilts)', 'Pelvic tilts', 'Becken kippen in Rückenlage')
 _c('Kopf rollen in Rückenlage', 'Head rolls lying down', 'Kopf rollen im Liegen')
 _c('Seitliches Zusammenziehen in Rückenlage (Somatics)', 'Lateral contraction lying down', 'Seitliches Zusammenziehen in Rückenlage', 'Somatische Seitbeuge im Liegen (Hanna Somatics)')
-_c('Swimming (Pilates) in Bauchlage', 'Swimming (Pilates)')
+_c('Swimming in Bauchlage', 'Swimming')
 _c('Knie pendeln (Scheibenwischer)', 'Windshield wipers', 'Knie pendeln', 'Scheibenwischer')
 _c('Beine an der Wand (Viparita Karani)', 'Legs up the wall', 'Beine an die Wand')
 _c('Selbstumarmung (Butterfly Hug)', 'Self-hug (butterfly hug)', 'Selbstumarmung')
@@ -288,7 +288,7 @@ MOVES = [
      ['Ausschütteln (Shaking)', 'Armkreisen und Hüftkreise im Stand', 'Wirbelsäulenwelle im Stand (Body Roll)', 'Roll Down im Stand', 'Katze-Kuh', 'Thread the Needle', 'Herabschauender Hund (Adho Mukha Svanasana)', 'Tiefer Ausfallschritt (Anjaneyasana)', 'Kniebeuge (Squat)', 'Berghaltung (Tadasana)']),
     ('method:m1:mitte', 5, 'Starke Mitte', 'A strong centre', 'Ruhige Kraft für Bauch, Rücken und Beckenboden, Übung für Übung mit Timer.',
      'Calm strength for your belly, back and pelvic floor, one exercise at a time with a timer.',
-     ['Beckenkippen (Pelvic Tilts)', 'Glute Bridge (Beckenheben)', 'Dead Bug', 'Bird Dog', 'Unterarmstütz (Forearm Plank)', 'Seitstütz auf dem Knie', 'Swimming (Pilates) in Bauchlage', 'Toe Taps', 'Kindhaltung (Balasana)']),
+     ['Beckenkippen (Pelvic Tilts)', 'Glute Bridge (Beckenheben)', 'Dead Bug', 'Bird Dog', 'Unterarmstütz (Forearm Plank)', 'Seitstütz auf dem Knie', 'Swimming in Bauchlage', 'Toe Taps', 'Kindhaltung (Balasana)']),
     ('method:m1:ruecken', 8, 'Rücken und Schultern lösen', 'Releasing back and shoulders', 'Für alle Tage, an denen du viel getragen, gebückt und gesessen hast.',
      'For all the days when you have carried, bent and sat a lot.',
      ['Katze-Kuh', 'Thread the Needle', 'Open Book (Rotation der Brustwirbelsäule in Seitlage)', 'Sphinx (Salamba Bhujangasana)', 'Kleine Kobra (Bhujangasana)', 'Brustdehnung im Türrahmen', 'Wall Angels an der Wand', 'Kindhaltung (Balasana)', 'Drehung in Rückenlage (Supta Matsyendrasana)']),

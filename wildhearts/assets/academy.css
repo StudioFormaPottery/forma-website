@@ -357,3 +357,120 @@ html[data-l=en] .hb.star .t::after{content:"Close to my heart"}
 .acm-waves .hw-dot{display:none}
 @media(max-width:959px){.acm-col{display:contents}.acm-video{order:1}.acm-chat{order:2}.acm-pay{order:3}.acm-notes{order:4}.acm-wb{order:5}}
 @media(max-width:700px){.acm-hero .spk.s2,.acm-hero .spk.s3{display:none}.acm-hero .spk.s1{top:auto;bottom:calc(100% - 40px);right:4%}}
+
+/* --- Runde 3: verspielte Hintergründe (Vivien, 28.10.2026: „so cute wie die Vögel“) --- */
+.tint{--tb:#FBF6F0;background:var(--tb);position:relative;isolation:isolate;margin-top:clamp(3.4rem,7vw,5.5rem);padding-bottom:clamp(3.2rem,7vw,5.5rem)}
+.tint.t1{--tb:#FBF6F0}.tint.t2{--tb:#F4E7E5}.tint.t3{--tb:#F6E8DD}.tint.t4{--tb:#F0E6D8}
+.tint::before{content:"";position:absolute;left:0;right:0;top:-38px;height:40px;background:var(--tb);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 26 C150 6 300 6 450 22 S750 40 900 20 S1100 8 1200 24 V40 H0Z'/%3E%3C/svg%3E") 0 0/1200px 100% repeat-x;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 26 C150 6 300 6 450 22 S750 40 900 20 S1100 8 1200 24 V40 H0Z'/%3E%3C/svg%3E") 0 0/1200px 100% repeat-x;
+  animation:tintwave 60s linear infinite}
+@keyframes tintwave{to{-webkit-mask-position:1200px 0;mask-position:1200px 0}}
+.tint::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:
+   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23C9A3AE' d='M12 1c1 6 5 10 11 11-6 1-10 5-11 11-1-6-5-10-11-11 6-1 10-5 11-11z'/%3E%3C/svg%3E") 97% 3%/16px no-repeat,
+   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23DDB7A7' d='M12 1c1 6 5 10 11 11-6 1-10 5-11 11-1-6-5-10-11-11 6-1 10-5 11-11z'/%3E%3C/svg%3E") 1.5% 96%/11px no-repeat,
+   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23B58C99' d='M12 1c1 6 5 10 11 11-6 1-10 5-11 11-1-6-5-10-11-11 6-1 10-5 11-11z'/%3E%3C/svg%3E") 60% 99%/9px no-repeat,
+   radial-gradient(closest-side,rgba(232,214,202,.75),transparent) -6% 8%/clamp(220px,32vw,460px) clamp(200px,28vw,420px) no-repeat,
+   radial-gradient(closest-side,rgba(234,223,222,.85),transparent) 104% 88%/clamp(240px,36vw,520px) clamp(220px,30vw,460px) no-repeat;
+  animation:tintfloat 22s ease-in-out infinite alternate}
+.tint.t3::after,.tint.t4::after{animation-delay:-9s}
+@keyframes tintfloat{0%{background-position:97% 3%,1.5% 96%,60% 99%,-6% 8%,104% 88%}100%{background-position:96% 5%,2.5% 94%,62% 98%,2% 16%,96% 80%}}
+.tint .birds{display:inline-flex;margin-top:1rem}
+.wo{display:grid;gap:clamp(1.2rem,3vw,2.6rem);align-items:center}
+@media(min-width:900px){.wo{grid-template-columns:1.3fr 1fr}}
+.wo h2{margin:.4rem 0 1rem}.wo .lead{font-size:1.08em;margin-bottom:.8rem}
+.wo-l{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+.wo-l li{background:rgba(251,248,244,.85);border-radius:22px;padding:1rem 1.1rem;box-shadow:0 14px 30px -26px rgba(74,58,65,.5)}
+.wo-l b{display:block;font-family:var(--serif);font-weight:500;font-size:1.35rem;color:var(--deep)}
+.wo-l span{font-size:.9rem;color:var(--muted)}
+@media(max-width:700px){.hero-x .hw-dot,.has-hw .hw-dot{display:none}}
+@media(prefers-reduced-motion:reduce){.tint::before,.tint::after{animation:none}}
+.wo>.birds{grid-column:1/-1;justify-self:end;margin-top:-.5rem}
+/* Mitgliederbereich: weicher, treibender Hintergrund */
+body.acm{position:relative}
+body.acm::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(232,214,202,.6),transparent) 92% 30%/min(70vw,560px) min(60vw,480px) no-repeat,
+   radial-gradient(closest-side,rgba(234,223,222,.8),transparent) 4% 76%/min(80vw,600px) min(64vw,520px) no-repeat,
+   radial-gradient(closest-side,rgba(240,230,216,.9),transparent) 40% 105%/min(90vw,700px) 320px no-repeat;
+  animation:acmdrift 26s ease-in-out infinite alternate}
+@keyframes acmdrift{to{background-position:84% 38%,10% 68%,46% 100%,0 0}}
+.acm-chathead{position:relative}.acm-chathead .birds{position:absolute;right:0;top:-6px;display:flex;gap:3px}
+@media(max-width:400px){.acm-chathead .bird.b3{display:none}}
+.acm-faq.tint{margin-top:clamp(3rem,6vw,5rem)}
+@media(prefers-reduced-motion:reduce){body.acm::before{animation:none}}
+/* Siegel neu (Runde 3): am Handy nichts über dem Foto, Kopfzeile sauber ausgerichtet */
+.ac-kick{align-items:center}
+@media(max-width:999px){.ac-photo .ac-seal.big{display:none}}
+.ac-seal{display:block}
+
+/* --- Academy-Welt (Vivien, 28.10.2026: „wenn man dort landet, soll man spüren: jetzt bin ich in der Academy“) --- */
+body.acad{background:#F0E0DA;--bg:#F0E0DA}
+body.acad::after{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:
+   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='190' viewBox='0 0 150 190'%3E%3Cg fill='none' stroke='%237D5E68' stroke-opacity='.07' stroke-width='1.2'%3E%3Cpath d='M30 170V88a45 45 0 0 1 90 0v82'/%3E%3Cpath d='M41 170V90a34 34 0 0 1 68 0v80' stroke-dasharray='.1 5' stroke-linecap='round'/%3E%3C/g%3E%3Cpath d='M75 40c.5 3 2.3 4.8 5.3 5.3-3 .5-4.8 2.3-5.3 5.3-.5-3-2.3-4.8-5.3-5.3 3-.5 4.8-2.3 5.3-5.3z' fill='%23B58C99' fill-opacity='.16'/%3E%3C/svg%3E") 0 0/150px 190px,
+   linear-gradient(180deg,#F2E3DE 0%,#EFDCD4 45%,#F3E4DB 100%)}
+body.acad .site-top{background:rgba(242,227,222,.93)}
+.acband{background:linear-gradient(110deg,#5E4A51,#6B5658 45%,#7D5E68);color:#FBF5F7;position:relative;overflow:hidden}
+.acband::after{content:"";position:absolute;right:-60px;top:-90px;width:260px;height:240px;border-radius:58% 42% 47% 53%/52% 46% 54% 48%;background:rgba(232,214,202,.14)}
+.acband-in{max-width:1600px;margin:0 auto;padding:.7rem max(16px,clamp(24px,4vw,64px));display:flex;align-items:center;justify-content:space-between;gap:1rem;position:relative;z-index:1}
+.acband-l{display:flex;align-items:center;gap:.8rem;color:inherit;text-decoration:none;min-width:0}
+.acband-mark{width:34px;height:auto;flex:0 0 34px}
+.acband-l b{display:block;font-family:var(--serif);font-weight:500;font-size:1.35rem;line-height:1.05;letter-spacing:.01em}
+.acband-l b i{font-style:normal;font-family:var(--sans);font-size:.62em;letter-spacing:.32em;text-transform:uppercase;margin-left:.35em;color:#EADFDE;vertical-align:.12em}
+.acband-l small{display:block;font-size:.78rem;color:#E8D6CA;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acband-r{font-family:var(--serif);font-style:italic;font-size:1.05rem;color:#F3E2D8;white-space:nowrap}
+@media(max-width:640px){.acband-r{display:none}.acband-l b{font-size:1.2rem}}
+/* Zeichen im Bogen: hochformatig, im Kopf der Seiten schlank */
+.ac-mark-bogen.mini{width:48px!important;height:auto!important;flex:0 0 48px!important}
+.ac-mark-bogen.acm-seal{width:clamp(64px,9vw,104px)}
+.ac-mark-bogen.acm-sealbig{width:84px}
+.ac-head .ac-mark-bogen{width:72px;height:auto}
+.ac-photo .ac-mark-bogen.big{width:96px;height:auto;filter:drop-shadow(0 10px 18px rgba(74,58,65,.2))}
+.acad .wm{position:fixed;right:-40px;bottom:-30px;width:300px;opacity:.06;z-index:-1;pointer-events:none}
+@keyframes archfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.ac-mark-bogen.big,.ac-mark-bogen.acm-seal,.ac-mark-bogen.acm-sealbig{animation:archfloat 7s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.ac-mark-bogen{animation:none!important}}
+.ac-kick .ac-mark-bogen.mini{filter:none}
+.acad .ac-kick>.ac-seal,.acad .ac-kick a{display:none}.acad .ac-kick small{margin:0}
+/* Interessentinnen-Liste */
+.liste{display:grid;gap:clamp(1.4rem,3vw,3rem);align-items:start}
+@media(min-width:900px){.liste{grid-template-columns:1fr 1fr}}
+.liste h2{margin:.4rem 0 1rem}.liste .lead{max-width:32em}
+.liste-f{background:rgba(251,248,244,.92);border-radius:28px;padding:clamp(1.2rem,3vw,2rem);display:grid;gap:1rem;box-shadow:0 18px 40px -30px rgba(74,58,65,.45)}
+.liste-f fieldset{border:0;padding:0;margin:0}.liste-f legend{font-size:.88rem;color:var(--muted);margin-bottom:.4rem}
+.liste-t .birds{display:inline-flex;margin-top:1.2rem}
+.acad-cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;background:rgba(251,248,244,.9);border-radius:26px;padding:1.2rem 1.4rem;margin-top:2rem}
+.acad-cta p{margin:0;max-width:34em}
+/* Academy-Logo „Ring“ (Vivien, 28.10.2026, Runde 4): rund, immer quadratisch, klein ohne Schrift */
+.ac-mark-ring{aspect-ratio:1/1;height:auto!important}
+.ac-mark-ring.mini{width:56px!important;flex:0 0 56px!important}
+.acband-mark.ac-mark-ring{width:40px;flex:0 0 40px}
+.ac-mark-ring.acm-seal{width:clamp(92px,11vw,128px)}
+.ac-mark-ring.acm-sealbig{width:116px}
+.ac-head .ac-mark-ring{width:108px;flex:0 0 108px}
+@media(max-width:520px){.ac-head .ac-mark-ring{width:84px;flex-basis:84px}}
+.ac-photo .ac-mark-ring.big{width:138px;left:-34px;filter:drop-shadow(0 12px 22px rgba(74,58,65,.22))}
+.ac-mark-ring.big,.ac-mark-ring.acm-seal,.ac-mark-ring.acm-sealbig,.ac-mark-ring.herom{animation:archfloat 7s ease-in-out infinite}
+.ac-seal.herom{display:none}
+@media(max-width:999px){.ac-seal.herom{display:block;width:104px;margin:0 auto 1.1rem;filter:drop-shadow(0 10px 18px rgba(74,58,65,.18))}}
+@media(prefers-reduced-motion:reduce){.ac-mark-ring{animation:none!important}}
+/* Chat: „Häufig gefragt“-Chips (Runde 4) – am Handy waagrecht wischen, am Computer umbrechen */
+.acm-chips{margin:1rem 0 .2rem;min-width:0}
+.acm-chips-k{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--plum);margin:0 0 .5rem}
+.acm-chips-r{display:flex;flex-wrap:wrap;gap:.45rem}
+.acm-chip{font:inherit;font-size:.9rem;background:#fff;color:var(--deep);border:1px solid #E3D3D2;border-radius:99px;padding:.5em .95em;cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s}
+.acm-chip:hover,.acm-chip:focus-visible{background:var(--blush);border-color:var(--plum)}
+.acm-chip.done{background:var(--blush);border-color:transparent;color:var(--plum)}
+@media(max-width:700px){.acm-chips-r{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -1px;padding:2px 1px 6px;scroll-snap-type:x proximity;mask-image:linear-gradient(90deg,#000 88%,transparent)}
+  .acm-chips-r::-webkit-scrollbar{display:none}.acm-chip{scroll-snap-align:start;flex:0 0 auto}}
+.acm-msgs .bub.q{align-self:flex-end;background:#EADFDE;color:var(--deep);border-bottom-right-radius:6px}
+.acm-msgs .bub.fa{background:#fff;box-shadow:0 10px 24px -18px rgba(74,58,65,.45)}
+.acm-msgs .fa-k{display:block;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--plum);margin-bottom:.3rem}
+.acm-msgs .fa-more{display:inline-block;margin-top:.5rem;color:var(--plum);font-size:.9rem}
+.acm-msgs .fa-b{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.7rem}
+.acm-msgs .fa-b button{font:inherit;font-size:.86rem;border-radius:99px;padding:.45em .9em;cursor:pointer;border:1px solid var(--plum)}
+.acm-msgs .fa-yes{background:var(--plum);color:var(--on)}.acm-msgs .fa-ask{background:transparent;color:var(--plum)}
+.acm-msgs .fa-ok{display:block;margin-top:.6rem;font-size:.88rem;color:var(--plum)}
+.acm-faq details.hl{box-shadow:0 0 0 3px var(--plum)!important;transition:box-shadow .3s}
+.acm-msgs{max-height:min(72vh,620px)}

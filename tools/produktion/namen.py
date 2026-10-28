@@ -1,5 +1,5 @@
 # Übungsnamen für die Übungslisten im Teleprompter (Vivien, 26.10.2026).
-# Gängige deutsche und englische Namen aus Yoga, Pilates, Bodyweight und Somatics, keine Fantasienamen.
+# Gängige deutsche und englische Namen aus Yoga, Bodyweight und Somatics, keine Fantasienamen.
 N = {
     'b_box': ('Box Breathing', 'Box breathing'),
     'b_long': ('Verlängertes Ausatmen', 'Extended exhale'),
@@ -45,7 +45,7 @@ N = {
     'w_sidelunge': ('Seitlicher Ausfallschritt', 'Side lunge'),
     'w_sideplank': ('Seitstütz auf dem Knie', 'Kneeling side plank'),
     'w_squat': ('Langsame Kniebeuge', 'Slow squat'),
-    'w_swim': ('Swimming (Pilates) in Bauchlage', 'Swimming (Pilates)'),
+    'w_swim': ('Swimming in Bauchlage', 'Swimming'),
     'w_wallsit': ('Wandsitz', 'Wall sit'),
     'y_baby': ('Glückliches Baby (Ananda Balasana)', 'Happy baby'),
     'y_bridge': ('Brücke (Setu Bandhasana)', 'Bridge pose'),

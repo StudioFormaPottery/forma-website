@@ -826,6 +826,9 @@ function natal_invoice_mail(array $inv, string $pdf): void
             ["Hi $first,", $storno ? 'attached is credit note ' . $inv['nr'] . ' for your records. The amount of ' . forma_cents_de(-(int)$inv['gross_cents']) . ' will be refunded to you.'
                 : 'attached is your invoice ' . $inv['nr'] . ' as a PDF. Amount: ' . forma_cents_de((int)$inv['gross_cents']) . ' (already paid).', 'If you have any questions, just reply to this email.'],
             null, [[$file, $pdf, 'application/pdf']]);
+    } elseif (str_starts_with((string)($inv['kind'] ?? ''), 'ac_') && isset($GLOBALS['ac_inv_capture']) && is_array($GLOBALS['ac_inv_capture'])) {
+        // Academy (Vivien, 28.10.2026): PDF hängt an der Bestätigungs-/Danke-Mail, keine eigene Rechnungsmail an die Teilnehmerin
+        $GLOBALS['ac_inv_capture'][] = [$file, $pdf, 'application/pdf', (string)$inv['nr']];
     } elseif (trim((string)$inv['email']) !== '') {
         $storno = (int)$inv['gross_cents'] < 0;
         natal_mail((string)$inv['email'], ($storno ? 'Deine Stornorechnung ' : 'Deine Rechnung ') . $inv['nr'] . ' von Movecia', $storno ? 'Deine Stornorechnung' : 'Deine Rechnung',
@@ -1212,7 +1215,7 @@ function natal_seo_jsonld(): string
     $biz = [
         '@type' => ['LocalBusiness', 'SportsActivityLocation'],
         '@id' => $base . '/#movecia',
-        'name' => 'Movecia – Yoga, Pilates & Mindful Movement',
+        'name' => 'Movecia – Yoga, Bodyweight & Mindful Movement',
         'alternateName' => 'Movecia Personal Fitness',
         'url' => $base . '/',
         'logo' => $base . '/img/movecia/movecia-zeichen-1024.png',
@@ -1225,14 +1228,14 @@ function natal_seo_jsonld(): string
             array_map(fn($c) => ['@type' => 'City', 'name' => $c], ['Mathon', 'Ischgl', 'Galtür', 'Kappl', 'See', 'Landeck', 'Pians', 'Zams']),
             [['@type' => 'AdministrativeArea', 'name' => 'Paznaun'], ['@type' => 'AdministrativeArea', 'name' => 'Tirol'], ['@type' => 'Country', 'name' => 'Österreich'], ['@type' => 'Country', 'name' => 'Deutschland'], ['@type' => 'Country', 'name' => 'Schweiz']]
         ),
-        'founder' => ['@type' => 'Person', 'name' => 'Vivien Malonga', 'jobTitle' => 'Personal Trainerin für Yoga, Pilates und prä-/postnatales Training'],
+        'founder' => ['@type' => 'Person', 'name' => 'Vivien Malonga', 'jobTitle' => 'Personal Trainerin für Yoga, Bodyweight-Training und prä-/postnatales Training'],
         'sameAs' => ['https://www.instagram.com/movementwithviv/'],
     ];
     $service = [
         '@type' => 'Service',
         '@id' => $base . '/natal/#service',
         'name' => 'Prä- & Postnatal Training 1:1',
-        'alternateName' => ['Schwangerschaftstraining', 'Rückbildungstraining', 'Beckenbodentraining nach der Geburt', 'Geburtsvorbereitung', 'Pränatal Pilates', 'Postnatal Training online'],
+        'alternateName' => ['Schwangerschaftstraining', 'Rückbildungstraining', 'Beckenbodentraining nach der Geburt', 'Geburtsvorbereitung', 'Postnatal Training online'],
         'serviceType' => 'Prä- und postnatales Personal Training',
         'description' => 'Einzeltraining in der Schwangerschaft und nach der Geburt: Mobilisation, Atemarbeit, Beckenboden, Geburtsvorbereitung, Rückbildung und Kräftigung. Im Studio in Mathon (Paznaun, Tirol) oder live online per Video.',
         'provider' => ['@id' => $base . '/#movecia'],

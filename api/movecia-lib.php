@@ -66,6 +66,8 @@ function mm_schema(PDO $pdo): void
     if (!in_array('script', $gc, true)) $pdo->exec("ALTER TABLE mm_gatherings ADD COLUMN script TEXT NOT NULL DEFAULT ''");
     $cols = array_column($pdo->query('PRAGMA table_info(mm_subscribers)')->fetchAll(), 'name');
     if (!in_array('lang', $cols, true)) $pdo->exec("ALTER TABLE mm_subscribers ADD COLUMN lang TEXT NOT NULL DEFAULT 'en'");
+    // Teacher-Training-Interessentinnen (Vivien, 28.10.2026): eigener Merker, damit die Herkunft (Reset, Unfold …) erhalten bleibt
+    if (!in_array('academy_at', $cols, true)) { $pdo->exec("ALTER TABLE mm_subscribers ADD COLUMN academy_at TEXT NOT NULL DEFAULT ''"); $pdo->exec("ALTER TABLE mm_subscribers ADD COLUMN practice TEXT NOT NULL DEFAULT ''"); }
 }
 
 // --- Einstellungen (liegen nur im Datenordner, nie im Repo) ---------------------------
@@ -500,6 +502,10 @@ function mm_mail_confirm(array $sub): bool
     $first = forma_first_name($sub['name']);
     $link = mm_site() . '/api/wh-confirm.php?t=' . $sub['token'];
     $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#7D5E68;';
+    if (($sub['source'] ?? '') === 'academy') {
+        require_once __DIR__ . '/academy-lib.php';
+        return ac_interest_confirm_mail($sub, $link);
+    }
     if (($sub['source'] ?? '') === 'unfold') {
         // Unfold-Infoliste (Vivien, 24.10.2026): erst bestätigen, dann kommen alle Infos, bevor Unfold offiziell gepostet wird
         if ($de) {
@@ -557,7 +563,7 @@ function mm_mail_confirm(array $sub): bool
 /** Viv bekommt Bescheid, wenn jemand Interesse an einem Angebot zeigt (nach der Bestätigung). */
 function mm_notify_interest(array $sub, string $source): void
 {
-    $what = ['mentoring' => 'Mentoring für ihr Herzensbusiness', 'year' => 'den Jahreskreis', 'circle' => 'den Inner Circle', 'retreat' => 'das Alpine Retreat', 'unfold' => 'Unfold – The Mindful Becoming', 'teacher' => 'das Mindful Becoming Teacher Training'][$source] ?? $source;
+    $what = ['mentoring' => 'Mentoring für ihr Herzensbusiness', 'year' => 'den Jahreskreis', 'circle' => 'den Inner Circle', 'retreat' => 'das Alpine Retreat', 'unfold' => 'Unfold – The Mindful Becoming', 'academy' => 'das Mindful Becoming Teacher Training (Movecia Academy)', 'teacher' => 'das Mindful Becoming Teacher Training (Movecia Academy)'][$source] ?? $source;
     $t = "Hallo Viv,\n\n{$sub['name']} ({$sub['email']}) interessiert sich für $what und hat ihre E-Mail-Adresse bestätigt.\nSprache: " . (($sub['lang'] ?? 'en') === 'de' ? 'Deutsch' : 'Englisch') . "\n\nDu siehst sie in der Verwaltung unter Movecia Movement → E-Mail-Liste.\n";
     mm_mail(MM_FROM_EMAIL, 'Neue Interessentin: ' . $sub['name'] . ' · ' . $what, $t, mm_mail_html('Neue Interessentin', nl2br(forma_h($t)), 'de'));
 }
@@ -664,10 +670,8 @@ function mm_ml_push(PDO $pdo, array $sub, bool $active = true): bool
     if (!$cfg) return false;
     try {
         $body = ['email' => $sub['email'], 'fields' => ['name' => $sub['name']], 'status' => $active ? 'active' : 'unsubscribed'];
-        if ($active) {
-            $body['groups'] = [forma_ml_group($cfg['api_key'], MM_ML_GROUP)];
-            if (($sub['source'] ?? '') === 'teacher') $body['groups'][] = forma_ml_group($cfg['api_key'], MM_ML_TEACHER); // eigene Gruppe für die Teacher-Training-Warteliste
-        }
+        if ($active) $body['groups'] = [forma_ml_group($cfg['api_key'], MM_ML_GROUP)];
+        if ($active && (($sub['academy_at'] ?? '') !== '' || ($sub['source'] ?? '') === 'teacher')) $body['groups'][] = forma_ml_group($cfg['api_key'], MM_ML_TEACHER);
         forma_ml_request('POST', '/api/subscribers', $body, $cfg['api_key']);
         $pdo->prepare('UPDATE mm_subscribers SET ml_synced = 1 WHERE id = ?')->execute([$sub['id']]);
         return true;
@@ -781,7 +785,7 @@ function mm_offers(): array
         'unfold' => ['price' => $mc['u_once'], 'special' => $mc['g_u_once'], 'plans' => [[$mc['u_n'], $mc['u_inst'], 0]], 'title' => 'Unfold – The Mindful Becoming', 'billing' => 'once', 'text' => '13 weeks for you: a weekly live call, two movement videos a week, workbooks, rituals and recordings. Starts ' . mv_date(mv_ts($mc['u_start']), 'en') . '.'],
         'circle' => ['price' => 3900, 'special' => 2900, 'periods' => [[6, 17400], [12, 31200]], 'title' => 'The Inner Circle', 'billing' => 'monthly', 'text' => 'Your monthly circle: live gatherings, breathwork, gentle movement and a members area with rituals and affirmations. A space where women support each other and come back to themselves.'],
         'year' => ['price' => 240000, 'special' => 199000, 'plans' => [[3, 80000, 66400], [6, 40000, 33200]], 'title' => 'The Year Circle', 'billing' => 'once', 'text' => 'Twelve months together: The Inner Circle plus 1:1 mentoring for the idea that is close to your heart. Like a best friend who walks the whole year with you.'],
-        'retreat' => ['price' => 79000, 'special' => 69000, 'title' => 'Wild Hearts Alpine Retreat', 'billing' => 'once', 'text' => 'A weekend in the Austrian Alps: yoga, Pilates, forest walks, breathwork, pottery, cooking together and a women\'s circle. Lots of quiet, lots of nature, back to you.'],
+        'retreat' => ['price' => 79000, 'special' => 69000, 'title' => 'Wild Hearts Alpine Retreat', 'billing' => 'once', 'text' => 'A weekend in the Austrian Alps: yoga, bodyweight training, forest walks, breathwork, pottery, cooking together and a women\'s circle. Lots of quiet, lots of nature, back to you.'],
     ];
     $cfg = mm_cfg('offers') ?? [];
     $out = [];

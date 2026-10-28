@@ -10,4 +10,5 @@ if ($sub['status'] !== 'abgemeldet') {
     $pdo->prepare("UPDATE mm_subscribers SET status = 'abgemeldet' WHERE id = ?")->execute([$sub['id']]);
     mm_ml_push($pdo, $sub, false);
 }
+if (!empty($_GET['de']) || ($sub['lang'] ?? '') === 'de') mm_page('pass gut auf dich auf ♡', 'Du bist abgemeldet', 'Du bekommst keine E-Mails mehr von mir. Die Tür bleibt offen, du kannst jederzeit wiederkommen.', '/', 'moveciamovement.com');
 mm_page('take care ♡', "You're unsubscribed", 'You won\'t get any more emails from the Wild Hearts Collective. The door stays open, you can come back anytime.', '/', 'moveciamovement.com');

@@ -17,7 +17,7 @@ Jeden **Sonntag** kommt das Paket für die **kommende Woche Montag bis Sonntag**
 ## Inhalt
 - Typen abwechseln: Gedanke (quote), kleine Übung (steps), Frage/Umfrage (poll), Foto mit Angebot (photo/offer), Journaling (quote, dark).
 - Pro Woche höchstens zwei Angebots-Posts (Method, Unfold), der Rest schenkt echten Wert: Breathwork, kurze Übungen, Journaling-Fragen, Gedanken.
-- Übungen nur echte Übungen aus Yoga, Pilates, Bodyweight, Somatics mit gängigen deutschen/englischen Namen (Katze-Kuh/Cat-Cow, Kindhaltung, Glute Bridge, Bird Dog …), keine Fantasienamen.
+- Übungen nur echte Übungen aus Yoga, Bodyweight, Somatics mit gängigen deutschen/englischen Namen (Katze-Kuh/Cat-Cow, Kindhaltung, Glute Bridge, Bird Dog …), keine Fantasienamen.
 - Preise und Termine immer live aus `api/method-lib.php` (`mv_cfg_raw()`): Early-Bird Method bis 1.12.2026 (€ 29 statt € 39), Unfold Early-Bird bis 11.1.2027 (€ 450 statt € 490, 3 × € 165 statt 3 × € 175). Nach Ablauf nur noch die regulären Preise nennen. Gathering-Preise nie erwähnen. Inner Circle und Jahreskreis gibt es nicht mehr.
 - Sprache: schönes, schlichtes Hochdeutsch, warm, fließende ganze Sätze. Keine Floskeln, keine Dreierketten, keine „nicht X, sondern Y“-Sätze, keine Gedankenstriche-Ketten, keine Therapie-Sprache, keine erfundenen Geschichten.
 - Hashtags: 8–10 pro Caption, Mischung aus groß (#mindfulmovement, #yogafürfrauen) und Nische (#tiredday, #mentalload), immer #movecia.

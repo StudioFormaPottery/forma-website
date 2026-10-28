@@ -323,7 +323,116 @@ function mv_schema(PDO $pdo): void
     mv_prod_sync($pdo);
     mv_voice_migrate($pdo);
     mv_lektorat_sync($pdo);
+    mv_nopilates_migrate($pdo);
     mv_workbooks_sync($pdo);
+}
+
+/** Kein „Pilates“ bei Movecia (Vivien, 28.10.2026): dieselben Ersetzungen wie im Repo, einmal auch auf die gespeicherten Daten. */
+function mv_nopilates_map(): array
+{
+    return [
+        ' (Pilates)' => '',
+        'die Clamshell aus dem Pilates' => 'die Clamshell',
+        'the clamshell from Pilates' => 'the clamshell',
+        'Ich unterrichte Yoga, Pilates und achtsame Bewegung' => 'Ich unterrichte Yoga, Bodyweight-Training und achtsame Bewegung',
+        'I teach yoga, Pilates and mindful movement' => 'I teach yoga, bodyweight training and mindful movement',
+        'weitere Ausbildungen, Pilates, somatische Arbeit' => 'weitere Ausbildungen, Bodyweight-Training, somatische Arbeit',
+        'More courses. Pilates. Somatic work' => 'More courses. Bodyweight training. Somatic work',
+        'More trainings. Pilates. Somatic work' => 'More trainings. Bodyweight training. Somatic work',
+        'Stunden Yoga, Pilates, Rehabilitation' => 'Stunden Yoga, Bodyweight-Training, Rehabilitation',
+        'Ausbildung gemacht. Yoga, Pilates, Rehabilitation' => 'Ausbildung gemacht. Yoga, Bodyweight-Training, Rehabilitation',
+        'hours of yoga, Pilates, rehab' => 'hours of yoga, bodyweight training, rehab',
+        'hours of training. Yoga, Pilates, rehab' => 'hours of training. Yoga, bodyweight training, rehab',
+        'Übungen aus Yoga, Pilates und Somatics' => 'Übungen aus Yoga, Bodyweight und Somatics',
+        'exercises from yoga, Pilates and somatics' => 'exercises from yoga, bodyweight training and somatics',
+        'Yoga, Pilates, Somatic Movement und Breathwork' => 'Yoga, Bodyweight-Training, Somatic Movement und Breathwork',
+        'Kurze Videos aus Yoga, Pilates und Somatic Movement' => 'Kurze Videos aus Yoga, Bodyweight und Somatic Movement',
+        'Yoga und Pilates in der Gruppe' => 'Yoga und Bodyweight-Training in der Gruppe',
+        'Yoga, Pilates and gentle movement' => 'Yoga, bodyweight training and gentle movement',
+        'Yoga, Pilates und sanfte Bewegung' => 'Yoga, Bodyweight-Training und sanfte Bewegung',
+        'yoga, Pilates, forest walks' => 'yoga, bodyweight training, forest walks',
+        'Movecia – Yoga, Pilates & Mindful Movement' => 'Movecia – Yoga, Bodyweight & Mindful Movement',
+        'Personal Trainerin für Yoga, Pilates und prä-/postnatales Training' => 'Personal Trainerin für Yoga, Bodyweight-Training und prä-/postnatales Training',
+        '\'Pränatal Pilates\', ' => '',
+        'YOGA · PILATES · MINDFUL MOVEMENT' => 'YOGA · BODYWEIGHT · MINDFUL MOVEMENT',
+        'Yoga · Pilates · Mindful Movement' => 'Yoga · Bodyweight · Mindful Movement',
+        '#pilatesonline' => '#bodyweighttraining',
+        'Yoga/Pilates/Mindful Movement' => 'Yoga/Bodyweight/Mindful Movement'
+    ];
+}
+
+function mv_nopilates_str($v)
+{
+    if (is_string($v)) return strtr($v, mv_nopilates_map());
+    if (is_array($v)) { foreach ($v as $k => $x) $v[$k] = mv_nopilates_str($x); }
+    return $v;
+}
+
+/** Text oder JSON-Text: JSON wird ausgepackt, ersetzt und genauso wieder eingepackt (Umlaute bleiben lesbar). */
+function mv_nopilates_field(string $s): string
+{
+    if ($s === '' || stripos($s, 'pilates') === false) return $s;
+    $t = ltrim($s);
+    if ($t !== '' && ($t[0] === '[' || $t[0] === '{')) {
+        $j = json_decode($s, true);
+        if (is_array($j)) return json_encode(mv_nopilates_str($j), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+    return mv_nopilates_str($s);
+}
+
+function mv_nopilates_migrate(PDO $pdo): void
+{
+    if (!empty((mm_cfg('method') ?? [])['nopilates_v1'])) return;
+    try {
+        $pdo->beginTransaction();
+        $cols = ['title_de', 'title_en', 'text_de', 'text_en', 'script_de', 'script_en', 'ex', 'steps'];
+        foreach ($pdo->query('SELECT id, ' . implode(', ', $cols) . ' FROM mv_lessons')->fetchAll() as $r) {
+            $set = []; $val = [];
+            foreach ($cols as $c) { $n = mv_nopilates_field((string)$r[$c]); if ($n !== (string)$r[$c]) { $set[] = "$c = ?"; $val[] = $n; } }
+            if ($set) { $val[] = $r['id']; $pdo->prepare('UPDATE mv_lessons SET ' . implode(', ', $set) . ' WHERE id = ?')->execute($val); }
+        }
+        foreach ($pdo->query('SELECT id, title_de, title_en, intro_de, intro_en FROM mv_programs')->fetchAll() as $r) {
+            $n = array_map(fn($x) => mv_nopilates_field((string)$x), [$r['title_de'], $r['title_en'], $r['intro_de'], $r['intro_en']]);
+            if ($n !== [$r['title_de'], $r['title_en'], $r['intro_de'], $r['intro_en']]) $pdo->prepare('UPDATE mv_programs SET title_de = ?, title_en = ?, intro_de = ?, intro_en = ? WHERE id = ?')->execute([...$n, $r['id']]);
+        }
+        // Mediathek: Name ändert sich → neuer Schlüssel; gibt es ihn schon, bleibt der Clip mit Video
+        foreach ($pdo->query('SELECT * FROM mv_clips')->fetchAll() as $c) {
+            $de = mv_nopilates_str((string)$c['name_de']); $en = mv_nopilates_str((string)$c['name_en']);
+            if ($de === $c['name_de'] && $en === $c['name_en']) continue;
+            $nk = mv_clip_key($de);
+            $ex = $pdo->prepare('SELECT * FROM mv_clips WHERE ckey = ? AND id <> ?'); $ex->execute([$nk, $c['id']]); $o = $ex->fetch();
+            if ($o) {
+                if ($o['guid'] === '' && $c['guid'] !== '') $pdo->prepare('UPDATE mv_clips SET guid = ? WHERE id = ?')->execute([$c['guid'], $o['id']]);
+                $pdo->prepare('DELETE FROM mv_clips WHERE id = ?')->execute([$c['id']]);
+            } else {
+                $pdo->prepare('UPDATE mv_clips SET ckey = ?, name_de = ?, name_en = ? WHERE id = ?')->execute([$nk, $de, $en, $c['id']]);
+            }
+            $pdo->prepare('UPDATE mv_voices SET ckey = ? WHERE ckey = ?')->execute([$nk, $c['ckey']]);
+        }
+        foreach ($pdo->query('SELECT id, ckey, text FROM mv_voices')->fetchAll() as $v) {
+            $t = mv_nopilates_str((string)$v['text']);
+            $k = (string)$v['ckey'];
+            if (str_contains($k, '-pilates')) $k = trim(str_replace('-pilates', '', $k), '-');
+            if ($t !== $v['text'] || $k !== $v['ckey']) $pdo->prepare('UPDATE mv_voices SET ckey = ?, text = ?, text_hash = ? WHERE id = ?')->execute([$k, $t, mv_text_hash($t), $v['id']]);
+        }
+        $gc = array_column($pdo->query('PRAGMA table_info(mm_gatherings)')->fetchAll(), 'name');
+        if (in_array('script', $gc, true)) {
+            foreach ($pdo->query('SELECT id, title, description AS descr, script FROM mm_gatherings')->fetchAll() as $g) {
+                $n = array_map(fn($x) => mv_nopilates_field((string)$x), [$g['title'], $g['descr'], $g['script']]);
+                if ($n !== [$g['title'], $g['descr'], $g['script']]) $pdo->prepare('UPDATE mm_gatherings SET title = ?, description = ?, script = ? WHERE id = ?')->execute([...$n, $g['id']]);
+            }
+        }
+        $pdo->commit();
+    } catch (Throwable $e) { if ($pdo->inTransaction()) $pdo->rollBack(); error_log('nopilates: ' . $e->getMessage()); return; }
+    // Teleprompter-Dateien im Datenordner
+    foreach (['movecia-prompter.json', 'movecia-natal-prompter.json', 'movecia-uebung.json'] as $f) {
+        $p = forma_data_dir() . '/' . $f;
+        if (!is_file($p)) continue;
+        $s = (string)file_get_contents($p);
+        $n = mv_nopilates_field($s);
+        if ($n !== $s) file_put_contents($p, $n, LOCK_EX);
+    }
+    mv_save_cfg(['nopilates_v1' => 1]);
 }
 
 /**
@@ -389,7 +498,7 @@ function mv_lektorat_sync(PDO $pdo): void
  */
 function mv_workbooks_sync(PDO $pdo): void
 {
-    $ver = 9; // 2: ohne Schatten (Vivien, 26.10.2026); 3–5: Sprach-Lektorat (27.10.2026); 6: neuer Look mit Foto im Bogen und Wellen (28.10.2026)
+    $ver = 10; // 2: ohne Schatten (Vivien, 26.10.2026); 3–5: Sprach-Lektorat (27.10.2026); 6: neuer Look mit Foto im Bogen und Wellen (28.10.2026); 10: ohne „Pilates“ (28.10.2026)
     $c = mm_cfg('workbooks') ?? [];
     if ((int)($c['v'] ?? 0) >= $ver) return;
     $src = __DIR__ . '/seed/workbooks/pdf/';
@@ -1578,7 +1687,7 @@ function mv_lesson_clips_old(array $l): array
 // --- Mediathek: jede Übung einmal gefilmt, überall wiederverwendet ---------------------------------------
 
 const MV_SEASONS = ['fruehling' => ['Frühling', 'Spring', '🌸'], 'sommer' => ['Sommer', 'Summer', '☀️'], 'herbst' => ['Herbst', 'Autumn', '🍂'], 'winter' => ['Winter', 'Winter', '❄️'], 'immer' => ['Ganzjährig', 'All year', '♾️']];
-const MV_STYLES = ['yoga' => 'Yoga', 'pilates' => 'Pilates', 'somatic' => 'Somatic', 'bodyweight' => 'Bodyweight', 'mobility' => 'Mobility', 'atem' => 'Atem', 'ruhe' => 'Ruhe & Meditation', 'natal' => 'Prä-/Postnatal'];
+const MV_STYLES = ['yoga' => 'Yoga', 'pilates' => 'Tiefenmuskulatur', 'somatic' => 'Somatic', 'bodyweight' => 'Bodyweight', 'mobility' => 'Mobility', 'atem' => 'Atem', 'ruhe' => 'Ruhe & Meditation', 'natal' => 'Prä-/Postnatal'];
 
 /** Schlüssel einer Übung: der Name, klein geschrieben, ohne Sonderzeichen (gleicher Name = gleicher Clip) */
 function mv_clip_key(string $name): string

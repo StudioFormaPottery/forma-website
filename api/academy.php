@@ -15,10 +15,24 @@ if (isset($_GET['paid'])) {
     $n = max(1, (int)($_GET['p'] ?? 1));
     try { ac_check_part($pdo, $r, $n); } catch (Throwable $e) { error_log('AC paid: ' . $e->getMessage()); }
     $r = ac_booking($pdo, (int)$r['id']);
-    $en = $r['lang'] === 'en';
+    $en = false;
     if ($r['status'] !== 'bezahlt') mm_page('oh', $en ? 'Almost there' : 'Fast geschafft', $en ? 'Your payment has not come through yet. If you have paid, you will get your confirmation by email in a few minutes.' : 'Deine Zahlung ist noch nicht angekommen. Wenn du bezahlt hast, bekommst du deine Bestätigung in ein paar Minuten per E-Mail.', '/academy/teacher-training/' . ($en ? '?lang=en' : ''), $en ? 'Back to the training' : 'Zurück zur Ausbildung');
     header('Location: ' . ($n === 1 ? '/academy/teacher-training/?danke=1' . ($en ? '&lang=en' : '') . '#top' : '/academy/mitglieder/?bezahlt=1' . ($en ? '&lang=en' : '')), true, 303);
     exit;
+}
+
+// Gesprächsraum (Kennenlerngespräch): fragt alle paar Sekunden, ob Vivien das Angebot gezeigt hat.
+// Preis und Link kommen nur hierher, wenn das Angebot für genau dieses Gespräch läuft (nie öffentlich).
+if (isset($_GET['call'])) {
+    $c = ac_call_by_link($pdo, (int)$_GET['call'], (string)($_GET['k'] ?? ''));
+    if (!$c) forma_json(['ok' => false], 404);
+    $out = ['ok' => true, 'now' => time(), 'offer' => null];
+    if (ac_offer_live($c)) {
+        $cfg = ac_cfg(); $p = ac_prices($c);
+        $out['offer'] = ['until' => (int)$c['offer_until'], 'total' => ac_eur($p['total']), 'before' => ac_eur($cfg['price']), 'deposit' => ac_eur(intdiv($p['total'], 2)),
+            'save' => ac_eur($cfg['price'] - $p['total']), 'link' => ac_offer_link((string)$c['offer_token']), 'free' => ac_free($pdo) > 0];
+    }
+    forma_json($out);
 }
 
 // Nächste offene Teilzahlung bezahlen (Link in Mail und im Mitgliederbereich)
@@ -26,7 +40,7 @@ if (isset($_GET['pay'])) {
     $r = ac_booking($pdo, (int)$_GET['pay']);
     if (!$r || $r['status'] !== 'bezahlt' || !hash_equals((string)$r['token'], (string)($_GET['k'] ?? ''))) mm_page('oh', 'Link nicht gültig · Link not valid', 'Dieser Link funktioniert leider nicht. Schreib mir einfach. · This link does not work. Just write to me.');
     $p = ac_next_part($r);
-    $en = $r['lang'] === 'en';
+    $en = false;
     if (!$p) mm_page('ok', $en ? 'All paid' : 'Alles bezahlt', $en ? 'Everything is already paid. Thank you so much!' : 'Es ist schon alles bezahlt. Danke dir von Herzen!', ac_area($r['lang']), $en ? 'Members area' : 'Zum Mitgliederbereich');
     try { header('Location: ' . ac_part_checkout($pdo, $r, $p), true, 303); exit; }
     catch (Throwable $e) { error_log('AC pay: ' . $e->getMessage()); mm_page('oh', $en ? 'Not right now' : 'Gerade nicht', $en ? 'Payment is not working right now. Please try again in a moment.' : 'Die Bezahlung klappt gerade nicht. Bitte versuch es gleich noch einmal.'); }
@@ -34,7 +48,7 @@ if (isset($_GET['pay'])) {
 
 $in = ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' ? ($_POST ?: (json_decode((string)file_get_contents('php://input'), true) ?: [])) : [];
 $action = (string)($in['action'] ?? ($_GET['action'] ?? ''));
-$en = ($in['lang'] ?? '') === 'en';
+$en = false; // Teacher Training nur auf Deutsch
 
 // Mitgliederbereich: Notizen und Chat (nur angemeldet, Buchung mit Anzahlung)
 if (in_array($action, ['note', 'chat', 'chat_get'], true)) {

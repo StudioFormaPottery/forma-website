@@ -53,6 +53,6 @@ impuls, uebung, atem, meditation, home, journal, merk, tipp, uhr, stimmung, wass
 - Fließende, ganze Sätze. Keine abgehackten Kurzsätze oder Satzfragmente als Stilmittel, keine Ketten aus Einwortsätzen.
 - Keine Gedankenstriche als Stilmittel, kein Muster „nicht X, sondern Y“, keine Dreierlisten aus Gewohnheit, keine leeren Kalendersprüche, kein Therapie-Jargon.
 - Kein „tun“ als Füllverb („was man tut“), lieber ein genaues Verb.
-- Konkret statt allgemein: echte Beispiele aus dem Alltag einer Frau mit Familie, Job und Mental Load, echte Übungen mit ihren gängigen Namen (Yoga, Pilates, Somatics, Breathwork).
+- Konkret statt allgemein: echte Beispiele aus dem Alltag einer Frau mit Familie, Job und Mental Load, echte Übungen mit ihren gängigen Namen (Yoga, Somatics, Breathwork).
 - Wissen korrekt und vorsichtig formulieren (Nervensystem, Stress, Schlaf, Gewohnheiten). Keine Heilversprechen, keine Diagnosen. Wo es passt, freundlich darauf hinweisen, sich bei anhaltender Erschöpfung oder seelischer Belastung Unterstützung bei Ärztin oder Therapeutin zu holen.
-- Vivien lebt mit Mann und vier Kindern in Mathon im Paznaun (Tirol), hat ein Töpferstudio (FORMA), Pferde, unterrichtet Yoga/Pilates/Mindful Movement. Persönliche Bezüge sparsam und allgemein halten, nichts Konkretes erfinden (keine erfundenen Erlebnisse mit Namen, Zahlen oder Daten).
+- Vivien lebt mit Mann und vier Kindern in Mathon im Paznaun (Tirol), hat ein Töpferstudio (FORMA), Pferde, unterrichtet Yoga/Bodyweight/Mindful Movement. Persönliche Bezüge sparsam und allgemein halten, nichts Konkretes erfinden (keine erfundenen Erlebnisse mit Namen, Zahlen oder Daten).
