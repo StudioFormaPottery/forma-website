@@ -50,7 +50,7 @@ body::before{content:"";position:absolute;inset:0;background:radial-gradient(48%
 .waves .w1{fill:#EADFDE}.waves .w2{fill:#E8D6CA;opacity:.85}.waves .w3{fill:#F6EEE7}
 .dark .waves .w1{fill:#5A4750}.dark .waves .w2{fill:#6B5658;opacity:.8}.dark .waves .w3{fill:#55434A}
 .lines{position:absolute;left:0;width:100%;height:200px;top:46%;z-index:1;opacity:.5}
-.lines path{fill:none;stroke:#7D5E68;stroke-width:2}.dark .lines path{stroke:#E8D6CA;opacity:.6}
+.lines path{fill:none;stroke:#7D5E68;stroke-width:1.2;opacity:.3}.dark .lines path{stroke:#E8D6CA;opacity:.3}
 .pebble{position:absolute;right:-40px;top:150px;width:330px;z-index:1;opacity:.95}
 .s .pebble{top:260px;width:360px}
 .pebble .pb-soft{fill:#E8D6CA}.pebble .pb-line{fill:none;stroke:#7D5E68;stroke-width:1.6}.pebble .pb-dot{fill:#7D5E68}
@@ -70,7 +70,7 @@ body::before{content:"";position:absolute;inset:0;background:radial-gradient(48%
 .ib svg{width:62px;height:62px}
 .k{font-size:24px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:#7D5E68}
 .dark .k{color:#E8D6CA}
-h1{font-family:Cormorant,serif;font-weight:500;font-size:112px;line-height:.98;margin-top:20px;max-width:900px}
+h1{font-family:Cormorant,serif;font-weight:500;font-size:112px;line-height:1.04;margin-top:20px;max-width:900px}
 .s h1{font-size:124px}
 h1 em{font-style:italic;color:#7D5E68}.dark h1 em{color:#E8D6CA}
 .text{font-size:34px;line-height:1.45;margin-top:28px;max-width:860px;color:#4A3A41}
@@ -90,9 +90,9 @@ h1 em{font-style:italic;color:#7D5E68}.dark h1 em{color:#E8D6CA}
 .t-quote h1{font-size:132px}.s.t-quote h1{font-size:146px}
 .sig{font-family:Cormorant,serif;font-style:italic;font-size:48px;color:#7D5E68;margin-top:26px}
 .dark .sig{color:#E8D6CA}
-.deal{margin-top:28px;background:#4A3A41;color:#FBF5F7;border-radius:34px;padding:30px 36px;font-size:29px;line-height:1.4;position:relative;overflow:hidden}
+.deal{margin-top:28px;background:#4A3A41;color:#FBF5F7;border-radius:34px;padding:32px 38px;font-size:29px;line-height:1.55;position:relative;overflow:hidden}
 .deal::after{content:"";position:absolute;right:-60px;bottom:-80px;width:220px;height:220px;border-radius:46% 54% 60% 40%/50% 42% 58% 50%;background:#E8D6CA;opacity:.12}
-.deal b{font-family:Cormorant,serif;font-weight:500;font-size:84px;display:block;line-height:1}
+.deal b{font-family:Cormorant,serif;font-weight:500;font-size:84px;display:block;line-height:1.05;margin-bottom:14px}
 /* Foto im Bogen mit Wellenkante (wie die Angebotskarten auf der Website) */
 .ph{position:relative;z-index:2;margin:34px 0 0;height:560px;border-radius:300px 300px 0 0;background-size:cover;background-position:50% 40%;
  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 500' preserveAspectRatio='none'%3E%3Cpath d='M0 0h400v468c-40 22-90 30-140 16S140 446 90 458 20 482 0 476z'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
