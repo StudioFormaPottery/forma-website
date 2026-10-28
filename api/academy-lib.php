@@ -575,7 +575,7 @@ function ac_account_link(PDO $pdo, array $r): array
 function ac_mail_html(array $r, string $hand, string $title, array $blocks, string $link, string $btn, string $legal, bool $confetti = false): string
 {
     // Academy-Mails mit eigenem Kopf (Pflaume-Band mit Academy-Logo) bzw. Konfetti-Bild (Vivien, 28.10.2026)
-    $html = '<p style="margin:0 0 16px;"><img src="' . forma_h(mm_site()) . '/img/movecia/' . ($confetti ? 'mail-academy-konfetti.png' : 'mail-academy-kopf.png') . '?v=3" width="500" alt="Movecia Academy" style="display:block;width:100%;max-width:500px;height:auto;border:0;border-radius:18px;"></p>';
+    $html = '<p style="margin:0 0 16px;"><img src="' . forma_h(mm_site()) . '/img/movecia/' . ($confetti ? 'mail-academy-konfetti.png' : 'mail-academy-kopf.png') . '?v=4" width="500" alt="Movecia Academy" style="display:block;width:100%;max-width:500px;height:auto;border:0;border-radius:18px;"></p>';
     $html .= '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#7D5E68;">' . forma_h($hand) . '</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:28px;line-height:1.2;color:#6B5658;margin:0 0 14px;">' . forma_h($title) . '</h1>';
     foreach ($blocks as $b) {
         if (is_array($b) && isset($b['h'])) $html .= '<h2 style="font-family:Georgia,serif;font-weight:400;font-size:21px;color:#6B5658;margin:24px 0 6px;">' . forma_h($b['h']) . '</h2>';
@@ -1041,9 +1041,10 @@ function ac_jsonld(PDO $pdo): array
 // --- Gemeinsame Gestaltung: Academy-Siegel, Early-Bird-Vögel ------------------------------------------
 
 // --- Academy-Logo (Vivien, 28.10.2026, Runde 3: eigenes Untermarken-Logo, keine Vögel) -------------------
-// Drei Entwürfe: 'bogen' (Kiesel in einem Torbogen = Schwelle in die Ausbildung, Standard), 'zwei' (zwei Kiesel:
-// Lehrerin und Schülerin), 'ring' (Siegel mit ACADEMY / MOVECIA im Kreis). AC_LOGO wählt den Standard.
-const AC_LOGO = 'bogen';
+// Drei Entwürfe: 'bogen' (Kiesel in einem Torbogen = Schwelle in die Ausbildung), 'zwei' (zwei Kiesel:
+// Lehrerin und Schülerin), 'ring' (Siegel mit ACADEMY / Movecia im Kreis, STANDARD seit Runde 4). AC_LOGO wählt den Standard.
+// Unter ca. 70 px wird der Ring ohne Schrift gezeichnet ('ring-s'), sonst wäre sie nicht lesbar.
+const AC_LOGO = 'ring'; // Vivien, 28.10.2026 (Runde 4): Entwurf C „Ring“ ist das Academy-Logo
 
 /** Movecia-Kiesel (weiche Form, Umriss, Punkt) als <g>, zentriert auf (cx, cy), Breite w. */
 function ac_pebble(float $cx, float $cy, float $w, string $line, string $soft, string $dot, float $sw = 3.6, bool $withSoft = true): string
@@ -1071,15 +1072,21 @@ function ac_logo_mark(string $v, bool $onPlum = false): array
            . ac_pebble(92, 70, 56, $c['line'], $c['soft'], $c['dot'], 4.2, true);
         return [$o, 140, 124];
     }
+    if ($v === 'ring-s') {
+        $o = '<circle cx="100" cy="100" r="94" fill="' . $c['fill'] . '" stroke="' . $c['line'] . '" stroke-width="5"/>'
+           . '<circle cx="100" cy="100" r="78" fill="none" stroke="' . $c['thin'] . '" stroke-width="2.4"/>'
+           . ac_pebble(100, 100, 104, $c['line'], $c['soft'], $c['dot'], 4.6);
+        return [$o, 200, 200];
+    }
     if ($v === 'ring') {
         static $n = 0; $n++;
-        $o = '<defs><path id="acT' . $n . '" d="M 33 100 A 67 67 0 0 1 167 100"/><path id="acB' . $n . '" d="M 38 100 A 62 62 0 0 0 162 100"/></defs>'
+        $o = '<defs><path id="acT' . $n . '" d="M 33 100 A 67 67 0 0 1 167 100"/><path id="acB' . $n . '" d="M 36 100 A 64 64 0 0 0 164 100"/></defs>'
            . '<circle cx="100" cy="100" r="96" fill="' . $c['fill'] . '" stroke="' . $c['line'] . '" stroke-width="1.6"/>'
            . '<circle cx="100" cy="100" r="86" fill="none" stroke="' . $c['thin'] . '" stroke-width="1"/>'
-           . '<text font-family="Hanken, Hanken Grotesk, Helvetica, Arial, sans-serif" font-size="15" font-weight="500" letter-spacing="5.6" fill="' . $c['line'] . '"><textPath href="#acT' . $n . '" startOffset="50.7%" text-anchor="middle">ACADEMY</textPath></text>'
-           . '<text font-family="Cormorant, Cormorant Garamond, Georgia, serif" font-style="italic" font-size="17" fill="' . $c['line'] . '" letter-spacing="1.5"><textPath href="#acB' . $n . '" startOffset="50%" text-anchor="middle" dominant-baseline="hanging">Movecia</textPath></text>'
+           . '<text font-family="Hanken, Hanken Grotesk, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="500" letter-spacing="6" fill="' . $c['line'] . '"><textPath href="#acT' . $n . '" startOffset="51%" text-anchor="middle">ACADEMY</textPath></text>'
+           . '<text font-family="Cormorant, Cormorant Garamond, Georgia, serif" font-style="italic" font-size="21" fill="' . $c['line'] . '" letter-spacing="1.2"><textPath href="#acB' . $n . '" startOffset="50%" text-anchor="middle" dominant-baseline="hanging">Movecia</textPath></text>'
            . '<circle cx="34" cy="100" r="2.2" fill="' . $c['thin'] . '"/><circle cx="166" cy="100" r="2.2" fill="' . $c['thin'] . '"/>'
-           . ac_pebble(100, 100, 62, $c['line'], $c['soft'], $c['dot'], 3.8);
+           . ac_pebble(100, 98, 70, $c['line'], $c['soft'], $c['dot'], 3.6);
         return [$o, 200, 200];
     }
     // 'bogen': Torbogen mit Schwelle, innen ein zweiter feiner Bogen, Kiesel in der Tür, kleiner Stern über dem Scheitel
@@ -1094,8 +1101,10 @@ function ac_logo_mark(string $v, bool $onPlum = false): array
 /** Zeichen als SVG-Element (für Seiten). $cls für Größe/Position. */
 function ac_seal(string $cls = '', ?string $v = null, bool $onPlum = false): string
 {
-    [$o, $w, $h] = ac_logo_mark($v ?? AC_LOGO, $onPlum);
-    return '<svg class="ac-seal ac-mark-' . ($v ?? AC_LOGO) . ' ' . forma_h($cls) . '" viewBox="0 0 ' . $w . ' ' . $h . '" aria-hidden="true">' . $o . '</svg>';
+    $v = $v ?? AC_LOGO;
+    $small = $v === 'ring' && preg_match('/\b(mini|acband-mark)\b/', $cls);
+    [$o, $w, $h] = ac_logo_mark($small ? 'ring-s' : $v, $onPlum);
+    return '<svg class="ac-seal ac-mark-' . $v . ' ' . forma_h($cls) . '" viewBox="0 0 ' . $w . ' ' . $h . '" aria-hidden="true">' . $o . '</svg>';
 }
 
 /** Logo als eigenständige SVG-Datei: 'mark' oder 'stack' (Zeichen über Schriftzug „Movecia / ACADEMY / Mindful Movement Teacher Training“). */

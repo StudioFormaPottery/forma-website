@@ -28,7 +28,7 @@ $ee = fn(int $x) => ac_eur($x, 'en');
 $dd = fn(string $ymd) => ac_d($ymd);
 $de2 = fn(string $ymd) => ac_d($ymd, 'en');
 if ($offer || isset($_GET['danke']) || isset($_GET['abbruch'])) $GLOBALS['mvl_noindex'] = true;
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=5">';
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=6">';
 mvl_head('Yogalehrerausbildung auf Deutsch · Mindful Movement Teacher Training ' . AC_HOURS . ' Std. | Movecia Academy Tirol',
     'Die ' . AC_HOURS . '-Stunden-Ausbildung mit Vivien Malonga, ausschließlich auf Deutsch: vollständige 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum, Somatic Movement, Breathwork, Anatomie & Body Scanning, Mental Load & Nervensystem. 11 Monate hybrid, online aus Österreich, Deutschland, der Schweiz und Südtirol, Präsenzwochenende in Tirol. Start ' . mv_date($st) . ', nur 10 Plätze.' . ($c['eb'] ? ' Early-Bird bis ' . mv_date($c['eb_end']) . '.' : ''),
     $site . '/academy/teacher-training/', '/img/movecia/og-academy.jpg', $css, ac_jsonld($pdo));
@@ -67,6 +67,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
 <section class="w"><div class="in hero-x ac-hero two">
   <?= mv_waves(false) ?>
   <div class="ac-hero-tx">
+    <?= ac_seal('herom') ?>
     <p class="ac-kick"><?= ac_seal('mini') ?><span><a href="/academy/">Movecia Academy</a><small><span class="de">Teacher Training 2027 · nur alle 2 Jahre</span><span class="en">Teacher Training 2027 · every two years</span></small></span></p>
     <h1>The Movecia <em>Method</em></h1>
     <p class="sub">Mindful Movement Teacher Training</p>
