@@ -52,6 +52,17 @@ main b,main strong{font-weight:500}
 <?php
 }
 try { mm_auto_setup($pdo); } catch (Throwable $e) { error_log('MM setup: ' . $e->getMessage()); }
+// Einmalig (Vivien, 28.10.2026: „Samhain Gathering · The Old New Year kannst du löschen“): Gathering samt Anmeldungen entfernen.
+try {
+    if (forma_setting($pdo, 'mm_del_samhain_2026') === null) {
+        $ids = $pdo->query("SELECT id FROM mm_gatherings WHERE title LIKE '%Samhain%' AND starts_at LIKE '2026-10-31%'")->fetchAll(PDO::FETCH_COLUMN);
+        foreach ($ids as $gid) {
+            $pdo->prepare('DELETE FROM mm_signups WHERE gathering_id = ?')->execute([(int)$gid]);
+            $pdo->prepare('DELETE FROM mm_gatherings WHERE id = ?')->execute([(int)$gid]);
+        }
+        forma_set_setting($pdo, 'mm_del_samhain_2026', (string)count($ids));
+    }
+} catch (Throwable $e) { error_log('MM Samhain löschen: ' . $e->getMessage()); }
 // Prä- & Postnatal Training (eigener Reiter ?view=natal)
 require __DIR__ . '/natal.inc.php';
 // Method & Unfold (eigener Reiter ?view=method)
@@ -135,7 +146,7 @@ if ($action === 'mm_testroom') {
     try {
         $t = mm_testroom(!empty($_POST['renew']));
     } catch (Throwable $e) {
-        go($mmBack . '&p=gatherings#technik', 'Der Testraum konnte nicht angelegt werden: ' . $e->getMessage());
+        go($mmBack, 'Der Testraum konnte nicht angelegt werden: ' . $e->getMessage());
     }
     header('Location: ' . mm_testroom_link($t));
     exit;
@@ -352,7 +363,8 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             </div>
             <div class="mm-hero-stats">
                 <a href="<?= forma_h($self) ?>?view=natal"><b><?= $natalReq ?></b><span>Anfragen Prä- &amp; Postnatal</span></a>
-                <a href="<?= forma_h($self) ?>?view=movecia&amp;p=gatherings#g<?= (int)($next['id'] ?? 0) ?>"><b><?= $nextSign ?></b><span>Anmeldungen nächstes Gathering</span></a>
+                <?php $ptAll = 0; try { $ptAll = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); $ptAll += count(array_filter(mm_pt_list($pdo), fn($r) => $r['status'] === 'neu')); } catch (Throwable $e) {} ?>
+                <a href="<?= forma_h($self) ?>?view=training"><b><?= $ptAll ?></b><span>Anfragen Personal Training</span></a>
                 <a href="<?= forma_h($self) ?>?view=movecia&amp;p=einst#liste"><b><?= $subOk ?></b><span>auf der E-Mail-Liste</span></a>
             </div>
         </section>
@@ -404,30 +416,68 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         </div>
         <?php endif; ?>
         <?php if ($part === ''): ?>
-        <h2 style="margin-top:18px">Gleich loslegen</h2>
-        <div class="qa">
-            <a class="main" href="<?= forma_h($self) ?>?view=studio"><span class="ic">🎥</span><b>Aufnehmen</b><span>Talking Head oder Flow im Studio, mit Kamera-Look und Teleprompter</span></a>
-            <a class="main" href="<?= forma_h($self) ?>?view=insta"><span class="ic">📱</span><b>Instagram heute</b><span>Story und Reel für heute ansehen und teilen</span></a>
-            <?php if ($next): ?><a class="main" href="<?= forma_h($GLOBALS['mmHostLink']((int)$next['id'])) ?>" target="_blank" rel="noopener"><span class="ic">✨</span><b>Gathering öffnen</b><span>Als Gastgeberin: <?= forma_h($next['title']) ?></span></a><?php else: ?><a class="main" href="<?= forma_h($self) ?>?view=movecia&amp;p=gatherings#neu"><span class="ic">✨</span><b>Gathering anlegen</b><span>Noch keines geplant</span></a><?php endif; ?>
-            <form method="post" target="_blank"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_testroom"><button type="submit"><span class="ic">🎙️</span><b>Kamera &amp; Mikro testen</b><span>Kurzer Technik-Check vor einem Live-Termin</span></button></form>
-        </div>
-        <p class="small muted" style="margin:6px 0 0">Alles Weitere findest du oben in den Reitern: Videos &amp; Content (Zu filmen, Studio, Instagram, Mediathek, Musik, Live-Texte), Gatherings, Programme, Ansehen &amp; Testen und Einstellungen.</p>
-
-        <div class="mm-stats">
-            <a class="mm-stat live" href="<?= forma_h($self) ?>?view=movecia&amp;p=gatherings#g<?= (int)($next['id'] ?? 0) ?>"><b><?= $live ?></b><span>gerade im Videochat</span></a>
-            <span class="mm-stat"><b><?= $joinedAll ?></b><span>waren schon bei einem Gathering dabei</span></span>
-        </div>
+<style>
+.qg{margin:22px 0 6px}
+.qg h2{display:flex;align-items:center;gap:10px;margin:0 0 10px}
+.qg h2 small{font-family:"Outfit",sans-serif;font-size:15px;color:#7D7076}
+.qg .dot{width:14px;height:14px;border-radius:50%;display:inline-block}
+.qg .qa{margin-top:0}
+@media(min-width:900px){.qg .qa{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.qg.tag .qa a,.qg.tag .qa button{background:#E4E8DC;border-color:#C9D0BB}.qg.tag b{color:#3F4A26}.qg.tag .qa span{color:#5E6450}.qg.tag .dot{background:#8E9A72}
+.qg.kurs .qa a{background:#7D5E68;border-color:#7D5E68}.qg.kurs b{color:#FBF5F7}.qg.kurs .qa span{color:#EADFDE}.qg.kurs .dot{background:#7D5E68}
+.qg.test .qa a,.qg.test .qa button{background:#F3E7DA;border-color:#E2CDB7}.qg.test b{color:#5A4434}.qg.test .qa span{color:#86705E}.qg.test .dot{background:#C9A27E}
+.qg .qa .soon{opacity:.75}
+</style>
+        <section class="qg tag">
+            <h2><span class="dot"></span>Jeden Tag <small>aufnehmen, posten, sammeln</small></h2>
+            <div class="qa">
+                <a href="<?= forma_h($self) ?>?view=studio"><span class="ic">🎥</span><b>Studio</b><span>Aufnehmen mit Kamera-Look und Teleprompter</span></a>
+                <a href="<?= forma_h($self) ?>?view=insta"><span class="ic">📱</span><b>Instagram täglich</b><span>Story und Reel für heute</span></a>
+                <a href="<?= forma_h($self) ?>?view=mediathek"><span class="ic">📚</span><b>Mediathek</b><span>Alle Übungen nach Jahreszeit und Stil</span></a>
+                <a href="<?= forma_h($self) ?>?view=videos"><span class="ic">🎬</span><b>Zu filmen</b><span>Was als Nächstes dran ist</span></a>
+                <a href="<?= forma_h($self) ?>?view=musik"><span class="ic">🎵</span><b>Musik</b><span>Deine Lieder für die Videos</span></a>
+                <a href="<?= forma_h($self) ?>?view=texte"><span class="ic">🎙️</span><b>Live-Texte</b><span>Teleprompter für Live-Einheiten</span></a>
+            </div>
+        </section>
+        <section class="qg kurs">
+            <h2><span class="dot"></span>Kurse &amp; Programme</h2>
+            <div class="qa">
+                <a href="<?= forma_h($self) ?>?view=method#programme"><span class="ic">🌱</span><b>Method</b><span>Monatsprogramme, Mitglieder, Preise</span></a>
+                <a href="<?= forma_h($self) ?>?view=method#unfold"><span class="ic">🌸</span><b>Unfold</b><span>3-Monats-Programm, Plätze, Live-Calls</span></a>
+                <a href="<?= forma_h($self) ?>?view=natal"><span class="ic">🤰</span><b>Prä- &amp; Postnatal<?= $natalReq ? ' · ' . $natalReq . ' neu' : '' ?></b><span>Anfragen, Termine, Pakete</span></a>
+                <a href="<?= forma_h($self) ?>?view=training"><span class="ic">🏔️</span><b>Personal Training<?= $ptAll ? ' · ' . $ptAll . ' neu' : '' ?></b><span>Hotelgäste und 1:1-Anfragen</span></a>
+                <a href="<?= forma_h($self) ?>?view=movecia&amp;p=gatherings"><span class="ic">✨</span><b>Gatherings</b><span><?= $next ? 'Nächstes: ' . forma_h(date('d. m.', strtotime((string)$next['starts_at']))) . ' · ' . $nextSign . ' angemeldet' : 'Anlegen und Angebot einblenden' ?></span></a>
+                <a class="soon" href="https://moveciamovement.com/" target="_blank" rel="noopener"><span class="ic">🎓</span><b>Teacher Training</b><span>Start November 2027 · in Vorbereitung</span></a>
+            </div>
+        </section>
+        <section class="qg test">
+            <h2><span class="dot"></span>Ansehen &amp; Testen <small>so sehen es deine Kundinnen</small></h2>
+            <div class="qa">
+                <a href="<?= forma_h($self) ?>?view=vorschau"><span class="ic">👁</span><b>Alle Seiten ansehen</b><span>Jede Seite und jeder Mitgliederbereich als Beispiel</span></a>
+                <a href="<?= forma_h($self) ?>?view=method#test"><span class="ic">🧪</span><b>Als Testteilnehmerin einloggen</b><span>Method oder Unfold echt ausprobieren</span></a>
+                <a href="<?= forma_h($self) ?>?view=natal#testkundin"><span class="ic">🧪</span><b>Als Testkundin Prä-/Postnatal</b><span>Testkundin anlegen und Mail bekommen</span></a>
+                <a href="<?= forma_h(mm_site()) ?>/mitglieder/" target="_blank" rel="noopener"><span class="ic">🔑</span><b>Login Method &amp; Unfold</b><span>moveciamovement.com/mitglieder</span></a>
+                <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/" target="_blank" rel="noopener"><span class="ic">🔑</span><b>Login Prä- &amp; Postnatal</b><span>moveciamovement.com/natal/mitglied</span></a>
+                <form method="post" target="_blank"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_testroom"><button type="submit"><span class="ic">🎙️</span><b>Kamera &amp; Mikro testen</b><span>Technik-Check vor einem Live-Termin</span></button></form>
+            </div>
+        </section>
         <div class="mm-links">
             <a href="https://moveciamovement.com/" target="_blank" rel="noopener">Website</a>
             <a href="https://moveciamovement.com/links/" target="_blank" rel="noopener">Link in Bio</a>
-            <a href="https://moveciamovement.com/gathering/" target="_blank" rel="noopener">Gathering-Seite</a>
             <a href="https://moveciamovement.com/reset/" target="_blank" rel="noopener">Reset Routine Download</a>
             <a href="https://dashboard.mailerlite.com/automations" target="_blank" rel="noopener">MailerLite</a>
-            <a href="https://whereby.com/information/embedded/" target="_blank" rel="noopener">Whereby</a>
         </div>
-
         <?php endif; ?>
         <?php if ($part === 'gatherings'): ?>
+        <div class="mm-stats" style="margin-top:0">
+            <a class="mm-stat live" href="#g<?= (int)($next['id'] ?? 0) ?>"><b><?= $live ?></b><span>gerade im Videochat</span></a>
+            <span class="mm-stat"><b><?= $next ? $nextSign : 0 ?></b><span>Anmeldungen nächstes Gathering</span></span>
+            <span class="mm-stat"><b><?= $joinedAll ?></b><span>waren schon bei einem Gathering dabei</span></span>
+        </div>
+        <div class="mm-links">
+            <a href="https://moveciamovement.com/gathering/" target="_blank" rel="noopener">Gathering-Seite</a>
+            <a href="https://whereby.com/information/embedded/" target="_blank" rel="noopener">Whereby</a>
+        </div>
         <h2>Gatherings</h2>
         <?php if ($next && $next['room_url'] !== ''): ?>
             <a class="card notice" href="<?= forma_h($GLOBALS['mmHostLink']((int)$next['id'])) ?>" target="_blank" rel="noopener" style="border-color:#7D5E68;background:#FBF8F4"><span class="ic" style="background:#EADFDE;color:#7D5E68"><?= admin_icon('kalender') ?></span><span><strong>Als Gastgeberin in den Raum: <?= forma_h($next['title']) ?></strong><br><span class="muted small"><?= forma_h(mm_when_de($next)) ?> · dein Fenster mit Teleprompter, Aufnahme und Video-Bühne →</span></span></a>
@@ -499,7 +549,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_save_gathering"><input type="hidden" name="gid" value="<?= (int)$d['id'] ?>">
             <?php if (!$edit): ?>
             <p class="small"><strong>Vorlage wählen</strong> · ein Tipp füllt Titel, Dauer, Uhrzeit, Text und das passende Teleprompter-Skript aus. Danach nur noch das Datum prüfen.</p>
-            <div class="mm-links" style="margin-top:0"><?php foreach (mm_gathering_presets() as $i => $pr): ?><a href="#neu" data-preset="<?= $i ?>"><?= forma_h($pr['label']) ?></a><?php endforeach; ?></div>
+            <div class="mm-links" style="margin-top:0"><?php foreach (mm_gathering_presets() as $i => $pr): if (($pr['date'] ?? '9999') < date('Y-m-d')) continue; ?><a href="#neu" data-preset="<?= $i ?>"><?= forma_h($pr['label']) ?></a><?php endforeach; ?></div>
             <script>
             (() => {
               const P = <?= json_encode(mm_gathering_presets(), JSON_UNESCAPED_UNICODE) ?>;
@@ -532,8 +582,9 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         </form>
 
         <?php mm_offer_schema($pdo); $offs = mm_offers(); $orders = $pdo->query('SELECT * FROM mm_orders ORDER BY id DESC LIMIT 60')->fetchAll(); $openOrd = count(array_filter($orders, fn($o) => $o['status'] === 'offen')); ?>
-        <h2 id="angebote">Angebote</h2>
-        <form method="post" class="card stack">
+        <details class="card stack mm-offer" id="angebote" style="margin-top:16px">
+        <summary><span style="font-size:22px">🎁</span> <strong style="font-size:19px">Angebot fürs Gathering</strong> <span class="muted small">· was du am Ende eines Gatherings einblenden kannst, mit Gathering-Preis<?= $openOrd ? ' · <b style="color:#A0463A">' . $openOrd . ' Zahlung offen</b>' : '' ?></span></summary>
+        <form method="post" class="stack" style="margin-top:10px">
             <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_save_offers">
             <p class="small">Am Ende eines Gatherings kannst du im Gastgeberinnen-Fenster („✦ Angebot“) Unfold, die Method und das Alpine Retreat einblenden. Hier trägst du den regulären Preis fürs Retreat ein. Den günstigeren Gathering-Preis und wie viele Minuten er gilt, gibst du beim Einblenden ein. Läuft der Countdown ab, gilt automatisch wieder der reguläre Preis, auch beim Bezahlen. Titel und Text sehen die Frauen, deshalb auf Englisch.</p>
             <p class="small">Method und Unfold kannst du ebenfalls einblenden. Ihre Preise (auch die Gathering-Preise) stellst du unter <a href="<?= forma_h($self) ?>?view=method#preise">Method &amp; Unfold → Preise</a> ein.</p>
@@ -553,13 +604,13 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <button class="btn" type="submit">Angebote speichern</button>
         </form>
         <?php try { $tp = mm_test_promo(); } catch (Throwable $e) { $tp = null; } if ($tp && (int)$tp['until'] > time()): ?>
-        <div class="card stack" style="margin-top:12px">
+        <div class="stack" style="margin-top:12px">
             <p><strong>Gutscheincode für deine Testbuchung</strong></p>
             <p class="small"><span class="sel" style="font-size:20px;letter-spacing:.06em"><?= forma_h($tp['code']) ?></span> · 100 % · höchstens 3 Mal · bis <?= forma_h(date('d. m. Y', (int)$tp['until'])) ?><?= $tp['live'] ? '' : ' · Stripe-Testmodus' ?></p>
             <p class="muted small">Im Stripe-Bezahlfenster bei „Gutscheincode hinzufügen“ eingeben, dann zahlst du € 0. Das Feld erscheint nur beim regulären Preis. Test-Abo danach in Stripe kündigen. Bitte nicht weitergeben.</p>
         </div>
         <?php endif; ?>
-        <details class="card stack" style="margin-top:12px">
+        <details class="stack" style="margin-top:12px;border-top:1px solid var(--line);padding-top:10px">
             <summary><strong>Buchungen aus Gathering-Angeboten (<?= count($orders) ?>)</strong> <span class="muted small">· frühere Inner-Circle- und Jahreskreis-Buchungen stehen auch hier</span></summary>
             <?php if (!$orders): ?><p class="muted small">Noch keine. Probier es im Testraum aus: Angebot einblenden und mit dem Gast-Link (zweites Gerät) „buchen“. Im Stripe-Testmodus geht das mit der Testkarte 4242 4242 4242 4242.</p><?php endif; ?>
             <?php foreach ($orders as $o): ?>
@@ -571,17 +622,8 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <?php endforeach; ?>
             <?php if ($openOrd): ?><form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_order_recheck"><button class="link small" type="submit">Offene Zahlungen bei Stripe prüfen</button></form><?php endif; ?>
         </details>
-
-        <h2 id="technik">Technik-Test</h2>
-        <?php $tr = mm_cfg('testroom') ?? []; $trReady = !empty($tr['room_url']) && (int)($tr['ends'] ?? 0) > time(); ?>
-        <div class="card stack">
-            <p class="small">Probier Mikro, Kamera, Lautsprecher und Teleprompter in Ruhe aus, bevor die Frauen kommen. Erst siehst du dein Kamerabild und einen Pegel, der beim Sprechen ausschlägt, dann kannst du direkt in einen eigenen Whereby-Testraum auf moveciamovement.com gehen, genau so, wie die Gäste ihn später sehen.<?= $hasWhereby ? '' : ' Ohne Whereby-Schlüssel klappt erst einmal nur der Geräte-Check.' ?></p>
-            <form method="post" target="_blank"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_testroom"><button class="btn" type="submit">Testraum öffnen</button></form>
-            <?php if ($trReady): ?>
-                <p class="muted small">Zum Testen mit einem zweiten Gerät oder einer Freundin (sie sieht und hört dich dann, wie eine Teilnehmerin): <span class="sel"><?= forma_h(mm_testroom_link($tr, true)) ?></span><br>Der Testraum gilt bis <?= forma_h(date('d. m. Y', (int)$tr['ends'])) ?> und entsteht danach automatisch neu.</p>
-                <form method="post" target="_blank"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_testroom"><input type="hidden" name="renew" value="1"><button class="link small" type="submit">Neuen Testraum anlegen</button></form>
-            <?php endif; ?>
-        </div>
+        </details>
+        <script>(function(){var h=location.hash.slice(1);if(!h)return;var e=document.getElementById(h);if(e&&e.tagName==='DETAILS')e.open=true;})();</script>
 
         <?php endif; ?>
         <?php if ($part === 'einst'): ?>
