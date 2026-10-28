@@ -21,12 +21,25 @@
   const SEG_MODEL = 'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite';
   const FACE_MODEL = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
   const KEY = 'mv-talkcam';
-  const DEF = { on: true, look: 'natur', beauty: 35, eyes: 45, blur: 0, light: 0, ring: 25, warm: 8, contrast: 0, guide: 'oval', mirror: true, aspect: '16:9' };
+  const DEF = { on: true, look: 'natur', beauty: 35, eyes: 45, blur: 0, light: 0, ring: 25, warm: 8, contrast: 0, blush: 0, eyeBig: 0, eyeBright: 20, lashes: 15, brows: 15, lipColor: 'rose', lip: 0, lipBig: 0, filter: 'none', filterAmt: 70, guide: 'oval', mirror: true, aspect: '16:9' };
+  // Looks setzen Haut, Augen, Lippen und Farbfilter auf einmal (danach frei anpassbar)
   const LOOKS = {
-    natur: { label: 'Natürlich', beauty: 35, eyes: 45, ring: 25, warm: 8, light: 0, contrast: 0 },
-    pur: { label: 'Ungeschminkt', beauty: 60, eyes: 75, ring: 40, warm: 12, light: 6, contrast: -4 },
-    warm: { label: 'Warm & weich', beauty: 50, eyes: 55, ring: 35, warm: 26, light: 8, contrast: -8 },
-    klar: { label: 'Klar & frisch', beauty: 25, eyes: 40, ring: 20, warm: -4, light: 4, contrast: 10 },
+    natur: { label: 'Natürlich', beauty: 35, eyes: 45, ring: 25, warm: 8, light: 0, contrast: 0, blush: 0, eyeBig: 0, eyeBright: 20, lashes: 15, brows: 15, lip: 0, lipBig: 0, filter: 'none' },
+    frisch: { label: 'Frisch ohne Make-up', beauty: 55, eyes: 75, ring: 40, warm: 12, light: 6, contrast: -4, blush: 25, eyeBig: 8, eyeBright: 35, lashes: 35, brows: 30, lipColor: 'rose', lip: 30, lipBig: 8, filter: 'golden', filterAmt: 35 },
+    glam: { label: 'Make-up-Look', beauty: 55, eyes: 65, ring: 35, warm: 8, light: 4, contrast: 4, blush: 35, eyeBig: 18, eyeBright: 45, lashes: 65, brows: 55, lipColor: 'beere', lip: 55, lipBig: 22, filter: 'rose', filterAmt: 40 },
+    golden: { label: 'Golden Hour', beauty: 45, eyes: 55, ring: 35, warm: 18, light: 8, contrast: -6, blush: 20, eyeBig: 6, eyeBright: 30, lashes: 30, brows: 25, lipColor: 'koralle', lip: 30, lipBig: 8, filter: 'golden', filterAmt: 70 },
+    klar: { label: 'Klar & frisch', beauty: 25, eyes: 40, ring: 20, warm: -4, light: 4, contrast: 8, blush: 10, eyeBig: 0, eyeBright: 40, lashes: 25, brows: 20, lip: 15, lipColor: 'nude', lipBig: 0, filter: 'klar', filterAmt: 60 },
+  };
+  const LIPS = { natur: ['Natur', [.62, .33, .34]], rose: ['Rosé', [.82, .44, .5]], nude: ['Nude', [.74, .52, .45]], koralle: ['Koralle', [.9, .44, .37]], beere: ['Beere', [.56, .17, .3]], rot: ['Rot', [.72, .12, .16]] };
+  // Farbfilter (wie bei Instagram): Sättigung, Kontrast, Aufhellen der Tiefen, Farbstich in Schatten/Lichtern, Schwarz-Weiß
+  const FILTERS = {
+    none: ['Kein', { sat: 1, con: 1, fade: 0, sh: [0, 0, 0], hi: [0, 0, 0], bw: 0 }],
+    golden: ['Golden', { sat: 1.08, con: 1.04, fade: .03, sh: [.03, .015, -.03], hi: [.07, .035, -.05], bw: 0 }],
+    rose: ['Rosé', { sat: 1, con: .97, fade: .045, sh: [.045, 0, .03], hi: [.045, .01, .025], bw: 0 }],
+    pastell: ['Pastell', { sat: .8, con: .88, fade: .08, sh: [.02, .02, .045], hi: [.025, .012, 0], bw: 0 }],
+    film: ['Film', { sat: .9, con: 1.08, fade: .07, sh: [-.015, .03, .045], hi: [.05, .03, -.025], bw: 0 }],
+    klar: ['Klar', { sat: 1.14, con: 1.1, fade: 0, sh: [0, 0, .012], hi: [.01, .005, 0], bw: 0 }],
+    mono: ['Schwarz-Weiß', { sat: 1, con: 1.12, fade: .04, sh: [0, 0, 0], hi: [.02, .015, 0], bw: 1 }],
   };
 
   function load() { try { return Object.assign({}, DEF, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { return Object.assign({}, DEF); } }
@@ -78,50 +91,63 @@ void main(){
 }`;
   const FS_FINAL = `#version 300 es
 precision highp float; in vec2 uv; out vec4 o;
-uniform sampler2D base; uniform sampler2D bg; uniform sampler2D mask;
+uniform sampler2D base; uniform sampler2D bg; uniform sampler2D mask; uniform sampler2D fmask;
 uniform vec4 crop; uniform vec2 res;
 uniform float beauty, eyes, blur, light, ring, warm, contrast, useMask, hasFace, bypass;
+uniform float blush, eyeBig, eyeBright, lashes, brows, lip, lipBig;
+uniform vec3 lipCol;
+uniform float fSat, fCon, fFade, fBW; uniform vec3 fSh, fHi;
 uniform vec2 eyeL, eyeR, eyeRad; uniform vec2 faceC, faceR;
+uniform vec2 eyeCL, eyeCR; uniform float eyeW; uniform vec2 lipC, lipRad; uniform vec2 chL, chR;
 vec3 B(vec2 u){ return texture(base, vec2(u.x, 1.-u.y)).rgb; }
 float luma(vec3 c){ return dot(c, vec3(.299,.587,.114)); }
+vec4 FM(vec2 u){ vec2 d = 1.5/res; return (texture(fmask,u)*2. + texture(fmask,u+vec2(d.x,0.)) + texture(fmask,u-vec2(d.x,0.)) + texture(fmask,u+vec2(0.,d.y)) + texture(fmask,u-vec2(0.,d.y)))/6.; }
 float skinOf(vec3 c){
   float y = luma(c); float cb = .5 + (-.168736*c.r - .331264*c.g + .5*c.b); float cr = .5 + (.5*c.r - .418688*c.g - .081312*c.b);
   float s = smoothstep(.28,.32,cb) * (1.-smoothstep(.50,.54,cb)) * smoothstep(.51,.545,cr) * (1.-smoothstep(.67,.71,cr));
   return s * smoothstep(.08,.2,y);
 }
+// Farbe übernehmen, Helligkeit behalten (wie Ebenenmodus „Farbe“)
+vec3 setLum(vec3 c, float l){ float d = l - luma(c); c += d; float L = luma(c), n = min(min(c.r,c.g),c.b), x = max(max(c.r,c.g),c.b);
+  if (n < 0.) c = L + (c-L)*L/max(L-n,1e-4); if (x > 1.) c = L + (c-L)*(1.-L)/max(x-L,1e-4); return c; }
+vec2 mag(vec2 p, vec2 c, vec2 R, float k){ vec2 d = p-c; float r = length(d/R); if (r < 1.) { float t = 1.-r*r; d *= 1.-k*t*t; } return c+d; }
 void main(){
-  vec3 c = B(uv);
+  vec2 wuv = uv;
+  if (bypass < .5 && hasFace > .5) {
+    vec2 p = uv*res;
+    if (eyeBig > 0.) { vec2 R = vec2(eyeW*1.05, eyeW*.85); p = mag(p, eyeCL*res, R, eyeBig*.2); p = mag(p, eyeCR*res, R, eyeBig*.2); }
+    if (lipBig > 0.) p = mag(p, lipC*res, lipRad*1.35, lipBig*.17);
+    wuv = p/res;
+  }
+  vec3 c = B(wuv);
   if (bypass > .5) { o = vec4(c,1.); return; }
   vec2 px = 1./res;
   float m = useMask > .5 ? smoothstep(.35,.75, texture(mask, crop.xy + uv*crop.zw).r) : 1.;
-  // Gesichtsbereich (weiche Ellipse), ohne Gesicht: ganzes Bild
+  vec4 fm = hasFace > .5 ? FM(wuv) : vec4(0.);
   float fd = hasFace > .5 ? length((uv-faceC)*res/faceR) : 0.;
   float faceW = hasFace > .5 ? 1.-smoothstep(1.0, 1.45, fd) : 1.;
-  // Augenringe: zwei weiche Ellipsen unter den Augen
   float ew = 0.;
   if (hasFace > .5 && eyes > 0.) {
     float dl = length((uv-eyeL)*res/eyeRad), dr = length((uv-eyeR)*res/eyeRad);
     ew = max(1.-smoothstep(.35,1.,dl), 1.-smoothstep(.35,1.,dr));
   }
-  // Haut weich: Kanten erhaltender Weichzeichner (bilateral), nur auf Haut
-  float sk = skinOf(c);
+  // Haut weich (Kanten bleiben), nur auf Haut, nicht auf Lippen, Brauen, Wimpern
+  float sk = skinOf(c) * (1. - clamp(fm.r + fm.g + fm.b, 0., 1.));
   float amt = (beauty*.9 + ew*eyes*.5) * sk * faceW * m;
   if (amt > .002) {
     float r = max(2., (hasFace > .5 ? faceR.x : res.y*.12) * .045);
     vec3 acc = c; float ws = 1.;
     for (int i = 0; i < 12; i++) {
-      float a = float(i) * .5235988;
-      vec2 d = vec2(cos(a), sin(a));
+      float a = float(i) * .5235988; vec2 d = vec2(cos(a), sin(a));
       for (int k = 1; k <= 2; k++) {
-        vec3 s = B(uv + d * r * float(k) * (k == 2 ? 1. : .5) * px);
+        vec3 s = B(wuv + d * r * float(k) * (k == 2 ? 1. : .5) * px);
         vec3 df = s - c; float w = exp(-dot(df,df) * 160.);
         acc += s * w; ws += w;
       }
     }
-    vec3 sm = acc / ws;
-    c = mix(c, sm, clamp(amt, 0., .92));
+    c = mix(c, acc / ws, clamp(amt, 0., .92));
   }
-  // Augenringe aufhellen: nur bis zur Helligkeit der Wange darunter, Farbton etwas zur Wange hin (wirkt natürlich)
+  // Augenringe
   if (ew > 0.) {
     vec2 eye = length((uv-eyeL)*res) < length((uv-eyeR)*res) ? eyeL : eyeR;
     vec2 ck = eye + vec2(0., eyeRad.y * 2.4) * px;
@@ -129,15 +155,55 @@ void main(){
     float lc = luma(c), lk = luma(cheek);
     vec3 fix = c * clamp(lk / max(lc, .03), 1., 1.45);
     fix = mix(fix, cheek * (luma(fix) / max(lk, .03)), .35);
-    float k = ew * eyes * mix(.5, 1., sk);
-    c = mix(c, fix, clamp(k, 0., 1.));
+    c = mix(c, fix, clamp(ew * eyes * mix(.5, 1., sk), 0., 1.));
   }
-  // Gesicht aufhellen (wie ein weiches Ringlicht von vorne)
+  if (hasFace > .5) {
+    // Augen strahlen: Weiß und Iris klarer, leicht geschärft
+    if (eyeBright > 0.) {
+      vec2 R = vec2(eyeW*.6, eyeW*.32);
+      float w = max(1.-smoothstep(.45,1.,length((wuv-eyeCL)*res/R)), 1.-smoothstep(.45,1.,length((wuv-eyeCR)*res/R)));
+      if (w > 0.) {
+        vec3 bl = (B(wuv+vec2(2.,0.)*px)+B(wuv-vec2(2.,0.)*px)+B(wuv+vec2(0.,2.)*px)+B(wuv-vec2(0.,2.)*px))*.25;
+        vec3 sh = c + (c - bl) * 1.2;
+        float l = luma(sh); sh = mix(sh, sh * 1.12 + .02, smoothstep(.35, .8, l));
+        c = mix(c, clamp(sh,0.,1.), w * eyeBright * .85);
+      }
+    }
+    // Wimpern betonen: nur was am Lidrand schon dunkel ist, wird kräftiger (keine aufgemalte Linie)
+    if (lashes > 0. && fm.b > .01) {
+      vec3 mean = (B(wuv+vec2(0.,eyeW*.12)*px) + B(wuv-vec2(0.,eyeW*.12)*px) + B(wuv+vec2(eyeW*.12,0.)*px) + B(wuv-vec2(eyeW*.12,0.)*px)) * .25;
+      float hair = clamp((luma(mean) - luma(c)) * 6. + .1, 0., 1.);
+      c = mix(c, pow(c, vec3(1.6)) * .8, clamp(fm.b * lashes * hair * 1.2, 0., .9));
+    }
+    // Brauen betonen: nur die Härchen dunkler und dichter (Lücken füllen), Haut dazwischen bleibt
+    if (brows > 0. && fm.g > .01) {
+      float r = eyeW * .08; vec3 mn = c, mean = vec3(0.);
+      for (int i = 0; i < 8; i++) { float a = float(i) * .785398; vec3 sm = B(wuv + vec2(cos(a), sin(a)) * r * px); mn = min(mn, sm); mean += sm; }
+      mean *= .125;
+      float hair = clamp((luma(mean) - luma(c)) * 7. + .2, 0., 1.);
+      vec3 fill = mix(c, mn, .45 * hair) * mix(1., .8, hair);
+      c = mix(c, fill, clamp(fm.g * brows, 0., .8));
+    }
+    // Rouge
+    if (blush > 0.) {
+      vec2 R = vec2(eyeW*1.05, eyeW*.75);
+      float w = max(1.-smoothstep(.0,1.,length((uv-chL)*res/R)), 1.-smoothstep(.0,1.,length((uv-chR)*res/R)));
+      vec3 bc = setLum(vec3(.86,.42,.48), luma(c));
+      c = mix(c, bc, w * blush * .42 * mix(.4, 1., skinOf(c)));
+    }
+    // Lippenfarbe: Farbton der gewählten Farbe, Licht und Struktur der Lippen bleiben
+    if (lip > 0. && fm.r > .01) {
+      float l = luma(c);
+      vec3 tint = setLum(lipCol, min(mix(l, luma(lipCol), .3), l * 1.04));
+      tint += (c - B(wuv + vec2(1.5,1.5)*px)) * .6;
+      c = mix(c, clamp(tint,0.,1.), clamp(fm.r * lip * .8, 0., .78));
+    }
+  }
+  // Glow / Gesicht aufhellen
   if (ring > 0.) {
     float rw = hasFace > .5 ? 1.-smoothstep(.55, 1.6, fd) : m * .6;
     c = c + (1.-c) * ring * .22 * rw * (1. - .5*luma(c));
   }
-  // Hintergrund unscharf (und eine Spur ruhiger)
   if (blur > 0.) {
     vec4 b = texture(bg, vec2(uv.x, 1.-uv.y));
     vec3 bc = b.a > .02 ? b.rgb / b.a : c;
@@ -148,6 +214,14 @@ void main(){
   c *= exp2(light * 1.1);
   c = (c - .5) * (1. + contrast * .7) + .5;
   c += vec3(.07, .02, -.07) * warm;
+  // Farbfilter
+  c = clamp(c, 0., 1.);
+  float L = luma(c);
+  c += fSh * (1.-L) + fHi * L;
+  c = mix(vec3(luma(c)), c, fSat);
+  c = (c - .5) * fCon + .5;
+  c = c * (1. - fFade) + fFade * vec3(1., .98, .96);
+  c = mix(c, vec3(luma(c)), fBW);
   o = vec4(clamp(c, 0., 1.), 1.);
 }`;
 
@@ -185,6 +259,9 @@ void main(){
         const tex = () => { const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); return t; };
         this.tVid = tex(); this.tMask = tex();
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, 1, 1, 0, gl.RED, gl.UNSIGNED_BYTE, new Uint8Array([255]));
+        // Gesichtsmaske: R = Lippen, G = Brauen, B = Wimpernrand (aus den Gesichtspunkten gezeichnet)
+        this.tFace = tex(); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+        this.fc = document.createElement('canvas'); this.fx = this.fc.getContext('2d');
         this.tex = tex; this.fbos = {};
         return true;
       } catch (e) { console.warn('TalkCam WebGL', e); return false; }
@@ -231,7 +308,7 @@ void main(){
     }
     on(f) { this.listeners.push(f); }
     emit(t) { this.listeners.forEach(f => { try { f(t, this); } catch (e) {} }); }
-    needFace() { return this.s.on && (this.s.eyes > 0 || this.s.ring > 0 || this.s.beauty > 0) || this.s.guide === 'oval'; }
+    needFace() { const s = this.s; return s.on && (s.eyes > 0 || s.ring > 0 || s.beauty > 0 || s.blush > 0 || s.eyeBig > 0 || s.eyeBright > 0 || s.lashes > 0 || s.brows > 0 || s.lip > 0 || s.lipBig > 0) || s.guide === 'oval'; }
     needSeg() { return this.s.on && this.s.blur > 0; }
     ensureModels() {
       if (!this.ok) return;
@@ -287,10 +364,44 @@ void main(){
         rx: Math.abs(rc.x - lc.x) * W / 2, ry: Math.abs(chin.y - top.y) * H / 2,
         el, er, ew: (el.ew + er.ew) / 2, eyeY: (P(159).y + P(386).y) / 2,
       };
+      // Augenmitten (Iris, wenn vorhanden), Lippen, Wangen
+      const mid = (a, b) => { const A = P(a), Bp = P(b); return { x: (A.x + Bp.x) / 2, y: (A.y + Bp.y) / 2 }; };
+      f.cl = lm.length > 473 ? P(468) : mid(33, 133); f.cr = lm.length > 473 ? P(473) : mid(362, 263);
+      const ml = P(61), mr = P(291), mt = P(0), mb = P(17);
+      f.lc = { x: (ml.x + mr.x) / 2, y: (mt.y + mb.y) / 2 }; f.lrx = Math.hypot((mr.x - ml.x) * W, (mr.y - ml.y) * H) / 2; f.lry = Math.abs(mb.y - mt.y) * H / 2;
+      f.chl = mid(205, 50); f.chr = mid(425, 280);
+      this.drawFaceMask(P, W, H, f.ew);
       const o = this.face; if (!o) { this.face = f; return; }
-      const k = .45, L = (a, b) => a + (b - a) * k;
+      const k = .45, L = (a, b) => a + (b - a) * k, LP = (a, b) => ({ x: L(a.x, b.x), y: L(a.y, b.y) });
       this.face = { cx: L(o.cx, f.cx), cy: L(o.cy, f.cy), rx: L(o.rx, f.rx), ry: L(o.ry, f.ry), ew: L(o.ew, f.ew), eyeY: L(o.eyeY, f.eyeY),
-        el: { x: L(o.el.x, el.x), y: L(o.el.y, el.y) }, er: { x: L(o.er.x, er.x), y: L(o.er.y, er.y) } };
+        el: LP(o.el, el), er: LP(o.er, er), cl: LP(o.cl, f.cl), cr: LP(o.cr, f.cr), lc: LP(o.lc, f.lc), lrx: L(o.lrx, f.lrx), lry: L(o.lry, f.lry), chl: LP(o.chl, f.chl), chr: LP(o.chr, f.chr) };
+    }
+    drawFaceMask(P, W, H, ew) {
+      const s = this.s; if (!(s.lip > 0 || s.brows > 0 || s.lashes > 0)) return;
+      const c = this.fc, x = this.fx, w = Math.max(64, Math.round(W / 3)), h = Math.max(64, Math.round(H / 3));
+      if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+      x.setTransform(1, 0, 0, 1, 0, 0); x.globalCompositeOperation = 'source-over'; x.clearRect(0, 0, w, h);
+      const poly = (ids, close) => { x.beginPath(); ids.forEach((i, n) => { const p = P(i); n ? x.lineTo(p.x * w, p.y * h) : x.moveTo(p.x * w, p.y * h); }); if (close) x.closePath(); };
+      const sc = w / W, soft = 'filter' in x;
+      if (soft) x.filter = 'blur(' + Math.max(1, ew * sc * .06).toFixed(1) + 'px)';
+      // Lippen: außen füllen, Mund innen aussparen
+      poly([61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291, 409, 270, 269, 267, 0, 37, 39, 40, 185], true); x.fillStyle = 'rgb(255,0,0)'; x.fill();
+      x.globalCompositeOperation = 'destination-out';
+      poly([78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308, 415, 310, 311, 312, 13, 82, 81, 80, 191], true); x.fill();
+      x.globalCompositeOperation = 'lighter';
+      // Brauen
+      x.fillStyle = 'rgb(0,255,0)';
+      poly([70, 63, 105, 66, 107, 55, 65, 52, 53, 46], true); x.fill();
+      poly([300, 293, 334, 296, 336, 285, 295, 282, 283, 276], true); x.fill();
+      // Wimpernrand oben (etwas über dem Lid)
+      x.strokeStyle = 'rgb(0,0,255)'; x.lineWidth = Math.max(1.2, ew * sc * .1); x.lineCap = 'round'; x.lineJoin = 'round';
+      x.save(); x.translate(0, -ew * sc * .03);
+      poly([33, 246, 161, 160, 159, 158, 157, 173, 133]); x.stroke();
+      poly([263, 466, 388, 387, 386, 385, 384, 398, 362]); x.stroke();
+      x.restore();
+      if (soft) x.filter = 'none';
+      const gl = this.gl; gl.bindTexture(gl.TEXTURE_2D, this.tFace); gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
+      try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, c); } catch (e) {}
     }
     draw() {
       const v = this.video; if (v.readyState < 2) return;
@@ -334,8 +445,14 @@ void main(){
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, base.t); gl.uniform1i(u.base, 0);
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, bgT); gl.uniform1i(u.bg, 1);
       gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, this.tMask); gl.uniform1i(u.mask, 2);
+      gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, this.tFace); gl.uniform1i(u.fmask, 3);
       gl.uniform4fv(u.crop, crop); gl.uniform2f(u.res, W, H);
       const f = this.face, hasFace = f ? 1 : 0;
+      for (const k of ['blush', 'eyeBig', 'eyeBright', 'lashes', 'brows', 'lip', 'lipBig']) gl.uniform1f(u[k], (s[k] || 0) / 100);
+      gl.uniform3fv(u.lipCol, (LIPS[s.lipColor] || LIPS.rose)[1]);
+      const F = (FILTERS[s.filter] || FILTERS.none)[1], fa = s.filter === 'none' ? 0 : (s.filterAmt == null ? 70 : s.filterAmt) / 100;
+      gl.uniform1f(u.fSat, 1 + (F.sat - 1) * fa); gl.uniform1f(u.fCon, 1 + (F.con - 1) * fa); gl.uniform1f(u.fFade, F.fade * fa); gl.uniform1f(u.fBW, F.bw * fa);
+      gl.uniform3f(u.fSh, F.sh[0] * fa, F.sh[1] * fa, F.sh[2] * fa); gl.uniform3f(u.fHi, F.hi[0] * fa, F.hi[1] * fa, F.hi[2] * fa);
       gl.uniform1f(u.bypass, on ? 0 : 1);
       gl.uniform1f(u.beauty, s.beauty / 100); gl.uniform1f(u.eyes, s.eyes / 100); gl.uniform1f(u.blur, useMask ? blur : 0);
       gl.uniform1f(u.light, s.light / 100); gl.uniform1f(u.ring, s.ring / 100); gl.uniform1f(u.warm, s.warm / 100); gl.uniform1f(u.contrast, s.contrast / 100);
@@ -344,6 +461,9 @@ void main(){
         gl.uniform2f(u.eyeL, f.el.x, f.el.y); gl.uniform2f(u.eyeR, f.er.x, f.er.y);
         gl.uniform2f(u.eyeRad, f.ew * .62, f.ew * .30);
         gl.uniform2f(u.faceC, f.cx, f.cy); gl.uniform2f(u.faceR, f.rx * 1.05, f.ry * 1.1);
+        gl.uniform2f(u.eyeCL, f.cl.x, f.cl.y); gl.uniform2f(u.eyeCR, f.cr.x, f.cr.y); gl.uniform1f(u.eyeW, f.ew);
+        gl.uniform2f(u.lipC, f.lc.x, f.lc.y); gl.uniform2f(u.lipRad, f.lrx, Math.max(f.lry, f.lrx * .35));
+        gl.uniform2f(u.chL, f.chl.x, f.chl.y); gl.uniform2f(u.chR, f.chr.x, f.chr.y);
       }
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       this.emit('frame');
@@ -385,6 +505,12 @@ void main(){
 .tc-sl label{display:flex;justify-content:space-between;font-size:17px;color:#4A3A41}
 .tc-sl label small{color:#7D7076;font-size:15px}
 .tc-sl input[type=range]{width:100%;accent-color:#7D5E68;height:30px}
+.tc-g{background:#FBF8F4;border:1.5px solid #DDD2C6;border-radius:18px;padding:0 14px}
+.tc-g>summary{list-style:none;cursor:pointer;padding:13px 0;font-size:18px;color:#4A3A41;display:flex;justify-content:space-between;align-items:center}
+.tc-g>summary::-webkit-details-marker{display:none}
+.tc-g>summary::after{content:"▾";color:#7D5E68}.tc-g[open]>summary::after{content:"▴"}
+.tc-gb{display:flex;flex-direction:column;gap:12px;padding:0 0 14px}
+.tc-lips button{display:inline-flex;align-items:center;gap:8px}.tc-lips i{width:16px;height:16px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.12)}
 .tc-more{border-top:1px solid #EADFDE;padding-top:12px}
 .tc-more>summary{cursor:pointer;font-size:17px;color:#7D5E68;list-style:none}
 .tc-more>summary::-webkit-details-marker{display:none}
@@ -487,20 +613,16 @@ void main(){
   // ---------- Einstellungen ----------
   function panel(tc, el, opts) {
     css(); opts = opts || {};
-    const s = tc.s;
-    const sl = (k, label, min, max, hint) => `<div class="tc-sl"><label for="tc-${k}"><span>${label}</span><small data-v="${k}"></small></label><input id="tc-${k}" type="range" min="${min}" max="${max}" step="1" data-k="${k}"${hint ? ` aria-describedby="tc-${k}-h"` : ''}></div>`;
+    const sl = (k, label, min, max) => `<div class="tc-sl"><label for="tc-${k}"><span>${label}</span><small data-v="${k}"></small></label><input id="tc-${k}" type="range" min="${min}" max="${max}" step="1" data-k="${k}"></div>`;
+    const grp = (id, title, body, open) => `<details class="tc-g" data-grp="${id}"${open ? ' open' : ''}><summary>${title}</summary><div class="tc-gb">${body}</div></details>`;
     el.innerHTML = `<div class="tc-p">
   <label class="tc-sw"><span>✨ Kamera-Look an</span><input type="checkbox" data-on></label>
   <div><h3>Look</h3><div class="tc-chips" data-looks>${Object.keys(LOOKS).map(k => `<button type="button" data-look="${k}">${LOOKS[k].label}</button>`).join('')}</div></div>
-  ${sl('beauty', 'Haut weich', 0, 100)}
-  ${sl('eyes', 'Augenringe aufhellen', 0, 100)}
-  ${sl('blur', 'Hintergrund unscharf', 0, 100)}
-  ${sl('ring', 'Gesicht aufhellen (wie Ringlicht)', 0, 100)}
-  <details class="tc-more"><summary>Mehr Licht-Einstellungen ▾</summary><div class="tc-p">
-    ${sl('light', 'Helligkeit', -50, 50)}
-    ${sl('warm', 'Wärme', -50, 50)}
-    ${sl('contrast', 'Kontrast', -50, 50)}
-  </div></details>
+  ${grp('haut', '🌸 Haut', sl('beauty', 'Haut weich', 0, 100) + sl('eyes', 'Augenringe aufhellen', 0, 100) + sl('ring', 'Glow (Gesicht aufhellen)', 0, 100) + sl('blush', 'Rouge', 0, 100), true)}
+  ${grp('augen', '👁 Augen &amp; Brauen', sl('eyeBright', 'Augen strahlen', 0, 100) + sl('eyeBig', 'Augen etwas größer', 0, 100) + sl('lashes', 'Wimpern betonen', 0, 100) + sl('brows', 'Brauen betonen', 0, 100))}
+  ${grp('lippen', '💋 Lippen', `<div class="tc-chips tc-lips" data-lips>${Object.keys(LIPS).map(k => `<button type="button" data-lipc="${k}"><i style="background:rgb(${LIPS[k][1].map(v => Math.round(v * 255)).join(',')})"></i>${LIPS[k][0]}</button>`).join('')}</div>` + sl('lip', 'Farbe', 0, 100) + sl('lipBig', 'Lippen voller', 0, 100))}
+  ${grp('filter', '🎞 Farbfilter', `<div class="tc-chips" data-filters>${Object.keys(FILTERS).map(k => `<button type="button" data-flt="${k}">${FILTERS[k][0]}</button>`).join('')}</div>` + sl('filterAmt', 'Stärke', 0, 100))}
+  ${grp('licht', '☀️ Hintergrund &amp; Licht', sl('blur', 'Hintergrund unscharf', 0, 100) + sl('light', 'Helligkeit', -50, 50) + sl('warm', 'Wärme', -50, 50) + sl('contrast', 'Kontrast', -50, 50))}
   <div><h3>Hilfe für die Position</h3><div class="tc-chips" data-guides><button type="button" data-g="oval">Kopf-Oval</button><button type="button" data-g="kreuz">Kreuz</button><button type="button" data-g="raster">Raster</button><button type="button" data-g="aus">Aus</button></div></div>
   ${opts.aspect === false ? '' : `<div><h3>Format</h3><div class="tc-chips" data-aspects><button type="button" data-a="16:9">Quer 16:9</button><button type="button" data-a="9:16">Hoch 9:16 (Story, Reel)</button></div></div>`}
   <label class="tc-sw"><span>Vorschau spiegeln <small style="color:#7D7076;font-size:15px">(wie ein Spiegel, die Aufnahme ist richtig herum)</small></span><input type="checkbox" data-mir></label>
@@ -508,22 +630,30 @@ void main(){
 </div>`;
     const q = sel => el.querySelector(sel), qa = sel => el.querySelectorAll(sel);
     function sync() {
-      q('[data-on]').checked = !!tc.s.on;
-      q('[data-mir]').checked = !!tc.s.mirror;
-      qa('[data-k]').forEach(i => { i.value = tc.s[i.dataset.k]; i.disabled = !tc.s.on; const v = q(`[data-v="${i.dataset.k}"]`); const n = +tc.s[i.dataset.k]; v.textContent = i.min < 0 ? (n > 0 ? '+' + n : n) : n + ' %'; });
-      qa('[data-look]').forEach(b => b.setAttribute('aria-pressed', String(tc.s.on && tc.s.look === b.dataset.look)));
-      qa('[data-g]').forEach(b => b.setAttribute('aria-pressed', String(tc.s.guide === b.dataset.g)));
-      qa('[data-a]').forEach(b => b.setAttribute('aria-pressed', String(tc.s.aspect === b.dataset.a)));
+      const s = tc.s;
+      q('[data-on]').checked = !!s.on; q('[data-mir]').checked = !!s.mirror;
+      qa('[data-k]').forEach(i => { const k = i.dataset.k, n = +(s[k] == null ? DEF[k] : s[k]); i.value = n; i.disabled = !s.on; q(`[data-v="${k}"]`).textContent = i.min < 0 ? (n > 0 ? '+' + n : n) : n + ' %'; });
+      qa('[data-look]').forEach(b => b.setAttribute('aria-pressed', String(s.on && s.look === b.dataset.look)));
+      qa('[data-lipc]').forEach(b => b.setAttribute('aria-pressed', String(s.lipColor === b.dataset.lipc)));
+      qa('[data-flt]').forEach(b => b.setAttribute('aria-pressed', String((s.filter || 'none') === b.dataset.flt)));
+      qa('[data-g]').forEach(b => b.setAttribute('aria-pressed', String(s.guide === b.dataset.g)));
+      qa('[data-a]').forEach(b => b.setAttribute('aria-pressed', String(s.aspect === b.dataset.a)));
     }
     q('[data-on]').onchange = e => { tc.set({ on: e.target.checked }); sync(); };
     q('[data-mir]').onchange = e => { tc.set({ mirror: e.target.checked }); sync(); };
     qa('[data-k]').forEach(i => i.addEventListener('input', () => { tc.set({ [i.dataset.k]: +i.value, look: 'eigen' }); sync(); }));
     qa('[data-look]').forEach(b => b.onclick = () => { const L = Object.assign({}, LOOKS[b.dataset.look]); delete L.label; tc.set(Object.assign(L, { on: true, look: b.dataset.look })); sync(); });
+    qa('[data-lipc]').forEach(b => b.onclick = () => { const p = { lipColor: b.dataset.lipc, look: 'eigen' }; if (!(tc.s.lip > 0)) p.lip = 40; tc.set(p); sync(); });
+    qa('[data-flt]').forEach(b => b.onclick = () => { tc.set({ filter: b.dataset.flt, look: 'eigen' }); sync(); });
     qa('[data-g]').forEach(b => b.onclick = () => { tc.set({ guide: b.dataset.g }); sync(); });
     qa('[data-a]').forEach(b => b.onclick = () => { tc.set({ aspect: b.dataset.a }); sync(); });
+    // aufgeklappte Bereiche merken
+    let og = {}; try { og = JSON.parse(localStorage.getItem('mv-talkcam-open') || '{}'); } catch (e) {}
+    qa('[data-grp]').forEach(d => { if (og[d.dataset.grp] != null) d.open = !!og[d.dataset.grp]; d.addEventListener('toggle', () => { og[d.dataset.grp] = d.open; try { localStorage.setItem('mv-talkcam-open', JSON.stringify(og)); } catch (e) {} }); });
     const cmp = q('[data-cmp]');
     const down = e => { e.preventDefault(); tc.compare = true; cmp.classList.add('on'); }, up = () => { tc.compare = false; cmp.classList.remove('on'); };
     cmp.addEventListener('pointerdown', down); ['pointerup', 'pointerleave', 'pointercancel'].forEach(t => cmp.addEventListener(t, up));
+    tc.on(t => { if (t === 'external') sync(); });
     sync();
     return el;
   }
