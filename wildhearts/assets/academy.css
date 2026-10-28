@@ -433,3 +433,12 @@ body.acad .site-top{background:rgba(242,227,222,.93)}
 @media(prefers-reduced-motion:reduce){.ac-mark-bogen{animation:none!important}}
 .ac-kick .ac-mark-bogen.mini{filter:none}
 .acad .ac-kick>.ac-seal,.acad .ac-kick a{display:none}.acad .ac-kick small{margin:0}
+/* Interessentinnen-Liste */
+.liste{display:grid;gap:clamp(1.4rem,3vw,3rem);align-items:start}
+@media(min-width:900px){.liste{grid-template-columns:1fr 1fr}}
+.liste h2{margin:.4rem 0 1rem}.liste .lead{max-width:32em}
+.liste-f{background:rgba(251,248,244,.92);border-radius:28px;padding:clamp(1.2rem,3vw,2rem);display:grid;gap:1rem;box-shadow:0 18px 40px -30px rgba(74,58,65,.45)}
+.liste-f fieldset{border:0;padding:0;margin:0}.liste-f legend{font-size:.88rem;color:var(--muted);margin-bottom:.4rem}
+.liste-t .birds{display:inline-flex;margin-top:1.2rem}
+.acad-cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;background:rgba(251,248,244,.9);border-radius:26px;padding:1.2rem 1.4rem;margin-top:2rem}
+.acad-cta p{margin:0;max-width:34em}

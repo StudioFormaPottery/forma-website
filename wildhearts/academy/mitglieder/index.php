@@ -237,7 +237,7 @@ mvl_head($L('Teacher Training · Mitgliederbereich', 'Teacher Training · Member
   // Countdown
   var cd=document.querySelector('.acm-count'),start=+cd.dataset.start*1000;
   function pad(n){return n<10?'0'+n:''+n}
-  function tick(){var s=Math.max(0,Math.floor((start-Date.now())/1000));var v={d:Math.floor(s/86400),h:pad(Math.floor(s%86400/3600)),m:pad(Math.floor(s%3600/60)),s:pad(s%60)};cd.querySelectorAll('[data-u]').forEach(function(b){b.textContent=v[b.dataset.u]})}
+  function tick(){var s=Math.max(0,Math.floor((start-Date.now())/1000));if(s===0&&!cd.dataset.go){cd.dataset.go=1;cd.querySelector('.acm-cl').innerHTML='<b>Heute geht es los ♡</b> Modul 1 ist für dich offen.'}var v={d:Math.floor(s/86400),h:pad(Math.floor(s%86400/3600)),m:pad(Math.floor(s%3600/60)),s:pad(s%60)};cd.querySelectorAll('[data-u]').forEach(function(b){b.textContent=v[b.dataset.u]})}
   tick();setInterval(tick,1000);
   function api(data){data.lang=en?'en':'de';return fetch('/api/academy.php',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify(data)}).then(function(r){return r.json()})}
   // Notizen

@@ -482,6 +482,8 @@ function ac_tick(PDO $pdo): void
     $f = forma_data_dir() . '/movecia-academy-tick';
     if (is_file($f) && (int)file_get_contents($f) > time() - 600) return;
     @file_put_contents($f, (string)time());
+    try { ac_eb_reminder_run($pdo); } catch (Throwable $e) { error_log('AC EB reminder: ' . $e->getMessage()); }
+    try { ac_waitlist_run($pdo); } catch (Throwable $e) { error_log('AC waitlist: ' . $e->getMessage()); }
     if (!forma_stripe_key()) return;
     $open = $pdo->prepare("SELECT * FROM ac_bookings WHERE status = 'offen' AND stripe_session <> '' AND created_at >= ? ORDER BY id LIMIT 10");
     $open->execute([date('c', time() - 2 * 86400)]);
@@ -492,16 +494,25 @@ function ac_tick(PDO $pdo): void
 /** Spätere Teilzahlungen: Bezahl-Link AC_MAIL_BEFORE Tage vorher, Erinnerung am Fälligkeitstag (jeweils einmal). */
 function ac_due_run(PDO $pdo): void
 {
+    // Vollautomatisch (Vivien, 28.10.2026): Bezahl-Link 10 Tage vorher, Erinnerung am Fälligkeitstag und 3 Tage danach,
+    // Info an Vivien erst, wenn 7 Tage nach Fälligkeit noch nichts da ist.
     $today = date('Y-m-d');
     foreach ($pdo->query("SELECT * FROM ac_bookings WHERE status = 'bezahlt'")->fetchAll() as $r) {
         $parts = ac_parts($r); $changed = false;
         foreach ($parts as &$p) {
             if ($p['paid'] !== '' || $p['due'] === '') continue;
             if ($p['session'] !== '') { try { if (ac_check_part($pdo, $r, (int)$p['n'])) { $changed = false; continue 2; } } catch (Throwable $e) {} }
+            $p += ['remind2' => 0, 'viv' => 0];
             $kind = '';
             if (!$p['mailed'] && $today >= date('Y-m-d', strtotime($p['due'] . ' -' . AC_MAIL_BEFORE . ' days'))) { $p['mailed'] = 1; $kind = 'link'; }
             elseif ($p['mailed'] && !$p['remind'] && $today >= $p['due']) { $p['remind'] = 1; $kind = 'remind'; }
-            if ($kind !== '') { $changed = true; try { ac_mail_due($r, $p, $kind === 'remind'); } catch (Throwable $e) { error_log('AC due mail: ' . $e->getMessage()); } }
+            elseif ($p['remind'] && !$p['remind2'] && $today >= date('Y-m-d', strtotime($p['due'] . ' +3 days'))) { $p['remind2'] = 1; $kind = 'remind'; }
+            elseif ($p['remind2'] && !$p['viv'] && $today >= date('Y-m-d', strtotime($p['due'] . ' +7 days'))) { $p['viv'] = 1; $kind = 'viv'; }
+            if ($kind === 'viv') {
+                $changed = true;
+                $v = "Hallo Viv,\n\n" . $r['name'] . ' (' . $r['email'] . ', ' . $r['phone'] . ') hat die ' . ac_part_label($r, (int)$p['n']) . ' über ' . ac_eur((int)$p['cents']) . ' fürs Teacher Training noch nicht bezahlt (fällig seit ' . ac_d($p['due']) . "). Sie hat den Bezahl-Link und zwei Erinnerungen bekommen.\n\nVielleicht magst du ihr kurz persönlich schreiben: " . forma_site_url() . "/verwaltung/?view=academy\n";
+                try { mm_mail(natal_notify_email_safe(), 'Teacher Training: Zahlung offen · ' . $r['name'], $v, mm_mail_html('Zahlung offen', nl2br(forma_h($v)), 'de')); } catch (Throwable $e) {}
+            } elseif ($kind !== '') { $changed = true; try { ac_mail_due($r, $p, $kind === 'remind'); } catch (Throwable $e) { error_log('AC due mail: ' . $e->getMessage()); } }
             break; // immer nur die nächste offene Zahlung
         }
         unset($p);
@@ -773,6 +784,15 @@ function ac_call_request(PDO $pdo, array $in, string $ipHash): array
     } catch (Throwable $e) {
         if ($pdo->inTransaction()) $pdo->exec('ROLLBACK');
         throw $e;
+    }
+    // Mit Whereby-Schlüssel sofort fix (Vivien, 28.10.2026: keine Handarbeit): Raum anlegen, Bestätigung an sie, Kalender + Gastgeberinnen-Link an Vivien
+    if (mm_whereby_key() !== '') {
+        ac_call_confirm($pdo, $id);
+        $c = ac_call($pdo, $id);
+        $v = "Hallo Viv,\n\nneues Kennenlerngespräch zum Teacher Training, schon fix eingetragen:\n\n" . ac_call_when($c) . "\n" . $name . ' · ' . $email . ($phone !== '' ? ' · ' . $phone : '') . ($note !== '' ? "\n\nIhre Nachricht: " . $note : '')
+            . "\n\nDein Gastgeberinnen-Link: " . ($c['host_url'] ?: $c['room_url']) . "\nIm Gespräch kannst du ihr in der Verwaltung mit „✦ Angebot zeigen“ den Early-Bird-Preis für 30 Minuten freischalten: " . forma_site_url() . "/verwaltung/?view=academy#gespraeche\n";
+        try { mm_mail(natal_notify_email_safe(), 'Kennenlerngespräch Teacher Training: ' . $name . ' · ' . ac_call_when($c), $v, mm_mail_html('Kennenlerngespräch', nl2br(forma_h($v)), 'de'), [['Kennenlerngespraech.ics', ac_call_ics($c, true), 'text/calendar']]); } catch (Throwable $e) { error_log('AC call viv: ' . $e->getMessage()); }
+        return ['ok' => true, 'fixed' => true, 'when' => ac_call_when($c)];
     }
     $c = ac_call($pdo, $id);
     $first = forma_first_name($name);
@@ -1107,4 +1127,186 @@ function ac_birds(): string
 {
     $b = fn(string $cls, string $tr) => '<svg class="bird ' . $cls . '" viewBox="0 0 40 30" style="' . $tr . '" aria-hidden="true"><path d="M8 18c3-6 10-8 16-5 2-4 6-6 10-5-2 1-3 3-3 5 1 6-5 11-13 11-6 0-10-2-12-6z" fill="currentColor" opacity=".92"/><path class="wing" d="M14 16c2-6 7-9 12-8-2 4-5 7-12 8z" fill="#F2ECE4" opacity=".75"/><circle cx="30" cy="11" r="1.1" fill="#2E2529"/><path d="M34 11.5l3 .6-3 1" fill="none" stroke="#E8B48F" stroke-width="1.4" stroke-linecap="round"/><path d="M14 27l-2 2M18 28l-1 2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>';
     return '<span class="birds" aria-hidden="true">' . $b('b1', '') . $b('b2', '') . $b('b3', '') . '</span>';
+}
+
+
+// --- Interessentinnen-Liste Teacher Training (Vivien, 28.10.2026) -----------------------------------
+// Anmeldung über api/wh-subscribe.php (source academy, Double-Opt-in, mm_subscribers.academy_at/practice),
+// auch Warteliste, wenn alle Plätze vergeben sind. Nur Deutsch.
+
+function ac_interest_list(PDO $pdo): array
+{
+    mm_schema($pdo);
+    return $pdo->query("SELECT * FROM mm_subscribers WHERE academy_at <> '' AND status = 'bestaetigt' ORDER BY academy_at DESC")->fetchAll();
+}
+
+function ac_interest_unsub(array $sub): string { return mm_site() . '/api/wh-unsubscribe.php?t=' . $sub['token'] . '&de=1'; }
+
+function ac_interest_confirm_mail(array $sub, string $link): bool
+{
+    $first = forma_first_name((string)$sub['name']) ?: 'meine Liebe';
+    $r = ['lang' => 'de', 'test' => 0];
+    $blocks = ["Hallo $first,", 'schön, dass du dich für das Movecia Mindful Movement Teacher Training interessierst! Bitte bestätige noch kurz deine E-Mail-Adresse, dann schicke ich dir gleich alle Infos zur Ausbildung.', 'Falls du dich nicht eingetragen hast, ignorier diese Mail einfach.'];
+    return mm_mail((string)$sub['email'], 'Bitte bestätige deine E-Mail fürs Teacher Training 🌿', ac_mail_text($blocks, $link, 'Ja, ich bestätige meine E-Mail', '', false),
+        ac_mail_html($r, 'nur noch ein Klick ♡', 'Teacher Training 2027', $blocks, $link, 'Ja, ich bestätige meine E-Mail', ''), [], 'Vivien · Movecia Academy');
+}
+
+/** Infomail nach der Bestätigung: was dich erwartet, Preise vom Server, Link zum Buchen und zum Kennenlerngespräch. */
+function ac_interest_info_blocks(array $sub): array
+{
+    $c = ac_cfg();
+    $full = ac_free(forma_db()) <= 0;
+    $first = forma_first_name((string)$sub['name']) ?: 'meine Liebe';
+    return [
+        "Hallo $first,",
+        $full ? 'danke, dass du dich auf die Warteliste fürs Teacher Training 2027 gesetzt hast. Gerade sind alle zehn Plätze vergeben. Wird ein Platz frei, erfährst du es als Erste.' : 'wie schön, dass du dich für das Movecia Mindful Movement Teacher Training interessierst! Hier ist alles, was du wissen musst, ganz in Ruhe zum Nachlesen.',
+        ['h' => 'Was dich erwartet'],
+        ['Eine Ausbildung mit ' . AC_HOURS . ' Stunden, inklusive vollständiger 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum', 'Somatic Movement, Breathwork und Meditation, ganz viel Anatomie und Body Scanning, achtsame Berührung und Rituale', 'Mental Load und Nervensystem, und wie du Stunden hältst, ohne deine eigene Energie zu verbrennen', 'Deine Selbstständigkeit: faire Preise, sichtbar werden, mit meiner persönlichen Hilfe', '11 Monate hybrid ab ' . mv_date($c['start_ts']) . ', wöchentlicher Live-Call, Coworking und Lerngruppen, ein Präsenzwochenende in den Tiroler Alpen', 'Ausschließlich auf Deutsch, online aus Österreich, Deutschland, der Schweiz und Südtirol'],
+        ['h' => 'Preis'],
+        ['box' => $c['eb'] ? ['Early Bird bis ' . mv_date($c['eb_end']) . ': ' . ac_eur($c['eb_total']), 'danach ' . ac_eur($c['r_total']), 'bei der Buchung 50 % Anzahlung, den Rest auf einmal oder in Teilen bis 15. September 2027, ohne Aufschlag'] : [ac_eur($c['r_total']), 'bei der Buchung 50 % Anzahlung, den Rest bis 15. September 2027']],
+        'Es gibt nur zehn Plätze, und die Ausbildung findet nur alle zwei Jahre statt. Wenn du magst, lernen wir uns vorher in einem kostenlosen Gespräch kennen (30 Minuten, online). Den Link findest du auf der Seite.',
+        'Ich freu mich, von dir zu hören.',
+    ];
+}
+
+function ac_interest_info_mail(array $sub): bool
+{
+    $r = ['lang' => 'de', 'test' => 0];
+    $blocks = ac_interest_info_blocks($sub);
+    $link = mm_site() . '/academy/teacher-training/#buchen';
+    $legal = 'Du bekommst diese E-Mail, weil du dich auf moveciamovement.com für das Teacher Training eingetragen hast. Abmelden: ' . ac_interest_unsub($sub);
+    return mm_mail((string)$sub['email'], 'Teacher Training 2027: alle Infos für dich 🌿', ac_mail_text($blocks, $link, 'Zur Ausbildung', $legal, false),
+        ac_mail_html($r, 'schön, dass du da bist ♡', 'Movecia Mindful Movement Teacher Training', $blocks, $link, 'Zur Ausbildung & zum Kennenlerngespräch', $legal), [], 'Vivien · Movecia Academy');
+}
+
+/** „Noch 2 Wochen Early Bird“ (Vivien, 28.10.2026): am 17.3.2027 um 10:00 Wien, an bestätigte Interessentinnen ohne Buchung, genau einmal. */
+function ac_eb_reminder_at(): int { $c = ac_cfg_raw(); return mv_ts(date('Y-m-d', strtotime($c['eb_until'] . ' -14 days')), '10:00'); }
+
+function ac_eb_reminder_blocks(array $sub): array
+{
+    $c = ac_cfg();
+    $first = forma_first_name((string)$sub['name']) ?: 'meine Liebe';
+    return [
+        "Hallo $first,",
+        'nur eine kleine Erinnerung, ganz ohne Druck: Der Early-Bird-Preis fürs Teacher Training 2027 gilt noch zwei Wochen, bis ' . mv_date($c['eb_end']) . '.',
+        ['box' => ['Early Bird: ' . ac_eur($c['eb_total']) . ' (bis ' . mv_date($c['eb_end']) . ')', 'danach: ' . ac_eur($c['r_total']), 'bei der Buchung 50 % Anzahlung, den Rest bis 15. September 2027, ohne Aufschlag']],
+        'Es gibt nur zehn Plätze, und die nächste Runde startet erst wieder in zwei Jahren. Wenn du noch Fragen hast, buch dir gern ein kostenloses Kennenlerngespräch, dann reden wir in Ruhe darüber.',
+        'Alles Liebe, und egal wie du dich entscheidest: Schön, dass du da bist.',
+    ];
+}
+
+function ac_eb_reminder_mail(array $sub): bool
+{
+    $r = ['lang' => 'de', 'test' => 0];
+    $blocks = ac_eb_reminder_blocks($sub);
+    $link = mm_site() . '/academy/teacher-training/#buchen';
+    $legal = 'Du bekommst diese E-Mail, weil du dich auf moveciamovement.com für das Teacher Training eingetragen hast. Abmelden: ' . ac_interest_unsub($sub);
+    return mm_mail((string)$sub['email'], 'Noch 2 Wochen Early Bird fürs Teacher Training 🕊', ac_mail_text($blocks, $link, 'Platz sichern', $legal, false),
+        ac_mail_html($r, 'noch zwei Wochen ♡', 'Noch 2 Wochen Early Bird', $blocks, $link, 'Platz sichern', $legal), [], 'Vivien · Movecia Academy');
+}
+
+function ac_eb_reminder_run(PDO $pdo): void
+{
+    $c = ac_cfg();
+    if (time() < ac_eb_reminder_at() || !$c['eb']) return;
+    $st = mm_cfg('academy-mails') ?? [];
+    if (!empty($st['eb2w_done'])) return;
+    $sent = $st['eb2w'] ?? [];
+    $booked = array_map('strtolower', $pdo->query("SELECT email FROM ac_bookings WHERE status = 'bezahlt'")->fetchAll(PDO::FETCH_COLUMN));
+    $n = 0;
+    foreach (ac_interest_list($pdo) as $sub) {
+        if (in_array((int)$sub['id'], $sent, true) || in_array(strtolower((string)$sub['email']), $booked, true)) continue;
+        if ($n++ >= 40) break; // gedrosselt, Rest beim nächsten Durchlauf
+        $sent[] = (int)$sub['id'];
+        mm_save_cfg('academy-mails', ['eb2w' => $sent] + $st); // vor dem Versand merken: nie doppelt
+        try { ac_eb_reminder_mail($sub); } catch (Throwable $e) { error_log('AC EB mail: ' . $e->getMessage()); }
+    }
+    if ($n < 40) mm_save_cfg('academy-mails', ['eb2w' => $sent, 'eb2w_done' => date('c')] + $st);
+}
+
+
+/** Kalenderdatei fürs Kennenlerngespräch (für Vivien mit Gastgeberinnen-Link). */
+function ac_call_ics(array $c, bool $host = false): string
+{
+    $tz = new DateTimeZone('Europe/Vienna');
+    $f = fn(DateTime $d) => (clone $d)->setTimezone(new DateTimeZone('UTC'))->format('Ymd\THis\Z');
+    $esc = fn(string $v) => str_replace(["\\", ';', ',', "\n"], ['\\\\', '\;', '\\,', '\\n'], $v);
+    $from = new DateTime($c['date'] . ' ' . $c['slot'], $tz);
+    $to = (clone $from)->modify('+' . AC_CALL_MINUTES . ' minutes');
+    $where = $host ? ((string)$c['host_url'] ?: (string)$c['room_url']) : (string)$c['room_url'];
+    $sum = $host ? 'Kennenlerngespräch Teacher Training: ' . $c['name'] : 'Kennenlerngespräch mit Vivien (Movecia Academy)';
+    return "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Movecia//Academy//DE\r\nMETHOD:PUBLISH\r\nBEGIN:VEVENT\r\nUID:ac-call-{$c['id']}@moveciamovement.com\r\nDTSTAMP:" . $f(new DateTime('now', $tz))
+        . "\r\nDTSTART:" . $f($from) . "\r\nDTEND:" . $f($to) . "\r\nSUMMARY:" . $esc($sum) . "\r\nLOCATION:" . $esc($where ?: 'Online per Video')
+        . "\r\nDESCRIPTION:" . $esc(($host ? $c['email'] . ($c['phone'] !== '' ? ' · ' . $c['phone'] : '') . ($c['note'] !== '' ? ' · ' . $c['note'] : '') . ' · ' : '') . 'Videoraum: ' . ($where ?: 'Link per E-Mail')) . "\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n";
+}
+
+/** Warteliste automatisch (Vivien, 28.10.2026): War die Ausbildung voll und wird wieder ein Platz frei, bekommen alle Interessentinnen ohne Buchung eine Mail. */
+function ac_waitlist_run(PDO $pdo): void
+{
+    $st = mm_cfg('academy-mails') ?? [];
+    $free = ac_free($pdo);
+    if ($free <= 0) { if (empty($st['was_full'])) mm_save_cfg('academy-mails', ['was_full' => date('c')] + $st); return; }
+    if (empty($st['was_full'])) return;
+    unset($st['was_full']);
+    mm_save_cfg('academy-mails', $st + ['wait_sent' => date('c')]);
+    $booked = array_map('strtolower', $pdo->query("SELECT email FROM ac_bookings WHERE status IN ('bezahlt','offen')")->fetchAll(PDO::FETCH_COLUMN));
+    $r = ['lang' => 'de', 'test' => 0];
+    $link = mm_site() . '/academy/teacher-training/#buchen';
+    foreach (ac_interest_list($pdo) as $sub) {
+        if (in_array(strtolower((string)$sub['email']), $booked, true)) continue;
+        $first = forma_first_name((string)$sub['name']) ?: 'meine Liebe';
+        $blocks = ["Hallo $first,", 'gute Nachrichten: Im Teacher Training 2027 ist gerade wieder ein Platz frei geworden. Du stehst auf meiner Warteliste, deshalb erfährst du es als Erste.', 'Wer zuerst bucht, bekommt den Platz. Wenn du noch Fragen hast, schreib mir einfach.'];
+        $legal = 'Du bekommst diese E-Mail, weil du auf der Warteliste fürs Teacher Training stehst. Abmelden: ' . ac_interest_unsub($sub);
+        try { mm_mail((string)$sub['email'], 'Ein Platz im Teacher Training ist frei geworden 🕊', ac_mail_text($blocks, $link, 'Platz sichern', $legal, false), ac_mail_html($r, 'ein Platz ist frei ♡', 'Teacher Training 2027', $blocks, $link, 'Platz sichern', $legal), [], 'Vivien · Movecia Academy'); } catch (Throwable $e) {}
+    }
+}
+
+
+// --- Stornieren mit Erstattung (Vivien, 28.10.2026: Buchhaltung lückenlos) ------------------------------
+// Vorschlag nach der Storno-Staffel; Erstattung über Stripe je Zahlung (neueste zuerst), je erstatteter Zahlung eine
+// Stornorechnung im gemeinsamen Nummernkreis (forma_invoice_storno, in einer Transaktion, Google-Tabelle). Platz wird frei,
+// die Warteliste bekommt automatisch Bescheid (ac_waitlist_run).
+
+/** Erstattungsvorschlag in Cent nach der Storno-Staffel (Stand heute). */
+function ac_storno_suggest(array $r): array
+{
+    $c = ac_cfg();
+    $paid = ac_paid_cents($r); $total = (int)$r['total_cents'];
+    $today = date('Y-m-d');
+    if (time() <= ac_withdraw_until($r)) return [$paid, 'Rücktritt innerhalb von 14 Tagen: alles zurück'];
+    if ($today <= $c['storno1']) { $fee = (int)round($total * .25); return [max(0, $paid - $fee), 'Storno bis ' . ac_d($c['storno1']) . ': Gebühr 25 % (' . ac_eur($fee) . ')']; }
+    if ($today <= $c['due_final']) { $fee = (int)round($total * .5); return [max(0, $paid - $fee), 'Storno bis ' . ac_d($c['due_final']) . ': Gebühr 50 % (' . ac_eur($fee) . ')']; }
+    return [0, 'Storno nach dem ' . ac_d($c['due_final']) . ': keine Erstattung'];
+}
+
+function ac_cancel(PDO $pdo, array $r, int $refund): string
+{
+    if ($r['status'] !== 'bezahlt') return 'Diese Buchung ist nicht aktiv.';
+    $refund = max(0, min($refund, ac_paid_cents($r)));
+    $left = $refund; $done = 0;
+    require_once __DIR__ . '/invoices.php';
+    $pays = $pdo->prepare('SELECT * FROM ac_payments WHERE booking_id = ? ORDER BY id DESC');
+    $pays->execute([$r['id']]);
+    $parts = ac_parts($r);
+    foreach ($pays->fetchAll() as $pay) {
+        if ($left <= 0) break;
+        $amt = min($left, (int)$pay['cents']);
+        $pi = '';
+        foreach ($parts as $pt) if ((int)$pt['n'] === (int)$pay['n']) $pi = (string)$pt['ref'];
+        if ($pi === '') continue;
+        try {
+            forma_stripe('POST', '/v1/refunds', ['payment_intent' => $pi, 'amount' => $amt, 'reason' => 'requested_by_customer', 'metadata' => ['academy_booking' => (string)$r['id']]]);
+        } catch (Throwable $e) { error_log('AC refund: ' . $e->getMessage()); return 'Die Erstattung bei Stripe hat nicht geklappt (' . $e->getMessage() . '). Es wurde nichts storniert.'; }
+        $was = $GLOBALS['FORMA_TEST'] ?? null;
+        if ((int)$r['test'] === 1) $GLOBALS['FORMA_TEST'] = true;
+        if (empty($GLOBALS['FORMA_TEST'])) forma_invoice_storno($pdo, 'ac_tt', (int)$pay['id'], $amt);
+        $GLOBALS['FORMA_TEST'] = $was;
+        $left -= $amt; $done += $amt;
+    }
+    $pdo->prepare("UPDATE ac_bookings SET status = 'storniert' WHERE id = ?")->execute([$r['id']]);
+    $first = forma_first_name((string)$r['name']);
+    $blocks = ["Hallo $first,", 'deine Buchung fürs Teacher Training 2027 ist storniert.' . ($done > 0 ? ' ' . ac_eur($done) . ' bekommst du über deine Karte zurück, das dauert meist ein paar Tage. Die Stornorechnung schicke ich dir in einer eigenen E-Mail.' : ''), 'Danke dir für dein Vertrauen. Wenn du später doch dabei sein möchtest, bist du jederzeit herzlich willkommen.'];
+    try { mm_mail((string)$r['email'], ((int)$r['test'] ? '[TEST] ' : '') . 'Deine Stornierung · Teacher Training', ac_mail_text($blocks, '', '', '', false), ac_mail_html($r, 'alles Gute ♡', 'Deine Stornierung', $blocks, '', '', ''), [], 'Vivien · Movecia Academy'); } catch (Throwable $e) {}
+    try { ac_waitlist_run($pdo); } catch (Throwable $e) {}
+    return 'Storniert. ' . ($done > 0 ? ac_eur($done) . ' werden erstattet, die Stornorechnung ist verschickt.' : 'Keine Erstattung.');
 }

@@ -238,7 +238,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   <div class="callbox rv">
     <div>
       <p class="k"><span class="de">Wunschtermin wählen</span><span class="en">Choose a time</span></p>
-      <p class="mut" style="margin-top:.4rem;font-size:.95rem"><span class="de">Mittwoch, Donnerstag und Freitag um 8:00 Uhr, Mittwoch und Donnerstag auch um 18:30 Uhr. Ich bestätige dir den Termin per E-Mail.</span><span class="en">Wednesday, Thursday and Friday at 8:00 am, and Wednesday and Thursday at 6:30 pm too (Vienna time). I will confirm the time by email.</span></p>
+      <p class="mut" style="margin-top:.4rem;font-size:.95rem"><span class="de">Mittwoch, Donnerstag und Freitag um 8:00 Uhr, Mittwoch und Donnerstag auch um 18:30 Uhr. <?= mm_whereby_key() !== '' ? 'Du bekommst sofort die Bestätigung mit dem Link zum Videoraum.' : 'Ich bestätige dir den Termin per E-Mail.' ?></span><span class="en">Wednesday, Thursday and Friday at 8:00 am, and Wednesday and Thursday at 6:30 pm too (Vienna time). I will confirm the time by email.</span></p>
       <div class="slots" id="slots" role="group" aria-label="Termine">
         <?php foreach (array_slice($slots, 0, 24) as $s): $t = strtotime($s['date']); ?>
         <button type="button" class="slot" data-d="<?= $s['date'] ?>" data-s="<?= $s['slot'] ?>" aria-pressed="false"><span class="de"><?= $wdDe[(int)date('N', $t)] ?>, <?= date('j', $t) ?>. <?= $mDe[(int)date('n', $t)] ?></span><span class="en"><?= date('D j M', $t) ?></span><small><span class="de"><?= $s['slot'] ?> Uhr</span><span class="en"><?= date('g:i a', strtotime('2000-01-01 ' . $s['slot'])) ?></span></small></button>
@@ -253,11 +253,33 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
       <label class="f"><span><span class="de">Was möchtest du mich fragen? (freiwillig)</span><span class="en">What would you like to ask me? (optional)</span></span><textarea name="note" maxlength="600"></textarea></label>
       <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <p class="mut" style="font-size:.82rem"><span class="de">Deine Angaben nutze ich nur für unser Gespräch, mehr dazu im <a href="/terms/#datenschutz">Datenschutz</a>.</span><span class="en">I only use your details for our call; see the <a href="/terms/#datenschutz">privacy notice</a>.</span></p>
-      <div><button class="btn" type="submit" id="cb"><span class="de">Termin anfragen</span><span class="en">Request this time</span></button></div>
+      <div><button class="btn" type="submit" id="cb"><?= mm_whereby_key() !== '' ? 'Termin buchen' : 'Termin anfragen' ?></button></div>
       <p class="err" id="ce" hidden></p>
       <div class="okmsg" id="co" hidden></div>
     </form>
   </div>
+</div></section>
+
+<section class="w sec tint t2" id="liste"><div class="in liste">
+  <div class="liste-t rv">
+    <p class="k"><?= $free ? 'Noch nicht so weit?' : 'Ausgebucht' ?></p>
+    <h2><?= $free ? 'Setz deinen Namen <em>auf die Liste</em>' : 'Trag dich auf die <em>Warteliste</em> ein' ?></h2>
+    <p class="lead"><?= $free ? 'Du spürst, dass dich die Ausbildung ruft, aber du möchtest noch in Ruhe überlegen? Trag dich ein, dann schicke ich dir alle Infos und sag dir rechtzeitig Bescheid, bevor der Early-Bird-Preis endet.' : 'Gerade sind alle zehn Plätze vergeben. Trag dich ein, dann erfährst du als Erste, wenn ein Platz frei wird, und bist bei der nächsten Runde ganz vorne dabei.' ?></p>
+    <?= ac_birds() ?>
+  </div>
+  <form class="form liste-f rv" id="lf" novalidate>
+    <?php if (isset($_GET['liste'])): ?><div class="okmsg">Danke, deine E-Mail ist bestätigt ♡ Die Infos sind schon in deinem Postfach.</div><?php endif; ?>
+    <label class="f"><span>Vorname</span><input type="text" name="name" autocomplete="given-name" required maxlength="60"></label>
+    <label class="f"><span>E-Mail</span><input type="email" name="email" autocomplete="email" required maxlength="160"></label>
+    <fieldset><legend>Wie lange praktizierst du schon? (freiwillig)</legend>
+      <div class="prc"><?php foreach ($pr as $k => [$de, $en]): ?><label><input type="radio" name="practice" value="<?= $k ?>"><span><?= $de ?></span></label><?php endforeach; ?></div>
+    </fieldset>
+    <label class="chk"><input type="checkbox" name="consent" value="1"><span>Ja, schick mir Infos zum Teacher Training per E-Mail. Abmelden geht jederzeit mit einem Klick (<a href="/terms/#datenschutz">Datenschutz</a>).</span></label>
+    <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div><button class="btn" type="submit" id="lb"><?= $free ? 'Auf die Liste setzen' : 'Auf die Warteliste' ?></button></div>
+    <p class="err" id="le" hidden></p>
+    <div class="okmsg" id="lo" hidden>Fast geschafft: Ich habe dir gerade eine E-Mail geschickt. Bitte bestätige kurz deine Adresse, dann kommen alle Infos.</div>
+  </form>
 </div></section>
 
 <section class="w sec" id="buchen"><div class="in">
@@ -305,7 +327,8 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
       <?php if (isset($_GET['abbruch'])): ?><p class="note"><span class="de">Die Zahlung wurde abgebrochen, es wurde nichts abgebucht.</span><span class="en">The payment was cancelled; nothing was charged.</span></p><?php endif; ?>
       <?php else: ?>
       <p class="k"><span class="de">Ausgebucht</span><span class="en">Fully booked</span></p>
-      <p><span class="de">Alle Plätze sind vergeben. Schreib mir gern an <a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a>, dann melde ich mich, wenn ein Platz frei wird.</span><span class="en">All places are taken. Write to me at <a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a> and I'll let you know if a place opens up.</span></p>
+      <p>Alle zehn Plätze sind vergeben. Trag dich auf die Warteliste ein, dann erfährst du als Erste, wenn ein Platz frei wird.</p>
+      <p><a class="btn" href="#liste">Auf die Warteliste</a></p>
       <?php endif; ?>
     </form>
   </div>
@@ -347,7 +370,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
     if(cf.name.value.trim().length<2||cf.email.value.indexOf('@')<1){ce.textContent=en?'Please enter your name and email.':'Bitte gib deinen Namen und deine E-Mail an.';ce.hidden=false;return}
     var d=Object.fromEntries(new FormData(cf));d.action='call';d.date=pick.dataset.d;d.slot=pick.dataset.s;d.lang=L();d.t=T;cb.disabled=true;
     try{var r=await fetch('/api/academy.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});var j=await r.json();
-      if(j.ok){cf.querySelectorAll('label,button').forEach(function(x){x.hidden=true});co.textContent=(en?'Thank you! Your preferred time: ':'Danke! Dein Wunschtermin: ')+j.when+(en?'. I will confirm it by email shortly.':'. Ich bestätige ihn dir in Kürze per E-Mail.');co.hidden=false;pick.disabled=true;return}
+      if(j.ok){cf.querySelectorAll('label,button').forEach(function(x){x.hidden=true});co.textContent=j.fixed?('Wunderbar, unser Gespräch ist fix: '+j.when+'. Die Bestätigung mit dem Link zum Videoraum ist schon in deinem Postfach ♡'):('Danke! Dein Wunschtermin: '+j.when+'. Ich bestätige ihn dir in Kürze per E-Mail.');co.hidden=false;pick.disabled=true;return}
       ce.textContent=j.error||'…';ce.hidden=false}catch(x){ce.textContent=en?'Something went wrong. Please try again.':'Das hat gerade nicht geklappt. Bitte versuch es noch einmal.';ce.hidden=false}
     cb.disabled=false});
   var bf=document.getElementById('bf'),be=document.getElementById('be'),bb=document.getElementById('bb');
@@ -362,6 +385,15 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
     try{var r=await fetch('/api/academy.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});var j=await r.json();
       if(j.url){location.href=j.url;return}be.textContent=j.error||'…';be.hidden=false}catch(x){be.textContent=en?'Something went wrong. Please try again.':'Das hat gerade nicht geklappt. Bitte versuch es noch einmal.';be.hidden=false}
     bb.disabled=false});
+})();
+</script>
+<script>
+(function(){var f=document.getElementById('lf');if(!f)return;var t0=Date.now();
+f.addEventListener('submit',function(e){e.preventDefault();var b=document.getElementById('lb'),er=document.getElementById('le'),ok=document.getElementById('lo');er.hidden=true;
+ var d={name:f.name.value.trim(),email:f.email.value.trim(),practice:(f.querySelector('[name=practice]:checked')||{}).value||'',consent:f.consent.checked?1:0,website:f.website.value,elapsed:Date.now()-t0,source:'academy',lang:'de'};
+ b.disabled=true;fetch('/api/wh-subscribe.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(function(r){return r.json()}).then(function(j){b.disabled=false;
+  if(j.ok){ok.hidden=false;if(j.already)ok.textContent='Du bist schon auf der Liste ♡ Ich habe dir die Infos gerade noch einmal geschickt.';f.querySelectorAll('label.f,fieldset,label.chk').forEach(function(x){x.style.display='none'});b.parentNode.style.display='none'}
+  else{er.textContent=j.error||'Das hat nicht geklappt. Bitte versuch es noch einmal.';er.hidden=false}}).catch(function(){b.disabled=false;er.textContent='Bitte prüf deine Verbindung.';er.hidden=false})});
 })();
 </script>
 </body>

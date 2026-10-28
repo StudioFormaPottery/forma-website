@@ -73,6 +73,7 @@ mvl_head('Movecia Academy · Yogalehrerausbildung auf Deutsch, Tirol & online', 
       </div>
     </div>
   </div>
+  <div class="acad-cta rv"><p><b>Noch nicht so weit?</b> Setz deinen Namen auf die Liste, dann bekommst du alle Infos zum Teacher Training und eine Erinnerung, bevor der Early-Bird-Preis endet.</p><a class="btn line" href="/academy/teacher-training/#liste">Auf die Liste setzen</a></div>
 </div></section>
 
 <section class="band"><span class="band-blob b1" aria-hidden="true"></span><span class="band-blob b2" aria-hidden="true"></span><div class="w"><div class="in">

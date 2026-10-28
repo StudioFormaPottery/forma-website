@@ -14,6 +14,15 @@ if ($action === 'mm_ac_offer') {
     try { $link = ac_offer_start($pdo, (int)($_POST['id'] ?? 0)); $_SESSION['ac_offer_link'] = $link; go($acBack . '#gespraeche', 'Das Angebot läuft jetzt ' . AC_OFFER_MINUTES . ' Minuten. Schick ihr den Link unten im Chat des Videoraums.'); }
     catch (Throwable $e) { go($acBack . '#gespraeche', $e->getMessage()); }
 }
+if ($action === 'mm_popup_mode') {
+    mm_save_cfg('popup', ['mode' => ($_POST['mode'] ?? '') === 'off' ? 'off' : 'auto']);
+    go($self . '?view=movecia', ($_POST['mode'] ?? '') === 'off' ? 'Das Pop-up auf der Startseite ist aus.' : 'Das Pop-up zeigt automatisch das nächste Angebot.');
+}
+if ($action === 'mm_ac_cancel') {
+    $r = ac_booking($pdo, (int)($_POST['id'] ?? 0));
+    $cents = (int)round((float)str_replace(',', '.', (string)($_POST['refund'] ?? '0')) * 100);
+    go($acBack, $r ? ac_cancel($pdo, $r, $cents) : 'Buchung nicht gefunden.');
+}
 if ($action === 'mm_ac_check') {
     foreach ($pdo->query("SELECT * FROM ac_bookings WHERE status IN ('offen','bezahlt')")->fetchAll() as $r) {
         foreach (ac_parts($r) as $pt) if ($pt['paid'] === '' && $pt['session'] !== '') { try { ac_check_part($pdo, $r, (int)$pt['n']); } catch (Throwable $e) {} }
@@ -31,6 +40,28 @@ if ($action === 'mm_ac_seen') {
     go($acBack . '#chat', 'Als erledigt markiert.');
 }
 
+if ($view === 'academy' && isset($_GET['csv'])) {
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="teacher-training-interessentinnen-' . date('Y-m-d') . '.csv"');
+    $o = fopen('php://output', 'w');
+    fwrite($o, "\xEF\xBB\xBF");
+    fputcsv($o, ['Vorname', 'E-Mail', 'Praxis', 'eingetragen', 'gebucht'], ';');
+    $bk = array_map('strtolower', $pdo->query("SELECT email FROM ac_bookings WHERE status = 'bezahlt'")->fetchAll(PDO::FETCH_COLUMN));
+    foreach (ac_interest_list($pdo) as $x) fputcsv($o, [$x['name'], $x['email'], ac_practice_label((string)$x['practice']), date('d.m.Y', strtotime((string)$x['academy_at'])), in_array(strtolower((string)$x['email']), $bk, true) ? 'ja' : 'nein'], ';');
+    exit;
+}
+if ($view === 'academy' && isset($_GET['mail'])) {
+    // Mail-Vorschau (Vivien will Mails immer erst sehen): Infomail Liste, „Noch 2 Wochen Early Bird“, Konfetti-Mail
+    $demo = ['name' => 'Lena', 'email' => 'lena@example.com', 'token' => str_repeat('0', 32), 'lang' => 'de', 'test' => 0];
+    $r = ['lang' => 'de', 'test' => 0];
+    $link = mm_site() . '/academy/teacher-training/#buchen';
+    $legal = 'Du bekommst diese E-Mail, weil du dich auf moveciamovement.com für das Teacher Training eingetragen hast. Abmelden: …';
+    $m = (string)$_GET['mail'];
+    if ($m === 'eb2w') echo ac_mail_html($r, 'noch zwei Wochen ♡', 'Noch 2 Wochen Early Bird', ac_eb_reminder_blocks($demo), $link, 'Platz sichern', $legal);
+    elseif ($m === 'konfetti') { $b = ac_demo_booking(); echo ac_mail_html($b, 'willkommen in der Academy ♡', 'Dein Platz ist dir sicher', ac_welcome_blocks($pdo, $b, 'FO-2026-016'), '#', 'Passwort festlegen & loslegen', ac_legal($b), true); }
+    else echo ac_mail_html($r, 'schön, dass du da bist ♡', 'Movecia Mindful Movement Teacher Training', ac_interest_info_blocks($demo), $link, 'Zur Ausbildung & zum Kennenlerngespräch', $legal);
+    exit;
+}
 if ($view === 'academy') {
     try { ac_tick($pdo); } catch (Throwable $e) {}
     $c = ac_cfg();
@@ -51,7 +82,9 @@ if ($view === 'academy') {
     usort($chats, fn($a, $b) => [$b['open'], $b['at']] <=> [$a['open'], $a['at']]);
     $openChats = count(array_filter($chats, fn($x) => $x['open']));
     $offerLink = (string)($_SESSION['ac_offer_link'] ?? ''); unset($_SESSION['ac_offer_link']);
-    render_page('Academy · Teacher Training', function () use ($self, $flash, $c, $rows, $paidN, $free, $calls, $offerLink, $chats, $openChats) {
+    $interest = ac_interest_list($pdo);
+    $ebAt = ac_eb_reminder_at(); $ebSt = mm_cfg('academy-mails') ?? [];
+    render_page('Academy · Teacher Training', function () use ($self, $flash, $c, $rows, $paidN, $free, $calls, $offerLink, $chats, $openChats, $interest, $ebAt, $ebSt) {
         $csrf = '<input type="hidden" name="csrf" value="' . forma_h(csrf()) . '">';
         $d = fn(string $ymd) => date('j.n.Y', strtotime($ymd)); ?>
 <style>
@@ -118,10 +151,25 @@ details.why{margin-top:6px;font-size:16px;color:#4A3A41}details.why summary{curs
     <span><span class="nm"><?= forma_h($r['name']) ?></span><span class="sm"><?= date('d.m.Y', strtotime((string)($r['paid_at'] ?: $r['created_at']))) ?> · <?= forma_h($r['email']) ?> · <?= forma_h($r['phone']) ?> · <?= forma_h(ac_plan_label((string)$r['plan'])) ?></span></span>
     <span><?= $r['status'] === 'bezahlt' ? '<span class="tag ok">Platz sicher</span>' : '<span class="tag open">Zahlung offen</span>' ?><?= (int)$r['eb'] ? '<span class="tag eb">Early-Bird</span>' : '' ?><?= (int)$r['test'] ? '<span class="tag test">Test</span>' : '' ?></span>
     <div class="money"><div>bezahlt<b><?= mv_eur($paid) ?></b></div><div>offen<b><?= mv_eur((int)$r['total_cents'] - $paid) ?></b></div><div>nächste Zahlung<b><?= $next ? ($next['due'] === '' ? 'jetzt' : $d($next['due'])) . ' · ' . mv_eur((int)$next['cents']) : '✓ alles bezahlt' ?></b></div></div>
-    <details class="why"><summary>Fragebogen &amp; Zahlungsplan</summary>Praxis: <?= forma_h(ac_practice_label((string)$r['practice'])) ?><?= $r['practice_note'] !== '' ? '<br>' . nl2br(forma_h($r['practice_note'])) : '' ?><br><br>Warum: <?= nl2br(forma_h($r['why'])) ?><br><br><?= implode('<br>', array_map('forma_h', ac_parts_lines($r))) ?><?php if ($r['status'] === 'bezahlt' && $next): ?><br><br>Bezahl-Link für sie: <span class="sel"><?= forma_h(ac_pay_link($r)) ?></span><?php endif; ?></details>
+    <details class="why"><summary>Fragebogen &amp; Zahlungsplan</summary>Praxis: <?= forma_h(ac_practice_label((string)$r['practice'])) ?><?= $r['practice_note'] !== '' ? '<br>' . nl2br(forma_h($r['practice_note'])) : '' ?><br><br>Warum: <?= nl2br(forma_h($r['why'])) ?><br><br><?= implode('<br>', array_map('forma_h', ac_parts_lines($r))) ?><?php if ($r['status'] === 'bezahlt' && $next): ?><br><br>Bezahl-Link für sie: <span class="sel"><?= forma_h(ac_pay_link($r)) ?></span><?php endif; ?>
+    <?php if ($r['status'] === 'bezahlt'): [$sug, $why] = ac_storno_suggest($r); ?>
+    <form method="post" style="margin-top:14px;padding-top:12px;border-top:1px dashed #DDD2C6" onsubmit="return confirm('Buchung wirklich stornieren? Der Betrag wird über Stripe erstattet und eine Stornorechnung verschickt.')"><?= $csrf ?><input type="hidden" name="action" value="mm_ac_cancel"><input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
+      <b>Stornieren</b> · Vorschlag: <?= forma_h($why) ?><br>Erstatten (€): <input name="refund" value="<?= number_format($sug / 100, 2, ',', '') ?>" style="width:120px;font-size:17px"> <button class="btn btn-ghost" type="submit">Stornieren &amp; erstatten</button></form>
+    <?php endif; ?></details>
   </div>
   <?php endforeach; ?>
   <form method="post" style="margin-top:10px"><?= $csrf ?><input type="hidden" name="action" value="mm_ac_check"><button class="btn btn-ghost" type="submit">Zahlungen bei Stripe prüfen</button></form>
+</div>
+
+<h2 id="liste">💌 Interessentinnen<?= $free ? '' : ' &amp; Warteliste' ?> <span class="tag eb"><?= count($interest) ?></span></h2>
+<div class="card">
+  <p style="font-size:18px;margin-top:0">Frauen, die sich auf der Seite „auf die Liste“ gesetzt und ihre E-Mail bestätigt haben<?= $free ? '' : ' (alle Plätze vergeben: das ist jetzt die Warteliste)' ?>.</p>
+  <?php foreach (array_slice($interest, 0, 30) as $x): ?>
+  <div class="ac-row"><span><span class="nm"><?= forma_h($x['name']) ?></span><span class="sm"><?= forma_h($x['email']) ?> · <?= forma_h(ac_practice_label((string)$x['practice'])) ?> · seit <?= date('j.n.Y', strtotime((string)$x['academy_at'])) ?></span></span></div>
+  <?php endforeach; ?>
+  <?php if (!$interest): ?><p class="muted">Noch niemand auf der Liste.</p><?php endif; ?>
+  <p style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px"><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=academy&amp;csv=1">CSV herunterladen</a><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=academy&amp;mail=info" target="_blank">Infomail ansehen</a><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=academy&amp;mail=eb2w" target="_blank">„Noch 2 Wochen Early Bird“ ansehen</a><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=academy&amp;mail=konfetti" target="_blank">Konfetti-Mail ansehen</a></p>
+  <p class="muted small">„Noch 2 Wochen Early Bird“ geht automatisch am <?= date('j.n.Y', $ebAt) ?> um <?= date('H:i', $ebAt) ?> Uhr an alle auf der Liste, die noch nicht gebucht haben (einmal).<?= !empty($ebSt['eb2w_done']) ? ' ✓ Verschickt am ' . date('j.n.Y', strtotime($ebSt['eb2w_done'])) . ' an ' . count($ebSt['eb2w'] ?? []) . ' Frauen.' : '' ?></p>
 </div>
 
 <h2 id="gespraeche">Kennenlerngespräche</h2>
