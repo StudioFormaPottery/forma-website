@@ -6,6 +6,7 @@ header('Cache-Control: no-store');
 $pdo = forma_db();
 $sub = mm_sub_by_token($pdo, (string)($_GET['t'] ?? ''));
 if (!$sub) mm_page('hmm…', 'Link not found', 'This link no longer works. Simply sign up again on moveciamovement.com, it only takes a moment.', '/', 'Back to moveciamovement.com');
+if ($sub && $sub['source'] === 'teacher') $sub['source'] = 'academy'; // frühere Teaser-Seite /teacher-training/ → Academy-Liste
 if ($sub['status'] !== 'bestaetigt') {
     $u = $pdo->prepare("UPDATE mm_subscribers SET status = 'bestaetigt', confirmed_at = ? WHERE id = ? AND status <> 'bestaetigt'");
     $u->execute([date('c'), $sub['id']]);

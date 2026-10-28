@@ -3,7 +3,7 @@
 Vivien will maximale Sichtbarkeit, damit Frauen Method, Unfold und Prä-/Postnatal buchen.
 Geplante Aufgaben: Montag, Mittwoch, Freitag. Profil (seit 28.10.2026): „Movecia · Mindful Movement“, pinterest.at/moveciamovement
 (hello@moveciamovement.com), verknüpft mit FORMA und Frida & Knox: in Chrome oben rechts Pfeil neben dem Profilbild → Movecia wählen.
-Profil eingerichtet (Profilbild `img/movecia/movecia-profilbild-1080.png`, Kurzinfo, Website, Impressum-Link /terms/), alle 6 Pinnwände angelegt, dazu „Mindful Movement Teacher Training“ (Vivien, 28.10.2026: Teaser posten, Start November 2027, Ausbildung in Yoga, Somatic Movement und Bodyweight, insgesamt 550 Stunden – beim Teacher Training NIE „Pilates“ nennen; Link auf die Hauptseite, bis /teacher-training/ o. Ä. live ist, dann Pins dorthin verlinken).
+Profil eingerichtet (Profilbild `img/movecia/movecia-profilbild-1080.png`, Kurzinfo, Website, Impressum-Link /terms/), alle 6 Pinnwände angelegt, dazu „Mindful Movement Teacher Training“ (Vivien, 28.10.2026: Teaser posten, Start November 2027, Ausbildung in Yoga, Somatic Movement und Bodyweight, insgesamt 550 Stunden – beim Teacher Training NIE „Pilates“ nennen; Link auf moveciamovement.com/teacher-training/ mit Warteliste).
 Ist Movecia nicht im Menü: nichts anlegen, Vivien Bescheid geben und den fertigen Pin als Bild schicken.
 
 Veröffentlichen am einfachsten (seit 28.10.2026): https://at.pinterest.com/pin-creation-tool/ → Datei-Upload mit dem Pin aus dem Repo
@@ -28,6 +28,7 @@ Yoga für müde Tage · Mental Load & Selbstfürsorge für Mamas · Schwangersch
    | Breathwork-Übung | https://moveciamovement.com/method/ | Breathwork & Atemübungen |
    | Yoga/Somatic-Übung für müde Tage | https://moveciamovement.com/method/ | Yoga für müde Tage |
    | Journaling-Frage | https://moveciamovement.com/unfold/ | Journaling-Fragen |
+   | Teacher Training (Start Nov. 2027, 550 Std., Warteliste; nie Pilates, keine Preise) | https://moveciamovement.com/teacher-training/ | Mindful Movement Teacher Training |
    Preise immer live aus `api/method-lib.php` (`mv_cfg_raw`), abgelaufene Early-Birds nie nennen, Gathering-Preise nie.
    Nur echte Übungen mit gängigen Namen (Katze-Kuh, Kindhaltung, Glute Bridge, Box Breathing …).
 3. Pin bauen (Look automatisch wie Website und Wochenbilder, siehe `tools/movecia-week/README.md` „Look“): JSON wie ein Wochen-Post plus `file` = `img/pins/movecia/<datum>-<thema>.jpg`, lokalen Server starten

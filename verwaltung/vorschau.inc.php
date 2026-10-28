@@ -112,7 +112,7 @@ body{background:#F2ECE4}h1,h2{color:#6B5658}
         $tile($site . '/academy/teacher-training/#liste', '💌', 'Interessentinnen-Liste', 'Formular „Setz deinen Namen auf die Liste“ (bei ausgebucht: Warteliste)');
         $tile($site . '/?popup=method', '🪟', 'Pop-up Startseite · Method', 'Bis 1.12.2026 automatisch');
         $tile($site . '/?popup=unfold', '🪟', 'Pop-up Startseite · Unfold', 'Bis 10.1.2027 automatisch');
-        $tile($site . '/?popup=academy', '🪟', 'Pop-up Startseite · Teacher Training', 'Danach automatisch');
+        $tile($site . '/?popup=teacher', '🪟', 'Pop-up Startseite · Teacher Training', 'Danach automatisch');
         $tile($self . '?view=academy#chat', '💬', 'Chat beantworten', 'Nachrichten der Teilnehmerinnen in der Verwaltung', false);
 ?>
 </div></section>

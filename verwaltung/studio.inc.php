@@ -37,13 +37,40 @@ if ($action === 'mm_looks_get' || $action === 'mm_looks_set') {
 if ($view === 'studio') {
     require_once dirname(__DIR__) . '/api/method-lib.php';
     mv_schema($pdo);
-    try { require_once dirname(__DIR__) . '/api/academy-lib.php'; ac_schema($pdo); } catch (Throwable $e) {} // legt das Academy-Willkommensvideo an
+    // Teacher-Training-Willkommensvideo (Vivien, 28.10.2026: „gleich mitfilmen, fertig bis 8. November“). Gleicher Schlüssel
+    // 'academy:welcome' wie im Academy-Entwurf (ac_welcome_lesson findet die Lektion dann). Nur Deutsch: die Ausbildung ist auf Deutsch.
+    try {
+        if (!$pdo->query("SELECT 1 FROM mv_lessons WHERE ukey = 'academy:welcome'")->fetchColumn()) {
+            $acPid = (int)($pdo->query("SELECT id FROM mv_programs WHERE audience = 'academy' ORDER BY id LIMIT 1")->fetchColumn() ?: 0);
+            if (!$acPid) {
+                $pdo->prepare("INSERT INTO mv_programs (audience, title_de, title_en, intro_de, intro_en, theme, sort, visible, created_at) VALUES ('academy', 'Teacher Training · vor dem Start', 'Teacher Training · before we begin', '', '', 'academy', 0, 1, ?)")->execute([date('c')]);
+                $acPid = (int)$pdo->lastInsertId();
+            }
+            $acScript = <<<'TXT'
+Hallo, meine Liebe, und herzlich willkommen im Movecia Mindful Movement Teacher Training. Ich freue mich so sehr, dass du hier bist, und ich möchte dir in diesen paar Minuten erzählen, warum mir diese Ausbildung so am Herzen liegt und was dich in den nächsten Monaten erwartet.
+
+Als ich selbst meine ersten Ausbildungen gemacht habe, war ich oft beeindruckt von dem vielen Wissen, aber ich habe mich auch oft ein bisschen verloren gefühlt. Es ging viel um Haltungen, um Abläufe und um Programme, und viel zu wenig um den Menschen, der vor einem auf der Matte liegt. Genau das wollte ich anders machen. Deshalb gibt es diese Ausbildung nur alle zwei Jahre und nur mit zehn Plätzen, damit ich jede von euch wirklich sehen und begleiten kann.
+
+Du bekommst bei mir eine vollständige 200-Stunden-Yogalehrerausbildung nach dem internationalen Curriculum, und dazu alles, was ich mir selbst immer gewünscht habe: Somatic Movement, Breathwork und Meditation, achtsame Berührung und Rituale, ganz viel Anatomie und Body Scanning, und das Wissen darüber, was Mental Load mit unserem Nervensystem macht. Und weil so viele von uns irgendwann ihre eigenen Stunden geben möchten, begleite ich dich auch beim Schritt in die Selbstständigkeit, ganz persönlich.
+
+Bis zu unserem Start am dritten November 2027 ist noch ein bisschen Zeit, und das ist gut so. Oben siehst du den Countdown, und ich lade dich ein, diese Zeit bewusst zu nutzen. In deinen Notizen kannst du alles festhalten, was dir einfällt: deine Fragen, deine Wünsche, deine Intentionen für dieses Jahr. Die Notizen gehören nur dir, niemand sonst kann sie lesen.
+
+Und wenn dich etwas beschäftigt, schreib mir einfach im Chat. Die Nachricht landet direkt bei mir, und ich antworte dir persönlich. Es gibt keine Frage, die zu klein ist.
+
+Bald findest du hier auch dein erstes Workbook, „Schön, dass du da bist“. Darin setzen wir gemeinsam deine Intentionen, und du bekommst ein paar Affirmationen, die dich bis zum Start begleiten.
+
+Ich danke dir von Herzen für dein Vertrauen. Mach es dir bis dahin schön, beweg dich, atme, und dann sehen wir uns am dritten November. Ich freue mich riesig auf dich.
+TXT;
+            $pdo->prepare("INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, visible, created_at, script_de, script_en, ukey, due) VALUES (?,?,?,?,?,'talk','any',4,0,1,?,?,'','academy:welcome','2026-11-08')")
+                ->execute([$acPid, 'Willkommen im Teacher Training', 'Welcome to the Teacher Training', 'Mein Willkommen an dich, bevor wir starten.', 'My welcome to you before we begin.', date('c'), $acScript]);
+        }
+    } catch (Throwable $e) { error_log('Studio academy welcome: ' . $e->getMessage()); }
     $talks = [];
-    foreach (['academy' => 'Academy', 'method' => 'Method', 'unfold' => 'Unfold', 'natal' => 'Prä- & Postnatal'] as $aud => $an) {
+    foreach (['academy' => 'Teacher Training', 'method' => 'Method', 'unfold' => 'Unfold', 'natal' => 'Prä- & Postnatal'] as $aud => $an) {
         foreach (mv_programs($pdo, $aud) as $p) foreach (mv_lessons($pdo, (int)$p['id']) as $l) {
             if (mv_lesson_is_clips($l)) continue;
             $talks[] = ['id' => (int)$l['id'], 'g' => $an, 't' => (string)$l['title_de'], 'te' => (string)($l['title_en'] ?: $l['title_de']),
-                'de' => (string)$l['script_de'], 'en' => (string)$l['script_en'], 'vde' => $l['video_de'] !== '', 'ven' => $l['video_en'] !== '' || $aud === 'academy', /* Academy nur Deutsch */ 'due' => (string)$l['due'],
+                'de' => (string)$l['script_de'], 'en' => (string)$l['script_en'], 'vde' => $l['video_de'] !== '', 'ven' => $aud === 'academy' ? $l['video_de'] !== '' : $l['video_en'] !== '', 'due' => (string)$l['due'],
                 'k' => ['breath' => 'Atem-Video', 'meditation' => 'Meditation'][$l['cat']] ?? 'Talking Head'];
         }
     }
@@ -71,7 +98,7 @@ if ($view === 'studio') {
     $dShort = fn(string $d) => $d === '' ? '' : $wd[(int)date('w', strtotime($d))] . ' ' . date('j.n.', strtotime($d));
     $queue = [];
     foreach ($talks as $t) $queue[] = ['v' => (string)$t['id'], 'ok' => $t['vde'] && $t['ven'], 'due' => $t['due'], 'ico' => '🗣', 'k' => $t['k'], 'n' => $t['t'],
-        'x' => $t['vde'] && $t['ven'] ? '' : ($t['vde'] ? ' (Englisch fehlt)' : ($t['ven'] ? ' (Deutsch fehlt)' : ' (DE + EN)')), 'g' => $t['g']];
+        'x' => $t['vde'] && $t['ven'] ? '' : ($t['g'] === 'Teacher Training' ? ' (nur Deutsch)' : ($t['vde'] ? ' (Englisch fehlt)' : ($t['ven'] ? ' (Deutsch fehlt)' : ' (DE + EN)'))), 'g' => $t['g']];
     foreach ($moves as $m) $queue[] = ['v' => 'c' . $m['id'], 'ok' => $m['ok'], 'due' => $m['due'], 'ico' => '🧘', 'k' => $m['k'], 'n' => $m['n'],
         'x' => $m['for'] ? ' · für ' . $m['for'][0] . (count($m['for']) > 1 ? ' +' . (count($m['for']) - 1) : '') : '', 'g' => ''];
     // Academy-Willkommensvideo ganz oben, solange es fehlt (Vivien, 28.10.2026)

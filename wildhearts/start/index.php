@@ -158,8 +158,8 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
   </div>
 </div></section>
 </main>
-<?php require_once __DIR__ . '/../assets/popup.inc.php'; try { echo mv_popup($pdo, isset($_GET['popup']) ? (string)$_GET['popup'] : null); } catch (Throwable $e) { error_log('MV popup: ' . $e->getMessage()); } ?>
 <?php mvl_foot(); ?>
+<?php require_once __DIR__ . '/../assets/next-popup.inc.php'; mv_next_popup(); ?>
 <?php require_once dirname(__DIR__, 2) . '/api/mm-pt.inc.php';
 $ptChips = function (string $name, array $map, string $type = 'checkbox') { foreach ($map as $k => [$de, $en]) echo '<label class="ptc"><input type="' . $type . '" name="' . $name . '[]" value="' . $k . '"><span><span class="de">' . htmlspecialchars($de) . '</span><span class="en">' . htmlspecialchars($en) . '</span></span></label>'; }; ?>
 <!-- 1:1 Personal Training anfragen (Vivien, 26.10.2026): Formular statt E-Mail, landet in der Verwaltung -->

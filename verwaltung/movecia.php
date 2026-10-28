@@ -312,7 +312,7 @@ if ($view === 'movecia') {
         $subs = $pdo->query("SELECT * FROM mm_subscribers ORDER BY created_at DESC")->fetchAll();
         $subOk = count(array_filter($subs, fn($x) => $x['status'] === 'bestaetigt'));
         $subOpen = count(array_filter($subs, fn($x) => $x['status'] === 'offen'));
-        $srcName = ['reset' => 'Reset Routine', 'circle' => 'Interesse Inner Circle', 'mentoring' => 'Interesse Mentoring', 'year' => 'Interesse Jahreskreis', 'retreat' => 'Interesse Alpine Retreat', 'unfold' => 'Interesse Unfold', 'link' => 'Link in Bio'];
+        $srcName = ['reset' => 'Reset Routine', 'circle' => 'Interesse Inner Circle', 'mentoring' => 'Interesse Mentoring', 'year' => 'Interesse Jahreskreis', 'retreat' => 'Interesse Alpine Retreat', 'unfold' => 'Interesse Unfold', 'teacher' => 'Interesse Teacher Training', 'academy' => 'Interesse Teacher Training', 'link' => 'Link in Bio'];
         $live = $next ? mm_live_count($pdo, (int)$next['id']) : 0;
         $joinedAll = (int)$pdo->query('SELECT COUNT(*) FROM mm_signups WHERE joined_at IS NOT NULL')->fetchColumn();
         $d = $edit ?: ['id' => 0, 'title' => 'Wild Hearts Gathering', 'starts_at' => '', 'minutes' => 30, 'description' => '', 'script' => ''];
@@ -380,11 +380,11 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         <a href="<?= forma_h($self . $nw['link']) ?>" style="display:flex;gap:12px;align-items:flex-start;margin:12px 0;padding:14px 18px;border-radius:20px;border:1.5px dashed #C9B0B8;background:#FBF8F4;color:#4A3A41;text-decoration:none"><span style="font-size:22px">✨</span><span><b style="font-size:17px"><?= forma_h($nw['title']) ?></b><br><span style="font-size:15px;color:#7D7076"><?= forma_h($nw['text']) ?> →</span></span></a>
         <?php endforeach; ?>
         <?php $acOpenM = 0; try { require_once dirname(__DIR__) . '/api/academy-lib.php'; $acOpenM = ac_unanswered($pdo); } catch (Throwable $e) {} ?>
-        <?php if ($part === ''): require_once dirname(__DIR__) . '/wildhearts/assets/popup.inc.php'; $puMode = (string)((mm_cfg('popup') ?? [])['mode'] ?? 'auto'); $puNow = ['method' => 'The Method', 'unfold' => 'Unfold', 'academy' => 'Teacher Training', '' => 'nichts'][mv_popup_state()] ?? ''; ?>
+        <?php if ($part === ''): require_once dirname(__DIR__) . '/api/method-lib.php'; require_once dirname(__DIR__) . '/wildhearts/assets/next-popup.inc.php'; $puMode = (string)((mm_cfg('popup') ?? [])['mode'] ?? 'auto'); $puNow = ['method' => 'The Method', 'unfold' => 'Unfold', 'teacher' => 'Teacher Training', '' => 'nichts'][mv_next_popup_phase()] ?? ''; ?>
         <form method="post" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0;padding:14px 18px;border-radius:20px;background:#FBF8F4;border:1px solid #E6DCD2;font-size:17px"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_popup_mode">
           <span>🪟 <b>Pop-up auf der Startseite</b>: <?= $puMode === 'off' ? 'aus' : 'automatisch, zeigt gerade <b>' . forma_h($puNow) . '</b>' ?></span>
           <button class="btn btn-ghost" name="mode" value="<?= $puMode === 'off' ? 'auto' : 'off' ?>" type="submit"><?= $puMode === 'off' ? 'Wieder automatisch' : 'Ausschalten' ?></button>
-          <a href="<?= forma_h(mm_site()) ?>/?popup=method" target="_blank" rel="noopener">Method</a> · <a href="<?= forma_h(mm_site()) ?>/?popup=unfold" target="_blank" rel="noopener">Unfold</a> · <a href="<?= forma_h(mm_site()) ?>/?popup=academy" target="_blank" rel="noopener">Teacher Training</a> ansehen
+          <a href="<?= forma_h(mm_site()) ?>/?popup=method" target="_blank" rel="noopener">Method</a> · <a href="<?= forma_h(mm_site()) ?>/?popup=unfold" target="_blank" rel="noopener">Unfold</a> · <a href="<?= forma_h(mm_site()) ?>/?popup=teacher" target="_blank" rel="noopener">Teacher Training</a> ansehen
         </form>
         <?php endif; ?>
         <?php if ($acOpenM): ?><a class="card notice" style="display:flex;gap:12px;align-items:center;font-size:18px;text-decoration:none;color:inherit;background:#EADFDE;border-radius:20px;padding:16px 18px;margin:12px 0" href="<?= forma_h($self) ?>?view=academy#chat"><span style="font-size:28px">💬</span><span><strong><?= $acOpenM === 1 ? '1 neue Nachricht' : $acOpenM . ' neue Nachrichten' ?> im Teacher Training</strong><br><span class="muted small">Antworten →</span></span></a><?php endif; ?>

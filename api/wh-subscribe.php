@@ -13,7 +13,8 @@ $in = json_decode((string)file_get_contents('php://input'), true);
 if (!is_array($in)) $in = $_POST;
 $name = trim((string)($in['name'] ?? ''));
 $email = strtolower(trim((string)($in['email'] ?? '')));
-$source = in_array($in['source'] ?? '', ['reset', 'circle', 'mentoring', 'year', 'retreat', 'unfold', 'academy'], true) ? $in['source'] : 'link';
+$source = in_array($in['source'] ?? '', ['reset', 'circle', 'mentoring', 'year', 'retreat', 'unfold', 'academy', 'teacher'], true) ? $in['source'] : 'link';
+if ($source === 'teacher') $source = 'academy'; // alte Teaser-Seite /teacher-training/ → Academy-Liste
 $lang = ($in['lang'] ?? '') === 'de' || $source === 'academy' ? 'de' : 'en'; // Teacher Training nur Deutsch
 $practice = in_array($in['practice'] ?? '', ['lt1', '1to2', 'gt2', 'teach'], true) ? (string)$in['practice'] : '';
 $de = $lang === 'de';
@@ -44,7 +45,9 @@ if ($sub && $sub['status'] === 'bestaetigt' && $source === 'academy') {
 if ($sub && $sub['status'] === 'bestaetigt') {
     if ($sub['source'] !== $source && $source !== 'link') $pdo->prepare('UPDATE mm_subscribers SET source = ? WHERE id = ?')->execute([$source, $sub['id']]);
     // schon dabei: Willkommensmail (bzw. Unfold-Infos) einfach noch einmal schicken
-    if ($source === 'unfold') { $sub['lang'] = $lang; mm_mail_unfold_info($sub); mm_notify_interest($sub, 'unfold'); } else mm_mail_welcome($sub);
+    if ($source === 'unfold') { $sub['lang'] = $lang; mm_mail_unfold_info($sub); mm_notify_interest($sub, 'unfold'); }
+    elseif ($source === 'teacher') { $sub['lang'] = $lang; $sub['source'] = 'teacher'; mm_mail_teacher_info($sub); mm_notify_interest($sub, 'teacher'); mm_ml_push($pdo, $sub); }
+    else mm_mail_welcome($sub);
     $out(['ok' => true, 'already' => true]);
 }
 if ($sub) {

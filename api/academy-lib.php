@@ -1137,7 +1137,7 @@ function ac_birds(): string
 function ac_interest_list(PDO $pdo): array
 {
     mm_schema($pdo);
-    return $pdo->query("SELECT * FROM mm_subscribers WHERE academy_at <> '' AND status = 'bestaetigt' ORDER BY academy_at DESC")->fetchAll();
+    return $pdo->query("SELECT * FROM mm_subscribers WHERE (academy_at <> '' OR source = 'teacher') AND status = 'bestaetigt' ORDER BY COALESCE(NULLIF(academy_at, ''), confirmed_at, created_at) DESC")->fetchAll();
 }
 
 function ac_interest_unsub(array $sub): string { return mm_site() . '/api/wh-unsubscribe.php?t=' . $sub['token'] . '&de=1'; }
