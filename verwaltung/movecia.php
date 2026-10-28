@@ -361,7 +361,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         <?php endif; ?>
         <?php mm_subnav($part ?: 'movecia'); ?>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
-        <?php foreach (FORMA_ADMIN_NEWS as $nw): if (date('Y-m-d') > $nw['until'] || ($nw['b'] ?? 'forma') !== 'movecia') continue; ?>
+        <?php foreach (FORMA_ADMIN_NEWS as $nw): if ($part !== '' || date('Y-m-d') > $nw['until'] || ($nw['b'] ?? 'forma') !== 'movecia') continue; ?>
         <a href="<?= forma_h($self . $nw['link']) ?>" style="display:flex;gap:12px;align-items:flex-start;margin:12px 0;padding:14px 18px;border-radius:20px;border:1.5px dashed #C9B0B8;background:#FBF8F4;color:#4A3A41;text-decoration:none"><span style="font-size:22px">✨</span><span><b style="font-size:17px"><?= forma_h($nw['title']) ?></b><br><span style="font-size:15px;color:#7D7076"><?= forma_h($nw['text']) ?> →</span></span></a>
         <?php endforeach; ?>
 <style>
