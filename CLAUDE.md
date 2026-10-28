@@ -451,3 +451,8 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Kamera: Handys rechnen in 1280; Hintergrund-Erkennung je nach Geräteleistung nur jedes 2./3. Bild, abwechselnd mit der Gesichtserkennung; zu langsame Geräte werden in den ersten Sekunden einmalig auf 1280 gesetzt.
 - Instagram täglich: Monatskalender (Punkte ⭕/🎬 je Eintrag, Farbe = offen/aufgenommen/gepostet), Tag antippen → Einträge + „＋ Story“/„＋ Reel“ → fertige Texte aus `verwaltung/insta-skripte.json` (DE/EN, nach Art gefiltert, „schon verwendet“) → „Nehmen & aufnehmen“ legt den Eintrag an und öffnet das Studio mit dem Text. Neue fertige Texte dort ergänzen (frei formuliert DE + EN).
 - Movecia-Verwaltung: `main{zoom:1.12}` nur ab 900 px (am Handy verursachte es seitliches Scrollen).
+
+## Meine Looks / Meine Filter speichern (Vivien, 28.10.2026: „Filter-Speicheroption“)
+- Kamera-Look (`talkcam.js` Panel, beide Profile): Box „💛 Meine Looks“ unter den Looks: „＋ So wie jetzt speichern“ → Name → antippen übernimmt, × löscht, gleicher Name = aktualisieren. Gespeichert werden nur die Look-Werte (Haut, Augen, Lippen, Farbfilter, Licht, Hintergrund), nicht Format/Hilfslinien/Spiegeln. `look` = `mine:<Name>`.
+- Bearbeiten (`studio-edit.js`, Licht & Farbe): „💛 Meine Filter“ genauso für ex/con/wm/sat/sh/hi.
+- Speicherort: Server (`settings`-Tabelle, Schlüssel `studio_looks_cam|move|edit`, Aktionen `mm_looks_get/set` in `studio.inc.php`), damit Handy und Computer gleich sind; Kopie in localStorage. Außerhalb der Verwaltung (`TalkCam.store` null) nur localStorage.

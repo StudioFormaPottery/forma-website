@@ -6,6 +6,34 @@
 // ?view=studio[&l=ID][&lang=de|en]. Ohne Lektion: eigener Text (z. B. tägliche Story), Format 9:16 wählbar.
 declare(strict_types=1);
 
+// „💛 Meine Looks“ (Vivien, 28.10.2026: „Filter speichern“): eigene Kamera-Looks / Bearbeiten-Filter auf dem Server,
+// damit sie am Handy und am Computer (beide Domains) gleich da sind. slot: cam (Talking Head), move (Übungen), edit (Bearbeiten).
+if ($action === 'mm_looks_get' || $action === 'mm_looks_set') {
+    header('Content-Type: application/json; charset=utf-8');
+    $slot = in_array($_POST['slot'] ?? '', ['cam', 'move', 'edit'], true) ? (string)$_POST['slot'] : 'cam';
+    $key = 'studio_looks_' . $slot;
+    if ($action === 'mm_looks_set') {
+        $in = json_decode((string)($_POST['list'] ?? '[]'), true);
+        $clean = [];
+        foreach (is_array($in) ? array_slice($in, 0, 40) : [] as $x) {
+            if (!is_array($x) || !is_array($x['s'] ?? null)) continue;
+            $n = trim(mb_substr(strip_tags((string)($x['n'] ?? '')), 0, 40));
+            if ($n === '') continue;
+            $v = [];
+            foreach ($x['s'] as $k => $val) {
+                if (!preg_match('/^[a-zA-Z]{1,20}$/', (string)$k)) continue;
+                if (is_int($val) || is_float($val) || is_bool($val) || (is_string($val) && preg_match('/^[a-z0-9:.]{0,16}$/', $val))) $v[$k] = $val;
+            }
+            $clean[] = ['n' => $n, 's' => $v];
+        }
+        forma_set_setting($pdo, $key, json_encode($clean, JSON_UNESCAPED_UNICODE));
+        echo json_encode(['ok' => 1, 'list' => $clean], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    echo json_encode(['list' => json_decode(forma_setting($pdo, $key) ?? '[]', true) ?: []], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 if ($view === 'studio') {
     require_once dirname(__DIR__) . '/api/method-lib.php';
     mv_schema($pdo);
@@ -449,8 +477,8 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   <button type="button" data-sheet="more">⚙️ Mehr</button>
 </nav>
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
-<script src="/wildhearts/assets/talkcam.js?v=3"></script>
-<script src="studio-edit.js?v=4"></script>
+<script src="/wildhearts/assets/talkcam.js?v=4"></script>
+<script src="studio-edit.js?v=5"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
@@ -462,6 +490,9 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   const csrf=<?= json_encode(csrf()) ?>, BUNNY=<?= $bunny ? 'true' : 'false' ?>;
   const $=id=>document.getElementById(id), esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   function post(a,d){const f=new FormData();f.append('csrf',csrf);f.append('action',a);for(const k in d)f.append(k,d[k]);return fetch(location.pathname,{method:'POST',body:f,credentials:'same-origin'}).then(r=>r.json())}
+  // „💛 Meine Looks“ auf dem Server (gleich auf Handy und Computer), auch für „Bearbeiten“ (Slot edit)
+  const looksStore={get:slot=>post('mm_looks_get',{slot}).then(j=>j.list||[]),set:(slot,list)=>post('mm_looks_set',{slot,list:JSON.stringify(list)}).then(j=>{if(!j.ok)throw 0;return j.list})};
+  if(window.TalkCam)TalkCam.store=looksStore;
   let clipm=false, cs=null, clips=[];
   let lang=<?= json_encode($lang) ?>, cur=null, tgt=null, tc=null, raw=null, rec=null, chunks=[], blob=null, saved=true, t0=0, tick=0, lock=null;
   const ls={get:(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
@@ -654,7 +685,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     if(typeof StudioEdit==='undefined'){$('msg').textContent='Der Bearbeiten-Baustein konnte nicht laden. Bitte Seite neu laden (vorher herunterladen!).';return}
     document.body.classList.add('editing');$('edWrap').hidden=false;$('edInfo').textContent=info||'';window.scrollTo({top:0,behavior:'smooth'});
     const back=()=>{document.body.classList.remove('editing');$('edWrap').hidden=true;edOpen=null};
-    edOpen=StudioEdit.open({blob:b,dur:dur,mount:$('ed'),musicHint:musicHint(),seed:(cur&&cur.id)||(ig&&ig.id)||Date.now(),onDone:(nb,inf)=>{back();done(nb,inf)},onCancel:back});}
+    edOpen=StudioEdit.open({store:looksStore,blob:b,dur:dur,mount:$('ed'),musicHint:musicHint(),seed:(cur&&cur.id)||(ig&&ig.id)||Date.now(),onDone:(nb,inf)=>{back();done(nb,inf)},onCancel:back});}
   function setBlob(nb,suffix){blob=nb;saved=false;const url=URL.createObjectURL(nb);$('play').src=url;const ext=nb.type.includes('mp4')?'mp4':'webm';
     $('dl').href=url;$('dl').download=String($('dl').download||'Video').replace(/(_bearbeitet)?\.\w+$/,'')+(suffix||'')+'.'+ext;$('prog').hidden=true;showAfter();}
   $('edit').onclick=()=>{if(!blob)return;const d=$('play').duration;

@@ -53,6 +53,12 @@
     if (move) { FACE_KEYS.forEach(k => s[k] = 0); if (s.guide === 'oval') s.guide = 'raster'; }
     return s;
   }
+  // Eigene Looks („Meine Looks“, Vivien 28.10.2026: „Filter speichern“). Standard: im Browser;
+  // die Verwaltung ersetzt TalkCam.store durch den Server, dann gelten sie auf allen Geräten.
+  const LOOK_KEYS = ['beauty', 'eyes', 'blur', 'light', 'ring', 'warm', 'contrast', 'blush', 'eyeBig', 'eyeBright', 'lashes', 'brows', 'lipColor', 'lip', 'lipBig', 'filter', 'filterAmt'];
+  const LOOK_KEYS_MOVE = ['blur', 'light', 'warm', 'contrast', 'filter', 'filterAmt'];
+  const mineLs = { get(slot) { try { return JSON.parse(localStorage.getItem('mv-talkcam-mine-' + slot) || '[]'); } catch (e) { return []; } }, set(slot, l) { try { localStorage.setItem('mv-talkcam-mine-' + slot, JSON.stringify(l)); } catch (e) {} } };
+  const defaultStore = { get: slot => Promise.resolve(mineLs.get(slot)), set: (slot, l) => Promise.resolve(l) };
   function save(s, profile) { try { localStorage.setItem(KEY + (profile === 'move' ? '-move' : ''), JSON.stringify(s)); } catch (e) {} }
   // Glätten ohne Nachziehen (One-Euro-Filter): ruhig, wenn du still bist, sofort mit, wenn du dich bewegst
   class OneEuro {
@@ -557,6 +563,16 @@ void main(){
 .tc-chips{display:flex;flex-wrap:wrap;gap:8px}
 .tc-chips button{font:inherit;font-size:17px;padding:10px 16px;border-radius:999px;border:1.5px solid #DDD2C6;background:#FBF8F4;color:#4A3A41;cursor:pointer;min-height:46px}
 .tc-chips button[aria-pressed=true]{background:#7D5E68;border-color:#7D5E68;color:#fff}
+.tc-mine{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:18px;background:#FBF1F0;border:1.5px solid #F0DCDA}
+.tc-mine .tc-chips button.tc-x{min-height:46px;min-width:40px;padding:6px 10px;margin-left:-6px;border-color:#EBD9D6;background:#fff;color:#9A7F86;font-size:18px}
+.tc-mine .tc-mc{display:inline-flex;gap:0}
+.tc-mine [hidden]{display:none!important}
+.tc-mine-f{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tc-mine-f input{font:inherit;font-size:17px;flex:1 1 180px;min-height:46px;padding:8px 14px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41}
+.tc-save{font:inherit;font-size:17px;padding:10px 18px;border-radius:999px;border:0;background:#7D5E68;color:#fff;cursor:pointer;min-height:46px}
+.tc-save.lite{background:transparent;border:1.5px solid #7D5E68;color:#7D5E68}
+.tc-mmsg{margin:0;font-size:15px;line-height:1.4;color:#7D7076;min-height:0}
+.tc-mmsg:empty{display:none}
 .tc-sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-radius:18px;background:#FBF8F4;border:1.5px solid #DDD2C6;font-size:18px;cursor:pointer}
 .tc-sw input{width:26px;height:26px;padding:0;flex:0 0 auto;accent-color:#7D5E68}
 .tc-p input[type=range]{padding:0;border:0;background:transparent;outline-offset:2px}
@@ -678,6 +694,9 @@ void main(){
     el.innerHTML = move ? `<div class="tc-p">
   <label class="tc-sw"><span>✨ Hintergrund &amp; Licht an</span><input type="checkbox" data-on></label>
   <p style="margin:0;font-size:16px;line-height:1.5;color:#7D7076">Für Flows und Bewegungsvideos: nur Hintergrund weich und Belichtung, keine Gesichtsfilter.</p>
+  <div class="tc-mine" data-minebox><h3>💛 Meine Looks</h3><div class="tc-chips" data-mine></div>
+    <div class="tc-mine-f" data-mform hidden><input type="text" maxlength="40" data-mname aria-label="Name für deinen Look"><button type="button" class="tc-save" data-mok>Speichern</button><button type="button" class="tc-save lite" data-mno>Abbrechen</button></div>
+    <div data-mrow><button type="button" class="tc-save" data-msave>＋ So wie jetzt speichern</button></div><p class="tc-mmsg" data-mmsg></p></div>
   ${sl('blur', 'Hintergrund weich', 0, 100)}${sl('light', 'Helligkeit', -50, 50)}${sl('warm', 'Wärme', -50, 50)}${sl('contrast', 'Kontrast', -50, 50)}
   <div><h3>Hilfe für die Position</h3><div class="tc-chips" data-guides><button type="button" data-g="raster">Raster</button><button type="button" data-g="kreuz">Kreuz</button><button type="button" data-g="aus">Aus</button></div></div>
   ${opts.aspect === false ? '' : `<div><h3>Format</h3><div class="tc-chips" data-aspects><button type="button" data-a="16:9">Quer 16:9</button><button type="button" data-a="9:16">Hoch 9:16</button></div></div>`}
@@ -686,6 +705,9 @@ void main(){
 </div>` : `<div class="tc-p">
   <label class="tc-sw"><span>✨ Kamera-Look an</span><input type="checkbox" data-on></label>
   <div><h3>Look</h3><div class="tc-chips" data-looks>${Object.keys(LOOKS).map(k => `<button type="button" data-look="${k}">${LOOKS[k].label}</button>`).join('')}</div></div>
+  <div class="tc-mine" data-minebox><h3>💛 Meine Looks</h3><div class="tc-chips" data-mine></div>
+    <div class="tc-mine-f" data-mform hidden><input type="text" maxlength="40" data-mname aria-label="Name für deinen Look"><button type="button" class="tc-save" data-mok>Speichern</button><button type="button" class="tc-save lite" data-mno>Abbrechen</button></div>
+    <div data-mrow><button type="button" class="tc-save" data-msave>＋ So wie jetzt speichern</button></div><p class="tc-mmsg" data-mmsg></p></div>
   ${grp('haut', '🌸 Haut', sl('beauty', 'Haut weich', 0, 100) + sl('eyes', 'Augenringe aufhellen', 0, 100) + sl('ring', 'Glow (Gesicht aufhellen)', 0, 100) + sl('blush', 'Rouge', 0, 100), true)}
   ${grp('augen', '👁 Augen &amp; Brauen', sl('eyeBright', 'Augen strahlen', 0, 100) + sl('eyeBig', 'Augen etwas größer', 0, 100) + sl('lashes', 'Wimpern betonen', 0, 100) + sl('brows', 'Brauen betonen', 0, 100))}
   ${grp('lippen', '💋 Lippen', `<div class="tc-chips tc-lips" data-lips>${Object.keys(LIPS).map(k => `<button type="button" data-lipc="${k}"><i style="background:rgb(${LIPS[k][1].map(v => Math.round(v * 255)).join(',')})"></i>${LIPS[k][0]}</button>`).join('')}</div>` + sl('lip', 'Farbe', 0, 100) + sl('lipBig', 'Lippen voller', 0, 100))}
@@ -702,6 +724,7 @@ void main(){
       q('[data-on]').checked = !!s.on; q('[data-mir]').checked = !!s.mirror;
       qa('[data-k]').forEach(i => { const k = i.dataset.k, n = +(s[k] == null ? DEF[k] : s[k]); i.value = n; i.disabled = !s.on; q(`[data-v="${k}"]`).textContent = i.min < 0 ? (n > 0 ? '+' + n : n) : n + ' %'; });
       qa('[data-look]').forEach(b => b.setAttribute('aria-pressed', String(s.on && s.look === b.dataset.look)));
+      qa('[data-mi]').forEach(b => b.setAttribute('aria-pressed', String(s.on && s.look === 'mine:' + b.textContent)));
       qa('[data-lipc]').forEach(b => b.setAttribute('aria-pressed', String(s.lipColor === b.dataset.lipc)));
       qa('[data-flt]').forEach(b => b.setAttribute('aria-pressed', String((s.filter || 'none') === b.dataset.flt)));
       qa('[data-g]').forEach(b => b.setAttribute('aria-pressed', String(s.guide === b.dataset.g)));
@@ -715,6 +738,42 @@ void main(){
     qa('[data-flt]').forEach(b => b.onclick = () => { tc.set({ filter: b.dataset.flt, look: 'eigen' }); sync(); });
     qa('[data-g]').forEach(b => b.onclick = () => { tc.set({ guide: b.dataset.g }); sync(); });
     qa('[data-a]').forEach(b => b.onclick = () => { tc.set({ aspect: b.dataset.a }); sync(); });
+    // ---- Meine Looks: speichern, antippen = übernehmen, × = löschen ----
+    const slot = move ? 'move' : 'cam', keys = move ? LOOK_KEYS_MOVE : LOOK_KEYS, store = window.TalkCam.store || defaultStore;
+    let mine = mineLs.get(slot);
+    const mmsg = q('[data-mmsg]'), mform = q('[data-mform]'), mrow = q('[data-mrow]'), mname = q('[data-mname]');
+    const escH = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    function drawMine() {
+      const box = q('[data-mine]');
+      box.innerHTML = mine.length ? mine.map((m, i) => `<span class="tc-mc"><button type="button" data-mi="${i}" aria-pressed="${String(tc.s.on && tc.s.look === 'mine:' + m.n)}">${escH(m.n)}</button><button type="button" class="tc-x" data-mx="${i}" aria-label="${escH(m.n)} löschen" title="löschen">×</button></span>`).join('')
+        : '<p class="tc-mmsg" style="margin:0">Stell den Look so ein, wie er dir gefällt, und speichere ihn hier. Dann ist er mit einem Tipp wieder da.</p>';
+      box.querySelectorAll('[data-mi]').forEach(b => b.onclick = () => { const m = mine[+b.dataset.mi]; if (!m) return; const p = { on: true, look: 'mine:' + m.n }; keys.forEach(k => { if (m.s[k] != null) p[k] = m.s[k]; }); tc.set(p); sync(); mmsg.textContent = '✓ „' + m.n + '“ ist eingestellt.'; });
+      box.querySelectorAll('[data-mx]').forEach(b => b.onclick = () => { const m = mine[+b.dataset.mx]; if (!m || !confirm('„' + m.n + '“ löschen?')) return; mine.splice(+b.dataset.mx, 1); put('„' + m.n + '“ gelöscht.'); });
+    }
+    function put(ok) {
+      mineLs.set(slot, mine); drawMine(); mmsg.textContent = 'Wird gespeichert …';
+      store.set(slot, mine).then(l => { if (Array.isArray(l)) { mine = l; mineLs.set(slot, mine); drawMine(); } mmsg.textContent = ok; })
+        .catch(() => { mmsg.textContent = ok + ' (Nur auf diesem Gerät – die Verbindung hat gerade nicht geklappt.)'; });
+    }
+    q('[data-msave]').onclick = () => {
+      let n = 1; while (mine.some(m => m.n === 'Mein Look ' + n)) n++;
+      const curName = String(tc.s.look || '').startsWith('mine:') ? tc.s.look.slice(5) : '';
+      mname.value = curName || 'Mein Look ' + n; mform.hidden = false; mrow.hidden = true; mmsg.textContent = ''; mname.focus(); mname.select();
+    };
+    const closeForm = () => { mform.hidden = true; mrow.hidden = false; };
+    q('[data-mno]').onclick = closeForm;
+    mname.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); q('[data-mok]').click(); } if (e.key === 'Escape') closeForm(); };
+    q('[data-mok]').onclick = () => {
+      const n = mname.value.trim().slice(0, 40); if (!n) { mname.focus(); return; }
+      const v = {}; keys.forEach(k => { if (tc.s[k] != null) v[k] = tc.s[k]; });
+      const i = mine.findIndex(m => m.n === n), had = i >= 0;
+      if (had) mine[i] = { n, s: v }; else mine.push({ n, s: v });
+      tc.set({ look: 'mine:' + n }); closeForm(); sync();
+      put(had ? '✓ „' + n + '“ ist aktualisiert.' : '✓ „' + n + '“ ist gespeichert.');
+    };
+    drawMine();
+    store.get(slot).then(l => { if (Array.isArray(l)) { if (!l.length && mine.length) { store.set(slot, mine).catch(() => {}); return; } mine = l; mineLs.set(slot, mine); drawMine(); } }).catch(() => {});
+
     // aufgeklappte Bereiche merken
     let og = {}; try { og = JSON.parse(localStorage.getItem('mv-talkcam-open') || '{}'); } catch (e) {}
     qa('[data-grp]').forEach(d => { if (og[d.dataset.grp] != null) d.open = !!og[d.dataset.grp]; d.addEventListener('toggle', () => { og[d.dataset.grp] = d.open; try { localStorage.setItem('mv-talkcam-open', JSON.stringify(og)); } catch (e) {} }); });
@@ -781,5 +840,5 @@ void main(){
     return b;
   }
 
-  window.TalkCam = { create, wrap, panel, stage, dialog, button, settings: load, LOOKS, _test: null };
+  window.TalkCam = { create, wrap, panel, stage, dialog, button, settings: load, LOOKS, store: null, _test: null };
 })();
