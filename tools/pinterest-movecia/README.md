@@ -3,7 +3,7 @@
 Vivien will maximale Sichtbarkeit, damit Frauen Method, Unfold und Prä-/Postnatal buchen.
 Geplante Aufgaben: Montag, Mittwoch, Freitag. Profil (seit 28.10.2026): „Movecia · Mindful Movement“, pinterest.at/moveciamovement
 (hello@moveciamovement.com), verknüpft mit FORMA und Frida & Knox: in Chrome oben rechts Pfeil neben dem Profilbild → Movecia wählen.
-Profil eingerichtet (Profilbild `img/movecia/movecia-profilbild-1080.png`, Kurzinfo, Website, Impressum-Link /terms/), alle 6 Pinnwände angelegt, dazu „Mindful Movement Teacher Training“ (Vivien, 28.10.2026: Teaser posten, Start November 2027, 200-Stunden-Ausbildung in Yoga, Somatic Movement und Bodyweight – beim Teacher Training NIE „Pilates“ nennen; Link auf die Hauptseite, bis /teacher-training/ o. Ä. live ist, dann Pins dorthin verlinken).
+Profil eingerichtet (Profilbild `img/movecia/movecia-profilbild-1080.png`, Kurzinfo, Website, Impressum-Link /terms/), alle 6 Pinnwände angelegt, dazu „Mindful Movement Teacher Training“ (Vivien, 28.10.2026: Teaser posten, Start November 2027, Ausbildung in Yoga, Somatic Movement und Bodyweight, insgesamt 550 Stunden – beim Teacher Training NIE „Pilates“ nennen; Link auf die Hauptseite, bis /teacher-training/ o. Ä. live ist, dann Pins dorthin verlinken).
 Ist Movecia nicht im Menü: nichts anlegen, Vivien Bescheid geben und den fertigen Pin als Bild schicken.
 
 Veröffentlichen am einfachsten (seit 28.10.2026): https://at.pinterest.com/pin-creation-tool/ → Datei-Upload mit dem Pin aus dem Repo
