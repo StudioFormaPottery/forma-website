@@ -203,7 +203,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   </div>
 
   <?php
-  // Ablauf des Präsenzwochenendes (Vivien, 28.10.2026): Fr 9:00 – So 16:00, Lehrproben in vier Runden, Kochworkshop mit der Ernährungstrainerin, Abschluss am Feuer.
+  // Ablauf des Präsenzwochenendes (Vivien, 28.10.2026): Fr 9:00 – So 16:00, Lehrproben in vier Runden, Kochworkshop mit der Ernährungstrainerin, rituelle Abschlusszeremonie (kein Feuer).
   $lu = [
     ['Freitag', 'Ankommen', 'berg', [
       ['8:30', 'Ankommen bei Tee und Obst', 'Zimmer beziehen, durchatmen, die anderen endlich in echt sehen.'],
@@ -233,7 +233,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
       ['9:15', 'Lehrproben · Runde 4', 'Die letzten Einheiten. Danach hast du es geschafft.'],
       ['11:30', 'Dein Weg danach', 'Prüfung, Zertifikat und deine Selbstständigkeit: alle Fragen auf den Tisch.'],
       ['12:30', 'Mittagessen', ''],
-      ['14:00', 'Abschlusszeremonie am Feuer', 'Wir würdigen, was in diesen elf Monaten gewachsen ist.'],
+      ['14:00', 'Rituelle Abschlusszeremonie', 'Wir würdigen gemeinsam, was in diesen elf Monaten in dir gewachsen ist.'],
       ['15:30', 'Abschlusskreis', 'Ein letztes Mal zusammen, bevor wir uns verabschieden.'],
       ['16:00', 'Heimreise', ''],
     ]],
