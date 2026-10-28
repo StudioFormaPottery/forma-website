@@ -15,6 +15,14 @@ $self = strtok($_SERVER['REQUEST_URI'] ?? '/verwaltung/', '?') ?: '/verwaltung/'
 $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
 
+/**
+ * „Neu von Claude“: kleine Box oben auf der Startseite, bis zum angegebenen Tag (Vivien, 28.10.2026).
+ * Jede neue Funktion hier mit Titel, einem Satz und Link eintragen, damit Vivien nicht suchen muss.
+ */
+const FORMA_ADMIN_NEWS = [
+    ['until' => '2026-11-15', 'title' => 'Neu: Angebote für Gruppen & Schulen', 'text' => 'Angebot anlegen, per WhatsApp schicken, Bestätigung und Vorabrechnung laufen automatisch', 'link' => '?view=angebote'],
+];
+
 function go(string $url, ?string $flash = null): void
 {
     if ($flash !== null) {
@@ -2568,6 +2576,26 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
     <?php if (!forma_stripe_key()): ?><p class="alert">Die Online-Bezahlung ist noch nicht eingerichtet. Bis dahin werden alle Kurse ohne Bezahlung reserviert. <a href="<?= forma_h($self) ?>?view=einstellungen">Jetzt Stripe verbinden</a></p><?php endif; ?>
     <?php $natalReq = 0; try { $natalReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} ?>
     <?php foreach ($minCourses as $mc): ?><a class="card notice" href="<?= forma_h($self) ?>?view=course&amp;id=<?= (int)$mc['id'] ?>"><span class="ic"><?= admin_icon('kalender') ?></span><span><strong>Zu wenige Anmeldungen: <?= forma_h($mc['title']) ?>, <?= forma_h(preg_replace('/\s*·.*$/u', '', (string)$mc['date_text'])) ?></strong><br><span class="muted small">Entscheide: findet statt oder Gäste informieren →</span></span></a><?php endforeach; ?>
+    <?php // Kleine Boxen ganz oben (Vivien, 28.10.2026: „direkt auf der Hauptseite als kleine Box, damit ich nicht suchen muss“)
+    foreach (FORMA_ADMIN_NEWS as $nw): if (date('Y-m-d') > $nw['until']) continue; ?>
+        <a class="card notice news" href="<?= forma_h($self . $nw['link']) ?>"><span class="ic">✨</span><span><strong><?= forma_h($nw['title']) ?></strong><br><span class="muted small"><?= forma_h($nw['text']) ?> →</span></span></a>
+    <?php endforeach; ?>
+    <?php foreach (forma_offers($pdo) as $of): if (!in_array($of['status'], ['offen', 'bestaetigt'], true)) continue;
+        $ofDays = implode(' & ', array_map(fn($d) => date('j.n.', strtotime($d['date'])), forma_offer_dates($of))); ?>
+        <div class="card notice offer-box">
+            <span class="ic"><?= admin_icon('angebot') ?></span>
+            <span style="flex:1;min-width:0"><strong>Angebot <?= forma_h($of['org']) ?> (<?= forma_h($ofDays) ?>): <?= forma_h(forma_offer_status_label($of)) ?></strong><br>
+            <span class="row-actions" style="margin-top:6px">
+                <?php if ($of['status'] === 'offen'): $wa = forma_offer_whatsapp($of); $ph = preg_replace('/\D+/', '', (string)$of['phone']); if (str_starts_with($ph, '00')) $ph = substr($ph, 2); elseif (str_starts_with($ph, '0')) $ph = '43' . substr($ph, 1); ?>
+                <a class="btn" href="https://wa.me/<?= forma_h($ph) ?>?text=<?= rawurlencode($wa) ?>" target="_blank" rel="noopener">Per WhatsApp schicken</a>
+                <?php else: ?>
+                <a class="btn" href="<?= forma_h($self) ?>?view=angebote&amp;id=<?= (int)$of['id'] ?>#a<?= (int)$of['id'] ?>">Bar bezahlt / Kinderzahl</a>
+                <?php endif; ?>
+                <a class="link small" href="<?= forma_h(forma_offer_link($of)) ?>" target="_blank" rel="noopener">Angebot ansehen</a>
+                <a class="link small" href="<?= forma_h($self) ?>?view=angebote&amp;id=<?= (int)$of['id'] ?>#a<?= (int)$of['id'] ?>">Alle Details</a>
+            </span></span>
+        </div>
+    <?php endforeach; ?>
     <?php if ($toPlan > 0): ?><a class="card notice" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('private') ?></span><span><strong><?= $toPlan === 1 ? '1 Private-Pottery-Buchung wartet' : $toPlan . ' Private-Pottery-Buchungen warten' ?> auf ihren Termin.</strong><br><span class="muted small">Im Kalender einplanen und Bestätigung schicken →</span></span></a><?php endif; ?>
     <div class="dash">
         <section class="agenda card">
@@ -2783,6 +2811,9 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .stat:hover,.tile:hover{border-color:var(--clay)}
 .logout{position:absolute;right:18px;bottom:10px;z-index:1}
 .notice{display:flex;gap:14px;align-items:center;text-decoration:none;color:var(--ink);border-color:#B05A38;background:#FFF7F0;margin-bottom:16px}
+.notice.news{border-style:dashed;background:#FBF1EA}
+.notice.news .ic{font-size:22px}
+.offer-box .btn{min-height:40px;padding:8px 18px}
 .ic{display:inline-flex;width:40px;height:40px;flex:0 0 40px;border-radius:12px;background:#F1E3D3;color:var(--clay);align-items:center;justify-content:center}
 .ic svg{width:24px;height:24px}
 .dash{display:grid;gap:16px}

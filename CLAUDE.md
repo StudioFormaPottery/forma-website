@@ -460,3 +460,7 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 ## Studio · Teleprompter neu & Löschen (Vivien, 28.10.2026: „Teleprompter funktioniert gar nicht“, „Videos sofort löschen“)
 - Teleprompter ohne CSS-Übergang und ohne mask-image (iPhone-Safari zeichnete den Text über dem WebGL-Kamerabild teils nicht): `prLoop` schiebt jedes Bild selbst per transform mit Kommastellen (`prPos += sp*dt`). Kasten deckend (dunkel, Verlauf nur als ::after unten), z-index 7 über allen Kamera-Hinweisen; Handy 50 % / mind. 150 px. Während der Aufnahme `body.recording` blendet Status, Positions-Hinweis und Hilfslinien aus. Der Text startet 1,2 s nach Aufnahmebeginn (Zeit für die erste Zeile). Aufnahme-Punkt und 3-2-1 liegen darüber (z-index 8), Punkt unten rechts.
 - Löschen: Am Stück „🗑 Löschen“ nach der Aufnahme (sofort, 8 s „Rückgängig“); Absatz für Absatz „🗑 Absatz X löschen“ in der Leiste (letzter Clip) und „🗑 Löschen“ bei jedem Clip in der Liste (`delClip`).
+
+## Neues sichtbar machen (Vivien, 28.10.2026: „direkt auf der Hauptseite als kleine Box, damit ich nicht suchen muss“)
+- Jede neue Verwaltungs-Funktion bekommt einen Eintrag in `FORMA_ADMIN_NEWS` (oben in `verwaltung/index.php`: until, title, text, link). Die Box „✨“ steht ganz oben auf der Startseite der Verwaltung, bis zum Datum.
+- Offene und bestätigte Gruppen-Angebote stehen dort ebenfalls als Box mit direktem Knopf („Per WhatsApp schicken“ bzw. „Bar bezahlt / Kinderzahl“, „Angebot ansehen“).
