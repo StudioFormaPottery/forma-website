@@ -11,7 +11,7 @@ function mm_subnav(string $active): void
     global $pdo;
     $self = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?');
     $req = 0; try { $req = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {}
-    $acReq = 0; try { $acReq = (int)$pdo->query("SELECT COUNT(*) FROM ac_calls WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {}
+    $acReq = 0; try { $acReq = (int)$pdo->query("SELECT COUNT(*) FROM ac_calls WHERE status = 'angefragt'")->fetchColumn(); require_once dirname(__DIR__) . '/api/academy-lib.php'; $acReq += ac_unanswered($pdo); } catch (Throwable $e) {}
     $ptReq = 0; try { $ptReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); } catch (Throwable $e) {}
     $tabs = [['movecia', '?view=movecia', '🏡 Übersicht'], ['studio', '?view=studio', '🎥 Studio'], ['videos', '?view=videos', '🎬 Videos hochladen'], ['insta', '?view=insta', '📱 Instagram täglich'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['musik', '?view=musik', '🎵 Musik'], ['method', '?view=method', '🌱 Method &amp; Unfold'], ['natal', '?view=natal', '🤰 Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['training', '?view=training', '🏔️ Personal Training' . ($ptReq ? ' <i>' . $ptReq . '</i>' : '')], ['academy', '?view=academy', '🎓 Academy' . ($acReq ? ' <i>' . $acReq . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', '🎙️ Live-Texte'], ['presse', '?view=presse', '📰 Presse'], ['einst', '?view=movecia#einstellungen', '⚙️ Einstellungen']]; ?>
 <style>
@@ -348,6 +348,8 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         </section>
         <?php mm_subnav('movecia'); ?>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <?php $acOpenM = 0; try { require_once dirname(__DIR__) . '/api/academy-lib.php'; $acOpenM = ac_unanswered($pdo); } catch (Throwable $e) {} ?>
+        <?php if ($acOpenM): ?><a class="card notice" style="display:flex;gap:12px;align-items:center;font-size:18px;text-decoration:none;color:inherit;background:#EADFDE;border-radius:20px;padding:16px 18px;margin:12px 0" href="<?= forma_h($self) ?>?view=academy#chat"><span style="font-size:28px">💬</span><span><strong><?= $acOpenM === 1 ? '1 neue Nachricht' : $acOpenM . ' neue Nachrichten' ?> im Teacher Training</strong><br><span class="muted small">Antworten →</span></span></a><?php endif; ?>
 <style>
 .qa{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0 4px}
 @media(min-width:900px){.qa{grid-template-columns:repeat(4,minmax(0,1fr))}}

@@ -20,6 +20,7 @@ unset($_SESSION['flash']);
  * Jede neue Funktion hier mit Titel, einem Satz und Link eintragen, damit Vivien nicht suchen muss.
  */
 const FORMA_ADMIN_NEWS = [
+    ['until' => '2026-11-30', 'title' => 'Neu: Academy · Teacher Training (Entwurf)', 'text' => 'Buchungen mit Zahlungsplan, Chat mit Teilnehmerinnen, Kennenlerngespräche, Willkommensvideo im Studio', 'link' => '?view=academy'],
     ['until' => '2026-11-15', 'title' => 'Neu: Angebote für Gruppen & Schulen', 'text' => 'Angebot anlegen, per WhatsApp schicken, Bestätigung und Vorabrechnung laufen automatisch', 'link' => '?view=angebote'],
 ];
 
@@ -2576,6 +2577,8 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
     <?php if (!forma_stripe_key()): ?><p class="alert">Die Online-Bezahlung ist noch nicht eingerichtet. Bis dahin werden alle Kurse ohne Bezahlung reserviert. <a href="<?= forma_h($self) ?>?view=einstellungen">Jetzt Stripe verbinden</a></p><?php endif; ?>
     <?php $natalReq = 0; try { $natalReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} ?>
     <?php foreach ($minCourses as $mc): ?><a class="card notice" href="<?= forma_h($self) ?>?view=course&amp;id=<?= (int)$mc['id'] ?>"><span class="ic"><?= admin_icon('kalender') ?></span><span><strong>Zu wenige Anmeldungen: <?= forma_h($mc['title']) ?>, <?= forma_h(preg_replace('/\s*·.*$/u', '', (string)$mc['date_text'])) ?></strong><br><span class="muted small">Entscheide: findet statt oder Gäste informieren →</span></span></a><?php endforeach; ?>
+    <?php $acOpen = 0; try { require_once dirname(__DIR__) . '/api/academy-lib.php'; $acOpen = ac_unanswered($pdo); } catch (Throwable $e) {} ?>
+    <?php if ($acOpen): ?><a class="card notice" href="<?= forma_h($self) ?>?view=academy#chat"><span class="ic">💬</span><span><strong><?= $acOpen === 1 ? '1 neue Nachricht' : $acOpen . ' neue Nachrichten' ?> im Teacher Training</strong><br><span class="muted small">Eine Teilnehmerin wartet auf deine Antwort →</span></span></a><?php endif; ?>
     <?php // Kleine Boxen ganz oben (Vivien, 28.10.2026: „direkt auf der Hauptseite als kleine Box, damit ich nicht suchen muss“)
     foreach (FORMA_ADMIN_NEWS as $nw): if (date('Y-m-d') > $nw['until']) continue; ?>
         <a class="card notice news" href="<?= forma_h($self . $nw['link']) ?>"><span class="ic">✨</span><span><strong><?= forma_h($nw['title']) ?></strong><br><span class="muted small"><?= forma_h($nw['text']) ?> →</span></span></a>

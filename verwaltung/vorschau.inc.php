@@ -105,6 +105,15 @@ body{background:#F2ECE4}h1,h2{color:#6B5658}
 ?>
 </div></section>
 
+<section class="grp" id="academy"><h2>Academy · Teacher Training</h2><p>Der Mitgliederbereich gleich nach der Anzahlung: Countdown bis zum Start, dein Willkommensvideo, Notizen, Chat mit dir und die Zahlungen.</p><div class="qa">
+<?php
+        $tile($site . '/academy/mitglieder/?demo=1', '🎓', 'Mitgliederbereich', 'Countdown, Willkommensvideo, Workbook, Notizen, Chat, Zahlungen');
+        $tile($site . '/academy/mitglieder/?demo=1&lang=en', '🇬🇧', 'Auf Englisch', 'Derselbe Bereich in englischer Sprache');
+        $tile($site . '/academy/mitglieder/', '🔑', 'Login-Seite', 'So meldet sich eine Teilnehmerin an');
+        $tile($self . '?view=academy#chat', '💬', 'Chat beantworten', 'Nachrichten der Teilnehmerinnen in der Verwaltung', false);
+?>
+</div></section>
+
 <section class="grp" id="natal"><h2>Prä- &amp; Postnatal</h2><p>Der Bereich für Kundinnen mit Paket. Nach jeder Einheit kommen dort Workbook, Aufnahme, Vertiefung und Bewegungsvideo dazu.</p><div class="qa">
 <?php
         $tile($site . '/natal/mitglied/?demo=prae', '🤰', 'Pränatal-Kundin', 'Zwei Einheiten erledigt, mit Workbook, Aufnahme und Videos');

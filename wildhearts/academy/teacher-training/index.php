@@ -1,7 +1,8 @@
 <?php
-// moveciamovement.com/academy/teacher-training – The Movecia Method · Mindful Movement Teacher Training (Vivien, 28.10.2026)
-// 500 Std. inkl. 200-Std.-Yogalehrerausbildung, 11 Monate hybrid, Start Mi 3.11.2027, Präsenzwochenende September 2028,
-// danach Online-Abschlussprüfung mit Kamera, dann Zertifikat. Max. 10 Plätze. Early-Bird € 3.390 bis 31.5.2027, danach € 4.500.
+// moveciamovement.com/academy/teacher-training – The Movecia Method · Mindful Movement Teacher Training (Vivien, 28.10.2026, Runde 2)
+// 550 Std. inkl. vollständiger 200-Std.-Yogalehrerausbildung, 11 Monate hybrid, Start Mi 3.11.2027, nur alle 2 Jahre, max. 10 Plätze.
+// Ende: Präsenzwochenende September 2028 (Lehrprobe) → Online-Abschlussprüfung mit Kamera → Zertifikat.
+// Buchung: 50 % Anzahlung, Rest auf einmal / in 2 / in 3 Zahlungen bis 15.9.2027. Early-Bird € 3.390 bis 31.3.2027, danach € 4.500.
 // ?danke=1 nach der Zahlung, ?angebot=TOKEN = persönliches Angebot aus dem Kennenlerngespräch (Countdown, Early-Bird-Preis).
 declare(strict_types=1);
 require_once __DIR__ . '/../../assets/icons.inc.php';
@@ -22,31 +23,38 @@ $mods = ac_modules();
 $slots = ac_call_slots($pdo);
 $e = fn(int $x) => str_replace('€ ', '€&nbsp;', mv_eur($x));
 $ee = fn(int $x) => ac_eur($x, 'en');
-$wu = ac_withdraw_until(['paid_at' => date('c')]);
+$dd = fn(string $ymd) => ac_d($ymd);
+$de2 = fn(string $ymd) => ac_d($ymd, 'en');
 if ($offer || isset($_GET['danke']) || isset($_GET['abbruch'])) $GLOBALS['mvl_noindex'] = true;
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=1">';
-mvl_head('Mindful Movement Teacher Training · Yogalehrerausbildung 500 Std. hybrid, Tirol | Movecia Academy',
-    'The Movecia Method: 500-Stunden-Ausbildung mit Vivien Malonga, inkl. Yogalehrerausbildung nach internationalem 200-Stunden-Curriculum, Somatic Movement, Breathwork, Anatomie & Body Scanning, Mental Load & Nervensystem. 11 Monate hybrid (online + Präsenzwochenende in Tirol), Start ' . mv_date($st) . ', max. ' . $c['seats'] . ' Plätze.' . ($c['eb'] ? ' Early-Bird bis ' . mv_date($c['eb_end']) . '.' : ''),
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=3">';
+mvl_head('Mindful Movement Teacher Training · Yogalehrerausbildung ' . AC_HOURS . ' Std. hybrid, Tirol | Movecia Academy',
+    'The Movecia Method: ' . AC_HOURS . '-Stunden-Ausbildung mit Vivien Malonga, inklusive vollständiger 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum, Somatic Movement, Breathwork, Anatomie & Body Scanning, achtsame Berührung, Mental Load & Nervensystem. 11 Monate hybrid mit Präsenzwochenende in Tirol, Start ' . mv_date($st) . '. Nur alle 2 Jahre, nur 10 Plätze.' . ($c['eb'] ? ' Early-Bird bis ' . mv_date($c['eb_end']) . '.' : ''),
     $site . '/academy/teacher-training/', '/img/movecia/og-academy.jpg', $css, ac_jsonld($pdo));
-$hours = [
-    ['Yoga', 'Yoga', 200, 'Vollständige Yogalehrerausbildung nach internationalem 200-Stunden-Curriculum: Asana, Alignment, Philosophie, Pranayama, Unterrichtspraxis.', 'A complete yoga teacher training following an international 200-hour curriculum: asana, alignment, philosophy, pranayama, teaching practice.', ''],
-    ['Somatic Movement', 'Somatic movement', 80, 'Langsame, spürende Bewegung, die Spannung löst und Menschen wieder in Kontakt mit ihrem Körper bringt.', 'Slow, sensing movement that releases tension and brings people back into contact with their bodies.', ''],
-    ['Breathwork & Meditation', 'Breathwork & meditation', 60, 'Atemtechniken und Meditationen sicher anleiten, für Ruhe, Energie und Konzentration.', 'Guiding breathing techniques and meditations safely, for calm, energy and focus.', ''],
-    ['Movecia Movement Method & Bodyweight', 'Movecia Movement Method & bodyweight', 60, 'Meine Methode: fließende Bewegung und Training mit dem eigenen Körpergewicht für eine starke, tiefe Mitte.', 'My method: flowing movement and bodyweight training for a strong, deep core.', ''],
-    ['Anatomie & Body Scanning', 'Anatomy & body scanning', 50, 'Den Körper verstehen und lesen lernen: Haltung, Muskelketten, Tiefenmuskulatur und wie du im Body Scan erkennst, was ein Mensch gerade braucht.', 'Understanding and reading the body: posture, muscle chains, the deep core and how a body scan shows you what someone needs right now.', 'star'],
-    ['Mental Load & Nervensystem', 'Mental load & the nervous system', 30, 'Was Stress und Verantwortung im Körper machen und wie Bewegung, Atem und Rituale das Nervensystem beruhigen. Wissen und Selbstfürsorge, keine Therapie.', 'What stress and responsibility do to the body and how movement, breath and rituals calm the nervous system. Knowledge and self-care, not therapy.', ''],
-    ['Aufbau deiner Selbstständigkeit', 'Building your own business', 20, 'Vom ersten Kurs bis zu Website, Flyern und eigenem Angebot: Wir setzen deine Ideen gemeinsam um.', 'From your first class to your website, flyers and your own offer: we bring your ideas to life together.', ''],
-];
+$hours = ac_hours();
 $pr = ['lt1' => ['weniger als 1 Jahr', 'less than a year'], '1to2' => ['1–2 Jahre', '1–2 years'], 'gt2' => ['mehr als 2 Jahre', 'more than 2 years'], 'teach' => ['ich unterrichte schon', 'I already teach']];
 $wdDe = ['', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 $mDe = ['', 'Jän.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Sept.', 'Okt.', 'Nov.', 'Dez.'];
+$spark = fn(string $cls) => '<svg class="spk ' . $cls . '" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1c1 6 5 10 11 11-6 1-10 5-11 11-1-6-5-10-11-11 6-1 10-5 11-11z"/></svg>';
+// Donut der Stundenverteilung
+$donut = (function () use ($hours) {
+    $r = 70; $C = 2 * M_PI * $r; $off = 0; $o = '';
+    foreach ($hours as $i => [$de, $en, $h, $col]) {
+        $len = $C * $h / AC_HOURS;
+        $o .= '<circle class="seg" style="--i:' . $i . '" cx="90" cy="90" r="' . $r . '" stroke="' . $col . '" stroke-dasharray="' . round($len - 2.2, 2) . ' ' . round($C, 2) . '" stroke-dashoffset="' . round(-$off, 2) . '"/>';
+        $off += $len;
+    }
+    return '<svg viewBox="0 0 180 180" class="donut" aria-hidden="true"><g transform="rotate(-90 90 90)">' . $o . '</g></svg>';
+})();
+$plans = ac_plans_open();
+$defPlan = isset($plans['two']) ? 'two' : 'full';
+$sched = fn(string $k) => ac_schedule($p['total'], $k);
 ?>
 <body>
 <?php mvl_top('academy'); ?>
-<main>
+<main id="top">
 <?php if ($offerLive): ?>
 <div class="w"><div class="offerbar" id="offerbar" data-until="<?= (int)$offer['offer_until'] ?>" data-now="<?= time() ?>">
-  <span><span class="de">Dein Angebot aus unserem Gespräch:</span><span class="en">Your offer from our call:</span> <b><?= $e($p['once']) ?></b><?= !$c['eb'] ? ' <s style="opacity:.6">' . $e($c['r_once']) . '</s>' : '' ?></span>
+  <span><span class="de">Dein Angebot aus unserem Gespräch:</span><span class="en">Your offer from our call:</span> <b><?= $e($p['total']) ?></b><?= !$c['eb'] ? ' <s style="opacity:.6">' . $e($c['r_total']) . '</s>' : '' ?></span>
   <span><span class="de">gilt noch</span><span class="en">valid for</span> <span class="cd" id="offercd">–</span></span>
   <a class="btn light sm" href="#buchen"><span class="de">Jetzt Platz sichern</span><span class="en">Book my place</span></a>
 </div></div>
@@ -54,50 +62,69 @@ $mDe = ['', 'Jän.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Se
 
 <section class="w"><div class="in hero-x ac-hero two">
   <?= mv_waves(false) ?>
-  <div>
-    <p class="k"><a href="/academy/" style="text-decoration:none">Movecia Academy</a> · <span class="de">Ausbildung</span><span class="en">Training</span></p>
+  <div class="ac-hero-tx">
+    <p class="ac-kick"><?= ac_seal('mini') ?><span><a href="/academy/">Movecia Academy</a><small><span class="de">Teacher Training 2027 · nur alle 2 Jahre</span><span class="en">Teacher Training 2027 · every two years</span></small></span></p>
     <h1>The Movecia <em>Method</em></h1>
     <p class="sub">Mindful Movement Teacher Training</p>
-    <p class="lead"><span class="de">Eine Ausbildung für Frauen, die Menschen wirklich begleiten möchten. Du lernst, zuzuhören, Körper zu lesen und das Nervensystem zu beruhigen, und du bekommst dabei eine vollständige Yogalehrerausbildung. 500 Stunden, elf Monate, online und in den Tiroler Alpen.</span><span class="en">A training for women who want to truly accompany people. You learn to listen, to read bodies and to calm the nervous system, and along the way you complete a full yoga teacher training. 500 hours over eleven months, online and in the Tyrolean Alps.</span></p>
+    <p class="lead"><span class="de">Andere begleiten und dabei bei dir selbst bleiben. Eine Ausbildung für Frauen, die Menschen wirklich sehen möchten: zuhören, Körper lesen, das Nervensystem beruhigen. Mit einer vollständigen 200-Stunden-Yogalehrerausbildung inklusive und allem, was ich mir in meinen eigenen Ausbildungen immer gewünscht habe.</span><span class="en">Guide others and stay close to yourself while you do. A training for women who want to truly see people: listening, reading bodies, calming the nervous system. With a complete 200-hour yoga teacher training included, and everything I always wished for in my own trainings.</span></p>
     <div class="facts">
-      <span><span class="de">500 Stunden inkl. 200 Std. Yoga</span><span class="en">500 hours incl. 200 h yoga</span></span>
+      <span><span class="de"><?= AC_HOURS ?> Stunden inkl. 200 Std. Yoga</span><span class="en"><?= AC_HOURS ?> hours incl. 200 h yoga</span></span>
       <span><span class="de">11 Monate · hybrid</span><span class="en">11 months · hybrid</span></span>
       <span><span class="de">Start <?= mv_date($st) ?></span><span class="en">Starts <?= mv_date($st, 'en') ?></span></span>
-      <span><span class="de">max. <?= (int)$c['seats'] ?> Plätze</span><span class="en">max. <?= (int)$c['seats'] ?> places</span></span>
-      <span class="<?= $free ? 'chip ok' : '' ?>" style="<?= $free ? 'display:inline-flex;gap:.45em;align-items:center' : '' ?>"><?= $free ? '<span class="de">Plätze frei</span><span class="en">Places available</span>' : '<span class="de">ausgebucht</span><span class="en">fully booked</span>' ?></span>
+      <span class="chip ok"><?= $free ? '<span class="de">Plätze frei</span><span class="en">Places available</span>' : '<span class="de">ausgebucht</span><span class="en">fully booked</span>' ?></span>
     </div>
-    <?php if ($c['eb']): ?><p class="ebadge"><b>Early Bird</b><span><span class="de"><?= $e($c['eb_once']) ?> statt <?= $e($c['r_once']) ?> · bis <?= mv_date($c['eb_end']) ?></span><span class="en"><?= $ee($c['eb_once']) ?> instead of <?= $ee($c['r_once']) ?> · until <?= mv_date($c['eb_end'], 'en') ?></span></span></p><?php endif; ?>
+    <?php if ($c['eb']): ?>
+    <a class="ebird" href="#buchen"><?= ac_birds() ?><b>Early Bird</b><span class="eb-p"><?= $e($c['eb_total']) ?></span><span class="eb-d"><span class="de">bis <?= mv_date($c['eb_end']) ?> · danach <?= $e($c['r_total']) ?></span><span class="en">until <?= mv_date($c['eb_end'], 'en') ?> · then <?= $ee($c['r_total']) ?></span></span></a>
+    <?php endif; ?>
     <div class="cta"><a class="btn" href="#buchen"><span class="de">Platz sichern</span><span class="en">Book my place</span> →</a><a class="btn line" href="#gespraech"><span class="de">Kennenlerngespräch</span><span class="en">Free intro call</span></a></div>
-    <?php if (isset($_GET['danke'])): ?><div class="thanks"><b><span class="de">Danke, du bist dabei ♡</span><span class="en">Thank you, you're in ♡</span></b><p><span class="de">Deine Bestätigung ist per E-Mail unterwegs, deine Rechnung kommt gleich hinterher. Wir starten am <?= mv_date($st) ?>.</span><span class="en">Your confirmation is on its way by email, with your invoice right behind it. We begin on <?= mv_date($st, 'en') ?>.</span></p></div><?php endif; ?>
+    <?php if (isset($_GET['danke'])): ?><div class="thanks"><b><span class="de">Konfetti, Konfetti! Du bist dabei ♡</span><span class="en">Confetti, confetti! You're in ♡</span></b><p><span class="de">Deine Konfetti-Mail mit dem Zugang zu deinem Mitgliederbereich ist unterwegs, deine Rechnung kommt gleich hinterher.</span><span class="en">Your confetti email with access to your members area is on its way, with your invoice right behind it.</span></p><p style="margin-top:.7rem"><a class="btn sm" href="/academy/mitglieder/"><span class="de">Zum Mitgliederbereich</span><span class="en">Members area</span></a></p></div><?php endif; ?>
   </div>
-  <div class="pic rv"><img src="/img/movecia/fotos/ev-lunge.jpg?v=1" alt="Vivien in einem tiefen Ausfallschritt mit erhobenen Armen in ihrem hellen Studio unter dem Dachstuhl" fetchpriority="high"><p class="stamp"><small><span class="de">Start</span><span class="en">Begins</span></small><span class="de"><?= mv_date($st) ?>, gleich nach den Herbstferien</span><span class="en"><?= mv_date($st, 'en') ?>, right after the autumn school holidays</span></p></div>
+  <div class="ac-photo rv">
+    <?= $spark('s1') . $spark('s2') . $spark('s3') ?>
+    <div class="pic"><img src="/img/movecia/fotos/ev-lunge.jpg?v=1" alt="Vivien in einem tiefen Ausfallschritt mit erhobenen Armen in ihrem hellen Studio unter dem Dachstuhl" fetchpriority="high"></div>
+    <?= ac_seal('big') ?>
+    <p class="stamp"><small><span class="de">Nur 10 Plätze</span><span class="en">Only 10 places</span></small><span class="de">und nur alle zwei Jahre</span><span class="en">and only every two years</span></p>
+  </div>
 </div></section>
+
+<div class="ac-ribbon" aria-hidden="true"><div class="rb-in"><?php for ($i = 0; $i < 2; $i++): ?><span><span class="de">nur 10 Plätze</span><span class="en">only 10 places</span></span><i>✦</i><span><span class="de">nur alle 2 Jahre</span><span class="en">only every 2 years</span></span><i>✦</i><span><?= AC_HOURS ?> <span class="de">Stunden</span><span class="en">hours</span></span><i>✦</i><span><span class="de">inkl. 200-Std.-Yogalehrerausbildung</span><span class="en">incl. 200-hour yoga teacher training</span></span><i>✦</i><span><span class="de">Präsenzwochenende in den Tiroler Alpen</span><span class="en">in-person weekend in the Tyrolean Alps</span></span><i>✦</i><?php endfor; ?></div></div>
 
 <section class="band" id="herz"><span class="band-blob b1" aria-hidden="true"></span><span class="band-blob b2" aria-hidden="true"></span><div class="w"><div class="in">
   <p class="k"><span class="de">Das Herzstück</span><span class="en">The heart of it</span></p>
   <blockquote><span class="de">Keine klassische Fitnessausbildung. Eine Ausbildung im Zuhören.</span><span class="en">Not a classic fitness course. A training in listening.</span></blockquote>
-  <p class="after"><span class="de">Viele Frauen tragen heute einen vollen Kopf und sehr viel Verantwortung. Wer sie begleitet, braucht mehr als einen guten Trainingsplan: ein feines Gespür für den Menschen, der gerade vor einem steht, und für sich selbst.</span><span class="en">Many women today carry a very full head and a great deal of responsibility. Anyone who guides them needs more than a good training plan: a fine sense for the person standing in front of them, and for themselves.</span></p>
+  <p class="after"><span class="de">Viele Frauen tragen heute einen vollen Kopf und sehr viel Verantwortung. Wer sie begleitet, braucht mehr als einen guten Trainingsplan: ein feines Gespür für den Menschen, der gerade vor einem steht, und für sich selbst. Genau das lernst du hier.</span><span class="en">Many women today carry a very full head and a great deal of responsibility. Anyone who guides them needs more than a good training plan: a fine sense for the person standing in front of them, and for themselves. That is exactly what you learn here.</span></p>
   <div class="heart">
-    <div class="rv"><span class="ib"><?= mv_icon_svg('herz') ?></span><b><span class="de">Mental Load verstehen</span><span class="en">Understanding mental load</span></b><p><span class="de">Du lernst, was Dauerverantwortung im Körper macht, und wie du Frauen dort abholst, wo sie wirklich stehen.</span><span class="en">You learn what constant responsibility does to the body and how to meet women exactly where they are.</span></p></div>
+    <div class="rv"><span class="ib"><?= mv_icon_svg('herz') ?></span><b><span class="de">Mental Load verstehen</span><span class="en">Understanding mental load</span></b><p><span class="de">Was Dauerverantwortung im Körper macht und wie du Frauen dort abholst, wo sie wirklich stehen.</span><span class="en">What constant responsibility does to the body, and how to meet women exactly where they are.</span></p></div>
     <div class="rv"><span class="ib"><?= mv_icon_svg('kreis') ?></span><b><span class="de">Zuhören, anderen und dir</span><span class="en">Listening to others and to yourself</span></b><p><span class="de">Du nimmst wahr, was dein Gegenüber braucht, und spürst gleichzeitig deine eigenen Grenzen.</span><span class="en">You notice what the person in front of you needs while staying aware of your own limits.</span></p></div>
-    <div class="rv"><span class="ib"><?= mv_icon_svg('atem') ?></span><b><span class="de">Das Nervensystem beruhigen</span><span class="en">Calming the nervous system</span></b><p><span class="de">Mit Atem, langsamer Bewegung und Ritualen schaffst du Momente, in denen Körper und Kopf zur Ruhe kommen.</span><span class="en">With breath, slow movement and rituals you create moments in which body and mind can settle.</span></p></div>
-  </div>
-  <div class="notx">
-    <div class="no"><b><span class="de">Wofür die Ausbildung nicht gedacht ist</span><span class="en">What this training is not about</span></b><span class="de">Starre Programme abspulen, Wiederholungen zählen, Menschen an einen Plan anpassen.</span><span class="en">Running through rigid programmes, counting reps, making people fit a plan.</span></div>
-    <div class="yes"><b><span class="de">Was du hier lernst</span><span class="en">What you learn here</span></b><span class="de">Dich wirklich auf den Menschen einzulassen und die Bewegung nach ihm zu richten.</span><span class="en">To truly engage with the person and shape the movement around them.</span></div>
+    <div class="rv"><span class="ib"><?= mv_icon_svg('atem') ?></span><b><span class="de">Das Nervensystem beruhigen</span><span class="en">Calming the nervous system</span></b><p><span class="de">Mit Atem, langsamer Bewegung, Berührung und Ritualen schaffst du Momente, in denen Körper und Kopf zur Ruhe kommen.</span><span class="en">With breath, slow movement, touch and rituals you create moments in which body and mind can settle.</span></p></div>
   </div>
 </div></div></section>
 
+<section class="w sec" id="wunsch"><div class="in">
+  <div class="sec-h rv"><div><p class="k"><span class="de">Was du bekommst</span><span class="en">What you get</span></p><h2 style="margin-top:.6rem"><span class="de">Alles, was ich mir selbst <em>gewünscht</em> hätte</span><span class="en">Everything I wish I'd been <em>given</em></span></h2></div>
+    <p><span class="de">Du bekommst eine vollständige 200-Stunden-Yogalehrerausbildung inklusive. Und dazu all das, was ich in meinen eigenen Ausbildungen so oft vermisst habe.</span><span class="en">You get a complete 200-hour yoga teacher training included. And on top of it, everything I so often missed in my own trainings.</span></p></div>
+  <div class="wish cute-cards">
+    <div class="rv"><span class="ib"><?= mv_icon_svg('sonne') ?></span><b><span class="de">Eine vollständige Yogalehrerausbildung</span><span class="en">A complete yoga teacher training</span></b><p><span class="de">200 Stunden nach internationalem Curriculum: Asana, Alignment, Philosophie, Pranayama und Unterrichtspraxis, damit dir nichts fehlt.</span><span class="en">200 hours following an international curriculum: asana, alignment, philosophy, pranayama and teaching practice, so that you miss nothing.</span></p></div>
+    <div class="rv"><span class="ib"><?= mv_icon_svg('welle') ?></span><b><span class="de">Somatic Movement &amp; Breathwork</span><span class="en">Somatic movement &amp; breathwork</span></b><p><span class="de">Langsame, spürende Bewegung und Atem, der auffängt. Damit gibst du Menschen etwas, das sie im Alltag wirklich tragen kann.</span><span class="en">Slow, sensing movement and breath that holds you. With it, you give people something that truly carries them through everyday life.</span></p></div>
+    <div class="rv"><span class="ib"><?= mv_icon_svg('kerze') ?></span><b><span class="de">Achtsame Berührung &amp; Rituale</span><span class="en">Mindful touch &amp; rituals</span></b><p><span class="de">Wie du sanft und mit Erlaubnis berührst, Halt gibst und kleine Rituale gestaltest, vom Ankommen bis zum Räuchern zum Abschluss einer Stunde.</span><span class="en">How to touch gently and with consent, offer support and create small rituals, from arriving on the mat to a little smoke cleansing at the end of a class.</span></p></div>
+    <div class="rv"><span class="ib"><?= mv_icon_svg('spirale') ?></span><b><span class="de">Stunden halten, ohne dich zu verausgaben</span><span class="en">Holding classes without draining yourself</span></b><p><span class="de">Du lernst, für andere da zu sein und deine eigene Energie zu schützen, damit du nach der Stunde nicht leer, sondern erfüllt nach Hause gehst.</span><span class="en">You learn to be there for others while protecting your own energy, so that you leave a class feeling full rather than empty.</span></p></div>
+    <div class="rv"><span class="ib"><?= mv_icon_svg('blatt') ?></span><b><span class="de">Faire Preise, ohne Angst</span><span class="en">Fair prices, without fear</span></b><p><span class="de">Was deine Arbeit wert ist, wie du Preise festlegst und dazu stehst, und wie du deine Kurse verkaufst, ohne dich dabei schlecht zu fühlen.</span><span class="en">What your work is worth, how to set your prices and stand by them, and how to sell your classes without feeling awkward about it.</span></p></div>
+    <div class="rv"><span class="ib"><?= mv_icon_svg('bluete') ?></span><b><span class="de">Sichtbar werden &amp; deine Selbstständigkeit</span><span class="en">Being seen &amp; your own business</span></b><p><span class="de">Wie die Menschen um dich herum von deiner Arbeit erfahren. Im Modul Selbstständigkeit helfe ich dir persönlich bei Website, Flyern und deinem ersten Angebot.</span><span class="en">How the people around you get to know your work. In the business module I help you personally with your website, flyers and your first offer.</span></p></div>
+  </div>
+</div></section>
+
 <section class="w sec" id="inhalte"><div class="in">
-  <div class="sec-h rv"><div><p class="k"><span class="de">Inhalte &amp; Stunden</span><span class="en">Content &amp; hours</span></p><h2 style="margin-top:.6rem"><span class="de">500 Stunden, die <em>zusammengehören</em></span><span class="en">500 hours that <em>belong together</em></span></h2></div>
-    <p><span class="de">Eine vollständige Yogalehrerausbildung nach internationalem 200-Stunden-Curriculum ist das Fundament. Alles andere macht daraus die Movecia Method.</span><span class="en">A complete yoga teacher training following an international 200-hour curriculum is the foundation. Everything else turns it into the Movecia Method.</span></p></div>
-  <div class="hours">
-    <div class="hbars rv">
-      <?php foreach ($hours as [$de, $en, $h, $sde, $sen, $cls]): ?>
-      <div class="hb <?= $cls ?>"><span class="t"><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></span><span class="h"><?= $h ?> <span class="de">Std.</span><span class="en">h</span></span><span class="bar"><i style="--w:<?= round($h / 2) ?>%"></i></span><span class="s"><span class="de"><?= $sde ?></span><span class="en"><?= $sen ?></span></span></div>
+  <div class="sec-h rv"><div><p class="k"><span class="de">Inhalte &amp; Stunden</span><span class="en">Content &amp; hours</span></p><h2 style="margin-top:.6rem"><span class="de"><?= AC_HOURS ?> Stunden, die <em>zusammengehören</em></span><span class="en"><?= AC_HOURS ?> hours that <em>belong together</em></span></h2></div>
+    <p><span class="de">Die vollständige 200-Stunden-Yogalehrerausbildung ist das Fundament. Alles andere macht daraus die Movecia Method.</span><span class="en">The complete 200-hour yoga teacher training is the foundation. Everything else turns it into the Movecia Method.</span></p></div>
+  <div class="comp rv">
+    <div class="donut-w"><?= $donut ?><div class="donut-c"><b><?= AC_HOURS ?></b><span><span class="de">Stunden</span><span class="en">hours</span></span><small><span class="de">ca. 10–12 Std. pro&nbsp;Woche</span><span class="en">about 10–12 h a&nbsp;week</span></small></div><?= $spark('s4') ?></div>
+    <ul class="legend">
+      <?php foreach ($hours as [$de, $en, $h, $col, $ic]): ?>
+      <li<?= $h === 60 && str_starts_with($de, 'Anatomie') ? ' class="star"' : '' ?>><span class="dot" style="background:<?= $col ?>"></span><span class="ic"><?= mv_icon_svg($ic) ?></span><span class="t"><span class="de"><?= forma_h($de) ?></span><span class="en"><?= forma_h($en) ?></span></span><span class="h"><?= $h ?> <span class="de">Std.</span><span class="en">h</span></span></li>
       <?php endforeach; ?>
-      <div class="hsum"><span><span class="de">Gesamt</span><span class="en">Total</span></span><span>500 <span class="de">Std.</span><span class="en">h</span></span></div>
-    </div>
+    </ul>
+  </div>
+  <div class="anat-row">
     <div class="anat rv">
       <img src="/img/movecia/fotos/ev-savasana.jpg?v=1" alt="" loading="lazy">
       <div class="tx">
@@ -112,16 +139,26 @@ $mDe = ['', 'Jän.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Se
         </ul>
       </div>
     </div>
+    <div class="anat soft2 rv">
+      <div class="tx">
+        <p class="k"><span class="de">Zwischen den Zeilen</span><span class="en">Between the lines</span></p>
+        <h3><span class="de">Bei dir bleiben</span><span class="en">Staying with yourself</span></h3>
+        <p><span class="de">Durch alle Module zieht sich eine Frage: Wie kannst du andere begleiten, ohne dich selbst zu verlieren? Du lernst, deine eigenen Grenzen zu spüren, dein Nervensystem nach einer Stunde wieder zu beruhigen und Mental Load nicht nur bei anderen, sondern auch bei dir zu erkennen. Das ist Wissen und Selbstfürsorge, keine Therapie, und genau das macht dich zu einer Begleiterin, der Menschen gern vertrauen.</span><span class="en">One question runs through every module: how can you guide others without losing yourself? You learn to sense your own limits, to settle your nervous system after a class, and to recognise mental load not only in others but in yourself. This is knowledge and self-care, not therapy, and it is exactly what makes you someone people love to trust.</span></p>
+      </div>
+    </div>
   </div>
 </div></section>
 
 <section class="w sec" id="ablauf"><div class="in">
-  <div class="sec-h rv"><div><p class="k"><span class="de">So läuft es ab</span><span class="en">How it works</span></p><h2 style="margin-top:.6rem"><span class="de">Elf Monate, <em>hybrid</em></span><span class="en">Eleven months, <em>hybrid</em></span></h2></div>
-    <p><span class="de">Jeden Monat öffnet sich ein neues Modul, immer am 1., nur das erste startet am <?= mv_date($st) ?>. Du lernst, wann es in deinen Alltag passt, und jede Woche sehen wir uns live.</span><span class="en">A new module opens every month, always on the 1st; only the first one opens on <?= mv_date($st, 'en') ?>. You learn whenever it fits into your day, and every week we meet live.</span></p></div>
-  <div class="how cute-cards">
+  <div class="sec-h rv"><div><p class="k"><span class="de">So lernst du</span><span class="en">How you learn</span></p><h2 style="margin-top:.6rem"><span class="de">Elf Monate, <em>nie allein</em></span><span class="en">Eleven months, <em>never alone</em></span></h2></div>
+    <p><span class="de">Jeden Monat öffnet sich ein neues Modul, immer am 1., nur das erste startet am Mittwoch, <?= mv_date($st) ?>. Plan etwa 10 bis 12 Stunden pro Woche ein, für Videos, Workbook, deine eigene Praxis, den Live-Call und deine Lerngruppe.</span><span class="en">A new module opens every month, always on the 1st; only the first opens on Wednesday, <?= mv_date($st, 'en') ?>. Allow about 10 to 12 hours a week for videos, workbook, your own practice, the live call and your learning group.</span></p></div>
+  <div class="how6 cute-cards">
     <div class="cat rv"><span class="ib"><?= mv_icon_svg('sonne') ?></span><b><span class="de">Theorie-Videos</span><span class="en">Theory videos</span></b><p><span class="de">Kompakte Videos zu jedem Thema, mit Kapitelübersicht, auf Handy, Tablet oder Computer.</span><span class="en">Compact videos on every topic, with a chapter overview, on your phone, tablet or computer.</span></p></div>
     <div class="cat rv"><span class="ib"><?= mv_icon_svg('blatt') ?></span><b><span class="de">Ausführliche Workbooks</span><span class="en">Extensive workbooks</span></b><p><span class="de">Zu jedem Modul ein Workbook zum Nachlesen, Üben und Reflektieren, schön gestaltet und zum Behalten.</span><span class="en">A workbook for every module to read, practise and reflect with, beautifully designed and yours to keep.</span></p></div>
-    <div class="cat rv"><span class="ib"><?= mv_icon_svg('kreis') ?></span><b><span class="de">Wöchentlicher Live-Call</span><span class="en">Weekly live call</span></b><p><span class="de">Wir üben gemeinsam, besprechen deine Fragen und unterrichten uns gegenseitig, in einer kleinen Gruppe von höchstens zehn Frauen.</span><span class="en">We practise together, talk through your questions and teach each other, in a small group of no more than ten women.</span></p></div>
+    <div class="cat rv"><span class="ib"><?= mv_icon_svg('kreis') ?></span><b><span class="de">Jede Woche live</span><span class="en">Live every week</span></b><p><span class="de">Im Live-Call üben wir gemeinsam, besprechen deine Fragen und unterrichten uns gegenseitig. Verpasste Calls werden aufgenommen.</span><span class="en">In the live call we practise together, talk through your questions and teach each other. Missed calls are recorded.</span></p></div>
+    <div class="cat rv"><span class="ib"><?= mv_icon_svg('kerze') ?></span><b><span class="de">Online-Coworking</span><span class="en">Online co-working</span></b><p><span class="de">Zu festen Zeiten lernen wir zusammen im Online-Raum, jede bei sich zu Hause, aber nicht allein. Das trägt durch volle Wochen.</span><span class="en">At set times we study together in our online room, each at home but not alone. It carries you through busy weeks.</span></p></div>
+    <div class="cat rv"><span class="ib"><?= mv_icon_svg('herz') ?></span><b><span class="de">Lerngruppen</span><span class="en">Learning groups</span></b><p><span class="de">In kleinen Gruppen fragt ihr euch gegenseitig ab, übt Sequenzen und unterrichtet euch. Oft entstehen daraus Freundschaften fürs Leben.</span><span class="en">In small groups you quiz each other, practise sequences and teach each other. Often friendships for life grow out of them.</span></p></div>
+    <div class="cat rv"><span class="ib"><?= mv_icon_svg('berg') ?></span><b><span class="de">Deine eigene Praxis</span><span class="en">Your own practice</span></b><p><span class="de">Du bewegst dich selbst weiter und dokumentierst ca. 100 Praxisstunden, damit das Wissen auch in deinem Körper ankommt.</span><span class="en">You keep moving yourself and document around 100 practice hours, so that what you learn settles into your own body too.</span></p></div>
   </div>
   <div class="mods">
     <?php foreach ($mods as $m): ?>
@@ -140,10 +177,10 @@ $mDe = ['', 'Jän.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Se
       <div class="tx">
         <p class="k"><span class="de">Präsenzwochenende · September 2028</span><span class="en">In-person weekend · September 2028</span></p>
         <h3><span class="de">Drei Tage in den Tiroler Alpen</span><span class="en">Three days in the Tyrolean Alps</span></h3>
-        <p><span class="de">Von Freitag 8:30 Uhr bis Sonntag 17:30 Uhr üben, unterrichten und lernen wir gemeinsam. Zwei Nächte mit Unterkunft und Verpflegung sind im Preis enthalten. Den genauen Ort gebe ich rechtzeitig bekannt.</span><span class="en">From Friday 8:30 am to Sunday 5:30 pm we practise, teach and learn together. Two nights with accommodation and meals are included in the price. I will announce the exact venue in good time.</span></p>
-        <p><span class="de"><b>Deine Lehrprobe:</b> Im Modul Unterrichten &amp; Sequencing entwickelst du deine eigene, etwa 25-minütige Einheit, und am Wochenende unterrichtest du sie. Das ist keine Prüfung, sondern dein schöner Moment, in dem alles zusammenkommt.</span><span class="en"><b>Your teaching practice:</b> in the teaching &amp; sequencing module you create your own session of about 25 minutes, and at the weekend you teach it. It is not an exam; it is your moment, when everything comes together.</span></p>
+        <p><span class="de">Von Freitag 8:30 Uhr bis Sonntag 17:30 Uhr üben, unterrichten und lernen wir gemeinsam. Zwei Nächte mit Unterkunft und Verpflegung sind im Preis enthalten. Der genaue Termin und der Ort werden noch bekannt gegeben.</span><span class="en">From Friday 8:30 am to Sunday 5:30 pm we practise, teach and learn together. Two nights with accommodation and meals are included in the price. The exact date and venue will be announced.</span></p>
+        <div class="lp"><b><span class="de">Deine Lehrprobe</span><span class="en">Your teaching practice</span></b><p><span class="de">Im Modul Unterrichten &amp; Sequencing entwickelst du deine eigene Einheit von etwa 25 Minuten, und am Wochenende unterrichtest du sie. Aufgeregt? Das ist ganz normal und sogar ein gutes Zeichen. Wir üben vorher viel gemeinsam, deine Lerngruppe kennt deine Stunde schon, und am Wochenende sitzen Frauen vor dir, die dir alles Gute wünschen. Das ist keine Prüfung, sondern dein Moment, in dem alles zusammenkommt.</span><span class="en">In the teaching &amp; sequencing module you create your own session of about 25 minutes, and at the weekend you teach it. Nervous? That is completely normal, and actually a good sign. We practise a lot together beforehand, your learning group already knows your class, and at the weekend you will be teaching women who are rooting for you. It is not an exam; it is your moment, when everything comes together.</span></p></div>
         <div class="facts"><span><span class="de">Fr 8:30 – So 17:30</span><span class="en">Fri 8:30 am – Sun 5:30 pm</span></span><span><span class="de">2 Nächte inklusive</span><span class="en">2 nights included</span></span><span><span class="de">Verpflegung inklusive</span><span class="en">Meals included</span></span></div>
-        <p class="must"><span class="de">Die Termine stehen ein Jahr im Voraus fest. Bitte plan das Wochenende fix ein, es kann nicht nachgeholt werden.</span><span class="en">The dates are fixed a year in advance. Please plan for the weekend, as it cannot be made up later.</span></p>
+        <p class="must"><span class="de">Die Termine stehen gut ein Jahr im Voraus fest. Bitte plan das Wochenende fix ein, es kann nicht nachgeholt werden.</span><span class="en">The dates are fixed well over a year in advance. Please plan for the weekend, as it cannot be made up later.</span></p>
       </div>
     </div>
     <div class="fin rv">
@@ -152,7 +189,7 @@ $mDe = ['', 'Jän.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Se
       <ol>
         <li><span class="ib"><?= mv_icon_svg('berg') ?></span><div><b><span class="de">Präsenzwochenende mit Lehrprobe</span><span class="en">In-person weekend with teaching practice</span></b><p><span class="de">Du unterrichtest deine eigene Einheit von etwa 25 Minuten.</span><span class="en">You teach your own session of about 25 minutes.</span></p></div></li>
         <li><span class="ib"><?= mv_icon_svg('kerze') ?></span><div><b><span class="de">Online-Abschlussprüfung</span><span class="en">Online final exam</span></b><p><span class="de">Nach dem Wochenende beantwortest du zu Hause die Multiple-Choice-Fragen, mit eingeschalteter Kamera in unserem Online-Prüfungsraum.</span><span class="en">After the weekend you answer the multiple-choice questions at home, with your camera on in our online exam room.</span></p></div></li>
-        <li><span class="ib"><?= mv_icon_svg('bluete') ?></span><div><b><span class="de">Dein Zertifikat</span><span class="en">Your certificate</span></b><p><span class="de">Mit bestandener Prüfung, dem Präsenzwochenende und ca. 100 dokumentierten Praxisstunden bekommst du dein Zertifikat der Movecia Academy über 500 Stunden.</span><span class="en">Once you have passed the exam, completed the in-person weekend and documented around 100 practice hours, you receive your 500-hour Movecia Academy certificate.</span></p></div></li>
+        <li><span class="ib"><?= mv_icon_svg('bluete') ?></span><div><b><span class="de">Dein Zertifikat</span><span class="en">Your certificate</span></b><p><span class="de">Mit bestandener Prüfung, dem Präsenzwochenende und ca. 100 dokumentierten Praxisstunden bekommst du dein Zertifikat der Movecia Academy über <?= AC_HOURS ?> Stunden.</span><span class="en">Once you have passed the exam, completed the in-person weekend and documented around 100 practice hours, you receive your <?= AC_HOURS ?>-hour Movecia Academy certificate.</span></p></div></li>
       </ol>
       <div class="room"><img src="/img/movecia/fotos/ev-gathering.jpg?v=1" alt="" loading="lazy"><p><span class="de"><b>Der Prüfungsraum</b> ist wie ein ruhiger Online-Coworking-Raum: Ihr sitzt mit Live-Kamera jeweils bei euch zu Hause, und ich bin die ganze Zeit dabei.</span><span class="en"><b>The exam room</b> is like a quiet online co-working space: each of you sits at home with your camera on, and I am there the whole time.</span></p></div>
     </div>
@@ -165,9 +202,9 @@ $mDe = ['', 'Jän.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Se
     <div class="pst rv"><span class="dot"><?= mv_icon_svg('welle') ?></span><div><span class="wd"><span class="de">Vorher · empfohlen</span><span class="en">Beforehand · recommended</span></span><b><span class="de">Etwa 1,5 Jahre eigene Praxis</span><span class="en">About 1.5 years of your own practice</span></b><p><span class="de">Mit der <a href="/method/">Method</a>, mit <a href="/unfold/">Unfold</a> oder in den <a href="/gathering/">Gatherings</a> lernst du die Movecia-Art zu bewegen von innen kennen.</span><span class="en">With the <a href="/method/">Method</a>, <a href="/unfold/">Unfold</a> or the <a href="/gathering/">Gatherings</a> you get to know the Movecia way of moving from the inside.</span></p></div></div>
     <div class="pst rv"><span class="dot"><?= mv_icon_svg('knospe') ?></span><div><span class="wd"><span class="de">Dein Moment</span><span class="en">Your moment</span></span><b><span class="de">Die Entscheidung</span><span class="en">The decision</span></b><p><span class="de">Du spürst, dass du das, was dir gut tut, weitergeben möchtest.</span><span class="en">You feel that you want to pass on what does you good.</span></p></div></div>
     <div class="pst rv"><span class="dot"><?= mv_icon_svg('kreis') ?></span><div><span class="wd"><span class="de">Kostenlos</span><span class="en">Free</span></span><b><span class="de">Kennenlerngespräch</span><span class="en">Intro call</span> <span class="opt"><span class="de">optional</span><span class="en">optional</span></span></b><p><span class="de">30 Minuten per Video, um deine Fragen zu klären.</span><span class="en">30 minutes by video to answer your questions.</span></p></div></div>
-    <div class="pst rv"><span class="dot"><?= mv_icon_svg('herz') ?></span><div><span class="wd"><span class="de">Online</span><span class="en">Online</span></span><b><span class="de">Deine Buchung</span><span class="en">Your booking</span></b><p><span class="de">Kurzer Fragebogen, Zahlung, und dein Platz ist sicher.</span><span class="en">A short questionnaire, payment, and your place is secured.</span></p></div></div>
+    <div class="pst rv"><span class="dot"><?= mv_icon_svg('herz') ?></span><div><span class="wd"><span class="de">Online</span><span class="en">Online</span></span><b><span class="de">Buchung &amp; Konfetti</span><span class="en">Booking &amp; confetti</span></b><p><span class="de">Mit der Anzahlung ist dein Platz sicher, und dein Mitgliederbereich öffnet sich sofort.</span><span class="en">Your deposit secures your place, and your members area opens straight away.</span></p></div></div>
     <div class="pst big rv"><span class="dot"><?= mv_icon_svg('sonne') ?></span><div><span class="wd"><?= mv_date($st) ?></span><b><span class="de">Start mit Modul 1</span><span class="en">Module 1 begins</span></b><p><span class="de">Gleich nach den Tiroler Herbstferien geht es los.</span><span class="en">We begin right after the Tyrolean autumn school holidays.</span></p></div></div>
-    <div class="pst rv"><span class="dot"><?= mv_icon_svg('blatt') ?></span><div><span class="wd"><span class="de">Nov. 2027 – Sept. 2028</span><span class="en">Nov 2027 – Sept 2028</span></span><b><span class="de">Elf Module</span><span class="en">Eleven modules</span></b><p><span class="de">Videos, Workbooks und jede Woche unser Live-Call.</span><span class="en">Videos, workbooks and our live call every week.</span></p></div></div>
+    <div class="pst rv"><span class="dot"><?= mv_icon_svg('blatt') ?></span><div><span class="wd"><span class="de">Nov. 2027 – Sept. 2028</span><span class="en">Nov 2027 – Sept 2028</span></span><b><span class="de">Elf Module</span><span class="en">Eleven modules</span></b><p><span class="de">Videos, Workbooks, Coworking, Lerngruppe und jede Woche unser Live-Call.</span><span class="en">Videos, workbooks, co-working, learning group and our live call every week.</span></p></div></div>
     <div class="pst big rv"><span class="dot"><?= mv_icon_svg('berg') ?></span><div><span class="wd"><span class="de">September 2028</span><span class="en">September 2028</span></span><b><span class="de">Präsenzwochenende &amp; Lehrprobe</span><span class="en">In-person weekend &amp; teaching practice</span></b><p><span class="de">Drei Tage zusammen in den Tiroler Alpen.</span><span class="en">Three days together in the Tyrolean Alps.</span></p></div></div>
     <div class="pst rv"><span class="dot"><?= mv_icon_svg('bluete') ?></span><div><span class="wd"><span class="de">Danach</span><span class="en">Afterwards</span></span><b><span class="de">Online-Prüfung &amp; Zertifikat</span><span class="en">Online exam &amp; certificate</span></b><p><span class="de">Multiple Choice mit Kamera im Prüfungsraum, dann hältst du dein Zertifikat in der Hand.</span><span class="en">Multiple choice with your camera on in the exam room, then your certificate is in your hands.</span></p></div></div>
   </div>
@@ -203,27 +240,33 @@ $mDe = ['', 'Jän.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Se
 
 <section class="w sec" id="buchen"><div class="in">
   <div class="pricebox">
+    <?= $spark('s5') . $spark('s6') ?>
     <div>
-      <p class="k"><span class="de">Investition</span><span class="en">Investment</span></p>
-      <h2 style="margin-top:.5rem"><span class="de">Dein Platz in der Ausbildung</span><span class="en">Your place on the training</span></h2>
-      <p class="amt"><?= $e($p['once']) ?><?= $p['eb'] ? '<s>' . $e($c['r_once']) . '</s>' : '' ?></p>
-      <?php if ($p['eb']): ?><p style="margin-top:.4rem;color:#F3E4DA"><span class="de"><?= $offerLive && !$c['eb'] ? 'Dein Angebot aus unserem Gespräch' : 'Early-Bird bis ' . mv_date($c['eb_end']) . ', danach ' . $e($c['r_once']) ?></span><span class="en"><?= $offerLive && !$c['eb'] ? 'Your offer from our call' : 'Early bird until ' . mv_date($c['eb_end'], 'en') . ', then ' . $ee($c['r_once']) ?></span></p><?php endif; ?>
+      <p class="k"><span class="de">Dein Platz</span><span class="en">Your place</span></p>
+      <h2 style="margin-top:.5rem"><span class="de">Einer von nur zehn</span><span class="en">One of only ten</span></h2>
+      <?php if ($p['eb']): ?><p class="ebird on-plum"><?= ac_birds() ?><b>Early Bird</b><span class="eb-p"><?= $e($p['total']) ?></span><span class="eb-d"><span class="de"><?= $offerLive && !$c['eb'] ? 'dein Angebot aus unserem Gespräch' : 'bis ' . mv_date($c['eb_end']) . ' · danach ' . $e($c['r_total']) ?></span><span class="en"><?= $offerLive && !$c['eb'] ? 'your offer from our call' : 'until ' . mv_date($c['eb_end'], 'en') . ' · then ' . $ee($c['r_total']) ?></span></span></p>
+      <?php else: ?><p class="amt"><?= $e($p['total']) ?></p><?php endif; ?>
       <ul class="incl">
-        <li><span class="de">500 Stunden Ausbildung inkl. 200 Std. Yoga nach internationalem Curriculum</span><span class="en">500 hours of training incl. 200 h yoga following an international curriculum</span></li>
-        <li><span class="de">11 Module mit Theorie-Videos und ausführlichen Workbooks</span><span class="en">11 modules with theory videos and extensive workbooks</span></li>
-        <li><span class="de">Jede Woche ein Live-Call in kleiner Gruppe</span><span class="en">A live call every week in a small group</span></li>
+        <li><span class="de"><?= AC_HOURS ?> Stunden inkl. vollständiger 200-Std.-Yogalehrerausbildung</span><span class="en"><?= AC_HOURS ?> hours incl. a complete 200-hour yoga teacher training</span></li>
+        <li><span class="de">11 Module mit Videos und ausführlichen Workbooks</span><span class="en">11 modules with videos and extensive workbooks</span></li>
+        <li><span class="de">Wöchentlicher Live-Call, Coworking und Lerngruppe</span><span class="en">Weekly live call, co-working and learning group</span></li>
         <li><span class="de">Präsenzwochenende mit 2 Nächten, Unterkunft und Verpflegung</span><span class="en">In-person weekend with 2 nights, accommodation and meals</span></li>
+        <li><span class="de">Mitgliederbereich ab sofort, mit Chat direkt zu mir</span><span class="en">Members area from day one, with a chat straight to me</span></li>
         <li><span class="de">Online-Abschlussprüfung und Zertifikat der Movecia Academy</span><span class="en">Online final exam and Movecia Academy certificate</span></li>
       </ul>
-      <div class="ebn"><b><span class="de">Höchstens <?= (int)$c['seats'] ?> Plätze</span><span class="en">No more than <?= (int)$c['seats'] ?> places</span></b><span class="de"><?= $free ? 'Gerade sind noch Plätze frei.' : 'Die Ausbildung ist ausgebucht. Schreib mir gern, falls ein Platz frei wird.' ?> Dein 14-tägiges Rücktrittsrecht beginnt erst mit dem Start, also bis <?= mv_date($wu) ?>.</span><span class="en"><?= $free ? 'There are still places available.' : 'The training is fully booked. Feel free to write to me in case a place opens up.' ?> Your 14-day right of withdrawal only starts when the training begins, so it runs until <?= mv_date($wu, 'en') ?>.</span></div>
+      <div class="ebn"><b><span class="de">So zahlst du</span><span class="en">How you pay</span></b><span class="de">Bei der Buchung zahlst du 50 % an, den Rest auf einmal oder in Teilen bis <?= $dd($c['due_final']) ?>, ohne Aufschlag. Dein Preis bleibt so, wie er bei der Buchung war. Etwa zehn Tage vor jeder Zahlung bekommst du einen Bezahl-Link. Innerhalb von 14 Tagen nach der Buchung kannst du ohne Angabe von Gründen zurücktreten und bekommst alles zurück.</span><span class="en">When you book, you pay a 50 % deposit, and the rest at once or in parts by <?= $de2($c['due_final']) ?>, with no surcharge. Your price stays exactly as it was when you booked. About ten days before each payment you get a payment link. Within 14 days of booking you can withdraw without giving a reason and get everything back.</span></div>
     </div>
     <form class="bookf" id="bf" novalidate>
       <?php if ($free): ?>
       <p class="k"><span class="de">Anmeldung</span><span class="en">Registration</span></p>
-      <div class="plans" role="radiogroup">
-        <label class="plan"><input type="radio" name="plan" value="once" checked><span class="badge"><span class="de">Beliebteste Wahl</span><span class="en">Most popular</span></span><span class="pt"><span class="de">Auf einmal</span><span class="en">In full</span></span><span class="pa"><?= $e($p['once']) ?></span><span class="ps"><span class="de">du sparst <?= $e($p['inst'] * $p['n'] - $p['once']) ?></span><span class="en">you save <?= $ee($p['inst'] * $p['n'] - $p['once']) ?></span></span></label>
-        <label class="plan"><input type="radio" name="plan" value="inst"><span class="pt"><span class="de"><?= (int)$p['n'] ?> Monatsraten</span><span class="en"><?= (int)$p['n'] ?> monthly payments</span></span><span class="pa"><?= (int)$p['n'] ?> × <?= $e($p['inst']) ?></span><span class="ps"><span class="de">gesamt <?= $e($p['inst'] * $p['n']) ?></span><span class="en"><?= $ee($p['inst'] * $p['n']) ?> in total</span></span></label>
+      <fieldset><legend><span class="de">Wie möchtest du zahlen?</span><span class="en">How would you like to pay?</span></legend>
+      <div class="payplans" role="radiogroup">
+        <?php foreach ($plans as $k => $pl): $s = $sched($k); ?>
+        <label class="pp"><input type="radio" name="plan" value="<?= $k ?>"<?= $k === $defPlan ? ' checked' : '' ?>><span class="pp-h"><span class="de"><?= $pl['de'] ?></span><span class="en"><?= $pl['en'] ?></span><?= $k === 'two' && count($plans) > 2 ? '<em><span class="de">beliebt</span><span class="en">popular</span></em>' : '' ?></span>
+          <span class="pp-rows"><?php foreach ($s as $x): ?><span class="pp-r"><span class="pp-w"><?= $x['due'] === '' ? '<span class="de">heute</span><span class="en">today</span>' : '<span class="de">bis ' . date('j.n.Y', strtotime($x['due'])) . '</span><span class="en">by ' . date('j M Y', strtotime($x['due'])) . '</span>' ?></span><b><span class="de"><?= $e((int)$x['cents']) ?></span><span class="en"><?= $ee((int)$x['cents']) ?></span></b></span><?php endforeach; ?></span></label>
+        <?php endforeach; ?>
       </div>
+      <p class="pp-note"><span class="de">♡ Je früher du buchst, desto mehr Zahlungsmöglichkeiten hast du: bis 15. Juni 2027 in drei Teilen, bis 31. August 2027 in zwei, danach auf einmal.</span><span class="en">♡ The earlier you book, the more ways you have to pay: in three parts until 15 June 2027, in two until 31 August 2027, and in one go after that.</span></p></fieldset>
       <label class="f"><span><span class="de">Vor- und Nachname</span><span class="en">Full name</span></span><input type="text" name="name" autocomplete="name" required maxlength="80"></label>
       <label class="f"><span>E-Mail</span><input type="email" name="email" autocomplete="email" required maxlength="160"></label>
       <label class="f"><span><span class="de">Telefon</span><span class="en">Phone</span></span><input type="text" name="phone" autocomplete="tel" required maxlength="40" inputmode="tel"></label>
@@ -232,14 +275,10 @@ $mDe = ['', 'Jän.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Se
       </fieldset>
       <label class="f"><span><span class="de">Erzähl mir kurz von deiner Praxis (freiwillig)</span><span class="en">Tell me a little about your practice (optional)</span></span><textarea name="practice_note" maxlength="800" style="min-height:80px"></textarea></label>
       <label class="f"><span><span class="de">Warum möchtest du die Ausbildung machen?</span><span class="en">Why would you like to do the training?</span></span><textarea name="why" maxlength="1500" required></textarea></label>
-      <fieldset class="wrf"><legend><span class="de">Dein Rücktrittsrecht</span><span class="en">Your right of withdrawal</span></legend>
-        <label class="wro"><input type="radio" name="wr" value="verzicht"><span><b><span class="de">Ab dem Start gleich alles nutzen</span><span class="en">Use everything from the start</span></b><small><span class="de">Videos und Workbook-Downloads sind ab dem <?= mv_date($st) ?> ganz offen. Für diese digitalen Inhalte verzichte ich auf mein Rücktrittsrecht.</span><span class="en">Videos and workbook downloads are fully open from <?= mv_date($st, 'en') ?>. I waive my right of withdrawal for this digital content.</span></small></span></label>
-        <label class="wro"><input type="radio" name="wr" value="behalten"><span><b><span class="de">Rücktrittsrecht behalten</span><span class="en">Keep my right of withdrawal</span></b><small><span class="de">Live-Calls und Videos starten wie geplant, die Workbook-Downloads öffnen sich nach dem Ende der 14-tägigen Frist ab dem Start.</span><span class="en">Live calls and videos start as planned; the workbook downloads open once the 14-day period from the start has ended.</span></small></span></label>
-      </fieldset>
-      <label class="chk"><input type="checkbox" name="weekend" value="1"><span><span class="de">Ich weiß, dass das Präsenzwochenende im September 2028 ein fester Termin ist, der nicht nachgeholt werden kann. Kann ich nicht teilnehmen, wird es nicht erstattet.</span><span class="en">I understand that the in-person weekend in September 2028 is a fixed date that cannot be made up later. If I cannot attend, it is not refunded.</span></span></label>
+      <label class="chk"><input type="checkbox" name="consent" value="1"><span><span class="de">Ich habe die <a href="/terms/#teacher" target="_blank">Bedingungen</a> gelesen: 14 Tage Rücktrittsrecht ab Buchung, danach die Storno-Staffel (bis 30.6.2027 25 %, bis 15.9.2027 50 %, danach der volle Preis), Ersatzteilnehmerin jederzeit möglich. Das Präsenzwochenende im September 2028 ist ein fester Termin, der nicht nachgeholt und bei Nichtteilnahme nicht erstattet wird.</span><span class="en">I have read the <a href="/terms/#teacher" target="_blank">terms</a>: a 14-day right of withdrawal from booking, then the cancellation scale (25 % until 30 June 2027, 50 % until 15 September 2027, the full price after that), and I can name someone to take my place at any time. The in-person weekend in September 2028 is a fixed date that cannot be made up and is not refunded if I don't attend.</span></span></label>
       <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <div><button class="btn" type="submit" id="bb"><span class="de">Weiter zur Zahlung</span><span class="en">Continue to payment</span> →</button></div>
-      <p class="mut" style="font-size:.82rem"><span class="de">Sichere Zahlung über Stripe (gemeinsames Konto von FORMA &amp; Movecia). Es gelten die <a href="/terms/#teacher">Bedingungen</a>.</span><span class="en">Secure payment with Stripe (shared FORMA &amp; Movecia account). The <a href="/terms/#teacher">terms</a> apply.</span></p>
+      <div><button class="btn" type="submit" id="bb"><span class="de">Anzahlung leisten &amp; Platz sichern</span><span class="en">Pay my deposit &amp; book</span> →</button></div>
+      <p class="mut" style="font-size:.82rem"><span class="de">Sichere Zahlung über Stripe (gemeinsames Konto von FORMA &amp; Movecia).</span><span class="en">Secure payment with Stripe (shared FORMA &amp; Movecia account).</span></p>
       <p class="err" id="be" hidden></p>
       <?php if (isset($_GET['abbruch'])): ?><p class="note"><span class="de">Die Zahlung wurde abgebrochen, es wurde nichts abgebucht.</span><span class="en">The payment was cancelled; nothing was charged.</span></p><?php endif; ?>
       <?php else: ?>
@@ -255,7 +294,7 @@ $mDe = ['', 'Jän.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Se
   <div class="rv">
     <p class="k"><span class="de">Deine Ausbilderin</span><span class="en">Your trainer</span></p>
     <h2 style="margin-top:.6rem"><span class="de">Hallo, ich bin <em>Vivien</em></span><span class="en">Hi, I'm <em>Vivien</em></span></h2>
-    <p style="margin-top:1rem"><span class="de">Ich unterrichte seit 2021 und habe rund 700 Stunden Yogalehrerausbildung und Bewegungslehre sowie knapp 400 Stunden Rehabilitation, Prävention und Gesundheitstraining hinter mir, dazu Weiterbildungen in somatischer Bewegung, Nervensystem-Regulation und prä- und postnatalem Training. Als Mama von vier Kindern weiß ich, wie sich ein voller Kopf anfühlt. Genau deshalb habe ich die Movecia Method entwickelt.</span><span class="en">I have been teaching since 2021, with around 700 hours of yoga teacher training and movement education and almost 400 hours of rehabilitation, prevention and health training behind me, plus further training in somatic movement, nervous system regulation and pre- and postnatal training. As a mother of four, I know what a full head feels like. That is exactly why I created the Movecia Method.</span></p>
+    <p style="margin-top:1rem"><span class="de">Ich unterrichte seit 2021 und habe rund 700 Stunden Yogalehrerausbildung und Bewegungslehre sowie knapp 400 Stunden Rehabilitation, Prävention und Gesundheitstraining hinter mir, dazu Weiterbildungen in somatischer Bewegung, Nervensystem-Regulation und prä- und postnatalem Training. Als Mama von vier Kindern weiß ich, wie sich ein voller Kopf anfühlt. Diese Ausbildung ist mein Herzensprojekt: Ich habe alles hineingepackt, was ich mir selbst immer gewünscht hätte.</span><span class="en">I have been teaching since 2021, with around 700 hours of yoga teacher training and movement education and almost 400 hours of rehabilitation, prevention and health training behind me, plus further training in somatic movement, nervous system regulation and pre- and postnatal training. As a mother of four, I know what a full head feels like. This training is my heart project: I have put into it everything I always wished I'd had myself.</span></p>
     <p class="hand"><span class="de">Ich freu mich auf dich.</span><span class="en">I can't wait to meet you.</span></p>
   </div>
 </div></section>
@@ -267,7 +306,7 @@ $mDe = ['', 'Jän.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Se
   <?php foreach (ac_faq() as [$qde, $qen, $ade, $aen]): ?>
   <details class="q"><summary><span class="de"><?= forma_h($qde) ?></span><span class="en"><?= forma_h($qen) ?></span></summary><p><span class="de"><?= forma_h($ade) ?></span><span class="en"><?= forma_h($aen) ?></span></p></details>
   <?php endforeach; ?>
-  <details class="q"><summary><span class="de">Kann ich zurücktreten?</span><span class="en">Can I withdraw?</span></summary><p><span class="de">Ja. Deine 14-tägige Rücktrittsfrist beginnt erst mit dem Start am <?= mv_date($st) ?>. Vor dem Start bekommst du alles zurück, danach zahlst du nur den Teil, der bis dahin genutzt wurde. Das Präsenzwochenende kann nicht nachgeholt und bei Nichtteilnahme nicht erstattet werden. Alle Details stehen in den <a href="/terms/#teacher">Bedingungen</a>.</span><span class="en">Yes. Your 14-day withdrawal period only begins with the start on <?= mv_date($st, 'en') ?>. Before the start you get everything back; after that you pay only for the part already used. The in-person weekend cannot be made up later and is not refunded if you do not attend. All the details are in the <a href="/terms/#teacher">terms</a>.</span></p></details>
+  <details class="q"><summary><span class="de">Kann ich zurücktreten oder stornieren?</span><span class="en">Can I withdraw or cancel?</span></summary><p><span class="de">Innerhalb von 14 Tagen nach der Buchung kannst du ohne Angabe von Gründen zurücktreten und bekommst alles zurück. Danach gilt: bis 30. Juni 2027 beträgt die Stornogebühr 25 % des Gesamtpreises, vom 1. Juli bis 15. September 2027 50 %, danach ist der volle Preis fällig. Du kannst jederzeit kostenlos eine Ersatzteilnehmerin nennen. Muss ich absagen, bekommst du alles zurück. Für den Krankheitsfall empfehle ich eine Seminar- oder Reisestornoversicherung. Alle Details stehen in den <a href="/terms/#teacher">Bedingungen</a>.</span><span class="en">Within 14 days of booking you can withdraw without giving a reason and get everything back. After that: until 30 June 2027 the cancellation fee is 25 % of the total price, from 1 July to 15 September 2027 it is 50 %, and after that the full price is due. You can name someone to take your place at any time at no cost. If I have to cancel, you get everything back. For illness, I recommend a seminar or travel cancellation insurance. All the details are in the <a href="/terms/#teacher">terms</a>.</span></p></details>
   </div>
 </div></section>
 </main>
@@ -275,12 +314,10 @@ $mDe = ['', 'Jän.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Se
 <script>
 (function(){
   var T=Date.now(),L=function(){return document.documentElement.dataset.l==='en'?'en':'de'};
-  // Countdown fürs Angebot aus dem Gespräch
   var ob=document.getElementById('offerbar');
   if(ob){var until=+ob.dataset.until*1000,skew=Date.now()-(+ob.dataset.now*1000),cd=document.getElementById('offercd');
     var tick=function(){var ms=until-(Date.now()-skew);if(ms<=0){cd.textContent='0:00';setTimeout(function(){location.href=location.pathname+(L()==='en'?'?lang=en':'')+'#buchen'},1500);return}var s=Math.ceil(ms/1000),m=Math.floor(s/60);cd.textContent=m+':'+String(s%60).padStart(2,'0');setTimeout(tick,500)};tick();}
   var angebot=new URLSearchParams(location.search).get('angebot')||'';
-  // Kennenlerngespräch
   var pick=null;document.querySelectorAll('#slots .slot').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('#slots .slot').forEach(function(x){x.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');pick=b})});
   var cf=document.getElementById('cf'),ce=document.getElementById('ce'),co=document.getElementById('co'),cb=document.getElementById('cb');
   cf.addEventListener('submit',async function(ev){ev.preventDefault();ce.hidden=true;var en=L()==='en';
@@ -291,15 +328,13 @@ $mDe = ['', 'Jän.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Se
       if(j.ok){cf.querySelectorAll('label,button').forEach(function(x){x.hidden=true});co.textContent=(en?'Thank you! Your preferred time: ':'Danke! Dein Wunschtermin: ')+j.when+(en?'. I will confirm it by email shortly.':'. Ich bestätige ihn dir in Kürze per E-Mail.');co.hidden=false;pick.disabled=true;return}
       ce.textContent=j.error||'…';ce.hidden=false}catch(x){ce.textContent=en?'Something went wrong. Please try again.':'Das hat gerade nicht geklappt. Bitte versuch es noch einmal.';ce.hidden=false}
     cb.disabled=false});
-  // Buchung
   var bf=document.getElementById('bf'),be=document.getElementById('be'),bb=document.getElementById('bb');
   if(bb)bf.addEventListener('submit',async function(ev){ev.preventDefault();be.hidden=true;var en=L()==='en',err=[];
     if(bf.name.value.trim().length<2||bf.email.value.indexOf('@')<1)err.push(en?'Please enter your name and email.':'Bitte gib deinen Namen und deine E-Mail an.');
     if(bf.phone.value.replace(/\D/g,'').length<6)err.push(en?'Please enter your phone number.':'Bitte gib deine Telefonnummer an.');
     if(!bf.querySelector('input[name=practice]:checked'))err.push(en?'Please tell me how long you have been practising.':'Bitte sag mir, wie lange du schon praktizierst.');
     if(bf.why.value.trim().length<10)err.push(en?'Please write a few words about why you want to do the training.':'Bitte schreib mir ein paar Sätze, warum du die Ausbildung machen möchtest.');
-    if(!bf.querySelector('input[name=wr]:checked'))err.push(en?'Please choose whether you keep your right of withdrawal.':'Bitte wähle, ob du dein Rücktrittsrecht behältst.');
-    if(!bf.weekend.checked)err.push(en?'Please tick the box about the in-person weekend.':'Bitte setz das Häkchen zum Präsenzwochenende.');
+    if(!bf.consent.checked)err.push(en?'Please tick the box about the terms.':'Bitte setz das Häkchen zu den Bedingungen.');
     if(err.length){be.textContent=err.join(' ');be.hidden=false;return}
     var d=Object.fromEntries(new FormData(bf));d.action='book';d.lang=L();d.t=T;d.angebot=angebot;bb.disabled=true;
     try{var r=await fetch('/api/academy.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});var j=await r.json();

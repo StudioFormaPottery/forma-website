@@ -20,22 +20,23 @@ $ld = [
      'hasOfferCatalog' => ['@type' => 'OfferCatalog', 'name' => 'Ausbildungen', 'itemListElement' => [['@type' => 'Offer', 'itemOffered' => ['@type' => 'Course', '@id' => $site . '/academy/teacher-training/#course', 'name' => AC_TITLE, 'url' => $site . '/academy/teacher-training/']]]]],
     ['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => [['@type' => 'ListItem', 'position' => 1, 'name' => 'Movecia', 'item' => $site . '/'], ['@type' => 'ListItem', 'position' => 2, 'name' => 'Academy', 'item' => $site . '/academy/']]],
 ];
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=1">';
-mvl_head('Movecia Academy · Yogalehrerausbildung & Mindful Movement Ausbildung in Tirol', 'Ausbildungen der Movecia Academy mit Vivien Malonga: das Mindful Movement Teacher Training mit 500 Stunden, inkl. 200-Stunden-Yogalehrerausbildung, Somatic Movement und Breathwork. Hybrid, mit Präsenzwochenende in den Tiroler Alpen. Start November 2027.', $site . '/academy/', '/img/movecia/og-academy.jpg', $css, $ld);
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=3">';
+mvl_head('Movecia Academy · Yogalehrerausbildung & Mindful Movement Ausbildung in Tirol', 'Ausbildungen der Movecia Academy mit Vivien Malonga: das Mindful Movement Teacher Training mit 550 Stunden, inkl. vollständiger 200-Stunden-Yogalehrerausbildung, Somatic Movement und Breathwork. Hybrid, mit Präsenzwochenende in den Tiroler Alpen. Nur alle 2 Jahre, nur 10 Plätze, Start November 2027.', $site . '/academy/', '/img/movecia/og-academy.jpg', $css, $ld);
 ?>
 <body>
 <?php mvl_top('academy'); ?>
 <main>
 <section class="w"><div class="in hero-x ac-hero">
-  <?= mv_waves(true, 'pb-desk') ?>
+  <?= mv_waves(false) ?>
   <div>
-    <p class="k"><span class="de">Movecia Academy · Ausbildungen</span><span class="en">Movecia Academy · trainings</span></p>
+    <div class="ac-head"><?= ac_seal() ?><p class="k" style="margin:0"><span class="de">Movecia Academy · Ausbildungen</span><span class="en">Movecia Academy · trainings</span><br><span class="de" style="color:var(--muted)">klein, persönlich, nur alle zwei Jahre</span><span class="en" style="color:var(--muted)">small, personal, only every two years</span></p></div>
     <h1><span class="de">Lernen, <em>andere</em> zu begleiten.</span><span class="en">Learn to <em>guide</em> others.</span></h1>
     <p class="sub"><span class="de">Und dabei bei dir zu bleiben.</span><span class="en">And stay close to yourself while you do.</span></p>
     <p class="lead"><span class="de">In der Movecia Academy gebe ich weiter, was ich in vielen Jahren Unterricht gelernt habe: wie Bewegung, Atem und echtes Zuhören zusammenkommen. Für Frauen, die selbst schon eine Weile in Bewegung sind und spüren, dass sie das weitergeben möchten.</span><span class="en">In the Movecia Academy I pass on what many years of teaching have taught me: how movement, breath and real listening come together. For women who have been moving for a while themselves and feel that they want to share it.</span></p>
     <div class="cta"><a class="btn" href="/academy/teacher-training/"><span class="de">Zum Teacher Training</span><span class="en">See the teacher training</span> →</a><a class="btn line" href="#ausbildungen"><span class="de">Alle Ausbildungen</span><span class="en">All trainings</span></a></div>
   </div>
 </div></section>
+<div class="ac-ribbon" aria-hidden="true"><div class="rb-in"><?php for ($i = 0; $i < 2; $i++): ?><span><span class="de">nur 10 Plätze</span><span class="en">only 10 places</span></span><i>✦</i><span><span class="de">nur alle 2 Jahre</span><span class="en">only every 2 years</span></span><i>✦</i><span><?= AC_HOURS ?> <span class="de">Stunden</span><span class="en">hours</span></span><i>✦</i><span><span class="de">inkl. 200-Std.-Yogalehrerausbildung</span><span class="en">incl. 200-hour yoga teacher training</span></span><i>✦</i><?php endfor; ?></div></div>
 
 <section class="w sec" id="ausbildungen"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">Ausbildungen</span><span class="en">Trainings</span></p><h2 style="margin-top:.6rem"><span class="de">Dein nächster <em>Schritt</em></span><span class="en">Your next <em>step</em></span></h2></div>
@@ -45,16 +46,16 @@ mvl_head('Movecia Academy · Yogalehrerausbildung & Mindful Movement Ausbildung 
       <div class="ac-pic"><img src="/img/movecia/fotos/ev-lunge.jpg?v=1" alt="" loading="lazy"><span class="onum">01</span></div>
       <div class="ac-tx">
         <?= mv_icons(['spirale', 'atem', 'herz'], 'ico', 0) ?>
-        <p class="k"><span class="de">500 Stunden · hybrid · 11 Monate</span><span class="en">500 hours · hybrid · 11 months</span></p>
+        <p class="k"><span class="de"><?= AC_HOURS ?> Stunden · hybrid · 11 Monate</span><span class="en"><?= AC_HOURS ?> hours · hybrid · 11 months</span></p>
         <h3>The Movecia Method</h3>
         <p class="ac-sub">Mindful Movement Teacher Training</p>
-        <p><span class="de">Eine Ausbildung für Frauen, die Menschen wirklich begleiten möchten, statt starre Programme abzuspulen. Mit einer vollständigen Yogalehrerausbildung nach internationalem 200-Stunden-Curriculum, Somatic Movement, Breathwork, Anatomie und Body Scanning, Mental Load und Nervensystem.</span><span class="en">A training for women who want to truly accompany people rather than run through rigid programmes. Including a complete yoga teacher training following an international 200-hour curriculum, somatic movement, breathwork, anatomy and body scanning, mental load and the nervous system.</span></p>
+        <p><span class="de">Andere begleiten und dabei bei dir selbst bleiben. Mit einer vollständigen 200-Stunden-Yogalehrerausbildung inklusive, dazu Somatic Movement, Breathwork, Anatomie und Body Scanning, achtsame Berührung und Rituale, Mental Load und Nervensystem und deine Selbstständigkeit.</span><span class="en">Guide others and stay close to yourself while you do. A complete 200-hour yoga teacher training is included, plus somatic movement, breathwork, anatomy and body scanning, mindful touch and rituals, mental load and the nervous system, and building your own business.</span></p>
         <div class="meta">
           <span class="chip"><span class="de">Start <?= mv_date($st) ?></span><span class="en">Starts <?= mv_date($st, 'en') ?></span></span>
           <span class="chip"><span class="de">Präsenzwochenende in den Tiroler Alpen</span><span class="en">In-person weekend in the Tyrolean Alps</span></span>
           <span class="chip <?= $free ? 'ok' : '' ?>"><?= $free ? '<span class="de">Plätze frei</span><span class="en">Places available</span>' : '<span class="de">ausgebucht</span><span class="en">fully booked</span>' ?></span>
         </div>
-        <?php if ($c['eb']): ?><p class="ac-eb"><span class="de">Early-Bird bis <?= mv_date($c['eb_end']) ?>: <?= str_replace('€ ', '€&nbsp;', mv_eur($c['eb_once'])) ?> statt <?= str_replace('€ ', '€&nbsp;', mv_eur($c['r_once'])) ?></span><span class="en">Early bird until <?= mv_date($c['eb_end'], 'en') ?>: <?= ac_eur($c['eb_once'], 'en') ?> instead of <?= ac_eur($c['r_once'], 'en') ?></span></p><?php endif; ?>
+        <?php if ($c['eb']): ?><span class="ebird" style="margin-top:1.8rem"><?= ac_birds() ?><b>Early Bird</b><span class="eb-p"><?= str_replace('€ ', '€&nbsp;', mv_eur($c['eb_total'])) ?></span><span class="eb-d"><span class="de">bis <?= mv_date($c['eb_end']) ?> · danach <?= str_replace('€ ', '€&nbsp;', mv_eur($c['r_total'])) ?></span><span class="en">until <?= mv_date($c['eb_end'], 'en') ?> · then <?= ac_eur($c['r_total'], 'en') ?></span></span></span><?php endif; ?>
         <p class="more"><span class="de">Alles zur Ausbildung</span><span class="en">All about the training</span> →</p>
       </div>
     </a>

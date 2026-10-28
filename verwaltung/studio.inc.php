@@ -37,8 +37,9 @@ if ($action === 'mm_looks_get' || $action === 'mm_looks_set') {
 if ($view === 'studio') {
     require_once dirname(__DIR__) . '/api/method-lib.php';
     mv_schema($pdo);
+    try { require_once dirname(__DIR__) . '/api/academy-lib.php'; ac_schema($pdo); } catch (Throwable $e) {} // legt das Academy-Willkommensvideo an
     $talks = [];
-    foreach (['method' => 'Method', 'unfold' => 'Unfold', 'natal' => 'Prä- & Postnatal'] as $aud => $an) {
+    foreach (['academy' => 'Academy', 'method' => 'Method', 'unfold' => 'Unfold', 'natal' => 'Prä- & Postnatal'] as $aud => $an) {
         foreach (mv_programs($pdo, $aud) as $p) foreach (mv_lessons($pdo, (int)$p['id']) as $l) {
             if (mv_lesson_is_clips($l)) continue;
             $talks[] = ['id' => (int)$l['id'], 'g' => $an, 't' => (string)$l['title_de'], 'te' => (string)($l['title_en'] ?: $l['title_de']),
@@ -73,7 +74,8 @@ if ($view === 'studio') {
         'x' => $t['vde'] && $t['ven'] ? '' : ($t['vde'] ? ' (Englisch fehlt)' : ($t['ven'] ? ' (Deutsch fehlt)' : ' (DE + EN)')), 'g' => $t['g']];
     foreach ($moves as $m) $queue[] = ['v' => 'c' . $m['id'], 'ok' => $m['ok'], 'due' => $m['due'], 'ico' => '🧘', 'k' => $m['k'], 'n' => $m['n'],
         'x' => $m['for'] ? ' · für ' . $m['for'][0] . (count($m['for']) > 1 ? ' +' . (count($m['for']) - 1) : '') : '', 'g' => ''];
-    usort($queue, fn($a, $b) => [$a['due'] === '' ? '9' : $a['due'], $a['ico'], $a['n']] <=> [$b['due'] === '' ? '9' : $b['due'], $b['ico'], $b['n']]);
+    // Academy-Willkommensvideo ganz oben, solange es fehlt (Vivien, 28.10.2026)
+    usort($queue, fn($a, $b) => [$a['g'] === 'Academy' && !$a['ok'] ? 0 : 1, $a['due'] === '' ? '9' : $a['due'], $a['ico'], $a['n']] <=> [$b['g'] === 'Academy' && !$b['ok'] ? 0 : 1, $b['due'] === '' ? '9' : $b['due'], $b['ico'], $b['n']]);
     foreach ($queue as &$q) $q['l'] = ($q['due'] === '' ? 'ohne Datum' : (!$q['ok'] && $q['due'] < $today ? '⚠ überfällig · ' . $dShort($q['due']) : 'bis ' . $dShort($q['due'])))
         . ' · ' . $q['ico'] . ' ' . $q['k'] . ' · ' . $q['n'] . ($q['g'] !== '' ? ' (' . $q['g'] . ')' : '') . $q['x'];
     unset($q);
@@ -300,7 +302,8 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
 @media(max-width:640px){.pk-day>summary .pill:not(.late):not(.soon){display:none}.pk-dt>b{font-size:19px}}
 .pill{font-size:14px;padding:3px 12px;border-radius:999px;background:#EADFDE;color:#6B5658}.pill.soon{background:#E8D6CA;color:#4A3A41}.pill.late{background:#F3D9D5;color:#A0413B}
 .pk-dh .cnt{margin-left:auto;font-size:15px;color:#7D7076}
-.pk-sub{font-size:15px;color:#7D7076;margin:12px 2px 8px}.pk-sub a{color:#7D5E68}
+.pk-sub{font-size:15px;color:#7D7076;margin:12px 2px 8px}
+.pk-first{background:linear-gradient(135deg,#F3E2D8,#EADFDE);border-radius:20px;padding:4px 12px 12px;margin-bottom:12px}.pk-sub a{color:#7D5E68}
 .pk-empty{font-size:19px;color:#6B5658;padding:12px}
 .pk-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
 .pk-t{display:flex;gap:12px;align-items:flex-start;text-align:left;font:inherit;padding:12px;border-radius:20px;border:1.5px solid #E6DCD2;background:#fff;color:#2E2529;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;min-height:84px}
@@ -371,7 +374,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
       <button type="button" data-tab="free" aria-selected="false">✍️ Frei aufnehmen</button>
       <?php if ($done): ?><button type="button" data-tab="done" aria-selected="false">✓ Schon fertig <span><?= count($done) ?></span></button><?php endif; ?>
     </div>
-    <div class="pk-pane pkc-pane" data-pane="next"><?php if (!$calOpen): ?><p class="pk-empty">Alles aufgenommen. Wunderbar ♡</p><?php else: ?>
+    <div class="pk-pane pkc-pane" data-pane="next"><?php $acT = array_values(array_filter($open, fn($t) => ($t['g'] ?? '') === 'Academy')); if ($acT): ?><div class="pk-first"><p class="pk-sub">🎓 Zuerst · für dein Teacher Training</p><div class="pk-tiles"><?= implode('', array_map($tile, $acT)) ?></div></div><?php endif; ?><?php if (!$calOpen): ?><p class="pk-empty">Alles aufgenommen. Wunderbar ♡</p><?php else: ?>
       <div class="pkc-wrap">
         <div class="pkc">
           <div class="pkc-h"><button type="button" class="pkc-nav" data-cm="-1" aria-label="Monat davor">‹</button><b id="calM"></b><button type="button" class="pkc-nav" data-cm="1" aria-label="nächster Monat">›</button></div>

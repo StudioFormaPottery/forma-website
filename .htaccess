@@ -67,6 +67,8 @@ RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^academy/?$ wildhearts/academy/ [L,QSA]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^academy/teacher-training/?$ wildhearts/academy/teacher-training/ [L,QSA]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^academy/mitglieder/?$ wildhearts/academy/mitglieder/ [L,QSA]
 # Personal Training für Hotelgäste (Vivien, 27.10.2026): nur per Link/QR vom Flyer, nirgends verlinkt
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^personal-training/?$ wildhearts/personal-training/ [L,QSA]
