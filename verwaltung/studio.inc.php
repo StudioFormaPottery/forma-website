@@ -391,7 +391,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
 </nav>
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
 <script src="/wildhearts/assets/talkcam.js?v=2"></script>
-<script src="studio-edit.js?v=3"></script>
+<script src="studio-edit.js?v=4"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
@@ -556,11 +556,17 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
 
   // =================== Bearbeiten ===================
   let edOpen=null,fromFile=false;
+  // Welche Musik passt? (Stichwörter aus dem Musik-Ordner, nach Titel/Text des Videos)
+  function musicHint(){if(mv||mvFree)return [];if(ig)return ig.kind==='reel'?['reel','lebendig','morgen']:['reel','morgen'];
+    const t=((cur&&cur.t)||'')+' '+String((cur&&(lang==='en'?cur.en:cur.de))||$('ownT').value||'').slice(0,300);
+    if(/abend|nacht|schlaf|meditation|atem|breath|ruhe|loslassen|savasana|evening|sleep/i.test(t))return ['meditation','abend'];
+    if(/morgen|morning|willkommen|welcome|start|ankommen/i.test(t))return ['morgen','reel'];
+    return ['morgen','reel','flow']}
   function editor(b,dur,info,done){
     if(typeof StudioEdit==='undefined'){$('msg').textContent='Der Bearbeiten-Baustein konnte nicht laden. Bitte Seite neu laden (vorher herunterladen!).';return}
     document.body.classList.add('editing');$('edWrap').hidden=false;$('edInfo').textContent=info||'';window.scrollTo({top:0,behavior:'smooth'});
     const back=()=>{document.body.classList.remove('editing');$('edWrap').hidden=true;edOpen=null};
-    edOpen=StudioEdit.open({blob:b,dur:dur,mount:$('ed'),onDone:(nb,inf)=>{back();done(nb,inf)},onCancel:back});}
+    edOpen=StudioEdit.open({blob:b,dur:dur,mount:$('ed'),musicHint:musicHint(),seed:(cur&&cur.id)||(ig&&ig.id)||Date.now(),onDone:(nb,inf)=>{back();done(nb,inf)},onCancel:back});}
   function setBlob(nb,suffix){blob=nb;saved=false;const url=URL.createObjectURL(nb);$('play').src=url;const ext=nb.type.includes('mp4')?'mp4':'webm';
     $('dl').href=url;$('dl').download=String($('dl').download||'Video').replace(/(_bearbeitet)?\.\w+$/,'')+(suffix||'')+'.'+ext;$('prog').hidden=true;showAfter();}
   $('edit').onclick=()=>{if(!blob)return;const d=$('play').duration;

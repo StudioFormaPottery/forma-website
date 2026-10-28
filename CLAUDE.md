@@ -423,7 +423,7 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 
 ## Musik-Ordner (Vivien, 28.10.2026)
 - Movecia-Reiter „🎵 Musik“ (`?view=musik`, `verwaltung/musik.inc.php`, Tabelle `mm_music`: title, file, dur, tags): Lieder (z. B. Epidemic Sound) per Ziehen/Antippen hochladen (8-MB-Stücke, `mm_mu_up`), Titel aus dem Dateinamen („ES_… - Künstler“ → „… – Künstler“), Stichwörter Morgen/Abend/Flow & Bewegung/Meditation & Atem/Reel & Story/Lebendig. Dateien in `../forma-data/musik/`, nur angemeldet abrufbar (`&dl=ID`). Gekaufte Musik nie ins Repo (öffentlich).
-- Studio → Bearbeiten → „🎵 Musik darunter“ zeigt „Aus deiner Musik“ (reinhören, „Nehmen“), daneben „Andere Datei vom Gerät“.
+- Studio → Bearbeiten → „🎵 Musik darunter“ zeigt „Aus deiner Musik“ (reinhören, „Nehmen“), daneben „Andere Datei vom Gerät“. Beim Öffnen legt der Editor automatisch ein passendes Lied darunter (`musicHint()` im Studio: Abend/Meditation/Atem → Stichwörter meditation/abend, Morgen/Willkommen → morgen, Instagram → reel; Wahl je Video fest über `seed`), leiser beim Sprechen; Übungs-Clips bekommen keine Musik.
 - Epidemic-Connector in Claude ist verbunden (Suche, Kürzen auf Länge). Downloads erreichen die Cloud-Arbeitsumgebung nicht (Proxy 403): Claude sucht aus und gibt Vivien Download-Links, sie zieht die Dateien in „🎵 Musik“.
 
 ## Studio am Handy (Vivien, 28.10.2026: „Bild fix, nichts verschieben, alles auf einem Bildschirm“)

@@ -242,12 +242,24 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
         + '<ul>' + L.map(x => '<li class="' + (x.id === libSel ? 'on' : '') + '"><button type="button" data-pv="' + x.id + '" aria-label="Reinhören">' + (preId === x.id ? '❚❚' : '▶') + '</button><span>' + esc(x.t) + '<small>' + f2(x.dur) + '</small></span><button type="button" class="pk" data-take="' + x.id + '">' + (x.id === libSel ? '✓ gewählt' : 'Nehmen') + '</button></li>').join('') + '</ul>';
       box.querySelectorAll('[data-lf]').forEach(b => b.onclick = () => { libF = b.dataset.lf; libUi(); });
       box.querySelectorAll('[data-pv]').forEach(b => b.onclick = () => { const id = +b.dataset.pv; if (preId === id) { pre.pause(); preId = 0; } else { pre.src = '?view=musik&dl=' + id; pre.volume = .6; pre.play().catch(() => {}); preId = id; } libUi(); });
-      box.querySelectorAll('[data-take]').forEach(b => b.onclick = async () => { const id = +b.dataset.take, x = lib.find(y => y.id === id); b.disabled = true; b.textContent = 'Lädt …';
-        try { const r = await fetch('?view=musik&dl=' + id, { credentials: 'same-origin' }); const bl = await r.blob(); const f = new File([bl], x.t + '.mp3', { type: bl.type || 'audio/mpeg' }); f._libId = id;
-          pre.pause(); preId = 0; libSel = id; setMusic(f); msg.className = 'se-msg ok'; msg.textContent = '🎵 „' + x.t + '“ liegt jetzt darunter. Mit ▶ Abspielen anhören.'; } catch (e) { msg.textContent = 'Das Lied konnte nicht laden.'; }
-        libUi(); });
+      box.querySelectorAll('[data-take]').forEach(b => b.onclick = () => { b.disabled = true; b.textContent = 'Lädt …'; take(+b.dataset.take, false); });
     }
-    fetch('?view=musik&json=1', { credentials: 'same-origin' }).then(r => r.json()).then(j => { lib = j.list || []; libTags = j.tags || {}; libUi(); }).catch(() => { K('lib').innerHTML = ''; });
+    async function take(id, auto) {
+      const x = lib.find(y => y.id === id); if (!x) return;
+      try { const r = await fetch('?view=musik&dl=' + id, { credentials: 'same-origin' }); const bl = await r.blob(); if (closed) return; const f = new File([bl], x.t + '.mp3', { type: bl.type || 'audio/mpeg' }); f._libId = id;
+        pre.pause(); preId = 0; libSel = id; setMusic(f); msg.className = 'se-msg ok';
+        msg.textContent = auto ? '🎵 Ich habe „' + x.t + '“ darunter gelegt, leise und leiser, wenn du sprichst. Passt es nicht, wähl unter „Musik darunter“ ein anderes Lied oder tippe auf „Musik entfernen“.' : '🎵 „' + x.t + '“ liegt jetzt darunter. Mit ▶ Abspielen anhören.'; } catch (e) { msg.textContent = 'Das Lied konnte nicht laden.'; }
+      libUi();
+    }
+    // Passendes Lied automatisch darunterlegen (Vivien, 28.10.2026: „muss ich das selber machen?“)
+    function autoPick() {
+      const hint = o.musicHint || []; if (file || !hint.length || !lib.length) return;
+      let m = []; for (const t of hint) { m = lib.filter(x => x.tags.includes(t)); if (m.length) break; }
+      if (!m.length) m = lib.filter(x => !x.tags.length || x.tags.some(t => hint.includes(t))); if (!m.length) m = lib;
+      const seed = String(o.seed || ''), n = [...seed].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+      mus.duck = true; mus.fade = true; sync(); take(m[n % m.length].id, true);
+    }
+    fetch('?view=musik&json=1', { credentials: 'same-origin' }).then(r => r.json()).then(j => { lib = j.list || []; libTags = j.tags || {}; libUi(); autoPick(); }).catch(() => { K('lib').innerHTML = ''; });
     K('mdel').onclick = () => { au.pause(); setMusic(null); libSel = 0; libUi(); };
     if (file) setMusic(file);
     function syncMusic() { if (!file || !au.duration) return; const d = au.duration, t = mus.from + Math.max(0, v.currentTime - a); au.currentTime = d ? t % d : 0; }
