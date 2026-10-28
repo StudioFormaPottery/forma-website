@@ -29,6 +29,7 @@ function mv_menu_items(): array
     ];
 }
 
+// Obere Leiste ohne Gatherings (Vivien, 28.10.2026: zu viele Punkte); im Menü mit den drei Strichen bleibt es
 function mv_menu(string $active = '', array $o = []): void
 {
     static $assets = false;
@@ -36,7 +37,7 @@ function mv_menu(string $active = '', array $o = []): void
     $links = $o['links'] ?? true;
     $items = mv_menu_items();
     if ($links): ?>
-<nav class="mvm-bar" aria-label="Menü"><?php foreach ($items as [$href, $de, $en, $k]) if ($k !== 'start'): ?><a href="<?= $href ?>"<?= $k === $active ? ' class="on" aria-current="page"' : '' ?>><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></a><?php endif; ?><a class="lg" href="/mitglieder/"><span class="de">Login</span><span class="en">Log in</span></a></nav>
+<nav class="mvm-bar" aria-label="Menü"><?php foreach ($items as [$href, $de, $en, $k]) if (!in_array($k, ['start', 'gathering'], true)): ?><a href="<?= $href ?>"<?= $k === $active ? ' class="on" aria-current="page"' : '' ?>><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></a><?php endif; ?><a class="lg" href="/mitglieder/"><span class="de">Login</span><span class="en">Log in</span></a></nav>
 <?php endif; ?>
 <button class="mvm-btn" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mvm-panel"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14"/></svg></button>
 <?php if ($assets) return; $assets = true; ?>
