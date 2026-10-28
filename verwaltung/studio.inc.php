@@ -581,7 +581,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
   window.addEventListener('beforeunload',e=>{if(edOpen){e.preventDefault();e.returnValue=''}});
 
   // Instagram: Video in 8-MB-Stücken auf den eigenen Server, am Tag dann unter „Instagram täglich“ teilen
-  async function igSave(G){const b=blob,CH=8*1024*1024,n=Math.max(1,Math.ceil(b.size/CH)),fill=$('prog').querySelector('i'),ext=b.type.includes('webm')?'webm':'mp4';
+  async function igSave(G){const b=blob,CH=1536*1024,n=Math.max(1,Math.ceil(b.size/CH)),fill=$('prog').querySelector('i'),ext=b.type.includes('webm')?'webm':'mp4';
     $('up').disabled=true;$('prog').hidden=false;$('msg').className='msg';
     try{for(let i=0;i<n;i++){const f=new FormData();f.append('csrf',csrf);f.append('action','mm_ig_up');f.append('id',G.id);f.append('n',i);f.append('ext',ext);if(i===n-1)f.append('last','1');
         f.append('b',b.slice(i*CH,(i+1)*CH),'teil');
