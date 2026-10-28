@@ -475,6 +475,8 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     <div class="box" id="lookBox"><h2>✨ Kamera-Look</h2><div id="panel"></div></div>
     <div class="box" id="devBox"><h2>Kamera &amp; Mikrofon</h2>
       <div class="dev"><label>Kamera<select id="cam"></select></label><label>Mikrofon<select id="mic"></select></label></div>
+      <div class="dev"><label>Bildqualität<select id="qual"><option value="4k">4K (3840 × 2160)</option><option value="2k">2K (2560 × 1440)</option><option value="hd">Full HD (1920 × 1080)</option></select></label></div>
+      <p class="hint" id="qInfo" style="margin:4px 0 0;font-size:15px;color:#7D7076"></p>
       <p class="tip" style="margin-top:10px">Tipp: Licht von vorne (Fenster vor dir, nicht hinter dir), Kamera auf Augenhöhe, Handy quer für Videos und hoch für Storys.</p>
     </div>
   </div>
@@ -489,8 +491,8 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   <button type="button" data-sheet="more">⚙️ Mehr</button>
 </nav>
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
-<script src="/wildhearts/assets/talkcam.js?v=4"></script>
-<script src="studio-edit.js?v=6"></script>
+<script src="/wildhearts/assets/talkcam.js?v=5"></script>
+<script src="studio-edit.js?v=7"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
@@ -615,14 +617,22 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;choose()});
 
   // ---- Kamera ----
+  // Bildqualität (Vivien, 28.10.2026: „Kamera-Qualität sollte 4K sein oder 2K“): die Kamera liefert höchstens, was sie kann
+  const QUAL={'4k':[3840,2160,'4K'],'2k':[2560,1440,'2K'],'hd':[1920,1080,'Full HD']};
+  const qual=()=>{const q=ls.get('st-qual','4k');return QUAL[q]?q:'4k'};
+  // Datenrate passend zur Größe, damit 4K auch wie 4K aussieht
+  const vbr=(w,h)=>{const p=w*h;return p>=7e6?40000000:p>=3.2e6?20000000:p>=1.8e6?12000000:p>=.8e6?8000000:5000000};
+  function qShow(){const el=$('qInfo');if(!el||!raw)return;const st=(raw.getVideoTracks()[0]||{getSettings:()=>({})}).getSettings(),cw=st.width||0,chh=st.height||0;
+    const cv=tc&&tc.canvas;const L=Math.max(cw,chh),lbl=L>=3800?'4K':L>=2500?'2K':L>=1900?'Full HD':L>=1260?'HD':'';
+    el.textContent=cw?'Deine Kamera liefert '+cw+' × '+chh+(lbl?' ('+lbl+')':'')+(cv?', aufgenommen wird in '+cv.width+' × '+cv.height+'.':'.')+(L<Math.max(QUAL[qual()][0],QUAL[qual()][1])-40?' Mehr kann diese Kamera nicht, bei der Handykamera ist das oft höher als bei der Laptop-Kamera.':''):''}
   async function startCam(){
     const cid=ls.get('st-cam',''), mid=ls.get('st-mic','');
     if(raw)raw.getTracks().forEach(t=>t.stop());if(tc)tc.destroy(false);
-    const v={width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30}};if(cid)v.deviceId={exact:cid};
+    const Q=QUAL[qual()]||QUAL['4k'];const v={width:{ideal:Q[0]},height:{ideal:Q[1]},frameRate:{ideal:30}};if(cid)v.deviceId={exact:cid};
     const a={echoCancellation:true,noiseSuppression:true,autoGainControl:true};if(mid)a.deviceId={exact:mid};
     try{raw=await navigator.mediaDevices.getUserMedia({video:v,audio:a})}
     catch(e){try{raw=await navigator.mediaDevices.getUserMedia({video:true,audio:true});ls.set('st-cam','');ls.set('st-mic','')}catch(e2){$('stage').innerHTML='<div class="tc-st">Kamera oder Mikrofon sind gesperrt. Bitte im Browser oben bei der Adresse erlauben und die Seite neu laden.</div>';return}}
-    tc=await TalkCam.create(raw,{mount:$('stage'),maxVh:vh(),profile:profile()});
+    tc=await TalkCam.create(raw,{mount:$('stage'),maxVh:vh(),profile:profile(),maxLong:Q[0]});qShow();
     $('stage').appendChild(pr);$('stage').appendChild(Object.assign(document.createElement('div'),{className:'cd',id:'cd'}));
     const rd=document.createElement('div');rd.className='recdot';rd.id='rd';rd.hidden=true;rd.innerHTML='<i></i><span id="rt">0:00</span>';$('stage').appendChild(rd);
     $('stage').appendChild(slab);
@@ -630,6 +640,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     if(ig&&tc.s&&tc.s.aspect!=='9:16'){tc.set({aspect:'9:16'})}
     TalkCam.panel(tc,$('panel'));
     devices();
+    try{$('qual').value=qual();$('qual').onchange=()=>{ls.set('st-qual',$('qual').value);startCam()};tc.on(t=>{if(t==='layout')qShow()})}catch(e){}
   }
   async function devices(){try{const ds=await navigator.mediaDevices.enumerateDevices();
     const fill=(sel,kind,key,label)=>{const curId=(raw.getTracks().find(t=>t.kind===kind.replace('input',''))||{getSettings:()=>({})}).getSettings().deviceId;
@@ -648,7 +659,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     $('go').hidden=true;$('msg').textContent='';prTop(true);
     for(const n of [3,2,1]){$('cd').textContent=n;await new Promise(r=>setTimeout(r,800))}$('cd').textContent='';
     const mt=mime(),big=tc.canvas.width*tc.canvas.height>1.5e6;
-    rec=new MediaRecorder(tc.stream(30),Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:big?8000000:5000000,audioBitsPerSecond:160000}));
+    rec=new MediaRecorder(tc.stream(30),Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:vbr(tc.canvas.width,tc.canvas.height),audioBitsPerSecond:160000}));
     chunks=[];rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
     rec.onstop=()=>{blob=new Blob(chunks,{type:(rec.mimeType||mt||'video/webm').split(';')[0]});saved=false;
       const url=URL.createObjectURL(blob);$('play').src=url;const ext=blob.type.includes('mp4')?'mp4':'webm';
@@ -793,7 +804,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     for(const n of [3,2,1]){$('cd').textContent=n;await new Promise(r=>setTimeout(r,650))}$('cd').textContent='';
     if(!cs)return;
     const mt=mime(),big=tc.canvas.width*tc.canvas.height>1.5e6,ch=[];
-    const r=new MediaRecorder(tc.stream(30),Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:big?8000000:5000000,audioBitsPerSecond:160000}));
+    const r=new MediaRecorder(tc.stream(30),Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:vbr(tc.canvas.width,tc.canvas.height),audioBitsPerSecond:160000}));
     const st={t0:0,s:null,e:null};
     r.ondataavailable=e=>{if(e.data&&e.data.size)ch.push(e.data)};
     r.onstop=()=>{const dur=(performance.now()-st.t0)/1000;const me=r._cs;r.stream.getVideoTracks().forEach(t=>t.stop());
@@ -899,7 +910,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     ac=ac||new (window.AudioContext||window.webkitAudioContext)();await ac.resume();
     let buf=null;try{buf=await ac.decodeAudioData(await c.blob.arrayBuffer())}catch(e){buf=null}
     const dest=ac.createMediaStreamDestination(),out=cv.captureStream(30);if(buf)dest.stream.getAudioTracks().forEach(t=>out.addTrack(t));
-    const mt=mime(),ch=[],r=new MediaRecorder(out,Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:W*H>1.5e6?8000000:5000000,audioBitsPerSecond:160000}));
+    const mt=mime(),ch=[],r=new MediaRecorder(out,Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:vbr(W,H),audioBitsPerSecond:160000}));
     r.ondataavailable=e=>{if(e.data&&e.data.size)ch.push(e.data)};
     const done=new Promise(ok=>r.onstop=ok);
     const draw=()=>{g.drawImage(v,0,0,W,H);const t=v.currentTime,q=list.find(x=>t>=x.a&&t<x.b);if(q)drawCue(g,W,H,q.t)};

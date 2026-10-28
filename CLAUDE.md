@@ -476,3 +476,8 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 ## Movecia · Teacher Training & Pinterest (Vivien, 28.10.2026)
 - Mindful Movement Teacher Training: Start November 2027, 200-Stunden-Ausbildung in Yoga, Somatic Movement und Bodyweight. Beim Teacher Training nie „Pilates“ nennen (Pins, Seite, Werbung). Teaser darf gezeigt werden (ersetzt „Teacher Training wird NICHT gezeigt“), Link auf die Hauptseite, bis eine eigene Seite live ist.
 - Pinterest-Profil Movecia: pinterest.at/moveciamovement, Ablauf in `tools/pinterest-movecia/README.md`.
+
+## Studio · Bildqualität 4K/2K (Vivien, 28.10.2026: „Kamera-Qualität sollte 4K sein oder 2K“)
+- Studio → Kamera & Mikrofon → „Bildqualität“ 4K (Standard) / 2K / Full HD (`QUAL`, localStorage `st-qual`): getUserMedia `ideal` in dieser Größe, `TalkCam.create(…, {maxLong})` rechnet in dieser Größe (auch am Handy, statt fest 1280). Darunter `#qInfo`: was die Kamera wirklich liefert und in welcher Größe aufgenommen wird (Laptop-Kameras können oft nur Full HD/HD).
+- Kommt ein Gerät in den ersten Sekunden nicht mit, stuft TalkCam einmal eine Stufe herunter (4K → 2K → Full HD) und sagt es im Status.
+- Datenrate nach Größe (`vbr` im Studio, `brate` im Editor): 4K 40 Mbit/s, 2K 20, Full HD 12, HD 8. Editor (`outSize`) bis 3840 statt 1920.
