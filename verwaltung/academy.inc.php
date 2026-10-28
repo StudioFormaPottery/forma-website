@@ -14,7 +14,7 @@ if ($action === 'mm_ac_offer') {
     try { $link = ac_offer_start($pdo, (int)($_POST['id'] ?? 0)); $_SESSION['ac_offer_link'] = $link; go($acBack . '#gespraeche', 'Das Angebot läuft jetzt ' . AC_OFFER_MINUTES . ' Minuten. Sie sieht die Karte mit dem Kennenlern-Preis in wenigen Sekunden in ihrem Gesprächsraum und hat ihn zusätzlich per Mail.'); }
     catch (Throwable $e) { go($acBack . '#gespraeche', $e->getMessage()); }
 }
-// Preis im Kennenlerngespräch (Vivien, 28.10.2026, Runde 4): ein Feld, Standard € 3.390, nie öffentlich
+// Preis im Kennenlerngespräch (Vivien, 28.10.2026, Runde 4): ein Feld, Standard € 3.890 (Early-Bird-Preis als Bonus nach dem 31.3.2027), nie öffentlich
 if ($action === 'mm_ac_callprice') {
     $eur = (int)round((float)str_replace(['.', ','], ['', '.'], preg_replace('/[^0-9.,]/', '', (string)($_POST['eur'] ?? ''))) * 100);
     if ($eur < 50000 || $eur > 1000000) go($acBack . '#gespraeche', 'Bitte einen Betrag zwischen € 500 und € 10.000 eingeben.');

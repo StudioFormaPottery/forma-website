@@ -20,7 +20,7 @@ const AC_MAIL_BEFORE = 10;               // Bezahl-Link so viele Tage vor dem F�
 // --- Einstellungen ------------------------------------------------------------------------------
 
 /**
- * Preise und Termine (Vivien, 28.10.2026 spätabends): Early-Bird € 3.890 bis inkl. 31.3.2027, danach € 4.900, max. 14 Plätze (vorher € 3.590 / € 4.500 / 10 Plätze). Kennenlern-Preis € 3.390.
+ * Preise und Termine (Vivien, 28.10.2026 spätabends): Early-Bird € 3.890 bis inkl. 31.3.2027, danach € 4.900, max. 14 Plätze (vorher € 3.590 / € 4.500 / 10 Plätze). Kennenlern-Preis € 3.890 (= Early Bird als Bonus im Gespräch, auch nach dem 31.3.).
  * Zahlung: 50 % Anzahlung bei Buchung; Rest auf einmal, oder 50 % bis 15.9.2027, oder 25 % am 15.6.2027 + 25 % am 15.9.2027. Kein Aufschlag.
  * Start Mi 3.11.2027 (Herbstferien 27.–31.10., 1.11. Allerheiligen, 2.11. Allerseelen schulfrei), Module 2–11 jeweils am 1.
  */
@@ -35,11 +35,11 @@ function ac_cfg_raw(): array
         'two_until' => '2027-08-31', // ab 16.6. nur noch auf einmal oder 2 Zahlungen, ab 1.9. nur auf einmal
         'storno1' => '2027-06-30',
         // Kennenlern-Preis (Runde 4): nur im Kennenlerngespräch, 20 Minuten, auch nach dem Early-Bird. Nie öffentlich nennen.
-        'call_total' => 339000,
+        'call_total' => 389000, // = Early-Bird-Preis als Bonus nach dem 31.3.2027 (Vivien, 28.10.2026)
     ];
     $c = mm_cfg('academy') ?? [];
     // Alte gespeicherte Standardwerte (Runde 4) gelten nicht mehr: Kennenlern-Preis jetzt € 3.390, Early-Bird € 3.590.
-    if ((int)($c['call_total'] ?? 0) === 319000) unset($c['call_total']);
+    if (in_array((int)($c['call_total'] ?? 0), [319000, 339000], true)) unset($c['call_total']);
     if (in_array((int)($c['eb_total'] ?? 0), [339000, 359000], true)) unset($c['eb_total']);
     // Preise und Plätze seit 28.10.2026 spätabends: € 3.890 / € 4.900, 14 Plätze. Alte gespeicherte Werte nicht mehr verwenden.
     if ((int)($c['total'] ?? 0) === 450000) unset($c['total']);
