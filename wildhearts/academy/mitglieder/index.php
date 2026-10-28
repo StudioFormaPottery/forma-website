@@ -78,7 +78,7 @@ if (!$r && !$demo) {
     mvl_head($L('Teacher Training · Mitgliederbereich', 'Teacher Training · Members area') . ' | Movecia Academy', '', mm_site() . $self, '/img/movecia/og-academy.jpg', $css);
     ?>
 <body class="acad acm-auth">
-<header class="w site-top"><div class="in top"><a class="brand" href="/academy/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a><div class="top-r acm-lang"></div></div></header>
+<header class="w site-top"><div class="in top"><a class="brand" href="/academy/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia</span></a><div class="top-r acm-lang"></div></div></header>
 <p class="en-note">This training is held in German only.</p>
 <?= ac_band('Mitgliederbereich') ?>
 <main class="w"><div class="in acm-authbox">
@@ -147,7 +147,7 @@ mvl_head($L('Teacher Training · Mitgliederbereich', 'Teacher Training · Member
 ?>
 <body class="acad acm">
 <header class="w site-top"><div class="in top">
-  <a class="brand" href="/academy/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a>
+  <a class="brand" href="/academy/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia</span></a>
   <div class="top-r acm-lang">
     <?php if (!$demo): ?><form method="post"><input type="hidden" name="a" value="logout"><button class="acm-out" type="submit">Abmelden</button></form><?php endif; ?>
   </div>

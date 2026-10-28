@@ -340,7 +340,7 @@ footer summary{cursor:pointer}
 <script src="/wildhearts/assets/schutz.js?v=3"></script>
 </head>
 <body data-mode="<?= $online ? 'online' : 'studio' ?>">
-<header class="top w"><a class="brand" href="<?= $order ? $h(natal_link($order)) : '/' ?>"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia<i></i></a><span class="top-r"><span class="tag">1:1 <?= $order ? ($online ? 'online' : 'im Studio') : 'im Studio &amp; online' ?> · Prä- &amp; Postnatal</span><?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('natal', ['lang' => false]); ?></span></header>
+<header class="top w"><a class="brand" href="<?= $order ? $h(natal_link($order)) : '/' ?>"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia</a><span class="top-r"><span class="tag">1:1 <?= $order ? ($online ? 'online' : 'im Studio') : 'im Studio &amp; online' ?> · Prä- &amp; Postnatal</span><?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('natal', ['lang' => false]); ?></span></header>
 <div class="w"><?php if ($bonus): $bc = natal_bonus_cfg(); ?><p class="bonusbox"><b>Dein Kennenlern-Bonus, <?= $h(forma_first_name((string)$bonus['name'])) ?></b>Danke für unser Gespräch! Jedes Paket ist für dich <?= (int)$bc['percent'] ?> % günstiger, im Studio und online. Der Bonus gilt bis <?= $h(natal_date_de((string)$bonus['bonus_until'])) ?> und ist unten schon eingerechnet.</p>
     <?php elseif ($bonusGone): ?><p class="bonusbox gone"><b>Dieser Bonus ist leider nicht mehr gültig</b>Er ist abgelaufen oder wurde schon eingelöst. Die Pakete kannst du unten natürlich trotzdem buchen, und bei Fragen schreib mir einfach.</p><?php endif; ?></div>
 

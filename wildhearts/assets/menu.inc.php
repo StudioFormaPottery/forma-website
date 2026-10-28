@@ -44,7 +44,7 @@ function mv_menu(string $active = '', array $o = []): void
 <script src="/wildhearts/assets/musik.js?v=1" defer></script>
 <div class="mvm" id="mvm-panel" role="dialog" aria-modal="true" aria-label="Menü" hidden>
   <div class="mvm-top">
-    <a class="mvm-brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt="" width="28" height="28">Movecia<i></i></a>
+    <a class="mvm-brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt="" width="28" height="28">Movecia</a>
     <button class="mvm-x" type="button" aria-label="Menü schließen"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg></button>
   </div>
   <nav class="mvm-list" aria-label="Seiten">

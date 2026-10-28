@@ -191,7 +191,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
 </head>
 <body>
 <header class="w"><div class="in top">
-  <a class="brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a>
+  <a class="brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia</span></a>
   <div class="top-r"><?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('unfold'); ?>
   <div class="lang" role="group" aria-label="Sprache / Language"><button type="button" data-l="de">Deutsch</button><button type="button" data-l="en">English</button></div></div>
 </div></header>

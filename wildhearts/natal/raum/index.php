@@ -199,7 +199,7 @@ a{color:var(--plum)}
 <body>
 <?php if ($state === 'open'): ?>
 <div class="room">
-  <div class="bar"><span class="brand"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia<i></i></span>
+  <div class="bar"><span class="brand"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia</span>
     <span class="t"><b><?= $h($room['title']) ?><?= $room['host'] ? ' · ' . $h($first) : '' ?></b><span><?= $h($when) ?> · <?= $h($room['sub']) ?></span></span>
     <span class="tick" id="tick" aria-live="polite"></span>
     <?php if ($room['host'] && $room['kind'] === 's'): ?><span class="rec"><button type="button" id="recBtn" title="Nimmt nur deine Kamera und dein Mikro auf">● Aufnahme</button><span id="recSt"></span></span><?php endif; ?>
@@ -295,7 +295,7 @@ addEventListener('resize',place);render();requestAnimationFrame(loop);
 <?php else: ?>
 <div class="wait"><span class="blob b1"></span><span class="blob b2"></span>
   <div class="card">
-    <span class="brand"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia<i></i></span>
+    <span class="brand"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia</span>
     <?php if ($state === 'invalid'): ?>
       <h1>Dieser Link <em>passt leider nicht</em></h1>
       <p class="mut">Bitte öffne den Link direkt aus deiner E-Mail. Wenn es trotzdem nicht klappt, antworte einfach auf die Mail.</p>

@@ -177,7 +177,7 @@ if (!$me && !$demo) {
     mv_head($L('Mitgliederbereich', 'Members area'), $lang);
     ?>
 <body class="auth">
-<header class="w"><div class="in top"><a class="brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a><?= mv_lang_switch($lang, '', false) ?></div></header>
+<header class="w"><div class="in top"><a class="brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia</span></a><?= mv_lang_switch($lang, '', false) ?></div></header>
 <main class="w"><div class="in authgrid">
   <div class="authpic"><img src="/img/movecia/fotos/ev-unfold-karte.jpg?v=10" alt=""><span class="blob" style="width:120px;height:120px;right:-30px;top:-30px;background:var(--peach)"></span></div>
   <div class="authbox">
@@ -352,7 +352,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
 ?>
 <body class="app">
 <header class="w bar"><div class="in top">
-  <a class="brand" href="<?= $self . ($demo ? '?demo=1' : '') ?>"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a>
+  <a class="brand" href="<?= $self . ($demo ? '?demo=1' : '') ?>"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia</span></a>
   <nav class="tabs" aria-label="<?= $L('Bereiche', 'Sections') ?>">
     <?php if ($acc['method']): ?><a href="?tab=bibliothek<?= $q ?>" <?= $tab === 'bibliothek' && !$lesson ? 'aria-current="page"' : '' ?>><?= $L('Bibliothek', 'Library') ?></a><?php endif; ?>
     <?php if ($acc['unfold']): ?><a href="?tab=unfold<?= $q ?>" <?= $tab === 'unfold' ? 'aria-current="page"' : '' ?>>Unfold</a><?php endif; ?>

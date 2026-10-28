@@ -77,7 +77,7 @@ body.acall{min-height:100dvh;display:flex;flex-direction:column}
 mvl_head('Kennenlerngespräch · Movecia Academy', '', mm_site() . '/academy/gespraech/', '/img/movecia/og-academy.jpg', $css);
 ?>
 <body class="acad acall">
-<header class="w site-top"><div class="in top"><a class="brand" href="/academy/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a><div class="top-r"><span class="muted" style="font-size:.9rem">Kennenlerngespräch</span></div></div></header>
+<header class="w site-top"><div class="in top"><a class="brand" href="/academy/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia</span></a><div class="top-r"><span class="muted" style="font-size:.9rem">Kennenlerngespräch</span></div></div></header>
 <?= ac_band('Unser Kennenlerngespräch') ?>
 <main id="top">
 <?php if ($state === 'open'): ?>

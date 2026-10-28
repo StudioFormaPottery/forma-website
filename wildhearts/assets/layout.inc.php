@@ -45,7 +45,7 @@ function mvl_top(string $active = ''): void
     require_once __DIR__ . '/menu.inc.php';
     ?>
 <header class="w site-top"><div class="in top">
-  <a class="brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a>
+  <a class="brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia</span></a>
   <div class="top-r">
     <?php mv_menu($active === '' ? 'start' : $active, empty($GLOBALS['mvl_de_only']) ? [] : ['lang' => false]); ?>
     <div class="lang" role="group" aria-label="Sprache / Language"><button type="button" data-set="de">DE</button><button type="button" data-set="en">EN</button></div>

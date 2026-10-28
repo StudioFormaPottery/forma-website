@@ -222,7 +222,7 @@ footer summary{cursor:pointer}
 <script src="/wildhearts/assets/schutz.js?v=3"></script>
 </head>
 <body>
-<header class="top w"><a class="brand" href="<?= $order ? $h(ptb_link($order)) : '/personal-training/' ?>"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia<i></i></a>
+<header class="top w"><a class="brand" href="<?= $order ? $h(ptb_link($order)) : '/personal-training/' ?>"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia</a>
   <span class="top-r"><span class="tag">Personal Training · Mathon</span>
     <span class="lang" role="group" aria-label="Sprache / Language"><button type="button" data-set="de">DE</button><button type="button" data-set="en">EN</button></span>
     <?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('', ['links' => false]); ?></span></header>

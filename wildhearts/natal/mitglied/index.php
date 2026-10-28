@@ -263,7 +263,7 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
 <body>
 <?php if ($demo): ?><p class="demo">Vorschau mit Beispieldaten · <a style="color:var(--peach)" href="?demo=prae">pränatal</a> · <a style="color:var(--peach)" href="?demo=post">postnatal</a> · <a style="color:var(--peach)" href="?demo=vorschau">in den ersten 14 Tagen</a></p><?php endif; ?>
 <header class="w"><div class="in top">
-  <a class="brand" href="<?= $h($self) ?>"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia<i></i></span></a>
+  <a class="brand" href="<?= $h($self) ?>"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia</span></a>
   <?php if ($me && !$demo): ?><form method="post"><input type="hidden" name="a" value="logout"><button type="submit">Abmelden</button></form><?php endif; ?>
 </div></header>
 
