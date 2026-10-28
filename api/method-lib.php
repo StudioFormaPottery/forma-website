@@ -389,7 +389,7 @@ function mv_lektorat_sync(PDO $pdo): void
  */
 function mv_workbooks_sync(PDO $pdo): void
 {
-    $ver = 6; // 2: ohne Schatten (Vivien, 26.10.2026); 3–5: Sprach-Lektorat (27.10.2026); 6: neuer Look mit Foto im Bogen und Wellen (28.10.2026)
+    $ver = 7; // 2: ohne Schatten (Vivien, 26.10.2026); 3–5: Sprach-Lektorat (27.10.2026); 6: neuer Look mit Foto im Bogen und Wellen (28.10.2026)
     $c = mm_cfg('workbooks') ?? [];
     if ((int)($c['v'] ?? 0) >= $ver) return;
     $src = __DIR__ . '/seed/workbooks/pdf/';
