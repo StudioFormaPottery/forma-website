@@ -128,13 +128,15 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 .box{background:#FBF8F4;border:1.5px solid #DDD2C6;border-radius:24px;padding:16px}
 .box>h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:26px;color:#4A3A41;margin:0 0 12px}
 #stage{position:relative}
-.pr{position:absolute;left:0;right:0;top:0;height:36%;overflow:hidden;background:linear-gradient(rgba(46,37,41,.72),rgba(46,37,41,.55) 80%,rgba(46,37,41,0));color:#FBF5F7;z-index:3;pointer-events:auto;cursor:pointer;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+.pr{position:absolute;left:0;right:0;top:0;height:42%;min-height:120px;overflow:hidden;background:rgba(36,28,32,.8);color:#FBF5F7;z-index:7;pointer-events:auto;cursor:pointer;border-radius:22px 22px 0 0}
+.pr::after{content:'';position:absolute;left:0;right:0;bottom:0;height:30%;background:linear-gradient(rgba(36,28,32,0),rgba(36,28,32,.95));pointer-events:none}
 .pr[hidden]{display:none}
-.pr-t{will-change:transform;backface-visibility:hidden;padding:14px 6% 60%;white-space:pre-wrap;font:400 var(--fs,30px)/1.45 "Hanken Grotesk","Outfit",system-ui,sans-serif;text-align:center}
+body.recording .tc-st,body.recording .tc-hint,body.recording .tc-guide{display:none!important}
+.pr-t{position:relative;padding:14px 6% 60%;white-space:pre-wrap;font:400 var(--fs,30px)/1.45 "Hanken Grotesk","Outfit",system-ui,sans-serif;text-align:center}
 .pr-t .hint{color:#C9B7BD;font-size:.6em}
-.cd{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:500 min(30vw,180px)/1 "Cormorant Garamond",Georgia,serif;color:#fff;text-shadow:0 2px 30px rgba(0,0,0,.5);z-index:5;pointer-events:none}
+.cd{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:500 min(30vw,180px)/1 "Cormorant Garamond",Georgia,serif;color:#fff;text-shadow:0 2px 30px rgba(0,0,0,.5);z-index:8;pointer-events:none}
 .cd:empty{display:none}
-.recdot{position:absolute;right:14px;top:14px;z-index:4;display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(160,65,59,.92);color:#fff;font:500 18px/1.2 "Hanken Grotesk","Outfit",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.recdot{position:absolute;right:14px;bottom:14px;z-index:8;display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(160,65,59,.92);color:#fff;font:500 18px/1.2 "Hanken Grotesk","Outfit",system-ui,sans-serif;font-variant-numeric:tabular-nums}
 .recdot[hidden]{display:none}.recdot i{width:10px;height:10px;border-radius:50%;background:#fff;animation:bl 1s infinite}
 @keyframes bl{50%{opacity:.2}}
 .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
@@ -143,6 +145,7 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 .bar .stop{background:#4A3A41;color:#fff}
 .bar .up{background:#3F6B3E;border-color:#3F6B3E;color:#fff}
 .bar .sm{min-height:48px;font-size:17px;padding:10px 18px;border-color:#DDD2C6}
+.bar .del,.clip .cb button.del{color:#A0413B;border-color:#E6C3BF}
 .bar [hidden]{display:none!important}
 .msg{font-size:18px;color:#6B5658;margin:10px 2px 0}
 .msg.ok{color:#3F6B3E;font-weight:500}
@@ -225,6 +228,7 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
  body.editing .mtools,body.editing .msheet{display:none!important}
  body.rec-ui.editing{overflow:auto}
  body.rec-ui .pr-t{padding-left:5%;padding-right:5%}
+ body.rec-ui .pr{height:50%;min-height:150px;border-radius:0}
 }
 .pk{background:#FBF8F4;border:1.5px solid #DDD2C6;border-radius:28px;padding:14px;margin-bottom:12px;box-shadow:0 14px 30px -24px rgba(74,58,65,.45)}
 .pk-now{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
@@ -424,6 +428,8 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
       <button type="button" class="next" id="edit" hidden>✂️ Bearbeiten · Licht, Ausschnitt, Musik</button>
       <a class="b" id="dl" hidden download>⬇ Herunterladen</a>
       <button type="button" class="sm" id="again" hidden>↺ Nochmal aufnehmen</button>
+      <button type="button" class="sm del" id="del" hidden>🗑 Löschen</button>
+      <button type="button" class="sm del" id="cdel" hidden>🗑 Letzten Absatz löschen</button>
       <button type="button" class="go" id="cgo" hidden>● Absatz 1 aufnehmen</button>
       <button type="button" class="next" id="cnext" hidden>✓ Fertig · nächster Absatz</button>
       <button type="button" class="sm" id="credo" hidden>↺ Absatz nochmal</button>
@@ -504,11 +510,11 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   // Weich gleitend statt in ganzen Pixel-Sprüngen (Vivien, 28.10.2026: Text ruckelte am Handy und MacBook): Verschiebung per GPU-transform mit Kommastellen
   let prPos=0;const prT=()=>pr.querySelector('.pr-t');const prMax=()=>Math.max(0,(prT()?prT().offsetHeight:0)-pr.clientHeight*.6);
   // Der Lauf selbst ist eine CSS-Animation (läuft auf der Grafikkarte weiter, auch wenn die Kamera-Filter viel rechnen)
-  function prSet(){const t=prT();if(!t)return;t.style.transition='none';t.style.transform='translate3d(0,'+(-prPos).toFixed(2)+'px,0)';void t.offsetHeight}
-  function prPlay(){const t=prT();if(!t)return;const max=prMax(),rem=max-prPos;if(rem<=0.5)return;t.style.transition='transform '+(rem/Math.max(5,sp)).toFixed(2)+'s linear';t.style.transform='translate3d(0,'+(-max).toFixed(2)+'px,0)'}
-  function prNow(){const t=prT();if(!t)return prPos;const m=getComputedStyle(t).transform;if(!m||m==='none')return 0;const v=m.match(/matrix(3d)?\(([^)]+)\)/);if(!v)return prPos;const a=v[2].split(',').map(Number);return -(v[1]?a[13]:a[5])}
-  function prPause(){prPos=Math.max(0,prNow());prSet()}
-  function prMove(d,reset){if(run)prPos=prNow();prPos=reset?0:Math.max(0,Math.min(prPos+d,prMax()));pr.scrollTop=0;prSet();if(run)prPlay()}
+  // Neu (Vivien, 28.10.2026: „der Teleprompter funktioniert gar nicht“): kein CSS-Übergang und keine Maske mehr
+  // (iPhone-Safari zeichnete den Text über dem Kamerabild teils nicht), sondern jedes Bild per transform mit Kommastellen.
+  function prSet(){const t=prT();if(t)t.style.transform='translate3d(0,'+(-prPos).toFixed(2)+'px,0)'}
+  function prPlay(){} function prPause(){} function prNow(){return prPos}
+  function prMove(d,reset){prPos=reset?0:Math.max(0,Math.min(prPos+d,prMax()));pr.scrollTop=0;prSet()}
   let sp=+ls.get('st-sp',40), fs=+ls.get('st-fs',innerWidth<700?20:30), run=false, last=0;
   pr.style.setProperty('--fs',fs+'px');
   function textHtml(t){return esc(t||'').replace(/\[([^\]]+)\]/g,'<span class="hint">[$1]</span>')}
@@ -516,7 +522,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   function paras(lg){return String(textOf(lg)||'').split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean)}
   function setText(){if(clipm){showSlide();return}const t=cur?(lang==='en'?cur.en:cur.de):$('ownT').value;
     pr.querySelector('.pr-t').innerHTML=t.trim()?textHtml(t):'<span class="hint">'+(cur?'Für diese Lektion gibt es noch keinen '+(lang==='en'?'englischen':'deutschen')+' Text.':'Füge deinen Text beim Teleprompter ein.')+'</span>';prMove(0,true);}
-  let prWas=false,prSp=sp;function prLoop(){if(run!==prWas){prWas=run;run?prPlay():prPause()}else if(run&&sp!==prSp){prPause();prPlay()}prSp=sp;requestAnimationFrame(prLoop)}requestAnimationFrame(prLoop);
+  let prLast=0;function prLoop(ts){if(run&&!pr.hidden){const dt=prLast?Math.min(.1,(ts-prLast)/1000):0,m=prMax();if(prPos<m){prPos=Math.min(m,prPos+sp*dt);prSet()}}prLast=ts;requestAnimationFrame(prLoop)}requestAnimationFrame(prLoop);
   function toggle(){run=!run}
   pr.addEventListener('click',toggle);
   document.addEventListener('keydown',e=>{if(e.code==='Space'&&!/INPUT|TEXTAREA|SELECT|BUTTON/.test(document.activeElement.tagName)){e.preventDefault();toggle()}});
@@ -622,7 +628,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   // ---- Aufnahme ----
   const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
   function mime(){const ts=['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4;codecs=avc1,mp4a','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];return ts.find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||''}
-  function showAfter(){if(clipm){clipUi();return}const has=!!blob;if(tgt)$('up').textContent=tgt.ig?'💾 Für '+tgt.ig.l.split(' · ')[0]+' speichern ('+(tgt.ig.kind==='reel'?'Reel':'Story')+')':tgt.clip?'⬆ Als Clip „'+tgt.clip.n+'“ hochladen':'⬆ In „'+tgt.t.t+'“ hochladen ('+(tgt.lang==='de'?'Deutsch':'Englisch')+')';$('go').hidden=has||(rec&&rec.state==='recording');$('again').hidden=!has;$('dl').hidden=!has;$('edit').hidden=!has;$('up').hidden=!has||!tgt||(!BUNNY&&!tgt.ig);
+  function showAfter(){if(clipm){clipUi();return}const has=!!blob;if(tgt)$('up').textContent=tgt.ig?'💾 Für '+tgt.ig.l.split(' · ')[0]+' speichern ('+(tgt.ig.kind==='reel'?'Reel':'Story')+')':tgt.clip?'⬆ Als Clip „'+tgt.clip.n+'“ hochladen':'⬆ In „'+tgt.t.t+'“ hochladen ('+(tgt.lang==='de'?'Deutsch':'Englisch')+')';$('go').hidden=has||(rec&&rec.state==='recording');$('again').hidden=!has;$('del').hidden=!has;$('dl').hidden=!has;$('edit').hidden=!has;$('up').hidden=!has||!tgt||(!BUNNY&&!tgt.ig);
     $('play').hidden=!has;$('stage').style.display=has?'none':'';}
   $('go').onclick=async()=>{
     if(!tc){$('msg').textContent='Die Kamera läuft noch nicht.';return}
@@ -636,16 +642,24 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
       const url=URL.createObjectURL(blob);$('play').src=url;const ext=blob.type.includes('mp4')?'mp4':'webm';
       const d=new Date(),stamp=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+'-'+String(d.getMinutes()).padStart(2,'0');
       $('dl').href=url;$('dl').download=(tgt&&tgt.ig?tgt.ig.day+'_'+(tgt.ig.kind==='reel'?'Reel':'Story')+'_'+tgt.ig.t.slice(0,30):tgt&&tgt.clip?'Uebung_'+tgt.clip.n+'_'+stamp:(mvFree?'Bewegung_'+stamp:'TalkingHead_'+(tgt?tgt.t.t:'Eigener-Text')+'_'+(tgt?tgt.lang:lang).toUpperCase()+'_'+stamp)).replace(/[^\wäöüÄÖÜß-]+/g,'-')+'.'+ext;
-      $('rd').hidden=true;$('stop').hidden=true;run=false;showAfter();
+      $('rd').hidden=true;$('stop').hidden=true;run=false;document.body.classList.remove('recording');showAfter();
       $('msg').className='msg';$('msg').textContent='Schau es dir kurz an. Passt es, '+(tgt&&BUNNY?'tippe auf „Hochladen“ oder lade es herunter.':'lade es herunter.');
       if(lock){lock.release().catch(()=>{});lock=null}};
     fromFile=false;tgt=mv?{clip:mv}:(ig?{ig:ig}:(cur?{t:cur,lang:lang}:null));rec.start(1000);t0=performance.now();$('stop').hidden=false;$('rd').hidden=false;
-    if($('prAuto').checked&&!pr.hidden){run=true}
+    document.body.classList.add('recording');prMove(0,true);
+    if($('prAuto').checked&&!pr.hidden){const R=rec;setTimeout(()=>{if(rec===R&&R.state==='recording')run=true},1200)}
     try{lock=await navigator.wakeLock.request('screen')}catch(e){}
     (function loop(){if(!rec||rec.state!=='recording')return;$('rt').textContent=fmt((performance.now()-t0)/1000);tick=requestAnimationFrame(loop)})();
   };
   $('stop').onclick=()=>{if(rec&&rec.state==='recording')rec.stop()};
   $('again').onclick=()=>{if(!saved&&!confirm('Die Aufnahme ist noch nicht gespeichert. Trotzdem neu aufnehmen?'))return;blob=null;saved=true;$('play').removeAttribute('src');$('msg').textContent='';$('prog').hidden=true;prMove(0,true);showAfter();};
+  // Sofort löschen (Vivien, 28.10.2026): ohne Nachfrage, kurz rückgängig machbar
+  let undo=null;
+  $('del').onclick=()=>{if(!blob)return;undo={b:blob,src:$('play').src,href:$('dl').href,name:$('dl').download,saved:saved,tgt:tgt};
+    blob=null;saved=true;$('play').removeAttribute('src');$('prog').hidden=true;prMove(0,true);showAfter();
+    $('msg').className='msg';$('msg').innerHTML='🗑 Aufnahme gelöscht. <button type="button" class="sm" id="undo" style="margin-left:6px">Rückgängig</button>';
+    $('undo').onclick=()=>{if(!undo)return;blob=undo.b;$('play').src=undo.src;$('dl').href=undo.href;$('dl').download=undo.name;saved=undo.saved;tgt=undo.tgt;undo=null;$('msg').textContent='Aufnahme ist wieder da.';showAfter()};
+    const U=undo;setTimeout(()=>{if(undo===U){undo=null;if($('undo'))$('msg').textContent=''}},8000)};
   $('dl').addEventListener('click',()=>{saved=true});
   window.addEventListener('beforeunload',e=>{if(blob&&!saved){e.preventDefault();e.returnValue=''}});
   $('up').onclick=()=>{
@@ -747,7 +761,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     slab.hidden=!P.length;slab.textContent='Absatz '+Math.min(i+1,P.length)+' von '+P.length;}
   function clipUi(){
     const P=paras(lang),n=P.length,recIng=!!(cs&&cs.rec);
-    ['go','stop','up','dl','again','edit'].forEach(id=>{if(clipm)$(id).hidden=true});if(clipm){$('play').hidden=true;$('stage').style.display=''}
+    ['go','stop','up','dl','again','edit','del'].forEach(id=>{if(clipm)$(id).hidden=true});$('cdel').hidden=!clipm||recIng||lastClip<0||!clips[lastClip];if(!$('cdel').hidden)$('cdel').textContent='🗑 Absatz '+(lastClip+1)+' löschen';if(clipm){$('play').hidden=true;$('stage').style.display=''}
     $('cgo').hidden=!clipm||recIng;$('cnext').hidden=!clipm||!recIng;$('credo').hidden=!clipm||!recIng;$('cend').hidden=!clipm||!recIng;
     if(clipm&&!recIng){const first=clips.findIndex((c,i)=>i<n&&!c);const start=clips.length&&first<0&&clips.filter(Boolean).length>=n?-1:(first<0?Math.min(clips.length,n):first);
       $('cgo').dataset.start=Math.max(0,start);$('cgo').textContent=n?(start<0?'● Alles nochmal ab Absatz 1':'● Absatz '+(start+1)+' von '+n+' aufnehmen'):'● Aufnehmen';if(start<0)$('cgo').dataset.start=0;}
@@ -775,16 +789,19 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
       const type=(r.mimeType||mt||'video/webm').split(';')[0],b=new Blob(ch,{type}),ext=type.includes('mp4')?'mp4':'webm';
       const old=clips[me.i];if(old){URL.revokeObjectURL(old.url);if(old.sub)URL.revokeObjectURL(old.sub.url)}
       clips[me.i]={i:me.i,blob:b,url:URL.createObjectURL(b),ext:ext,dur:dur,s:st.s==null?.2:Math.max(0,st.s-.15),e:st.e==null?dur-.2:Math.min(dur,st.e+.25),lang:lang,text:paras(lang)[me.i]||'',sub:null,saved:false};
-      renderClips();clipUi();};
-    r._cs=cs;cs.rec=r;r.start(1000);st.t0=performance.now();$('rd').hidden=false;clipUi();
+      lastClip=me.i;renderClips();clipUi();};
+    r._cs=cs;cs.rec=r;r.start(1000);st.t0=performance.now();$('rd').hidden=false;document.body.classList.add('recording');clipUi();
     try{if(!lock)lock=await navigator.wakeLock.request('screen')}catch(e){}
     (function loop(){if(!cs||cs.rec!==r||r.state!=='recording')return;const t=(performance.now()-st.t0)/1000;$('rt').textContent=fmt(t);
       if(an){an.getFloatTimeDomainData(abuf);let q=0;for(const v of abuf)q+=v*v;const rms=Math.sqrt(q/abuf.length);if(rms>.02){if(st.s==null)st.s=t;st.e=t}}
       // langer Absatz: Text läuft sanft mit
-      if(prMax()>4&&!pr.hidden&&!run)run=true;
+      if(t>1.2&&prMax()>4&&!pr.hidden&&!run)run=true;
       requestAnimationFrame(loop)})();
   }
-  function stopRec(discard){if(cs&&cs.rec&&cs.rec.state==='recording'){cs.rec._cs.discard=!!discard;cs.rec.stop()}$('rd').hidden=true;run=false}
+  let lastClip=-1;
+  function stopRec(discard){if(cs&&cs.rec&&cs.rec.state==='recording'){cs.rec._cs.discard=!!discard;cs.rec.stop()}$('rd').hidden=true;run=false;document.body.classList.remove('recording')}
+  function delClip(i){const c=clips[i];if(!c)return;URL.revokeObjectURL(c.url);if(c.sub)URL.revokeObjectURL(c.sub.url);clips[i]=null;if(lastClip===i)lastClip=-1;renderClips();clipUi();$('msg').className='msg';$('msg').textContent='🗑 Absatz '+(i+1)+' gelöscht. Nimm ihn einfach neu auf.'}
+  $('cdel').onclick=()=>{if(cs&&cs.rec)return;delClip(lastClip)};
   function finish(){stopRec(false);cs=null;slab.hidden=false;showSlide();slab.textContent='Fertig ✓';if(lock){lock.release().catch(()=>{});lock=null}clipUi();
     const n=clips.filter(Boolean).length;$('msg').className='msg ok';$('msg').textContent=n?'✓ '+n+' Clip'+(n>1?'s':'')+' fertig. Rechts kannst du sie ansehen, neu aufnehmen, sichern oder Untertitel dazu machen.':'';}
   $('cgo').onclick=()=>startClip(+($('cgo').dataset.start||0));
@@ -803,8 +820,9 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
         +(c&&c.sub?'<a class="sub" href="'+c.sub.url+'" download="'+esc(fileName(c,c.sub.lang))+'" data-saved="'+i+'">⬇ mit Untertitel</a>':'')
         +(c?'<button type="button" class="ed" data-edit="'+i+'">✂️ Bearbeiten</button>':'')
         +(c&&canShare([c.blob])?'<button type="button" data-share="'+i+'">📲 Sichern</button>':'')
-        +'<button type="button" data-retake="'+i+'">'+(c?'↺ Neu aufnehmen':'● Aufnehmen')+'</button></div></div></div>';}
+        +'<button type="button" data-retake="'+i+'">'+(c?'↺ Neu aufnehmen':'● Aufnehmen')+'</button>'+(c?'<button type="button" class="del" data-del="'+i+'">🗑 Löschen</button>':'')+'</div></div></div>';}
     box.innerHTML=h;const any=clips.some(Boolean);$('clAll').hidden=!any;$('shareAll').hidden=!any||!canShare(clips.filter(Boolean).map(c=>c.blob));$('zipSub').hidden=!clips.some(c=>c&&c.sub);
+    box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(cs&&cs.rec)return;delClip(+b.dataset.del)});
     box.querySelectorAll('[data-retake]').forEach(b=>b.onclick=()=>{if(cs&&cs.rec)return;startClip(+b.dataset.retake,true);window.scrollTo({top:0,behavior:'smooth'})});
     box.querySelectorAll('[data-saved]').forEach(a=>a.addEventListener('click',()=>{const c=clips[+a.dataset.saved];if(c)c.saved=true}));
     box.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>shareFiles([clips[+b.dataset.share]]));
