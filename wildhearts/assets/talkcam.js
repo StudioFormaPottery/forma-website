@@ -334,7 +334,8 @@ void main(){
       this.crop = [(vw - cw) / 2 / vw, (vh - ch) / 2 / vh, cw / vw, ch / vh];
       // Handys und langsame Geräte rechnen in 1280 (sonst hakt das Bild), schnelle Computer in 1920
       const mobile = /iPhone|iPad|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform || ''));
-      const long = this.opts.maxLong || this.autoLong || (Math.max(cw, ch) >= 1700 && !mobile ? 1920 : 1280);
+      // Mit opts.maxLong (Studio-Qualität 4K/2K/Full HD, Vivien 28.10.2026) so groß wie gewählt, sonst wie bisher
+      const long = this.autoLong || this.opts.maxLong || (Math.max(cw, ch) >= 1700 && !mobile ? 1920 : 1280);
       const sc = Math.min(1, long / Math.max(cw, ch));
       const W = Math.round(cw * sc / 2) * 2, H = Math.round(ch * sc / 2) * 2;
       if (this.canvas.width !== W || this.canvas.height !== H) { this.canvas.width = W; this.canvas.height = H; }
@@ -476,7 +477,10 @@ void main(){
       if (s.on && !this.compare) this.analyse(now);
       // Hält das Gerät nicht mit, einmalig auf 1280 herunter (nur in den ersten Sekunden, nie während einer Aufnahme)
       const fd = performance.now() - now; this.fms = (this.fms || fd) * .95 + fd * .05;
-      if (!this.autoLong && !this.opts.maxLong && this.frame > 60 && this.frame < 400 && this.fms > 26 && Math.max(W, H) > 1300) { this.autoLong = 1280; this.layout(); return; }
+      if (!this.autoLong && this.frame > 60 && this.frame < 400 && this.fms > 26 && Math.max(W, H) > 1300) {
+        const L = Math.max(W, H); this.autoLong = this.opts.maxLong ? (L > 2600 ? 2560 : L > 2000 ? 1920 : 1280) : 1280;
+        if (this.opts.maxLong && this.autoLong >= 1920) this.setStatus('Für ein flüssiges Bild läuft die Kamera jetzt in ' + (this.autoLong >= 2560 ? '2K' : 'Full HD') + '.');
+        this.layout(); return; }
       const crop = this.crop;
       // 1. Ausschnitt
       const base = this.fbo('base', W, H);

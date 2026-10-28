@@ -79,6 +79,7 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
 
   const DEF = { ex: 0, con: 0, wm: 0, sat: 1, sh: 0, hi: 0, fmt: 'orig', zoom: 1, ox: 0, oy: 0, rot: 0 };
   const FMTS = [['orig', 'Wie aufgenommen'], ['16:9', 'Quer 16:9'], ['9:16', 'Hoch 9:16 (Reel)'], ['4:5', '4:5 (Feed)'], ['1:1', 'Quadrat']];
+  const brate = (w, h) => { const p = w * h; return p >= 7e6 ? 40e6 : p >= 3.2e6 ? 20e6 : p >= 1.8e6 ? 12e6 : p >= .8e6 ? 8e6 : 5e6; };
   let lastMusic = null; // Musikdatei bleibt für die nächsten Clips gewählt
 
   function open(o) {
@@ -173,7 +174,7 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
       Ws = srcO ? srcO.w : (v.videoWidth || 1280); Hs = srcO ? srcO.h : (v.videoHeight || 720);
       let w = Ws, h = Hs; const f = st.fmt;
       if (f !== 'orig') { const [x, y] = f.split(':').map(Number), r = x / y; if (r >= Ws / Hs) { w = Ws; h = Ws / r; } else { h = Hs; w = Hs * r; } }
-      const k = Math.min(1, 1920 / Math.max(w, h)); w = Math.round(w * k / 2) * 2; h = Math.round(h * k / 2) * 2;
+      const k = Math.min(1, 3840 / Math.max(w, h)); // bis 4K (Vivien, 28.10.2026) w = Math.round(w * k / 2) * 2; h = Math.round(h * k / 2) * 2;
       if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
       Wo = w; Ho = h;
     }
@@ -389,7 +390,7 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
       let first = null; for await (const w of frames(a + t0, a + t0 + 1)) { first = w; break; }
       if (!first) return null;
       srcO = { el: first.el, w: first.w, h: first.h }; outSize(); first.done();
-      const W = Wo, H = Ho, vbr = W * H > 1.5e6 ? 8e6 : 5e6;
+      const W = Wo, H = Ho, vbr = brate(W, H);
       const vc = await M.getFirstEncodableVideoCodec(['avc', 'hevc', 'vp9', 'av1'], { width: W, height: H, bitrate: vbr });
       if (!vc) { srcO = null; return null; }
       // ---- Ton offline mischen ----
@@ -470,7 +471,7 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
       audio(); musicSrc(); await ac.resume().catch(() => {}); spk.gain.value = 0; // beim Fertigstellen nichts über die Lautsprecher
       await seek(a); syncMusic();
       const mt = mime(), out = cv.captureStream(30); recDest.stream.getAudioTracks().forEach(t => out.addTrack(t));
-      const ch = [], r = new MediaRecorder(out, Object.assign(mt ? { mimeType: mt } : {}, { videoBitsPerSecond: Wo * Ho > 1.5e6 ? 8000000 : 5000000, audioBitsPerSecond: 160000 }));
+      const ch = [], r = new MediaRecorder(out, Object.assign(mt ? { mimeType: mt } : {}, { videoBitsPerSecond: brate(Wo, Ho), audioBitsPerSecond: 160000 }));
       r.ondataavailable = e => { if (e.data && e.data.size) ch.push(e.data); }; const done = new Promise(ok => r.onstop = ok);
       const bar = q('.se-prog'), fill = bar.querySelector('i'); bar.hidden = false; msg.className = 'se-msg'; msg.textContent = 'Wird fertig gestellt … dauert so lang wie das Video (' + fmt(b - a) + '). Seite offen lassen.';
       draw(); r.start(500); playing = true;

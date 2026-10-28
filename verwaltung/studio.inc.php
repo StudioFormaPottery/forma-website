@@ -133,6 +133,25 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 .pr{position:absolute;left:0;right:0;top:0;height:42%;min-height:120px;overflow:hidden;background:rgba(36,28,32,.8);color:#FBF5F7;z-index:7;pointer-events:auto;cursor:pointer;border-radius:22px 22px 0 0}
 .pr::after{content:'';position:absolute;left:0;right:0;bottom:0;height:30%;background:linear-gradient(rgba(36,28,32,0),rgba(36,28,32,.95));pointer-events:none}
 .pr[hidden]{display:none}
+/* Nur Teleprompter (Vivien, 28.10.2026: filmt mit der iPhone-Kamera-App, liest am MacBook) */
+#tpo{position:fixed;inset:0;z-index:190;background:#1F191C;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:20px 16px calc(24px + env(safe-area-inset-bottom))}
+#tpo[hidden]{display:none}
+.tpo-cd{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:500 min(30vw,200px)/1 "Cormorant Garamond",Georgia,serif;color:#fff;pointer-events:none}
+.tpo-cd:empty{display:none}
+.tpo-bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.tpo-bar button{font:inherit;font-size:17px;min-height:48px;padding:10px 18px;border-radius:999px;border:1.5px solid rgba(251,248,244,.4);background:rgba(251,248,244,.1);color:#fff;cursor:pointer}
+.tpo-bar button.main{background:#FBF5F7;color:#4A3A41;border-color:#FBF5F7;min-width:150px}
+.tpo-bar span{color:#E8D6CA;font-size:16px}
+.tpo-tip{margin:12px 0 0;color:rgba(251,248,244,.6);font-size:15px;text-align:center}
+.tpo-hint{position:absolute;top:26%;left:50%;transform:translate(-50%,0);max-width:520px;width:90%;text-align:center;color:rgba(251,248,244,.75);font-size:18px;line-height:1.5}
+body.tponly .pr.top{width:min(680px,94vw)}
+/* iPhone als Kamera (Continuity-Kamera, Vivien 28.10.2026) */
+.iph{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px}
+.iph button{font:inherit;font-size:17px;padding:10px 18px;border-radius:999px;border:1.5px solid #7D5E68;background:#FBF5F7;color:#7D5E68;cursor:pointer;min-height:46px}
+.iph button.on{background:#7D5E68;color:#fff}
+.iph-help{margin-top:10px;padding:14px 16px;border-radius:18px;background:#FBF1F0;border:1.5px solid #F0DCDA;font-size:16px;line-height:1.5;color:#4A3A41}
+.iph-help ol{margin:8px 0 0 20px;padding:0}.iph-help li{margin:4px 0}
+body.recording .iph,body.recording .iph-help,body.rec-ui .iph,body.rec-ui .iph-help{display:none}
 /* An der Kamera (Vivien, 28.10.2026: „sieht aus, als würde ich nach unten schauen“): während der Aufnahme ganz oben, mittig unter der Linse, schmal, 3 Zeilen */
 body.prtop .pr.top{display:block;position:fixed;top:0;left:50%;right:auto;transform:translateX(-50%);width:min(560px,94vw);height:calc(var(--fs,30px) * 1.4 * 3 + 22px + env(safe-area-inset-top,0px));min-height:0;padding-top:env(safe-area-inset-top,0px);border-radius:0 0 22px 22px;z-index:200;background:rgba(36,28,32,.94);box-shadow:0 8px 24px -10px rgba(0,0,0,.5)}
 body.prtop .pr.top .pr-t{padding:10px 3% 60%;line-height:1.4}
@@ -429,8 +448,11 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   <div class="view">
     <div id="stage" class="tc-stage" style="aspect-ratio:16/9"><div class="tc-st">Kamera startet … Bitte erlaube Kamera und Mikrofon.</div></div>
     <video id="play" controls playsinline hidden></video>
+    <div class="iph" id="iph" hidden><button type="button" id="iphBtn">📱 iPhone als Kamera</button><span class="hint" id="iphInfo" style="font-size:15px;color:#7D7076"></span></div>
+    <div class="iph-help" id="iphHelp" hidden></div>
     <div class="bar">
       <button type="button" class="go" id="go">● Aufnahme starten</button>
+      <button type="button" class="sm" id="tpOnly" title="Du filmst mit der Kamera-App am Handy, hier läuft nur der Text">📜 Nur Teleprompter</button>
       <button type="button" class="stop" id="stop" hidden>■ Stopp</button>
       <button type="button" class="up" id="up" hidden>⬆ In die Lektion hochladen</button>
       <button type="button" class="next" id="edit" hidden>✂️ Bearbeiten · Licht, Ausschnitt, Musik</button>
@@ -478,6 +500,8 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     <div class="box" id="lookBox"><h2>✨ Kamera-Look</h2><div id="panel"></div></div>
     <div class="box" id="devBox"><h2>Kamera &amp; Mikrofon</h2>
       <div class="dev"><label>Kamera<select id="cam"></select></label><label>Mikrofon<select id="mic"></select></label></div>
+      <div class="dev"><label>Bildqualität<select id="qual"><option value="4k">4K (3840 × 2160)</option><option value="2k">2K (2560 × 1440)</option><option value="hd">Full HD (1920 × 1080)</option></select></label></div>
+      <p class="hint" id="qInfo" style="margin:4px 0 0;font-size:15px;color:#7D7076"></p>
       <p class="tip" style="margin-top:10px">Tipp: Licht von vorne (Fenster vor dir, nicht hinter dir), Kamera auf Augenhöhe, Handy quer für Videos und hoch für Storys.</p>
     </div>
   </div>
@@ -492,8 +516,8 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   <button type="button" data-sheet="more">⚙️ Mehr</button>
 </nav>
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
-<script src="/wildhearts/assets/talkcam.js?v=4"></script>
-<script src="studio-edit.js?v=6"></script>
+<script src="/wildhearts/assets/talkcam.js?v=5"></script>
+<script src="studio-edit.js?v=7"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
@@ -549,6 +573,32 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   function prTop(on){on=on&&$('prCam').checked&&!pr.hidden;if(on===pr.classList.contains('top'))return;
     if(on){document.body.appendChild(pr);pr.classList.add('top')}else{pr.classList.remove('top');const st=$('stage');st&&st.insertBefore(pr,st.querySelector('.cd'))}
     document.body.classList.toggle('prtop',on);prMove(0,true)}
+  // ---- Nur Teleprompter: nichts aufnehmen, Text ganz oben unter der Handy-Linse, Rest dunkel ----
+  const tpo=document.createElement('div');tpo.id='tpo';tpo.hidden=true;
+  tpo.innerHTML='<div class="tpo-cd" id="tpoCd"></div><p class="tpo-hint" id="tpoHint">Starte jetzt die Aufnahme am Handy.<br>Der Text läuft gleich los.</p>'
+    +'<div class="tpo-bar"><button type="button" class="main" data-t="pp">⏸ Pause</button><button type="button" data-t="slow">− langsamer</button><span id="tpoSp"></span><button type="button" data-t="fast">schneller +</button>'
+    +'<button type="button" data-t="sm">A−</button><button type="button" data-t="lg">A+</button><button type="button" data-t="top">⟲ Anfang</button><button type="button" data-t="x">✕ Beenden</button></div>'
+    +'<p class="tpo-tip">Leertaste oder Tippen auf den Text: Pause und weiter · ↑ ↓ Tempo · Esc: beenden</p>';
+  document.body.appendChild(tpo);let tpOn=false;
+  const tpUi=()=>{$('tpoSp').textContent='Tempo '+(spLv+1)+' von 10';tpo.querySelector('[data-t="pp"]').textContent=run?'⏸ Pause':'▶ Weiter'};
+  async function tpStart(){const t=String(textOf(lang)||'').trim();if(!t){$('msg').className='msg';$('msg').textContent='Füge zuerst deinen Text beim Teleprompter ein.';return}
+    tpOn=true;run=false;pr.querySelector('.pr-t').innerHTML=textHtml(t);pr.hidden=false;tpo.hidden=false;document.body.classList.add('tponly','prtop');
+    document.body.appendChild(pr);pr.classList.add('top');prMove(0,true);$('tpoHint').hidden=false;tpUi();
+    try{if(!lock)lock=await navigator.wakeLock.request('screen')}catch(e){}
+    for(const n of [3,2,1]){if(!tpOn)return;$('tpoCd').textContent=n;await new Promise(r=>setTimeout(r,900))}$('tpoCd').textContent='';
+    if(!tpOn)return;$('tpoHint').hidden=true;run=true;tpUi()}
+  function tpEnd(){if(!tpOn)return;tpOn=false;run=false;$('tpoCd').textContent='';tpo.hidden=true;document.body.classList.remove('tponly');
+    pr.classList.add('top');prTop(false);pr.hidden=!!(mv||mvFree)||$('prOn').getAttribute('aria-pressed')==='false';setText();if(lock){lock.release().catch(()=>{});lock=null}}
+  tpo.addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b)return;b.blur();const k=b.dataset.t;
+    if(k==='pp'){$('tpoCd').textContent='';$('tpoHint').hidden=true;toggle()}
+    else if(k==='slow'||k==='fast'){const x=document.querySelector('[data-sp="'+(k==='fast'?1:-1)+'"]');x&&x.click()}
+    else if(k==='sm'||k==='lg'){const x=document.querySelector('[data-fs="'+(k==='lg'?3:-3)+'"]');x&&x.click()}
+    else if(k==='top'){prMove(0,true)}
+    else if(k==='x'){tpEnd();return}
+    tpUi()});
+  document.addEventListener('keydown',e=>{if(!tpOn)return;if(e.key==='Escape'){e.preventDefault();tpEnd()}else setTimeout(tpUi,0)});
+  pr.addEventListener('click',()=>{if(tpOn){$('tpoHint').hidden=true;setTimeout(tpUi,0)}});
+  $('tpOnly').onclick=()=>{if((rec&&rec.state==='recording')||(cs&&cs.rec))return;tpStart()};
   // eigener Text je Sprache (für Untertitel in der anderen Sprache)
   if(ls.get('st-own-de',null)===null&&ls.get('st-own',''))ls.set('st-own-de',ls.get('st-own',''));
   const ownOf=lg=>ls.get('st-own-'+lg,'');
@@ -560,7 +610,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     const wasIg=!!ig;ig=val[0]==='i'?(IGS.find(x=>x.id===+val.slice(1))||null):null;
     const id=+val;cur=(mv||mvFree)?null:(ig?{ig:ig,id:'i'+ig.id,t:ig.l,de:ig.text,en:ig.text,vde:ig.has,ven:ig.has,g:'Instagram',k:ig.kind==='reel'?'Reel':'Story',due:ig.day}:(TALKS.find(t=>t.id===id)||null));$('own').hidden=!!cur;$('ownT').value=ownOf(lang);
     const isMove=!!(mv||mvFree);$('prBox').hidden=isMove;$('mtPr').hidden=isMove;$('langSeg').hidden=isMove||!!ig;
-    if(tc&&!isMove&&ig!==null!==wasIg){tc.set({aspect:ig?'9:16':'16:9'});TalkCam.panel(tc,$('panel'))}$('modeSeg').hidden=isMove;pr.hidden=isMove||$('prOn').getAttribute('aria-pressed')==='false';
+    if(tc&&!isMove&&ig!==null!==wasIg){tc.set({aspect:ig?'9:16':'16:9'});TalkCam.panel(tc,$('panel'))}$('modeSeg').hidden=isMove;if($('tpOnly'))$('tpOnly').hidden=isMove;pr.hidden=isMove||$('prOn').getAttribute('aria-pressed')==='false';
     if(isMove&&clipm)setMode('ganz');
     document.querySelector('.sh h1').textContent=isMove?'🧘 Studio · Übung filmen':'🎥 Talking-Head-Studio';
     const sp=document.querySelector('.sh p');if(!sp.dataset.t)sp.dataset.t=sp.textContent;sp.textContent=isMove?'Für Flows und Bewegungsvideos: Kamera aufstellen, Raster nutzen, aufnehmen. Hier gibt es nur Hintergrund weich und Belichtung, keine Gesichtsfilter.':sp.dataset.t;
@@ -618,14 +668,22 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;choose()});
 
   // ---- Kamera ----
+  // Bildqualität (Vivien, 28.10.2026: „Kamera-Qualität sollte 4K sein oder 2K“): die Kamera liefert höchstens, was sie kann
+  const QUAL={'4k':[3840,2160,'4K'],'2k':[2560,1440,'2K'],'hd':[1920,1080,'Full HD']};
+  const qual=()=>{const q=ls.get('st-qual','4k');return QUAL[q]?q:'4k'};
+  // Datenrate passend zur Größe, damit 4K auch wie 4K aussieht
+  const vbr=(w,h)=>{const p=w*h;return p>=7e6?40000000:p>=3.2e6?20000000:p>=1.8e6?12000000:p>=.8e6?8000000:5000000};
+  function qShow(){const el=$('qInfo');if(!el||!raw)return;const st=(raw.getVideoTracks()[0]||{getSettings:()=>({})}).getSettings(),cw=st.width||0,chh=st.height||0;
+    const cv=tc&&tc.canvas;const L=Math.max(cw,chh),lbl=L>=3800?'4K':L>=2500?'2K':L>=1900?'Full HD':L>=1260?'HD':'';
+    el.textContent=cw?'Deine Kamera liefert '+cw+' × '+chh+(lbl?' ('+lbl+')':'')+(cv?', aufgenommen wird in '+cv.width+' × '+cv.height+'.':'.')+(L<Math.max(QUAL[qual()][0],QUAL[qual()][1])-40?' Mehr kann diese Kamera nicht, bei der Handykamera ist das oft höher als bei der Laptop-Kamera.':''):''}
   async function startCam(){
     const cid=ls.get('st-cam',''), mid=ls.get('st-mic','');
     if(raw)raw.getTracks().forEach(t=>t.stop());if(tc)tc.destroy(false);
-    const v={width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30}};if(cid)v.deviceId={exact:cid};
+    const Q=QUAL[qual()]||QUAL['4k'];const v={width:{ideal:Q[0]},height:{ideal:Q[1]},frameRate:{ideal:30}};if(cid)v.deviceId={exact:cid};
     const a={echoCancellation:true,noiseSuppression:true,autoGainControl:true};if(mid)a.deviceId={exact:mid};
     try{raw=await navigator.mediaDevices.getUserMedia({video:v,audio:a})}
     catch(e){try{raw=await navigator.mediaDevices.getUserMedia({video:true,audio:true});ls.set('st-cam','');ls.set('st-mic','')}catch(e2){$('stage').innerHTML='<div class="tc-st">Kamera oder Mikrofon sind gesperrt. Bitte im Browser oben bei der Adresse erlauben und die Seite neu laden.</div>';return}}
-    tc=await TalkCam.create(raw,{mount:$('stage'),maxVh:vh(),profile:profile()});
+    tc=await TalkCam.create(raw,{mount:$('stage'),maxVh:vh(),profile:profile(),maxLong:Q[0]});qShow();
     $('stage').appendChild(pr);$('stage').appendChild(Object.assign(document.createElement('div'),{className:'cd',id:'cd'}));
     const rd=document.createElement('div');rd.className='recdot';rd.id='rd';rd.hidden=true;rd.innerHTML='<i></i><span id="rt">0:00</span>';$('stage').appendChild(rd);
     $('stage').appendChild(slab);
@@ -633,8 +691,33 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     if(ig&&tc.s&&tc.s.aspect!=='9:16'){tc.set({aspect:'9:16'})}
     TalkCam.panel(tc,$('panel'));
     devices();
+    try{$('qual').value=qual();$('qual').onchange=()=>{ls.set('st-qual',$('qual').value);startCam()};tc.on(t=>{if(t==='layout')qShow()})}catch(e){}
   }
-  async function devices(){try{const ds=await navigator.mediaDevices.enumerateDevices();
+  // ---- iPhone als Kamera (Apples Continuity-Kamera): das iPhone filmt, Teleprompter und alles andere bleiben am MacBook ----
+  const isMacDesk=/Macintosh/.test(navigator.userAgent)&&!(navigator.maxTouchPoints>1);
+  const isIph=l=>/iphone/i.test(l||'');
+  function iphUi(ds){const box=$('iph');if(!box)return;box.hidden=!isMacDesk;if(!isMacDesk)return;
+    const cur=(raw&&raw.getVideoTracks()[0])||null,on=!!(cur&&isIph(cur.label));
+    $('iphBtn').classList.toggle('on',on);$('iphBtn').textContent=on?'📱 iPhone filmt · zurück zur Mac-Kamera':'📱 iPhone als Kamera';
+    $('iphInfo').textContent=on?'Der Teleprompter steht oben am Bildschirm, direkt unter deinem iPhone.':(ds&&ds.some(d=>d.kind==='videoinput'&&isIph(d.label))?'Dein iPhone ist bereit.':'')}
+  function iphHelp(){const h=$('iphHelp');h.hidden=false;h.innerHTML='<b>Dein iPhone wird gerade nicht gefunden.</b> So klappt es (einmal einrichten, danach geht es mit einem Klick):'
+    +'<ol><li>iPhone und MacBook sind mit derselben Apple-ID angemeldet, WLAN und Bluetooth sind an beiden an.</li>'
+    +'<li>Am iPhone: Einstellungen → Allgemein → AirPlay &amp; Continuity → <b>Continuity-Kamera</b> einschalten.</li>'
+    +'<li>iPhone sperren und ruhig hinstellen, am besten quer mit einer Halterung oben mittig am MacBook-Bildschirm, Rückkamera zu dir.</li>'
+    +'<li>Hier nochmal auf „📱 iPhone als Kamera“ tippen. Beim ersten Mal fragt das iPhone kurz nach, das bestätigst du einmal.</li></ol>'
+    +'<span style="color:#7D7076">Braucht macOS Ventura und iOS 16 oder neuer.</span> <button type="button" id="iphX" style="font:inherit;border:0;background:none;color:#7D5E68;text-decoration:underline;cursor:pointer">schließen</button>';
+    $('iphX').onclick=()=>{h.hidden=true}}
+  async function useIphone(){let ds=[];try{ds=await navigator.mediaDevices.enumerateDevices()}catch(e){}
+    const d=ds.find(x=>x.kind==='videoinput'&&isIph(x.label));
+    if(!d){iphHelp();return}
+    $('iphHelp').hidden=true;ls.set('st-cam',d.deviceId);
+    // auch das iPhone-Mikrofon nehmen, wenn vorhanden (näher am Gesicht als das MacBook)
+    const m=ds.find(x=>x.kind==='audioinput'&&isIph(x.label));if(m)ls.set('st-mic',m.deviceId);
+    $('msg').className='msg';$('msg').textContent='📱 iPhone-Kamera wird verbunden …';await startCam();
+    const on=raw&&raw.getVideoTracks()[0]&&isIph(raw.getVideoTracks()[0].label);
+    $('msg').className='msg'+(on?' ok':'');$('msg').textContent=on?'✓ Dein iPhone filmt jetzt. Schau beim Sprechen in die iPhone-Linse, der Text steht direkt darunter.':'Das iPhone hat sich nicht gemeldet. Ist es gesperrt und in der Nähe? Dann nochmal tippen.';}
+  $('iphBtn').onclick=()=>{const cur=raw&&raw.getVideoTracks()[0];if(cur&&isIph(cur.label)){ls.set('st-cam','');ls.set('st-mic','');startCam();return}useIphone()};
+  async function devices(){try{const ds=await navigator.mediaDevices.enumerateDevices();iphUi(ds);
     const fill=(sel,kind,key,label)=>{const curId=(raw.getTracks().find(t=>t.kind===kind.replace('input',''))||{getSettings:()=>({})}).getSettings().deviceId;
       sel.innerHTML=ds.filter(d=>d.kind===kind).map((d,i)=>'<option value="'+esc(d.deviceId)+'"'+(d.deviceId===curId?' selected':'')+'>'+esc(d.label||label+' '+(i+1))+'</option>').join('');
       sel.onchange=()=>{ls.set(key,sel.value);startCam()}};
@@ -651,7 +734,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     $('go').hidden=true;$('msg').textContent='';prTop(true);
     for(const n of [3,2,1]){$('cd').textContent=n;await new Promise(r=>setTimeout(r,800))}$('cd').textContent='';
     const mt=mime(),big=tc.canvas.width*tc.canvas.height>1.5e6;
-    rec=new MediaRecorder(tc.stream(30),Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:big?8000000:5000000,audioBitsPerSecond:160000}));
+    rec=new MediaRecorder(tc.stream(30),Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:vbr(tc.canvas.width,tc.canvas.height),audioBitsPerSecond:160000}));
     chunks=[];rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
     rec.onstop=()=>{blob=new Blob(chunks,{type:(rec.mimeType||mt||'video/webm').split(';')[0]});saved=false;
       const url=URL.createObjectURL(blob);$('play').src=url;const ext=blob.type.includes('mp4')?'mp4':'webm';
@@ -796,7 +879,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     for(const n of [3,2,1]){$('cd').textContent=n;await new Promise(r=>setTimeout(r,650))}$('cd').textContent='';
     if(!cs)return;
     const mt=mime(),big=tc.canvas.width*tc.canvas.height>1.5e6,ch=[];
-    const r=new MediaRecorder(tc.stream(30),Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:big?8000000:5000000,audioBitsPerSecond:160000}));
+    const r=new MediaRecorder(tc.stream(30),Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:vbr(tc.canvas.width,tc.canvas.height),audioBitsPerSecond:160000}));
     const st={t0:0,s:null,e:null};
     r.ondataavailable=e=>{if(e.data&&e.data.size)ch.push(e.data)};
     r.onstop=()=>{const dur=(performance.now()-st.t0)/1000;const me=r._cs;r.stream.getVideoTracks().forEach(t=>t.stop());
@@ -902,7 +985,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     ac=ac||new (window.AudioContext||window.webkitAudioContext)();await ac.resume();
     let buf=null;try{buf=await ac.decodeAudioData(await c.blob.arrayBuffer())}catch(e){buf=null}
     const dest=ac.createMediaStreamDestination(),out=cv.captureStream(30);if(buf)dest.stream.getAudioTracks().forEach(t=>out.addTrack(t));
-    const mt=mime(),ch=[],r=new MediaRecorder(out,Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:W*H>1.5e6?8000000:5000000,audioBitsPerSecond:160000}));
+    const mt=mime(),ch=[],r=new MediaRecorder(out,Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:vbr(W,H),audioBitsPerSecond:160000}));
     r.ondataavailable=e=>{if(e.data&&e.data.size)ch.push(e.data)};
     const done=new Promise(ok=>r.onstop=ok);
     const draw=()=>{g.drawImage(v,0,0,W,H);const t=v.currentTime,q=list.find(x=>t>=x.a&&t<x.b);if(q)drawCue(g,W,H,q.t)};

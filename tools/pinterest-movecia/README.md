@@ -3,12 +3,13 @@
 Vivien will maximale Sichtbarkeit, damit Frauen Method, Unfold und Prä-/Postnatal buchen.
 Geplante Aufgaben: Montag, Mittwoch, Freitag. Profil (seit 28.10.2026): „Movecia · Mindful Movement“, pinterest.at/moveciamovement
 (hello@moveciamovement.com), verknüpft mit FORMA und Frida & Knox: in Chrome oben rechts Pfeil neben dem Profilbild → Movecia wählen.
-Profil eingerichtet (Profilbild `img/movecia/movecia-profilbild-1080.png`, Kurzinfo, Website, Impressum-Link /terms/), alle 6 Pinnwände angelegt, dazu „Mindful Movement Teacher Training“ (Vivien, 28.10.2026: Teaser posten, Start November 2027; Link auf die Hauptseite, bis /teacher-training/ o. Ä. live ist, dann Pins dorthin verlinken).
+Profil eingerichtet (Profilbild `img/movecia/movecia-profilbild-1080.png`, Kurzinfo, Website, Impressum-Link /terms/), alle 6 Pinnwände angelegt, dazu „Mindful Movement Teacher Training“ (Vivien, 28.10.2026: Teaser posten, Start November 2027, Ausbildung in Yoga, Somatic Movement und Bodyweight, insgesamt 550 Stunden – beim Teacher Training NIE „Pilates“ nennen; Link auf die Hauptseite, bis /teacher-training/ o. Ä. live ist, dann Pins dorthin verlinken).
 Ist Movecia nicht im Menü: nichts anlegen, Vivien Bescheid geben und den fertigen Pin als Bild schicken.
 
 Veröffentlichen am einfachsten (seit 28.10.2026): https://at.pinterest.com/pin-creation-tool/ → Datei-Upload mit dem Pin aus dem Repo
 (file_upload, kein Warten auf die Live-Seite nötig) → Titel, Beschreibung, Link, Pinnwand, unter „Weitere Optionen“ Alt-Text → „Veröffentlichen“.
-Fotos: Hochformat-Fotos 640 px werden im breiten Bogen stark vergrößert und unscharf; besser große Fotos (ev-ueber-mich, pt-*, ev-start*, ev-method, ev-natal-sitzend) nehmen und Person ganz sichtbar halten (Vivien, 28.10.2026).
+Fotos: Hochformat-Fotos 640 px werden im breiten Bogen stark vergrößert und unscharf; besser große Fotos (ev-ueber-mich, pt-*, ev-start*, ev-method, ev-natal-sitzend) nehmen und Person ganz sichtbar, eher klein im Raum zeigen (Vivien, 28.10.2026: „weiter nach hinten“). Für Hochformat-Fotos gibt es Breitfassungen mit sanft verlängerten Rändern, z. B. `ev-ueber-mich-weit.jpg`, `pos` dann um 50% 60%. In der Chrome-Leiste vor jedem Pin prüfen, dass oben „Movecia · Mindful Movement“ aktiv ist (der Login wechselt manchmal auf Frida & Knox).
+Alte/ersetzte Pins nicht löschen (nur Vivien), sondern per „Pin bearbeiten“ in die private Pinnwand „Archiv“ verschieben.
 Pin-URL: neuester Pin unter https://at.pinterest.com/moveciamovement/_created/.
 Nach „Pinnwand erstellen“ kommt ein Fenster mit Pin-Vorschlägen: dort NICHTS anklicken außer „Fertig“, sonst wird ein fremder Pin gemerkt.
 
