@@ -408,7 +408,6 @@ body.acm::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:non
 body.acad{background:#F0E0DA;--bg:#F0E0DA}
 body.acad::after{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
   background:
-   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='190' viewBox='0 0 150 190'%3E%3Cg fill='none' stroke='%237D5E68' stroke-opacity='.07' stroke-width='1.2'%3E%3Cpath d='M30 170V88a45 45 0 0 1 90 0v82'/%3E%3Cpath d='M41 170V90a34 34 0 0 1 68 0v80' stroke-dasharray='.1 5' stroke-linecap='round'/%3E%3C/g%3E%3Cpath d='M75 40c.5 3 2.3 4.8 5.3 5.3-3 .5-4.8 2.3-5.3 5.3-.5-3-2.3-4.8-5.3-5.3 3-.5 4.8-2.3 5.3-5.3z' fill='%23B58C99' fill-opacity='.16'/%3E%3C/svg%3E") 0 0/150px 190px,
    linear-gradient(180deg,#F2E3DE 0%,#EFDCD4 45%,#F3E4DB 100%)}
 body.acad .site-top{background:rgba(242,227,222,.93)}
 .acband{background:linear-gradient(110deg,#5E4A51,#6B5658 45%,#7D5E68);color:#FBF5F7;position:relative;overflow:hidden}
