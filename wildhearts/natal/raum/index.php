@@ -229,15 +229,12 @@ function nx(){if(!N.length||Date.now()>=s){k.style.opacity=0;return;}k.style.opa
 nx();setInterval(nx,9000);})();
 </script>
 <?php if ($room['host'] && $room['kind'] === 's'): ?>
-<script src="/wildhearts/assets/talkcam.js?v=1"></script>
 <script>
 // Aufnahme: nur Viviens eigene Kamera und Mikro (nicht der Whereby-Raum), Upload in Stücken direkt zum Termin.
 (function(){
 const btn=document.getElementById('recBtn'),st=document.getElementById('recSt');if(!btn)return;
 const base='/api/natal-rec.php?r=<?= $h((string)$_GET['r']) ?>&k=<?= $h((string)$_GET['k']) ?>';
-let rec=null,stream=null,wr=null,id=0,off=0,queue=[],busy=false,t0=0,stopped=false,tick=null,mime='';
-// Kamera-Look (Vivien, 28.10.2026): gilt für die Aufnahme, nicht für das Whereby-Bild der Kundin
-if(window.TalkCam)btn.insertAdjacentElement('afterend',TalkCam.button(null,{note:'Der Look gilt für deine Aufnahme dieser Einheit. Die Kundin sieht dich im Videoraum über Whereby, dort wirkt der Look nicht (Whereby hat in seinen Kamera-Einstellungen einen eigenen Hintergrund-Weichzeichner).'}));
+let rec=null,stream=null,id=0,off=0,queue=[],busy=false,t0=0,stopped=false,tick=null,mime='';
 const fmt=b=>b>1e9?(b/1e9).toFixed(1)+' GB':Math.round(b/1e6)+' MB';
 const show=()=>{const m=Math.floor((Date.now()-t0)/60000);st.textContent=rec?('läuft '+m+' Min · '+fmt(off)+' gespeichert'):st.textContent;};
 async function pump(){if(busy)return;busy=true;
@@ -249,14 +246,13 @@ async function pump(){if(busy)return;busy=true;
  if(stopped&&!queue.length){const s=Math.round((Date.now()-t0)/1000);const r=await fetch(base+'&a=finish&id='+id+'&sec='+s,{method:'POST'});const j=await r.json().catch(()=>({}));
   st.textContent=j.ok?'✓ Aufnahme gespeichert ('+fmt(j.bytes)+'), sie ist jetzt im Bereich der Kundin.':'Die Aufnahme konnte nicht gespeichert werden.';btn.disabled=false;stopped=false;}}
 btn.addEventListener('click',async()=>{
- if(rec){rec.stop();if(wr)wr.stop();else stream.getTracks().forEach(t=>t.stop());wr=null;rec=null;clearInterval(tick);btn.classList.remove('on');btn.textContent='● Aufnahme';btn.disabled=true;st.textContent='wird fertig hochgeladen …';return;}
+ if(rec){rec.stop();stream.getTracks().forEach(t=>t.stop());rec=null;clearInterval(tick);btn.classList.remove('on');btn.textContent='● Aufnahme';btn.disabled=true;st.textContent='wird fertig hochgeladen …';return;}
  if(!confirm('Aufnahme starten? Aufgenommen werden nur deine Kamera und dein Mikro. Tipp: Mit Kopfhörern ist auch die Stimme der Kundin nicht zu hören.'))return;
  try{stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720}},audio:{echoCancellation:true,noiseSuppression:true}});}
  catch(e){alert('Kamera oder Mikro sind gesperrt. Bitte im Browser erlauben.');return;}
- if(window.TalkCam){wr=await TalkCam.wrap(stream);stream=wr.stream;}
  mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','video/mp4'].find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported(m))||'';
  const r=await fetch(base+'&a=start&mime='+encodeURIComponent(mime||'video/webm'),{method:'POST'});const j=await r.json().catch(()=>({}));
- if(!j.ok){alert('Die Aufnahme kann gerade nicht starten.');if(wr){wr.stop();wr=null}else stream.getTracks().forEach(t=>t.stop());return;}
+ if(!j.ok){alert('Die Aufnahme kann gerade nicht starten.');stream.getTracks().forEach(t=>t.stop());return;}
  id=j.id;off=0;queue=[];t0=Date.now();
  rec=new MediaRecorder(stream,mime?{mimeType:mime,videoBitsPerSecond:1200000}:{videoBitsPerSecond:1200000});
  rec.ondataavailable=e=>{if(e.data&&e.data.size){queue.push(e.data);pump();}};
