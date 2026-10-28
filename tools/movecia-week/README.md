@@ -22,4 +22,8 @@ Jeden **Sonntag** kommt das Paket für die **kommende Woche Montag bis Sonntag**
 - Sprache: schönes, schlichtes Hochdeutsch, warm, fließende ganze Sätze. Keine Floskeln, keine Dreierketten, keine „nicht X, sondern Y“-Sätze, keine Gedankenstriche-Ketten, keine Therapie-Sprache, keine erfundenen Geschichten.
 - Hashtags: 8–10 pro Caption, Mischung aus groß (#mindfulmovement, #yogafürfrauen) und Nische (#tiredday, #mentalload), immer #movecia.
 - Bereits verwendete Themen in `history.md` eintragen und nicht wiederholen.
-- Fotos nur aus `img/movecia/fotos/` (art-*.jpg bevorzugt), keine Fotos vom Töpfern.
+- Fotos nur die neuen Bilder `img/movecia/fotos/ev-*.jpg` bzw. `pt-*.jpg` (heller Studio-Look unterm Dachstuhl, cremefarbene Outfits), nie art-*, fold, reach, keine Fotos vom Töpfern. Alte Pfade ersetzt `make_week.py` automatisch und meldet es.
+
+## Look (Vivien, 27.10.2026: alles cute, modern, eine Movecia-Handschrift)
+- `make_week.page()` ist die eine Vorlage für Wochenbilder, Pins (`tools/pinterest-movecia/make_pin.py`) und Werbung (`tools/movecia-ads/make_ads.py`): weicher Farbverlauf, drei Wellen unten, feine Pflaume-Linien, Kiesel-Zeichen, Themen-Icon in der runden Blase (Feld `icon`, Namen aus `tools/workbooks/icons.py`, sonst passend zum Typ), Listen als Pastell-Karten (`bullets: true` = Herzchen statt Zahlen), Fotos im Bogen mit Wellenkante (`pos` = Bildausschnitt, z. B. "50% 22%"), `chips` = kleine Infos.
+- Nach jedem Bauen alle Bilder ansehen: nichts darf unten abgeschnitten sein oder in die Fußzeile laufen.

@@ -1,0 +1,139 @@
+{
+ "zip": "Movecia_Werbung.zip",
+ "ads": [
+  {
+   "name": "1_Method_Early-Bird",
+   "langs": {
+    "de": {
+     "type": "offer",
+     "icon": "sonne",
+     "photo": "img/movecia/fotos/ev-method-karte.jpg",
+     "kicker": "On demand · Start 1. Dezember",
+     "title": "Mindful Movement",
+     "em": "Method",
+     "text": "Ein paar ruhige Minuten für dich, jeden Tag: Flows, Somatic Movement, Breathwork und Meditation. Du beginnst bei Monat 1 und gehst Schritt für Schritt weiter.",
+     "price": "€ 29 im Monat",
+     "deal": "Early-Bird bis 1. Dezember statt € 39. Dein Preis bleibt, solange du dabei bist.",
+     "cta": "Jetzt Platz sichern",
+     "url": "moveciamovement.com/method",
+     "pinbtn": "Mehr erfahren",
+     "pos": "50% 22%"
+    },
+    "en": {
+     "type": "offer",
+     "icon": "sonne",
+     "photo": "img/movecia/fotos/ev-method-karte.jpg",
+     "kicker": "On demand · starts 1 December",
+     "title": "Mindful Movement",
+     "em": "Method",
+     "text": "A few calm minutes for yourself, every day: flows, somatic movement, breathwork and meditation. You start at month one and take it step by step.",
+     "price": "€29 a month",
+     "deal": "Early-bird price until 1 December, usually €39. Your price stays the same for as long as you stay.",
+     "cta": "Save your spot",
+     "url": "moveciamovement.com/method",
+     "pinbtn": "Learn more",
+     "pos": "50% 22%"
+    }
+   }
+  },
+  {
+   "name": "2_Unfold_Early-Bird",
+   "langs": {
+    "de": {
+     "type": "offer",
+     "icon": "schmetterling",
+     "photo": "img/movecia/fotos/ev-unfold-karte.jpg",
+     "kicker": "3 Monate live online · Start 10. Jänner",
+     "title": "Unfold|",
+     "em": "The Mindful Becoming",
+     "text": "Drei Monate, in denen du zu dir zurückfindest und Schritt für Schritt ins Tun kommst, mit Live-Calls, Bewegungsvideos und Workbooks.",
+     "price": "€ 450",
+     "deal": "Early-Bird bis 11. Jänner statt € 490, oder 3 × € 165. Nur 10 Plätze.",
+     "cta": "Jetzt Platz sichern",
+     "url": "moveciamovement.com/unfold",
+     "pinbtn": "Mehr erfahren",
+     "pos": "50% 78%"
+    },
+    "en": {
+     "type": "offer",
+     "icon": "schmetterling",
+     "photo": "img/movecia/fotos/ev-unfold-karte.jpg",
+     "kicker": "3 months live online · starts 10 January",
+     "title": "Unfold|",
+     "em": "The Mindful Becoming",
+     "text": "Three months to find your way back to yourself and, step by step, start doing what matters to you, with live calls, movement videos and workbooks.",
+     "price": "€450",
+     "deal": "Early-bird price until 11 January, usually €490, or 3 × €165. Only 10 spots.",
+     "cta": "Save your spot",
+     "url": "moveciamovement.com/unfold",
+     "pinbtn": "Learn more",
+     "pos": "50% 78%"
+    }
+   }
+  },
+  {
+   "name": "3_Unfold_Kennst-du-das",
+   "langs": {
+    "de": {
+     "type": "steps",
+     "dark": true,
+     "bullets": true,
+     "icon": "spiegel",
+     "kicker": "Kennst du das?",
+     "title": "Du funktionierst.|",
+     "em": "Aber wo bist du?",
+     "items": [
+      "Dein Kopf ist voll mit Listen, Terminen und den Bedürfnissen aller anderen.",
+      "Bewegung würde dir guttun, aber jedes Programm fühlt sich nach noch mehr Leistung an.",
+      "Du spürst, dass mehr in dir steckt, und weißt nicht, wo du anfangen sollst."
+     ],
+     "sig": "Unfold. Drei Monate, um zu dir zurückzufinden.",
+     "cta": "Start 10. Jänner · nur 10 Plätze",
+     "url": "moveciamovement.com/unfold",
+     "pinbtn": "Mehr erfahren"
+    },
+    "en": {
+     "type": "steps",
+     "dark": true,
+     "bullets": true,
+     "icon": "spiegel",
+     "kicker": "Sound familiar?",
+     "title": "You keep everything running.|",
+     "em": "But where are you?",
+     "items": [
+      "Your head is full of lists, appointments and everyone else's needs.",
+      "You know movement would help, but every programme feels like even more pressure.",
+      "You feel there is more inside you and don't know where to begin."
+     ],
+     "sig": "Unfold. Three months to find your way back to you.",
+     "cta": "Starts 10 January · only 10 spots",
+     "url": "moveciamovement.com/unfold",
+     "pinbtn": "Learn more"
+    }
+   }
+  },
+  {
+   "name": "4_Prae-Postnatal",
+   "langs": {
+    "de": {
+     "type": "photo",
+     "icon": "herz",
+     "photo": "img/movecia/fotos/ev-natal-sitzend.jpg",
+     "kicker": "Prä- & Postnatal · 1:1 im Studio oder online",
+     "title": "Bewegt durch die",
+     "em": "Schwangerschaft",
+     "text": "Ruhiges, kräftigendes Training ganz für dich, mit Atem, Beckenboden und viel Raum für das, was dein Körper gerade braucht.",
+     "chips": [
+      "Studio in Mathon ab € 52",
+      "online ab € 44 pro Einheit",
+      "Kennenlernen kostenlos"
+     ],
+     "cta": "Mehr erfahren",
+     "url": "moveciamovement.com/natal",
+     "pinbtn": "Mehr erfahren",
+     "pos": "50% 55%"
+    }
+   }
+  }
+ ]
+}

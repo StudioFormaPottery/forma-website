@@ -22,7 +22,7 @@ Yoga für müde Tage · Mental Load & Selbstfürsorge für Mamas · Schwangersch
    | Journaling-Frage | https://moveciamovement.com/unfold/ | Journaling-Fragen |
    Preise immer live aus `api/method-lib.php` (`mv_cfg_raw`), abgelaufene Early-Birds nie nennen, Gathering-Preise nie.
    Nur echte Übungen mit gängigen Namen (Katze-Kuh, Kindhaltung, Glute Bridge, Box Breathing …).
-3. Pin bauen: JSON wie ein Wochen-Post plus `file` = `img/pins/movecia/<datum>-<thema>.jpg`, lokalen Server starten
+3. Pin bauen (Look automatisch wie Website und Wochenbilder, siehe `tools/movecia-week/README.md` „Look“): JSON wie ein Wochen-Post plus `file` = `img/pins/movecia/<datum>-<thema>.jpg`, lokalen Server starten
    (`FORMA_DATA_DIR=/tmp/x php -S 127.0.0.1:8765`), `python3 tools/pinterest-movecia/make_pin.py pin.json`, Bild ansehen.
    Fotos (Vivien, 27.10.2026): IMMER die neuen Bilder `img/movecia/fotos/ev-*.jpg` (heller Studio-Look mit Bergblick),
    nie mehr art-*.jpg, fold.jpg, reach.jpg. Für natal: `ev-natal.jpg`/`ev-natal-sitzend.jpg`. Bevorzugt Bilder, auf denen
