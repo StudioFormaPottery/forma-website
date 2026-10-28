@@ -32,30 +32,35 @@ function mv_next_popup(): void
         return $l === 'en' ? $d->format('j F') : $d->format('j') . '. ' . $m[(int)$d->format('n')];
     };
     if ($ph === 'method') {
-        $p = ['img' => '/img/movecia/fotos/ev-method-karte.jpg', 'pos' => '50% 30%', 'href' => '/method/',
+        $p = ['img' => '/img/movecia/fotos/ev-katze-kuh.jpg', 'pos' => '62% 55%', 'href' => '/method/',
             'k' => ['Mindful Movement Method · Start ' . $short($ml, 'de'), 'Mindful Movement Method · starts ' . $short($ml, 'en')],
             'h' => ['Jeden Tag ein paar <em>ruhige Minuten</em> für dich', 'A few <em>quiet minutes</em> for you, every day'],
             't' => ['Kurze Videos aus Yoga, Somatic Movement und Bodyweight, dazu Breathwork und Meditation. Du beginnst bei Monat 1 und gehst Schritt für Schritt weiter.', 'Short videos of yoga, somatic movement and bodyweight training, plus breathwork and meditation. You begin with month 1 and go step by step.'],
             'price' => $c['eb_m'] ? ['Early-Bird bis ' . $short($c['eb_m_end'], 'de') . ': ' . $eu($c['m1']) . ' statt ' . $eu($c['r_m1']) . ' im Monat', 'Early bird until ' . $short($c['eb_m_end'], 'en') . ': ' . $eu($c['m1']) . ' instead of ' . $eu($c['r_m1']) . ' a month'] : [$eu($c['m1']) . ' im Monat', $eu($c['m1']) . ' a month'],
             'btn' => ['Mehr erfahren', 'Find out more']];
     } elseif ($ph === 'unfold') {
-        $p = ['img' => '/img/movecia/fotos/ev-unfold-karte.jpg', 'pos' => '50% 35%', 'href' => '/unfold/',
+        $p = ['img' => '/img/movecia/fotos/ev-unfold.jpg', 'pos' => '50% 22%', 'href' => '/unfold/',
             'k' => ['Unfold · Start ' . $short($us, 'de') . ' · nur ' . (int)$c['u_seats'] . ' Plätze', 'Unfold · starts ' . $short($us, 'en') . ' · only ' . (int)$c['u_seats'] . ' spots'],
             'h' => ['Unfold · <em>The Mindful Becoming</em>', 'Unfold · <em>The Mindful Becoming</em>'],
             't' => ['Drei Monate, in denen du zu dir zurückfindest: wöchentliche Live-Calls, Bewegungsvideos und Workbooks gegen den Mental Load.', 'Three months to come back to yourself: weekly live calls, movement videos and workbooks for your mental load.'],
             'price' => $c['eb_u'] ? ['Early-Bird bis ' . $short($c['eb_u_end'], 'de') . ': ' . $eu($c['u_once']) . ' statt ' . $eu($c['r_u_once']), 'Early bird until ' . $short($c['eb_u_end'], 'en') . ': ' . $eu($c['u_once']) . ' instead of ' . $eu($c['r_u_once'])] : [$eu($c['u_once']) . ' oder ' . (int)$c['u_n'] . ' × ' . $eu($c['u_inst']), $eu($c['u_once']) . ' or ' . (int)$c['u_n'] . ' × ' . $eu($c['u_inst'])],
             'btn' => ['Platz sichern', 'Save my spot']];
     } else {
-        $p = ['img' => '/img/movecia/fotos/ev-ueber-mich-weit.jpg', 'pos' => '50% 60%', 'href' => '/teacher-training/#liste',
-            'k' => ['Bald bei Movecia · Start November 2027', 'Coming soon · starts November 2027'],
-            'h' => ['Mindful Movement <em>Teacher Training</em>', 'Mindful Movement <em>Teacher Training</em>'],
-            't' => ['Eine Ausbildung in Yoga, Somatic Movement und Bodyweight mit insgesamt 550 Stunden. Setz deinen Namen auf die Liste, dann erfährst du alle Infos als Erste.', 'A training in yoga, somatic movement and bodyweight with 550 hours in total. Put your name on the list and you\'ll be the first to hear all the details.'],
-            'price' => null,
-            'btn' => ['Auf die Liste', 'Put me on the list']];
+        // Teacher Training ist seit 28.10.2026 als Movecia Academy buchbar, Preis immer aus ac_cfg() (Server)
+        require_once dirname(__DIR__, 2) . '/api/academy-lib.php';
+        $ac = ac_cfg();
+        $p = ['img' => '/img/movecia/fotos/ev-lunge.jpg', 'pos' => '42% 55%', 'href' => '/academy/teacher-training/',
+            'k' => ['Movecia Academy · Start ' . $short($ac['start_ts'], 'de') . ' 2027 · nur ' . (int)$ac['seats'] . ' Plätze', 'Movecia Academy · starts ' . $short($ac['start_ts'], 'en') . ' 2027 · only ' . (int)$ac['seats'] . ' places'],
+            'h' => ['The Mindful Becoming <em>Teacher Training</em>', 'The Mindful Becoming <em>Teacher Training</em>'],
+            't' => ['550 Stunden inklusive einer vollständigen 200-Stunden-Yogalehrerausbildung, hybrid mit einem Präsenzwochenende in den Tiroler Alpen. Nur alle zwei Jahre.', '550 hours including a complete 200-hour yoga teacher training, hybrid with an in-person weekend in the Tyrolean Alps. Only every two years.'],
+            'price' => $ac['eb'] ? ['Early-Bird bis ' . $short($ac['eb_end'], 'de') . ': ' . $eu($ac['price']) . ' statt ' . $eu($ac['r_total']), 'Early bird until ' . $short($ac['eb_end'], 'en') . ': ' . ac_eur($ac['price'], 'en') . ' instead of ' . ac_eur($ac['r_total'], 'en')] : [$eu($ac['price']) . ', zur Buchung 50 % Anzahlung', ac_eur($ac['price'], 'en') . ', 50 % deposit to book'],
+            'btn' => ['Zur Ausbildung', 'See the training']];
+        $acStart = (int)$ac['start_ts'];
+        $acEb = (int)$ac['eb'];
     }
-    $startTs = $ph === 'method' ? $ml : ($ph === 'unfold' ? $us : 0);
+    $startTs = $ph === 'method' ? $ml : ($ph === 'unfold' ? $us : ($acStart ?? 0));
     // Schlüssel fürs „schon gesehen“: ändert sich mit Angebot und Preisstufe → neues Angebot oder Ende des Early-Bird zeigt das Pop-up wieder
-    $ver = $ph . '-' . ($ph === 'method' ? (int)$c['eb_m'] : ($ph === 'unfold' ? (int)$c['eb_u'] : 0));
+    $ver = $ph . '-' . ($ph === 'method' ? (int)$c['eb_m'] : ($ph === 'unfold' ? (int)$c['eb_u'] : 'ac' . ($acEb ?? 0)));
     ?>
 <!-- Kiesel-Pop-up (Vivien, 28.10.2026: „voll langweilig, lieber rund, in der Form vom Logo“): weiche Kieselform mit versetztem Pflaume-Umriss wie im Logo,
      Foto als Kiesel, Pflaume-Punkt mit Countdown bis zum Start. Bewegt sich ganz leicht mit der Maus, atmet langsam. -->
@@ -63,6 +68,8 @@ function mv_next_popup(): void
   <div class="npop-stage">
     <span class="npop-ring" aria-hidden="true"></span>
     <div class="npop-card">
+      <svg class="npop-logo" viewBox="17 14 94 94" aria-hidden="true"><path d="M56 32 C 76 29, 92 44, 91 64 C 90 84, 72 96, 53 92 C 34 88, 25 72, 29 53 C 32 40, 43 33, 56 32 Z" fill="#E8D6CA" transform="translate(-6 -4)"/><path d="M44 30 C 62 20, 90 28, 98 50 C 104 68, 92 78, 84 88 C 76 100, 50 98, 36 88 C 22 78, 22 58, 28 46 C 32 38, 38 33, 44 30 Z" fill="none" stroke="#7D5E68" stroke-width="1.6" stroke-linejoin="round" transform="translate(7 4) translate(63 60) scale(0.85) translate(-63 -60)"/><circle cx="81" cy="54" r="9" fill="#7D5E68"/></svg>
+      <span class="npop-spark s1" aria-hidden="true">✦</span><span class="npop-spark s2" aria-hidden="true">✦</span><span class="npop-spark s3" aria-hidden="true">·</span>
       <button class="npop-x" type="button" aria-label="Schließen / Close">✕</button>
       <div class="npop-pic">
         <div class="npop-ph" style="background-image:url(<?= forma_h($p['img']) ?>);background-position:<?= forma_h($p['pos']) ?>"></div>
@@ -104,6 +111,17 @@ function mv_next_popup(): void
 .npop-cta{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;margin-top:.6rem}
 .npop-cta .btn{font-size:.92rem}
 .npop-later{border:0;background:none;color:var(--muted,#7D7076);font:inherit;font-size:.88rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:.4em 0}
+/* Movecia-Zeichen zart im Hintergrund + kleine Funkel (Vivien, 28.10.2026: „cuter, Logo im Hintergrund“) */
+.npop-card{overflow:visible}
+.npop-logo{position:absolute;z-index:0;left:1%;bottom:-2%;width:230px;height:230px;opacity:.55;rotate:-10deg;pointer-events:none;animation:npLogo 9s ease-in-out infinite alternate}
+@keyframes npLogo{to{rotate:-3deg;scale:1.04}}
+.npop-tx,.npop-pic{position:relative;z-index:1}
+.npop-spark{position:absolute;z-index:2;color:var(--plum,#7D5E68);pointer-events:none;line-height:1;animation:npTw 3.2s ease-in-out infinite}
+.npop-spark.s1{left:7%;top:11%;font-size:1.05rem;opacity:.55}
+.npop-spark.s2{left:calc(210px + 3rem);bottom:12%;font-size:.75rem;opacity:.45;animation-delay:-1.4s}
+.npop-spark.s3{left:4%;bottom:20%;font-size:2.4rem;color:#C9A9B2;animation-delay:-2.2s}
+@keyframes npTw{50%{transform:scale(.6);opacity:.2}}
+.npop-pr{background:rgba(234,223,222,.75);border-color:#E2CFD3}
 .npop-x{position:absolute;right:9%;top:9%;z-index:2;width:34px;height:34px;border-radius:50%;border:0;background:rgba(251,248,244,.95);color:var(--deep,#4A3A41);font-size:.9rem;cursor:pointer;box-shadow:0 2px 8px rgba(46,37,41,.1)}
 @media(max-width:719px){
   .npop-stage{width:min(420px,100%)}
@@ -120,8 +138,12 @@ function mv_next_popup(): void
   .npop-pr{align-self:center}
   .npop-cta{justify-content:center}
   .npop-x{right:2px;top:-10px}
+  .npop-logo{width:140px;height:140px;left:9%;bottom:auto;top:15%;opacity:.5}
+  .npop-spark.s1{left:9%;top:6%}
+  .npop-spark.s2{left:auto;right:12%;bottom:auto;top:32%}
+  .npop-spark.s3{left:6%;bottom:12%}
 }
-@media(prefers-reduced-motion:reduce){.npop-card,.npop-ring,.npop-ph,.npop-dot{animation:none}.npop-stage{transition:none}}
+@media(prefers-reduced-motion:reduce){.npop-card,.npop-ring,.npop-ph,.npop-dot,.npop-logo,.npop-spark{animation:none}.npop-stage{transition:none}}
 </style>
 <script>
 (function(){
@@ -139,7 +161,6 @@ function mv_next_popup(): void
   try{seen=sessionStorage.getItem(key)==='1'}catch(e){}
   if(seen&&!force)return;
   if(/[#&]anfrage/.test(location.hash)&&!force)return;
-  var stage=p.querySelector('.npop-stage');
   // Kein Mitwackeln mit der Maus (Vivien, 28.10.2026: „dass er so komisch wackelt, muss nicht sein“)
   function close(){p.classList.remove('on');setTimeout(function(){p.hidden=true},450);try{sessionStorage.setItem(key,'1')}catch(e){}document.removeEventListener('keydown',esc)}
   function esc(e){if(e.key==='Escape')close()}

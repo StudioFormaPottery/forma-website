@@ -520,19 +520,19 @@ function mm_mail_confirm(array $sub): bool
         return mm_mail($sub['email'], 'Please confirm your email for Unfold 🌿', $text, mm_mail_html('Confirm your email', $html));
     }
     if (($sub['source'] ?? '') === 'teacher') {
-        // Warteliste Mindful Movement Teacher Training (Vivien, 28.10.2026): erst bestätigen, dann Platz auf der Liste
+        // Warteliste Mindful Becoming Teacher Training (Vivien, 28.10.2026): erst bestätigen, dann Platz auf der Liste
         if ($de) {
-            $text = "Hallo $first,\n\nschön, dass du dich für das Mindful Movement Teacher Training interessierst!\n\nBitte bestätige zuerst deine E-Mail-Adresse, dann steht dein Name auf der Liste:\n$link\n\nSobald alle Infos feststehen, erfährst du es als Erste.\n\nFalls du dich nicht eingetragen hast, ignoriere diese Mail einfach.\n\nAlles Liebe, Viv";
+            $text = "Hallo $first,\n\nschön, dass du dich für das Mindful Becoming Teacher Training interessierst!\n\nBitte bestätige zuerst deine E-Mail-Adresse, dann steht dein Name auf der Liste:\n$link\n\nSobald alle Infos feststehen, erfährst du es als Erste.\n\nFalls du dich nicht eingetragen hast, ignoriere diese Mail einfach.\n\nAlles Liebe, Viv";
             $html = '<p style="' . $hand . '">Hallo ' . forma_h($first) . ',</p>'
-                . '<p style="margin:14px 0 0;">schön, dass du dich für das <strong>Mindful Movement Teacher Training</strong> interessierst!</p>'
+                . '<p style="margin:14px 0 0;">schön, dass du dich für das <strong>Mindful Becoming Teacher Training</strong> interessierst!</p>'
                 . '<p style="margin:14px 0 0;">Bitte bestätige zuerst deine E-Mail-Adresse, dann steht dein Name auf der Liste. Sobald alle Infos feststehen, erfährst du es als Erste.</p>'
                 . mm_button($link, 'Ja, ich bestätige meine E-Mail')
                 . '<p style="margin:16px 0 0;font-size:14px;color:#7D7076;">Falls du dich nicht eingetragen hast, ignoriere diese Mail einfach.</p>';
             return mm_mail($sub['email'], 'Bitte bestätige deine E-Mail fürs Teacher Training 🌿', $text, mm_mail_html('E-Mail bestätigen', $html, 'de'));
         }
-        $text = "Hey $first,\n\nHow lovely that you're interested in the Mindful Movement Teacher Training!\n\nPlease confirm your email address first, and your name will be on the list:\n$link\n\nAs soon as all the details are ready, you'll be the first to hear.\n\nIf you didn't sign up, simply ignore this email.\n\nWith love, Viv";
+        $text = "Hey $first,\n\nHow lovely that you're interested in the Mindful Becoming Teacher Training!\n\nPlease confirm your email address first, and your name will be on the list:\n$link\n\nAs soon as all the details are ready, you'll be the first to hear.\n\nIf you didn't sign up, simply ignore this email.\n\nWith love, Viv";
         $html = '<p style="' . $hand . '">Hey ' . forma_h($first) . ',</p>'
-            . '<p style="margin:14px 0 0;">How lovely that you\'re interested in the <strong>Mindful Movement Teacher Training</strong>!</p>'
+            . '<p style="margin:14px 0 0;">How lovely that you\'re interested in the <strong>Mindful Becoming Teacher Training</strong>!</p>'
             . '<p style="margin:14px 0 0;">Please confirm your email address first, and your name will be on the list. As soon as all the details are ready, you\'ll be the first to hear.</p>'
             . mm_button($link, 'Yes, confirm my email')
             . '<p style="margin:16px 0 0;font-size:14px;color:#7D7076;">If you didn\'t sign up, simply ignore this email.</p>';
@@ -557,7 +557,7 @@ function mm_mail_confirm(array $sub): bool
 /** Viv bekommt Bescheid, wenn jemand Interesse an einem Angebot zeigt (nach der Bestätigung). */
 function mm_notify_interest(array $sub, string $source): void
 {
-    $what = ['mentoring' => 'Mentoring für ihr Herzensbusiness', 'year' => 'den Jahreskreis', 'circle' => 'den Inner Circle', 'retreat' => 'das Alpine Retreat', 'unfold' => 'Unfold – The Mindful Becoming', 'teacher' => 'das Mindful Movement Teacher Training'][$source] ?? $source;
+    $what = ['mentoring' => 'Mentoring für ihr Herzensbusiness', 'year' => 'den Jahreskreis', 'circle' => 'den Inner Circle', 'retreat' => 'das Alpine Retreat', 'unfold' => 'Unfold – The Mindful Becoming', 'teacher' => 'das Mindful Becoming Teacher Training'][$source] ?? $source;
     $t = "Hallo Viv,\n\n{$sub['name']} ({$sub['email']}) interessiert sich für $what und hat ihre E-Mail-Adresse bestätigt.\nSprache: " . (($sub['lang'] ?? 'en') === 'de' ? 'Deutsch' : 'Englisch') . "\n\nDu siehst sie in der Verwaltung unter Movecia Movement → E-Mail-Liste.\n";
     mm_mail(MM_FROM_EMAIL, 'Neue Interessentin: ' . $sub['name'] . ' · ' . $what, $t, mm_mail_html('Neue Interessentin', nl2br(forma_h($t)), 'de'));
 }
@@ -597,7 +597,7 @@ function mm_mail_unfold_info(array $sub): bool
     return mm_mail($sub['email'], $L('Unfold – The Mindful Becoming: alle Infos für dich 🌿', 'Unfold – The Mindful Becoming: all the details for you 🌿'), $text, mm_mail_html('Unfold · The Mindful Becoming', $html, $de ? 'de' : 'en'));
 }
 
-/** Nach der Bestätigung: „Du stehst auf der Liste“ fürs Mindful Movement Teacher Training (DE/EN). Keine Preise, kein Pilates. */
+/** Nach der Bestätigung: „Du stehst auf der Liste“ fürs Mindful Becoming Teacher Training (DE/EN). Keine Preise, kein Pilates. */
 function mm_mail_teacher_info(array $sub): bool
 {
     $de = ($sub['lang'] ?? 'en') === 'de';
@@ -608,8 +608,8 @@ function mm_mail_teacher_info(array $sub): bool
     $out = mm_site() . '/api/wh-unsubscribe.php?t=' . $sub['token'];
     $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#7D5E68;';
     $img = '<img src="' . mm_site() . '/img/movecia/fotos/ev-ueber-mich-weit.jpg" width="500" alt="" style="display:block;width:100%;max-width:500px;height:auto;max-height:320px;object-fit:cover;border-radius:16px;margin:0 0 20px;">';
-    $p1 = $L('dein Name steht jetzt auf der Liste für das Mindful Movement Teacher Training. Sobald alle Infos, Termine und Preise feststehen, schreibe ich dir als Erste, noch bevor ich es offiziell ankündige.',
-        'your name is now on the list for the Mindful Movement Teacher Training. As soon as all the details, dates and prices are ready, you\'ll be the first to hear, even before I announce it officially.');
+    $p1 = $L('dein Name steht jetzt auf der Liste für das Mindful Becoming Teacher Training. Sobald alle Infos, Termine und Preise feststehen, schreibe ich dir als Erste, noch bevor ich es offiziell ankündige.',
+        'your name is now on the list for the Mindful Becoming Teacher Training. As soon as all the details, dates and prices are ready, you\'ll be the first to hear, even before I announce it officially.');
     $p2 = $L('Das Wichtigste schon jetzt: eine Ausbildung in Yoga, Somatic Movement und Bodyweight mit insgesamt 550 Stunden. Wir starten im November 2027.',
         'The essentials for now: a training in yoga, somatic movement and bodyweight with 550 hours in total. We start in November 2027.');
     $p3 = $L('Bis dahin schenke ich dir meine Reset-Routine für müde Tage, zehn ruhige Minuten nur für dich.',
@@ -622,7 +622,7 @@ function mm_mail_teacher_info(array $sub): bool
         . mm_button($reset, $L('Zu meiner Reset-Routine', 'Get my Reset Routine'))
         . '<p style="margin:14px 0 0;font-size:14px;color:#7D7076;text-align:center;"><a href="' . forma_h($page) . '" style="color:#7D5E68;">' . $L('Zur Teacher-Training-Seite', 'Teacher Training page') . '</a></p>'
         . '<p style="margin:22px 0 0;font-size:12px;color:#7D7076;">' . $L('Du bekommst diese E-Mail, weil du dich auf moveciamovement.com eingetragen hast.', 'You\'re receiving this email because you signed up on moveciamovement.com.') . ' <a href="' . forma_h($out) . '" style="color:#7D7076;">' . $L('Abmelden', 'Unsubscribe') . '</a></p>';
-    return mm_mail($sub['email'], $L('Du stehst auf der Liste fürs Teacher Training 🌿', 'You\'re on the list for the Teacher Training 🌿'), $text, mm_mail_html('Mindful Movement Teacher Training', $html, $de ? 'de' : 'en'));
+    return mm_mail($sub['email'], $L('Du stehst auf der Liste fürs Teacher Training 🌿', 'You\'re on the list for the Teacher Training 🌿'), $text, mm_mail_html('Mindful Becoming Teacher Training', $html, $de ? 'de' : 'en'));
 }
 
 function mm_mail_welcome(array $sub): bool

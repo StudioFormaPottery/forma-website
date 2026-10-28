@@ -11,11 +11,12 @@ function mm_subnav(string $active): void
     global $pdo;
     $self = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?');
     $req = 0; try { $req = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {}
+    $acReq = 0; try { $acReq = (int)$pdo->query("SELECT COUNT(*) FROM ac_calls WHERE status = 'angefragt'")->fetchColumn(); require_once dirname(__DIR__) . '/api/academy-lib.php'; $acReq += ac_unanswered($pdo); } catch (Throwable $e) {}
     $ptReq = 0; try { $ptReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); } catch (Throwable $e) {}
     // Aufgeräumt (Vivien, 28.10.2026: „viele Buttons doppelt, zu viele Reiter“): 8 Hauptreiter, Video-Sachen und Einstellungen mit kleiner zweiter Reihe.
     $groups = ['videos' => 'content', 'studio' => 'content', 'insta' => 'content', 'mediathek' => 'content', 'musik' => 'content', 'texte' => 'content', 'presse' => 'einst', 'liste' => 'einst'];
     $main = $groups[$active] ?? $active;
-    $tabs = [['movecia', '?view=movecia', '🏡 Übersicht'], ['content', '?view=videos', '🎬 Videos &amp; Content'], ['gatherings', '?view=movecia&amp;p=gatherings', '✨ Gatherings'], ['method', '?view=method', '🌱 Method &amp; Unfold'], ['natal', '?view=natal', '🤰 Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['training', '?view=training', '🏔️ Personal Training' . ($ptReq ? ' <i>' . $ptReq . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Ansehen &amp; Testen'], ['einst', '?view=movecia&amp;p=einst', '⚙️ Einstellungen']];
+    $tabs = [['movecia', '?view=movecia', '🏡 Übersicht'], ['content', '?view=videos', '🎬 Videos &amp; Content'], ['gatherings', '?view=movecia&amp;p=gatherings', '✨ Gatherings'], ['method', '?view=method', '🌱 Method &amp; Unfold'], ['natal', '?view=natal', '🤰 Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['training', '?view=training', '🏔️ Personal Training' . ($ptReq ? ' <i>' . $ptReq . '</i>' : '')], ['academy', '?view=academy', '🎓 Academy' . ($acReq ? ' <i>' . $acReq . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Ansehen &amp; Testen'], ['einst', '?view=movecia&amp;p=einst', '⚙️ Einstellungen']];
     $subs = [
         'content' => [['videos', '?view=videos', '🎬 Zu filmen'], ['studio', '?view=studio', '🎥 Studio'], ['insta', '?view=insta', '📱 Instagram täglich'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['musik', '?view=musik', '🎵 Musik'], ['texte', '?view=texte', '🎙️ Live-Texte']],
         'einst' => [['einst', '?view=movecia&amp;p=einst', '⚙️ Verbindungen &amp; Mails'], ['liste', '?view=movecia&amp;p=einst#liste', '💌 E-Mail-Liste'], ['presse', '?view=presse', '📰 Presse']],
@@ -84,6 +85,8 @@ require __DIR__ . '/mediathek.inc.php';
 require __DIR__ . '/vorschau.inc.php';
 // Personal Training für Hotelgäste (?view=training, Vivien 27.10.2026)
 require __DIR__ . '/ptb.inc.php';
+// Movecia Academy · Teacher Training (?view=academy, Vivien 28.10.2026)
+require __DIR__ . '/academy.inc.php';
 
 $mmBack = $self . '?view=movecia';
 
@@ -376,6 +379,8 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         <?php foreach (FORMA_ADMIN_NEWS as $nw): if ($part !== '' || date('Y-m-d') > $nw['until'] || ($nw['b'] ?? 'forma') !== 'movecia') continue; ?>
         <a href="<?= forma_h($self . $nw['link']) ?>" style="display:flex;gap:12px;align-items:flex-start;margin:12px 0;padding:14px 18px;border-radius:20px;border:1.5px dashed #C9B0B8;background:#FBF8F4;color:#4A3A41;text-decoration:none"><span style="font-size:22px">✨</span><span><b style="font-size:17px"><?= forma_h($nw['title']) ?></b><br><span style="font-size:15px;color:#7D7076"><?= forma_h($nw['text']) ?> →</span></span></a>
         <?php endforeach; ?>
+        <?php $acOpenM = 0; try { require_once dirname(__DIR__) . '/api/academy-lib.php'; $acOpenM = ac_unanswered($pdo); } catch (Throwable $e) {} ?>
+        <?php if ($acOpenM): ?><a class="card notice" style="display:flex;gap:12px;align-items:center;font-size:18px;text-decoration:none;color:inherit;background:#EADFDE;border-radius:20px;padding:16px 18px;margin:12px 0" href="<?= forma_h($self) ?>?view=academy#chat"><span style="font-size:28px">💬</span><span><strong><?= $acOpenM === 1 ? '1 neue Nachricht' : $acOpenM . ' neue Nachrichten' ?> im Teacher Training</strong><br><span class="muted small">Antworten →</span></span></a><?php endif; ?>
 <style>
 .qa{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0 4px}
 @media(min-width:900px){.qa{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -447,7 +452,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                 <a href="<?= forma_h($self) ?>?view=natal"><span class="ic">🤰</span><b>Prä- &amp; Postnatal<?= $natalReq ? ' · ' . $natalReq . ' neu' : '' ?></b><span>Anfragen, Termine, Pakete</span></a>
                 <a href="<?= forma_h($self) ?>?view=training"><span class="ic">🏔️</span><b>Personal Training<?= $ptAll ? ' · ' . $ptAll . ' neu' : '' ?></b><span>Hotelgäste und 1:1-Anfragen</span></a>
                 <a href="<?= forma_h($self) ?>?view=movecia&amp;p=gatherings"><span class="ic">✨</span><b>Gatherings</b><span><?= $next ? 'Nächstes: ' . forma_h(date('d. m.', strtotime((string)$next['starts_at']))) . ' · ' . $nextSign . ' angemeldet' : 'Anlegen und Angebot einblenden' ?></span></a>
-                <a class="soon" href="https://moveciamovement.com/" target="_blank" rel="noopener"><span class="ic">🎓</span><b>Teacher Training</b><span>Start November 2027 · in Vorbereitung</span></a>
+                <a href="<?= forma_h($self) ?>?view=academy"><span class="ic">🎓</span><b>Academy<?= $acReq ? ' · ' . $acReq . ' neu' : '' ?></b><span>Teacher Training: Buchungen, Zahlungen, Chat</span></a>
             </div>
         </section>
         <section class="qg test">

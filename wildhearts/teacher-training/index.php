@@ -1,5 +1,5 @@
 <?php
-// moveciamovement.com/teacher-training – Teaser + Warteliste fürs Mindful Movement Teacher Training (Vivien, 28.10.2026).
+// moveciamovement.com/teacher-training – Teaser + Warteliste fürs Mindful Becoming Teacher Training (Vivien, 28.10.2026).
 // Start November 2027, insgesamt 550 Stunden, Yoga · Somatic Movement · Bodyweight. Nie „Pilates“ nennen, noch keine Preise.
 // Eintragen über api/wh-subscribe.php mit source „teacher“ (Double-Opt-in, MailerLite-Gruppe „Teacher Training“, Info an Viv).
 declare(strict_types=1);
@@ -8,11 +8,11 @@ require dirname(__DIR__, 2) . '/api/method-lib.php';
 require __DIR__ . '/../assets/layout.inc.php';
 header('Cache-Control: no-cache');
 $site = mm_site();
-$course = ['@context' => 'https://schema.org', '@type' => 'Course', 'name' => 'Mindful Movement Teacher Training', 'inLanguage' => ['de', 'en'],
+$course = ['@context' => 'https://schema.org', '@type' => 'Course', 'name' => 'Mindful Becoming Teacher Training', 'inLanguage' => ['de', 'en'],
     'description' => 'Ausbildung in Yoga, Somatic Movement und Bodyweight mit insgesamt 550 Stunden bei Vivien Malonga (Movecia). Start im November 2027.',
     'provider' => ['@type' => 'Organization', 'name' => 'Movecia', 'url' => $site . '/']];
-mvl_head('Mindful Movement Teacher Training · 550 Stunden · ab November 2027 | Movecia',
-    'Mindful Movement Teacher Training mit Vivien Malonga: Ausbildung in Yoga, Somatic Movement und Bodyweight, insgesamt 550 Stunden, Start im November 2027. Jetzt auf die Liste setzen.',
+mvl_head('Mindful Becoming Teacher Training · 550 Stunden · ab November 2027 | Movecia',
+    'Mindful Becoming Teacher Training mit Vivien Malonga: Ausbildung in Yoga, Somatic Movement und Bodyweight, insgesamt 550 Stunden, Start im November 2027. Jetzt auf die Liste setzen.',
     $site . '/teacher-training/', '/img/movecia/og-start.jpg', '', [$course]);
 ?>
 <body>
@@ -21,7 +21,7 @@ mvl_head('Mindful Movement Teacher Training · 550 Stunden · ab November 2027 |
 <section class="w"><div class="in hero-x">
   <?= mv_waves() ?>
   <p class="k"><span class="de">Bald bei Movecia · Start November 2027</span><span class="en">Coming soon to Movecia · starts November 2027</span></p>
-  <h1 style="font-size:clamp(2.8rem,8vw,6.6rem)">Mindful Movement <em>Teacher Training</em></h1>
+  <h1 style="font-size:clamp(2.8rem,8vw,6.6rem)">The Mindful Becoming <em>Teacher Training</em></h1>
   <p class="sub"><span class="de">550 Stunden · Yoga · Somatic Movement · Bodyweight</span><span class="en">550 hours · yoga · somatic movement · bodyweight</span></p>
   <p class="lead"><span class="de">Du möchtest selbst unterrichten, achtsam und nah am Körper? In meiner Ausbildung lernst du, Menschen sicher und liebevoll durch Bewegung zu begleiten, mit Yoga, Somatic Movement und Bodyweight. Alle Details, Termine und Preise folgen bald.</span><span class="en">Would you love to teach, mindfully and close to the body? In my training you'll learn to guide people through movement safely and with care, using yoga, somatic movement and bodyweight training. All the details, dates and prices are coming soon.</span></p>
   <div class="cta"><a class="btn" href="#liste"><span class="de">Setz deinen Namen auf die Liste</span><span class="en">Put your name on the list</span> →</a></div>

@@ -5,7 +5,7 @@ Options -Indexes
 <FilesMatch "\.(md|sqlite|log)$">
   Require all denied
 </FilesMatch>
-<FilesMatch "^(lib|movecia-lib|natal-lib|method-lib|ptb-lib|movecia)\.php$|\.inc\.php$">
+<FilesMatch "^(lib|movecia-lib|natal-lib|method-lib|ptb-lib|academy-lib|movecia)\.php$|\.inc\.php$">
   Require all denied
 </FilesMatch>
 
@@ -59,11 +59,19 @@ RewriteRule ^mitglieder/?$ wildhearts/mitglieder/ [L,QSA]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^method/?$ wildhearts/method/ [L,QSA]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
-RewriteRule ^teacher-training/?$ wildhearts/teacher-training/ [L,QSA]
+# Warteliste-Seite ist seit 28.10.2026 die Academy-Seite (Teacher Training buchbar)
+RewriteRule ^teacher-training/?$ /academy/teacher-training/ [R=301,L]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^unfold/call/?$ wildhearts/unfold/call/ [L,QSA]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^links/?$ wildhearts/index.html [L,QSA]
+# Movecia Academy (Vivien, 28.10.2026): Ausbildungen, erste: Teacher Training
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^academy/?$ wildhearts/academy/ [L,QSA]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^academy/teacher-training/?$ wildhearts/academy/teacher-training/ [L,QSA]
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^academy/mitglieder/?$ wildhearts/academy/mitglieder/ [L,QSA]
 # Personal Training für Hotelgäste (Vivien, 27.10.2026): nur per Link/QR vom Flyer, nirgends verlinkt
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^personal-training/?$ wildhearts/personal-training/ [L,QSA]

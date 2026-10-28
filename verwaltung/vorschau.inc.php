@@ -71,6 +71,8 @@ body{background:#F2ECE4}h1,h2{color:#6B5658}
         $tile($site . '/', '🏠', 'Hauptseite', 'moveciamovement.com');
         $tile($site . '/method/', '🌱', 'Method', 'Verkaufsseite der Mitgliedschaft mit Preisen');
         $tile($site . '/unfold/', '🌸', 'Unfold', 'Seite und Buchung des 3-Monats-Programms');
+        $tile($site . '/academy/', '🎓', 'Academy', 'Übersicht der Ausbildungen');
+        $tile($site . '/academy/teacher-training/', '🧘', 'Teacher Training', 'Seite, Kennenlerngespräch und Buchung');
         $tile($site . '/natal/', '🤰', 'Prä- &amp; Postnatal · Studio', 'Angebot, Einheiten, Kennenlerngespräch, Buchung');
         $tile($site . '/natal/online/', '💻', 'Prä- &amp; Postnatal · Online', 'Gleiche Seite, startet auf Online');
         $tile($site . '/gathering/', '✨', 'Gathering-Anmeldung', 'Anmeldeseite fürs nächste kostenlose Gathering');
@@ -100,6 +102,15 @@ body{background:#F2ECE4}h1,h2{color:#6B5658}
         if ($uMove) $tile($m . '?demo=1&unfold=1&l=' . (int)$uMove['id'], '🎬', 'Ein Bewegungsvideo', $h($uMove['title_de']));
         if ($uTalk) $tile($m . '?demo=1&unfold=1&l=' . (int)$uTalk['id'], '🗣', 'Ein Talking Head', $h($uTalk['title_de']));
         $tile($self . '?view=method#test', '🧪', 'Echter Testzugang', 'Testteilnehmerin mit Unfold anlegen, auch „vor dem Start“', false);
+?>
+</div></section>
+
+<section class="grp" id="academy"><h2>Academy · Teacher Training</h2><p>Der Mitgliederbereich gleich nach der Anzahlung: Countdown bis zum Start, dein Willkommensvideo, Notizen, Chat mit dir und die Zahlungen.</p><div class="qa">
+<?php
+        $tile($site . '/academy/mitglieder/?demo=1', '🎓', 'Mitgliederbereich', 'Countdown, Willkommensvideo, Workbook, Notizen, Chat, Zahlungen');
+        $tile($site . '/academy/mitglieder/?demo=1&lang=en', '🇬🇧', 'Auf Englisch', 'Derselbe Bereich in englischer Sprache');
+        $tile($site . '/academy/mitglieder/', '🔑', 'Login-Seite', 'So meldet sich eine Teilnehmerin an');
+        $tile($self . '?view=academy#chat', '💬', 'Chat beantworten', 'Nachrichten der Teilnehmerinnen in der Verwaltung', false);
 ?>
 </div></section>
 

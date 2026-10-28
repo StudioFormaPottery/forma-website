@@ -37,34 +37,7 @@ if ($action === 'mm_looks_get' || $action === 'mm_looks_set') {
 if ($view === 'studio') {
     require_once dirname(__DIR__) . '/api/method-lib.php';
     mv_schema($pdo);
-    // Teacher-Training-Willkommensvideo (Vivien, 28.10.2026: „gleich mitfilmen, fertig bis 8. November“). Gleicher Schlüssel
-    // 'academy:welcome' wie im Academy-Entwurf (ac_welcome_lesson findet die Lektion dann). Nur Deutsch: die Ausbildung ist auf Deutsch.
-    try {
-        if (!$pdo->query("SELECT 1 FROM mv_lessons WHERE ukey = 'academy:welcome'")->fetchColumn()) {
-            $acPid = (int)($pdo->query("SELECT id FROM mv_programs WHERE audience = 'academy' ORDER BY id LIMIT 1")->fetchColumn() ?: 0);
-            if (!$acPid) {
-                $pdo->prepare("INSERT INTO mv_programs (audience, title_de, title_en, intro_de, intro_en, theme, sort, visible, created_at) VALUES ('academy', 'Teacher Training · vor dem Start', 'Teacher Training · before we begin', '', '', 'academy', 0, 1, ?)")->execute([date('c')]);
-                $acPid = (int)$pdo->lastInsertId();
-            }
-            $acScript = <<<'TXT'
-Hallo, meine Liebe, und herzlich willkommen im Movecia Mindful Movement Teacher Training. Ich freue mich so sehr, dass du hier bist, und ich möchte dir in diesen paar Minuten erzählen, warum mir diese Ausbildung so am Herzen liegt und was dich in den nächsten Monaten erwartet.
-
-Als ich selbst meine ersten Ausbildungen gemacht habe, war ich oft beeindruckt von dem vielen Wissen, aber ich habe mich auch oft ein bisschen verloren gefühlt. Es ging viel um Haltungen, um Abläufe und um Programme, und viel zu wenig um den Menschen, der vor einem auf der Matte liegt. Genau das wollte ich anders machen. Deshalb gibt es diese Ausbildung nur alle zwei Jahre und nur mit zehn Plätzen, damit ich jede von euch wirklich sehen und begleiten kann.
-
-Du bekommst bei mir eine vollständige 200-Stunden-Yogalehrerausbildung nach dem internationalen Curriculum, und dazu alles, was ich mir selbst immer gewünscht habe: Somatic Movement, Breathwork und Meditation, achtsame Berührung und Rituale, ganz viel Anatomie und Body Scanning, und das Wissen darüber, was Mental Load mit unserem Nervensystem macht. Und weil so viele von uns irgendwann ihre eigenen Stunden geben möchten, begleite ich dich auch beim Schritt in die Selbstständigkeit, ganz persönlich.
-
-Bis zu unserem Start am dritten November 2027 ist noch ein bisschen Zeit, und das ist gut so. Oben siehst du den Countdown, und ich lade dich ein, diese Zeit bewusst zu nutzen. In deinen Notizen kannst du alles festhalten, was dir einfällt: deine Fragen, deine Wünsche, deine Intentionen für dieses Jahr. Die Notizen gehören nur dir, niemand sonst kann sie lesen.
-
-Und wenn dich etwas beschäftigt, schreib mir einfach im Chat. Die Nachricht landet direkt bei mir, und ich antworte dir persönlich. Es gibt keine Frage, die zu klein ist.
-
-Bald findest du hier auch dein erstes Workbook, „Schön, dass du da bist“. Darin setzen wir gemeinsam deine Intentionen, und du bekommst ein paar Affirmationen, die dich bis zum Start begleiten.
-
-Ich danke dir von Herzen für dein Vertrauen. Mach es dir bis dahin schön, beweg dich, atme, und dann sehen wir uns am dritten November. Ich freue mich riesig auf dich.
-TXT;
-            $pdo->prepare("INSERT INTO mv_lessons (program_id, title_de, title_en, text_de, text_en, cat, energy, minutes, sort, visible, created_at, script_de, script_en, ukey, due) VALUES (?,?,?,?,?,'talk','any',4,0,1,?,?,'','academy:welcome','2026-11-08')")
-                ->execute([$acPid, 'Willkommen im Teacher Training', 'Welcome to the Teacher Training', 'Mein Willkommen an dich, bevor wir starten.', 'My welcome to you before we begin.', date('c'), $acScript]);
-        }
-    } catch (Throwable $e) { error_log('Studio academy welcome: ' . $e->getMessage()); }
+    try { require_once dirname(__DIR__) . '/api/academy-lib.php'; ac_schema($pdo); } catch (Throwable $e) {} // legt das Academy-Willkommensvideo an
     $talks = [];
     foreach (['academy' => 'Teacher Training', 'method' => 'Method', 'unfold' => 'Unfold', 'natal' => 'Prä- & Postnatal'] as $aud => $an) {
         foreach (mv_programs($pdo, $aud) as $p) foreach (mv_lessons($pdo, (int)$p['id']) as $l) {
@@ -101,7 +74,8 @@ TXT;
         'x' => $t['vde'] && $t['ven'] ? '' : ($t['g'] === 'Teacher Training' ? ' (nur Deutsch)' : ($t['vde'] ? ' (Englisch fehlt)' : ($t['ven'] ? ' (Deutsch fehlt)' : ' (DE + EN)'))), 'g' => $t['g']];
     foreach ($moves as $m) $queue[] = ['v' => 'c' . $m['id'], 'ok' => $m['ok'], 'due' => $m['due'], 'ico' => '🧘', 'k' => $m['k'], 'n' => $m['n'],
         'x' => $m['for'] ? ' · für ' . $m['for'][0] . (count($m['for']) > 1 ? ' +' . (count($m['for']) - 1) : '') : '', 'g' => ''];
-    usort($queue, fn($a, $b) => [$a['due'] === '' ? '9' : $a['due'], $a['ico'], $a['n']] <=> [$b['due'] === '' ? '9' : $b['due'], $b['ico'], $b['n']]);
+    // Academy-Willkommensvideo ganz oben, solange es fehlt (Vivien, 28.10.2026)
+    usort($queue, fn($a, $b) => [$a['g'] === 'Academy' && !$a['ok'] ? 0 : 1, $a['due'] === '' ? '9' : $a['due'], $a['ico'], $a['n']] <=> [$b['g'] === 'Academy' && !$b['ok'] ? 0 : 1, $b['due'] === '' ? '9' : $b['due'], $b['ico'], $b['n']]);
     foreach ($queue as &$q) $q['l'] = ($q['due'] === '' ? 'ohne Datum' : (!$q['ok'] && $q['due'] < $today ? '⚠ überfällig · ' . $dShort($q['due']) : 'bis ' . $dShort($q['due'])))
         . ' · ' . $q['ico'] . ' ' . $q['k'] . ' · ' . $q['n'] . ($q['g'] !== '' ? ' (' . $q['g'] . ')' : '') . $q['x'];
     unset($q);
@@ -347,7 +321,8 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
 @media(max-width:640px){.pk-day>summary .pill:not(.late):not(.soon){display:none}.pk-dt>b{font-size:19px}}
 .pill{font-size:14px;padding:3px 12px;border-radius:999px;background:#EADFDE;color:#6B5658}.pill.soon{background:#E8D6CA;color:#4A3A41}.pill.late{background:#F3D9D5;color:#A0413B}
 .pk-dh .cnt{margin-left:auto;font-size:15px;color:#7D7076}
-.pk-sub{font-size:15px;color:#7D7076;margin:12px 2px 8px}.pk-sub a{color:#7D5E68}
+.pk-sub{font-size:15px;color:#7D7076;margin:12px 2px 8px}
+.pk-first{background:linear-gradient(135deg,#F3E2D8,#EADFDE);border-radius:20px;padding:4px 12px 12px;margin-bottom:12px}.pk-sub a{color:#7D5E68}
 .pk-empty{font-size:19px;color:#6B5658;padding:12px}
 .pk-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
 .pk-t{display:flex;gap:12px;align-items:flex-start;text-align:left;font:inherit;padding:12px;border-radius:20px;border:1.5px solid #E6DCD2;background:#fff;color:#2E2529;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;min-height:84px}
@@ -418,7 +393,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
       <button type="button" data-tab="free" aria-selected="false">✍️ Frei aufnehmen</button>
       <?php if ($done): ?><button type="button" data-tab="done" aria-selected="false">✓ Schon fertig <span><?= count($done) ?></span></button><?php endif; ?>
     </div>
-    <div class="pk-pane pkc-pane" data-pane="next"><?php if (!$calOpen): ?><p class="pk-empty">Alles aufgenommen. Wunderbar ♡</p><?php else: ?>
+    <div class="pk-pane pkc-pane" data-pane="next"><?php $acT = array_values(array_filter($open, fn($t) => ($t['g'] ?? '') === 'Academy')); if ($acT): ?><div class="pk-first"><p class="pk-sub">🎓 Zuerst · für dein Teacher Training</p><div class="pk-tiles"><?= implode('', array_map($tile, $acT)) ?></div></div><?php endif; ?><?php if (!$calOpen): ?><p class="pk-empty">Alles aufgenommen. Wunderbar ♡</p><?php else: ?>
       <div class="pkc-wrap">
         <div class="pkc">
           <div class="pkc-h"><button type="button" class="pkc-nav" data-cm="-1" aria-label="Monat davor">‹</button><b id="calM"></b><button type="button" class="pkc-nav" data-cm="1" aria-label="nächster Monat">›</button></div>
