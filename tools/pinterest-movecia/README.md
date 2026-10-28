@@ -8,7 +8,7 @@ Ist Movecia nicht im Menü: nichts anlegen, Vivien Bescheid geben und den fertig
 
 Veröffentlichen am einfachsten (seit 28.10.2026): https://at.pinterest.com/pin-creation-tool/ → Datei-Upload mit dem Pin aus dem Repo
 (file_upload, kein Warten auf die Live-Seite nötig) → Titel, Beschreibung, Link, Pinnwand, unter „Weitere Optionen“ Alt-Text → „Veröffentlichen“.
-Fotos: Hochformat-Fotos 640 px werden im breiten Bogen stark vergrößert und unscharf; besser große Fotos (ev-ueber-mich, pt-*, ev-start*, ev-method, ev-natal-sitzend) nehmen und Person ganz sichtbar halten (Vivien, 28.10.2026).
+Fotos: Hochformat-Fotos 640 px werden im breiten Bogen stark vergrößert und unscharf; besser große Fotos (ev-ueber-mich, pt-*, ev-start*, ev-method, ev-natal-sitzend) nehmen und Person ganz sichtbar, eher klein im Raum zeigen (Vivien, 28.10.2026: „weiter nach hinten“). Für Hochformat-Fotos gibt es Breitfassungen mit sanft verlängerten Rändern, z. B. `ev-ueber-mich-weit.jpg`, `pos` dann um 50% 60%. In der Chrome-Leiste vor jedem Pin prüfen, dass oben „Movecia · Mindful Movement“ aktiv ist (der Login wechselt manchmal auf Frida & Knox).
 Alte/ersetzte Pins nicht löschen (nur Vivien), sondern per „Pin bearbeiten“ in die private Pinnwand „Archiv“ verschieben.
 Pin-URL: neuester Pin unter https://at.pinterest.com/moveciamovement/_created/.
 Nach „Pinnwand erstellen“ kommt ein Fenster mit Pin-Vorschlägen: dort NICHTS anklicken außer „Fertig“, sonst wird ein fremder Pin gemerkt.
