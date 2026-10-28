@@ -321,7 +321,7 @@ $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig
 </div>
 
 <script src="/wildhearts/assets/talkcam.js?v=2"></script>
-<script src="studio-edit.js?v=1"></script>
+<script src="studio-edit.js?v=2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>

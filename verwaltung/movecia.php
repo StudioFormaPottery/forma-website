@@ -12,7 +12,7 @@ function mm_subnav(string $active): void
     $self = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?');
     $req = 0; try { $req = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {}
     $ptReq = 0; try { $ptReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); } catch (Throwable $e) {}
-    $tabs = [['movecia', '?view=movecia', '🏡 Übersicht'], ['studio', '?view=studio', '🎥 Studio'], ['videos', '?view=videos', '🎬 Videos hochladen'], ['insta', '?view=insta', '📱 Instagram täglich'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['method', '?view=method', '🌱 Method &amp; Unfold'], ['natal', '?view=natal', '🤰 Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['training', '?view=training', '🏔️ Personal Training' . ($ptReq ? ' <i>' . $ptReq . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', '🎙️ Live-Texte'], ['presse', '?view=presse', '📰 Presse'], ['einst', '?view=movecia#einstellungen', '⚙️ Einstellungen']]; ?>
+    $tabs = [['movecia', '?view=movecia', '🏡 Übersicht'], ['studio', '?view=studio', '🎥 Studio'], ['videos', '?view=videos', '🎬 Videos hochladen'], ['insta', '?view=insta', '📱 Instagram täglich'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['musik', '?view=musik', '🎵 Musik'], ['method', '?view=method', '🌱 Method &amp; Unfold'], ['natal', '?view=natal', '🤰 Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['training', '?view=training', '🏔️ Personal Training' . ($ptReq ? ' <i>' . $ptReq . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', '🎙️ Live-Texte'], ['presse', '?view=presse', '📰 Presse'], ['einst', '?view=movecia#einstellungen', '⚙️ Einstellungen']]; ?>
 <style>
 .mvsub{position:sticky;top:0;z-index:40;margin:-8px -16px 16px;padding:10px 16px;background:rgba(242,236,228,.96);border-bottom:1px solid #DDD2C6;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .mvsub::-webkit-scrollbar{display:none}
@@ -54,6 +54,8 @@ require __DIR__ . '/videos.inc.php';
 // Talking-Head-Studio mit Kamera-Look (?view=studio, Vivien 28.10.2026)
 // Instagram täglich: Storys & Reels planen, vorab aufnehmen, am Tag teilen (?view=insta, Vivien 28.10.2026)
 require __DIR__ . '/insta.inc.php';
+// Eigener Musik-Ordner für Studio-Videos (?view=musik, Vivien 28.10.2026)
+require __DIR__ . '/musik.inc.php';
 require __DIR__ . '/studio.inc.php';
 require __DIR__ . '/mediathek.inc.php';
 // Als Teilnehmerin ansehen (?view=vorschau)
@@ -387,6 +389,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <a class="main" href="<?= forma_h($self) ?>?view=videos"><span class="ic">🎬</span><b>Videos hochladen</b><span>Clips filmen, Voice-over einsprechen, Talking Heads – mit Zeitplan</span></a>
             <a class="main" href="<?= forma_h($self) ?>?view=studio"><span class="ic">🎥</span><b>Talking-Head-Studio</b><span>Aufnehmen mit Kamera-Look (Haut, Augenringe, Hintergrund, Licht), Positions-Hilfe und Teleprompter</span></a>
             <a class="main" href="<?= forma_h($self) ?>?view=insta"><span class="ic">📱</span><b>Instagram täglich</b><span>Storys &amp; Reels für den Monat planen, vorab aufnehmen, am Tag nur noch teilen</span></a>
+            <a class="main" href="<?= forma_h($self) ?>?view=musik"><span class="ic">🎵</span><b>Deine Musik</b><span>Lieder (z. B. von Epidemic Sound) hochladen, im Studio mit einem Tipp unter deine Videos legen</span></a>
             <a class="main" href="<?= forma_h($self) ?>?view=mediathek"><span class="ic">📚</span><b>Mediathek</b><span>Jede Übung einmal gefilmt, nach Jahreszeit und Stil sortiert</span></a>
             <a class="main" href="<?= forma_h($self) ?>?view=training"><span class="ic">🏔️</span><b>Personal Training<?php $ptN = 0; try { $ptN = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); } catch (Throwable $e) {} ?><?= $ptN ? ' · ' . $ptN . ' neu' : '' ?></b><span>Hotelgäste (Wintersaison 26/27): Anfragen, Kalender, Flyer &amp; QR-Code</span></a>
             <a href="<?= forma_h($self) ?>?view=vorschau"><span class="ic">👁</span><b>Als Teilnehmerin ansehen</b><span>Alle Seiten und Programme so, wie deine Teilnehmerinnen sie sehen</span></a>

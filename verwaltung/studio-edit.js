@@ -45,6 +45,16 @@
 .se-file{display:flex;flex-direction:column;gap:8px}
 .se-file b{font-weight:500;font-size:17px;color:#4A3A41;word-break:break-word}
 .se-note{font-size:15px;line-height:1.5;color:#7D7076;margin:0}
+.se-lib{display:flex;flex-direction:column;gap:8px}
+.se-lib .chips{display:flex;flex-wrap:wrap;gap:6px}
+.se-lib .chips button{font:inherit;font-size:14px;padding:6px 12px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer}
+.se-lib .chips button[aria-pressed=true]{background:#4A3A41;border-color:#4A3A41;color:#fff}
+.se-lib ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto}
+.se-lib li{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #E6DCD2;border-radius:16px;padding:6px 8px}
+.se-lib li.on{border-color:#7D5E68;box-shadow:0 0 0 2px #7D5E68 inset}
+.se-lib li span{flex:1;min-width:0;font-size:16px;color:#2E2529;line-height:1.3}.se-lib li small{display:block;color:#7D7076;font-size:13px}
+.se-lib li button{font:inherit;flex:0 0 auto;border-radius:999px;border:1.5px solid #DDD2C6;background:#FBF8F4;color:#4A3A41;cursor:pointer;min-height:40px;padding:6px 12px;font-size:15px}
+.se-lib li button.pk{background:#7D5E68;border-color:#7D5E68;color:#fff}
 .se-busy .se-r,.se-busy .se-tl{opacity:.45;pointer-events:none}
 `;
   function css() { if (document.getElementById('se-css')) return; const s = document.createElement('style'); s.id = 'se-css'; s.textContent = CSS; document.head.appendChild(s); }
@@ -107,12 +117,13 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
     <button type="button" class="se-b" data-k="resetFrame">Ausschnitt zurücksetzen</button></div></details>
   <details class="tc-g" open><summary>🎵 Musik darunter</summary><div class="tc-gb">
     <div class="se-file"><b data-k="mname">Noch keine Musik</b>
-      <label class="se-b pl" style="width:max-content">🎵 Musik wählen<input type="file" accept="audio/*,.mp3,.m4a,.wav,.aac,.ogg" hidden data-k="mfile"></label>
       <button type="button" class="se-b" data-k="mdel" hidden>Musik entfernen</button></div>
+    <div class="se-lib" data-k="lib"><p class="se-note">Deine Musik wird geladen …</p></div>
+    <label class="se-b" style="width:max-content">📁 Andere Datei vom Gerät<input type="file" accept="audio/*,.mp3,.m4a,.wav,.aac,.ogg" hidden data-k="mfile"></label>
     <div data-sl="vol"></div><div data-sl="voice"></div><div data-sl="from"></div>
     <label class="tc-sw">Musik leiser, wenn ich spreche<input type="checkbox" data-k="duck"></label>
     <label class="tc-sw">Musik sanft ein- und ausblenden<input type="checkbox" data-k="fade"></label>
-    <p class="se-note">Nimm eine Musikdatei von deinem Gerät (MP3, M4A, WAV), z. B. gekaufte oder lizenzfreie Musik. Spotify lässt sich nicht in ein Video mischen: die Lieder sind kopiergeschützt und nur zum Anhören gedacht. In der Method können deine Frauen ihre eigene Spotify-Playlist neben dem Video laufen lassen.</p>
+    <p class="se-note">Neue Lieder (z. B. von Epidemic Sound) legst du unter „🎵 Musik“ in deinen Musik-Ordner. Spotify lässt sich nicht in ein Video mischen, die Lieder sind kopiergeschützt.</p>
   </div></details>
 </div>`;
     const q = s => root.querySelector(s), K = k => root.querySelector('[data-k="' + k + '"]');
@@ -207,7 +218,7 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
     function sync() { Object.keys(inputs).forEach(k => { const obj = ['vol', 'voice', 'from'].includes(k) ? mus : st; inputs[k].value = obj[k]; inputs[k].previousElementSibling.querySelector('small').textContent = SL[k][4](+obj[k]); });
       K('fmts').querySelectorAll('button').forEach(b2 => b2.setAttribute('aria-pressed', String(b2.dataset.f === st.fmt)));
       K('duck').checked = mus.duck; K('fade').checked = mus.fade;
-      K('mname').textContent = file ? '🎵 ' + file.name : 'Noch keine Musik'; K('mdel').hidden = !file;
+      K('mname').textContent = file ? '🎵 ' + file.name.replace(/\.\w+$/, '') : 'Noch keine Musik'; K('mdel').hidden = !file;
       ['vol', 'from'].forEach(k => inputs[k].closest('.tc-sl').style.opacity = file ? '' : '.45'); K('duck').closest('label').style.opacity = K('fade').closest('label').style.opacity = file ? '' : '.45'; }
     K('fmts').innerHTML = FMTS.map(f => '<button type="button" data-f="' + f[0] + '">' + f[1] + '</button>').join('');
     K('fmts').querySelectorAll('button').forEach(b2 => b2.onclick = () => { st.fmt = b2.dataset.f; sync(); draw(); });
@@ -218,8 +229,25 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
 
     // Musik
     function setMusic(f) { file = f; lastMusic = f; if (au.src) URL.revokeObjectURL(au.src); if (f) { au.src = URL.createObjectURL(f); au.onloadedmetadata = () => { inputs.from.max = Math.max(1, Math.floor(au.duration || 600) - 5); if (mus.from > +inputs.from.max) mus.from = 0; sync(); }; } else au.removeAttribute('src'); sync(); }
-    K('mfile').onchange = e => { const f = e.target.files[0]; if (f) setMusic(f); e.target.value = ''; };
-    K('mdel').onclick = () => { au.pause(); setMusic(null); };
+    K('mfile').onchange = e => { const f = e.target.files[0]; if (f) setMusic(f); e.target.value = ''; libUi(); };
+    // Musik-Ordner auf dem Server (Verwaltung → 🎵 Musik)
+    let lib = [], libTags = {}, libF = '', libSel = file && file._libId || 0; const pre = new Audio(); let preId = 0;
+    function libUi() {
+      const box = K('lib'); if (closed) return;
+      if (!lib.length) { box.innerHTML = '<p class="se-note">Noch keine Lieder in deinem Musik-Ordner. <a href="?view=musik" target="_blank">🎵 Musik öffnen</a> und Lieder hineinziehen.</p>'; return; }
+      const used = Object.keys(libTags).filter(k => lib.some(x => x.tags.includes(k)));
+      const L = lib.filter(x => !libF || x.tags.includes(libF)), f2 = s2 => s2 > 0 ? Math.floor(s2 / 60) + ':' + String(Math.floor(s2 % 60)).padStart(2, '0') : '';
+      box.innerHTML = '<b style="font-weight:500;font-size:17px;color:#4A3A41">Aus deiner Musik</b>' + (used.length ? '<div class="chips"><button type="button" data-lf="" aria-pressed="' + (!libF) + '">Alle</button>' + used.map(k => '<button type="button" data-lf="' + k + '" aria-pressed="' + (libF === k) + '">' + esc(libTags[k]) + '</button>').join('') + '</div>' : '')
+        + '<ul>' + L.map(x => '<li class="' + (x.id === libSel ? 'on' : '') + '"><button type="button" data-pv="' + x.id + '" aria-label="Reinhören">' + (preId === x.id ? '❚❚' : '▶') + '</button><span>' + esc(x.t) + '<small>' + f2(x.dur) + '</small></span><button type="button" class="pk" data-take="' + x.id + '">' + (x.id === libSel ? '✓ gewählt' : 'Nehmen') + '</button></li>').join('') + '</ul>';
+      box.querySelectorAll('[data-lf]').forEach(b => b.onclick = () => { libF = b.dataset.lf; libUi(); });
+      box.querySelectorAll('[data-pv]').forEach(b => b.onclick = () => { const id = +b.dataset.pv; if (preId === id) { pre.pause(); preId = 0; } else { pre.src = '?view=musik&dl=' + id; pre.volume = .6; pre.play().catch(() => {}); preId = id; } libUi(); });
+      box.querySelectorAll('[data-take]').forEach(b => b.onclick = async () => { const id = +b.dataset.take, x = lib.find(y => y.id === id); b.disabled = true; b.textContent = 'Lädt …';
+        try { const r = await fetch('?view=musik&dl=' + id, { credentials: 'same-origin' }); const bl = await r.blob(); const f = new File([bl], x.t + '.mp3', { type: bl.type || 'audio/mpeg' }); f._libId = id;
+          pre.pause(); preId = 0; libSel = id; setMusic(f); msg.className = 'se-msg ok'; msg.textContent = '🎵 „' + x.t + '“ liegt jetzt darunter. Mit ▶ Abspielen anhören.'; } catch (e) { msg.textContent = 'Das Lied konnte nicht laden.'; }
+        libUi(); });
+    }
+    fetch('?view=musik&json=1', { credentials: 'same-origin' }).then(r => r.json()).then(j => { lib = j.list || []; libTags = j.tags || {}; libUi(); }).catch(() => { K('lib').innerHTML = ''; });
+    K('mdel').onclick = () => { au.pause(); setMusic(null); libSel = 0; libUi(); };
     if (file) setMusic(file);
     function syncMusic() { if (!file || !au.duration) return; const d = au.duration, t = mus.from + Math.max(0, v.currentTime - a); au.currentTime = d ? t % d : 0; }
     function mixTick() {
@@ -312,7 +340,7 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
       close(); o.onDone && o.onDone(nb, info);
     };
     K('cancel').onclick = () => { if (busy && !confirm('Fertigstellen abbrechen?')) return; close(); o.onCancel && o.onCancel(); };
-    function close() { closed = true; stop(); removeEventListener('resize', onRs); try { ac && ac.close(); } catch (e) {} URL.revokeObjectURL(url); if (au.src) au.pause(); mount.innerHTML = ''; }
+    function close() { closed = true; stop(); try { pre.pause(); } catch (e) {} removeEventListener('resize', onRs); try { ac && ac.close(); } catch (e) {} URL.revokeObjectURL(url); if (au.src) au.pause(); mount.innerHTML = ''; }
 
     // ---- Laden (MediaRecorder-Dateien kennen ihre Länge oft nicht: kurz ans Ende springen) ----
     v.addEventListener('loadedmetadata', async () => {
