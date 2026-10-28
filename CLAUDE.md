@@ -444,3 +444,10 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Bezahlen: online `api/angebot-zahlen.php?t=TOKEN` (Stripe, Abgleich in `forma_reconcile_payments`) oder „Bar bezahlt“ in der Verwaltung. Erst dann die fertige Rechnung (`forma_invoice_for('angebot')`) an den Rechnungsempfänger + Kopie an Vivien, Kopie auch an die Ansprechperson, wenn deren E-Mail anders ist.
 - Kommen weniger Kinder: „Es kommen weniger (oder mehr) Kinder“ → tatsächliche Zahl (`final`), verrechnet wird immer diese; neue Vorabrechnung optional.
 - QR im PDF: `api/vendor/phpqrcode` (LGPL, nur Matrix, FPDF zeichnet).
+
+## Kalender im Studio und bei Instagram täglich (Vivien, 28.10.2026)
+- Studio: Reiter „📅 Kalender“ in der Auswahl = kleiner Monatskalender (`.pkc`, Klassen mit Präfix pkc-, weil `.cal-*` in index.php belegt ist). Farbe je Tag nach Dringlichkeit: überfällig dunkles Pflaume, ≤7 Tage Pflaume, ≤14 gedämpft, ≤21 Mauve, später zart; Zahl = offene Videos. Tag antippen → daneben (Handy darunter) die Videos, Übungen eingeklappt.
+- Studio: Kästen rechts (Teleprompter, Kamera-Look, Kamera & Mikrofon, Clips, Untertitel) per Überschrift einklappbar, gemerkt (`st-shut-<id>`), Kamera-Look und Kamera & Mikrofon starten zu. Tempo in 10 Stufen mit Anzeige „Tempo X von 10“, auch ↑/↓.
+- Kamera: Handys rechnen in 1280; Hintergrund-Erkennung je nach Geräteleistung nur jedes 2./3. Bild, abwechselnd mit der Gesichtserkennung; zu langsame Geräte werden in den ersten Sekunden einmalig auf 1280 gesetzt.
+- Instagram täglich: Monatskalender (Punkte ⭕/🎬 je Eintrag, Farbe = offen/aufgenommen/gepostet), Tag antippen → Einträge + „＋ Story“/„＋ Reel“ → fertige Texte aus `verwaltung/insta-skripte.json` (DE/EN, nach Art gefiltert, „schon verwendet“) → „Nehmen & aufnehmen“ legt den Eintrag an und öffnet das Studio mit dem Text. Neue fertige Texte dort ergänzen (frei formuliert DE + EN).
+- Movecia-Verwaltung: `main{zoom:1.12}` nur ab 900 px (am Handy verursachte es seitliches Scrollen).

@@ -222,7 +222,7 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
 .pkc-h{display:flex;align-items:center;justify-content:space-between;margin:0 2px 6px}
 .pkc-h b{font:500 22px/1 "Cormorant Garamond",Georgia,serif;color:#4A3A41}
 .pkc-nav{width:36px;height:36px;border-radius:50%;border:1.5px solid #E6DCD2;background:#FBF8F4;color:#4A3A41;font-size:18px;cursor:pointer}
-.pkc-g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.pkc-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
 .pkc-g .wd{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#7D7076;text-align:center;padding:2px 0 4px}
 .pkc-g .d{position:relative;aspect-ratio:1;border-radius:12px;border:0;background:none;font:inherit;font-size:15px;color:#4A3A41;cursor:default;display:flex;align-items:center;justify-content:center;padding:0}
 .pkc-g .d.out{color:#C9BEC1}
