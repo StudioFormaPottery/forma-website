@@ -1028,6 +1028,35 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 @media (min-width:900px){.tpl-desc{font-size:20px}.tpl-gets li{font-size:18px}}
 #tpl-dialog .book-inner{max-width:880px}
 
+/* Foto-Galerie (Lightbox) für Shop-Bilder */
+.tpl-img img,.tpl-gallery img#tpl-main{cursor:zoom-in}
+.tpl-img{position:relative}
+.tpl-zoom{position:absolute;top:10px;right:10px;z-index:2;width:34px;height:34px;border-radius:50%;background:rgba(251,241,234,.92);color:var(--clay);display:grid;place-items:center;box-shadow:0 2px 8px rgba(51,33,27,.15);pointer-events:none}
+.tpl-zoom svg{width:18px;height:18px}
+.tpl-gallery{position:relative}
+.tpl-gallery .tpl-zoom{top:12px;right:12px}
+.lb{border:0;padding:0;margin:0;width:100vw;height:100dvh;max-width:none;max-height:none;background:transparent;color:#FBF1EA;overflow:hidden}
+.lb::backdrop{background:rgba(51,33,27,.92)}
+.lb-in{position:relative;width:100%;height:100%;display:flex;flex-direction:column}
+.lb-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px 6px}
+.lb-title{font-family:var(--display);font-weight:600;font-size:clamp(18px,2vw,24px);margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-count{font-size:15px;opacity:.85;margin-left:6px;font-family:inherit;font-weight:400}
+.lb-close{flex:none;width:44px;height:44px;border-radius:50%;border:0;background:rgba(251,241,234,.95);color:var(--clay);display:grid;place-items:center;cursor:pointer}
+.lb-stage{position:relative;flex:1;min-height:0}
+.lb-track{display:flex;width:100%;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.lb-track::-webkit-scrollbar{display:none}
+.lb-slide{flex:0 0 100%;height:100%;display:grid;place-items:center;padding:8px clamp(12px,6vw,90px);scroll-snap-align:center;box-sizing:border-box}
+.lb-slide img{max-width:100%;max-height:100%;object-fit:contain;border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,.35);background:var(--blush)}
+.lb img,.tpl-img img,#tpl-main,.tpl-thumbs img{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:50px;border-radius:50%;border:0;background:rgba(251,241,234,.95);color:var(--clay);font-size:30px;line-height:1;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.lb-nav.prev{left:clamp(10px,2vw,28px)}.lb-nav.next{right:clamp(10px,2vw,28px)}.lb-nav:disabled{visibility:hidden}
+.lb-thumbs{display:flex;justify-content:center;gap:10px;padding:12px 16px calc(16px + env(safe-area-inset-bottom));overflow-x:auto}
+.lb-thumbs button{flex:none;width:76px;height:57px;padding:0;border:2px solid transparent;border-radius:12px;overflow:hidden;cursor:pointer;background:none;opacity:.6;transition:opacity .2s}
+.lb-thumbs button.on{border-color:#FBF1EA;opacity:1}
+.lb-thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+@media (max-width:700px){.lb-nav{display:none}.lb-slide{padding:6px 10px}.lb-thumbs button{width:60px;height:45px}}
+@media (hover:none){.lb-nav{display:none}}
+
 /* Pottery Pause Special */
 .pp-special{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,.62fr) minmax(0,1.38fr);gap:clamp(20px,4vw,56px);align-items:center;padding:clamp(76px,7vw,96px) clamp(22px,4vw,56px) clamp(30px,4vw,52px);margin:0 0 clamp(30px,4vw,44px);border-radius:36px;background:radial-gradient(circle at 20% 40%,rgba(251,241,234,.5) 0 2px,transparent 3px) 0 0/52px 52px,var(--blush);color:var(--ink);scroll-margin-top:130px}
 .pp-special>*:not(.maker-wave):not(.xm-garland){position:relative;z-index:1}
@@ -1489,6 +1518,17 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     </div>
   </dialog>
 
+  <dialog class="lb" id="lb" aria-label="Fotos ansehen">
+    <div class="lb-in">
+      <div class="lb-top"><p class="lb-title"><span id="lb-title"></span><span class="lb-count" id="lb-count"></span></p>
+        <button class="lb-close" type="button" id="lb-close" aria-label="Galerie schließen"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+      <div class="lb-stage"><div class="lb-track" id="lb-track"></div>
+        <button class="lb-nav prev" type="button" id="lb-prev" aria-label="Vorheriges Bild">‹</button>
+        <button class="lb-nav next" type="button" id="lb-next" aria-label="Nächstes Bild">›</button></div>
+      <div class="lb-thumbs" id="lb-thumbs"></div>
+    </div>
+  </dialog>
+
   <dialog class="book-dialog" id="tpl-dialog" aria-labelledby="tpl-title">
     <div class="book-inner">
       <button class="book-close" type="button" id="tpl-close" aria-label="Schließen">
@@ -1499,7 +1539,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
         <h3 class="step-title" id="tpl-title" tabindex="-1"></h3>
         <p class="step-meta" id="tpl-meta"></p>
         <div class="tpl-detail">
-          <div class="tpl-gallery"><img id="tpl-main" alt=""><div class="tpl-thumbs" id="tpl-thumbs"></div></div>
+          <div class="tpl-gallery"><img id="tpl-main" alt="" draggable="false"><span class="tpl-zoom" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M11 8.5v5M8.5 11h5"/></svg></span><div class="tpl-thumbs" id="tpl-thumbs"></div></div>
           <div class="tpl-info">
             <p class="tpl-desc" id="tpl-desc"></p>
             <p class="tpl-lv" id="tpl-lv"></p>
@@ -2684,6 +2724,8 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       }else{
         var i=document.createElement('img');i.src=srcs[0];i.alt=t.image?'Vorschau: '+t.title:'';i.loading='lazy';im.appendChild(i);
       }
+      var zb=el('span','tpl-zoom');zb.setAttribute('aria-hidden','true');zb.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M11 8.5v5M8.5 11h5"/></svg>';im.appendChild(zb);
+      [].forEach.call(im.querySelectorAll('img'),function(x,n){x.draggable=false;x.addEventListener('click',function(e){e.stopPropagation();lbOpen(srcs,n,t.title);});});
       c.appendChild(im);
       var b=el('div','tpl-body'),tags=el('div','tpl-tags');
       tags.appendChild(el('span',null,t.season_label));if(t.age&&t.age.indexOf('kinder')===0&&t.age_label)tags.appendChild(el('span',null,t.age_label));if(t.langs)tags.appendChild(el('span',null,t.langs));b.appendChild(tags);
@@ -2734,10 +2776,27 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
   });
   var infoD=$('info-dialog');function infoOpen(t,x){$('info-title').textContent=t;$('info-text').textContent=x;show(infoD);}
   $('info-close').addEventListener('click',function(){hide(infoD);});infoD.addEventListener('click',function(e){if(e.target===infoD)hide(infoD);});
-  var td=$('tpl-dialog'),tf=$('tpl-form');
+  var td=$('tpl-dialog'),tf=$('tpl-form'),tplIdx=0,tplSrcs=[];
+  // Foto-Galerie: Bild antippen = groß ansehen und durchblättern
+  var lb=$('lb'),lbT=$('lb-track'),lbTh=$('lb-thumbs'),lbN=0,lbK=0;
+  function lbSet(k){lbK=k;$('lb-count').textContent=lbN>1?' · '+(k+1)+' / '+lbN:'';$('lb-prev').disabled=k===0;$('lb-next').disabled=k>=lbN-1;[].forEach.call(lbTh.children,function(b,n){b.className=n===k?'on':'';});}
+  function lbGo(k,smooth){k=Math.max(0,Math.min(lbN-1,k));lbT.scrollTo({left:k*lbT.clientWidth,behavior:smooth?'smooth':'auto'});lbSet(k);}
+  function lbOpen(srcs,start,title){lbN=srcs.length;lbT.innerHTML='';lbTh.innerHTML='';$('lb-title').textContent=title||'';
+    srcs.forEach(function(src,n){var sl=el('div','lb-slide'),i=document.createElement('img');i.src=src;i.alt=(title||'Foto')+' – Bild '+(n+1);i.draggable=false;sl.appendChild(i);lbT.appendChild(sl);
+      if(lbN>1){var b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Bild '+(n+1));var ti=document.createElement('img');ti.src=src;ti.alt='';ti.draggable=false;b.appendChild(ti);b.onclick=function(){lbGo(n,true);};lbTh.appendChild(b);}});
+    lbTh.hidden=lbN<2;show(lb);requestAnimationFrame(function(){lbGo(start||0,false);});}
+  lbT.addEventListener('scroll',function(){var k=Math.round(lbT.scrollLeft/Math.max(1,lbT.clientWidth));if(k!==lbK)lbSet(k);},{passive:true});
+  $('lb-prev').addEventListener('click',function(){lbGo(lbK-1,true);});$('lb-next').addEventListener('click',function(){lbGo(lbK+1,true);});
+  $('lb-close').addEventListener('click',function(){hide(lb);});
+  lb.addEventListener('click',function(e){if(e.target.classList&&(e.target.classList.contains('lb-slide')||e.target.classList.contains('lb-stage')||e.target.classList.contains('lb-in')||e.target===lb))hide(lb);});
+  lb.addEventListener('keydown',function(e){if(e.key==='ArrowRight'){e.preventDefault();lbGo(lbK+1,true);}else if(e.key==='ArrowLeft'){e.preventDefault();lbGo(lbK-1,true);}});
+  lb.addEventListener('contextmenu',function(e){if(e.target.tagName==='IMG')e.preventDefault();});
+  window.addEventListener('resize',function(){if(lb.open)lbGo(lbK,false);});
+  $('tpl-main').addEventListener('click',function(){if(tplCur&&tplSrcs.length)lbOpen(tplSrcs,tplIdx,tplCur.title);});
+  ['tpl-grid','tpl-thumbs','tpl-main'].forEach(function(id){var x=$(id);if(x)x.addEventListener('contextmenu',function(e){if(e.target.tagName==='IMG')e.preventDefault();});});
   function tplOpen(t){tplCur=t;tf.hidden=false;$('tpl-buy').hidden=!t.buyable;$('tpl-soon').hidden=!!t.buyable;
-    var srcs=[t.image||('img/tpl-'+t.season+'.jpg')].concat(t.slides||[]),main=$('tpl-main'),th=$('tpl-thumbs');main.onerror=function(){main.onerror=null;main.src='img/tpl-'+(t.season||'ganzjaehrig')+'.jpg';};main.src=srcs[0];main.alt='Vorschau: '+t.title;th.innerHTML='';
-    if(srcs.length>1)srcs.forEach(function(src,n){var b=document.createElement('button');b.type='button';b.className=n?'':'on';b.setAttribute('aria-label','Bild '+(n+1));var i=document.createElement('img');i.src=src;i.alt='';b.appendChild(i);b.onclick=function(){main.src=src;[].forEach.call(th.children,function(x){x.className='';});b.className='on';};th.appendChild(b);});
+    var srcs=[t.image||('img/tpl-'+t.season+'.jpg')].concat(t.slides||[]),main=$('tpl-main'),th=$('tpl-thumbs');main.onerror=function(){main.onerror=null;main.src='img/tpl-'+(t.season||'ganzjaehrig')+'.jpg';};main.src=srcs[0];main.alt='Vorschau: '+t.title;th.innerHTML='';tplIdx=0;tplSrcs=srcs;
+    if(srcs.length>1)srcs.forEach(function(src,n){var b=document.createElement('button');b.type='button';b.className=n?'':'on';b.setAttribute('aria-label','Bild '+(n+1));var i=document.createElement('img');i.src=src;i.alt='';b.appendChild(i);b.onclick=function(){main.src=src;tplIdx=n;[].forEach.call(th.children,function(x){x.className='';});b.className='on';};th.appendChild(b);});
     $('tpl-desc').textContent=t.description||'';
     var lvT=['','Einfach','Mittel','Für Fortgeschrittene'];$('tpl-lv').textContent='Schwierigkeit: '+(lvT[t.level]||'Einfach')+(t.age_label&&t.age&&t.age.indexOf('kinder')===0?' · '+t.age_label:'');$('tpl-done').hidden=true;$('tpl-error').hidden=true;$('tpl-id').value=t.id;$('tpl-title').textContent=t.title;$('tpl-meta').textContent=t.season_label+(t.langs?' · '+t.langs:'')+' · digitaler Download (PDF) · '+euro(t.price_cents);$('tpl-submit').textContent='Weiter zur Bezahlung · '+euro(t.price_cents);show(td);}
   function tplDone(t,x,link){tf.hidden=true;$('tpl-done').hidden=false;$('tpl-done-title').textContent=t;$('tpl-done-text').textContent=x;var a=$('tpl-download');if(link){a.href=link;a.hidden=false;}else a.hidden=true;show(td);}

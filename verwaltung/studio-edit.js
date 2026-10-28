@@ -168,9 +168,9 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
       [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]].forEach(x => gl.texParameteri(gl.TEXTURE_2D, x[0], x[1]));
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     }
-    let cmp = false, Ws = 0, Hs = 0, Wo = 0, Ho = 0;
+    let cmp = false, Ws = 0, Hs = 0, Wo = 0, Ho = 0, srcO = null;
     function outSize() {
-      Ws = v.videoWidth || 1280; Hs = v.videoHeight || 720;
+      Ws = srcO ? srcO.w : (v.videoWidth || 1280); Hs = srcO ? srcO.h : (v.videoHeight || 720);
       let w = Ws, h = Hs; const f = st.fmt;
       if (f !== 'orig') { const [x, y] = f.split(':').map(Number), r = x / y; if (r >= Ws / Hs) { w = Ws; h = Ws / r; } else { h = Hs; w = Hs * r; } }
       const k = Math.min(1, 1920 / Math.max(w, h)); w = Math.round(w * k / 2) * 2; h = Math.round(h * k / 2) * 2;
@@ -184,9 +184,9 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
       return { an, sc, mx, my, ox: st.ox * mx, oy: -st.oy * my };
     }
     function draw() {
-      if (!gl || !v.videoWidth) return; outSize();
+      if (!gl || (!srcO && !v.videoWidth)) return; outSize();
       gl.viewport(0, 0, Wo, Ho); gl.bindTexture(gl.TEXTURE_2D, tex);
-      try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, v); } catch (e) { return; }
+      try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, srcO ? srcO.el : v); } catch (e) { return; }
       const g = geo();
       gl.uniform1i(U.t, 0); gl.uniform2f(U.so, Ws, Hs); gl.uniform2f(U.oo, Wo, Ho); gl.uniform2f(U.off, g.ox, g.oy);
       gl.uniform1f(U.sc, g.sc); gl.uniform1f(U.ang, g.an); gl.uniform1f(U.ex, st.ex); gl.uniform1f(U.con, st.con); gl.uniform1f(U.wm, st.wm);
@@ -361,8 +361,111 @@ gl_FragColor=vec4(clamp(col,0.,1.),1.);}`;
 
     // ---- Fertig stellen (Echtzeit) ----
     let rendering = false;
+    // ---- Schnell fertig stellen (Vivien, 28.10.2026: „dauert so lange wie das Video, bei 30 Minuten zu lang“) ----
+    // WebCodecs über Mediabunny (verwaltung/vendor, erst bei Bedarf geladen): Bilder direkt dekodieren, durch denselben
+    // WebGL-Filter schicken und mit dem Grafikchip kodieren; Ton (Stimme + Musik, Ein-/Ausblenden, leiser beim Sprechen)
+    // in einem OfflineAudioContext mischen. Viel schneller als Echtzeit. Klappt etwas nicht, bleibt der Echtzeit-Weg.
+    let mbP = null;
+    function loadMB() {
+      if (window.Mediabunny) return Promise.resolve(window.Mediabunny);
+      if (!mbP) mbP = new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = (o.vendor || 'vendor/') + 'mediabunny.min.js?v=1'; sc.onload = () => window.Mediabunny ? ok(window.Mediabunny) : no(new Error('mb')); sc.onerror = () => { mbP = null; no(new Error('mb')); }; document.head.appendChild(sc); });
+      return mbP;
+    }
+    async function fastRender(bar, fill) {
+      if (!window.VideoEncoder || !window.VideoDecoder || !window.OfflineAudioContext) return null;
+      const M = await loadMB();
+      const input = new M.Input({ source: new M.BlobSource(o.blob), formats: M.ALL_FORMATS });
+      const vt = await input.getPrimaryVideoTrack(); if (!vt || !(await vt.canDecode())) return null;
+      const at = await input.getPrimaryAudioTrack(); const atOk = at && (await at.canDecode());
+      const t0 = await vt.getFirstTimestamp().catch(() => 0) || 0, D = b - a;
+      // Größe wie beim Echtzeit-Weg
+      // Ohne Drehung: Einzelbilder direkt als VideoFrame an WebGL (schnell); mit Drehung (Handy-Kamera) über Canvas
+      const rot = await vt.getRotation?.() ?? vt.rotation ?? 0, direct = !rot;
+      const vs = direct ? new M.VideoSampleSink(vt) : new M.CanvasSink(vt, { poolSize: 2 });
+      const frames = async function* (s0, s1) {
+        if (!direct) { for await (const w of vs.canvases(s0, s1)) yield { el: w.canvas, w: w.canvas.width, h: w.canvas.height, ts: w.timestamp, dur: w.duration, done() {} }; return; }
+        for await (const smp of vs.samples(s0, s1)) { const f = smp.toVideoFrame(); smp.close(); yield { el: f, w: f.displayWidth, h: f.displayHeight, ts: f.timestamp / 1e6, dur: (f.duration || 0) / 1e6, done() { f.close(); } }; }
+      };
+      let first = null; for await (const w of frames(a + t0, a + t0 + 1)) { first = w; break; }
+      if (!first) return null;
+      srcO = { el: first.el, w: first.w, h: first.h }; outSize(); first.done();
+      const W = Wo, H = Ho, vbr = W * H > 1.5e6 ? 8e6 : 5e6;
+      const vc = await M.getFirstEncodableVideoCodec(['avc', 'hevc', 'vp9', 'av1'], { width: W, height: H, bitrate: vbr });
+      if (!vc) { srcO = null; return null; }
+      // ---- Ton offline mischen ----
+      const SR = 48000, len = Math.max(1, Math.ceil(D * SR));
+      let voiceBufs = [];
+      if (atOk) { const as = new M.AudioBufferSink(at); for await (const x of as.buffers(Math.max(0, a + t0 - 1), a + t0 + D + 1)) { if (closed) return 'x'; voiceBufs.push(x); } }
+      const place = (ctx, dst) => voiceBufs.forEach(x => { const s0 = new AudioBufferSourceNode(ctx, { buffer: x.buffer }); s0.connect(dst); const rel = x.timestamp - t0 - a; if (rel >= 0) s0.start(rel); else if (-rel < x.buffer.duration) s0.start(0, -rel); });
+      let mixed = null;
+      if (voiceBufs.length || file) {
+        let rms = null;
+        if (file && mus.duck && voiceBufs.length) { // 1. Durchgang: wann wird gesprochen?
+          const c1 = new OfflineAudioContext(1, len, SR); place(c1, c1.destination); const r1 = (await c1.startRendering()).getChannelData(0);
+          const win = Math.round(SR * .05); rms = []; for (let i = 0; i < r1.length; i += win) { let q2 = 0, n = Math.min(win, r1.length - i); for (let j = 0; j < n; j++) q2 += r1[i + j] * r1[i + j]; rms.push(Math.sqrt(q2 / Math.max(1, n))); }
+        }
+        const c2 = new OfflineAudioContext(2, len, SR), vg = new GainNode(c2, { gain: mus.voice }); vg.connect(c2.destination); place(c2, vg);
+        if (file) {
+          const mb = await new Promise((ok, no) => file.arrayBuffer().then(ab => { const tmp = new OfflineAudioContext(2, SR, SR); tmp.decodeAudioData(ab, ok, no); }, no)).catch(() => null);
+          if (mb) {
+            const ms = new AudioBufferSourceNode(c2, { buffer: mb, loop: true }), mg = new GainNode(c2, { gain: 0 }); ms.connect(mg); mg.connect(c2.destination);
+            ms.start(0, (mus.from || 0) % Math.max(.1, mb.duration));
+            let duckT = -9, prev = 0;
+            for (let k = 0, t = 0; t < D; k++, t = k * .05) {
+              let g = mus.vol;
+              if (mus.fade) g *= Math.max(0, Math.min(1, t / 1.5, (D - t) / 2.5));
+              if (rms && (rms[k] || 0) > .025) duckT = t; if (rms && t - duckT < .6) g *= .35;
+              if (Math.abs(g - prev) > .001 || k === 0) { mg.gain.setTargetAtTime(g, t, g < prev ? .12 : .45); prev = g; }
+            }
+          }
+        }
+        mixed = await c2.startRendering();
+      }
+      if (closed) return 'x';
+      // ---- Ausgabe: MP4, Stück für Stück in Blobs (kein riesiger Arbeitsspeicher bei langen Videos) ----
+      let parts = [], end = 0;
+      const put = (pos, data) => { const bl = new Blob([data]), pe = pos + data.byteLength;
+        if (pos === end) { parts.push({ p: pos, b: bl }); end = pe; return; }
+        if (pos > end) { parts.push({ p: end, b: new Blob([new Uint8Array(pos - end)]) }, { p: pos, b: bl }); end = pe; return; }
+        const nx = []; for (const x of parts) { const xs = x.p, xe = x.p + x.b.size; if (xe <= pos || xs >= pe) { nx.push(x); continue; }
+          if (xs < pos) nx.push({ p: xs, b: x.b.slice(0, pos - xs) }); if (xe > pe) nx.push({ p: pe, b: x.b.slice(pe - xs) }); }
+        nx.push({ p: pos, b: bl }); nx.sort((x, y) => x.p - y.p); parts = nx; if (pe > end) end = pe; };
+      const target = new M.StreamTarget(new WritableStream({ write(ch) { put(ch.position, ch.data); } }), { chunked: true, chunkSize: 4 * 1024 * 1024 });
+      const out = new M.Output({ format: new M.Mp4OutputFormat({ fastStart: false }), target });
+      const cs = new M.CanvasSource(cv, { codec: vc, bitrate: vbr, keyFrameInterval: 2, latencyMode: 'realtime' });
+      out.addVideoTrack(cs, { frameRate: 30 });
+      let as2 = null;
+      if (mixed) { const ac2 = await M.getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: 2, sampleRate: SR, bitrate: 160000 }); if (ac2) { as2 = new M.AudioBufferSource({ codec: ac2, bitrate: 160000 }); out.addAudioTrack(as2); } }
+      await out.start();
+      if (as2) await as2.add(mixed);
+      msg.textContent = 'Wird fertig gestellt … geht schneller als das Video lang ist. Seite offen lassen.';
+      let lastTs = -1; const W0 = performance.now();
+      for await (const w of frames(a + t0, a + t0 + D)) {
+        if (closed) { w.done(); await out.cancel(); return 'x'; }
+        const ts = Math.max(0, w.ts - t0 - a); if (ts <= lastTs || ts >= D) { w.done(); continue; } lastTs = ts;
+        srcO.el = w.el; draw(); w.done();
+        await cs.add(ts, Math.max(1 / 60, Math.min(w.dur || 1 / 30, D - ts)));
+        fill.style.width = Math.min(100, ts / D * 100) + '%';
+        // Wächter: ist das Gerät hier nicht schneller als Echtzeit, lieber gleich den bewährten Weg nehmen
+        const el = (performance.now() - W0) / 1000;
+        if (!window.__seFastForce && el > 3 && D - ts > 4 && ts / el < 1.15) { try { await out.cancel(); } catch (e) {} srcO = null; return null; }
+      }
+      srcO = null;
+      await out.finalize();
+      return new Blob(parts.map(x => x.b), { type: 'video/mp4' });
+    }
+
     K('done').onclick = async () => {
-      if (busy || !gl) return; if (!window.MediaRecorder || !cv.captureStream) { msg.textContent = 'Dieser Browser kann das Video nicht neu speichern. Bitte Chrome oder Safari nehmen.'; return; }
+      if (busy || !gl) return;
+      { // zuerst der schnelle Weg
+        stop(); busy = rendering = true; root.classList.add('se-busy'); K('done').disabled = K('play').disabled = true;
+        const bar = q('.se-prog'), fill = bar.querySelector('i'); bar.hidden = false; fill.style.width = '0%'; msg.className = 'se-msg'; msg.textContent = 'Wird vorbereitet …';
+        let nb = null; try { nb = await fastRender(bar, fill); } catch (e) { console.warn('schnell fertig stellen', e); nb = null; }
+        srcO = null; busy = rendering = false; root.classList.remove('se-busy'); K('done').disabled = K('play').disabled = false; bar.hidden = true;
+        if (closed || nb === 'x') return;
+        if (nb && nb.size > 1000) { const info = { a, b, dur: b - a, music: file ? file.name : '', fmt: st.fmt, fast: true }; close(); o.onDone && o.onDone(nb, info); return; }
+        draw();
+      } if (!window.MediaRecorder || !cv.captureStream) { msg.textContent = 'Dieser Browser kann das Video nicht neu speichern. Bitte Chrome oder Safari nehmen.'; return; }
       stop(); busy = rendering = true; root.classList.add('se-busy'); K('done').disabled = K('play').disabled = true;
       audio(); musicSrc(); await ac.resume().catch(() => {}); spk.gain.value = 0; // beim Fertigstellen nichts über die Lautsprecher
       await seek(a); syncMusic();
