@@ -1437,6 +1437,12 @@ function forma_reconcile_payments(PDO $pdo, bool $force = false): void
             error_log('FORMA reconcile private plus: ' . $e->getMessage());
         }
     }
+    try {
+        forma_offer_schema($pdo);
+        foreach ($pdo->query("SELECT * FROM offers WHERE status = 'bestaetigt' AND stripe_session != '' ORDER BY id DESC LIMIT 20")->fetchAll() as $of) forma_offer_check($pdo, $of);
+    } catch (Throwable $e) {
+        error_log('FORMA reconcile angebot: ' . $e->getMessage());
+    }
     foreach ($pdo->query("SELECT * FROM kasse_sales WHERE status = 'offen' AND stripe_session != '' ORDER BY id DESC LIMIT 20")->fetchAll() as $ks) {
         try {
             forma_kasse_check($pdo, $ks);
@@ -2826,4 +2832,5 @@ function forma_template_cover(string $file): string
 
 require_once __DIR__ . '/invoices.php';
 require_once __DIR__ . '/kasse.php';
+require_once __DIR__ . '/angebote.inc.php';
 require_once __DIR__ . '/minimum.php';

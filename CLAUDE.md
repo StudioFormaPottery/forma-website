@@ -435,3 +435,12 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Einsortieren durch Claude: Ordner „Noch nicht einsortiert“ hat „📋 Liste für Claude kopieren“ (Titel der unsortierten Lieder). Claude sucht die Lieder bei Epidemic (Stimmung/Genre), trägt sie in `verwaltung/musik-ordner.json` ein und pusht; beim nächsten Öffnen von „🎵 Musik“ werden unsortierte Lieder nach dieser Liste einsortiert.
 - Lieder-Paket (28.10.2026): „📦 Lieder-Paket von Claude einfügen“ auf der Musik-Seite. Claude gibt Zeilen `Titel – Künstler | ordner,ordner | Sekunden | <signierter Epidemic-Link>`; der Server lädt jedes Lied selbst (`mm_mu_fetch`, nur https://audiocdn.epidemicsound.com/, curl), doppelte Titel werden übersprungen. Die Links gelten nur ca. 10 Minuten. Signierte Links nie ins Repo.
 - Teleprompter gleitet per CSS-transition auf der Grafikkarte (`prPlay`/`prPause`/`prNow`), damit er trotz Kamera-Filtern nicht ruckelt.
+
+## Angebote für Gruppen (Vivien, 28.10.2026)
+- Verwaltung `?view=angebote` (Kachel „Angebote“, Reiter neben „Rechnungen“). Logik in `api/angebote.inc.php`, Tabelle `offers`, Nummern `AN-JJJJ-NNN`.
+- Vivien legt an: Gruppe, z. H. (eigene zweite Zeile, nicht im Eyebrow), E-Mail, Telefon, Termine (Uhrzeit/Ort freiwillig), Preis pro Kind, Werkstück. Link per WhatsApp (`forma_offer_whatsapp`).
+- Öffentliche Seite `/angebot/?t=TOKEN`, kurz halten, Nebensachen einklappbar: Anzahl Kinder pro Termin (keine Namen, kein Hinweis darauf), Gesamtbetrag live, „Rechnung an“ (die Schule / mich / jemand anderen; Name, z. H., E-Mail, Adresse – Name und Adresse Pflicht, offizielle Rechnung), Nachricht eingeklappt, „Angebot bestätigen“.
+- Bestätigt → Termine im Verwaltungs-Kalender und in `vb_items` (belegt; offene Angebote mit Uhrzeit halten den Termin ebenfalls frei), Vorabrechnung (PDF ohne Rechnungsnummer, „noch nicht bezahlt“, QR-Code zum Online-Bezahlen, `forma_invoice_pdf` mit `doc = vorab`) an Rechnungs-E-Mail und Ansprechperson, Info an Vivien.
+- Bezahlen: online `api/angebot-zahlen.php?t=TOKEN` (Stripe, Abgleich in `forma_reconcile_payments`) oder „Bar bezahlt“ in der Verwaltung. Erst dann die fertige Rechnung (`forma_invoice_for('angebot')`) an den Rechnungsempfänger + Kopie an Vivien, Kopie auch an die Ansprechperson, wenn deren E-Mail anders ist.
+- Kommen weniger Kinder: „Es kommen weniger (oder mehr) Kinder“ → tatsächliche Zahl (`final`), verrechnet wird immer diese; neue Vorabrechnung optional.
+- QR im PDF: `api/vendor/phpqrcode` (LGPL, nur Matrix, FPDF zeichnet).

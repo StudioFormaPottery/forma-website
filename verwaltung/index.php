@@ -798,6 +798,57 @@ if ($action === 'kasse_new') {
         : ($email !== '' ? "Der Bezahl-Link über $sum ist per E-Mail an $first unterwegs. Du kannst ihn unten auch per WhatsApp schicken." : "Der Bezahl-Link über $sum ist fertig. Schick ihn unten per WhatsApp an $first.")) . $booked);
 }
 
+// --- Angebote für Gruppen (api/angebote.inc.php) ------------------------------------------------
+if ($action === 'offer_create') {
+    check_csrf();
+    $back = $self . '?view=angebote';
+    $org = forma_clean((string)($_POST['org'] ?? ''), 160);
+    $dates = [];
+    foreach ((array)($_POST['d_date'] ?? []) as $i => $dd) {
+        $dd = (string)$dd;
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dd)) continue;
+        $tm = fn(string $k) => preg_match('/^\d{2}:\d{2}$/', (string)($_POST[$k][$i] ?? '')) ? (string)$_POST[$k][$i] : '';
+        $dates[] = ['date' => $dd, 'from' => $tm('d_from'), 'to' => $tm('d_to'), 'place' => forma_clean((string)($_POST['d_place'][$i] ?? ''), 120),
+            'kids' => max(0, min(FORMA_OFFER_MAX_KIDS, (int)($_POST['d_kids'][$i] ?? 0))), 'final' => null];
+    }
+    usort($dates, fn($a, $b) => strcmp($a['date'] . $a['from'], $b['date'] . $b['from']));
+    $unit = euro_to_cents((string)($_POST['unit'] ?? ''));
+    if ($org === '' || !$dates || $unit <= 0) go($back . '&neu=1', 'Bitte Gruppe, mindestens einen Termin und den Preis pro Kind eintragen.');
+    $valid = (string)($_POST['valid_until'] ?? '');
+    $id = forma_offer_create($pdo, ['org' => $org, 'contact' => forma_clean((string)($_POST['contact'] ?? ''), 120), 'email' => strtolower(forma_clean((string)($_POST['email'] ?? ''), 160)),
+        'phone' => forma_clean((string)($_POST['phone'] ?? ''), 40), 'title' => forma_clean((string)($_POST['title'] ?? ''), 160) ?: 'Pottery bemalen',
+        'intro' => forma_clean((string)($_POST['intro'] ?? ''), 2000), 'item' => forma_clean((string)($_POST['item'] ?? ''), 60) ?: 'Teller', 'unit_cents' => $unit,
+        'dates' => $dates, 'valid_until' => preg_match('/^\d{4}-\d{2}-\d{2}$/', $valid) ? $valid : '']);
+    go($back . '&id=' . $id . '#a' . $id, 'Das Angebot ist angelegt. Kopier die Nachricht unten und schick sie per WhatsApp.');
+}
+
+if (in_array($action, ['offer_final', 'offer_resend', 'offer_cash', 'offer_withdraw', 'offer_reopen'], true)) {
+    check_csrf();
+    $oid = (int)($_POST['oid'] ?? 0);
+    $o = forma_offer_get($pdo, $oid);
+    $back = $self . '?view=angebote&id=' . $oid . '#a' . $oid;
+    if (!$o) go($self . '?view=angebote', 'Dieses Angebot gibt es nicht mehr.');
+    if ($o['status'] === 'bestaetigt' && $o['stripe_session'] !== '') {
+        try { if (forma_offer_check($pdo, $o) === 'bezahlt') go($back, 'Das Angebot ist inzwischen online bezahlt, die Rechnung ist schon raus.'); } catch (Throwable $e) { error_log('FORMA offer check: ' . $e->getMessage()); }
+    }
+    if ($action === 'offer_final') {
+        if (!forma_offer_set_final($pdo, $oid, (array)($_POST['final'] ?? []))) go($back, 'Die Anzahl kannst du nur ändern, solange das Angebot bestätigt und noch nicht bezahlt ist.');
+        $msg = 'Gespeichert. Verrechnet werden jetzt ' . forma_offer_kids(forma_offer_get($pdo, $oid)) . ' Kinder (' . forma_euro(forma_offer_total(forma_offer_get($pdo, $oid))) . ').';
+        if (!empty($_POST['resend'])) $msg .= forma_offer_send_vorab($pdo, $oid, true) ? ' Die neue Vorabrechnung ist per E-Mail unterwegs.' : ' Ohne E-Mail-Adresse: Die neue Vorabrechnung ist auf der Angebotsseite.';
+        go($back, $msg);
+    }
+    if ($action === 'offer_resend') go($back, forma_offer_send_vorab($pdo, $oid, true) ? 'Die Vorabrechnung ist noch einmal per E-Mail unterwegs.' : 'Ohne E-Mail-Adresse geht keine Mail. Die Vorabrechnung liegt auf der Angebotsseite.');
+    if ($action === 'offer_cash') go($back, forma_offer_mark_cash($pdo, $oid) ? 'Als bar bezahlt gespeichert. Die fertige Rechnung ist raus' . (trim((string)$o['email']) !== '' ? ', an die Gruppe und an dich.' : ' (nur an dich, keine E-Mail-Adresse hinterlegt).') : 'Das geht nur bei einem bestätigten, noch nicht bezahlten Angebot.');
+    if ($action === 'offer_withdraw') {
+        $pdo->prepare("UPDATE offers SET status = 'zurueckgezogen' WHERE id = ? AND status IN ('offen','bestaetigt')")->execute([$oid]);
+        go($back, 'Das Angebot ist zurückgezogen, der Link zeigt jetzt „nicht mehr aktuell“ und die Termine sind wieder frei.');
+    }
+    if ($action === 'offer_reopen') {
+        $pdo->prepare("UPDATE offers SET status = 'offen', confirmed_at = NULL WHERE id = ? AND status = 'zurueckgezogen'")->execute([$oid]);
+        go($back, 'Das Angebot ist wieder offen.');
+    }
+}
+
 if ($action === 'kasse_remind' || $action === 'kasse_cash' || $action === 'kasse_cancel') {
     $kid = (int)($_POST['kid'] ?? 0);
     $s = forma_kasse_get($pdo, $kid);
@@ -1239,6 +1290,148 @@ if ($view === 'kasse') {
     <?php });
 }
 
+if ($view === 'angebot_vorab') {
+    $o = forma_offer_get($pdo, (int)($_GET['id'] ?? 0));
+    if (!$o || $o['status'] === 'offen') go($self . '?view=angebote', 'Eine Vorabrechnung gibt es erst nach der Bestätigung.');
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: inline; filename="Vorabrechnung_' . $o['nr'] . '.pdf"');
+    echo forma_invoice_pdf(forma_offer_vorab($o));
+    exit;
+}
+
+if ($view === 'angebote') {
+    forma_offer_schema($pdo);
+    foreach ($pdo->query("SELECT * FROM offers WHERE status = 'bestaetigt' AND stripe_session != ''")->fetchAll() as $of) {
+        try { forma_offer_check($pdo, $of); } catch (Throwable $e) { error_log('FORMA offer check: ' . $e->getMessage()); }
+    }
+    $offers = forma_offers($pdo);
+    $sel = (int)($_GET['id'] ?? 0);
+    $neu = !empty($_GET['neu']) || !$offers;
+    render_page('Angebote', function () use ($self, $flash, $offers, $sel, $neu, $pdo) {
+        $openN = count(array_filter($offers, fn($o) => $o['status'] === 'offen')); ?>
+        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
+        <div class="seg"><a href="<?= forma_h($self) ?>?view=rechnungen">Rechnungen</a><a class="on" href="<?= forma_h($self) ?>?view=angebote">Angebote<?= $openN ? ' · ' . $openN . ' offen' : '' ?></a></div>
+        <h1>Angebote</h1>
+        <p class="muted">Unverbindliche Angebote für Gruppen, z. B. Schulklassen beim Pottery bemalen. Du schickst den Link per WhatsApp, die Gruppe trägt pro Termin die Anzahl Kinder ein und bestätigt. Dann stehen die Termine im Kalender und die Vorabrechnung geht raus. Die fertige Rechnung entsteht erst nach der Zahlung (online automatisch, bar mit „Bar bezahlt“).</p>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+
+        <details class="card" <?= $neu ? 'open' : '' ?> id="neu">
+            <summary><strong>+ Neues Angebot</strong></summary>
+            <form method="post" class="stack" style="margin-top:12px">
+                <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="offer_create">
+                <label>Gruppe / Schule<input name="org" required maxlength="160" placeholder="z. B. MS Paznaun, Gruppe Kreativ"></label>
+                <div class="row">
+                    <label>z. H. (Ansprechperson)<input name="contact" maxlength="120" placeholder="Vor- und Nachname"></label>
+                    <label>E-Mail (für Vorabrechnung und Rechnung)<input name="email" type="email" maxlength="160"></label>
+                </div>
+                <div class="row">
+                    <label>Telefon (für WhatsApp)<input name="phone" maxlength="40"></label>
+                    <label>Gültig bis<input name="valid_until" type="date" value="<?= forma_h(date('Y-m-d', strtotime('+12 days'))) ?>"></label>
+                </div>
+                <div class="row">
+                    <label>Titel<input name="title" maxlength="160" value="Pottery bemalen" placeholder="Pottery bemalen für die Gruppe …"></label>
+                    <label>Werkstück pro Kind<input name="item" maxlength="60" value="Teller"></label>
+                </div>
+                <label>Preis pro Kind (€, inkl. Werkstück, Farben und Fertigstellung)<input name="unit" inputmode="decimal" required value="15"></label>
+                <label>Text oben im Angebot (leer lassen für den Standardtext)<textarea name="intro" rows="3" maxlength="2000"></textarea></label>
+                <strong>Termine</strong>
+                <div id="offer-dates" class="stack">
+                    <?php for ($i = 0; $i < 2; $i++): ?>
+                    <div class="offer-date">
+                        <label>Datum<input type="date" name="d_date[]"<?= $i === 0 ? ' required' : '' ?>></label>
+                        <label>von<input type="time" name="d_from[]" step="900"></label>
+                        <label>bis<input type="time" name="d_to[]" step="900"></label>
+                        <label>Ort<input name="d_place[]" maxlength="120" placeholder="im Atelier"></label>
+                        <label>Kinder (ca.)<input type="number" name="d_kids[]" min="0" max="<?= FORMA_OFFER_MAX_KIDS ?>" placeholder="0"></label>
+                    </div>
+                    <?php endfor; ?>
+                </div>
+                <button class="link" type="button" id="offer-more">+ weiterer Termin</button>
+                <p class="muted small">Uhrzeit und Ort sind freiwillig. „Kinder (ca.)“ ist nur der Startwert, die Gruppe trägt die echte Zahl selbst ein.</p>
+                <button class="btn" type="submit">Angebot anlegen</button>
+            </form>
+        </details>
+
+        <div class="offer-list">
+        <?php foreach ($offers as $o): $dates = forma_offer_dates($o); $st = (string)$o['status']; $link = forma_offer_link($o); ?>
+            <div class="card booking offer<?= $o['id'] == $sel ? ' sel' : '' ?>" id="a<?= (int)$o['id'] ?>">
+                <div class="booking-head"><strong><?= forma_h($o['org']) ?></strong>
+                    <span class="pill <?= $st === 'offen' ? 'pill-wait' : ($st === 'zurueckgezogen' ? '' : 'pill-ok') ?>"><?= forma_h(forma_offer_status_label($o)) ?></span></div>
+                <div class="muted small"><?= forma_h($o['nr']) ?> · <?= forma_h($o['title']) ?><?= $o['contact'] !== '' ? ' · z. H. ' . forma_h($o['contact']) : '' ?> · <?= forma_h(forma_euro((int)$o['unit_cents'])) ?> pro Kind<?= $o['email'] !== '' ? ' · ' . forma_h($o['email']) : ' · <b>keine E-Mail</b>' ?></div>
+                <ul class="small" style="margin:6px 0;padding-left:18px">
+                    <?php foreach ($dates as $d): $fin = isset($d['final']) && $d['final'] !== null; ?>
+                    <li><?= forma_h(forma_offer_day($d['date'])) ?><?= forma_offer_when($d) !== '' ? ' · ' . forma_h(forma_offer_when($d)) : '' ?><?= $st !== 'offen' ? ' · <strong>' . forma_offer_bill_kids($d) . ' Kinder</strong>' . ($fin && (int)$d['final'] !== (int)$d['kids'] ? ' <span class="muted">(bestätigt waren ' . (int)$d['kids'] . ')</span>' : '') : '' ?></li>
+                    <?php endforeach; ?>
+                </ul>
+                <?php if ($st !== 'offen' && $st !== 'zurueckgezogen'): ?><div><strong>Gesamt: <?= forma_h(forma_euro(forma_offer_total($o))) ?></strong> <span class="muted small">· bestätigt am <?= forma_h(date('d.m.Y, H:i', strtotime((string)$o['confirmed_at']))) ?><?= $o['paid_at'] ? ' · bezahlt am ' . forma_h(date('d.m.Y', strtotime((string)$o['paid_at']))) : '' ?></span></div><?php endif; ?>
+                <?php if ($o['note'] !== ''): ?><p class="small" style="margin:6px 0"><em>Nachricht:</em> <?= nl2br(forma_h($o['note'])) ?></p><?php endif; ?>
+                <?php if ($st !== 'offen' && $st !== 'zurueckgezogen'): [$bn, $ba, $be] = forma_offer_bill($o); ?><p class="small" style="margin:6px 0"><em>Rechnung an:</em> <?= forma_h(implode(' · ', array_filter([$bn, str_replace("\n", ', ', $ba), $be]))) ?></p><?php endif; ?>
+
+                <?php if ($st === 'offen' || $st === 'bestaetigt'): $wa = forma_offer_whatsapp($o); $phone = preg_replace('/\D+/', '', (string)$o['phone']); if (str_starts_with($phone, '00')) $phone = substr($phone, 2); elseif (str_starts_with($phone, '0')) $phone = '43' . substr($phone, 1); ?>
+                <details <?= $st === 'offen' && $o['id'] == $sel ? 'open' : '' ?>><summary class="link small">Link &amp; WhatsApp-Nachricht</summary>
+                    <div class="stack" style="margin-top:8px">
+                        <textarea id="wa<?= (int)$o['id'] ?>" rows="6"><?= forma_h($wa) ?></textarea>
+                        <div class="row-actions">
+                            <a class="btn" href="https://wa.me/<?= forma_h($phone) ?>?text=<?= rawurlencode($wa) ?>" target="_blank" rel="noopener" data-wa-from="wa<?= (int)$o['id'] ?>" data-phone="<?= forma_h($phone) ?>">Per WhatsApp schicken</a>
+                            <button class="btn btn-ghost" type="button" data-copy-from="wa<?= (int)$o['id'] ?>">Nachricht kopieren</button>
+                            <a class="link small" href="<?= forma_h($link) ?>" target="_blank" rel="noopener">Angebot ansehen</a>
+                        </div>
+                    </div>
+                </details>
+                <?php endif; ?>
+
+                <?php if ($st === 'bestaetigt'): ?>
+                <details><summary class="link small">Es kommen weniger (oder mehr) Kinder</summary>
+                    <form method="post" class="stack" style="margin-top:8px">
+                        <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="offer_final"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>">
+                        <?php foreach ($dates as $i => $d): ?>
+                        <label><?= forma_h(forma_offer_day($d['date'])) ?> · bestätigt: <?= (int)$d['kids'] ?> · tatsächlich:<input type="number" min="0" max="<?= FORMA_OFFER_MAX_KIDS ?>" name="final[<?= $i ?>]" value="<?= isset($d['final']) && $d['final'] !== null ? (int)$d['final'] : '' ?>" placeholder="<?= (int)$d['kids'] ?>"></label>
+                        <?php endforeach; ?>
+                        <label class="check small"><input type="checkbox" name="resend" value="1" checked> neue Vorabrechnung an die Gruppe schicken</label>
+                        <button class="btn btn-ghost" type="submit">Anzahl speichern</button>
+                        <span class="muted small">Verrechnet wird immer die tatsächliche Zahl. Leer lassen = wie bestätigt.</span>
+                    </form>
+                </details>
+                <div class="row-actions" style="margin-top:8px">
+                    <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="offer_cash"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>"><button class="btn" type="submit">Bar bezahlt · <?= forma_h(forma_euro(forma_offer_total($o))) ?></button></form>
+                    <a class="link small" href="<?= forma_h($self) ?>?view=angebot_vorab&amp;id=<?= (int)$o['id'] ?>" target="_blank">Vorabrechnung ansehen</a>
+                    <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="offer_resend"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>"><button class="link small" type="submit">Vorabrechnung noch einmal schicken</button></form>
+                </div>
+                <?php elseif ($st === 'bezahlt'): $inv = $pdo->prepare("SELECT id, nr FROM invoices WHERE kind = 'angebot' AND ref_id = ?"); $inv->execute([(int)$o['id']]); $inv = $inv->fetch(); ?>
+                <div class="row-actions"><?php if ($inv): ?><a class="link small" href="<?= forma_h($self) ?>?view=rechnung_pdf&amp;id=<?= (int)$inv['id'] ?>" target="_blank">Rechnung <?= forma_h($inv['nr']) ?> ansehen</a><?php endif; ?></div>
+                <?php endif; ?>
+
+                <?php if ($st === 'offen' || $st === 'bestaetigt'): ?>
+                <details class="del"><summary class="link small">Angebot zurückziehen</summary>
+                    <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="offer_withdraw"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>"><button class="btn btn-danger" type="submit">Ja, zurückziehen</button> <span class="muted small">Der Link zeigt dann „nicht mehr aktuell“, die Termine sind wieder frei.</span></form>
+                </details>
+                <?php elseif ($st === 'zurueckgezogen'): ?>
+                <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="offer_reopen"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>"><button class="link small" type="submit">Wieder öffnen</button></form>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+        </div>
+        <style>
+            .seg{display:inline-flex;gap:4px;background:#EAD8C6;border-radius:999px;padding:4px;margin:4px 0 6px}
+            .seg a{padding:7px 16px;border-radius:999px;text-decoration:none;color:var(--clay)}
+            .seg a.on{background:var(--clay);color:#FBF1EA}
+            .offer-date{display:grid;grid-template-columns:1.3fr 1fr 1fr 1.3fr .9fr;gap:8px;border-bottom:1px dashed var(--line);padding-bottom:8px}
+            .offer-list{display:grid;gap:12px;margin-top:12px;max-width:760px}
+            .offer.sel{border-color:var(--clay);border-width:2px}
+            .offer textarea{width:100%;box-sizing:border-box;font:inherit;font-size:.95rem;border-radius:14px;border:1.5px solid #E4D2BF;padding:12px;background:#fff}
+            @media (max-width:640px){.offer-date{grid-template-columns:1fr 1fr}.offer-date label:first-child{grid-column:1/-1}}
+        </style>
+        <script>
+        (function(){
+            var more=document.getElementById('offer-more'),box=document.getElementById('offer-dates');
+            if(more&&box)more.addEventListener('click',function(){var c=box.lastElementChild.cloneNode(true);c.querySelectorAll('input').forEach(function(i){i.value='';i.required=false;});box.appendChild(c);});
+            document.querySelectorAll('[data-copy-from]').forEach(function(b){b.addEventListener('click',function(){var t=document.getElementById(b.dataset.copyFrom);t.select();(navigator.clipboard?navigator.clipboard.writeText(t.value):Promise.reject()).then(function(){b.textContent='Kopiert ✓';}).catch(function(){document.execCommand('copy');b.textContent='Kopiert ✓';});});});
+            document.querySelectorAll('[data-wa-from]').forEach(function(a){a.addEventListener('click',function(){a.href='https://wa.me/'+(a.dataset.phone||'')+'?text='+encodeURIComponent(document.getElementById(a.dataset.waFrom).value);});});
+        })();
+        </script>
+    <?php });
+}
+
 if ($view === 'rechnungen') {
     forma_invoice_schema($pdo);
     forma_sheet_sync($pdo);
@@ -1248,6 +1441,9 @@ if ($view === 'rechnungen') {
     $cfg = ['prefix' => forma_setting($pdo, 'invoice_prefix') ?? '', 'oss' => forma_setting($pdo, 'oss_active') === '1', 'sheet' => forma_setting($pdo, 'sheet_id') ?? '', 'err' => forma_setting($pdo, 'sheet_error') ?? ''];
     render_page('Rechnungen', function () use ($self, $flash, $rows, $sum, $gkey, $cfg) { ?>
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
+        <?php $offOpen = (function () { try { forma_offer_schema($GLOBALS['pdo']); return (int)$GLOBALS['pdo']->query("SELECT COUNT(*) FROM offers WHERE status = 'offen'")->fetchColumn(); } catch (Throwable $e) { return 0; } })(); ?>
+        <div class="seg"><a class="on" href="<?= forma_h($self) ?>?view=rechnungen">Rechnungen</a><a href="<?= forma_h($self) ?>?view=angebote">Angebote<?= $offOpen ? ' · ' . $offOpen . ' offen' : '' ?></a></div>
+        <style>.seg{display:inline-flex;gap:4px;background:#EAD8C6;border-radius:999px;padding:4px;margin:4px 0 6px}.seg a{padding:7px 16px;border-radius:999px;text-decoration:none;color:var(--clay)}.seg a.on{background:var(--clay);color:#FBF1EA}</style>
         <h1>Rechnungen</h1>
         <p class="muted">Nach jeder Online-Zahlung (Kurs, Private Pottery, Template) und jedem Verkauf an der Atelier-Kasse wird automatisch eine Rechnung erstellt und als PDF an die Kundin und an dich geschickt. Eigener Nummernkreis für Online-Verkäufe, lückenlos pro Jahr.</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
@@ -1448,6 +1644,9 @@ if ($view === 'kalender') {
     foreach ($st->fetchAll() as $s) {
         $events[$s['date']][] = ['type' => 'private', 'sort' => sprintf('%05s', $s['start']), 'time' => forma_de_time((string)$s['start']), 's' => $s];
     }
+    foreach (forma_offer_events($pdo, $first, $last) as $oe) {
+        $events[$oe['date']][] = ['type' => 'angebot', 'sort' => $oe['from'] !== '' ? sprintf('%05s', $oe['from']) : '98', 'time' => $oe['from'] !== '' ? str_replace(' Uhr', '', (string)preg_replace('/\s*·.*$/u', '', forma_offer_when(['from' => $oe['from'], 'to' => $oe['to']]))) : '', 'e' => $oe];
+    }
     foreach ($open as $b) {
         if ($b['wish_date'] !== '' && $b['wish_date'] >= $first && $b['wish_date'] <= $last) {
             $events[$b['wish_date']][] = ['type' => 'wunsch', 'sort' => 'zz', 'b' => $b];
@@ -1515,13 +1714,14 @@ if ($view === 'kalender') {
                         <?php foreach (array_slice($ev, 0, 4) as $e): ?>
                             <?php if ($e['type'] === 'kurs'): ?><span class="ev ev-kurs"><?= forma_h(trim($e['time'] . ' ' . $e['title'])) ?></span>
                             <?php elseif ($e['type'] === 'private'): ?><span class="ev ev-private<?= $e['s']['mailed_at'] ? '' : ' pending' ?>"><?= forma_h($e['time'] . ' ' . forma_first_name((string)$e['s']['name'])) ?></span>
+                            <?php elseif ($e['type'] === 'angebot'): ?><span class="ev ev-angebot<?= $e['e']['o']['status'] === 'offen' ? ' pending' : '' ?>"><?= forma_h(trim(preg_replace('/\s*Uhr$/u', '', $e['time']) . ' ' . preg_replace('/,.*$/u', '', (string)$e['e']['o']['org']))) ?></span>
                             <?php else: ?><span class="ev ev-wish">Wunsch: <?= forma_h(forma_first_name((string)$e['b']['name'])) ?></span><?php endif; ?>
                         <?php endforeach; ?>
                         <?php if (count($ev) > 4): ?><span class="ev more">+<?= count($ev) - 4 ?></span><?php endif; ?>
                     </a>
                 <?php endfor; ?>
             </div>
-            <p class="legend small muted"><span class="ev ev-kurs">Kurs</span> <span class="ev ev-private">Private Pottery</span> <span class="ev ev-private pending">vorgemerkt</span> <span class="ev ev-wish">Wunschtermin</span></p>
+            <p class="legend small muted"><span class="ev ev-kurs">Kurs</span> <span class="ev ev-private">Private Pottery</span> <span class="ev ev-private pending">vorgemerkt</span> <span class="ev ev-wish">Wunschtermin</span> <span class="ev ev-angebot">Gruppe (Angebot)</span></p>
             <?php if ($sel === ''): ?><p class="small muted">Gast mit altem Gutschein? Tipp auf den Tag, an dem sie kommen möchte, dann findest du unten „Gast mit altem Gutschein eintragen“.</p><?php endif; ?>
 
             <?php if ($sel !== ''): $ev = $events[$sel] ?? []; ?>
@@ -1547,6 +1747,8 @@ if ($view === 'kalender') {
                                 </details>
                             </div>
                         </div>
+                    <?php elseif ($e['type'] === 'angebot'): $oo = $e['e']['o']; ?>
+                        <a class="day-item kurs" href="<?= forma_h($self) ?>?view=angebote&amp;id=<?= (int)$oo['id'] ?>#a<?= (int)$oo['id'] ?>"><strong><?= forma_h(forma_offer_when($e['e']) !== '' ? forma_offer_when($e['e']) : 'Uhrzeit offen') ?></strong> <?= forma_h($oo['title']) ?> · <?= forma_h($oo['org']) ?> <span class="muted small">· <?= $oo['status'] === 'offen' ? 'Angebot noch nicht bestätigt' : (int)$e['e']['kids'] . ' Kinder · ' . ($oo['status'] === 'bezahlt' ? 'bezahlt' : 'bestätigt, noch nicht bezahlt') ?></span></a>
                     <?php else: $b = $e['b']; ?>
                         <a class="day-item wunsch" href="<?= $q(['m' => $month, 'd' => $sel, 'assign' => (int)$b['id']]) ?>#tag"><span class="wish-dot"></span> Wunschtermin von <strong><?= forma_h($b['name']) ?></strong> <span class="muted small">· <?= forma_h(FORMA_WISH_TIMES[$b['wish_time']] ?? '') ?></span> <span class="small">Einplanen →</span></a>
                     <?php endif; ?>
@@ -2316,6 +2518,9 @@ $voucherOpen = (int)$pdo->query("SELECT COUNT(*) FROM vouchers WHERE status = 'b
 $voucherUnpaid = (int)$pdo->query("SELECT COUNT(*) FROM vouchers WHERE via = 'kasse' AND status = 'offen'")->fetchColumn();
 $kasseUnpaid = (int)$pdo->query("SELECT COUNT(*) FROM kasse_sales WHERE status = 'offen'")->fetchColumn();
 $privateOpen = (int)$pdo->query("SELECT COUNT(*) FROM private_bookings WHERE status IN ('bezahlt','anfrage') AND done = 0")->fetchColumn();
+forma_offer_schema($pdo);
+$offerOpen = (int)$pdo->query("SELECT COUNT(*) FROM offers WHERE status = 'offen'")->fetchColumn();
+$offerUnpaid = (int)$pdo->query("SELECT COUNT(*) FROM offers WHERE status = 'bestaetigt'")->fetchColumn();
 // Agenda für die nächsten 7 Tage: Kurse mit Anmeldungen und Private-Pottery-Termine
 $agenda = [];
 $st = $pdo->prepare('SELECT * FROM courses WHERE start_date BETWEEN ? AND ? ORDER BY start_date, id');
@@ -2342,7 +2547,7 @@ foreach ($pdo->query("SELECT id, hours, status FROM private_bookings WHERE statu
 $newBookings = (int)$pdo->query("SELECT COUNT(*) FROM bookings WHERE status = 'bestaetigt' AND created_at >= '" . date('c', strtotime('-7 days')) . "'")->fetchColumn();
 try { forma_min_check($pdo); } catch (Throwable $e) { error_log('FORMA min: ' . $e->getMessage()); }
 $minCourses = $pdo->query("SELECT * FROM courses WHERE min_status = 'gemeldet' AND start_date >= '" . date('Y-m-d') . "' ORDER BY start_date")->fetchAll();
-render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive, $voucherOpen, $voucherUnpaid, $kasseUnpaid, $privateOpen, $agenda, $toPlan, $newBookings, $minCourses) {
+render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive, $voucherOpen, $voucherUnpaid, $kasseUnpaid, $privateOpen, $offerOpen, $offerUnpaid, $agenda, $toPlan, $newBookings, $minCourses) {
     $h = (int)date('G');
     $hello = $h < 11 ? 'Guten Morgen' : ($h < 17 ? 'Hallo' : 'Guten Abend'); ?>
     <section class="hero">
@@ -2385,6 +2590,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
             <a class="tile" href="<?= forma_h($self) ?>?view=templates"><span class="ic"><?= admin_icon('template') ?></span><strong>Templates</strong><span class="muted small">&amp; Maker Club</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=gutscheine"><span class="ic"><?= admin_icon('gutschein') ?></span><strong>Gutscheine</strong><span class="muted small"><?= $voucherOpen ?> offen<?= $voucherUnpaid ? ' · <b style="color:#8C2C1D">' . $voucherUnpaid . ' noch nicht bezahlt</b>' : '' ?></span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=rechnungen"><span class="ic"><?= admin_icon('rechnung') ?></span><strong>Rechnungen</strong><span class="muted small">automatisch nach Zahlung</span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=angebote"><span class="ic"><?= admin_icon('angebot') ?></span><strong>Angebote</strong><span class="muted small"><?= $offerOpen ? $offerOpen . ' noch nicht bestätigt' : 'für Gruppen &amp; Schulen' ?><?= $offerUnpaid ? ' · <b style="color:#8C2C1D">' . $offerUnpaid . ' noch nicht bezahlt</b>' : '' ?></span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=liste"><span class="ic"><?= admin_icon('mail') ?></span><strong>E-Mail-Liste</strong><span class="muted small"><?= $subCount ?> <?= $subCount === 1 ? 'Kontakt' : 'Kontakte' ?></span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=popup"><span class="ic"><?= admin_icon('popup') ?></span><strong>Pop-up &amp; Deko</strong><span class="muted small"><?= $popupLive ? 'gerade sichtbar' : 'ausgeschaltet' ?> · Deko</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=tests"><span class="ic"><?= admin_icon('test') ?></span><strong>Testbuchungen</strong><span class="muted small">jedes Angebot ausprobieren</span></a>
@@ -2454,6 +2660,7 @@ function admin_icon(string $k): string
         'template' => '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h4"/>',
         'gutschein' => '<rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-1-3-5-4-5-1.5S10 8 12 8zm0 0c1-3 5-4 5-1.5S14 8 12 8z"/>',
         'rechnung' => '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+        'angebot' => '<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9.5 14l2 2 3.5-4"/>',
         'mail' => '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/>',
         'popup' => '<path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8zM6 16l.6 1.4L8 18l-1.4.6L6 20l-.6-1.4L4 18l1.4-.6z"/>',
         'test' => '<path d="M9 3h6M10 3v6l-5 9a2 2 0 001.8 3h10.4a2 2 0 001.8-3l-5-9V3"/><path d="M7.5 14h9"/>',
@@ -2619,6 +2826,8 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .ev{display:block;font-size:11.5px;line-height:1.25;padding:2px 5px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#EAD8C6}
 .ev-private{background:var(--clay);color:#FBF1EA}
 .ev-private.pending{background:#fff;color:var(--clay);border:1.5px dashed var(--clay)}
+.ev-angebot{background:#674B40;color:#FBF1EA}
+.ev-angebot.pending{background:#fff;color:#674B40;border:1.5px dashed #674B40}
 .ev-wish{background:#fff;border:1.5px dashed #B05A38;color:#8a3f24}
 .ev.more{background:none;color:var(--soft)}
 .legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.legend .ev{display:inline-block;font-size:13px}
