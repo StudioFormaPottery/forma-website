@@ -645,7 +645,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   // =================== Bearbeiten ===================
   let edOpen=null,fromFile=false;
   // Welche Musik passt? (Stichwörter aus dem Musik-Ordner, nach Titel/Text des Videos)
-  function musicHint(){if(mv||mvFree)return [];if(ig)return ig.kind==='reel'?['reel','lebendig','morgen']:['reel','morgen'];
+  function musicHint(){if(mv||mvFree)return [];const wi=[10,11].includes(new Date().getMonth())&&new Date().getDate()>=(new Date().getMonth()===10?15:1);if(ig)return wi?['winter','reel']:(ig.kind==='reel'?['reel','lebendig','morgen']:['reel','morgen']);
     const t=((cur&&cur.t)||'')+' '+String((cur&&(lang==='en'?cur.en:cur.de))||$('ownT').value||'').slice(0,300);
     if(/abend|nacht|schlaf|meditation|atem|breath|ruhe|loslassen|savasana|evening|sleep/i.test(t))return ['meditation','abend'];
     if(/morgen|morning|willkommen|welcome|start|ankommen/i.test(t))return ['morgen','reel'];

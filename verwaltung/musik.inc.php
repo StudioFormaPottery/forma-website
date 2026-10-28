@@ -4,7 +4,7 @@
 // gekaufte Musik darf nicht öffentlich liegen), nur angemeldet abrufbar. ?view=musik, Aktionen mm_mu_*.
 declare(strict_types=1);
 
-const MU_TAGS = ['morgen' => '☀️ Morgen', 'abend' => '🌙 Abend', 'flow' => '🧘 Flow & Bewegung', 'meditation' => '🕯️ Meditation & Atem', 'reel' => '📱 Reel & Story', 'lebendig' => '✨ Lebendig'];
+const MU_TAGS = ['morgen' => '☀️ Morgen', 'abend' => '🌙 Abend', 'flow' => '🧘 Flow & Bewegung', 'meditation' => '🕯️ Meditation & Atem', 'reel' => '📱 Reel & Story', 'lebendig' => '✨ Lebendig', 'winter' => '❄️ Winter & Advent'];
 
 function mu_schema(PDO $pdo): void
 {
@@ -158,7 +158,8 @@ if ($view === 'musik' || str_starts_with((string)$action, 'mm_mu_')) {
                 'meditation' => ['🕯️', 'Meditation & Atem', 'Fast still, Klangflächen, Klavier: Meditationen, Breathwork'],
                 'flow' => ['🧘', 'Flow & Bewegung', 'Gleichmäßiger Fluss für Bewegungsvideos und Flows'],
                 'reel' => ['📱', 'Reel & Story', 'Kurz, freundlich, gute Laune für Instagram'],
-                'lebendig' => ['✨', 'Lebendig', 'Mehr Schwung: Kraft, Cardio, Tanz']];
+                'lebendig' => ['✨', 'Lebendig', 'Mehr Schwung: Kraft, Cardio, Tanz'],
+                'winter' => ['❄️', 'Winter & Advent', 'Kerzenlicht, Schnee, Weihnachtszeit: für November und Dezember']];
             $in = []; foreach ($list as $r) { $tg = array_values(array_filter(explode(',', $r['tags']))); if (!$tg) $in[''][] = $r; foreach ($tg as $t) if (isset($folders[$t])) $in[$t][] = $r; }
             $row = function (array $r) use ($h, $fmt) { $tags = array_filter(explode(',', $r['tags']));
                 $o = '<div class="song" data-id="' . (int)$r['id'] . '"><button type="button" class="pl" data-play="' . (int)$r['id'] . '" aria-label="Anhören">▶</button>'
