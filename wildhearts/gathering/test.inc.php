@@ -275,6 +275,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 <?php endif; ?>
 
 <script src="/wildhearts/gathering/offer.js?v=10"></script>
+<?php if (!$guest): ?><script src="/wildhearts/assets/talkcam.js?v=1"></script><?php endif; ?>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
@@ -468,6 +469,13 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
   // --- Aufnahme nur von Viv (eigene Kamera + Mikro, nicht der Whereby-Raum) ---
   const R = $('rec2');
   let rStream = null, rRec = null, rChunks = [], rT0 = 0, rTimer = 0;
+  let rWrap = null;
+  // Kamera-Look (Vivien, 28.10.2026): gilt für deine eigenen Aufnahmen und die Übungsansicht, nicht für das Whereby-Bild
+  if (window.TalkCam) {
+    const note = 'Der Look gilt für deine Aufnahmen und die Übungsansicht. Im Live-Raum zeigt Whereby dein Kamerabild direkt, dort wirkt der Look nicht (Whereby hat in seinen Kamera-Einstellungen einen eigenen Hintergrund-Weichzeichner).';
+    if (R) R.insertAdjacentElement('afterend', TalkCam.button(null, {cls: 'ghostbtn', note}));
+    const ubo = $('ubopen'); if (ubo) ubo.insertAdjacentElement('afterend', TalkCam.button(null, {note}));
+  }
   if (R) {
     const fmt = () => { const s = Math.floor((Date.now() - rT0) / 1000); return '■ Stopp ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
     const finish = () => {
@@ -477,8 +485,8 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       a.href = URL.createObjectURL(new Blob(rChunks, {type}));
       a.download = 'Wild-Hearts-Gathering-' + new Date().toISOString().slice(0, 10) + '.' + ext;
       document.body.appendChild(a); a.click(); a.remove();
-      rStream.getTracks().forEach(t => t.stop());
-      rStream = rRec = null; rChunks = [];
+      if (rWrap) rWrap.stop(); else rStream.getTracks().forEach(t => t.stop());
+      rStream = rRec = rWrap = null; rChunks = [];
       R.textContent = '● Aufnahme'; R.classList.remove('recon');
       alert('Die Aufnahme ist gespeichert (Downloads-Ordner). Darauf bist nur du zu sehen und zu hören.');
     };
@@ -489,9 +497,10 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       try {
         rStream = await navigator.mediaDevices.getUserMedia({video: {width: {ideal: 1280}, height: {ideal: 720}}, audio: {echoCancellation: true, noiseSuppression: true}});
       } catch (e) { alert('Kein Zugriff auf Kamera oder Mikro. Bitte im Browser erlauben.'); return; }
+      if (window.TalkCam) { rWrap = await TalkCam.wrap(rStream); rStream = rWrap.stream; }
       const types = ['video/mp4;codecs=avc1,mp4a', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4'];
       const mimeType = types.find(t => MediaRecorder.isTypeSupported(t)) || '';
-      rRec = new MediaRecorder(rStream, mimeType ? {mimeType, videoBitsPerSecond: 1500000} : {videoBitsPerSecond: 1500000});
+      rRec = new MediaRecorder(rStream, mimeType ? {mimeType, videoBitsPerSecond: 2500000} : {videoBitsPerSecond: 2500000});
       rChunks = [];
       rRec.ondataavailable = e => e.data.size && rChunks.push(e.data);
       rRec.onstop = finish;
@@ -695,7 +704,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 
     const PR = $('practice'), cv = $('ubcv'), g = cv.getContext('2d');
     const cam = document.createElement('video'); cam.muted = true; cam.playsInline = true;
-    let uStream = null, uRaf = 0, uRec = null, uChunks = [], uT0 = 0;
+    let uStream = null, uRaf = 0, uRec = null, uChunks = [], uT0 = 0, uWrap = null;
     const rr = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
     const cover = (src, sw, sh, x, y, w, h, mirror) => {
       const s = Math.max(w / sw, h / sh), dw = sw * s, dh = sh * s;
@@ -848,6 +857,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       stop();
       try { uStream = await navigator.mediaDevices.getUserMedia({video: {width: {ideal: 1280}, height: {ideal: 720}}, audio: {echoCancellation: true, noiseSuppression: true}}); }
       catch (e) { alert('Kein Zugriff auf Kamera oder Mikro. Bitte im Browser erlauben.'); return; }
+      if (window.TalkCam) { uWrap = await TalkCam.wrap(uStream); uStream = uWrap.stream; }
       cam.srcObject = uStream; cam.play().catch(() => {});
       PR.hidden = false; document.body.style.overflow = 'hidden'; frame(); $('ubttl').textContent = callTitle();
       qPrep(); qMsgs = []; qSync(); qLoop(); uOffer = null; $('uboffer').textContent = '✦ Angebot zeigen';
@@ -862,8 +872,8 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     const closeU = () => {
       if (uRec) uRec.stop();
       cancelAnimationFrame(uRaf);
-      if (uStream) uStream.getTracks().forEach(t => t.stop());
-      uStream = null; PR.hidden = true; document.body.style.overflow = '';
+      if (uWrap) uWrap.stop(); else if (uStream) uStream.getTracks().forEach(t => t.stop());
+      uStream = null; uWrap = null; PR.hidden = true; document.body.style.overflow = '';
       clearTimeout(qTimer); clearInterval(qClock); qMsgs = []; saleTimers.forEach(clearTimeout); uOffer = null;
       if (P) { window.hidePrompter(); document.body.appendChild(P); }
     };

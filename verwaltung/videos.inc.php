@@ -132,9 +132,10 @@ if ($view === 'videos') {
       </ol>
     <?php else: ?>
       <div class="steps">
-        <div class="step"><span class="no">1</span><div><b>Mit dem Teleprompter aufnehmen</b><p>Du sprichst einmal am Stück in die Kamera, der Text läuft mit.</p>
-          <p class="btns"><?php if (trim((string)$l['script_de']) !== ''): ?><a class="tp" href="<?= $u('view=method&lang=de&prompter=' . $id) ?>" target="_blank" rel="noopener">Teleprompter Deutsch</a><?php endif; ?><?php if (trim((string)$l['script_en']) !== ''): ?><a class="tp" href="<?= $u('view=method&lang=en&prompter=' . $id) ?>" target="_blank" rel="noopener">Teleprompter Englisch</a><?php endif; ?></p></div></div>
-        <div class="step"><span class="no">2</span><div><b>Ganzes Video hochladen</b><p>Einmal auf Deutsch und einmal auf Englisch. Schneiden musst du nichts.</p>
+        <div class="step"><span class="no">1</span><div><b>Im Studio aufnehmen</b><p>Du sprichst einmal am Stück in die Kamera, der Text läuft oben im Bild mit. Mit Kamera-Look und Hilfe für deine Position, danach direkt hier hochladen.</p>
+          <p class="btns"><a class="see" href="<?= $u('view=studio&l=' . $id . '&lang=de') ?>">🎥 Im Studio aufnehmen · Deutsch</a><a class="see" href="<?= $u('view=studio&l=' . $id . '&lang=en') ?>">🎥 Im Studio aufnehmen · Englisch</a></p>
+          <p class="btns" style="margin-top:4px!important"><span style="font-size:16px;color:#7D7076;align-self:center">Oder nur der Text, z. B. fürs Handy:</span><?php if (trim((string)$l['script_de']) !== ''): ?><a class="tp" href="<?= $u('view=method&lang=de&prompter=' . $id) ?>" target="_blank" rel="noopener">Teleprompter Deutsch</a><?php endif; ?><?php if (trim((string)$l['script_en']) !== ''): ?><a class="tp" href="<?= $u('view=method&lang=en&prompter=' . $id) ?>" target="_blank" rel="noopener">Teleprompter Englisch</a><?php endif; ?></p></div></div>
+        <div class="step"><span class="no">2</span><div><b>Oder ein fertiges Video hochladen</b><p>Wenn du woanders aufgenommen hast: einmal auf Deutsch und einmal auf Englisch. Schneiden musst du nichts.</p>
           <div class="two">
           <?php foreach (['de' => 'Deutsch', 'en' => 'Englisch'] as $lg => $ln): $g = (string)$l['video_' . $lg]; ?>
             <div class="vbox" data-id="<?= $id ?>" data-lang="<?= $lg ?>">
@@ -238,7 +239,7 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
 </style>
 <?php mm_subnav('videos'); ?>
 <section class="vh"><h1>🎬 Videos hochladen</h1><p>Oben steht immer, was als Nächstes dran ist. Tipp auf ein Video, dann siehst du jede Übung mit „Clip“, „Deutsch einsprechen“ und „Englisch einsprechen“. Eine Übung, die du einmal gefilmt hast, steckt automatisch in allen Videos mit dieser Übung.</p>
-  <a class="lk" href="<?= $u('view=mediathek') ?>">📚 Zur Mediathek: alle Übungen nach Jahreszeit &amp; Stil</a></section>
+  <a class="lk" href="<?= $u('view=mediathek') ?>">📚 Zur Mediathek: alle Übungen nach Jahreszeit &amp; Stil</a> <a class="lk" href="<?= $u('view=studio') ?>">🎥 Talking-Head-Studio</a></section>
 <?php if ($flash): ?><p class="alert"><?= $h($flash) ?></p><?php endif; ?>
 <?php if (!$bunny): ?><p class="warn">Bevor du Clips hochladen kannst, muss einmal Bunny verbunden werden: <a href="<?= $u('view=method') ?>#bunny">hier verbinden</a>. Einsprechen geht schon jetzt.</p><?php endif; ?>
 

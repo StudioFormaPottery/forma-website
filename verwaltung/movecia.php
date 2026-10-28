@@ -12,12 +12,12 @@ function mm_subnav(string $active): void
     $self = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?');
     $req = 0; try { $req = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {}
     $ptReq = 0; try { $ptReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); } catch (Throwable $e) {}
-    $tabs = [['movecia', '?view=movecia', 'Übersicht'], ['videos', '?view=videos', '🎬 Videos hochladen'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['method', '?view=method', 'Method &amp; Unfold'], ['natal', '?view=natal', 'Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['training', '?view=training', 'Personal Training' . ($ptReq ? ' <i>' . $ptReq . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', 'Live-Texte'], ['presse', '?view=presse', 'Presse'], ['einst', '?view=movecia#einstellungen', 'Einstellungen']]; ?>
+    $tabs = [['movecia', '?view=movecia', 'Übersicht'], ['videos', '?view=videos', '🎬 Videos hochladen'], ['studio', '?view=studio', '🎥 Studio'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['method', '?view=method', 'Method &amp; Unfold'], ['natal', '?view=natal', 'Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['training', '?view=training', 'Personal Training' . ($ptReq ? ' <i>' . $ptReq . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Als Teilnehmerin'], ['texte', '?view=texte', 'Live-Texte'], ['presse', '?view=presse', 'Presse'], ['einst', '?view=movecia#einstellungen', 'Einstellungen']]; ?>
 <style>
 .mvsub{position:sticky;top:0;z-index:40;margin:-8px -16px 16px;padding:10px 16px;background:rgba(242,236,228,.96);border-bottom:1px solid #DDD2C6;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .mvsub::-webkit-scrollbar{display:none}
 .mvsub a{flex:0 0 auto;padding:10px 16px;border-radius:999px;border:1px solid #DDD2C6;background:#FBF8F4;color:#6B5658;text-decoration:none;font-size:17px;white-space:nowrap}
-<?= !in_array($active, ['videos', 'mediathek'], true) ? 'main{zoom:1.12}' : '' ?>
+<?= !in_array($active, ['videos', 'mediathek', 'studio'], true) ? 'main{zoom:1.12}' : '' ?>
 .mvsub a.on{background:#7D5E68;border-color:#7D5E68;color:#FBF5F7}
 .mvsub a.fo{background:transparent;border-color:transparent;color:#8C2C1D;padding-left:4px}
 .mvsub i{font-style:normal;display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:999px;background:#B5544A;color:#fff;font-size:12px;text-align:center}
@@ -36,6 +36,8 @@ require __DIR__ . '/texte.inc.php';
 require __DIR__ . '/presse.inc.php';
 // Videos hochladen (?view=videos)
 require __DIR__ . '/videos.inc.php';
+// Talking-Head-Studio mit Kamera-Look (?view=studio, Vivien 28.10.2026)
+require __DIR__ . '/studio.inc.php';
 require __DIR__ . '/mediathek.inc.php';
 // Als Teilnehmerin ansehen (?view=vorschau)
 require __DIR__ . '/vorschau.inc.php';
@@ -366,6 +368,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
             <form method="post" target="_blank"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_testroom"><button class="main" type="submit"><span class="ic">🎥</span><b>Video &amp; Technik testen</b><span>Kamera, Mikro, Teleprompter, Aufnahme – danach direkt in deinen Testraum</span></button></form>
             <?php if ($next): ?><a href="<?= forma_h($GLOBALS['mmHostLink']((int)$next['id'])) ?>" target="_blank" rel="noopener"><span class="ic">✨</span><b>Nächstes Gathering öffnen</b><span>Als Gastgeberin: <?= forma_h($next['title']) ?></span></a><?php else: ?><a href="#neu"><span class="ic">✨</span><b>Gathering anlegen</b><span>Noch keines geplant</span></a><?php endif; ?>
             <a class="main" href="<?= forma_h($self) ?>?view=videos"><span class="ic">🎬</span><b>Videos hochladen</b><span>Clips filmen, Voice-over einsprechen, Talking Heads – mit Zeitplan</span></a>
+            <a class="main" href="<?= forma_h($self) ?>?view=studio"><span class="ic">🎥</span><b>Talking-Head-Studio</b><span>Aufnehmen mit Kamera-Look (Haut, Augenringe, Hintergrund, Licht), Positions-Hilfe und Teleprompter</span></a>
             <a class="main" href="<?= forma_h($self) ?>?view=mediathek"><span class="ic">📚</span><b>Mediathek</b><span>Jede Übung einmal gefilmt, nach Jahreszeit und Stil sortiert</span></a>
             <a class="main" href="<?= forma_h($self) ?>?view=training"><span class="ic">🏔️</span><b>Personal Training<?php $ptN = 0; try { $ptN = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); } catch (Throwable $e) {} ?><?= $ptN ? ' · ' . $ptN . ' neu' : '' ?></b><span>Hotelgäste (Wintersaison 26/27): Anfragen, Kalender, Flyer &amp; QR-Code</span></a>
             <a href="<?= forma_h($self) ?>?view=vorschau"><span class="ic">👁</span><b>Als Teilnehmerin ansehen</b><span>Alle Seiten und Programme so, wie deine Teilnehmerinnen sie sehen</span></a>
