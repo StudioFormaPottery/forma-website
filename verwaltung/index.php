@@ -23,6 +23,7 @@ unset($_SESSION['flash']);
 const FORMA_ADMIN_NEWS = [
     ['b' => 'movecia', 'until' => '2026-11-20', 'title' => 'Neu im Studio: iPhone als Kamera', 'text' => 'Unter dem Kamerabild „📱 iPhone als Kamera“ tippen: dein iPhone filmt, Teleprompter und alles andere bleiben am MacBook', 'link' => '?view=studio'],
     ['b' => 'movecia', 'until' => '2026-11-15', 'title' => 'Neu im Studio: 4K, Teleprompter an der Kamera, schnelleres Speichern', 'text' => 'Bildqualität 4K/2K unter „Kamera & Mikrofon“, Text beim Aufnehmen direkt unter der Linse, „🗑 Löschen“ nach jeder Aufnahme, „💛 Meine Looks“ zum Speichern deiner Filter, Bearbeiten speichert viel schneller', 'link' => '?view=studio'],
+    ['until' => '2026-11-15', 'title' => 'Aufgeräumt: weniger Knöpfe', 'text' => 'Einzeltermin + Serientermine = „Neuer Termin“, Bestand liegt in der Kasse, Testbuchungen und E-Mail-Liste in den Einstellungen. Bei Movecia nur noch 8 Reiter', 'link' => '?view=edit'],
     ['until' => '2026-11-15', 'title' => 'Neu: Angebote für Gruppen & Schulen', 'text' => 'Angebot anlegen, per WhatsApp schicken, Bestätigung und Vorabrechnung laufen automatisch', 'link' => '?view=angebote'],
 ];
 
@@ -2064,7 +2065,8 @@ if ($view === 'gutscheine') {
 if ($view === 'series') {
     render_page('Serientermine', function () use ($self, $flash) { ?>
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
-        <h1>Serientermine anlegen</h1>
+        <h1>Neuer Termin</h1>
+        <p class="seg"><a href="<?= forma_h($self) ?>?view=edit">Einzeltermin</a> <span class="on">Serientermine (z. B. jeden Mi &amp; Fr)</span></p>
         <p class="muted">Legt für jeden gewählten Wochentag im Zeitraum einen eigenen Termin an. Termine, die es schon gibt, werden übersprungen.</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <form method="post" class="card stack" id="series">
@@ -2116,6 +2118,7 @@ if ($view === 'einstellungen') {
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Einstellungen</h1>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <p class="row-actions"><a class="btn btn-sm" href="<?= forma_h($self) ?>?view=tests">🧪 Testbuchungen · jedes Angebot ausprobieren</a> <a class="btn btn-sm" href="<?= forma_h($self) ?>?view=liste">💌 E-Mail-Liste</a></p>
         <h2>Online-Bezahlung mit Stripe</h2>
         <?php if ($key): ?>
             <div class="card stack">
@@ -2302,6 +2305,7 @@ if ($view === 'edit') {
     render_page($id ? 'Termin bearbeiten' : 'Neuer Termin', function () use ($c, $self, $flash) { ?>
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1><?= $c['id'] ? 'Termin bearbeiten' : 'Neuer Termin' ?></h1>
+        <?php if (!$c['id']): ?><p class="seg"><span class="on">Einzeltermin</span> <a href="<?= forma_h($self) ?>?view=series">Serientermine (z. B. jeden Mi &amp; Fr)</a></p><?php endif; ?>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <form method="post" class="card stack">
             <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
@@ -2612,20 +2616,16 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
         </section>
         <nav class="tiles">
             <a class="tile hl" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('kalender') ?></span><strong>Kalender</strong><span class="muted small">Kurse &amp; Private Pottery</span></a>
-            <a class="tile hl" href="<?= forma_h($self) ?>?view=kasse"><span class="ic"><?= admin_icon('kasse') ?></span><strong>Kasse</strong><span class="muted small">Pottery bemalen & Gutscheine<?= $kasseUnpaid ? ' · <b style="color:#8C2C1D">' . $kasseUnpaid . ' Bezahl-Link' . ($kasseUnpaid === 1 ? '' : 's') . ' offen</b>' : '' ?></span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=bestand"><span class="ic"><?= admin_icon('bestand') ?></span><strong>Bestand</strong><span class="muted small">Pottery bemalen · was ist da?</span></a>
+            <a class="tile hl" href="<?= forma_h($self) ?>?view=kasse"><span class="ic"><?= admin_icon('kasse') ?></span><strong>Kasse</strong><span class="muted small">Pottery bemalen, Gutscheine &amp; Bestand<?= $kasseUnpaid ? ' · <b style="color:#8C2C1D">' . $kasseUnpaid . ' Bezahl-Link' . ($kasseUnpaid === 1 ? '' : 's') . ' offen</b>' : '' ?></span></a>
             <a class="tile hl" href="<?= forma_h($self) ?>?view=winter"><span class="ic"><?= admin_icon('winter') ?></span><strong>Wintersaison 26/27</strong><span class="muted small">Hotel-Flyer &amp; Buchungsseite</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=private"><span class="ic"><?= admin_icon('private') ?></span><strong>Private Pottery</strong><span class="muted small"><?= $privateOpen ?> offen</span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=edit"><span class="ic"><?= admin_icon('plus') ?></span><strong>Einzeltermin</strong><span class="muted small">z. B. ein Special-Kurs</span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=series"><span class="ic"><?= admin_icon('serie') ?></span><strong>Serientermine</strong><span class="muted small">z. B. jeden Mi &amp; Fr</span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=edit"><span class="ic"><?= admin_icon('plus') ?></span><strong>Neuer Termin</strong><span class="muted small">einzeln oder als Serie</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=templates"><span class="ic"><?= admin_icon('template') ?></span><strong>Templates</strong><span class="muted small">&amp; Maker Club</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=gutscheine"><span class="ic"><?= admin_icon('gutschein') ?></span><strong>Gutscheine</strong><span class="muted small"><?= $voucherOpen ?> offen<?= $voucherUnpaid ? ' · <b style="color:#8C2C1D">' . $voucherUnpaid . ' noch nicht bezahlt</b>' : '' ?></span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=rechnungen"><span class="ic"><?= admin_icon('rechnung') ?></span><strong>Rechnungen</strong><span class="muted small">automatisch nach Zahlung</span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=angebote"><span class="ic"><?= admin_icon('angebot') ?></span><strong>Angebote</strong><span class="muted small"><?= $offerOpen ? $offerOpen . ' noch nicht bestätigt' : 'für Gruppen &amp; Schulen' ?><?= $offerUnpaid ? ' · <b style="color:#8C2C1D">' . $offerUnpaid . ' noch nicht bezahlt</b>' : '' ?></span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=liste"><span class="ic"><?= admin_icon('mail') ?></span><strong>E-Mail-Liste</strong><span class="muted small"><?= $subCount ?> <?= $subCount === 1 ? 'Kontakt' : 'Kontakte' ?></span></a>
             <a class="tile" href="<?= forma_h($self) ?>?view=popup"><span class="ic"><?= admin_icon('popup') ?></span><strong>Pop-up &amp; Deko</strong><span class="muted small"><?= $popupLive ? 'gerade sichtbar' : 'ausgeschaltet' ?> · Deko</span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=tests"><span class="ic"><?= admin_icon('test') ?></span><strong>Testbuchungen</strong><span class="muted small">jedes Angebot ausprobieren</span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=einstellungen"><span class="ic"><?= admin_icon('settings') ?></span><strong>Einstellungen</strong><span class="muted small">Stripe, MailerLite, E-Mail</span></a>
+            <a class="tile" href="<?= forma_h($self) ?>?view=einstellungen"><span class="ic"><?= admin_icon('settings') ?></span><strong>Einstellungen</strong><span class="muted small">Stripe, Mails, Testbuchungen</span></a>
         </nav>
     </div>
     <h2 id="termine">Alle kommenden Kurstermine</h2>
@@ -2766,6 +2766,9 @@ input:focus,textarea:focus{outline:3px solid #B05A38;outline-offset:1px}
 .sel{user-select:all;overflow-wrap:anywhere}
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:8px 0 4px}
+p.seg{display:inline-flex;flex-wrap:wrap;gap:4px;background:#EAD8C6;border-radius:999px;padding:4px;margin:4px 0 14px}
+p.seg a,p.seg span{padding:8px 18px;border-radius:999px;text-decoration:none;color:#8C2C1D}
+p.seg span.on{background:#8C2C1D;color:#FBF1EA}
 .tile{display:flex;flex-direction:column;gap:2px;padding:14px 16px;border-radius:16px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--ink)}
 .tile:hover{border-color:var(--clay)}
 .group{margin-bottom:12px}.group summary{cursor:pointer;padding:8px 0;list-style-position:outside}

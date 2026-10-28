@@ -240,7 +240,7 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
 </style>
 <?php mm_subnav('videos'); ?>
 <section class="vh"><h1>🎬 Videos hochladen</h1><p>Oben steht immer, was als Nächstes dran ist. Tipp auf ein Video, dann siehst du jede Übung mit „Clip“, „Deutsch einsprechen“ und „Englisch einsprechen“. Eine Übung, die du einmal gefilmt hast, steckt automatisch in allen Videos mit dieser Übung.</p>
-  <a class="lk" href="<?= $u('view=mediathek') ?>">📚 Zur Mediathek: alle Übungen nach Jahreszeit &amp; Stil</a> <a class="lk" href="<?= $u('view=studio') ?>">🎥 Talking-Head-Studio</a></section>
+</section>
 <?php if ($flash): ?><p class="alert"><?= $h($flash) ?></p><?php endif; ?>
 <?php if (!$bunny): ?><p class="warn">Bevor du Clips hochladen kannst, muss einmal Bunny verbunden werden: <a href="<?= $u('view=method') ?>#bunny">hier verbinden</a>. Einsprechen geht schon jetzt.</p><?php endif; ?>
 
