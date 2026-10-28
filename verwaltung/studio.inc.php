@@ -131,6 +131,11 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 .pr{position:absolute;left:0;right:0;top:0;height:42%;min-height:120px;overflow:hidden;background:rgba(36,28,32,.8);color:#FBF5F7;z-index:7;pointer-events:auto;cursor:pointer;border-radius:22px 22px 0 0}
 .pr::after{content:'';position:absolute;left:0;right:0;bottom:0;height:30%;background:linear-gradient(rgba(36,28,32,0),rgba(36,28,32,.95));pointer-events:none}
 .pr[hidden]{display:none}
+/* An der Kamera (Vivien, 28.10.2026: „sieht aus, als würde ich nach unten schauen“): während der Aufnahme ganz oben, mittig unter der Linse, schmal, 3 Zeilen */
+body.prtop .pr.top{display:block;position:fixed;top:0;left:50%;right:auto;transform:translateX(-50%);width:min(560px,94vw);height:calc(var(--fs,30px) * 1.4 * 3 + 22px + env(safe-area-inset-top,0px));min-height:0;padding-top:env(safe-area-inset-top,0px);border-radius:0 0 22px 22px;z-index:200;background:rgba(36,28,32,.94);box-shadow:0 8px 24px -10px rgba(0,0,0,.5)}
+body.prtop .pr.top .pr-t{padding:10px 3% 60%;line-height:1.4}
+body.prtop .pr.top::after{height:34%}
+body.prtop .mtools{visibility:hidden}
 body.recording .tc-st,body.recording .tc-hint,body.recording .tc-guide{display:none!important}
 .pr-t{position:relative;padding:14px 6% 60%;white-space:pre-wrap;font:400 var(--fs,30px)/1.45 "Hanken Grotesk","Outfit",system-ui,sans-serif;text-align:center}
 .pr-t .hint{color:#C9B7BD;font-size:.6em}
@@ -464,6 +469,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
         <button type="button" id="prTop" aria-label="zum Anfang">⟲ Anfang</button>
       </div>
       <label class="chk"><input type="checkbox" id="prAuto" checked> Text läuft mit der Aufnahme los</label>
+      <label class="chk"><input type="checkbox" id="prCam" checked> Beim Aufnehmen ganz oben an der Kamera (Blick in die Linse)</label>
       <p class="tip" style="margin-top:8px">Tippen auf den Text oder Leertaste: Pause und weiter.</p>
     </div>
     <div class="box" id="lookBox"><h2>✨ Kamera-Look</h2><div id="panel"></div></div>
@@ -534,6 +540,12 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   document.querySelectorAll('[data-fs]').forEach(b=>b.onclick=()=>{fs=Math.max(18,Math.min(60,fs+(+b.dataset.fs)));pr.style.setProperty('--fs',fs+'px');ls.set('st-fs',fs)});
   $('prTop').onclick=()=>{prMove(0,true);run=false};
   $('prOn').onclick=()=>{pr.hidden=!pr.hidden;$('prOn').setAttribute('aria-pressed',String(!pr.hidden));$('prOn').textContent=pr.hidden?'Text aus':'Text an'};
+  // Text beim Aufnehmen ganz oben an der Kamera (eigenes Element am <body>, damit nichts verschiebt)
+  try{$('prCam').checked=ls.get('st-prcam','1')!=='0'}catch(e){}
+  $('prCam').onchange=()=>ls.set('st-prcam',$('prCam').checked?'1':'0');
+  function prTop(on){on=on&&$('prCam').checked&&!pr.hidden;if(on===pr.classList.contains('top'))return;
+    if(on){document.body.appendChild(pr);pr.classList.add('top')}else{pr.classList.remove('top');const st=$('stage');st&&st.insertBefore(pr,st.querySelector('.cd'))}
+    document.body.classList.toggle('prtop',on);prMove(0,true)}
   // eigener Text je Sprache (für Untertitel in der anderen Sprache)
   if(ls.get('st-own-de',null)===null&&ls.get('st-own',''))ls.set('st-own-de',ls.get('st-own',''));
   const ownOf=lg=>ls.get('st-own-'+lg,'');
@@ -633,7 +645,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   $('go').onclick=async()=>{
     if(!tc){$('msg').textContent='Die Kamera läuft noch nicht.';return}
     if(!window.MediaRecorder){$('msg').textContent='Dieser Browser kann nicht aufnehmen. Bitte Chrome oder Safari nehmen.';return}
-    $('go').hidden=true;$('msg').textContent='';
+    $('go').hidden=true;$('msg').textContent='';prTop(true);
     for(const n of [3,2,1]){$('cd').textContent=n;await new Promise(r=>setTimeout(r,800))}$('cd').textContent='';
     const mt=mime(),big=tc.canvas.width*tc.canvas.height>1.5e6;
     rec=new MediaRecorder(tc.stream(30),Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:big?8000000:5000000,audioBitsPerSecond:160000}));
@@ -642,7 +654,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
       const url=URL.createObjectURL(blob);$('play').src=url;const ext=blob.type.includes('mp4')?'mp4':'webm';
       const d=new Date(),stamp=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+'-'+String(d.getMinutes()).padStart(2,'0');
       $('dl').href=url;$('dl').download=(tgt&&tgt.ig?tgt.ig.day+'_'+(tgt.ig.kind==='reel'?'Reel':'Story')+'_'+tgt.ig.t.slice(0,30):tgt&&tgt.clip?'Uebung_'+tgt.clip.n+'_'+stamp:(mvFree?'Bewegung_'+stamp:'TalkingHead_'+(tgt?tgt.t.t:'Eigener-Text')+'_'+(tgt?tgt.lang:lang).toUpperCase()+'_'+stamp)).replace(/[^\wäöüÄÖÜß-]+/g,'-')+'.'+ext;
-      $('rd').hidden=true;$('stop').hidden=true;run=false;document.body.classList.remove('recording');showAfter();
+      $('rd').hidden=true;$('stop').hidden=true;run=false;document.body.classList.remove('recording');prTop(false);showAfter();
       $('msg').className='msg';$('msg').textContent='Schau es dir kurz an. Passt es, '+(tgt&&BUNNY?'tippe auf „Hochladen“ oder lade es herunter.':'lade es herunter.');
       if(lock){lock.release().catch(()=>{});lock=null}};
     fromFile=false;tgt=mv?{clip:mv}:(ig?{ig:ig}:(cur?{t:cur,lang:lang}:null));rec.start(1000);t0=performance.now();$('stop').hidden=false;$('rd').hidden=false;
@@ -777,7 +789,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     if(!tc){$('msg').textContent='Die Kamera läuft noch nicht.';return}
     if(!baseName)baseName=slug(cur?cur.t:'Story')+'_'+lang.toUpperCase()+'_'+stamp();
     meter();cs={i:i,single:!!single,rec:null,discard:false};setText();clipUi();
-    $('cgo').hidden=true;$('msg').textContent='';
+    $('cgo').hidden=true;$('msg').textContent='';prTop(true);
     for(const n of [3,2,1]){$('cd').textContent=n;await new Promise(r=>setTimeout(r,650))}$('cd').textContent='';
     if(!cs)return;
     const mt=mime(),big=tc.canvas.width*tc.canvas.height>1.5e6,ch=[];
@@ -802,7 +814,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   function stopRec(discard){if(cs&&cs.rec&&cs.rec.state==='recording'){cs.rec._cs.discard=!!discard;cs.rec.stop()}$('rd').hidden=true;run=false;document.body.classList.remove('recording')}
   function delClip(i){const c=clips[i];if(!c)return;URL.revokeObjectURL(c.url);if(c.sub)URL.revokeObjectURL(c.sub.url);clips[i]=null;if(lastClip===i)lastClip=-1;renderClips();clipUi();$('msg').className='msg';$('msg').textContent='🗑 Absatz '+(i+1)+' gelöscht. Nimm ihn einfach neu auf.'}
   $('cdel').onclick=()=>{if(cs&&cs.rec)return;delClip(lastClip)};
-  function finish(){stopRec(false);cs=null;slab.hidden=false;showSlide();slab.textContent='Fertig ✓';if(lock){lock.release().catch(()=>{});lock=null}clipUi();
+  function finish(){stopRec(false);prTop(false);cs=null;slab.hidden=false;showSlide();slab.textContent='Fertig ✓';if(lock){lock.release().catch(()=>{});lock=null}clipUi();
     const n=clips.filter(Boolean).length;$('msg').className='msg ok';$('msg').textContent=n?'✓ '+n+' Clip'+(n>1?'s':'')+' fertig. Rechts kannst du sie ansehen, neu aufnehmen, sichern oder Untertitel dazu machen.':'';}
   $('cgo').onclick=()=>startClip(+($('cgo').dataset.start||0));
   $('cnext').onclick=()=>{if(!cs)return;const i=cs.i,single=cs.single;stopRec(false);const n=paras(lang).length;
