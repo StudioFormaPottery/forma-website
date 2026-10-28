@@ -41,7 +41,7 @@ function mv_menu(string $active = '', array $o = []): void
 <?php endif; ?>
 <button class="mvm-btn" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mvm-panel"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14"/></svg></button>
 <?php if ($assets) return; $assets = true; ?>
-<script src="/wildhearts/assets/musik.js?v=1" defer></script>
+<script src="/wildhearts/assets/musik.js?v=2" defer></script>
 <div class="mvm" id="mvm-panel" role="dialog" aria-modal="true" aria-label="Menü" hidden>
   <div class="mvm-top">
     <a class="mvm-brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt="" width="28" height="28">Movecia</a>

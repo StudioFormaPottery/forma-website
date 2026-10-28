@@ -30,6 +30,8 @@
     + '.mvmu.hint .mvmu-n{display:none}'
     + '.mvmu.hint .mvmu-b .ring{animation:mvmuPulse 2s ease-in-out infinite}'
     + '@keyframes mvmuPulse{50%{opacity:.15;scale:1.12}}'
+    + '.mvmu.intro{animation:mvmuIn .7s cubic-bezier(.3,1.3,.5,1) both}'
+    + '@keyframes mvmuIn{from{opacity:0;transform:translateY(24px)}}'
     + '@media(prefers-reduced-motion:reduce){.mvmu-b .eq i,.mvmu.hint .mvmu-b .ring{animation:none}.mvmu-b .eq i{height:12px}}'
     + '@media print{.mvmu{display:none}}';
   var s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
@@ -49,7 +51,7 @@
     btn.setAttribute('aria-label', on ? (en() ? 'Pause music' : 'Musik pausieren') : (en() ? 'Play soft music' : 'Leise Musik abspielen'));
     btn.title = btn.getAttribute('aria-label');
     nx.setAttribute('aria-label', en() ? 'Next song' : 'Nächstes Lied');
-    if (box.classList.contains('hint')) tEl.textContent = en() ? 'Tap for music' : 'Tippen für Musik';
+    if (box.classList.contains('hint')) tEl.textContent = en() ? 'Soft music? Tap to listen' : 'Leise Musik? Hier antippen';
   }
   function fade(to, ms, done) {
     clearInterval(fadeT); var from = a.volume, t0 = Date.now();
@@ -82,6 +84,8 @@
     if (box.classList.contains('on')) pause();
     else play().catch(function () {});
   });
+  tEl.addEventListener('click', function () { if (box.classList.contains('hint')) play().catch(function () {}); });
+  tEl.style.cursor = 'pointer';
   nx.addEventListener('click', function () {
     fade(0, 400, function () { load(st.i + 1, 0); a.play().then(function () { fade(VOL, 1500); }).catch(function () {}); });
   });
@@ -104,8 +108,24 @@
     }
     list = st.order.map(function (k) { return list[k]; }).filter(Boolean);
     if (st.i >= list.length) st.i = 0;
+    // Über der Fußzeile stehen bleiben, damit der Name unten lesbar bleibt (Vivien, 28.10.2026)
+    var foot = null;
+    function lift() {
+      if (!foot) foot = document.querySelector('footer, .foot');
+      var b = 16;
+      if (foot) { var top = foot.getBoundingClientRect().top; if (top < innerHeight) b = innerHeight - top + 16; }
+      box.style.bottom = 'calc(' + Math.round(b) + 'px + env(safe-area-inset-bottom))';
+    }
     var mount = function () { document.body.appendChild(box); label(); ready = true;
-      if (st.on) play().catch(function () { box.classList.add('hint'); label(); });
+      lift(); addEventListener('scroll', lift, { passive: true }); addEventListener('resize', lift);
+      if (st.on) { play().catch(function () { box.classList.add('hint'); label(); }); return; }
+      // Am Anfang als kleines Pop-up unten links zeigen (einmal pro Besuch), damit man den Player sieht
+      var seen = false; try { seen = sessionStorage.getItem('mv-mu-intro') === '1'; sessionStorage.setItem('mv-mu-intro', '1'); } catch (e) {}
+      if (seen) return;
+      box.classList.add('intro', 'hint'); label();
+      var hov = false; box.addEventListener('mouseenter', function () { hov = true; }); box.addEventListener('mouseleave', function () { hov = false; });
+      var close = function () { if (hov) return setTimeout(close, 1500); if (!box.classList.contains('on')) { box.classList.remove('hint'); label(); } };
+      setTimeout(close, 9000);
     };
     if (document.body) mount(); else document.addEventListener('DOMContentLoaded', mount);
   }).catch(function () {});
