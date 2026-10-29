@@ -31,6 +31,64 @@ const FORMA_ADMIN_NEWS = [
     ['until' => '2026-11-15', 'title' => 'Neu: Angebote für Gruppen & Schulen', 'text' => 'Angebot anlegen, per WhatsApp schicken, Bestätigung und Vorabrechnung laufen automatisch', 'link' => '?view=angebote'],
 ];
 
+/**
+ * Neu-Boxen wegwischen (Vivien, 29.10.2026: „das sind ja nur Infos, wie Benachrichtigungen“).
+ * Gemerkt am Server (Setting news_hidden), damit sie auf iPhone und MacBook gleich weg sind.
+ */
+function admin_news_key(array $nw): string
+{
+    return substr(md5($nw['title']), 0, 12);
+}
+
+function admin_news_list(PDO $pdo, string $b): array
+{
+    $hidden = json_decode((string)(forma_setting($pdo, 'news_hidden') ?? '[]'), true) ?: [];
+    return array_values(array_filter(FORMA_ADMIN_NEWS, fn($nw) => date('Y-m-d') <= $nw['until']
+        && ($nw['b'] ?? 'forma') === $b && !in_array(admin_news_key($nw), $hidden, true)));
+}
+
+function admin_news_render(PDO $pdo, string $b, string $self, string $back): void
+{
+    $list = admin_news_list($pdo, $b);
+    if (!$list) return;
+    $hid = '<input type="hidden" name="csrf" value="' . forma_h(csrf()) . '"><input type="hidden" name="action" value="news_hide"><input type="hidden" name="back" value="' . forma_h($back) . '">';
+    echo '<div class="newsbox">';
+    foreach ($list as $nw) {
+        echo '<div class="nwi"><a href="' . forma_h($self . $nw['link']) . '"><span class="ic">✨</span><span><b>' . forma_h($nw['title']) . '</b><br><span class="nwt">' . forma_h($nw['text']) . ' →</span></span></a>'
+            . '<form method="post">' . $hid . '<button class="nwx" name="k" value="' . admin_news_key($nw) . '" title="Wegwischen" aria-label="Wegwischen">×</button></form></div>';
+    }
+    if (count($list) > 1) {
+        echo '<form method="post" class="nwall">' . $hid . '<button name="k" value="all_' . forma_h($b) . '">Alle wegwischen</button></form>';
+    }
+    echo '</div>';
+    echo <<<'HTML'
+<style>
+.newsbox{margin:12px 0}
+.nwi{position:relative;display:flex;align-items:flex-start;margin:0 0 10px;border-radius:20px;border:1.5px dashed #C9B0B8;background:#FBF8F4;touch-action:pan-y;transition:transform .25s,opacity .25s,max-height .3s,margin .3s;overflow:hidden;max-height:400px}
+.nwi a{display:flex;gap:12px;align-items:flex-start;flex:1;padding:14px 4px 14px 18px;color:#4A3A41;text-decoration:none}
+.nwi .ic{font-size:22px}.nwi b{font-size:17px}.nwt{font-size:15px;color:#7D7076}
+.nwi form{margin:0}
+.nwx{border:0;background:none;color:#9C8A91;font-size:26px;line-height:1;padding:10px 14px;cursor:pointer;border-radius:50%}
+.nwx:hover{color:#4A3A41;background:#F0E8E2}
+.nwall{text-align:right;margin:-2px 0 6px}.nwall button{border:0;background:none;color:#7D7076;font-size:14px;text-decoration:underline;cursor:pointer}
+.nwi.gone{opacity:0;max-height:0;margin:0;border-width:0}
+</style>
+<script>
+(function(){
+  function hide(el){var b=el.querySelector('.nwx'),d=new FormData(b.form);d.append('k',b.value);d.append('ajax','1');
+    fetch(location.href,{method:'POST',body:d,credentials:'same-origin'});setTimeout(function(){el.classList.add('gone')},200);}
+  document.querySelectorAll('.nwi').forEach(function(el){
+    var x0=null,dx=0;
+    el.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;dx=0;el.style.transition='none'},{passive:true});
+    el.addEventListener('touchmove',function(e){if(x0===null)return;dx=e.touches[0].clientX-x0;el.style.transform='translateX('+dx+'px)';el.style.opacity=String(1-Math.min(Math.abs(dx)/260,.7))},{passive:true});
+    el.addEventListener('touchend',function(){el.style.transition='';if(Math.abs(dx)>90){el.style.transform='translateX('+(dx>0?'110%':'-110%')+')';hide(el)}else{el.style.transform='';el.style.opacity=''}x0=null});
+    el.querySelector('.nwx').addEventListener('click',function(e){e.preventDefault();el.style.transform='translateX(110%)';hide(el)});
+  });
+})();
+</script>
+HTML;
+}
+
 function go(string $url, ?string $flash = null): void
 {
     if ($flash !== null) {
@@ -250,6 +308,21 @@ if (!$loggedIn) {
 // --- Ab hier nur angemeldet -------------------------------------------------
 if ($action !== '') {
     check_csrf();
+}
+if ($action === 'news_hide') {
+    $k = (string)($_POST['k'] ?? '');
+    $hidden = json_decode((string)(forma_setting($pdo, 'news_hidden') ?? '[]'), true) ?: [];
+    if (str_starts_with($k, 'all_')) {
+        foreach (admin_news_list($pdo, substr($k, 4)) as $nw) $hidden[] = admin_news_key($nw);
+    } elseif (preg_match('/^[0-9a-f]{12}$/', $k)) {
+        $hidden[] = $k;
+    }
+    // nur Schlüssel behalten, die es noch gibt
+    $live = array_map('admin_news_key', FORMA_ADMIN_NEWS);
+    forma_set_setting($pdo, 'news_hidden', json_encode(array_values(array_intersect(array_unique($hidden), $live))));
+    if (!empty($_POST['ajax'])) { header('Content-Type: application/json'); exit('{"ok":true}'); }
+    $back = (string)($_POST['back'] ?? '');
+    go($self . (str_starts_with($back, '?') ? $back : ''));
 }
 
 if ($action === 'logout') {
@@ -2594,7 +2667,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
     require_once __DIR__ . '/feed.inc.php';
     admin_offer_chip($pdo, $self);
     admin_feed_box($pdo, $self);
-    $fnews = array_values(array_filter(FORMA_ADMIN_NEWS, fn($nw) => date('Y-m-d') <= $nw['until'] && ($nw['b'] ?? 'forma') === 'forma'));
+    $fnews = admin_news_list($pdo, 'forma'); // weggewischte Boxen ausgeblendet
     if ($fnews): ?>
         <details class="card fnews"><summary>✨ Neu in deiner Verwaltung (<?= count($fnews) ?>)</summary>
         <?php foreach ($fnews as $nw): ?><a class="fnews-it" href="<?= forma_h($self . $nw['link']) ?>"><strong><?= forma_h($nw['title']) ?></strong><br><span class="muted small"><?= forma_h($nw['text']) ?> →</span></a><?php endforeach; ?>
