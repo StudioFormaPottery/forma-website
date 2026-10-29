@@ -92,6 +92,21 @@ $mmBack = $self . '?view=movecia';
 
 // Personal Training Anfragen (Vivien, 26.10.2026)
 require_once dirname(__DIR__) . '/api/mm-pt.inc.php';
+if ($action === 'mm_tm_new' || $action === 'mm_tm_reset' || $action === 'mm_tm_del') {
+    require_once dirname(__DIR__) . '/api/termin-lib.php';
+    tm_schema($pdo);
+    $tid = (int)($_POST['tid'] ?? 0);
+    if ($action === 'mm_tm_new') {
+        $d = (string)($_POST['date'] ?? '');
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $d) || trim((string)($_POST['title'] ?? '')) === '') go($mmBack . '#termine', 'Bitte Titel und Tag eintragen.');
+        tm_create($pdo, ['title' => trim((string)$_POST['title']), 'guest' => trim((string)($_POST['guest'] ?? '')), 'intro' => trim((string)($_POST['intro'] ?? '')), 'date' => $d,
+            'times' => str_replace([' ', ';', '.'], [',', ',', ':'], trim((string)($_POST['times'] ?? ''))), 'minutes' => (int)($_POST['minutes'] ?? 45), 'script' => trim((string)($_POST['script'] ?? ''))]);
+        go($mmBack . '#termine', 'Termin-Link angelegt.');
+    }
+    if ($action === 'mm_tm_reset') { tm_reset($pdo, $tid); go($mmBack . '#termine', 'Die Uhrzeit ist wieder frei, der Link funktioniert weiter.'); }
+    tm_reset($pdo, $tid); $pdo->prepare("UPDATE mm_termine SET status = 'geloescht' WHERE id = ?")->execute([$tid]);
+    go($mmBack . '#termine', 'Termin-Link gelöscht.');
+}
 if ($action === 'mm_pt_done' || $action === 'mm_pt_open' || $action === 'mm_pt_delete') {
     mm_pt_schema($pdo);
     $pid = (int)($_POST['pid'] ?? 0);
@@ -400,6 +415,40 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .qa .ic{font-size:26px;line-height:1}
 .qa .main{background:#7D5E68;border-color:#7D5E68}.qa .main b,.qa .main span{color:#FBF5F7}
 </style>
+        <?php if ($part === ''): require_once dirname(__DIR__) . '/api/termin-lib.php'; $tmList = []; try { $tmList = tm_list($pdo); } catch (Throwable $e) {} ?>
+        <section id="termine" style="margin:18px 0;padding:18px 20px;border-radius:22px;background:#FBF8F4;border:1px solid #DDD2C6">
+            <h2 style="margin:0 0 .3rem">📅 Termin-Links für Videogespräche</h2>
+            <p style="margin:0 0 .8rem;color:#7D7076;font-size:16px">Link schicken, die Person tippt eine Uhrzeit an, der Termin ist sofort fix. Du bekommst eine Mail mit deinem Gastgeberinnen-Fenster (Teleprompter mit Gesprächsleitfaden).</p>
+            <?php foreach ($tmList as $tm): $tl = tm_link($tm); $hl = tm_host_link($tm); ?>
+            <div style="background:#fff;border-radius:18px;padding:14px 16px;margin:0 0 10px;border:1px solid #EADFDE">
+                <p style="margin:0;font-size:17px"><b><?= forma_h($tm['title']) ?></b><?= $tm['guest'] !== '' ? ' · ' . forma_h($tm['guest']) : '' ?></p>
+                <p style="margin:.25rem 0;font-size:16px;color:#4A3A41"><?php if ($tm['status'] === 'fix'): ?>✓ Fix: <?= forma_h(tm_when($tm)) ?> · <?= forma_h($tm['name']) ?> (<?= forma_h($tm['email']) ?>)<?= $tm['note'] !== '' ? '<br><span style="color:#7D7076">„' . forma_h($tm['note']) . '“</span>' : '' ?><?php else: ?>⏳ Noch keine Uhrzeit gewählt · <?= forma_h(tm_day($tm)) ?>, zur Wahl: <?= forma_h(str_replace(',', ', ', $tm['times'])) ?> Uhr<?php endif; ?></p>
+                <p style="margin:.4rem 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+                    <input readonly value="<?= forma_h($tl) ?>" onclick="this.select()" style="flex:1;min-width:220px;font-size:15px;padding:.5em .8em;border-radius:12px;border:1px solid #DDD2C6">
+                    <button type="button" onclick="navigator.clipboard.writeText('<?= forma_h($tl) ?>');this.textContent='Kopiert ✓'" style="font-size:15px;padding:.5em 1em;border-radius:999px;border:1px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer">Link kopieren</button>
+                    <a href="<?= forma_h($tl) ?>" target="_blank" style="font-size:15px">So sieht sie es</a>
+                    <?php if ($hl): ?><a href="<?= forma_h($hl) ?>" target="_blank" style="font-size:15px;padding:.5em 1em;border-radius:999px;background:#7D5E68;color:#FBF5F7;text-decoration:none">Als Gastgeberin öffnen</a><?php endif; ?>
+                </p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <?php if ($tm['status'] === 'fix'): ?><form method="post" style="margin:0" onsubmit="return confirm('Uhrzeit wieder freigeben? Sie kann dann neu wählen (bitte selbst Bescheid geben).')"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="tid" value="<?= (int)$tm['id'] ?>"><input type="hidden" name="action" value="mm_tm_reset"><button style="font-size:14px;padding:.45em .9em;border-radius:999px;border:1px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer">Uhrzeit wieder freigeben</button></form><?php endif; ?>
+                    <form method="post" style="margin:0" onsubmit="return confirm('Termin-Link löschen?')"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="tid" value="<?= (int)$tm['id'] ?>"><input type="hidden" name="action" value="mm_tm_del"><button style="font-size:14px;padding:.45em .9em;border:0;background:none;color:#7D7076;cursor:pointer">löschen</button></form>
+                </div>
+            </div>
+            <?php endforeach; ?>
+            <details><summary style="cursor:pointer;font-size:16px;color:#7D5E68">＋ Neuen Termin-Link anlegen</summary>
+                <form method="post" style="display:grid;gap:8px;margin-top:10px;max-width:560px"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_tm_new">
+                    <label>Worum geht es?<input name="title" required placeholder="z. B. Fotoshooting im Atelier" style="width:100%"></label>
+                    <label>Anrede auf der Seite („Hallo, …!“)<input name="guest" placeholder="z. B. Maria" style="width:100%"></label>
+                    <label>Kurzer Text für sie (freiwillig)<textarea name="intro" rows="2" style="width:100%"></textarea></label>
+                    <label>Tag<input type="date" name="date" required></label>
+                    <label>Uhrzeiten zur Wahl<input name="times" value="08:00, 08:30, 09:00, 09:30, 10:00" style="width:100%"></label>
+                    <label>Dauer (Minuten)<input type="number" name="minutes" value="45" min="15" max="180"></label>
+                    <label>Gesprächsleitfaden für deinen Teleprompter (freiwillig, [Überschriften] erscheinen klein)<textarea name="script" rows="5" style="width:100%"></textarea></label>
+                    <button style="justify-self:start;font-size:16px;padding:.6em 1.2em;border-radius:999px;border:0;background:#7D5E68;color:#FBF5F7;cursor:pointer">Anlegen</button>
+                </form>
+            </details>
+        </section>
+        <?php endif; ?>
         <?php $ptList = []; try { $ptList = mm_pt_list($pdo); } catch (Throwable $e) {} ?>
         <?php if ($part === '' && $ptList): ?>
         <section id="pt" style="margin:18px 0;padding:18px 20px;border-radius:22px;background:#FBF8F4;border:1px solid #DDD2C6">

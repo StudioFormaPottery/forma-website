@@ -21,6 +21,7 @@ unset($_SESSION['flash']);
  */
 // Neu-Boxen: 'b' => 'movecia' erscheint nur auf der Movecia-Übersicht, sonst nur bei FORMA (Vivien, 28.10.2026).
 const FORMA_ADMIN_NEWS = [
+    ['b' => 'movecia', 'until' => '2026-11-30', 'title' => 'Neu: 📅 Termin-Links für Videogespräche', 'text' => 'Link schicken, die Person tippt selbst eine Uhrzeit an, der Termin ist sofort fix, mit Videoraum und deinem Teleprompter. Der Link fürs Marigold (Montag, 2. November) ist schon angelegt', 'link' => '?view=movecia#termine'],
     ['b' => 'movecia', 'until' => '2026-11-30', 'title' => 'Neu: ✦ Kennenlern-Preis im Gespräch', 'text' => 'Im Kennenlerngespräch einmal „✦ Angebot zeigen“ tippen: Sie sieht in ihrem Gesprächsraum sofort die Karte mit dem Kennenlern-Preis (20 Min.) und bekommt ihn per Mail. Preis unter Academy → Kennenlerngespräche änderbar.', 'link' => '?view=academy#kennenlernpreis'],
     ['b' => 'movecia', 'until' => '2026-11-20', 'title' => 'Neu im Studio: 📜 Nur Teleprompter', 'text' => 'Du filmst mit der Kamera-App am iPhone, am MacBook läuft nur der Text ganz oben unter der Linse. Danach das Video über „🎞 Video vom Gerät bearbeiten“ holen', 'link' => '?view=studio'],
     ['b' => 'movecia', 'until' => '2026-11-20', 'title' => 'Neu im Studio: iPhone als Kamera', 'text' => 'Unter dem Kamerabild „📱 iPhone als Kamera“ tippen: dein iPhone filmt, Teleprompter und alles andere bleiben am MacBook', 'link' => '?view=studio'],
