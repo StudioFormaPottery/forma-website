@@ -40,7 +40,7 @@ function mv_next_popup(): void
         return $l === 'en' ? $d->format('j F') : $d->format('j') . '. ' . $m[(int)$d->format('n')];
     };
     if ($ph === 'method') {
-        $p = ['img' => '/img/movecia/fotos/ev-katze-kuh.jpg', 'pos' => '62% 55%', 'href' => '/method/',
+        $p = ['img' => '/img/movecia/fotos/ev-method-karte.jpg', 'pos' => '40% 30%', 'href' => '/method/',
             'k' => ['Mindful Movement Method · Start ' . $short($ml, 'de'), 'Mindful Movement Method · starts ' . $short($ml, 'en')],
             'h' => ['Jeden Tag ein paar <em>ruhige Minuten</em> für dich', 'A few <em>quiet minutes</em> for you, every day'],
             't' => ['Kurze Videos aus Yoga, Somatic Movement und Bodyweight, dazu Breathwork und Meditation. Du beginnst bei Monat 1 und gehst Schritt für Schritt weiter.', 'Short videos of yoga, somatic movement and bodyweight training, plus breathwork and meditation. You begin with month 1 and go step by step.'],
@@ -94,15 +94,7 @@ function mv_next_popup(): void
     <div class="npop-card" tabindex="-1">
       <button class="npop-x" type="button" aria-label="Schließen / Close">✕</button>
       <div class="npop-side">
-        <svg class="npop-waves" viewBox="0 0 1200 200" preserveAspectRatio="none" aria-hidden="true">
-          <path class="w1" d="M0 120 C150 70 300 170 450 120 S750 70 900 120 S1150 170 1200 120 V200 H0Z"/>
-          <path class="w2" d="M0 140 C200 100 400 180 600 140 S1000 100 1200 140 V200 H0Z"/>
-          <path class="w3" d="M0 165 C150 140 300 190 450 165 S750 140 900 165 S1150 190 1200 165 V200 H0Z"/>
-        </svg>
-        <span class="npop-blob b1" aria-hidden="true"></span><span class="npop-blob b2" aria-hidden="true"></span>
-        <span class="npop-spk s1" aria-hidden="true"></span><span class="npop-spk s2" aria-hidden="true"></span><span class="npop-spk s3" aria-hidden="true"></span>
         <div class="npop-orb">
-          <div class="npop-ring" aria-hidden="true"></div>
           <div class="npop-pic">
             <div class="npop-ph" style="background-image:url(<?= forma_h($p['img']) ?>);background-position:<?= forma_h($p['pos']) ?>"></div>
           </div>
@@ -131,38 +123,14 @@ function mv_next_popup(): void
 .npop-stage{position:relative;margin:auto;width:min(860px,100%);transform:translateY(26px) scale(.96);transition:transform .8s cubic-bezier(.2,1.2,.3,1)}
 .npop.on .npop-stage{transform:none}
 .npop-card{outline:0;position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);background:var(--cr);border-radius:32px;overflow:hidden;box-shadow:0 34px 80px rgba(46,37,41,.3)}
-/* linke Seite: Pflaume, Wellen, Mondring */
-.npop-side{position:relative;min-height:440px;display:grid;place-items:center;padding:42px 24px 64px;background:radial-gradient(120% 90% at 20% 0%,#9A7884 0%,var(--pl) 42%,var(--dp) 100%);overflow:hidden;isolation:isolate}
-.npop-waves{position:absolute;left:0;bottom:0;width:200%;height:42%;z-index:-1}
-.npop-waves path{fill:var(--cr)}
-.npop-waves .w1{opacity:.08;animation:npw 16s linear infinite}
-.npop-waves .w2{opacity:.12;animation:npw 11s linear infinite reverse}
-.npop-waves .w3{opacity:.2;animation:npw 8s linear infinite}
-@keyframes npw{to{transform:translateX(-50%)}}
-.npop-blob{position:absolute;z-index:-1;border-radius:46% 54% 60% 40%/50% 42% 58% 50%;filter:blur(2px)}
-.npop-blob.b1{width:220px;height:200px;left:-70px;top:-60px;background:rgba(232,214,202,.18);animation:npb 14s ease-in-out infinite alternate}
-.npop-blob.b2{width:160px;height:150px;right:-50px;top:38%;background:rgba(234,223,222,.14);animation:npb 11s ease-in-out infinite alternate-reverse}
-@keyframes npb{to{transform:translate(18px,24px) rotate(40deg);border-radius:58% 42% 38% 62%/44% 60% 40% 56%}}
-.npop-spk{position:absolute;width:12px;height:12px;background:var(--pf);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);opacity:0;animation:nps 3.6s ease-in-out infinite}
-.npop-spk.s1{left:14%;top:16%}.npop-spk.s2{right:13%;top:24%;width:9px;height:9px;animation-delay:1.2s}.npop-spk.s3{left:20%;bottom:30%;width:8px;height:8px;animation-delay:2.3s}
-@keyframes nps{0%,100%{opacity:0;transform:scale(.5) rotate(0)}50%{opacity:.9;transform:scale(1) rotate(45deg)}}
-.npop-orb{--r:150px;position:relative;width:calc(var(--r)*2);height:calc(var(--r)*2);display:grid;place-items:center}
-.npop-ring{position:absolute;inset:0;border-radius:50%;border:1px dashed rgba(251,248,244,.35);animation:npr 70s linear infinite}
-.npop-ring .mp{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px;opacity:0;transform:rotate(var(--a)) translateY(calc(var(--r) * -1)) rotate(calc(var(--a) * -1));transition:opacity .5s calc(.5s + var(--n) * .08s)}
-.npop.on .npop-ring .mp{opacity:1}
-.npop-ring .mp svg{width:100%;height:100%;animation:npr 70s linear infinite reverse;overflow:visible}
-.npop-ring .mp .o{fill:none;stroke:rgba(251,248,244,.55);stroke-width:1.2}
-.npop-ring .mp .l{fill:rgba(251,248,244,.85)}
-.npop-ring .mp.cur{width:38px;height:38px;margin:-19px}
-.npop-ring .mp.cur .o{stroke:var(--pf);stroke-width:1.4}
-.npop-ring .mp.cur .l{fill:var(--pf)}
-.npop-ring .mp.cur svg{filter:drop-shadow(0 0 8px rgba(232,214,202,.9))}
-@keyframes npr{to{rotate:360deg}}
-.npop-pic{position:relative;width:62%;aspect-ratio:3/4.3}
-.npop-pic::after{content:"";position:absolute;inset:-9px 9px 9px -9px;border:1.3px solid rgba(232,214,202,.75);border-radius:999px 999px 20px 20px;pointer-events:none}
-.npop-ph{width:100%;height:100%;background-size:cover;border-radius:999px 999px 18px 18px;clip-path:inset(100% 0 0 0 round 999px 999px 18px 18px);transition:clip-path 1.1s cubic-bezier(.6,0,.2,1) .25s}
-.npop.on .npop-ph{clip-path:inset(0 0 0 0 round 999px 999px 18px 18px)}
-.npop-dot{position:absolute;left:50%;bottom:4px;transform:translate(-50%,50%);white-space:nowrap;display:inline-flex;align-items:baseline;gap:.3em;background:var(--cr);color:var(--dp);border-radius:999px;padding:.5em 1.1em;line-height:1;box-shadow:0 8px 20px rgba(46,37,41,.28)}
+/* linke Seite: Pflaume mit Foto im Bogen (Vivien, 29.10.2026: Wellen + Mondring waren zu viel) */
+.npop-side{position:relative;min-height:520px;display:block;padding:0;background:radial-gradient(120% 90% at 20% 0%,#9A7884 0%,var(--pl) 42%,var(--dp) 100%);overflow:hidden;isolation:isolate}
+.npop-orb{position:absolute;inset:0}
+.npop-pic{position:absolute;inset:0}
+.npop-pic::after{content:"";position:absolute;inset:auto 0 0 0;height:30%;background:linear-gradient(to top,rgba(46,37,41,.38),transparent);pointer-events:none}
+.npop-ph{width:100%;height:100%;background-size:cover;transform:scale(1.06);transition:transform 1.6s cubic-bezier(.2,.8,.2,1)}
+.npop.on .npop-ph{transform:none}
+.npop-dot{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);white-space:nowrap;display:inline-flex;align-items:baseline;gap:.3em;background:var(--cr);color:var(--dp);border-radius:999px;padding:.5em 1.1em;line-height:1;box-shadow:0 8px 20px rgba(46,37,41,.28)}
 .npop-dot b{font-family:var(--serif);font-weight:500;font-size:1.25rem;color:var(--pl)}
 .npop-dot small{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase}
 /* rechte Seite */
@@ -189,11 +157,10 @@ function mv_next_popup(): void
 @keyframes npi{to{border-radius:58% 42% 44% 56%/42% 58% 42% 58%;transform:translateY(-3px)}}
 .npop-f svg{width:24px;height:24px;fill:none;stroke:var(--dp);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .npop-pr{margin:.4rem 0 0;align-self:flex-start;display:inline-flex;gap:.5em;align-items:center;background:var(--dp);border-radius:999px;padding:.5em 1.15em;color:var(--cr);font-size:.85rem}
-.npop-pr .star{color:var(--pf);animation:nps 3s ease-in-out infinite;opacity:1}
+.npop-pr .star{color:var(--pf)}
 .npop-cta{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1.1rem;margin-top:.6rem}
 .npop-go{position:relative;overflow:hidden;font-size:.95rem}
 .npop-go::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-18deg);animation:npsh 4.5s ease-in-out 2s infinite}
-@keyframes npsh{0%{left:-60%}35%,100%{left:130%}}
 .npop-go .ar{display:inline-block;transition:transform .3s}
 .npop-go:hover .ar{transform:translateX(5px)}
 .npop-later{border:0;background:none;color:var(--muted,#7D7076);font:inherit;font-size:.88rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:.4em 0}
@@ -203,10 +170,7 @@ function mv_next_popup(): void
   .npop{padding:14px 12px}
   .npop-stage{width:min(420px,100%)}
   .npop-card{grid-template-columns:1fr}
-  .npop-side{min-height:0;padding:40px 16px 46px}
-  .npop-orb{--r:min(118px,32vw)}
-  .npop-ring .mp{width:20px;height:20px;margin:-10px}
-  .npop-ring .mp.cur{width:30px;height:30px;margin:-15px}
+  .npop-side{min-height:0;height:min(44vh,340px)}
   .npop-tx{padding:1.6rem 1.3rem 1.5rem;align-items:center;text-align:center;gap:.5rem}
   .npop-now{justify-content:center;padding-right:0}
   .npop-line{align-self:center}
@@ -215,8 +179,7 @@ function mv_next_popup(): void
   .npop-x{right:12px;top:12px;background:rgba(255,255,255,.92)}
 }
 @media(prefers-reduced-motion:reduce){
-  .npop-stage,.npop-ph,.npop-line path,.npop-f li,.npop-ring .mp{transition:none}
-  .npop-waves path,.npop-blob,.npop-spk,.npop-ring,.npop-ring .mp svg,.npop-f .fi,.npop-go::after,.npop-pr .star{animation:none}
+  .npop-stage,.npop-ph,.npop-line path,.npop-f li{transition:none}
 }
 </style>
 <script>
@@ -239,9 +202,7 @@ function mv_next_popup(): void
     else d='M12 4A8 8 0 0 0 12 20A'+rx+' 8 0 0 '+(f<.75?0:1)+' 12 4Z';
     if(f<.02||f>.98)d='';
     return '<svg viewBox="0 0 24 24"><circle class="o" cx="12" cy="12" r="8"/>'+(d?'<path class="l" d="'+d+'"/>':'')+'</svg>';}
-  var ring=p.querySelector('.npop-ring'),cur=Math.round(ph*8)%8,h='';
-  for(var i=0;i<8;i++)h+='<span class="mp'+(i===cur?' cur':'')+'" style="--a:'+(i*45)+'deg;--n:'+i+'">'+moon(i===cur?ph:i/8)+'</span>';
-  ring.innerHTML=h;
+  var cur=Math.round(ph*8)%8;
   var MD=['Neumond','zunehmende Sichel','erstes Viertel','zunehmender Mond','Vollmond','abnehmender Mond','letztes Viertel','abnehmende Sichel'],
       ME=['New moon','Waxing crescent','First quarter','Waxing gibbous','Full moon','Waning gibbous','Last quarter','Waning crescent'];
   // Jahreskreis: aktuelles bzw. nächstes Fest (±10 Tage = „Zeit von …“), sonst die Jahreszeit auf dem Weg dorthin
