@@ -568,3 +568,4 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 
 ## Musik-Geschmack Website (Vivien, 29.10.2026)
 - Musik auf moveciamovement.com: mystisch, natürlich, tiefe Töne „die aus der Seele kommen“, Drones, gesummte/gechantete Stimmen (Vorbild: mystische Chant-Musik auf YouTube). KEIN Glocken-/Klangschalen-Geklimper, kein Piano-Geplimper, keine Beats. Bei Epidemic nach drone / ambient / meditation / vocal presence suchen, Ordner `web`.
+- Bestätigungsmail an die Gästin (Vivien, 29.10.2026: „schön, um zu zeigen, wie organisiert wir sind“): `tm_guest_mail()` im Academy-Design (Kopfbild, Datumskarte, Knopf zum Videogespräch, „Darüber sprechen wir“ = nur die [Überschriften] aus dem Leitfaden via `tm_agenda`, nie der Sprechtext, „Gut zu wissen“, .ics). Der Teleprompter-Link geht nur an Vivien. Vorschau: Verwaltung → Termin-Links → „Bestätigungsmail ansehen“ (`?view=movecia&tmvorschau=ID`).

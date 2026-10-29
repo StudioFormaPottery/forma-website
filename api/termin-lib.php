@@ -44,6 +44,10 @@ function tm_seed(PDO $pdo): void
 {
     $cfg = mm_cfg('termine') ?? [];
     if (!empty($cfg['seed_marigold'])) {
+        if (empty($cfg['script_marigold2'])) {
+            $pdo->prepare("UPDATE mm_termine SET script = ? WHERE title = 'Präsenzwochenende Teacher Training' AND date = '2026-11-02' AND status = 'offen'")->execute([tm_script_marigold()]);
+            $cfg = ['script_marigold2' => date('c')] + $cfg; mm_save_cfg('termine', $cfg);
+        }
         if (empty($cfg['msg_marigold'])) {
             $pdo->prepare("UPDATE mm_termine SET msg = ? WHERE title = 'Präsenzwochenende Teacher Training' AND date = '2026-11-02' AND msg = ''")->execute([tm_msg_marigold()]);
             mm_save_cfg('termine', ['msg_marigold' => date('c')] + $cfg);
@@ -83,13 +87,13 @@ function tm_script_marigold(): string
 {
     return "[Begrüßung]\nHallo Maria, hallo Jakob! Schön, dass es heute klappt. Ich habe mir ein paar Punkte notiert, damit wir nichts vergessen.\n\n"
         . "[Kurz zur Ausbildung]\nThe Mindful Becoming Teacher Training startet am 3. November 2027 und dauert elf Monate. Höchstens 14 Teilnehmerinnen, mit uns beiden Ausbilderinnen also maximal 16 Personen. Das Präsenzwochenende ist der Abschluss im September 2028.\n\n"
-        . "[Termin]\nWelches Wochenende im September 2028 passt bei euch? Ich hätte gern Freitag bis Sonntag, also zum Beispiel 22. bis 24. September.\n\n"
-        . "[Zeiten]\nFreitag ab 9 Uhr bis Sonntag 16 Uhr. Geht ein Early Check-in am Freitag und ein Late Check-out am Sonntag?\n\n"
-        . "[Räume]\nOpen Space und Praxisraum an allen drei Tagen. Frage: Zählen wir zwei Ausbilderinnen bei den 12 Personen für den kostenlosen Open Space mit?\n\n"
-        . "[Zimmer]\nDoppelzimmer für die Teilnehmerinnen, Einzelzimmer nur auf Wunsch, den Aufpreis rechne ich selbst mit ihnen ab. Wie läuft die Zimmerverteilung bei euch?\n\n"
+        . "[Der Termin im September 2028]\nWelches Wochenende im September 2028 passt bei euch? Ich hätte gern Freitag bis Sonntag, also zum Beispiel 22. bis 24. September.\n\n"
+        . "[Ablauf und Zeiten]\nFreitag ab 9 Uhr bis Sonntag 16 Uhr. Geht ein Early Check-in am Freitag und ein Late Check-out am Sonntag?\n\n"
+        . "[Räume: Open Space und Praxisraum]\nOpen Space und Praxisraum an allen drei Tagen. Frage: Zählen wir zwei Ausbilderinnen bei den 12 Personen für den kostenlosen Open Space mit?\n\n"
+        . "[Zimmer und Belegung]\nDoppelzimmer für die Teilnehmerinnen, Einzelzimmer nur auf Wunsch, den Aufpreis rechne ich selbst mit ihnen ab. Wie läuft die Zimmerverteilung bei euch?\n\n"
         . "[Küche und Verpflegung]\nCommunity Kitchen für alle drei Tage. Ein Mietkoch ohne Küchenhilfe, die Teilnehmerinnen kochen in kleinen Gruppen mit, als Kochworkshop mit unserer Ernährungsberaterin. Dürfen sie in der Gastroküche mitarbeiten? Gibt es Hygieneregeln? Zimmerchen für den Koch buchen. Habt ihr einen Koch, den ihr empfehlt?\n\n"
-        . "[Kosten]\nKönnt ihr mir ein schriftliches Angebot für September 2028 schicken, mit den Preisen fix für uns? Wie hoch ist die Anzahlung, und ab wann gelten die Stornobedingungen?\n\n"
-        . "[Fotograf]\nIch möchte gern eine Fotografin oder einen Fotografen dabeihaben. Ist das bei euch in Ordnung, auch Fotos vom Haus und vom Garten? Dürfen wir die Fotos auf unserer Website verwenden?\n\n"
+        . "[Kosten und euer Angebot]\nKönnt ihr mir ein schriftliches Angebot für September 2028 schicken, mit den Preisen fix für uns? Wie hoch ist die Anzahlung, und ab wann gelten die Stornobedingungen?\n\n"
+        . "[Fotografin oder Fotograf]\nIch möchte gern eine Fotografin oder einen Fotografen dabeihaben. Ist das bei euch in Ordnung, auch Fotos vom Haus und vom Garten? Dürfen wir die Fotos auf unserer Website verwenden?\n\n"
         . "[Sonstiges]\nAbschlusszeremonie am Sonntag, ganz ruhig, ohne Feuer. Klangschalen und Meditationskissen von euch? Parken, Anreise, WLAN.\n\n"
         . "[Abschluss]\nDanke euch! Ich schicke euch alles noch einmal schriftlich, und ihr schickt mir das Angebot. Ich freu mich riesig!";
 }
@@ -218,17 +222,53 @@ function tm_book(PDO $pdo, array $t, string $slot, string $name, string $email, 
     return ['ok' => true, 'when' => tm_when($t)];
 }
 
+/** Gesprächspunkte für die Gästin = [Überschriften] aus dem Leitfaden (ohne Begrüßung/Abschluss, nie der Sprechtext). */
+function tm_agenda(array $t): array
+{
+    preg_match_all('/^\[([^\]]+)\]/m', (string)$t['script'], $m);
+    return array_values(array_filter($m[1] ?? [], fn($x) => !preg_match('/^(Begrüßung|Abschluss|Sonstiges)$/u', trim($x))));
+}
+
+/** Schöne Bestätigung im Movecia-Academy-Design (Vivien, 29.10.2026: „um zu zeigen, wie organisiert wir sind“). */
+function tm_guest_mail(array $t, bool $hasRoom = true): array
+{
+    $h = 'forma_h';
+    $hello = $t['guest'] !== '' ? $t['guest'] : forma_first_name((string)$t['name']);
+    $link = tm_link($t);
+    $ts = tm_ts($t);
+    $wd = ['', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'][(int)date('N', $ts)];
+    $end = date('G:i', $ts + (int)$t['minutes'] * 60);
+    $ag = tm_agenda($t);
+    $html = '<p style="margin:0 0 18px;"><img src="' . $h(mm_site()) . '/img/movecia/mail-academy-kopf.png?v=4" width="500" alt="Movecia Academy" style="display:block;width:100%;max-width:500px;height:auto;border:0;border-radius:18px;"></p>'
+        . '<p style="margin:0 0 4px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#7D7076;">Terminbestätigung</p>'
+        . '<p style="margin:0 0 14px;font-family:Georgia,\'Times New Roman\',serif;font-size:28px;line-height:1.15;color:#2E2529;">Hallo ' . $h($hello) . ', unser Termin steht.</p>'
+        . '<p style="margin:0 0 18px;">Danke, dass ihr euch Zeit nehmt! Hier ist alles auf einen Blick, die Kalenderdatei hängt an dieser Mail.</p>'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FBF8F4;border:1px solid #DDD2C6;border-radius:18px;"><tr>'
+        . '<td width="92" align="center" valign="middle" style="padding:16px 0 16px 16px;"><table role="presentation" cellpadding="0" cellspacing="0" style="background:#7D5E68;border-radius:14px;"><tr><td align="center" style="padding:8px 14px;color:#FBF5F7;font-family:Helvetica,Arial,sans-serif;">'
+        . '<div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;">' . $h(mb_substr($wd, 0, 2)) . '</div><div style="font-family:Georgia,serif;font-size:30px;line-height:1.05;">' . date('j', $ts) . '</div><div style="font-size:11px;letter-spacing:.1em;">' . $h(['', 'Jän', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'][(int)date('n', $ts)]) . '</div></td></tr></table></td>'
+        . '<td valign="middle" style="padding:16px 18px;font-size:15px;line-height:1.55;"><b style="font-size:17px;">' . $h($t['title']) . '</b><br>' . $h($wd . ', ' . mv_date($ts)) . '<br>' . date('G:i', $ts) . ' bis ' . $end . ' Uhr · online per Video</td></tr></table>'
+        . natal_btn($link, 'Zum Videogespräch')
+        . '<p style="margin:0 0 6px;font-size:13px;color:#7D7076;text-align:center;">Der Raum öffnet sich 15 Minuten vorher, direkt im Browser, ganz ohne App und Konto.</p>';
+    if ($ag) {
+        $html .= '<p style="margin:24px 0 8px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#7D7076;">Darüber sprechen wir</p><table role="presentation" width="100%" cellpadding="0" cellspacing="0">';
+        foreach ($ag as $i => $x) $html .= '<tr><td width="34" valign="top" style="padding:6px 0;"><span style="display:inline-block;width:24px;height:24px;line-height:24px;border-radius:50%;background:#E9E2D8;color:#7D5E68;font-size:12px;text-align:center;">' . ($i + 1) . '</span></td><td style="padding:6px 0;font-size:15px;border-bottom:1px solid #E6DED3;">' . $h($x) . '</td></tr>';
+        $html .= '</table><p style="margin:10px 0 0;font-size:14px;color:#7D7076;">Fehlt euch noch ein Punkt? Antwortet einfach auf diese Mail.</p>';
+    }
+    $html .= '<p style="margin:24px 0 8px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#7D7076;">Gut zu wissen</p>'
+        . '<p style="margin:0;font-size:15px;">Am besten am Laptop oder Handy mit Kopfhörern, Kamera und Mikrofon im Browser erlauben. Klappt etwas nicht, schreibt mir einfach kurz.</p>'
+        . ($t['note'] !== '' ? '<p style="margin:16px 0 0;font-size:14px;color:#7D7076;">Eure Nachricht: „' . $h($t['note']) . '“</p>' : '')
+        . '<p style="margin:20px 0 0;">Ich freu mich auf euch!</p>';
+    $text = 'Hallo ' . $hello . ",\n\nunser Termin steht: " . $t['title'] . "\n" . $wd . ', ' . mv_date($ts) . ', ' . date('G:i', $ts) . ' bis ' . $end . " Uhr, online per Video.\n\nZum Videogespräch (öffnet sich 15 Minuten vorher, keine App nötig):\n" . $link . "\n"
+        . ($ag ? "\nDarüber sprechen wir:\n- " . implode("\n- ", $ag) . "\n" : '') . "\nIch freu mich auf euch!\n\nAlles Liebe, Viv";
+    return [$html, $text];
+}
+
 function tm_mails(PDO $pdo, array $t): void
 {
     $g = mm_gathering($pdo, (int)$t['gid']);
     $hasRoom = $g && (string)$g['room_url'] !== '';
-    $first = forma_first_name((string)$t['name']);
-    $link = tm_link($t);
-    $html = '<p>Hallo ' . forma_h($first) . ',</p><p>wie schön, unser Gespräch ist fix: <b>' . forma_h(tm_when($t)) . '</b>, etwa ' . (int)$t['minutes'] . ' Minuten, online per Video.</p>'
-        . '<p>Tipp zur Uhrzeit einfach auf den Knopf. Der Videoraum öffnet sich 15 Minuten vorher und läuft direkt im Browser, am Handy oder am Laptop. Du brauchst keine App und kein Konto. Die Kalenderdatei hängt an dieser Mail.</p>'
-        . natal_btn($link, 'Zum Videogespräch') . '<p>Ich freu mich auf euch!</p>';
-    $text = "Hallo $first,\n\nwie schön, unser Gespräch ist fix: " . tm_when($t) . ', etwa ' . (int)$t['minutes'] . " Minuten, online per Video.\n\nZum Videoraum (öffnet sich 15 Minuten vorher, keine App nötig):\n$link\n\nIch freu mich auf euch!\n\nAlles Liebe, Viv";
-    try { mm_mail((string)$t['email'], 'Fix: unser Videogespräch am ' . tm_when($t), $text, mm_mail_html('Unser Videogespräch', $html, 'de'), [['termin.ics', tm_ics($t), 'text/calendar']], 'Vivien · Movecia'); } catch (Throwable $e) { error_log('TM mail guest: ' . $e->getMessage()); }
+    [$html, $text] = tm_guest_mail($t, $hasRoom);
+    try { mm_mail((string)$t['email'], 'Terminbestätigung: ' . $t['title'] . ' · ' . tm_when($t), $text, mm_mail_html('Unser Videogespräch', $html, 'de'), [['termin.ics', tm_ics($t), 'text/calendar']], 'Vivien · Movecia'); } catch (Throwable $e) { error_log('TM mail guest: ' . $e->getMessage()); }
     $host = tm_host_link($t);
     $v = "Hallo Viv,\n\n" . $t['name'] . ' (' . $t['email'] . ') hat sich eine Uhrzeit ausgesucht:' . "\n\n" . $t['title'] . "\n" . tm_when($t) . ', ' . (int)$t['minutes'] . " Minuten\n"
         . ($t['note'] !== '' ? "\nNachricht: " . $t['note'] . "\n" : '')
