@@ -506,3 +506,31 @@ body.acad .site-top{background:rgba(242,227,222,.93)}
 .lu-day li.meal b{font-weight:400;color:var(--muted)}
 .lu-note{margin:1.2rem auto 0;max-width:46em;text-align:center;color:var(--muted);font-size:.92rem}
 @media(min-width:900px){.lu-tabs{display:none}.lu-days{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.lu-day{display:block}}
+
+/* --- Ruhiger & neutraler (Vivien, 29.10.2026: „Hellrosa zu girly“, Academy-Band mittig) ---
+   Leinen/Hafer statt Rosa, Pflaume bleibt Akzent. */
+body.acad{background:#EEE7DE;--bg:#EEE7DE}
+body.acad::after{background:linear-gradient(180deg,#F2ECE4 0%,#ECE4D9 50%,#F1EAE1 100%)}
+body.acad .site-top{background:rgba(242,236,228,.94)}
+.acad .tint.t1{--tb:#FAF6F0}.acad .tint.t2{--tb:#E9E3DA}.acad .tint.t3{--tb:#F2EAE0}.acad .tint.t4{--tb:#ECE4D8}
+.acad .ac-ribbon{background:linear-gradient(90deg,#E9E2D8,#F1EADF 50%,#E9E2D8);border-color:#DDD2C6}
+.acad .ebird{background:linear-gradient(135deg,#F4EEE6,#ECE4D9 60%,#F6F1EA);border-color:#DDD2C6}
+.acad .anat.soft2,.acad .thanks{background:linear-gradient(160deg,#F2EBE1,#E9E2D8)}
+.acad .acm-ph{background:radial-gradient(circle at 30% 30%,#F4EEE6,#ECE4D9 55%,#E2D8CB)}
+.acad .okmsg{background:#ECE4D9}
+.acband{background:#5E4A51}
+.acband::after{display:none}
+.acband-in{justify-content:center;text-align:center;padding-top:.85rem;padding-bottom:.85rem}
+.acband-l{flex-direction:column;gap:.35rem}
+.acband-l small{white-space:normal}
+.acband-r{display:none}
+/* Line-up ohne Uhrzeiten: Tageszeit nur beim ersten Punkt (29.10.2026) */
+.lu-day li{grid-template-columns:5.6rem 1fr}
+.lu-day .lu-t{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--plum);padding-top:.3rem}
+.lu-day li.same{border-top:0;padding-top:.2rem}
+.acband{z-index:3}
+.acad .lineup{background:linear-gradient(160deg,#FBF8F3,#EEE7DD)}
+.acad .cute-cards>*:nth-child(5n+1){background:#FBF8F4!important}.acad .cute-cards>*:nth-child(5n+2){background:#F1E8DE!important}.acad .cute-cards>*:nth-child(5n+3){background:#E9E3DA!important}.acad .cute-cards>*:nth-child(5n+4){background:#F6F0E8!important}.acad .cute-cards>*:nth-child(5n){background:#E6DED3!important}
+body.acad{--blush:#E9E2D8}
+.acad .ebird.on-plum{background:rgba(251,245,247,.12);border-color:rgba(251,245,247,.3)}
+.acad .mod.hl{background:#ECE4D9}
