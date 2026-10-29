@@ -584,5 +584,5 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 
 ## Startseiten-Pop-up (Vivien, 29.10.2026, nach „Bäm“-Versuch: Wellen + Mondring „over the top“, Foto immer zu klein)
 - `next-popup.inc.php`: links füllt das Foto die ganze Hälfte (am Handy oben, max. 340 px hoch), sanfter Zoom beim Öffnen, Countdown-Pille unten auf dem Foto. Method-Foto: `ev-ueber-mich.jpg` (Seitstretch im Schneidersitz, von Vivien gewählt; Seitbeuge-Foto gefiel ihr nicht). Keine Wellen, kein Mondring, keine Blobs/Sternchen.
-- Rechts: zwei kleine Chips (heutige Mondphase, Jahreskreis ± 10 Tage um die 8 Feste, sonst „Jahreszeit · auf dem Weg zu …“), Titel mit sich zeichnender Wellenlinie, drei Angebots-Icons (`$feat`), Preis als dunkle Pille, Knopf mit Glanz. Bei Design-Wünschen hier lieber dezent bleiben.
+- Rechts (ohne Mond-/Jahreskreis-Chips, Vivien 29.10.2026): Titel mit sich zeichnender Wellenlinie, drei Angebots-Icons (`$feat`), Preis als dunkle Pille, Knopf mit Glanz. Bei Design-Wünschen hier lieber dezent bleiben.
 - 29.10.2026 nachgeschärft: Schriftzug „Movecia Academy · Ausbildungen“ im Kopf wieder raus (steht schon im dunklen Band), Countdown-Banner mit welligem Rand oben/unten (CSS-Maske, `.acc`). Menü: Academy als eigene dunkle Pflaume-Karte (`.mvm-ac`, Seitenleiste und obere Leiste), Untertitel „Für alle, die eine Ausbildung machen möchten“.

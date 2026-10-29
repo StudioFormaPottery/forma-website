@@ -88,7 +88,7 @@ function mv_next_popup(): void
     ?>
 <!-- Pop-up „mit Bäm“ (Vivien, 29.10.2026: Box war „mega langweilig“, mehr Movement, Icons, Weiblichkeit, Zyklus, Jahreskreis):
      Pflaume-Seite mit treibenden Wellen, Foto im Torbogen, ringsum ein langsam kreisender Ring aus Mondphasen (heutige Phase leuchtet),
-     rechts die heutige Mondphase und das Jahreskreisfest als kleine Chips, gezeichnete Welle unter dem Titel, drei Icons zum Angebot. -->
+     gezeichnete Welle unter dem Titel, drei Icons zum Angebot. -->
 <div class="npop" id="npop" data-ph="<?= forma_h($ver) ?>" data-force="<?= $force ? '1' : '' ?>" data-start="<?= (int)$startTs ?>" role="dialog" aria-modal="true" aria-labelledby="npop-h" hidden>
   <div class="npop-stage">
     <div class="npop-card" tabindex="-1">
@@ -102,7 +102,6 @@ function mv_next_popup(): void
         </div>
       </div>
       <div class="npop-tx">
-        <div class="npop-now" aria-hidden="true"><span class="nm"></span><span class="ns"></span></div>
         <p class="k"><span class="de"><?= forma_h($p['k'][0]) ?></span><span class="en"><?= forma_h($p['k'][1]) ?></span></p>
         <h2 id="npop-h"><span class="de"><?= $p['h'][0] ?></span><span class="en"><?= $p['h'][1] ?></span></h2>
         <svg class="npop-line" viewBox="0 0 220 14" aria-hidden="true"><path d="M2 8 C 20 1, 38 1, 56 8 S 92 15, 110 8 S 146 1, 164 8 S 200 15, 218 7"/></svg>
@@ -135,12 +134,6 @@ function mv_next_popup(): void
 .npop-dot small{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase}
 /* rechte Seite */
 .npop-tx{position:relative;display:flex;flex-direction:column;gap:.6rem;min-width:0;padding:2.6rem 2.6rem 2.3rem 2.4rem}
-.npop-now{display:flex;flex-wrap:wrap;gap:.4rem;padding-right:2.4rem}
-.npop-now>span{display:inline-flex;align-items:center;gap:.4em;font-size:.72rem;letter-spacing:.04em;color:var(--dp);background:var(--bl);border-radius:999px;padding:.32em .8em .32em .45em}
-.npop-now>span:empty{display:none}
-.npop-now svg{width:18px;height:18px;flex:none}
-.npop-now .ns svg{fill:none;stroke:var(--pl);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.npop-now .ns{background:#F2E6DA}
 .npop-tx .k{margin:.2rem 0 0;font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--pl)}
 .npop-tx h2{font-size:clamp(1.65rem,3.2vw,2.2rem);line-height:1.08;margin:0}
 .npop-tx h2 em{color:var(--pl)}
@@ -173,7 +166,6 @@ function mv_next_popup(): void
   .npop-side{min-height:0;height:min(44vh,340px)}
   .npop-dot{left:14px;top:14px;bottom:auto;transform:none}
   .npop-tx{padding:1.6rem 1.3rem 1.5rem;align-items:center;text-align:center;gap:.5rem}
-  .npop-now{justify-content:center;padding-right:0}
   .npop-line{align-self:center}
   .npop-pr{align-self:center}
   .npop-cta{justify-content:center}
@@ -196,36 +188,7 @@ function mv_next_popup(): void
     if(n<=0){b.textContent=E?'Today':'Heute';t1.textContent=E?'starts':'Start';t2.textContent='';}
     else if(n===1){b.textContent=E?'Tomorrow':'Morgen';t1.textContent='Start';t2.textContent='';}
     else{b.textContent=n;t1.textContent=E?'in':'in';t2.textContent=E?'days':'Tagen';}}
-  // Mondphase (0 = Neumond … 0.5 = Vollmond), aus einem bekannten Neumond gerechnet
-  var age=((Date.now()-Date.UTC(2000,0,6,18,14))/864e5)%29.530588853;if(age<0)age+=29.530588853;var ph=age/29.530588853;
-  function moon(f){var r=8,c=Math.cos(2*Math.PI*f),rx=Math.abs(r*c).toFixed(2),d;
-    if(f<.5)d='M12 4A8 8 0 0 1 12 20A'+rx+' 8 0 0 '+(f<.25?0:1)+' 12 4Z';
-    else d='M12 4A8 8 0 0 0 12 20A'+rx+' 8 0 0 '+(f<.75?0:1)+' 12 4Z';
-    if(f<.02||f>.98)d='';
-    return '<svg viewBox="0 0 24 24"><circle class="o" cx="12" cy="12" r="8"/>'+(d?'<path class="l" d="'+d+'"/>':'')+'</svg>';}
-  var cur=Math.round(ph*8)%8;
-  var MD=['Neumond','zunehmende Sichel','erstes Viertel','zunehmender Mond','Vollmond','abnehmender Mond','letztes Viertel','abnehmende Sichel'],
-      ME=['New moon','Waxing crescent','First quarter','Waxing gibbous','Full moon','Waning gibbous','Last quarter','Waning crescent'];
-  // Jahreskreis: aktuelles bzw. nächstes Fest (±10 Tage = „Zeit von …“), sonst die Jahreszeit auf dem Weg dorthin
-  var I={kerze:'<path d="M12 3c1.6 2 1.6 3.4 0 4.6-1.6-1.2-1.6-2.6 0-4.6zM9.5 10h5v10h-5zM7 20h10"/>',keim:'<path d="M12 20v-8M12 12c0-3.5-2.5-6-6-6 0 3.5 2.5 6 6 6zM12 14c0-3 2.2-5.5 5.5-5.5 0 3-2.4 5.5-5.5 5.5zM8 20h8"/>',
-    blume:'<circle cx="12" cy="9" r="2"/><path d="M12 5a2.4 2.4 0 1 1 3.2 2.8M15.2 10.2A2.4 2.4 0 1 1 12 13M8.8 10.2A2.4 2.4 0 1 1 8.8 6.6M12 13v7M12 17c2-2 4-2 5-1"/>',
-    sonne:'<circle cx="12" cy="12" r="3.6"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>',
-    aehre:'<path d="M12 21V8M12 8c-1.5-1-1.5-3 0-4.5 1.5 1.5 1.5 3.5 0 4.5zM12 12c-2 0-3.5-1.2-4-3 2 0 3.5 1.2 4 3zM12 12c2 0 3.5-1.2 4-3-2 0-3.5 1.2-4 3zM12 16c-2 0-3.5-1.2-4-3 2 0 3.5 1.2 4 3zM12 16c2 0 3.5-1.2 4-3-2 0-3.5 1.2-4 3z"/>',
-    blatt:'<path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14zM5 19l7-7"/>',
-    laterne:'<path d="M10 4h4M9 6.5h6l1 3v7l-1 2.5H9L8 16.5v-7zM12 10c1 1 1 2.5 0 3.5-1-1-1-2.5 0-3.5zM12 4V2.5"/>',
-    stern:'<path d="M12 3l1.9 5.6H20l-4.9 3.6 1.9 5.8L12 14.4 7 18l1.9-5.8L4 8.6h6.1z"/>'};
-  var F=[[2,1,'Imbolc','Imbolc','kerze'],[3,20,'Ostara','Ostara','keim'],[5,1,'Beltane','Beltane','blume'],[6,21,'Litha','Litha','sonne'],[8,1,'Lughnasadh','Lughnasadh','aehre'],[9,22,'Mabon','Mabon','blatt'],[10,31,'Samhain','Samhain','laterne'],[12,21,'Yule','Yule','stern']];
-  var now=new Date(),y=now.getFullYear(),best=null,next=null;
-  [y-1,y,y+1].forEach(function(yy){F.forEach(function(f){var d=new Date(yy,f[0]-1,f[1]),dd=(d-now)/864e5;
-    if(Math.abs(dd)<=10&&(!best||Math.abs(dd)<Math.abs(best.dd)))best={f:f,dd:dd};
-    if(dd>0&&(!next||dd<next.dd))next={f:f,dd:dd};});});
-  var seas=['Winter','Winter','Frühling','Frühling','Frühling','Sommer','Sommer','Sommer','Herbst','Herbst','Herbst','Winter'],
-      seasE=['Winter','Winter','Spring','Spring','Spring','Summer','Summer','Summer','Autumn','Autumn','Autumn','Winter'];
-  function chips(){var E=en(),m=p.querySelector('.npop-now .nm'),s=p.querySelector('.npop-now .ns');
-    m.innerHTML=moon(ph).replace('<svg','<svg style="--x:0"').replace('class="o"','class="o" style="fill:none;stroke:#7D5E68;stroke-width:1.4"').replace('class="l"','class="l" style="fill:#7D5E68"')+(E?ME[cur]:MD[cur]);
-    var f=best?best.f:next.f,t=best?(E?'Season of '+f[3]:'Zeit von '+f[2]):(E?seasE[now.getMonth()]+' · on the way to '+f[3]:seas[now.getMonth()]+' · auf dem Weg zu '+f[2]);
-    s.innerHTML='<svg viewBox="0 0 24 24">'+I[f[4]]+'</svg>'+t;}
-  fill();chips();document.addEventListener('mvlang',function(){fill();chips()});
+  fill();document.addEventListener('mvlang',fill);
   try{seen=sessionStorage.getItem(key)==='1'}catch(e){}
   if(seen&&!force)return;
   if(/[#&]anfrage/.test(location.hash)&&!force)return;
