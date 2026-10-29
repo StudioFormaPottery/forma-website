@@ -33,7 +33,7 @@ mvl_head('Movecia Academy · Yogalehrerausbildung auf Deutsch, Tirol & online', 
 <section class="w"><div class="in hero-x ac-hero">
   <?= mv_waves(false) ?>
   <div>
-    <div class="ac-head"><?= ac_seal() ?><p class="k" style="margin:0"><span class="de">Movecia Academy · Ausbildungen</span><span class="en">Movecia Academy · trainings</span><br><span class="de" style="color:var(--muted)">klein und persönlich</span><span class="en" style="color:var(--muted)">small and personal</span></p></div>
+    <div class="ac-head2"><p class="ac-brand">Movecia <em>Academy</em><span>Ausbildungen</span></p><?= ac_countdown() ?></div>
     <h1><span class="de">Lernen, <em>andere</em> zu begleiten.</span><span class="en">Learn to <em>guide</em> others.</span></h1>
     <p class="sub"><span class="de">Ohne dich selbst dabei zu verlieren.</span><span class="en">Without losing yourself along the way.</span></p>
     <p class="lead"><span class="de">In der Movecia Academy gebe ich weiter, was ich in vielen Jahren Unterricht gelernt habe: Mindful Movement, Yoga, Somatic Movement und Breathwork, verbunden zu einer Praxis, die Körper und Kopf spürbar stärkt. Für Frauen, die selbst schon eine Weile in Bewegung sind und spüren, dass sie das weitergeben möchten. Alle Ausbildungen finden auf Deutsch statt, online aus Österreich, Deutschland, der Schweiz und Südtirol, mit Präsenzzeit in Tirol.</span><span class="en">In the Movecia Academy I pass on what many years of teaching have taught me: mindful movement, yoga, somatic movement and breathwork, woven into one practice that leaves body and mind noticeably stronger. For women who have been moving for a while themselves and feel that they want to share it.</span></p>

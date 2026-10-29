@@ -1237,6 +1237,21 @@ function ac_band(string $sub = 'Mindful Becoming Teacher Training'): string
         . '<span><b>Movecia <i>Academy</i></b><small>' . forma_h($sub) . '</small></span></a><span class="acband-r">nur 14 Plätze</span></div></div>';
 }
 
+/** Countdown (Vivien, 29.10.2026): bis Ende Early-Bird, danach bis Ausbildungsstart, Tage/Std./Min./Sek., läuft live. */
+function ac_countdown(): string
+{
+    $c = ac_cfg();
+    $now = time();
+    [$lbl, $to] = $c['eb'] ? ['Early-Bird-Preis endet in', $c['eb_end'] + 59] : ['Die Ausbildung startet in', $c['start_ts']];
+    if ($to <= $now) return '';
+    $u = fn(string $k, string $l) => '<span class="acc-u"><b data-k="' . $k . '">–</b><small>' . $l . '</small></span>';
+    return '<div class="acc" data-to="' . (int)$to . '" data-now="' . $now . '" role="timer"><p class="acc-l">' . forma_h($lbl) . '</p><div class="acc-t">'
+        . $u('d', 'Tage') . $u('h', 'Stunden') . $u('m', 'Minuten') . $u('s', 'Sekunden') . '</div></div>'
+        . '<script>(function(){var e=document.currentScript.previousElementSibling,to=+e.dataset.to*1000,sk=Date.now()-e.dataset.now*1000,q=function(k){return e.querySelector(\'[data-k="\'+k+\'"]\')};'
+        . 'function t(){var ms=Math.max(0,to-(Date.now()-sk)),x=Math.floor(ms/1000),p=function(n){return n<10?"0"+n:""+n};'
+        . 'q("d").textContent=Math.floor(x/86400);q("h").textContent=p(Math.floor(x%86400/3600));q("m").textContent=p(Math.floor(x%3600/60));q("s").textContent=p(x%60);if(ms>0)setTimeout(t,1000-(Date.now()%1000))}t()})();</script>';
+}
+
 /** Kleine handgezeichnete Vögel fürs Early-Bird-Abzeichen. */
 function ac_birds(): string
 {

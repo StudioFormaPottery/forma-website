@@ -534,3 +534,17 @@ body.acad .site-top{background:rgba(242,236,228,.94)}
 body.acad{--blush:#E9E2D8}
 .acad .ebird.on-plum{background:rgba(251,245,247,.12);border-color:rgba(251,245,247,.3)}
 .acad .mod.hl{background:#ECE4D9}
+
+/* Kopf der Academy-Seite (Vivien, 29.10.2026: Siegel weg, „Movecia Academy“ mit mehr Wirkung, Countdown) */
+.ac-head2{display:flex;flex-direction:column;gap:1.1rem;margin-bottom:1.4rem}
+.ac-brand{margin:0;font-family:var(--serif);font-weight:500;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1;color:var(--ink,#2E2529);display:flex;flex-wrap:wrap;align-items:baseline;gap:.15em .45em}
+.ac-brand em{color:var(--plum,#7D5E68)}
+.ac-brand span{font-family:var(--sans);font-size:.34em;letter-spacing:.3em;text-transform:uppercase;color:var(--plum,#7D5E68);border-left:1px solid var(--line,#DDD2C6);padding-left:.9em;align-self:center}
+.acc-l{margin:0 0 .45rem;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted,#7D7076)}
+.acc-t{display:flex;gap:.5rem}
+.acc-u{display:flex;flex-direction:column;align-items:center;min-width:4.4rem;padding:.6rem .5rem .5rem;border-radius:18px;background:#FBF8F4;border:1px solid var(--line,#DDD2C6);box-shadow:0 8px 20px rgba(125,94,104,.08)}
+.acc-u:first-child{background:var(--plum,#7D5E68);border-color:var(--plum,#7D5E68)}
+.acc-u:first-child b,.acc-u:first-child small{color:#FBF5F7}
+.acc-u b{font-family:var(--serif);font-weight:500;font-size:2rem;line-height:1;font-variant-numeric:tabular-nums;color:var(--ink,#2E2529)}
+.acc-u small{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted,#7D7076);margin-top:.3rem}
+@media(max-width:520px){.acc-t{gap:.35rem}.acc-u{min-width:0;flex:1;padding:.5rem .2rem .45rem}.acc-u b{font-size:1.55rem}.acc-u small{font-size:.5rem;letter-spacing:.06em}}
