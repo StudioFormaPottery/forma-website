@@ -22,13 +22,12 @@ $offer = ac_offer_by_token($pdo, (string)($_GET['angebot'] ?? ''));
 $offerLive = ac_offer_live($offer);
 $p = ac_prices($offerLive ? $offer : null);
 $mods = ac_modules();
-$slots = ac_call_slots($pdo);
 $e = fn(int $x) => str_replace('€ ', '€&nbsp;', mv_eur($x));
 $ee = fn(int $x) => ac_eur($x, 'en');
 $dd = fn(string $ymd) => ac_d($ymd);
 $de2 = fn(string $ymd) => ac_d($ymd, 'en');
 if ($offer || isset($_GET['danke']) || isset($_GET['abbruch'])) $GLOBALS['mvl_noindex'] = true;
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=9">';
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=10">';
 mvl_head('Yogalehrerausbildung auf Deutsch · Mindful Becoming Teacher Training ' . AC_HOURS . ' Std. | Movecia Academy Tirol',
     'Die ' . AC_HOURS . '-Stunden-Ausbildung mit Vivien Malonga, ausschließlich auf Deutsch: vollständige 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum, Somatic Movement, Breathwork, Anatomie & Body Scanning, Mental Load & Nervensystem. 11 Monate hybrid, online aus Österreich, Deutschland, der Schweiz und Südtirol, Präsenzwochenende in Tirol. Start ' . mv_date($st) . ', nur 14 Plätze.' . ($c['eb'] ? ' Early-Bird bis ' . mv_date($c['eb_end']) . '.' : ''),
     $site . '/academy/teacher-training/', '/img/movecia/og-academy.jpg', $css, ac_jsonld($pdo));
@@ -287,13 +286,14 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
     <p><span class="de">In 30 Minuten per Video lernen wir uns kennen, und du kannst alles fragen, was dir auf dem Herzen liegt. Das Gespräch ist freiwillig, du kannst auch direkt buchen.</span><span class="en">In 30 minutes by video we get to know each other, and you can ask me anything that is on your mind. The call is optional; you can also book straight away.</span></p></div>
   <div class="callbox rv">
     <div>
-      <p class="k"><span class="de">Wunschtermin wählen</span><span class="en">Choose a time</span></p>
-      <p class="mut" style="margin-top:.4rem;font-size:.95rem"><span class="de">Mittwoch, Donnerstag und Freitag um 8:00 Uhr, Mittwoch und Donnerstag auch um 18:30 Uhr. <?= mm_whereby_key() !== '' ? 'Du bekommst sofort die Bestätigung mit dem Link zum Videoraum.' : 'Ich bestätige dir den Termin per E-Mail.' ?></span><span class="en">Wednesday, Thursday and Friday at 8:00 am, and Wednesday and Thursday at 6:30 pm too (Vienna time). I will confirm the time by email.</span></p>
-      <div class="slots" id="slots" role="group" aria-label="Termine">
-        <?php foreach (array_slice($slots, 0, 24) as $s): $t = strtotime($s['date']); ?>
-        <button type="button" class="slot" data-d="<?= $s['date'] ?>" data-s="<?= $s['slot'] ?>" aria-pressed="false"><span class="de"><?= $wdDe[(int)date('N', $t)] ?>, <?= date('j', $t) ?>. <?= $mDe[(int)date('n', $t)] ?></span><span class="en"><?= date('D j M', $t) ?></span><small><span class="de"><?= $s['slot'] ?> Uhr</span><span class="en"><?= date('g:i a', strtotime('2000-01-01 ' . $s['slot'])) ?></span></small></button>
-        <?php endforeach; ?>
-        <?php if (!$slots): ?><p class="mut"><span class="de">Gerade ist kein Termin frei. Schreib mir einfach an <a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a>.</span><span class="en">No times are free right now. Just write to me at <a href="mailto:hello@moveciamovement.com">hello@moveciamovement.com</a>.</span></p><?php endif; ?>
+      <p class="k">Dein Wunschtermin</p>
+      <p class="mut" style="margin-top:.4rem;font-size:.95rem">Montag bis Freitag, 30 Minuten per Video. Schick mir deinen Wunsch, ich schaue in meinen Kalender und schicke dir die genaue Uhrzeit mit dem Link zum Videoraum per E-Mail.</p>
+      <div class="cwish" id="wish">
+        <label class="f"><span>Wunschtag</span><input type="date" id="wday" min="<?= date('Y-m-d', strtotime('+1 day')) ?>" max="<?= date('Y-m-d', strtotime('+' . AC_CALL_WEEKS . ' weeks')) ?>"></label>
+        <div class="f"><span>Tageszeit</span>
+          <div class="parts" role="radiogroup" aria-label="Tageszeit"><?php foreach (AC_CALL_PARTS as $k => [$lbl]): ?><button type="button" class="part" data-p="<?= $k ?>" role="radio" aria-checked="false"><?= $lbl ?></button><?php endforeach; ?></div>
+        </div>
+        <label class="f wt"><span>Wunschuhrzeit <small>(freiwillig)</small></span><input type="text" id="wtime" maxlength="20" placeholder="z. B. 9:30" inputmode="numeric" autocomplete="off"></label>
       </div>
     </div>
     <form class="form" id="cf" novalidate>
@@ -303,7 +303,7 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
       <label class="f"><span><span class="de">Was möchtest du mich fragen? (freiwillig)</span><span class="en">What would you like to ask me? (optional)</span></span><textarea name="note" maxlength="600"></textarea></label>
       <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <p class="mut" style="font-size:.82rem"><span class="de">Deine Angaben nutze ich nur für unser Gespräch, mehr dazu im <a href="/terms/#datenschutz">Datenschutz</a>.</span><span class="en">I only use your details for our call; see the <a href="/terms/#datenschutz">privacy notice</a>.</span></p>
-      <div><button class="btn" type="submit" id="cb"><?= mm_whereby_key() !== '' ? 'Termin buchen' : 'Termin anfragen' ?></button></div>
+      <div><button class="btn" type="submit" id="cb">Wunschtermin schicken</button></div>
       <p class="err" id="ce" hidden></p>
       <div class="okmsg" id="co" hidden></div>
     </form>
@@ -414,14 +414,17 @@ $sched = fn(string $k) => ac_schedule($p['total'], $k);
   if(ob){var until=+ob.dataset.until*1000,skew=Date.now()-(+ob.dataset.now*1000),cd=document.getElementById('offercd');
     var tick=function(){var ms=until-(Date.now()-skew);if(ms<=0){cd.textContent='0:00';setTimeout(function(){location.href=location.pathname+(L()==='en'?'?lang=en':'')+'#buchen'},1500);return}var s=Math.ceil(ms/1000),m=Math.floor(s/60);cd.textContent=m+':'+String(s%60).padStart(2,'0');setTimeout(tick,500)};tick();}
   var angebot=new URLSearchParams(location.search).get('angebot')||'';
-  var pick=null;document.querySelectorAll('#slots .slot').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('#slots .slot').forEach(function(x){x.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');pick=b})});
+  var part='',wday=document.getElementById('wday'),wtime=document.getElementById('wtime');document.querySelectorAll('#wish .part').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('#wish .part').forEach(function(x){x.setAttribute('aria-checked','false')});b.setAttribute('aria-checked','true');part=b.dataset.p})});
   var cf=document.getElementById('cf'),ce=document.getElementById('ce'),co=document.getElementById('co'),cb=document.getElementById('cb');
   cf.addEventListener('submit',async function(ev){ev.preventDefault();ce.hidden=true;var en=L()==='en';
-    if(!pick){ce.textContent=en?'Please choose a time on the left.':'Bitte wähl zuerst einen Termin.';ce.hidden=false;return}
+    var wd=wday.value?new Date(wday.value+'T12:00:00').getDay():-1;
+    if(!wday.value){ce.textContent='Bitte wähl deinen Wunschtag.';ce.hidden=false;return}
+    if(wd===0||wd===6){ce.textContent='Bitte wähl einen Tag von Montag bis Freitag.';ce.hidden=false;return}
+    if(!part){ce.textContent='Bitte wähl Vormittag, Mittag oder Abend.';ce.hidden=false;return}
     if(cf.name.value.trim().length<2||cf.email.value.indexOf('@')<1){ce.textContent=en?'Please enter your name and email.':'Bitte gib deinen Namen und deine E-Mail an.';ce.hidden=false;return}
-    var d=Object.fromEntries(new FormData(cf));d.action='call';d.date=pick.dataset.d;d.slot=pick.dataset.s;d.lang=L();d.t=T;cb.disabled=true;
+    var d=Object.fromEntries(new FormData(cf));d.action='call';d.date=wday.value;d.daypart=part;d.wish_time=wtime.value.trim();d.lang=L();d.t=T;cb.disabled=true;
     try{var r=await fetch('/api/academy.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});var j=await r.json();
-      if(j.ok){cf.querySelectorAll('label,button').forEach(function(x){x.hidden=true});co.textContent=j.fixed?('Wunderbar, unser Gespräch ist fix: '+j.when+'. Die Bestätigung mit dem Link zum Videoraum ist schon in deinem Postfach ♡'):('Danke! Dein Wunschtermin: '+j.when+'. Ich bestätige ihn dir in Kürze per E-Mail.');co.hidden=false;pick.disabled=true;return}
+      if(j.ok){cf.querySelectorAll('label,button').forEach(function(x){x.hidden=true});co.textContent='Danke! Dein Wunschtermin: '+j.when+'. Ich schicke dir in den nächsten ein, zwei Tagen die genaue Uhrzeit per E-Mail ♡';co.hidden=false;document.getElementById('wish').hidden=true;return}
       ce.textContent=j.error||'…';ce.hidden=false}catch(x){ce.textContent=en?'Something went wrong. Please try again.':'Das hat gerade nicht geklappt. Bitte versuch es noch einmal.';ce.hidden=false}
     cb.disabled=false});
   var bf=document.getElementById('bf'),be=document.getElementById('be'),bb=document.getElementById('bb');

@@ -14,6 +14,9 @@ const AC_HOURS = 550;
 // Kennenlerngespräch (Vivien): Mi/Do/Fr 8:00, Mi/Do 18:30, 30 Minuten, online per Video
 const AC_CALL_SLOTS = [3 => ['08:00', '18:30'], 4 => ['08:00', '18:30'], 5 => ['08:00']];
 const AC_CALL_MINUTES = 30;
+// Wunschtermin fürs Kennenlerngespräch (Vivien, 29.10.2026): Mo–Fr, Tageszeit + freiwillige Uhrzeit; Vivien bucht in der Verwaltung ein
+const AC_CALL_PARTS = ['vormittag' => ['Vormittag', '09:00'], 'mittag' => ['Mittag', '12:00'], 'abend' => ['Abend', '18:30']];
+const AC_CALL_WEEKS = 10;
 const AC_OFFER_MINUTES = 20;             // so lange gilt der Kennenlern-Preis aus dem Gespräch (Vivien, 28.10.2026, Runde 4)
 const AC_MAIL_BEFORE = 10;               // Bezahl-Link so viele Tage vor dem Fälligkeitstag
 
@@ -281,6 +284,9 @@ function ac_schema(PDO $pdo): void
     if (!in_array('call_price', $bc, true)) $pdo->exec('ALTER TABLE ac_bookings ADD COLUMN call_price INTEGER NOT NULL DEFAULT 0');
     $cc = array_column($pdo->query('PRAGMA table_info(ac_calls)')->fetchAll(), 'name');
     if (!in_array('offer_mailed', $cc, true)) $pdo->exec('ALTER TABLE ac_calls ADD COLUMN offer_mailed INTEGER NOT NULL DEFAULT 0');
+    // Wunschtermin statt fester Zeiten (Vivien, 29.10.2026): Tag + Tageszeit + freiwillige Wunschuhrzeit, slot bleibt leer bis Vivien einbucht
+    if (!in_array('daypart', $cc, true)) $pdo->exec("ALTER TABLE ac_calls ADD COLUMN daypart TEXT NOT NULL DEFAULT ''");
+    if (!in_array('wish_time', $cc, true)) $pdo->exec("ALTER TABLE ac_calls ADD COLUMN wish_time TEXT NOT NULL DEFAULT ''");
     ac_welcome_lesson($pdo);
 }
 
@@ -806,8 +812,26 @@ function ac_call_slots(PDO $pdo, int $weeks = 8): array
     return $out;
 }
 
+/** Wunsch als Text: „Montag, 8. November 2027 · Vormittag, gern um 9:30 Uhr“. */
+function ac_call_wish(array $c): string
+{
+    $t = strtotime((string)$c['date'] . ' 12:00');
+    $wd = ['', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
+    $p = AC_CALL_PARTS[(string)($c['daypart'] ?? '')][0] ?? '';
+    $w = trim((string)($c['wish_time'] ?? ''));
+    return $wd[(int)date('N', $t)] . ', ' . mv_date($t) . ($p !== '' ? ' · ' . $p : '') . ($w !== '' ? ', gern um ' . $w . (preg_match('/^\d{1,2}[:.]\d{2}$/', $w) ? ' Uhr' : '') : '');
+}
+
+/** Uhrzeit-Vorschlag zum Einbuchen: Wunschuhrzeit, sonst Beginn der Tageszeit. */
+function ac_call_suggest_time(array $c): string
+{
+    if (preg_match('/^(\d{1,2})[:.](\d{2})$/', trim((string)($c['wish_time'] ?? '')), $m) && (int)$m[1] < 24 && (int)$m[2] < 60) return sprintf('%02d:%02d', (int)$m[1], (int)$m[2]);
+    return AC_CALL_PARTS[(string)($c['daypart'] ?? '')][1] ?? '09:00';
+}
+
 function ac_call_when(array $c, string $lang = 'de'): string
 {
+    if ((string)$c['slot'] === '') return ac_call_wish($c);
     $t = strtotime($c['date'] . ' ' . $c['slot']);
     if ($lang === 'en') return date('l, j F Y', $t) . ', ' . date('g:i a', $t) . ' (Vienna time)';
     $wd = ['', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
@@ -817,51 +841,48 @@ function ac_call_when(array $c, string $lang = 'de'): string
 function ac_call_request(PDO $pdo, array $in, string $ipHash): array
 {
     ac_schema($pdo);
-    $en = false; // nur Deutsch
     $date = (string)($in['date'] ?? '');
-    $slot = (string)($in['slot'] ?? '');
-    $ok = false;
-    foreach (ac_call_slots($pdo) as $s) if ($s['date'] === $date && $s['slot'] === $slot) $ok = true;
+    $part = (string)($in['daypart'] ?? '');
+    $wish = forma_clean((string)($in['wish_time'] ?? ''), 20);
     $name = forma_clean((string)($in['name'] ?? ''), 80);
     $email = strtolower(trim((string)($in['email'] ?? '')));
     $phone = forma_clean((string)($in['phone'] ?? ''), 40);
     $note = trim(mb_substr((string)($in['note'] ?? ''), 0, 600));
-    if (!$ok) return ['ok' => false, 'error' => $en ? 'Please choose one of the free times.' : 'Bitte wähl einen der freien Termine.'];
-    if (mb_strlen($name) < 2 || !filter_var($email, FILTER_VALIDATE_EMAIL)) return ['ok' => false, 'error' => $en ? 'Please enter your name and email.' : 'Bitte gib deinen Namen und deine E-Mail an.'];
+    $tz = new DateTimeZone('Europe/Vienna');
+    $d = DateTimeImmutable::createFromFormat('!Y-m-d', $date, $tz);
+    $today = new DateTimeImmutable('today', $tz);
+    if (!$d || $d->format('Y-m-d') !== $date || (int)$d->format('N') > 5 || $d <= $today || $d > $today->modify('+' . AC_CALL_WEEKS . ' weeks'))
+        return ['ok' => false, 'error' => 'Bitte wähl einen Wunschtag von Montag bis Freitag (ab morgen).'];
+    if (!isset(AC_CALL_PARTS[$part])) return ['ok' => false, 'error' => 'Bitte wähl Vormittag, Mittag oder Abend.'];
+    if (mb_strlen($name) < 2 || !filter_var($email, FILTER_VALIDATE_EMAIL)) return ['ok' => false, 'error' => 'Bitte gib deinen Namen und deine E-Mail an.'];
     $q = $pdo->prepare('SELECT COUNT(*) FROM ac_calls WHERE ip_hash = ? AND created_at >= ?');
     $q->execute([$ipHash, date('c', time() - 3600)]);
-    if ((int)$q->fetchColumn() >= 4) return ['ok' => false, 'error' => $en ? 'Please try again later.' : 'Bitte versuch es später noch einmal.'];
-    $pdo->exec('BEGIN IMMEDIATE');
-    try {
-        $q = $pdo->prepare("SELECT COUNT(*) FROM ac_calls WHERE date = ? AND slot = ? AND status IN ('angefragt','bestaetigt')");
-        $q->execute([$date, $slot]);
-        if ((int)$q->fetchColumn() > 0) { $pdo->exec('ROLLBACK'); return ['ok' => false, 'error' => $en ? 'Someone has just taken this time. Please choose another one.' : 'Dieser Termin ist gerade vergeben worden. Bitte wähl einen anderen.']; }
-        $pdo->prepare('INSERT INTO ac_calls (date, slot, name, email, phone, note, lang, token, ip_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)')
-            ->execute([$date, $slot, $name, $email, $phone, $note, $en ? 'en' : 'de', bin2hex(random_bytes(12)), $ipHash, date('c')]);
-        $id = (int)$pdo->lastInsertId();
-        $pdo->exec('COMMIT');
-    } catch (Throwable $e) {
-        if ($pdo->inTransaction()) $pdo->exec('ROLLBACK');
-        throw $e;
-    }
-    // Mit Whereby-Schlüssel sofort fix (Vivien, 28.10.2026: keine Handarbeit): Raum anlegen, Bestätigung an sie, Kalender + Gastgeberinnen-Link an Vivien
-    if (mm_whereby_key() !== '') {
-        ac_call_confirm($pdo, $id);
-        $c = ac_call($pdo, $id);
-        $v = "Hallo Viv,\n\nneues Kennenlerngespräch zum Teacher Training, schon fix eingetragen:\n\n" . ac_call_when($c) . "\n" . $name . ' · ' . $email . ($phone !== '' ? ' · ' . $phone : '') . ($note !== '' ? "\n\nIhre Nachricht: " . $note : '')
-            . "\n\nDein Gastgeberinnen-Link: " . ($c['host_url'] ?: $c['room_url']) . "\nIm Gespräch tippst du in der Verwaltung einmal auf „✦ Angebot zeigen“: Sie sieht dann sofort in ihrem Gesprächsraum den Kennenlern-Preis (" . mv_eur(ac_cfg()['call_total']) . ") für " . AC_OFFER_MINUTES . " Minuten und bekommt ihn zusätzlich per Mail: " . forma_site_url() . "/verwaltung/?view=academy#gespraeche\n";
-        try { mm_mail(natal_notify_email_safe(), 'Kennenlerngespräch Teacher Training: ' . $name . ' · ' . ac_call_when($c), $v, mm_mail_html('Kennenlerngespräch', nl2br(forma_h($v)), 'de'), [['Kennenlerngespraech.ics', ac_call_ics($c, true), 'text/calendar']]); } catch (Throwable $e) { error_log('AC call viv: ' . $e->getMessage()); }
-        return ['ok' => true, 'fixed' => true, 'when' => ac_call_when($c)];
-    }
-    $c = ac_call($pdo, $id);
+    if ((int)$q->fetchColumn() >= 4) return ['ok' => false, 'error' => 'Bitte versuch es später noch einmal.'];
+    $pdo->prepare("INSERT INTO ac_calls (date, slot, daypart, wish_time, name, email, phone, note, lang, token, ip_hash, created_at) VALUES (?,'',?,?,?,?,?,?,'de',?,?,?)")
+        ->execute([$date, $part, $wish, $name, $email, $phone, $note, bin2hex(random_bytes(12)), $ipHash, date('c')]);
+    $c = ac_call($pdo, (int)$pdo->lastInsertId());
     $first = forma_first_name($name);
-    $r = ['lang' => $en ? 'en' : 'de', 'email' => $email];
-    $lines = $en ? ["Dear $first,", 'thank you for your interest in the Mindful Becoming Teacher Training! Your preferred time for our free 30-minute call is: ' . ac_call_when($c, 'en') . '.', 'I will confirm the time by email within the next day or two, together with the link to our video room. You don\'t need an app or an account for it.']
-        : ["Hallo $first,", 'schön, dass du dich für das Mindful Becoming Teacher Training interessierst! Dein Wunschtermin für unser kostenloses 30-Minuten-Gespräch: ' . ac_call_when($c) . '.', 'Ich bestätige dir den Termin in den nächsten ein, zwei Tagen per E-Mail, zusammen mit dem Link zu unserem Videoraum. Du brauchst dafür keine App und kein Konto.'];
-    mv_send_member_mail($r, $en ? 'Your call about the Teacher Training' : 'Dein Kennenlerngespräch zum Teacher Training', $en ? 'let\'s talk ♡' : 'lass uns reden ♡', AC_SHORT, $lines, '', '', '');
-    $v = "Hallo Viv,\n\nneuer Gesprächswunsch zum Teacher Training:\n\n" . ac_call_when($c) . "\n" . $name . ' · ' . $email . ($phone !== '' ? ' · ' . $phone : '') . ($note !== '' ? "\n\nIhre Nachricht: " . $note : '') . "\n\nBitte in der Verwaltung bestätigen: " . forma_site_url() . "/verwaltung/?view=academy\n";
-    mm_mail(natal_notify_email_safe(), 'Kennenlerngespräch Teacher Training: ' . $name, $v, mm_mail_html('Gesprächswunsch', nl2br(forma_h($v)), 'de'));
-    return ['ok' => true, 'when' => ac_call_when($c, $en ? 'en' : 'de')];
+    $lines = ["Hallo $first,", 'schön, dass du dich für das Mindful Becoming Teacher Training interessierst! Dein Wunschtermin für unser kostenloses 30-Minuten-Gespräch: ' . ac_call_wish($c) . '.',
+        'Ich schaue in meinen Kalender und schicke dir in den nächsten ein, zwei Tagen die genaue Uhrzeit, zusammen mit dem Link zu unserem Videoraum. Du brauchst dafür keine App und kein Konto.'];
+    try { mv_send_member_mail(['lang' => 'de', 'email' => $email], 'Dein Kennenlerngespräch zum Teacher Training', 'lass uns reden ♡', AC_SHORT, $lines, '', '', ''); } catch (Throwable $e) { error_log('AC wish mail: ' . $e->getMessage()); }
+    $v = "Hallo Viv,\n\nneuer Wunschtermin für ein Kennenlerngespräch zum Teacher Training:\n\n" . ac_call_wish($c) . "\n" . $name . ' · ' . $email . ($phone !== '' ? ' · ' . $phone : '') . ($note !== '' ? "\n\nIhre Nachricht: " . $note : '')
+        . "\n\nIn der Verwaltung siehst du ihn gleich oben als Pop-up und buchst ihn mit einem Tipp ein: " . forma_site_url() . "/verwaltung/\n";
+    try { mm_mail(natal_notify_email_safe(), 'Wunschtermin Kennenlerngespräch: ' . $name, $v, mm_mail_html('Wunschtermin', nl2br(forma_h($v)), 'de')); } catch (Throwable $e) { error_log('AC wish viv: ' . $e->getMessage()); }
+    return ['ok' => true, 'when' => ac_call_wish($c)];
+}
+
+/** Vivien bucht einen Wunschtermin ein (Datum + Uhrzeit), dann wie bisher bestätigen (Videoraum, Mail an sie). */
+function ac_call_book(PDO $pdo, int $id, string $date, string $time): string
+{
+    $c = ac_call($pdo, $id);
+    if (!$c || $c['status'] !== 'angefragt') return 'Diese Anfrage gibt es nicht mehr.';
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !preg_match('/^(\d{1,2}):(\d{2})$/', $time, $m) || (int)$m[1] > 23 || (int)$m[2] > 59) return 'Bitte Datum und Uhrzeit eintragen.';
+    $time = sprintf('%02d:%02d', (int)$m[1], (int)$m[2]);
+    if (strtotime($date . ' ' . $time) < time()) return 'Dieser Zeitpunkt liegt in der Vergangenheit.';
+    $warn = '';
+    try { require_once __DIR__ . '/belegt.inc.php'; $busy = vb_busy($pdo, $date, $date); if (!vb_free($busy, $date, vb_min($time), AC_CALL_MINUTES)) $warn = ' Achtung: Zu dieser Zeit hast du schon etwas anderes im Kalender.'; } catch (Throwable $e) {}
+    $pdo->prepare('UPDATE ac_calls SET date = ?, slot = ? WHERE id = ?')->execute([$date, $time, $id]);
+    return 'Eingebucht für ' . ac_call_when(ac_call($pdo, $id)) . '. ' . ac_call_confirm($pdo, $id) . $warn;
 }
 
 function ac_call_confirm(PDO $pdo, int $id): string
@@ -893,6 +914,13 @@ function ac_call_cancel(PDO $pdo, int $id): void
     if (!$c || $c['status'] === 'abgesagt') return;
     $pdo->prepare("UPDATE ac_calls SET status = 'abgesagt' WHERE id = ?")->execute([$id]);
     $en = $c['lang'] === 'en';
+    if ((string)$c['slot'] === '') { // Wunschtermin passt nicht (noch nicht eingebucht)
+        $first = forma_first_name((string)$c['name']);
+        mv_send_member_mail(['lang' => 'de', 'email' => $c['email']], 'Ein anderer Termin für unser Gespräch', 'neuer Termin ♡', AC_SHORT,
+            ["Hallo $first,", 'danke für deinen Wunschtermin (' . ac_call_wish($c) . '). Genau da geht es sich bei mir leider nicht aus, das tut mir leid. Magst du mir einfach einen anderen Wunschtermin schicken? Ich freu mich auf unser Gespräch.'],
+            mm_site() . '/academy/teacher-training/#gespraech', 'Anderen Wunschtermin schicken', '');
+        return;
+    }
     $first = forma_first_name((string)$c['name']);
     $link = mm_site() . '/academy/teacher-training/' . ($en ? '?lang=en' : '') . '#gespraech';
     mv_send_member_mail(['lang' => $c['lang'], 'email' => $c['email']], $en ? 'A new time for our call' : 'Ein neuer Termin für unser Gespräch', $en ? 'let\'s find a new time ♡' : 'neuer Termin ♡', AC_SHORT,

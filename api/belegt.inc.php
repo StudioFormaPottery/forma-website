@@ -85,6 +85,7 @@ function vb_items(PDO $pdo, string $from, string $to): array
         $st = $pdo->prepare("SELECT id, date, slot, name FROM ac_calls WHERE date BETWEEN ? AND ? AND status IN ('angefragt','bestaetigt')");
         $st->execute([$from, $to]);
         foreach ($st->fetchAll() as $c) {
+            if ((string)$c['slot'] === '') continue; // nur Wunschtermin, noch nicht eingebucht
             $a = vb_min((string)$c['slot']);
             $out[] = ['date' => (string)$c['date'], 'a' => $a, 'b' => $a + 30, 'kind' => 'call', 'title' => 'Kennenlerngespräch Teacher Training', 'who' => (string)$c['name'], 'n' => 0, 'block' => true, 'id' => (int)$c['id']];
         }

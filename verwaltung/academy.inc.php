@@ -8,8 +8,12 @@ require_once dirname(__DIR__) . '/api/academy-lib.php';
 ac_schema($pdo);
 $acBack = $self . '?view=academy';
 
+// Wunschtermine (Vivien, 29.10.2026): Einbuchen/Ablehnen auch aus dem Pop-up auf der Hauptseite, dann zurück dorthin
+$acB = $_POST['back'] ?? null;
+$acCallBack = (is_string($acB) && preg_match('/^(\?[A-Za-z0-9_=&.-]*)?$/', $acB)) ? $self . $acB : $acBack . '#gespraeche';
+if ($action === 'mm_ac_call_book') { go($acCallBack, ac_call_book($pdo, (int)($_POST['id'] ?? 0), (string)($_POST['date'] ?? ''), (string)($_POST['time'] ?? ''))); }
 if ($action === 'mm_ac_call_ok') { go($acBack . '#gespraeche', ac_call_confirm($pdo, (int)($_POST['id'] ?? 0))); }
-if ($action === 'mm_ac_call_no') { ac_call_cancel($pdo, (int)($_POST['id'] ?? 0)); go($acBack . '#gespraeche', 'Abgesagt, sie hat eine Mail mit einem Link für einen neuen Termin bekommen.'); }
+if ($action === 'mm_ac_call_no') { ac_call_cancel($pdo, (int)($_POST['id'] ?? 0)); go($acCallBack, 'Erledigt, sie hat eine liebe Mail mit der Bitte um einen anderen Termin bekommen.'); }
 if ($action === 'mm_ac_offer') {
     try { $link = ac_offer_start($pdo, (int)($_POST['id'] ?? 0)); $_SESSION['ac_offer_link'] = $link; go($acBack . '#gespraeche', 'Das Angebot läuft jetzt ' . AC_OFFER_MINUTES . ' Minuten. Sie sieht die Karte mit dem Kennenlern-Preis in wenigen Sekunden in ihrem Gesprächsraum und hat ihn zusätzlich per Mail.'); }
     catch (Throwable $e) { go($acBack . '#gespraeche', $e->getMessage()); }
@@ -195,7 +199,9 @@ details.why{margin-top:6px;font-size:16px;color:#4A3A41}details.why summary{curs
   <div class="ac-row">
     <span><span class="nm"><?= forma_h(ac_call_when($x)) ?></span><span class="sm"><?= forma_h($x['name']) ?> · <?= forma_h($x['email']) ?><?= $x['phone'] !== '' ? ' · ' . forma_h($x['phone']) : '' ?><?= $x['note'] !== '' ? '<br>„' . forma_h($x['note']) . '“' : '' ?></span></span>
     <span>
-      <?php if ($x['status'] === 'angefragt'): ?>
+      <?php if ($x['status'] === 'angefragt' && (string)$x['slot'] === ''): ?>
+        <form method="post" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center"><?= $csrf ?><input type="hidden" name="action" value="mm_ac_call_book"><input type="hidden" name="id" value="<?= (int)$x['id'] ?>"><input type="date" name="date" value="<?= forma_h((string)$x['date']) ?>" required style="font:inherit;font-size:17px;padding:6px 8px;border-radius:10px;border:1px solid #DDD2C6"><input type="time" name="time" value="<?= forma_h(ac_call_suggest_time($x)) ?>" step="300" required style="font:inherit;font-size:17px;padding:6px 8px;border-radius:10px;border:1px solid #DDD2C6"><button class="btn" type="submit">✓ Einbuchen</button></form>
+      <?php elseif ($x['status'] === 'angefragt'): ?>
         <form method="post"><?= $csrf ?><input type="hidden" name="action" value="mm_ac_call_ok"><input type="hidden" name="id" value="<?= (int)$x['id'] ?>"><button class="btn" type="submit">✓ Passt</button></form>
       <?php else: ?>
         <?php if ($x['host_url'] !== ''): ?><a class="btn" href="<?= forma_h($x['host_url']) ?>" target="_blank" rel="noopener">Zum Gespräch</a><?php endif; ?>
@@ -203,7 +209,7 @@ details.why{margin-top:6px;font-size:16px;color:#4A3A41}details.why summary{curs
         <form method="post"><?= $csrf ?><input type="hidden" name="action" value="mm_ac_offer"><input type="hidden" name="id" value="<?= (int)$x['id'] ?>"><button class="btn btn-ghost" type="submit">✦ Angebot zeigen</button></form>
         <?php endif; ?>
       <?php endif; ?>
-      <form method="post" onsubmit="return confirm('Gespräch absagen? Sie bekommt eine Mail mit einem Link für einen neuen Termin.')"><?= $csrf ?><input type="hidden" name="action" value="mm_ac_call_no"><input type="hidden" name="id" value="<?= (int)$x['id'] ?>"><button class="btn btn-ghost" type="submit">absagen</button></form>
+      <form method="post" onsubmit="return confirm('<?= (string)$x['slot'] === '' ? 'Passt leider nicht? Sie bekommt eine liebe Mail mit der Bitte um einen anderen Wunschtermin.' : 'Gespräch absagen? Sie bekommt eine Mail mit einem Link für einen neuen Termin.' ?>')"><?= $csrf ?><input type="hidden" name="action" value="mm_ac_call_no"><input type="hidden" name="id" value="<?= (int)$x['id'] ?>"><button class="btn btn-ghost" type="submit"><?= (string)$x['slot'] === '' ? 'passt nicht' : 'absagen' ?></button></form>
     </span>
   </div>
   <?php endforeach; ?>
