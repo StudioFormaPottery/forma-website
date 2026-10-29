@@ -580,7 +580,7 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - `next-popup.inc.php`: helle Karte (#FBF8F4, 28 px Ecken), Foto im hohen Torbogen mit feinem versetztem Pflaume-Bogen, Countdown als Pflaume-Etikett unten am Bogen, Preis als Pille. Kein Morphen, kein Logo im Hintergrund, keine Funkel, kein Wackeln. Logik (Phasen, Preise, gesehen-Schlüssel) unverändert.
 
 ## Academy-Kopf mit Countdown (Vivien, 29.10.2026)
-- /academy oben: statt Siegel + kleiner Zeile jetzt „Movecia *Academy* | AUSBILDUNGEN“ groß (`.ac-brand`) und darunter `ac_countdown()` (academy-lib): Kacheln Tage/Stunden/Minuten/Sekunden, live, bis Ende Early-Bird, danach bis Ausbildungsstart. Dunkles Band (`ac_band`) bleibt ohne Countdown. Academy-Logo will Vivien noch ändern (findet das Ring-Siegel „ganz schlimm“).
+- /academy oben: statt Siegel + kleiner Zeile jetzt „Movecia *Academy* | AUSBILDUNGEN“ groß (`.ac-brand`) und darunter `ac_countdown()` (academy-lib): Pflaume-Banner (Bogenlinien, „Early Bird endet in“, große Zahlen mit Doppelpunkten, Preis + „Platz sichern“; Vivien: nackte Zahlenkacheln waren „hässlich“), live, bis Ende Early-Bird, danach bis Ausbildungsstart. Dunkles Band (`ac_band`) bleibt ohne Countdown. Academy-Logo will Vivien noch ändern (findet das Ring-Siegel „ganz schlimm“).
 
 ## Startseiten-Pop-up (Vivien, 29.10.2026, nach „Bäm“-Versuch: Wellen + Mondring „over the top“, Foto immer zu klein)
 - `next-popup.inc.php`: links füllt das Foto die ganze Hälfte (am Handy oben, max. 340 px hoch), sanfter Zoom beim Öffnen, Countdown-Pille unten auf dem Foto. Method-Foto: `ev-ueber-mich.jpg` (Seitstretch im Schneidersitz, von Vivien gewählt; Seitbeuge-Foto gefiel ihr nicht). Keine Wellen, kein Mondring, keine Blobs/Sternchen.

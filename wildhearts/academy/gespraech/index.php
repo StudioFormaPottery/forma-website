@@ -34,7 +34,7 @@ if ($c) {
     }
 }
 $first = $c ? forma_first_name((string)$c['name']) : '';
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=11"><style>
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=12"><style>
 body.acall{min-height:100dvh;display:flex;flex-direction:column}
 .acall main{flex:1;display:flex;flex-direction:column}
 .cr-wait{max-width:560px;margin:clamp(1.5rem,6vh,4rem) auto;padding:0 16px;text-align:center}
