@@ -70,18 +70,16 @@ function mv_next_popup(): void
     // Schlüssel fürs „schon gesehen“: ändert sich mit Angebot und Preisstufe → neues Angebot oder Ende des Early-Bird zeigt das Pop-up wieder
     $ver = $ph . '-' . ($ph === 'method' ? (int)$c['eb_m'] : ($ph === 'unfold' ? (int)$c['eb_u'] : (int)ac_cfg()['eb']));
     ?>
-<!-- Kiesel-Pop-up (Vivien, 28.10.2026: „voll langweilig, lieber rund, in der Form vom Logo“): weiche Kieselform mit versetztem Pflaume-Umriss wie im Logo,
-     Foto als Kiesel, Pflaume-Punkt mit Countdown bis zum Start. Bewegt sich ganz leicht mit der Maus, atmet langsam. -->
+<!-- Torbogen-Pop-up (Vivien, 29.10.2026: Kiesel-Pop-up wirkte altmodisch, „wieder dieses Tor“): klare helle Karte,
+     Foto im hohen Torbogen mit feinem versetztem Pflaume-Bogen, Countdown als kleines Etikett am Bogen. Ruhig, ohne Wackeln. -->
 <div class="npop" id="npop" data-ph="<?= forma_h($ver) ?>" data-force="<?= $force ? '1' : '' ?>" data-start="<?= (int)$startTs ?>" role="dialog" aria-modal="true" aria-labelledby="npop-h" hidden>
   <div class="npop-stage">
-    <span class="npop-ring" aria-hidden="true"></span>
     <div class="npop-card">
-      <svg class="npop-logo" viewBox="17 14 94 94" aria-hidden="true"><path d="M56 32 C 76 29, 92 44, 91 64 C 90 84, 72 96, 53 92 C 34 88, 25 72, 29 53 C 32 40, 43 33, 56 32 Z" fill="#E8D6CA" transform="translate(-6 -4)"/><path d="M44 30 C 62 20, 90 28, 98 50 C 104 68, 92 78, 84 88 C 76 100, 50 98, 36 88 C 22 78, 22 58, 28 46 C 32 38, 38 33, 44 30 Z" fill="none" stroke="#7D5E68" stroke-width="1.6" stroke-linejoin="round" transform="translate(7 4) translate(63 60) scale(0.85) translate(-63 -60)"/><circle cx="81" cy="54" r="9" fill="#7D5E68"/></svg>
-      <span class="npop-spark s1" aria-hidden="true">✦</span><span class="npop-spark s2" aria-hidden="true">✦</span><span class="npop-spark s3" aria-hidden="true">·</span>
       <button class="npop-x" type="button" aria-label="Schließen / Close">✕</button>
       <div class="npop-pic">
+        <span class="npop-arc" aria-hidden="true"></span>
         <div class="npop-ph" style="background-image:url(<?= forma_h($p['img']) ?>);background-position:<?= forma_h($p['pos']) ?>"></div>
-        <span class="npop-dot" aria-hidden="true"><?php if ($startTs): ?><small class="t1"></small><b></b><small class="t2"></small><?php else: ?><small>Nov</small><b>2027</b><?php endif; ?></span>
+        <span class="npop-dot" aria-hidden="true"><?php if ($startTs): ?><small class="t1"></small> <b></b> <small class="t2"></small><?php else: ?><small>Nov</small> <b>2027</b><?php endif; ?></span>
       </div>
       <div class="npop-tx">
         <p class="k"><span class="de"><?= forma_h($p['k'][0]) ?></span><span class="en"><?= forma_h($p['k'][1]) ?></span></p>
@@ -94,64 +92,38 @@ function mv_next_popup(): void
   </div>
 </div>
 <style>
-.npop{position:fixed;inset:0;z-index:90;display:flex;overflow-y:auto;padding:28px 18px;background:rgba(46,37,41,.38);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;transition:opacity .45s}
+.npop{position:fixed;inset:0;z-index:90;display:flex;overflow-y:auto;padding:28px 18px;background:rgba(46,37,41,.34);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);opacity:0;transition:opacity .4s}
 .npop.on{opacity:1}
 .npop[hidden]{display:none}
-.npop-stage{--mx:0;--my:0;position:relative;margin:auto;width:min(700px,100%);transform:translateY(24px) scale(.94) rotate(-1.5deg);transition:transform .9s cubic-bezier(.2,1.25,.4,1)}
+.npop-stage{position:relative;margin:auto;width:min(720px,100%);transform:translateY(18px);transition:transform .6s cubic-bezier(.2,.9,.3,1)}
 .npop.on .npop-stage{transform:none}
-.npop-card{position:relative;z-index:1;display:grid;grid-template-columns:210px 1fr;gap:2rem;align-items:center;padding:3rem 3.4rem 3rem 3rem;background:radial-gradient(120% 90% at 20% 15%,#FBF6F1 0%,#F4EAE2 55%,#EEDFD4 100%);border-radius:44% 56% 48% 52% / 24% 30% 28% 22%;box-shadow:0 34px 80px rgba(46,37,41,.26);translate:calc(var(--mx)*4px) calc(var(--my)*4px);animation:npMorph 14s ease-in-out infinite alternate}
-.npop-ring{position:absolute;inset:0;border:1.5px solid var(--plum,#7D5E68);border-radius:52% 48% 40% 60% / 30% 22% 30% 26%;translate:calc(16px - var(--mx)*10px) calc(-14px - var(--my)*10px);rotate:-1.2deg;opacity:.75;pointer-events:none;animation:npRing 17s ease-in-out infinite alternate}
-@keyframes npMorph{to{border-radius:52% 48% 44% 56% / 30% 24% 22% 28%}}
-@keyframes npRing{to{border-radius:46% 54% 52% 48% / 24% 30% 26% 30%}}
-.npop-pic{position:relative;translate:calc(var(--mx)*-7px) calc(var(--my)*-7px)}
-.npop-ph{aspect-ratio:4/5;background-size:cover;border-radius:52% 48% 44% 56% / 48% 44% 56% 52%;rotate:-2deg;box-shadow:0 14px 34px rgba(74,58,65,.22);animation:npFloat 7s ease-in-out infinite alternate}
-@keyframes npFloat{to{rotate:1deg;translate:0 -5px}}
-.npop-dot{position:absolute;right:-14px;top:6px;width:78px;height:78px;border-radius:50%;background:var(--plum,#7D5E68);color:#FBF5F7;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;box-shadow:0 8px 20px rgba(74,58,65,.3);animation:npBreathe 4.5s ease-in-out infinite}
-.npop-dot b{font-family:var(--serif);font-weight:500;font-size:1.6rem;line-height:.95;margin:.12em 0 .16em}
-.npop-dot b.w{font-size:1.05rem}
-.npop-dot small{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;opacity:.9}
-@keyframes npBreathe{50%{transform:scale(1.07)}}
-.npop-tx{display:flex;flex-direction:column;gap:.5rem;min-width:0}
-.npop-tx .k{font-size:.62rem;letter-spacing:.16em;padding-right:1.8rem}
-.npop-tx h2{font-size:clamp(1.65rem,3.2vw,2.15rem);line-height:1.08;margin:.05rem 0 .15rem}
-.npop-t{color:var(--muted,#7D7076);margin:0;font-size:.92rem;line-height:1.55}
-.npop-pr{margin:.25rem 0 0;align-self:flex-start;background:rgba(251,248,244,.85);border:1px solid var(--line,#DDD2C6);border-radius:18px;padding:.5em 1.05em;color:var(--deep,#4A3A41);font-size:.86rem}
-.npop-cta{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;margin-top:.6rem}
+.npop-card{position:relative;display:grid;grid-template-columns:230px 1fr;gap:2.4rem;align-items:center;padding:2.4rem 2.6rem 2.4rem 2.4rem;background:#FBF8F4;border-radius:28px;box-shadow:0 30px 70px rgba(46,37,41,.22)}
+.npop-pic{position:relative;padding:10px 12px 0 0}
+.npop-ph{aspect-ratio:3/4.2;background-size:cover;border-radius:999px 999px 18px 18px}
+.npop-arc{position:absolute;inset:0 0 14px 14px;border:1.3px solid var(--plum,#7D5E68);border-radius:999px 999px 18px 18px;opacity:.6;pointer-events:none}
+.npop-dot{position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);white-space:nowrap;display:inline-flex;align-items:baseline;gap:.3em;background:var(--plum,#7D5E68);color:#FBF5F7;border-radius:999px;padding:.45em 1em;line-height:1;box-shadow:0 6px 16px rgba(74,58,65,.22)}
+.npop-dot b{font-family:var(--serif);font-weight:500;font-size:1.15rem}
+.npop-dot small{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;opacity:.9}
+.npop-tx{display:flex;flex-direction:column;gap:.55rem;min-width:0}
+.npop-tx .k{font-size:.62rem;letter-spacing:.16em;padding-right:2rem;color:var(--plum,#7D5E68)}
+.npop-tx h2{font-size:clamp(1.6rem,3vw,2.05rem);line-height:1.1;margin:0 0 .1rem}
+.npop-t{color:var(--muted,#7D7076);margin:0;font-size:.92rem;line-height:1.6}
+.npop-pr{margin:.2rem 0 0;align-self:flex-start;background:#F2ECE4;border-radius:999px;padding:.5em 1.1em;color:var(--deep,#4A3A41);font-size:.85rem}
+.npop-cta{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1.1rem;margin-top:.7rem}
 .npop-cta .btn{font-size:.92rem}
 .npop-later{border:0;background:none;color:var(--muted,#7D7076);font:inherit;font-size:.88rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:.4em 0}
-/* Movecia-Zeichen zart im Hintergrund + kleine Funkel (Vivien, 28.10.2026: „cuter, Logo im Hintergrund“) */
-.npop-card{overflow:visible}
-.npop-logo{position:absolute;z-index:0;left:1%;bottom:-2%;width:230px;height:230px;opacity:.55;rotate:-10deg;pointer-events:none;animation:npLogo 9s ease-in-out infinite alternate}
-@keyframes npLogo{to{rotate:-3deg;scale:1.04}}
-.npop-tx,.npop-pic{position:relative;z-index:1}
-.npop-spark{position:absolute;z-index:2;color:var(--plum,#7D5E68);pointer-events:none;line-height:1;animation:npTw 3.2s ease-in-out infinite}
-.npop-spark.s1{left:7%;top:11%;font-size:1.05rem;opacity:.55}
-.npop-spark.s2{left:calc(210px + 3rem);bottom:12%;font-size:.75rem;opacity:.45;animation-delay:-1.4s}
-.npop-spark.s3{left:4%;bottom:20%;font-size:2.4rem;color:#C9A9B2;animation-delay:-2.2s}
-@keyframes npTw{50%{transform:scale(.6);opacity:.2}}
-.npop-pr{background:rgba(234,223,222,.75);border-color:#E2CFD3}
-.npop-x{position:absolute;right:9%;top:9%;z-index:2;width:34px;height:34px;border-radius:50%;border:0;background:rgba(251,248,244,.95);color:var(--deep,#4A3A41);font-size:.9rem;cursor:pointer;box-shadow:0 2px 8px rgba(46,37,41,.1)}
+.npop-x{position:absolute;right:16px;top:16px;z-index:2;width:34px;height:34px;border-radius:50%;border:1px solid #E6DCD2;background:#fff;color:var(--deep,#4A3A41);font-size:.85rem;cursor:pointer}
 @media(max-width:719px){
-  .npop-stage{width:min(420px,100%)}
-  .npop-card{grid-template-columns:1fr;gap:1rem;padding:2rem 1.5rem 1.8rem;text-align:center;border-radius:46% 54% 42% 58% / 14% 16% 13% 12%}
-  .npop-ring{translate:calc(9px - var(--mx)*6px) calc(-9px - var(--my)*6px);border-radius:52% 48% 50% 50% / 15% 12% 14% 14%}
-  @keyframes npMorph{to{border-radius:52% 48% 46% 54% / 16% 13% 12% 15%}}
-  @keyframes npRing{to{border-radius:46% 54% 52% 48% / 12% 15% 13% 14%}}
-  .npop-pic{width:min(46vw,175px);margin:0 auto}
-  .npop-ph{aspect-ratio:1/1}
-  .npop-dot{width:66px;height:66px;right:-18px;top:-4px}
-  .npop-dot b{font-size:1.4rem}
+  .npop-stage{width:min(400px,100%)}
+  .npop-card{grid-template-columns:1fr;gap:1.6rem;padding:2rem 1.4rem 1.7rem;text-align:center}
+  .npop-pic{width:min(46vw,170px);margin:0 auto}
   .npop-tx{align-items:center}
   .npop-tx .k{padding-right:0}
   .npop-pr{align-self:center}
   .npop-cta{justify-content:center}
-  .npop-x{right:2px;top:-10px}
-  .npop-logo{width:140px;height:140px;left:9%;bottom:auto;top:15%;opacity:.5}
-  .npop-spark.s1{left:9%;top:6%}
-  .npop-spark.s2{left:auto;right:12%;bottom:auto;top:32%}
-  .npop-spark.s3{left:6%;bottom:12%}
+  .npop-x{right:12px;top:12px}
 }
-@media(prefers-reduced-motion:reduce){.npop-card,.npop-ring,.npop-ph,.npop-dot,.npop-logo,.npop-spark{animation:none}.npop-stage{transition:none}}
+@media(prefers-reduced-motion:reduce){.npop-stage{transition:none}}
 </style>
 <script>
 (function(){
@@ -162,8 +134,8 @@ function mv_next_popup(): void
   function fill(){if(!st||!dot)return;var en=document.documentElement.dataset.l==='en';
     var d0=new Date();d0.setHours(0,0,0,0);var s=new Date(st*1000);s.setHours(0,0,0,0);var n=Math.round((s-d0)/864e5);
     var b=dot.querySelector('b'),t1=dot.querySelector('.t1'),t2=dot.querySelector('.t2');
-    if(n<=0){b.textContent=en?'Today':'Heute';b.className='w';t1.textContent=en?'starts':'Start';t2.textContent='';}
-    else if(n===1){b.textContent=en?'Tomorrow':'Morgen';b.className='w';t1.textContent='Start';t2.textContent='';}
+    if(n<=0){b.textContent=en?'Today':'Heute';b.className='';t1.textContent=en?'starts':'Start';t2.textContent='';}
+    else if(n===1){b.textContent=en?'Tomorrow':'Morgen';b.className='';t1.textContent='Start';t2.textContent='';}
     else{b.textContent=n;b.className='';t1.textContent=en?'in':'in';t2.textContent=en?'days':'Tagen';}}
   fill();document.addEventListener('mvlang',fill);
   try{seen=sessionStorage.getItem(key)==='1'}catch(e){}
