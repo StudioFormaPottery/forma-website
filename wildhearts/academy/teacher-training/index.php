@@ -27,7 +27,7 @@ $ee = fn(int $x) => ac_eur($x, 'en');
 $dd = fn(string $ymd) => ac_d($ymd);
 $de2 = fn(string $ymd) => ac_d($ymd, 'en');
 if ($offer || isset($_GET['danke']) || isset($_GET['abbruch'])) $GLOBALS['mvl_noindex'] = true;
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=12">';
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=13">';
 mvl_head('Yogalehrerausbildung auf Deutsch · Mindful Becoming Teacher Training ' . AC_HOURS . ' Std. | Movecia Academy Tirol',
     'Die ' . AC_HOURS . '-Stunden-Ausbildung mit Vivien Malonga, ausschließlich auf Deutsch: vollständige 200-Stunden-Yogalehrerausbildung nach internationalem Curriculum, Somatic Movement, Breathwork, Anatomie & Body Scanning, Mental Load & Nervensystem. 11 Monate hybrid, online aus Österreich, Deutschland, der Schweiz und Südtirol, Präsenzwochenende in Tirol. Start ' . mv_date($st) . ', nur 14 Plätze.' . ($c['eb'] ? ' Early-Bird bis ' . mv_date($c['eb_end']) . '.' : ''),
     $site . '/academy/teacher-training/', '/img/movecia/og-academy.jpg', $css, ac_jsonld($pdo));

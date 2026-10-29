@@ -24,7 +24,7 @@ function mv_menu_items(): array
         ['/natal/', 'Prä- &amp; Postnatal', 'Pre- &amp; postnatal', 'natal', '1:1 im Studio &amp; online', '1:1 in the studio &amp; online'],
         ['/gathering/', 'Gatherings', 'Gatherings', 'gathering', 'Live und kostenlos, einmal im Monat', 'Free and live, once a month'],
         // Movecia Academy (Vivien, 28.10.2026): Ausbildungen, zuerst das Teacher Training
-        ['/academy/', 'Academy', 'Academy', 'academy', 'Teacher Training ab Nov. 2027 · jetzt buchbar', 'Teacher training from Nov 2027 · open now'],
+        ['/academy/', 'Academy', 'Academy', 'academy', 'Für alle, die eine Ausbildung machen möchten', 'For everyone who wants to train as a teacher'],
         ['/#vivien', 'Über mich', 'About me', 'about', 'Ich bin Vivien', "Hi, I'm Vivien"],
     ];
 }
@@ -37,7 +37,7 @@ function mv_menu(string $active = '', array $o = []): void
     $links = $o['links'] ?? true;
     $items = mv_menu_items();
     if ($links): ?>
-<nav class="mvm-bar" aria-label="Menü"><?php foreach ($items as [$href, $de, $en, $k]) if (!in_array($k, ['start', 'gathering'], true)): ?><a href="<?= $href ?>"<?= $k === $active ? ' class="on" aria-current="page"' : '' ?>><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></a><?php endif; ?><a class="lg" href="/mitglieder/"><span class="de">Login</span><span class="en">Log in</span></a></nav>
+<nav class="mvm-bar" aria-label="Menü"><?php foreach ($items as [$href, $de, $en, $k]) if (!in_array($k, ['start', 'gathering'], true)): ?><a href="<?= $href ?>"<?= $k === $active ? ' class="on' . ($k === 'academy' ? ' mvm-ac' : '') . '" aria-current="page"' : ($k === 'academy' ? ' class="mvm-ac"' : '') ?>><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></a><?php endif; ?><a class="lg" href="/mitglieder/"><span class="de">Login</span><span class="en">Log in</span></a></nav>
 <?php endif; ?>
 <button class="mvm-btn" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mvm-panel"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14"/></svg></button>
 <?php if ($assets) return; $assets = true; ?>
@@ -48,7 +48,7 @@ function mv_menu(string $active = '', array $o = []): void
     <button class="mvm-x" type="button" aria-label="Menü schließen"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg></button>
   </div>
   <nav class="mvm-list" aria-label="Seiten">
-    <?php foreach ($items as [$href, $de, $en, $k, $sde, $sen]): ?><a href="<?= $href ?>"<?= $k === $active ? ' class="on" aria-current="page"' : '' ?>><b><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></b><small><span class="de"><?= $sde ?></span><span class="en"><?= $sen ?></span></small><svg class="ar" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4l6 6-6 6"/></svg></a>
+    <?php foreach ($items as [$href, $de, $en, $k, $sde, $sen]): ?><a href="<?= $href ?>"<?= $k === $active ? ' class="on' . ($k === 'academy' ? ' mvm-ac' : '') . '" aria-current="page"' : ($k === 'academy' ? ' class="mvm-ac"' : '') ?>><b><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></b><small><span class="de"><?= $sde ?></span><span class="en"><?= $sen ?></span></small><svg class="ar" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4l6 6-6 6"/></svg></a>
     <?php endforeach; ?>
   </nav>
   <div class="mvm-foot">
@@ -86,6 +86,13 @@ html:not([data-l=en]):not([lang=en]) .mvm .en,html:not([data-l=en]):not([lang=en
 .mvm-list a.on b{color:#7D5E68}
 .mvm-list a.on b::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#7D5E68;margin-left:.5rem;vertical-align:middle}
 .mvm-list a:active{background:#FBF8F4}
+/* Academy hebt sich ab (Vivien, 29.10.2026): eigene dunkle Pflaume-Karte */
+.mvm-list a.mvm-ac{margin:12px 0 4px;padding:16px 18px;border:0;border-radius:20px;background:linear-gradient(115deg,#5E4A51,#7D5E68);color:#FBF5F7}
+.mvm-list a.mvm-ac b,.mvm-list a.mvm-ac.on b{color:#FBF5F7}
+.mvm-list a.mvm-ac small{color:#E8D6CA}
+.mvm-list a.mvm-ac .ar{color:#FBF5F7}
+.mvm-list a.mvm-ac.on b::after{background:#E8D6CA}
+.mvm-bar a.mvm-ac{background:#6B5658;color:#FBF5F7}
 .mvm-foot{margin-top:auto;padding-top:24px;display:flex;flex-direction:column;gap:14px;align-items:flex-start}
 .mvm-login{display:inline-flex;align-items:center;justify-content:center;width:100%;background:#7D5E68;color:#FBF5F7;border-radius:999px;padding:.9em 1.4em;text-decoration:none;font-weight:500}
 .mvm-app{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:10px 14px;border:1px solid #DDD2C6;border-radius:18px;background:#FBF8F4;color:#2E2529;text-decoration:none}

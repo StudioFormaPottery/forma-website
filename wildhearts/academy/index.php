@@ -22,7 +22,7 @@ $ld = [
      'hasOfferCatalog' => ['@type' => 'OfferCatalog', 'name' => 'Ausbildungen', 'itemListElement' => [['@type' => 'Offer', 'itemOffered' => ['@type' => 'Course', '@id' => $site . '/academy/teacher-training/#course', 'name' => AC_TITLE, 'url' => $site . '/academy/teacher-training/']]]]],
     ['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => [['@type' => 'ListItem', 'position' => 1, 'name' => 'Movecia', 'item' => $site . '/'], ['@type' => 'ListItem', 'position' => 2, 'name' => 'Academy', 'item' => $site . '/academy/']]],
 ];
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=12">';
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=13">';
 mvl_head('Movecia Academy · Yogalehrerausbildung auf Deutsch, Tirol & online', 'Ausbildungen der Movecia Academy mit Vivien Malonga, ausschließlich auf Deutsch, für Österreich, Deutschland, die Schweiz und Südtirol: das Mindful Becoming Teacher Training mit 550 Stunden, inkl. vollständiger 200-Stunden-Yogalehrerausbildung, Somatic Movement und Breathwork. Hybrid, mit Präsenzwochenende in den Tiroler Alpen. Nur 14 Plätze, Start November 2027.', $site . '/academy/', '/img/movecia/og-academy.jpg', $css, $ld);
 ?>
 <body class="acad">
@@ -33,7 +33,7 @@ mvl_head('Movecia Academy · Yogalehrerausbildung auf Deutsch, Tirol & online', 
 <section class="w"><div class="in hero-x ac-hero">
   <?= mv_waves(false) ?>
   <div>
-    <div class="ac-head2"><p class="ac-brand">Movecia <em>Academy</em><span>Ausbildungen</span></p><?= ac_countdown() ?></div>
+    <div class="ac-head2"><?= ac_countdown() ?></div>
     <h1><span class="de">Lernen, <em>andere</em> zu begleiten.</span><span class="en">Learn to <em>guide</em> others.</span></h1>
     <p class="sub"><span class="de">Ohne dich selbst dabei zu verlieren.</span><span class="en">Without losing yourself along the way.</span></p>
     <p class="lead"><span class="de">In der Movecia Academy gebe ich weiter, was ich in vielen Jahren Unterricht gelernt habe: Mindful Movement, Yoga, Somatic Movement und Breathwork, verbunden zu einer Praxis, die Körper und Kopf spürbar stärkt. Für Frauen, die selbst schon eine Weile in Bewegung sind und spüren, dass sie das weitergeben möchten. Alle Ausbildungen finden auf Deutsch statt, online aus Österreich, Deutschland, der Schweiz und Südtirol, mit Präsenzzeit in Tirol.</span><span class="en">In the Movecia Academy I pass on what many years of teaching have taught me: mindful movement, yoga, somatic movement and breathwork, woven into one practice that leaves body and mind noticeably stronger. For women who have been moving for a while themselves and feel that they want to share it.</span></p>
