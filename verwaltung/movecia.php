@@ -429,6 +429,11 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                     <a href="<?= forma_h($tl) ?>" target="_blank" style="font-size:15px">So sieht sie es</a>
                     <?php if ($hl): ?><a href="<?= forma_h($hl) ?>" target="_blank" style="font-size:15px;padding:.5em 1em;border-radius:999px;background:#7D5E68;color:#FBF5F7;text-decoration:none">Als Gastgeberin öffnen</a><?php endif; ?>
                 </p>
+                <?php $tmMsg = tm_message($tm); ?>
+                <details style="margin:.3rem 0 .5rem"<?= $tm['status'] === 'offen' ? ' open' : '' ?>><summary style="cursor:pointer;font-size:15px;color:#7D5E68">✉️ Fertige Nachricht mit Link</summary>
+                    <textarea readonly rows="9" style="width:100%;margin-top:6px;font:inherit;font-size:15px;padding:.7em .9em;border-radius:12px;border:1px solid #DDD2C6;background:#FBF8F4"><?= forma_h($tmMsg) ?></textarea>
+                    <button type="button" data-msg="<?= forma_h($tmMsg) ?>" onclick="navigator.clipboard.writeText(this.dataset.msg);this.textContent='Kopiert ✓'" style="font-size:15px;padding:.5em 1.1em;border-radius:999px;border:0;background:#7D5E68;color:#FBF5F7;cursor:pointer">Nachricht kopieren</button>
+                </details>
                 <div style="display:flex;gap:8px;flex-wrap:wrap">
                     <?php if ($tm['status'] === 'fix'): ?><form method="post" style="margin:0" onsubmit="return confirm('Uhrzeit wieder freigeben? Sie kann dann neu wählen (bitte selbst Bescheid geben).')"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="tid" value="<?= (int)$tm['id'] ?>"><input type="hidden" name="action" value="mm_tm_reset"><button style="font-size:14px;padding:.45em .9em;border-radius:999px;border:1px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer">Uhrzeit wieder freigeben</button></form><?php endif; ?>
                     <form method="post" style="margin:0" onsubmit="return confirm('Termin-Link löschen?')"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="tid" value="<?= (int)$tm['id'] ?>"><input type="hidden" name="action" value="mm_tm_del"><button style="font-size:14px;padding:.45em .9em;border:0;background:none;color:#7D7076;cursor:pointer">löschen</button></form>

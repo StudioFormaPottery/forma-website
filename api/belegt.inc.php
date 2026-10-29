@@ -90,6 +90,17 @@ function vb_items(PDO $pdo, string $from, string $to): array
             $out[] = ['date' => (string)$c['date'], 'a' => $a, 'b' => $a + 30, 'kind' => 'call', 'title' => 'Kennenlerngespräch Teacher Training', 'who' => (string)$c['name'], 'n' => 0, 'block' => true, 'id' => (int)$c['id']];
         }
     } catch (Throwable $e) {}
+    try { // Persönliche Termin-Links (api/termin-lib.php): offen = ganzes Zeitfenster gesperrt, fix = gewählte Zeit
+        $st = $pdo->prepare("SELECT id, title, guest, name, date, times, minutes, status, slot FROM mm_termine WHERE date BETWEEN ? AND ? AND status IN ('offen','fix')");
+        $st->execute([$from, $to]);
+        foreach ($st->fetchAll() as $t) {
+            $ts = array_values(array_filter(explode(',', (string)$t['times'])));
+            if ($t['status'] === 'fix' && $t['slot'] !== '') { $a = vb_min((string)$t['slot']); $b = $a + (int)$t['minutes']; }
+            elseif ($ts) { $a = vb_min($ts[0]); $b = vb_min(end($ts)) + (int)$t['minutes']; }
+            else continue;
+            $out[] = ['date' => (string)$t['date'], 'a' => $a, 'b' => $b, 'kind' => 'termin', 'title' => 'Videogespräch: ' . $t['title'] . ($t['status'] === 'offen' ? ' (Uhrzeit wird noch gewählt)' : ''), 'who' => (string)($t['name'] ?: $t['guest']), 'n' => 0, 'block' => true, 'id' => (int)$t['id']];
+        }
+    } catch (Throwable $e) {}
     // Gruppen-Angebote (api/angebote.inc.php): bestätigt = belegt; offene Angebote halten den Termin ebenfalls frei
     foreach (forma_offer_events($pdo, $from, $to) as $e) {
         if ($e['from'] === '') continue;

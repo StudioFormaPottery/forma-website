@@ -35,6 +35,7 @@ function tm_schema(PDO $pdo): void
         booked_at TEXT NOT NULL DEFAULT '',
         created_at TEXT NOT NULL
     )");
+    try { $pdo->exec("ALTER TABLE mm_termine ADD COLUMN msg TEXT NOT NULL DEFAULT ''"); } catch (Throwable $e) {}
     tm_seed($pdo);
 }
 
@@ -42,7 +43,13 @@ function tm_schema(PDO $pdo): void
 function tm_seed(PDO $pdo): void
 {
     $cfg = mm_cfg('termine') ?? [];
-    if (!empty($cfg['seed_marigold'])) return;
+    if (!empty($cfg['seed_marigold'])) {
+        if (empty($cfg['msg_marigold'])) {
+            $pdo->prepare("UPDATE mm_termine SET msg = ? WHERE title = 'Präsenzwochenende Teacher Training' AND date = '2026-11-02' AND msg = ''")->execute([tm_msg_marigold()]);
+            mm_save_cfg('termine', ['msg_marigold' => date('c')] + $cfg);
+        }
+        return;
+    }
     tm_create($pdo, [
         'title' => 'Präsenzwochenende Teacher Training',
         'guest' => 'Maria und Jakob',
@@ -51,6 +58,24 @@ function tm_seed(PDO $pdo): void
         'script' => tm_script_marigold(),
     ]);
     mm_save_cfg('termine', ['seed_marigold' => date('c')] + $cfg);
+}
+
+/** Fertige Mail an Maria und Jakob (Vivien, 29.10.2026), {link} wird beim Kopieren ersetzt. Einmal nachgetragen. */
+function tm_msg_marigold(): string
+{
+    return "Hallo Maria, hallo Jakob,\n\nschön, dass es am Montag klappt! Am besten geht es bei mir zwischen 8 und 11 Uhr, da sind meine Kinder in Betreuung (Au-pair).\n\n"
+        . "Hier könnt ihr euch einfach eine Uhrzeit aussuchen:\n{link}\n\n"
+        . "Ihr bekommt dann gleich eine Bestätigung, und über denselben Link kommt ihr am Montag direkt in unser Videogespräch, ganz ohne App.\n\n"
+        . "Es wäre super, wenn ihr mir vorher schon die Kostenaufstellung schicken könntet. Falls das übers Wochenende zu knapp ist, macht das gar nichts, dann besprechen wir einfach alles am Montag.\n\n"
+        . "Ich freu mich auf euch!\n\nLiebe Grüße\nVivien";
+}
+
+/** Nachricht zum Kopieren: eigene Nachricht des Termins oder ein kurzer Standardtext, immer mit Link. */
+function tm_message(array $t): string
+{
+    $m = trim((string)($t['msg'] ?? ''));
+    if ($m === '') $m = ($t['guest'] !== '' ? 'Hallo ' . $t['guest'] . ",\n\n" : "Hallo,\n\n") . 'such dir für unser Videogespräch (' . $t['title'] . ', ' . tm_day($t) . ") einfach eine Uhrzeit aus:\n{link}\n\nDu bekommst dann gleich eine Bestätigung, und über denselben Link kommst du direkt in unser Videogespräch, ganz ohne App.\n\nLiebe Grüße\nVivien";
+    return str_replace('{link}', tm_link($t), $m);
 }
 
 /** Gesprächsleitfaden für den Teleprompter (nur Vivien sieht ihn). */
@@ -134,7 +159,7 @@ function tm_day(array $t): string
 function tm_free_times(PDO $pdo, array $t): array
 {
     $busy = [];
-    try { require_once __DIR__ . '/belegt.inc.php'; $busy = vb_busy($pdo, $t['date'], $t['date']); } catch (Throwable $e) {}
+    try { require_once __DIR__ . '/belegt.inc.php'; $busy = vb_busy($pdo, $t['date'], $t['date'], ['termin']); } catch (Throwable $e) {}
     $out = [];
     foreach (explode(',', (string)$t['times']) as $s) {
         if ($s === '' || tm_ts($t, $s) < time() + 30 * 60) continue;
