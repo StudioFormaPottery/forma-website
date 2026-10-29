@@ -2656,6 +2656,43 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
         </div>
         <form method="post" class="logout"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="logout"><button class="link small" type="submit">Abmelden</button></form>
     </section>
+    <?php // Diese Woche (Vivien, 29.10.2026): nur Termine mit Anmeldungen, Mo–So der laufenden Woche, gleich unter den Zahlen
+    require_once dirname(__DIR__) . '/api/belegt.inc.php';
+    $wkFrom = date('Y-m-d', strtotime('monday this week')); $wkTo = date('Y-m-d', strtotime('sunday this week'));
+    $wk = array_values(array_filter(vb_items($pdo, $wkFrom, $wkTo), fn($it) => $it['date'] >= $wkFrom && $it['date'] <= $wkTo && (($it['kind'] === 'forma' && $it['n'] > 0) || $it['kind'] === 'private')));
+    usort($wk, fn($a, $b) => [$a['date'], $a['a']] <=> [$b['date'], $b['a']]);
+    $wdS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']; ?>
+    <section class="card week">
+        <h2>Diese Woche <span class="muted small"><?= date('j.n.', strtotime($wkFrom)) ?> – <?= date('j.n.', strtotime($wkTo)) ?></span></h2>
+        <?php if (!$wk): ?><p class="muted" style="margin:.3rem 0 0">Diese Woche hat sich noch niemand für einen Kurs angemeldet.</p><?php else: ?>
+        <div class="wk-list">
+        <?php foreach ($wk as $it): $t = strtotime($it['date']); $past = $it['date'] < date('Y-m-d');
+            $title = preg_replace('/\s*·.*$/u', '', (string)$it['title']);
+            $who = $it['kind'] === 'private' ? (string)$it['who'] : ($it['n'] === 1 ? '1 Person' : $it['n'] . ' Personen');
+            $href = $it['kind'] === 'forma' ? '?view=course&id=' . (int)$it['id'] : '?view=kalender&m=' . substr($it['date'], 0, 7); ?>
+            <a class="wk-it<?= $past ? ' past' : '' ?><?= $it['date'] === date('Y-m-d') ? ' today' : '' ?>" href="<?= forma_h($self . $href) ?>">
+                <span class="wk-d"><b><?= $wdS[(int)date('w', $t)] ?></b><small><?= date('j.n.', $t) ?></small></span>
+                <span class="wk-t"><strong><?= forma_h($title) ?></strong><span class="muted small"><?= sprintf('%d:%02d', intdiv($it['a'], 60), $it['a'] % 60) ?> Uhr</span></span>
+                <span class="wk-n"><?= forma_h($who) ?></span>
+            </a>
+        <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+    </section>
+    <style>
+    .week{margin:12px 0}
+    .week h2{margin:0 0 .6rem;font-size:1.25rem}
+    .wk-list{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+    .wk-it{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:#F6EEE6;color:inherit;text-decoration:none;border:1px solid rgba(51,33,27,.08)}
+    .wk-it:hover{border-color:#8C2C1D}
+    .wk-it.today{background:#fff;border-color:#8C2C1D}
+    .wk-it.past{opacity:.5}
+    .wk-d{display:flex;flex-direction:column;align-items:center;min-width:44px;padding:4px 0;border-radius:12px;background:#8C2C1D;color:#fff;line-height:1.1}
+    .wk-d b{font-size:1rem}.wk-d small{font-size:.72rem;opacity:.9}
+    .wk-t{display:flex;flex-direction:column;flex:1;min-width:0}
+    .wk-t strong{line-height:1.25}
+    .wk-n{font-weight:600;color:#8C2C1D;white-space:nowrap;font-size:.95rem}
+    </style>
     <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
     <?php if (!forma_stripe_key()): ?><p class="alert">Die Online-Bezahlung ist noch nicht eingerichtet. Bis dahin werden alle Kurse ohne Bezahlung reserviert. <a href="<?= forma_h($self) ?>?view=einstellungen">Jetzt Stripe verbinden</a></p><?php endif; ?>
     <?php $natalReq = 0; try { $natalReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} ?>

@@ -402,6 +402,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         <?php endif; ?>
         <?php mm_subnav($part ?: 'movecia'); ?>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <?php if ($part === '') { require_once __DIR__ . '/woche.inc.php'; mm_week_box($pdo, $self); } // Diese Woche (Vivien, 29.10.2026) ?>
         <?php if ($part === '') admin_news_render($pdo, 'movecia', $self, '?view=movecia'); ?>
         <?php if ($part === '') { require_once __DIR__ . '/ac-wunsch.inc.php'; ac_wish_popup($pdo, '?view=movecia'); } ?>
         <?php $acOpenM = 0; try { require_once dirname(__DIR__) . '/api/academy-lib.php'; $acOpenM = ac_unanswered($pdo); } catch (Throwable $e) {} ?>
