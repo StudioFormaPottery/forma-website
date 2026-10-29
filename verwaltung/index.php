@@ -2578,7 +2578,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
         </div>
         <div class="stats">
             <a class="stat" href="<?= forma_h($self) ?>?view=kalender"><b><?= $toPlan ?></b><span>Private Pottery zum Einplanen</span></a>
-            <a class="stat" href="#termine"><b><?= $newBookings ?></b><span>neue Buchungen in 7 Tagen</span></a>
+            <a class="stat" href="#neu"><b><?= $newBookings ?></b><span>neue Buchungen in 7 Tagen</span></a>
             <a class="stat" href="<?= forma_h($self) ?>?view=liste"><b><?= $subCount ?></b><span>Kontakte im Newsletter</span></a>
         </div>
         <form method="post" class="logout"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="logout"><button class="link small" type="submit">Abmelden</button></form>
@@ -2590,26 +2590,17 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
     <?php require_once __DIR__ . '/ac-wunsch.inc.php'; ac_wish_popup($pdo, ''); // Pop-up Wunschtermin Kennenlerngespräch (Vivien, 29.10.2026) ?>
     <?php $acOpen = 0; try { require_once dirname(__DIR__) . '/api/academy-lib.php'; $acOpen = ac_unanswered($pdo); } catch (Throwable $e) {} ?>
     <?php if ($acOpen): ?><a class="card notice" href="<?= forma_h($self) ?>?view=academy#chat"><span class="ic">💬</span><span><strong><?= $acOpen === 1 ? '1 neue Nachricht' : $acOpen . ' neue Nachrichten' ?> im Teacher Training</strong><br><span class="muted small">Eine Teilnehmerin wartet auf deine Antwort →</span></span></a><?php endif; ?>
-    <?php // Kleine Boxen ganz oben (Vivien, 28.10.2026: „direkt auf der Hauptseite als kleine Box, damit ich nicht suchen muss“)
-    foreach (FORMA_ADMIN_NEWS as $nw): if (date('Y-m-d') > $nw['until'] || ($nw['b'] ?? 'forma') !== 'forma') continue; ?>
-        <a class="card notice news" href="<?= forma_h($self . $nw['link']) ?>"><span class="ic">✨</span><span><strong><?= forma_h($nw['title']) ?></strong><br><span class="muted small"><?= forma_h($nw['text']) ?> →</span></span></a>
-    <?php endforeach; ?>
-    <?php foreach (forma_offers($pdo) as $of): if (!in_array($of['status'], ['offen', 'bestaetigt'], true)) continue;
-        $ofDays = implode(' & ', array_map(fn($d) => date('j.n.', strtotime($d['date'])), forma_offer_dates($of))); ?>
-        <div class="card notice offer-box">
-            <span class="ic"><?= admin_icon('angebot') ?></span>
-            <span style="flex:1;min-width:0"><strong>Angebot <?= forma_h($of['org']) ?> (<?= forma_h($ofDays) ?>): <?= forma_h(forma_offer_status_label($of)) ?></strong><br>
-            <span class="row-actions" style="margin-top:6px">
-                <?php if ($of['status'] === 'offen'): $wa = forma_offer_whatsapp($of); $ph = preg_replace('/\D+/', '', (string)$of['phone']); if (str_starts_with($ph, '00')) $ph = substr($ph, 2); elseif (str_starts_with($ph, '0')) $ph = '43' . substr($ph, 1); ?>
-                <a class="btn" href="https://wa.me/<?= forma_h($ph) ?>?text=<?= rawurlencode($wa) ?>" target="_blank" rel="noopener">Per WhatsApp schicken</a>
-                <?php else: ?>
-                <a class="btn" href="<?= forma_h($self) ?>?view=angebote&amp;id=<?= (int)$of['id'] ?>#a<?= (int)$of['id'] ?>">Bar bezahlt / Kinderzahl</a>
-                <?php endif; ?>
-                <a class="link small" href="<?= forma_h(forma_offer_link($of)) ?>" target="_blank" rel="noopener">Angebot ansehen</a>
-                <a class="link small" href="<?= forma_h($self) ?>?view=angebote&amp;id=<?= (int)$of['id'] ?>#a<?= (int)$of['id'] ?>">Alle Details</a>
-            </span></span>
-        </div>
-    <?php endforeach; ?>
+    <?php // „Neu reingekommen“ statt Funktions-Boxen (Vivien, 29.10.2026: Buchungen/Gutscheine sofort sehen, ohne zu suchen)
+    require_once __DIR__ . '/feed.inc.php';
+    admin_offer_chip($pdo, $self);
+    admin_feed_box($pdo, $self);
+    $fnews = array_values(array_filter(FORMA_ADMIN_NEWS, fn($nw) => date('Y-m-d') <= $nw['until'] && ($nw['b'] ?? 'forma') === 'forma'));
+    if ($fnews): ?>
+        <details class="card fnews"><summary>✨ Neu in deiner Verwaltung (<?= count($fnews) ?>)</summary>
+        <?php foreach ($fnews as $nw): ?><a class="fnews-it" href="<?= forma_h($self . $nw['link']) ?>"><strong><?= forma_h($nw['title']) ?></strong><br><span class="muted small"><?= forma_h($nw['text']) ?> →</span></a><?php endforeach; ?>
+        </details>
+        <style>.fnews{margin:10px 0;padding:.7rem 1.1rem}.fnews summary{cursor:pointer;color:#7a5a48;font-size:.95rem}.fnews-it{display:block;padding:.55rem 0;border-top:1px solid rgba(51,33,27,.1);color:inherit;text-decoration:none}.fnews-it:first-of-type{border-top:0;margin-top:.4rem}</style>
+    <?php endif; ?>
     <?php if ($toPlan > 0): ?><a class="card notice" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('private') ?></span><span><strong><?= $toPlan === 1 ? '1 Private-Pottery-Buchung wartet' : $toPlan . ' Private-Pottery-Buchungen warten' ?> auf ihren Termin.</strong><br><span class="muted small">Im Kalender einplanen und Bestätigung schicken →</span></span></a><?php endif; ?>
     <div class="dash">
         <section class="agenda card">

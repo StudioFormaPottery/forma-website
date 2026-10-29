@@ -569,3 +569,8 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 
 ## Musik-Geschmack Website (Vivien, 29.10.2026)
 - Musik auf moveciamovement.com: mystisch, natürlich, tiefe Töne „die aus der Seele kommen“, Drones, gesummte/gechantete Stimmen (Vorbild: mystische Chant-Musik auf YouTube). KEIN Glocken-/Klangschalen-Geklimper, kein Piano-Geplimper, keine Beats. Bei Epidemic nach drone / ambient / meditation / vocal presence suchen, Ordner `web`.
+
+## Verwaltung · „Neu reingekommen“ (Vivien, 29.10.2026: „sobald eine Buchung reinkommt, sofort sehen, wer was gebucht hat“)
+- FORMA-Startseite der Verwaltung: Box „Neu reingekommen“ (`verwaltung/feed.inc.php`, `admin_feed_box`) statt der Funktions-Boxen, letzte 7 Tage, neueste oben, 6 sichtbar, Rest aufklappbar: Kursbuchungen (Name, Kurs, Termin, Personen, Gutschein/bezahlt/vor Ort), Gutscheine gekauft/bezahlt/ausgestellt (noch offen)/eingelöst, Private Pottery, Atelier-Kasse, Templates, Gruppen-Angebote bestätigt/bezahlt. Seit dem letzten Besuch neu = roter Ring (Setting `admin_feed_seen`). Die Zahl „neue Buchungen in 7 Tagen“ springt dorthin (`#neu`).
+- Gruppen-Angebote stehen auf der Startseite nur noch als ein kleines Feld (`admin_offer_chip`: „N Angebote verschickt · M bestätigt, noch nicht bezahlt“ → Angebote), keine einzelnen Boxen mehr.
+- Funktions-Neuigkeiten (`FORMA_ADMIN_NEWS` ohne `b`) stehen eingeklappt darunter („✨ Neu in deiner Verwaltung (N)“). Neue Ereignisarten (z. B. neue Buchungsarten) in `admin_feed()` ergänzen.
