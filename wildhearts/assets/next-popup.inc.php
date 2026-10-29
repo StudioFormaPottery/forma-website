@@ -40,7 +40,7 @@ function mv_next_popup(): void
         return $l === 'en' ? $d->format('j F') : $d->format('j') . '. ' . $m[(int)$d->format('n')];
     };
     if ($ph === 'method') {
-        $p = ['img' => '/img/movecia/fotos/ev-method-karte.jpg', 'pos' => '40% 30%', 'href' => '/method/',
+        $p = ['img' => '/img/movecia/fotos/ev-ueber-mich.jpg', 'pos' => '45% 55%', 'href' => '/method/',
             'k' => ['Mindful Movement Method · Start ' . $short($ml, 'de'), 'Mindful Movement Method · starts ' . $short($ml, 'en')],
             'h' => ['Jeden Tag ein paar <em>ruhige Minuten</em> für dich', 'A few <em>quiet minutes</em> for you, every day'],
             't' => ['Kurze Videos aus Yoga, Somatic Movement und Bodyweight, dazu Breathwork und Meditation. Du beginnst bei Monat 1 und gehst Schritt für Schritt weiter.', 'Short videos of yoga, somatic movement and bodyweight training, plus breathwork and meditation. You begin with month 1 and go step by step.'],
@@ -171,6 +171,7 @@ function mv_next_popup(): void
   .npop-stage{width:min(420px,100%)}
   .npop-card{grid-template-columns:1fr}
   .npop-side{min-height:0;height:min(44vh,340px)}
+  .npop-dot{left:14px;top:14px;bottom:auto;transform:none}
   .npop-tx{padding:1.6rem 1.3rem 1.5rem;align-items:center;text-align:center;gap:.5rem}
   .npop-now{justify-content:center;padding-right:0}
   .npop-line{align-self:center}
