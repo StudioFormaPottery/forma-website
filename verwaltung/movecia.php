@@ -437,9 +437,9 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                 <p style="margin:.4rem 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
                     <input readonly value="<?= forma_h($tl) ?>" onclick="this.select()" style="flex:1;min-width:220px;font-size:15px;padding:.5em .8em;border-radius:12px;border:1px solid #DDD2C6">
                     <button type="button" onclick="navigator.clipboard.writeText('<?= forma_h($tl) ?>');this.textContent='Kopiert ✓'" style="font-size:15px;padding:.5em 1em;border-radius:999px;border:1px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer">Link kopieren</button>
-                    <a href="<?= forma_h($tl) ?>" target="_blank" style="font-size:15px">So sieht sie es</a>
+                    <a href="<?= forma_h($tl) ?>&amp;vorschau=1" target="_blank" style="font-size:15px">Vorschau (bucht nichts)</a>
                     <a href="?view=movecia&amp;tmvorschau=<?= (int)$tm['id'] ?>" target="_blank" style="font-size:15px">Bestätigungsmail ansehen</a>
-                    <?php if ($hl): ?><a href="<?= forma_h($hl) ?>" target="_blank" style="font-size:15px;padding:.5em 1em;border-radius:999px;background:#7D5E68;color:#FBF5F7;text-decoration:none">Als Gastgeberin öffnen</a><?php endif; ?>
+                    <?php if ($hl): ?><a href="<?= forma_h($hl) ?>" target="_blank" style="font-size:15px;padding:.5em 1em;border-radius:999px;background:#7D5E68;color:#FBF5F7;text-decoration:none">Als Gastgeberin öffnen</a><?php endif; ?><?php if (!$hl && $tm['status'] === 'offen'): ?><span style="font-size:14px;color:#7D7076">Dein Zugang zum Videoraum (mit Teleprompter) erscheint hier, sobald sie eine Uhrzeit gewählt hat.</span><?php endif; ?>
                 </p>
                 <?php $tmMsg = tm_message($tm); ?>
                 <details style="margin:.3rem 0 .5rem"<?= $tm['status'] === 'offen' ? ' open' : '' ?>><summary style="cursor:pointer;font-size:15px;color:#7D5E68">✉️ Fertige Nachricht mit Link</summary>

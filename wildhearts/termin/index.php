@@ -17,7 +17,8 @@ $h = 'forma_h';
 $tok = (string)($_GET['t'] ?? '');
 $t = tm_by_token($pdo, $tok);
 $err = '';
-if ($t && $_SERVER['REQUEST_METHOD'] === 'POST') {
+$preview = !empty($_GET['vorschau']); // Vivien schaut sich die Seite an, ohne zu buchen
+if ($t && !$preview && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (trim((string)($_POST['website'] ?? '')) !== '' || time() - (int)($_POST['ts'] ?? 0) < 3) $err = 'Bitte versuch es noch einmal.';
     else {
         $r = tm_book($pdo, $t, (string)($_POST['slot'] ?? ''), (string)($_POST['name'] ?? ''), (string)($_POST['email'] ?? ''), (string)($_POST['note'] ?? ''));
@@ -94,6 +95,7 @@ mvl_head('Videogespräch · Movecia', '', mm_site() . '/termin/', '/img/movecia/
     <?php elseif ($state === 'gone'): ?>
       <h1>Für diesen Tag ist <em>nichts mehr frei</em></h1><p>Schreib mir einfach an hello@moveciamovement.com, dann finden wir gemeinsam einen neuen Termin.</p>
     <?php elseif ($state === 'choose'): ?>
+      <?php if ($preview): ?><p class="tm-err" style="background:#E9E2D8;color:#4A3A41!important">Vorschau: So sieht es die Gästin. Hier wird nichts gebucht.</p><?php endif; ?>
       <p class="tm-k">Videogespräch · <?= $h($t['title']) ?></p>
       <h1>Hallo<?= $t['guest'] !== '' ? ', <em>' . $h($t['guest']) . '</em>' : '' ?>!</h1>
       <?php if ($t['intro'] !== ''): ?><p><?= $h($t['intro']) ?></p><?php endif; ?>
@@ -107,7 +109,7 @@ mvl_head('Videogespräch · Movecia', '', mm_site() . '/termin/', '/img/movecia/
         <label>Deine E-Mail (dorthin schicke ich die Bestätigung)<input type="email" name="email" autocomplete="email" required value="<?= $h((string)($_POST['email'] ?? '')) ?>"></label>
         <label>Möchtest du mir vorab etwas sagen? (freiwillig)<textarea name="note"><?= $h((string)($_POST['note'] ?? '')) ?></textarea></label>
         <input class="tm-hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><input type="hidden" name="ts" value="<?= time() ?>">
-        <button class="tm-go" type="submit">Termin fix machen</button>
+        <button class="tm-go" type="<?= $preview ? 'button' : 'submit' ?>"<?= $preview ? ' onclick="alert(\'Vorschau: hier wird nichts gebucht.\')"' : '' ?>>Termin fix machen</button>
       </form>
       <p style="font-size:.88rem;margin-top:1rem">Du bekommst sofort eine Bestätigung mit Kalenderdatei. Über diesen Link kommst du dann auch in unseren Videoraum, ganz ohne App.</p>
     <?php elseif ($state === 'over'): ?>
