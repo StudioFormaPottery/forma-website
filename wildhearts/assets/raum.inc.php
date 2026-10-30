@@ -1,15 +1,13 @@
 <?php
 // Kleine Galerie des Movecia Studios in Mathon (Vivien, 30.10.2026): echte Fotos vom Raum, nur gerade gerichtet
 // und farblich angeglichen (nichts dazu- oder weggerechnet). Bilder wechseln ruhig von selbst, Wischen/Punkte möglich.
-// Eingebaut in /natal (#wo) und /personal-training. mv_raum_gallery($en)
+// Eingebaut in /natal (#wo), /personal-training und /bio. Seit 30.10.2026 nur noch drei Fotos (Vivien: Rad/Sessel und Hanteln raus). mv_raum_gallery($en)
 function mv_raum_gallery(bool $en = false, string $id = 'raum'): string
 {
     $pics = [
         ['raum-1.jpg', 'Der Raum mit Sprossenwand, Matte und Monstera', 'The room with wall bars, mat and monstera', '50% 60%'],
-        ['raum-3.jpg', 'Licht vom Fenster, Bike, Box und Gewichte', 'Window light, bike, box and weights', '50% 55%'],
         ['raum-2.jpg', 'Sprossenwand, Parallettes und viel Platz zum Bewegen', 'Wall bars, parallettes and plenty of space to move', '50% 60%'],
-        ['raum-4.jpg', 'Kleine Helfer: Ring, Hanteln und Gewichte', 'Little helpers: ring, dumbbells and weights', '50% 62%'],
-        ['raum-5.jpg', 'Kurzhanteln auf der Box', 'Dumbbells on the box', '50% 50%'],
+        ['raum-4.jpg', 'Kleine Helfer: Ring, Gewichte und ein gutes Buch', 'Little helpers: a ring, weights and a good book', '50% 62%'],
     ];
     $h = fn($s) => htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
     ob_start(); ?>
