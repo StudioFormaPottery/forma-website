@@ -213,7 +213,7 @@ function gw_grant(PDO $pdo, array $r): bool
         $o = natal_order($pdo, (int)$pdo->lastInsertId());
         $link = natal_link($o);
         $btn = 'Meine Termine wählen';
-        $how = 'Deine zwei Einheiten sind schon für dich angelegt. Über den Knopf kommst du auf deine persönliche Seite: Dort füllst du einmal kurz den Gesundheitsfragebogen aus und wählst deine Wunschtermine, ich bestätige dir dann jeden Termin mit Uhrzeit. Wir treffen uns live per Video, du brauchst nur eine Matte, etwas Platz und dein Handy oder Laptop. Bitte sprich das Training vorher mit deiner Ärztin oder Hebamme ab.';
+        $how = 'Deine zwei Einheiten sind schon für dich angelegt, einlösbar bis 30. April 2027. Über den Knopf kommst du auf deine persönliche Seite: Dort füllst du einmal kurz den Gesundheitsfragebogen aus und wählst deine Wunschtermine, ich bestätige dir dann jeden Termin mit Uhrzeit. Wir treffen uns live per Video, du brauchst nur eine Matte, etwas Platz und dein Handy oder Laptop. Bitte sprich das Training vorher mit deiner Ärztin oder Hebamme ab.';
     }
     $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#4A3040;';
     $text = "Hallo $first,\n\ndu hast gewonnen! 🎁\n\nBeim Weihnachts-Gewinnspiel von Movecia bist du die Gewinnerin, und ich freue mich so für dich. Dein Gewinn: {$p[0]}.\n\n$how\n\n$btn: $link\n\nFrohe Weihnachten und alles Liebe,\nVivien";
