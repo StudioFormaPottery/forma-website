@@ -151,7 +151,7 @@ body.tponly .pr.top{width:min(680px,94vw)}
 .iph button.on{background:#7D5E68;color:#fff}
 .iph-help{margin-top:10px;padding:14px 16px;border-radius:18px;background:#FBF1F0;border:1.5px solid #F0DCDA;font-size:16px;line-height:1.5;color:#4A3A41}
 .iph-help ol{margin:8px 0 0 20px;padding:0}.iph-help li{margin:4px 0}
-body.recording .iph,body.recording .iph-help,body.rec-ui .iph,body.rec-ui .iph-help{display:none}
+body.recording #wide,body.recording .iph,body.recording .iph-help,body.rec-ui .iph,body.rec-ui .iph-help{display:none}
 /* An der Kamera (Vivien, 28.10.2026: „sieht aus, als würde ich nach unten schauen“): während der Aufnahme ganz oben, mittig unter der Linse, schmal, 3 Zeilen */
 body.prtop .pr.top{display:block;position:fixed;top:0;left:50%;right:auto;transform:translateX(-50%);width:min(560px,94vw);height:calc(var(--fs,30px) * 1.4 * 3 + 22px + env(safe-area-inset-top,0px));min-height:0;padding-top:env(safe-area-inset-top,0px);border-radius:0 0 22px 22px;z-index:200;background:rgba(36,28,32,.94);box-shadow:0 8px 24px -10px rgba(0,0,0,.5)}
 body.prtop .pr.top .pr-t{padding:10px 3% 60%;line-height:1.4}
@@ -460,9 +460,11 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     <video id="play" controls playsinline hidden></video>
     <div class="iph" id="iph" hidden><button type="button" id="iphBtn">📱 iPhone als Kamera</button><span class="hint" id="iphInfo" style="font-size:15px;color:#7D7076"></span></div>
     <div class="iph-help" id="iphHelp" hidden></div>
+    <div class="iph-help" id="wideHelp" hidden></div>
     <div class="bar">
       <button type="button" class="go" id="go">● Aufnahme starten</button>
       <button type="button" class="sm" id="tpOnly" title="Du filmst mit der Kamera-App am Handy, hier läuft nur der Text">📜 Nur Teleprompter</button>
+      <button type="button" class="sm" id="wide" title="Die Kamera soll den ganzen Raum zeigen und nicht auf dein Gesicht zoomen">🧍 Ganzer Raum</button>
       <button type="button" class="stop" id="stop" hidden>■ Stopp</button>
       <button type="button" class="up" id="up" hidden>⬆ In die Lektion hochladen</button>
       <button type="button" class="next" id="edit" hidden>✂️ Schneiden &amp; bearbeiten</button>
@@ -530,7 +532,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
   <button type="button" data-sheet="more">⚙️ Mehr</button>
 </nav>
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
-<script src="/wildhearts/assets/talkcam.js?v=5"></script>
+<script src="/wildhearts/assets/talkcam.js?v=6"></script>
 <script src="studio-edit.js?v=7"></script>
 <script src="schnitt.js?v=13"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -717,6 +719,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     const a={echoCancellation:true,noiseSuppression:true,autoGainControl:true};if(mid)a.deviceId={exact:mid};
     try{raw=await navigator.mediaDevices.getUserMedia({video:v,audio:a})}
     catch(e){try{raw=await navigator.mediaDevices.getUserMedia({video:true,audio:true});ls.set('st-cam','');ls.set('st-mic','')}catch(e2){$('stage').innerHTML='<div class="tc-st">Kamera oder Mikrofon sind gesperrt. Bitte im Browser oben bei der Adresse erlauben und die Seite neu laden.</div>';return}}
+    if(ls.get('st-wide',''))await wideZoom();
     tc=await TalkCam.create(raw,{mount:$('stage'),maxVh:vh(),profile:profile(),maxLong:Q[0]});qShow();
     $('stage').appendChild(pr);$('stage').appendChild(Object.assign(document.createElement('div'),{className:'cd',id:'cd'}));
     const rd=document.createElement('div');rd.className='recdot';rd.id='rd';rd.hidden=true;rd.innerHTML='<i></i><span id="rt">0:00</span>';$('stage').appendChild(rd);
@@ -734,6 +737,19 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     const cur=(raw&&raw.getVideoTracks()[0])||null,on=!!(cur&&isIph(cur.label));
     $('iphBtn').classList.toggle('on',on);$('iphBtn').textContent=on?'📱 iPhone filmt · zurück zur Mac-Kamera':'📱 iPhone als Kamera';
     $('iphInfo').textContent=on?'Der Teleprompter steht oben am Bildschirm, direkt unter deinem iPhone.':(ds&&ds.some(d=>d.kind==='videoinput'&&isIph(d.label))?'Dein iPhone ist bereit.':'')}
+  // ---- Ganzer Raum: Mac-Folgemodus (Center Stage) kann eine Website nicht selbst ausschalten; wir zoomen ganz heraus, wo die Kamera das erlaubt, und zeigen den Weg im Kontrollzentrum ----
+  async function wideZoom(){try{const t=raw&&raw.getVideoTracks()[0];const c=t&&t.getCapabilities?t.getCapabilities():{};if(c.zoom&&typeof c.zoom.min==='number'){await t.applyConstraints({advanced:[{zoom:c.zoom.min}]});return true}}catch(e){}return false}
+  async function wideShow(){const h=$('wideHelp');if(!h.hidden){h.hidden=true;return}
+    const z=await wideZoom();ls.set('st-wide','1');
+    const fmt=tc&&tc.s&&tc.s.aspect==='9:16';
+    h.innerHTML='<b>Damit die Kamera den ganzen Raum zeigt</b>'+(z?' <span style="color:#5E7A4A">✓ Kamera ist ganz herausgezoomt</span>':'')
+      +'<ol style="margin:8px 0 6px;padding-left:22px"><li>Lass die Kamera hier an.</li><li>Klick oben rechts in der Mac-Menüleiste auf das <b>Kontrollzentrum</b> (die zwei kleinen Schalter).</li><li>Tippe auf <b>Videoeffekte</b> (grünes Kamera-Symbol) und schalte <b>Folgemodus</b> aus.</li></ol>'
+      +'Der Mac merkt sich das für diesen Browser – du musst es nur einmal machen. Das kann leider keine Website für dich umschalten, das geht nur am Mac selbst.'
+      +(fmt?'<br><br>💡 Du nimmst gerade im Hochformat 9:16 auf. Dabei wird vom breiten Kamerabild nur die Mitte genommen, das wirkt auch gezoomt. Für den ganzen Körper ist 16:9 (Kamera-Look → Format) besser.':'')
+      +'<br><br>Tipp: Für Ganzkörper-Aufnahmen ist das <b>📱 iPhone als Kamera</b> oft noch besser (Rückkamera, weiter Winkel). Auch dort den Folgemodus im Kontrollzentrum ausschalten.'
+      +'<br><button type="button" style="margin-top:10px;padding:8px 16px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;font:inherit;cursor:pointer" onclick="this.parentNode.hidden=true">Alles klar</button>';
+    h.hidden=false}
+  $('wide').onclick=wideShow;
   function iphHelp(){const h=$('iphHelp');h.hidden=false;h.innerHTML='<b>Dein iPhone wird gerade nicht gefunden.</b> So klappt es (einmal einrichten, danach geht es mit einem Klick):'
     +'<ol><li>iPhone und MacBook sind mit derselben Apple-ID angemeldet, WLAN und Bluetooth sind an beiden an.</li>'
     +'<li>Am iPhone: Einstellungen → Allgemein → AirPlay &amp; Continuity → <b>Continuity-Kamera</b> einschalten.</li>'

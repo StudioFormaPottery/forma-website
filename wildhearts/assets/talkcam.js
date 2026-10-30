@@ -23,7 +23,7 @@
   // Ganzkörper (Flows, Bewegungsvideos): Mehrklassen-Modell erkennt den ganzen Körper auch auf Abstand besser
   const SEG_BODY = 'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite';
   const KEY = 'mv-talkcam';
-  const DEF = { on: true, look: 'natur', beauty: 35, eyes: 45, blur: 0, light: 0, ring: 25, warm: 8, contrast: 0, blush: 0, eyeBig: 0, eyeBright: 20, lashes: 15, brows: 15, lipColor: 'rose', lip: 0, lipBig: 0, filter: 'none', filterAmt: 70, guide: 'oval', mirror: true, aspect: '16:9' };
+  const DEF = { on: true, look: 'natur', beauty: 35, eyes: 45, blur: 0, light: 0, ring: 25, warm: 8, contrast: 0, blush: 0, eyeBig: 0, eyeBright: 20, lashes: 15, brows: 15, lipColor: 'rose', lip: 0, lipBig: 0, matte: 0, teeth: 0, filter: 'none', filterAmt: 70, guide: 'oval', mirror: true, aspect: '16:9' };
   // Looks setzen Haut, Augen, Lippen und Farbfilter auf einmal (danach frei anpassbar)
   const LOOKS = {
     natur: { label: 'Natürlich', beauty: 35, eyes: 45, ring: 25, warm: 8, light: 0, contrast: 0, blush: 0, eyeBig: 0, eyeBright: 20, lashes: 15, brows: 15, lip: 0, lipBig: 0, filter: 'none' },
@@ -45,7 +45,7 @@
   };
 
   // Profil „move“ (Flows, Bewegungsvideos): nur Hintergrund weich und Belichtung, KEINE Gesichtsfilter
-  const FACE_KEYS = ['beauty', 'eyes', 'ring', 'blush', 'eyeBig', 'eyeBright', 'lashes', 'brows', 'lip', 'lipBig'];
+  const FACE_KEYS = ['beauty', 'eyes', 'ring', 'matte', 'teeth', 'blush', 'eyeBig', 'eyeBright', 'lashes', 'brows', 'lip', 'lipBig'];
   const DEF_MOVE = { on: true, blur: 35, light: 0, warm: 0, contrast: 0, filter: 'none', filterAmt: 70, guide: 'raster', mirror: true, aspect: '16:9' };
   function load(profile) {
     const move = profile === 'move', def = move ? DEF_MOVE : DEF;
@@ -55,7 +55,7 @@
   }
   // Eigene Looks („Meine Looks“, Vivien 28.10.2026: „Filter speichern“). Standard: im Browser;
   // die Verwaltung ersetzt TalkCam.store durch den Server, dann gelten sie auf allen Geräten.
-  const LOOK_KEYS = ['beauty', 'eyes', 'blur', 'light', 'ring', 'warm', 'contrast', 'blush', 'eyeBig', 'eyeBright', 'lashes', 'brows', 'lipColor', 'lip', 'lipBig', 'filter', 'filterAmt'];
+  const LOOK_KEYS = ['beauty', 'eyes', 'blur', 'light', 'ring', 'warm', 'contrast', 'matte', 'teeth', 'blush', 'eyeBig', 'eyeBright', 'lashes', 'brows', 'lipColor', 'lip', 'lipBig', 'filter', 'filterAmt'];
   const LOOK_KEYS_MOVE = ['blur', 'light', 'warm', 'contrast', 'filter', 'filterAmt'];
   const mineLs = { get(slot) { try { return JSON.parse(localStorage.getItem('mv-talkcam-mine-' + slot) || '[]'); } catch (e) { return []; } }, set(slot, l) { try { localStorage.setItem('mv-talkcam-mine-' + slot, JSON.stringify(l)); } catch (e) {} } };
   const defaultStore = { get: slot => Promise.resolve(mineLs.get(slot)), set: (slot, l) => Promise.resolve(l) };
@@ -131,7 +131,7 @@ precision highp float; in vec2 uv; out vec4 o;
 uniform sampler2D base; uniform sampler2D bg; uniform sampler2D mask; uniform sampler2D fmask;
 uniform vec4 crop; uniform vec2 res;
 uniform float beauty, eyes, blur, light, ring, warm, contrast, useMask, hasFace, bypass;
-uniform float blush, eyeBig, eyeBright, lashes, brows, lip, lipBig;
+uniform float blush, eyeBig, eyeBright, lashes, brows, lip, lipBig, matte, teeth;
 uniform vec3 lipCol;
 uniform float fSat, fCon, fFade, fBW; uniform vec3 fSh, fHi;
 uniform vec2 eyeL, eyeR, eyeRad; uniform vec2 faceC, faceR;
@@ -161,6 +161,9 @@ void main(){
   vec2 px = 1./res;
   float m = useMask > .5 ? smoothstep(.35,.75, texture(mask, crop.xy + uv*crop.zw).r) : 1.;
   vec4 fm = hasFace > .5 ? FM(wuv) : vec4(0.);
+  // Blau = Wimpernrand ODER Mundinnenraum (Zähne): getrennt über den Abstand zum Mund
+  float mouthW = hasFace > .5 ? 1.-smoothstep(1.1, 1.5, length((wuv-lipC)*res/max(lipRad, vec2(4.)))) : 0.;
+  float fTeeth = fm.b * mouthW; fm.b *= 1.-mouthW;
   float fd = hasFace > .5 ? length((uv-faceC)*res/faceR) : 0.;
   float faceW = hasFace > .5 ? 1.-smoothstep(1.0, 1.45, fd) : 1.;
   float ew = 0.;
@@ -183,6 +186,18 @@ void main(){
       }
     }
     c = mix(c, acc / ws, clamp(amt, 0., .92));
+  }
+  // Glanz weg (matt): helle Glanzstellen auf der Haut (Stirn, Nase, Wangen) an die Haut rundherum angleichen
+  if (matte > 0. && hasFace > .5) {
+    float r = max(3., faceR.x * .09); vec3 mean = vec3(0.);
+    for (int i = 0; i < 10; i++) { float a = float(i) * .6283185; mean += B(wuv + vec2(cos(a), sin(a)) * r * px); }
+    mean *= .1;
+    float lc = luma(c), lm = luma(mean);
+    float e1 = max(1.-smoothstep(.5,1.3,length((wuv-eyeCL)*res/vec2(eyeW*.75, eyeW*.5))), 1.-smoothstep(.5,1.3,length((wuv-eyeCR)*res/vec2(eyeW*.75, eyeW*.5))));
+    float hl = smoothstep(.02, .1, lc - lm) * smoothstep(.4, .65, lc);
+    float w = hl * skinOf(mean) * faceW * m * (1.-e1) * (1.-mouthW) * (1. - clamp(fm.r + fm.g + fm.b, 0., 1.));
+    vec3 fix = setLum(mix(c, mean, .6), mix(lc, lm, .85));
+    c = mix(c, fix, clamp(w * matte * 1.1, 0., .95));
   }
   // Augenringe
   if (ew > 0.) {
@@ -227,6 +242,14 @@ void main(){
       float w = max(1.-smoothstep(.0,1.,length((uv-chL)*res/R)), 1.-smoothstep(.0,1.,length((uv-chR)*res/R)));
       vec3 bc = setLum(vec3(.86,.42,.48), luma(c));
       c = mix(c, bc, w * blush * .42 * mix(.4, 1., skinOf(c)));
+    }
+    // Zähne weißer: nur helle, gelbliche Stellen im Mund (Zunge und dunkler Mundraum bleiben)
+    if (teeth > 0. && fTeeth > .01) {
+      float l = luma(c);
+      float w = fTeeth * smoothstep(.22, .45, l) * (1.-smoothstep(.06, .18, c.r - c.g));
+      vec3 wh = vec3(l) * 1.06 + vec3(.0, .006, .022);
+      wh = mix(wh, c, .15);
+      c = mix(c, clamp(wh, 0., 1.), clamp(w * teeth * .9, 0., .85));
     }
     // Lippenfarbe: Farbton der gewählten Farbe, Licht und Struktur der Lippen bleiben
     if (lip > 0. && fm.r > .01) {
@@ -349,7 +372,7 @@ void main(){
     }
     on(f) { this.listeners.push(f); }
     emit(t) { this.listeners.forEach(f => { try { f(t, this); } catch (e) {} }); }
-    needFace() { const s = this.s; if (this.profile === 'move') return false; return s.on && (s.eyes > 0 || s.ring > 0 || s.beauty > 0 || s.blush > 0 || s.eyeBig > 0 || s.eyeBright > 0 || s.lashes > 0 || s.brows > 0 || s.lip > 0 || s.lipBig > 0) || s.guide === 'oval'; }
+    needFace() { const s = this.s; if (this.profile === 'move') return false; return s.on && (s.eyes > 0 || s.ring > 0 || s.beauty > 0 || s.blush > 0 || s.eyeBig > 0 || s.eyeBright > 0 || s.lashes > 0 || s.brows > 0 || s.lip > 0 || s.lipBig > 0 || s.matte > 0 || s.teeth > 0) || s.guide === 'oval'; }
     needSeg() { return this.s.on && this.s.blur > 0; }
     ensureModels() {
       if (!this.ok) return;
@@ -439,7 +462,7 @@ void main(){
       this.face = f;
     }
     drawFaceMask(P, W, H, ew) {
-      const s = this.s; if (!(s.lip > 0 || s.brows > 0 || s.lashes > 0)) return;
+      const s = this.s; if (!(s.lip > 0 || s.brows > 0 || s.lashes > 0 || s.teeth > 0)) return;
       const c = this.fc, x = this.fx, w = Math.max(64, Math.round(W / 3)), h = Math.max(64, Math.round(H / 3));
       if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
       x.setTransform(1, 0, 0, 1, 0, 0); x.globalCompositeOperation = 'source-over'; x.clearRect(0, 0, w, h);
@@ -451,6 +474,8 @@ void main(){
       x.globalCompositeOperation = 'destination-out';
       poly([78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308, 415, 310, 311, 312, 13, 82, 81, 80, 191], true); x.fill();
       x.globalCompositeOperation = 'lighter';
+      // Mund innen (Zähne): blau, der Shader trennt es über den Abstand zum Mund von den Wimpern
+      poly([78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308, 415, 310, 311, 312, 13, 82, 81, 80, 191], true); x.fillStyle = 'rgb(0,0,255)'; x.fill();
       // Brauen
       x.fillStyle = 'rgb(0,255,0)';
       poly([70, 63, 105, 66, 107, 55, 65, 52, 53, 46], true); x.fill();
@@ -517,7 +542,7 @@ void main(){
       gl.uniform4fv(u.crop, crop); gl.uniform2f(u.res, W, H);
       const f = this.face, hasFace = f ? 1 : 0;
       const ffa = f ? this.fa : 0;   // Gesichts-Effekte weich ein-/ausblenden, wenn das Gesicht kurz verloren geht
-      for (const k of ['blush', 'eyeBig', 'eyeBright', 'lashes', 'brows', 'lip', 'lipBig']) gl.uniform1f(u[k], (s[k] || 0) / 100 * ffa);
+      for (const k of ['blush', 'eyeBig', 'eyeBright', 'lashes', 'brows', 'lip', 'lipBig', 'matte', 'teeth']) if (u[k]) gl.uniform1f(u[k], (s[k] || 0) / 100 * ffa);
       gl.uniform3fv(u.lipCol, (LIPS[s.lipColor] || LIPS.rose)[1]);
       const F = (FILTERS[s.filter] || FILTERS.none)[1], fa = s.filter === 'none' ? 0 : (s.filterAmt == null ? 70 : s.filterAmt) / 100;
       gl.uniform1f(u.fSat, 1 + (F.sat - 1) * fa); gl.uniform1f(u.fCon, 1 + (F.con - 1) * fa); gl.uniform1f(u.fFade, F.fade * fa); gl.uniform1f(u.fBW, F.bw * fa);
@@ -712,9 +737,9 @@ void main(){
   <div class="tc-mine" data-minebox><h3>💛 Meine Looks</h3><div class="tc-chips" data-mine></div>
     <div class="tc-mine-f" data-mform hidden><input type="text" maxlength="40" data-mname aria-label="Name für deinen Look"><button type="button" class="tc-save" data-mok>Speichern</button><button type="button" class="tc-save lite" data-mno>Abbrechen</button></div>
     <div data-mrow><button type="button" class="tc-save" data-msave>＋ So wie jetzt speichern</button></div><p class="tc-mmsg" data-mmsg></p></div>
-  ${grp('haut', '🌸 Haut', sl('beauty', 'Haut weich', 0, 100) + sl('eyes', 'Augenringe aufhellen', 0, 100) + sl('ring', 'Glow (Gesicht aufhellen)', 0, 100) + sl('blush', 'Rouge', 0, 100), true)}
+  ${grp('haut', '🌸 Haut', sl('beauty', 'Haut weich', 0, 100) + sl('eyes', 'Augenringe aufhellen', 0, 100) + sl('ring', 'Glow (Gesicht aufhellen)', 0, 100) + sl('matte', 'Glanz weg (matt)', 0, 100) + sl('blush', 'Rouge', 0, 100), true)}
   ${grp('augen', '👁 Augen &amp; Brauen', sl('eyeBright', 'Augen strahlen', 0, 100) + sl('eyeBig', 'Augen etwas größer', 0, 100) + sl('lashes', 'Wimpern betonen', 0, 100) + sl('brows', 'Brauen betonen', 0, 100))}
-  ${grp('lippen', '💋 Lippen', `<div class="tc-chips tc-lips" data-lips>${Object.keys(LIPS).map(k => `<button type="button" data-lipc="${k}"><i style="background:rgb(${LIPS[k][1].map(v => Math.round(v * 255)).join(',')})"></i>${LIPS[k][0]}</button>`).join('')}</div>` + sl('lip', 'Farbe', 0, 100) + sl('lipBig', 'Lippen voller', 0, 100))}
+  ${grp('lippen', '💋 Lippen & Zähne', `<div class="tc-chips tc-lips" data-lips>${Object.keys(LIPS).map(k => `<button type="button" data-lipc="${k}"><i style="background:rgb(${LIPS[k][1].map(v => Math.round(v * 255)).join(',')})"></i>${LIPS[k][0]}</button>`).join('')}</div>` + sl('lip', 'Farbe', 0, 100) + sl('lipBig', 'Lippen voller', 0, 100) + sl('teeth', 'Zähne weißer', 0, 100))}
   ${grp('filter', '🎞 Farbfilter', `<div class="tc-chips" data-filters>${Object.keys(FILTERS).map(k => `<button type="button" data-flt="${k}">${FILTERS[k][0]}</button>`).join('')}</div>` + sl('filterAmt', 'Stärke', 0, 100))}
   ${grp('licht', '☀️ Hintergrund &amp; Licht', sl('blur', 'Hintergrund unscharf', 0, 100) + sl('light', 'Helligkeit', -50, 50) + sl('warm', 'Wärme', -50, 50) + sl('contrast', 'Kontrast', -50, 50))}
   <div><h3>Hilfe für die Position</h3><div class="tc-chips" data-guides><button type="button" data-g="oval">Kopf-Oval</button><button type="button" data-g="kreuz">Kreuz</button><button type="button" data-g="raster">Raster</button><button type="button" data-g="aus">Aus</button></div></div>
