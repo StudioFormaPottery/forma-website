@@ -415,7 +415,7 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
 </div></footer>
 
 <?php if ($me): ?>
-<script src="/wildhearts/assets/flow-player.js?v=11"></script>
+<script src="/wildhearts/assets/flow-player.js?v=12"></script>
 <script src="/wildhearts/assets/titelkarte.js?v=1"></script>
 <script>
 (() => {

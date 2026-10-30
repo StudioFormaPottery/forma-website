@@ -6,7 +6,7 @@
    Kein Vorspulen und kein Überspringen: Das Programm soll begleiten, nicht abgehakt werden. Am Ende meldet der
    Player „mvflow:done“ am Element (der Mitgliederbereich speichert dann „erledigt“).
    Sprechtexte werden nie angezeigt (Vivien, 27.10.2026), auch nicht in der Vorschau.
-   Dazu ein Musikfeld: Spotify, Apple Music, YouTube Music, Deezer, SoundCloud direkt auf der Seite, Amazon Music daneben.
+   Musik: zu jedem Video die Musik aus der Verwaltung; wer lieber eigene hört, verbindet Spotify oder Apple Music (dann geht die Video-Musik aus).
    Aufruf: MvFlow(element, {lang, mode, title, intro, photo, items:[{name, src, sec, voice}], music:[{title,url}], preview})
    oder automatisch für jedes [data-mv-flow]. */
 (function () {
@@ -158,7 +158,7 @@
 .mvf-mub{padding:2px 18px 20px;display:flex;flex-direction:column;gap:14px}
 .mvf-sm{font-size:.86rem;color:var(--muted);margin:0;line-height:1.5}
 .mvf-sm a{color:var(--plum)}
-.mvf-prov{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mvf-prov{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-width:420px}
 @media(max-width:420px){.mvf-prov{grid-template-columns:repeat(2,1fr)}}
 .mvf-prov button{display:flex;align-items:center;gap:9px;border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:11px 12px;cursor:pointer;font-size:.9rem;text-align:left;transition:border-color .2s,background .2s}
 .mvf-prov button i{width:10px;height:10px;border-radius:50%;flex:none}
@@ -198,7 +198,14 @@
 
   // Sonnenaufgang: weicher Akkord, der aufblüht und warm ausklingt, am Ende ein zarter Glockenton
   let ac = null, pjP = null;
-  function actx() { if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; } } if (ac && ac.state === 'suspended') ac.resume(); return ac; }
+  function actx() { try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {} // iPhone: Klang auch im Lautlos-Modus
+    if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; } } if (ac && ac.state === 'suspended') ac.resume(); return ac; }
+  // Countdown-Klang (Vivien, 30.10.2026: „in den letzten Sekunden hört man den Timer nicht“): klare, weiche Glocke bei 3, 2, 1, heller bei 0
+  function bell(hi) {
+    const a = actx(); if (!a) return; const t = a.currentTime, out = a.createGain(); out.gain.value = .0001; out.connect(a.destination);
+    out.gain.exponentialRampToValueAtTime(hi ? .5 : .38, t + .015); out.gain.exponentialRampToValueAtTime(.0001, t + (hi ? 1.6 : .9));
+    [[hi ? 880 : 660, 1], [hi ? 1320 : 990, .35], [hi ? 1760 : 1320, .12]].forEach(([f, v]) => { const o = a.createOscillator(), g = a.createGain(); o.type = 'sine'; o.frequency.value = f; g.gain.value = v; o.connect(g).connect(out); o.start(t); o.stop(t + (hi ? 1.7 : 1)); });
+  }
   function sunrise(len) {
     const a = actx(); if (!a) return;
     const t0 = a.currentTime, L = Math.max(2.2, len);
@@ -222,21 +229,12 @@
   // --- Musik: eigener Anbieter, eigene Playlist ------------------------------------------------------------
   const PROV = {
     spotify: { n: 'Spotify', c: '#1DB954', h: 152, login: 'https://accounts.spotify.com/login', ex: 'open.spotify.com/playlist/…' },
-    apple: { n: 'Apple Music', c: '#FA2D48', h: 175, login: 'https://music.apple.com/', ex: 'music.apple.com/at/playlist/…' },
-    youtube: { n: 'YouTube Music', c: '#FF0033', h: 200, login: 'https://music.youtube.com/', ex: 'music.youtube.com/playlist?list=…' },
-    deezer: { n: 'Deezer', c: '#A238FF', h: 150, login: 'https://www.deezer.com/login', ex: 'deezer.com/playlist/…' },
-    soundcloud: { n: 'SoundCloud', c: '#FF5500', h: 166, login: 'https://soundcloud.com/signin', ex: 'soundcloud.com/…/sets/…' },
-    amazon: { n: 'Amazon Music', c: '#25D1DA', h: 0, login: 'https://music.amazon.de/', ex: '' }
+    apple: { n: 'Apple Music', c: '#FA2D48', h: 175, login: 'https://music.apple.com/', ex: 'music.apple.com/at/playlist/…' }
   };
   function embedOf(url) {
     url = String(url || '').trim(); let m;
     if ((m = url.match(/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(?:embed\/)?(playlist|album|track|artist|show|episode)\/([A-Za-z0-9]{10,40})/))) return { p: 'spotify', src: `https://open.spotify.com/embed/${m[1]}/${m[2]}?utm_source=generator&theme=0` };
     if ((m = url.match(/^https?:\/\/(?:embed\.)?music\.apple\.com(\/[a-z]{2}\/(?:playlist|album|station|song)\/[^\s?#]+(?:\?i=\d+)?)/))) return { p: 'apple', src: 'https://embed.music.apple.com' + m[1] };
-    if ((m = url.match(/(?:youtube\.com|youtu\.be)\/.*[?&]list=([A-Za-z0-9_-]+)/))) return { p: 'youtube', src: `https://www.youtube-nocookie.com/embed/videoseries?list=${m[1]}` };
-    if ((m = url.match(/(?:youtube\.com\/watch\?(?:.*&)?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/))) return { p: 'youtube', src: `https://www.youtube-nocookie.com/embed/${m[1]}` };
-    if ((m = url.match(/deezer\.com\/(?:[a-z]{2}\/)?(playlist|album|track|artist)\/(\d+)/))) return { p: 'deezer', src: `https://widget.deezer.com/widget/auto/${m[1]}/${m[2]}` };
-    if (/^https?:\/\/(?:www\.|m\.)?soundcloud\.com\/[^\s]+/.test(url)) return { p: 'soundcloud', src: 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url.split('?')[0]) + '&color=%237D5E68&visual=false&show_comments=false' };
-    if (/music\.amazon\./.test(url)) return { p: 'amazon', src: '', open: url };
     return null;
   }
   function musicBox(root, T, lists, flow) {
@@ -245,7 +243,7 @@
     let prov = PROV[st.p] ? st.p : 'spotify';
     const provBtns = Object.keys(PROV).map(k => `<button type="button" data-pv="${k}"><i style="background:${PROV[k].c}"></i>${PROV[k].n}</button>`).join('');
     box.querySelector('[data-mub]').innerHTML = `
-      <p class="mvf-sm">${flow ? T('Wenn du magst, läuft deine eigene Musik leise im Hintergrund. Stell sie so leise, dass du meine Stimme gut hörst.', 'If you like, your own music can play softly in the background. Keep it low enough to hear my voice.') : T('Such dir aus, womit du Musik hörst, und leg deine Lieblings-Playlist dazu.', 'Choose where you listen to music and add your favourite playlist.')}</p>
+      <p class="mvf-sm">${T('Zu jedem Video läuft schon meine Musik. Lieber deine eigene? Dann verbinde Spotify oder Apple Music, meine Musik geht dann aus.', 'Every session already comes with my music. Prefer your own? Connect Spotify or Apple Music and mine will switch off.')}${flow ? ' ' + T('Stell sie so leise, dass du meine Stimme gut hörst.', 'Keep it low enough to hear my voice.') : ''}</p>
       <div class="mvf-prov" role="group" aria-label="${T('Musikdienst', 'Music service')}">${provBtns}</div>
       <div data-pbody></div>
       <p class="mvf-err" data-merr hidden></p>
@@ -260,16 +258,11 @@
         const h = e.p === 'spotify' ? 80 : PROV[e.p].h;
         dock.innerHTML = `<iframe src="${esc(e.src)}" height="${h}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="${esc(PROV[e.p].n)}"></iframe>`;
         dock.hidden = false; lab.textContent = PROV[e.p].n + ' ' + T('ist verbunden', 'is connected');
-      } else lab.textContent = T('Spotify, Apple Music und mehr', 'Spotify, Apple Music and more');
+      } else lab.textContent = T('Spotify oder Apple Music', 'Spotify or Apple Music');
     }
     function draw() {
       box.querySelectorAll('[data-pv]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pv === prov)));
       const P = PROV[prov];
-      if (prov === 'amazon') {
-        pbody.innerHTML = `<p class="mvf-sm">${T('Amazon Music lässt sich leider nicht direkt hier einbauen. Starte deine Playlist in der Amazon-Music-App und komm einfach wieder zurück, die Musik läuft weiter.', 'Amazon Music can’t be built in here, unfortunately. Start your playlist in the Amazon Music app and come back, the music keeps playing.')}</p>
-          <p class="mvf-sm"><a class="mvf-btn" href="${P.login}" target="_blank" rel="noopener">${T('Amazon Music öffnen', 'Open Amazon Music')} ↗</a></p>`;
-        return;
-      }
       const sug = prov === 'spotify' && lists.length ? `<p class="mvf-k">${T('Meine Lieblings-Playlists', 'My favourite playlists')}</p><div class="mvf-sug">${lists.map((x, i) => `<button type="button" data-sg="${i}"><span>${ICON.note}</span>${esc(x.title)}</button>`).join('')}</div>` : '';
       pbody.innerHTML = `<div style="display:flex;flex-direction:column;gap:12px">${sug}
         <p class="mvf-k">${T('Deine eigene Playlist', 'Your own playlist')}</p>
@@ -282,19 +275,18 @@
         const e = embedOf(inp.value);
         if (!e) { err.textContent = T('Diesen Link kann ich leider nicht abspielen. Nimm bitte den Link über „Teilen“ → „Link kopieren“.', 'Sorry, I can’t play this link. Please use “Share” → “Copy link”.'); err.hidden = false; return; }
         err.hidden = true;
-        if (e.p === 'amazon') { window.open(e.open, '_blank', 'noopener'); return; }
-        prov = e.p; st = { p: e.p, url: inp.value.trim() }; save(); mount(); draw();
+        prov = e.p; st = { p: e.p, url: inp.value.trim() }; save(); mount(); draw(); root.dispatchEvent(new CustomEvent('mvf:own', { detail: true }));
       });
       if (ps) ps.addEventListener('click', () => { navigator.clipboard.readText().then(t => { inp.value = String(t || '').trim(); if (inp.value) go.click(); }).catch(() => inp.focus()); });
       inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); go.click(); } });
-      pbody.querySelectorAll('[data-sg]').forEach(b => b.addEventListener('click', () => { st = { p: 'spotify', url: lists[+b.dataset.sg].url }; save(); mount(); draw(); }));
+      pbody.querySelectorAll('[data-sg]').forEach(b => b.addEventListener('click', () => { st = { p: 'spotify', url: lists[+b.dataset.sg].url }; save(); mount(); draw(); root.dispatchEvent(new CustomEvent('mvf:own', { detail: true })); }));
     }
     box.querySelectorAll('[data-pv]').forEach(b => b.addEventListener('click', () => { prov = b.dataset.pv; err.hidden = true; draw(); }));
-    off.addEventListener('click', () => { st = {}; save(); mount(); draw(); });
+    off.addEventListener('click', () => { st = {}; save(); mount(); draw(); root.dispatchEvent(new CustomEvent('mvf:own', { detail: false })); });
     draw();
     // Fremde Musikdienste laden erst, wenn sie die Musik selbst aufklappt (Datenschutz)
     if (st.url) { lab.textContent = ((PROV[st.p] || {}).n || '') + ' · ' + T('zum Laden antippen', 'tap to load'); off.hidden = false; }
-    else lab.textContent = T('Spotify, Apple Music und mehr', 'Spotify, Apple Music and more');
+    else lab.textContent = T('Spotify oder Apple Music', 'Spotify or Apple Music');
     box.addEventListener('toggle', () => { if (box.open && st.url && dock.hidden) mount(); });
   }
 
@@ -434,7 +426,7 @@
       clipOn(i);
       const n = items[i + 1];
       q('[data-af]').innerHTML = n ? T('Als Nächstes: ', 'Up next: ') + '<b>' + esc(n.name) + '</b>' : T('Das ist deine letzte Übung.', 'This is your last exercise.');
-      total = secOf(i); left = total; chimed = false; q('[data-st]').classList.remove('end');
+      total = secOf(i); left = total; chimed = false; lastBeep = 99; q('[data-st]').classList.remove('end'); if (bgG && bgRun && bgOn && run) ramp(bgG, BGV, 1.2);
       const vf = q('[data-vflag]'); if (vf) vf.hidden = !!it.voice;
       voice.pause(); voice.onloadedmetadata = null;
       if (flow && it.voice) {
@@ -456,7 +448,7 @@
       q('[data-trk]').style.width = Math.min(100, 100 * (1 - r / all)) + '%';
     }
     // Ablauf: title (Titelbild, 3 s) → ready (verschwommen, Welle mit Übung 1, 10 Sekunden in der Mitte) → run
-    let phase = 'run', phT = 0; const READY = 10, TITLE = (data.photo || data.title) ? 3 : 0;
+    let phase = 'run', phT = 0, lastBeep = 99; const READY = 10, TITLE = (data.photo || data.title) ? 3 : 0;
     function setPhase(p) {
       phase = p; const st = q('[data-st]'), tc = q('[data-tc]');
       tc.classList.toggle('on', p === 'title'); st.classList.toggle('ready', p === 'ready');
@@ -471,8 +463,9 @@
       else if (phase === 'ready') { if (vidOk()) phT -= dt; q('[data-cd]').textContent = String(Math.max(1, Math.ceil(phT))); if (phT <= 0) setPhase('run'); }
       else if (!sw && vidOk()) {
         left -= dt;
-        if (left <= 5 && !chimed) { chimed = true; q('[data-st]').classList.add('end'); if (sound) sunrise(5); }
-        if (left <= 0) { left = 0; draw(); advance(); } else draw();
+        if (left <= 5 && !chimed) { chimed = true; q('[data-st]').classList.add('end'); if (sound) sunrise(5); if (bgG && bgRun && bgOn) ramp(bgG, BGV * .3, .6); }
+        const sec = Math.ceil(left); if (sound && sec <= 3 && sec >= 0 && sec !== lastBeep && left > -0.2) { lastBeep = sec; bell(sec === 0); }
+        if (left <= 0) { left = 0; if (sound && lastBeep !== 0) { lastBeep = 0; bell(true); } draw(); advance(); } else draw();
       }
       raf = requestAnimationFrame(tick);
     }
@@ -515,6 +508,7 @@
     q('[data-mus]').addEventListener('click', () => {
       if (bgm.length) { bgOn = !bgOn; try { localStorage.setItem('mvf-bgm', bgOn ? '1' : '0'); } catch (e) {} if (bgOn && run) bgPlay(); else bgPause(.6); bgUi(); return; }
       const m = q('[data-mu]'); m.open = true; m.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+    root.addEventListener('mvf:own', e => { if (!bgm.length) return; bgOn = !e.detail; if (bgOn && run) bgPlay(); else bgPause(.6); bgUi(); });
     bgUi();
     if (pv) {
       q('[data-skip]').addEventListener('click', () => { if (sw) return; if (phase !== 'run') { setPhase('run'); return; } if (idx < items.length - 1) { idx++; show(idx); } else finish(); });
