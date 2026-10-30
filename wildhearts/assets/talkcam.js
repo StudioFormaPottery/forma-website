@@ -352,7 +352,7 @@ void main(){
     }
     layout() {
       const vw = this.video.videoWidth || 1280, vh = this.video.videoHeight || 720;
-      const [aw, ah] = this.s.aspect === '9:16' ? [9, 16] : this.s.aspect === '1:1' ? [1, 1] : [16, 9];
+      const [aw, ah] = this.s.aspect === '9:16' ? [9, 16] : this.s.aspect === '4:5' ? [4, 5] : this.s.aspect === '1:1' ? [1, 1] : [16, 9];
       let cw = vw, ch = vw * ah / aw; if (ch > vh) { ch = vh; cw = vh * aw / ah; }
       this.crop = [(vw - cw) / 2 / vw, (vh - ch) / 2 / vh, cw / vw, ch / vh];
       // Handys und langsame Geräte rechnen in 1280 (sonst hakt das Bild), schnelle Computer in 1920
@@ -637,6 +637,7 @@ void main(){
   function target(aspect) {
     if (aspect === '9:16') return { x: .5, eye: .36, faceH: .2 };
     if (aspect === '1:1') return { x: .5, eye: .36, faceH: .32 };
+    if (aspect === '4:5') return { x: .5, eye: .36, faceH: .26 };
     return { x: .5, eye: .37, faceH: .4 };
   }
 
@@ -728,7 +729,7 @@ void main(){
     <div data-mrow><button type="button" class="tc-save" data-msave>＋ So wie jetzt speichern</button></div><p class="tc-mmsg" data-mmsg></p></div>
   ${sl('blur', 'Hintergrund weich', 0, 100)}${sl('light', 'Helligkeit', -50, 50)}${sl('warm', 'Wärme', -50, 50)}${sl('contrast', 'Kontrast', -50, 50)}
   <div><h3>Hilfe für die Position</h3><div class="tc-chips" data-guides><button type="button" data-g="raster">Raster</button><button type="button" data-g="kreuz">Kreuz</button><button type="button" data-g="aus">Aus</button></div></div>
-  ${opts.aspect === false ? '' : `<div><h3>Format</h3><div class="tc-chips" data-aspects><button type="button" data-a="16:9">Quer 16:9</button><button type="button" data-a="9:16">Hoch 9:16</button></div></div>`}
+  ${opts.aspect === false ? '' : `<div><h3>Format</h3><div class="tc-chips" data-aspects><button type="button" data-a="16:9">Quer 16:9</button><button type="button" data-a="4:5">Feed 4:5</button><button type="button" data-a="9:16">Hoch 9:16</button></div></div>`}
   <label class="tc-sw"><span>Vorschau spiegeln</span><input type="checkbox" data-mir></label>
   <div><button type="button" class="tc-cmp" data-cmp>👁 Gedrückt halten: ohne</button></div>
 </div>` : `<div class="tc-p">
@@ -743,7 +744,7 @@ void main(){
   ${grp('filter', '🎞 Farbfilter', `<div class="tc-chips" data-filters>${Object.keys(FILTERS).map(k => `<button type="button" data-flt="${k}">${FILTERS[k][0]}</button>`).join('')}</div>` + sl('filterAmt', 'Stärke', 0, 100))}
   ${grp('licht', '☀️ Hintergrund &amp; Licht', sl('blur', 'Hintergrund unscharf', 0, 100) + sl('light', 'Helligkeit', -50, 50) + sl('warm', 'Wärme', -50, 50) + sl('contrast', 'Kontrast', -50, 50))}
   <div><h3>Hilfe für die Position</h3><div class="tc-chips" data-guides><button type="button" data-g="oval">Kopf-Oval</button><button type="button" data-g="kreuz">Kreuz</button><button type="button" data-g="raster">Raster</button><button type="button" data-g="aus">Aus</button></div></div>
-  ${opts.aspect === false ? '' : `<div><h3>Format</h3><div class="tc-chips" data-aspects><button type="button" data-a="16:9">Quer 16:9</button><button type="button" data-a="9:16">Hoch 9:16 (Story, Reel)</button></div></div>`}
+  ${opts.aspect === false ? '' : `<div><h3>Format</h3><div class="tc-chips" data-aspects><button type="button" data-a="16:9">Quer 16:9</button><button type="button" data-a="4:5">Feed 4:5 (Instagram-Beitrag)</button><button type="button" data-a="9:16">Hoch 9:16 (Story, Reel)</button></div></div>`}
   <label class="tc-sw"><span>Vorschau spiegeln <small style="color:#6E6168;font-size:15px">(wie ein Spiegel, die Aufnahme ist richtig herum)</small></span><input type="checkbox" data-mir></label>
   <div><button type="button" class="tc-cmp" data-cmp>👁 Gedrückt halten: ohne Look</button></div>
 </div>`;
