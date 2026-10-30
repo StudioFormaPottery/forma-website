@@ -728,13 +728,27 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     if(!m||tr.label===m.label)return;
     const ns=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:m.deviceId},echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
     raw.removeTrack(tr);tr.stop();raw.addTrack(ns.getAudioTracks()[0]);ls.set('st-mic',m.deviceId)}catch(e){}}
+  function camErr(e){const n=(e&&e.name)||'',saf=/^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const why=n==='NotAllowedError'||n==='SecurityError'
+      ?(saf?'Safari hat Kamera oder Mikrofon für diese Seite gesperrt. Oben in der Menüleiste: <b>Safari → Einstellungen für forma-pottery.com</b> → Kamera und Mikrofon auf <b>Erlauben</b> stellen. Steht dort schon „Erlauben“, dann am Mac: <b>Systemeinstellungen → Datenschutz &amp; Sicherheit → Kamera</b> (und Mikrofon) → Safari einschalten.'
+          :'Der Browser hat Kamera oder Mikrofon für diese Seite gesperrt. Klick links neben der Adresse auf das <b>Schloss- bzw. Regler-Symbol</b> → Kamera und Mikrofon auf <b>Zulassen</b>. Hilft das nicht, am Mac: <b>Systemeinstellungen → Datenschutz &amp; Sicherheit → Kamera</b> (und Mikrofon) → deinen Browser einschalten.')
+      :n==='NotReadableError'||n==='AbortError'?'Die Kamera wird gerade von etwas anderem benutzt – zum Beispiel FaceTime, Zoom, Photo Booth oder einem zweiten Tab mit dem Studio. Schließ das und tippe dann auf „Nochmal versuchen“.'
+      :n==='NotFoundError'||n==='OverconstrainedError'?'Es wurde keine Kamera gefunden. Ist das iPhone als Kamera gewählt, aber gerade nicht in der Nähe? Tippe auf „Nochmal versuchen“, dann nehme ich die Kamera vom Mac.'
+      :'Kamera oder Mikrofon starten gerade nicht ('+esc(n||'unbekannt')+').';
+    if(n==='NotFoundError'||n==='OverconstrainedError'){ls.set('st-cam','');ls.set('st-mic','')}
+    $('stage').innerHTML='<div class="tc-st" style="line-height:1.5;padding:18px">'+why+'<br><button type="button" id="camRetry" style="margin-top:12px;font:inherit;padding:9px 18px;border-radius:999px;border:0;background:#7D5E68;color:#fff;cursor:pointer">🔄 Nochmal versuchen</button></div>';
+    $('camRetry').onclick=()=>{$('stage').innerHTML='<div class="tc-st">Kamera startet …</div>';startCam()};}
   async function startCam(){
     const cid=ls.get('st-cam',''), mid=ls.get('st-mic','');
     if(raw)raw.getTracks().forEach(t=>t.stop());if(tc)tc.destroy(false);
     const Q=QUAL[qual()]||QUAL['4k'];const v={width:{ideal:Q[0]},height:{ideal:Q[1]},frameRate:{ideal:30}};if(cid)v.deviceId={exact:cid};
     const a={echoCancellation:true,noiseSuppression:true,autoGainControl:true};if(mid)a.deviceId={ideal:mid};
     try{raw=await navigator.mediaDevices.getUserMedia({video:v,audio:a})}
-    catch(e){try{raw=await navigator.mediaDevices.getUserMedia({video:true,audio:a});ls.set('st-cam','')}catch(e2){$('stage').innerHTML='<div class="tc-st">Kamera oder Mikrofon sind gesperrt. Bitte im Browser oben bei der Adresse erlauben und die Seite neu laden.</div>';return}}
+    catch(e){let err=e;
+      // Schritt für Schritt einfacher werden: ohne gemerkte Kamera, dann ganz ohne Vorgaben, dann nur Kamera (Vivien, 30.10.2026)
+      for(const c of [{video:true,audio:a},{video:true,audio:true},{video:true}]){try{raw=await navigator.mediaDevices.getUserMedia(c);ls.set('st-cam','');if(!c.audio){ls.set('st-mic','');ls.set('st-mic-l','')}err=null;break}catch(e2){err=e2}}
+      if(err){camErr(err);return}
+      if(!raw.getAudioTracks().length){$('msg').className='msg bad';$('msg').textContent='⚠️ Das Mikrofon meldet sich gerade nicht. Steck dein Mikro neu an und tippe auf „Nochmal versuchen“, sonst wird ohne Ton aufgenommen.'}}
     await micFix();
     if(ls.get('st-wide',''))await wideZoom();
     tc=await TalkCam.create(raw,{mount:$('stage'),maxVh:vh(),profile:profile(),maxLong:Q[0]});qShow();
