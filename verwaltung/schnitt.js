@@ -60,7 +60,7 @@
   async function addTake(blob, name, opt) {
     opt = opt || {};
     const did = opt.draft ? await draftFor(opt.draft, opt.renew) : await ensureDraft();
-    const c = { id: uid(), blob, name: name || 'Aufnahme', added: Date.now(), in: 0, out: 0, mute: false, draft: did };
+    const c = { id: uid(), blob, name: name || 'Aufnahme', added: Date.now(), in: 0, out: 0, mute: false, draft: did }; c.src = c.id;
     await dbPut(c); const order = (await kvGet(ordKey(did))) || []; order.push(c.id); await kvSet(ordKey(did), order);
     // target = wohin das fertige Video kommt (Lektion + Sprache, Übungs-Clip oder Instagram-Tag), damit „Fertig stellen“ gleich hochlädt
     const l = await drafts(); const d = l.find(x => x.id === did); if (d) { d.at = Date.now(); if (opt.target) { d.tg = opt.target; d.up = null; } await draftsSave(l); }
@@ -82,6 +82,15 @@
 @media(max-width:980px){.sn-pv.p916{max-width:min(100%,38vh * 9 / 16)}.sn-pv.p45{max-width:min(100%,38vh * 4 / 5)}.sn-pv.p11{max-width:min(100%,38vh)}}
 .sn-pv video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;background:#1E171B;transform-origin:50% 50%;will-change:transform}
 .sn-pv video.on{display:block}
+.sn-pv video.sn-ov{z-index:1}
+.sn-bro{margin-top:10px;display:flex;flex-direction:column;gap:10px}
+.sn-bro:empty{display:none}
+.sn-bo{background:#fff;border:1.5px solid #E6DCD2;border-radius:16px;padding:10px 12px;font-size:15.5px;color:#4A3A41}
+.sn-bo .t{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}.sn-bo .t b{font-weight:500}.sn-bo .t small{color:#7D7076}
+.sn-bo label{display:block;margin-top:8px;font-size:14.5px;color:#6B5658}.sn-bo input[type=range]{width:100%;accent-color:#7D5E68}
+.sn-bo .r{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sn-c .br{position:absolute;left:6px;bottom:44px;background:rgba(125,94,104,.88);color:#fff;border-radius:999px;font-size:12px;padding:1px 7px}
+.sn-hint{font-size:14.5px;color:#7D7076;margin:8px 2px 0;line-height:1.45}
 .sn-pv .big{position:absolute;inset:0;margin:auto;width:76px;height:76px;border-radius:50%;border:0;background:rgba(251,245,247,.9);color:#4A3A41;font-size:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2}
 .sn-pv .big[hidden]{display:none}
 .sn-pv .empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#EADFDE;text-align:center;padding:20px;font-size:17px}
@@ -316,6 +325,12 @@ void main(){
       <button type="button" class="sn-b sm" data-k="mute">🔇 Ton aus</button>
       <button type="button" class="sn-b sm del" data-k="delClip">🗑 Clip löschen</button>
     </div>
+    <div class="sn-row">
+      <button type="button" class="sn-b sm" data-k="broMk">🎞 Nur als Bild über das Video davor (Stimme läuft weiter)</button>
+      <label class="sn-b sm" style="cursor:pointer">＋ Bild darüber legen (Video vom Gerät)<input type="file" accept="video/*,.mov,.mp4,.m4v,.webm" hidden data-k="broFile"></label>
+    </div>
+    <p class="sn-hint" data-k="broHint"></p>
+    <div class="sn-bro" data-k="bro"></div>
   </div>
   <div class="sn-row" style="margin-top:14px">
     <button type="button" class="sn-b main" data-k="done">✓ Fertig stellen</button>
@@ -388,6 +403,7 @@ void main(){
 
     // ---- Zustand ----
     let clips = [], sel = -1, closed = false, busy = false, curDraft = null, drList = [];
+    let bros = []; const ovV = new Map(); // „Bild darüber“: Clips, die nur ihr Bild über ein Talking Head legen (dessen Stimme läuft weiter)
     let covers = [], cov = null, shAC = null; const elSrcs = new WeakMap(); // Titelbilder · gemeinsamer Ton-Mischer
     const st = Object.assign({ look: 'natur', br: 1, ct: 1, sa: 1, se: 0, fmt: 'orig' }, ls.get('sn-st', {}));
     const mus = Object.assign({ vol: .18, voice: 1, duck: true, fade: true }, ls.get('sn-mus', {}));
@@ -412,7 +428,7 @@ void main(){
     const zAt = (c, off) => { if (!c || !c.zoom) return 1; const L = len(c) || 1, p = Math.max(0, Math.min(1, off / L)); return c.zoom[0] + (c.zoom[1] - c.zoom[0]) * p; };
     // MediaRecorder-Dateien kennen ihre Länge oft nicht: einmal ans Ende springen
     async function probeDur(c, v) { try { v.currentTime = 1e7; await new Promise(r => { v.onseeked = r; setTimeout(r, 2500); }); c.dur = isFinite(v.duration) && v.duration > 0 ? v.duration : (v.currentTime || 1); v.currentTime = 0; } catch (e) { c.dur = c.dur || 1; } if (!c.out || c.out > c.dur) c.out = c.dur; dbPut(dbRow(c)); ui(); }
-    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft });
+    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft, src: c.src || null, bro: !!c.bro, osrc: c.osrc || null, ost: c.ost || 0 });
     const len = c => Math.max(0, (c.out || c.dur || 0) - (c.in || 0));
     const total = () => clips.reduce((a, c) => a + len(c), 0);
     const tv = document.createElement('video'); tv.muted = true; tv.playsInline = true; tv.preload = 'auto'; let thumbQ = Promise.resolve();
@@ -434,7 +450,8 @@ void main(){
         curDraft = await ensureDraft(); drList = await drafts();
         const all = await dbAll(), rows = all.filter(r => r.draft === curDraft), order = (await kvGet(ordKey(curDraft))) || [];
         rows.sort((a, b) => (order.indexOf(a.id) + 1 || 1e9) - (order.indexOf(b.id) + 1 || 1e9) || a.added - b.added);
-        const urls = new Map(); clips = rows.map(r => { let u = urls.get(r.blob); if (!u) { u = URL.createObjectURL(r.blob); urls.set(r.blob, u); } return Object.assign({}, r, { url: u }); });
+        const urls = new Map(); const objs = rows.map(r => { let u = urls.get(r.blob); if (!u) { u = URL.createObjectURL(r.blob); urls.set(r.blob, u); } return Object.assign({}, r, { url: u }); });
+        clips = objs.filter(r => !r.bro); bros = objs.filter(r => r.bro); bros.forEach(ovVid);
         slots(); if (clips.length) { sel = 0; vidFor(clips[0]); prep(1); }
         await covLoad().catch(() => {});
         drawDrafts(); ui(); clips.forEach(thumb);
@@ -446,7 +463,7 @@ void main(){
       if (closed) return;
       const inp = K('drName'); if (document.activeElement !== inp) inp.value = (drList.find(d => d.id === curDraft) || {}).name || '';
       const all = await dbAll().catch(() => []);
-      const info = {}; all.forEach(c => { const k = c.draft; if (!k) return; const i = info[k] || (info[k] = { n: 0, sec: 0 }); i.n++; i.sec += Math.max(0, (c.out || c.dur || 0) - (c.in || 0)); });
+      const info = {}; all.forEach(c => { const k = c.draft; if (!k || c.bro) return; const i = info[k] || (info[k] = { n: 0, sec: 0 }); i.n++; i.sec += Math.max(0, (c.out || c.dur || 0) - (c.in || 0)); });
       const when = t => { const d = new Date(t || 0), h = new Date(), s2 = x => String(x).padStart(2, '0');
         return (d.toDateString() === h.toDateString() ? 'heute' : d.getDate() + '.' + (d.getMonth() + 1) + '.') + ' ' + s2(d.getHours()) + ':' + s2(d.getMinutes()); };
       const L = drList.slice().sort((a, b) => (b.at || 0) - (a.at || 0));
@@ -463,7 +480,7 @@ void main(){
     async function openDraft(id) {
       if (busy || id === curDraft) return; stop();
       clips.forEach(c => { if (!clips.some(x => x !== c && x.url === c.url)) URL.revokeObjectURL(c.url); });
-      clips = []; dropVids(); sel = -1; pos = 0; undoRows = null; autoLog = []; lastSum = null; K('undo').hidden = true; autoResUi(null);
+      clips = []; broClear(); dropVids(); sel = -1; pos = 0; undoRows = null; autoLog = []; lastSum = null; K('undo').hidden = true; autoResUi(null);
       await kvSet('cur', id).catch(() => {}); K('res').hidden = true; K('coved').hidden = true; covShow(false); result = null;
       await load(); say('📝 „' + drName(id) + '“ ist offen.', 'ok');
     }
@@ -483,13 +500,13 @@ void main(){
     };
     async function addFiles(files) {
       let n = 0;
-      for (const f of files) { if (!f || !f.size) continue; const c = { id: uid(), blob: f, name: f.name.replace(/\.\w+$/, ''), added: Date.now() + n, in: 0, out: 0, mute: false, dur: 0, draft: curDraft }; c.url = URL.createObjectURL(f); clips.push(c); await dbPut(dbRow(c)); slots(); vidFor(c); thumb(c); n++; }
+      for (const f of files) { if (!f || !f.size) continue; const c = { id: uid(), blob: f, name: f.name.replace(/\.\w+$/, ''), added: Date.now() + n, in: 0, out: 0, mute: false, dur: 0, draft: curDraft }; c.src = c.id; c.url = URL.createObjectURL(f); clips.push(c); await dbPut(dbRow(c)); slots(); vidFor(c); thumb(c); n++; }
       await saveOrder(); await touch(); if (sel < 0 && clips.length) sel = 0; if (n) say('✓ ' + n + (n > 1 ? ' Clips' : ' Clip') + ' dazu. Tipp auf einen Clip, um Anfang und Ende zu setzen.', 'ok'); ui();
     }
     const saveOrder = () => kvSet(ordKey(curDraft), clips.map(c => c.id)).catch(() => {});
     const touch = async () => { const d = drList.find(x => x.id === curDraft); if (d) { d.at = Date.now(); await draftsSave(drList).catch(() => {}); drawDrafts(); } };
     K('file').onchange = e => { addFiles([...e.target.files]); e.target.value = ''; };
-    K('clearAll').onclick = async () => { if (!clips.length || !confirm('Wirklich alle ' + clips.length + ' Clips von diesem Gerät löschen?')) return; stop(); for (const c of clips) { await dbDel(c.id); } const urls = new Set(clips.map(c => c.url)); clips = []; dropVids(); urls.forEach(u => URL.revokeObjectURL(u)); sel = -1; await saveOrder(); undoRows = null; K('undo').hidden = true; K('autoRes').hidden = true; drawDrafts(); ui(); say('Alle Clips in „' + drName(curDraft) + '“ gelöscht.'); };
+    K('clearAll').onclick = async () => { if (!clips.length || !confirm('Wirklich alle ' + clips.length + ' Clips von diesem Gerät löschen?')) return; stop(); for (const c of clips) { await dbDel(c.id); } for (const o of bros) { await dbDel(o.id); } broClear(); const urls = new Set(clips.map(c => c.url)); clips = []; dropVids(); urls.forEach(u => URL.revokeObjectURL(u)); sel = -1; await saveOrder(); undoRows = null; K('undo').hidden = true; K('autoRes').hidden = true; drawDrafts(); ui(); say('Alle Clips in „' + drName(curDraft) + '“ gelöscht.'); };
 
     // ---- Vorschau: Clips nacheinander abspielen ----
     let playing = false, pos = 0, raf = 0, cmp = false, prepped = false; // pos = Stelle im Gesamtvideo
@@ -503,12 +520,14 @@ void main(){
       v.classList.add('on'); v.muted = !!c.mute; v.style.filter = cmp ? '' : filterCss(st);
       if (seek !== false) { const t = (c.in || 0) + off; if (Math.abs(v.currentTime - t) > .08) v.currentTime = t; }
       v.style.transform = c.zoom ? 'scale(' + zAt(c, seek !== false ? off : Math.max(0, v.currentTime - (c.in || 0))).toFixed(4) + ')' : '';
+      broSync(c, seek !== false ? (c.in || 0) + off : v.currentTime, false);
     }
     function tick() {
       if (!playing) return;
       const c = clips[sel]; const v = cur(); if (!c || !v) { stop(); return; }
       const off = Math.max(0, v.currentTime - (c.in || 0)); pos = starts()[sel] + off; timeUi(); musDrive(pos + CD(), true);
       if (c.zoom) v.style.transform = 'scale(' + zAt(c, off).toFixed(4) + ')';
+      broSync(c, v.currentTime, true);
       if (!prepped && (c.out || c.dur) - v.currentTime < 1.2) { prepped = true; prep(sel + 1); }
       if (v.currentTime >= (c.out || c.dur) - .04 || v.ended) {
         if (sel < clips.length - 1) { sel++; prepped = false; const n = clips[sel], nv = vidFor(n); show(sel, 0); nv.play().catch(() => {}); renderClips(false); edUi(); ztDraw(); }
@@ -537,7 +556,7 @@ void main(){
         if (t >= D0) { covRun = 0; covShow(false); pos = 0; covSkip = true; playing = false; play(); return; } covRun = requestAnimationFrame(step); };
       covRun = requestAnimationFrame(step);
     }
-    function stop() { playing = false; cancelAnimationFrame(raf); if (covRun) { cancelAnimationFrame(covRun); covRun = 0; covShow(false); } const v = cur(); if (v) v.pause(); musStop(); big.hidden = !clips.length; K('play').textContent = '▶ Abspielen'; }
+    function stop() { playing = false; cancelAnimationFrame(raf); ovV.forEach(x => { if (!x.paused) x.pause(); }); if (covRun) { cancelAnimationFrame(covRun); covRun = 0; covShow(false); } const v = cur(); if (v) v.pause(); musStop(); big.hidden = !clips.length; K('play').textContent = '▶ Abspielen'; }
     K('play').onclick = () => playing ? stop() : play(); big.onclick = play;
     K('cmp').onclick = () => { cmp = !cmp; K('cmp').textContent = cmp ? 'Nachher zeigen' : 'Vorher zeigen'; K('cmp').setAttribute('aria-pressed', String(cmp)); K('tag').textContent = cmp ? 'Vorher' : ''; const v = cur(); if (v) v.style.filter = cmp ? '' : filterCss(st); };
     function timeUi() { K('time').textContent = fmt(pos) + ' / ' + fmt(total()); if (clips.length) ztPh(); }
@@ -546,7 +565,7 @@ void main(){
     // ---- Clip-Liste ----
     function renderClips(full) {
       const box = K('clips');
-      if (full !== false) box.innerHTML = covTile() + clips.map((c, i) => `<button type="button" class="sn-c ${i === sel ? 'on' : ''}${c.auto ? ' auto' : ''}" data-ci="${i}"><span class="n">${i + 1}</span>${c.mute ? '<span class="mu">🔇</span>' : ''}${c.thumb ? `<img src="${c.thumb}" alt="">` : '<span class="ph">🎬</span>'}<b>${esc(c.name)}</b><small>${fmt1(len(c))}${(c.in || (c.out && c.dur && c.out < c.dur - .05)) ? ' · geschnitten' : ''}</small></button>`).join('')
+      if (full !== false) box.innerHTML = covTile() + clips.map((c, i) => `<button type="button" class="sn-c ${i === sel ? 'on' : ''}${c.auto ? ' auto' : ''}" data-ci="${i}"><span class="n">${i + 1}</span>${c.mute ? '<span class="mu">🔇</span>' : ''}${broOf(c).length ? '<span class="br">🎞 ' + broOf(c).length + '</span>' : ''}${c.thumb ? `<img src="${c.thumb}" alt="">` : '<span class="ph">🎬</span>'}<b>${esc(c.name)}</b><small>${fmt1(len(c))}${(c.in || (c.out && c.dur && c.out < c.dur - .05)) ? ' · geschnitten' : ''}</small></button>`).join('')
         + `<label class="sn-add"><b>＋</b>Clips<input type="file" accept="video/*,.mov,.mp4,.m4v,.webm" multiple hidden></label>`;
       else box.querySelectorAll('.sn-c').forEach(b => b.classList.toggle('on', +b.dataset.ci === sel));
       box.querySelectorAll('.sn-c[data-ci]').forEach(b => b.onclick = () => { if (busy) return; stop(); covShow(false); sel = +b.dataset.ci; pos = starts()[sel]; show(sel, 0); renderClips(false); edUi(); barUi(); timeUi(); });
@@ -580,6 +599,7 @@ void main(){
       K('edT').textContent = 'Clip ' + (sel + 1) + ' von ' + clips.length + ' · ' + c.name;
       K('edD').textContent = 'von ' + fmt1(c.in || 0) + ' bis ' + fmt1(c.out || c.dur || 0) + ' · Länge ' + fmt1(len(c));
       ztDraw();
+      broUi();
       K('mute').textContent = c.mute ? '🔊 Ton an' : '🔇 Ton aus'; K('left').disabled = sel === 0; K('right').disabled = sel === clips.length - 1;
       ovlUi();
     }
@@ -593,6 +613,66 @@ void main(){
     K('left').onclick = async () => { if (sel <= 0) return; [clips[sel - 1], clips[sel]] = [clips[sel], clips[sel - 1]]; sel--; await saveOrder(); ui(); };
     K('right').onclick = async () => { if (sel >= clips.length - 1) return; [clips[sel + 1], clips[sel]] = [clips[sel], clips[sel + 1]]; sel++; await saveOrder(); ui(); };
     K('mute').onclick = () => { const c = clips[sel]; if (!c) return; c.mute = !c.mute; dbPut(dbRow(c)); ui(); };
+    // ---- Bild darüber, Stimme läuft weiter (Vivien, 30.10.2026: „im Talking Head zeige ich etwas dazwischen,
+    // die Stimme soll weiterlaufen, nur das Bild wechselt“). Ein Clip wird zum Bild über einem Talking Head:
+    // verankert an der Stelle im Ausgangsvideo (osrc = Quelle, ost = Sekunde darin), eigener Ton fällt weg.
+    function srcOf(c) { return c.src || c.id; }
+    async function ensureSrc(P) { if (P.src) return P.src; const g = clips.filter(x => !x.src && x.name === P.name && Math.abs((x.dur || 0) - (P.dur || 0)) < .05); if (!g.includes(P)) g.push(P); for (const x of g) { x.src = P.id; await dbPut(dbRow(x)); } return P.src; }
+    function broOf(c) { const k = srcOf(c), a = c.in || 0, b = c.out || c.dur || 0; return bros.filter(o => o.osrc === k && o.ost >= a - .01 && o.ost < b); }
+    function broAt(c, s) { if (!c) return null; const k = srcOf(c); for (const o of bros) { const L = len(o); if (o.osrc === k && L > 0 && s >= o.ost && s < o.ost + L - .001) return o; } return null; }
+    function ovVid(o) {
+      let v = ovV.get(o.id); if (v) return v;
+      v = document.createElement('video'); v.className = 'sn-ov'; v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.src = o.url;
+      pv.insertBefore(v, big); ovV.set(o.id, v);
+      v.addEventListener('loadedmetadata', () => { if (o.dur) return; const d = isFinite(v.duration) && v.duration > 0 ? v.duration : 0; if (d) { o.dur = d; if (!o.out) o.out = d; dbPut(dbRow(o)); broUi(); renderClips(); } else probeDur(o, v); });
+      return v;
+    }
+    function broSync(c, s, run) {
+      const o = broAt(c, s);
+      ovV.forEach((v, id) => { if (!o || id !== o.id) { v.classList.remove('on'); if (!v.paused) v.pause(); } });
+      if (!o) return; const v = ovVid(o), want = (o.in || 0) + (s - o.ost);
+      v.style.filter = cmp ? '' : filterCss(st); v.classList.add('on');
+      if (Math.abs(v.currentTime - want) > (run ? .3 : .05)) { try { v.currentTime = want; } catch (e) {} }
+      if (run && v.paused) v.play().catch(() => {}); if (!run && !v.paused) v.pause();
+    }
+    function broClear() { ovV.forEach(v => { v.pause(); v.removeAttribute('src'); v.remove(); }); ovV.clear(); bros.forEach(o => { if (!clips.some(c => c.url === o.url)) URL.revokeObjectURL(o.url); }); bros = []; }
+    function broUi() {
+      const c = clips[sel], box = K('bro'); if (!c) { box.innerHTML = ''; return; }
+      K('broMk').style.display = sel < 1 ? 'none' : '';
+      K('broHint').textContent = sel < 1 ? 'Tipp: Leg den Clip, den du zeigen willst, direkt hinter dein Talking Head und tipp dort auf „🎞 Nur als Bild über das Video davor“.' : 'Dieser Clip wird zum Bild über Clip ' + sel + ': man sieht ihn, hört aber weiter die Stimme aus Clip ' + sel + '.';
+      const a = c.in || 0, b = c.out || c.dur || 0, list = broOf(c);
+      box.innerHTML = list.length ? '<b style="font-weight:500;color:#4A3A41">🎞 Bild darüber · Stimme läuft weiter</b>' + list.map(o => { const mx = Math.max(.6, (o.dur || len(o)) - (o.in || 0));
+        return '<div class="sn-bo" data-bo="' + o.id + '"><div class="t"><b>' + esc(o.name) + '</b><small data-bl>' + fmt1(len(o)) + ' lang · ab ' + fmt1(o.ost - a) + ' in diesem Clip</small></div>'
+          + '<label>Beginnt bei<input type="range" data-bs min="' + a.toFixed(2) + '" max="' + Math.max(a + .1, b - .3).toFixed(2) + '" step="0.1" value="' + o.ost.toFixed(2) + '"></label>'
+          + '<label>Länge<input type="range" data-bd min="0.5" max="' + mx.toFixed(2) + '" step="0.1" value="' + Math.min(mx, len(o) || mx).toFixed(2) + '"></label>'
+          + '<div class="r"><button type="button" class="sn-b sm" data-bp>▶ Ansehen</button><button type="button" class="sn-b sm" data-bb>↩ Wieder eigener Clip</button><button type="button" class="sn-b sm del" data-bx>🗑 Entfernen</button></div></div>'; }).join('') : '';
+      box.querySelectorAll('[data-bo]').forEach(el => {
+        const o = bros.find(x => x.id === el.dataset.bo); if (!o) return;
+        const info = () => { el.querySelector('[data-bl]').textContent = fmt1(len(o)) + ' lang · ab ' + fmt1(o.ost - a) + ' in diesem Clip'; };
+        const peek = () => { stop(); pos = starts()[sel] + Math.max(0, o.ost - a); show(sel, Math.max(0, o.ost - a) + .05); timeUi(); };
+        el.querySelector('[data-bs]').oninput = e => { o.ost = +e.target.value; info(); peek(); };
+        el.querySelector('[data-bd]').oninput = e => { o.out = Math.min(o.dur || 1e9, (o.in || 0) + +e.target.value); info(); peek(); };
+        el.querySelectorAll('input').forEach(i => i.onchange = () => { dbPut(dbRow(o)); schedCache = null; });
+        el.querySelector('[data-bp]').onclick = () => { stop(); const off = Math.max(0, o.ost - a - 1.5); pos = starts()[sel] + off; show(sel, off); play(); };
+        el.querySelector('[data-bb]').onclick = async () => { stop(); bros = bros.filter(x => x !== o); const v = ovV.get(o.id); if (v) { v.pause(); v.remove(); ovV.delete(o.id); } o.bro = false; o.osrc = null; o.ost = 0; o.mute = false; clips.splice(sel + 1, 0, o); await dbPut(dbRow(o)); await saveOrder(); sel++; ui(); thumb(o); say('↩ „' + o.name + '“ ist wieder ein eigener Clip (Clip ' + (sel + 1) + ').', 'ok'); };
+        el.querySelector('[data-bx]').onclick = async () => { stop(); bros = bros.filter(x => x !== o); const v = ovV.get(o.id); if (v) { v.pause(); v.remove(); ovV.delete(o.id); } await dbDel(o.id); if (!clips.some(c2 => c2.url === o.url) && !bros.some(x => x.url === o.url)) URL.revokeObjectURL(o.url); ui(); say('🗑 Bild darüber entfernt.'); };
+      });
+    }
+    K('broMk').onclick = async () => {
+      if (busy || sel < 1) return; stop(); const c = clips[sel], P = clips[sel - 1];
+      const k = await ensureSrc(P), pa = P.in || 0, pb = P.out || P.dur || 0;
+      c.bro = true; c.osrc = k; c.ost = Math.max(pa, pb - len(c)); c.mute = true;
+      clips.splice(sel, 1); bros.push(c); sel--; await dbPut(dbRow(c)); await saveOrder();
+      ui(); ovVid(c);
+      say('🎞 „' + c.name + '“ liegt jetzt als Bild über Clip ' + (sel + 1) + '. Die Stimme läuft darunter weiter. Mit „Beginnt bei“ schiebst du es an die richtige Stelle.', 'ok');
+    };
+    K('broFile').onchange = async e => {
+      const f = e.target.files[0]; e.target.value = ''; const c = clips[sel]; if (!f || !c) return; stop();
+      const k = await ensureSrc(c), v = cur();
+      const o = { id: uid(), blob: f, name: f.name.replace(/\.\w+$/, ''), added: Date.now(), in: 0, out: 0, mute: true, dur: 0, draft: curDraft, bro: true, osrc: k, ost: v ? Math.max(c.in || 0, Math.min(v.currentTime, (c.out || c.dur || 0) - .5)) : (c.in || 0) };
+      o.url = URL.createObjectURL(f); bros.push(o); await dbPut(dbRow(o)); ovVid(o); ui();
+      say('🎞 „' + o.name + '“ liegt als Bild über Clip ' + (sel + 1) + ', ab der Stelle, an der du gerade warst. Die Stimme läuft weiter.', 'ok');
+    };
     async function delAt(i) {
       const c = clips[i]; if (!c) return; stop();
       await dbDel(c.id); clips.splice(i, 1); slots(); dropVids();
@@ -967,7 +1047,7 @@ void main(){
           const r = SA.analyze(F, 16000, { minPause: auto.pause, stumbles: auto.stumbles, noise: auto.noise !== false });
           if (!r.segs.length) { next.push(Object.assign({}, c, { auto: true })); continue; } // nur Stille erkannt → lieber so lassen
           pn += r.pauses.n; psec += r.pauses.sec; const a0 = c.in || 0;
-          r.segs.forEach((sg, k) => next.push({ id: uid(), blob: c.blob, url: c.url, name: c.name, added: c.added + k, in: a0 + sg.s, out: a0 + sg.e, mute: !!c.mute, dur: c.dur, auto: true, zoom: null, draft: curDraft }));
+          r.segs.forEach((sg, k) => next.push({ id: uid(), src: c.src || c.id, blob: c.blob, url: c.url, name: c.name, added: c.added + k, in: a0 + sg.s, out: a0 + sg.e, mute: !!c.mute, dur: c.dur, auto: true, zoom: null, draft: curDraft }));
           r.cut.forEach(sg => log.push({ url: c.url, blob: c.blob, name: c.name, dur: c.dur, s: a0 + sg.s, e: a0 + sg.e, why: sg.why }));
         }
         if (!next.length) { say('Da war nichts zu schneiden.'); return; }
@@ -1142,6 +1222,18 @@ void main(){
       say('Wird fertig gestellt … Seite offen lassen.'); const W0 = performance.now(); let lastTs = -1;
       // Titelbild ganz vorne (ohne Licht & Farbe, so wie hochgeladen)
       if (C0) { const cvC = await covCanvas(); if (cvC) for (let k = 0; ; k++) { const t = k / 30; if (t >= C0 - 1e-6) break; if (closed) { try { await out.cancel(); } catch (e) {} return 'x'; } draw(cvC, cvC.width, cvC.height, 1, true); await cs.add(t, Math.min(1 / 30, C0 - t)); lastTs = t; fill.style.width = Math.min(100, t / D * 100) + '%'; } }
+      // Bild darüber: je Clip der Reihe nach dekodiert, die Stimme bleibt die vom Talking Head
+      const ovS = new Map();
+      const ovFrame = async (o, t) => {
+        let S = ovS.get(o.id);
+        if (S && S.cur && t < S.cur.timestamp - .1) { try { await S.it.return(); } catch (e) {} S = null; }
+        if (!S) { S = { cur: null, done: false, bad: false }; ovS.set(o.id, S);
+          try { const inp = new M.Input({ source: new M.BlobSource(o.blob), formats: M.ALL_FORMATS }), vt = await inp.getPrimaryVideoTrack();
+            if (!vt || !(await vt.canDecode())) S.bad = true; else S.it = new M.CanvasSink(vt, { poolSize: 3 }).canvases(Math.max(o.in || 0, t - .05), o.out || o.dur)[Symbol.asyncIterator](); } catch (e) { S.bad = true; } }
+        if (S.bad) return null;
+        while (!S.done && (!S.cur || S.cur.timestamp + (S.cur.duration || 1 / 30) <= t)) { const r = await S.it.next(); if (r.done) { S.done = true; break; } S.cur = r.value; }
+        return S.cur;
+      };
       for (const x of ins) {
         const eOut = x.c.out || x.c.dur, direct = !x.rot, vs = direct ? new M.VideoSampleSink(x.vt) : new M.CanvasSink(x.vt, { poolSize: 2 });
         const it = direct ? vs.samples(x.c.in || 0, eOut) : vs.canvases(x.c.in || 0, eOut);
@@ -1149,12 +1241,14 @@ void main(){
           if (closed) { try { await out.cancel(); } catch (e) {} return 'x'; }
           let el, sw, shh, tsrc, dur; if (direct) { const f = smp.toVideoFrame(); smp.close(); el = f; sw = f.displayWidth; shh = f.displayHeight; tsrc = f.timestamp / 1e6; dur = (f.duration || 0) / 1e6; } else { el = smp.canvas; sw = el.width; shh = el.height; tsrc = smp.timestamp; dur = smp.duration; }
           const ts = x.start + Math.max(0, tsrc - (x.c.in || 0)); const ok2 = ts > lastTs && ts < D;
-          if (ok2) { draw(el, sw, shh, zAt(x.c, tsrc - (x.c.in || 0))); lastTs = ts; } if (direct) el.close();
+          const bo = ok2 ? broAt(x.c, tsrc) : null, bf = bo ? await ovFrame(bo, (bo.in || 0) + (tsrc - bo.ost)) : null;
+          if (ok2) { if (bf) draw(bf.canvas, bf.canvas.width, bf.canvas.height, 1); else draw(el, sw, shh, zAt(x.c, tsrc - (x.c.in || 0))); lastTs = ts; } if (direct) el.close();
           if (ok2) await cs.add(ts, Math.max(1 / 60, Math.min(dur || 1 / 30, D - ts)));
           fill.style.width = Math.min(100, ts / D * 100) + '%';
           const el2 = (performance.now() - W0) / 1000; if (!window.__snFastForce && el2 > 4 && D - ts > 4 && ts / el2 < 1.1) { try { await out.cancel(); } catch (e) {} return null; }
         }
       }
+      for (const S of ovS.values()) { try { if (S.it) await S.it.return(); } catch (e) {} }
       await out.finalize(); const blob = new Blob(parts.map(x => x.b), { type: mov ? 'video/quicktime' : 'video/mp4' });
       // Sicherheitsnetz: sollte Ton drin sein, aber die Datei hat keine Tonspur → lieber der Echtzeit-Weg
       if (mixed) { try { const chk = new M.Input({ source: new M.BlobSource(blob), formats: M.ALL_FORMATS }); if (!(await chk.getPrimaryAudioTrack())) { console.warn('Schnitt: ohne Tonspur gespeichert, nehme den Echtzeit-Weg'); return null; } } catch (e) {} }
@@ -1185,11 +1279,16 @@ void main(){
         if (!c.mute) { try { const s = elSource(v); if (!used.some(u => u[0] === s)) { s.src.connect(vg); s.spk.gain.value = 0; used.push([s, vg]); } } catch (e) { console.warn('Stimme (Echtzeit)', e); } }
         v.muted = !!c.mute; v.volume = 1;
         await v.play().catch(() => {});
-        await new Promise(ok => { const step = () => { if (closed) { ok(); return; } draw(v, v.videoWidth, v.videoHeight, zAt(c, v.currentTime - (c.in || 0))); const t = t0 + (v.currentTime - (c.in || 0));
+        await new Promise(ok => { const step = () => { if (closed) { ok(); return; }
+          const bo = broAt(c, v.currentTime), ov = bo ? ovVid(bo) : null;
+          ovV.forEach(x => { if (x !== ov && !x.paused) x.pause(); });
+          if (ov) { const want = (bo.in || 0) + (v.currentTime - bo.ost); if (Math.abs(ov.currentTime - want) > .3) { try { ov.currentTime = want; } catch (e) {} } if (ov.paused) ov.play().catch(() => {}); }
+          if (ov && ov.readyState >= 2 && ov.videoWidth) draw(ov, ov.videoWidth, ov.videoHeight, 1); else draw(v, v.videoWidth, v.videoHeight, zAt(c, v.currentTime - (c.in || 0))); const t = t0 + (v.currentTime - (c.in || 0));
           if (mg) { musDrive(t, true); const g = mus.fade ? Math.max(0, Math.min(1, t / 1.5, (D - t) / 2.5)) : 1; mg.gain.setTargetAtTime(g, ac.currentTime, .2); }
           fill.style.width = Math.min(100, t / D * 100) + '%'; if (v.ended || v.currentTime >= (c.out || c.dur) - .03) { ok(); return; } (v.requestVideoFrameCallback ? v.requestVideoFrameCallback(step) : requestAnimationFrame(step)); }; step(); v.onended = ok; });
         v.pause(); t0 += len(c);
       }
+      ovV.forEach(x => x.pause());
       await new Promise(x => setTimeout(x, 150)); r.stop(); await done; musStop(); stream.getVideoTracks().forEach(t => t.stop());
       used.forEach(([s, n]) => { try { s.src.disconnect(n); } catch (e) {} s.spk.gain.value = 1; }); try { vg.disconnect(); if (mg) mg.disconnect(); } catch (e) {}
       clips.forEach(c => { const v = vids.get(c.slot); if (v) v.muted = !!c.mute; });
