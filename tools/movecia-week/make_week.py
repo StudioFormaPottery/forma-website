@@ -131,6 +131,12 @@ h1 em{font-style:italic;color:#4A3040}.dark h1 em{color:#E6DBCF}
 .bg .foot{margin-top:22px}.bg .twinkle{color:#FBF9F6;opacity:.9}
 .f.bg .wrap{padding-bottom:56px}.f.bg h1{font-size:76px}.f.bg .text{font-size:25px;margin-top:12px}.f.bg .deal{font-size:24px;padding:18px 26px;margin-top:16px}.f.bg .deal b{font-size:54px;margin-bottom:6px}.f.bg .card{padding:30px 34px 26px}.f.bg .foot{margin-top:16px}
 .s.bg .wrap{padding-bottom:200px}.pin.bg .wrap{padding-bottom:70px}
+.deal.wb{overflow:visible;margin-top:96px!important}
+.deal.wb::after{right:0;bottom:0;width:150px;height:150px;border-radius:120px 0 34px 0}
+.wbirds{position:absolute;right:30px;top:-95px;display:flex;align-items:flex-end;gap:0;pointer-events:none}
+.wbird{width:118px;height:107px;display:block;filter:drop-shadow(0 3px 4px rgba(46,29,39,.18))}
+.f .wbird{width:96px;height:87px}.f .wbirds{top:-78px}.f .deal.wb{margin-top:78px!important}
+.wbird:nth-child(2){width:96px;height:87px}.f .wbird:nth-child(2){width:80px;height:73px}
 .f .qrbox img{width:104px;height:104px}.f .qrbox{padding:10px 18px 10px 10px;gap:14px}.f .qrbox span{font-size:20px;max-width:220px}.f .qrbox b{font-size:28px}
 .f.adv .top{margin-top:40px}
 .f.adv.t-offer .ph{height:320px}.f.adv.t-offer .body{margin-top:18px!important}.f.adv.t-offer .text{font-size:26px}
@@ -151,6 +157,27 @@ def ibubble(p):
     return f'<div class="ib">{wbicons.icon(k, 62)}</div>'
 
 STAR = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg>'
+
+def winter_birds():
+    # Early-Bird-Vögelchen wie auf der Academy-Seite, hier mit Wintermütze und Schal (Vivien, 30.10.2026)
+    def bird(col, hat, band, scarf, tilt, flip=False):
+        tr = f'transform:rotate({tilt}deg)' + (' scaleX(-1)' if flip else '')
+        return (f'<svg class="wbird" viewBox="0 0 44 40" style="{tr}">'
+                # Körper + Flügel (wie ac_birds), etwas nach unten versetzt, damit Platz für die Mütze ist
+                f'<g transform="translate(0 8)"><path d="M8 18c3-6 10-8 16-5 2-4 6-6 10-5-2 1-3 3-3 5 1 6-5 11-13 11-6 0-10-2-12-6z" fill="{col}"/>'
+                f'<path d="M14 16c2-6 7-9 12-8-2 4-5 7-12 8z" fill="#FBF9F6" opacity=".7"/>'
+                f'<circle cx="30" cy="11" r="1.2" fill="#2A2026"/><path d="M34 11.5l3 .6-3 1" fill="none" stroke="#E8B48F" stroke-width="1.5" stroke-linecap="round"/>'
+                # Schal um den Hals mit hängendem Ende
+                f'<path d="M23.5 14.5c2.5 2 6.5 2 9 .2l.6 2.4c-3 2-7.4 2-10.4-.2z" fill="{scarf}"/>'
+                f'<path d="M25 16.4l-1.6 6.2 2.6.5 1.2-6z" fill="{scarf}"/><path d="M23.6 21.4l2.4.4M23.9 19.6l2.4.4" stroke="#FBF9F6" stroke-width=".7" opacity=".8"/>'
+                f'<path d="M14 27l-2 2M18 28l-1 2" stroke="{col}" stroke-width="1.2" stroke-linecap="round"/></g>'
+                # Strickmütze mit Bommel
+                f'<path d="M24.6 15.6c-.6-5.4 2.6-9 6.4-9s6.6 3.6 6 8.6z" fill="{hat}"/>'
+                f'<path d="M24.2 15.4c4-1.4 9-1.4 13.2-.6l.2 2.4c-4.4-.8-9.2-.8-13.4.6z" fill="{band}"/>'
+                f'<path d="M27.5 8.5v5M30.5 7.4v6.4M33.6 8.2v5.6" stroke="{band}" stroke-width=".7" opacity=".55"/>'
+                f'<circle cx="31.4" cy="5.6" r="2.6" fill="{band}"/></svg>')
+    return ('<span class="wbirds">' + bird('#F3E2D8', '#B58C99', '#FBF9F6', '#B58C99', -4)
+            + bird('#E6DBCF', '#FBF9F6', '#B58C99', '#D9A9B5', 3) + bird('#F7F1EE', '#8E6475', '#F3E2D8', '#E6DBCF', -2, True) + '</span>')
 
 def garland():
     # Bogen-Girlande mit Kugeln und Sternchen in Movecia-Farben
@@ -186,7 +213,7 @@ def page(p, story, pin=False):
         body += '<div class="steps">' + ''.join(f'<div style="background:{PASTELS[(i + 1) % 5]}"><span>{mark(i)}</span>{esc(s)}</div>' for i, s in enumerate(p['items'])) + '</div>'
     if p['type'] == 'poll':
         body += '<div class="poll">' + ''.join(f'<div style="background:{PASTELS[(i + 1) % 5]}"><span>{esc(s)}</span><i></i></div>' for i, s in enumerate(p['items'])) + '</div>'
-    if p['type'] == 'offer': body += f'<div class="deal"><b>{esc(p["price"])}</b>{esc(p["deal"])}</div>'
+    if p['type'] == 'offer': body += f'<div class="deal{" wb" if p.get("birds") else ""}">{winter_birds() if p.get("birds") else ""}<b>{esc(p["price"])}</b>{esc(p["deal"])}</div>'
     if p.get('chips'): body += '<div class="chips">' + ''.join(f'<span>{esc(c)}</span>' for c in p['chips']) + '</div>'
     if p.get('sig'): body += f'<p class="sig">{esc(p["sig"])}</p>'
     if p.get('advent'): cls.append('adv')

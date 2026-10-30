@@ -12,7 +12,7 @@
      "photo": "img/movecia/fotos/ev-ueber-mich-weit.jpg",
      "pos": "62% 30%",
      "kicker": "On demand · Start am 1. Dezember",
-     "title": "Mindful Movement",
+     "title": "The Mindful|Movement",
      "em": "Method",
      "text": "Schenk dir im Advent jeden Tag ein paar ruhige Minuten: Flows, Somatic Movement, Breathwork und Meditation. Du startest bei Monat 1 und gehst Schritt für Schritt weiter.",
      "price": "€ 29 im Monat",
@@ -21,7 +21,8 @@
      "url": "moveciamovement.com/method",
      "pinbtn": "Mehr erfahren",
      "bg": true,
-     "shift": "4%"
+     "shift": "4%",
+     "birds": true
     },
     "en": {
      "type": "offer",
@@ -31,7 +32,7 @@
      "photo": "img/movecia/fotos/ev-ueber-mich-weit.jpg",
      "pos": "62% 30%",
      "kicker": "On demand · starts 1 December",
-     "title": "Mindful Movement",
+     "title": "The Mindful|Movement",
      "em": "Method",
      "text": "Give yourself a few quiet minutes every day this Advent: flows, somatic movement, breathwork and meditation. You start at month one and take it one step at a time.",
      "price": "€29 a month",
@@ -40,7 +41,8 @@
      "url": "moveciamovement.com/method",
      "pinbtn": "Learn more",
      "bg": true,
-     "shift": "4%"
+     "shift": "4%",
+     "birds": true
     }
    }
   },
@@ -91,7 +93,8 @@
      "url": "moveciamovement.com/unfold",
      "pinbtn": "Mehr erfahren",
      "bg": true,
-     "shift": "38%"
+     "shift": "38%",
+     "birds": true
     },
     "en": {
      "type": "offer",
@@ -110,7 +113,8 @@
      "url": "moveciamovement.com/unfold",
      "pinbtn": "Learn more",
      "bg": true,
-     "shift": "38%"
+     "shift": "38%",
+     "birds": true
     }
    }
   }

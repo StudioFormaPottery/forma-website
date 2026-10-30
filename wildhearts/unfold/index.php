@@ -4,6 +4,7 @@
 declare(strict_types=1);
 require dirname(__DIR__, 2) . '/api/method-lib.php';
 require_once dirname(__DIR__) . '/assets/waves.inc.php';
+require_once dirname(__DIR__, 2) . '/api/academy-lib.php';
 header('Cache-Control: no-store');
 $pdo = forma_db();
 mv_schema($pdo);
@@ -54,7 +55,7 @@ $ld = [
 ];
 foreach ($ld as $j) echo '<script type="application/ld+json">' . json_encode($j, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "</script>\n";
 ?>
-<link rel="stylesheet" href="/wildhearts/assets/cute.css?v=6">
+<link rel="stylesheet" href="/wildhearts/assets/cute.css?v=7">
 <style>
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:normal;src:url(/fonts/CormorantGaramond-VF.woff) format("woff")}
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(/fonts/CormorantGaramond-Italic-VF.woff) format("woff")}
@@ -284,7 +285,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
       <p class="gp"><b><span class="de">Info-Gathering · 30 Minuten · kostenlos</span><span class="en">Info Gathering · 30 minutes · free</span></b><span class="de">Vor dem Start erzähle ich dir live alles über Unfold und beantworte deine Fragen.</span><span class="en">Before we begin, I'll tell you all about Unfold live and answer your questions.</span></p>
     </div>
     <div style="position:relative">
-      <?php if ($c['eb_u']): ?><p class="k" style="color:var(--peach)"><span class="de">Early-Bird bis <?= mv_date($c['eb_u_end']) ?></span><span class="en">Early bird until <?= mv_date($c['eb_u_end'], 'en') ?></span></p><?php endif; ?>
+      <?php if ($c['eb_u']): ?><?= mv_perch_birds() ?><p class="k" style="color:var(--peach)"><span class="de">Early-Bird bis <?= mv_date($c['eb_u_end']) ?></span><span class="en">Early bird until <?= mv_date($c['eb_u_end'], 'en') ?></span></p><?php endif; ?>
       <p class="amt"><?php if ($c['eb_u']): ?><s style="opacity:.5;font-size:.55em;font-weight:400;margin-right:.2em"><?= $eur($c['r_u_once']) ?></s> <?php endif; ?><?= $eur($c['u_once']) ?></p>
       <?php if ($c['eb_u']): ?><p class="mut" style="color:inherit;opacity:.85;margin:.3rem 0 0"><span class="de">Bis <?= mv_date($c['eb_u_end']) ?> buchen und <?= $eur($c['r_u_once'] - $c['u_once']) ?> sparen. Danach kostet Unfold <?= $eur($c['r_u_once']) ?> oder <?= (int)$c['u_n'] ?> × <?= $eur($c['r_u_inst']) ?>.</span><span class="en">Book by <?= mv_date($c['eb_u_end'], 'en') ?> and save <?= $eur($c['r_u_once'] - $c['u_once']) ?>. After that Unfold costs <?= $eur($c['r_u_once']) ?> or <?= (int)$c['u_n'] ?> × <?= $eur($c['r_u_inst']) ?>.</span></p><?php endif; ?>
       <div class="row" style="margin-top:.8rem"><span><span class="de">auf einmal</span><span class="en">in full</span> <em class="tag"><span class="de">beliebteste Wahl</span><span class="en">most popular</span></em></span><span><?= $eur($c['u_once']) ?></span></div>

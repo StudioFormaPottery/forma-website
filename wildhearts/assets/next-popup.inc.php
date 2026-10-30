@@ -1,25 +1,37 @@
 <?php
-// Pop-up auf der Movecia-Hauptseite für das Angebot, das als Nächstes startet (Vivien, 28.10.2026):
-// bis zum Start der Mindful Movement Method (launch) → Method, danach bis zum Unfold-Start (u_start) → Unfold,
-// danach → Teacher Training (Warteliste). Einmal pro Browser-Sitzung, nach ein paar Sekunden.
-// Vorschau: /?popup=method|unfold|teacher (zeigt es sofort, auch wenn es schon gesehen wurde).
+// Pop-up auf der Movecia-Hauptseite (Vivien, 28.10.2026, Wechsel seit 30.10.2026):
+// alle Angebote, die gerade buchbar sind, in fester Reihenfolge: The Mindful Movement Method (bis zum Start),
+// Unfold (bis zum Start, solange offen und Plätze frei), Teacher Training (Movecia Academy, bis zum Start).
+// Wer öfter kommt, sieht bei jedem Besuch (Browser-Sitzung) das nächste: Zähler im Cookie mvpop (1 Jahr).
+// Einmal pro Browser-Sitzung, nach ein paar Sekunden. Vorschau: /?popup=method|unfold|teacher.
 
-function mv_next_popup_phase(): string
+/** Alle gerade aktiven Pop-up-Angebote in Reihenfolge (leer = Pop-up aus). */
+function mv_next_popup_phases(): array
 {
-    if ((string)((mm_cfg('popup') ?? [])['mode'] ?? 'auto') === 'off') return ''; // Verwaltung → Movecia: Pop-up aus
+    if ((string)((mm_cfg('popup') ?? [])['mode'] ?? 'auto') === 'off') return []; // Verwaltung → Movecia: Pop-up aus
     $c = mv_cfg();
     $now = time();
-    if ($now < mv_ts($c['launch'])) return 'method';
-    // Unfold nur, solange es noch offen ist und Plätze frei sind – sonst gleich das nächste Angebot (Vivien, 28.10.2026)
+    $out = [];
+    if ($now < mv_ts($c['launch'])) $out[] = 'method';
     if ($now < mv_ts($c['u_start'], '00:00') && (int)$c['u_open'] === 1) {
         $free = 1;
         try { $free = mv_unfold_free(forma_db()); } catch (Throwable $e) {}
-        if ($free > 0) return 'unfold';
+        if ($free > 0) $out[] = 'unfold';
     }
-    // Teacher Training (Movecia Academy) bis zum Start, danach nichts
     require_once dirname(__DIR__, 2) . '/api/academy-lib.php';
     $a = ac_cfg();
-    return $a['open'] && $now < $a['start_ts'] ? 'teacher' : '';
+    if ($a['open'] && $now < $a['start_ts']) $out[] = 'teacher';
+    return $out;
+}
+
+/** Das Angebot, das dieser Besuch zeigt (Verwaltung zeigt das erste). */
+function mv_next_popup_phase(bool $rotate = false): string
+{
+    $l = mv_next_popup_phases();
+    if (!$l) return '';
+    if (!$rotate) return $l[0];
+    $n = max(0, (int)($_COOKIE['mvpop'] ?? 0));
+    return $l[$n % count($l)];
 }
 
 function mv_next_popup(): void
@@ -29,7 +41,7 @@ function mv_next_popup(): void
     $force = in_array($gp, ['method', 'unfold', 'teacher'], true) ? $gp : '';
     require_once dirname(__DIR__, 2) . '/api/academy-lib.php';
     try { $pdoA = forma_db(); ac_schema($pdoA); ac_tick($pdoA); } catch (Throwable $e) {} // Academy-Automatik auch über Startseiten-Aufrufe
-    $ph = $force ?: mv_next_popup_phase();
+    $ph = $force ?: mv_next_popup_phase(true);
     if ($ph === '') return;
     $eu = fn(int $x) => '€ ' . number_format($x / 100, 0, ',', '.');
     $ml = mv_ts($c['launch']);
@@ -41,7 +53,7 @@ function mv_next_popup(): void
     };
     if ($ph === 'method') {
         $p = ['img' => '/img/movecia/fotos/ev-ueber-mich.jpg', 'pos' => '45% 55%', 'href' => '/method/',
-            'k' => ['Mindful Movement Method · Start ' . $short($ml, 'de'), 'Mindful Movement Method · starts ' . $short($ml, 'en')],
+            'k' => ['The Mindful Movement Method · Start ' . $short($ml, 'de'), 'The Mindful Movement Method · starts ' . $short($ml, 'en')],
             'h' => ['Jeden Tag ein paar <em>ruhige Minuten</em> für dich', 'A few <em>quiet minutes</em> for you, every day'],
             't' => ['Kurze Videos aus Yoga, Somatic Movement und Bodyweight, dazu Breathwork und Meditation. Du beginnst bei Monat 1 und gehst Schritt für Schritt weiter.', 'Short videos of yoga, somatic movement and bodyweight training, plus breathwork and meditation. You begin with month 1 and go step by step.'],
             'price' => $c['eb_m'] ? ['Early-Bird bis ' . $short($c['eb_m_end'], 'de') . ': ' . $eu($c['m1']) . ' statt ' . $eu($c['r_m1']) . ' im Monat', 'Early bird until ' . $short($c['eb_m_end'], 'en') . ': ' . $eu($c['m1']) . ' instead of ' . $eu($c['r_m1']) . ' a month'] : [$eu($c['m1']) . ' im Monat', $eu($c['m1']) . ' a month'],
@@ -85,6 +97,8 @@ function mv_next_popup(): void
         : ($ph === 'unfold' ? [['video', 'Live-Calls', 'Live calls'], ['welle', 'Bewegung', 'Movement'], ['buch', 'Workbooks', 'Workbooks']]
         : [['uhr', AC_HOURS . ' Stunden', AC_HOURS . ' hours'], ['laptop', '11 Monate hybrid', '11 months, hybrid'], ['kreis', 'Nur ' . (int)ac_cfg()['seats'] . ' Plätze', 'Only ' . (int)ac_cfg()['seats'] . ' spots']]);
     $svg = fn(string $k) => '<svg viewBox="0 0 24 24" aria-hidden="true">' . $ic[$k] . '</svg>';
+    $ebNow = $ph === 'method' ? (bool)$c['eb_m'] : ($ph === 'unfold' ? (bool)$c['eb_u'] : (bool)ac_cfg()['eb']);
+    $birds = $ebNow ? mv_perch_birds('l s') : '';
     ?>
 <!-- Pop-up „mit Bäm“ (Vivien, 29.10.2026: Box war „mega langweilig“, mehr Movement, Icons, Weiblichkeit, Zyklus, Jahreskreis):
      Pflaume-Seite mit treibenden Wellen, Foto im Torbogen, ringsum ein langsam kreisender Ring aus Mondphasen (heutige Phase leuchtet),
@@ -109,7 +123,7 @@ function mv_next_popup(): void
         <ul class="npop-f">
           <?php foreach ($feat as $i => $f): ?><li style="--i:<?= $i ?>"><span class="fi"><?= $svg($f[0]) ?></span><span class="de"><?= forma_h($f[1]) ?></span><span class="en"><?= forma_h($f[2]) ?></span></li><?php endforeach; ?>
         </ul>
-        <?php if ($p['price']): ?><p class="npop-pr"><span class="star" aria-hidden="true">✦</span><span class="de"><?= forma_h($p['price'][0]) ?></span><span class="en"><?= forma_h($p['price'][1]) ?></span></p><?php endif; ?>
+        <?php if ($p['price']): ?><p class="npop-pr<?= $birds ? ' has-b' : '' ?>"><?= $birds ?><span class="star" aria-hidden="true">✦</span><span class="de"><?= forma_h($p['price'][0]) ?></span><span class="en"><?= forma_h($p['price'][1]) ?></span></p><?php endif; ?>
         <div class="npop-cta"><a class="btn npop-go" href="<?= forma_h($p['href']) ?>"><span class="de"><?= forma_h($p['btn'][0]) ?></span><span class="en"><?= forma_h($p['btn'][1]) ?></span> <span class="ar">→</span></a><button class="npop-later" type="button"><span class="de">Später</span><span class="en">Maybe later</span></button></div>
       </div>
     </div>
@@ -151,6 +165,7 @@ function mv_next_popup(): void
 .npop-f svg{width:24px;height:24px;fill:none;stroke:var(--dp);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .npop-pr{margin:.4rem 0 0;align-self:flex-start;display:inline-flex;gap:.5em;align-items:center;background:var(--dp);border-radius:999px;padding:.5em 1.15em;color:var(--cr);font-size:.85rem}
 .npop-pr .star{color:var(--pf)}
+.npop-pr{position:relative}.npop-pr.has-b{margin-top:1.6rem}
 .npop-cta{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1.1rem;margin-top:.6rem}
 .npop-go{position:relative;overflow:hidden;font-size:.95rem}
 .npop-go::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-18deg);animation:npsh 4.5s ease-in-out 2s infinite}
@@ -168,6 +183,7 @@ function mv_next_popup(): void
   .npop-tx{padding:1.6rem 1.3rem 1.5rem;align-items:center;text-align:center;gap:.5rem}
   .npop-line{align-self:center}
   .npop-pr{align-self:center}
+  .npop-pr .mvb.l{left:50%;transform:translateX(-50%)}
   .npop-cta{justify-content:center}
   .npop-x{right:12px;top:12px;background:rgba(255,255,255,.92)}
 }
@@ -178,7 +194,7 @@ function mv_next_popup(): void
 <script>
 (function(){
   var p=document.getElementById('npop');if(!p)return;
-  var key='mv-npop-'+p.dataset.ph,force=!!p.dataset.force,seen=false;
+  var key='mv-npop-s',force=!!p.dataset.force,seen=false;
   // Countdown, immer aus der echten Startzeit gerechnet
   var st=+p.dataset.start||0,dot=p.querySelector('.npop-dot');
   function en(){return document.documentElement.dataset.l==='en'}
@@ -198,7 +214,7 @@ function mv_next_popup(): void
   p.querySelector('.npop-cta .btn').addEventListener('click',function(){try{sessionStorage.setItem(key,'1')}catch(e){}});
   function trap(e){if(e.key!=='Tab')return;var f=p.querySelectorAll('a[href],button'),a=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}}
   document.addEventListener('keydown',function(e){if(!p.hidden)trap(e)});
-  setTimeout(function(){p.hidden=false;requestAnimationFrame(function(){requestAnimationFrame(function(){p.classList.add('on');p.querySelector('.npop-card').focus({preventScroll:true})})});document.addEventListener('keydown',esc)},force?300:3500);
+  setTimeout(function(){try{var m=document.cookie.match(/(?:^|; )mvpop=(\d+)/),n=m?+m[1]:0;if(!force){document.cookie='mvpop='+(n+1)+';path=/;max-age=31536000;SameSite=Lax';sessionStorage.setItem(key,'1')}}catch(e){}p.hidden=false;requestAnimationFrame(function(){requestAnimationFrame(function(){p.classList.add('on');p.querySelector('.npop-card').focus({preventScroll:true})})});document.addEventListener('keydown',esc)},force?300:3500);
 })();
 </script>
 <?php

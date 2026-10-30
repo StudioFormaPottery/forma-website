@@ -1262,9 +1262,39 @@ function ac_countdown(): string
 }
 
 /** Kleine handgezeichnete Vögel fürs Early-Bird-Abzeichen. */
+// Winterzeit für die Vögelchen (Vivien, 30.10.2026: „bis Jänner lassen“): 1. November bis 15. Jänner
+function ac_winter(): bool
+{
+    $md = (new DateTimeImmutable('now', new DateTimeZone('Europe/Vienna')))->format('md');
+    return $md >= '1101' || $md <= '0115';
+}
+
+// Vögelchen mit Mütze und Schal auf Early-Bird-Kästchen der übrigen Movecia-Seiten (nur in der Winterzeit;
+// ?winter=1 zeigt sie zur Vorschau). $cls positioniert die Gruppe (Styles .mvb in cute.css).
+function mv_perch_birds(string $cls = ''): string
+{
+    if (!ac_winter() && empty($_GET['winter'])) return '';
+    $GLOBALS['ac_force_winter'] = true;
+    $b = ac_birds();
+    unset($GLOBALS['ac_force_winter']);
+    return str_replace('class="birds"', 'class="birds mvb ' . $cls . '"', $b);
+}
+
 function ac_birds(): string
 {
     $b = fn(string $cls, string $tr) => '<svg class="bird ' . $cls . '" viewBox="0 0 40 30" style="' . $tr . '" aria-hidden="true"><path d="M8 18c3-6 10-8 16-5 2-4 6-6 10-5-2 1-3 3-3 5 1 6-5 11-13 11-6 0-10-2-12-6z" fill="currentColor" opacity=".92"/><path class="wing" d="M14 16c2-6 7-9 12-8-2 4-5 7-12 8z" fill="#F5F1EB" opacity=".75"/><circle cx="30" cy="11" r="1.1" fill="#2A2026"/><path d="M34 11.5l3 .6-3 1" fill="none" stroke="#E8B48F" stroke-width="1.4" stroke-linecap="round"/><path d="M14 27l-2 2M18 28l-1 2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>';
+    // Winter (Vivien, 30.10.2026): vom 1. November bis 15. Jänner tragen die Vögelchen Strickmütze und Schal
+    if (ac_winter() || !empty($GLOBALS['ac_force_winter'])) {
+        $hat = [['#FBF9F6', '#B58C99'], ['#B58C99', '#FBF9F6'], ['#4A3040', '#E6DBCF']];
+        $i = 0;
+        $b = function (string $cls, string $tr) use (&$i, $hat) {
+            [$h, $bd] = $hat[$i++ % 3];
+            return '<svg class="bird ' . $cls . '" viewBox="0 0 40 30" style="' . $tr . '" aria-hidden="true"><path d="M8 18c3-6 10-8 16-5 2-4 6-6 10-5-2 1-3 3-3 5 1 6-5 11-13 11-6 0-10-2-12-6z" fill="currentColor" opacity=".92"/><path class="wing" d="M14 16c2-6 7-9 12-8-2 4-5 7-12 8z" fill="#F5F1EB" opacity=".75"/><circle cx="30" cy="11" r="1.1" fill="#2A2026"/><path d="M34 11.5l3 .6-3 1" fill="none" stroke="#E8B48F" stroke-width="1.4" stroke-linecap="round"/>'
+                . '<path d="M22.6 14.2c2.4 1.9 5.8 1.8 8.2 0l.5 2c-2.8 1.8-6.4 1.8-9.2-.1z" fill="' . $bd . '"/><path d="M24 15.9l-1.4 4.8 2.2.4 1-4.6z" fill="' . $bd . '"/>'
+                . '<path d="M25.6 9.6c-.3-3.6 1.8-6 4.6-6s4.9 2.4 4.4 5.8z" fill="' . $h . '" stroke="' . $bd . '" stroke-width=".5"/><path d="M25.3 9.4c3-.9 6.5-.9 9.6-.3l.1 1.6c-3.2-.6-6.6-.6-9.8.3z" fill="' . $bd . '"/><circle cx="30.4" cy="3" r="1.8" fill="' . $bd . '"/>'
+                . '<path d="M14 27l-2 2M18 28l-1 2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>';
+        };
+    }
     return '<span class="birds" aria-hidden="true">' . $b('b1', '') . $b('b2', '') . $b('b3', '') . '</span>';
 }
 
