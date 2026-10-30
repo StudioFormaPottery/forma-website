@@ -184,7 +184,7 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
         if (!$r) $igJson(['error' => 'Eintrag nicht gefunden.']);
         $f = $_FILES['b'] ?? null;
         if (!$f || $f['error'] !== UPLOAD_ERR_OK) $igJson(['error' => 'Upload-Stück fehlt (Fehler ' . (int)($f['error'] ?? -1) . ').']);
-        $ext = ($_POST['ext'] ?? '') === 'webm' ? 'webm' : 'mp4';
+        $ext = in_array($_POST['ext'] ?? '', ['webm', 'mov'], true) ? (string)$_POST['ext'] : 'mp4'; // .mov = vom iPhone fertig gestellt (Ton unkomprimiert)
         $tmp = ig_dir() . '/up-' . $r['id'] . '.part';
         if ((int)($_POST['n'] ?? 0) === 0) @unlink($tmp);
         file_put_contents($tmp, file_get_contents($f['tmp_name']), FILE_APPEND);
@@ -205,7 +205,7 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
         $ext = pathinfo($p, PATHINFO_EXTENSION);
         $fn = date('Y-m-d', strtotime($r['day'])) . '_' . ($r['kind'] === 'reel' ? 'Reel' : 'Story') . '_' . preg_replace('/[^\wäöüÄÖÜß-]+/u', '-', mb_substr(ig_title($r), 0, 30)) . '.' . $ext;
         $size = filesize($p); $from = 0; $to = $size - 1;
-        header('Content-Type: video/' . ($ext === 'webm' ? 'webm' : 'mp4'));
+        header('Content-Type: video/' . ($ext === 'webm' ? 'webm' : ($ext === 'mov' ? 'quicktime' : 'mp4')));
         header('Accept-Ranges: bytes');
         header('Content-Disposition: ' . (isset($_GET['save']) ? 'attachment' : 'inline') . '; filename="' . rawurlencode($fn) . '"; filename*=UTF-8\'\'' . rawurlencode($fn));
         header('Cache-Control: private, max-age=3600');

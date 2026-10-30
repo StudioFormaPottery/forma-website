@@ -288,6 +288,13 @@ body.clipm .pr-t{padding:14px 6%;width:100%}
 .pkc-g .d.has{cursor:pointer;font-weight:500}
 .pkc-g .d.u0{background:#7D5E68;color:#fff}.pkc-g .d.u1{background:#9B7B87;color:#fff}.pkc-g .d.u2{background:#E3CFD7;color:#4A3A41}.pkc-g .d.u3{background:#F3EAEE;color:#4A3A41}
 .pkc-g .d.late{background:#6B3F4E;color:#fff}
+.pkc-g .d.fin{background:#E3ECDF;color:#2F4A2E}
+/* 📤 Direkt aus dem Kalender hochladen (Vivien, 30.10.2026) */
+.pk-tw{display:flex;flex-direction:column;gap:6px;min-width:0}
+.pk-up{display:flex;flex-wrap:wrap;gap:6px}
+.pk-ub{display:inline-flex;align-items:center;gap:6px;font-size:16px;min-height:44px;padding:8px 16px;border-radius:999px;background:#3F6B3E;color:#fff;cursor:pointer;font-weight:400}
+.pk-ub.re{background:#E7EFE3;color:#2F4A2E;font-size:15px;min-height:40px;padding:6px 14px}
+.pk-ub.busy{opacity:.6;pointer-events:none}
 .pkc-g .d.sel{outline:2.5px solid #4A3A41;outline-offset:1px}
 .pkc-g .d i{position:absolute;top:2px;right:3px;font-style:normal;font-size:10px;line-height:15px;min-width:15px;padding:0 3px;border-radius:999px;background:rgba(255,255,255,.9);color:#4A3A41}
 .pkc-leg{display:flex;flex-wrap:wrap;gap:4px 12px;margin:8px 2px 0;font-size:12px;color:#7D7076}.pkc-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertipkc-align:-1px}
@@ -379,9 +386,12 @@ $igT = array_values(array_filter($tiles, fn($t) => $t['ty'] === 'ig'));
 $done = array_values(array_filter($tiles, fn($t) => $t['ok'] && $t['ty'] !== 'ig'));
 // Kalender (Vivien, 28.10.2026: „Kalendertool statt großer Liste, dringend = kräftiges Pflaume“): je Fälligkeitstag die offenen Videos
 $calOpen = array_merge($open, array_values(array_filter($igT, fn($t) => !$t['ok'])));
-$calBy = []; foreach ($calOpen as $t) $calBy[$t['due'] === '' ? 'ohne' : $t['due']][] = $t;
+// Schon Hochgeladenes bleibt mit ✓ am Tag stehen (Vivien, 30.10.2026: „ich weiß nicht genau, ob es oben ist“)
+$calAll = array_merge($calOpen, array_values(array_filter($done, fn($t) => $t['due'] !== '')), array_values(array_filter($igT, fn($t) => $t['ok'])));
+$calBy = []; foreach ($calAll as $t) $calBy[$t['due'] === '' ? 'ohne' : $t['due']][] = $t;
 ksort($calBy);
-$calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'ig' => count(array_filter($l, fn($t) => $t['ty'] === 'ig')), 'th' => count(array_filter($l, fn($t) => $t['ty'] === 'talk')), 'cl' => count(array_filter($l, fn($t) => $t['ty'] === 'clip'))];
+foreach ($calBy as &$l) usort($l, fn($a, $b) => $a['ok'] <=> $b['ok']); unset($l);
+$calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_filter($l, fn($t) => !$t['ok'])), 'all' => count($l), 'ig' => count(array_filter($l, fn($t) => $t['ty'] === 'ig')), 'th' => count(array_filter($l, fn($t) => $t['ty'] === 'talk')), 'cl' => count(array_filter($l, fn($t) => $t['ty'] === 'clip'))];
 ?>
 <section class="pk" id="pk">
   <div class="pk-now"><i id="pkI">🗣</i><div class="pk-nt"><small>Du nimmst gerade auf</small><b id="pkT">…</b><span id="pkS"></span></div>
@@ -522,7 +532,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
 <script src="/wildhearts/assets/talkcam.js?v=5"></script>
 <script src="studio-edit.js?v=7"></script>
-<script src="schnitt.js?v=9"></script>
+<script src="schnitt.js?v=10"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
@@ -538,6 +548,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   const looksStore={get:slot=>post('mm_looks_get',{slot}).then(j=>j.list||[]),set:(slot,list)=>post('mm_looks_set',{slot,list:JSON.stringify(list)}).then(j=>{if(!j.ok)throw 0;return j.list})};
   if(window.TalkCam)TalkCam.store=looksStore;
   let clipm=false, cs=null, clips=[];
+  let camLater=/[?&]kal=1/.test(location.search); // vom Kalender zum Hochladen: Kamera erst, wenn aufgenommen wird
   let lang=<?= json_encode($lang) ?>, cur=null, tgt=null, tc=null, raw=null, rec=null, chunks=[], blob=null, saved=true, t0=0, tick=0, lock=null;
   const ls={get:(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
 
@@ -635,20 +646,37 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     const t=()=>{bx.classList.toggle('shut');ls.set(k,bx.classList.contains('shut')?'1':'0')};h.onclick=t;h.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();t()}}});
   // ---- Kalender ----
   const CAL=<?= json_encode($calMeta) ?>;let calY,calMo,calSel='';
-  (function(){const ks=Object.keys(CAL).filter(k=>k!=='ohne').sort(),td=new Date().toISOString().slice(0,10),first=ks.find(k=>k>=td)||ks[ks.length-1]||td;const d=new Date(first+'T12:00:00');calY=d.getFullYear();calMo=d.getMonth();calSel=first&&CAL[first]?first:''})();
+  (function(){const ks=Object.keys(CAL).filter(k=>k!=='ohne'&&CAL[k].n>0).sort(),td=new Date().toISOString().slice(0,10),first=ks.find(k=>k>=td)||ks[ks.length-1]||td;const d=new Date(first+'T12:00:00');calY=d.getFullYear();calMo=d.getMonth();calSel=first&&CAL[first]?first:''})();
   function urg(d){const n=Math.round((new Date(d+'T12:00:00')-new Date(new Date().toDateString()+' 12:00'))/864e5);return n<0?'late':n<=7?'u0':n<=14?'u1':n<=21?'u2':'u3'}
   function calDraw(){const g=$('calG');if(!g)return;const MO2=['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];$('calM').textContent=MO2[calMo]+' '+calY;
     const f=new Date(calY,calMo,1),off=(f.getDay()+6)%7,days=new Date(calY,calMo+1,0).getDate(),td=new Date().toISOString().slice(0,10);let h=['Mo','Di','Mi','Do','Fr','Sa','So'].map(x=>'<span class="wd">'+x+'</span>').join('');
     for(let i=0;i<off;i++)h+='<span></span>';
     for(let d=1;d<=days;d++){const k=calY+'-'+String(calMo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'),m=CAL[k];
-      h+='<button type="button" class="d'+(m?' has '+urg(k):'')+(k===td?' today':'')+(k===calSel?' sel':'')+'" data-cd="'+k+'"'+(m?' aria-label="'+d+'.: '+m.n+' Videos"':' tabindex="-1"')+'>'+d+(m?'<i>'+m.n+'</i>':'')+'</button>'}
+      h+='<button type="button" class="d'+(m?' has '+(m.n?urg(k):'fin'):'')+(k===td?' today':'')+(k===calSel?' sel':'')+'" data-cd="'+k+'"'+(m?' aria-label="'+d+'.: '+(m.n?m.n+' Videos offen':'alles hochgeladen')+'"':' tabindex="-1"')+'>'+d+(m?'<i>'+(m.n||'✓')+'</i>':'')+'</button>'}
     g.innerHTML=h;g.querySelectorAll('.d.has').forEach(b=>b.onclick=()=>{calSel=b.dataset.cd;calDraw();calShow()})}
   function calShow(){document.querySelectorAll('.pkc-day').forEach(x=>x.hidden=x.dataset.d!==calSel);const hint=$('calHint');if(hint)hint.hidden=!!document.querySelector('.pkc-day:not([hidden])')}
   document.querySelectorAll('[data-cm]').forEach(b=>b.onclick=()=>{calMo+=+b.dataset.cm;if(calMo<0){calMo=11;calY--}if(calMo>11){calMo=0;calY++}calDraw()});
   calDraw();calShow();
+  // ---- 📤 Direkt aus dem Kalender hochladen (Vivien, 30.10.2026: „im Kalender draufdrücken, Video hochladen, schneiden, und es ist direkt drin“) ----
+  // Das Video landet im ✂️ Schnitt im Entwurf dieses Videos, mit Ziel. „Fertig stellen & hochladen“ lädt es dann genau hierhin.
+  function upTargets(v){const out=[];
+    if(/^\d+$/.test(v)&&v!=='0'){const T=TALKS.find(x=>x.id===+v);if(!T)return out;(T.g==='Academy'?['de']:['de','en']).forEach(lg=>out.push({done:lg==='de'?T.vde:T.ven,lab:lg==='de'?'Deutsch':'Englisch',name:T.t+(lg==='en'?' (EN)':''),tg:{k:'talk',id:T.id,lang:lg,n:T.t,g:T.g,due:T.due||''}}))}
+    else if(v[0]==='c'){const M=MOVES.find(x=>x.id===+v.slice(1));if(M)out.push({done:M.ok,lab:'Clip',name:'Übung · '+M.n,tg:{k:'clip',c:M.id,n:M.n,due:M.due||''}})}
+    else if(v[0]==='i'){const G=IGS.find(x=>x.id===+v.slice(1));if(G)out.push({done:G.has,lab:'Video',name:(G.kind==='reel'?'Reel ':'Story ')+G.day,tg:{k:'ig',id:G.id,n:G.t,due:G.day,kind:G.kind}})}
+    return out}
+  document.querySelectorAll('.pkc-day .pk-t,[data-pane=ig] .pk-t,.pk-first .pk-t').forEach(t=>{const list=upTargets(t.dataset.v);if(!list.length)return;
+    const w=document.createElement('div');w.className='pk-tw';t.parentNode.insertBefore(w,t);w.appendChild(t);
+    const row=document.createElement('div');row.className='pk-up';
+    row.innerHTML=list.map((x,i)=>'<label class="pk-ub'+(x.done?' re':'')+'">'+(x.done?'✓ '+(list.length>1?esc(x.lab)+' ':'')+'ist drin · neu hochladen':'📤 '+(list.length>1?esc(x.lab)+' ':'')+'hochladen')+'<input type="file" accept="video/*,.mov,.mp4,.m4v" multiple hidden data-ui="'+i+'"></label>').join('');
+    row.querySelectorAll('input').forEach(inp=>inp.onchange=async()=>{const x=list[+inp.dataset.ui],fs=[...inp.files];inp.value='';if(!fs.length||typeof Schnitt==='undefined')return;
+      const lb=inp.parentNode,old=lb.firstChild.textContent;lb.classList.add('busy');lb.firstChild.textContent='Wird geöffnet … ';
+      try{for(let i=0;i<fs.length;i++)await Schnitt.addTake(fs[i],fs[i].name.replace(/\.\w+$/,''),{draft:x.name,target:x.tg,open:true,renew:i===0});saved=true;location.href='?view=schnitt'}
+      catch(e){lb.classList.remove('busy');lb.firstChild.textContent=old;alert('Das Video konnte nicht geöffnet werden. Bitte nochmal versuchen.')}});
+    w.appendChild(row)});
   // ---- Kachel-Auswahl ----
   const pkBody=$('pkBody'),pkTg=$('pkToggle');
-  function pkOpen(o){pkBody.hidden=!o;pkTg.setAttribute('aria-expanded',String(o));pkTg.textContent=o?'Schließen':'Anderes Video wählen'}
+  function camGo(){if(camLater){camLater=false;startCam()}}
+  function pkOpen(o){if(!o)camGo();pkBody.hidden=!o;pkTg.setAttribute('aria-expanded',String(o));pkTg.textContent=o?'Schließen':'Anderes Video wählen'}
   pkTg.onclick=()=>pkOpen(pkBody.hidden);
   document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
     document.querySelectorAll('[data-pane]').forEach(p=>p.hidden=p.dataset.pane!==b.dataset.tab)});
@@ -759,7 +787,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   $('stop').onclick=()=>{if(rec&&rec.state==='recording')rec.stop()};
   // Jede Aufnahme wandert sofort in den Schnitt (Vivien, 30.10.2026: „dann ist es einfach weg“) – nichts geht mehr verloren
   async function keepTake(b){ if(!b||typeof Schnitt==='undefined')return;
-    try{ await Schnitt.addTake(b, takeName(), {draft:draftName()}); const m=$('kept'); if(m){m.hidden=false;m.innerHTML='✓ sicher im <a href="?view=schnitt" style="color:inherit">Entwurf „'+draftName().replace(/[<>&]/g,'')+'“</a>'} }catch(e){} }
+    try{ await Schnitt.addTake(b, takeName(), {draft:draftName(),target:snTarget()}); const m=$('kept'); if(m){m.hidden=false;m.innerHTML='✓ sicher im <a href="?view=schnitt" style="color:inherit">Entwurf „'+draftName().replace(/[<>&]/g,'')+'“</a>'} }catch(e){} }
   $('again').onclick=()=>{blob=null;saved=true;$('kept').hidden=true;$('play').removeAttribute('src');$('msg').textContent='';$('prog').hidden=true;prMove(0,true);showAfter();};
   // Sofort löschen (Vivien, 28.10.2026): ohne Nachfrage, kurz rückgängig machbar
   let undo=null,lastRt=-9;
@@ -815,14 +843,19 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   // ✂️ Schnitt (Vivien, 30.10.2026): Aufnahme in den Schnitt legen (bleibt auf dem Gerät), dort mehrere Takes schneiden
   function takeName(){return (tgt&&tgt.ig?tgt.ig.t.slice(0,30):tgt&&tgt.clip?tgt.clip.n:tgt?tgt.t.t+' ('+tgt.lang.toUpperCase()+')':'Aufnahme')}
   // Entwurf je Video (Vivien, 30.10.2026: „erst alle aufnehmen, dann die Entwürfe weiterbearbeiten“)
+  // Ziel für den Schnitt (Vivien, 30.10.2026: „hochladen und es ist direkt drin“): „Fertig stellen & hochladen“ lädt genau hierhin
+  function snTarget(){ if(!tgt)return null;
+    if(tgt.ig)return {k:'ig',id:tgt.ig.id,n:tgt.ig.t,due:tgt.ig.day,kind:tgt.ig.kind};
+    if(tgt.clip)return {k:'clip',c:tgt.clip.id,n:tgt.clip.n,due:tgt.clip.due||''};
+    return {k:'talk',id:tgt.t.id,lang:tgt.lang,n:tgt.t.t,g:tgt.t.g,due:tgt.t.due||''}; }
   function draftName(){ if(tgt&&tgt.ig)return (tgt.ig.kind==='reel'?'Reel ':'Story ')+tgt.ig.day;
     if(tgt&&tgt.clip)return 'Übung · '+tgt.clip.n;
     if(tgt)return tgt.t.t+(tgt.lang==='en'?' (EN)':'');
     return mvFree?'Bewegungs-Clips':'Eigener Text'; }
   $('edit').onclick=async()=>{if(!blob||typeof Schnitt==='undefined')return;$('edit').disabled=true;
-    try{ if($('kept').hidden) await Schnitt.addTake(blob,takeName(),{draft:draftName(),open:true}); else await Schnitt.setDraft(draftName()); saved=true;location.href='?view=schnitt'}catch(e){$('edit').disabled=false;$('msg').textContent='Konnte die Aufnahme nicht in den Schnitt legen.'}};
+    try{ if($('kept').hidden) await Schnitt.addTake(blob,takeName(),{draft:draftName(),target:snTarget(),open:true}); else await Schnitt.setDraft(draftName(),snTarget()); saved=true;location.href='?view=schnitt'}catch(e){$('edit').disabled=false;$('msg').textContent='Konnte die Aufnahme nicht in den Schnitt legen.'}};
   let takeN=0;
-  $('take').onclick=async()=>{if(!blob||typeof Schnitt==='undefined')return;$('take').disabled=true;try{if($('kept').hidden)await Schnitt.addTake(blob,takeName()+' · Take '+(++takeN),{draft:draftName()});saved=true;$('kept').hidden=true;blob=null;$('play').removeAttribute('src');$('prog').hidden=true;prMove(0,true);showAfter();
+  $('take').onclick=async()=>{if(!blob||typeof Schnitt==='undefined')return;$('take').disabled=true;try{if($('kept').hidden)await Schnitt.addTake(blob,takeName()+' · Take '+(++takeN),{draft:draftName(),target:snTarget()});saved=true;$('kept').hidden=true;blob=null;$('play').removeAttribute('src');$('prog').hidden=true;prMove(0,true);showAfter();
     $('msg').className='msg ok';$('msg').innerHTML='✓ Der Take liegt im Entwurf „'+draftName().replace(/[<>&]/g,'')+'“ (<a href="?view=schnitt">✂️ Schnitt</a>). Jetzt den nächsten aufnehmen, am Schluss alles zusammenschneiden.'}catch(e){$('msg').textContent='Konnte den Take nicht sichern.'}$('take').disabled=false};
   $('editOld').onclick=()=>{if(!blob)return;const d=$('play').duration;
     editor(blob,isFinite(d)?d:0,tgt?(tgt.ig?'Instagram '+(tgt.ig.kind==='reel'?'Reel':'Story')+' für '+tgt.ig.l.split(' · ')[0]+'. Tipp: Format „Hoch 9:16“.':tgt.clip?'Übung „'+tgt.clip.n+'“':'„'+tgt.t.t+'“ · '+(tgt.lang==='de'?'Deutsch':'Englisch'))+'. Danach kannst du direkt hochladen.':'Danach herunterladen.',(nb,inf)=>{
@@ -860,7 +893,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   const SHEETS={pk:['Welches Video?',()=>[$('pk')]],pr:['Teleprompter',()=>[$('prBox')]],look:['Kamera-Look',()=>[$('lookBox')]],clips:['Deine Clips',()=>[$('clipBox'),$('subBox')]],more:['Mehr',()=>[document.querySelector('.pick'),$('devBox')]]};
   let sheetK='',sheetNodes=[];
   function relayout(){if(tc){tc.opts.maxVh=vh();tc.emit('layout')}$('play').style.maxHeight=PH.matches?'':vh()+'vh'}
-  function closeSheet(){if(!sheetK)return;sheetNodes.forEach(([n,ph])=>{ph.parentNode.insertBefore(n,ph);ph.remove()});sheetNodes=[];sheetK='';$('msheet').hidden=true;document.body.classList.remove('sheet-open');
+  function closeSheet(){if(!sheetK)return;camGo();sheetNodes.forEach(([n,ph])=>{ph.parentNode.insertBefore(n,ph);ph.remove()});sheetNodes=[];sheetK='';$('msheet').hidden=true;document.body.classList.remove('sheet-open');
     document.querySelectorAll('[data-sheet]').forEach(b=>b.setAttribute('aria-pressed','false'));relayout()}
   function openSheet(k){if(sheetK===k){closeSheet();return}closeSheet();const d=SHEETS[k];if(!d)return;sheetK=k;$('mshT').textContent=d[0];
     d[1]().forEach(n=>{if(!n)return;const ph=document.createComment('sheet');n.parentNode.insertBefore(ph,n);$('mshB').appendChild(n);sheetNodes.push([n,ph])});
@@ -1030,7 +1063,8 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     bar.hidden=true;$('subAll').disabled=false;renderClips();$('msg').className='msg ok';$('msg').textContent='✓ Untertitel fertig ('+ok+' Clips). Bei jedem Clip gibt es jetzt „⬇ mit Untertitel“.';};
   subChips();document.body.classList.toggle('clipm',clipm);setMode(clipm?'clips':'ganz');
   window.__studio=()=>tc;
-  choose();startCam();
+  // Vom Kalender aus zum Hochladen (?kal=1) erst einmal ohne Kamera: die startet, sobald ein Video zum Aufnehmen gewählt wird
+  choose();if(!camLater)startCam();
   applyPhone();
   if(!/[?&](l|c|ig|move)=/.test(location.search)){if(PH.matches)openSheet('pk');else pkOpen(true)}
 })();

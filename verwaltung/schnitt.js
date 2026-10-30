@@ -50,19 +50,20 @@
     return cur;
   }
   // Entwurf mit diesem Namen finden oder anlegen
-  async function draftFor(name) {
+  async function draftFor(name, renew) { // renew: war der Entwurf schon hochgeladen, einen frischen mit gleichem Namen anlegen
     const n = String(name || '').trim(); if (!n) return ensureDraft();
     const l = await drafts(); const hit = l.find(d => (d.name || '').toLowerCase() === n.toLowerCase());
-    if (hit) return hit.id;
+    if (hit && !(renew && hit.up)) return hit.id;
     const d = { id: uid(), name: n, at: Date.now() }; l.unshift(d); await draftsSave(l); return d.id;
   }
   // Ein Take aus dem Studio in den Schnitt legen (bleibt auf dem Gerät)
   async function addTake(blob, name, opt) {
     opt = opt || {};
-    const did = opt.draft ? await draftFor(opt.draft) : await ensureDraft();
+    const did = opt.draft ? await draftFor(opt.draft, opt.renew) : await ensureDraft();
     const c = { id: uid(), blob, name: name || 'Aufnahme', added: Date.now(), in: 0, out: 0, mute: false, draft: did };
     await dbPut(c); const order = (await kvGet(ordKey(did))) || []; order.push(c.id); await kvSet(ordKey(did), order);
-    const l = await drafts(); const d = l.find(x => x.id === did); if (d) { d.at = Date.now(); await draftsSave(l); }
+    // target = wohin das fertige Video kommt (Lektion + Sprache, Übungs-Clip oder Instagram-Tag), damit „Fertig stellen“ gleich hochlädt
+    const l = await drafts(); const d = l.find(x => x.id === did); if (d) { d.at = Date.now(); if (opt.target) { d.tg = opt.target; d.up = null; } await draftsSave(l); }
     if (opt.open) await kvSet('cur', did);
     return c.id;
   }
@@ -219,6 +220,33 @@
 .sn-auto-res li span{flex:1;min-width:120px;font-size:15px}
 .sn-auto-res li small{color:#7D7076}
 .sn-c.auto b::before{content:"✨ ";font-size:11px}
+/* Wohin kommt das Video? (Vivien, 30.10.2026: „hochladen und es soll direkt drin sein“) */
+.sn-tg{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;background:#FBF5F7;border:1.5px solid #E2CBD2;border-radius:18px;padding:10px 14px;margin:0 0 10px;font-size:17px;color:#4A3A41}
+.sn-tg.on{background:#F4F7F1;border-color:#CFE0CE}
+.sn-tg>span{flex:1;min-width:200px;line-height:1.4}.sn-tg>span b{font-weight:500}.sn-tg small{display:block;font-size:14.5px;color:#7D7076}
+.sn-tg select{flex:1 1 100%;font:inherit;font-size:16px;padding:10px 12px;border:1.5px solid #DDD2C6;border-radius:12px;background:#fff;color:#2E2529;max-width:100%}
+.sn-tg select[hidden]{display:none}
+/* Titelbild ganz am Anfang (Vivien, 30.10.2026) */
+.sn-covimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:3;display:none;background:#1E171B}.sn-covimg.on{display:block}
+.sn-c.cov{background:#FBF5F7;border-style:solid}.sn-c.cov .n{background:#7D5E68}
+.sn-c.cov.off img{opacity:.35;filter:grayscale(.6)}
+.sn-add.cov{border-color:#B98A9A;background:#FBF5F7}
+.sn-cov{background:#FBF5F7;border:1.5px solid #E2CBD2;border-radius:18px;padding:12px 14px;margin:0 0 10px;display:flex;flex-direction:column;gap:10px}
+.sn-cov[hidden]{display:none}
+.sn-cov .h{display:flex;justify-content:space-between;align-items:center;gap:8px}.sn-cov .h b{font-weight:500;font-size:18px;color:#4A3A41}
+.sn-cov .ths{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sn-cov .th{position:relative;width:76px;height:76px;border-radius:14px;overflow:hidden;border:2.5px solid #E6DCD2;cursor:pointer;padding:0;background:#EEE5E1}
+.sn-cov .th.on{border-color:#7D5E68;box-shadow:0 0 0 2px #7D5E68}
+.sn-cov .th img{width:100%;height:100%;object-fit:cover;display:block}
+.sn-cov .th .x{position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(46,37,41,.72);color:#fff;font-size:13px;line-height:24px;cursor:pointer;padding:0}
+.sn-cov .new{width:76px;height:76px;border-radius:14px;border:2px dashed #C9B0B8;background:#fff;color:#7D5E68;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;cursor:pointer;text-align:center;line-height:1.2}
+.sn-cov .new b{font-size:24px;font-weight:400}
+/* Hochladen */
+.sn-up{border-radius:18px;padding:12px 14px;margin:10px 0 0;font-size:17px;line-height:1.45;background:#F4F7F1;border:1.5px solid #CFE0CE;color:#2F4A2E}
+.sn-up[hidden]{display:none}.sn-up b{display:block;font-weight:500;font-size:20px;margin-bottom:2px}
+.sn-up.run{background:#FBF8F4;border-color:#E6DCD2;color:#4A3A41}.sn-up.bad{background:#FBF1EF;border-color:#E8C9C2;color:#7A3A2E}
+.sn-up .sn-row{margin-top:10px}
+.sn-dr-list li small.up{color:#3F6B3E}
 `;
   function css() { if (document.getElementById('sn-css')) return; const s = document.createElement('style'); s.id = 'sn-css'; s.textContent = CSS; document.head.appendChild(s); }
 
@@ -247,7 +275,8 @@ void main(){
     const mount = o.mount; mount.innerHTML = '';
     const root = document.createElement('div'); root.className = 'sn'; mount.appendChild(root);
     root.innerHTML = `<div class="sn-l">
-  <div class="sn-pv" id="snpv"><div class="empty" id="snempty"><b>Noch keine Clips</b>Tipp unten auf „＋ Clips“ und wähl Videos vom iPhone oder Computer, oder nimm im Studio auf.</div><button type="button" class="big" data-k="big" hidden aria-label="Abspielen">▶</button><span class="tag" data-k="tag"></span></div>
+  <div class="sn-tg" data-k="tg"><span data-k="tgT"></span><button type="button" class="sn-b sm" data-k="tgBtn">Ändern</button><select data-k="tgSel" hidden aria-label="Wohin kommt das Video?"></select></div>
+  <div class="sn-pv" id="snpv"><div class="empty" id="snempty"><b>Noch keine Clips</b>Tipp unten auf „＋ Clips“ und wähl Videos vom iPhone oder Computer, oder nimm im Studio auf.</div><img class="sn-covimg" data-k="covimg" alt=""><button type="button" class="big" data-k="big" hidden aria-label="Abspielen">▶</button><span class="tag" data-k="tag"></span></div>
   <div class="sn-tl">
     <div class="sn-row" style="margin-top:8px"><span class="t" data-k="time">0:00 / 0:00</span>
       <button type="button" class="sn-b pl" data-k="play">▶ Abspielen</button>
@@ -261,6 +290,13 @@ void main(){
   </div>
   <h2 style="margin-top:16px" data-k="h2">Deine Clips <span style="font-size:16px;color:#7D7076;font-family:'Hanken Grotesk',sans-serif;font-weight:400" data-k="cnt"></span></h2>
   <div class="sn-clips" data-k="clips"></div>
+  <div class="sn-cov" data-k="coved" hidden>
+    <div class="h"><b>🖼 Titelbild ganz am Anfang</b><button type="button" class="sn-b sm" data-k="covX">Schließen</button></div>
+    <label class="sn-sw"><input type="checkbox" data-k="covOn"> Titelbild vor dem ersten Clip zeigen</label>
+    <div class="ths" data-k="covThs"></div>
+    <div><div style="font-size:16px;color:#4A3A41;margin-bottom:4px">Wie lange?</div><div class="sn-chips" data-k="covDur"></div></div>
+    <p class="sn-note">Das Bild steht ganz vorne, noch vor deinem ersten Clip, und ist auch das Vorschaubild, wenn das Video hochgeladen wird. Die Musik läuft schon darunter. Dein zuletzt gewähltes Titelbild nehme ich für die nächsten Talking Heads automatisch wieder.</p>
+  </div>
   <div class="sn-row" style="margin-top:0">
     <label class="sn-b pl" style="cursor:pointer">＋ Clips vom Gerät<input type="file" accept="video/*,.mov,.mp4,.m4v,.webm" multiple hidden data-k="file"></label>
     ${o.studioUrl ? `<a class="sn-b" href="${esc(o.studioUrl)}">● Im Studio aufnehmen</a>` : ''}
@@ -288,11 +324,12 @@ void main(){
   <p class="sn-msg" data-k="msg"></p>
   <div class="sn-res" data-k="res" hidden>
     <h2>Dein fertiges Video</h2>
-    <video controls playsinline data-k="resv"></video>
+    <div class="sn-up" data-k="up" hidden></div>
+    <video controls playsinline data-k="resv" style="margin-top:10px"></video>
     <div class="sn-row" style="margin-top:12px">
       <button type="button" class="sn-b pl" data-k="share" hidden>📲 In Fotos sichern</button>
       <a class="sn-b" data-k="dl" download>⬇ Als Datei herunterladen</a>
-      ${o.toStudio ? '<button type="button" class="sn-b dk" data-k="toStudio">⬆ Im Studio hochladen</button>' : ''}
+      ${o.upload ? '<button type="button" class="sn-b dk" data-k="upBtn">⬆ Hochladen</button>' : ''}
       <button type="button" class="sn-b sm" data-k="resX">Schließen</button>
     </div>
     <p class="sn-note" style="margin-top:8px" data-k="resN"></p>
@@ -351,6 +388,7 @@ void main(){
 
     // ---- Zustand ----
     let clips = [], sel = -1, closed = false, busy = false, curDraft = null, drList = [];
+    let covers = [], cov = null, shAC = null; const elSrcs = new WeakMap(); // Titelbilder · gemeinsamer Ton-Mischer
     const st = Object.assign({ look: 'natur', br: 1, ct: 1, sa: 1, se: 0, fmt: 'orig' }, ls.get('sn-st', {}));
     const mus = Object.assign({ vol: .18, voice: 1, duck: true, fade: true }, ls.get('sn-mus', {}));
     const auto = Object.assign({ pause: .7, stumbles: true, zoom: true, noise: true }, ls.get('sn-auto', {}));
@@ -398,6 +436,7 @@ void main(){
         rows.sort((a, b) => (order.indexOf(a.id) + 1 || 1e9) - (order.indexOf(b.id) + 1 || 1e9) || a.added - b.added);
         const urls = new Map(); clips = rows.map(r => { let u = urls.get(r.blob); if (!u) { u = URL.createObjectURL(r.blob); urls.set(r.blob, u); } return Object.assign({}, r, { url: u }); });
         slots(); if (clips.length) { sel = 0; vidFor(clips[0]); prep(1); }
+        await covLoad().catch(() => {});
         drawDrafts(); ui(); clips.forEach(thumb);
       } catch (e) { say('Die gespeicherten Clips konnten nicht geladen werden.', 'bad'); }
     }
@@ -412,19 +451,20 @@ void main(){
         return (d.toDateString() === h.toDateString() ? 'heute' : d.getDate() + '.' + (d.getMonth() + 1) + '.') + ' ' + s2(d.getHours()) + ':' + s2(d.getMinutes()); };
       const L = drList.slice().sort((a, b) => (b.at || 0) - (a.at || 0));
       K('drList').innerHTML = L.map(d => { const i = info[d.id] || { n: 0, sec: 0 }, on = d.id === curDraft;
-        return `<li class="${on ? 'on' : ''}"><span>${esc(d.name || 'Ohne Namen')}<small>${i.n ? i.n + (i.n > 1 ? ' Clips' : ' Clip') + (i.sec > .05 ? ' · ' + fmt(i.sec) : '') : 'noch leer'} · ${when(d.at)}${on ? ' · offen' : ''}</small></span>`
+        return `<li class="${on ? 'on' : ''}"><span>${esc(d.name || 'Ohne Namen')}<small>${i.n ? i.n + (i.n > 1 ? ' Clips' : ' Clip') + (i.sec > .05 ? ' · ' + fmt(i.sec) : '') : 'noch leer'} · ${when(d.at)}${on ? ' · offen' : ''}</small>${d.up ? '<small class="up">✓ hochgeladen ' + when(d.up.at) + '</small>' : ''}</span>`
           + (on ? '' : `<button type="button" data-dopen="${d.id}">Öffnen</button>`)
           + `<button type="button" class="x" data-ddel="${d.id}" aria-label="Entwurf löschen" title="Entwurf löschen">🗑</button></li>`; }).join('');
       K('drList').querySelectorAll('[data-dopen]').forEach(b => b.onclick = () => openDraft(b.dataset.dopen));
       K('drList').querySelectorAll('[data-ddel]').forEach(b => b.onclick = () => delDraft(b.dataset.ddel));
       K('h2').firstChild.textContent = (drList.find(d => d.id === curDraft) || {}).name ? 'Clips in „' + drName(curDraft) + '“ ' : 'Deine Clips ';
+      tgUi();
     }
     K('drName').oninput = () => { const d = drList.find(x => x.id === curDraft); if (!d) return; d.name = K('drName').value.trim().slice(0, 60); d.at = Date.now(); draftsSave(drList).catch(() => {}); clearTimeout(K('drName')._t); K('drName')._t = setTimeout(drawDrafts, 600); };
     async function openDraft(id) {
       if (busy || id === curDraft) return; stop();
       clips.forEach(c => { if (!clips.some(x => x !== c && x.url === c.url)) URL.revokeObjectURL(c.url); });
       clips = []; dropVids(); sel = -1; pos = 0; undoRows = null; autoLog = []; lastSum = null; K('undo').hidden = true; autoResUi(null);
-      await kvSet('cur', id).catch(() => {}); K('res').hidden = true;
+      await kvSet('cur', id).catch(() => {}); K('res').hidden = true; K('coved').hidden = true; covShow(false); result = null;
       await load(); say('📝 „' + drName(id) + '“ ist offen.', 'ok');
     }
     async function delDraft(id) {
@@ -467,7 +507,7 @@ void main(){
     function tick() {
       if (!playing) return;
       const c = clips[sel]; const v = cur(); if (!c || !v) { stop(); return; }
-      const off = Math.max(0, v.currentTime - (c.in || 0)); pos = starts()[sel] + off; timeUi(); musDrive(pos, true);
+      const off = Math.max(0, v.currentTime - (c.in || 0)); pos = starts()[sel] + off; timeUi(); musDrive(pos + CD(), true);
       if (c.zoom) v.style.transform = 'scale(' + zAt(c, off).toFixed(4) + ')';
       if (!prepped && (c.out || c.dur) - v.currentTime < 1.2) { prepped = true; prep(sel + 1); }
       if (v.currentTime >= (c.out || c.dur) - .04 || v.ended) {
@@ -479,13 +519,25 @@ void main(){
     const starts = () => { let a = 0; return clips.map(c => { const s = a; a += len(c); return s; }); };
     async function play() {
       if (busy || !clips.length) return; if (sel < 0) sel = 0; const c = clips[sel], v = vidFor(c); prepped = false; prep(sel + 1);
+      if (shAC && shAC.state === 'suspended') shAC.resume().catch(() => {});
+      // Titelbild: von ganz vorne abgespielt, steht es zuerst ein paar Sekunden (Musik läuft schon darunter)
+      const wantCov = CD() && sel === 0 && pos < .05 && !covRun && !covSkip; covSkip = false;
+      if (wantCov) { show(0, 0); playing = true; big.hidden = true; K('play').textContent = '❚❚ Pause'; covPlay(); return; }
       if (v.currentTime < (c.in || 0) || v.currentTime >= (c.out || c.dur) - .05) show(sel, 0); else show(sel, 0, false);
-      playing = true; big.hidden = true; K('play').textContent = '❚❚ Pause';
+      playing = true; big.hidden = true; K('play').textContent = '❚❚ Pause'; covShow(false);
       try { await v.play(); } catch (e) { playing = false; big.hidden = false; K('play').textContent = '▶ Abspielen'; say('Abspielen klappt nicht. Bitte nochmal auf ▶ tippen.'); return; }
-      musDrive(pos, true);
+      musDrive(pos + CD(), true);
       cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
     }
-    function stop() { playing = false; cancelAnimationFrame(raf); const v = cur(); if (v) v.pause(); musStop(); big.hidden = !clips.length; K('play').textContent = '▶ Abspielen'; }
+    let covRun = 0, covSkip = false;
+    function covPlay() {
+      const t0 = performance.now(), D0 = CD(); covShow(true); musDrive(0, true);
+      const step = () => { if (!playing) { covRun = 0; return; } const t = (performance.now() - t0) / 1000;
+        K('time').textContent = 'Titelbild ' + fmt1(t) + ' / ' + fmt(total() + D0); musDrive(t, true);
+        if (t >= D0) { covRun = 0; covShow(false); pos = 0; covSkip = true; playing = false; play(); return; } covRun = requestAnimationFrame(step); };
+      covRun = requestAnimationFrame(step);
+    }
+    function stop() { playing = false; cancelAnimationFrame(raf); if (covRun) { cancelAnimationFrame(covRun); covRun = 0; covShow(false); } const v = cur(); if (v) v.pause(); musStop(); big.hidden = !clips.length; K('play').textContent = '▶ Abspielen'; }
     K('play').onclick = () => playing ? stop() : play(); big.onclick = play;
     K('cmp').onclick = () => { cmp = !cmp; K('cmp').textContent = cmp ? 'Nachher zeigen' : 'Vorher zeigen'; K('cmp').setAttribute('aria-pressed', String(cmp)); K('tag').textContent = cmp ? 'Vorher' : ''; const v = cur(); if (v) v.style.filter = cmp ? '' : filterCss(st); };
     function timeUi() { K('time').textContent = fmt(pos) + ' / ' + fmt(total()); if (clips.length) ztPh(); }
@@ -494,14 +546,16 @@ void main(){
     // ---- Clip-Liste ----
     function renderClips(full) {
       const box = K('clips');
-      if (full !== false) box.innerHTML = clips.map((c, i) => `<button type="button" class="sn-c ${i === sel ? 'on' : ''}${c.auto ? ' auto' : ''}" data-ci="${i}"><span class="n">${i + 1}</span>${c.mute ? '<span class="mu">🔇</span>' : ''}${c.thumb ? `<img src="${c.thumb}" alt="">` : '<span class="ph">🎬</span>'}<b>${esc(c.name)}</b><small>${fmt1(len(c))}${(c.in || (c.out && c.dur && c.out < c.dur - .05)) ? ' · geschnitten' : ''}</small></button>`).join('')
+      if (full !== false) box.innerHTML = covTile() + clips.map((c, i) => `<button type="button" class="sn-c ${i === sel ? 'on' : ''}${c.auto ? ' auto' : ''}" data-ci="${i}"><span class="n">${i + 1}</span>${c.mute ? '<span class="mu">🔇</span>' : ''}${c.thumb ? `<img src="${c.thumb}" alt="">` : '<span class="ph">🎬</span>'}<b>${esc(c.name)}</b><small>${fmt1(len(c))}${(c.in || (c.out && c.dur && c.out < c.dur - .05)) ? ' · geschnitten' : ''}</small></button>`).join('')
         + `<label class="sn-add"><b>＋</b>Clips<input type="file" accept="video/*,.mov,.mp4,.m4v,.webm" multiple hidden></label>`;
       else box.querySelectorAll('.sn-c').forEach(b => b.classList.toggle('on', +b.dataset.ci === sel));
-      box.querySelectorAll('.sn-c').forEach(b => b.onclick = () => { if (busy) return; stop(); sel = +b.dataset.ci; pos = starts()[sel]; show(sel, 0); renderClips(false); edUi(); barUi(); timeUi(); });
-      const add = box.querySelector('.sn-add input'); if (add) add.onchange = e => { addFiles([...e.target.files]); e.target.value = ''; };
-      K('cnt').textContent = clips.length ? '· ' + clips.length + (clips.length > 1 ? ' Clips' : ' Clip') + ' · ' + fmt(total()) : '';
+      box.querySelectorAll('.sn-c[data-ci]').forEach(b => b.onclick = () => { if (busy) return; stop(); covShow(false); sel = +b.dataset.ci; pos = starts()[sel]; show(sel, 0); renderClips(false); edUi(); barUi(); timeUi(); });
+      const add = box.querySelector('.sn-add:not(.cov) input'); if (add) add.onchange = e => { addFiles([...e.target.files]); e.target.value = ''; };
+      const ct = box.querySelector('[data-cov]'); if (ct) ct.onclick = () => { if (busy) return; stop(); const o2 = K('coved').hidden; K('coved').hidden = !o2; covShow(o2 && !!covObj()); if (o2) covEdUi(); };
+      const cf = box.querySelector('.sn-add.cov input'); if (cf) cf.onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) covAdd(f); };
+      K('cnt').textContent = clips.length ? '· ' + clips.length + (clips.length > 1 ? ' Clips' : ' Clip') + ' · ' + fmt(total() + CD()) + (CD() ? ' mit Titelbild' : '') : '';
       q('#snempty').hidden = !!clips.length; big.hidden = !!playing || !clips.length;
-      K('done').disabled = !clips.length;
+      K('done').disabled = !clips.length; doneLbl();
     }
     // Zeigt an, wenn ein anderer Clip denselben Bereich noch einmal zeigt (nach dem Ziehen über einen Nachbarn)
     function ovlUi() {
@@ -701,7 +755,7 @@ void main(){
     let schedCache = null, schedD = -1;
     // Ablaufplan: ein Lied nach dem anderen, je XF Sekunden Überblendung; reicht die Musik nicht, geht es von vorne los
     function sched() {
-      const D = total();
+      const D = total() + CD();
       if (schedCache && Math.abs(schedD - D) < .05) return schedCache;
       schedD = D; const out = [];
       if (mlist.length && D > .2) { let t = 0, k = 0;
@@ -711,7 +765,7 @@ void main(){
     }
     // Wie laut läuft welches Lied zur Zeit t (0…1, noch ohne Lautstärke-Regler)?
     function musPlan(t) {
-      const D = schedD < 0 ? total() : schedD, out = [];
+      const D = schedD < 0 ? total() + CD() : schedD, out = [];
       sched().forEach((x, i) => { const end = Math.min(D, x.start + x.dur);
         if (t < x.start - .01 || t >= end) return;
         const xf = xfOf(x.dur), fi = x.start < .01 ? .4 : xf, fo = Math.min(xf, (end - x.start) / 2);
@@ -732,7 +786,7 @@ void main(){
     }
     const musStop = () => [auA, auB].forEach(a => a.pause());
     function mlUi() {
-      const box = K('mlist'), D = total();
+      const box = K('mlist'), D = total() + CD();
       if (!mlist.length) { box.innerHTML = '<p class="sn-note">Noch keine Musik. Nimm unten ein oder mehrere Lieder – ich schneide sie auf die Länge deines Videos zu und blende sie ineinander.</p>'; return; }
       const ges = mlist.reduce((a, m) => a + (m.dur || 0), 0);
       box.innerHTML = '<ul>' + mlist.map((m, i) => '<li><b class="n">' + (i + 1) + '</b><span>' + esc(m.name) + '<small>' + (m.dur ? fmt(m.dur) : '') + '</small></span>'
@@ -762,13 +816,13 @@ void main(){
       for (let i = 0; i < key.length; i++) { h ^= key.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
       const rnd = () => (h = (Math.imul(h, 1664525) + 1013904223) >>> 0) / 4294967296;
       const ranked = base.map(x => ({ x, s: score(x), r: rnd() })).sort((a, b) => a.s - b.s || a.r - b.r).map(o => o.x);
-      const D = total(), out = []; let t = 0;
+      const D = total() + CD(), out = []; let t = 0;
       for (const x of ranked) { out.push(x); t += Math.max(20, (x.dur || 150) - XF); if (t >= D + 2 && out.length >= 3) break; }
       return out.slice(0, 8);
     }
     function sugUi() {
       const box = K('sug'); if (!o.musicUrl || !lib.length) { box.innerHTML = ''; return; }
-      sugList = suggest(); const D = total(), drin = id => mlist.some(m => m.id === id);
+      sugList = suggest(); const D = total() + CD(), drin = id => mlist.some(m => m.id === id);
       let t = 0, n = 0; for (const x of sugList) { n++; t += Math.max(20, (x.dur || 150) - XF); if (t >= D) break; }
       box.innerHTML = '<div class="hd"><b>✦ Vorschlag für dieses Video</b><button type="button" data-k2="sugnew">🎲 andere</button></div><ol>'
         + sugList.map(x => '<li class="' + (drin(x.id) ? 'on' : '') + '"><button type="button" data-spv="' + x.id + '" aria-label="Reinhören">' + (preId === x.id ? '❚❚' : '▶') + '</button><span>' + esc(x.t) + '<small>' + (x.dur ? fmt(x.dur) : '') + '</small></span><button type="button" data-sadd="' + x.id + '">' + (drin(x.id) ? '✓' : '＋') + '</button></li>').join('')
@@ -948,7 +1002,7 @@ void main(){
     let mbP = null;
     function loadMB() { if (window.Mediabunny) return Promise.resolve(window.Mediabunny); if (!mbP) mbP = new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = (o.vendor || 'vendor/') + 'mediabunny.min.js?v=1'; sc.onload = () => window.Mediabunny ? ok(window.Mediabunny) : no(new Error('mb')); sc.onerror = () => { mbP = null; no(new Error('mb')); }; document.head.appendChild(sc); }); return mbP; }
     function outSize(w0, h0) { let w = w0, h = h0; if (st.fmt !== 'orig') { const [x, y] = st.fmt.split(':').map(Number), r = x / y; if (r >= w0 / h0) { w = w0; h = w0 / r; } else { h = h0; w = h0 * r; } } const k = Math.min(1, 3840 / Math.max(w, h)); return [Math.round(w * k / 2) * 2, Math.round(h * k / 2) * 2]; }
-    // WebGL-Filter (gleiche Rechnung wie die CSS-Filter der Vorschau)
+    // WebGL-Filter (gleiche Rechnung wie die CSS-Filter der Vorschau); neutral = ohne Licht & Farbe (Titelbild)
     function makeGL(cv) {
       const gl = cv.getContext('webgl', { preserveDrawingBuffer: true, premultipliedAlpha: false }); if (!gl) return null;
       const sh = (t, s) => { const x = gl.createShader(t); gl.shaderSource(x, s); gl.compileShader(x); return x; };
@@ -959,26 +1013,56 @@ void main(){
       const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
       [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]].forEach(x => gl.texParameteri(gl.TEXTURE_2D, x[0], x[1]));
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-      return (el, sw, shh, z) => { gl.viewport(0, 0, cv.width, cv.height); gl.bindTexture(gl.TEXTURE_2D, tex); try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, el); } catch (e) { return false; }
-        gl.uniform1i(U.t, 0); gl.uniform2f(U.so, sw, shh); gl.uniform2f(U.oo, cv.width, cv.height); gl.uniform1f(U.br, st.br); gl.uniform1f(U.ct, st.ct); gl.uniform1f(U.sa, st.sa); gl.uniform1f(U.se, st.se); gl.uniform1f(U.zm, z || 1); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); return true; };
+      return (el, sw, shh, z, neutral) => { gl.viewport(0, 0, cv.width, cv.height); gl.bindTexture(gl.TEXTURE_2D, tex); try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, el); } catch (e) { return false; }
+        const L = neutral ? { br: 1, ct: 1, sa: 1, se: 0 } : st;
+        gl.uniform1i(U.t, 0); gl.uniform2f(U.so, sw, shh); gl.uniform2f(U.oo, cv.width, cv.height); gl.uniform1f(U.br, L.br); gl.uniform1f(U.ct, L.ct); gl.uniform1f(U.sa, L.sa); gl.uniform1f(U.se, L.se); gl.uniform1f(U.zm, z || 1); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); return true; };
     }
-    async function mixAudio(M, inputs, D, SR) { // inputs: [{input, c, start}] → AudioBuffer oder null
-      const N = Math.max(1, Math.ceil(D * SR)); let bufs = [];
-      for (const x of inputs) { if (x.c.mute) continue; try { const at = await x.input.getPrimaryAudioTrack(); if (!at || !(await at.canDecode())) continue; const as = new M.AudioBufferSink(at);
-        for await (const b of as.buffers(Math.max(0, x.c.in - 1), x.c.out + 1)) { if (closed) return null; const rel = b.timestamp - x.c.in; const endRel = rel + b.buffer.duration; if (endRel <= 0 || rel >= len(x.c)) continue; bufs.push({ buffer: b.buffer, at: x.start + rel, clipStart: x.start, clipEnd: x.start + len(x.c) }); } } catch (e) {} }
-      if (!bufs.length && !mlist.length) return null;
-      const place = (ctx, dst) => { const gains = new Map(); bufs.forEach(b => { let g = gains.get(b.clipStart); if (!g) { // je Clip 20 ms ein-/ausblenden, damit die Schnitte nicht knacken
-          g = new GainNode(ctx, { gain: 0 }); g.connect(dst); const f = Math.min(.02, (b.clipEnd - b.clipStart) / 4); g.gain.setValueAtTime(0, b.clipStart); g.gain.linearRampToValueAtTime(1, b.clipStart + f); g.gain.setValueAtTime(1, Math.max(b.clipStart + f, b.clipEnd - f)); g.gain.linearRampToValueAtTime(0, b.clipEnd); gains.set(b.clipStart, g); }
-        const s0 = new AudioBufferSourceNode(ctx, { buffer: b.buffer }); s0.connect(g); const off = b.at < 0 ? -b.at : 0, when = Math.max(0, b.at), dur = Math.min(b.buffer.duration - off, b.clipEnd - when); if (dur > 0) s0.start(when, off, dur); }); };
+    // ---- Ton der Clips holen (Vivien, 30.10.2026: „beim Exportieren ist der Ton weg. Komplett.“) ----
+    // Am iPhone (Safari bis iOS 18) gibt es keinen AudioDecoder/AudioEncoder. Früher wurde die Stimme dann still übersprungen
+    // und das Video ganz ohne Tonspur gespeichert. Jetzt drei Wege, und wenn keiner klappt, der Echtzeit-Weg (nimmt den Ton mit):
+    // 1) WebCodecs, 2) Tonspur ohne Neu-Kodieren in eine kleine Audiodatei umpacken und vom Browser entschlüsseln lassen,
+    // 3) die ganze Datei vom Browser entschlüsseln lassen.
+    const decodeAB = (ab, SR) => new Promise((ok, no) => { const ctx = new OfflineAudioContext(2, 1, SR); let fin = false;
+      const r = ctx.decodeAudioData(ab, b => { if (!fin) { fin = true; ok(b); } }, e => { if (!fin) { fin = true; no(e || new Error('decode')); } });
+      if (r && r.then) r.then(b => { if (!fin) { fin = true; ok(b); } }, e => { if (!fin) { fin = true; no(e); } }); });
+    async function voicePieces(M, input, c, SR, whole) { // → { pieces: [{buffer, ts}], fail } · ts = Startzeit im Ausgangsvideo
+      const a = c.in || 0, b = c.out || c.dur || 0;
+      let at = null; try { at = await input.getPrimaryAudioTrack(); } catch (e) {}
+      if (!at) return { pieces: [] }; // Clip ohne Tonspur: nichts zu tun
+      try { if (await at.canDecode()) { const as = new M.AudioBufferSink(at), out = [];
+          for await (const x of as.buffers(Math.max(0, a - 1), b + 1)) { if (closed) return null; out.push({ buffer: x.buffer, ts: x.timestamp }); }
+          if (out.length) return { pieces: out }; } } catch (e) { console.warn('Ton (WebCodecs)', e); }
+      try { const sink = new M.EncodedPacketSink(at); const p0 = (await sink.getPacket(Math.max(0, a - .5))) || (await sink.getFirstPacket());
+        if (p0) { const codec = at.codec, cfg = await at.getDecoderConfig();
+          const tgt = new M.BufferTarget(), op = new M.Output({ format: (codec === 'opus' || codec === 'vorbis') ? new M.WebMOutputFormat() : new M.Mp4OutputFormat(), target: tgt });
+          const src = new M.EncodedAudioPacketSource(codec); op.addAudioTrack(src); await op.start();
+          let first = true, n = 0; const t0 = p0.timestamp;
+          for await (const p of sink.packets(p0)) { if (closed) return null; if (p.timestamp > b + .5) break;
+            await src.add(new M.EncodedPacket(p.data, p.type, Math.max(0, p.timestamp - t0), p.duration), first ? { decoderConfig: cfg } : undefined); first = false; n++; }
+          await op.finalize();
+          if (n && tgt.buffer) return { pieces: [{ buffer: await decodeAB(tgt.buffer, SR), ts: t0 }] }; } } catch (e) { console.warn('Ton (umpacken)', e); }
+      try { let buf = whole.get(c.blob); if (!buf && c.blob.size < 450e6) { buf = await decodeAB(await c.blob.arrayBuffer(), SR); whole.set(c.blob, buf); } if (buf) return { pieces: [{ buffer: buf, ts: 0 }] }; } catch (e) { console.warn('Ton (ganze Datei)', e); }
+      return { pieces: [], fail: true };
+    }
+    async function mixAudio(M, inputs, D, SR) { // inputs: [{input, c, start}] → { buf: AudioBuffer|null } oder { fail } oder null (abgebrochen)
+      const N = Math.max(1, Math.ceil(D * SR)), segs = [], whole = new Map(); let fail = 0, k = 0;
+      for (const x of inputs) { k++; if (x.c.mute) continue; if (inputs.length > 1) say('Ton wird vorbereitet … ' + k + ' von ' + inputs.length);
+        const r = await voicePieces(M, x.input, x.c, SR, whole); if (r === null) return null; if (r.fail) { fail++; continue; }
+        const a = x.c.in || 0, e = x.c.out || x.c.dur || 0;
+        r.pieces.forEach(p => { const s0 = Math.max(p.ts, a), s1 = Math.min(p.ts + p.buffer.duration, e);
+          if (s1 - s0 > .001) segs.push({ buffer: p.buffer, when: x.start + (s0 - a), off: s0 - p.ts, dur: s1 - s0, cs: x.start, ce: x.start + (e - a) }); }); }
+      if (fail) return { fail };
+      if (!segs.length && !mlist.length) return { buf: null };
+      const place = (ctx, dst) => { const gains = new Map(); segs.forEach(sg => { let g = gains.get(sg.cs); if (!g) { // je Clip 20 ms ein-/ausblenden, damit die Schnitte nicht knacken
+          g = new GainNode(ctx, { gain: 0 }); g.connect(dst); const f = Math.min(.02, (sg.ce - sg.cs) / 4); g.gain.setValueAtTime(0, sg.cs); g.gain.linearRampToValueAtTime(1, sg.cs + f); g.gain.setValueAtTime(1, Math.max(sg.cs + f, sg.ce - f)); g.gain.linearRampToValueAtTime(0, sg.ce); gains.set(sg.cs, g); }
+        const s0 = new AudioBufferSourceNode(ctx, { buffer: sg.buffer }); s0.connect(g); s0.start(sg.when, sg.off, sg.dur); }); };
       let rms = null;
-      if (mlist.length && mus.duck && bufs.length) { const c1 = new OfflineAudioContext(1, N, SR); place(c1, c1.destination); const r1 = (await c1.startRendering()).getChannelData(0); const win = Math.round(SR * .05); rms = []; for (let i = 0; i < r1.length; i += win) { let s = 0, n = Math.min(win, r1.length - i); for (let j = 0; j < n; j++) s += r1[i + j] * r1[i + j]; rms.push(Math.sqrt(s / Math.max(1, n))); } }
+      if (mlist.length && mus.duck && segs.length) { const c1 = new OfflineAudioContext(1, N, SR); place(c1, c1.destination); const r1 = (await c1.startRendering()).getChannelData(0); const win = Math.round(SR * .05); rms = []; for (let i = 0; i < r1.length; i += win) { let s = 0, n = Math.min(win, r1.length - i); for (let j = 0; j < n; j++) s += r1[i + j] * r1[i + j]; rms.push(Math.sqrt(s / Math.max(1, n))); } }
       const c2 = new OfflineAudioContext(2, N, SR), vg = new GainNode(c2, { gain: mus.voice }); vg.connect(c2.destination); place(c2, vg);
       if (mlist.length) {
         // Alle gewählten Lieder einmal entschlüsseln, dann der Reihe nach legen und ineinander blenden
         const dec = new Map();
-        for (const m of mlist) { if (dec.has(m.url)) continue;
-          const b2 = await new Promise((ok, no) => m.file.arrayBuffer().then(ab => { const tmp = new OfflineAudioContext(2, SR, SR); tmp.decodeAudioData(ab, ok, no); }, no)).catch(() => null);
-          if (b2) dec.set(m.url, b2); }
+        for (const m of mlist) { if (dec.has(m.url)) continue; const b2 = await m.file.arrayBuffer().then(ab => decodeAB(ab, SR)).catch(() => null); if (b2) dec.set(m.url, b2); }
         const master = new GainNode(c2, { gain: 0 }); master.connect(c2.destination);
         let any = false;
         for (const x of sched()) { const mb = dec.get(x.m.url); if (!mb) continue; any = true;
@@ -989,71 +1073,189 @@ void main(){
           g.gain.setValueAtTime(0, x.start); g.gain.linearRampToValueAtTime(1, x.start + fi);
           g.gain.setValueAtTime(1, Math.max(x.start + fi, end - fo)); g.gain.linearRampToValueAtTime(0, end);
           src.start(x.start, 0, end - x.start + .05); }
-        if (any) { let duckT = -9, prev = 0; for (let k = 0, t = 0; t < D; k++, t = k * .05) { let g = mus.vol; if (mus.fade) g *= Math.max(0, Math.min(1, t / 1.5, (D - t) / 2.5)); if (rms && (rms[k] || 0) > .025) duckT = t; if (rms && t - duckT < .6) g *= .35; if (Math.abs(g - prev) > .001 || k === 0) { master.gain.setTargetAtTime(g, t, g < prev ? .12 : .45); prev = g; } } } }
-      return c2.startRendering();
+        if (any) { let duckT = -9, prev = 0; for (let k2 = 0, t = 0; t < D; k2++, t = k2 * .05) { let g = mus.vol; if (mus.fade) g *= Math.max(0, Math.min(1, t / 1.5, (D - t) / 2.5)); if (rms && (rms[k2] || 0) > .025) duckT = t; if (rms && t - duckT < .6) g *= .35; if (Math.abs(g - prev) > .001 || k2 === 0) { master.gain.setTargetAtTime(g, t, g < prev ? .12 : .45); prev = g; } } } }
+      return { buf: await c2.startRendering() };
     }
     async function fastRender(fill) {
       if (!window.VideoEncoder || !window.VideoDecoder || !window.OfflineAudioContext) return null;
-      const M = await loadMB(); const D = total(), SR = 48000;
-      const ins = []; let start = 0; for (const c of clips) { const input = new M.Input({ source: new M.BlobSource(c.blob), formats: M.ALL_FORMATS }); const vt = await input.getPrimaryVideoTrack(); if (!vt || !(await vt.canDecode())) return null; const rot = (await vt.getRotation?.()) ?? vt.rotation ?? 0; ins.push({ input, vt, rot, c, start }); start += len(c); }
+      const M = await loadMB(); const C0 = CD(), D = total() + C0, SR = 48000;
+      const ins = []; let start = C0; for (const c of clips) { const input = new M.Input({ source: new M.BlobSource(c.blob), formats: M.ALL_FORMATS }); const vt = await input.getPrimaryVideoTrack(); if (!vt || !(await vt.canDecode())) return null; const rot = (await vt.getRotation?.()) ?? vt.rotation ?? 0; ins.push({ input, vt, rot, c, start }); start += len(c); }
       // Ausgabegröße nach dem ersten Clip (Drehung beachten)
       const f0 = ins[0]; let w0 = f0.vt.displayWidth || f0.vt.codedWidth, h0 = f0.vt.displayHeight || f0.vt.codedHeight; if (f0.rot % 180) [w0, h0] = [h0, w0];
       const [W, H] = outSize(w0, h0), cv = document.createElement('canvas'); cv.width = W; cv.height = H; const draw = makeGL(cv); if (!draw) return null;
       const vbr = brate(W, H), vc = await M.getFirstEncodableVideoCodec(['avc', 'hevc', 'vp9', 'av1'], { width: W, height: H, bitrate: vbr }); if (!vc) return null;
-      say('Ton wird gemischt …'); const mixed = await mixAudio(M, ins, D, SR); if (closed) return 'x';
+      say('Ton wird vorbereitet …'); const mx = await mixAudio(M, ins, D, SR); if (closed) return 'x'; if (!mx) return null;
+      if (mx.fail) { console.warn('Schnitt: Ton nicht lesbar, nehme den Echtzeit-Weg'); return null; }
+      const mixed = mx.buf;
+      // Ton: AAC in MP4; am iPhone ohne Ton-Kodierer unkomprimiert in .mov (spielt in Fotos, Instagram und Bunny); sonst Opus
+      let acodec = null, mov = false; const aopt = { numberOfChannels: 2, sampleRate: SR, bitrate: 160000 };
+      if (mixed) {
+        if (await M.canEncodeAudio('aac', aopt).catch(() => false)) acodec = 'aac';
+        else if (!window.AudioEncoder) { acodec = 'pcm-s16'; mov = true; }
+        else if (await M.canEncodeAudio('opus', aopt).catch(() => false)) acodec = 'opus';
+        else return null; // kein Ton-Kodierer: lieber der Echtzeit-Weg, der den Ton mitnimmt
+      }
       let parts = [], end = 0;
       const put = (p, data) => { const bl = new Blob([data]), pe = p + data.byteLength; if (p === end) { parts.push({ p, b: bl }); end = pe; return; } if (p > end) { parts.push({ p: end, b: new Blob([new Uint8Array(p - end)]) }, { p, b: bl }); end = pe; return; }
         const nx = []; for (const x of parts) { const xs = x.p, xe = x.p + x.b.size; if (xe <= p || xs >= pe) { nx.push(x); continue; } if (xs < p) nx.push({ p: xs, b: x.b.slice(0, p - xs) }); if (xe > pe) nx.push({ p: pe, b: x.b.slice(pe - xs) }); } nx.push({ p, b: bl }); nx.sort((x, y) => x.p - y.p); parts = nx; if (pe > end) end = pe; };
       const target = new M.StreamTarget(new WritableStream({ write(ch) { put(ch.position, ch.data); } }), { chunked: true, chunkSize: 4 * 1024 * 1024 });
-      const out = new M.Output({ format: new M.Mp4OutputFormat({ fastStart: false }), target });
+      const out = new M.Output({ format: mov ? new M.MovOutputFormat({ fastStart: false }) : new M.Mp4OutputFormat({ fastStart: false }), target });
       const cs = new M.CanvasSource(cv, { codec: vc, bitrate: vbr, keyFrameInterval: 2, latencyMode: 'realtime' }); out.addVideoTrack(cs, { frameRate: 30 });
-      let as2 = null; if (mixed) { const ac2 = await M.getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: 2, sampleRate: SR, bitrate: 160000 }); if (ac2) { as2 = new M.AudioBufferSource({ codec: ac2, bitrate: 160000 }); out.addAudioTrack(as2); } else if (!window.MediaRecorder) return null; }
+      let as2 = null; if (mixed) { as2 = new M.AudioBufferSource(acodec === 'pcm-s16' ? { codec: 'pcm-s16' } : { codec: acodec, bitrate: 160000 }); out.addAudioTrack(as2); }
       await out.start(); if (as2) await as2.add(mixed);
       say('Wird fertig gestellt … Seite offen lassen.'); const W0 = performance.now(); let lastTs = -1;
+      // Titelbild ganz vorne (ohne Licht & Farbe, so wie hochgeladen)
+      if (C0) { const cvC = await covCanvas(); if (cvC) for (let k = 0; ; k++) { const t = k / 30; if (t >= C0 - 1e-6) break; if (closed) { try { await out.cancel(); } catch (e) {} return 'x'; } draw(cvC, cvC.width, cvC.height, 1, true); await cs.add(t, Math.min(1 / 30, C0 - t)); lastTs = t; fill.style.width = Math.min(100, t / D * 100) + '%'; } }
       for (const x of ins) {
-        const direct = !x.rot, vs = direct ? new M.VideoSampleSink(x.vt) : new M.CanvasSink(x.vt, { poolSize: 2 }), L = len(x.c);
-        const it = direct ? vs.samples(x.c.in, x.c.out) : vs.canvases(x.c.in, x.c.out);
+        const eOut = x.c.out || x.c.dur, direct = !x.rot, vs = direct ? new M.VideoSampleSink(x.vt) : new M.CanvasSink(x.vt, { poolSize: 2 });
+        const it = direct ? vs.samples(x.c.in || 0, eOut) : vs.canvases(x.c.in || 0, eOut);
         for await (const smp of it) {
           if (closed) { try { await out.cancel(); } catch (e) {} return 'x'; }
           let el, sw, shh, tsrc, dur; if (direct) { const f = smp.toVideoFrame(); smp.close(); el = f; sw = f.displayWidth; shh = f.displayHeight; tsrc = f.timestamp / 1e6; dur = (f.duration || 0) / 1e6; } else { el = smp.canvas; sw = el.width; shh = el.height; tsrc = smp.timestamp; dur = smp.duration; }
-          const ts = x.start + Math.max(0, tsrc - x.c.in); const ok2 = ts > lastTs && ts < D;
-          if (ok2) { draw(el, sw, shh, zAt(x.c, tsrc - x.c.in)); lastTs = ts; } if (direct) el.close();
+          const ts = x.start + Math.max(0, tsrc - (x.c.in || 0)); const ok2 = ts > lastTs && ts < D;
+          if (ok2) { draw(el, sw, shh, zAt(x.c, tsrc - (x.c.in || 0))); lastTs = ts; } if (direct) el.close();
           if (ok2) await cs.add(ts, Math.max(1 / 60, Math.min(dur || 1 / 30, D - ts)));
           fill.style.width = Math.min(100, ts / D * 100) + '%';
           const el2 = (performance.now() - W0) / 1000; if (!window.__snFastForce && el2 > 4 && D - ts > 4 && ts / el2 < 1.1) { try { await out.cancel(); } catch (e) {} return null; }
         }
       }
-      await out.finalize(); return new Blob(parts.map(x => x.b), { type: 'video/mp4' });
+      await out.finalize(); const blob = new Blob(parts.map(x => x.b), { type: mov ? 'video/quicktime' : 'video/mp4' });
+      // Sicherheitsnetz: sollte Ton drin sein, aber die Datei hat keine Tonspur → lieber der Echtzeit-Weg
+      if (mixed) { try { const chk = new M.Input({ source: new M.BlobSource(blob), formats: M.ALL_FORMATS }); if (!(await chk.getPrimaryAudioTrack())) { console.warn('Schnitt: ohne Tonspur gespeichert, nehme den Echtzeit-Weg'); return null; } } catch (e) {} }
+      return blob;
     }
+    // Ein <video>/<audio> darf nur ein einziges Mal an den Ton-Mischer (Web Audio). Früher wurde bei jedem Fertigstellen neu
+    // verbunden – beim zweiten Mal klappte das nicht mehr und der Ton war weg. Jetzt: einmal verbinden, merken, wiederverwenden.
+    function sharedAC() { if (!shAC || shAC.state === 'closed') shAC = new (window.AudioContext || window.webkitAudioContext)(); return shAC; }
+    function elSource(el) { let s = elSrcs.get(el); if (s) return s; const ac = sharedAC(), src = ac.createMediaElementSource(el), spk = ac.createGain(); src.connect(spk); spk.connect(ac.destination); s = { src, spk }; elSrcs.set(el, s); return s; }
     // Rückfall: in Echtzeit über Canvas + MediaRecorder (alle Browser, dauert so lang wie das Video)
     async function slowRender(fill) {
       if (!window.MediaRecorder) return null; const v0 = vidFor(clips[0]); if (!v0 || !v0.videoWidth) return null;
       const [W, H] = outSize(v0.videoWidth, v0.videoHeight), cv = document.createElement('canvas'); cv.width = W; cv.height = H; const draw = makeGL(cv); if (!draw) return null;
-      const ac = new (window.AudioContext || window.webkitAudioContext)(); await ac.resume().catch(() => {}); const dest = ac.createMediaStreamDestination(), vg = ac.createGain(); vg.gain.value = mus.voice; vg.connect(dest);
-      const srcs = new Map(); let mg = null, msrc = null;
-      if (mlist.length) { try { mg = ac.createGain(); mg.gain.value = 0; mg.connect(dest); [auA, auB].forEach(a => { const sx = ac.createMediaElementSource(a); sx.connect(mg); }); } catch (e) { mg = null; } }
+      const C0 = CD(), D = total() + C0, cvC = C0 ? await covCanvas() : null;
+      const ac = sharedAC(); await ac.resume().catch(() => {}); const dest = ac.createMediaStreamDestination(), vg = ac.createGain(); vg.gain.value = mus.voice; vg.connect(dest);
+      const used = []; let mg = null;
+      if (mlist.length) { try { mg = ac.createGain(); mg.gain.value = 0; mg.connect(dest); [auA, auB].forEach(a => { const s = elSource(a); s.src.connect(mg); s.spk.gain.value = 0; used.push([s, mg]); }); } catch (e) { console.warn('Musik (Echtzeit)', e); mg = null; } }
       const stream = cv.captureStream(30); dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
       const mt = mime(), ch = [], r = new MediaRecorder(stream, Object.assign(mt ? { mimeType: mt } : {}, { videoBitsPerSecond: brate(W, H), audioBitsPerSecond: 160000 })); r.ondataavailable = e => { if (e.data && e.data.size) ch.push(e.data); }; const done = new Promise(ok => r.onstop = ok);
-      const D = total(); say('Wird fertig gestellt … dauert so lang wie das Video (' + fmt(D) + '). Seite offen lassen.');
-      r.start(500); let t0 = 0; const startAt = performance.now();
+      say('Wird fertig gestellt … dauert so lang wie das Video (' + fmt(D) + '). Seite offen lassen.');
+      r.start(500); let t0 = 0;
       if (mg) musDrive(0, true);
+      if (cvC) { const s0 = performance.now(); await new Promise(ok => { const step = () => { if (closed) { ok(); return; } const t = (performance.now() - s0) / 1000; draw(cvC, cvC.width, cvC.height, 1, true);
+          if (mg) { musDrive(t, true); mg.gain.setTargetAtTime(mus.fade ? Math.max(0, Math.min(1, t / 1.5)) : 1, ac.currentTime, .2); }
+          fill.style.width = Math.min(100, t / D * 100) + '%'; if (t >= C0) { ok(); return; } requestAnimationFrame(step); }; step(); }); t0 = C0; }
       for (let i = 0; i < clips.length && !closed; i++) {
         const c = clips[i], v = vidFor(c); v.classList.remove('on'); v.style.transform = ''; v.muted = true; v.currentTime = c.in || 0; await new Promise(ok => { v.onseeked = ok; setTimeout(ok, 1500); });
-        if (!c.mute && !srcs.has(c.slot)) { try { const s = ac.createMediaElementSource(v); s.connect(vg); srcs.set(c.slot, s); } catch (e) {} }
-        if (c.mute) v.muted = true; else v.muted = false; v.volume = 1;
+        if (!c.mute) { try { const s = elSource(v); if (!used.some(u => u[0] === s)) { s.src.connect(vg); s.spk.gain.value = 0; used.push([s, vg]); } } catch (e) { console.warn('Stimme (Echtzeit)', e); } }
+        v.muted = !!c.mute; v.volume = 1;
         await v.play().catch(() => {});
         await new Promise(ok => { const step = () => { if (closed) { ok(); return; } draw(v, v.videoWidth, v.videoHeight, zAt(c, v.currentTime - (c.in || 0))); const t = t0 + (v.currentTime - (c.in || 0));
           if (mg) { musDrive(t, true); const g = mus.fade ? Math.max(0, Math.min(1, t / 1.5, (D - t) / 2.5)) : 1; mg.gain.setTargetAtTime(g, ac.currentTime, .2); }
           fill.style.width = Math.min(100, t / D * 100) + '%'; if (v.ended || v.currentTime >= (c.out || c.dur) - .03) { ok(); return; } (v.requestVideoFrameCallback ? v.requestVideoFrameCallback(step) : requestAnimationFrame(step)); }; step(); v.onended = ok; });
         v.pause(); t0 += len(c);
       }
-      await new Promise(x => setTimeout(x, 150)); r.stop(); await done; musStop(); stream.getVideoTracks().forEach(t => t.stop()); try { ac.close(); } catch (e) {}
+      await new Promise(x => setTimeout(x, 150)); r.stop(); await done; musStop(); stream.getVideoTracks().forEach(t => t.stop());
+      used.forEach(([s, n]) => { try { s.src.disconnect(n); } catch (e) {} s.spk.gain.value = 1; }); try { vg.disconnect(); if (mg) mg.disconnect(); } catch (e) {}
       clips.forEach(c => { const v = vids.get(c.slot); if (v) v.muted = !!c.mute; });
       if (closed) return 'x'; const type = (r.mimeType || mt || 'video/webm').split(';')[0]; return new Blob(ch, { type });
     }
-    let result = null;
+
+    // ---- Titelbild (Vivien, 30.10.2026: „ein einheitliches Titelbild, das ganz am Anfang vom Video sitzt, direkt vorm ersten Schnitt“) ----
+    // Bilder liegen auf dem Gerät (IndexedDB kv.covers), je Entwurf kv['cov:'+id] = { on, id, dur }. Neue Talking-Head-Entwürfe
+    // bekommen automatisch das zuletzt gewählte Bild (je Programm und Sprache gemerkt in localStorage sn-cov-last).
+    function covObj() { return cov && cov.on ? covers.find(x => x.id === cov.id) || null : null; }
+    function CD() { return covObj() ? Math.max(.5, +cov.dur || 2) : 0; }
+    function covGrp() { const t = curTg(); return t ? (t.k === 'talk' ? 'talk:' + (t.g || '') + ':' + (t.lang || '') : t.k) : 'frei'; }
+    async function covLoad() {
+      if (!covers.length) covers = ((await kvGet('covers')) || []).map(x => Object.assign({}, x, { url: URL.createObjectURL(x.blob) }));
+      cov = (await kvGet('cov:' + curDraft)) || null; if (!cov) covDefault();
+    }
+    function covDefault() { const t = curTg(), last = ls.get('sn-cov-last', {}), id = last[covGrp()] || last.talk || last.any, has = !!(id && covers.some(x => x.id === id));
+      cov = { on: has && !!t && t.k === 'talk', id: has ? id : (covers[0] ? covers[0].id : null), dur: +ls.get('sn-cov-dur', 2) || 2, auto: true }; }
+    const covSave = async () => { if (!cov) return; const c2 = Object.assign({}, cov); delete c2.auto; cov.auto = false; await kvSet('cov:' + curDraft, c2).catch(() => {}); };
+    const covsSave = () => kvSet('covers', covers.map(x => ({ id: x.id, blob: x.blob, name: x.name, at: x.at }))).catch(() => {});
+    function covRemember() { const c = covObj(); if (!c) return; const last = ls.get('sn-cov-last', {}); last[covGrp()] = c.id; if (curTg() && curTg().k === 'talk') last.talk = c.id; last.any = c.id; ls.set('sn-cov-last', last); ls.set('sn-cov-dur', cov.dur); }
+    function covTile() {
+      const c = cov && covers.find(x => x.id === cov.id);
+      if (c) return '<button type="button" class="sn-c cov' + (cov.on ? '' : ' off') + '" data-cov="1"><span class="n">🖼</span><img src="' + c.url + '" alt=""><b>Titelbild</b><small>' + (cov.on ? sec1(CD()) + ' ganz vorne' : 'aus · antippen') + '</small></button>';
+      if (covers.length) return '<button type="button" class="sn-add cov" data-cov="1"><b>🖼</b>Titelbild</button>';
+      return '<label class="sn-add cov"><b>🖼</b>Titelbild<br>hochladen<input type="file" accept="image/*" hidden data-k="covfile"></label>';
+    }
+    async function covAdd(f) {
+      if (!/^image\//.test(f.type || '') && !/\.(jpe?g|png|heic|heif|webp)$/i.test(f.name || '')) { say('Bitte ein Bild wählen (JPG oder PNG).', 'bad'); return; }
+      let blob = f; // kleiner rechnen (höchstens 2400 px), damit es leicht bleibt
+      try { const bm = await createImageBitmap(f), k = Math.min(1, 2400 / Math.max(bm.width, bm.height)), cv = document.createElement('canvas'); cv.width = Math.round(bm.width * k); cv.height = Math.round(bm.height * k); cv.getContext('2d').drawImage(bm, 0, 0, cv.width, cv.height); blob = (await new Promise(ok => cv.toBlob(ok, 'image/jpeg', .92))) || f; } catch (e) {}
+      const x = { id: uid(), blob, name: String(f.name || 'Titelbild').replace(/\.\w+$/, ''), at: Date.now() }; x.url = URL.createObjectURL(blob);
+      covers.unshift(x); while (covers.length > 12) { const r0 = covers.pop(); URL.revokeObjectURL(r0.url); } await covsSave();
+      cov = Object.assign(cov || {}, { on: true, id: x.id, dur: (cov && cov.dur) || +ls.get('sn-cov-dur', 2) || 2 }); await covSave(); covRemember();
+      K('coved').hidden = false; covChanged(true); say('🖼 Titelbild ist drin. Es steht ganz am Anfang, vor deinem ersten Clip.', 'ok');
+    }
+    function covEdUi() {
+      const box = K('covThs'); K('covOn').checked = !!covObj();
+      box.innerHTML = covers.map(x => '<button type="button" class="th' + (cov && cov.id === x.id ? ' on' : '') + '" data-cth="' + x.id + '" aria-label="Dieses Titelbild nehmen"><img src="' + x.url + '" alt=""><span class="x" data-cdel="' + x.id + '" aria-label="Bild löschen">✕</span></button>').join('')
+        + '<label class="new"><b>＋</b>Neues Bild<input type="file" accept="image/*" hidden></label>';
+      box.querySelector('.new input').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) covAdd(f); };
+      box.querySelectorAll('[data-cth]').forEach(b => b.onclick = async e => { if (e.target.closest('[data-cdel]')) return; cov = Object.assign(cov || {}, { id: b.dataset.cth, on: true, dur: (cov && cov.dur) || 2 }); await covSave(); covRemember(); covChanged(true); });
+      box.querySelectorAll('[data-cdel]').forEach(b => b.onclick = async e => { e.stopPropagation(); if (!confirm('Dieses Titelbild von diesem Gerät löschen?')) return; const id = b.dataset.cdel, i = covers.findIndex(x => x.id === id);
+        if (i >= 0) { URL.revokeObjectURL(covers[i].url); covers.splice(i, 1); } await covsSave(); if (cov && cov.id === id) { cov.id = covers[0] ? covers[0].id : null; if (!cov.id) cov.on = false; await covSave(); } covChanged(); });
+      K('covDur').innerHTML = [1, 1.5, 2, 3, 4].map(s => '<button type="button" data-cd="' + s + '" aria-pressed="' + (!!cov && +cov.dur === s) + '">' + String(s).replace('.', ',') + ' s</button>').join('');
+      K('covDur').querySelectorAll('button').forEach(b => b.onclick = async () => { if (!cov) cov = { on: false, id: covers[0] ? covers[0].id : null, dur: 2 }; cov.dur = +b.dataset.cd; ls.set('sn-cov-dur', cov.dur); await covSave(); covChanged(true); });
+    }
+    function covChanged(showIt) { covEdUi(); covShow(showIt ? !!covObj() : (!K('coved').hidden && !!covObj())); schedCache = null; renderClips(); timeUi(); mlUi(); sugUi(); }
+    K('covOn').onchange = async () => { if (!covers.length) { K('covOn').checked = false; return; }
+      cov = Object.assign(cov || { dur: 2 }, { on: K('covOn').checked, id: (cov && cov.id && covers.some(x => x.id === cov.id)) ? cov.id : covers[0].id }); await covSave(); if (cov.on) covRemember(); covChanged(true); };
+    K('covX').onclick = () => { K('coved').hidden = true; covShow(false); };
+    function covShow(on) { const im = K('covimg'), c = covObj(); if (on && c) { if (im.getAttribute('src') !== c.url) im.src = c.url; im.classList.add('on'); } else im.classList.remove('on'); }
+    async function covCanvas() { const c = covObj(); if (!c) return null; let src = null;
+      try { src = await createImageBitmap(c.blob); } catch (e) { src = await new Promise(ok => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => ok(null); im.src = c.url; }); }
+      if (!src) return null; const w = src.width || src.naturalWidth, h = src.height || src.naturalHeight, k = Math.min(1, 2048 / Math.max(w, h));
+      const cv = document.createElement('canvas'); cv.width = Math.max(2, Math.round(w * k)); cv.height = Math.max(2, Math.round(h * k)); cv.getContext('2d').drawImage(src, 0, 0, cv.width, cv.height); return cv; }
+    // Vorschaubild für Bunny im Format des fertigen Videos (Mitte ausgeschnitten wie im Video)
+    async function covThumb() {
+      const cv = await covCanvas(); if (!cv) return null; const v = K('resv'), W = v.videoWidth || 1280, H = v.videoHeight || 720, k = Math.min(1, 1600 / Math.max(W, H));
+      const o2 = document.createElement('canvas'); o2.width = Math.round(W * k); o2.height = Math.round(H * k); const ra = cv.width / cv.height, ro = o2.width / o2.height;
+      let sw = cv.width, sh = cv.height; if (ra > ro) sw = sh * ro; else sh = sw / ro;
+      o2.getContext('2d').drawImage(cv, (cv.width - sw) / 2, (cv.height - sh) / 2, sw, sh, 0, 0, o2.width, o2.height);
+      return new Promise(ok => o2.toBlob(ok, 'image/jpeg', .9)); }
+
+    // ---- Wohin kommt das Video? (Vivien, 30.10.2026: „hochladen, dann soll es direkt drin sein“) ----
+    function curTg() { return (drList.find(x => x.id === curDraft) || {}).tg || null; }
+    const LGN = { de: 'Deutsch', en: 'Englisch' };
+    const dShort = d => { if (!d) return ''; const x = new Date(d + 'T12:00:00'); return isNaN(x) ? '' : ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][x.getDay()] + ' ' + x.getDate() + '.' + (x.getMonth() + 1) + '.'; };
+    function tgLabel(t) { if (!t) return ''; return t.k === 'talk' ? '„' + t.n + '“ · ' + (LGN[t.lang] || '') : t.k === 'clip' ? 'Übung „' + t.n + '“' : (t.kind === 'reel' ? 'Reel' : 'Story') + ' für ' + dShort(t.due) + ' · „' + t.n + '“'; }
+    const tgKey = t => t ? (t.k === 'talk' ? 't' + t.id + t.lang : t.k === 'clip' ? 'c' + t.c : 'i' + t.id) : '';
+    function doneLbl() { K('done').textContent = curTg() && o.upload ? '✓ Fertig stellen & hochladen' : '✓ Fertig stellen'; }
+    function tgUi() {
+      const box = K('tg'); if (!o.upload) { box.hidden = true; return; } const t = curTg(); box.classList.toggle('on', !!t);
+      K('tgT').innerHTML = t ? '📤 Kommt hinein in: <b>' + esc(tgLabel(t)) + '</b><small>' + (t.due ? 'fertig bis ' + esc(dShort(t.due)) + ' · ' : '') + '„Fertig stellen“ lädt es gleich dorthin hoch.</small>'
+        : '📤 <b>Wohin kommt das Video?</b><small>Auswählen, dann lädt „Fertig stellen“ es gleich an die richtige Stelle. Ohne Auswahl kannst du es nur sichern oder herunterladen.</small>';
+      K('tgBtn').textContent = t ? 'Ändern' : 'Auswählen'; doneLbl();
+    }
+    let targets = null, upWanted = false;
+    async function tgOpen(force) {
+      const s = K('tgSel'); if (!s.hidden && !force) { s.hidden = true; return; } s.hidden = false; s.innerHTML = '<option>Wird geladen …</option>';
+      if (!targets) { try { targets = await o.targets(); } catch (e) { targets = []; } }
+      const now = tgKey(curTg()), open = targets.filter(t => !t.done), fin = targets.filter(t => t.done);
+      const opt = t => '<option value="' + esc(tgKey(t)) + '"' + (tgKey(t) === now ? ' selected' : '') + '>' + esc((t.due ? dShort(t.due) + ' · ' : '') + (t.k === 'talk' ? '🗣 ' : t.k === 'clip' ? '🧘 ' : '📱 ') + tgLabel(t)) + '</option>';
+      s.innerHTML = '<option value="">— Nirgends, nur sichern oder herunterladen —</option>' + (open.length ? '<optgroup label="Noch offen · nach Datum">' + open.map(opt).join('') + '</optgroup>' : '')
+        + (fin.length ? '<optgroup label="Schon hochgeladen · wird ersetzt">' + fin.map(opt).join('') + '</optgroup>' : '');
+      if (now && !targets.some(t => tgKey(t) === now)) s.insertAdjacentHTML('beforeend', '<option value="' + esc(now) + '" selected>' + esc(tgLabel(curTg())) + '</option>');
+    }
+    K('tgBtn').onclick = () => tgOpen();
+    K('tgSel').onchange = async () => {
+      const v = K('tgSel').value, d = drList.find(x => x.id === curDraft); if (!d) return;
+      const t = v ? ((targets || []).find(x => tgKey(x) === v) || (tgKey(d.tg) === v ? d.tg : null)) : null;
+      d.tg = t ? { k: t.k, id: t.id, c: t.c, lang: t.lang, n: t.n, g: t.g, due: t.due, kind: t.kind } : null; d.up = null;
+      if (t && !d.name) d.name = t.k === 'talk' ? t.n + (t.lang === 'en' ? ' (EN)' : '') : t.k === 'clip' ? 'Übung · ' + t.n : (t.kind === 'reel' ? 'Reel ' : 'Story ') + t.due;
+      await draftsSave(drList).catch(() => {}); K('tgSel').hidden = true; if (!cov || cov.auto) { covDefault(); covChanged(); } drawDrafts();
+      say(t ? '📤 Kommt hinein in: ' + tgLabel(t) : 'Ohne Ziel: nach dem Fertigstellen sichern oder herunterladen.', 'ok');
+      if (t && result && upWanted) { upWanted = false; doUpload(); }
+    };
+
+    let result = null, upping = false;
+    const extOf = b => /quicktime/.test(b.type || '') ? 'mov' : /webm/.test(b.type || '') ? 'webm' : 'mp4';
     K('done').onclick = async () => {
-      if (busy || !clips.length) return; stop(); busy = true; root.classList.add('sn-busy'); K('done').disabled = true; K('res').hidden = true;
+      if (busy || !clips.length) return; stop(); covShow(false); busy = true; root.classList.add('sn-busy'); K('done').disabled = true; K('res').hidden = true;
       const bar = K('prog'), fill = bar.querySelector('i'); bar.hidden = false; fill.style.width = '0%'; say('Wird vorbereitet …');
       let nb = null, fast = true;
       try { nb = await fastRender(fill); } catch (e) { console.warn('schnitt fast', e); nb = null; }
@@ -1062,18 +1264,38 @@ void main(){
       busy = false; root.classList.remove('sn-busy'); K('done').disabled = false; bar.hidden = true;
       if (nb === 'x' || closed) return;
       if (!nb || nb.size < 1000) { say('Das hat nicht geklappt. Bitte nochmal „Fertig stellen“ tippen (am besten in Safari oder Chrome).', 'bad'); return; }
-      result = nb; const url = URL.createObjectURL(nb), ext = nb.type.includes('mp4') ? 'mp4' : 'webm';
+      result = nb; const url = URL.createObjectURL(nb), ext = extOf(nb), tg = curTg();
       const d = new Date(), stamp = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') + '_' + String(d.getHours()).padStart(2, '0') + '-' + String(d.getMinutes()).padStart(2, '0');
-      K('resv').src = url; K('dl').href = url; K('dl').download = 'Movecia_Schnitt_' + stamp + '.' + ext; K('res').hidden = false;
+      const base = tg ? String(tg.n + (tg.lang === 'en' ? ' EN' : '')).replace(/[^\wäöüÄÖÜß-]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 48) || 'Movecia' : 'Movecia_Schnitt';
+      K('resv').src = url; K('dl').href = url; K('dl').download = base + '_' + stamp + '.' + ext; K('res').hidden = false; K('up').hidden = true;
       const canSh = !!(navigator.canShare && (() => { try { return navigator.canShare({ files: [new File([nb], 'v.' + ext, { type: nb.type })] }); } catch (e) { return false; } })());
       K('share').hidden = !canSh; K('dl').className = 'sn-b' + (canSh ? '' : ' pl');
-      K('resN').textContent = fmt(total()) + ' · ' + clips.length + (clips.length > 1 ? ' Clips' : ' Clip') + (mlist.length ? ' · mit Musik' : '') + (fast ? '' : ' · in Echtzeit gespeichert');
-      say(canSh ? '✓ Fertig. Schau es dir an, dann „In Fotos sichern“ (landet direkt in deiner Galerie) oder im Studio hochladen.' : '✓ Fertig. Schau es dir an, dann herunterladen oder im Studio hochladen.', 'ok'); K('res').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      K('resN').textContent = fmt(total() + CD()) + ' · ' + clips.length + (clips.length > 1 ? ' Clips' : ' Clip') + (CD() ? ' · mit Titelbild' : '') + (mlist.length ? ' · mit Musik' : '') + (fast ? '' : ' · in Echtzeit gespeichert');
       try { await kvSet('result', { blob: nb, at: Date.now(), draft: drName(curDraft) }); } catch (e) {}
+      K('res').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (tg && o.upload) await doUpload();
+      else say(canSh ? '✓ Fertig. Schau es dir an, dann „In Fotos sichern“ (landet direkt in deiner Galerie)' + (o.upload ? ' oder „⬆ Hochladen“.' : '.') : '✓ Fertig. Schau es dir an, dann herunterladen' + (o.upload ? ' oder „⬆ Hochladen“.' : '.'), 'ok');
     };
-    K('share').onclick = async () => { if (!result) return; const ext = result.type.includes('mp4') ? 'mp4' : 'webm'; try { await navigator.share({ files: [new File([result], K('dl').download || ('video.' + ext), { type: result.type })] }); } catch (e) {} };
+    async function doUpload() {
+      const tg = curTg(); if (!result || !tg || !o.upload || upping) return; upping = true;
+      const box = K('up'); box.hidden = false; box.className = 'sn-up run';
+      box.innerHTML = '<b>⬆ Wird hochgeladen …</b><span data-k2="upt">' + esc(tgLabel(tg)) + '</span><div class="sn-prog"><i></i></div><small>Bitte die Seite offen lassen, bis hier „Ist drin“ steht.</small>';
+      const fillU = box.querySelector('.sn-prog i'), txt = box.querySelector('[data-k2=upt]'); if (K('upBtn')) K('upBtn').disabled = true;
+      say('⬆ Wird hochgeladen … Seite bitte offen lassen.');
+      let r = null; try { r = await o.upload(result, tg, p => { const pc = Math.round(Math.max(0, Math.min(1, p)) * 100); fillU.style.width = pc + '%'; txt.textContent = tgLabel(tg) + ' · ' + pc + ' %'; }, extOf(result)); } catch (e) { r = { error: (e && e.message) || '' }; }
+      upping = false; if (K('upBtn')) K('upBtn').disabled = false;
+      if (!r || r.error) { box.className = 'sn-up bad'; box.innerHTML = '<b>Hochladen hat nicht geklappt</b>' + esc((r && r.error) || 'Die Verbindung ist abgebrochen.') + '<div class="sn-row"><button type="button" class="sn-b pl" data-k2="again">⬆ Nochmal hochladen</button></div><small>Dein Video ist nicht verloren, es liegt hier fertig. Du kannst es auch zuerst „In Fotos sichern“.</small>';
+        box.querySelector('[data-k2=again]').onclick = doUpload; say('Hochladen hat nicht geklappt. Tipp auf „Nochmal hochladen“.', 'bad'); return; }
+      if (r.guid && CD() && o.thumb) { try { const tb = await covThumb(); if (tb) await o.thumb(r.guid, tb); } catch (e) { console.warn('Vorschaubild', e); } }
+      const dd = drList.find(x => x.id === curDraft); if (dd) { dd.up = { at: Date.now(), guid: r.guid || '' }; await draftsSave(drList).catch(() => {}); drawDrafts(); }
+      if (targets) { const tt = targets.find(x => tgKey(x) === tgKey(tg)); if (tt) tt.done = true; }
+      box.className = 'sn-up'; box.innerHTML = '<b>✓ Ist drin!</b>' + esc(tgLabel(tg)) + ' ist hochgeladen.' + (r.note ? ' ' + esc(r.note) : '')
+        + (o.calUrl ? '<div class="sn-row"><a class="sn-b pl" href="' + esc(o.calUrl) + '">📅 Zurück zum Kalender</a></div>' : '');
+      say('✓ Hochgeladen: ' + tgLabel(tg), 'ok');
+    }
+    if (K('upBtn')) K('upBtn').onclick = () => { if (!result) return; if (curTg()) { doUpload(); return; } upWanted = true; tgOpen(true); K('tg').scrollIntoView({ behavior: 'smooth', block: 'start' }); say('Wähl oben aus, wohin das Video kommt, dann lade ich es gleich hoch.'); };
+    K('share').onclick = async () => { if (!result) return; const ext = extOf(result); try { await navigator.share({ files: [new File([result], K('dl').download || ('video.' + ext), { type: result.type })] }); } catch (e) {} };
     K('resX').onclick = () => { K('res').hidden = true; };
-    if (K('toStudio')) K('toStudio').onclick = async () => { if (!result) return; try { await kvSet('result', { blob: result, at: Date.now() }); } catch (e) {} o.toStudio(result); };
     K('dl').addEventListener('click', () => {});
 
     function close() { closed = true; stop(); try { pre.pause(); } catch (e) {} clips.forEach(c => URL.revokeObjectURL(c.url)); mount.innerHTML = ''; }
@@ -1083,6 +1305,8 @@ void main(){
   // Fertiges Video aus dem Schnitt holen (für das Studio) und wieder vergessen
   async function takeResult() { try { const r = await kvGet('result'); if (r && r.blob) { await kvDel('result'); return r.blob; } } catch (e) {} return null; }
   // Entwurf (nach Name) zum offenen machen – das Studio ruft das vor dem Wechsel in den Schnitt auf
-  async function setDraft(name) { const id = await draftFor(name); await kvSet('cur', id); return id; }
+  async function setDraft(name, target) { const id = await draftFor(name); await kvSet('cur', id);
+    if (target) { const l = await drafts(), d = l.find(x => x.id === id); if (d) { d.tg = target; d.up = null; await draftsSave(l); } }
+    return id; }
   window.Schnitt = { open, addTake, takeResult, draftFor, setDraft, drafts };
 })();
