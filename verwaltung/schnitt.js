@@ -9,7 +9,9 @@
  *   Zoom hinein/heraus im Wechsel (kaschiert die Schnitte). Analyse in schnitt-auto.js (bei Bedarf geladen), Rückgängig möglich.
  * - Alle Clips liegen in IndexedDB auf dem Gerät („mv-schnitt“), bis Vivien sie löscht. Das Studio legt Takes dort ab.
  *   Clips aus derselben Datei teilen sich ein <video>-Element (viele Abschnitte = kein Speicherproblem).
- * Schnitt.open({mount, musicUrl, onDone(blob), toStudio(blob)}) · Schnitt.addTake(blob, name) (aus dem Studio)
+ * - Entwürfe (Vivien, 30.10.2026): jedes Video ist ein eigener Entwurf. Erst alle Aufnahmen machen, später in Ruhe schneiden.
+ *   Takes aus dem Studio landen automatisch im Entwurf mit dem Namen der Lektion.
+ * Schnitt.open({mount, musicUrl, onDone(blob), toStudio(blob)}) · Schnitt.addTake(blob, name, {draft, open}) (aus dem Studio)
  */
 (function () {
   'use strict';
@@ -27,10 +29,41 @@
   const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const ls = { get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
 
+  // ---- Entwürfe: je Video ein eigener (Clips tragen die Entwurfs-Nummer) ----
+  const ordKey = id => 'order:' + id;
+  async function drafts() { return (await kvGet('drafts')) || []; }
+  async function draftsSave(l) { await kvSet('drafts', l); }
+  // Sorgt dafür, dass es einen aktuellen Entwurf gibt; holt alte Clips ohne Entwurf einmalig hinein
+  async function ensureDraft() {
+    let l = await drafts(), cur = await kvGet('cur');
+    const all = await dbAll(), alt = all.filter(c => !c.draft);
+    if (alt.length && !l.some(d => d.migrated)) {
+      const d = { id: uid(), name: 'Mein Schnitt', at: Date.now(), migrated: true };
+      l.unshift(d); await draftsSave(l);
+      const ord = (await kvGet('order')) || alt.map(c => c.id);
+      for (const c of alt) { c.draft = d.id; await dbPut(c); }
+      await kvSet(ordKey(d.id), ord.filter(x => alt.some(c => c.id === x))); cur = d.id; await kvSet('cur', cur);
+    }
+    if (!l.length) { const d = { id: uid(), name: '', at: Date.now() }; l = [d]; await draftsSave(l); cur = d.id; await kvSet('cur', cur); }
+    if (!cur || !l.some(d => d.id === cur)) { cur = l[0].id; await kvSet('cur', cur); }
+    return cur;
+  }
+  // Entwurf mit diesem Namen finden oder anlegen
+  async function draftFor(name) {
+    const n = String(name || '').trim(); if (!n) return ensureDraft();
+    const l = await drafts(); const hit = l.find(d => (d.name || '').toLowerCase() === n.toLowerCase());
+    if (hit) return hit.id;
+    const d = { id: uid(), name: n, at: Date.now() }; l.unshift(d); await draftsSave(l); return d.id;
+  }
   // Ein Take aus dem Studio in den Schnitt legen (bleibt auf dem Gerät)
-  async function addTake(blob, name) {
-    const c = { id: uid(), blob, name: name || 'Aufnahme', added: Date.now(), in: 0, out: 0, mute: false };
-    await dbPut(c); const order = (await kvGet('order')) || []; order.push(c.id); await kvSet('order', order); return c.id;
+  async function addTake(blob, name, opt) {
+    opt = opt || {};
+    const did = opt.draft ? await draftFor(opt.draft) : await ensureDraft();
+    const c = { id: uid(), blob, name: name || 'Aufnahme', added: Date.now(), in: 0, out: 0, mute: false, draft: did };
+    await dbPut(c); const order = (await kvGet(ordKey(did))) || []; order.push(c.id); await kvSet(ordKey(did), order);
+    const l = await drafts(); const d = l.find(x => x.id === did); if (d) { d.at = Date.now(); await draftsSave(l); }
+    if (opt.open) await kvSet('cur', did);
+    return c.id;
   }
 
   const CSS = `
@@ -104,6 +137,16 @@
 .sn-zt-bar input[type=range]{flex:1;min-width:90px;max-width:220px;accent-color:#7D5E68}
 .sn-zt-bar .zb{font:inherit;font-size:18px;width:36px;height:36px;border-radius:50%;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer}
 .sn-zt-hint{font-size:14px;color:#7D7076;margin:6px 2px 0;line-height:1.45}
+.sn-box.dr{background:linear-gradient(135deg,#FBF8F4,#EFEAE2);border-color:#DDD2C6}
+.sn-dr-name{width:100%;font:inherit;font-size:18px;padding:10px 12px;border-radius:14px;border:1.5px solid #DDD2C6;background:#fff;color:#2E2529}
+.sn-dr-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto}
+.sn-dr-list li{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #E6DCD2;border-radius:16px;padding:8px 10px}
+.sn-dr-list li.on{border-color:#7D5E68;box-shadow:0 0 0 2px #7D5E68 inset}
+.sn-dr-list li span{flex:1;min-width:0;font-size:16px;color:#2E2529;line-height:1.3}
+.sn-dr-list li small{display:block;color:#7D7076;font-size:13px}
+.sn-dr-list li button{font:inherit;flex:0 0 auto;border-radius:999px;border:1.5px solid #DDD2C6;background:#FBF8F4;color:#4A3A41;cursor:pointer;min-height:38px;padding:5px 12px;font-size:15px}
+.sn-dr-list li button.x{color:#8C2C1D;border-color:#E2C4BC;padding:5px 10px}
+.sn-dr-cur{font-size:15px;color:#6E6168}
 @media(max-width:980px){.sn-zt-in{height:92px}.sn-zt-hint{font-size:13px}}
 .sn-r{display:flex;flex-direction:column;gap:14px;min-width:0}
 .sn-box{background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:22px;padding:14px 16px}
@@ -177,12 +220,12 @@ void main(){
     </div>
     <p class="sn-zt-hint" data-k="zthint">Tippen = Stelle anspringen · die Griffe <b>⟦ ⟧</b> an den Rändern ziehen = Anfang und Ende länger oder kürzer machen · zwei Finger auseinander (oder ＋) = Zeitleiste auseinanderziehen</p>
   </div>
-  <h2 style="margin-top:16px">Deine Clips <span style="font-size:16px;color:#7D7076;font-family:'Hanken Grotesk',sans-serif;font-weight:400" data-k="cnt"></span></h2>
+  <h2 style="margin-top:16px" data-k="h2">Deine Clips <span style="font-size:16px;color:#7D7076;font-family:'Hanken Grotesk',sans-serif;font-weight:400" data-k="cnt"></span></h2>
   <div class="sn-clips" data-k="clips"></div>
   <div class="sn-row" style="margin-top:0">
     <label class="sn-b pl" style="cursor:pointer">＋ Clips vom Gerät<input type="file" accept="video/*,.mov,.mp4,.m4v,.webm" multiple hidden data-k="file"></label>
     ${o.studioUrl ? `<a class="sn-b" href="${esc(o.studioUrl)}">● Im Studio aufnehmen</a>` : ''}
-    <button type="button" class="sn-b sm del" data-k="clearAll">Alle Clips löschen</button>
+    <button type="button" class="sn-b sm del" data-k="clearAll">Clips dieses Entwurfs löschen</button>
   </div>
   <div class="sn-ed" data-k="ed" hidden>
     <div class="h"><b data-k="edT"></b><span data-k="edD"></span></div>
@@ -217,6 +260,13 @@ void main(){
   </div>
 </div>
 <div class="sn-r">
+  <details class="sn-box dr" open><summary>📝 Entwürfe</summary><div class="bd">
+    <div><label style="display:block;font-size:16px;color:#4A3A41;margin-bottom:4px">Woran arbeitest du gerade?</label>
+      <input type="text" class="sn-dr-name" maxlength="60" placeholder="z. B. The Method · Morgen-Flow" data-k="drName"></div>
+    <p class="sn-note">Jede Aufnahme und jeder Schnitt gehört zu einem Entwurf. So kannst du zuerst alle Videos aufnehmen und später in Ruhe eines nach dem anderen fertig schneiden. Alles bleibt auf diesem Gerät gespeichert.</p>
+    <ul class="sn-dr-list" data-k="drList"></ul>
+    <button type="button" class="sn-b" data-k="drNew">＋ Neuer Entwurf</button>
+  </div></details>
   <details class="sn-box auto" open><summary>✨ Automatisch schneiden</summary><div class="bd">
     <p class="sn-note" style="color:#4A3A41">Ein Tipp, und ich schneide Pausen raus, nehme heraus, wo du dich erst zurechtsetzt oder neu angesetzt hast, und lege einen sanften Zoom über die Abschnitte, damit es sich flüssig und lebendig anschaut. Danach siehst du jeden Schnitt in der Zeitleiste und kannst ihn mit den Griffen länger oder kürzer ziehen.</p>
     <button type="button" class="sn-b main" data-k="auto" style="font-size:18px;min-height:52px">✨ Jetzt automatisch schneiden</button>
@@ -251,7 +301,7 @@ void main(){
     const say = (t, c) => { msg.className = 'sn-msg' + (c ? ' ' + c : ''); msg.textContent = t; };
 
     // ---- Zustand ----
-    let clips = [], sel = -1, closed = false, busy = false;
+    let clips = [], sel = -1, closed = false, busy = false, curDraft = null, drList = [];
     const st = Object.assign({ look: 'natur', br: 1, ct: 1, sa: 1, se: 0, fmt: 'orig' }, ls.get('sn-st', {}));
     const mus = Object.assign({ vol: .18, voice: 1, duck: true, fade: true }, ls.get('sn-mus', {}));
     const auto = Object.assign({ pause: .7, stumbles: true, zoom: true, noise: true }, ls.get('sn-auto', {}));
@@ -274,7 +324,7 @@ void main(){
     const zAt = (c, off) => { if (!c || !c.zoom) return 1; const L = len(c) || 1, p = Math.max(0, Math.min(1, off / L)); return c.zoom[0] + (c.zoom[1] - c.zoom[0]) * p; };
     // MediaRecorder-Dateien kennen ihre Länge oft nicht: einmal ans Ende springen
     async function probeDur(c, v) { try { v.currentTime = 1e7; await new Promise(r => { v.onseeked = r; setTimeout(r, 2500); }); c.dur = isFinite(v.duration) && v.duration > 0 ? v.duration : (v.currentTime || 1); v.currentTime = 0; } catch (e) { c.dur = c.dur || 1; } if (!c.out || c.out > c.dur) c.out = c.dur; dbPut(dbRow(c)); ui(); }
-    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto });
+    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft });
     const len = c => Math.max(0, (c.out || c.dur || 0) - (c.in || 0));
     const total = () => clips.reduce((a, c) => a + len(c), 0);
     const tv = document.createElement('video'); tv.muted = true; tv.playsInline = true; tv.preload = 'auto'; let thumbQ = Promise.resolve();
@@ -293,21 +343,63 @@ void main(){
     // ---- Laden ----
     async function load() {
       try {
-        const rows = await dbAll(), order = (await kvGet('order')) || [];
+        curDraft = await ensureDraft(); drList = await drafts();
+        const all = await dbAll(), rows = all.filter(r => r.draft === curDraft), order = (await kvGet(ordKey(curDraft))) || [];
         rows.sort((a, b) => (order.indexOf(a.id) + 1 || 1e9) - (order.indexOf(b.id) + 1 || 1e9) || a.added - b.added);
         const urls = new Map(); clips = rows.map(r => { let u = urls.get(r.blob); if (!u) { u = URL.createObjectURL(r.blob); urls.set(r.blob, u); } return Object.assign({}, r, { url: u }); });
         slots(); if (clips.length) { sel = 0; vidFor(clips[0]); prep(1); }
-        ui(); clips.forEach(thumb);
+        drawDrafts(); ui(); clips.forEach(thumb);
       } catch (e) { say('Die gespeicherten Clips konnten nicht geladen werden.', 'bad'); }
     }
+    // ---- Entwürfe ----
+    const drName = id => { const d = drList.find(x => x.id === id); return (d && d.name) || 'Ohne Namen'; };
+    async function drawDrafts() {
+      if (closed) return;
+      const inp = K('drName'); if (document.activeElement !== inp) inp.value = (drList.find(d => d.id === curDraft) || {}).name || '';
+      const all = await dbAll().catch(() => []);
+      const info = {}; all.forEach(c => { const k = c.draft; if (!k) return; const i = info[k] || (info[k] = { n: 0, sec: 0 }); i.n++; i.sec += Math.max(0, (c.out || c.dur || 0) - (c.in || 0)); });
+      const when = t => { const d = new Date(t || 0), h = new Date(), s2 = x => String(x).padStart(2, '0');
+        return (d.toDateString() === h.toDateString() ? 'heute' : d.getDate() + '.' + (d.getMonth() + 1) + '.') + ' ' + s2(d.getHours()) + ':' + s2(d.getMinutes()); };
+      const L = drList.slice().sort((a, b) => (b.at || 0) - (a.at || 0));
+      K('drList').innerHTML = L.map(d => { const i = info[d.id] || { n: 0, sec: 0 }, on = d.id === curDraft;
+        return `<li class="${on ? 'on' : ''}"><span>${esc(d.name || 'Ohne Namen')}<small>${i.n ? i.n + (i.n > 1 ? ' Clips' : ' Clip') + (i.sec > .05 ? ' · ' + fmt(i.sec) : '') : 'noch leer'} · ${when(d.at)}${on ? ' · offen' : ''}</small></span>`
+          + (on ? '' : `<button type="button" data-dopen="${d.id}">Öffnen</button>`)
+          + `<button type="button" class="x" data-ddel="${d.id}" aria-label="Entwurf löschen" title="Entwurf löschen">🗑</button></li>`; }).join('');
+      K('drList').querySelectorAll('[data-dopen]').forEach(b => b.onclick = () => openDraft(b.dataset.dopen));
+      K('drList').querySelectorAll('[data-ddel]').forEach(b => b.onclick = () => delDraft(b.dataset.ddel));
+      K('h2').firstChild.textContent = (drList.find(d => d.id === curDraft) || {}).name ? 'Clips in „' + drName(curDraft) + '“ ' : 'Deine Clips ';
+    }
+    K('drName').oninput = () => { const d = drList.find(x => x.id === curDraft); if (!d) return; d.name = K('drName').value.trim().slice(0, 60); d.at = Date.now(); draftsSave(drList).catch(() => {}); clearTimeout(K('drName')._t); K('drName')._t = setTimeout(drawDrafts, 600); };
+    async function openDraft(id) {
+      if (busy || id === curDraft) return; stop();
+      clips.forEach(c => { if (!clips.some(x => x !== c && x.url === c.url)) URL.revokeObjectURL(c.url); });
+      clips = []; dropVids(); sel = -1; pos = 0; undoRows = null; autoLog = []; lastSum = null; K('undo').hidden = true; autoResUi(null);
+      await kvSet('cur', id).catch(() => {}); K('res').hidden = true;
+      await load(); say('📝 „' + drName(id) + '“ ist offen.', 'ok');
+    }
+    async function delDraft(id) {
+      const nm = drName(id); if (!confirm('Entwurf „' + nm + '“ mit allen Clips von diesem Gerät löschen?')) return;
+      const all = await dbAll(); for (const c of all) if (c.draft === id) await dbDel(c.id);
+      await kvDel(ordKey(id)).catch(() => {});
+      drList = (await drafts()).filter(d => d.id !== id); await draftsSave(drList);
+      if (id === curDraft) { clips.forEach(c => URL.revokeObjectURL(c.url)); clips = []; dropVids(); sel = -1; pos = 0; await kvDel('cur').catch(() => {}); await load(); }
+      else drawDrafts();
+      say('🗑 „' + nm + '“ gelöscht.');
+    }
+    K('drNew').onclick = async () => {
+      if (busy) return; const d = { id: uid(), name: '', at: Date.now() };
+      drList = await drafts(); drList.unshift(d); await draftsSave(drList);
+      await openDraft(d.id); K('drName').focus();
+    };
     async function addFiles(files) {
       let n = 0;
-      for (const f of files) { if (!f || !f.size) continue; const c = { id: uid(), blob: f, name: f.name.replace(/\.\w+$/, ''), added: Date.now() + n, in: 0, out: 0, mute: false, dur: 0 }; c.url = URL.createObjectURL(f); clips.push(c); await dbPut(dbRow(c)); slots(); vidFor(c); thumb(c); n++; }
-      await saveOrder(); if (sel < 0 && clips.length) sel = 0; if (n) say('✓ ' + n + (n > 1 ? ' Clips' : ' Clip') + ' dazu. Tipp auf einen Clip, um Anfang und Ende zu setzen.', 'ok'); ui();
+      for (const f of files) { if (!f || !f.size) continue; const c = { id: uid(), blob: f, name: f.name.replace(/\.\w+$/, ''), added: Date.now() + n, in: 0, out: 0, mute: false, dur: 0, draft: curDraft }; c.url = URL.createObjectURL(f); clips.push(c); await dbPut(dbRow(c)); slots(); vidFor(c); thumb(c); n++; }
+      await saveOrder(); await touch(); if (sel < 0 && clips.length) sel = 0; if (n) say('✓ ' + n + (n > 1 ? ' Clips' : ' Clip') + ' dazu. Tipp auf einen Clip, um Anfang und Ende zu setzen.', 'ok'); ui();
     }
-    const saveOrder = () => kvSet('order', clips.map(c => c.id)).catch(() => {});
+    const saveOrder = () => kvSet(ordKey(curDraft), clips.map(c => c.id)).catch(() => {});
+    const touch = async () => { const d = drList.find(x => x.id === curDraft); if (d) { d.at = Date.now(); await draftsSave(drList).catch(() => {}); drawDrafts(); } };
     K('file').onchange = e => { addFiles([...e.target.files]); e.target.value = ''; };
-    K('clearAll').onclick = async () => { if (!clips.length || !confirm('Wirklich alle ' + clips.length + ' Clips von diesem Gerät löschen?')) return; stop(); for (const c of clips) { await dbDel(c.id); } const urls = new Set(clips.map(c => c.url)); clips = []; dropVids(); urls.forEach(u => URL.revokeObjectURL(u)); sel = -1; await saveOrder(); undoRows = null; K('undo').hidden = true; K('autoRes').hidden = true; ui(); say('Alle Clips gelöscht.'); };
+    K('clearAll').onclick = async () => { if (!clips.length || !confirm('Wirklich alle ' + clips.length + ' Clips von diesem Gerät löschen?')) return; stop(); for (const c of clips) { await dbDel(c.id); } const urls = new Set(clips.map(c => c.url)); clips = []; dropVids(); urls.forEach(u => URL.revokeObjectURL(u)); sel = -1; await saveOrder(); undoRows = null; K('undo').hidden = true; K('autoRes').hidden = true; drawDrafts(); ui(); say('Alle Clips in „' + drName(curDraft) + '“ gelöscht.'); };
 
     // ---- Vorschau: Clips nacheinander abspielen ----
     let playing = false, pos = 0, raf = 0, cmp = false, prepped = false; // pos = Stelle im Gesamtvideo
@@ -567,7 +659,7 @@ void main(){
     }
     async function keepBack(i) {
       const e = autoLog[i]; if (!e) return; autoLog.splice(i, 1);
-      const c = { id: uid(), blob: e.blob, url: e.url, name: e.name, added: Date.now(), in: e.s, out: e.e, mute: false, dur: e.dur, zoom: null, auto: true };
+      const c = { id: uid(), blob: e.blob, url: e.url, name: e.name, added: Date.now(), in: e.s, out: e.e, mute: false, dur: e.dur, zoom: null, auto: true, draft: curDraft };
       let at = clips.findIndex(x => x.url === e.url && (x.in || 0) >= e.e); if (at < 0) { let last = -1; clips.forEach((x, k) => { if (x.url === e.url) last = k; }); at = last + 1; }
       clips.splice(at, 0, c); if (auto.zoom) assignZoom(clips, true); await dbPut(dbRow(c)); for (const x of clips) if (x.zoom) await dbPut(dbRow(x)); await saveOrder(); sel = at; pos = starts()[sel]; ui(); thumb(c);
       autoResUi(lastSum); say('✓ Die Stelle ist wieder drin (Clip ' + (at + 1) + ').', 'ok');
@@ -591,7 +683,7 @@ void main(){
           const r = SA.analyze(F, 16000, { minPause: auto.pause, stumbles: auto.stumbles, noise: auto.noise !== false });
           if (!r.segs.length) { next.push(Object.assign({}, c, { auto: true })); continue; } // nur Stille erkannt → lieber so lassen
           pn += r.pauses.n; psec += r.pauses.sec; const a0 = c.in || 0;
-          r.segs.forEach((sg, k) => next.push({ id: uid(), blob: c.blob, url: c.url, name: c.name, added: c.added + k, in: a0 + sg.s, out: a0 + sg.e, mute: !!c.mute, dur: c.dur, auto: true, zoom: null }));
+          r.segs.forEach((sg, k) => next.push({ id: uid(), blob: c.blob, url: c.url, name: c.name, added: c.added + k, in: a0 + sg.s, out: a0 + sg.e, mute: !!c.mute, dur: c.dur, auto: true, zoom: null, draft: curDraft }));
           r.cut.forEach(sg => log.push({ url: c.url, blob: c.blob, name: c.name, dur: c.dur, s: a0 + sg.s, e: a0 + sg.e, why: sg.why }));
         }
         if (!next.length) { say('Da war nichts zu schneiden.'); return; }
@@ -733,7 +825,7 @@ void main(){
       K('share').hidden = !canSh; K('dl').className = 'sn-b' + (canSh ? '' : ' pl');
       K('resN').textContent = fmt(total()) + ' · ' + clips.length + (clips.length > 1 ? ' Clips' : ' Clip') + (mfile ? ' · mit Musik' : '') + (fast ? '' : ' · in Echtzeit gespeichert');
       say(canSh ? '✓ Fertig. Schau es dir an, dann „In Fotos sichern“ (landet direkt in deiner Galerie) oder im Studio hochladen.' : '✓ Fertig. Schau es dir an, dann herunterladen oder im Studio hochladen.', 'ok'); K('res').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      try { await kvSet('result', { blob: nb, at: Date.now() }); } catch (e) {}
+      try { await kvSet('result', { blob: nb, at: Date.now(), draft: drName(curDraft) }); } catch (e) {}
     };
     K('share').onclick = async () => { if (!result) return; const ext = result.type.includes('mp4') ? 'mp4' : 'webm'; try { await navigator.share({ files: [new File([result], K('dl').download || ('video.' + ext), { type: result.type })] }); } catch (e) {} };
     K('resX').onclick = () => { K('res').hidden = true; };
@@ -746,5 +838,7 @@ void main(){
   }
   // Fertiges Video aus dem Schnitt holen (für das Studio) und wieder vergessen
   async function takeResult() { try { const r = await kvGet('result'); if (r && r.blob) { await kvDel('result'); return r.blob; } } catch (e) {} return null; }
-  window.Schnitt = { open, addTake, takeResult };
+  // Entwurf (nach Name) zum offenen machen – das Studio ruft das vor dem Wechsel in den Schnitt auf
+  async function setDraft(name) { const id = await draftFor(name); await kvSet('cur', id); return id; }
+  window.Schnitt = { open, addTake, takeResult, draftFor, setDraft, drafts };
 })();

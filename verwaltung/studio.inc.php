@@ -522,7 +522,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
 <script src="/wildhearts/assets/talkcam.js?v=5"></script>
 <script src="studio-edit.js?v=7"></script>
-<script src="schnitt.js?v=4"></script>
+<script src="schnitt.js?v=5"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
@@ -759,7 +759,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   $('stop').onclick=()=>{if(rec&&rec.state==='recording')rec.stop()};
   // Jede Aufnahme wandert sofort in den Schnitt (Vivien, 30.10.2026: „dann ist es einfach weg“) – nichts geht mehr verloren
   async function keepTake(b){ if(!b||typeof Schnitt==='undefined')return;
-    try{ await Schnitt.addTake(b, takeName()); const m=$('kept'); if(m){m.hidden=false} }catch(e){} }
+    try{ await Schnitt.addTake(b, takeName(), {draft:draftName()}); const m=$('kept'); if(m){m.hidden=false;m.innerHTML='✓ sicher im <a href="?view=schnitt" style="color:inherit">Entwurf „'+draftName().replace(/[<>&]/g,'')+'“</a>'} }catch(e){} }
   $('again').onclick=()=>{blob=null;saved=true;$('kept').hidden=true;$('play').removeAttribute('src');$('msg').textContent='';$('prog').hidden=true;prMove(0,true);showAfter();};
   // Sofort löschen (Vivien, 28.10.2026): ohne Nachfrage, kurz rückgängig machbar
   let undo=null,lastRt=-9;
@@ -814,10 +814,16 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     $('dl').href=url;$('dl').download=String($('dl').download||'Video').replace(/(_bearbeitet)?\.\w+$/,'')+(suffix||'')+'.'+ext;$('prog').hidden=true;showAfter();}
   // ✂️ Schnitt (Vivien, 30.10.2026): Aufnahme in den Schnitt legen (bleibt auf dem Gerät), dort mehrere Takes schneiden
   function takeName(){return (tgt&&tgt.ig?tgt.ig.t.slice(0,30):tgt&&tgt.clip?tgt.clip.n:tgt?tgt.t.t+' ('+tgt.lang.toUpperCase()+')':'Aufnahme')}
-  $('edit').onclick=async()=>{if(!blob||typeof Schnitt==='undefined')return;$('edit').disabled=true;try{await Schnitt.addTake(blob,takeName());saved=true;location.href='?view=schnitt'}catch(e){$('edit').disabled=false;$('msg').textContent='Konnte die Aufnahme nicht in den Schnitt legen.'}};
+  // Entwurf je Video (Vivien, 30.10.2026: „erst alle aufnehmen, dann die Entwürfe weiterbearbeiten“)
+  function draftName(){ if(tgt&&tgt.ig)return (tgt.ig.kind==='reel'?'Reel ':'Story ')+tgt.ig.day;
+    if(tgt&&tgt.clip)return 'Übung · '+tgt.clip.n;
+    if(tgt)return tgt.t.t+(tgt.lang==='en'?' (EN)':'');
+    return mvFree?'Bewegungs-Clips':'Eigener Text'; }
+  $('edit').onclick=async()=>{if(!blob||typeof Schnitt==='undefined')return;$('edit').disabled=true;
+    try{ if($('kept').hidden) await Schnitt.addTake(blob,takeName(),{draft:draftName(),open:true}); else await Schnitt.setDraft(draftName()); saved=true;location.href='?view=schnitt'}catch(e){$('edit').disabled=false;$('msg').textContent='Konnte die Aufnahme nicht in den Schnitt legen.'}};
   let takeN=0;
-  $('take').onclick=async()=>{if(!blob||typeof Schnitt==='undefined')return;$('take').disabled=true;try{await Schnitt.addTake(blob,takeName()+' · Take '+(++takeN));saved=true;blob=null;$('play').removeAttribute('src');$('prog').hidden=true;prMove(0,true);showAfter();
-    $('msg').className='msg ok';$('msg').innerHTML='✓ Take '+takeN+' liegt im <a href="?view=schnitt">✂️ Schnitt</a>. Jetzt den nächsten aufnehmen, am Schluss alles zusammenschneiden.'}catch(e){$('msg').textContent='Konnte den Take nicht sichern.'}$('take').disabled=false};
+  $('take').onclick=async()=>{if(!blob||typeof Schnitt==='undefined')return;$('take').disabled=true;try{if($('kept').hidden)await Schnitt.addTake(blob,takeName()+' · Take '+(++takeN),{draft:draftName()});saved=true;$('kept').hidden=true;blob=null;$('play').removeAttribute('src');$('prog').hidden=true;prMove(0,true);showAfter();
+    $('msg').className='msg ok';$('msg').innerHTML='✓ Der Take liegt im Entwurf „'+draftName().replace(/[<>&]/g,'')+'“ (<a href="?view=schnitt">✂️ Schnitt</a>). Jetzt den nächsten aufnehmen, am Schluss alles zusammenschneiden.'}catch(e){$('msg').textContent='Konnte den Take nicht sichern.'}$('take').disabled=false};
   $('editOld').onclick=()=>{if(!blob)return;const d=$('play').duration;
     editor(blob,isFinite(d)?d:0,tgt?(tgt.ig?'Instagram '+(tgt.ig.kind==='reel'?'Reel':'Story')+' für '+tgt.ig.l.split(' · ')[0]+'. Tipp: Format „Hoch 9:16“.':tgt.clip?'Übung „'+tgt.clip.n+'“':'„'+tgt.t.t+'“ · '+(tgt.lang==='de'?'Deutsch':'Englisch'))+'. Danach kannst du direkt hochladen.':'Danach herunterladen.',(nb,inf)=>{
       setBlob(nb,'_bearbeitet');$('msg').className='msg ok';$('msg').textContent='✓ Bearbeitet ('+fmt(inf.dur)+(inf.music?', mit Musik':'')+'). Schau es dir an, dann '+(tgt&&BUNNY?'hochladen oder herunterladen.':'herunterladen.');});};
