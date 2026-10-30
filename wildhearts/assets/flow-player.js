@@ -65,7 +65,7 @@
 .mvf-ph .mk{width:64px;height:64px;opacity:.9}
 .mvf-shade{position:absolute;left:0;right:0;bottom:0;height:55%;background:linear-gradient(to top,rgba(46,37,41,.62),rgba(46,37,41,0));pointer-events:none}
 .mvf-stage{container-type:inline-size}
-/* Übungsname als Welle mit Logo links unten (Vivien, 30.10.2026): läuft rechts in einer Spitze aus, gleitet beim Start herein, nach 6 s weg, Tippen zeigt sie wieder */
+/* Übungsname als Welle mit Logo links unten (Vivien, 30.10.2026): läuft rechts in einer Spitze aus, blendet bei jeder neuen Übung kurz ein und nach 3,5 s wieder aus */
 .mvf-name{position:absolute;left:0;bottom:0;width:70cqw;height:24cqw;max-height:190px;color:#F7F1EE;pointer-events:none;opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
 .mvf-name.on{opacity:1;transform:none}
 .mvf-name svg{position:absolute;inset:0;width:100%;height:100%}
@@ -351,8 +351,7 @@
     root.querySelectorAll('[data-d]').forEach(b => b.addEventListener('click', () => { dur = +b.dataset.d; try { localStorage.setItem('mvf-dur', String(dur)); } catch (e) {} seg(); }));
     seg();
     let nmT = 0;
-    function nameShow() { const w = q('[data-nmw]'); if (!w) return; w.classList.remove('on'); void w.offsetWidth; w.classList.add('on'); clearTimeout(nmT); nmT = setTimeout(() => w.classList.remove('on'), 6000); }
-    q('[data-st]').addEventListener('click', nameShow);
+    function nameShow() { const w = q('[data-nmw]'); if (!w) return; w.classList.remove('on'); void w.offsetWidth; w.classList.add('on'); clearTimeout(nmT); nmT = setTimeout(() => w.classList.remove('on'), 3500); }
     function show(i) {
       const it = items[i];
       q('[data-tag]').textContent = T(`Übung ${i + 1} von ${items.length}`, `Exercise ${i + 1} of ${items.length}`);

@@ -5,6 +5,17 @@
 // Eingebunden aus verwaltung/movecia.php (?view=mediathek), nur angemeldet. Aktionen in method.inc.php (mm_mv_clip_*).
 declare(strict_types=1);
 
+if (!function_exists('mm_cover_wave')) {
+    /** Welle mit Logo und Übungsname als Titelbild-Overlay (gleich wie Entwurf A „Übungs-Einblendung“). */
+    function mm_cover_wave(string $de, string $en): string
+    {
+        $h = 'forma_h';
+        return '<div class="cw" aria-hidden="true"><svg viewBox="0 0 620 240" preserveAspectRatio="none"><defs><linearGradient id="cwg" x1="0" x2="1"><stop offset="0" stop-color="#4A3040" stop-opacity=".94"/><stop offset=".62" stop-color="#4A3040" stop-opacity=".9"/><stop offset="1" stop-color="#4A3040" stop-opacity="0"/></linearGradient><linearGradient id="cwl" x1="0" x2="1"><stop offset="0" stop-color="#B58C99" stop-opacity=".75"/><stop offset=".7" stop-color="#B58C99" stop-opacity=".5"/><stop offset="1" stop-color="#B58C99" stop-opacity="0"/></linearGradient></defs>'
+            . '<path d="M0 64 C110 30 210 98 310 84 S470 66 540 150 C572 188 600 222 620 240 H0Z" fill="url(#cwg)"/><path d="M0 46 C120 14 220 80 320 66 S480 48 560 138 C588 172 606 200 618 222" fill="none" stroke="url(#cwl)" stroke-width="2"/></svg>'
+            . '<div class="in"><img src="/img/movecia/movecia-zeichen-hell.svg" alt=""><div><small>' . $h($en !== $de ? $en : 'Übung') . '</small><b>' . $h($de) . '</b></div></div></div>';
+    }
+}
+
 if ($view === 'mediathek') {
     require_once dirname(__DIR__) . '/api/method-lib.php';
     mv_schema($pdo);
@@ -41,6 +52,18 @@ main{max-width:1200px}
 .mc .v{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:linear-gradient(140deg,#7D5E68,#4A3A41)}
 .mc .v iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .mc .v .e{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#EADFDE;font-size:16px}
+.mc .v .th{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* Titelbild mit Welle + Name (Vivien, 30.10.2026): nur als Cover, beim Abspielen weg */
+.mc .v{container-type:inline-size}
+.cw{position:absolute;left:0;bottom:0;width:78cqw;height:30cqw;pointer-events:none;color:#F7F1EE}
+.cw svg{position:absolute;inset:0;width:100%;height:100%}
+.cw .in{position:absolute;left:max(12px,4.4cqw);right:16cqw;top:38%;bottom:7%;display:flex;align-items:center;gap:max(8px,2.4cqw)}
+.cw .in img{width:max(24px,7.6cqw);height:max(24px,7.6cqw);flex:0 0 auto}
+.cw .in div{min-width:0}
+.cw small{display:block;font-size:max(9px,2.6cqw);letter-spacing:.2em;text-transform:uppercase;opacity:.85;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cw b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:max(17px,6.4cqw);line-height:1.02}
+.mc .v .e{align-items:flex-start;padding-top:14%}
+.mc .v button .pb{position:absolute;right:5cqw;top:5cqw;width:13cqw;height:13cqw;min-width:40px;min-height:40px;border-radius:50%;background:rgba(247,241,238,.9);color:#4A3040;display:flex;align-items:center;justify-content:center;font-size:max(14px,4.4cqw);padding-left:3px}
 .mc .v button{position:absolute;inset:0;width:100%;border:0;background:transparent;color:#FBF5F7;font:inherit;font-size:18px;cursor:pointer}
 .tg{display:flex;flex-wrap:wrap;gap:6px}
 .tg button{font:inherit;font-size:15px;padding:6px 12px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#6B5658;cursor:pointer}
@@ -71,7 +94,7 @@ main{max-width:1200px}
 <?php foreach ($clips as $c): $g = (string)$c['guid']; $use = $usage[$c['ckey']] ?? []; $se = array_filter(explode(',', (string)$c['seasons'])); $sy = array_filter(explode(',', (string)$c['styles'])); ?>
   <div class="mc<?= $g ? ' ok' : '' ?>" data-c="<?= (int)$c['id'] ?>" data-have="<?= $g ? 1 : 0 ?>" data-q="<?= $h(mb_strtolower($c['name_de'] . ' ' . $c['name_en'])) ?>" data-se="<?= $h(implode(',', $se)) ?>" data-sy="<?= $h(implode(',', $sy)) ?>">
     <h3><?= $h($c['name_de']) ?><?php if ($c['name_en'] !== $c['name_de']): ?><small><?= $h($c['name_en']) ?></small><?php endif; ?></h3>
-    <div class="v"><?php if ($g && mv_bunny()['lib'] !== ''): ?><button type="button" data-play="<?= $h(mv_embed($g) . '&autoplay=true&loop=true&muted=true') ?>">▶ Clip ansehen</button><?php else: ?><span class="e">noch kein Clip</span><?php endif; ?></div>
+    <div class="v"><?php $th = $g ? mv_thumb($g) : ''; if ($th !== ''): ?><img class="th" src="<?= $h($th) ?>" alt="" loading="lazy" onerror="this.remove()"><?php endif; ?><?= mm_cover_wave($c['name_de'], $c['name_en']) ?><?php if ($g && mv_bunny()['lib'] !== ''): ?><button type="button" data-play="<?= $h(mv_embed($g) . '&autoplay=true&loop=true&muted=true') ?>" aria-label="Clip ansehen"><span class="pb">▶</span></button><?php else: ?><span class="e">noch kein Clip</span><?php endif; ?></div>
     <span class="msg"><?= $g ? '✓ gefilmt' : 'noch nicht gefilmt' ?><?= $use ? ' · in ' . count($use) . ' ' . (count($use) === 1 ? 'Video' : 'Videos') : ' · gerade in keinem Video' ?><?php $v = $vc[$c['ckey']] ?? []; if ($v): ?><br>🎙 Voice-over gespeichert: Deutsch <?= (int)($v['de'] ?? 0) ?> · Englisch <?= (int)($v['en'] ?? 0) ?><?php endif; ?></span>
     <?php if ($bunny): ?><label class="up<?= $g ? ' again' : '' ?>"><input type="file" accept="video/*" class="vfile"><span><?= $g ? 'Neu hochladen' : '📹 Clip hochladen' ?></span></label><span class="bar" hidden><i></i></span><?php endif; ?>
     <a class="up again" style="text-decoration:none;text-align:center" href="<?= $u('view=studio&c=' . (int)$c['id']) ?>">🧘 Im Studio filmen</a>
