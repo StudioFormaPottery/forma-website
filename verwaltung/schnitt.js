@@ -15,11 +15,35 @@
  */
 (function () {
   'use strict';
-  const DB = 'mv-schnitt', VER = 1;
-  function idb() { return new Promise((ok, no) => { const r = indexedDB.open(DB, VER); r.onupgradeneeded = () => { const d = r.result; if (!d.objectStoreNames.contains('clips')) d.createObjectStore('clips', { keyPath: 'id' }); if (!d.objectStoreNames.contains('kv')) d.createObjectStore('kv'); }; r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error); }); }
-  async function dbAll() { const d = await idb(); return new Promise((ok, no) => { const r = d.transaction('clips').objectStore('clips').getAll(); r.onsuccess = () => ok(r.result || []); r.onerror = () => no(r.error); }); }
-  async function dbPut(c) { const d = await idb(); return new Promise((ok, no) => { const t = d.transaction('clips', 'readwrite'); t.objectStore('clips').put(c); t.oncomplete = ok; t.onerror = () => no(t.error); }); }
-  async function dbDel(id) { const d = await idb(); return new Promise((ok, no) => { const t = d.transaction('clips', 'readwrite'); t.objectStore('clips').delete(id); t.oncomplete = ok; t.onerror = () => no(t.error); }); }
+  const DB = 'mv-schnitt', VER = 2;
+  // Videodateien liegen seit 30.10.2026 einmal je Datei im Speicher „files“, die Clips verweisen nur darauf (fid).
+  // Vorher steckte die ganze Datei in jedem Clip: jeder Schnitt, jedes Löschen, jede Änderung schrieb das
+  // ganze Video (oft mehrere GB) neu auf die Festplatte – deshalb stand der Editor nach „Hier schneiden“ still.
+  let dbP = null;
+  function idb() { if (!dbP) dbP = new Promise((ok, no) => { const r = indexedDB.open(DB, VER); r.onupgradeneeded = () => { const d = r.result; if (!d.objectStoreNames.contains('clips')) d.createObjectStore('clips', { keyPath: 'id' }); if (!d.objectStoreNames.contains('kv')) d.createObjectStore('kv'); if (!d.objectStoreNames.contains('files')) d.createObjectStore('files'); }; r.onsuccess = () => { const d = r.result; d.onversionchange = () => { d.close(); dbP = null; }; ok(d); }; r.onerror = () => { dbP = null; no(r.error); }; r.onblocked = () => {}; }); return dbP; }
+  const fidOf = new WeakMap(); // Blob → schon gespeicherte Datei
+  const req = r => new Promise((ok, no) => { r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error); });
+  async function dbAll() {
+    const d = await idb(), t = d.transaction(['clips', 'files']), rows = (await req(t.objectStore('clips').getAll())) || [];
+    const need = new Set(rows.filter(r => r.fid && !r.blob).map(r => r.fid)), files = new Map();
+    if (need.size) { const st = t.objectStore('files'); await Promise.all([...need].map(async f => { const b = await req(st.get(f)); if (b) { files.set(f, b); fidOf.set(b, f); } })); }
+    rows.forEach(r => { if (r.fid && !r.blob) r.blob = files.get(r.fid) || null; });
+    return rows;
+  }
+  async function dbPut(c) {
+    const d = await idb(), row = Object.assign({}, c); let newFile = null;
+    if (row.blob) { let f = fidOf.get(row.blob); if (!f) { f = 'f' + uid(); newFile = [f, row.blob]; } row.fid = f; }
+    delete row.blob; delete row.url; delete row.thumb; delete row.slot;
+    return new Promise((ok, no) => { const t = d.transaction(['clips', 'files'], 'readwrite'); if (newFile) t.objectStore('files').put(newFile[1], newFile[0]); t.objectStore('clips').put(row);
+      t.oncomplete = () => { if (newFile) fidOf.set(newFile[1], newFile[0]); ok(); }; t.onerror = () => no(t.error); });
+  }
+  async function dbDel(id) {
+    const d = await idb(); const t0 = d.transaction('clips'), row = await req(t0.objectStore('clips').get(id)).catch(() => null);
+    await new Promise((ok, no) => { const t = d.transaction('clips', 'readwrite'); t.objectStore('clips').delete(id); t.oncomplete = ok; t.onerror = () => no(t.error); });
+    const f = row && row.fid; if (!f) return;
+    const rest = (await req(d.transaction('clips').objectStore('clips').getAll())) || [];
+    if (!rest.some(r => r.fid === f)) await new Promise(ok => { const t = d.transaction('files', 'readwrite'); t.objectStore('files').delete(f); t.oncomplete = ok; t.onerror = ok; });
+  }
   async function kvGet(k) { const d = await idb(); return new Promise((ok, no) => { const r = d.transaction('kv').objectStore('kv').get(k); r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error); }); }
   async function kvSet(k, v) { const d = await idb(); return new Promise((ok, no) => { const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = ok; t.onerror = () => no(t.error); }); }
   async function kvDel(k) { const d = await idb(); return new Promise((ok, no) => { const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').delete(k); t.oncomplete = ok; t.onerror = () => no(t.error); }); }
@@ -60,7 +84,7 @@
   async function addTake(blob, name, opt) {
     opt = opt || {};
     const did = opt.draft ? await draftFor(opt.draft, opt.renew) : await ensureDraft();
-    const c = { id: uid(), blob, name: name || 'Aufnahme', added: Date.now(), in: 0, out: 0, mute: false, draft: did }; c.src = c.id;
+    const c = { id: uid(), blob, name: name || 'Aufnahme', added: Date.now(), in: 0, out: 0, mute: false, draft: did, rec: 1 }; c.src = c.id;
     await dbPut(c); const order = (await kvGet(ordKey(did))) || []; order.push(c.id); await kvSet(ordKey(did), order);
     // target = wohin das fertige Video kommt (Lektion + Sprache, Übungs-Clip oder Instagram-Tag), damit „Fertig stellen“ gleich hochlädt
     const l = await drafts(); const d = l.find(x => x.id === did); if (d) { d.at = Date.now(); if (opt.target) { d.tg = opt.target; d.up = null; } await draftsSave(l); }
@@ -513,7 +537,7 @@ void main(){
       return c.zoom[0] + (c.zoom[1] - c.zoom[0]) * p; };
     // MediaRecorder-Dateien kennen ihre Länge oft nicht: einmal ans Ende springen
     async function probeDur(c, v) { try { v.currentTime = 1e7; await new Promise(r => { v.onseeked = r; setTimeout(r, 2500); }); c.dur = isFinite(v.duration) && v.duration > 0 ? v.duration : (v.currentTime || 1); v.currentTime = 0; } catch (e) { c.dur = c.dur || 1; } if (!c.out || c.out > c.dur) c.out = c.dur; dbPut(dbRow(c)); ui(); }
-    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft, src: c.src || null, bro: !!c.bro, osrc: c.osrc || null, ost: c.ost || 0, fr: c.fr || null, zm: c.zm || null, fe: c.fe || 0, trash: c.trash || 0, tpos: c.tpos || 0, fx: c.fx || 0 });
+    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft, src: c.src || null, bro: !!c.bro, osrc: c.osrc || null, ost: c.ost || 0, fr: c.fr || null, zm: c.zm || null, fe: c.fe || 0, trash: c.trash || 0, tpos: c.tpos || 0, fx: c.fx || 0, rec: c.rec || 0 });
     const len = c => Math.max(0, (c.out || c.dur || 0) - (c.in || 0));
     const total = () => clips.reduce((a, c) => a + len(c), 0);
     const tv = document.createElement('video'); tv.muted = true; tv.playsInline = true; tv.preload = 'auto'; let thumbQ = Promise.resolve();
@@ -622,8 +646,8 @@ void main(){
       if (prepRun) return; prepRun = true;
       try {
         for (;;) {
-          if (closed) break; const list = clips.concat(bros).filter(c => !c.fx && c.blob); if (!list.length) break;
-          const c = list[0], key = srcOf(c), size = c.blob.size, same = clips.concat(bros).filter(x => !x.fx && x.blob && x.blob.size === size && srcOf(x) === key);
+          if (closed) break; const list = clips.concat(bros).filter(c => !c.fx && c.blob && c.blob.size < 1.5e9 && (c.rec || /webm/.test(c.blob.type || '') || /webm$|· Take \d|^Aufnahme/i.test(c.name || ''))); if (!list.length) break;
+          const c = list[0], key = srcOf(c), size = c.blob.size, same = clips.concat(bros).filter(x => !x.fx && x.blob && (x.blob === c.blob || (x.blob.size === size && srcOf(x) === key)));
           if (!K('msg').textContent || /vorbereitet/.test(K('msg').textContent)) say('⏳ „' + c.name + '“ wird fürs Schneiden vorbereitet, du kannst schon weitermachen …');
           let r = null; try { r = await remux(c.blob); } catch (e) { console.warn('Schnitt: Vorbereiten nicht möglich', e); }
           while (playing || busy) await new Promise(x => setTimeout(x, 800));
