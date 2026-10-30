@@ -904,7 +904,7 @@ void main(){
     // Ton eines Clips (nur in/out) stückweise in die Analyse füttern
     async function clipFrames(M, SA, c, onProg) {
       const input = new M.Input({ source: new M.BlobSource(c.blob), formats: M.ALL_FORMATS });
-      const at = await input.getPrimaryAudioTrack(); if (!at || !(await at.canDecode())) return null;
+      const at = (await pickAudio(input)).dec; if (!at) return null;
       const sink = new M.AudioBufferSink(at), f = SA.framer(), a = c.in || 0, b = c.out || c.dur || 1e9; let got = 0;
       for await (const x of sink.buffers(a, b)) { if (closed) return null; const ab = x.buffer; const chans = []; for (let k = 0; k < ab.numberOfChannels; k++) chans.push(ab.getChannelData(k));
         // nur den Teil innerhalb von in/out nehmen
@@ -1025,11 +1025,22 @@ void main(){
     const decodeAB = (ab, SR) => new Promise((ok, no) => { const ctx = new OfflineAudioContext(2, 1, SR); let fin = false;
       const r = ctx.decodeAudioData(ab, b => { if (!fin) { fin = true; ok(b); } }, e => { if (!fin) { fin = true; no(e || new Error('decode')); } });
       if (r && r.then) r.then(b => { if (!fin) { fin = true; ok(b); } }, e => { if (!fin) { fin = true; no(e); } }); });
+    // Welche Tonspur? Neuere iPhones speichern zuerst eine „räumliche“ Tonspur (APAC), die Browser nicht lesen können,
+    // und daneben eine normale Stereo-Spur (AAC). Früher wurde nur die erste genommen → kein Ton. Jetzt: die erste lesbare, AAC bevorzugt.
+    async function pickAudio(input) {
+      let list = []; try { list = await input.getAudioTracks(); } catch (e) {}
+      if (!list.length) { try { const p = await input.getPrimaryAudioTrack(); if (p) list = [p]; } catch (e) {} }
+      if (!list.length) return { dec: null, raw: null };
+      const rank = t => ({ aac: 0, opus: 1, mp3: 2, vorbis: 3, flac: 4 }[t.codec] ?? (/^pcm/.test(t.codec || '') ? 5 : 9));
+      const sorted = list.slice().sort((a, b) => rank(a) - rank(b));
+      let dec = null; for (const t of sorted) { try { if (await t.canDecode()) { dec = t; break; } } catch (e) {} }
+      return { dec, raw: sorted.find(t => rank(t) < 9) || sorted[0] };
+    }
     async function voicePieces(M, input, c, SR, whole) { // → { pieces: [{buffer, ts}], fail } · ts = Startzeit im Ausgangsvideo
       const a = c.in || 0, b = c.out || c.dur || 0;
-      let at = null; try { at = await input.getPrimaryAudioTrack(); } catch (e) {}
+      const pk = await pickAudio(input), at = pk.raw;
       if (!at) return { pieces: [] }; // Clip ohne Tonspur: nichts zu tun
-      try { if (await at.canDecode()) { const as = new M.AudioBufferSink(at), out = [];
+      try { if (pk.dec) { const as = new M.AudioBufferSink(pk.dec), out = [];
           for await (const x of as.buffers(Math.max(0, a - 1), b + 1)) { if (closed) return null; out.push({ buffer: x.buffer, ts: x.timestamp }); }
           if (out.length) return { pieces: out }; } } catch (e) { console.warn('Ton (WebCodecs)', e); }
       try { const sink = new M.EncodedPacketSink(at); const p0 = (await sink.getPacket(Math.max(0, a - .5))) || (await sink.getFirstPacket());
