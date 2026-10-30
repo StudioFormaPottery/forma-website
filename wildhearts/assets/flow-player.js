@@ -18,7 +18,7 @@
 .mvf button{font:inherit;color:inherit}
 .mvf button:focus-visible,.mvf a:focus-visible,.mvf input:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
 .mvf svg.i{width:1.15em;height:1.15em;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.mvf .serif{font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500}
+.mvf .serif{font-family:"Hanken Grotesk","Outfit",system-ui,sans-serif;font-weight:400}
 
 /* Start */
 .mvf-intro{position:relative;overflow:hidden;border-radius:30px;padding:clamp(22px,4vw,40px);
@@ -36,7 +36,7 @@
 .mvf-wave{position:absolute!important;z-index:0!important;left:0;right:0;bottom:0;width:100%;height:90px;pointer-events:none;opacity:.6}
 .mvf-eye{display:flex;align-items:center;gap:8px;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--plum);margin:0}
 .mvf-eye i{width:22px;height:1px;background:currentColor;opacity:.5}
-.mvf-title{margin:0;font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-style:italic;font-size:clamp(2rem,5vw,3rem);line-height:1.05;color:var(--deep)}
+.mvf .mvf-title{margin:0;line-height:1.12!important;font-family:"Hanken Grotesk","Outfit",system-ui,sans-serif;font-weight:400;letter-spacing:-.01em;font-size:clamp(1.7rem,4.2vw,2.5rem);line-height:1.1.05;color:var(--deep)}
 .mvf-desc{margin:0;color:#5E5157;line-height:1.6;max-width:38em}
 .mvf-meta{display:flex;flex-wrap:wrap;gap:8px}
 .mvf-chip{display:inline-flex;align-items:center;gap:7px;border-radius:999px;background:rgba(255,255,255,.75);border:1px solid var(--line);padding:7px 14px;font-size:.92rem;color:var(--deep)}
@@ -48,7 +48,7 @@
 .mvf-seg{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:440px}
 .mvf-seg button{border:1.5px solid var(--line);background:rgba(255,255,255,.8);border-radius:22px;padding:14px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:border-color .2s,background .2s,transform .2s}
 .mvf-seg button:hover{transform:translateY(-1px)}
-.mvf-seg b{font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-size:2.2rem;line-height:1;color:var(--deep)}
+.mvf-seg b{font-family:"Hanken Grotesk","Outfit",system-ui,sans-serif;font-weight:400;font-size:1.9rem;line-height:1;color:var(--deep)}
 .mvf-seg span{font-size:.84rem;color:var(--muted)}
 .mvf-seg button[aria-pressed="true"]{border-color:var(--plum);background:var(--blush)}
 .mvf-go{align-self:flex-start;display:inline-flex;align-items:center;gap:12px;border:0;border-radius:999px;background:var(--deep);color:#F7F1EE!important;padding:10px 26px 10px 10px;cursor:pointer;font-size:1.05rem;font-weight:500;box-shadow:0 14px 30px -16px rgba(74,58,65,.7);transition:transform .2s,background .2s}
@@ -69,7 +69,7 @@
 .mvf-ring{transition:opacity .6s}
 .mvf-cd{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#FFFCF8;text-align:center;opacity:0;pointer-events:none;transition:opacity .6s;text-shadow:0 2px 18px rgba(46,29,39,.45)}
 .mvf-stage.ready .mvf-cd{opacity:1}
-.mvf-cd b{font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(4.5rem,16cqw,9rem);line-height:1;font-variant-numeric:tabular-nums}
+.mvf-cd b{font-family:"Hanken Grotesk","Outfit",system-ui,sans-serif;font-weight:400;font-size:clamp(4rem,14cqw,8rem);line-height:1;font-variant-numeric:tabular-nums}
 .mvf-cd span{font-size:clamp(.8rem,2.2cqw,1.05rem);letter-spacing:.18em;text-transform:uppercase;opacity:.9}
 @container (max-width:560px){.mvf-cd{align-items:flex-end;justify-content:flex-start;padding:5% 7% 0 0;text-align:right}.mvf-cd b{font-size:26cqw}.mvf-cd span{font-size:.62rem;letter-spacing:.14em}}
 .mvf-tc{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:6%;color:#FFFCF8;background:#4A3040 center/cover no-repeat;opacity:0;pointer-events:none;transition:opacity .8s ease}
@@ -77,7 +77,7 @@
 .mvf-tc>*{position:relative}
 .mvf-tc.on{opacity:1}
 .mvf-tc small{font-size:clamp(.66rem,1.8cqw,.9rem);letter-spacing:.24em;text-transform:uppercase;opacity:.9}
-.mvf-tc b{font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-style:italic;font-size:clamp(1.8rem,6.5cqw,3.6rem);line-height:1.05;max-width:16em}
+.mvf-tc b{font-family:"Hanken Grotesk","Outfit",system-ui,sans-serif;font-weight:400;letter-spacing:-.01em;font-size:clamp(1.5rem,5.4cqw,3rem);line-height:1.1;max-width:16em}
 .mvf-tc img{width:clamp(40px,8cqw,70px);height:auto}
 .mvf-ph{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;color:#E4DCD1;font-size:.95rem;text-align:center;padding:1rem}
 .mvf-ph .mk{width:64px;height:64px;opacity:.9}
@@ -89,11 +89,11 @@
 .mvf-name svg{position:absolute;inset:0;width:100%;height:100%}
 .mvf-name .in{position:absolute;left:max(16px,4.2cqw);right:14cqw;top:38%;bottom:6%;display:flex;align-items:center;gap:max(10px,2.2cqw)}
 .mvf-name .in>div{min-width:0}
-.mvf-name .in b{font-size:clamp(1.2rem,4.2cqw,2.3rem);line-height:1.05;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-wrap:balance}
-@container (max-width:560px){.mvf-name{width:88cqw;height:44cqw}.mvf-name .in{left:14px;right:30cqw;top:40%;bottom:8%;gap:9px}.mvf-name small{font-size:.54rem;letter-spacing:.16em;margin-bottom:2px}.mvf-name .in b{font-size:clamp(.98rem,5.2cqw,1.3rem)}.mvf-name .in img{width:26px;height:26px}}
+.mvf-name .in b{font-size:clamp(1.05rem,3.8cqw,2rem);line-height:1.05;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-wrap:balance}
+@container (max-width:560px){.mvf-name{width:88cqw;height:44cqw}.mvf-name .in{left:14px;right:30cqw;top:40%;bottom:8%;gap:9px}.mvf-name small{font-size:.54rem;letter-spacing:.16em;margin-bottom:2px}.mvf-name .in b{font-size:clamp(.92rem,4.6cqw,1.2rem)}.mvf-name .in img{width:26px;height:26px}}
 .mvf-name .in img{width:clamp(28px,7.2cqw,58px);height:clamp(28px,7.2cqw,58px)}
 .mvf-name small{display:block;font-size:clamp(.56rem,1.7cqw,.78rem);letter-spacing:.22em;text-transform:uppercase;opacity:.85;margin-bottom:.8cqw}
-.mvf-name b{display:block;font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(1.25rem,5.4cqw,2.6rem);line-height:1}
+.mvf-name b{display:block;font-family:"Hanken Grotesk","Outfit",system-ui,sans-serif;font-weight:400;font-size:clamp(1.1rem,4.6cqw,2.2rem);line-height:1.05}
 @media(prefers-reduced-motion:reduce){.mvf-name{transition:none}}
 .mvf-flag{position:absolute;left:14px;top:14px;font-size:.78rem;border-radius:999px;padding:5px 12px;background:rgba(251,248,244,.9);color:var(--deep)}
 .mvf-ring{position:absolute;right:clamp(12px,2.6vw,22px);bottom:clamp(12px,2.6vw,22px);width:clamp(84px,18vw,128px);aspect-ratio:1}
@@ -101,8 +101,8 @@
 .mvf-ring .t{fill:rgba(255,252,248,.9);stroke:rgba(255,255,255,.35);stroke-width:6}
 .mvf-ring .p{fill:none;stroke:var(--plum);stroke-width:6;stroke-linecap:round;transition:stroke .6s}
 .mvf-ring .n{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--deep)}
-.mvf-ring .n b{font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:600;font-size:clamp(2rem,6vw,3rem);line-height:1;font-variant-numeric:tabular-nums}
-.mvf-ring .n b.mm{font-size:clamp(1.55rem,4.6vw,2.3rem)}
+.mvf-ring .n b{font-family:"Hanken Grotesk","Outfit",system-ui,sans-serif;font-weight:400;font-size:clamp(1.7rem,5vw,2.5rem);line-height:1;font-variant-numeric:tabular-nums}
+.mvf-ring .n b.mm{font-size:clamp(1.35rem,4vw,2rem)}
 .mvf-ring .n span{margin-top:.35em;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;opacity:.65}
 .mvf-stage.end .mvf-ring .p{stroke:#C98A5E}
 .mvf-sun{position:absolute;left:0;right:0;bottom:-45%;height:85%;background:radial-gradient(closest-side,rgba(241,201,165,.85),transparent);opacity:0;transition:opacity 1.4s ease;pointer-events:none}
@@ -110,7 +110,7 @@
 .mvf-next{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(74,58,65,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#F7F1EE;opacity:0;pointer-events:none;transition:opacity .5s;text-align:center;padding:1rem}
 .mvf-next.on{opacity:1}
 .mvf-next small{font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;opacity:.85}
-.mvf-next b{font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-style:italic;font-size:clamp(1.6rem,4.4vw,2.6rem)}
+.mvf-next b{font-family:"Hanken Grotesk","Outfit",system-ui,sans-serif;font-weight:400;letter-spacing:-.01em;font-size:clamp(1.4rem,3.8vw,2.2rem)}
 .mvf-pausey{position:absolute;inset:0;display:grid;place-items:center;background:rgba(46,37,41,.28);opacity:0;pointer-events:none;transition:opacity .3s}
 .mvf-pausey span{background:rgba(251,248,244,.92);color:var(--deep);border-radius:999px;padding:10px 20px;font-size:.95rem}
 .mvf-stage.paused .mvf-pausey{opacity:1}
@@ -140,7 +140,7 @@
   background:radial-gradient(90% 90% at 50% 0%,#F6E3D6 0%,rgba(246,227,214,0) 70%),var(--cream)}
 .mvf-done>*{position:relative;z-index:1}
 .mvf-done .mk{width:70px;height:70px}
-.mvf-done h3{font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-style:italic;font-size:clamp(1.8rem,4.4vw,2.5rem);line-height:1.1;margin:0;color:var(--deep);max-width:16em}
+.mvf-done .mvf-dh{font-family:"Hanken Grotesk","Outfit",system-ui,sans-serif;font-weight:400;letter-spacing:-.01em;font-size:clamp(1.5rem,3.8vw,2.1rem);line-height:1.15.1;margin:0;color:var(--deep);max-width:16em}
 .mvf-done p{margin:0;color:#5E5157}
 .mvf-again{margin-top:8px;border:1.5px solid var(--line);background:rgba(255,255,255,.8);border-radius:999px;padding:11px 22px;cursor:pointer;color:var(--deep)!important}
 
@@ -319,7 +319,7 @@
   ${data.photo ? '' : BLOB}${WAVE}
   <div class="mvf-itx">
   <p class="mvf-eye"><i></i>${flow ? T('Dein Flow', 'Your flow') : T('Dein Bewegungsvideo', 'Your movement session')}</p>
-  ${data.title ? `<h2 class="mvf-title">${esc(data.title)}</h2>` : ''}
+  ${data.title ? `<p class="mvf-title" role="heading" aria-level="2">${esc(data.title)}</p>` : ''}
   ${data.intro ? `<p class="mvf-desc">${esc(data.intro)}</p>` : ''}
   <div class="mvf-meta"><span class="mvf-chip">${ICON.clock}<span data-tot></span></span></div>
   ${flow ? '' : `<p class="mvf-lbl">${T('Wie lange magst du jede Übung halten?', 'How long would you like to hold each exercise?')}</p>
@@ -359,7 +359,7 @@
   </div>
   ${pv ? `<div class="mvf-pv"><span>${T('Nur in deiner Vorschau:', 'Preview only:')}</span><button type="button" data-prev>‹ ${T('zurück', 'back')}</button><button type="button" data-skip>${T('weiter', 'next')} ›</button></div>` : ''}
 </div>
-<div class="mvf-done" data-done hidden>${WAVE}${MARK}<p class="mvf-eye" style="justify-content:center"><i></i>${T('Geschafft', 'Done')}<i></i></p><h3>${T('Schön, dass du dir diese Zeit genommen hast.', 'I’m so glad you took this time for yourself.')}</h3><p data-dt></p><button type="button" class="mvf-again" data-again>${T('Nochmal von vorn', 'Start again')}</button></div>
+<div class="mvf-done" data-done hidden>${WAVE}${MARK}<p class="mvf-eye" style="justify-content:center"><i></i>${T('Geschafft', 'Done')}<i></i></p><p class="mvf-dh" role="heading" aria-level="3">${T('Schön, dass du dir diese Zeit genommen hast.', 'I’m so glad you took this time for yourself.')}</p><p data-dt></p><button type="button" class="mvf-again" data-again>${T('Nochmal von vorn', 'Start again')}</button></div>
 <details class="mvf-mu" data-mu><summary><span class="ico">${ICON.note}</span><span class="tt"><b>${T('Deine Musik dazu', 'Add your music')}</b><span data-mstate></span></span><span class="chev">${ICON.chev}</span></summary><div class="mvf-mub" data-mub></div></details>
 <div class="mvf-dock" data-dock hidden></div>`;
     const q = s => root.querySelector(s);
