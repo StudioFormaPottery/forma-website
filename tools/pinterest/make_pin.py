@@ -8,8 +8,10 @@ from playwright.async_api import async_playwright
 import json
 REPO = Path(__file__).resolve().parents[2]
 html_src = (REPO / 'index.html').read_text(encoding='utf-8')
-HOUSE = re.search(r'<svg class="adv-house".*?</svg>', html_src, re.S).group(0)
-GARLAND = re.search(r'<svg class="xm-garland".*?</svg>', html_src, re.S).group(0)
+_m = re.search(r'<svg class="adv-house".*?</svg>', html_src, re.S)
+HOUSE = _m.group(0) if _m else ''  # Startseite zeigt seit 28.10.2026 ein Foto statt des Hauses
+_m = re.search(r'<svg class="xm-garland".*?</svg>', html_src, re.S)
+GARLAND = _m.group(0) if _m else ''
 STAR = 'M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z'
 F = REPO.as_uri() + '/fonts/'
 IMG = REPO.as_uri() + '/img/'
