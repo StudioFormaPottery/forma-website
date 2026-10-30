@@ -491,7 +491,11 @@ void main(){
     const xfOf = d => Math.max(.4, Math.min(XF, (d || 30) / 4));
     const vids = new Map(); // „Platz“ (url#0 / url#1) → <video>: zwei je Datei im Wechsel, damit der nächste Abschnitt
     // schon vorgespult bereitliegt und es am Schnitt nicht stockt (Vivien, 30.10.2026: „Video stockt in der Mitte“)
-    function slots() { const n = {}; clips.forEach(c => { n[c.url] = (n[c.url] || 0) + 1; c.slot = c.url + '#' + ((n[c.url] - 1) % 2); }); }
+    // Schließt ein Clip nahtlos an den vorigen an (gleiche Datei, Ende = Anfang, also z. B. nach „Hier schneiden“), nimmt er
+    // dasselbe Video-Element: es läuft einfach weiter, ohne zu springen. Nur echte Sprünge wechseln auf das zweite Element.
+    function slots() { const last = {}; let prev = null; clips.forEach(c => { const lk = last[c.url];
+      if (prev && prev.url === c.url && lk != null && Math.abs((prev.out || prev.dur || 0) - (c.in || 0)) < .06) c.slot = c.url + '#' + lk;
+      else { const k = lk == null ? 0 : 1 - lk; c.slot = c.url + '#' + k; last[c.url] = k; } prev = c; }); }
     function vidFor(c) {
       if (!c.slot) slots();
       let v = vids.get(c.slot);
@@ -509,7 +513,7 @@ void main(){
       return c.zoom[0] + (c.zoom[1] - c.zoom[0]) * p; };
     // MediaRecorder-Dateien kennen ihre Länge oft nicht: einmal ans Ende springen
     async function probeDur(c, v) { try { v.currentTime = 1e7; await new Promise(r => { v.onseeked = r; setTimeout(r, 2500); }); c.dur = isFinite(v.duration) && v.duration > 0 ? v.duration : (v.currentTime || 1); v.currentTime = 0; } catch (e) { c.dur = c.dur || 1; } if (!c.out || c.out > c.dur) c.out = c.dur; dbPut(dbRow(c)); ui(); }
-    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft, src: c.src || null, bro: !!c.bro, osrc: c.osrc || null, ost: c.ost || 0, fr: c.fr || null, zm: c.zm || null, fe: c.fe || 0, trash: c.trash || 0, tpos: c.tpos || 0 });
+    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft, src: c.src || null, bro: !!c.bro, osrc: c.osrc || null, ost: c.ost || 0, fr: c.fr || null, zm: c.zm || null, fe: c.fe || 0, trash: c.trash || 0, tpos: c.tpos || 0, fx: c.fx || 0 });
     const len = c => Math.max(0, (c.out || c.dur || 0) - (c.in || 0));
     const total = () => clips.reduce((a, c) => a + len(c), 0);
     const tv = document.createElement('video'); tv.muted = true; tv.playsInline = true; tv.preload = 'auto'; let thumbQ = Promise.resolve();
@@ -535,7 +539,7 @@ void main(){
         clips = objs.filter(r => !r.bro); bros = objs.filter(r => r.bro); bros.forEach(ovVid);
         slots(); if (clips.length) { sel = 0; vidFor(clips[0]); prep(1); }
         await covLoad().catch(() => {});
-        drawDrafts(); ui(); clips.forEach(thumb); trashUi();
+        drawDrafts(); ui(); clips.forEach(thumb); trashUi(); prepAll();
       } catch (e) { say('Die gespeicherten Clips konnten nicht geladen werden.', 'bad'); }
     }
     // ---- Entwürfe ----
@@ -594,10 +598,48 @@ void main(){
       drList = await drafts(); drList.unshift(d); await draftsSave(drList);
       await openDraft(d.id); K('drName').focus();
     };
+    // ---- Clips fürs Schneiden vorbereiten (Vivien, 30.10.2026: „beim Bearbeiten stockt es immer“) ----
+    // Aufnahmen aus dem Browser (Studio, MediaRecorder) haben kein Inhaltsverzeichnis: jedes Springen an eine Schnittstelle
+    // muss die Datei von vorne durchsuchen, darum hängt die Vorschau nach ein paar Schnitten. Einmal ohne Neu-Kodieren
+    // umpacken (Mediabunny, nur Pakete kopieren) → Datei mit Index, Springen geht sofort. Läuft still im Hintergrund.
+    let prepRun = false;
+    async function remux(blob) {
+      const M = await loadMB(); const input = new M.Input({ source: new M.BlobSource(blob), formats: M.ALL_FORMATS });
+      const fmt = await input.getFormat().catch(() => null); const webm = /webm|matroska/i.test((fmt && fmt.name) || '') || /webm/.test(blob.type || '');
+      let parts = [], end = 0;
+      const put = (p, data) => { const bl = new Blob([data]), pe = p + data.byteLength; if (p === end) { parts.push({ p, b: bl }); end = pe; return; } if (p > end) { parts.push({ p: end, b: new Blob([new Uint8Array(p - end)]) }, { p, b: bl }); end = pe; return; }
+        const nx = []; for (const x of parts) { const xs = x.p, xe = x.p + x.b.size; if (xe <= p || xs >= pe) { nx.push(x); continue; } if (xs < p) nx.push({ p: xs, b: x.b.slice(0, p - xs) }); if (xe > pe) nx.push({ p: pe, b: x.b.slice(pe - xs) }); } nx.push({ p, b: bl }); nx.sort((x, y) => x.p - y.p); parts = nx; if (pe > end) end = pe; };
+      const target = new M.StreamTarget(new WritableStream({ write(ch) { put(ch.position, ch.data); } }), { chunked: true, chunkSize: 4 * 1024 * 1024 });
+      const output = new M.Output({ format: webm ? new M.WebMOutputFormat() : new M.Mp4OutputFormat({ fastStart: false }), target });
+      const conv = await M.Conversion.init({ input, output });
+      if (!conv.isValid || (conv.discardedTracks || []).length) return null; // nichts verlieren (z. B. Ton): dann lieber so lassen
+      if ((conv.utilizedTracks || []).some(t => t.type === 'video') && !(await input.getPrimaryVideoTrack())) return null;
+      await conv.execute(); const nb = new Blob(parts.map(x => x.b), { type: webm ? 'video/webm' : 'video/mp4' });
+      let dur = 0; try { const chk = new M.Input({ source: new M.BlobSource(nb), formats: M.ALL_FORMATS }); dur = await chk.computeDuration(); const a0 = await input.getPrimaryAudioTrack(), a1 = await chk.getPrimaryAudioTrack(); if (a0 && !a1) return null; } catch (e) { return null; }
+      return { blob: nb, dur };
+    }
+    async function prepAll() {
+      if (prepRun) return; prepRun = true;
+      try {
+        for (;;) {
+          if (closed) break; const list = clips.concat(bros).filter(c => !c.fx && c.blob); if (!list.length) break;
+          const c = list[0], key = srcOf(c), size = c.blob.size, same = clips.concat(bros).filter(x => !x.fx && x.blob && x.blob.size === size && srcOf(x) === key);
+          if (!K('msg').textContent || /vorbereitet/.test(K('msg').textContent)) say('⏳ „' + c.name + '“ wird fürs Schneiden vorbereitet, du kannst schon weitermachen …');
+          let r = null; try { r = await remux(c.blob); } catch (e) { console.warn('Schnitt: Vorbereiten nicht möglich', e); }
+          while (playing || busy) await new Promise(x => setTimeout(x, 800));
+          if (closed) break;
+          const oldUrl = c.url, nu = r ? URL.createObjectURL(r.blob) : null;
+          for (const x of same) { x.fx = 1; if (r) { x.blob = r.blob; x.url = nu; if (r.dur > 0) { x.dur = r.dur; if (x.out > r.dur) x.out = r.dur; } } await dbPut(dbRow(x)); }
+          if (r) { if (!clips.concat(bros).some(x => x.url === oldUrl)) URL.revokeObjectURL(oldUrl); same.filter(x => x.bro).forEach(o => { const v = ovV.get(o.id); if (v) { v.pause(); v.remove(); ovV.delete(o.id); } });
+            const keep = cur() ? cur().currentTime : 0, sc = clips[sel]; slots(); dropVids(); ui(); if (sc && same.includes(sc)) show(sel, Math.max(0, keep - (sc.in || 0))); }
+        }
+        if (/vorbereitet/.test(K('msg').textContent)) say('✓ Alle Clips sind fürs Schneiden bereit.', 'ok');
+      } finally { prepRun = false; }
+    }
     async function addFiles(files) {
       let n = 0;
       for (const f of files) { if (!f || !f.size) continue; const c = { id: uid(), blob: f, name: f.name.replace(/\.\w+$/, ''), added: Date.now() + n, in: 0, out: 0, mute: false, dur: 0, draft: curDraft }; c.src = c.id; c.url = URL.createObjectURL(f); clips.push(c); await dbPut(dbRow(c)); slots(); vidFor(c); thumb(c); n++; }
-      await saveOrder(); await touch(); if (sel < 0 && clips.length) sel = 0; if (n) say('✓ ' + n + (n > 1 ? ' Clips' : ' Clip') + ' dazu. Tipp auf einen Clip, um Anfang und Ende zu setzen.', 'ok'); ui();
+      await saveOrder(); await touch(); prepAll(); if (sel < 0 && clips.length) sel = 0; if (n) say('✓ ' + n + (n > 1 ? ' Clips' : ' Clip') + ' dazu. Tipp auf einen Clip, um Anfang und Ende zu setzen.', 'ok'); ui();
     }
     const saveOrder = () => kvSet(ordKey(curDraft), clips.map(c => c.id)).catch(() => {});
     const touch = async () => { const d = drList.find(x => x.id === curDraft); if (d) { d.at = Date.now(); await draftsSave(drList).catch(() => {}); drawDrafts(); } };
@@ -754,7 +796,7 @@ void main(){
     K('resetCut').onclick = () => { const c = clips[sel]; if (!c) return; c.in = 0; c.out = c.dur; change(c); };
     K('split').onclick = async () => { const L = locate(pos); if (L.i >= 0) sel = L.i; const c = clips[sel], v = cur(); if (!c || !v) return; const t = L.i >= 0 ? (c.in || 0) + L.off : v.currentTime; if (t <= (c.in || 0) + .3 || t >= (c.out || c.dur) - .3) { say('Zum Teilen die Stelle etwas weiter in die Mitte schieben.'); return; }
       const n = Object.assign({}, c, { id: uid(), in: t, added: c.added + 1, thumb: c.thumb || null, url: c.url }); c.out = t; clips.splice(sel + 1, 0, n); await dbPut(dbRow(c)); await dbPut(dbRow(n)); await saveOrder(); ui(); lazyThumb(n); say('✂ Geteilt bei ' + fmt1(t) + '. Der zweite Teil ist jetzt Clip ' + (sel + 2) + '.', 'ok'); };
-    K('cut2').onclick = () => { if (busy || !clips[sel]) return; stop(); K('split').onclick(); };
+    K('cut2').onclick = () => { if (busy || !clips[sel]) return; K('split').onclick(); }; // läuft beim Schneiden einfach weiter
     document.addEventListener('keydown', e => { if (closed || busy || e.metaKey || e.ctrlKey || e.altKey || (e.key !== 's' && e.key !== 'S')) return; const t = e.target; if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return; if (!root.isConnected || !clips[sel]) return; e.preventDefault(); K('cut2').click(); });
     K('left').onclick = async () => { if (sel <= 0) return; [clips[sel - 1], clips[sel]] = [clips[sel], clips[sel - 1]]; sel--; await saveOrder(); ui(); };
     K('first').onclick = async () => { if (sel <= 0) return; const [c] = clips.splice(sel, 1); clips.unshift(c); sel = 0; await saveOrder(); pos = 0; ui(); say('⇤ „' + c.name + '“ ist jetzt ganz vorne.', 'ok'); };
