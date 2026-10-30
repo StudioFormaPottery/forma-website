@@ -728,6 +728,11 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     if(!m||tr.label===m.label)return;
     const ns=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:m.deviceId},echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
     raw.removeTrack(tr);tr.stop();raw.addTrack(ns.getAudioTracks()[0]);ls.set('st-mic',m.deviceId)}catch(e){}}
+  // Kamera geht, Mikrofon nicht: meist ist nur das Mikrofon für die Seite nicht erlaubt (dann heißen die Mikros „Mikrofon 1“)
+  function micHelp(){const saf=/^((?!chrome|android).)*safari/i.test(navigator.userAgent),m=$('msg');m.className='msg bad';
+    m.innerHTML='⚠️ <b>Das Mikrofon ist für diese Seite noch nicht erlaubt</b> – deshalb steht bei den Mikrofonen nur „Mikrofon 1“. <button type="button" id="micAsk" style="font:inherit;padding:6px 14px;border-radius:999px;border:0;background:#7D5E68;color:#fff;cursor:pointer;margin-left:6px">🎙 Mikrofon erlauben</button><span id="micHow"></span>';
+    $('micAsk').onclick=async()=>{try{const t=await navigator.mediaDevices.getUserMedia({audio:true});t.getTracks().forEach(x=>x.stop());m.className='msg ok';m.textContent='✓ Mikrofon erlaubt. Kamera startet neu …';startCam()}
+      catch(e){$('micHow').innerHTML='<br>Der Browser fragt nicht nach, weil das Mikrofon abgelehnt ist. '+(saf?'Oben in der Menüleiste <b>Safari → Einstellungen für forma-pottery.com</b> → <b>Mikrofon: Erlauben</b>, dann die Seite neu laden.':'Links neben der Adresse auf das <b>Regler-/Schloss-Symbol</b> → <b>Mikrofon: Zulassen</b>, dann die Seite neu laden.')+' Steht dort schon „Erlauben“: <b>Systemeinstellungen → Datenschutz &amp; Sicherheit → Mikrofon</b> → deinen Browser einschalten.'}};}
   function camErr(e){const n=(e&&e.name)||'',saf=/^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     const why=n==='NotAllowedError'||n==='SecurityError'
       ?(saf?'Safari hat Kamera oder Mikrofon für diese Seite gesperrt. Oben in der Menüleiste: <b>Safari → Einstellungen für forma-pottery.com</b> → Kamera und Mikrofon auf <b>Erlauben</b> stellen. Steht dort schon „Erlauben“, dann am Mac: <b>Systemeinstellungen → Datenschutz &amp; Sicherheit → Kamera</b> (und Mikrofon) → Safari einschalten.'
@@ -748,7 +753,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
       // Schritt für Schritt einfacher werden: ohne gemerkte Kamera, dann ganz ohne Vorgaben, dann nur Kamera (Vivien, 30.10.2026)
       for(const c of [{video:true,audio:a},{video:true,audio:true},{video:true}]){try{raw=await navigator.mediaDevices.getUserMedia(c);ls.set('st-cam','');if(!c.audio){ls.set('st-mic','');ls.set('st-mic-l','')}err=null;break}catch(e2){err=e2}}
       if(err){camErr(err);return}
-      if(!raw.getAudioTracks().length){$('msg').className='msg bad';$('msg').textContent='⚠️ Das Mikrofon meldet sich gerade nicht. Steck dein Mikro neu an und tippe auf „Nochmal versuchen“, sonst wird ohne Ton aufgenommen.'}}
+      if(!raw.getAudioTracks().length)micHelp()}
     await micFix();
     if(ls.get('st-wide',''))await wideZoom();
     tc=await TalkCam.create(raw,{mount:$('stage'),maxVh:vh(),profile:profile(),maxLong:Q[0]});qShow();
