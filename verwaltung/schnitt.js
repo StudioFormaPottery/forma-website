@@ -1592,7 +1592,7 @@ void main(){
     }
     if (K('upBtn')) K('upBtn').onclick = () => { if (!result) return; if (curTg()) { doUpload(); return; } upWanted = true; tgOpen(true); K('tg').scrollIntoView({ behavior: 'smooth', block: 'start' }); say('Wähl oben aus, wohin das Video kommt, dann lade ich es gleich hoch.'); };
     K('share').onclick = async () => { if (!result) return; const ext = extOf(result); try { await navigator.share({ files: [new File([result], K('dl').download || ('video.' + ext), { type: result.type })] }); } catch (e) {} };
-    K('resX').onclick = () => { K('res').hidden = true; };
+    K('resX').onclick = () => { const v = K('resv'); try { v.pause(); } catch (e) {} K('res').hidden = true; };
     K('dl').addEventListener('click', () => {});
 
     function close() { closed = true; stop(); try { pre.pause(); } catch (e) {} clips.forEach(c => URL.revokeObjectURL(c.url)); mount.innerHTML = ''; }

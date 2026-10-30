@@ -539,7 +539,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
 <script src="/wildhearts/assets/talkcam.js?v=7"></script>
 <script src="studio-edit.js?v=7"></script>
-<script src="schnitt.js?v=21"></script>
+<script src="schnitt.js?v=22"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
@@ -717,13 +717,23 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
   function qShow(){const el=$('qInfo');if(!el||!raw)return;const st=(raw.getVideoTracks()[0]||{getSettings:()=>({})}).getSettings(),cw=st.width||0,chh=st.height||0;
     const cv=tc&&tc.canvas;const L=Math.max(cw,chh),lbl=L>=3800?'4K':L>=2500?'2K':L>=1900?'Full HD':L>=1260?'HD':'';
     el.textContent=cw?'Deine Kamera liefert '+cw+' × '+chh+(lbl?' ('+lbl+')':'')+(cv?', aufgenommen wird in '+cv.width+' × '+cv.height+'.':'.')+(L<Math.max(QUAL[qual()][0],QUAL[qual()][1])-40?' Mehr kann diese Kamera nicht, bei der Handykamera ist das oft höher als bei der Laptop-Kamera.':''):''}
+  // Mikrofon merken (Vivien, 30.10.2026: „ich muss immer wieder mein Mikro umstellen“): Safari vergibt neue Geräte-IDs,
+  // deshalb merken wir auch den Namen (z. B. „RØDE …“) und nehmen nach dem Start genau dieses Mikrofon, wenn es angesteckt ist.
+  // Ohne eigene Wahl wird ein angestecktes Rode-/USB-Mikrofon automatisch genommen.
+  async function micFix(){try{const tr=raw&&raw.getAudioTracks()[0];if(!tr)return;const want=ls.get('st-mic-l','');
+    const ds=await navigator.mediaDevices.enumerateDevices(),mics=ds.filter(d=>d.kind==='audioinput'&&d.label&&d.deviceId!=='default'&&d.deviceId!=='communications');
+    const m=want?mics.find(d=>d.label===want):mics.find(d=>/r(ø|o)de|wireless go|usb|lavalier|shure|dji/i.test(d.label));
+    if(!m||tr.label===m.label)return;
+    const ns=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:m.deviceId},echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+    raw.removeTrack(tr);tr.stop();raw.addTrack(ns.getAudioTracks()[0]);ls.set('st-mic',m.deviceId)}catch(e){}}
   async function startCam(){
     const cid=ls.get('st-cam',''), mid=ls.get('st-mic','');
     if(raw)raw.getTracks().forEach(t=>t.stop());if(tc)tc.destroy(false);
     const Q=QUAL[qual()]||QUAL['4k'];const v={width:{ideal:Q[0]},height:{ideal:Q[1]},frameRate:{ideal:30}};if(cid)v.deviceId={exact:cid};
-    const a={echoCancellation:true,noiseSuppression:true,autoGainControl:true};if(mid)a.deviceId={exact:mid};
+    const a={echoCancellation:true,noiseSuppression:true,autoGainControl:true};if(mid)a.deviceId={ideal:mid};
     try{raw=await navigator.mediaDevices.getUserMedia({video:v,audio:a})}
-    catch(e){try{raw=await navigator.mediaDevices.getUserMedia({video:true,audio:true});ls.set('st-cam','');ls.set('st-mic','')}catch(e2){$('stage').innerHTML='<div class="tc-st">Kamera oder Mikrofon sind gesperrt. Bitte im Browser oben bei der Adresse erlauben und die Seite neu laden.</div>';return}}
+    catch(e){try{raw=await navigator.mediaDevices.getUserMedia({video:true,audio:a});ls.set('st-cam','')}catch(e2){$('stage').innerHTML='<div class="tc-st">Kamera oder Mikrofon sind gesperrt. Bitte im Browser oben bei der Adresse erlauben und die Seite neu laden.</div>';return}}
+    await micFix();
     if(ls.get('st-wide',''))await wideZoom();
     tc=await TalkCam.create(raw,{mount:$('stage'),maxVh:vh(),profile:profile(),maxLong:Q[0]});qShow();
     $('stage').appendChild(pr);$('stage').appendChild(Object.assign(document.createElement('div'),{className:'cd',id:'cd'}));
@@ -770,15 +780,15 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     if(!d){iphHelp();return}
     $('iphHelp').hidden=true;ls.set('st-cam',d.deviceId);
     // auch das iPhone-Mikrofon nehmen, wenn vorhanden (näher am Gesicht als das MacBook)
-    const m=ds.find(x=>x.kind==='audioinput'&&isIph(x.label));if(m)ls.set('st-mic',m.deviceId);
+    const m=ds.find(x=>x.kind==='audioinput'&&isIph(x.label));if(m&&!ls.get('st-mic-l',''))ls.set('st-mic',m.deviceId); // eigenes Mikro (z. B. Rode) bleibt
     $('msg').className='msg';$('msg').textContent='📱 iPhone-Kamera wird verbunden …';await startCam();
     const on=raw&&raw.getVideoTracks()[0]&&isIph(raw.getVideoTracks()[0].label);
     $('msg').className='msg'+(on?' ok':'');$('msg').textContent=on?'✓ Dein iPhone filmt jetzt. Schau beim Sprechen in die iPhone-Linse, der Text steht direkt darunter.':'Das iPhone hat sich nicht gemeldet. Ist es gesperrt und in der Nähe? Dann nochmal tippen.';}
-  $('iphBtn').onclick=()=>{const cur=raw&&raw.getVideoTracks()[0];if(cur&&isIph(cur.label)){ls.set('st-cam','');ls.set('st-mic','');startCam();return}useIphone()};
+  $('iphBtn').onclick=()=>{const cur=raw&&raw.getVideoTracks()[0];if(cur&&isIph(cur.label)){ls.set('st-cam','');if(!ls.get('st-mic-l',''))ls.set('st-mic','');startCam();return}useIphone()};
   async function devices(){try{const ds=await navigator.mediaDevices.enumerateDevices();iphUi(ds);
     const fill=(sel,kind,key,label)=>{const curId=(raw.getTracks().find(t=>t.kind===kind.replace('input',''))||{getSettings:()=>({})}).getSettings().deviceId;
       sel.innerHTML=ds.filter(d=>d.kind===kind).map((d,i)=>'<option value="'+esc(d.deviceId)+'"'+(d.deviceId===curId?' selected':'')+'>'+esc(d.label||label+' '+(i+1))+'</option>').join('');
-      sel.onchange=()=>{ls.set(key,sel.value);startCam()}};
+      sel.onchange=()=>{ls.set(key,sel.value);if(kind==='audioinput'){const o=sel.options[sel.selectedIndex];ls.set('st-mic-l',o?o.textContent:'')}startCam()}};
     fill($('cam'),'videoinput','st-cam','Kamera');fill($('mic'),'audioinput','st-mic','Mikrofon');}catch(e){}}
 
   // ---- Aufnahme ----
@@ -812,11 +822,13 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
   // Jede Aufnahme wandert sofort in den Schnitt (Vivien, 30.10.2026: „dann ist es einfach weg“) – nichts geht mehr verloren
   async function keepTake(b){ if(!b||typeof Schnitt==='undefined')return;
     try{ await Schnitt.addTake(b, takeName(), {draft:draftName(),target:snTarget()}); const m=$('kept'); if(m){m.hidden=false;m.innerHTML='✓ sicher im <a href="?view=schnitt" style="color:inherit">Entwurf „'+draftName().replace(/[<>&]/g,'')+'“</a>'} }catch(e){} }
-  $('again').onclick=()=>{blob=null;saved=true;$('kept').hidden=true;$('play').removeAttribute('src');$('msg').textContent='';$('prog').hidden=true;prMove(0,true);showAfter();};
+  // Video wirklich anhalten: nur src entfernen lässt den Ton weiterlaufen (Vivien, 30.10.2026)
+  function stopPlay(){const v=$('play');try{v.pause()}catch(e){}v.removeAttribute('src');try{v.load()}catch(e){}}
+  $('again').onclick=()=>{blob=null;saved=true;$('kept').hidden=true;stopPlay();$('msg').textContent='';$('prog').hidden=true;prMove(0,true);showAfter();};
   // Sofort löschen (Vivien, 28.10.2026): ohne Nachfrage, kurz rückgängig machbar
   let undo=null,lastRt=-9;
   $('del').onclick=()=>{if(!blob)return;undo={b:blob,src:$('play').src,href:$('dl').href,name:$('dl').download,saved:saved,tgt:tgt};
-    blob=null;saved=true;$('play').removeAttribute('src');$('prog').hidden=true;prMove(0,true);showAfter();
+    blob=null;saved=true;stopPlay();$('prog').hidden=true;prMove(0,true);showAfter();
     $('msg').className='msg';$('msg').innerHTML='🗑 Aufnahme gelöscht. <button type="button" class="sm" id="undo" style="margin-left:6px">Rückgängig</button>';
     $('undo').onclick=()=>{if(!undo)return;blob=undo.b;$('play').src=undo.src;$('dl').href=undo.href;$('dl').download=undo.name;saved=undo.saved;tgt=undo.tgt;undo=null;$('msg').textContent='Aufnahme ist wieder da.';showAfter()};
     const U=undo;setTimeout(()=>{if(undo===U){undo=null;if($('undo'))$('msg').textContent=''}},8000)};
@@ -879,7 +891,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
   $('edit').onclick=async()=>{if(!blob||typeof Schnitt==='undefined')return;$('edit').disabled=true;
     try{ if($('kept').hidden) await Schnitt.addTake(blob,takeName(),{draft:draftName(),target:snTarget(),open:true}); else await Schnitt.setDraft(draftName(),snTarget()); saved=true;location.href='?view=schnitt'}catch(e){$('edit').disabled=false;$('msg').textContent='Konnte die Aufnahme nicht in den Schnitt legen.'}};
   let takeN=0;
-  $('take').onclick=async()=>{if(!blob||typeof Schnitt==='undefined')return;$('take').disabled=true;try{if($('kept').hidden)await Schnitt.addTake(blob,takeName()+' · Take '+(++takeN),{draft:draftName(),target:snTarget()});saved=true;$('kept').hidden=true;blob=null;$('play').removeAttribute('src');$('prog').hidden=true;prMove(0,true);showAfter();
+  $('take').onclick=async()=>{if(!blob||typeof Schnitt==='undefined')return;$('take').disabled=true;try{if($('kept').hidden)await Schnitt.addTake(blob,takeName()+' · Take '+(++takeN),{draft:draftName(),target:snTarget()});saved=true;$('kept').hidden=true;blob=null;stopPlay();$('prog').hidden=true;prMove(0,true);showAfter();
     $('msg').className='msg ok';$('msg').innerHTML='✓ Der Take liegt im Entwurf „'+draftName().replace(/[<>&]/g,'')+'“ (<a href="?view=schnitt">✂️ Schnitt</a>). Jetzt den nächsten aufnehmen, am Schluss alles zusammenschneiden.'}catch(e){$('msg').textContent='Konnte den Take nicht sichern.'}$('take').disabled=false};
   $('editOld').onclick=()=>{if(!blob)return;const d=$('play').duration;
     editor(blob,isFinite(d)?d:0,tgt?(tgt.ig?'Instagram '+(tgt.ig.kind==='reel'?'Reel':'Story')+' für '+tgt.ig.l.split(' · ')[0]+'. Tipp: Format „Hoch 9:16“.':tgt.clip?'Übung „'+tgt.clip.n+'“':'„'+tgt.t.t+'“ · '+(tgt.lang==='de'?'Deutsch':'Englisch'))+'. Danach kannst du direkt hochladen.':'Danach herunterladen.',(nb,inf)=>{
@@ -983,7 +995,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
   }
   let lastClip=-1;
   function stopRec(discard){if(cs&&cs.rec&&cs.rec.state==='recording'){cs.rec._cs.discard=!!discard;cs.rec.stop()}$('rd').hidden=true;run=false;document.body.classList.remove('recording')}
-  function delClip(i){const c=clips[i];if(!c)return;URL.revokeObjectURL(c.url);if(c.sub)URL.revokeObjectURL(c.sub.url);clips[i]=null;if(lastClip===i)lastClip=-1;renderClips();clipUi();$('msg').className='msg';$('msg').textContent='🗑 Absatz '+(i+1)+' gelöscht. Nimm ihn einfach neu auf.'}
+  function delClip(i){const c=clips[i];if(!c)return;if($('play').src===c.url||($('play').src&&c.sub&&$('play').src===c.sub.url))stopPlay();URL.revokeObjectURL(c.url);if(c.sub)URL.revokeObjectURL(c.sub.url);clips[i]=null;if(lastClip===i)lastClip=-1;renderClips();clipUi();$('msg').className='msg';$('msg').textContent='🗑 Absatz '+(i+1)+' gelöscht. Nimm ihn einfach neu auf.'}
   $('cdel').onclick=()=>{if(cs&&cs.rec)return;delClip(lastClip)};
   function finish(){stopRec(false);prTop(false);cs=null;slab.hidden=false;showSlide();slab.textContent='Fertig ✓';if(lock){lock.release().catch(()=>{});lock=null}clipUi();
     const n=clips.filter(Boolean).length;$('msg').className='msg ok';$('msg').textContent=n?'✓ '+n+' Clip'+(n>1?'s':'')+' fertig. Rechts kannst du sie ansehen, neu aufnehmen, sichern oder Untertitel dazu machen.':'';}
