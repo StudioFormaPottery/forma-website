@@ -256,17 +256,20 @@ void main(){
     const mus = Object.assign({ vol: .18, voice: 1, duck: true, fade: true }, ls.get('sn-mus', {}));
     const auto = Object.assign({ pause: .7, stumbles: true, zoom: true, noise: true }, ls.get('sn-auto', {}));
     let mfile = null;
-    const vids = new Map(); // Quelldatei (url) → <video>, von allen Clips/Abschnitten aus dieser Datei geteilt
+    const vids = new Map(); // „Platz“ (url#0 / url#1) → <video>: zwei je Datei im Wechsel, damit der nächste Abschnitt
+    // schon vorgespult bereitliegt und es am Schnitt nicht stockt (Vivien, 30.10.2026: „Video stockt in der Mitte“)
+    function slots() { const n = {}; clips.forEach(c => { n[c.url] = (n[c.url] || 0) + 1; c.slot = c.url + '#' + ((n[c.url] - 1) % 2); }); }
     function vidFor(c) {
-      let v = vids.get(c.url);
+      if (!c.slot) slots();
+      let v = vids.get(c.slot);
       if (v) { if (!c.dur && v.readyState >= 1 && isFinite(v.duration) && v.duration > 0) { c.dur = v.duration; if (!c.out) c.out = c.dur; } return v; }
       v = document.createElement('video'); v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.muted = false;
-      v.src = c.url; pv.insertBefore(v, big); vids.set(c.url, v);
+      v.src = c.url; pv.insertBefore(v, big); vids.set(c.slot, v);
       v.addEventListener('loadedmetadata', () => { const d = isFinite(v.duration) && v.duration > 0 ? v.duration : 0; let probe = false; clips.filter(x => x.url === c.url && !x.dur).forEach(x => { x.dur = d; if (!x.out) x.out = d; if (!d) probe = true; }); if (!c.dur) { c.dur = d; if (!c.out) c.out = d; if (!d) probe = true; } if (probe) probeDur(c, v); else ui(); });
       return v;
     }
-    const vidUsers = url => clips.filter(x => x.url === url).length;
-    const dropVid = url => { if (vidUsers(url)) return; const v = vids.get(url); if (v) { v.remove(); vids.delete(url); } };
+    // Plätze aufräumen, die kein Clip mehr braucht
+    function dropVids() { const used = new Set(clips.map(c => c.slot)); [...vids.keys()].forEach(k => { if (!used.has(k)) { const v = vids.get(k); if (v) { v.pause(); v.removeAttribute('src'); v.remove(); } vids.delete(k); } }); }
     // Zoom je Clip: [von, bis] als Faktor, wird über die Clip-Länge gleichmäßig gefahren
     const zAt = (c, off) => { if (!c || !c.zoom) return 1; const L = len(c) || 1, p = Math.max(0, Math.min(1, off / L)); return c.zoom[0] + (c.zoom[1] - c.zoom[0]) * p; };
     // MediaRecorder-Dateien kennen ihre Länge oft nicht: einmal ans Ende springen
@@ -293,26 +296,27 @@ void main(){
         const rows = await dbAll(), order = (await kvGet('order')) || [];
         rows.sort((a, b) => (order.indexOf(a.id) + 1 || 1e9) - (order.indexOf(b.id) + 1 || 1e9) || a.added - b.added);
         const urls = new Map(); clips = rows.map(r => { let u = urls.get(r.blob); if (!u) { u = URL.createObjectURL(r.blob); urls.set(r.blob, u); } return Object.assign({}, r, { url: u }); });
-        clips.forEach(c => vidFor(c));
-        if (clips.length) { sel = 0; }
+        slots(); if (clips.length) { sel = 0; vidFor(clips[0]); prep(1); }
         ui(); clips.forEach(thumb);
       } catch (e) { say('Die gespeicherten Clips konnten nicht geladen werden.', 'bad'); }
     }
     async function addFiles(files) {
       let n = 0;
-      for (const f of files) { if (!f || !f.size) continue; const c = { id: uid(), blob: f, name: f.name.replace(/\.\w+$/, ''), added: Date.now() + n, in: 0, out: 0, mute: false, dur: 0 }; c.url = URL.createObjectURL(f); clips.push(c); await dbPut(dbRow(c)); vidFor(c); thumb(c); n++; }
+      for (const f of files) { if (!f || !f.size) continue; const c = { id: uid(), blob: f, name: f.name.replace(/\.\w+$/, ''), added: Date.now() + n, in: 0, out: 0, mute: false, dur: 0 }; c.url = URL.createObjectURL(f); clips.push(c); await dbPut(dbRow(c)); slots(); vidFor(c); thumb(c); n++; }
       await saveOrder(); if (sel < 0 && clips.length) sel = 0; if (n) say('✓ ' + n + (n > 1 ? ' Clips' : ' Clip') + ' dazu. Tipp auf einen Clip, um Anfang und Ende zu setzen.', 'ok'); ui();
     }
     const saveOrder = () => kvSet('order', clips.map(c => c.id)).catch(() => {});
     K('file').onchange = e => { addFiles([...e.target.files]); e.target.value = ''; };
-    K('clearAll').onclick = async () => { if (!clips.length || !confirm('Wirklich alle ' + clips.length + ' Clips von diesem Gerät löschen?')) return; stop(); for (const c of clips) { await dbDel(c.id); } clips.forEach(c => { const v = vids.get(c.url); if (v) { v.remove(); vids.delete(c.url); } URL.revokeObjectURL(c.url); }); clips = []; sel = -1; await saveOrder(); undoRows = null; K('undo').hidden = true; K('autoRes').hidden = true; ui(); say('Alle Clips gelöscht.'); };
+    K('clearAll').onclick = async () => { if (!clips.length || !confirm('Wirklich alle ' + clips.length + ' Clips von diesem Gerät löschen?')) return; stop(); for (const c of clips) { await dbDel(c.id); } const urls = new Set(clips.map(c => c.url)); clips = []; dropVids(); urls.forEach(u => URL.revokeObjectURL(u)); sel = -1; await saveOrder(); undoRows = null; K('undo').hidden = true; K('autoRes').hidden = true; ui(); say('Alle Clips gelöscht.'); };
 
     // ---- Vorschau: Clips nacheinander abspielen ----
-    let playing = false, pos = 0, raf = 0, cmp = false; // pos = Stelle im Gesamtvideo
-    const cur = () => (sel >= 0 && clips[sel]) ? vids.get(clips[sel].url) : null;
+    let playing = false, pos = 0, raf = 0, cmp = false, prepped = false; // pos = Stelle im Gesamtvideo
+    const cur = () => (sel >= 0 && clips[sel]) ? vids.get(clips[sel].slot) : null;
+    // den nächsten Abschnitt still an seine Anfangsstelle setzen, solange der aktuelle noch läuft
+    function prep(i) { const c = clips[i]; if (!c) return; const v = vidFor(c), t = c.in || 0; if (v !== cur() && Math.abs(v.currentTime - t) > .08) { try { v.currentTime = t; } catch (e) {} } }
     function locate(t) { let a = 0; for (let i = 0; i < clips.length; i++) { const L = len(clips[i]); if (t < a + L || i === clips.length - 1) return { i, off: Math.min(L, Math.max(0, t - a)), a }; a += L; } return { i: -1, off: 0, a: 0 }; }
     function show(i, off, seek) {
-      if (i < 0 || !clips[i]) return; const c = clips[i], v = vids.get(c.url);
+      if (i < 0 || !clips[i]) return; const c = clips[i], v = vidFor(c);
       vids.forEach(vv => { if (vv !== v) { vv.classList.remove('on'); if (!vv.paused) vv.pause(); } });
       v.classList.add('on'); v.muted = !!c.mute; v.style.filter = cmp ? '' : filterCss(st);
       if (seek !== false) { const t = (c.in || 0) + off; if (Math.abs(v.currentTime - t) > .08) v.currentTime = t; }
@@ -323,15 +327,16 @@ void main(){
       const c = clips[sel]; const v = cur(); if (!c || !v) { stop(); return; }
       const off = Math.max(0, v.currentTime - (c.in || 0)); pos = starts()[sel] + off; timeUi();
       if (c.zoom) v.style.transform = 'scale(' + zAt(c, off).toFixed(4) + ')';
+      if (!prepped && (c.out || c.dur) - v.currentTime < 1.2) { prepped = true; prep(sel + 1); }
       if (v.currentTime >= (c.out || c.dur) - .04 || v.ended) {
-        if (sel < clips.length - 1) { sel++; const n = clips[sel], nv = vids.get(n.url); show(sel, 0); nv.play().catch(() => {}); renderClips(false); edUi(); ztDraw(); }
+        if (sel < clips.length - 1) { sel++; prepped = false; const n = clips[sel], nv = vidFor(n); show(sel, 0); nv.play().catch(() => {}); renderClips(false); edUi(); ztDraw(); }
         else { stop(); pos = 0; sel = 0; show(0, 0); renderClips(false); edUi(); timeUi(); return; }
       }
       raf = requestAnimationFrame(tick);
     }
     const starts = () => { let a = 0; return clips.map(c => { const s = a; a += len(c); return s; }); };
     async function play() {
-      if (busy || !clips.length) return; if (sel < 0) sel = 0; const c = clips[sel], v = vids.get(c.url);
+      if (busy || !clips.length) return; if (sel < 0) sel = 0; const c = clips[sel], v = vidFor(c); prepped = false; prep(sel + 1);
       if (v.currentTime < (c.in || 0) || v.currentTime >= (c.out || c.dur) - .05) show(sel, 0); else show(sel, 0, false);
       playing = true; big.hidden = true; K('play').textContent = '❚❚ Pause';
       try { await v.play(); } catch (e) { playing = false; big.hidden = false; K('play').textContent = '▶ Abspielen'; say('Abspielen klappt nicht. Bitte nochmal auf ▶ tippen.'); return; }
@@ -363,7 +368,7 @@ void main(){
       ztDraw();
       K('mute').textContent = c.mute ? '🔊 Ton an' : '🔇 Ton aus'; K('left').disabled = sel === 0; K('right').disabled = sel === clips.length - 1;
     }
-    function ui() { renderClips(); edUi(); barUi(); timeUi(); if (sel >= 0 && clips[sel]) show(sel, 0, false); }
+    function ui() { slots(); dropVids(); renderClips(); edUi(); timeUi(); if (sel >= 0 && clips[sel]) { show(sel, 0, false); prep(sel + 1); } }
     async function change(c) { await dbPut(dbRow(c)); c.thumb = null; ui(); thumb(c); }
     K('setA').onclick = () => { const c = clips[sel], v = cur(); if (!c || !v) return; c.in = Math.min(v.currentTime, (c.out || c.dur) - .3); change(c); say('⟦ Anfang gesetzt bei ' + fmt1(c.in) + '.'); };
     K('setB').onclick = () => { const c = clips[sel], v = cur(); if (!c || !v) return; c.out = Math.max(v.currentTime, (c.in || 0) + .3); change(c); say('Ende gesetzt bei ' + fmt1(c.out) + ' ⟧.'); };
@@ -373,7 +378,7 @@ void main(){
     K('left').onclick = async () => { if (sel <= 0) return; [clips[sel - 1], clips[sel]] = [clips[sel], clips[sel - 1]]; sel--; await saveOrder(); ui(); };
     K('right').onclick = async () => { if (sel >= clips.length - 1) return; [clips[sel + 1], clips[sel]] = [clips[sel], clips[sel + 1]]; sel++; await saveOrder(); ui(); };
     K('mute').onclick = () => { const c = clips[sel]; if (!c) return; c.mute = !c.mute; dbPut(dbRow(c)); ui(); };
-    K('delClip').onclick = async () => { const c = clips[sel]; if (!c) return; stop(); await dbDel(c.id); clips.splice(sel, 1); dropVid(c.url); if (!clips.some(x => x.url === c.url)) URL.revokeObjectURL(c.url); sel = Math.min(sel, clips.length - 1); await saveOrder(); pos = sel >= 0 ? starts()[sel] : 0; ui(); say('🗑 Clip gelöscht.'); };
+    K('delClip').onclick = async () => { const c = clips[sel]; if (!c) return; stop(); await dbDel(c.id); clips.splice(sel, 1); slots(); dropVids(); if (!clips.some(x => x.url === c.url)) URL.revokeObjectURL(c.url); sel = Math.min(sel, clips.length - 1); await saveOrder(); pos = sel >= 0 ? starts()[sel] : 0; ui(); say('🗑 Clip gelöscht.'); };
 
     // ---- Zeitleiste über das ganze Video (Vivien, 30.10.2026: „Cut, Cut, Cut sehen und mit zwei Punkten ziehen“) ----
     // Jeder Clip ist ein Block, dazwischen die Schnittstellen. Die Griffe ⟦ ⟧ an den Rändern machen den Clip länger
@@ -552,7 +557,10 @@ void main(){
     }
     let audT = 0;
     async function audition(e) { // die rausgeschnittene Stelle kurz vorspielen
-      if (!e || busy) return; stop(); const v = vids.get(e.url); if (!v) return; vids.forEach(vv => { if (vv !== v) vv.classList.remove('on'); }); v.classList.add('on'); v.style.transform = ''; v.muted = false; v.currentTime = e.s; K('tag').textContent = 'Rausgeschnitten · Anhören';
+      if (!e || busy) return; stop();
+      const c0 = clips.find(x => x.url === e.url); let v = c0 ? vidFor(c0) : null;
+      if (!v) { v = document.createElement('video'); v.playsInline = true; v.setAttribute('playsinline', ''); v.src = e.url; pv.insertBefore(v, big); vids.set('tmp:' + e.url, v); }
+      if (!v) return; vids.forEach(vv => { if (vv !== v) vv.classList.remove('on'); }); v.classList.add('on'); v.style.transform = ''; v.muted = false; v.currentTime = e.s; K('tag').textContent = 'Rausgeschnitten · Anhören';
       const my = ++audT; try { await v.play(); } catch (x) { return; }
       await new Promise(ok => { const st2 = () => { if (audT !== my || closed || v.paused && v.currentTime < e.e - .05) { ok(); return; } if (v.currentTime >= e.e - .03) { ok(); return; } requestAnimationFrame(st2); }; st2(); });
       if (audT !== my) return; v.pause(); K('tag').textContent = cmp ? 'Vorher' : ''; if (sel >= 0) show(sel, 0);
@@ -561,7 +569,7 @@ void main(){
       const e = autoLog[i]; if (!e) return; autoLog.splice(i, 1);
       const c = { id: uid(), blob: e.blob, url: e.url, name: e.name, added: Date.now(), in: e.s, out: e.e, mute: false, dur: e.dur, zoom: null, auto: true };
       let at = clips.findIndex(x => x.url === e.url && (x.in || 0) >= e.e); if (at < 0) { let last = -1; clips.forEach((x, k) => { if (x.url === e.url) last = k; }); at = last + 1; }
-      clips.splice(at, 0, c); if (auto.zoom) assignZoom(clips, true); await dbPut(dbRow(c)); for (const x of clips) if (x.zoom) await dbPut(dbRow(x)); await saveOrder(); vidFor(c); sel = at; pos = starts()[sel]; ui(); thumb(c);
+      clips.splice(at, 0, c); if (auto.zoom) assignZoom(clips, true); await dbPut(dbRow(c)); for (const x of clips) if (x.zoom) await dbPut(dbRow(x)); await saveOrder(); sel = at; pos = starts()[sel]; ui(); thumb(c);
       autoResUi(lastSum); say('✓ Die Stelle ist wieder drin (Clip ' + (at + 1) + ').', 'ok');
     }
     let lastSum = null;
@@ -591,7 +599,7 @@ void main(){
         // Übernehmen: alte Zeilen raus, neue rein
         for (const c of clips) await dbDel(c.id);
         clips = next; assignZoom(clips, auto.zoom); for (const c of clips) await dbPut(dbRow(c)); await saveOrder();
-        undoRows = snap; autoLog = log; sel = 0; pos = 0; clips.forEach(c => vidFor(c)); ui(); clips.forEach(thumb);
+        undoRows = snap; autoLog = log; sel = 0; pos = 0; ui(); clips.forEach(thumb);
         const after = total(), saved = before - after;
         const nV = log.filter(x => x.why === 'versprecher').length, nG = log.filter(x => x.why === 'geraeusch').length;
         const parts = []; if (pn) parts.push(pn + (pn === 1 ? ' Pause' : ' Pausen') + ' rausgeschnitten');
@@ -611,7 +619,7 @@ void main(){
       clips = undoRows.rows.map(r => { let u = urls.get(r.blob); if (!u) u = URL.createObjectURL(r.blob); return Object.assign({}, r, { url: u }); });
       for (const c of clips) await dbPut(dbRow(c)); await kvSet('order', undoRows.order).catch(() => {});
       undoRows = null; autoLog = []; lastSum = null; K('undo').hidden = true; autoResUi(null);
-      [...vids.keys()].forEach(u => dropVid(u)); clips.forEach(c => vidFor(c)); sel = 0; pos = 0; ui(); clips.forEach(thumb); say('↩ Zurück auf den Stand vor dem automatischen Schnitt.');
+      sel = 0; pos = 0; ui(); clips.forEach(thumb); say('↩ Zurück auf den Stand vor dem automatischen Schnitt.');
     };
 
     // ---- Fertig stellen ----
@@ -683,7 +691,7 @@ void main(){
     }
     // Rückfall: in Echtzeit über Canvas + MediaRecorder (alle Browser, dauert so lang wie das Video)
     async function slowRender(fill) {
-      if (!window.MediaRecorder) return null; const v0 = vids.get(clips[0].url); if (!v0 || !v0.videoWidth) return null;
+      if (!window.MediaRecorder) return null; const v0 = vidFor(clips[0]); if (!v0 || !v0.videoWidth) return null;
       const [W, H] = outSize(v0.videoWidth, v0.videoHeight), cv = document.createElement('canvas'); cv.width = W; cv.height = H; const draw = makeGL(cv); if (!draw) return null;
       const ac = new (window.AudioContext || window.webkitAudioContext)(); await ac.resume().catch(() => {}); const dest = ac.createMediaStreamDestination(), vg = ac.createGain(); vg.gain.value = mus.voice; vg.connect(dest);
       const srcs = new Map(); let mg = null, msrc = null;
@@ -694,8 +702,8 @@ void main(){
       r.start(500); let t0 = 0; const startAt = performance.now();
       if (mfile) { au.currentTime = 0; au.play().catch(() => {}); }
       for (let i = 0; i < clips.length && !closed; i++) {
-        const c = clips[i], v = vids.get(c.url); v.classList.remove('on'); v.style.transform = ''; v.muted = true; v.currentTime = c.in || 0; await new Promise(ok => { v.onseeked = ok; setTimeout(ok, 1500); });
-        if (!c.mute && !srcs.has(c.url)) { try { const s = ac.createMediaElementSource(v); s.connect(vg); srcs.set(c.url, s); } catch (e) {} }
+        const c = clips[i], v = vidFor(c); v.classList.remove('on'); v.style.transform = ''; v.muted = true; v.currentTime = c.in || 0; await new Promise(ok => { v.onseeked = ok; setTimeout(ok, 1500); });
+        if (!c.mute && !srcs.has(c.slot)) { try { const s = ac.createMediaElementSource(v); s.connect(vg); srcs.set(c.slot, s); } catch (e) {} }
         if (c.mute) v.muted = true; else v.muted = false; v.volume = 1;
         await v.play().catch(() => {});
         await new Promise(ok => { const step = () => { if (closed) { ok(); return; } draw(v, v.videoWidth, v.videoHeight, zAt(c, v.currentTime - (c.in || 0))); const t = t0 + (v.currentTime - (c.in || 0));
@@ -704,7 +712,7 @@ void main(){
         v.pause(); t0 += len(c);
       }
       await new Promise(x => setTimeout(x, 150)); r.stop(); await done; au.pause(); stream.getVideoTracks().forEach(t => t.stop()); try { ac.close(); } catch (e) {}
-      clips.forEach(c => { const v = vids.get(c.url); if (v) v.muted = !!c.mute; });
+      clips.forEach(c => { const v = vids.get(c.slot); if (v) v.muted = !!c.mute; });
       if (closed) return 'x'; const type = (r.mimeType || mt || 'video/webm').split(';')[0]; return new Blob(ch, { type });
     }
     let result = null;

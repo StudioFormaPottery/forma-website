@@ -460,6 +460,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
       <button type="button" class="up" id="share1" hidden>📲 In Fotos sichern</button>
       <a class="b" id="dl" hidden download>⬇ Als Datei herunterladen</a>
       <button type="button" class="sm" id="again" hidden>↺ Nochmal aufnehmen</button>
+      <span id="kept" hidden style="font-size:15px;color:#3F6B3E;align-self:center">✓ sicher im <a href="?view=schnitt" style="color:inherit">Schnitt</a></span>
       <button type="button" class="sm" id="editOld" hidden>Licht &amp; Musik (alt)</button>
       <button type="button" class="sm del" id="del" hidden>🗑 Löschen</button>
       <button type="button" class="sm del" id="cdel" hidden>🗑 Letzten Absatz löschen</button>
@@ -521,7 +522,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
 <script src="/wildhearts/assets/talkcam.js?v=5"></script>
 <script src="studio-edit.js?v=7"></script>
-<script src="schnitt.js?v=3"></script>
+<script src="schnitt.js?v=4"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
@@ -674,7 +675,8 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   // ---- Kamera ----
   // Bildqualität (Vivien, 28.10.2026: „Kamera-Qualität sollte 4K sein oder 2K“): die Kamera liefert höchstens, was sie kann
   const QUAL={'4k':[3840,2160,'4K'],'2k':[2560,1440,'2K'],'hd':[1920,1080,'Full HD']};
-  const qual=()=>{const q=ls.get('st-qual',matchMedia('(max-width:760px),(pointer:coarse)').matches?'hd':'4k');return QUAL[q]?q:'4k'};
+  // Standard Full HD (Vivien, 30.10.2026: „Video stockt in der Mitte“) – 4K bremst mit den Kamera-Filtern jedes Gerät aus
+  const qual=()=>{const q=ls.get('st-qual','hd');return QUAL[q]?q:'hd'};
   // Datenrate passend zur Größe, damit 4K auch wie 4K aussieht
   const vbr=(w,h)=>{const p=w*h;return p>=7e6?40000000:p>=3.2e6?20000000:p>=1.8e6?12000000:p>=.8e6?8000000:5000000};
   function qShow(){const el=$('qInfo');if(!el||!raw)return;const st=(raw.getVideoTracks()[0]||{getSettings:()=>({})}).getSettings(),cw=st.width||0,chh=st.height||0;
@@ -746,17 +748,21 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
       $('dl').href=url;$('dl').download=(tgt&&tgt.ig?tgt.ig.day+'_'+(tgt.ig.kind==='reel'?'Reel':'Story')+'_'+tgt.ig.t.slice(0,30):tgt&&tgt.clip?'Uebung_'+tgt.clip.n+'_'+stamp:(mvFree?'Bewegung_'+stamp:'TalkingHead_'+(tgt?tgt.t.t:'Eigener-Text')+'_'+(tgt?tgt.lang:lang).toUpperCase()+'_'+stamp)).replace(/[^\wäöüÄÖÜß-]+/g,'-')+'.'+ext;
       $('rd').hidden=true;$('stop').hidden=true;run=false;document.body.classList.remove('recording');prTop(false);showAfter();
       $('msg').className='msg';$('msg').textContent='Schau es dir kurz an. Passt es, '+(tgt&&BUNNY?'tippe auf „Hochladen“ oder lade es herunter.':'lade es herunter.');
+      keepTake(blob);
       if(lock){lock.release().catch(()=>{});lock=null}};
     fromFile=false;tgt=mv?{clip:mv}:(ig?{ig:ig}:(cur?{t:cur,lang:lang}:null));rec.start(1000);t0=performance.now();$('stop').hidden=false;$('rd').hidden=false;
     document.body.classList.add('recording');prMove(0,true);
     if($('prAuto').checked&&!pr.hidden){const R=rec;setTimeout(()=>{if(rec===R&&R.state==='recording')run=true},1200)}
     try{lock=await navigator.wakeLock.request('screen')}catch(e){}
-    (function loop(){if(!rec||rec.state!=='recording')return;$('rt').textContent=fmt((performance.now()-t0)/1000);tick=requestAnimationFrame(loop)})();
+    (function loop(){if(!rec||rec.state!=='recording')return;const s2=(performance.now()-t0)/1000;if(s2-lastRt>.25){lastRt=s2;$('rt').textContent=fmt(s2)}tick=requestAnimationFrame(loop)})();
   };
   $('stop').onclick=()=>{if(rec&&rec.state==='recording')rec.stop()};
-  $('again').onclick=()=>{if(!saved&&!confirm('Die Aufnahme ist noch nicht gespeichert. Trotzdem neu aufnehmen?'))return;blob=null;saved=true;$('play').removeAttribute('src');$('msg').textContent='';$('prog').hidden=true;prMove(0,true);showAfter();};
+  // Jede Aufnahme wandert sofort in den Schnitt (Vivien, 30.10.2026: „dann ist es einfach weg“) – nichts geht mehr verloren
+  async function keepTake(b){ if(!b||typeof Schnitt==='undefined')return;
+    try{ await Schnitt.addTake(b, takeName()); const m=$('kept'); if(m){m.hidden=false} }catch(e){} }
+  $('again').onclick=()=>{blob=null;saved=true;$('kept').hidden=true;$('play').removeAttribute('src');$('msg').textContent='';$('prog').hidden=true;prMove(0,true);showAfter();};
   // Sofort löschen (Vivien, 28.10.2026): ohne Nachfrage, kurz rückgängig machbar
-  let undo=null;
+  let undo=null,lastRt=-9;
   $('del').onclick=()=>{if(!blob)return;undo={b:blob,src:$('play').src,href:$('dl').href,name:$('dl').download,saved:saved,tgt:tgt};
     blob=null;saved=true;$('play').removeAttribute('src');$('prog').hidden=true;prMove(0,true);showAfter();
     $('msg').className='msg';$('msg').innerHTML='🗑 Aufnahme gelöscht. <button type="button" class="sm" id="undo" style="margin-left:6px">Rückgängig</button>';
@@ -765,7 +771,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   $('dl').addEventListener('click',()=>{saved=true});
   // Direkt in die Fotos (Vivien, 30.10.2026: „nicht als Datei, sondern direkt in der Galerie“): Web Share → Fotos am iPhone
   $('share1').onclick=async()=>{if(!blob)return;try{await navigator.share({files:[new File([blob],$('dl').download||'Video.mp4',{type:blob.type})]});saved=true;$('msg').className='msg ok';$('msg').textContent='✓ Gesichert. Das Video liegt jetzt in deinen Fotos.'}catch(e){}};
-  window.addEventListener('beforeunload',e=>{if(blob&&!saved){e.preventDefault();e.returnValue=''}});
+  window.addEventListener('beforeunload',e=>{if(blob&&!saved&&$('kept').hidden){e.preventDefault();e.returnValue=''}});
   $('up').onclick=()=>{
     if(!blob||!tgt)return;if(typeof tus==='undefined'&&!tgt.ig){$('msg').textContent='Der Upload konnte nicht laden. Bitte Seite neu laden (vorher herunterladen!).';return}
     if(tgt.ig){igSave(tgt.ig);return}
