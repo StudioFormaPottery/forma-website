@@ -293,6 +293,7 @@ void main(){
   <div class="sn-tl">
     <div class="sn-row" style="margin-top:8px"><span class="t" data-k="time">0:00 / 0:00</span>
       <button type="button" class="sn-b pl" data-k="play">▶ Abspielen</button>
+      <button type="button" class="sn-b" data-k="cut2" title="An der Stelle der Linie schneiden (Taste S)">✂️ Hier schneiden</button>
       <button type="button" class="sn-b" data-k="cmp" title="Licht & Farbe kurz ausschalten">Vorher zeigen</button></div>
     <div class="sn-zt">
       <div class="sn-zt-sc" data-k="ztsc"><div class="sn-zt-in" data-k="ztin"><div class="sn-zt-tt" data-k="ztt"></div><div class="sn-zt-blocks" data-k="ztb"></div><div class="sn-zt-ph" data-k="ztph"></div></div></div>
@@ -649,8 +650,10 @@ void main(){
     K('setA').onclick = () => { const c = clips[sel], v = cur(); if (!c || !v) return; c.in = Math.min(v.currentTime, (c.out || c.dur) - .3); change(c); say('⟦ Anfang gesetzt bei ' + fmt1(c.in) + '.'); };
     K('setB').onclick = () => { const c = clips[sel], v = cur(); if (!c || !v) return; c.out = Math.max(v.currentTime, (c.in || 0) + .3); change(c); say('Ende gesetzt bei ' + fmt1(c.out) + ' ⟧.'); };
     K('resetCut').onclick = () => { const c = clips[sel]; if (!c) return; c.in = 0; c.out = c.dur; change(c); };
-    K('split').onclick = async () => { const c = clips[sel], v = cur(); if (!c || !v) return; const t = v.currentTime; if (t <= (c.in || 0) + .3 || t >= (c.out || c.dur) - .3) { say('Zum Teilen die Stelle etwas weiter in die Mitte schieben.'); return; }
+    K('split').onclick = async () => { const L = locate(pos); if (L.i >= 0) sel = L.i; const c = clips[sel], v = cur(); if (!c || !v) return; const t = L.i >= 0 ? (c.in || 0) + L.off : v.currentTime; if (t <= (c.in || 0) + .3 || t >= (c.out || c.dur) - .3) { say('Zum Teilen die Stelle etwas weiter in die Mitte schieben.'); return; }
       const n = Object.assign({}, c, { id: uid(), in: t, added: c.added + 1, thumb: null, url: c.url }); c.out = t; clips.splice(sel + 1, 0, n); await dbPut(dbRow(c)); await dbPut(dbRow(n)); await saveOrder(); c.thumb = null; ui(); thumb(c); thumb(n); say('✂ Geteilt bei ' + fmt1(t) + '. Der zweite Teil ist jetzt Clip ' + (sel + 2) + '.', 'ok'); };
+    K('cut2').onclick = () => { if (busy || !clips[sel]) return; stop(); K('split').onclick(); };
+    document.addEventListener('keydown', e => { if (closed || busy || e.metaKey || e.ctrlKey || e.altKey || (e.key !== 's' && e.key !== 'S')) return; const t = e.target; if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return; if (!root.isConnected || !clips[sel]) return; e.preventDefault(); K('cut2').click(); });
     K('left').onclick = async () => { if (sel <= 0) return; [clips[sel - 1], clips[sel]] = [clips[sel], clips[sel - 1]]; sel--; await saveOrder(); ui(); };
     K('first').onclick = async () => { if (sel <= 0) return; const [c] = clips.splice(sel, 1); clips.unshift(c); sel = 0; await saveOrder(); pos = 0; ui(); say('⇤ „' + c.name + '“ ist jetzt ganz vorne.', 'ok'); };
     K('right').onclick = async () => { if (sel >= clips.length - 1) return; [clips[sel + 1], clips[sel]] = [clips[sel], clips[sel + 1]]; sel++; await saveOrder(); ui(); };
