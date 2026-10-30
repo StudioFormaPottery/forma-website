@@ -28,8 +28,8 @@ function mvl_head(string $title, string $desc, string $canon, string $og = '/img
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
 <link rel="manifest" href="/app.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movecia"><meta name="apple-mobile-web-app-status-bar-style" content="default"><script src="/wildhearts/assets/app.js?v=2" defer></script>
 <link rel="stylesheet" href="/wildhearts/assets/mv.css?v=2">
-<link rel="stylesheet" href="/wildhearts/assets/site.css?v=17">
-<link rel="stylesheet" href="/wildhearts/assets/cute.css?v=4">
+<link rel="stylesheet" href="/wildhearts/assets/site.css?v=18">
+<link rel="stylesheet" href="/wildhearts/assets/cute.css?v=5">
 <?= $extraCss ?>
 <?php if ($deOnly): ?><script>(function(){var l=<?= json_encode($l) ?>;try{if(!l)l=localStorage.getItem('wh-lang')||''}catch(e){}if(!l)l=(navigator.language||'').toLowerCase().indexOf('en')===0?'en':'de';if(l==='en')document.documentElement.classList.add('want-en');})();</script>
 <style>.en-note{display:none}html.want-en .en-note{display:block;background:#4A3A41;color:#FBF5F7;text-align:center;font-size:.92rem;padding:.55rem 16px;margin:0}html.de-only .site-top .lang{display:none!important}</style>

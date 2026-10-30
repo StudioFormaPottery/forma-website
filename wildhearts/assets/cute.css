@@ -41,3 +41,11 @@
 /* Link in Bio: Wellen hinter dem Profil, über die ganze Breite */
 .hw.bio{top:-10px;bottom:-1.5rem}
 .hw.bio .hw-lines{top:44%}
+
+/* Ruhige Fassung (Vivien, 30.10.2026: Wellen mit Strichen und Punkten wirkten altmodisch): keine Linien, keine Punkte, kein Kiesel;
+   die Wellen bleiben, aber stark weichgezeichnet als langsam treibender Farbschleier */
+.hw.calm .hw-lines,.hw.calm .hw-dot,.hw.calm .hw-pebble{display:none}
+.hw.calm .hw-wave{filter:blur(42px);-webkit-mask:none;mask:none;bottom:-40px}
+.hw.calm .hw-wave.w1{opacity:.7}.hw.calm .hw-wave.w2{opacity:.55}.hw.calm .hw-wave.w3{opacity:.3}
+@media(max-width:699px){.hw.calm .hw-wave{filter:blur(28px)}}
+.hw.calm{bottom:-160px;-webkit-mask:linear-gradient(transparent,#000 110px,#000 calc(100% - 170px),transparent);mask:linear-gradient(transparent,#000 110px,#000 calc(100% - 170px),transparent)}

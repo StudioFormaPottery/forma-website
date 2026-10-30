@@ -113,7 +113,7 @@ $seoDesc = 'Prä- und postnatales Training 1:1 mit Vivien Malonga: Schwangerscha
 <meta name="robots" content="noindex, nofollow">
 <?php endif; ?>
 <meta name="theme-color" content="#F2ECE4">
-<link rel="stylesheet" href="/wildhearts/assets/cute.css?v=4">
+<link rel="stylesheet" href="/wildhearts/assets/cute.css?v=5">
 <style>
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:normal;src:url(/fonts/CormorantGaramond-VF.woff) format("woff")}
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(/fonts/CormorantGaramond-Italic-VF.woff) format("woff")}

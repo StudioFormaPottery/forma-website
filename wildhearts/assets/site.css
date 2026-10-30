@@ -248,3 +248,8 @@ details.q summary{font-size:1.22rem}
 .mhero-pic{width:min(100%,420px);justify-self:center}
 .mhero-pic img{object-position:50% 70%}
 @media(min-width:900px){.mhero{grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:3.5rem}.mhero-pic{width:min(100%,480px);justify-self:end}}
+
+/* Erstes Video auf der Startseite klar eingebettet (Vivien, 30.10.2026: ausgefranste Ränder wirkten altbacken) */
+.art.wide.clean{border-radius:18px;aspect-ratio:21/9;background:var(--stone,#E4DCD1)}
+.art.wide.clean video{transform:none}
+@media(max-width:700px){.art.wide.clean{border-radius:14px;aspect-ratio:4/3}}

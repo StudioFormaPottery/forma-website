@@ -36,15 +36,15 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
 <?php mvl_top(); ?>
 <main>
 <section class="w"><div class="in hero-x">
-  <!-- Bewegter Hintergrund oben (Vivien, 27.10.2026: „sieht so langweilig aus, gern Wellen“): fließende Wellen, feine Linien, Movecia-Kiesel -->
-  <?= mv_waves() ?>
+  <!-- Kopfbereich (Vivien, 30.10.2026: Linien, Punkte und Kiesel wirkten altmodisch): nur noch ein weicher, langsam treibender Farbschleier -->
+  <?= mv_waves(false, 'calm') ?>
   <p class="k"><span class="de">Mindful Movement · Yoga · Somatic · Breathwork</span><span class="en">Mindful movement · yoga · somatic · breathwork</span></p>
   <h1><span class="de"><em>Ich bin Movecia.</em></span><span class="en"><em>I am Movecia.</em></span></h1>
   <p class="sub"><span class="de">Bewegung beginnt bei dir.</span><span class="en">Movement begins with you.</span></p>
   <p class="lead"><span class="de">Movecia heißt „in Bewegung“. Ich begleite Frauen zurück in ihren Körper, mit sanfter, achtsamer Bewegung, mit Atem und mit Raum für das, was sie wirklich beschäftigt. Online, wann immer du magst, live in kleinen Runden und persönlich bei mir in den Tiroler Bergen.</span><span class="en">Movecia means “in motion”. I guide women back into their bodies with gentle, mindful movement, with breath and with room for whatever is really on their minds. Online whenever you like, live in small circles and in person with me in the Tyrolean mountains.</span></p>
   <div class="cta"><a class="btn" href="#angebote"><span class="de">So begleite ich dich</span><span class="en">Ways to move with me</span> →</a><a class="btn line" href="/unfold/"><span class="de">Unfold · Start <?= mv_date($st) ?></span><span class="en">Unfold · starts <?= mv_date($st, 'en') ?></span></a></div>
 </div>
-<div class="in"><div class="art wide soft rv"><video src="/video/movecia/start.mp4?v=10" poster="/img/movecia/fotos/ev-start.jpg?v=10" autoplay muted loop playsinline preload="metadata" aria-label="Vivien bewegt sich langsam in ihrem lichten Studio mit Blick auf die Berge"></video></div></div></section>
+<div class="in"><div class="art wide clean rv"><video src="/video/movecia/start.mp4?v=10" poster="/img/movecia/fotos/ev-start.jpg?v=10" autoplay muted loop playsinline preload="metadata" aria-label="Vivien bewegt sich langsam in ihrem lichten Studio mit Blick auf die Berge"></video></div></div></section>
 
 <section class="band"><span class="band-blob b1" aria-hidden="true"></span><span class="band-blob b2" aria-hidden="true"></span><div class="w"><div class="in">
   <p class="k"><span class="de">Wofür Movecia steht</span><span class="en">What Movecia stands for</span></p>

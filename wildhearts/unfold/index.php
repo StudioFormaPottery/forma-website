@@ -54,7 +54,7 @@ $ld = [
 ];
 foreach ($ld as $j) echo '<script type="application/ld+json">' . json_encode($j, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "</script>\n";
 ?>
-<link rel="stylesheet" href="/wildhearts/assets/cute.css?v=4">
+<link rel="stylesheet" href="/wildhearts/assets/cute.css?v=5">
 <style>
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:normal;src:url(/fonts/CormorantGaramond-VF.woff) format("woff")}
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(/fonts/CormorantGaramond-Italic-VF.woff) format("woff")}
