@@ -139,6 +139,13 @@
 .sn-zt-bar .t{font-size:16px;color:#4A3A41;font-variant-numeric:tabular-nums;margin-left:auto}
 .sn-zt-bar input[type=range]{flex:1;min-width:90px;max-width:220px;accent-color:#7D5E68}
 .sn-zt-bar .zb{font:inherit;font-size:18px;width:36px;height:36px;border-radius:50%;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer}
+.sn-ml{display:flex;flex-direction:column;gap:6px}
+.sn-ml ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.sn-ml li{display:flex;align-items:center;gap:8px;background:#FBF8F4;border:1.5px solid #EFE7DE;border-radius:12px;padding:6px 8px}
+.sn-ml li .n{width:22px;height:22px;flex:none;border-radius:50%;background:#4A3040;color:#fff;font-size:12.5px;display:flex;align-items:center;justify-content:center}
+.sn-ml li span{flex:1;min-width:0;font-size:15.5px;color:#4A3040;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sn-ml li span small{color:#7D7076;margin-left:6px}
+.sn-ml li button{font:inherit;font-size:15px;width:34px;height:34px;flex:none;border-radius:50%;border:1.5px solid #DDD2C6;background:#fff;color:#4A3040;cursor:pointer}
 .sn-ovl{display:none;margin:8px 2px 0;padding:10px 12px;border-radius:14px;background:#FBF1E8;border:1.5px solid #E2C9B4;font-size:15.5px;color:#4A3040;line-height:1.45}
 .sn-ovl.on{display:block}
 .sn-ovl b{font-weight:600}
@@ -308,9 +315,9 @@ void main(){
     <p class="sn-note">Bei einem anderen Format wird die Mitte ausgeschnitten. Für Reels und Storys „Hoch 9:16“.</p>
   </div></details>
   <details class="sn-box"><summary>🎵 Musik darunter</summary><div class="bd">
-    <div><b style="font-weight:500;font-size:17px;color:#4A3A41" data-k="mname">Noch keine Musik</b> <button type="button" class="sn-b sm" data-k="mdel" hidden>Musik entfernen</button></div>
+    <div class="sn-ml" data-k="mlist"></div>
     <div class="sn-lib" data-k="lib"><p class="sn-note">Deine Musik wird geladen …</p></div>
-    <label class="sn-b" style="width:max-content;cursor:pointer">📁 Andere Datei vom Gerät<input type="file" accept="audio/*,.mp3,.m4a,.wav,.aac" hidden data-k="mfile"></label>
+    <label class="sn-b" style="width:max-content;cursor:pointer">📁 Lieder vom Gerät<input type="file" accept="audio/*,.mp3,.m4a,.wav,.aac" multiple hidden data-k="mfile"></label>
     <div data-sl="vol"></div><div data-sl="voice"></div>
     <label class="sn-sw"><input type="checkbox" data-k="duck"> Musik leiser, wenn ich spreche</label>
     <label class="sn-sw"><input type="checkbox" data-k="fade"> Musik sanft ein- und ausblenden</label>
@@ -326,7 +333,8 @@ void main(){
     const st = Object.assign({ look: 'natur', br: 1, ct: 1, sa: 1, se: 0, fmt: 'orig' }, ls.get('sn-st', {}));
     const mus = Object.assign({ vol: .18, voice: 1, duck: true, fade: true }, ls.get('sn-mus', {}));
     const auto = Object.assign({ pause: .7, stumbles: true, zoom: true, noise: true }, ls.get('sn-auto', {}));
-    let mfile = null;
+    let mlist = []; const XF = 2.5; // Musik-Playlist; XF = Sekunden Überblendung (bei kurzen Liedern weniger)
+    const xfOf = d => Math.max(.4, Math.min(XF, (d || 30) / 4));
     const vids = new Map(); // „Platz“ (url#0 / url#1) → <video>: zwei je Datei im Wechsel, damit der nächste Abschnitt
     // schon vorgespult bereitliegt und es am Schnitt nicht stockt (Vivien, 30.10.2026: „Video stockt in der Mitte“)
     function slots() { const n = {}; clips.forEach(c => { n[c.url] = (n[c.url] || 0) + 1; c.slot = c.url + '#' + ((n[c.url] - 1) % 2); }); }
@@ -438,7 +446,7 @@ void main(){
     function tick() {
       if (!playing) return;
       const c = clips[sel]; const v = cur(); if (!c || !v) { stop(); return; }
-      const off = Math.max(0, v.currentTime - (c.in || 0)); pos = starts()[sel] + off; timeUi();
+      const off = Math.max(0, v.currentTime - (c.in || 0)); pos = starts()[sel] + off; timeUi(); musDrive(pos, true);
       if (c.zoom) v.style.transform = 'scale(' + zAt(c, off).toFixed(4) + ')';
       if (!prepped && (c.out || c.dur) - v.currentTime < 1.2) { prepped = true; prep(sel + 1); }
       if (v.currentTime >= (c.out || c.dur) - .04 || v.ended) {
@@ -453,10 +461,10 @@ void main(){
       if (v.currentTime < (c.in || 0) || v.currentTime >= (c.out || c.dur) - .05) show(sel, 0); else show(sel, 0, false);
       playing = true; big.hidden = true; K('play').textContent = '❚❚ Pause';
       try { await v.play(); } catch (e) { playing = false; big.hidden = false; K('play').textContent = '▶ Abspielen'; say('Abspielen klappt nicht. Bitte nochmal auf ▶ tippen.'); return; }
-      if (mfile) { musicPlay(); }
+      musDrive(pos, true);
       cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
     }
-    function stop() { playing = false; cancelAnimationFrame(raf); const v = cur(); if (v) v.pause(); if (au) au.pause(); big.hidden = !clips.length; K('play').textContent = '▶ Abspielen'; }
+    function stop() { playing = false; cancelAnimationFrame(raf); const v = cur(); if (v) v.pause(); musStop(); big.hidden = !clips.length; K('play').textContent = '▶ Abspielen'; }
     K('play').onclick = () => playing ? stop() : play(); big.onclick = play;
     K('cmp').onclick = () => { cmp = !cmp; K('cmp').textContent = cmp ? 'Nachher zeigen' : 'Vorher zeigen'; K('cmp').setAttribute('aria-pressed', String(cmp)); K('tag').textContent = cmp ? 'Vorher' : ''; const v = cur(); if (v) v.style.filter = cmp ? '' : filterCss(st); };
     function timeUi() { K('time').textContent = fmt(pos) + ' / ' + fmt(total()); if (clips.length) ztPh(); }
@@ -500,7 +508,7 @@ void main(){
       K('mute').textContent = c.mute ? '🔊 Ton an' : '🔇 Ton aus'; K('left').disabled = sel === 0; K('right').disabled = sel === clips.length - 1;
       ovlUi();
     }
-    function ui() { slots(); dropVids(); renderClips(); edUi(); timeUi(); if (sel >= 0 && clips[sel]) { show(sel, 0, false); prep(sel + 1); } }
+    function ui() { slots(); dropVids(); renderClips(); edUi(); timeUi(); schedCache = null; mlUi(); if (sel >= 0 && clips[sel]) { show(sel, 0, false); prep(sel + 1); } }
     async function change(c) { await dbPut(dbRow(c)); c.thumb = null; ui(); thumb(c); }
     K('setA').onclick = () => { const c = clips[sel], v = cur(); if (!c || !v) return; c.in = Math.min(v.currentTime, (c.out || c.dur) - .3); change(c); say('⟦ Anfang gesetzt bei ' + fmt1(c.in) + '.'); };
     K('setB').onclick = () => { const c = clips[sel], v = cur(); if (!c || !v) return; c.out = Math.max(v.currentTime, (c.in || 0) + .3); change(c); say('Ende gesetzt bei ' + fmt1(c.out) + ' ⟧.'); };
@@ -664,23 +672,75 @@ void main(){
     fmtUi();
     root.addEventListener('loadedmetadata', e => { if (e.target.tagName === 'VIDEO' && st.fmt === 'orig' && e.target === cur()) fmtUi(); }, true);
 
-    // ---- Musik ----
-    const au = new Audio(); au.loop = true; au.preload = 'auto';
-    let lib = [], libTags = {}, libSel = 0; const pre = new Audio(); let preId = 0;
-    function setMusic(f) { mfile = f; if (au.src) URL.revokeObjectURL(au.src); if (f) au.src = URL.createObjectURL(f); else au.removeAttribute('src'); K('mname').textContent = f ? '🎵 ' + f.name.replace(/\.\w+$/, '') : 'Noch keine Musik'; K('mdel').hidden = !f; libUi(); }
-    function musicPlay() { if (!mfile) return; au.volume = Math.min(1, mus.vol); au.currentTime = pos % Math.max(.1, au.duration || 1e9); au.play().catch(() => {}); }
-    K('mfile').onchange = e => { const f = e.target.files[0]; if (f) { libSel = 0; setMusic(f); } e.target.value = ''; };
-    K('mdel').onclick = () => { au.pause(); libSel = 0; setMusic(null); };
+    // ---- Musik (mehrere Lieder, automatisch auf die Länge zugeschnitten) ----
+    // Vivien, 30.10.2026: „mehrere Lieder auswählen und das System schneidet es auf die Länge zu
+    // und macht Ein- und Ausfaden, sodass es flüssig im Hintergrund läuft.“
+    const auA = new Audio(), auB = new Audio(); [auA, auB].forEach(a => { a.preload = 'auto'; a.hidden = true; root.appendChild(a); });
+    let lib = [], libTags = {}; const pre = new Audio(); let preId = 0;
+    let schedCache = null, schedD = -1;
+    // Ablaufplan: ein Lied nach dem anderen, je XF Sekunden Überblendung; reicht die Musik nicht, geht es von vorne los
+    function sched() {
+      const D = total();
+      if (schedCache && Math.abs(schedD - D) < .05) return schedCache;
+      schedD = D; const out = [];
+      if (mlist.length && D > .2) { let t = 0, k = 0;
+        while (t < D - .05 && out.length < 60) { const m = mlist[k % mlist.length], d = Math.max(1, m.dur || 30);
+          out.push({ m, start: t, dur: d }); t += Math.max(1, d - xfOf(d)); k++; } }
+      return (schedCache = out);
+    }
+    // Wie laut läuft welches Lied zur Zeit t (0…1, noch ohne Lautstärke-Regler)?
+    function musPlan(t) {
+      const D = schedD < 0 ? total() : schedD, out = [];
+      sched().forEach((x, i) => { const end = Math.min(D, x.start + x.dur);
+        if (t < x.start - .01 || t >= end) return;
+        const xf = xfOf(x.dur), fi = x.start < .01 ? .4 : xf, fo = Math.min(xf, (end - x.start) / 2);
+        let g = 1; if (t < x.start + fi) g = (t - x.start) / fi; else if (t > end - fo) g = (end - t) / Math.max(.1, fo);
+        out.push({ i, x, g: Math.max(0, Math.min(1, g)), off: t - x.start }); });
+      return out;
+    }
+    // Treibt die zwei Audio-Elemente für Vorschau und Echtzeit-Speichern
+    function musDrive(t, run) {
+      if (!mlist.length) return;
+      const plan = musPlan(t), keep = new Set();
+      plan.forEach(p => { const a = (p.i % 2) ? auB : auA; keep.add(a);
+        if (a.__u !== p.x.m.url) { a.__u = p.x.m.url; a.src = p.x.m.url; }
+        a.volume = Math.max(0, Math.min(1, p.g * mus.vol));
+        if (run) { if (Math.abs(a.currentTime - p.off) > .4) { try { a.currentTime = p.off; } catch (e) {} } if (a.paused) a.play().catch(() => {}); }
+      });
+      [auA, auB].forEach(a => { if (!keep.has(a) && !a.paused) a.pause(); });
+    }
+    const musStop = () => [auA, auB].forEach(a => a.pause());
+    function mlUi() {
+      const box = K('mlist'), D = total();
+      if (!mlist.length) { box.innerHTML = '<p class="sn-note">Noch keine Musik. Nimm unten ein oder mehrere Lieder – ich schneide sie auf die Länge deines Videos zu und blende sie ineinander.</p>'; return; }
+      const ges = mlist.reduce((a, m) => a + (m.dur || 0), 0);
+      box.innerHTML = '<ul>' + mlist.map((m, i) => '<li><b class="n">' + (i + 1) + '</b><span>' + esc(m.name) + '<small>' + (m.dur ? fmt(m.dur) : '') + '</small></span>'
+        + (i ? '<button type="button" data-mup="' + i + '" aria-label="nach oben">↑</button>' : '')
+        + '<button type="button" data-mx="' + i + '" aria-label="entfernen">✕</button></li>').join('') + '</ul>'
+        + '<p class="sn-note">' + (mlist.length > 1 ? 'Die Lieder laufen in dieser Reihenfolge und blenden ineinander. ' : '')
+        + (ges < D - .5 ? 'Zusammen ' + fmt(ges) + ' – dein Video ist ' + fmt(D) + ' lang, danach fange ich wieder vorne an.' : 'Reicht für dein ganzes Video (' + fmt(D) + ').') + '</p>';
+      box.querySelectorAll('[data-mx]').forEach(b => b.onclick = () => { const i = +b.dataset.mx; URL.revokeObjectURL(mlist[i].url); mlist.splice(i, 1); schedCache = null; musStop(); mlUi(); libUi(); });
+      box.querySelectorAll('[data-mup]').forEach(b => b.onclick = () => { const i = +b.dataset.mup; mlist.splice(i - 1, 0, mlist.splice(i, 1)[0]); schedCache = null; musStop(); mlUi(); });
+    }
+    const fileDur = url => new Promise(ok => { const a = new Audio(); a.preload = 'metadata'; a.onloadedmetadata = () => ok(a.duration || 0); a.onerror = () => ok(0); a.src = url; });
+    async function addMusic(file, name, id) {
+      const url = URL.createObjectURL(file), d = await fileDur(url);
+      mlist.push({ file, url, name: name || file.name.replace(/\.\w+$/, ''), id: id || 0, dur: d });
+      schedCache = null; mlUi(); libUi();
+    }
+    K('mfile').onchange = async e => { const fs = [...e.target.files]; e.target.value = ''; for (const f of fs) await addMusic(f); if (fs.length) say('🎵 ' + (fs.length > 1 ? fs.length + ' Lieder liegen' : '„' + fs[0].name.replace(/\.\w+$/, '') + '“ liegt') + ' jetzt darunter.', 'ok'); };
     K('duck').checked = mus.duck; K('fade').checked = mus.fade;
     K('duck').onchange = () => { mus.duck = K('duck').checked; ls.set('sn-mus', mus); }; K('fade').onchange = () => { mus.fade = K('fade').checked; ls.set('sn-mus', mus); };
     function libUi() {
       const box = K('lib'); if (!o.musicUrl) { box.innerHTML = ''; return; }
       if (!lib.length) { box.innerHTML = '<p class="sn-note">Noch keine Lieder im Musik-Ordner.</p>'; return; }
       const f2 = s2 => s2 > 0 ? fmt(s2) : '';
-      box.innerHTML = '<b style="font-weight:500;font-size:17px;color:#4A3A41">Aus deiner Musik</b><ul>' + lib.map(x => '<li class="' + (x.id === libSel ? 'on' : '') + '"><button type="button" data-pv="' + x.id + '" aria-label="Reinhören">' + (preId === x.id ? '❚❚' : '▶') + '</button><span>' + esc(x.t) + '<small>' + f2(x.dur) + '</small></span><button type="button" class="pk" data-take="' + x.id + '">' + (x.id === libSel ? '✓ gewählt' : 'Nehmen') + '</button></li>').join('') + '</ul>';
+      const drin = id => mlist.some(m => m.id === id);
+      box.innerHTML = '<b style="font-weight:500;font-size:17px;color:#4A3A41">Aus deiner Musik</b><ul>' + lib.map(x => '<li class="' + (drin(x.id) ? 'on' : '') + '"><button type="button" data-pv="' + x.id + '" aria-label="Reinhören">' + (preId === x.id ? '❚❚' : '▶') + '</button><span>' + esc(x.t) + '<small>' + f2(x.dur) + '</small></span><button type="button" class="pk" data-take="' + x.id + '">' + (drin(x.id) ? '✓ drin · nochmal' : '＋ Nehmen') + '</button></li>').join('') + '</ul>';
       box.querySelectorAll('[data-pv]').forEach(b => b.onclick = () => { const id = +b.dataset.pv; if (preId === id) { pre.pause(); preId = 0; } else { pre.src = o.musicUrl + id; pre.volume = .6; pre.play().catch(() => {}); preId = id; } libUi(); });
-      box.querySelectorAll('[data-take]').forEach(b => b.onclick = async () => { const x = lib.find(y => y.id === +b.dataset.take); b.disabled = true; b.textContent = 'Lädt …'; try { const r = await fetch(o.musicUrl + x.id, { credentials: 'same-origin' }); const bl = await r.blob(); const f = new File([bl], x.t + '.mp3', { type: bl.type || 'audio/mpeg' }); pre.pause(); preId = 0; libSel = x.id; setMusic(f); say('🎵 „' + x.t + '“ liegt jetzt darunter.', 'ok'); } catch (e) { say('Das Lied konnte nicht laden.', 'bad'); libUi(); } });
+      box.querySelectorAll('[data-take]').forEach(b => b.onclick = async () => { const x = lib.find(y => y.id === +b.dataset.take); b.disabled = true; b.textContent = 'Lädt …'; try { const r = await fetch(o.musicUrl + x.id, { credentials: 'same-origin' }); const bl = await r.blob(); const f = new File([bl], x.t + '.mp3', { type: bl.type || 'audio/mpeg' }); pre.pause(); preId = 0; await addMusic(f, x.t, x.id); say('🎵 „' + x.t + '“ liegt jetzt darunter.', 'ok'); } catch (e) { say('Das Lied konnte nicht laden.', 'bad'); libUi(); } });
     }
+    mlUi();
     if (o.musicUrl) fetch(o.musicUrl.replace(/&dl=$/, '&json=1'), { credentials: 'same-origin' }).then(r => r.json()).then(j => { lib = j.list || []; libTags = j.tags || {}; libUi(); }).catch(() => { K('lib').innerHTML = ''; });
     else libUi();
 
@@ -836,16 +896,30 @@ void main(){
       const N = Math.max(1, Math.ceil(D * SR)); let bufs = [];
       for (const x of inputs) { if (x.c.mute) continue; try { const at = await x.input.getPrimaryAudioTrack(); if (!at || !(await at.canDecode())) continue; const as = new M.AudioBufferSink(at);
         for await (const b of as.buffers(Math.max(0, x.c.in - 1), x.c.out + 1)) { if (closed) return null; const rel = b.timestamp - x.c.in; const endRel = rel + b.buffer.duration; if (endRel <= 0 || rel >= len(x.c)) continue; bufs.push({ buffer: b.buffer, at: x.start + rel, clipStart: x.start, clipEnd: x.start + len(x.c) }); } } catch (e) {} }
-      if (!bufs.length && !mfile) return null;
+      if (!bufs.length && !mlist.length) return null;
       const place = (ctx, dst) => { const gains = new Map(); bufs.forEach(b => { let g = gains.get(b.clipStart); if (!g) { // je Clip 20 ms ein-/ausblenden, damit die Schnitte nicht knacken
           g = new GainNode(ctx, { gain: 0 }); g.connect(dst); const f = Math.min(.02, (b.clipEnd - b.clipStart) / 4); g.gain.setValueAtTime(0, b.clipStart); g.gain.linearRampToValueAtTime(1, b.clipStart + f); g.gain.setValueAtTime(1, Math.max(b.clipStart + f, b.clipEnd - f)); g.gain.linearRampToValueAtTime(0, b.clipEnd); gains.set(b.clipStart, g); }
         const s0 = new AudioBufferSourceNode(ctx, { buffer: b.buffer }); s0.connect(g); const off = b.at < 0 ? -b.at : 0, when = Math.max(0, b.at), dur = Math.min(b.buffer.duration - off, b.clipEnd - when); if (dur > 0) s0.start(when, off, dur); }); };
       let rms = null;
-      if (mfile && mus.duck && bufs.length) { const c1 = new OfflineAudioContext(1, N, SR); place(c1, c1.destination); const r1 = (await c1.startRendering()).getChannelData(0); const win = Math.round(SR * .05); rms = []; for (let i = 0; i < r1.length; i += win) { let s = 0, n = Math.min(win, r1.length - i); for (let j = 0; j < n; j++) s += r1[i + j] * r1[i + j]; rms.push(Math.sqrt(s / Math.max(1, n))); } }
+      if (mlist.length && mus.duck && bufs.length) { const c1 = new OfflineAudioContext(1, N, SR); place(c1, c1.destination); const r1 = (await c1.startRendering()).getChannelData(0); const win = Math.round(SR * .05); rms = []; for (let i = 0; i < r1.length; i += win) { let s = 0, n = Math.min(win, r1.length - i); for (let j = 0; j < n; j++) s += r1[i + j] * r1[i + j]; rms.push(Math.sqrt(s / Math.max(1, n))); } }
       const c2 = new OfflineAudioContext(2, N, SR), vg = new GainNode(c2, { gain: mus.voice }); vg.connect(c2.destination); place(c2, vg);
-      if (mfile) { const mb = await new Promise((ok, no) => mfile.arrayBuffer().then(ab => { const tmp = new OfflineAudioContext(2, SR, SR); tmp.decodeAudioData(ab, ok, no); }, no)).catch(() => null);
-        if (mb) { const ms = new AudioBufferSourceNode(c2, { buffer: mb, loop: true }), mg = new GainNode(c2, { gain: 0 }); ms.connect(mg); mg.connect(c2.destination); ms.start(0);
-          let duckT = -9, prev = 0; for (let k = 0, t = 0; t < D; k++, t = k * .05) { let g = mus.vol; if (mus.fade) g *= Math.max(0, Math.min(1, t / 1.5, (D - t) / 2.5)); if (rms && (rms[k] || 0) > .025) duckT = t; if (rms && t - duckT < .6) g *= .35; if (Math.abs(g - prev) > .001 || k === 0) { mg.gain.setTargetAtTime(g, t, g < prev ? .12 : .45); prev = g; } } } }
+      if (mlist.length) {
+        // Alle gewählten Lieder einmal entschlüsseln, dann der Reihe nach legen und ineinander blenden
+        const dec = new Map();
+        for (const m of mlist) { if (dec.has(m.url)) continue;
+          const b2 = await new Promise((ok, no) => m.file.arrayBuffer().then(ab => { const tmp = new OfflineAudioContext(2, SR, SR); tmp.decodeAudioData(ab, ok, no); }, no)).catch(() => null);
+          if (b2) dec.set(m.url, b2); }
+        const master = new GainNode(c2, { gain: 0 }); master.connect(c2.destination);
+        let any = false;
+        for (const x of sched()) { const mb = dec.get(x.m.url); if (!mb) continue; any = true;
+          const xf = xfOf(x.dur), end = Math.min(D, x.start + Math.min(x.dur, mb.duration)), fi = x.start < .01 ? .4 : xf, fo = Math.min(xf, (end - x.start) / 2);
+          if (end - x.start < .3) continue;
+          const src = new AudioBufferSourceNode(c2, { buffer: mb }), g = new GainNode(c2, { gain: 0 });
+          src.connect(g); g.connect(master);
+          g.gain.setValueAtTime(0, x.start); g.gain.linearRampToValueAtTime(1, x.start + fi);
+          g.gain.setValueAtTime(1, Math.max(x.start + fi, end - fo)); g.gain.linearRampToValueAtTime(0, end);
+          src.start(x.start, 0, end - x.start + .05); }
+        if (any) { let duckT = -9, prev = 0; for (let k = 0, t = 0; t < D; k++, t = k * .05) { let g = mus.vol; if (mus.fade) g *= Math.max(0, Math.min(1, t / 1.5, (D - t) / 2.5)); if (rms && (rms[k] || 0) > .025) duckT = t; if (rms && t - duckT < .6) g *= .35; if (Math.abs(g - prev) > .001 || k === 0) { master.gain.setTargetAtTime(g, t, g < prev ? .12 : .45); prev = g; } } } }
       return c2.startRendering();
     }
     async function fastRender(fill) {
@@ -887,23 +961,23 @@ void main(){
       const [W, H] = outSize(v0.videoWidth, v0.videoHeight), cv = document.createElement('canvas'); cv.width = W; cv.height = H; const draw = makeGL(cv); if (!draw) return null;
       const ac = new (window.AudioContext || window.webkitAudioContext)(); await ac.resume().catch(() => {}); const dest = ac.createMediaStreamDestination(), vg = ac.createGain(); vg.gain.value = mus.voice; vg.connect(dest);
       const srcs = new Map(); let mg = null, msrc = null;
-      if (mfile) { try { msrc = ac.createMediaElementSource(au); mg = ac.createGain(); mg.gain.value = 0; msrc.connect(mg); mg.connect(dest); } catch (e) {} }
+      if (mlist.length) { try { mg = ac.createGain(); mg.gain.value = 0; mg.connect(dest); [auA, auB].forEach(a => { const sx = ac.createMediaElementSource(a); sx.connect(mg); }); } catch (e) { mg = null; } }
       const stream = cv.captureStream(30); dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
       const mt = mime(), ch = [], r = new MediaRecorder(stream, Object.assign(mt ? { mimeType: mt } : {}, { videoBitsPerSecond: brate(W, H), audioBitsPerSecond: 160000 })); r.ondataavailable = e => { if (e.data && e.data.size) ch.push(e.data); }; const done = new Promise(ok => r.onstop = ok);
       const D = total(); say('Wird fertig gestellt … dauert so lang wie das Video (' + fmt(D) + '). Seite offen lassen.');
       r.start(500); let t0 = 0; const startAt = performance.now();
-      if (mfile) { au.currentTime = 0; au.play().catch(() => {}); }
+      if (mg) musDrive(0, true);
       for (let i = 0; i < clips.length && !closed; i++) {
         const c = clips[i], v = vidFor(c); v.classList.remove('on'); v.style.transform = ''; v.muted = true; v.currentTime = c.in || 0; await new Promise(ok => { v.onseeked = ok; setTimeout(ok, 1500); });
         if (!c.mute && !srcs.has(c.slot)) { try { const s = ac.createMediaElementSource(v); s.connect(vg); srcs.set(c.slot, s); } catch (e) {} }
         if (c.mute) v.muted = true; else v.muted = false; v.volume = 1;
         await v.play().catch(() => {});
         await new Promise(ok => { const step = () => { if (closed) { ok(); return; } draw(v, v.videoWidth, v.videoHeight, zAt(c, v.currentTime - (c.in || 0))); const t = t0 + (v.currentTime - (c.in || 0));
-          if (mg) { let g = mus.vol; if (mus.fade) g *= Math.max(0, Math.min(1, t / 1.5, (D - t) / 2.5)); mg.gain.setTargetAtTime(g, ac.currentTime, .2); }
+          if (mg) { musDrive(t, true); const g = mus.fade ? Math.max(0, Math.min(1, t / 1.5, (D - t) / 2.5)) : 1; mg.gain.setTargetAtTime(g, ac.currentTime, .2); }
           fill.style.width = Math.min(100, t / D * 100) + '%'; if (v.ended || v.currentTime >= (c.out || c.dur) - .03) { ok(); return; } (v.requestVideoFrameCallback ? v.requestVideoFrameCallback(step) : requestAnimationFrame(step)); }; step(); v.onended = ok; });
         v.pause(); t0 += len(c);
       }
-      await new Promise(x => setTimeout(x, 150)); r.stop(); await done; au.pause(); stream.getVideoTracks().forEach(t => t.stop()); try { ac.close(); } catch (e) {}
+      await new Promise(x => setTimeout(x, 150)); r.stop(); await done; musStop(); stream.getVideoTracks().forEach(t => t.stop()); try { ac.close(); } catch (e) {}
       clips.forEach(c => { const v = vids.get(c.slot); if (v) v.muted = !!c.mute; });
       if (closed) return 'x'; const type = (r.mimeType || mt || 'video/webm').split(';')[0]; return new Blob(ch, { type });
     }
@@ -923,7 +997,7 @@ void main(){
       K('resv').src = url; K('dl').href = url; K('dl').download = 'Movecia_Schnitt_' + stamp + '.' + ext; K('res').hidden = false;
       const canSh = !!(navigator.canShare && (() => { try { return navigator.canShare({ files: [new File([nb], 'v.' + ext, { type: nb.type })] }); } catch (e) { return false; } })());
       K('share').hidden = !canSh; K('dl').className = 'sn-b' + (canSh ? '' : ' pl');
-      K('resN').textContent = fmt(total()) + ' · ' + clips.length + (clips.length > 1 ? ' Clips' : ' Clip') + (mfile ? ' · mit Musik' : '') + (fast ? '' : ' · in Echtzeit gespeichert');
+      K('resN').textContent = fmt(total()) + ' · ' + clips.length + (clips.length > 1 ? ' Clips' : ' Clip') + (mlist.length ? ' · mit Musik' : '') + (fast ? '' : ' · in Echtzeit gespeichert');
       say(canSh ? '✓ Fertig. Schau es dir an, dann „In Fotos sichern“ (landet direkt in deiner Galerie) oder im Studio hochladen.' : '✓ Fertig. Schau es dir an, dann herunterladen oder im Studio hochladen.', 'ok'); K('res').scrollIntoView({ behavior: 'smooth', block: 'start' });
       try { await kvSet('result', { blob: nb, at: Date.now(), draft: drName(curDraft) }); } catch (e) {}
     };

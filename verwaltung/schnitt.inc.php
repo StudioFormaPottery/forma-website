@@ -26,7 +26,7 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
   <div><b>3 · Fertig stellen</b>Ein Video aus allen Clips, mit Licht und Musik. Dann herunterladen, in die Fotos sichern oder im Studio hochladen.</div>
 </div>
 <div id="sn"></div>
-<script src="schnitt.js?v=7"></script>
+<script src="schnitt.js?v=8"></script>
 <script>
 Schnitt.open({mount:document.getElementById('sn'),musicUrl:'?view=musik&dl=',vendor:'vendor/',studioUrl:'?view=studio&take=1',
   toStudio:function(){location.href='?view=studio&cut=1'}});
