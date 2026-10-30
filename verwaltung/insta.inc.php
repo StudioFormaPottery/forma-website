@@ -278,6 +278,7 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
     <?php else: ?>
       <?php if ($has): ?><button type="button" class="b main" data-share="<?= (int)$r['id'] ?>">📲 Teilen → Instagram</button><?php endif; ?>
       <a class="b <?= $has ? '' : 'rec' ?>" href="<?= $h($self) ?>?view=studio&amp;ig=<?= (int)$r['id'] ?>"><?= $has ? '↺ Neu aufnehmen' : '🎥 Aufnehmen' ?></a>
+      <a class="b sm" href="<?= $h($self) ?>?view=schnitt&amp;entwurf=<?= rawurlencode(($r['kind'] === 'reel' ? 'Reel ' : 'Story ') . $r['day']) ?>#entwuerfe" title="Den Entwurf zu diesem Tag im Schnitt öffnen">✂️ Entwurf im Schnitt</a>
       <button type="button" class="b sm" data-copy title="Text als Bildunterschrift kopieren">📋 Caption</button>
     <?php endif; ?>
     <?php if ($st !== 'gepostet'): ?><form method="post"><?= $hid('mm_ig_status', ['id' => $r['id'], 'st' => 'gepostet']) ?><button class="b sm">✓ Gepostet</button></form>
@@ -394,7 +395,8 @@ main{max-width:1240px}
 @media(max-width:640px){.dc{grid-template-columns:minmax(0,1fr)}.thead .b{margin-left:0}.tl{grid-template-columns:minmax(0,1fr)}}
 </style>
 <?php mm_subnav('insta'); ?>
-<div class="ih"><h1>📱 Instagram</h1>
+<div class="ih"><h1>📱 Instagram <a href="<?= $h($self) ?>?view=schnitt#entwuerfe" style="font:500 15px/1 'Hanken Grotesk',system-ui,sans-serif;padding:8px 14px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;text-decoration:none;vertical-align:middle;margin-left:8px">📝 Meine Entwürfe</a></h1>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 12px"><?php foreach (['reel' => '🎬 Reel jetzt aufnehmen', 'story' => '⭕ Story jetzt aufnehmen'] as $qk => $ql): ?><form method="post" style="margin:0"><?= $hid('mm_ig_save', ['id' => 0, 'kind' => $qk, 'acc' => $mv ? 'movecia' : 'privat', 'day' => date('Y-m-d'), 'title' => ($qk === 'reel' ? 'Reel' : 'Story') . ' ' . date('j.n.'), 'studio' => 1]) ?><button class="b main" style="font-size:17px;padding:12px 20px">  <?= $ql ?></button></form><?php endforeach; ?></div>
   <div class="acct" role="tablist"><a href="<?= $h($self) ?>?view=insta&amp;a=mvig&amp;m=<?= $h($m) ?>" class="<?= $mv ? 'on' : '' ?>"><b>🌿 @moveciamovement</b><span>Mindful &amp; Somatic Movement · Deutsch</span></a><a href="<?= $h($self) ?>?view=insta&amp;a=mein&amp;m=<?= $h($m) ?>" class="<?= $mv ? '' : 'on' ?>"><b>🤍 Dein Instagram</b><span>Tagesthemen · Deutsch &amp; Englisch</span></a></div>
   <?php if ($mv): ?><p>Der Contentplan für dein Movecia-Konto ist auf Wachstum ausgelegt: montags und mittwochs ein Reel mit einem Satz, bei dem sich Mamas ertappt fühlen, donnerstags ein Karussell zum Speichern, freitags ein Reel oder ein Angebot, dazu Storys am Dienstag und am Wochenende. Das Weihnachts-Gewinnspiel kommt jede Woche vor. Bei Beiträgen kopierst du einfach Folien und Caption, Reels und Storys nimmst du im Studio auf. Link in Bio: <b>moveciamovement.com/bio</b> <button type="button" class="b sm" data-copylink="https://moveciamovement.com/bio">📋 Link kopieren</button></p>
   <?php else: ?><p>Jeden Tag ein Thema aus deinem Leben: dazu ein Reel und eine Story als Talking Head und eine Nachricht für deinen Instagram- und WhatsApp-Kanal mit einer Foto-Idee. Aufnehmen kannst du in Ruhe im Studio, am Tag selbst tippst du nur noch auf „Teilen“ bzw. „Text kopieren“.</p><?php endif; ?></div>

@@ -579,7 +579,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
   function textOf(lg){return cur?(lg==='en'?cur.en:cur.de):ownOf(lg)}
   function paras(lg){return String(textOf(lg)||'').split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean)}
   function setText(){if(clipm){showSlide();return}const t=cur?(lang==='en'?cur.en:cur.de):$('ownT').value;
-    pr.querySelector('.pr-t').innerHTML=t.trim()?textHtml(t):'<span class="hint">'+(cur?'Für diese Lektion gibt es noch keinen '+(lang==='en'?'englischen':'deutschen')+' Text.':'Füge deinen Text beim Teleprompter ein.')+'</span>';prMove(0,true);}
+    pr.querySelector('.pr-t').innerHTML=t.trim()?textHtml(t):'<span class="hint">'+(cur&&!cur.ig?'Für diese Lektion gibt es noch keinen '+(lang==='en'?'englischen':'deutschen')+' Text.':'Füge deinen Text beim Teleprompter ein.')+'</span>';prMove(0,true);}
   let prLast=0;function prLoop(ts){if(run&&!pr.hidden){const dt=prLast?Math.min(.1,(ts-prLast)/1000):0,m=prMax();if(prPos<m){prPos=Math.min(m,prPos+sp*dt);prSet()}}prLast=ts;requestAnimationFrame(prLoop)}requestAnimationFrame(prLoop);
   function toggle(){run=!run}
   pr.addEventListener('click',toggle);

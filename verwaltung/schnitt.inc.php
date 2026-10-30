@@ -148,6 +148,8 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
       let j=null;for(let t=0;t<3&&!j;t++){try{j=await fetch(location.pathname,{method:'POST',body:f,credentials:'same-origin'}).then(r=>r.json())}catch(e){await new Promise(r=>setTimeout(r,2000))}}
       if(!j||j.error)return {error:j?j.error:'Die Verbindung ist abgebrochen.'};prog((i+1)/n)}
     return {ok:1,note:'Am Tag selbst unter „📱 Instagram täglich“ auf „Teilen“ tippen.'}}
+  // ?entwurf=Name (z. B. aus „Instagram täglich“): genau diesen Entwurf öffnen, wenn es ihn gibt
+  (async()=>{const want=new URLSearchParams(location.search).get('entwurf');if(want){try{const l=await Schnitt.drafts();if(l.some(d=>(d.name||'').toLowerCase()===want.toLowerCase()))await Schnitt.setDraft(want)}catch(e){}}
   Schnitt.open({mount:document.getElementById('sn'),musicUrl:'?view=musik&dl=',vendor:'vendor/',studioUrl:'?view=studio&take=1',calUrl:'?view=studio&kal=1',
     targets:()=>fetch('?view=schnitt&ziele=1',{credentials:'same-origin'}).then(r=>r.json()).then(j=>j.list||[]),
     upload:(blob,tg,prog,ext)=>{
@@ -157,7 +159,7 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
       if(tg.k==='ig')return igUp(blob,tg.id,ext,prog);
       return Promise.resolve({error:'Unbekanntes Ziel.'});},
     seeUrl:(tg,r)=>tg.k==='talk'?'?view=videos&play='+tg.id+'&lang='+tg.lang:(tg.k==='clip'&&r.see?'?view=videos&play='+r.see:''),
-    thumb:(guid,img)=>post('mm_sn_thumb',{guid:guid},['img',img,'titelbild.jpg'])});
+    thumb:(guid,img)=>post('mm_sn_thumb',{guid:guid},['img',img,'titelbild.jpg'])});})();
 })();
 </script>
 <?php
