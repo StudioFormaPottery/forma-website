@@ -596,7 +596,7 @@ if ($action === 'save_community') {
 
 if ($action === 'save_deko') {
     $m = (string)($_POST['deko'] ?? 'auto');
-    forma_set_setting($pdo, 'deko', in_array($m, ['auto', 'herbst', 'winter', 'fruehling', 'sommer', 'aus'], true) ? $m : 'auto');
+    forma_set_setting($pdo, 'deko', in_array($m, ['auto', 'halloween', 'herbst', 'winter', 'fruehling', 'sommer', 'aus'], true) ? $m : 'auto');
     go($self . '?view=popup', 'Die saisonale Deko ist gespeichert.');
 }
 
@@ -2327,15 +2327,15 @@ if ($view === 'popup') {
         <form method="post" class="card stack">
             <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
             <input type="hidden" name="action" value="save_deko">
-            <p class="muted small">Kleine Icons, die zur Jahreszeit passen: Herbstblätter, Kürbis und Tasse, im Winter Schneeflocken und Tannen, im Frühling Tulpen, im Sommer Sonne und Berge. „Automatisch“ wechselt von selbst nach Monat.</p>
+            <p class="muted small">Kleine Icons, die zur Jahreszeit passen: Herbstblätter, Kürbis und Tasse, im Winter Schneeflocken und Tannen, im Frühling Tulpen, im Sommer Sonne und Berge. „Automatisch“ wechselt von selbst nach Monat, vom 30. Oktober bis 1. November mit Halloween (Kürbisse, Spinnen, Fledermäuse und Halloween-Pop-up für Pottery bemalen).</p>
             <label for="deko">Deko</label>
             <select id="deko" name="deko">
                 <?php $cur = forma_setting($GLOBALS['pdo'], 'deko') ?? 'auto';
-                foreach (['auto' => 'Automatisch nach Jahreszeit', 'herbst' => 'Herbst', 'winter' => 'Winter', 'fruehling' => 'Frühling', 'sommer' => 'Sommer', 'aus' => 'Keine Deko'] as $k => $l): ?>
+                foreach (['auto' => 'Automatisch nach Jahreszeit', 'halloween' => 'Halloween', 'herbst' => 'Herbst', 'winter' => 'Winter', 'fruehling' => 'Frühling', 'sommer' => 'Sommer', 'aus' => 'Keine Deko'] as $k => $l): ?>
                 <option value="<?= $k ?>" <?= $cur === $k ? 'selected' : '' ?>><?= $l ?></option>
                 <?php endforeach; ?>
             </select>
-            <p class="muted small">Vorschau: <a href="/?deko=herbst" target="_blank" rel="noopener">Herbst</a> · <a href="/?deko=winter" target="_blank" rel="noopener">Winter</a> · <a href="/?deko=fruehling" target="_blank" rel="noopener">Frühling</a> · <a href="/?deko=sommer" target="_blank" rel="noopener">Sommer</a></p>
+            <p class="muted small">Vorschau: <a href="/?deko=halloween" target="_blank" rel="noopener">Halloween</a> · <a href="/?deko=herbst" target="_blank" rel="noopener">Herbst</a> · <a href="/?deko=winter" target="_blank" rel="noopener">Winter</a> · <a href="/?deko=fruehling" target="_blank" rel="noopener">Frühling</a> · <a href="/?deko=sommer" target="_blank" rel="noopener">Sommer</a></p>
             <button class="btn" type="submit">Speichern</button>
         </form>
     <?php });

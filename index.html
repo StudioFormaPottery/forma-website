@@ -343,6 +343,25 @@ section{scroll-margin-top:96px}
 .season-deco{position:absolute;z-index:1;pointer-events:none;opacity:1;transform:rotate(var(--r,0deg));animation:sway 7s ease-in-out infinite alternate}
 .season-deco svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 8px rgba(103,48,30,.12))}
 @keyframes sway{from{transform:rotate(var(--r,0deg)) translateY(0)}to{transform:rotate(calc(var(--r,0deg) + 8deg)) translateY(-8px)}}
+/* Halloween (30.10.–1.11.) */
+.hw-fx{position:fixed;inset:0;pointer-events:none;z-index:45;overflow:hidden}
+.hw-bat{position:absolute;left:0;animation:hwfly linear infinite;will-change:transform}
+.hw-bat.rev{animation-name:hwflyrev}
+.hw-bat i{display:block;width:100%;height:100%;animation:hwbob 1.8s ease-in-out infinite alternate}
+.hw-bat svg{width:100%;height:100%;display:block;overflow:visible}
+.hw-bat .w{transform-origin:32px 18px;animation:hwflap .22s ease-in-out infinite alternate}
+@keyframes hwfly{from{transform:translateX(-12vw)}to{transform:translateX(112vw)}}
+@keyframes hwflyrev{from{transform:translateX(112vw) scaleX(-1)}to{transform:translateX(-12vw) scaleX(-1)}}
+@keyframes hwbob{from{transform:translateY(-26px) rotate(-6deg)}to{transform:translateY(26px) rotate(6deg)}}
+@keyframes hwflap{from{transform:scaleY(1)}to{transform:scaleY(.35)}}
+.hw-spider{position:absolute;top:0;z-index:2;width:26px;margin-left:-13px;height:calc(var(--len) + 30px);overflow:hidden;pointer-events:none}
+.hw-spider b{position:absolute;left:0;bottom:0;width:26px;height:26px;animation:hwdrop 6s ease-in-out infinite alternate;animation-delay:inherit}
+.hw-spider b::before{content:"";position:absolute;left:50%;bottom:18px;width:1px;height:400px;background:rgba(51,33,27,.42)}
+.hw-spider svg{position:absolute;inset:0;width:26px;height:26px;animation:hwwiggle 2.6s ease-in-out infinite alternate;transform-origin:50% 0}
+@keyframes hwdrop{from{transform:translateY(calc(var(--len) * -.55))}to{transform:translateY(0)}}
+@keyframes hwwiggle{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
+@media (max-width:860px){.hw-spider.desk{display:none}}
+@media (prefers-reduced-motion:reduce){.hw-spider b,.hw-spider svg{animation:none}}
 @media (max-width:860px){.season-deco.desk{display:none}.season-deco{transform:scale(.8) rotate(var(--r,0deg))}}
 
 .vchoice.hours,.vchoice.mode,.vchoice.contact{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -573,6 +592,33 @@ section{scroll-margin-top:96px}
 .season .flake svg{display:block;width:100%;height:100%}
 .season .flake.red{color:var(--clay);filter:none;opacity:.7}
 @keyframes snow{0%{transform:translate(0,-20px) rotate(0)}50%{transform:translate(18px,300px) rotate(120deg)}100%{transform:translate(-8px,700px) rotate(240deg)}}
+/* Halloween-Pop-up (30.10.–1.11.): Nacht im Atelier, Spinnennetze, Fledermäuse */
+.season.theme-halloween{background:#2B1D18;color:#F3E6DA;box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.season.theme-halloween::backdrop{background:rgba(26,16,12,.68)}
+.season.theme-halloween .season-top{border-bottom-color:rgba(238,226,212,.22)}
+.season.theme-halloween .post-big,.season.theme-halloween .post-sub,.season.theme-halloween .season-next,.season.theme-halloween .eyebrow,.season.theme-halloween .consent{color:#EEE2D4}
+.season.theme-halloween .post-sub,.season.theme-halloween .consent{opacity:.82}
+.season.theme-halloween h3{color:#F3E6DA}
+.season.theme-halloween .season-date{background:#8C2C1D;color:#FBF1EA}
+.season.theme-halloween .season-close{background:#3E2A23;color:#F3E6DA}
+.season.theme-halloween .season-row input{background:#3A2822;border-color:rgba(238,226,212,.25);color:#FBF1EA}
+.season.theme-halloween .season-row input::placeholder{color:rgba(238,226,212,.6)}
+.season.theme-halloween .consent a{color:#EEE2D4}
+.season.theme-halloween .btn-ghost{color:#FBF1EA;border-color:rgba(238,226,212,.6)}
+.season.theme-halloween .btn-solid{background:#8C2C1D;color:#FBF1EA;border-color:#8C2C1D}
+.season.theme-halloween .season-img img{filter:saturate(.85) brightness(.92);box-shadow:0 0 0 6px rgba(140,44,29,.25),0 18px 40px rgba(0,0,0,.45)}
+.season .hw-web{position:absolute;width:150px;height:150px;opacity:.4}
+.season .hw-web.l{left:-8px;top:-8px}.season .hw-web.r{right:-10px;bottom:-10px;width:110px;height:110px;transform:rotate(180deg);opacity:.3}
+.season .hw-moon{position:absolute;right:76px;top:18px;width:46px;height:46px;opacity:.9}
+.season .hw-pbat{position:absolute;width:40px;height:25px;animation:hwpb 9s ease-in-out infinite}
+.season .hw-pbat svg{width:100%;height:100%;display:block}.season .hw-pbat .w{transform-origin:32px 18px;animation:hwflap .2s ease-in-out infinite alternate}
+@keyframes hwpb{0%{transform:translate(0,0)}25%{transform:translate(60px,-18px)}50%{transform:translate(120px,10px)}75%{transform:translate(50px,26px)}100%{transform:translate(0,0)}}
+.season .hw-pspider{position:absolute;top:0;width:24px;height:120px;overflow:hidden}
+.season .hw-pspider b{position:absolute;left:0;bottom:0;width:24px;height:24px;animation:hwdrop 5s ease-in-out infinite alternate;--len:110px}
+.season .hw-pspider b::before{content:"";position:absolute;left:50%;bottom:16px;width:1px;height:200px;background:rgba(238,226,212,.45)}
+.season .hw-pspider svg{width:24px;height:24px;display:block}
+@media (max-width:700px){.season .hw-web{width:90px;height:90px}.season .hw-web.r{width:70px;height:70px}.season .hw-moon{display:none}}
+@media (prefers-reduced-motion:reduce){.season .hw-pbat,.season .hw-pbat .w,.season .hw-pspider b{animation:none}}
 .season.theme-advent .season-img{background:#EEDFCF}
 .season.theme-advent .season-body{padding-top:64px}
 .season.theme-advent .season-body::before{background:var(--clay);opacity:.12}
@@ -2892,9 +2938,16 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     sun:'<circle cx="32" cy="32" r="12" fill="'+C.r+'"/><g stroke="'+C.b+'" stroke-width="4" stroke-linecap="round"><path d="M32 4v8M32 52v8M4 32h8M52 32h8M12 12l6 6M46 46l6 6M12 52l6-6M46 18l6-6"/></g>',
     mountain:'<path d="M2 54l20-32 10 14 8-10 22 28z" fill="'+C.k+'"/><path d="M22 22l6 9-4-2-4 4-4-2z" fill="'+C.p+'"/><path d="M40 26l6 8-3-1-3 3-3-2z" fill="'+C.p+'"/>',
     flower:'<path d="M32 30v28" stroke="'+C.k+'" stroke-width="3"/><g fill="'+C.b+'"><circle cx="32" cy="12" r="8"/><circle cx="22" cy="22" r="8"/><circle cx="42" cy="22" r="8"/><circle cx="26" cy="32" r="8"/><circle cx="38" cy="32" r="8"/></g><circle cx="32" cy="24" r="6" fill="'+C.r+'"/>',
+    jack:'<path d="M31 16c0-5 2-9 6-11" stroke="'+C.k+'" stroke-width="4" stroke-linecap="round" fill="none"/><ellipse cx="20" cy="38" rx="13" ry="17" fill="'+C.r+'"/><ellipse cx="44" cy="38" rx="13" ry="17" fill="'+C.r+'"/><ellipse cx="32" cy="38" rx="12" ry="19" fill="#9E3A26"/><path d="M19 32l6-6 5 7zM45 32l-6-6-5 7z" fill="#33211B"/><path d="M18 43l4 4 4-4 4 4 4-4 4 4 4-4 4 4c-4 5-9 7-14 7s-11-2-14-7z" fill="#33211B"/>',
+    ghost:'<path d="M14 58V28C14 16 22 8 32 8s18 8 18 20v30l-6-5-6 5-6-5-6 5-6-5z" fill="'+C.p+'" stroke="'+C.k+'" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="26" cy="28" rx="3" ry="4.5" fill="#33211B"/><ellipse cx="38" cy="28" rx="3" ry="4.5" fill="#33211B"/><ellipse cx="32" cy="38" rx="3.5" ry="4" fill="#33211B"/>',
+    bat:'<path d="M32 26c-3 0-4 3-4 3l-2-5-1 6c-6-6-14-8-23-4 5 2 7 6 6 10 4-3 9-2 11 2 2-4 6-5 9-3l4 9 4-9c3-2 7-1 9 3 2-4 7-5 11-2-1-4 1-8 6-10-9-4-17-2-23 4l-1-6-2 5s-1-3-4-3z" fill="#33211B"/><circle cx="30" cy="31" r="1" fill="'+C.p+'"/><circle cx="34" cy="31" r="1" fill="'+C.p+'"/>',
+    spider:'<path d="M32 0v24" stroke="'+C.k+'" stroke-width="1.5"/><g stroke="#33211B" stroke-width="2.5" fill="none" stroke-linecap="round"><path d="M28 34l-10-6-6 4M28 38l-12-2-6 6M28 42l-10 4-4 8M30 45l-6 8-2 6M36 34l10-6 6 4M36 38l12-2 6 6M36 42l10 4 4 8M34 45l6 8 2 6"/></g><ellipse cx="32" cy="40" rx="7" ry="9" fill="#33211B"/><circle cx="32" cy="29" r="5" fill="#33211B"/><circle cx="30" cy="28" r="1.2" fill="'+C.r+'"/><circle cx="34" cy="28" r="1.2" fill="'+C.r+'"/>',
+    web:'<g stroke="'+C.k+'" stroke-width="1.6" fill="none" opacity=".8"><path d="M4 4l56 56M4 4l26 56M4 4l56 26M4 4h56M4 4v56"/><path d="M4 18c6 0 12-2 14-14M4 32c12 0 22-6 28-28M4 46c18 0 32-10 42-42M4 60c24 0 44-14 56-56"/></g>',
+    moon:'<path d="M40 8a24 24 0 1 0 16 38A20 20 0 0 1 40 8z" fill="'+C.b+'"/><path d="M12 12l1.5 3 3 1.5-3 1.5L12 21l-1.5-3-3-1.5 3-1.5zM52 52l1 2 2 1-2 1-1 2-1-2-2-1 2-1z" fill="'+C.r+'"/>',
+    hat:'<path d="M8 50c8 4 40 4 48 0-6-3-12-4-16-4L34 10c-2-4-6-6-10-2l6 4 4 34c-6 0-16 1-26 4z" fill="#33211B"/><path d="M22 44c6-1 14-1 20 0l-1 5c-6-1-12-1-18 0z" fill="'+C.r+'"/><circle cx="20" cy="9" r="2" fill="'+C.b+'"/>',
     icecream:'<path d="M20 30l12 30 12-30z" fill="'+C.b+'"/><path d="M22 34l18 0M24 40h14M27 47h9" stroke="'+C.k+'" stroke-width="1.5" opacity=".5"/><circle cx="25" cy="24" r="10" fill="'+C.r+'"/><circle cx="39" cy="24" r="10" fill="'+C.p+'" stroke="'+C.b+'" stroke-width="1.5"/><circle cx="32" cy="14" r="9" fill="'+C.k+'"/>'
   };
-  var SEASONS={herbst:['leaf','pumpkin','mug','leaf2','mushroom','acorn','leaf','mug'],winter:['snow','tree','mug','star','mitten','snow','tree','star'],fruehling:['tulip','daisy','sprout','butterfly','tulip','daisy','sprout','butterfly'],sommer:['sun','mountain','flower','icecream','sun','flower','mountain','daisy']};
+  var SEASONS={halloween:['jack','ghost','bat','spider','web','moon','hat','jack'],herbst:['leaf','pumpkin','mug','leaf2','mushroom','acorn','leaf','mug'],winter:['snow','tree','mug','star','mitten','snow','tree','star'],fruehling:['tulip','daisy','sprout','butterfly','tulip','daisy','sprout','butterfly'],sommer:['sun','mountain','flower','icecream','sun','flower','mountain','daisy']};
   var SPOTS=[
     ['.hero',{left:'41%',top:'5%'},78,1],['.hero',{right:'1.5%',bottom:'24%'},66,0],['.hero',{left:'48%',bottom:'17%'},48,0],['.hero',{right:'1.5%',top:'8%'},44,1],
     ['#angebote',{right:'8%',top:'56px'},96,1],['#angebote',{right:'21%',top:'170px'},58,0],['#angebote',{left:'2%',bottom:'90px'},62,0],
@@ -2908,10 +2961,13 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     ['#post-card',{right:'4%',top:'18px'},62,1],['#post-card',{left:'2.5%',bottom:'14px'},54,0],['#post-card',{left:'48%',top:'16px'},44,0],
     ['.foot',{right:'6%',top:'90px'},56,0]
   ];
-  function seasonFor(d){var m=d.getMonth()+1;return m>=3&&m<=5?'fruehling':m>=6&&m<=8?'sommer':m>=9&&m<=11?'herbst':'winter';}
+  // Halloween (Vivien, 30.10.2026): jedes Jahr 30.10. bis 1.11., ab 2.11. wieder Herbst
+  function isHalloween(d){var m=d.getMonth()+1,t=d.getDate();return (m===10&&t>=30)||(m===11&&t===1);}
+  function seasonFor(d){if(isHalloween(d))return 'halloween';var m=d.getMonth()+1;return m>=3&&m<=5?'fruehling':m>=6&&m<=8?'sommer':m>=9&&m<=11?'herbst':'winter';}
   function drawDeco(mode){
     document.querySelectorAll('.season-deco').forEach(function(e){e.remove();});
     if(mode==='aus')return;
+    if(mode==='herbst'&&isHalloween(new Date()))mode='halloween';
     var season=SEASONS[mode]?mode:seasonFor(new Date()),all=SEASONS[season].filter(function(v,i,a){return a.indexOf(v)===i;});
     // bei jedem Besuch eine andere Auswahl: 3 Motive, zufällig verteilt
     for(var j=all.length-1;j>0;j--){var q=Math.floor(Math.random()*(j+1)),t=all[j];all[j]=all[q];all[q]=t;}
@@ -2926,9 +2982,35 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       w.innerHTML='<svg viewBox="0 0 64 64">'+ICONS[list[i]]+'</svg>';
       host.appendChild(w);
     });
+    halloweenFx(season==='halloween');
     keepTextFree();
     if(document.fonts&&document.fonts.ready)document.fonts.ready.then(keepTextFree);
     setTimeout(keepTextFree,1200);
+  }
+  // Halloween: Fledermäuse fliegen durchs Bild, kleine Spinnen hängen an den Bereichen
+  function halloweenFx(on){
+    document.querySelectorAll('.hw-fx,.hw-spider').forEach(function(e){e.remove();});
+    if(!on)return;
+    var calm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var BAT='<svg viewBox="0 0 64 40"><g class="w"><path d="M32 14c-3 0-4 3-4 3l-2-5-1 6c-6-6-14-8-23-4 5 2 7 6 6 10 4-3 9-2 11 2 2-4 6-5 9-3l4 9 4-9c3-2 7-1 9 3 2-4 7-5 11-2-1-4 1-8 6-10-9-4-17-2-23 4l-1-6-2 5s-1-3-4-3z" fill="#33211B"/></g><circle cx="30" cy="19" r="1" fill="#FBF1EA"/><circle cx="34" cy="19" r="1" fill="#FBF1EA"/></svg>';
+    if(!calm){var fx=document.createElement('div');fx.className='hw-fx';fx.setAttribute('aria-hidden','true');
+      var n=innerWidth<700?3:5;
+      for(var i=0;i<n;i++){var b=document.createElement('span');b.className='hw-bat'+(i%2?' rev':'');
+        var sz=26+Math.round(Math.random()*26);b.style.width=sz+'px';b.style.height=(sz*.62)+'px';
+        b.style.top=(6+Math.random()*70)+'%';b.style.animationDuration=(13+Math.random()*12)+'s';b.style.animationDelay=(-Math.random()*20+i*2.5)+'s';
+        b.innerHTML='<i>'+BAT+'</i>';fx.appendChild(b);}
+      document.body.appendChild(fx);}
+    var SP='<svg viewBox="0 0 40 40"><g stroke="#33211B" stroke-width="2" fill="none" stroke-linecap="round"><path d="M17 18l-8-5-5 3M17 21l-10-1-5 5M17 24l-8 4-3 6M19 27l-5 6-1 5M23 18l8-5 5 3M23 21l10-1 5 5M23 24l8 4 3 6M21 27l5 6 1 5"/></g><ellipse cx="20" cy="23" rx="5.5" ry="7" fill="#33211B"/><circle cx="20" cy="14" r="4" fill="#33211B"/><circle cx="18.6" cy="13.4" r=".9" fill="#8C2C1D"/><circle cx="21.4" cy="13.4" r=".9" fill="#8C2C1D"/></svg>';
+    [['.hero','47%',150],['.hero','88%',60],['.hero','96%',110],['#angebote','5%',120],['#angebote','93%',70],['#events','90%',100],['#studio','4%',80],['#fragen','94%',110],['#gutschein','8%',70],['#kontakt','92%',90],['#maker-club','6%',60],['.foot','50%',50]].forEach(function(s,i){
+      var host=document.querySelector(s[0]);if(!host)return;
+      if(getComputedStyle(host).position==='static')host.style.position='relative';
+      var d=document.createElement('span');d.className='hw-spider'+(i%2?' desk':'');d.setAttribute('aria-hidden','true');
+      d.style.left=s[1];d.style.setProperty('--len',s[2]+'px');d.style.animationDelay=(-i*1.7)+'s';d.innerHTML='<b>'+SP+'</b>';host.appendChild(d);
+    });
+    // Spinnen nie über Schrift: sonst ausblenden
+    function free(){var txt=textRects();document.querySelectorAll('.hw-spider').forEach(function(d){d.style.visibility='';var b=d.getBoundingClientRect();
+      for(var i=0;i<txt.length;i++){var t=txt[i];if(b.left-10<t.right&&b.right+10>t.left&&b.top<t.bottom&&b.bottom+6>t.top){d.style.visibility='hidden';break;}}});}
+    free();setTimeout(free,1200);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(free);
   }
   // Icons dürfen nie Schrift verdecken: jedes Icon, das eine Textzeile berührt, wird ausgeblendet
   function textRects(){
@@ -2994,9 +3076,18 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
       f.style.animationDuration=(7+Math.random()*7)+'s';f.style.animationDelay=(-Math.random()*12)+'s';
       f.innerHTML='<svg viewBox="0 0 24 24">'+(k%3===0?DOTP:STARP)+'</svg>';deco.appendChild(f);}
   }
+  function halloweenPopDeco(){
+    var deco=document.getElementById('season-deco');
+    var WEB='<svg class="hw-web l" viewBox="0 0 64 64"><g stroke="#EEE2D4" stroke-width=".9" fill="none"><path d="M0 0l64 64M0 0l30 64M0 0l64 30M0 0h64M0 0v64"/><path d="M0 14c6 0 12-3 14-14M0 28c12 0 23-7 28-28M0 44c18 0 33-11 44-44M0 60c25 0 46-16 60-60"/></g></svg>';
+    var BAT='<svg viewBox="0 0 64 40"><g class="w"><path d="M32 14c-3 0-4 3-4 3l-2-5-1 6c-6-6-14-8-23-4 5 2 7 6 6 10 4-3 9-2 11 2 2-4 6-5 9-3l4 9 4-9c3-2 7-1 9 3 2-4 7-5 11-2-1-4 1-8 6-10-9-4-17-2-23 4l-1-6-2 5s-1-3-4-3z" fill="#120B09"/></g><circle cx="30" cy="19" r="1.1" fill="#C24A33"/><circle cx="34" cy="19" r="1.1" fill="#C24A33"/></svg>';
+    var SP='<svg viewBox="0 0 40 40"><g stroke="#EEE2D4" stroke-width="2" fill="none" stroke-linecap="round"><path d="M17 18l-8-5-5 3M17 21l-10-1-5 5M17 24l-8 4-3 6M19 27l-5 6-1 5M23 18l8-5 5 3M23 21l10-1 5 5M23 24l8 4 3 6M21 27l5 6 1 5"/></g><ellipse cx="20" cy="23" rx="5.5" ry="7" fill="#EEE2D4"/><circle cx="20" cy="14" r="4" fill="#EEE2D4"/><circle cx="18.6" cy="13.4" r="1" fill="#8C2C1D"/><circle cx="21.4" cy="13.4" r="1" fill="#8C2C1D"/></svg>';
+    var h=WEB+WEB.replace('hw-web l','hw-web r')+'<svg class="hw-moon" viewBox="0 0 64 64"><path d="M40 8a24 24 0 1 0 16 38A20 20 0 0 1 40 8z" fill="#EEE2D4"/></svg>';
+    h+='<span class="hw-pbat" style="left:8%;top:44%">'+BAT+'</span><span class="hw-pbat" style="left:52%;top:9%;animation-delay:-3s;animation-duration:11s">'+BAT+'</span><span class="hw-pbat" style="left:70%;top:70%;animation-delay:-6s;width:30px;height:19px">'+BAT+'</span>';
+    deco.innerHTML=h;
+  }
   function openSeason(p){
-    season.classList.toggle('theme-advent',p.theme==='advent');
-    if(p.theme==='advent')adventDeco();else document.getElementById('season-deco').innerHTML='';
+    season.classList.toggle('theme-advent',p.theme==='advent');season.classList.toggle('theme-halloween',p.theme==='halloween');
+    if(p.theme==='advent')adventDeco();else if(p.theme==='halloween')halloweenPopDeco();else document.getElementById('season-deco').innerHTML='';
     var img=document.getElementById('season-img');
     if(p.image){document.getElementById('season-pic').src=p.image;img.hidden=false;document.getElementById('season-inner').classList.remove('no-img');}
     else{img.hidden=true;document.getElementById('season-inner').classList.add('no-img');}

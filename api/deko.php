@@ -11,4 +11,4 @@ try {
     $mode = 'auto';
 }
 header('Cache-Control: public, max-age=300');
-forma_json(['ok' => true, 'community' => $community, 'mode' => in_array($mode, ['auto', 'herbst', 'winter', 'fruehling', 'sommer', 'aus'], true) ? $mode : 'auto']);
+forma_json(['ok' => true, 'community' => $community, 'mode' => in_array($mode, ['auto', 'halloween', 'herbst', 'winter', 'fruehling', 'sommer', 'aus'], true) ? $mode : 'auto']);

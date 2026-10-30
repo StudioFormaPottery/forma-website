@@ -4,8 +4,27 @@ declare(strict_types=1);
 require __DIR__ . '/lib.php';
 
 try {
-    $p = forma_popup(forma_db());
+    $pdo = forma_db();
+    $p = forma_popup($pdo);
     $preview = isset($_GET['vorschau']);
+    // Halloween (Vivien, 30.10.2026): jedes Jahr vom 30.10. bis 1.11. automatisch ein Halloween-Pop-up für Pottery bemalen,
+    // außer die Deko ist in der Verwaltung ausgeschaltet. Ab 2.11. wieder das normale Pop-up.
+    $md = (new DateTimeImmutable('now', new DateTimeZone('Europe/Vienna')))->format('m-d');
+    $hwOn = ($md >= '10-30' && $md <= '10-31') || $md === '11-01';
+    if ((($hwOn && (forma_setting($pdo, 'deko') ?? 'auto') !== 'aus') || ($preview && ($_GET['thema'] ?? '') === 'halloween'))) {
+        forma_json(['ok' => true, 'popup' => [
+            'id' => 'hw' . date('Y'),
+            'eyebrow' => 'Halloween im Atelier',
+            'title' => 'Gruselig schön: Pottery bemalen',
+            'text' => '',
+            'date_line' => 'Ab November · Mi & Do 15–18 Uhr',
+            'signup' => true,
+            'button_text' => 'Platz reservieren',
+            'button_link' => '#pottery-bemalen',
+            'image' => 'img/bemalen-hand.jpg',
+            'theme' => 'halloween',
+        ]]);
+    }
     if (!$preview && !forma_popup_live($p)) {
         forma_json(['ok' => true, 'popup' => null]);
     }
