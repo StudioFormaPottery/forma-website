@@ -26,6 +26,7 @@
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   const fmt = s => { s = Math.max(0, s || 0); return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'); };
   const fmt1 = s => fmt(s) + ',' + Math.floor((Math.max(0, s || 0) % 1) * 10);
+  const sec1 = v => (Math.round((v || 0) * 10) / 10).toFixed(1).replace('.', ',') + ' s'; // kurze Dauer als Sekunden, nicht als Uhrzeit
   const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const ls = { get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
 
@@ -68,7 +69,7 @@
 
   const CSS = `
 .sn{font-family:"Hanken Grotesk","Outfit",system-ui,sans-serif;color:#2E2529;display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,400px);gap:22px;align-items:start}
-@media(max-width:980px){.sn{display:flex;flex-direction:column;gap:14px}}
+@media(max-width:980px){.sn{display:flex;flex-direction:column;gap:14px}.sn>*{min-width:0;max-width:100%}}
 .sn *{box-sizing:border-box}
 .sn h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;color:#4A3A41;font-size:26px;margin:0 0 8px}
 .sn-l{min-width:0}
@@ -111,7 +112,7 @@
 .sn-ed{background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:18px;padding:12px 14px;margin-top:4px}
 .sn-ed .h{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between}
 .sn-ed .h b{font-weight:500;font-size:17px;color:#4A3A41}.sn-ed .h span{color:#7D7076;font-size:15px}
-.sn-zt{position:relative;margin-top:10px;border-radius:16px;background:#fff;border:1.5px solid #E6DCD2;overflow:hidden}
+.sn-zt{position:relative;max-width:100%;margin-top:10px;border-radius:16px;background:#fff;border:1.5px solid #E6DCD2;overflow:hidden}
 .sn-zt-sc{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;overscroll-behavior-x:contain;touch-action:pan-x pinch-zoom;cursor:crosshair}
 .sn-zt-in{position:relative;height:104px;min-width:100%;user-select:none;-webkit-user-select:none;touch-action:pan-x}
 .sn-zt-tt{position:absolute;left:0;right:0;top:0;height:20px}
@@ -121,6 +122,8 @@
 .sn-zt-bl .lb{position:absolute;left:7px;top:5px;right:7px;font-size:12.5px;color:#4A3A41;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 .sn-zt-bl .ln{position:absolute;left:7px;bottom:5px;font-size:12px;color:#6E6168;font-variant-numeric:tabular-nums;pointer-events:none}
 .sn-zt-bl.mu .lb::after{content:" 🔇"}
+.sn-zt-g{position:absolute;top:6px;bottom:8px;border-radius:10px;background:repeating-linear-gradient(135deg,#F3ECE4,#F3ECE4 5px,#E8DCD0 5px,#E8DCD0 10px);border:1.5px dashed #CFBEB0;overflow:hidden;pointer-events:none}
+.sn-zt-g span{position:absolute;left:5px;right:5px;top:50%;transform:translateY(-50%);font-size:11.5px;color:#8A7A6E;white-space:nowrap;overflow:hidden;text-align:center}
 .sn-zt-cut{position:absolute;top:6px;bottom:8px;width:16px;margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#8C2C1D;background:rgba(140,44,29,.10);border-left:1.5px dashed #C08C82;border-right:1.5px dashed #C08C82;border-radius:4px;pointer-events:none;z-index:1}
 .sn-zt-h{position:absolute;top:6px;bottom:8px;width:16px;border-radius:8px;background:#7D5E68;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:ew-resize;touch-action:none;box-shadow:0 1px 4px rgba(46,37,41,.35);z-index:2}
 .sn-zt-h.a{border-top-right-radius:2px;border-bottom-right-radius:2px}
@@ -175,6 +178,11 @@
 .sn-res video{width:100%;max-height:50vh;border-radius:14px;background:#000;display:block}
 .sn-busy .sn-r,.sn-busy .sn-clips,.sn-busy .sn-ed,.sn-busy .sn-tl{opacity:.4;pointer-events:none}
 .sn-box.auto{background:linear-gradient(135deg,#FBF8F4,#F3E7EA);border-color:#E2CBD2}
+.sn-pz .lb{font-size:16px;color:#4A3A41;margin-bottom:2px}
+.sn-pz .lb b{color:#4A3040;font-variant-numeric:tabular-nums;font-size:18px}
+.sn-pz input[type=range]{width:100%;accent-color:#7D5E68;height:36px;margin:0}
+.sn-pz .sc{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:#9A8C93;margin-top:-6px}
+.sn-pz .sn-note{margin:4px 0 0}
 .sn-auto-res{background:#fff;border:1.5px solid #E6DCD2;border-radius:16px;padding:10px 12px;font-size:16px;color:#4A3A41;line-height:1.5}
 .sn-auto-res ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
 .sn-auto-res li{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#FBF8F4;border-radius:12px;padding:6px 8px}
@@ -218,7 +226,7 @@ void main(){
       <div class="sn-zt-sc" data-k="ztsc"><div class="sn-zt-in" data-k="ztin"><div class="sn-zt-tt" data-k="ztt"></div><div class="sn-zt-blocks" data-k="ztb"></div><div class="sn-zt-ph" data-k="ztph"></div></div></div>
       <div class="sn-zt-bar"><button type="button" class="zb" data-k="zoomOut" aria-label="Zeitleiste zusammenziehen">－</button><input type="range" min="0" max="100" step="1" value="0" data-k="zoomR" aria-label="Zeitleiste auseinanderziehen"><button type="button" class="zb" data-k="zoomIn" aria-label="Zeitleiste auseinanderziehen">＋</button><span class="t" data-k="ztime">0:00,0</span></div>
     </div>
-    <p class="sn-zt-hint" data-k="zthint">Tippen = Stelle anspringen · die Griffe <b>⟦ ⟧</b> an den Rändern ziehen = Anfang und Ende länger oder kürzer machen · zwei Finger auseinander (oder ＋) = Zeitleiste auseinanderziehen</p>
+    <p class="sn-zt-hint" data-k="zthint">Tippen = Stelle anspringen · die Griffe <b>⟦ ⟧</b> an den Rändern ziehen = Anfang und Ende länger oder kürzer machen (das schraffierte Stück daneben ist das, was weggeschnitten wurde – da kannst du wieder hineinziehen) · zwei Finger auseinander (oder ＋) = Zeitleiste auseinanderziehen</p>
   </div>
   <h2 style="margin-top:16px" data-k="h2">Deine Clips <span style="font-size:16px;color:#7D7076;font-family:'Hanken Grotesk',sans-serif;font-weight:400" data-k="cnt"></span></h2>
   <div class="sn-clips" data-k="clips"></div>
@@ -270,7 +278,13 @@ void main(){
   <details class="sn-box auto" open><summary>✨ Automatisch schneiden</summary><div class="bd">
     <p class="sn-note" style="color:#4A3A41">Ein Tipp, und ich schneide Pausen raus, nehme heraus, wo du dich erst zurechtsetzt oder neu angesetzt hast, und lege einen sanften Zoom über die Abschnitte, damit es sich flüssig und lebendig anschaut. Danach siehst du jeden Schnitt in der Zeitleiste und kannst ihn mit den Griffen länger oder kürzer ziehen.</p>
     <button type="button" class="sn-b main" data-k="auto" style="font-size:18px;min-height:52px">✨ Jetzt automatisch schneiden</button>
-    <div><div style="font-size:16px;color:#4A3A41;margin-bottom:6px">Pausen rausschneiden ab</div><div class="sn-chips" data-k="pauses"></div></div>
+    <div class="sn-pz">
+      <div class="lb">Pausen rausschneiden ab <b data-k="pauseV">0,7 s</b></div>
+      <input type="range" min="20" max="250" step="5" value="70" data-k="pauseR" aria-label="Pausen rausschneiden ab">
+      <div class="sc"><span>jede Atempause</span><span>nur lange Pausen</span></div>
+      <p class="sn-note" data-k="pauseH"></p>
+      <button type="button" class="sn-b sm" data-k="pauseGo" hidden>✨ Mit dieser Einstellung nochmal schneiden</button>
+    </div>
     <label class="sn-sw"><input type="checkbox" data-k="stumbles"> Versprecher erkennen (wenn du neu ansetzt)</label>
     <label class="sn-sw"><input type="checkbox" data-k="noisefx"> Stellen ohne Sprechen rausnehmen (in Position gehen, rascheln)</label>
     <label class="sn-sw"><input type="checkbox" data-k="zoomfx"> Sanfter Zoom hinein und heraus</label>
@@ -488,33 +502,64 @@ void main(){
         if (xi >= (c.out || c.dur || 0) - .001 && xi < hi) hi = xi; }
       return [lo, hi];
     }
+    // Wie viel weggeschnittenes Material wird neben dem gewählten Clip gezeigt? (Fenster, damit die Leiste nicht endlos wird)
+    let GW = null;
+    function ghostWin() {
+      const c = clips[sel]; if (!c) return null;
+      const r = room(sel), p = pps(), cap = (Math.max(260, ztSc.clientWidth) * .3) / p;
+      return { g0: Math.max(r[0], (c.in || 0) - cap), g1: Math.min(r[1], (c.out || c.dur || 0) + cap), lo: r[0], hi: r[1] };
+    }
+    const ztLim = i => (GW && i === sel) ? [GW.g0, GW.g1] : room(i);
+    let LAY = { p: 1, head: 0, tail: 0, selS: 0, selE: 0 };
+    // Zeit im Gesamtvideo -> Pixel (die Schatten-Stücke schieben alles dahinter nach rechts)
+    const ZTX = t => t * LAY.p + (LAY.head && t >= LAY.selS - 1e-6 ? LAY.head : 0) + (LAY.tail && t >= LAY.selE - 1e-6 ? LAY.tail : 0);
+    function ZTT(x) { // Pixel -> Zeit im Gesamtvideo
+      const p = LAY.p; if (!LAY.head && !LAY.tail) return x / p;
+      const a = LAY.selS * p; if (x < a) return x / p;
+      if (x < a + LAY.head) return LAY.selS;
+      const b = a + LAY.head + (LAY.selE - LAY.selS) * p; if (x < b) return LAY.selS + (x - a - LAY.head) / p;
+      if (x < b + LAY.tail) return LAY.selE;
+      return LAY.selE + (x - b - LAY.tail) / p;
+    }
     function ztDraw() {
-      const T = total(), W = Math.max(ztSc.clientWidth, Math.round(basePps() * Z * T)); ztIn.style.width = W + 'px';
-      const p = W / Math.max(.4, T), st2 = [.2, .5, 1, 2, 5, 10, 15, 30, 60, 120, 300, 600].find(x => x * p >= 64) || 900;
-      let h = ''; for (let t = 0; t <= T + 1e-6; t += st2) h += '<div class="sn-zt-tk big" style="left:' + (t * p) + 'px"><span>' + (st2 < 1 ? fmt1(t) : fmt(t)) + '</span></div>';
+      const T = total(), p = pps(), S = starts(), c0 = clips[sel];
+      if (!ztDrag || ztDrag.h === 'ph') GW = ghostWin();
+      if (!c0) GW = null;
+      const head = GW ? Math.max(0, ((c0.in || 0) - GW.g0)) * p : 0, tail = GW ? Math.max(0, (GW.g1 - (c0.out || c0.dur || 0))) * p : 0;
+      LAY = { p, head, tail, selS: c0 ? S[sel] : 0, selE: c0 ? S[sel] + len(c0) : 0 };
+      const W = Math.max(ztSc.clientWidth, Math.round(T * p + head + tail)); ztIn.style.width = W + 'px';
+      const st2 = [.2, .5, 1, 2, 5, 10, 15, 30, 60, 120, 300, 600].find(x => x * p >= 64) || 900;
+      let h = ''; for (let t = 0; t <= T + 1e-6; t += st2) h += '<div class="sn-zt-tk big" style="left:' + ZTX(t) + 'px"><span>' + (st2 < 1 ? fmt1(t) : fmt(t)) + '</span></div>';
       K('ztt').innerHTML = h;
-      const S = starts(); let b2 = '';
+      let b2 = '', x = 0;
       clips.forEach((c, i) => {
-        const x = S[i] * p, w = Math.max(3, len(c) * p), on = i === sel, r = room(i);
+        const on = i === sel, w = Math.max(3, len(c) * p);
+        if (on && head > 0) { const rest = (c.in || 0) - GW.lo;
+          b2 += '<div class="sn-zt-g a" style="left:' + x + 'px;width:' + head + 'px" title="Hier wurde vorne etwas weggeschnitten – Griff ⟦ hierher ziehen">' + (head > 48 ? '<span>⟵ noch ' + sec1(rest) + '</span>' : '') + '</div>';
+          x += head; }
         b2 += '<div class="sn-zt-bl' + (on ? ' on' : '') + (c.mute ? ' mu' : '') + '" data-bl="' + i + '" style="left:' + x + 'px;width:' + w + 'px">'
           + (w > 54 ? '<span class="lb">' + (i + 1) + ' · ' + esc(c.name) + '</span><span class="ln">' + fmt1(len(c)) + '</span>' : '') + '</div>';
-        if (on) { const canA = (c.in || 0) - r[0] > .05, canB = r[1] - (c.out || c.dur || 0) > .05;
-          b2 += '<div class="sn-zt-h a' + (canA ? '' : ' off') + '" data-h="a" data-i="' + i + '" style="left:' + x + 'px" title="Anfang ziehen">⟦</div>'
-            + '<div class="sn-zt-h b' + (canB ? '' : ' off') + '" data-h="b" data-i="' + i + '" style="left:' + (x + w) + 'px" title="Ende ziehen">⟧</div>'; }
+        if (on) { const canA = (c.in || 0) - GW.lo > .05, canB = GW.hi - (c.out || c.dur || 0) > .05;
+          b2 += '<div class="sn-zt-h a' + (canA ? '' : ' off') + '" data-h="a" data-i="' + i + '" style="left:' + x + 'px" title="Anfang ziehen – nach links wird der Clip länger">⟦</div>'
+            + '<div class="sn-zt-h b' + (canB ? '' : ' off') + '" data-h="b" data-i="' + i + '" style="left:' + (x + w) + 'px" title="Ende ziehen – nach rechts wird der Clip länger">⟧</div>'; }
+        x += w;
+        if (on && tail > 0) { const rest = GW.hi - (c.out || c.dur || 0);
+          b2 += '<div class="sn-zt-g b" style="left:' + x + 'px;width:' + tail + 'px" title="Hier wurde hinten etwas weggeschnitten – Griff ⟧ hierher ziehen">' + (tail > 48 ? '<span>noch ' + sec1(rest) + ' ⟶</span>' : '') + '</div>';
+          x += tail; }
         // Schnittstelle: hier wurde etwas herausgeschnitten (gleiche Datei, Lücke) oder zwei Aufnahmen stoßen aneinander
         if (i < clips.length - 1) { const n2 = clips[i + 1];
           const gap = n2.url === c.url ? Math.max(0, (n2.in || 0) - (c.out || c.dur || 0)) : 0;
-          b2 += '<div class="sn-zt-cut" style="left:' + (x + w) + 'px" title="' + (gap > .05 ? fmt1(gap) + ' herausgeschnitten' : 'Schnitt') + '">✂</div>'; }
+          b2 += '<div class="sn-zt-cut" style="left:' + x + 'px" title="' + (gap > .05 ? fmt1(gap) + ' herausgeschnitten' : 'Schnitt') + '">✂</div>'; }
       });
       K('ztb').innerHTML = b2;
       K('ztb').querySelectorAll('[data-bl]').forEach(el => el.onclick = e => { if (ztDrag) return; const i = +el.dataset.bl; if (i !== sel) { stop(); sel = i; pos = starts()[sel]; show(sel, 0); renderClips(false); edUi(); } });
       K('zoomR').value = Math.round(Math.log(Z) / Math.log(ZMAX) * 100); ztPh();
     }
-    function ztPh() { const p = pps(); K('ztph').style.left = (pos * p) + 'px'; K('ztime').textContent = fmt1(pos) + ' / ' + fmt1(total());
-      if (!ztDrag) { const x = pos * p, l = ztSc.scrollLeft, w = ztSc.clientWidth; if (x < l + 8 || x > l + w - 8) ztSc.scrollLeft = Math.max(0, x - w * (playing ? .3 : .5)); } }
+    function ztPh() { K('ztph').style.left = ZTX(pos) + 'px'; K('ztime').textContent = fmt1(pos) + ' / ' + fmt1(total());
+      if (!ztDrag) { const x = ZTX(pos), l = ztSc.scrollLeft, w = ztSc.clientWidth; if (x < l + 8 || x > l + w - 8) ztSc.scrollLeft = Math.max(0, x - w * (playing ? .3 : .5)); } }
     function setZ(z, anchorT) { // anchorT = Zeit, die beim Zoomen an Ort und Stelle bleibt
       z = Math.max(1, Math.min(ZMAX, z)); if (anchorT == null) anchorT = pos;
-      const before = anchorT * pps() - ztSc.scrollLeft; Z = z; ztDraw(); ztSc.scrollLeft = Math.max(0, anchorT * pps() - before);
+      const before = ZTX(anchorT) - ztSc.scrollLeft; Z = z; ztDraw(); ztSc.scrollLeft = Math.max(0, ZTX(anchorT) - before);
     }
     K('zoomIn').onclick = () => setZ(Z * 1.7); K('zoomOut').onclick = () => setZ(Z / 1.7);
     K('zoomR').oninput = () => setZ(Math.pow(ZMAX, +K('zoomR').value / 100));
@@ -529,21 +574,21 @@ void main(){
     const ptrs = new Map();
     ztIn.addEventListener('pointerdown', e => {
       if (busy || !clips.length) return; ptrs.set(e.pointerId, e.clientX);
-      if (ptrs.size === 2) { const [x1, x2] = [...ptrs.values()], r = ztIn.getBoundingClientRect(); pinch = { d: Math.abs(x1 - x2), z: Z, t: ((x1 + x2) / 2 - r.left) / pps() }; ztDrag = null; return; }
+      if (ptrs.size === 2) { const [x1, x2] = [...ptrs.values()], r = ztIn.getBoundingClientRect(); pinch = { d: Math.abs(x1 - x2), z: Z, t: ZTT((x1 + x2) / 2 - r.left) }; ztDrag = null; return; }
       const hEl = e.target.closest('[data-h]'); if (playing) stop();
       const r = ztIn.getBoundingClientRect(), x = e.clientX - r.left;
       if (hEl) { const i = +hEl.dataset.i, c = clips[i]; ztDrag = { h: hEl.dataset.h, i, x0: e.clientX, in0: c.in || 0, out0: c.out || c.dur || 0, id: e.pointerId, moved: false }; }
       else ztDrag = { h: 'ph', id: e.pointerId, moved: false };
-      ztIn.setPointerCapture(e.pointerId); if (ztDrag.h === 'ph') seekTo(x / pps()); e.preventDefault();
+      ztIn.setPointerCapture(e.pointerId); if (ztDrag.h === 'ph') seekTo(ZTT(x)); e.preventDefault();
     });
     ztIn.addEventListener('pointermove', e => {
       if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, e.clientX);
       if (pinch && ptrs.size === 2) { const [x1, x2] = [...ptrs.values()], d = Math.abs(x1 - x2); if (pinch.d > 12) setZ(pinch.z * d / pinch.d, pinch.t); return; }
       if (!ztDrag || ztDrag.id !== e.pointerId) return; ztDrag.moved = true;
       const r = ztIn.getBoundingClientRect(), p = pps();
-      if (ztDrag.h === 'ph') { seekTo((e.clientX - r.left) / p); }
+      if (ztDrag.h === 'ph') { seekTo(ZTT(e.clientX - r.left)); }
       else {
-        const c = clips[ztDrag.i], rm = room(ztDrag.i), d = (e.clientX - ztDrag.x0) / p;
+        const c = clips[ztDrag.i], rm = ztLim(ztDrag.i), d = (e.clientX - ztDrag.x0) / p;
         if (ztDrag.h === 'a') { c.in = Math.max(rm[0], Math.min(ztDrag.in0 + d, (c.out || c.dur) - .3)); ztDraw(); seekTo(starts()[ztDrag.i] + .02); }
         else { c.out = Math.min(rm[1], Math.max(ztDrag.out0 + d, (c.in || 0) + .3)); ztDraw(); seekTo(starts()[ztDrag.i] + len(c) - .05); }
         K('edD').textContent = 'von ' + fmt1(c.in || 0) + ' bis ' + fmt1(c.out || c.dur || 0) + ' · Länge ' + fmt1(len(c));
@@ -558,7 +603,7 @@ void main(){
       say(d.h === 'a' ? '⟦ Anfang von Clip ' + (d.i + 1) + ': ' + fmt1(c.in || 0) + (c.in < d.in0 ? ' (länger)' : ' (kürzer)') : 'Ende von Clip ' + (d.i + 1) + ': ' + fmt1(c.out) + (c.out > d.out0 ? ' (länger)' : ' (kürzer)') + ' ⟧');
     };
     ztIn.addEventListener('pointerup', ztUp); ztIn.addEventListener('pointercancel', ztUp);
-    ztSc.addEventListener('wheel', e => { if (e.ctrlKey || e.metaKey) { e.preventDefault(); const r = ztIn.getBoundingClientRect(); setZ(Z * (e.deltaY < 0 ? 1.15 : 1 / 1.15), (e.clientX - r.left) / pps()); } }, { passive: false });
+    ztSc.addEventListener('wheel', e => { if (e.ctrlKey || e.metaKey) { e.preventDefault(); const r = ztIn.getBoundingClientRect(); setZ(Z * (e.deltaY < 0 ? 1.15 : 1 / 1.15), ZTT(e.clientX - r.left)); } }, { passive: false });
     addEventListener('resize', () => { if (clips.length) ztDraw(); });
 
     // ---- Regler ----
@@ -604,13 +649,31 @@ void main(){
 
     // ---- ✨ Automatisch schneiden (Vivien, 30.10.2026) ----
     let undoRows = null, autoLog = [], autoP = null;
-    const PAUSES = [[.4, 'kurz · 0,4 s'], [.7, 'normal · 0,7 s'], [1.2, 'nur lange · 1,2 s']];
+    let lastPause = null; // mit welcher Einstellung zuletzt geschnitten wurde
+    // Pausen-Regler: Vivien stellt selbst ein, ab welcher Länge eine Pause rausfliegt (0,2 s bis 2,5 s)
+    const pauseTxt = v => v < .4 ? 'Sehr streng: auch kurze Atempausen fallen weg. Wirkt flott, kann gehetzt klingen.'
+      : v < .65 ? 'Streng: kleine Hänger und Atempausen fallen weg.'
+      : v < .95 ? 'Ausgewogen: Denkpausen fallen weg, zum Atmen bleibt Luft.'
+      : v < 1.4 ? 'Ruhig: nur deutliche Pausen fallen weg, dein Rhythmus bleibt.'
+      : 'Sehr ruhig: nur lange Pausen fallen weg, sonst bleibt alles wie aufgenommen.';
     const ZOOMS = [[1, 1.06], [1.09, 1.04], [1.03, 1.08], [1.1, 1.05]]; // im Wechsel langsam hinein / heraus, leicht versetzt (kaschiert die Schnitte)
     function autoUi() {
-      K('pauses').innerHTML = PAUSES.map(p => `<button type="button" data-p="${p[0]}" aria-pressed="${auto.pause === p[0]}">${p[1]}</button>`).join('');
-      K('pauses').querySelectorAll('button').forEach(b => b.onclick = () => { auto.pause = +b.dataset.p; ls.set('sn-auto', auto); autoUi(); });
+      const v = Math.max(.2, Math.min(2.5, +auto.pause || .7));
+      K('pauseR').value = Math.round(v * 100); pauseUi(v);
       K('stumbles').checked = auto.stumbles; K('zoomfx').checked = auto.zoom; K('noisefx').checked = auto.noise !== false;
     }
+    function pauseUi(v) {
+      K('pauseV').textContent = sec1(v); K('pauseH').textContent = pauseTxt(v);
+      const go = K('pauseGo'), again = clips.some(c => c.auto) && lastPause != null && Math.abs(lastPause - v) > .001;
+      go.hidden = !again; if (again) go.textContent = '✨ Mit ' + sec1(v) + ' nochmal schneiden';
+    }
+    K('pauseR').oninput = () => { auto.pause = +K('pauseR').value / 100; pauseUi(auto.pause); };
+    K('pauseR').onchange = () => { auto.pause = +K('pauseR').value / 100; ls.set('sn-auto', auto); pauseUi(auto.pause); };
+    K('pauseGo').onclick = async () => {
+      if (busy) return;
+      if (undoRows) { await K('undo').onclick(); }
+      K('auto').onclick();
+    };
     autoUi();
     K('stumbles').onchange = () => { auto.stumbles = K('stumbles').checked; ls.set('sn-auto', auto); };
     K('noisefx').onchange = () => { auto.noise = K('noisefx').checked; ls.set('sn-auto', auto); };
@@ -691,7 +754,7 @@ void main(){
         // Übernehmen: alte Zeilen raus, neue rein
         for (const c of clips) await dbDel(c.id);
         clips = next; assignZoom(clips, auto.zoom); for (const c of clips) await dbPut(dbRow(c)); await saveOrder();
-        undoRows = snap; autoLog = log; sel = 0; pos = 0; ui(); clips.forEach(thumb);
+        undoRows = snap; autoLog = log; lastPause = auto.pause; sel = 0; pos = 0; ui(); clips.forEach(thumb);
         const after = total(), saved = before - after;
         const nV = log.filter(x => x.why === 'versprecher').length, nG = log.filter(x => x.why === 'geraeusch').length;
         const parts = []; if (pn) parts.push(pn + (pn === 1 ? ' Pause' : ' Pausen') + ' rausgeschnitten');
@@ -710,7 +773,7 @@ void main(){
       for (const c of clips) await dbDel(c.id);
       clips = undoRows.rows.map(r => { let u = urls.get(r.blob); if (!u) u = URL.createObjectURL(r.blob); return Object.assign({}, r, { url: u }); });
       for (const c of clips) await dbPut(dbRow(c)); await kvSet('order', undoRows.order).catch(() => {});
-      undoRows = null; autoLog = []; lastSum = null; K('undo').hidden = true; autoResUi(null);
+      undoRows = null; autoLog = []; lastSum = null; lastPause = null; K('undo').hidden = true; autoResUi(null);
       sel = 0; pos = 0; ui(); clips.forEach(thumb); say('↩ Zurück auf den Stand vor dem automatischen Schnitt.');
     };
 
