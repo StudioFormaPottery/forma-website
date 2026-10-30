@@ -627,13 +627,17 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
   // eigener Text je Sprache (für Untertitel in der anderen Sprache)
   if(ls.get('st-own-de',null)===null&&ls.get('st-own',''))ls.set('st-own-de',ls.get('st-own',''));
   const ownOf=lg=>ls.get('st-own-'+lg,'');
-  $('ownT').addEventListener('input',()=>{ls.set('st-own-'+lang,$('ownT').value);setText();subPreview()});
+  let igT=0;
+  $('ownT').addEventListener('input',()=>{const v=$('ownT').value;
+    // Instagram-Eintrag: Text direkt hier einfügen, wird beim Eintrag gespeichert (Vivien, 30.10.2026)
+    if(cur&&cur.ig){cur.de=cur.en=v;cur.ig.text=v;clearTimeout(igT);igT=setTimeout(()=>post('mm_ig_text',{id:cur.ig.id,text:v}).catch(()=>{}),600)}
+    else ls.set('st-own-'+lang,v);setText();subPreview()});
 
   // ---- Auswahl ----
   const profile=()=>(mv||mvFree)?'move':'talk';
   function choose(){const val=$('what').value;mv=val[0]==='c'?(MOVES.find(m=>m.id===+val.slice(1))||null):null;mvFree=val==='m';
     const wasIg=!!ig;ig=val[0]==='i'?(IGS.find(x=>x.id===+val.slice(1))||null):null;
-    const id=+val;cur=(mv||mvFree)?null:(ig?{ig:ig,id:'i'+ig.id,t:ig.l,de:ig.text,en:ig.text,vde:ig.has,ven:ig.has,g:'Instagram',k:ig.kind==='reel'?'Reel':'Story',due:ig.day}:(TALKS.find(t=>t.id===id)||null));$('own').hidden=!!cur;$('ownT').value=ownOf(lang);
+    const id=+val;cur=(mv||mvFree)?null:(ig?{ig:ig,id:'i'+ig.id,t:ig.l,de:ig.text,en:ig.text,vde:ig.has,ven:ig.has,g:'Instagram',k:ig.kind==='reel'?'Reel':'Story',due:ig.day}:(TALKS.find(t=>t.id===id)||null));$('own').hidden=!!cur&&!cur.ig;$('ownT').value=cur&&cur.ig?(ig.text||''):ownOf(lang);
     const isMove=!!(mv||mvFree);if(cur&&cur.do&&lang!=='de'){lang='de';$('ownT').value=ownOf(lang)}$('prBox').hidden=isMove;$('mtPr').hidden=isMove;$('langSeg').hidden=isMove||!!ig||!!(cur&&cur.do);
     if(tc&&!isMove&&ig!==null!==wasIg){tc.set({aspect:ig?'9:16':'16:9'});TalkCam.panel(tc,$('panel'))}$('modeSeg').hidden=isMove;if($('tpOnly'))$('tpOnly').hidden=isMove;pr.hidden=isMove||$('prOn').getAttribute('aria-pressed')==='false';
     if(isMove&&clipm)setMode('ganz');

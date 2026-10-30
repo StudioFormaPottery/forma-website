@@ -135,6 +135,12 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
         if (!empty($_POST['studio'])) go(strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?') . '?view=studio&ig=' . $id);
         go($igBack . '#d' . $day, 'Gespeichert.');
     }
+    // Text eines Eintrags direkt aus dem Studio speichern
+    if ($action === 'mm_ig_text') {
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id && ig_get($pdo, $id)) $pdo->prepare('UPDATE mm_insta SET text=?, updated_at=? WHERE id=?')->execute([trim((string)($_POST['text'] ?? '')), date('c'), $id]);
+        $igJson(['ok' => 1]);
+    }
     // Thema für einen Tag nehmen (Reel + Story + Channel auf einmal)
     if ($action === 'mm_ig_theme') {
         $day = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST['day'] ?? '')) ? $_POST['day'] : date('Y-m-d');
