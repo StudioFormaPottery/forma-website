@@ -745,7 +745,9 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     $('stage').innerHTML='<div class="tc-st" style="line-height:1.5;padding:18px">'+why+'<br><button type="button" id="camRetry" style="margin-top:12px;font:inherit;padding:9px 18px;border-radius:999px;border:0;background:#7D5E68;color:#fff;cursor:pointer">🔄 Nochmal versuchen</button></div>';
     $('camRetry').onclick=()=>{$('stage').innerHTML='<div class="tc-st">Kamera startet …</div>';startCam()};}
   async function startCam(){
-    const cid=ls.get('st-cam',''), mid=ls.get('st-mic','');
+    const cid=ls.get('st-cam','');let mid=ls.get('st-mic','');
+    // gemerktes Mikro über den Namen finden (Safari vergibt neue IDs) – ohne zweite Aufnahme daneben
+    try{const want=ls.get('st-mic-l','');if(want){const ds=await navigator.mediaDevices.enumerateDevices(),m=ds.find(d=>d.kind==='audioinput'&&d.label===want);if(m){mid=m.deviceId;ls.set('st-mic',mid)}}}catch(e){}
     if(raw)raw.getTracks().forEach(t=>t.stop());if(tc)tc.destroy(false);
     const Q=QUAL[qual()]||QUAL['4k'];const v={width:{ideal:Q[0]},height:{ideal:Q[1]},frameRate:{ideal:30}};if(cid)v.deviceId={exact:cid};
     const a={echoCancellation:true,noiseSuppression:true,autoGainControl:true};if(mid)a.deviceId={ideal:mid};
@@ -755,7 +757,6 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
       for(const c of [{video:true,audio:a},{video:true,audio:true},{video:true}]){try{raw=await navigator.mediaDevices.getUserMedia(c);ls.set('st-cam','');if(!c.audio){ls.set('st-mic','');ls.set('st-mic-l','')}err=null;break}catch(e2){err=e2;if(c.audio)micErr=e2}}
       if(err){camErr(err);return}
       if(!raw.getAudioTracks().length)micHelp()}
-    await micFix();
     if(ls.get('st-wide',''))await wideZoom();
     tc=await TalkCam.create(raw,{mount:$('stage'),maxVh:vh(),profile:profile(),maxLong:Q[0]});qShow();
     $('stage').appendChild(pr);$('stage').appendChild(Object.assign(document.createElement('div'),{className:'cd',id:'cd'}));
