@@ -386,6 +386,12 @@ footer summary{cursor:pointer}
     </div>
   </section>
 
+  <section class="w" id="studio" style="padding-top:0">
+    <p class="k"><?= $L('Das Studio', 'The studio') ?></p>
+    <h2 style="margin-top:.6rem"><?= $L('Mein kleines <em>Movement-Studio</em> in Mathon', 'My small <em>movement studio</em> in Mathon') ?></h2>
+    <p class="mut" style="margin-top:.6rem;max-width:44em"><?= $L('Hell, ruhig und privat: Sprossenwand, Matten, Gewichte und viel Platz zum Bewegen. Kein Fitnessstudio-Trubel, nur wir beide.', 'Bright, calm and private: wall bars, mats, weights and plenty of space to move. No busy gym, just the two of us.') ?></p>
+    <?php require_once dirname(__DIR__) . '/assets/raum.inc.php'; echo mv_raum_gallery(($lang ?? 'de') === 'en', 'raum-pt'); ?>
+  </section>
   <section class="w" style="padding-top:0">
     <div class="two">
       <div><p class="k">FAQ</p><h2 style="margin-top:.6rem"><?= $L('Gut zu wissen', 'Good to know') ?></h2></div>

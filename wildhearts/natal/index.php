@@ -673,6 +673,10 @@ footer summary{cursor:pointer}
     <div class="card"><h3>Im Studio in Mathon</h3><p style="margin-top:.6rem">Mein Studio liegt in Mathon im Paznaun, mitten in Tirol. Hierher kommen Schwangere und junge Mamas aus Ischgl, Galtür, Kappl, See und dem ganzen Paznaun, aber auch aus Landeck und Zams. Schwangerschaftstraining, Geburtsvorbereitung, Beckenboden- und Rückbildungstraining finden hier immer 1:1 statt, ohne Gruppe und ohne Vergleich.</p></div>
     <div class="card pl"><h3>Online, wo immer du bist</h3><p style="margin-top:.6rem">Du wohnst weiter weg, in Innsbruck, Vorarlberg, Deutschland oder der Schweiz, oder willst nach der Geburt einfach nicht aus dem Haus? Dann trainieren wir live per Video. Ich sehe dich, leite dich an und korrigiere dich wie im Studio. Dein Baby kann einfach neben dir liegen.</p></div>
   </div>
+  <?php require_once dirname(__DIR__) . '/assets/raum.inc.php'; ?>
+  <h3 style="margin-top:2.2rem">So sieht mein Studio aus</h3>
+  <p class="mut" style="margin-top:.4rem;max-width:44em">Ein kleiner, heller Raum nur für dich und mich: Matten, Polster, Sprossenwand und alles, was wir für dein Training brauchen.</p>
+  <?= mv_raum_gallery(false, 'raum-natal') ?>
 </section>
 <?php endif; ?>
 
