@@ -118,6 +118,7 @@
 .sn-trash li{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 0;border-top:1px solid #EFE7DE;font-size:15.5px;color:#4A3A41}
 .sn-trash li span{flex:1;min-width:160px}.sn-trash li small{display:block;color:#7D7076;font-size:13.5px}
 .sn-trash ul{list-style:none;margin:6px 0 0;padding:0}
+.sn-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px}.sn-top .sn-cur{font-size:15px;color:#7D7076}
 .sn-pv .sn-glc{position:absolute;inset:0;width:100%;height:100%;z-index:2;display:none;pointer-events:none}
 .sn-bro{margin-top:10px;display:flex;flex-direction:column;gap:10px}
 .sn-bro:empty{display:none}
@@ -372,6 +373,7 @@ void main(){
     const mount = o.mount; mount.innerHTML = '';
     const root = document.createElement('div'); root.className = 'sn'; mount.appendChild(root);
     root.innerHTML = `<div class="sn-l">
+  <div class="sn-top"><button type="button" class="sn-b" data-k="drJump">📝 Meine Entwürfe <span data-k="drCnt"></span></button><span class="sn-cur" data-k="drCur"></span></div>
   <div class="sn-tg" data-k="tg"><span data-k="tgT"></span><button type="button" class="sn-b sm" data-k="tgBtn">Ändern</button><select data-k="tgSel" hidden aria-label="Wohin kommt das Video?"></select></div>
   <div class="sn-pv" id="snpv"><div class="empty" id="snempty"><b>Noch keine Clips</b>Tipp unten auf „＋ Clips“ und wähl Videos vom iPhone oder Computer, oder nimm im Studio auf.</div><img class="sn-covimg" data-k="covimg" alt=""><button type="button" class="big" data-k="big" hidden aria-label="Abspielen">▶</button><span class="tag" data-k="tag"></span></div>
   <div class="sn-tl">
@@ -460,7 +462,7 @@ void main(){
   </div>
 </div>
 <div class="sn-r">
-  <details class="sn-box dr" open><summary>📝 Entwürfe</summary><div class="bd">
+  <details class="sn-box dr" open data-k="drBox"><summary>📝 Entwürfe</summary><div class="bd">
     <div><label style="display:block;font-size:16px;color:#4A3A41;margin-bottom:4px">Woran arbeitest du gerade?</label>
       <input type="text" class="sn-dr-name" maxlength="60" placeholder="z. B. The Method · Morgen-Flow" data-k="drName"></div>
     <div class="sn-note">Jede Aufnahme und jeder Schnitt gehört zu einem Entwurf. So kannst du zuerst alle Videos aufnehmen und später in Ruhe eines nach dem anderen fertig schneiden. Alles bleibt auf diesem Gerät gespeichert.</div>
@@ -591,6 +593,7 @@ void main(){
       K('drList').querySelectorAll('[data-dopen]').forEach(b => b.onclick = () => openDraft(b.dataset.dopen));
       K('drList').querySelectorAll('[data-ddel]').forEach(b => b.onclick = () => delDraft(b.dataset.ddel));
       K('drList').querySelectorAll('[data-dmerge]').forEach(b => b.onclick = () => mergeDraft(b.dataset.dmerge));
+      { const n = drList.length, cn = (drList.find(d => d.id === curDraft) || {}).name; K('drCnt').textContent = n ? '(' + n + ')' : ''; K('drCur').textContent = 'Offen: ' + (cn || 'Ohne Namen'); }
       K('h2').firstChild.textContent = (drList.find(d => d.id === curDraft) || {}).name ? 'Clips in „' + drName(curDraft) + '“ ' : 'Deine Clips ';
       tgUi();
     }
@@ -625,6 +628,8 @@ void main(){
       else drawDrafts();
       trashUi(); say('🗑 „' + nm + '“ gelöscht, die Clips liegen im Papierkorb.');
     }
+    function drJump() { const b = K('drBox'); b.open = true; b.scrollIntoView({ behavior: 'smooth', block: 'start' }); b.style.boxShadow = '0 0 0 3px #7D5E68'; setTimeout(() => b.style.boxShadow = '', 2200); }
+    K('drJump').onclick = drJump; if (location.hash === '#entwuerfe') setTimeout(drJump, 600);
     K('drNew').onclick = async () => {
       if (busy) return; const d = { id: uid(), name: '', at: Date.now() };
       drList = await drafts(); drList.unshift(d); await draftsSave(drList);

@@ -453,7 +453,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
   <div class="seg" id="langSeg" role="group" aria-label="Sprache"><button type="button" data-lang="de" aria-pressed="<?= $lang === 'de' ? 'true' : 'false' ?>">Deutsch</button><button type="button" data-lang="en" aria-pressed="<?= $lang === 'en' ? 'true' : 'false' ?>">Englisch</button></div>
   <div class="seg" id="modeSeg" role="group" aria-label="Aufnahme-Art"><button type="button" data-mode="ganz">Am Stück</button><button type="button" data-mode="clips">Absatz für Absatz</button></div>
   <label class="cauto" id="cautoL" hidden><input type="checkbox" id="cauto"> Automatisch weiter: Wenn du einen Absatz fertig gesprochen hast, kommt nach einer kurzen Pause 3-2-1 und der nächste Absatz startet von selbst.</label>
-  <a class="seg-f" href="?view=schnitt" title="Videos vom Handy oder Computer schneiden und bearbeiten">✂️ Video vom Gerät schneiden</a><input type="file" id="openF" accept="video/*" hidden>
+  <a class="seg-f" href="?view=schnitt" title="Videos vom Handy oder Computer schneiden und bearbeiten">✂️ Video vom Gerät schneiden</a><a class="seg-f" href="?view=schnitt#entwuerfe" title="Alle angefangenen Videos im Schnitt">📝 Meine Entwürfe</a><input type="file" id="openF" accept="video/*" hidden>
   <span class="done-l" id="doneL"></span>
 </div>
 <p class="what-i" id="whatI" hidden></p>
@@ -541,7 +541,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
 <script src="/wildhearts/assets/talkcam.js?v=7"></script>
 <script src="studio-edit.js?v=7"></script>
-<script src="schnitt.js?v=32"></script>
+<script src="schnitt.js?v=33"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
