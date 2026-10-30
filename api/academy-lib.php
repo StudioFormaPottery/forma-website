@@ -73,14 +73,14 @@ function ac_eur(int $c, string $lang = 'de'): string
 function ac_hours(): array
 {
     return [
-        ['Yoga nach internationalem 200-Std.-Curriculum', 'Yoga, following an international 200-hour curriculum', 200, '#7D5E68', 'sonne'],
+        ['Yoga nach internationalem 200-Std.-Curriculum', 'Yoga, following an international 200-hour curriculum', 200, '#5A3C4C', 'sonne'],
         ['Somatic Movement', 'Somatic movement', 80, '#B58C99', 'welle'],
-        ['Breathwork & Meditation', 'Breathwork & meditation', 60, '#C9B0B8', 'atem'],
+        ['Breathwork & Meditation', 'Breathwork & meditation', 60, '#C8B5BF', 'atem'],
         ['Movecia Movement Method & Bodyweight', 'Movecia Movement Method & bodyweight', 60, '#E8C9B8', 'spirale'],
         ['Anatomie & Body Scanning', 'Anatomy & body scanning', 60, '#9A6F7A', 'herz'],
         ['Achtsame Berührung & Rituale', 'Mindful touch & rituals', 30, '#DDB7A7', 'kerze'],
-        ['Mental Load & Nervensystem', 'Mental load & the nervous system', 30, '#EADFDE', 'kreis'],
-        ['Deine Selbstständigkeit', 'Your own business', 30, '#4A3A41', 'bluete'],
+        ['Mental Load & Nervensystem', 'Mental load & the nervous system', 30, '#E4DCD1', 'kreis'],
+        ['Deine Selbstständigkeit', 'Your own business', 30, '#3A2631', 'bluete'],
     ];
 }
 
@@ -641,20 +641,20 @@ function ac_mail_html(array $r, string $hand, string $title, array $blocks, stri
 {
     // Academy-Mails mit eigenem Kopf (Pflaume-Band mit Academy-Logo) bzw. Konfetti-Bild (Vivien, 28.10.2026)
     $html = '<p style="margin:0 0 16px;"><img src="' . forma_h(mm_site()) . '/img/movecia/' . ($confetti ? 'mail-academy-konfetti.png' : 'mail-academy-kopf.png') . '?v=4" width="500" alt="Movecia Academy" style="display:block;width:100%;max-width:500px;height:auto;border:0;border-radius:18px;"></p>';
-    $html .= '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#7D5E68;">' . forma_h($hand) . '</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:28px;line-height:1.2;color:#6B5658;margin:0 0 14px;">' . forma_h($title) . '</h1>';
+    $html .= '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#5A3C4C;">' . forma_h($hand) . '</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:28px;line-height:1.2;color:#4A3040;margin:0 0 14px;">' . forma_h($title) . '</h1>';
     foreach ($blocks as $b) {
-        if (is_array($b) && isset($b['h'])) $html .= '<h2 style="font-family:Georgia,serif;font-weight:400;font-size:21px;color:#6B5658;margin:24px 0 6px;">' . forma_h($b['h']) . '</h2>';
+        if (is_array($b) && isset($b['h'])) $html .= '<h2 style="font-family:Georgia,serif;font-weight:400;font-size:21px;color:#4A3040;margin:24px 0 6px;">' . forma_h($b['h']) . '</h2>';
         elseif (is_array($b) && isset($b['plan'])) {
             $html .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:0 6px;margin:8px 0;">';
-            foreach ($b['plan'] as $x) $html .= '<tr><td style="background:' . ($x['paid'] ? '#EADFDE' : '#FBF8F4') . ';border-radius:14px 0 0 14px;padding:10px 0 10px 14px;width:26px;font-size:16px;color:#7D5E68;">' . ($x['paid'] ? '✓' : '○') . '</td><td style="background:' . ($x['paid'] ? '#EADFDE' : '#FBF8F4') . ';padding:10px 8px;"><b style="font-weight:600;color:#2E2529;">' . forma_h($x['lab']) . '</b><br><span style="font-size:13px;color:#7D7076;">' . forma_h($x['when']) . '</span></td><td align="right" style="background:' . ($x['paid'] ? '#EADFDE' : '#FBF8F4') . ';border-radius:0 14px 14px 0;padding:10px 14px 10px 8px;white-space:nowrap;font-size:16px;color:#2E2529;">' . forma_h($x['amt']) . '</td></tr>';
-            $html .= '</table><p style="font-size:13px;color:#7D7076;margin:2px 0 10px;">' . forma_h($b['sum']) . '</p>';
+            foreach ($b['plan'] as $x) $html .= '<tr><td style="background:' . ($x['paid'] ? '#E4DCD1' : '#FBF9F6') . ';border-radius:14px 0 0 14px;padding:10px 0 10px 14px;width:26px;font-size:16px;color:#5A3C4C;">' . ($x['paid'] ? '✓' : '○') . '</td><td style="background:' . ($x['paid'] ? '#E4DCD1' : '#FBF9F6') . ';padding:10px 8px;"><b style="font-weight:600;color:#2A2026;">' . forma_h($x['lab']) . '</b><br><span style="font-size:13px;color:#6E6168;">' . forma_h($x['when']) . '</span></td><td align="right" style="background:' . ($x['paid'] ? '#E4DCD1' : '#FBF9F6') . ';border-radius:0 14px 14px 0;padding:10px 14px 10px 8px;white-space:nowrap;font-size:16px;color:#2A2026;">' . forma_h($x['amt']) . '</td></tr>';
+            $html .= '</table><p style="font-size:13px;color:#6E6168;margin:2px 0 10px;">' . forma_h($b['sum']) . '</p>';
         }
-        elseif (is_array($b) && isset($b['box'])) $html .= '<div style="background:#FBF8F4;border-radius:16px;padding:14px 18px;margin:12px 0;">' . implode('', array_map(fn($x) => '<p style="margin:4px 0;">' . forma_h($x) . '</p>', $b['box'])) . '</div>';
+        elseif (is_array($b) && isset($b['box'])) $html .= '<div style="background:#FBF9F6;border-radius:16px;padding:14px 18px;margin:12px 0;">' . implode('', array_map(fn($x) => '<p style="margin:4px 0;">' . forma_h($x) . '</p>', $b['box'])) . '</div>';
         elseif (is_array($b)) $html .= '<ul style="padding-left:20px;margin:8px 0;">' . implode('', array_map(fn($x) => '<li style="margin:5px 0;">' . forma_h($x) . '</li>', $b)) . '</ul>';
         else $html .= '<p>' . forma_h($b) . '</p>';
     }
     if ($link !== '') $html .= mm_button($link, $btn);
-    if ($legal !== '') $html .= '<p style="font-size:13px;color:#7D7076;border-top:1px solid #DDD2C6;padding-top:12px;margin-top:22px;">' . forma_h($legal) . '</p>';
+    if ($legal !== '') $html .= '<p style="font-size:13px;color:#6E6168;border-top:1px solid #D3C9BC;padding-top:12px;margin-top:22px;">' . forma_h($legal) . '</p>';
     return mm_mail_html($title, $html, (string)$r['lang']);
 }
 
@@ -1165,8 +1165,8 @@ function ac_pebble(float $cx, float $cy, float $w, string $line, string $soft, s
 /** Farben hell (auf Beige) oder auf Pflaume. */
 function ac_logo_colors(bool $onPlum): array
 {
-    return $onPlum ? ['line' => '#FBF5F7', 'soft' => 'rgba(232,214,202,.55)', 'dot' => '#F3E2D8', 'fill' => 'rgba(251,245,247,.10)', 'thin' => 'rgba(251,245,247,.55)', 'text' => '#FBF5F7', 'sub' => '#EADFDE']
-        : ['line' => '#7D5E68', 'soft' => '#E8D6CA', 'dot' => '#7D5E68', 'fill' => '#F6EAE6', 'thin' => '#C9A3AE', 'text' => '#4A3A41', 'sub' => '#7D5E68'];
+    return $onPlum ? ['line' => '#F7F1EE', 'soft' => 'rgba(232,214,202,.55)', 'dot' => '#F3E2D8', 'fill' => 'rgba(251,245,247,.10)', 'thin' => 'rgba(251,245,247,.55)', 'text' => '#F7F1EE', 'sub' => '#E4DCD1']
+        : ['line' => '#5A3C4C', 'soft' => '#E6DBCF', 'dot' => '#5A3C4C', 'fill' => '#F6EAE6', 'thin' => '#C9A3AE', 'text' => '#3A2631', 'sub' => '#5A3C4C'];
 }
 
 /** Nur das Zeichen (ohne Schrift). Gibt [innerSVG, breite, höhe] zurück. */
@@ -1264,7 +1264,7 @@ function ac_countdown(): string
 /** Kleine handgezeichnete Vögel fürs Early-Bird-Abzeichen. */
 function ac_birds(): string
 {
-    $b = fn(string $cls, string $tr) => '<svg class="bird ' . $cls . '" viewBox="0 0 40 30" style="' . $tr . '" aria-hidden="true"><path d="M8 18c3-6 10-8 16-5 2-4 6-6 10-5-2 1-3 3-3 5 1 6-5 11-13 11-6 0-10-2-12-6z" fill="currentColor" opacity=".92"/><path class="wing" d="M14 16c2-6 7-9 12-8-2 4-5 7-12 8z" fill="#F2ECE4" opacity=".75"/><circle cx="30" cy="11" r="1.1" fill="#2E2529"/><path d="M34 11.5l3 .6-3 1" fill="none" stroke="#E8B48F" stroke-width="1.4" stroke-linecap="round"/><path d="M14 27l-2 2M18 28l-1 2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>';
+    $b = fn(string $cls, string $tr) => '<svg class="bird ' . $cls . '" viewBox="0 0 40 30" style="' . $tr . '" aria-hidden="true"><path d="M8 18c3-6 10-8 16-5 2-4 6-6 10-5-2 1-3 3-3 5 1 6-5 11-13 11-6 0-10-2-12-6z" fill="currentColor" opacity=".92"/><path class="wing" d="M14 16c2-6 7-9 12-8-2 4-5 7-12 8z" fill="#F5F1EB" opacity=".75"/><circle cx="30" cy="11" r="1.1" fill="#2A2026"/><path d="M34 11.5l3 .6-3 1" fill="none" stroke="#E8B48F" stroke-width="1.4" stroke-linecap="round"/><path d="M14 27l-2 2M18 28l-1 2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>';
     return '<span class="birds" aria-hidden="true">' . $b('b1', '') . $b('b2', '') . $b('b3', '') . '</span>';
 }
 

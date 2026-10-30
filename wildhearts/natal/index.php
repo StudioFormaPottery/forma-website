@@ -112,13 +112,13 @@ $seoDesc = 'Prä- und postnatales Training 1:1 mit Vivien Malonga: Schwangerscha
 <?php else: ?>
 <meta name="robots" content="noindex, nofollow">
 <?php endif; ?>
-<meta name="theme-color" content="#F2ECE4">
+<meta name="theme-color" content="#F5F1EB">
 <link rel="stylesheet" href="/wildhearts/assets/cute.css?v=5">
 <style>
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:normal;src:url(/fonts/CormorantGaramond-VF.woff) format("woff")}
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(/fonts/CormorantGaramond-Italic-VF.woff) format("woff")}
 @font-face{font-family:"Hanken";font-weight:300 700;src:url(/fonts/HankenGrotesk-VF.woff) format("woff")}
-:root{--bg:#F2ECE4;--sand:#E8DED2;--card:#FBF8F4;--ink:#2E2529;--muted:#7D7076;--line:#DDD2C6;--plum:#7D5E68;--plumdeep:#6B5658;--blush:#EADFDE;--peach:#E8D6CA;--on:#FBF5F7;--r:24px;
+:root{--bg:#F5F1EB;--sand:#E8DED2;--card:#FBF9F6;--ink:#2A2026;--muted:#6E6168;--line:#D3C9BC;--plum:#5A3C4C;--plumdeep:#4A3040;--blush:#E4DCD1;--peach:#E6DBCF;--on:#F7F1EE;--r:24px;
 --serif:"Cormorant",Georgia,serif;--sans:"Hanken",system-ui,sans-serif}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -218,7 +218,7 @@ body[data-mode=online] .m-studio,body[data-mode=studio] .m-online{display:none!i
 .mq-in span::after{content:"✦";font-style:normal;font-size:.55em;margin-left:2.4rem;opacity:.6;vertical-align:middle}
 @keyframes mq{to{transform:translateX(-50%)}}
 .two{display:grid;gap:16px;margin-top:2.6rem}
-.wide-pic{margin:16px 0 0;border-radius:24px;overflow:hidden;aspect-ratio:21/9;background:#E8D6CA}.wide-pic img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 55%}@media(max-width:700px){.wide-pic{aspect-ratio:4/3}}
+.wide-pic{margin:16px 0 0;border-radius:24px;overflow:hidden;aspect-ratio:21/9;background:#E6DBCF}.wide-pic img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 55%}@media(max-width:700px){.wide-pic{aspect-ratio:4/3}}
 @media(min-width:900px){.two{grid-template-columns:1fr 1fr}}
 .card{background:var(--card);border-radius:var(--r);padding:clamp(1.5rem,3vw,2.4rem)}
 .card.pl{background:var(--plum);color:var(--on)}

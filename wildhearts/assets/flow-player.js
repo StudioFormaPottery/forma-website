@@ -11,7 +11,7 @@
    oder automatisch für jedes [data-mv-flow]. */
 (function () {
   const CSS = `
-.mvf{--ink:#2E2529;--muted:#7D7076;--line:#E3D8CD;--card:#FBF8F4;--plum:#7D5E68;--deep:#4A3A41;--blush:#EADFDE;--peach:#E8D6CA;--glow:#F1C9A5;--cream:#FFFCF8;
+.mvf{--ink:#2A2026;--muted:#6E6168;--line:#E3D8CD;--card:#FBF9F6;--plum:#5A3C4C;--deep:#3A2631;--blush:#E4DCD1;--peach:#E6DBCF;--glow:#F1C9A5;--cream:#FFFCF8;
   display:flex;flex-direction:column;gap:16px;color:var(--ink);font-family:inherit;font-size:1rem}
 .mvf *{box-sizing:border-box}
 .mvf [hidden]{display:none!important}
@@ -51,7 +51,7 @@
 .mvf-seg b{font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-size:2.2rem;line-height:1;color:var(--deep)}
 .mvf-seg span{font-size:.84rem;color:var(--muted)}
 .mvf-seg button[aria-pressed="true"]{border-color:var(--plum);background:var(--blush)}
-.mvf-go{align-self:flex-start;display:inline-flex;align-items:center;gap:12px;border:0;border-radius:999px;background:var(--deep);color:#FBF5F7!important;padding:10px 26px 10px 10px;cursor:pointer;font-size:1.05rem;font-weight:500;box-shadow:0 14px 30px -16px rgba(74,58,65,.7);transition:transform .2s,background .2s}
+.mvf-go{align-self:flex-start;display:inline-flex;align-items:center;gap:12px;border:0;border-radius:999px;background:var(--deep);color:#F7F1EE!important;padding:10px 26px 10px 10px;cursor:pointer;font-size:1.05rem;font-weight:500;box-shadow:0 14px 30px -16px rgba(74,58,65,.7);transition:transform .2s,background .2s}
 .mvf-go:hover{transform:translateY(-2px);background:var(--plum)}
 .mvf-go .pl{width:44px;height:44px;border-radius:50%;background:var(--peach);color:var(--deep);display:grid;place-items:center}
 .mvf-go .pl svg{width:18px;height:18px;fill:currentColor;stroke:none;margin-left:3px}
@@ -59,12 +59,12 @@
 /* Abspielen */
 .mvf-play,.mvf-done{scroll-margin-top:150px}
 .mvf-play{display:flex;flex-direction:column;gap:14px}
-.mvf-stage{position:relative;aspect-ratio:16/9;width:100%;border-radius:30px;overflow:hidden;background:radial-gradient(circle at 30% 30%,#8C727B,#4A3A41)}
+.mvf-stage{position:relative;aspect-ratio:16/9;width:100%;border-radius:30px;overflow:hidden;background:radial-gradient(circle at 30% 30%,#8C727B,#3A2631)}
 .mvf-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}
-.mvf-ph{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;color:#EADFDE;font-size:.95rem;text-align:center;padding:1rem}
+.mvf-ph{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;color:#E4DCD1;font-size:.95rem;text-align:center;padding:1rem}
 .mvf-ph .mk{width:64px;height:64px;opacity:.9}
 .mvf-shade{position:absolute;left:0;right:0;bottom:0;height:55%;background:linear-gradient(to top,rgba(46,37,41,.62),rgba(46,37,41,0));pointer-events:none}
-.mvf-name{position:absolute;left:clamp(14px,3vw,26px);bottom:clamp(12px,3vw,24px);right:clamp(110px,24vw,170px);color:#FBF5F7}
+.mvf-name{position:absolute;left:clamp(14px,3vw,26px);bottom:clamp(12px,3vw,24px);right:clamp(110px,24vw,170px);color:#F7F1EE}
 .mvf-name small{display:block;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;opacity:.85;margin-bottom:2px}
 .mvf-name b{display:block;font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(1.35rem,3.6vw,2.2rem);line-height:1.08;text-shadow:0 1px 10px rgba(0,0,0,.25)}
 .mvf-flag{position:absolute;left:14px;top:14px;font-size:.78rem;border-radius:999px;padding:5px 12px;background:rgba(251,248,244,.9);color:var(--deep)}
@@ -79,7 +79,7 @@
 .mvf-stage.end .mvf-ring .p{stroke:#C98A5E}
 .mvf-sun{position:absolute;left:0;right:0;bottom:-45%;height:85%;background:radial-gradient(closest-side,rgba(241,201,165,.85),transparent);opacity:0;transition:opacity 1.4s ease;pointer-events:none}
 .mvf-stage.end .mvf-sun{opacity:1}
-.mvf-next{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(74,58,65,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#FBF5F7;opacity:0;pointer-events:none;transition:opacity .5s;text-align:center;padding:1rem}
+.mvf-next{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(74,58,65,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#F7F1EE;opacity:0;pointer-events:none;transition:opacity .5s;text-align:center;padding:1rem}
 .mvf-next.on{opacity:1}
 .mvf-next small{font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;opacity:.85}
 .mvf-next b{font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-style:italic;font-size:clamp(1.6rem,4.4vw,2.6rem)}
@@ -100,7 +100,7 @@
 .mvf-rb{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;cursor:pointer;font-size:.82rem;color:var(--muted)}
 .mvf-rb .c{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--cream);border:1px solid var(--line);color:var(--deep);transition:background .2s,transform .2s}
 .mvf-rb:hover .c{transform:translateY(-1px);background:#fff}
-.mvf-rb.main .c{width:70px;height:70px;background:var(--deep);border-color:var(--deep);color:#FBF5F7}
+.mvf-rb.main .c{width:70px;height:70px;background:var(--deep);border-color:var(--deep);color:#F7F1EE}
 .mvf-rb.main svg.i{width:26px;height:26px}
 .mvf-rb.main .c svg.f{fill:currentColor;stroke:none}
 .mvf-rb[aria-pressed="false"] .c{color:var(--muted);background:transparent}
@@ -138,7 +138,7 @@
 .mvf-sug{display:grid;gap:8px}
 @media(min-width:560px){.mvf-sug{grid-template-columns:1fr 1fr}}
 .mvf-sug button{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:#fff;border-radius:16px;padding:10px 12px;cursor:pointer;text-align:left;font-size:.92rem;color:var(--deep)}
-.mvf-sug button span{width:34px;height:34px;border-radius:10px;flex:none;display:grid;place-items:center;background:linear-gradient(135deg,#EADFDE,#E8D6CA);color:var(--plum)}
+.mvf-sug button span{width:34px;height:34px;border-radius:10px;flex:none;display:grid;place-items:center;background:linear-gradient(135deg,#E4DCD1,#E6DBCF);color:var(--plum)}
 .mvf-sug button span svg{width:16px;height:16px}
 .mvf-sug button:hover{border-color:var(--plum)}
 .mvf-k{margin:0;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}

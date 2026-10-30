@@ -116,7 +116,7 @@ function mv_next_popup(): void
   </div>
 </div>
 <style>
-.npop{--pl:#7D5E68;--dp:#4A3A41;--cr:#FBF8F4;--pf:#E8D6CA;--bl:#EADFDE;position:fixed;inset:0;z-index:90;display:flex;overflow-y:auto;padding:24px 16px;background:rgba(46,37,41,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .45s}
+.npop{--pl:#5A3C4C;--dp:#3A2631;--cr:#FBF9F6;--pf:#E6DBCF;--bl:#E4DCD1;position:fixed;inset:0;z-index:90;display:flex;overflow-y:auto;padding:24px 16px;background:rgba(46,37,41,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .45s}
 .npop.on{opacity:1}
 .npop[hidden]{display:none}
 .npop-stage{position:relative;margin:auto;width:min(860px,100%);transform:translateY(26px) scale(.96);transition:transform .8s cubic-bezier(.2,1.2,.3,1)}
@@ -140,7 +140,7 @@ function mv_next_popup(): void
 .npop-line{width:150px;height:14px;margin:-.1rem 0 .1rem}
 .npop-line path{fill:none;stroke:var(--pl);stroke-width:2;stroke-linecap:round;stroke-dasharray:260;stroke-dashoffset:260;transition:stroke-dashoffset 1.4s ease .9s}
 .npop.on .npop-line path{stroke-dashoffset:0}
-.npop-t{color:var(--muted,#7D7076);margin:0;font-size:.92rem;line-height:1.6}
+.npop-t{color:var(--muted,#6E6168);margin:0;font-size:.92rem;line-height:1.6}
 .npop-f{list-style:none;margin:.35rem 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
 .npop-f li{display:flex;flex-direction:column;align-items:center;gap:.4rem;text-align:center;font-size:.76rem;line-height:1.25;color:var(--dp);opacity:0;transform:translateY(10px);transition:opacity .5s calc(1s + var(--i) * .15s),transform .6s cubic-bezier(.2,1.4,.3,1) calc(1s + var(--i) * .15s)}
 .npop.on .npop-f li{opacity:1;transform:none}
@@ -156,8 +156,8 @@ function mv_next_popup(): void
 .npop-go::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-18deg);animation:npsh 4.5s ease-in-out 2s infinite}
 .npop-go .ar{display:inline-block;transition:transform .3s}
 .npop-go:hover .ar{transform:translateX(5px)}
-.npop-later{border:0;background:none;color:var(--muted,#7D7076);font:inherit;font-size:.88rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:.4em 0}
-.npop-x{position:absolute;right:16px;top:16px;z-index:3;width:36px;height:36px;border-radius:50%;border:1px solid #E6DCD2;background:#fff;color:var(--dp);font-size:.85rem;cursor:pointer;transition:transform .3s}
+.npop-later{border:0;background:none;color:var(--muted,#6E6168);font:inherit;font-size:.88rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:.4em 0}
+.npop-x{position:absolute;right:16px;top:16px;z-index:3;width:36px;height:36px;border-radius:50%;border:1px solid #DED5C9;background:#fff;color:var(--dp);font-size:.85rem;cursor:pointer;transition:transform .3s}
 .npop-x:hover{transform:rotate(90deg)}
 @media(max-width:759px){
   .npop{padding:14px 12px}

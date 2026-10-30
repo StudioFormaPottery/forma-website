@@ -79,7 +79,7 @@ $h = 'forma_h';
 <title><?= $open ? 'Gathering room' : 'Wild Hearts Gathering' ?> · Wild Hearts</title>
 <meta name="description" content="A free live circle for women who want more than just functioning. With Viv, from the Austrian mountains.">
 <?php if ($me): ?><meta name="robots" content="noindex, nofollow"><?php endif; ?>
-<meta name="theme-color" content="#F2ECE4">
+<meta name="theme-color" content="#F5F1EB">
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
 <link rel="manifest" href="/app.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movecia"><meta name="apple-mobile-web-app-status-bar-style" content="default"><script src="/wildhearts/assets/app.js?v=2" defer></script>
@@ -90,7 +90,7 @@ $h = 'forma_h';
 @font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(/fonts/Outfit-Bold.woff) format("woff")}
 @font-face{font-family:"Hand";font-weight:400;font-display:swap;src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
-:root{--cream:#F2ECE4;--oat:#E8DED2;--blush:#E8D6CA;--rose:#C9B2B8;--wine:#7D5E68;--wine-deep:#6B5658;--earth:#4A3A41;--brown:#7D7076;--ink:#2E2529;--sage-soft:#EADFDE;--line:#DDD2C6;--blob:58% 42% 47% 53% / 52% 46% 54% 48%;--hand:"Hand","Bradley Hand",cursive}
+:root{--cream:#F5F1EB;--oat:#E8DED2;--blush:#E6DBCF;--rose:#C9B2B8;--wine:#5A3C4C;--wine-deep:#4A3040;--earth:#3A2631;--brown:#6E6168;--ink:#2A2026;--sage-soft:#E4DCD1;--line:#D3C9BC;--blob:58% 42% 47% 53% / 52% 46% 54% 48%;--hand:"Hand","Bradley Hand",cursive}
 *{box-sizing:border-box;margin:0}
 [hidden]{display:none!important}
 html,body{background:var(--cream)}
@@ -105,7 +105,7 @@ main{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:max(36px,
 h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(38px,9vw,56px);line-height:1.05;color:var(--wine-deep);margin-top:8px}
 .when{display:inline-block;margin-top:18px;padding:14px 22px;border-radius:22px;background:var(--sage-soft);color:var(--earth);font-weight:500}
 .lead{color:var(--brown);margin:16px auto 0;max-width:38ch}
-.card{position:relative;margin-top:30px;padding:32px 22px 24px;border-radius:30px;background:#FBF8F4;border:1.5px solid var(--line);box-shadow:0 18px 40px rgba(70,50,58,.1);text-align:left}
+.card{position:relative;margin-top:30px;padding:32px 22px 24px;border-radius:30px;background:#FBF9F6;border:1.5px solid var(--line);box-shadow:0 18px 40px rgba(70,50,58,.1);text-align:left}
 .tape{position:absolute;width:86px;height:26px;background:rgba(232,214,202,.82);top:-13px;left:50%;margin-left:-43px;transform:rotate(-6deg)}
 form{display:flex;flex-direction:column;gap:12px}
 label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--brown)}
@@ -113,7 +113,7 @@ input[type=text],input[type=email]{font:inherit;font-size:17px;padding:14px 18px
 input:focus{outline:2px solid var(--blush);outline-offset:1px;border-color:var(--wine)}
 .consent{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;color:var(--brown)}
 .consent input{margin-top:3px;width:18px;height:18px;accent-color:var(--wine);flex:0 0 auto}
-button,.btn{font:inherit;font-weight:500;font-size:17px;padding:15px 24px;border-radius:999px;border:0;background:var(--wine);color:#F2ECE4;cursor:pointer;text-decoration:none;display:inline-block;text-align:center}
+button,.btn{font:inherit;font-weight:500;font-size:17px;padding:15px 24px;border-radius:999px;border:0;background:var(--wine);color:#F5F1EB;cursor:pointer;text-decoration:none;display:inline-block;text-align:center}
 button:disabled{opacity:.6;cursor:wait}
 .msg{text-align:center;font-size:15.5px;line-height:1.5;padding:6px 0 0}
 .msg.err{color:var(--wine)}

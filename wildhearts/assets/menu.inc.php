@@ -60,50 +60,50 @@ function mv_menu(string $active = '', array $o = []): void
 </div>
 <style>
 .mvm-bar{display:none;align-items:center;gap:.25rem;margin-left:auto}
-.mvm-bar a{color:var(--ink,#2E2529);text-decoration:none;padding:.45em .8em;border-radius:999px;font-size:.95rem;white-space:nowrap}
-.mvm-bar a:hover,.mvm-bar a.on{background:var(--card,#FBF8F4)}
-.mvm-bar a.lg{border:1px solid var(--line,#DDD2C6)}
-.mvm-btn{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;border:1px solid var(--line,#DDD2C6);background:var(--card,#FBF8F4);color:var(--ink,#2E2529);border-radius:999px;cursor:pointer;padding:0}
+.mvm-bar a{color:var(--ink,#2A2026);text-decoration:none;padding:.45em .8em;border-radius:999px;font-size:.95rem;white-space:nowrap}
+.mvm-bar a:hover,.mvm-bar a.on{background:var(--card,#FBF9F6)}
+.mvm-bar a.lg{border:1px solid var(--line,#D3C9BC)}
+.mvm-btn{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;border:1px solid var(--line,#D3C9BC);background:var(--card,#FBF9F6);color:var(--ink,#2A2026);border-radius:999px;cursor:pointer;padding:0}
 @media(min-width:900px){.mvm-bar{display:flex}.mvm-bar~.mvm-btn{display:none}}
 html:not([data-l=en]):not([lang=en]) .mvm .en,html:not([data-l=en]):not([lang=en]) .mvm-bar .en,html[data-l=en] .mvm .de,html[data-l=en] .mvm-bar .de,html[lang=en]:not([data-l=de]) .mvm .de,html[lang=en]:not([data-l=de]) .mvm-bar .de{display:none!important}
-.mvm{position:fixed;inset:0;z-index:1000;background:#F2ECE4;color:#2E2529;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;padding:max(14px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));font-family:"Hanken",system-ui,sans-serif;font-size:17px;line-height:1.5;opacity:0;transform:translateX(24px);transition:opacity .25s ease,transform .25s ease}
+.mvm{position:fixed;inset:0;z-index:1000;background:#F5F1EB;color:#2A2026;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;padding:max(14px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));font-family:"Hanken",system-ui,sans-serif;font-size:17px;line-height:1.5;opacity:0;transform:translateX(24px);transition:opacity .25s ease,transform .25s ease}
 .mvm.open{opacity:1;transform:none}
 .mvm[hidden]{display:none}
-.mvm-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid #DDD2C6}
-.mvm-brand{display:flex;align-items:center;gap:.5rem;font-family:"Cormorant",Georgia,serif;font-size:1.75rem;color:#2E2529;text-decoration:none;line-height:1}
-.mvm-brand i{display:inline-block;width:.3em;height:.3em;border-radius:50%;background:#7D5E68;margin-left:.04em}
-.mvm-x{display:grid;place-items:center;width:44px;height:44px;border:1px solid #DDD2C6;background:#FBF8F4;color:#2E2529;border-radius:999px;cursor:pointer;padding:0}
+.mvm-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid #D3C9BC}
+.mvm-brand{display:flex;align-items:center;gap:.5rem;font-family:"Cormorant",Georgia,serif;font-size:1.75rem;color:#2A2026;text-decoration:none;line-height:1}
+.mvm-brand i{display:inline-block;width:.3em;height:.3em;border-radius:50%;background:#5A3C4C;margin-left:.04em}
+.mvm-x{display:grid;place-items:center;width:44px;height:44px;border:1px solid #D3C9BC;background:#FBF9F6;color:#2A2026;border-radius:999px;cursor:pointer;padding:0}
 /* Menüknopf in der Kieselform des Movecia-Logos (Vivien, 28.10.2026, Vorbild: Hotel mit Logo-Form um die drei Striche) */
-.mvm-btn,.mvm-x{width:50px;height:50px;flex:0 0 50px;border:0!important;border-radius:0!important;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='17 14 94 94'%3E%3Cpath d='M56 32 C 76 29, 92 44, 91 64 C 90 84, 72 96, 53 92 C 34 88, 25 72, 29 53 C 32 40, 43 33, 56 32 Z' fill='%23E8D6CA' transform='translate%28-2 0%29'/%3E%3Cpath d='M44 30 C 62 20, 90 28, 98 50 C 104 68, 92 78, 84 88 C 76 100, 50 98, 36 88 C 22 78, 22 58, 28 46 C 32 38, 38 33, 44 30 Z' fill='none' stroke='%237D5E68' stroke-width='2.6' stroke-linejoin='round' transform='translate%283 2%29 translate%2863 60%29 scale%280.85%29 translate%28-63 -60%29'/%3E%3C/svg%3E") center/100% 100% no-repeat!important;color:#4A3A41!important;transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
+.mvm-btn,.mvm-x{width:50px;height:50px;flex:0 0 50px;border:0!important;border-radius:0!important;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='17 14 94 94'%3E%3Cpath d='M56 32 C 76 29, 92 44, 91 64 C 90 84, 72 96, 53 92 C 34 88, 25 72, 29 53 C 32 40, 43 33, 56 32 Z' fill='%23E8D6CA' transform='translate%28-2 0%29'/%3E%3Cpath d='M44 30 C 62 20, 90 28, 98 50 C 104 68, 92 78, 84 88 C 76 100, 50 98, 36 88 C 22 78, 22 58, 28 46 C 32 38, 38 33, 44 30 Z' fill='none' stroke='%237D5E68' stroke-width='2.6' stroke-linejoin='round' transform='translate%283 2%29 translate%2863 60%29 scale%280.85%29 translate%28-63 -60%29'/%3E%3C/svg%3E") center/100% 100% no-repeat!important;color:#3A2631!important;transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
 .mvm-btn:hover,.mvm-x:hover{transform:rotate(-8deg) scale(1.05)}
 .mvm-btn svg,.mvm-x svg{translate:1px 1px}
 
 .mvm-list{display:flex;flex-direction:column;margin-top:6px}
-.mvm-list a{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:1rem;padding:15px 4px;border-bottom:1px solid #DDD2C6;color:#2E2529;text-decoration:none}
+.mvm-list a{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:1rem;padding:15px 4px;border-bottom:1px solid #D3C9BC;color:#2A2026;text-decoration:none}
 .mvm-list b{font-family:"Cormorant",Georgia,serif;font-weight:500;font-size:1.85rem;line-height:1.1}
-.mvm-list small{grid-column:1;font-size:.88rem;color:#7D7076;margin-top:2px}
-.mvm-list .ar{grid-column:2;grid-row:1/span 2;color:#7D5E68}
-.mvm-list a.on b{color:#7D5E68}
-.mvm-list a.on b::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#7D5E68;margin-left:.5rem;vertical-align:middle}
-.mvm-list a:active{background:#FBF8F4}
+.mvm-list small{grid-column:1;font-size:.88rem;color:#6E6168;margin-top:2px}
+.mvm-list .ar{grid-column:2;grid-row:1/span 2;color:#5A3C4C}
+.mvm-list a.on b{color:#5A3C4C}
+.mvm-list a.on b::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#5A3C4C;margin-left:.5rem;vertical-align:middle}
+.mvm-list a:active{background:#FBF9F6}
 /* Academy hebt sich ab (Vivien, 29.10.2026): eigene dunkle Pflaume-Karte */
-.mvm-list a.mvm-ac{margin:12px 0 4px;padding:16px 18px;border:0;border-radius:20px;background:linear-gradient(115deg,#5E4A51,#7D5E68);color:#FBF5F7}
-.mvm-list a.mvm-ac b,.mvm-list a.mvm-ac.on b{color:#FBF5F7}
-.mvm-list a.mvm-ac small{color:#E8D6CA}
-.mvm-list a.mvm-ac .ar{color:#FBF5F7}
-.mvm-list a.mvm-ac.on b::after{background:#E8D6CA}
-.mvm-bar a.mvm-ac{background:#6B5658;color:#FBF5F7}
+.mvm-list a.mvm-ac{margin:12px 0 4px;padding:16px 18px;border:0;border-radius:20px;background:linear-gradient(115deg,#5E4A51,#5A3C4C);color:#F7F1EE}
+.mvm-list a.mvm-ac b,.mvm-list a.mvm-ac.on b{color:#F7F1EE}
+.mvm-list a.mvm-ac small{color:#E6DBCF}
+.mvm-list a.mvm-ac .ar{color:#F7F1EE}
+.mvm-list a.mvm-ac.on b::after{background:#E6DBCF}
+.mvm-bar a.mvm-ac{background:#4A3040;color:#F7F1EE}
 .mvm-foot{margin-top:auto;padding-top:24px;display:flex;flex-direction:column;gap:14px;align-items:flex-start}
-.mvm-login{display:inline-flex;align-items:center;justify-content:center;width:100%;background:#7D5E68;color:#FBF5F7;border-radius:999px;padding:.9em 1.4em;text-decoration:none;font-weight:500}
-.mvm-app{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:10px 14px;border:1px solid #DDD2C6;border-radius:18px;background:#FBF8F4;color:#2E2529;text-decoration:none}
+.mvm-login{display:inline-flex;align-items:center;justify-content:center;width:100%;background:#5A3C4C;color:#F7F1EE;border-radius:999px;padding:.9em 1.4em;text-decoration:none;font-weight:500}
+.mvm-app{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:10px 14px;border:1px solid #D3C9BC;border-radius:18px;background:#FBF9F6;color:#2A2026;text-decoration:none}
 .mvm-app img{border-radius:9px;flex:0 0 34px}
 .mvm-app b{display:block;font-weight:500;font-size:.98rem}
-.mvm-app small{display:block;font-size:.82rem;color:#7D7076}
+.mvm-app small{display:block;font-size:.82rem;color:#6E6168}
 .mv-standalone .mvm-app{display:none}
-.mvm-lang{display:flex;background:#FBF8F4;border:1px solid #DDD2C6;border-radius:999px;padding:3px}
-.mvm-lang button{font:inherit;font-size:.9rem;border:0;background:none;border-radius:999px;padding:.4em 1em;cursor:pointer;color:#7D7076}
-.mvm-lang button[aria-pressed=true]{background:#7D5E68;color:#FBF5F7}
-.mvm-mail{font-size:.9rem;color:#7D7076}
+.mvm-lang{display:flex;background:#FBF9F6;border:1px solid #D3C9BC;border-radius:999px;padding:3px}
+.mvm-lang button{font:inherit;font-size:.9rem;border:0;background:none;border-radius:999px;padding:.4em 1em;cursor:pointer;color:#6E6168}
+.mvm-lang button[aria-pressed=true]{background:#5A3C4C;color:#F7F1EE}
+.mvm-mail{font-size:.9rem;color:#6E6168}
 html.mvm-lock,html.mvm-lock body{overflow:hidden}
 @media(prefers-reduced-motion:reduce){.mvm{transition:none}}
 </style>

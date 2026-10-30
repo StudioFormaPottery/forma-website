@@ -4,8 +4,8 @@
   "start_url": "/mitglieder/",
   "scope": "/mitglieder/",
   "display": "standalone",
-  "background_color": "#F2ECE4",
-  "theme_color": "#F2ECE4",
+  "background_color": "#F5F1EB",
+  "theme_color": "#F5F1EB",
   "icons": [
     {"src": "/img/movecia/movecia-app-180.png", "sizes": "180x180", "type": "image/png"},
     {"src": "/img/movecia/movecia-zeichen-1024.png", "sizes": "1024x1024", "type": "image/png"}

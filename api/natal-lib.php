@@ -332,23 +332,23 @@ function natal_clean_wishes($raw): array
 function natal_mail_html(string $title, string $inner, string $foot = ''): string
 {
     return '<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . forma_h($title) . '</title></head>'
-        . '<body style="margin:0;padding:0;background:#F2ECE4;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2ECE4;"><tr><td align="center" style="padding:26px 12px;">'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FBF8F4;border-radius:24px;font-family:Helvetica,Arial,sans-serif;color:#2E2529;">'
+        . '<body style="margin:0;padding:0;background:#F5F1EB;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F5F1EB;"><tr><td align="center" style="padding:26px 12px;">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FBF9F6;border-radius:24px;font-family:Helvetica,Arial,sans-serif;color:#2A2026;">'
         . '<tr><td style="padding:24px 30px 0;"><img src="' . forma_h(mm_site()) . '/img/movecia/movecia-mail.png" width="180" height="40" alt="Movecia." style="display:block;border:0;width:180px;height:auto;"></td></tr>'
         . '<tr><td style="padding:14px 30px 28px;font-size:16px;line-height:1.65;">' . $inner
         . '<p style="margin:24px 0 0;">Bis bald,<br>Vivien</p></td></tr></table>'
-        . '<p style="max-width:560px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#7D7076;margin:16px auto 0;">Vivien Malonga · Movecia – Personal Fitness · ' . NATAL_COMPANY['street'] . ' · ' . NATAL_COMPANY['city'] . ' · ' . NATAL_COMPANY['email'] . '</p>' . $foot
+        . '<p style="max-width:560px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#6E6168;margin:16px auto 0;">Vivien Malonga · Movecia – Personal Fitness · ' . NATAL_COMPANY['street'] . ' · ' . NATAL_COMPANY['city'] . ' · ' . NATAL_COMPANY['email'] . '</p>' . $foot
         . '</td></tr></table></body></html>';
 }
 
 function natal_btn(string $href, string $label): string
 {
-    return '<p style="margin:22px 0 6px;text-align:center;"><a href="' . forma_h($href) . '" style="display:inline-block;padding:14px 28px;border-radius:999px;background:#7D5E68;color:#FBF5F7;text-decoration:none;font-weight:bold;">' . forma_h($label) . '</a></p>';
+    return '<p style="margin:22px 0 6px;text-align:center;"><a href="' . forma_h($href) . '" style="display:inline-block;padding:14px 28px;border-radius:999px;background:#5A3C4C;color:#F7F1EE;text-decoration:none;font-weight:bold;">' . forma_h($label) . '</a></p>';
 }
 
 function natal_h1(string $t): string
 {
-    return '<h1 style="font-family:Georgia,\'Times New Roman\',serif;font-weight:400;font-size:28px;line-height:1.2;color:#2E2529;margin:0 0 14px;">' . forma_h($t) . '</h1>';
+    return '<h1 style="font-family:Georgia,\'Times New Roman\',serif;font-weight:400;font-size:28px;line-height:1.2;color:#2A2026;margin:0 0 14px;">' . forma_h($t) . '</h1>';
 }
 
 /** Schickt eine Mail: Text-Version wird aus den Absätzen gebaut, HTML aus denselben Teilen. */
@@ -361,11 +361,11 @@ function natal_mail(string $to, string $subject, string $title, array $paras, ?a
     $html = natal_h1($title);
     foreach ($paras as $p) {
         $html .= is_array($p)
-            ? '<p style="margin:0 0 14px;padding:12px 16px;background:#F2ECE4;border-radius:14px;">' . implode('<br>', array_map('forma_h', $p)) . '</p>'
+            ? '<p style="margin:0 0 14px;padding:12px 16px;background:#F5F1EB;border-radius:14px;">' . implode('<br>', array_map('forma_h', $p)) . '</p>'
             : '<p style="margin:0 0 14px;">' . nl2br(forma_h($p)) . '</p>';
     }
     if ($button) $html .= natal_btn($button[0], $button[1]);
-    $foot = $legal === '' ? '' : '<div style="max-width:560px;margin:18px auto 0;padding:18px 22px;border-radius:18px;background:#FBF8F4;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#7D7076;text-align:left;">' . nl2br(forma_h($legal)) . '</div>';
+    $foot = $legal === '' ? '' : '<div style="max-width:560px;margin:18px auto 0;padding:18px 22px;border-radius:18px;background:#FBF9F6;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#6E6168;text-align:left;">' . nl2br(forma_h($legal)) . '</div>';
     return mm_mail($to, $subject, $text, natal_mail_html($title, $html, $foot), $attachments, NATAL_FROM_NAME);
 }
 
@@ -443,7 +443,7 @@ function natal_checkout(PDO $pdo, array $o): string
         'cancel_url' => $site . '/natal/?o=' . $o['id'] . '&k=' . $o['token'] . '&abgebrochen=1',
     ];
     $branded = $params;
-    $branded['branding_settings'] = ['display_name' => 'Movecia – Personal Fitness', 'background_color' => '#F2ECE4', 'button_color' => '#7D5E68', 'border_style' => 'rounded', 'font_family' => 'inter'];
+    $branded['branding_settings'] = ['display_name' => 'Movecia – Personal Fitness', 'background_color' => '#F5F1EB', 'button_color' => '#5A3C4C', 'border_style' => 'rounded', 'font_family' => 'inter'];
     $branded['payment_intent_data']['statement_descriptor_suffix'] = 'MOVECIA';
     try {
         $s = forma_stripe('POST', '/v1/checkout/sessions', $branded, null, '2025-09-30.clover');
@@ -618,15 +618,15 @@ function natal_pack_cards(string $base): array
         foreach (natal_packages_for($md) as $p) {
             $name = preg_replace('/ online$/', '', $p['title']);
             $detail = $p['units'] > 1 ? $p['units'] . ' × ' . forma_euro($p['unit_cents']) : '1 Einheit';
-            $rows .= '<tr><td style="padding:7px 0;border-top:1px solid #DDD2C6;">' . forma_h($name) . '<br><span style="font-size:13px;color:#7D7076;">' . forma_h($p['sub']) . '</span></td>'
-                . '<td align="right" style="padding:7px 0;border-top:1px solid #DDD2C6;white-space:nowrap;vertical-align:top;"><b>' . forma_h(forma_euro($p['cents'])) . '</b><br><span style="font-size:13px;color:#7D7076;">' . forma_h($detail) . '</span></td></tr>';
+            $rows .= '<tr><td style="padding:7px 0;border-top:1px solid #D3C9BC;">' . forma_h($name) . '<br><span style="font-size:13px;color:#6E6168;">' . forma_h($p['sub']) . '</span></td>'
+                . '<td align="right" style="padding:7px 0;border-top:1px solid #D3C9BC;white-space:nowrap;vertical-align:top;"><b>' . forma_h(forma_euro($p['cents'])) . '</b><br><span style="font-size:13px;color:#6E6168;">' . forma_h($detail) . '</span></td></tr>';
             $text .= "\n· " . $name . ': ' . forma_euro($p['cents']) . ($p['units'] > 1 ? ' (' . $detail . ')' : '');
         }
         $link = $base . (str_contains($base, '?') ? '&' : '?') . 'm=' . $md;
-        $html .= '<div style="margin:18px 0 6px;padding:18px 20px;background:' . ($online ? '#EADFDE' : '#F2ECE4') . ';border-radius:18px;">'
-            . '<p style="margin:0 0 8px;font-family:Georgia,\'Times New Roman\',serif;font-size:21px;color:#2E2529;">' . forma_h($label) . '</p>'
-            . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.4;color:#2E2529;">' . $rows . '</table>'
-            . '<p style="margin:16px 0 2px;text-align:center;"><a href="' . forma_h($link) . '" style="display:inline-block;padding:12px 24px;border-radius:999px;background:#7D5E68;color:#FBF5F7;text-decoration:none;font-weight:bold;">' . ($online ? 'Online ansehen &amp; buchen' : 'Studio ansehen &amp; buchen') . '</a></p></div>';
+        $html .= '<div style="margin:18px 0 6px;padding:18px 20px;background:' . ($online ? '#E4DCD1' : '#F5F1EB') . ';border-radius:18px;">'
+            . '<p style="margin:0 0 8px;font-family:Georgia,\'Times New Roman\',serif;font-size:21px;color:#2A2026;">' . forma_h($label) . '</p>'
+            . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.4;color:#2A2026;">' . $rows . '</table>'
+            . '<p style="margin:16px 0 2px;text-align:center;"><a href="' . forma_h($link) . '" style="display:inline-block;padding:12px 24px;border-radius:999px;background:#5A3C4C;color:#F7F1EE;text-decoration:none;font-weight:bold;">' . ($online ? 'Online ansehen &amp; buchen' : 'Studio ansehen &amp; buchen') . '</a></p></div>';
     }
     return [$html, $text];
 }
@@ -1020,12 +1020,12 @@ function natal_news_welcome_build(array $sub, bool $send)
     $html = '<p style="margin:0 0 14px;">' . forma_h("Hallo $first,") . '</p><p style="margin:0 0 14px;">' . forma_h($intro) . '</p>'
         . '<p style="margin:0 0 14px;">' . forma_h($packs) . '</p>'
         . '<p style="margin:18px 0 0;font-family:Georgia,\'Times New Roman\',serif;font-size:22px;">Pakete &amp; Preise</p>'
-        . '<p style="margin:4px 0 0;font-size:14px;color:#7D7076;">Je mehr Einheiten, desto günstiger. Alle Pakete gelten bis 6 Monate nach der Geburt.</p>';
+        . '<p style="margin:4px 0 0;font-size:14px;color:#6E6168;">Je mehr Einheiten, desto günstiger. Alle Pakete gelten bis 6 Monate nach der Geburt.</p>';
     [$ch, $ct] = natal_pack_cards($base);
     $html .= $ch . '<p style="margin:18px 0 14px;">' . forma_h($call) . '</p>'
         . '<p style="margin:0 0 14px;">Im Anhang findest du beide Flyer als PDF. Und wenn du Fragen hast, antworte einfach auf diese Mail.</p>';
     $unsub = natal_news_unsub_link($sub);
-    $foot = '<p style="max-width:560px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#7D7076;margin:8px auto 0;">Du bekommst diese Mail, weil du dich auf moveciamovement.com für Infos zum Prä- und Postnatal-Training angemeldet hast. <a href="' . forma_h($unsub) . '" style="color:#7D7076;">Abmelden</a></p>';
+    $foot = '<p style="max-width:560px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#6E6168;margin:8px auto 0;">Du bekommst diese Mail, weil du dich auf moveciamovement.com für Infos zum Prä- und Postnatal-Training angemeldet hast. <a href="' . forma_h($unsub) . '" style="color:#6E6168;">Abmelden</a></p>';
     $text = "Hallo $first,\n\n$intro\n\n$packs\n\nPakete & Preise (je mehr Einheiten, desto günstiger, gültig bis 6 Monate nach der Geburt):" . $ct . "\n\n$call\n\nAlles ansehen: $base\n\nIm Anhang findest du beide Flyer als PDF. Und wenn du Fragen hast, antworte einfach auf diese Mail.\n\nBis bald,\nVivien\n\nAbmelden: $unsub";
     $files = [];
     $dir = dirname(__DIR__) . '/wildhearts/natal/files/';
@@ -1132,8 +1132,8 @@ function natal_bonus_mail(array $c, string $tok, string $until): array
         foreach (natal_packages_for($md) as $k => $p) {
             if (!isset($bp[$k])) continue;
             $nm = preg_replace('/ online$/', '', $p['title']);
-            $rows .= '<tr><td style="padding:7px 0;border-top:1px solid #DDD2C6;">' . forma_h($nm) . '<br><span style="font-size:13px;color:#7D7076;">' . (int)$p['units'] . ' × ' . forma_h(forma_euro($bp[$k]['unit'])) . ' statt ' . forma_h(forma_euro($p['unit_cents'])) . '</span></td>'
-                . '<td align="right" style="padding:7px 0;border-top:1px solid #DDD2C6;white-space:nowrap;vertical-align:top;"><span style="font-size:13px;color:#7D7076;text-decoration:line-through;">' . forma_h(forma_euro($p['cents'])) . '</span><br><b>' . forma_h(forma_euro($bp[$k]['total'])) . '</b></td></tr>';
+            $rows .= '<tr><td style="padding:7px 0;border-top:1px solid #D3C9BC;">' . forma_h($nm) . '<br><span style="font-size:13px;color:#6E6168;">' . (int)$p['units'] . ' × ' . forma_h(forma_euro($bp[$k]['unit'])) . ' statt ' . forma_h(forma_euro($p['unit_cents'])) . '</span></td>'
+                . '<td align="right" style="padding:7px 0;border-top:1px solid #D3C9BC;white-space:nowrap;vertical-align:top;"><span style="font-size:13px;color:#6E6168;text-decoration:line-through;">' . forma_h(forma_euro($p['cents'])) . '</span><br><b>' . forma_h(forma_euro($bp[$k]['total'])) . '</b></td></tr>';
             $txt .= "\n· $nm: " . forma_euro($bp[$k]['total']) . ' statt ' . forma_euro($p['cents']) . ' (' . $p['units'] . ' × ' . forma_euro($bp[$k]['unit']) . ')';
         }
     }
@@ -1141,7 +1141,7 @@ function natal_bonus_mail(array $c, string $tok, string $until): array
     $intro = 'danke für unser Gespräch, ich habe mich sehr gefreut, dich kennenzulernen! Wenn du dich für eine Begleitung durch die Schwangerschaft und die Zeit danach entscheidest, habe ich ein kleines Dankeschön für dich.';
     $bonus = 'Als Kennenlern-Bonus bekommst du jedes Paket ' . $cfg['percent'] . ' % günstiger, im Studio und online. Der Bonus gilt bis ' . $untilDe . ' und ist schon in deinem Link eingetragen.';
     $html = natal_h1('Dein Kennenlern-Bonus') . '<p style="margin:0 0 14px;">' . forma_h("Hallo $first,") . '</p><p style="margin:0 0 14px;">' . forma_h($intro) . '</p><p style="margin:0 0 14px;">' . forma_h($bonus) . '</p>'
-        . '<div style="margin:16px 0 6px;padding:8px 20px 16px;background:#EADFDE;border-radius:18px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.4;color:#2E2529;">' . $rows . '</table></div>'
+        . '<div style="margin:16px 0 6px;padding:8px 20px 16px;background:#E4DCD1;border-radius:18px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.4;color:#2A2026;">' . $rows . '</table></div>'
         . natal_btn($base, 'Paket mit Bonus buchen')
         . '<p style="margin:14px 0 0;">Deine Wunschtermine suchst du dir beim Buchen gleich im Kalender aus. Wenn du noch Fragen hast, antworte einfach auf diese Mail.</p>';
     $text = "Hallo $first,\n\n$intro\n\n$bonus$txt\n\nPaket mit Bonus buchen: $base\n\nDeine Wunschtermine suchst du dir beim Buchen gleich im Kalender aus. Wenn du noch Fragen hast, antworte einfach auf diese Mail.\n\nBis bald,\nVivien";

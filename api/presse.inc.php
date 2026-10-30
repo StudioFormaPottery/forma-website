@@ -111,9 +111,9 @@ function presse_html(string $brand, string $to): string
     $s = presse_sign($brand);
     $f = $brand === 'forma';
     $site = $f ? 'https://www.forma-pottery.com' : 'https://moveciamovement.com';
-    $ink = $f ? '#33211B' : '#2E2529';
-    $acc = $f ? '#8C2C1D' : '#7D5E68';
-    $soft = $f ? '#E4D2BF' : '#EADFDE';
+    $ink = $f ? '#33211B' : '#2A2026';
+    $acc = $f ? '#8C2C1D' : '#5A3C4C';
+    $soft = $f ? '#E4D2BF' : '#E4DCD1';
     $serif = $f ? 'Georgia,serif' : 'Georgia,\'Cormorant Garamond\',serif';
     $pics = '';
     foreach (array_chunk(array_slice(PRESSE_PHOTOS[$brand], 0, 4), 2) as $row) {
@@ -125,8 +125,8 @@ function presse_html(string $brand, string $to): string
     foreach ($i['paras'] as $p) $body .= '<p style="margin:0 0 14px">' . $h($p) . '</p>';
     $body .= '<p style="margin:0 0 14px">Ich freue mich auf Ihre Rückmeldung.</p>'
         . '<p style="margin:0 0 4px">' . $h($s[0]) . '</p><p style="margin:0;font-family:' . $serif . ';font-size:22px;color:' . $acc . '">' . $h($s[1]) . '</p>'
-        . '<p style="margin:2px 0 0;font-size:13px;color:#7D7076">' . $h($s[2]) . '<br>' . $h($s[3]) . '</p>'
-        . '<p style="margin:18px 0 0;font-size:14px;color:#7D7076">' . $h($i['ps']) . '</p>'
+        . '<p style="margin:2px 0 0;font-size:13px;color:#6E6168">' . $h($s[2]) . '<br>' . $h($s[3]) . '</p>'
+        . '<p style="margin:18px 0 0;font-size:14px;color:#6E6168">' . $h($i['ps']) . '</p>'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0 6px">' . $pics . '</table>'
         . '<div style="margin:18px 0 0;padding:22px 24px;border-radius:18px;background:' . $soft . '">'
         . '<p style="margin:0 0 6px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:' . $acc . '">Pressetext</p>'
@@ -134,7 +134,7 @@ function presse_html(string $brand, string $to): string
     foreach ($r['paras'] as $p) $body .= '<p style="margin:0 0 12px;font-size:15px">' . $h($p) . '</p>';
     $body .= '<p style="margin:14px 0 6px;font-weight:bold;font-size:15px">Auf einen Blick</p><ul style="margin:0;padding-left:18px;font-size:15px">';
     foreach ($r['facts'] as $x) $body .= '<li style="margin:0 0 4px">' . $h($x) . '</li>';
-    $body .= '</ul><p style="margin:12px 0 0;font-size:13px;color:#7D7076">Fotos zur freien Verwendung im Anhang (Foto: ' . ($f ? 'Studio FORMA' : 'Movecia') . ').</p></div>';
+    $body .= '</ul><p style="margin:12px 0 0;font-size:13px;color:#6E6168">Fotos zur freien Verwendung im Anhang (Foto: ' . ($f ? 'Studio FORMA' : 'Movecia') . ').</p></div>';
 
     if ($f) {
         return '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>'
@@ -146,10 +146,10 @@ function presse_html(string $brand, string $to): string
     }
     return '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>'
         . '<body style="margin:0;padding:0;background:#E8DED2"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#E8DED2"><tr><td align="center" style="padding:26px 12px">'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#F2ECE4;border-radius:24px;font-family:Helvetica,Arial,sans-serif;color:#2E2529">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#F5F1EB;border-radius:24px;font-family:Helvetica,Arial,sans-serif;color:#2A2026">'
         . '<tr><td style="padding:24px 30px 0"><img src="' . $site . '/img/movecia/movecia-mail.png" width="160" alt="Movecia." style="display:block;border:0;width:160px;height:auto"></td></tr>'
         . '<tr><td style="padding:18px 30px 28px;font-size:16px;line-height:1.65">' . $body . '</td></tr></table>'
-        . '<p style="max-width:600px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#7D7076;margin:16px auto 0">Vivien Malonga · Movecia · Mathon im Paznaun · <a href="' . $site . '" style="color:#7D7076">moveciamovement.com</a></p>'
+        . '<p style="max-width:600px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#6E6168;margin:16px auto 0">Vivien Malonga · Movecia · Mathon im Paznaun · <a href="' . $site . '" style="color:#6E6168">moveciamovement.com</a></p>'
         . '</td></tr></table></body></html>';
 }
 

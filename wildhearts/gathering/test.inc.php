@@ -29,14 +29,14 @@ $offers = $guest ? [] : mm_offers_active();
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title><?= $gath ? 'Gathering · Gastgeberin' : 'Technik-Test' ?> · Wild Hearts</title>
-<meta name="theme-color" content="#F2ECE4">
+<meta name="theme-color" content="#F5F1EB">
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
 <style>
 @font-face{font-family:"Italiana";font-weight:400;font-display:swap;src:url(/fonts/Italiana-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Hand";font-weight:400;font-display:swap;src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
-:root{--cream:#F2ECE4;--oat:#E8DED2;--blush:#E8D6CA;--wine:#7D5E68;--wine-deep:#6B5658;--earth:#4A3A41;--brown:#7D7076;--ink:#2E2529;--sage-soft:#EADFDE;--line:#DDD2C6;--blob:58% 42% 47% 53% / 52% 46% 54% 48%}
+:root{--cream:#F5F1EB;--oat:#E8DED2;--blush:#E6DBCF;--wine:#5A3C4C;--wine-deep:#4A3040;--earth:#3A2631;--brown:#6E6168;--ink:#2A2026;--sage-soft:#E4DCD1;--line:#D3C9BC;--blob:58% 42% 47% 53% / 52% 46% 54% 48%}
 *{box-sizing:border-box;margin:0}
 [hidden]{display:none!important}
 html,body{background:var(--cream)}
@@ -49,7 +49,7 @@ main{position:relative;max-width:760px;margin:0 auto;padding:max(30px,env(safe-a
 .hand{font-family:"Hand","Bradley Hand",cursive;color:var(--wine);font-size:20px;transform:rotate(-2deg);display:inline-block}
 h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(36px,8vw,52px);line-height:1.05;color:var(--wine-deep);margin-top:6px}
 .lead{color:var(--brown);margin-top:10px}
-.card{margin-top:22px;padding:22px;border-radius:26px;background:#FBF8F4;border:1.5px solid var(--line);box-shadow:0 14px 34px rgba(70,50,58,.08)}
+.card{margin-top:22px;padding:22px;border-radius:26px;background:#FBF9F6;border:1.5px solid var(--line);box-shadow:0 14px 34px rgba(70,50,58,.08)}
 .card h2{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:28px;color:var(--wine-deep);margin-bottom:6px}
 .step{font-family:"Outfit",sans-serif;display:inline-block;width:30px;height:30px;border-radius:50%;background:var(--sage-soft);color:var(--wine-deep);text-align:center;line-height:30px;font-size:16px;margin-right:8px;vertical-align:4px}
 .preview{position:relative;margin-top:14px;border-radius:20px;overflow:hidden;background:var(--earth);aspect-ratio:16/10}
@@ -62,7 +62,7 @@ h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(36px,8vw
 .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:15px;color:var(--brown);flex:1 1 240px}
 select{font:inherit;font-size:16px;padding:11px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--cream);color:var(--ink)}
-button,.btn{font:inherit;font-weight:500;font-size:17px;padding:13px 22px;border-radius:999px;border:0;background:var(--wine);color:#F2ECE4;cursor:pointer;text-decoration:none;display:inline-block}
+button,.btn{font:inherit;font-weight:500;font-size:17px;padding:13px 22px;border-radius:999px;border:0;background:var(--wine);color:#F5F1EB;cursor:pointer;text-decoration:none;display:inline-block}
 button.ghost{background:var(--cream);color:var(--wine-deep);border:1.5px solid var(--line)}
 button:disabled{opacity:.55;cursor:default}
 .tip{font-size:15px;color:var(--brown);margin-top:12px}
@@ -72,7 +72,7 @@ button:disabled{opacity:.55;cursor:default}
 .roomwrap iframe{flex:1;width:100%;border:0;background:#2B1E23;min-height:0}
 textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16px;border-radius:18px;border:1.5px solid var(--line);background:var(--cream);color:var(--ink);line-height:1.6;resize:vertical;margin-top:12px}
 .saved{font-size:14px;color:var(--brown);margin-top:6px;min-height:1.2em}
-.prompter{position:relative;flex:0 0 auto;height:34vh;min-height:150px;background:#1F181B;color:#F2ECE4;overflow:hidden;border-bottom:1px solid #5A4C52}
+.prompter{position:relative;flex:0 0 auto;height:34vh;min-height:150px;background:#1F181B;color:#F5F1EB;overflow:hidden;border-bottom:1px solid #5A4C52}
 .prompter.solo{position:fixed;inset:0;height:auto;z-index:6}
 .prompter .scroll{position:absolute;inset:0;overflow-y:auto;padding:18px 7vw 60vh;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .prompter .scroll::-webkit-scrollbar{display:none}
@@ -89,20 +89,20 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 .practice{position:fixed;inset:0;z-index:7;background:#1F181B;display:flex;flex-direction:column}
 .practice canvas{flex:1;width:100%;min-height:0;object-fit:contain;background:#1F181B}
 .practice .pbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 16px;color:#C9B2B8;font-size:14px}
-.practice .pbar button{padding:7px 16px;font-size:15px;background:#EADFDE;color:#6B5658}
+.practice .pbar button{padding:7px 16px;font-size:15px;background:#E4DCD1;color:#4A3040}
 .practice .pbar .recon{background:#93402F;color:#FBF1EA}
 .pask{display:flex;gap:8px;flex-wrap:wrap;padding:10px 16px;background:#1F181B;border-top:1px solid #5A4C52}
-.pask select,.pask input{font:inherit;font-size:16px;padding:9px 12px;border-radius:12px;border:1px solid #5A4C52;background:#2B2226;color:#F2ECE4}
+.pask select,.pask input{font:inherit;font-size:16px;padding:9px 12px;border-radius:12px;border:1px solid #5A4C52;background:#2B2226;color:#F5F1EB}
 .pask input{flex:1 1 260px;min-width:0}
-.pask button{padding:9px 16px;font-size:15px;background:#EADFDE;color:#6B5658}
-.pask button.ghost{background:transparent;color:#EADFDE;border:1px solid #7D7076}
+.pask button{padding:9px 16px;font-size:15px;background:#E4DCD1;color:#4A3040}
+.pask button.ghost{background:transparent;color:#E4DCD1;border:1px solid #6E6168}
 .ublist{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .ubrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .ubrow input[type=text]{font:inherit;font-size:16px;padding:10px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--cream);flex:1 1 160px;min-width:0}
 .ubrow label.pick{font-size:14px;padding:8px 12px;border-radius:999px;border:1.5px solid var(--line);cursor:pointer;color:var(--wine-deep);background:var(--cream)}
 .ubrow .sw{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--line);background-size:cover;background-position:center;flex:0 0 auto}
 .ubrow button{padding:8px 12px;font-size:14px}
-.offd{position:fixed;left:16px;bottom:16px;z-index:21;width:min(380px,calc(100% - 32px));max-height:calc(100% - 90px);overflow:auto;background:#FBF8F4;color:var(--ink);border-radius:22px;padding:18px;box-shadow:0 18px 44px rgba(31,22,26,.4);font-size:16px}
+.offd{position:fixed;left:16px;bottom:16px;z-index:21;width:min(380px,calc(100% - 32px));max-height:calc(100% - 90px);overflow:auto;background:#FBF9F6;color:var(--ink);border-radius:22px;padding:18px;box-shadow:0 18px 44px rgba(31,22,26,.4);font-size:16px}
 .offd h3{font-size:19px;font-weight:500;color:var(--wine-deep);margin-bottom:8px}
 .offd label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--brown);margin-top:10px}
 .offd select,.offd input{font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--cream);color:var(--ink)}
@@ -112,7 +112,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 .offd .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .offd .acts button{padding:10px 16px;font-size:15px}
 .offd .cl{position:absolute;right:10px;top:8px;background:transparent;color:var(--brown);font-size:22px;padding:4px 8px}
-.qd{position:fixed;right:16px;top:70px;z-index:21;width:min(400px,calc(100% - 32px));max-height:calc(100% - 90px);overflow:auto;background:#FBF8F4;color:var(--ink);border-radius:22px;padding:18px;box-shadow:0 18px 44px rgba(31,22,26,.4);font-size:16px}
+.qd{position:fixed;right:16px;top:70px;z-index:21;width:min(400px,calc(100% - 32px));max-height:calc(100% - 90px);overflow:auto;background:#FBF9F6;color:var(--ink);border-radius:22px;padding:18px;box-shadow:0 18px 44px rgba(31,22,26,.4);font-size:16px}
 .qd h3{font-size:19px;font-weight:500;color:var(--wine-deep);margin-bottom:4px}
 .qd .hint{font-size:13.5px;color:var(--brown);margin-bottom:10px}
 .qd .q{border-top:1px solid var(--line);padding:10px 0}
@@ -126,7 +126,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 .qd .cl{position:absolute;right:10px;top:8px;background:transparent;color:var(--brown);font-size:22px;padding:4px 8px}
 #qbadge:not(:empty){display:inline-block;min-width:20px;padding:0 6px;border-radius:999px;background:#B9C77A;color:#1F181B;font-size:12px;margin-left:4px}
 .roombar .recon{background:#93402F;color:#FBF1EA;border-color:#93402F}
-.roombar .ghostbtn{background:transparent;color:var(--blush);border:1px solid #7D7076}
+.roombar .ghostbtn{background:transparent;color:var(--blush);border:1px solid #6E6168}
 </style>
 <script src="/wildhearts/assets/schutz.js?v=3"></script>
 </head>
@@ -504,7 +504,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
   // --- Übungsansicht: nur lokal gezeichnet, nichts davon geht in den Whereby-Raum ---
   const UL = $('ublist');
   if (UL) {
-    const SW = ['#7D5E68', '#B79FA6', '#7D7076', '#C9B2B8', '#6B5658', '#8A8F6E'];
+    const SW = ['#5A3C4C', '#B79FA6', '#6E6168', '#C9B2B8', '#4A3040', '#8A8F6E'];
     // Namen aus aller Welt: Europa, USA, Lateinamerika, Asien, Afrika, Naher Osten
     const WORLD = ['Anna', 'Sophie', 'Lena', 'Emily', 'Olivia', 'Chloé', 'Giulia', 'Lucía', 'Inês', 'Freya', 'Saoirse', 'Ingrid', 'Zofia', 'Eleni', 'Katarina', 'Madison', 'Ashley', 'Brooke', 'Jasmine', 'Valentina', 'Camila', 'Mariana', 'Yuki', 'Hana', 'Mei', 'Ji-woo', 'Priya', 'Ananya', 'Linh', 'Mai', 'Aiko', 'Siti', 'Leila', 'Yasmin', 'Noa', 'Amara', 'Zara', 'Nia', 'Aisha', 'Ayşe', 'Elif', 'Isla', 'Mia', 'Tamara', 'Rosa'];
     const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -558,7 +558,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     };
     qm.onchange = () => { try { localStorage.setItem('wh-fragen-takt', qm.value); } catch (e) {} if (!PR.hidden) qLoop(); };
     let qList = [], qTimed = [], qMsgs = [], qTimer = 0, qStart = 0, qClock = 0;
-    const NAMECOL = ['#7D5E68', '#8A5A44', '#3F6B6B', '#7A5C8A', '#A0703A', '#4E6E3A', '#9A4F5F', '#3F5A82', '#7D7076', '#7C7A2F'];
+    const NAMECOL = ['#5A3C4C', '#8A5A44', '#3F6B6B', '#7A5C8A', '#A0703A', '#4E6E3A', '#9A4F5F', '#3F5A82', '#6E6168', '#7C7A2F'];
     const parseQ = l => {
       let at = -1;
       const tm = l.match(/^(\d{1,3}(?:[.,]\d{1,2})?)\s*(?:min\.?|minute[n]?|m)\s*:?\s*/i);
@@ -607,19 +607,19 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       const sec = Math.ceil(Math.max(0, 25 * 60000 - (now - uOffer.at)) / 1000), live = sec > 0;
       const h = 120 + list.length * ih + 20, y = H - h - 22 + (1 - ease) * 30;
       g.save(); g.globalAlpha = ease; g.shadowColor = 'rgba(31,22,26,.4)'; g.shadowBlur = 30; g.shadowOffsetY = 12;
-      g.fillStyle = '#F2ECE4'; rr(x, y, w, h, 26); g.fill(); g.shadowColor = 'transparent';
-      g.fillStyle = '#7D5E68'; g.font = '400 19px Hand, cursive'; g.fillText('just for you tonight ♡', x + 24, y + 40);
-      g.fillStyle = '#6B5658'; g.font = '400 34px Italiana, Georgia, serif'; g.fillText('Ways to walk with me', x + 24, y + 82);
-      g.fillStyle = '#EADFDE'; rr(x + w - 210, y + 22, 186, 32, 16); g.fill(); g.fillStyle = '#6B5658'; g.font = '500 15px Outfit, system-ui, sans-serif';
+      g.fillStyle = '#F5F1EB'; rr(x, y, w, h, 26); g.fill(); g.shadowColor = 'transparent';
+      g.fillStyle = '#5A3C4C'; g.font = '400 19px Hand, cursive'; g.fillText('just for you tonight ♡', x + 24, y + 40);
+      g.fillStyle = '#4A3040'; g.font = '400 34px Italiana, Georgia, serif'; g.fillText('Ways to walk with me', x + 24, y + 82);
+      g.fillStyle = '#E4DCD1'; rr(x + w - 210, y + 22, 186, 32, 16); g.fill(); g.fillStyle = '#4A3040'; g.font = '500 15px Outfit, system-ui, sans-serif';
       g.fillText('Gathering prices · ' + Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'), x + w - 198, y + 43);
       list.forEach(([kk, o], i) => {
         const yy = y + 110 + i * ih, lv = live && o.sp > 0 && o.sp < o.reg, per = o.mon ? '/mo' : '';
-        g.strokeStyle = '#DDD2C6'; g.lineWidth = 1; g.beginPath(); g.moveTo(x + 24, yy); g.lineTo(x + w - 24, yy); g.stroke();
-        g.fillStyle = '#6B5658'; g.font = '400 26px Italiana, Georgia, serif'; g.fillText(o.title, x + 24, yy + 34);
-        g.font = '400 15px Outfit, system-ui, sans-serif'; g.fillStyle = '#7D7076'; g.fillText((wrap(o.text, w - 48)[0] || '') + ' …', x + 24, yy + 58);
-        if (lv) { g.fillStyle = '#A0959A'; g.font = '400 16px Outfit, system-ui, sans-serif'; const rt = eur(o.reg) + per; g.fillText(rt, x + 24, yy + 94); const rw = g.measureText(rt).width; g.strokeStyle = '#A0959A'; g.beginPath(); g.moveTo(x + 24, yy + 88); g.lineTo(x + 24 + rw, yy + 88); g.stroke(); g.fillStyle = '#6B5658'; g.font = '500 24px Outfit, system-ui, sans-serif'; g.fillText(eur(o.sp) + per, x + 34 + rw, yy + 95); }
-        else { g.fillStyle = '#6B5658'; g.font = '500 24px Outfit, system-ui, sans-serif'; g.fillText(eur(o.reg) + per, x + 24, yy + 95); }
-        g.fillStyle = '#7D5E68'; rr(x + w - 174, yy + 70, 150, 38, 19); g.fill(); g.fillStyle = '#F2ECE4'; g.font = '500 16px Outfit, system-ui, sans-serif'; g.textAlign = 'center';
+        g.strokeStyle = '#D3C9BC'; g.lineWidth = 1; g.beginPath(); g.moveTo(x + 24, yy); g.lineTo(x + w - 24, yy); g.stroke();
+        g.fillStyle = '#4A3040'; g.font = '400 26px Italiana, Georgia, serif'; g.fillText(o.title, x + 24, yy + 34);
+        g.font = '400 15px Outfit, system-ui, sans-serif'; g.fillStyle = '#6E6168'; g.fillText((wrap(o.text, w - 48)[0] || '') + ' …', x + 24, yy + 58);
+        if (lv) { g.fillStyle = '#A0959A'; g.font = '400 16px Outfit, system-ui, sans-serif'; const rt = eur(o.reg) + per; g.fillText(rt, x + 24, yy + 94); const rw = g.measureText(rt).width; g.strokeStyle = '#A0959A'; g.beginPath(); g.moveTo(x + 24, yy + 88); g.lineTo(x + 24 + rw, yy + 88); g.stroke(); g.fillStyle = '#4A3040'; g.font = '500 24px Outfit, system-ui, sans-serif'; g.fillText(eur(o.sp) + per, x + 34 + rw, yy + 95); }
+        else { g.fillStyle = '#4A3040'; g.font = '500 24px Outfit, system-ui, sans-serif'; g.fillText(eur(o.reg) + per, x + 24, yy + 95); }
+        g.fillStyle = '#5A3C4C'; rr(x + w - 174, yy + 70, 150, 38, 19); g.fill(); g.fillStyle = '#F5F1EB'; g.font = '500 16px Outfit, system-ui, sans-serif'; g.textAlign = 'center';
         g.fillText((kk === 'year' ? 'Apply · ' : 'Book · ') + eur(lv ? o.sp : o.reg), x + w - 99, yy + 95); g.textAlign = 'start';
       });
       g.restore();
@@ -632,23 +632,23 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       g.font = '400 18px Outfit, system-ui, sans-serif'; const ls = wrap(o.text, w - 48).slice(0, 4);
       const h = 120 + ls.length * 26 + 70 + (live ? 46 : 0) + 64, y = H - h - 22 + (1 - ease) * 30;
       g.save(); g.globalAlpha = ease; g.shadowColor = 'rgba(31,22,26,.4)'; g.shadowBlur = 30; g.shadowOffsetY = 12;
-      g.fillStyle = '#F2ECE4'; rr(x, y, w, h, 26); g.fill(); g.shadowColor = 'transparent';
-      g.fillStyle = '#7D5E68'; g.font = '400 19px Hand, cursive'; g.fillText(live ? 'just for you tonight ♡' : 'when you are ready ♡', x + 24, y + 40);
-      g.fillStyle = '#6B5658'; g.font = '400 36px Italiana, Georgia, serif'; g.fillText(o.title, x + 24, y + 86);
-      g.fillStyle = '#7D7076'; g.font = '400 18px Outfit, system-ui, sans-serif'; ls.forEach((l, i) => g.fillText(l, x + 24, y + 120 + i * 26));
+      g.fillStyle = '#F5F1EB'; rr(x, y, w, h, 26); g.fill(); g.shadowColor = 'transparent';
+      g.fillStyle = '#5A3C4C'; g.font = '400 19px Hand, cursive'; g.fillText(live ? 'just for you tonight ♡' : 'when you are ready ♡', x + 24, y + 40);
+      g.fillStyle = '#4A3040'; g.font = '400 36px Italiana, Georgia, serif'; g.fillText(o.title, x + 24, y + 86);
+      g.fillStyle = '#6E6168'; g.font = '400 18px Outfit, system-ui, sans-serif'; ls.forEach((l, i) => g.fillText(l, x + 24, y + 120 + i * 26));
       let yy = y + 120 + ls.length * 26 + 30;
       const per = o.mon ? ' / month' : '';
       if (live && sec > 0) {
         g.fillStyle = '#A0959A'; g.font = '400 20px Outfit, system-ui, sans-serif'; const rt = eur(o.reg) + per; g.fillText(rt, x + 24, yy); const rw = g.measureText(rt).width;
         g.strokeStyle = '#A0959A'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x + 24, yy - 7); g.lineTo(x + 24 + rw, yy - 7); g.stroke();
-        g.fillStyle = '#6B5658'; g.font = '500 34px Outfit, system-ui, sans-serif'; g.fillText(eur(o.sp) + per, x + 36 + rw, yy + 2);
-        yy += 30; g.fillStyle = '#EADFDE'; rr(x + 24, yy, 300, 36, 18); g.fill();
-        g.fillStyle = '#6B5658'; g.font = '500 17px Outfit, system-ui, sans-serif'; g.fillText('Gathering price ends in ' + Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'), x + 40, yy + 24); yy += 46;
+        g.fillStyle = '#4A3040'; g.font = '500 34px Outfit, system-ui, sans-serif'; g.fillText(eur(o.sp) + per, x + 36 + rw, yy + 2);
+        yy += 30; g.fillStyle = '#E4DCD1'; rr(x + 24, yy, 300, 36, 18); g.fill();
+        g.fillStyle = '#4A3040'; g.font = '500 17px Outfit, system-ui, sans-serif'; g.fillText('Gathering price ends in ' + Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'), x + 40, yy + 24); yy += 46;
       } else {
-        g.fillStyle = '#6B5658'; g.font = '500 34px Outfit, system-ui, sans-serif'; g.fillText(eur(o.reg) + per, x + 24, yy + 2); yy += 16;
+        g.fillStyle = '#4A3040'; g.font = '500 34px Outfit, system-ui, sans-serif'; g.fillText(eur(o.reg) + per, x + 24, yy + 2); yy += 16;
       }
-      g.fillStyle = '#7D5E68'; rr(x + 24, yy + 8, w - 48, 50, 25); g.fill();
-      g.fillStyle = '#F2ECE4'; g.font = '500 19px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('Book now · ' + eur(live && sec > 0 ? o.sp : o.reg), x + w / 2, yy + 40); g.textAlign = 'start';
+      g.fillStyle = '#5A3C4C'; rr(x + 24, yy + 8, w - 48, 50, 25); g.fill();
+      g.fillStyle = '#F5F1EB'; g.font = '500 19px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('Book now · ' + eur(live && sec > 0 ? o.sp : o.reg), x + w / 2, yy + 40); g.textAlign = 'start';
       g.restore();
     };
     const openCount = () => qMsgs.filter(m => !m.done && m.who >= 0).length;
@@ -708,17 +708,17 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       g.font = '500 ' + (small ? 16 : 20) + 'px Outfit, system-ui, sans-serif';
       const w = g.measureText(t).width + 20, lh = small ? 26 : 32;
       g.fillStyle = 'rgba(31,22,26,.62)'; rr(x + 8, y + h - lh - 8, w, lh, 9); g.fill();
-      g.fillStyle = '#F2ECE4'; g.fillText(t, x + 18, y + h - (small ? 15 : 18));
+      g.fillStyle = '#F5F1EB'; g.fillText(t, x + 18, y + h - (small ? 15 : 18));
     };
     const drawChat = (x0, W, H) => {
       const pw = W - x0, now = performance.now();
       g.fillStyle = '#EDE3DA'; g.fillRect(x0, 0, pw, H);
       g.fillStyle = 'rgba(125,94,104,.07)';
       for (let yy = 70; yy < H; yy += 34) for (let xx = x0 + ((yy / 34) % 2 ? 10 : 27); xx < W; xx += 34) { g.beginPath(); g.arc(xx, yy, 2.2, 0, Math.PI * 2); g.fill(); }
-      g.fillStyle = '#6B5658'; g.fillRect(x0, 0, pw, 64);
-      g.fillStyle = '#EADFDE'; g.beginPath(); g.arc(x0 + 34, 32, 18, 0, Math.PI * 2); g.fill();
-      g.fillStyle = '#6B5658'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('♡', x0 + 34, 39); g.textAlign = 'start';
-      g.fillStyle = '#F2ECE4'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.fillText('Wild Hearts Chat', x0 + 62, 28);
+      g.fillStyle = '#4A3040'; g.fillRect(x0, 0, pw, 64);
+      g.fillStyle = '#E4DCD1'; g.beginPath(); g.arc(x0 + 34, 32, 18, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#4A3040'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('♡', x0 + 34, 39); g.textAlign = 'start';
+      g.fillStyle = '#F5F1EB'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.fillText('Wild Hearts Chat', x0 + 62, 28);
       const oc = openCount();
       g.fillStyle = '#C9D0B8'; g.font = '400 15px Outfit, system-ui, sans-serif'; g.fillText(oc ? oc + (oc === 1 ? ' Frage offen' : ' Fragen offen') : (rows.length + 1) + ' im Kreis', x0 + 62, 50);
       g.save(); g.beginPath(); g.rect(x0, 64, pw, H - 64); g.clip();
@@ -729,13 +729,13 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
           g.font = '500 18px Outfit, system-ui, sans-serif';
           const ls2 = wrap(m.text, pw - 90), bw2 = Math.min(pw - 40, Math.max(...ls2.map(l => g.measureText(l).width)) + 36), bh2 = 22 + ls2.length * 24, bx2 = x0 + (pw - bw2) / 2; yb -= bh2;
           g.save(); g.globalAlpha = ease; g.translate(bx2 + bw2 / 2, yb + bh2 / 2); g.scale(0.8 + 0.2 * ease, 0.8 + 0.2 * ease); g.translate(-(bx2 + bw2 / 2), -(yb + bh2 / 2));
-          g.fillStyle = '#7D5E68'; rr(bx2, yb, bw2, bh2, 16); g.fill(); g.fillStyle = '#F2ECE4';
+          g.fillStyle = '#5A3C4C'; rr(bx2, yb, bw2, bh2, 16); g.fill(); g.fillStyle = '#F5F1EB';
           ls2.forEach((l, j) => g.fillText(l, bx2 + 18, yb + 28 + j * 24)); g.restore(); yb -= 12; continue;
         }
         if (m.who < 0) {
           g.font = '400 16px Outfit, system-ui, sans-serif';
           const tw2 = g.measureText(m.text).width + 28, bx = x0 + (pw - tw2) / 2, bh = 32; yb -= bh;
-          g.fillStyle = '#E1EAC9'; rr(bx, yb, tw2, bh, 10); g.fill(); g.fillStyle = '#6B5658'; g.fillText(m.text, bx + 14, yb + 21); yb -= 10; continue;
+          g.fillStyle = '#E1EAC9'; rr(bx, yb, tw2, bh, 10); g.fill(); g.fillStyle = '#4A3040'; g.fillText(m.text, bx + 14, yb + 21); yb -= 10; continue;
         }
         const name = rows[m.who] ? rows[m.who].name.trim() || 'Gast' : 'Gast', nc = NAMECOL[m.who % NAMECOL.length];
         g.font = '400 20px Outfit, system-ui, sans-serif';
@@ -751,7 +751,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
         g.beginPath(); g.moveTo(bx + 2, yb); g.lineTo(bx - 10, yb); g.lineTo(bx + 2, yb + 14); g.closePath(); g.fill();
         g.shadowColor = 'transparent';
         g.fillStyle = nc; g.font = '500 16px Outfit, system-ui, sans-serif'; g.fillText(name, bx + 14, yb + 26);
-        g.fillStyle = '#2E2529'; g.font = '400 20px Outfit, system-ui, sans-serif';
+        g.fillStyle = '#2A2026'; g.font = '400 20px Outfit, system-ui, sans-serif';
         ls.forEach((l, j) => g.fillText(l, bx + 14, yb + 53 + j * 27));
         g.fillStyle = '#A0959A'; g.font = '400 13px Outfit, system-ui, sans-serif';
         const tt = m.done ? m.time + '  ✓✓' : m.time; const tw3 = g.measureText(tt).width;
@@ -764,9 +764,9 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     };
     const nowHM = () => { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
     const drawTop = (W, TOP, n) => {
-      g.fillStyle = '#4A3A41'; g.fillRect(0, 0, W, TOP);
-      g.fillStyle = '#E8D6CA'; g.font = '400 24px Hand, "Bradley Hand", cursive'; g.fillText('welcome, wild heart ♡', 28, 47);
-      g.font = '500 26px Outfit, system-ui, sans-serif'; g.fillStyle = '#F2ECE4'; g.textAlign = 'center';
+      g.fillStyle = '#3A2631'; g.fillRect(0, 0, W, TOP);
+      g.fillStyle = '#E6DBCF'; g.font = '400 24px Hand, "Bradley Hand", cursive'; g.fillText('welcome, wild heart ♡', 28, 47);
+      g.font = '500 26px Outfit, system-ui, sans-serif'; g.fillStyle = '#F5F1EB'; g.textAlign = 'center';
       g.fillText(callTitle(), W / 2, 36);
       g.font = '400 17px Outfit, system-ui, sans-serif'; g.fillStyle = '#C9B2B8';
       g.fillText(new Date().toLocaleDateString('de-AT', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'}) + ' · ' + nowHM() + ' · moveciamovement.com', W / 2, 60);
@@ -775,9 +775,9 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       // kleiner, unaufdringlicher Hinweis, dass es eine Übung ist
       g.font = '500 15px Outfit, system-ui, sans-serif'; const tag = 'Übung', tw2 = g.measureText(tag).width + 22;
       g.fillStyle = 'rgba(234,223,222,.16)'; rr(xr - tw2, 24, tw2, 28, 14); g.fill(); g.fillStyle = '#C9B2B8'; g.fillText(tag, xr - 11, 43); xr -= tw2 + 16;
-      g.fillStyle = '#EADFDE'; g.font = '500 18px Outfit, system-ui, sans-serif'; g.fillText(n + ' im Raum', xr, 44); xr -= g.measureText(n + ' im Raum').width + 12;
+      g.fillStyle = '#E4DCD1'; g.font = '500 18px Outfit, system-ui, sans-serif'; g.fillText(n + ' im Raum', xr, 44); xr -= g.measureText(n + ' im Raum').width + 12;
       g.beginPath(); g.arc(xr - 8, 37, 7, 0, Math.PI * 2); g.fill(); g.beginPath(); g.arc(xr - 8, 54, 12, Math.PI, 0); g.fill();
-      if (uRec) { const s2 = Math.floor((Date.now() - uT0) / 1000); xr -= 40; g.fillStyle = '#C0533F'; g.beginPath(); g.arc(xr - 6, 38, 7, 0, Math.PI * 2); g.fill(); g.fillStyle = '#F2ECE4'; g.textAlign = 'end'; g.fillText(Math.floor(s2 / 60) + ':' + String(s2 % 60).padStart(2, '0'), xr - 20, 44); }
+      if (uRec) { const s2 = Math.floor((Date.now() - uT0) / 1000); xr -= 40; g.fillStyle = '#C0533F'; g.beginPath(); g.arc(xr - 6, 38, 7, 0, Math.PI * 2); g.fill(); g.fillStyle = '#F5F1EB'; g.textAlign = 'end'; g.fillText(Math.floor(s2 / 60) + ':' + String(s2 % 60).padStart(2, '0'), xr - 20, 44); }
       g.textAlign = 'start';
     };
     const icon = (kind, cx, cy, col) => {
@@ -791,17 +791,17 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     };
     const drawBottom = (W, FH, BOT) => {
       const y = FH - BOT;
-      g.fillStyle = '#4A3A41'; g.fillRect(0, y, W, BOT);
+      g.fillStyle = '#3A2631'; g.fillRect(0, y, W, BOT);
       const btns = [['mic', 'Mikro'], ['cam', 'Kamera'], ['share', 'Teilen'], ['chat', 'Chat'], ['hand', 'Melden'], ['more', 'Mehr']];
       const bw = 92, total = btns.length * bw + 140, x0 = (W - total) / 2;
       btns.forEach(([k, lab], i) => {
         const cx = x0 + i * bw + bw / 2, cy = y + 38, active = k === 'chat';
-        g.fillStyle = active ? '#7D5E68' : 'rgba(242,236,228,.1)'; g.beginPath(); g.arc(cx, cy, 26, 0, Math.PI * 2); g.fill();
-        icon(k, cx, cy, '#F2ECE4');
+        g.fillStyle = active ? '#5A3C4C' : 'rgba(242,236,228,.1)'; g.beginPath(); g.arc(cx, cy, 26, 0, Math.PI * 2); g.fill();
+        icon(k, cx, cy, '#F5F1EB');
         g.fillStyle = '#C9B2B8'; g.font = '400 14px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText(lab, cx, y + 86); g.textAlign = 'start';
       });
       const lx = x0 + btns.length * bw + 20;
-      g.fillStyle = '#7D7076'; rr(lx, y + 18, 120, 42, 21); g.fill();
+      g.fillStyle = '#6E6168'; rr(lx, y + 18, 120, 42, 21); g.fill();
       g.fillStyle = '#FBF1EA'; g.font = '500 17px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('Verlassen', lx + 60, y + 45); g.textAlign = 'start';
     };
     const frame = () => {
@@ -818,7 +818,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
         const y = (H - (rws * th + (rws - 1) * gap)) / 2 + row * (th + gap);
         if (k === 0) {
           if (cam.videoWidth) cover(cam, cam.videoWidth, cam.videoHeight, x, y, tw, th, true);
-          else { g.fillStyle = '#4A3A41'; rr(x, y, tw, th, 14); g.fill(); }
+          else { g.fillStyle = '#3A2631'; rr(x, y, tw, th, 14); g.fill(); }
           label('Viv', x, y, th, small);
         } else {
           const r = rows[k - 1], im = imgs.get(k - 1);
@@ -826,13 +826,13 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
           else { g.fillStyle = r.color; rr(x, y, tw, th, 14); g.fill(); }
           const rad = Math.min(tw, th) * 0.19;
           g.fillStyle = 'rgba(242,236,228,.9)'; g.beginPath(); g.arc(x + tw / 2, y + th / 2 - 8, rad, 0, Math.PI * 2); g.fill();
-          g.fillStyle = '#6B5658'; g.font = '500 ' + Math.round(rad * 0.9) + 'px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+          g.fillStyle = '#4A3040'; g.font = '500 ' + Math.round(rad * 0.9) + 'px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
           g.fillText((r.name.trim()[0] || '?').toUpperCase(), x + tw / 2, y + th / 2 - 6); g.textAlign = 'start'; g.textBaseline = 'alphabetic';
           label(r.name.trim() || 'Gast', x, y, th, small);
           if (open.has(k - 1)) {
             const pulse = 3 + 2 * Math.sin(performance.now() / 180);
             g.strokeStyle = '#B9C77A'; g.lineWidth = pulse; rr(x + 2, y + 2, tw - 4, th - 4, 13); g.stroke();
-            g.fillStyle = '#F2ECE4'; g.beginPath(); g.arc(x + tw - 24, y + 24, small ? 14 : 17, 0, Math.PI * 2); g.fill();
+            g.fillStyle = '#F5F1EB'; g.beginPath(); g.arc(x + tw - 24, y + 24, small ? 14 : 17, 0, Math.PI * 2); g.fill();
             g.font = (small ? 15 : 18) + 'px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('✋', x + tw - 24, y + 25); g.textAlign = 'start'; g.textBaseline = 'alphabetic';
           }
         }

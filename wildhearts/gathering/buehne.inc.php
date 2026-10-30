@@ -16,25 +16,25 @@ if (!isset($testTok)) { http_response_code(404); exit; }
 @font-face{font-family:"Italiana";font-weight:400;font-display:swap;src:url(/fonts/Italiana-Regular.woff) format("woff")}
 *{box-sizing:border-box;margin:0}
 [hidden]{display:none!important}
-html,body{height:100%;background:#1F181B;color:#F2ECE4;font-family:"Outfit",system-ui,sans-serif;font-size:17px;line-height:1.55}
+html,body{height:100%;background:#1F181B;color:#F5F1EB;font-family:"Outfit",system-ui,sans-serif;font-size:17px;line-height:1.55}
 .stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
 .stage video{width:100%;height:100%;object-fit:contain;background:#000}
-.idle{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#4A3A41;text-align:center;padding:24px}
-.idle h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(36px,6vw,60px);color:#EADFDE}
+.idle{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#3A2631;text-align:center;padding:24px}
+.idle h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(36px,6vw,60px);color:#E4DCD1}
 .idle p{color:#C9B2B8}
 .panel{position:fixed;left:16px;top:16px;width:min(420px,calc(100% - 32px));max-height:calc(100% - 32px);overflow:auto;background:rgba(31,22,26,.94);border:1px solid #5A4C52;border-radius:20px;padding:16px;z-index:3}
-.panel h2{font-size:18px;font-weight:500;color:#EADFDE;margin-bottom:6px}
+.panel h2{font-size:18px;font-weight:500;color:#E4DCD1;margin-bottom:6px}
 .panel ol{padding-left:20px;font-size:15px;color:#E8DED2}
 .panel li{margin:4px 0}
 .panel small{display:block;color:#C9B2B8;font-size:13.5px;margin-top:8px}
 .list{display:flex;flex-direction:column;gap:6px;margin-top:12px}
-.list button{text-align:left;background:#2B2226;color:#F2ECE4;border:1px solid #5A4C52}
-.list button.on{background:#7D5E68;border-color:#7D5E68}
+.list button{text-align:left;background:#2B2226;color:#F5F1EB;border:1px solid #5A4C52}
+.list button.on{background:#5A3C4C;border-color:#5A3C4C}
 button,label.btn{font:inherit;font-size:16px;padding:10px 16px;border-radius:999px;border:0;background:#B79FA6;color:#1F181B;cursor:pointer;display:inline-block}
 .row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
 .chk{display:flex;gap:8px;align-items:center;font-size:15px;color:#E8DED2}
 .chk input{width:18px;height:18px;accent-color:#B79FA6}
-.ghost{background:transparent;color:#EADFDE;border:1px solid #7D7076}
+.ghost{background:transparent;color:#E4DCD1;border:1px solid #6E6168}
 .show{position:fixed;left:16px;top:16px;z-index:3;padding:6px 12px;font-size:14px;background:rgba(31,22,26,.7);color:#C9B2B8;border:1px solid #5A4C52}
 </style>
 <script src="/wildhearts/assets/schutz.js?v=3"></script>

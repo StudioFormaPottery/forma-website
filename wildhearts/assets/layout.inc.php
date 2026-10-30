@@ -23,7 +23,7 @@ function mvl_head(string $title, string $desc, string $canon, string $og = '/img
 <meta name="robots" content="<?= empty($GLOBALS['mvl_noindex']) ? 'index, follow, max-image-preview:large' : 'noindex, nofollow' ?>">
 <?php foreach ($jsonld as $j): ?><script type="application/ld+json"><?= json_encode($j, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
 <?php endforeach; ?>
-<meta name="theme-color" content="#F2ECE4">
+<meta name="theme-color" content="#F5F1EB">
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
 <link rel="manifest" href="/app.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movecia"><meta name="apple-mobile-web-app-status-bar-style" content="default"><script src="/wildhearts/assets/app.js?v=2" defer></script>
@@ -32,7 +32,7 @@ function mvl_head(string $title, string $desc, string $canon, string $og = '/img
 <link rel="stylesheet" href="/wildhearts/assets/cute.css?v=5">
 <?= $extraCss ?>
 <?php if ($deOnly): ?><script>(function(){var l=<?= json_encode($l) ?>;try{if(!l)l=localStorage.getItem('wh-lang')||''}catch(e){}if(!l)l=(navigator.language||'').toLowerCase().indexOf('en')===0?'en':'de';if(l==='en')document.documentElement.classList.add('want-en');})();</script>
-<style>.en-note{display:none}html.want-en .en-note{display:block;background:#4A3A41;color:#FBF5F7;text-align:center;font-size:.92rem;padding:.55rem 16px;margin:0}html.de-only .site-top .lang{display:none!important}</style>
+<style>.en-note{display:none}html.want-en .en-note{display:block;background:#3A2631;color:#F7F1EE;text-align:center;font-size:.92rem;padding:.55rem 16px;margin:0}html.de-only .site-top .lang{display:none!important}</style>
 <?php else: ?><script>(function(){var l=<?= json_encode($l) ?>;try{if(!l)l=localStorage.getItem('wh-lang')||''}catch(e){}if(!l)l=(navigator.language||'').toLowerCase().indexOf('en')===0?'en':'de';document.documentElement.dataset.l=l;document.documentElement.lang=l;})();</script>
 <?php endif; ?>
 <script src="/wildhearts/assets/schutz.js?v=3"></script>

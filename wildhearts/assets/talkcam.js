@@ -552,58 +552,58 @@ void main(){
 
   // ---------- Vorschau mit Hilfslinien ----------
   const CSS = `
-.tc-stage{position:relative;width:100%;background:#2E2529;border-radius:22px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.tc-stage{position:relative;width:100%;background:#2A2026;border-radius:22px;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .tc-stage .tc-cv{display:block;width:100%;height:100%;object-fit:contain}
 .tc-stage.mir .tc-cv{transform:scaleX(-1)}
 .tc-guide{position:absolute;pointer-events:none}
 .tc-guide svg{position:absolute;inset:0;width:100%;height:100%}
-.tc-hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);padding:8px 16px;border-radius:999px;background:rgba(46,37,41,.72);color:#FBF5F7;font:500 17px/1.3 "Hanken Grotesk","Outfit",system-ui,sans-serif;white-space:nowrap;transition:background .3s}
+.tc-hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);padding:8px 16px;border-radius:999px;background:rgba(46,37,41,.72);color:#F7F1EE;font:500 17px/1.3 "Hanken Grotesk","Outfit",system-ui,sans-serif;white-space:nowrap;transition:background .3s}
 .tc-hint.ok{background:rgba(63,107,62,.85)}
 .tc-hint:empty{display:none}
-.tc-st{position:absolute;left:12px;bottom:64px;right:12px;z-index:4;padding:8px 14px;border-radius:14px;background:rgba(251,248,244,.92);color:#4A3A41;font:15px/1.4 "Hanken Grotesk","Outfit",system-ui,sans-serif}
+.tc-st{position:absolute;left:12px;bottom:64px;right:12px;z-index:4;padding:8px 14px;border-radius:14px;background:rgba(251,248,244,.92);color:#3A2631;font:15px/1.4 "Hanken Grotesk","Outfit",system-ui,sans-serif}
 .tc-st:empty{display:none}
-.tc-p{display:flex;flex-direction:column;gap:16px;font-family:"Hanken Grotesk","Outfit",system-ui,sans-serif;color:#2E2529}
-.tc-p h3{margin:0;font:500 15px/1 "Hanken Grotesk","Outfit",system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#7D7076}
+.tc-p{display:flex;flex-direction:column;gap:16px;font-family:"Hanken Grotesk","Outfit",system-ui,sans-serif;color:#2A2026}
+.tc-p h3{margin:0;font:500 15px/1 "Hanken Grotesk","Outfit",system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#6E6168}
 .tc-chips{display:flex;flex-wrap:wrap;gap:8px}
-.tc-chips button{font:inherit;font-size:17px;padding:10px 16px;border-radius:999px;border:1.5px solid #DDD2C6;background:#FBF8F4;color:#4A3A41;cursor:pointer;min-height:46px}
-.tc-chips button[aria-pressed=true]{background:#7D5E68;border-color:#7D5E68;color:#fff}
+.tc-chips button{font:inherit;font-size:17px;padding:10px 16px;border-radius:999px;border:1.5px solid #D3C9BC;background:#FBF9F6;color:#3A2631;cursor:pointer;min-height:46px}
+.tc-chips button[aria-pressed=true]{background:#5A3C4C;border-color:#5A3C4C;color:#fff}
 .tc-mine{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:18px;background:#FBF1F0;border:1.5px solid #F0DCDA}
 .tc-mine .tc-chips button.tc-x{min-height:46px;min-width:40px;padding:6px 10px;margin-left:-6px;border-color:#EBD9D6;background:#fff;color:#9A7F86;font-size:18px}
 .tc-mine .tc-mc{display:inline-flex;gap:0}
 .tc-mine [hidden]{display:none!important}
 .tc-mine-f{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.tc-mine-f input{font:inherit;font-size:17px;flex:1 1 180px;min-height:46px;padding:8px 14px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41}
-.tc-save{font:inherit;font-size:17px;padding:10px 18px;border-radius:999px;border:0;background:#7D5E68;color:#fff;cursor:pointer;min-height:46px}
-.tc-save.lite{background:transparent;border:1.5px solid #7D5E68;color:#7D5E68}
-.tc-mmsg{margin:0;font-size:15px;line-height:1.4;color:#7D7076;min-height:0}
+.tc-mine-f input{font:inherit;font-size:17px;flex:1 1 180px;min-height:46px;padding:8px 14px;border-radius:999px;border:1.5px solid #D3C9BC;background:#fff;color:#3A2631}
+.tc-save{font:inherit;font-size:17px;padding:10px 18px;border-radius:999px;border:0;background:#5A3C4C;color:#fff;cursor:pointer;min-height:46px}
+.tc-save.lite{background:transparent;border:1.5px solid #5A3C4C;color:#5A3C4C}
+.tc-mmsg{margin:0;font-size:15px;line-height:1.4;color:#6E6168;min-height:0}
 .tc-mmsg:empty{display:none}
-.tc-sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-radius:18px;background:#FBF8F4;border:1.5px solid #DDD2C6;font-size:18px;cursor:pointer}
-.tc-sw input{width:26px;height:26px;padding:0;flex:0 0 auto;accent-color:#7D5E68}
+.tc-sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-radius:18px;background:#FBF9F6;border:1.5px solid #D3C9BC;font-size:18px;cursor:pointer}
+.tc-sw input{width:26px;height:26px;padding:0;flex:0 0 auto;accent-color:#5A3C4C}
 .tc-p input[type=range]{padding:0;border:0;background:transparent;outline-offset:2px}
 .tc-sl{display:flex;flex-direction:column;gap:4px}
-.tc-sl label{display:flex;justify-content:space-between;font-size:17px;color:#4A3A41}
-.tc-sl label small{color:#7D7076;font-size:15px}
-.tc-sl input[type=range]{width:100%;accent-color:#7D5E68;height:30px}
-.tc-g{background:#FBF8F4;border:1.5px solid #DDD2C6;border-radius:18px;padding:0 14px}
-.tc-g>summary{list-style:none;cursor:pointer;padding:13px 0;font-size:18px;color:#4A3A41;display:flex;justify-content:space-between;align-items:center}
+.tc-sl label{display:flex;justify-content:space-between;font-size:17px;color:#3A2631}
+.tc-sl label small{color:#6E6168;font-size:15px}
+.tc-sl input[type=range]{width:100%;accent-color:#5A3C4C;height:30px}
+.tc-g{background:#FBF9F6;border:1.5px solid #D3C9BC;border-radius:18px;padding:0 14px}
+.tc-g>summary{list-style:none;cursor:pointer;padding:13px 0;font-size:18px;color:#3A2631;display:flex;justify-content:space-between;align-items:center}
 .tc-g>summary::-webkit-details-marker{display:none}
-.tc-g>summary::after{content:"▾";color:#7D5E68}.tc-g[open]>summary::after{content:"▴"}
+.tc-g>summary::after{content:"▾";color:#5A3C4C}.tc-g[open]>summary::after{content:"▴"}
 .tc-gb{display:flex;flex-direction:column;gap:12px;padding:0 0 14px}
 .tc-lips button{display:inline-flex;align-items:center;gap:8px}.tc-lips i{width:16px;height:16px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.12)}
-.tc-more{border-top:1px solid #EADFDE;padding-top:12px}
-.tc-more>summary{cursor:pointer;font-size:17px;color:#7D5E68;list-style:none}
+.tc-more{border-top:1px solid #E4DCD1;padding-top:12px}
+.tc-more>summary{cursor:pointer;font-size:17px;color:#5A3C4C;list-style:none}
 .tc-more>summary::-webkit-details-marker{display:none}
 .tc-more[open]>summary{margin-bottom:12px}
-.tc-cmp{font:inherit;font-size:17px;padding:12px 18px;border-radius:999px;border:1.5px solid #4A3A41;background:transparent;color:#4A3A41;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none}
-.tc-cmp.on{background:#4A3A41;color:#fff}
+.tc-cmp{font:inherit;font-size:17px;padding:12px 18px;border-radius:999px;border:1.5px solid #3A2631;background:transparent;color:#3A2631;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none}
+.tc-cmp.on{background:#3A2631;color:#fff}
 .tc-dlg{position:fixed;inset:0;z-index:2147483000;background:rgba(46,37,41,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:16px}
-.tc-dlg-in{background:#F2ECE4;border-radius:28px;max-width:1180px;width:100%;padding:18px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:18px;margin:auto 0}
+.tc-dlg-in{background:#F5F1EB;border-radius:28px;max-width:1180px;width:100%;padding:18px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:18px;margin:auto 0}
 @media(max-width:820px){.tc-dlg-in{grid-template-columns:1fr}}
 .tc-dlg-h{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:10px}
-.tc-dlg-h b{font:500 30px/1.1 "Cormorant Garamond",Georgia,serif;color:#4A3A41}
-.tc-dlg-h button,.tc-btn{font:inherit;font-size:17px;border:1.5px solid #DDD2C6;background:#fff;border-radius:999px;padding:10px 18px;cursor:pointer;color:#4A3A41}
-.tc-btn.main{background:#7D5E68;border-color:#7D5E68;color:#fff}
-.tc-open{font:inherit;font-size:16px;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;border:1.5px solid #7D5E68;background:#FBF5F7;color:#7D5E68;cursor:pointer}
+.tc-dlg-h b{font:500 30px/1.1 "Cormorant Garamond",Georgia,serif;color:#3A2631}
+.tc-dlg-h button,.tc-btn{font:inherit;font-size:17px;border:1.5px solid #D3C9BC;background:#fff;border-radius:999px;padding:10px 18px;cursor:pointer;color:#3A2631}
+.tc-btn.main{background:#5A3C4C;border-color:#5A3C4C;color:#fff}
+.tc-open{font:inherit;font-size:16px;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;border:1.5px solid #5A3C4C;background:#F7F1EE;color:#5A3C4C;cursor:pointer}
 .tc-open b{font-weight:500}
 `;
   function css() { if (document.getElementById('tc-css')) return; const st = document.createElement('style'); st.id = 'tc-css'; st.textContent = CSS; document.head.appendChild(st); }
@@ -697,7 +697,7 @@ void main(){
     const move = tc.profile === 'move';
     el.innerHTML = move ? `<div class="tc-p">
   <label class="tc-sw"><span>✨ Hintergrund &amp; Licht an</span><input type="checkbox" data-on></label>
-  <p style="margin:0;font-size:16px;line-height:1.5;color:#7D7076">Für Flows und Bewegungsvideos: nur Hintergrund weich und Belichtung, keine Gesichtsfilter.</p>
+  <p style="margin:0;font-size:16px;line-height:1.5;color:#6E6168">Für Flows und Bewegungsvideos: nur Hintergrund weich und Belichtung, keine Gesichtsfilter.</p>
   <div class="tc-mine" data-minebox><h3>💛 Meine Looks</h3><div class="tc-chips" data-mine></div>
     <div class="tc-mine-f" data-mform hidden><input type="text" maxlength="40" data-mname aria-label="Name für deinen Look"><button type="button" class="tc-save" data-mok>Speichern</button><button type="button" class="tc-save lite" data-mno>Abbrechen</button></div>
     <div data-mrow><button type="button" class="tc-save" data-msave>＋ So wie jetzt speichern</button></div><p class="tc-mmsg" data-mmsg></p></div>
@@ -719,7 +719,7 @@ void main(){
   ${grp('licht', '☀️ Hintergrund &amp; Licht', sl('blur', 'Hintergrund unscharf', 0, 100) + sl('light', 'Helligkeit', -50, 50) + sl('warm', 'Wärme', -50, 50) + sl('contrast', 'Kontrast', -50, 50))}
   <div><h3>Hilfe für die Position</h3><div class="tc-chips" data-guides><button type="button" data-g="oval">Kopf-Oval</button><button type="button" data-g="kreuz">Kreuz</button><button type="button" data-g="raster">Raster</button><button type="button" data-g="aus">Aus</button></div></div>
   ${opts.aspect === false ? '' : `<div><h3>Format</h3><div class="tc-chips" data-aspects><button type="button" data-a="16:9">Quer 16:9</button><button type="button" data-a="9:16">Hoch 9:16 (Story, Reel)</button></div></div>`}
-  <label class="tc-sw"><span>Vorschau spiegeln <small style="color:#7D7076;font-size:15px">(wie ein Spiegel, die Aufnahme ist richtig herum)</small></span><input type="checkbox" data-mir></label>
+  <label class="tc-sw"><span>Vorschau spiegeln <small style="color:#6E6168;font-size:15px">(wie ein Spiegel, die Aufnahme ist richtig herum)</small></span><input type="checkbox" data-mir></label>
   <div><button type="button" class="tc-cmp" data-cmp>👁 Gedrückt halten: ohne Look</button></div>
 </div>`;
     const q = sel => el.querySelector(sel), qa = sel => el.querySelectorAll(sel);
@@ -821,7 +821,7 @@ void main(){
     css(); opts = opts || {};
     const d = document.createElement('div'); d.className = 'tc-dlg'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
     d.innerHTML = `<div class="tc-dlg-in"><div class="tc-dlg-h"><b>✨ Kamera-Look</b><button type="button" data-x>Fertig</button></div><div><div data-stage class="tc-stage" style="aspect-ratio:16/9"><div class="tc-st">Kamera startet …</div></div>
-<p style="font:16px/1.5 'Hanken Grotesk','Outfit',system-ui,sans-serif;color:#6B5658;margin:10px 4px 0">${opts.note || 'Der Look wird gespeichert und gilt für deine Aufnahmen hier. Hilfslinien siehst nur du, sie sind nie in der Aufnahme.'}</p></div><div data-panel></div></div>`;
+<p style="font:16px/1.5 'Hanken Grotesk','Outfit',system-ui,sans-serif;color:#4A3040;margin:10px 4px 0">${opts.note || 'Der Look wird gespeichert und gilt für deine Aufnahmen hier. Hilfslinien siehst nur du, sie sind nie in der Aufnahme.'}</p></div><div data-panel></div></div>`;
     document.body.appendChild(d); const prevOv = document.body.style.overflow; document.body.style.overflow = 'hidden';
     let tc = null;
     const close = () => { if (tc) tc.destroy(true); d.remove(); document.body.style.overflow = prevOv; if (opts.onClose) opts.onClose(load()); };

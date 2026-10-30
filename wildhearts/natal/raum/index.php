@@ -109,12 +109,12 @@ $when = $room && $room['start'] ? natal_date_de(date('Y-m-d', $room['start'])) .
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <title><?= $room ? $h($room['title']) . ' · ' : '' ?>Movecia Videoraum</title>
-<meta name="theme-color" content="#F2ECE4">
+<meta name="theme-color" content="#F5F1EB">
 <style>
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:normal;src:url(/fonts/CormorantGaramond-VF.woff) format("woff")}
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(/fonts/CormorantGaramond-Italic-VF.woff) format("woff")}
 @font-face{font-family:"Hanken";font-weight:300 700;src:url(/fonts/HankenGrotesk-VF.woff) format("woff")}
-:root{--bg:#F2ECE4;--card:#FBF8F4;--ink:#2E2529;--muted:#7D7076;--line:#DDD2C6;--plum:#7D5E68;--deep:#4A3A41;--blush:#EADFDE;--peach:#E8D6CA;--on:#FBF5F7;
+:root{--bg:#F5F1EB;--card:#FBF9F6;--ink:#2A2026;--muted:#6E6168;--line:#D3C9BC;--plum:#5A3C4C;--deep:#3A2631;--blush:#E4DCD1;--peach:#E6DBCF;--on:#F7F1EE;
 --serif:"Cormorant",Georgia,serif;--sans:"Hanken",system-ui,sans-serif}
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -164,14 +164,14 @@ a{color:var(--plum)}
 .tp.min .tp-view,.tp.min .tp-edit{display:none}
 .tp-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px clamp(10px,2vw,20px);background:#3d3036}
 .tp-ctl b{font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-right:4px}
-.tp-ctl select,.tp-ctl button{font:inherit;font-size:.85rem;border-radius:999px;border:1px solid #6b5a62;background:#4A3A41;color:#F6EFF1;padding:.38rem .8rem;cursor:pointer}
+.tp-ctl select,.tp-ctl button{font:inherit;font-size:.85rem;border-radius:999px;border:1px solid #6b5a62;background:#3A2631;color:#F6EFF1;padding:.38rem .8rem;cursor:pointer}
 .tp-ctl select{max-width:min(320px,60vw)}
 .tp-ctl button.on{background:var(--plum);border-color:var(--plum)}
 .tp-ctl .sp{font-size:.8rem;opacity:.75;min-width:3.2em;text-align:center}
 .tp-ctl .rt{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
 .tp-view{position:relative;height:clamp(140px,28vh,320px);overflow:hidden;cursor:pointer}
 .tp-view:before{content:"";position:absolute;left:0;right:0;top:34%;height:2.2em;background:rgba(234,223,222,.08);border-top:1px solid rgba(234,223,222,.18);border-bottom:1px solid rgba(234,223,222,.18);pointer-events:none;z-index:1}
-.tp-view:after{content:"";position:absolute;inset:0;background:linear-gradient(#4A3A41,transparent 18%,transparent 78%,#4A3A41);pointer-events:none;z-index:2}
+.tp-view:after{content:"";position:absolute;inset:0;background:linear-gradient(#3A2631,transparent 18%,transparent 78%,#3A2631);pointer-events:none;z-index:2}
 .tp-text{position:absolute;left:0;right:0;padding:0 clamp(16px,6vw,90px);white-space:pre-wrap;line-height:1.45;font-family:var(--sans);will-change:transform}
 .tp-text .h{display:block;font-size:.55em;letter-spacing:.06em;color:#C9B4BB;margin-top:.6em}
 .tp-edit{display:none;padding:10px clamp(10px,2vw,20px) 12px}
@@ -215,7 +215,7 @@ a{color:var(--plum)}
       <span class="rt"><button type="button" id="tpEd">✎ Bearbeiten</button><button type="button" id="tpMin">▾ Einklappen</button></span>
     </div>
     <div class="tp-view" id="tpView"><div class="tp-text" id="tpText"></div></div>
-    <div class="tp-edit"><textarea id="tpArea" spellcheck="true"></textarea><p>Wird automatisch gespeichert. {name} wird durch ihren Vornamen ersetzt, Zeilen in [eckigen Klammern] erscheinen klein als Hinweis. <button type="button" id="tpReset" style="font:inherit;background:none;border:0;color:#EADFDE;text-decoration:underline;cursor:pointer">Vorlage wiederherstellen</button></p></div>
+    <div class="tp-edit"><textarea id="tpArea" spellcheck="true"></textarea><p>Wird automatisch gespeichert. {name} wird durch ihren Vornamen ersetzt, Zeilen in [eckigen Klammern] erscheinen klein als Hinweis. <button type="button" id="tpReset" style="font:inherit;background:none;border:0;color:#E4DCD1;text-decoration:underline;cursor:pointer">Vorlage wiederherstellen</button></p></div>
   </div>
   <?php endif; ?>
   <div class="frame"><iframe src="<?= $h($src) ?>" allow="camera; microphone; fullscreen; speaker; display-capture; autoplay; compute-pressure" title="Movecia Videoraum"></iframe></div>

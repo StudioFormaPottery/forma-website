@@ -42,7 +42,7 @@ CSS = """
 @font-face{font-family:"Hanken";font-weight:300 700;src:url(FONTS/HankenGrotesk-VF.woff) format("woff")}
 @font-face{font-family:"Hand";src:url(FONTS/HomemadeApple-Regular.woff) format("woff")}
 @page{size:A4}
-:root{--bg:#F2ECE4;--plum:#7D5E68;--deep:#4A3A41;--ink:#2E2529;--muted:#7D7076;--blush:#EADFDE;--peach:#E8D6CA;--rose:#D9B8B4;--line:#E3D8CD;--soft:#FBF4F2}
+:root{--bg:#F5F1EB;--plum:#5A3C4C;--deep:#3A2631;--ink:#2A2026;--muted:#6E6168;--blush:#E4DCD1;--peach:#E6DBCF;--rose:#D9B8B4;--line:#E3D8CD;--soft:#FBF4F2}
 *{box-sizing:border-box}
 html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{margin:0;font-family:"Hanken",sans-serif;font-size:10.4pt;line-height:1.62;color:var(--ink)}
@@ -383,8 +383,8 @@ def pdf(docs, path):
                 pg.pdf(path=out, format='A4', print_background=True, margin={'top': '0', 'bottom': '0', 'left': '0', 'right': '0'}, page_ranges='1')
             else:
                 pg.pdf(path=out, format='A4', print_background=True, display_header_footer=True,
-                       header_template='<div style="width:100%;font-size:7px;color:#7D7076;padding:0 17mm;display:flex;justify-content:space-between;font-family:Georgia,serif;letter-spacing:.08em"><span>MOVECIA</span><span>' + title + '</span></div>',
-                       footer_template='<div style="width:100%;font-size:7px;color:#7D7076;text-align:center;font-family:Georgia,serif"><span class="pageNumber"></span> / <span class="totalPages"></span> &#183; &#9825; &#183; moveciamovement.com</div>',
+                       header_template='<div style="width:100%;font-size:7px;color:#6E6168;padding:0 17mm;display:flex;justify-content:space-between;font-family:Georgia,serif;letter-spacing:.08em"><span>MOVECIA</span><span>' + title + '</span></div>',
+                       footer_template='<div style="width:100%;font-size:7px;color:#6E6168;text-align:center;font-family:Georgia,serif"><span class="pageNumber"></span> / <span class="totalPages"></span> &#183; &#9825; &#183; moveciamovement.com</div>',
                        margin={'top': '20mm', 'bottom': '18mm', 'left': '17mm', 'right': '17mm'})
             parts.append(out)
             os.remove(tmp)

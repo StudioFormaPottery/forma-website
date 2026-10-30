@@ -63,13 +63,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 @font-face{font-family:"Italiana";src:url(/fonts/Italiana-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:300 500;src:url(/fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:600 800;src:url(/fonts/Outfit-Bold.woff) format("woff")}
-:root{--cream:#F2ECE4;--wine:#7D5E68;--wine-deep:#6B5658;--brown:#7D7076;--ink:#2E2529;--line:#DDD2C6}
+:root{--cream:#F5F1EB;--wine:#5A3C4C;--wine-deep:#4A3040;--brown:#6E6168;--ink:#2A2026;--line:#D3C9BC}
 *{box-sizing:border-box;margin:0}
 body{background:var(--cream);font-family:"Outfit",system-ui,sans-serif;color:var(--ink);font-size:17px;line-height:1.6}
 main{max-width:620px;margin:0 auto;padding:40px 16px 60px}
 h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(34px,7vw,46px);line-height:1.1;color:var(--wine-deep);margin-bottom:10px}
 p{color:var(--brown)}
-form{display:flex;flex-direction:column;gap:12px;margin-top:20px;padding:22px;border-radius:24px;background:#FBF8F4;border:1.5px solid var(--line)}
+form{display:flex;flex-direction:column;gap:12px;margin-top:20px;padding:22px;border-radius:24px;background:#FBF9F6;border:1.5px solid var(--line)}
 label{display:flex;flex-direction:column;gap:5px;font-size:14px;color:var(--brown)}
 input,select,textarea{font:inherit;font-size:16px;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--cream);color:var(--ink)}
 button{font:inherit;font-weight:500;font-size:17px;padding:14px 22px;border-radius:999px;border:0;background:var(--wine);color:var(--cream);cursor:pointer}

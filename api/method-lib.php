@@ -703,7 +703,7 @@ function mv_send_reset(PDO $pdo, string $email): void
     $t = $en ? "Hi $first,\n\nHere you can choose a new password for your Movecia members area. The link is valid for one hour.\n\n$link\n\nIf you didn't request this, you can simply ignore this email."
         : "Hallo $first,\n\nhier kannst du dir ein neues Passwort für deinen Movecia-Mitgliederbereich aussuchen. Der Link gilt eine Stunde.\n\n$link\n\nWenn du das nicht angefordert hast, ignorier diese E-Mail einfach.";
     $html = '<p>' . ($en ? 'Hi ' : 'Hallo ') . forma_h($first) . ',</p><p>' . ($en ? 'here you can choose a new password for your Movecia members area. The link is valid for one hour.' : 'hier kannst du dir ein neues Passwort für deinen Movecia-Mitgliederbereich aussuchen. Der Link gilt eine Stunde.') . '</p>'
-        . mm_button($link, $en ? 'Choose a new password' : 'Neues Passwort wählen') . '<p style="font-size:13px;color:#7D7076;">' . ($en ? 'If you didn\'t request this, you can simply ignore this email.' : 'Wenn du das nicht angefordert hast, ignorier diese E-Mail einfach.') . '</p>';
+        . mm_button($link, $en ? 'Choose a new password' : 'Neues Passwort wählen') . '<p style="font-size:13px;color:#6E6168;">' . ($en ? 'If you didn\'t request this, you can simply ignore this email.' : 'Wenn du das nicht angefordert hast, ignorier diese E-Mail einfach.') . '</p>';
     mm_mail((string)$m['email'], $en ? 'Your new Movecia password' : 'Dein neues Passwort für Movecia', $t, mm_mail_html($en ? 'New password' : 'Neues Passwort', $html, $m['lang']), [], 'Vivien · Movecia');
 }
 
@@ -1159,10 +1159,10 @@ function mv_send_member_mail(array $r, string $subject, string $hand, string $ti
     $en = $r['lang'] === 'en';
     $q = $en ? 'If you have any questions, simply reply to this email.' : 'Wenn du Fragen hast, antworte einfach auf diese E-Mail.';
     $text = implode("\n\n", $lines) . ($link !== '' ? "\n\n$btn: $link" : '') . "\n\n$q" . ($en ? "\n\nSee you soon,\nVivien" : "\n\nBis bald,\nVivien") . ($legal !== '' ? "\n\n$legal" : '');
-    $html = '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#7D5E68;">' . forma_h($hand) . '</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:28px;color:#6B5658;margin:0 0 14px;">' . forma_h($title) . '</h1>';
+    $html = '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#5A3C4C;">' . forma_h($hand) . '</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:28px;color:#4A3040;margin:0 0 14px;">' . forma_h($title) . '</h1>';
     foreach ($lines as $l) $html .= '<p>' . forma_h($l) . '</p>';
     $html .= ($link !== '' ? mm_button($link, $btn) : '') . '<p>' . $q . '</p>'
-        . ($legal !== '' ? '<p style="font-size:13px;color:#7D7076;border-top:1px solid #DDD2C6;padding-top:12px;margin-top:22px;">' . forma_h($legal) . '</p>' : '');
+        . ($legal !== '' ? '<p style="font-size:13px;color:#6E6168;border-top:1px solid #D3C9BC;padding-top:12px;margin-top:22px;">' . forma_h($legal) . '</p>' : '');
     mm_mail((string)$r['email'], $subject, $text, mm_mail_html($title, $html, (string)$r['lang']), [], 'Vivien · Movecia');
 }
 

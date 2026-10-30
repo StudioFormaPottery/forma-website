@@ -355,8 +355,8 @@ function natal_birth_mail(array $o): array
         'Und wenn du in der Zwischenzeit etwas brauchst, eine Frage hast oder einfach erzählen magst, melde dich jederzeit bei mir. Ich bin für dich da.',
     ];
     $html = '<p style="margin:6px 0 18px;text-align:center;">' . $icons . '</p>'
-        . '<h1 style="font-family:Georgia,\'Times New Roman\',serif;font-weight:400;font-size:34px;line-height:1.15;color:#2E2529;margin:0 0 6px;text-align:center;">Hurra, dein Baby ist da!</h1>'
-        . '<p style="margin:0 0 22px;text-align:center;font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-size:19px;color:#7D5E68;">Willkommen auf der Welt, kleines Wunder.</p>';
+        . '<h1 style="font-family:Georgia,\'Times New Roman\',serif;font-weight:400;font-size:34px;line-height:1.15;color:#2A2026;margin:0 0 6px;text-align:center;">Hurra, dein Baby ist da!</h1>'
+        . '<p style="margin:0 0 22px;text-align:center;font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-size:19px;color:#5A3C4C;">Willkommen auf der Welt, kleines Wunder.</p>';
     foreach (array_slice($paras, 1) as $i => $p) $html .= '<p style="margin:0 0 14px;">' . ($i === 0 ? '<strong>' . forma_h('Liebe ' . $first . ',') . '</strong><br>' : '') . forma_h($p) . '</p>';
     $html .= natal_btn(natal_link($o), 'Meine Termine');
     $text = "Hurra, dein Baby ist da!\n\n" . implode("\n\n", $paras) . "\n\nMeine Termine: " . natal_link($o) . "\n\nBis bald,\nVivien";

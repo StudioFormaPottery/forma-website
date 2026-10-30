@@ -437,7 +437,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   </select>
   <div class="seg" id="langSeg" role="group" aria-label="Sprache"><button type="button" data-lang="de" aria-pressed="<?= $lang === 'de' ? 'true' : 'false' ?>">Deutsch</button><button type="button" data-lang="en" aria-pressed="<?= $lang === 'en' ? 'true' : 'false' ?>">Englisch</button></div>
   <div class="seg" id="modeSeg" role="group" aria-label="Aufnahme-Art"><button type="button" data-mode="ganz">Am Stück</button><button type="button" data-mode="clips">Absatz für Absatz</button></div>
-  <label class="seg-f" title="Ein Video vom Handy oder Computer öffnen und bearbeiten">🎞 Video vom Gerät bearbeiten<input type="file" id="openF" accept="video/*" hidden></label>
+  <a class="seg-f" href="?view=schnitt" title="Videos vom Handy oder Computer schneiden und bearbeiten">✂️ Video vom Gerät schneiden</a><input type="file" id="openF" accept="video/*" hidden>
   <span class="done-l" id="doneL"></span>
 </div>
 <p class="what-i" id="whatI" hidden></p>
@@ -455,9 +455,12 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
       <button type="button" class="sm" id="tpOnly" title="Du filmst mit der Kamera-App am Handy, hier läuft nur der Text">📜 Nur Teleprompter</button>
       <button type="button" class="stop" id="stop" hidden>■ Stopp</button>
       <button type="button" class="up" id="up" hidden>⬆ In die Lektion hochladen</button>
-      <button type="button" class="next" id="edit" hidden>✂️ Bearbeiten · Licht, Ausschnitt, Musik</button>
-      <a class="b" id="dl" hidden download>⬇ Herunterladen</a>
+      <button type="button" class="next" id="edit" hidden>✂️ Schneiden &amp; bearbeiten</button>
+      <button type="button" class="sm" id="take" hidden title="Diese Aufnahme in den Schnitt legen und gleich die nächste aufnehmen">＋ Noch ein Take</button>
+      <button type="button" class="up" id="share1" hidden>📲 In Fotos sichern</button>
+      <a class="b" id="dl" hidden download>⬇ Als Datei herunterladen</a>
       <button type="button" class="sm" id="again" hidden>↺ Nochmal aufnehmen</button>
+      <button type="button" class="sm" id="editOld" hidden>Licht &amp; Musik (alt)</button>
       <button type="button" class="sm del" id="del" hidden>🗑 Löschen</button>
       <button type="button" class="sm del" id="cdel" hidden>🗑 Letzten Absatz löschen</button>
       <button type="button" class="go" id="cgo" hidden>● Absatz 1 aufnehmen</button>
@@ -518,6 +521,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
 <script src="/wildhearts/assets/talkcam.js?v=5"></script>
 <script src="studio-edit.js?v=7"></script>
+<script src="schnitt.js?v=1"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
@@ -670,7 +674,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   // ---- Kamera ----
   // Bildqualität (Vivien, 28.10.2026: „Kamera-Qualität sollte 4K sein oder 2K“): die Kamera liefert höchstens, was sie kann
   const QUAL={'4k':[3840,2160,'4K'],'2k':[2560,1440,'2K'],'hd':[1920,1080,'Full HD']};
-  const qual=()=>{const q=ls.get('st-qual','4k');return QUAL[q]?q:'4k'};
+  const qual=()=>{const q=ls.get('st-qual',matchMedia('(max-width:760px),(pointer:coarse)').matches?'hd':'4k');return QUAL[q]?q:'4k'};
   // Datenrate passend zur Größe, damit 4K auch wie 4K aussieht
   const vbr=(w,h)=>{const p=w*h;return p>=7e6?40000000:p>=3.2e6?20000000:p>=1.8e6?12000000:p>=.8e6?8000000:5000000};
   function qShow(){const el=$('qInfo');if(!el||!raw)return;const st=(raw.getVideoTracks()[0]||{getSettings:()=>({})}).getSettings(),cw=st.width||0,chh=st.height||0;
@@ -726,7 +730,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   // ---- Aufnahme ----
   const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
   function mime(){const ts=['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4;codecs=avc1,mp4a','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];return ts.find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||''}
-  function showAfter(){if(clipm){clipUi();return}const has=!!blob;if(tgt)$('up').textContent=tgt.ig?'💾 Für '+tgt.ig.l.split(' · ')[0]+' speichern ('+(tgt.ig.kind==='reel'?'Reel':'Story')+')':tgt.clip?'⬆ Als Clip „'+tgt.clip.n+'“ hochladen':'⬆ In „'+tgt.t.t+'“ hochladen ('+(tgt.lang==='de'?'Deutsch':'Englisch')+')';$('go').hidden=has||(rec&&rec.state==='recording');$('again').hidden=!has;$('del').hidden=!has;$('dl').hidden=!has;$('edit').hidden=!has;$('up').hidden=!has||!tgt||(!BUNNY&&!tgt.ig);
+  function showAfter(){if(clipm){clipUi();return}const has=!!blob;$('take').hidden=!has;$('share1').hidden=!has||!(blob&&canShare([blob]));if(tgt)$('up').textContent=tgt.ig?'💾 Für '+tgt.ig.l.split(' · ')[0]+' speichern ('+(tgt.ig.kind==='reel'?'Reel':'Story')+')':tgt.clip?'⬆ Als Clip „'+tgt.clip.n+'“ hochladen':'⬆ In „'+tgt.t.t+'“ hochladen ('+(tgt.lang==='de'?'Deutsch':'Englisch')+')';$('go').hidden=has||(rec&&rec.state==='recording');$('again').hidden=!has;$('del').hidden=!has;$('dl').hidden=!has;$('edit').hidden=!has;$('up').hidden=!has||!tgt||(!BUNNY&&!tgt.ig);
     $('play').hidden=!has;$('stage').style.display=has?'none':'';}
   $('go').onclick=async()=>{
     if(!tc){$('msg').textContent='Die Kamera läuft noch nicht.';return}
@@ -759,6 +763,8 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     $('undo').onclick=()=>{if(!undo)return;blob=undo.b;$('play').src=undo.src;$('dl').href=undo.href;$('dl').download=undo.name;saved=undo.saved;tgt=undo.tgt;undo=null;$('msg').textContent='Aufnahme ist wieder da.';showAfter()};
     const U=undo;setTimeout(()=>{if(undo===U){undo=null;if($('undo'))$('msg').textContent=''}},8000)};
   $('dl').addEventListener('click',()=>{saved=true});
+  // Direkt in die Fotos (Vivien, 30.10.2026: „nicht als Datei, sondern direkt in der Galerie“): Web Share → Fotos am iPhone
+  $('share1').onclick=async()=>{if(!blob)return;try{await navigator.share({files:[new File([blob],$('dl').download||'Video.mp4',{type:blob.type})]});saved=true;$('msg').className='msg ok';$('msg').textContent='✓ Gesichert. Das Video liegt jetzt in deinen Fotos.'}catch(e){}};
   window.addEventListener('beforeunload',e=>{if(blob&&!saved){e.preventDefault();e.returnValue=''}});
   $('up').onclick=()=>{
     if(!blob||!tgt)return;if(typeof tus==='undefined'&&!tgt.ig){$('msg').textContent='Der Upload konnte nicht laden. Bitte Seite neu laden (vorher herunterladen!).';return}
@@ -800,7 +806,13 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     edOpen=StudioEdit.open({store:looksStore,blob:b,dur:dur,mount:$('ed'),musicHint:musicHint(),seed:(cur&&cur.id)||(ig&&ig.id)||Date.now(),onDone:(nb,inf)=>{back();done(nb,inf)},onCancel:back});}
   function setBlob(nb,suffix){blob=nb;saved=false;const url=URL.createObjectURL(nb);$('play').src=url;const ext=nb.type.includes('mp4')?'mp4':'webm';
     $('dl').href=url;$('dl').download=String($('dl').download||'Video').replace(/(_bearbeitet)?\.\w+$/,'')+(suffix||'')+'.'+ext;$('prog').hidden=true;showAfter();}
-  $('edit').onclick=()=>{if(!blob)return;const d=$('play').duration;
+  // ✂️ Schnitt (Vivien, 30.10.2026): Aufnahme in den Schnitt legen (bleibt auf dem Gerät), dort mehrere Takes schneiden
+  function takeName(){return (tgt&&tgt.ig?tgt.ig.t.slice(0,30):tgt&&tgt.clip?tgt.clip.n:tgt?tgt.t.t+' ('+tgt.lang.toUpperCase()+')':'Aufnahme')}
+  $('edit').onclick=async()=>{if(!blob||typeof Schnitt==='undefined')return;$('edit').disabled=true;try{await Schnitt.addTake(blob,takeName());saved=true;location.href='?view=schnitt'}catch(e){$('edit').disabled=false;$('msg').textContent='Konnte die Aufnahme nicht in den Schnitt legen.'}};
+  let takeN=0;
+  $('take').onclick=async()=>{if(!blob||typeof Schnitt==='undefined')return;$('take').disabled=true;try{await Schnitt.addTake(blob,takeName()+' · Take '+(++takeN));saved=true;blob=null;$('play').removeAttribute('src');$('prog').hidden=true;prMove(0,true);showAfter();
+    $('msg').className='msg ok';$('msg').innerHTML='✓ Take '+takeN+' liegt im <a href="?view=schnitt">✂️ Schnitt</a>. Jetzt den nächsten aufnehmen, am Schluss alles zusammenschneiden.'}catch(e){$('msg').textContent='Konnte den Take nicht sichern.'}$('take').disabled=false};
+  $('editOld').onclick=()=>{if(!blob)return;const d=$('play').duration;
     editor(blob,isFinite(d)?d:0,tgt?(tgt.ig?'Instagram '+(tgt.ig.kind==='reel'?'Reel':'Story')+' für '+tgt.ig.l.split(' · ')[0]+'. Tipp: Format „Hoch 9:16“.':tgt.clip?'Übung „'+tgt.clip.n+'“':'„'+tgt.t.t+'“ · '+(tgt.lang==='de'?'Deutsch':'Englisch'))+'. Danach kannst du direkt hochladen.':'Danach herunterladen.',(nb,inf)=>{
       setBlob(nb,'_bearbeitet');$('msg').className='msg ok';$('msg').textContent='✓ Bearbeitet ('+fmt(inf.dur)+(inf.music?', mit Musik':'')+'). Schau es dir an, dann '+(tgt&&BUNNY?'hochladen oder herunterladen.':'herunterladen.');});};
   $('openF').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
@@ -810,6 +822,10 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     $('msg').className='msg';$('msg').textContent=tgt?'Das Video gehört dann zu: '+(tgt.ig?'Instagram '+tgt.ig.l:tgt.clip?'Übung „'+tgt.clip.n+'“':'„'+tgt.t.t+'“ ('+(lang==='de'?'Deutsch':'Englisch')+')')+'. Oben bei „Was nimmst du auf?“ kannst du das noch ändern.':'';
     $('edit').click();};
   window.addEventListener('beforeunload',e=>{if(edOpen){e.preventDefault();e.returnValue=''}});
+  if(/[?&]cut=1/.test(location.search)&&typeof Schnitt!=='undefined'){Schnitt.takeResult().then(b=>{if(!b)return;fromFile=true;tgt=mv?{clip:mv}:(ig?{ig:ig}:(cur?{t:cur,lang:lang}:null));
+    const d=new Date(),stamp=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');$('dl').download='Movecia_Schnitt_'+stamp+'.mp4';setBlob(b,'');saved=false;
+    $('msg').className='msg ok';$('msg').textContent='✓ Dein fertig geschnittenes Video ist da. '+(tgt?'Es gehört zu: '+(tgt.ig?'Instagram '+tgt.ig.l:tgt.clip?'Übung „'+tgt.clip.n+'“':'„'+tgt.t.t+'“ ('+(lang==='de'?'Deutsch':'Englisch')+')')+'. Passt das nicht, oben unter „Was nimmst du auf?“ ändern, dann hochladen.':'Oben auswählen, wozu es gehört, dann hochladen.');
+    if(PH.matches)closeSheet();else{const pk=document.getElementById('pk');if(pk)pk.open=false}})}
 
   // Instagram: Video in 8-MB-Stücken auf den eigenen Server, am Tag dann unter „Instagram täglich“ teilen
   async function igSave(G){const b=blob,CH=1536*1024,n=Math.max(1,Math.ceil(b.size/CH)),fill=$('prog').querySelector('i'),ext=b.type.includes('webm')?'webm':'mp4';

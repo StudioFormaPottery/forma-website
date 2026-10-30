@@ -14,17 +14,17 @@ function mm_subnav(string $active): void
     $acReq = 0; try { $acReq = (int)$pdo->query("SELECT COUNT(*) FROM ac_calls WHERE status = 'angefragt'")->fetchColumn(); require_once dirname(__DIR__) . '/api/academy-lib.php'; $acReq += ac_unanswered($pdo); } catch (Throwable $e) {}
     $ptReq = 0; try { $ptReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); } catch (Throwable $e) {}
     // Aufgeräumt (Vivien, 28.10.2026: „viele Buttons doppelt, zu viele Reiter“): 8 Hauptreiter, Video-Sachen und Einstellungen mit kleiner zweiter Reihe.
-    $groups = ['videos' => 'content', 'studio' => 'content', 'insta' => 'content', 'mediathek' => 'content', 'musik' => 'content', 'texte' => 'content', 'presse' => 'einst', 'liste' => 'einst'];
+    $groups = ['videos' => 'content', 'studio' => 'content', 'schnitt' => 'content', 'insta' => 'content', 'mediathek' => 'content', 'musik' => 'content', 'texte' => 'content', 'presse' => 'einst', 'liste' => 'einst'];
     $main = $groups[$active] ?? $active;
     $tabs = [['movecia', '?view=movecia', '🏡 Übersicht'], ['content', '?view=videos', '🎬 Videos &amp; Content'], ['gatherings', '?view=movecia&amp;p=gatherings', '✨ Gatherings'], ['method', '?view=method', '🌱 Method &amp; Unfold'], ['natal', '?view=natal', '🤰 Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['training', '?view=training', '🏔️ Personal Training' . ($ptReq ? ' <i>' . $ptReq . '</i>' : '')], ['academy', '?view=academy', '🎓 Academy' . ($acReq ? ' <i>' . $acReq . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Ansehen &amp; Testen'], ['einst', '?view=movecia&amp;p=einst', '⚙️ Einstellungen']];
     $subs = [
-        'content' => [['videos', '?view=videos', '🎬 Zu filmen'], ['studio', '?view=studio', '🎥 Studio'], ['insta', '?view=insta', '📱 Instagram täglich'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['musik', '?view=musik', '🎵 Musik'], ['texte', '?view=texte', '🎙️ Live-Texte']],
+        'content' => [['videos', '?view=videos', '🎬 Zu filmen'], ['studio', '?view=studio', '🎥 Studio'], ['schnitt', '?view=schnitt', '✂️ Schnitt'], ['insta', '?view=insta', '📱 Instagram täglich'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['musik', '?view=musik', '🎵 Musik'], ['texte', '?view=texte', '🎙️ Live-Texte']],
         'einst' => [['einst', '?view=movecia&amp;p=einst', '⚙️ Verbindungen &amp; Mails'], ['liste', '?view=movecia&amp;p=einst#liste', '💌 E-Mail-Liste'], ['presse', '?view=presse', '📰 Presse']],
     ][$main] ?? []; ?><style>
 .mvsub{position:sticky;top:0;z-index:40;margin:-8px -16px 16px;padding:10px 16px;background:rgba(242,236,228,.96);border-bottom:1px solid #DDD2C6;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .mvsub::-webkit-scrollbar{display:none}
 .mvsub a{flex:0 0 auto;padding:10px 16px;border-radius:999px;border:1px solid #DDD2C6;background:#FBF8F4;color:#6B5658;text-decoration:none;font-size:17px;white-space:nowrap}
-<?= !in_array($active, ['videos', 'mediathek', 'studio'], true) ? '@media(min-width:900px){main{zoom:1.12}}' : '' ?>
+<?= !in_array($active, ['videos', 'mediathek', 'studio', 'schnitt'], true) ? '@media(min-width:900px){main{zoom:1.12}}' : '' ?>
 .mvsub a.on{background:#7D5E68;border-color:#7D5E68;color:#FBF5F7}
 .mvsub2{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:-6px 0 16px;padding:2px 0}
 .mvsub2::-webkit-scrollbar{display:none}
@@ -80,6 +80,7 @@ require __DIR__ . '/insta.inc.php';
 // Eigener Musik-Ordner für Studio-Videos (?view=musik, Vivien 28.10.2026)
 require __DIR__ . '/musik.inc.php';
 require __DIR__ . '/studio.inc.php';
+require __DIR__ . '/schnitt.inc.php';
 require __DIR__ . '/mediathek.inc.php';
 // Als Teilnehmerin ansehen (?view=vorschau)
 require __DIR__ . '/vorschau.inc.php';

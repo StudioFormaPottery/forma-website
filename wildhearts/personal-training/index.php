@@ -46,7 +46,7 @@ $disc = $prices[PTB_MAX_UNITS]['unit'];
 <title><?= $order ? 'Deine Termine · Your sessions · Movecia' : 'Personal Training in Mathon · Movecia' ?></title>
 <meta name="description" content="Personal Training 1:1 mit Vivien im kleinen Studio in Mathon, wenige Minuten von Ischgl. 75 Minuten, ganz auf dich abgestimmt, allein oder zu zweit. Personal training in Mathon near Ischgl, one-to-one or for two.">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#F2ECE4">
+<meta name="theme-color" content="#F5F1EB">
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
 <link rel="manifest" href="/app.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Movecia"><meta name="apple-mobile-web-app-status-bar-style" content="default"><script src="/wildhearts/assets/app.js?v=2" defer></script>
@@ -55,7 +55,7 @@ $disc = $prices[PTB_MAX_UNITS]['unit'];
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:normal;src:url(/fonts/CormorantGaramond-VF.woff) format("woff")}
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(/fonts/CormorantGaramond-Italic-VF.woff) format("woff")}
 @font-face{font-family:"Hanken";font-weight:300 700;src:url(/fonts/HankenGrotesk-VF.woff) format("woff")}
-:root{--bg:#F2ECE4;--sand:#E8DED2;--card:#FBF8F4;--ink:#2E2529;--muted:#7D7076;--line:#DDD2C6;--plum:#7D5E68;--plumdeep:#6B5658;--dark:#4A3A41;--blush:#EADFDE;--peach:#E8D6CA;--on:#FBF5F7;--r:24px;
+:root{--bg:#F5F1EB;--sand:#E8DED2;--card:#FBF9F6;--ink:#2A2026;--muted:#6E6168;--line:#D3C9BC;--plum:#5A3C4C;--plumdeep:#4A3040;--dark:#3A2631;--blush:#E4DCD1;--peach:#E6DBCF;--on:#F7F1EE;--r:24px;
 --serif:"Cormorant",Georgia,serif;--sans:"Hanken",system-ui,sans-serif}
 html[data-l=de] .en,html[data-l=en] .de{display:none!important}
 *{box-sizing:border-box}

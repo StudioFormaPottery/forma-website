@@ -47,8 +47,8 @@ $lines = function (string $l) use ($goals, $places, $times, $msg, $phone): array
     return $r;
 };
 $tbl = function (array $rows): string {
-    $h = '<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin:14px 0;background:#FBF8F4;border-radius:16px;">';
-    foreach ($rows as [$k, $v]) $h .= '<tr><td style="padding:10px 16px;font-size:14px;color:#7D7076;vertical-align:top;width:34%;">' . forma_h($k) . '</td><td style="padding:10px 16px;font-size:15px;">' . nl2br(forma_h($v)) . '</td></tr>';
+    $h = '<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin:14px 0;background:#FBF9F6;border-radius:16px;">';
+    foreach ($rows as [$k, $v]) $h .= '<tr><td style="padding:10px 16px;font-size:14px;color:#6E6168;vertical-align:top;width:34%;">' . forma_h($k) . '</td><td style="padding:10px 16px;font-size:15px;">' . nl2br(forma_h($v)) . '</td></tr>';
     return $h . '</table>';
 };
 $first = trim((string)strtok($name, ' '));
@@ -66,7 +66,7 @@ try {
 try {
     $rows = array_merge([['Name', $name], ['E-Mail', $email]], $lines('de'));
     $html = '<p>Neue Anfrage für 1:1 Personal Training' . ($en ? ' (auf Englisch)' : '') . ':</p>' . $tbl($rows)
-        . '<p><a href="' . forma_h(forma_site_url() . '/verwaltung/?view=movecia#pt') . '" style="display:inline-block;background:#7D5E68;color:#FBF5F7;text-decoration:none;padding:12px 22px;border-radius:999px;">In der Verwaltung ansehen</a></p>';
+        . '<p><a href="' . forma_h(forma_site_url() . '/verwaltung/?view=movecia#pt') . '" style="display:inline-block;background:#5A3C4C;color:#F7F1EE;text-decoration:none;padding:12px 22px;border-radius:999px;">In der Verwaltung ansehen</a></p>';
     mm_mail(natal_notify_email(), 'Personal Training Anfrage: ' . $name, strip_tags(str_replace(['</p>', '</tr>'], ["\n\n", "\n"], $html)), mm_mail_html('Neue Anfrage', $html, 'de'));
 } catch (Throwable $e) { error_log('PT Info: ' . $e->getMessage()); }
 

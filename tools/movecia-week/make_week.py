@@ -18,7 +18,7 @@ OLD_PHOTOS = {'art-fold.jpg': 'ev-method-foto.jpg', 'art-reach.jpg': 'ev-ueber-m
               'reach.jpg': 'ev-ueber-mich.jpg', 'art-schwanger.jpg': 'ev-natal.jpg', 'schwanger.jpg': 'ev-natal.jpg',
               'schwanger-kueche.jpg': 'ev-natal-sitzend.jpg'}
 TYPE_ICON = {'quote': 'herz', 'steps': 'uebung', 'poll': 'stimmung', 'offer': 'stern', 'photo': 'sonne'}
-PASTELS = ['#FBF8F4', '#F3E2D8', '#EEDFE0', '#F8EFE7', '#E8D9DD']
+PASTELS = ['#FBF9F6', '#F3E2D8', '#EEDFE0', '#F8EFE7', '#E8D9DD']
 
 def photo_path(p):
     ph = p.get('photo') or ''
@@ -39,59 +39,59 @@ CSS = """
 @font-face{font-family:Cormorant;font-weight:300 700;font-style:italic;src:url(/fonts/CormorantGaramond-Italic-VF.woff) format("woff")}
 @font-face{font-family:Hanken;font-weight:300 700;src:url(/fonts/HankenGrotesk-VF.woff) format("woff")}
 *{box-sizing:border-box;margin:0}
-body{width:1080px;height:1350px;overflow:hidden;background:#F3EAE1;color:#2E2529;font-family:Hanken,sans-serif;position:relative}
+body{width:1080px;height:1350px;overflow:hidden;background:#F3EAE1;color:#2A2026;font-family:Hanken,sans-serif;position:relative}
 body.s{height:1920px}
 body.pin{height:1620px}
-body.dark{background:#4A3A41;color:#FBF5F7}
+body.dark{background:#3A2631;color:#F7F1EE}
 body::before{content:"";position:absolute;inset:0;background:radial-gradient(48% 34% at 88% 10%,rgba(232,214,202,.9),transparent 70%),radial-gradient(40% 30% at 6% 40%,rgba(234,223,222,.85),transparent 70%);z-index:0}
 .dark::before{background:radial-gradient(48% 34% at 88% 10%,rgba(125,94,104,.55),transparent 70%),radial-gradient(40% 30% at 6% 50%,rgba(107,86,88,.5),transparent 70%)}
 .waves{position:absolute;left:0;bottom:0;width:100%;height:300px;z-index:1}
 .s .waves{height:420px}
-.waves .w1{fill:#EADFDE}.waves .w2{fill:#E8D6CA;opacity:.85}.waves .w3{fill:#F6EEE7}
-.dark .waves .w1{fill:#5A4750}.dark .waves .w2{fill:#6B5658;opacity:.8}.dark .waves .w3{fill:#55434A}
+.waves .w1{fill:#E4DCD1}.waves .w2{fill:#E6DBCF;opacity:.85}.waves .w3{fill:#F6EEE7}
+.dark .waves .w1{fill:#5A4750}.dark .waves .w2{fill:#4A3040;opacity:.8}.dark .waves .w3{fill:#55434A}
 .lines{position:absolute;left:0;width:100%;height:200px;top:46%;z-index:1;opacity:.5}
-.lines path{fill:none;stroke:#7D5E68;stroke-width:1.2;opacity:.3}.dark .lines path{stroke:#E8D6CA;opacity:.3}
+.lines path{fill:none;stroke:#5A3C4C;stroke-width:1.2;opacity:.3}.dark .lines path{stroke:#E6DBCF;opacity:.3}
 .pebble{position:absolute;right:-40px;top:150px;width:330px;z-index:1;opacity:.95}
 .s .pebble{top:260px;width:360px}
-.pebble .pb-soft{fill:#E8D6CA}.pebble .pb-line{fill:none;stroke:#7D5E68;stroke-width:1.6}.pebble .pb-dot{fill:#7D5E68}
-.dark .pebble .pb-soft{fill:#6B5658}.dark .pebble .pb-line{stroke:#E8D6CA}.dark .pebble .pb-dot{fill:#E8D6CA}
-.dot{position:absolute;border-radius:50%;background:#7D5E68;opacity:.35;z-index:1}
+.pebble .pb-soft{fill:#E6DBCF}.pebble .pb-line{fill:none;stroke:#5A3C4C;stroke-width:1.6}.pebble .pb-dot{fill:#5A3C4C}
+.dark .pebble .pb-soft{fill:#4A3040}.dark .pebble .pb-line{stroke:#E6DBCF}.dark .pebble .pb-dot{fill:#E6DBCF}
+.dot{position:absolute;border-radius:50%;background:#5A3C4C;opacity:.35;z-index:1}
 .wrap{position:absolute;inset:0;padding:80px 84px 96px;display:flex;flex-direction:column;z-index:2}
 .s .wrap{padding:180px 90px 250px}
 .pin .wrap{padding:96px 90px 120px}
 .top{display:flex;justify-content:space-between;align-items:center}
 .brand{display:flex;align-items:center;gap:14px;font-family:Cormorant,serif;font-size:46px;background:rgba(251,248,244,.85);padding:10px 26px 10px 14px;border-radius:99px}
-.brand img{width:44px}.brand i{display:inline-block;width:11px;height:11px;border-radius:50%;background:#7D5E68}
-.dark .brand{background:rgba(251,245,247,.08)}.dark .brand i{background:#E8D6CA}
-.day{font-size:23px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:#6B5658;background:rgba(251,248,244,.85);padding:12px 22px;border-radius:99px}
-.dark .day{color:#EADFDE;background:rgba(251,245,247,.08)}
-.ib{display:grid;place-items:center;width:96px;height:96px;border-radius:50%;background:#FBF8F4;box-shadow:0 0 0 10px rgba(251,248,244,.45);margin-bottom:26px}
+.brand img{width:44px}.brand i{display:inline-block;width:11px;height:11px;border-radius:50%;background:#5A3C4C}
+.dark .brand{background:rgba(251,245,247,.08)}.dark .brand i{background:#E6DBCF}
+.day{font-size:23px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:#4A3040;background:rgba(251,248,244,.85);padding:12px 22px;border-radius:99px}
+.dark .day{color:#E4DCD1;background:rgba(251,245,247,.08)}
+.ib{display:grid;place-items:center;width:96px;height:96px;border-radius:50%;background:#FBF9F6;box-shadow:0 0 0 10px rgba(251,248,244,.45);margin-bottom:26px}
 .dark .ib{background:#F3E2D8;box-shadow:0 0 0 10px rgba(243,226,216,.12)}
 .ib svg{width:62px;height:62px}
-.k{font-size:24px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:#7D5E68}
-.dark .k{color:#E8D6CA}
+.k{font-size:24px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:#5A3C4C}
+.dark .k{color:#E6DBCF}
 h1{font-family:Cormorant,serif;font-weight:500;font-size:112px;line-height:1.04;margin-top:20px;max-width:900px}
 .s h1{font-size:124px}
-h1 em{font-style:italic;color:#7D5E68}.dark h1 em{color:#E8D6CA}
-.text{font-size:34px;line-height:1.45;margin-top:28px;max-width:860px;color:#4A3A41}
-.dark .text{color:#EADFDE}
+h1 em{font-style:italic;color:#5A3C4C}.dark h1 em{color:#E6DBCF}
+.text{font-size:34px;line-height:1.45;margin-top:28px;max-width:860px;color:#3A2631}
+.dark .text{color:#E4DCD1}
 .mid{margin:auto 0}
 .steps{display:grid;gap:16px;margin-top:36px}
-.steps div{display:grid;grid-template-columns:64px 1fr;gap:22px;align-items:center;border-radius:30px;padding:22px 28px;font-size:31px;line-height:1.35;color:#2E2529}
-.steps span{display:grid;place-items:center;width:64px;height:64px;border-radius:46% 54% 60% 40%/50% 42% 58% 50%;background:rgba(255,255,255,.8);color:#7D5E68;font-family:Cormorant,serif;font-size:36px}
+.steps div{display:grid;grid-template-columns:64px 1fr;gap:22px;align-items:center;border-radius:30px;padding:22px 28px;font-size:31px;line-height:1.35;color:#2A2026}
+.steps span{display:grid;place-items:center;width:64px;height:64px;border-radius:46% 54% 60% 40%/50% 42% 58% 50%;background:rgba(255,255,255,.8);color:#5A3C4C;font-family:Cormorant,serif;font-size:36px}
 .poll{display:grid;gap:18px;margin-top:40px}
-.poll div{border-radius:99px;padding:26px 40px;font-size:35px;display:flex;justify-content:space-between;align-items:center;color:#2E2529}
-.poll i{width:34px;height:34px;border-radius:50%;border:2.5px solid #7D5E68;display:block}
+.poll div{border-radius:99px;padding:26px 40px;font-size:35px;display:flex;justify-content:space-between;align-items:center;color:#2A2026}
+.poll i{width:34px;height:34px;border-radius:50%;border:2.5px solid #5A3C4C;display:block}
 .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;position:relative}
-.url{font-size:26px;color:#6B5658}.url b{display:block;font-family:Cormorant,serif;font-weight:500;font-size:42px;color:#2E2529}
-.dark .url{color:#E8D6CA}.dark .url b{color:#FBF5F7}
-.btn{background:#7D5E68;color:#FBF5F7;border-radius:99px;padding:20px 36px;font-size:27px;white-space:nowrap}
-.dark .btn{background:#E8D6CA;color:#4A3A41}
+.url{font-size:26px;color:#4A3040}.url b{display:block;font-family:Cormorant,serif;font-weight:500;font-size:42px;color:#2A2026}
+.dark .url{color:#E6DBCF}.dark .url b{color:#F7F1EE}
+.btn{background:#5A3C4C;color:#F7F1EE;border-radius:99px;padding:20px 36px;font-size:27px;white-space:nowrap}
+.dark .btn{background:#E6DBCF;color:#3A2631}
 .t-quote h1{font-size:132px}.s.t-quote h1{font-size:146px}
-.sig{font-family:Cormorant,serif;font-style:italic;font-size:48px;color:#7D5E68;margin-top:26px}
-.dark .sig{color:#E8D6CA}
-.deal{margin-top:28px;background:#4A3A41;color:#FBF5F7;border-radius:34px;padding:32px 38px;font-size:29px;line-height:1.55;position:relative;overflow:hidden}
-.deal::after{content:"";position:absolute;right:-60px;bottom:-80px;width:220px;height:220px;border-radius:46% 54% 60% 40%/50% 42% 58% 50%;background:#E8D6CA;opacity:.12}
+.sig{font-family:Cormorant,serif;font-style:italic;font-size:48px;color:#5A3C4C;margin-top:26px}
+.dark .sig{color:#E6DBCF}
+.deal{margin-top:28px;background:#3A2631;color:#F7F1EE;border-radius:34px;padding:32px 38px;font-size:29px;line-height:1.55;position:relative;overflow:hidden}
+.deal::after{content:"";position:absolute;right:-60px;bottom:-80px;width:220px;height:220px;border-radius:46% 54% 60% 40%/50% 42% 58% 50%;background:#E6DBCF;opacity:.12}
 .deal b{font-family:Cormorant,serif;font-weight:500;font-size:84px;display:block;line-height:1.05;margin-bottom:14px}
 /* Foto im Bogen mit Wellenkante (wie die Angebotskarten auf der Website) */
 .ph{position:relative;z-index:2;margin:34px 0 0;height:560px;border-radius:300px 300px 0 0;background-size:cover;background-position:50% 40%;
@@ -104,8 +104,8 @@ h1 em{font-style:italic;color:#7D5E68}.dark h1 em{color:#E8D6CA}
 .photo .text{font-size:31px;margin-top:20px}
 .photo .ib{position:absolute;right:46px;bottom:-30px;margin:0;z-index:3}
 .phbox{position:relative}
-.chips{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}.chips span{background:rgba(251,248,244,.9);border-radius:99px;padding:12px 22px;font-size:25px;color:#4A3A41}.dark .chips span{background:rgba(251,245,247,.1);color:#EADFDE}
-.dark .steps div{color:#2E2529}
+.chips{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}.chips span{background:rgba(251,248,244,.9);border-radius:99px;padding:12px 22px;font-size:25px;color:#3A2631}.dark .chips span{background:rgba(251,245,247,.1);color:#E4DCD1}
+.dark .steps div{color:#2A2026}
 """
 
 def esc(x): return html.escape(x or '')
@@ -139,7 +139,7 @@ def page(p, story, pin=False):
     if p['type'] == 'offer': body += f'<div class="deal"><b>{esc(p["price"])}</b>{esc(p["deal"])}</div>'
     if p.get('chips'): body += '<div class="chips">' + ''.join(f'<span>{esc(c)}</span>' for c in p['chips']) + '</div>'
     if p.get('sig'): body += f'<p class="sig">{esc(p["sig"])}</p>'
-    dots = '<span class="dot" style="width:14px;height:14px;left:7%;top:24%"></span><span class="dot" style="width:9px;height:9px;left:62%;top:9%"></span><span class="dot" style="width:11px;height:11px;right:9%;top:58%;background:#E8D6CA;opacity:.9"></span>'
+    dots = '<span class="dot" style="width:14px;height:14px;left:7%;top:24%"></span><span class="dot" style="width:9px;height:9px;left:62%;top:9%"></span><span class="dot" style="width:11px;height:11px;right:9%;top:58%;background:#E6DBCF;opacity:.9"></span>'
     deco = WAVES + LINES + dots
     if has_photo:
         cls.append('photo')

@@ -21,6 +21,7 @@ unset($_SESSION['flash']);
  */
 // Neu-Boxen: 'b' => 'movecia' erscheint nur auf der Movecia-Übersicht, sonst nur bei FORMA (Vivien, 28.10.2026).
 const FORMA_ADMIN_NEWS = [
+    ['b' => 'movecia', 'until' => '2026-11-30', 'title' => 'Neu: ✂️ Video-Schnitt', 'text' => 'Mehrere Aufnahmen vom iPhone oder aus dem Studio zu einem Video schneiden: Anfang/Ende, teilen, umsortieren, Licht, Musik. Die Clips bleiben auf deinem Gerät. Fertiges Video direkt „In Fotos sichern“', 'link' => '?view=schnitt'],
     ['b' => 'movecia', 'until' => '2026-11-30', 'title' => 'Neu: 📅 Termin-Links für Videogespräche', 'text' => 'Link schicken, die Person tippt selbst eine Uhrzeit an, der Termin ist sofort fix, mit Videoraum und deinem Teleprompter. Der Link fürs Marigold (Montag, 2. November) ist schon angelegt', 'link' => '?view=movecia#termine'],
     ['b' => 'movecia', 'until' => '2026-11-30', 'title' => 'Neu: ✦ Kennenlern-Preis im Gespräch', 'text' => 'Im Kennenlerngespräch einmal „✦ Angebot zeigen“ tippen: Sie sieht in ihrem Gesprächsraum sofort die Karte mit dem Kennenlern-Preis (20 Min.) und bekommt ihn per Mail. Preis unter Academy → Kennenlerngespräche änderbar.', 'link' => '?view=academy#kennenlernpreis'],
     ['b' => 'movecia', 'until' => '2026-11-20', 'title' => 'Neu im Studio: 📜 Nur Teleprompter', 'text' => 'Du filmst mit der Kamera-App am iPhone, am MacBook läuft nur der Text ganz oben unter der Linse. Danach das Video über „🎞 Video vom Gerät bearbeiten“ holen', 'link' => '?view=studio'],
@@ -332,7 +333,7 @@ if ($action === 'logout') {
 }
 
 // Movecia Movement / Wild Hearts: eigener Bereich (verwaltung/movecia.php)
-if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 'natal' || $view === 'method' || $view === 'texte' || $view === 'presse' || $view === 'vorschau' || $view === 'videos' || $view === 'mediathek' || $view === 'studio' || $view === 'insta' || $view === 'musik' || $view === 'training' || $view === 'academy') {
+if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 'natal' || $view === 'method' || $view === 'texte' || $view === 'presse' || $view === 'vorschau' || $view === 'videos' || $view === 'mediathek' || $view === 'studio' || $view === 'schnitt' || $view === 'insta' || $view === 'musik' || $view === 'training' || $view === 'academy') {
     require __DIR__ . '/movecia.php';
 }
 // Wintersaison 2026/27: Hotel-Flyer + Buchungsseiten (FORMA ?view=winter, Movecia ?view=winter_mm)
@@ -3095,7 +3096,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 </head>
 <body>
 <main>
-<?php $swSelf = strtok($_SERVER['REQUEST_URI'] ?? '/verwaltung/', '?') ?: '/verwaltung/'; $swMm = in_array((string)($GLOBALS['view'] ?? ''), ['movecia', 'natal', 'method', 'texte', 'presse', 'vorschau', 'videos', 'mediathek', 'studio', 'insta', 'musik'], true); $swReq = 0; if (isset($GLOBALS['pdo'])) { try { $swReq = (int)$GLOBALS['pdo']->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} } ?>
+<?php $swSelf = strtok($_SERVER['REQUEST_URI'] ?? '/verwaltung/', '?') ?: '/verwaltung/'; $swMm = in_array((string)($GLOBALS['view'] ?? ''), ['movecia', 'natal', 'method', 'texte', 'presse', 'vorschau', 'videos', 'mediathek', 'studio', 'schnitt', 'insta', 'musik'], true); $swReq = 0; if (isset($GLOBALS['pdo'])) { try { $swReq = (int)$GLOBALS['pdo']->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} } ?>
 <header class="head"><nav class="sw" aria-label="Bereich wechseln"><a class="sw-f<?= $swMm ? '' : ' on' ?>" href="<?= forma_h($swSelf) ?>"<?= $swMm ? '' : ' aria-current="page"' ?>><span class="sw-ic"><img src="/img/forma-logo.png" alt=""></span><span class="sw-t"><b>FORMA</b><small>🏺 Atelierverwaltung</small></span></a><a class="sw-m<?= $swMm ? ' on' : '' ?>" href="<?= forma_h($swSelf) ?>?view=movecia"<?= $swMm ? ' aria-current="page"' : '' ?>><span class="sw-ic"><img src="/img/movecia/movecia-zeichen.svg" alt=""></span><span class="sw-t"><b>Movecia</b><small>🌿 Studioverwaltung</small></span><?php if ($swReq): ?><i class="sw-badge" title="Terminanfragen"><?= $swReq ?></i><?php endif; ?></a></nav><span class="head-deco"><span class="deco-slot"></span><span class="deco-slot"></span><span class="deco-slot"></span></span></header>
 <?php $body(); ?>
 </main>

@@ -1,5 +1,5 @@
 /* Öffentliche Movecia-Seiten: ruhig, viel Raum, feine große Schrift, weich verschwommene Bilder (Vorbild Mindful Body) */
-:root{--mauve:#8A7378;--mauve-d:#6F5A60}
+:root{--mauve:#8C7480;--mauve-d:#6A5460}
 .site-top{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.9);backdrop-filter:blur(10px)}
 .site-top .top{padding-top:16px;padding-bottom:16px}
 .top-r{display:flex;align-items:center;gap:.5rem;margin-left:auto}
@@ -20,7 +20,7 @@ h1,h2{font-weight:400}
 .art.wide{aspect-ratio:21/9}@media(max-width:700px){.art.wide{aspect-ratio:4/3}}
 .art.tall{aspect-ratio:4/5}.art.arch{border-radius:260px 260px var(--r) var(--r)}
 /* gemalter Platzhalter, bis die Everygen-Bilder da sind */
-.art.paint{background:radial-gradient(60% 70% at 25% 35%,#E8D6CA 0,transparent 70%),radial-gradient(55% 60% at 75% 60%,#C9AFB5 0,transparent 70%),radial-gradient(40% 50% at 55% 20%,#F5ECE3 0,transparent 70%),linear-gradient(160deg,#EADFDE,#D9C3C3)}
+.art.paint{background:radial-gradient(60% 70% at 25% 35%,#E6DBCF 0,transparent 70%),radial-gradient(55% 60% at 75% 60%,#C9AFB5 0,transparent 70%),radial-gradient(40% 50% at 55% 20%,#F5ECE3 0,transparent 70%),linear-gradient(160deg,#E4DCD1,#D8CFC4)}
 .art.paint::before{content:"";position:absolute;inset:-10%;background:radial-gradient(30% 40% at 50% 55%,rgba(74,58,65,.35),transparent 70%);filter:blur(30px);animation:drift 14s ease-in-out infinite alternate}
 @keyframes drift{to{transform:translate(6%,-4%) scale(1.08)}}
 @media(prefers-reduced-motion:reduce){.art.paint::before{animation:none}}
@@ -40,9 +40,9 @@ h1,h2{font-weight:400}
 .offer::after{content:"";position:absolute;right:-60px;bottom:-70px;width:220px;height:220px;border-radius:46% 54% 60% 40%/50% 42% 58% 50%;background:var(--oi);opacity:.07;z-index:-1;animation:mvblob 18s ease-in-out infinite alternate}
 @keyframes mvblob{to{border-radius:58% 42% 38% 62%/44% 60% 40% 56%;transform:rotate(25deg) scale(1.08)}}
 .o-method{--ob:#F1E4DA}
-.o-unfold{--ob:#EADFDE}
+.o-unfold{--ob:#E4DCD1}
 .o-natal{--ob:#EFE3E0;--oi:#9A6F7A}
-.o-gather{--ob:#4A3A41;--oi:#E8D6CA;--ot:#FBF5F7;--om:#D9C9CE}
+.o-gather{--ob:#3A2631;--oi:#E6DBCF;--ot:#F7F1EE;--om:#D9C9CE}
 .offer .art{aspect-ratio:4/5;border-radius:24px 24px 0 0;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 500' preserveAspectRatio='none'%3E%3Cpath d='M0 0h400v468c-40 22-90 30-140 16S140 446 90 458 20 482 0 476z'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 500' preserveAspectRatio='none'%3E%3Cpath d='M0 0h400v468c-40 22-90 30-140 16S140 446 90 458 20 482 0 476z'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
 .offer .art::after{display:none}
 .onum{position:absolute;z-index:2;top:26px;left:26px;font-family:var(--serif);font-size:1.05rem;letter-spacing:.12em;background:rgba(251,248,244,.86);color:var(--deep);border-radius:999px;padding:.15em .8em;backdrop-filter:blur(4px)}
@@ -53,7 +53,7 @@ h1,h2{font-weight:400}
 .offer p{color:var(--om);margin-top:.4rem;font-size:.97em}
 .offer .k,.offer .more{color:var(--oi)}
 .offer .meta{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.8rem}
-.o-gather .chip{background:rgba(251,245,247,.1);color:#FBF5F7;border-color:rgba(251,245,247,.25)}
+.o-gather .chip{background:rgba(251,245,247,.1);color:#F7F1EE;border-color:rgba(251,245,247,.25)}
 .offer .more{margin-top:1rem;font-weight:500;display:inline-flex;align-items:center;gap:.4em}
 .offer:hover .more{text-decoration:underline}
 /* Icons, die sich sanft abwechseln */
@@ -129,7 +129,7 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
 .vsolo{position:relative;margin:0 auto;width:min(100%,460px);aspect-ratio:9/16;max-height:86vh;border-radius:230px 230px 30px 30px;overflow:hidden;background:var(--peach)}
 .vsolo video{width:100%;height:100%;object-fit:cover;display:block}
 .vsolo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(74,58,65,.34),rgba(74,58,65,.06) 30%,rgba(74,58,65,.06) 70%,rgba(74,58,65,.4));pointer-events:none}
-.flow{position:absolute;inset:0;z-index:1;color:#FBF5F7;pointer-events:none}
+.flow{position:absolute;inset:0;z-index:1;color:#F7F1EE;pointer-events:none}
 .f-lab{position:absolute;font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(1.35rem,2.4vw,1.85rem);line-height:1;letter-spacing:.01em;text-shadow:0 1px 3px rgba(46,37,41,.35),0 2px 18px rgba(46,37,41,.5)}
 .f-top{top:15%;left:50%;transform:translateX(-50%)}
 .f-bot{bottom:7%;left:50%;transform:translateX(-50%)}
@@ -155,7 +155,7 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
 .art.wide.soft:hover video{transform:none}
 .vsolo.soft{max-height:92vh;width:min(100%,520px)}
 .vsolo.soft video{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22%,#000 78%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 84%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent 0,#000 22%,#000 78%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 84%,transparent 100%);mask-composite:intersect}
-.vsolo.soft .flow{color:#4A3A41}
+.vsolo.soft .flow{color:#3A2631}
 .vsolo.soft .f-lab{text-shadow:0 0 14px rgba(242,236,228,.95),0 0 4px rgba(242,236,228,.9)}
 .vsolo.soft .f-top{top:9%}.vsolo.soft .f-bot{bottom:6%}
 .vsolo.soft .f-line{top:calc(9% + 2.6rem);bottom:calc(6% + 2.8rem);background:rgba(74,58,65,.55)}
@@ -168,7 +168,7 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
 .vside video{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
 .vside figcaption{font-family:var(--serif);font-style:italic;font-size:clamp(1.6rem,2.6vw,2.4rem);color:var(--plum);text-align:center}
 @media(max-width:899px){.vpair{display:block}.vside{display:none}.vpair .vsolo.soft{width:min(100%,420px);margin:0 auto}}
-.vsolo.soft .flow{color:#FBF5F7}
+.vsolo.soft .flow{color:#F7F1EE}
 .vsolo.soft .f-lab{text-shadow:0 1px 3px rgba(46,37,41,.5),0 2px 18px rgba(46,37,41,.55)}
 .vsolo.soft .f-top{top:17%}.vsolo.soft .f-bot{bottom:14%}
 .vsolo.soft .f-line{top:calc(17% + 2.4rem);bottom:calc(14% + 2.6rem);background:rgba(251,245,247,.9);box-shadow:0 0 6px rgba(46,37,41,.25)}
@@ -191,7 +191,7 @@ html,body{overflow-x:hidden;overflow-x:clip;max-width:100%}
 .band>.w{position:relative;z-index:2}
 .band-blob{position:absolute;z-index:0;border-radius:46% 54% 60% 40%/50% 42% 58% 50%;animation:mvblob 16s ease-in-out infinite alternate}
 .band-blob.b1{width:clamp(220px,30vw,460px);height:clamp(220px,30vw,460px);left:-8%;top:10%;background:#9C858A;opacity:.55}
-.band-blob.b2{width:clamp(160px,22vw,340px);height:clamp(160px,22vw,340px);right:-5%;bottom:-12%;background:#E8D6CA;opacity:.22;animation-duration:21s}
+.band-blob.b2{width:clamp(160px,22vw,340px);height:clamp(160px,22vw,340px);right:-5%;bottom:-12%;background:#E6DBCF;opacity:.22;animation-duration:21s}
 /* Drei Schritte: Icons in weichen, atmenden Formen, verbunden durch eine Welle */
 .steps{position:relative}
 .steps-line{display:none}
@@ -219,7 +219,7 @@ html,body{overflow-x:hidden;overflow-x:clip;max-width:100%}
 @media(prefers-reduced-motion:reduce){.band-blob,.steps .n{animation:none}}
 .values .vc p,.values .vc p span{font-family:var(--sans);font-size:1rem;color:var(--muted)}.values .vc b span{font:inherit;color:inherit}
 .values .vi i{animation:none!important;opacity:1!important}
-.values .vc:nth-child(1){background:#FBF8F4}.values .vc:nth-child(2){background:#F3E2D8}.values .vc:nth-child(3){background:#EEDFE0}.values .vc:nth-child(4){background:#F8EFE7}.values .vc:nth-child(5){background:#E8D9DD}
+.values .vc:nth-child(1){background:#FBF9F6}.values .vc:nth-child(2){background:#F3E2D8}.values .vc:nth-child(3){background:#EEDFE0}.values .vc:nth-child(4){background:#F8EFE7}.values .vc:nth-child(5){background:#E8D9DD}
 .values .vi{background:rgba(255,255,255,.75)}
 @media(max-width:699px){.values .vn{display:none}}
 /* Etwas zierlicher (Vivien, 28.10.2026: „alles sehr groß, v. a. in Safari – ein bisschen kompakter, aber nicht zu viel“). Alle Werte rund 10–15 % kleiner. */

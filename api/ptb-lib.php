@@ -307,12 +307,12 @@ function ptb_clean_wishes(PDO $pdo, $raw): array
 function ptb_mail_html(string $title, string $inner, bool $en): string
 {
     return '<!DOCTYPE html><html lang="' . ($en ? 'en' : 'de') . '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . forma_h($title) . '</title></head>'
-        . '<body style="margin:0;padding:0;background:#F2ECE4;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2ECE4;"><tr><td align="center" style="padding:26px 12px;">'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FBF8F4;border-radius:24px;font-family:Helvetica,Arial,sans-serif;color:#2E2529;">'
+        . '<body style="margin:0;padding:0;background:#F5F1EB;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F5F1EB;"><tr><td align="center" style="padding:26px 12px;">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FBF9F6;border-radius:24px;font-family:Helvetica,Arial,sans-serif;color:#2A2026;">'
         . '<tr><td style="padding:24px 30px 0;"><img src="' . forma_h(mm_site()) . '/img/movecia/movecia-mail.png" width="180" height="40" alt="Movecia." style="display:block;border:0;width:180px;height:auto;"></td></tr>'
         . '<tr><td style="padding:14px 30px 28px;font-size:16px;line-height:1.65;">' . $inner
         . '<p style="margin:24px 0 0;">' . ($en ? 'See you soon,<br>Vivien' : 'Bis bald,<br>Vivien') . '</p></td></tr></table>'
-        . '<p style="max-width:560px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#7D7076;margin:16px auto 0;">Vivien Malonga · Movecia – Personal Fitness · Mathon, Paznaun · ' . NATAL_COMPANY['email'] . ' · ' . NATAL_COMPANY['phone'] . '</p>'
+        . '<p style="max-width:560px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#6E6168;margin:16px auto 0;">Vivien Malonga · Movecia – Personal Fitness · Mathon, Paznaun · ' . NATAL_COMPANY['email'] . ' · ' . NATAL_COMPANY['phone'] . '</p>'
         . '</td></tr></table></body></html>';
 }
 
@@ -326,7 +326,7 @@ function ptb_mail_guest(array $o, string $subject, string $title, array $paras, 
     $html = natal_h1($title);
     foreach ($paras as $p) {
         $html .= is_array($p)
-            ? '<p style="margin:0 0 14px;padding:12px 16px;background:#F2ECE4;border-radius:14px;">' . implode('<br>', array_map(fn($l) => str_starts_with($l, '**') ? '<b>' . forma_h(substr($l, 2)) . '</b>' : forma_h($l), $p)) . '</p>'
+            ? '<p style="margin:0 0 14px;padding:12px 16px;background:#F5F1EB;border-radius:14px;">' . implode('<br>', array_map(fn($l) => str_starts_with($l, '**') ? '<b>' . forma_h(substr($l, 2)) . '</b>' : forma_h($l), $p)) . '</p>'
             : '<p style="margin:0 0 14px;">' . nl2br(forma_h($p)) . '</p>';
     }
     if ($button) $html .= natal_btn($button[0], $button[1]);
@@ -468,7 +468,7 @@ function ptb_checkout(PDO $pdo, array $o): string
         'cancel_url' => ptb_link($o) . '&abgebrochen=1',
     ];
     $branded = $params;
-    $branded['branding_settings'] = ['display_name' => 'Movecia – Personal Fitness', 'background_color' => '#F2ECE4', 'button_color' => '#7D5E68', 'border_style' => 'rounded', 'font_family' => 'inter'];
+    $branded['branding_settings'] = ['display_name' => 'Movecia – Personal Fitness', 'background_color' => '#F5F1EB', 'button_color' => '#5A3C4C', 'border_style' => 'rounded', 'font_family' => 'inter'];
     $branded['payment_intent_data']['statement_descriptor_suffix'] = 'MOVECIA';
     try {
         $s = forma_stripe('POST', '/v1/checkout/sessions', $branded, null, '2025-09-30.clover');
