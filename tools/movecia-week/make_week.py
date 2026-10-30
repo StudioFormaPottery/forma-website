@@ -120,6 +120,17 @@ h1 em{font-style:italic;color:#4A3040}.dark h1 em{color:#E6DBCF}
 .qrbox img{width:150px;height:150px;border-radius:12px}
 .qrbox span{font-size:23px;line-height:1.35;color:#2A2026;max-width:260px}
 .qrbox b{display:block;font-family:Cormorant,serif;font-weight:500;font-size:34px}
+.bgph{position:absolute;inset:-60px;background-size:cover;z-index:0;filter:blur(40px) brightness(1.1) saturate(.85);opacity:.4}
+.bg{background:#F2ECE5}
+.bgimg{position:absolute;left:0;top:0;width:100%;z-index:0;transform:translateY(var(--sh,0%));-webkit-mask:linear-gradient(#000 72%,transparent);mask:linear-gradient(#000 72%,transparent)}
+.bgfade{position:absolute;left:0;right:0;bottom:0;height:55%;z-index:1;background:linear-gradient(rgba(245,241,235,0),rgba(245,241,235,.35) 50%,rgba(245,241,235,.55))}
+.bg::before{display:none}
+.bg .card{margin-top:auto;background:rgba(251,249,246,.74);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-radius:40px;padding:38px 40px 32px;box-shadow:0 20px 60px -30px rgba(46,29,39,.45)}
+.bg .card .k{color:#4A3040}.bg h1{font-size:92px;margin-top:12px}.s.bg h1{font-size:100px}.pin.bg h1{font-size:86px}
+.bg .text{font-size:28px;margin-top:16px}.bg .deal{margin-top:20px;padding:24px 30px}.bg .deal b{font-size:66px}
+.bg .foot{margin-top:22px}.bg .twinkle{color:#FBF9F6;opacity:.9}
+.f.bg .wrap{padding-bottom:56px}.f.bg h1{font-size:76px}.f.bg .text{font-size:25px;margin-top:12px}.f.bg .deal{font-size:24px;padding:18px 26px;margin-top:16px}.f.bg .deal b{font-size:54px;margin-bottom:6px}.f.bg .card{padding:30px 34px 26px}.f.bg .foot{margin-top:16px}
+.s.bg .wrap{padding-bottom:200px}.pin.bg .wrap{padding-bottom:70px}
 .f .qrbox img{width:104px;height:104px}.f .qrbox{padding:10px 18px 10px 10px;gap:14px}.f .qrbox span{font-size:20px;max-width:220px}.f .qrbox b{font-size:28px}
 .f.adv .top{margin-top:40px}
 .f.adv.t-offer .ph{height:320px}.f.adv.t-offer .body{margin-top:18px!important}.f.adv.t-offer .text{font-size:26px}
@@ -184,6 +195,14 @@ def page(p, story, pin=False):
     if p.get('advent'):
         tw = [('8%', '30%', 26), ('88%', '40%', 22), ('14%', '62%', 18), ('92%', '70%', 28), ('50%', '16%', 16)]
         deco += garland() + ''.join(f'<span class="twinkle" style="left:{x};top:{y};width:{w}px;height:{w}px">{STAR}</span>' for x, y, w in tw)
+    if p.get('bg'):
+        # Foto als ganzer Hintergrund, Text auf durchscheinender Karte darüber (Vivien, 30.10.2026)
+        cls.append('bg')
+        pos = esc(p.get('pos', '50% 40%'))
+        bgdeco = (garland() if p.get('advent') else '') + ''.join(f'<span class="twinkle" style="left:{x};top:{y};width:{w}px;height:{w}px">{STAR}</span>' for x, y, w in [('7%', '20%', 24), ('90%', '26%', 20), ('82%', '12%', 16)])
+        sh = esc(p.get('shift', '0%'))
+        inner = f'<div class="bgph" style="background-image:url(/{esc(photo_path(p))});background-position:{pos}"></div><img class="bgimg" style="--sh:-{sh}" src="/{esc(photo_path(p))}"><div class="bgfade"></div>{bgdeco}<div class="wrap">{top}<div class="card">{body}{foot}</div></div>'
+        return f'<!doctype html><html><head><meta charset="utf-8"><style>{CSS}</style></head><body class="{" ".join(cls)}">{inner}</body></html>'
     if has_photo:
         cls.append('photo')
         pos = f';background-position:{esc(p["pos"])}' if p.get('pos') else ''
