@@ -57,7 +57,7 @@ body.m1{background:#F5E9DF}.m1 .ph::before{content:"";position:absolute;inset:0;
 const P=new URLSearchParams(location.search), m=P.get('m')||'1', f=P.get('f')||'feed', l=P.get('l')||'de', de=l==='de';
 document.body.classList.add(f,'m'+m);
 const T=(a,b)=>de?a:b;
-const brand=`<div class="top"><div class="brand"><img src="../../img/movecia/movecia-zeichen-klein.svg"><span>Movecia<i></i></span></div><span class="pill">${T('Nur 10 Plätze','Only 10 spots')}</span></div>`;
+const brand=`<div class="top"><div class="brand"><img src="../../img/movecia/movecia-zeichen-klein.svg"><span>Movecia</span></div><span class="pill">${T('Nur 10 Plätze','Only 10 spots')}</span></div>`;
 const foot=`<div class="foot"><div class="url">${T('Jetzt buchen','Book now')}<b>moveciamovement.com/unfold</b></div><span class="btn">${T('Link in Bio','Link in bio')} →</span></div>`;
 let h='';
 if(m==='1'){

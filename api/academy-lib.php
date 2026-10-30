@@ -1221,7 +1221,7 @@ function ac_logo_file(string $v, string $layout = 'stack', bool $onPlum = false)
     if ($layout === 'mark') return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="' . (int)round(1024 * $h / $w) . '" viewBox="0 0 ' . $w . ' ' . $h . '">' . $o . '</svg>';
     $W = 420; $mw = $v === 'ring' ? 150 : ($v === 'zwei' ? 150 : 118); $mh = $mw * $h / $w;
     $y = 20 + $mh;
-    $txt = '<text x="' . ($W / 2) . '" y="' . ($y + 66) . '" text-anchor="middle" font-family="Cormorant, Cormorant Garamond, Georgia, serif" font-weight="500" font-size="62" fill="' . $c['text'] . '">Movecia<tspan fill="' . $c['dot'] . '">.</tspan></text>'
+    $txt = '<text x="' . ($W / 2) . '" y="' . ($y + 66) . '" text-anchor="middle" font-family="Cormorant, Cormorant Garamond, Georgia, serif" font-weight="500" font-size="62" fill="' . $c['text'] . '">Movecia</text>'
         . '<text x="' . ($W / 2 + 6) . '" y="' . ($y + 104) . '" text-anchor="middle" font-family="Hanken, Hanken Grotesk, Helvetica, Arial, sans-serif" font-weight="500" font-size="21" letter-spacing="12" fill="' . $c['sub'] . '">ACADEMY</text>'
         . '<path d="M' . ($W / 2 - 70) . ' ' . ($y + 122) . ' H' . ($W / 2 + 70) . '" stroke="' . $c['thin'] . '" stroke-width="1"/>'
         . '<text x="' . ($W / 2 + 1.5) . '" y="' . ($y + 146) . '" text-anchor="middle" font-family="Hanken, Hanken Grotesk, Helvetica, Arial, sans-serif" font-size="12.5" letter-spacing="3" fill="' . $c['sub'] . '">MINDFUL BECOMING TEACHER TRAINING</text>';

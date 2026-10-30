@@ -199,7 +199,7 @@ def page(p, story, pin=False):
     logo = '/img/movecia/movecia-zeichen-hell.svg' if p.get('dark') else '/img/movecia/movecia-zeichen-klein.svg'
     day = f'<span class="day">{esc(p["day"])}</span>' if p.get('day') else ''
     if p.get('advtag'): day = f'<span class="adv-tag">{STAR.replace("<svg ", "<svg width=\'18\' height=\'18\' ")}{esc(p["advtag"])}</span>'
-    top = f'<div class="top"><div class="brand"><img src="{logo}"><span>Movecia<i></i></span></div>{day}</div>'
+    top = f'<div class="top"><div class="brand"><img src="{logo}"><span>Movecia</span></div>{day}</div>'
     foot = ''
     if p.get('cta') or p.get('url'):
         right = f'<span class="btn">{esc(p.get("btn", "Link in Bio"))} →</span>'
