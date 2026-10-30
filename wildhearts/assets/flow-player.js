@@ -198,17 +198,39 @@
 
   // Sonnenaufgang: weicher Akkord, der aufblüht und warm ausklingt, am Ende ein zarter Glockenton
   let ac = null, pjP = null;
-  function actx() { try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {} // iPhone: Klang auch im Lautlos-Modus
-    if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; } } if (ac && ac.state === 'suspended') ac.resume(); return ac; }
+  // Am Computer (v. a. Safari) blieb der Web-Audio-Ton stumm (Vivien, 30.10.2026: keine Musik, keine Glocke). Deshalb dort
+  // Glocke und Musik über normale Audio-Elemente; Web Audio nur noch am iPhone/iPad (dort lässt sich die Lautstärke sonst nicht regeln).
+  const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  function actx() { if (IOS) { try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {} } // iPhone: Klang auch im Lautlos-Modus
+    if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; } } if (ac && ac.state !== 'running') { try { ac.resume(); } catch (e) {} } return ac; }
+  // Klänge einmal vorab als WAV berechnen (OfflineAudioContext braucht keinen Klick) und über <audio> abspielen
+  function wavUrl(buf) {
+    const d = buf.getChannelData(0), n = d.length, b = new ArrayBuffer(44 + n * 2), v = new DataView(b), w = (o, t) => { for (let i = 0; i < t.length; i++) v.setUint8(o + i, t.charCodeAt(i)); };
+    w(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, buf.sampleRate, true); v.setUint32(28, buf.sampleRate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, 'data'); v.setUint32(40, n * 2, true);
+    for (let i = 0; i < n; i++) v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, d[i])) * 32767, true);
+    return URL.createObjectURL(new Blob([b], { type: 'audio/wav' }));
+  }
+  const SND = {};
+  function sndPrep() {
+    if (SND.ready) return; SND.ready = 1;
+    const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if (!OC) return;
+    const mk = (k, len, fn) => { try { const oc = new OC(1, Math.ceil(44100 * len), 44100); fn(oc); const r = oc.startRendering(); const done = buf => { SND[k] = wavUrl(buf); }; if (r && r.then) r.then(done); else oc.oncomplete = e => done(e.renderedBuffer); } catch (e) {} };
+    mk('lo', 1.1, oc => bellOn(oc, 0, false)); mk('hi', 1.8, oc => bellOn(oc, 0, true)); mk('sun', 7.8, oc => sunriseOn(oc, 0, 5));
+    SND.el = [new Audio(), new Audio(), new Audio()]; SND.k = 0;
+  }
+  function sndUnlock() { sndPrep(); (SND.el || []).forEach(el => { try { el.muted = true; el.src = SND.sil || (SND.sil = wavUrl({ getChannelData: () => new Float32Array(2205), sampleRate: 44100 })); const p = el.play(); if (p && p.then) p.then(() => { el.pause(); el.muted = false; }).catch(() => { el.muted = false; }); else el.muted = false; } catch (e) {} }); }
+  function sndPlay(k) { if (!SND.el || !SND[k]) return false; const el = SND.el[SND.k++ % SND.el.length]; try { el.muted = false; el.volume = 1; el.src = SND[k]; el.currentTime = 0; const p = el.play(); if (p && p.catch) p.catch(() => {}); return true; } catch (e) { return false; } }
   // Countdown-Klang (Vivien, 30.10.2026: „in den letzten Sekunden hört man den Timer nicht“): klare, weiche Glocke bei 3, 2, 1, heller bei 0
-  function bell(hi) {
-    const a = actx(); if (!a) return; const t = a.currentTime, out = a.createGain(); out.gain.value = .0001; out.connect(a.destination);
+  function bell(hi) { if (!IOS && sndPlay(hi ? 'hi' : 'lo')) return; const a = actx(); if (a) bellOn(a, a.currentTime, hi); }
+  function sunrise(len) { if (!IOS && sndPlay('sun')) return; const a = actx(); if (a) sunriseOn(a, a.currentTime, len); }
+  function bellOn(a, t, hi) {
+    const out = a.createGain(); out.gain.value = .0001; out.connect(a.destination);
     out.gain.exponentialRampToValueAtTime(hi ? .5 : .38, t + .015); out.gain.exponentialRampToValueAtTime(.0001, t + (hi ? 1.6 : .9));
     [[hi ? 880 : 660, 1], [hi ? 1320 : 990, .35], [hi ? 1760 : 1320, .12]].forEach(([f, v]) => { const o = a.createOscillator(), g = a.createGain(); o.type = 'sine'; o.frequency.value = f; g.gain.value = v; o.connect(g).connect(out); o.start(t); o.stop(t + (hi ? 1.7 : 1)); });
   }
-  function sunrise(len) {
-    const a = actx(); if (!a) return;
-    const t0 = a.currentTime, L = Math.max(2.2, len);
+  function sunriseOn(a, t0, len) {
+    const L = Math.max(2.2, len);
     const out = a.createGain(); out.gain.value = .0001; out.connect(a.destination);
     out.gain.exponentialRampToValueAtTime(.22, t0 + L * .55); out.gain.exponentialRampToValueAtTime(.0001, t0 + L + 2.2);
     const lp = a.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = .6; lp.frequency.setValueAtTime(320, t0); lp.frequency.exponentialRampToValueAtTime(3200, t0 + L); lp.connect(out);
@@ -407,12 +429,16 @@
     try { if (localStorage.getItem('mvf-bgm') === '0') bgOn = false; } catch (e) {}
     const bgA = [new Audio(), new Audio()], bgE = [null, null], BGV = flow ? .16 : .5;
     bgA.forEach(a => { a.preload = 'auto'; });
-    function bgSetup() { const a = actx(); if (!a || bgG) return; try { bgG = a.createGain(); bgG.gain.value = 0; bgG.connect(a.destination); bgA.forEach((el, k) => { const g = a.createGain(); g.gain.value = 0; a.createMediaElementSource(el).connect(g); g.connect(bgG); bgE[k] = g; }); } catch (e) { bgG = null; } }
-    function ramp(g, v, sec) { if (!g || !ac) return; const t = ac.currentTime; try { g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(v, t + sec); } catch (e) {} }
-    function bgSong(k, slot) { const el = bgA[slot], m = bgm[k % bgm.length]; bgK = k; if (el.getAttribute('src') !== m.url) el.src = m.url; try { el.currentTime = 0; } catch (e) {} el.play().catch(() => {}); if (bgE[slot]) ramp(bgE[slot], 1, k ? 2.4 : .2); else el.volume = 1; }
+    function bgApply() { bgA.forEach((el, k) => { try { el.volume = Math.max(0, Math.min(1, bgG.v * (bgE[k] ? bgE[k].v : 1))); } catch (e) {} }); }
+    function bgSetup() { if (bgG) return; if (!IOS) { bgG = { fake: 1, v: 0 }; bgE[0] = { fake: 1, v: 0 }; bgE[1] = { fake: 1, v: 0 }; bgApply(); return; } const a = actx(); if (!a) return; try { bgG = a.createGain(); bgG.gain.value = 0; bgG.connect(a.destination); bgA.forEach((el, k) => { const g = a.createGain(); g.gain.value = 0; a.createMediaElementSource(el).connect(g); g.connect(bgG); bgE[k] = g; }); } catch (e) { bgG = null; } }
+    function ramp(g, v, sec) {
+      if (g && g.fake) { clearInterval(g.tm); const from = g.v, t0 = performance.now(), ms = Math.max(1, sec * 1000); g.tm = setInterval(() => { const x = Math.min(1, (performance.now() - t0) / ms); g.v = from + (v - from) * x; bgApply(); if (x >= 1) clearInterval(g.tm); }, 40); return; }
+      if (!g || !ac) return; const t = ac.currentTime; try { g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(v, t + sec); } catch (e) {} }
+    function bgSong(k, slot) { const el = bgA[slot], m = bgm[k % bgm.length]; bgK = k; if (el.getAttribute('src') !== m.url) el.src = m.url; try { el.currentTime = 0; } catch (e) {} el.play().catch(() => { // Browser lässt das zweite Element nicht: im ersten weiterspielen
+        if (slot !== bgCur) return; const o = 1 - slot; bgCur = o; const x = bgA[o]; x.src = m.url; try { x.currentTime = 0; } catch (e) {} x.play().catch(() => {}); if (bgE[o]) ramp(bgE[o], 1, .3); }); if (bgE[slot]) ramp(bgE[slot], 1, k ? 2.4 : .2); else el.volume = 1; }
     bgA.forEach((el, k) => el.addEventListener('timeupdate', () => {
       if (!bgRun || k !== bgCur || bgX || !isFinite(el.duration) || el.duration - el.currentTime > 2.6) return;
-      bgX = true; const o = bgCur; bgCur = 1 - bgCur; if (bgE[o]) ramp(bgE[o], 0, 2.4); setTimeout(() => { bgA[o].pause(); bgX = false; }, 2700); bgSong(bgK + 1, bgCur); }));
+      bgX = true; const o = bgCur; bgCur = 1 - bgCur; if (bgE[o]) ramp(bgE[o], 0, 2.4); setTimeout(() => { if (o !== bgCur) bgA[o].pause(); bgX = false; }, 2700); bgSong(bgK + 1, bgCur); }));
     function bgPlay() { if (!bgm.length || !bgOn) return; bgSetup(); if (!bgRun) { bgRun = true; if (!bgA[bgCur].getAttribute('src')) bgSong(0, bgCur); else bgA[bgCur].play().catch(() => {}); } else bgA[bgCur].play().catch(() => {}); if (bgG) ramp(bgG, BGV, 1.5); else bgA.forEach(a => a.volume = BGV); }
     function bgPause(fade) { if (!bgm.length) return; if (bgG && fade) { ramp(bgG, 0, fade); setTimeout(() => bgA.forEach(a => a.pause()), fade * 1000 + 100); } else bgA.forEach(a => a.pause()); }
     function bgUi() { const b = q('[data-mus]'); if (!bgm.length || !b) return; b.setAttribute('aria-pressed', String(bgOn)); b.querySelector('span:last-child').textContent = bgOn ? T('Musik an', 'Music on') : T('Musik aus', 'Music off'); }
@@ -497,8 +523,10 @@
     }
     q('[data-go]').addEventListener('click', () => {
       actx(); bgSetup(); q('[data-s]').hidden = true; q('[data-done]').hidden = true; q('[data-p]').hidden = false; idx = 0; run = true;
-      bgK = 0; bgCur = 0; bgRun = false; bgA.forEach(a => { a.pause(); a.removeAttribute('src'); }); bgE.forEach(g => { if (g) g.gain.value = 0; });
+      bgK = 0; bgCur = 0; bgRun = false; bgA.forEach(a => { a.pause(); a.removeAttribute('src'); }); bgE.forEach(g => { if (g) { if (g.fake) { clearInterval(g.tm); g.v = 0; } else g.gain.value = 0; } }); if (bgG && bgG.fake) { clearInterval(bgG.tm); bgG.v = 0; bgApply(); }
+      sndUnlock();
       phase = TITLE ? 'title' : 'ready'; show(0); setPhase(phase); play();
+      if (bgm.length && bgOn) { const el = bgA[1]; el.src = bgm[1 % bgm.length].url; const pr = el.play(); if (pr && pr.then) pr.then(() => { if (bgCur !== 1) el.pause(); }).catch(() => {}); } // 2. Lied jetzt freischalten (Safari), läuft leise
       q('[data-p]').scrollIntoView({ behavior: 'smooth', block: 'start' });
       try { navigator.wakeLock && navigator.wakeLock.request('screen').catch(() => {}); } catch (e) {}
     });

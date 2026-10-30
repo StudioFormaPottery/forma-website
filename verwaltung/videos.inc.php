@@ -42,7 +42,7 @@ body{background:#F2ECE4}main{max-width:900px}
 <div class="pv-w">
 <?php if ($fd): ?>
   <div data-mv-flow="<?= $h(json_encode($fd, JSON_UNESCAPED_UNICODE)) ?>"></div>
-  <script src="/wildhearts/assets/flow-player.js?v=12"></script>
+  <script src="/wildhearts/assets/flow-player.js?v=13"></script>
 <?php else: ?>
   <div class="pv-v"><?php if ($vid !== '' && mv_bunny()['lib'] !== ''): ?><iframe src="<?= $h(mv_embed($vid)) ?>" allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe><?php else: ?><div class="pv-e">Das Video ist noch nicht hochgeladen. Sobald es da ist, läuft es hier.</div><?php endif; ?></div>
   <script src="/wildhearts/assets/bunny-ton.js?v=1"></script>
@@ -370,7 +370,7 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
   function bgmDraw(box){const list=JSON.parse(box.dataset.list||'[]'),m=box.dataset.bgmode,need=+box.dataset.need||0,sum=list.reduce((a,x)=>a+(x.dur||150),0);
     box.querySelector('[data-bgc]').innerHTML=m==='off'?'<span class="bgm-o">Keine Musik – nur '+(box.closest('.vc').querySelector('[data-m=flow][aria-pressed=true]')?'deine Stimme':'der Timer-Klang')+'.</span>':
       (list.length?list.map(x=>'<span class="bgm-s">'+esc(x.t)+' <small>'+fmm(x.dur||0)+'</small><button type="button" data-bgx="'+x.id+'" aria-label="entfernen">✕</button></span>').join(''):'<span class="bgm-o">Noch keine Lieder im Musik-Ordner.</span>');
-    box.querySelector('[data-bgn]').textContent=m==='off'?'aus':(m==='auto'?'automatisch passend gewählt':'von dir gewählt')+(list.length?' · reicht für '+(sum+5>=need?'das ganze Video':fmm(sum)+' von '+fmm(need)+', danach von vorne'):'');
+    box.querySelector('[data-bgn]').textContent=m==='off'?'aus – im Video läuft keine Musik':'✓ läuft so im Video, nichts zu bestätigen · '+(m==='auto'?'automatisch passend gewählt':'von dir gewählt')+(list.length?' · reicht für '+(sum+5>=need?'das ganze Video':fmm(sum)+' von '+fmm(need)+', danach von vorne'):'');
     box.querySelector('[data-bgdo=auto]').hidden=m==='auto';box.querySelector('[data-bgdo=off]').hidden=m==='off';
     box.querySelectorAll('[data-bgx]').forEach(b=>b.onclick=()=>{const ids=list.map(x=>x.id).filter(i=>i!==+b.dataset.bgx);bgmSet(box,ids.length?{do:'set',ids:ids.join(',')}:{do:'off'})});}
   function bgmSet(box,d){box.classList.add('busy');post('mm_mv_bgm',Object.assign({id:box.dataset.bgm},d)).then(r=>{box.classList.remove('busy');if(r.error){alert(r.error);return}box.dataset.bgmode=r.mode;box.dataset.list=JSON.stringify(r.list);bgmDraw(box)}).catch(()=>box.classList.remove('busy'))}
