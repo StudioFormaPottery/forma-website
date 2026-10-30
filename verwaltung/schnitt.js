@@ -116,6 +116,10 @@
 .sn-c b{display:block;font-weight:500;font-size:13px;color:#4A3A41;padding:6px 8px 1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sn-c small{display:block;color:#7D7076;font-size:12px;padding:0 8px 7px;font-variant-numeric:tabular-nums}
 .sn-c .n{position:absolute;left:6px;top:6px;background:rgba(46,37,41,.75);color:#fff;border-radius:999px;font-size:12px;padding:1px 7px}
+.sn-c.drag{opacity:.35}
+.sn-ghost{position:fixed;z-index:9999;width:120px;border-radius:14px;overflow:hidden;pointer-events:none;box-shadow:0 14px 28px -10px rgba(46,37,41,.55);transform:rotate(-3deg) scale(1.04);background:#fff;border:2px solid #7D5E68}
+.sn-ghost img{width:100%;display:block}.sn-ghost b{display:block;padding:4px 8px;font-size:13px;font-weight:500;color:#4A3A41;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sn-drop{flex:0 0 4px;align-self:stretch;border-radius:4px;background:#7D5E68;margin:0 -7px}
 .sn-c .mu{position:absolute;right:6px;top:6px;background:rgba(46,37,41,.75);color:#fff;border-radius:999px;font-size:12px;padding:1px 7px}
 .sn-add{flex:0 0 auto;width:132px;height:132px;border-radius:14px;border:2px dashed #C9B0B8;background:#FBF8F4;color:#7D5E68;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;font:inherit;font-size:15px;text-align:center}
 .sn-add b{font-size:28px;font-weight:400;line-height:1}
@@ -298,6 +302,7 @@ void main(){
     <p class="sn-zt-hint" data-k="zthint">Tippen = Stelle anspringen · die Griffe <b>⟦ ⟧</b> an den Rändern ziehen = Anfang und Ende länger oder kürzer machen (das schraffierte Stück daneben ist das, was weggeschnitten wurde – da kannst du wieder hineinziehen) · der Griff darf auch über den nächsten Clip hinaus (was doppelt ist, kannst du darunter löschen) · zwei Finger auseinander (oder ＋) = Zeitleiste auseinanderziehen</p>
   </div>
   <h2 style="margin-top:16px" data-k="h2">Deine Clips <span style="font-size:16px;color:#7D7076;font-family:'Hanken Grotesk',sans-serif;font-weight:400" data-k="cnt"></span></h2>
+  <p class="sn-zt-hint" style="margin:0 2px 4px">Reihenfolge ändern: Kachel nehmen und an die neue Stelle ziehen (am Handy kurz drauf halten, dann ziehen).</p>
   <div class="sn-clips" data-k="clips"></div>
   <div class="sn-cov" data-k="coved" hidden>
     <div class="h"><b>🖼 Titelbild ganz am Anfang</b><button type="button" class="sn-b sm" data-k="covX">Schließen</button></div>
@@ -320,6 +325,7 @@ void main(){
       <button type="button" class="sn-b sm" data-k="resetCut">Schnitt zurück</button>
     </div>
     <div class="sn-row">
+      <button type="button" class="sn-b sm" data-k="first">⇤ Ganz nach vorne</button>
       <button type="button" class="sn-b sm" data-k="left">← Nach vorne</button>
       <button type="button" class="sn-b sm" data-k="right">Nach hinten →</button>
       <button type="button" class="sn-b sm" data-k="mute">🔇 Ton aus</button>
@@ -568,13 +574,48 @@ void main(){
       if (full !== false) box.innerHTML = covTile() + clips.map((c, i) => `<button type="button" class="sn-c ${i === sel ? 'on' : ''}${c.auto ? ' auto' : ''}" data-ci="${i}"><span class="n">${i + 1}</span>${c.mute ? '<span class="mu">🔇</span>' : ''}${broOf(c).length ? '<span class="br">🎞 ' + broOf(c).length + '</span>' : ''}${c.thumb ? `<img src="${c.thumb}" alt="">` : '<span class="ph">🎬</span>'}<b>${esc(c.name)}</b><small>${fmt1(len(c))}${(c.in || (c.out && c.dur && c.out < c.dur - .05)) ? ' · geschnitten' : ''}</small></button>`).join('')
         + `<label class="sn-add"><b>＋</b>Clips<input type="file" accept="video/*,.mov,.mp4,.m4v,.webm" multiple hidden></label>`;
       else box.querySelectorAll('.sn-c').forEach(b => b.classList.toggle('on', +b.dataset.ci === sel));
-      box.querySelectorAll('.sn-c[data-ci]').forEach(b => b.onclick = () => { if (busy) return; stop(); covShow(false); sel = +b.dataset.ci; pos = starts()[sel]; show(sel, 0); renderClips(false); edUi(); barUi(); timeUi(); });
+      if (full !== false) dragInit(box);
+      box.querySelectorAll('.sn-c[data-ci]').forEach(b => b.onclick = () => { if (busy || dragJust) return; stop(); covShow(false); sel = +b.dataset.ci; pos = starts()[sel]; show(sel, 0); renderClips(false); edUi(); barUi(); timeUi(); });
       const add = box.querySelector('.sn-add:not(.cov) input'); if (add) add.onchange = e => { addFiles([...e.target.files]); e.target.value = ''; };
       const ct = box.querySelector('[data-cov]'); if (ct) ct.onclick = () => { if (busy) return; stop(); const o2 = K('coved').hidden; K('coved').hidden = !o2; covShow(o2 && !!covObj()); if (o2) covEdUi(); };
       const cf = box.querySelector('.sn-add.cov input'); if (cf) cf.onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) covAdd(f); };
       K('cnt').textContent = clips.length ? '· ' + clips.length + (clips.length > 1 ? ' Clips' : ' Clip') + ' · ' + fmt(total() + CD()) + (CD() ? ' mit Titelbild' : '') : '';
       q('#snempty').hidden = !!clips.length; big.hidden = !!playing || !clips.length;
       K('done').disabled = !clips.length; doneLbl();
+    }
+    // Kacheln mit dem Finger/der Maus verschieben (Vivien, 30.10.2026: „Takes anklicken und ganz nach vorne schieben“)
+    // Maus: einfach ziehen. Handy: kurz drauf halten, dann ziehen (sonst würde das Wischen durch die Leiste nicht mehr gehen).
+    let dragJust = false, dragOn = false;
+    document.addEventListener('touchmove', e => { if (dragOn) e.preventDefault(); }, { passive: false });
+    function dragInit(box) {
+      box.querySelectorAll('.sn-c[data-ci]').forEach(tile => {
+        tile.style.touchAction = 'pan-x pan-y'; tile.draggable = false; tile.querySelectorAll('img').forEach(i => i.draggable = false);
+        tile.onpointerdown = e => {
+          if (busy || e.button > 0) return; const from = +tile.dataset.ci, x0 = e.clientX, y0 = e.clientY, touch = e.pointerType !== 'mouse';
+          let armed = !touch, started = false, ghost = null, drop = null, to = from, timer = 0, scr = 0;
+          const tiles = () => [...box.querySelectorAll('.sn-c[data-ci]')];
+          const start = () => { started = true; dragOn = true; stop(); tile.classList.add('drag'); ghost = document.createElement('div'); ghost.className = 'sn-ghost';
+            const im = tile.querySelector('img'); ghost.innerHTML = (im ? '<img src="' + im.src + '" alt="">' : '') + '<b>' + esc(clips[from].name) + '</b>'; document.body.appendChild(ghost);
+            drop = document.createElement('span'); drop.className = 'sn-drop'; if (navigator.vibrate) try { navigator.vibrate(15); } catch (er) {} };
+          const place = (x, y) => { ghost.style.left = (x - 60) + 'px'; ghost.style.top = (y - 50) + 'px';
+            const T = tiles(); let i = T.length; for (let k = 0; k < T.length; k++) { const r = T[k].getBoundingClientRect(); if (x < r.left + r.width / 2) { i = k; break; } }
+            to = i; const ref = T[i] || box.querySelector('.sn-add:not(.cov)'); if (ref && drop.nextSibling !== ref) box.insertBefore(drop, ref);
+            const br = box.getBoundingClientRect(); cancelAnimationFrame(scr); const edge = x < br.left + 50 ? -12 : x > br.right - 50 ? 12 : 0;
+            if (edge) { const go = () => { box.scrollLeft += edge; scr = requestAnimationFrame(go); }; scr = requestAnimationFrame(go); } };
+          if (touch) timer = setTimeout(() => { armed = true; start(); place(x0, y0); }, 320);
+          const move = ev => { const dx = ev.clientX - x0, dy = ev.clientY - y0;
+            if (!started) { if (touch && !armed && Math.hypot(dx, dy) > 10) { clearTimeout(timer); end(); return; } if (armed && Math.hypot(dx, dy) > 6) start(); else return; }
+            ev.preventDefault(); place(ev.clientX, ev.clientY); };
+          const end = async ev => { clearTimeout(timer); cancelAnimationFrame(scr); window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', end); window.removeEventListener('pointercancel', end);
+            if (!started) return; dragOn = false; dragJust = true; setTimeout(() => dragJust = false, 250); if (ghost) ghost.remove(); if (drop) drop.remove(); tile.classList.remove('drag');
+            if (!ev || ev.type === 'pointercancel') { renderClips(); return; }
+            let t = to > from ? to - 1 : to; if (t === from) { renderClips(); return; }
+            const [c] = clips.splice(from, 1); clips.splice(t, 0, c); sel = t; await saveOrder(); pos = starts()[sel]; ui();
+            say('↔ „' + c.name + '“ ist jetzt Clip ' + (t + 1) + (t === 0 ? ' (ganz vorne)' : t === clips.length - 1 ? ' (ganz hinten)' : '') + '.', 'ok'); };
+          window.addEventListener('pointermove', move, { passive: false }); window.addEventListener('pointerup', end); window.addEventListener('pointercancel', end);
+        };
+        tile.oncontextmenu = e => e.preventDefault();
+      });
     }
     // Zeigt an, wenn ein anderer Clip denselben Bereich noch einmal zeigt (nach dem Ziehen über einen Nachbarn)
     function ovlUi() {
@@ -600,7 +641,7 @@ void main(){
       K('edD').textContent = 'von ' + fmt1(c.in || 0) + ' bis ' + fmt1(c.out || c.dur || 0) + ' · Länge ' + fmt1(len(c));
       ztDraw();
       broUi();
-      K('mute').textContent = c.mute ? '🔊 Ton an' : '🔇 Ton aus'; K('left').disabled = sel === 0; K('right').disabled = sel === clips.length - 1;
+      K('mute').textContent = c.mute ? '🔊 Ton an' : '🔇 Ton aus'; K('left').disabled = sel === 0; K('first').disabled = sel === 0; K('right').disabled = sel === clips.length - 1;
       ovlUi();
     }
     function ui() { slots(); dropVids(); renderClips(); edUi(); timeUi(); schedCache = null; mlUi(); sugUi(); if (sel >= 0 && clips[sel]) { show(sel, 0, false); prep(sel + 1); } }
@@ -611,6 +652,7 @@ void main(){
     K('split').onclick = async () => { const c = clips[sel], v = cur(); if (!c || !v) return; const t = v.currentTime; if (t <= (c.in || 0) + .3 || t >= (c.out || c.dur) - .3) { say('Zum Teilen die Stelle etwas weiter in die Mitte schieben.'); return; }
       const n = Object.assign({}, c, { id: uid(), in: t, added: c.added + 1, thumb: null, url: c.url }); c.out = t; clips.splice(sel + 1, 0, n); await dbPut(dbRow(c)); await dbPut(dbRow(n)); await saveOrder(); c.thumb = null; ui(); thumb(c); thumb(n); say('✂ Geteilt bei ' + fmt1(t) + '. Der zweite Teil ist jetzt Clip ' + (sel + 2) + '.', 'ok'); };
     K('left').onclick = async () => { if (sel <= 0) return; [clips[sel - 1], clips[sel]] = [clips[sel], clips[sel - 1]]; sel--; await saveOrder(); ui(); };
+    K('first').onclick = async () => { if (sel <= 0) return; const [c] = clips.splice(sel, 1); clips.unshift(c); sel = 0; await saveOrder(); pos = 0; ui(); say('⇤ „' + c.name + '“ ist jetzt ganz vorne.', 'ok'); };
     K('right').onclick = async () => { if (sel >= clips.length - 1) return; [clips[sel + 1], clips[sel]] = [clips[sel], clips[sel + 1]]; sel++; await saveOrder(); ui(); };
     K('mute').onclick = () => { const c = clips[sel]; if (!c) return; c.mute = !c.mute; dbPut(dbRow(c)); ui(); };
     // ---- Bild darüber, Stimme läuft weiter (Vivien, 30.10.2026: „im Talking Head zeige ich etwas dazwischen,
