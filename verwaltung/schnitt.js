@@ -139,6 +139,23 @@
 .sn-zt-bar .t{font-size:16px;color:#4A3A41;font-variant-numeric:tabular-nums;margin-left:auto}
 .sn-zt-bar input[type=range]{flex:1;min-width:90px;max-width:220px;accent-color:#7D5E68}
 .sn-zt-bar .zb{font:inherit;font-size:18px;width:36px;height:36px;border-radius:50%;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer}
+.sn-sug{margin-top:8px}
+.sn-sug .hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.sn-sug .hd b{font-weight:500;font-size:17px;color:#4A3040;flex:1;min-width:140px}
+.sn-sug .hd button{font:inherit;font-size:14.5px;padding:6px 10px;border-radius:11px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3040;cursor:pointer}
+.sn-sug ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;counter-reset:sg}
+.sn-sug li{display:flex;align-items:center;gap:8px;background:#F6F1EA;border:1.5px solid #E6DCD2;border-radius:12px;padding:6px 8px}
+.sn-sug li.on{background:#EFE3E6;border-color:#C7B0B9}
+.sn-sug li span{flex:1;min-width:0;font-size:15.5px;color:#4A3040;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sn-sug li span small{color:#7D7076;margin-left:6px}
+.sn-sug li button{font:inherit;font-size:15px;min-width:34px;height:34px;flex:none;border-radius:17px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3040;cursor:pointer;padding:0 10px}
+.sn-sug .take{width:100%;margin-top:8px;font:inherit;font-size:17px;padding:12px;border-radius:14px;border:0;background:#4A3040;color:#fff;cursor:pointer}
+.sn-all{margin-top:10px;border-top:1.5px solid #EFE7DE;padding-top:8px}
+.sn-all>summary{cursor:pointer;font-size:16px;color:#4A3040;list-style:none}
+.sn-all>summary::-webkit-details-marker{display:none}
+.sn-all>summary::before{content:"▸ ";color:#9A8C93}
+.sn-all[open]>summary::before{content:"▾ "}
+.sn-all input[type=search]{width:100%;margin:8px 0;font:inherit;font-size:16px;padding:9px 11px;border-radius:12px;border:1.5px solid #DDD2C6;background:#fff;color:#2A2026}
 .sn-ml{display:flex;flex-direction:column;gap:6px}
 .sn-ml ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
 .sn-ml li{display:flex;align-items:center;gap:8px;background:#FBF8F4;border:1.5px solid #EFE7DE;border-radius:12px;padding:6px 8px}
@@ -316,7 +333,11 @@ void main(){
   </div></details>
   <details class="sn-box"><summary>🎵 Musik darunter</summary><div class="bd">
     <div class="sn-ml" data-k="mlist"></div>
-    <div class="sn-lib" data-k="lib"><p class="sn-note">Deine Musik wird geladen …</p></div>
+    <div class="sn-sug" data-k="sug"></div>
+    <details class="sn-all"><summary data-k="allsum">Alle Lieder durchsuchen</summary>
+      <input type="search" data-k="msearch" placeholder="Lied oder Künstlerin suchen …" aria-label="Lied suchen">
+      <div class="sn-lib" data-k="lib"><p class="sn-note">Deine Musik wird geladen …</p></div>
+    </details>
     <label class="sn-b" style="width:max-content;cursor:pointer">📁 Lieder vom Gerät<input type="file" accept="audio/*,.mp3,.m4a,.wav,.aac" multiple hidden data-k="mfile"></label>
     <div data-sl="vol"></div><div data-sl="voice"></div>
     <label class="sn-sw"><input type="checkbox" data-k="duck"> Musik leiser, wenn ich spreche</label>
@@ -508,7 +529,7 @@ void main(){
       K('mute').textContent = c.mute ? '🔊 Ton an' : '🔇 Ton aus'; K('left').disabled = sel === 0; K('right').disabled = sel === clips.length - 1;
       ovlUi();
     }
-    function ui() { slots(); dropVids(); renderClips(); edUi(); timeUi(); schedCache = null; mlUi(); if (sel >= 0 && clips[sel]) { show(sel, 0, false); prep(sel + 1); } }
+    function ui() { slots(); dropVids(); renderClips(); edUi(); timeUi(); schedCache = null; mlUi(); sugUi(); if (sel >= 0 && clips[sel]) { show(sel, 0, false); prep(sel + 1); } }
     async function change(c) { await dbPut(dbRow(c)); c.thumb = null; ui(); thumb(c); }
     K('setA').onclick = () => { const c = clips[sel], v = cur(); if (!c || !v) return; c.in = Math.min(v.currentTime, (c.out || c.dur) - .3); change(c); say('⟦ Anfang gesetzt bei ' + fmt1(c.in) + '.'); };
     K('setB').onclick = () => { const c = clips[sel], v = cur(); if (!c || !v) return; c.out = Math.max(v.currentTime, (c.in || 0) + .3); change(c); say('Ende gesetzt bei ' + fmt1(c.out) + ' ⟧.'); };
@@ -719,29 +740,78 @@ void main(){
         + '<button type="button" data-mx="' + i + '" aria-label="entfernen">✕</button></li>').join('') + '</ul>'
         + '<p class="sn-note">' + (mlist.length > 1 ? 'Die Lieder laufen in dieser Reihenfolge und blenden ineinander. ' : '')
         + (ges < D - .5 ? 'Zusammen ' + fmt(ges) + ' – dein Video ist ' + fmt(D) + ' lang, danach fange ich wieder vorne an.' : 'Reicht für dein ganzes Video (' + fmt(D) + ').') + '</p>';
-      box.querySelectorAll('[data-mx]').forEach(b => b.onclick = () => { const i = +b.dataset.mx; URL.revokeObjectURL(mlist[i].url); mlist.splice(i, 1); schedCache = null; musStop(); mlUi(); libUi(); });
+      box.querySelectorAll('[data-mx]').forEach(b => b.onclick = () => { const i = +b.dataset.mx; URL.revokeObjectURL(mlist[i].url); mlist.splice(i, 1); schedCache = null; musStop(); mlUi(); libUi(); sugUi(); });
       box.querySelectorAll('[data-mup]').forEach(b => b.onclick = () => { const i = +b.dataset.mup; mlist.splice(i - 1, 0, mlist.splice(i, 1)[0]); schedCache = null; musStop(); mlUi(); });
+    }
+    // ---- Vorschlag (Vivien, 30.10.2026: „ich horche mir die nicht an, ich klicke die ersten 4, 5, 6 an“) ----
+    // Welche Ordner passen zu diesem Entwurf? (gleiche Logik wie im Studio)
+    function wishTags() {
+      const t = String(drName(curDraft) || '').toLowerCase(), d = new Date();
+      const wi = (d.getMonth() === 10 && d.getDate() >= 15) || d.getMonth() === 11;
+      if (/reel|story|insta/.test(t)) return wi ? ['winter', 'reel', 'lebendig'] : ['reel', 'lebendig', 'morgen'];
+      if (/abend|nacht|schlaf|meditation|atem|breath|ruhe|loslassen|savasana|evening|sleep|night/.test(t)) return ['meditation', 'abend'];
+      if (/morgen|morning|willkommen|welcome|ankommen|start/.test(t)) return ['morgen', 'reel'];
+      if (/übung|uebung|flow|bewegung|move|workout|kraft/.test(t)) return ['flow', 'morgen'];
+      return ['flow', 'morgen', 'reel'];
+    }
+    let sugSeed = 0, sugList = [];
+    function suggest() {
+      const want = wishTags(), score = x => { const i = want.findIndex(t => (x.tags || []).includes(t)); return i < 0 ? 9 : i; };
+      const pool = lib.filter(x => score(x) < 9), base = pool.length >= 3 ? pool : lib;
+      const key = String(curDraft || '') + '|' + sugSeed; let h = 2166136261;
+      for (let i = 0; i < key.length; i++) { h ^= key.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+      const rnd = () => (h = (Math.imul(h, 1664525) + 1013904223) >>> 0) / 4294967296;
+      const ranked = base.map(x => ({ x, s: score(x), r: rnd() })).sort((a, b) => a.s - b.s || a.r - b.r).map(o => o.x);
+      const D = total(), out = []; let t = 0;
+      for (const x of ranked) { out.push(x); t += Math.max(20, (x.dur || 150) - XF); if (t >= D + 2 && out.length >= 3) break; }
+      return out.slice(0, 8);
+    }
+    function sugUi() {
+      const box = K('sug'); if (!o.musicUrl || !lib.length) { box.innerHTML = ''; return; }
+      sugList = suggest(); const D = total(), drin = id => mlist.some(m => m.id === id);
+      let t = 0, n = 0; for (const x of sugList) { n++; t += Math.max(20, (x.dur || 150) - XF); if (t >= D) break; }
+      box.innerHTML = '<div class="hd"><b>✦ Vorschlag für dieses Video</b><button type="button" data-k2="sugnew">🎲 andere</button></div><ol>'
+        + sugList.map(x => '<li class="' + (drin(x.id) ? 'on' : '') + '"><button type="button" data-spv="' + x.id + '" aria-label="Reinhören">' + (preId === x.id ? '❚❚' : '▶') + '</button><span>' + esc(x.t) + '<small>' + (x.dur ? fmt(x.dur) : '') + '</small></span><button type="button" data-sadd="' + x.id + '">' + (drin(x.id) ? '✓' : '＋') + '</button></li>').join('')
+        + '</ol><button type="button" class="take" data-k2="sugtake">✨ ' + (n === 1 ? 'Das erste Lied nehmen' : 'Die ersten ' + n + ' nehmen') + ' – reicht für dein Video (' + fmt(D) + ')</button>';
+      box.querySelector('[data-k2=sugnew]').onclick = () => { sugSeed++; sugUi(); };
+      box.querySelector('[data-k2=sugtake]').onclick = async () => { const b = box.querySelector('[data-k2=sugtake]'); b.disabled = true; b.textContent = 'Lädt …';
+        for (const x of sugList.slice(0, n)) { if (!mlist.some(m => m.id === x.id)) await takeSong(x); }
+        say('🎵 ' + (n === 1 ? 'Das Lied liegt' : n + ' Lieder liegen') + ' jetzt darunter' + (n > 1 ? ' – sie blenden ineinander' : '') + '.', 'ok'); };
+      box.querySelectorAll('[data-spv]').forEach(b => b.onclick = () => { const id = +b.dataset.spv; if (preId === id) { pre.pause(); preId = 0; } else { pre.src = o.musicUrl + id; pre.volume = .6; pre.play().catch(() => {}); preId = id; } sugUi(); libUi(); });
+      box.querySelectorAll('[data-sadd]').forEach(b => b.onclick = async () => { const x = sugList.find(y => y.id === +b.dataset.sadd); if (!x || mlist.some(m => m.id === x.id)) return; b.disabled = true; b.textContent = '…'; await takeSong(x); });
+    }
+    // Lied aus der Bibliothek holen und in die Playlist legen
+    async function takeSong(x) {
+      try { const r = await fetch(o.musicUrl + x.id, { credentials: 'same-origin' }); const bl = await r.blob();
+        const f = new File([bl], x.t + '.mp3', { type: bl.type || 'audio/mpeg' });
+        pre.pause(); preId = 0; await addMusic(f, x.t, x.id); return true;
+      } catch (e) { say('„' + x.t + '“ konnte nicht laden.', 'bad'); sugUi(); libUi(); return false; }
     }
     const fileDur = url => new Promise(ok => { const a = new Audio(); a.preload = 'metadata'; a.onloadedmetadata = () => ok(a.duration || 0); a.onerror = () => ok(0); a.src = url; });
     async function addMusic(file, name, id) {
       const url = URL.createObjectURL(file), d = await fileDur(url);
       mlist.push({ file, url, name: name || file.name.replace(/\.\w+$/, ''), id: id || 0, dur: d });
-      schedCache = null; mlUi(); libUi();
+      schedCache = null; mlUi(); libUi(); sugUi();
     }
     K('mfile').onchange = async e => { const fs = [...e.target.files]; e.target.value = ''; for (const f of fs) await addMusic(f); if (fs.length) say('🎵 ' + (fs.length > 1 ? fs.length + ' Lieder liegen' : '„' + fs[0].name.replace(/\.\w+$/, '') + '“ liegt') + ' jetzt darunter.', 'ok'); };
     K('duck').checked = mus.duck; K('fade').checked = mus.fade;
     K('duck').onchange = () => { mus.duck = K('duck').checked; ls.set('sn-mus', mus); }; K('fade').onchange = () => { mus.fade = K('fade').checked; ls.set('sn-mus', mus); };
     function libUi() {
-      const box = K('lib'); if (!o.musicUrl) { box.innerHTML = ''; return; }
-      if (!lib.length) { box.innerHTML = '<p class="sn-note">Noch keine Lieder im Musik-Ordner.</p>'; return; }
-      const f2 = s2 => s2 > 0 ? fmt(s2) : '';
-      const drin = id => mlist.some(m => m.id === id);
-      box.innerHTML = '<b style="font-weight:500;font-size:17px;color:#4A3A41">Aus deiner Musik</b><ul>' + lib.map(x => '<li class="' + (drin(x.id) ? 'on' : '') + '"><button type="button" data-pv="' + x.id + '" aria-label="Reinhören">' + (preId === x.id ? '❚❚' : '▶') + '</button><span>' + esc(x.t) + '<small>' + f2(x.dur) + '</small></span><button type="button" class="pk" data-take="' + x.id + '">' + (drin(x.id) ? '✓ drin · nochmal' : '＋ Nehmen') + '</button></li>').join('') + '</ul>';
-      box.querySelectorAll('[data-pv]').forEach(b => b.onclick = () => { const id = +b.dataset.pv; if (preId === id) { pre.pause(); preId = 0; } else { pre.src = o.musicUrl + id; pre.volume = .6; pre.play().catch(() => {}); preId = id; } libUi(); });
-      box.querySelectorAll('[data-take]').forEach(b => b.onclick = async () => { const x = lib.find(y => y.id === +b.dataset.take); b.disabled = true; b.textContent = 'Lädt …'; try { const r = await fetch(o.musicUrl + x.id, { credentials: 'same-origin' }); const bl = await r.blob(); const f = new File([bl], x.t + '.mp3', { type: bl.type || 'audio/mpeg' }); pre.pause(); preId = 0; await addMusic(f, x.t, x.id); say('🎵 „' + x.t + '“ liegt jetzt darunter.', 'ok'); } catch (e) { say('Das Lied konnte nicht laden.', 'bad'); libUi(); } });
+      const box = K('lib'); if (!o.musicUrl) { box.innerHTML = ''; K('allsum').textContent = ''; return; }
+      if (!lib.length) { box.innerHTML = '<p class="sn-note">Noch keine Lieder im Musik-Ordner.</p>'; K('allsum').textContent = 'Alle Lieder'; return; }
+      const f2 = s2 => s2 > 0 ? fmt(s2) : '', drin = id => mlist.some(m => m.id === id);
+      const qs = String(K('msearch').value || '').trim().toLowerCase();
+      const hit = qs ? lib.filter(x => x.t.toLowerCase().includes(qs)) : lib;
+      const show = hit.slice(0, 60);
+      K('allsum').textContent = 'Alle Lieder durchsuchen (' + lib.length + ')';
+      box.innerHTML = (hit.length ? '' : '<p class="sn-note">Nichts gefunden.</p>') + '<ul>' + show.map(x => '<li class="' + (drin(x.id) ? 'on' : '') + '"><button type="button" data-pv="' + x.id + '" aria-label="Reinhören">' + (preId === x.id ? '❚❚' : '▶') + '</button><span>' + esc(x.t) + '<small>' + f2(x.dur) + '</small></span><button type="button" class="pk" data-take="' + x.id + '">' + (drin(x.id) ? '✓ drin · nochmal' : '＋ Nehmen') + '</button></li>').join('') + '</ul>'
+        + (hit.length > show.length ? '<p class="sn-note">… und ' + (hit.length - show.length) + ' weitere. Tipp den Namen oben ein, um sie zu finden.</p>' : '');
+      box.querySelectorAll('[data-pv]').forEach(b => b.onclick = () => { const id = +b.dataset.pv; if (preId === id) { pre.pause(); preId = 0; } else { pre.src = o.musicUrl + id; pre.volume = .6; pre.play().catch(() => {}); preId = id; } libUi(); sugUi(); });
+      box.querySelectorAll('[data-take]').forEach(b => b.onclick = async () => { const x = lib.find(y => y.id === +b.dataset.take); b.disabled = true; b.textContent = 'Lädt …'; if (await takeSong(x)) say('🎵 „' + x.t + '“ liegt jetzt darunter.', 'ok'); });
     }
+    K('msearch').oninput = () => libUi();
     mlUi();
-    if (o.musicUrl) fetch(o.musicUrl.replace(/&dl=$/, '&json=1'), { credentials: 'same-origin' }).then(r => r.json()).then(j => { lib = j.list || []; libTags = j.tags || {}; libUi(); }).catch(() => { K('lib').innerHTML = ''; });
+    if (o.musicUrl) fetch(o.musicUrl.replace(/&dl=$/, '&json=1'), { credentials: 'same-origin' }).then(r => r.json()).then(j => { lib = j.list || []; libTags = j.tags || {}; libUi(); sugUi(); }).catch(() => { K('lib').innerHTML = ''; });
     else libUi();
 
     // ---- ✨ Automatisch schneiden (Vivien, 30.10.2026) ----
