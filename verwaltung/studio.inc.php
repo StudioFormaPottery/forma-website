@@ -743,10 +743,10 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     const z=await wideZoom();ls.set('st-wide','1');
     const fmt=tc&&tc.s&&tc.s.aspect==='9:16';
     h.innerHTML='<b>Damit die Kamera den ganzen Raum zeigt</b>'+(z?' <span style="color:#5E7A4A">✓ Kamera ist ganz herausgezoomt</span>':'')
-      +'<ol style="margin:8px 0 6px;padding-left:22px"><li>Lass die Kamera hier an.</li><li>Klick oben rechts in der Mac-Menüleiste auf das <b>Kontrollzentrum</b> (die zwei kleinen Schalter).</li><li>Tippe auf <b>Videoeffekte</b> (grünes Kamera-Symbol) und schalte <b>Folgemodus</b> aus.</li></ol>'
-      +'Der Mac merkt sich das für diesen Browser – du musst es nur einmal machen. Das kann leider keine Website für dich umschalten, das geht nur am Mac selbst.'
+      +'<ol style="margin:8px 0 6px;padding-left:22px"><li>Lass die Kamera hier an.</li><li>Oben in der Mac-Menüleiste erscheint dann ein <b>grünes Kamera-Symbol</b> (nur solange die Kamera läuft). Klick darauf – bei älteren macOS-Versionen steht es im <b>Kontrollzentrum</b> unter „Videoeffekte“.</li><li>Schalte dort <b>Folgemodus</b> aus.</li></ol>'
+      +'Steht dort kein Folgemodus oder lässt er sich nicht ausschalten, kann man ihn an diesem Mac leider nicht abstellen – eine Website kommt da nicht ran.'
       +(fmt?'<br><br>💡 Du nimmst gerade im Hochformat 9:16 auf. Dabei wird vom breiten Kamerabild nur die Mitte genommen, das wirkt auch gezoomt. Für den ganzen Körper ist 16:9 (Kamera-Look → Format) besser.':'')
-      +'<br><br>Tipp: Für Ganzkörper-Aufnahmen ist das <b>📱 iPhone als Kamera</b> oft noch besser (Rückkamera, weiter Winkel). Auch dort den Folgemodus im Kontrollzentrum ausschalten.'
+      +'<br><br><b>Sicherster Weg für den ganzen Körper:</b> iPhone mit der normalen Kamera-App auf <b>0,5×</b> (Weitwinkel) filmen und hier <b>📜 Nur Teleprompter</b> laufen lassen. Danach das Video über „Video vom Gerät bearbeiten“ hochladen – dort zoomt nichts mit.'
       +'<br><button type="button" style="margin-top:10px;padding:8px 16px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;font:inherit;cursor:pointer" onclick="this.parentNode.hidden=true">Alles klar</button>';
     h.hidden=false}
   $('wide').onclick=wideShow;
