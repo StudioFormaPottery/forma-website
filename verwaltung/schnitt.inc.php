@@ -22,11 +22,11 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 <div class="sh"><div><h1>✂️ Video-Schnitt</h1><p>Mehrere Aufnahmen vom iPhone oder aus dem Studio zu einem Video schneiden: Anfang und Ende setzen, teilen, umsortieren, Licht und Musik dazu, fertig.</p></div></div>
 <div class="how">
   <div><b>1 · Clips holen</b>Vom iPhone oder Computer, oder mehrere Takes im Studio aufnehmen. Sie bleiben auf diesem Gerät.</div>
-  <div><b>2 · Schneiden</b>Clip antippen, an die Stelle gehen, „Anfang hier“ oder „Ende hier“. Versprecher? Clip löschen, nächsten nehmen.</div>
+  <div><b>2 · ✨ Automatisch schneiden</b>Ein Tipp: Pausen raus, Versprecher erkannt, sanfter Zoom. Danach kannst du jeden Abschnitt noch antippen und anpassen.</div>
   <div><b>3 · Fertig stellen</b>Ein Video aus allen Clips, mit Licht und Musik. Dann herunterladen, in die Fotos sichern oder im Studio hochladen.</div>
 </div>
 <div id="sn"></div>
-<script src="schnitt.js?v=1"></script>
+<script src="schnitt.js?v=2"></script>
 <script>
 Schnitt.open({mount:document.getElementById('sn'),musicUrl:'?view=musik&dl=',vendor:'vendor/',studioUrl:'?view=studio&take=1',
   toStudio:function(){location.href='?view=studio&cut=1'}});
