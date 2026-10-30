@@ -682,3 +682,4 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Link in Bio /bio: Karte „Gewinne Zeit für dich“ bis 20.12. Datenschutz /terms: Absatz Gewinnspiel.
 - Unfold Early Bird jetzt bis inkl. 20.12.2026 (`eb_u_until`, Migration `price_v5`), danach € 550.
 - Instagram @moveciamovement: Plan v3 (`insta-studio-plan.json`, 2.11.–21.12., provokante Hooks, Gewinnspiel jede Woche ab 6.11.), `replace_from`/`replace_to` ersetzen beim Einspielen offene Einträge im Zeitraum. Reels: Sprechtext + „Caption:“ darunter; das Studio nimmt nur den Sprechtext in den Teleprompter, „📋 Caption“ kopiert nur die Caption.
+- Als Kundin testen kann jetzt auch Mix & Match (Vivien, 30.10.2026): Feld „davon online“ bei Studio-Paketen → Paket `x_<grundpaket>`, `mix_online`, der Test-Online-Termin bekommt `mode = online`.

@@ -438,6 +438,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <div class="row"><div class="stack"><label for="tkn">Name</label><input id="tkn" name="name" value="Test Kundin" maxlength="80"></div>
                 <div class="stack"><label for="tke">E-Mail für den Test</label><input id="tke" name="email" type="email" required placeholder="deine zweite Adresse"></div></div>
             <div class="stack"><label for="tkp">Paket</label><select id="tkp" name="package"><?php foreach (natal_packages() as $pk => $pp): if ((int)$pp['units'] < 2) continue; ?><option value="<?= forma_h($pk) ?>"<?= $pk === 'o_kombi' ? ' selected' : '' ?>><?= forma_h($pp['title']) ?></option><?php endforeach; ?></select></div>
+            <div class="stack"><label for="tkm">Mix &amp; Match: davon online (0 = kein Mix, nur bei Studio-Paketen)</label><input id="tkm" name="mix_online" type="number" min="0" max="13" value="0" style="max-width:140px"></div>
             <label class="check"><input type="checkbox" name="full" value="1" checked> Mitgliederbereich sofort komplett zeigen (die 14 Tage Widerrufsfrist überspringen)</label>
             <label class="check"><input type="checkbox" name="done" value="1" checked> Eine Einheit gestern als erledigt eintragen (damit das erste Workbook freigeschaltet ist)</label>
             <label class="check"><input type="checkbox" name="room" value="1" checked> Online-Termin in 20 Minuten (Videoraum öffnet sofort, du kannst dich als Kundin und hier als Gastgeberin einwählen)</label>

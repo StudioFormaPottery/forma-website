@@ -398,14 +398,20 @@ function natal_test_order(PDO $pdo, array $in): array
     $paid = $full ? date('c', time() - 15 * 86400) : date('c');
     $due = date('Y-m-d', strtotime(str_starts_with(preg_replace('/^o_/', '', $key), 'post') ? '-6 weeks' : '+8 weeks'));
     $tok = bin2hex(random_bytes(16));
+    // Mix & Match testen (Vivien, 30.10.2026): Studio-Paket mit „davon online“ → Paket x_<grundpaket> wie bei einer echten Mix-Buchung
+    $mixOn = str_starts_with($key, 'o_') ? 0 : max(0, min((int)$p['units'] - 1, (int)($in['mix_online'] ?? 0)));
+    $pk = $mixOn ? 'x_' . $key : $key;
     $pdo->prepare("INSERT INTO mm_natal_orders (package, title, units, unit_cents, amount_cents, name, email, phone, due_date, note, wishes, status, token, consent_start, created_at, paid_at, is_test) VALUES (?,?,?,0,0,?,?,'',?,'Testbuchung aus der Verwaltung','[]','bezahlt',?,1,?,?,1)")
-        ->execute([$key, $p['title'] . ' · TEST', $p['units'], $name, $email, $due, $tok, $paid, $paid]);
-    $o = natal_order($pdo, (int)$pdo->lastInsertId());
+        ->execute([$pk, $p['title'] . ($mixOn ? ' · Mix & Match (' . ((int)$p['units'] - $mixOn) . ' Studio, ' . $mixOn . ' online)' : '') . ' · TEST', $p['units'], $name, $email, $due, $tok, $paid, $paid]);
+    $oid = (int)$pdo->lastInsertId();
+    if ($mixOn) { try { $pdo->prepare('UPDATE mm_natal_orders SET mix_online = ? WHERE id = ?')->execute([$mixOn, $oid]); } catch (Throwable $e) {} }
+    $o = natal_order($pdo, $oid);
     $ins = $pdo->prepare('INSERT INTO mm_natal_sessions (order_id, date, start, status, created_at, confirmed_at) VALUES (?,?,?,?,?,?)');
     if (!empty($in['done'])) $ins->execute([$o['id'], date('Y-m-d', strtotime('-1 day')), '10:00', 'erledigt', date('c'), date('c')]);
     if (!empty($in['room'])) {
         $t = time() + 20 * 60;
         $ins->execute([$o['id'], date('Y-m-d', $t), date('H:i', $t), 'bestaetigt', date('c'), date('c')]);
+        if ($mixOn) { try { $pdo->prepare("UPDATE mm_natal_sessions SET mode = 'online' WHERE id = ?")->execute([(int)$pdo->lastInsertId()]); } catch (Throwable $e) {} }
     }
     natal_paid_mails($pdo, $o, []);
     return ['ok' => true, 'order' => $o];
