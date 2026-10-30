@@ -830,16 +830,16 @@ function natal_offer_mix_mail(array $a, array $mx): array
     $link = natal_offer_link($a);
     $rows = ''; $text = '';
     foreach ([['studio', 'Im Studio in Mathon', $mx['unit_studio']], ['online', 'Online, live per Video', $mx['unit_online']]] as [$k, $lb, $u]) {
-        $rows .= '<tr><td style="padding:8px 0;border-top:1px solid #DDD2C6;">' . forma_h($lb) . '</td><td align="right" style="padding:8px 0;border-top:1px solid #DDD2C6;white-space:nowrap;"><b>' . forma_h(forma_euro($u)) . '</b> <span style="font-size:13px;color:#7D7076;">pro Einheit</span></td></tr>';
+        $rows .= '<tr><td style="padding:8px 0;border-top:1px solid #D3C9BC;">' . forma_h($lb) . '</td><td align="right" style="padding:8px 0;border-top:1px solid #D3C9BC;white-space:nowrap;"><b>' . forma_h(forma_euro($u)) . '</b> <span style="font-size:13px;color:#6E6168;">pro Einheit</span></td></tr>';
         $text .= "\n· " . $lb . ': ' . forma_euro($u) . ' pro Einheit';
     }
     $ex = $mx['studio'] . ' im Studio + ' . $mx['online'] . ' online = ' . forma_euro($mx['cents']);
-    $rows .= '<tr><td colspan="2" style="padding:10px 0 0;border-top:2px solid #7D5E68;font-size:14px;color:#7D7076;">Zum Beispiel: ' . forma_h($ex) . '</td></tr>';
+    $rows .= '<tr><td colspan="2" style="padding:10px 0 0;border-top:2px solid #4A3040;font-size:14px;color:#6E6168;">Zum Beispiel: ' . forma_h($ex) . '</td></tr>';
     $text .= "\nZum Beispiel: " . $ex;
     $html = '<p style="margin:0 0 14px;">' . forma_h($hello) . '</p><p style="margin:0 0 14px;">' . forma_h($intro) . '</p>'
         . ($note !== '' ? '<p style="margin:0 0 14px;">' . nl2br(forma_h($note)) . '</p>' : '')
-        . '<div style="margin:18px 0 6px;padding:18px 20px;background:#F2ECE4;border-radius:18px;"><p style="margin:0 0 8px;font-family:Georgia,\'Times New Roman\',serif;font-size:21px;color:#2E2529;">Dein ' . forma_h($mx['name']) . '-Paket · Mix &amp; Match</p>'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.4;color:#2E2529;">' . $rows . '</table><p style="margin:10px 0 0;font-size:13px;color:#7D7076;">inkl. 20 % USt.</p></div>'
+        . '<div style="margin:18px 0 6px;padding:18px 20px;background:#F5F1EB;border-radius:18px;"><p style="margin:0 0 8px;font-family:Georgia,\'Times New Roman\',serif;font-size:21px;color:#2A2026;">Dein ' . forma_h($mx['name']) . '-Paket · Mix &amp; Match</p>'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.4;color:#2A2026;">' . $rows . '</table><p style="margin:10px 0 0;font-size:13px;color:#6E6168;">inkl. 20 % USt.</p></div>'
         . '<p style="margin:18px 0 14px;">' . forma_h($how) . '</p>' . natal_btn($link, 'Aufteilung wählen & buchen')
         . '<p style="margin:18px 0 14px;">Bei Fragen schreib mir einfach.</p>';
     $text = $hello . "\n\n" . $intro . ($note !== '' ? "\n\n" . $note : '') . "\n\nDein " . $mx['name'] . '-Paket · ' . $mx['units'] . ' Einheiten · Mix & Match (inkl. 20 % USt.):' . $text
