@@ -128,7 +128,7 @@ function mv_head(string $title, string $lang): void
 <link rel="manifest" href="/wildhearts/mitglieder/manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Movecia">
-<link rel="stylesheet" href="/wildhearts/assets/mv.css?v=1">
+<link rel="stylesheet" href="/wildhearts/assets/mv.css?v=3">
 <link rel="stylesheet" href="/wildhearts/mitglieder/app.css?v=2">
 <script src="/wildhearts/assets/schutz.js?v=3"></script>
 </head>

@@ -42,7 +42,7 @@ CSS = """
 @font-face{font-family:"Hanken";font-weight:300 700;src:url(FONTS/HankenGrotesk-VF.woff) format("woff")}
 @font-face{font-family:"Hand";src:url(FONTS/HomemadeApple-Regular.woff) format("woff")}
 @page{size:A4}
-:root{--bg:#F5F1EB;--plum:#5A3C4C;--deep:#3A2631;--ink:#2A2026;--muted:#6E6168;--blush:#E4DCD1;--peach:#E6DBCF;--rose:#D9B8B4;--line:#E3D8CD;--soft:#FBF4F2}
+:root{--bg:#F5F1EB;--plum:#4A3040;--deep:#2E1D27;--ink:#2A2026;--muted:#6E6168;--blush:#E4DCD1;--peach:#E6DBCF;--rose:#D9B8B4;--line:#E3D8CD;--soft:#FBF4F2}
 *{box-sizing:border-box}
 html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{margin:0;font-family:"Hanken",sans-serif;font-size:10.4pt;line-height:1.62;color:var(--ink)}

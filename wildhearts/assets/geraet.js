@@ -21,8 +21,8 @@
     var s = document.createElement('style');
     s.textContent = '.mvdev{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;padding:24px;background:rgba(46,37,41,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}' +
       '.mvdev>div{max-width:30rem;background:#F5F1EB;color:#2A2026;border-radius:28px;padding:2.2rem 1.8rem;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25);font:400 1.06rem/1.6 "Hanken Grotesk",system-ui,sans-serif}' +
-      '.mvdev img{width:58px;height:58px}.mvdev h2{font:italic 400 1.9rem/1.15 "Cormorant Garamond",Georgia,serif;color:#5A3C4C;margin:.7rem 0 .7rem}' +
-      '.mvdev p{margin:0;color:#3A2631}.mvdev button{margin-top:1.5rem;font:500 1.02rem "Hanken Grotesk",system-ui,sans-serif;border:0;border-radius:999px;background:#5A3C4C;color:#F7F1EE;padding:.85em 1.7em;cursor:pointer}';
+      '.mvdev img{width:58px;height:58px}.mvdev h2{font:italic 400 1.9rem/1.15 "Cormorant Garamond",Georgia,serif;color:#4A3040;margin:.7rem 0 .7rem}' +
+      '.mvdev p{margin:0;color:#2E1D27}.mvdev button{margin-top:1.5rem;font:500 1.02rem "Hanken Grotesk",system-ui,sans-serif;border:0;border-radius:999px;background:#4A3040;color:#F7F1EE;padding:.85em 1.7em;cursor:pointer}';
     document.head.appendChild(s);
   }
   function hold(on) {

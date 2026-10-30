@@ -24,7 +24,7 @@ $src = $room !== '' ? $room . (str_contains($room, '?') ? '&' : '?') . http_buil
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Unfold · Live-Call</title>
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
-<link rel="stylesheet" href="/wildhearts/assets/mv.css?v=1">
+<link rel="stylesheet" href="/wildhearts/assets/mv.css?v=3">
 <style>
 html,body{height:100%}body{display:flex;flex-direction:column}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:10px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}

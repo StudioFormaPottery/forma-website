@@ -3,7 +3,7 @@
 // Als Inline-SVG im Mitgliederbereich, als PNG (img/movecia/icons/, per Playwright erzeugt) in Mails und Workbooks.
 declare(strict_types=1);
 
-const NATAL_ICON_COLORS = ['plum' => '#5A3C4C', 'peach' => '#E6DBCF', 'blush' => '#E4DCD1', 'rose' => '#C9A3A3', 'sand' => '#D8BFA8', 'deep' => '#3A2631'];
+const NATAL_ICON_COLORS = ['plum' => '#4A3040', 'peach' => '#E6DBCF', 'blush' => '#E4DCD1', 'rose' => '#C9A3A3', 'sand' => '#D8BFA8', 'deep' => '#2E1D27'];
 
 /** SVG-Körper (viewBox 0 0 64 64). Farben: P = Pflaume (Linie), F = Füllung. */
 function natal_icon_body(string $n): string

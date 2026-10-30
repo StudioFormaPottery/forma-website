@@ -60,7 +60,7 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
     <div class="flow" aria-hidden="true">
       <span class="f-lab f-top"><span class="de">ankommen</span><span class="en">arrive</span></span>
       <span class="f-line"></span>
-      <span class="f-dot"><svg viewBox="17 14 94 94" aria-hidden="true"><path d="M56 32 C 76 29, 92 44, 91 64 C 90 84, 72 96, 53 92 C 34 88, 25 72, 29 53 C 32 40, 43 33, 56 32 Z" fill="#E6DBCF" transform="translate(-6 -4)"/><path d="M44 30 C 62 20, 90 28, 98 50 C 104 68, 92 78, 84 88 C 76 100, 50 98, 36 88 C 22 78, 22 58, 28 46 C 32 38, 38 33, 44 30 Z" fill="none" stroke="#5A3C4C" stroke-width="4.2" stroke-linejoin="round" transform="translate(7 4) translate(63 60) scale(0.85) translate(-63 -60)"/><circle cx="81" cy="54" r="10" fill="#5A3C4C"/></svg></span>
+      <span class="f-dot"><svg viewBox="17 14 94 94" aria-hidden="true"><path d="M56 32 C 76 29, 92 44, 91 64 C 90 84, 72 96, 53 92 C 34 88, 25 72, 29 53 C 32 40, 43 33, 56 32 Z" fill="#E6DBCF" transform="translate(-6 -4)"/><path d="M44 30 C 62 20, 90 28, 98 50 C 104 68, 92 78, 84 88 C 76 100, 50 98, 36 88 C 22 78, 22 58, 28 46 C 32 38, 38 33, 44 30 Z" fill="none" stroke="#4A3040" stroke-width="4.2" stroke-linejoin="round" transform="translate(7 4) translate(63 60) scale(0.85) translate(-63 -60)"/><circle cx="81" cy="54" r="10" fill="#4A3040"/></svg></span>
       <span class="f-lab f-mid"><span class="de">spüren</span><span class="en">feel</span></span>
       <span class="f-lab f-bot"><span class="de">entfalten</span><span class="en">unfold</span></span>
     </div>
@@ -198,16 +198,16 @@ $ptChips = function (string $name, array $map, string $type = 'checkbox') { fore
 .ptd::backdrop{background:rgba(46,37,41,.5);backdrop-filter:blur(4px)}
 .ptd form,.ptok{padding:clamp(1.4rem,4vw,2.4rem);display:flex;flex-direction:column;gap:.7rem;position:relative}
 .ptd h2{font-size:clamp(1.7rem,4vw,2.3rem);margin:.2rem 0 .4rem;line-height:1.1}
-.ptq{margin:.7rem 0 0;font-weight:500;color:var(--deep,#3A2631)}
+.ptq{margin:.7rem 0 0;font-weight:500;color:var(--deep,#2E1D27)}
 .ptg{display:flex;flex-wrap:wrap;gap:.5rem}
 .ptc{cursor:pointer}.ptc input{position:absolute;opacity:0;pointer-events:none}
 .ptc>span{display:inline-block;padding:.55em 1em;border:1px solid var(--line,#D3C9BC);border-radius:999px;background:#FBF9F6;font-size:.98rem;transition:background .2s,color .2s,border-color .2s}
-.ptc input:checked+span{background:var(--plum,#5A3C4C);border-color:var(--plum,#5A3C4C);color:#F7F1EE}
+.ptc input:checked+span{background:var(--plum,#4A3040);border-color:var(--plum,#4A3040);color:#F7F1EE}
 .ptc input:focus-visible+span{outline:2px solid var(--peach,#E6DBCF);outline-offset:2px}
 .ptrow{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}@media(max-width:560px){.ptrow{grid-template-columns:1fr}}
 .ptx{position:absolute;right:16px;top:14px;border:0;background:none;font-size:1.3rem;color:var(--muted,#6E6168);cursor:pointer;padding:.3em}
 .ptn{color:var(--muted,#6E6168);margin:.2rem 0}.ptn a{color:inherit}
-.ptmsg{color:var(--plum,#5A3C4C);margin:0}
+.ptmsg{color:var(--plum,#4A3040);margin:0}
 .ptok{align-items:center;text-align:center}
 </style>
 <script>

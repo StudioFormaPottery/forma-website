@@ -191,11 +191,11 @@ html[data-l=en] .hb.star .t::after{content:"Close to my heart"}
 
 /* ===== Runde 2 (Vivien, 28.10.2026: „mehr cute, das gewisse Oh-my-God“) ===== */
 /* Academy-Siegel */
-.ac-seal .s-bg{fill:#F7F1EE}.ac-seal .s-ring{fill:none;stroke:#5A3C4C;stroke-width:1.1;stroke-dasharray:1.5 3.5;opacity:.7}
+.ac-seal .s-bg{fill:#F7F1EE}.ac-seal .s-ring{fill:none;stroke:#4A3040;stroke-width:1.1;stroke-dasharray:1.5 3.5;opacity:.7}
 .ac-seal .s-leaf ellipse{fill:#C8B5BF;opacity:.85}
-.ac-seal .s-txt{font:500 10.5px var(--sans);letter-spacing:.32em;fill:#5A3C4C}
-.ac-seal .s-soft{fill:#E6DBCF}.ac-seal .s-line{fill:none;stroke:#5A3C4C;stroke-width:4;stroke-linejoin:round}.ac-seal .s-dot{fill:#5A3C4C}
-.ac-seal .s-yr{font:italic 500 14px var(--serif);fill:#5A3C4C;letter-spacing:.06em}
+.ac-seal .s-txt{font:500 10.5px var(--sans);letter-spacing:.32em;fill:#4A3040}
+.ac-seal .s-soft{fill:#E6DBCF}.ac-seal .s-line{fill:none;stroke:#4A3040;stroke-width:4;stroke-linejoin:round}.ac-seal .s-dot{fill:#4A3040}
+.ac-seal .s-yr{font:italic 500 14px var(--serif);fill:#4A3040;letter-spacing:.06em}
 .ac-kick{display:flex;align-items:center;gap:.8rem;margin-bottom:1.1rem!important}
 .ac-kick .ac-seal.mini{width:64px;height:64px;flex:0 0 64px;filter:drop-shadow(0 6px 14px rgba(125,94,104,.22))}
 .ac-kick a{font-family:var(--serif);font-size:1.5rem;color:var(--ink);text-decoration:none;display:block;line-height:1.1}
@@ -294,7 +294,7 @@ html[data-l=en] .hb.star .t::after{content:"Close to my heart"}
 .acm-lang a,.acm-lang button{font:inherit;font-size:.85rem;border:0;background:transparent;color:var(--plum);padding:.35em .7em;border-radius:999px;text-decoration:none;cursor:pointer}
 .acm-lang [aria-pressed=true]{background:var(--plum);color:var(--on)}
 .acm-lang .acm-out{box-shadow:inset 0 0 0 1px var(--plum);margin-left:.3rem}
-.acm-demo{background:#3A2631;color:#F7F1EE;text-align:center;font-size:.9rem;padding:.55rem 16px;margin:0}
+.acm-demo{background:#2E1D27;color:#F7F1EE;text-align:center;font-size:.9rem;padding:.55rem 16px;margin:0}
 .acm-hero{padding-top:clamp(1.6rem,5vw,4rem);padding-bottom:clamp(5rem,12vw,9rem)}
 .acm-hero .spk{position:absolute;fill:#C9A3AE;z-index:1;animation:twinkle 3.6s ease-in-out infinite}
 .acm-hero .spk.s1{width:22px;right:8%;top:6%}.acm-hero .spk.s2{width:14px;right:22%;top:28%;animation-delay:1.2s}.acm-hero .spk.s3{width:18px;left:52%;top:2%;animation-delay:2.1s}
@@ -302,7 +302,7 @@ html[data-l=en] .hb.star .t::after{content:"Close to my heart"}
 .acm-seal{width:clamp(84px,12vw,140px);height:auto;flex:0 0 auto;filter:drop-shadow(0 10px 20px rgba(125,94,104,.22));animation:sealfloat 7s ease-in-out infinite}
 .acm-hello h1{font-size:clamp(2.6rem,7vw,5.6rem);margin-top:.4rem}
 .acm-lead{font-size:1.1em;color:var(--muted);margin-top:.5rem;max-width:34em}
-.acm-count{margin-top:clamp(1.6rem,4vw,2.6rem);background:linear-gradient(135deg,#4A3040,#5A3C4C 60%,#8F6E79);color:var(--on);border-radius:32px;padding:clamp(1.1rem,3vw,1.8rem);max-width:980px;position:relative;overflow:hidden}
+.acm-count{margin-top:clamp(1.6rem,4vw,2.6rem);background:linear-gradient(135deg,#3A2631,#4A3040 60%,#8F6E79);color:var(--on);border-radius:32px;padding:clamp(1.1rem,3vw,1.8rem);max-width:980px;position:relative;overflow:hidden}
 .acm-count::after{content:"";position:absolute;width:260px;height:260px;right:-90px;top:-120px;border-radius:58% 42% 47% 53%/52% 46% 54% 48%;background:rgba(232,214,202,.18)}
 .acm-cl{font-size:1rem;color:#E4DCD1;position:relative}.acm-cl b{color:#fff;font-weight:500}
 .acm-cd{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(.4rem,1.6vw,1rem);margin-top:.9rem;position:relative}
@@ -417,7 +417,7 @@ body.acad::after{content:"";position:fixed;inset:0;z-index:-2;pointer-events:non
   background:
    linear-gradient(180deg,#F2E3DE 0%,#EFDCD4 45%,#F3E4DB 100%)}
 body.acad .site-top{background:rgba(242,227,222,.93)}
-.acband{background:linear-gradient(110deg,#5E4A51,#4A3040 45%,#5A3C4C);color:#F7F1EE;position:relative;overflow:hidden}
+.acband{background:linear-gradient(110deg,#4A3040,#3A2631 45%,#4A3040);color:#F7F1EE;position:relative;overflow:hidden}
 .acband::after{content:"";position:absolute;right:-60px;top:-90px;width:260px;height:240px;border-radius:58% 42% 47% 53%/52% 46% 54% 48%;background:rgba(232,214,202,.14)}
 .acband-in{max-width:1600px;margin:0 auto;padding:.7rem max(16px,clamp(24px,4vw,64px));display:flex;align-items:center;justify-content:space-between;gap:1rem;position:relative;z-index:1}
 .acband-l{display:flex;align-items:center;gap:.8rem;color:inherit;text-decoration:none;min-width:0}
@@ -518,7 +518,7 @@ body.acad .site-top{background:rgba(242,236,228,.94)}
 .acad .anat.soft2,.acad .thanks{background:linear-gradient(160deg,#F2EBE1,#E9E2D8)}
 .acad .acm-ph{background:radial-gradient(circle at 30% 30%,#F4EEE6,#ECE4D9 55%,#E2D8CB)}
 .acad .okmsg{background:#ECE4D9}
-.acband{background:#5E4A51}
+.acband{background:#4A3040}
 .acband::after{display:none}
 .acband-in{justify-content:center;text-align:center;padding-top:.85rem;padding-bottom:.85rem}
 .acband-l{flex-direction:column;gap:.35rem}
@@ -538,9 +538,9 @@ body.acad{--blush:#E9E2D8}
 /* Kopf der Academy-Seite (Vivien, 29.10.2026: Siegel weg, „Movecia Academy“ mit mehr Wirkung, Countdown) */
 .ac-head2{display:flex;flex-direction:column;gap:1.1rem;margin-bottom:1.4rem}
 .ac-brand{margin:0;font-family:var(--serif);font-weight:500;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1;color:var(--ink,#2A2026);display:flex;flex-wrap:wrap;align-items:baseline;gap:.15em .45em}
-.ac-brand em{color:var(--plum,#5A3C4C)}
-.ac-brand span{font-family:var(--sans);font-size:.34em;letter-spacing:.3em;text-transform:uppercase;color:var(--plum,#5A3C4C);border-left:1px solid var(--line,#D3C9BC);padding-left:.9em;align-self:center}
-.acc{position:relative;overflow:hidden;display:flex;align-items:center;gap:1.6rem 2.2rem;flex-wrap:wrap;max-width:760px;padding:1.3rem 1.6rem 1.3rem 1.8rem;border-radius:26px;background:linear-gradient(115deg,#5E4A51 0%,#4A3040 45%,#5A3C4C 100%);color:#F7F1EE;box-shadow:0 22px 50px rgba(74,58,65,.22)}
+.ac-brand em{color:var(--plum,#4A3040)}
+.ac-brand span{font-family:var(--sans);font-size:.34em;letter-spacing:.3em;text-transform:uppercase;color:var(--plum,#4A3040);border-left:1px solid var(--line,#D3C9BC);padding-left:.9em;align-self:center}
+.acc{position:relative;overflow:hidden;display:flex;align-items:center;gap:1.6rem 2.2rem;flex-wrap:wrap;max-width:760px;padding:1.3rem 1.6rem 1.3rem 1.8rem;border-radius:26px;background:linear-gradient(115deg,#4A3040 0%,#3A2631 45%,#4A3040 100%);color:#F7F1EE;box-shadow:0 22px 50px rgba(74,58,65,.22)}
 .acc::after{content:"";position:absolute;right:-50px;bottom:-80px;width:220px;height:200px;border-radius:58% 42% 47% 53%/52% 46% 54% 48%;background:rgba(232,214,202,.12);pointer-events:none}
 .acc-arc{position:absolute;left:-18px;bottom:-40px;width:150px;color:rgba(251,245,247,.18);pointer-events:none}
 .acc-lab{position:relative;display:flex;flex-direction:column;line-height:1.05}
@@ -555,7 +555,7 @@ body.acad{--blush:#E9E2D8}
 .acc-p{display:flex;align-items:baseline;gap:.5rem}
 .acc-p b{font-family:var(--serif);font-weight:500;font-size:1.35rem}
 .acc-p s{font-size:.85rem;color:#E6DBCF;opacity:.85}
-.acc-btn{display:inline-block;background:#F7F1EE;color:#3A2631;text-decoration:none;border-radius:999px;padding:.55em 1.2em;font-size:.88rem;transition:transform .2s}
+.acc-btn{display:inline-block;background:#F7F1EE;color:#2E1D27;text-decoration:none;border-radius:999px;padding:.55em 1.2em;font-size:.88rem;transition:transform .2s}
 .acc-btn:hover{transform:translateY(-1px)}
 @media(max-width:600px){.acc{flex-direction:column;align-items:center;text-align:center;gap:1rem;padding:1.4rem 1rem 1.3rem}.acc-lab{align-items:center}.acc-u b{font-size:2.1rem}.acc-u{min-width:2.6rem}.acc-sep{font-size:1.5rem}.acc-side{margin-left:0;align-items:center}}
 
@@ -579,3 +579,24 @@ body.acad{--blush:#E9E2D8}
   .ac-head2{display:flex;justify-content:center}
   .ac-hero .cta .btn{width:100%;max-width:340px;justify-content:center}
 }
+
+/* Countdown als volles Band (Vivien, 30.10.2026: „nur zur Hälfte“, gerade Seiten, weiß hinter den Wellen): über die ganze
+   Breite, oben und unten sanft gewellt, kein Schatten/Filter, die Seite scheint direkt durch die Wellen */
+.acc-wrap{position:relative;z-index:2;margin:0}
+.acc-wrap .acc{max-width:none;width:100%;border-radius:0;filter:none;box-shadow:none;margin:0;
+  padding:2.6rem max(16px,calc((100% - 1180px)/2)) 2.6rem;justify-content:center;gap:1.6rem 3.2rem;
+  background:linear-gradient(100deg,#2E1D27 0%,#3A2631 50%,#2E1D27 100%)}
+.acc-wrap .acc::after{right:max(-50px,calc((100% - 1380px)/2))}
+.acc-wrap .acc-side{margin-left:0}
+@media(max-width:600px){.acc-wrap .acc{padding:2.4rem 16px 2.3rem}}
+.acc-wrap+main .ac-hero{padding-top:clamp(1.6rem,4vw,3rem)}
+/* direkt unter dem dunklen Academy-Band: oben nahtlos anschließen, nur unten eine sanfte Welle */
+.acc-wrap .acc{
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 0H1200V18C1050 38 900 38 750 22S450 2 300 18 100 34 0 22Z'/%3E%3C/svg%3E") bottom/100% 40px no-repeat,linear-gradient(#000,#000) top/100% calc(100% - 39px) no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 0H1200V18C1050 38 900 38 750 22S450 2 300 18 100 34 0 22Z'/%3E%3C/svg%3E") bottom/100% 40px no-repeat,linear-gradient(#000,#000) top/100% calc(100% - 39px) no-repeat;
+  padding-bottom:3.4rem}
+.acband{margin-bottom:0!important}
+/* Band und Countdown eine Fläche im dunklen Lila */
+.acband{background:#4A3040!important}
+.acc-wrap .acc{background:#4A3040}
+.acc-wrap .acc::after{background:rgba(247,241,238,.06)}

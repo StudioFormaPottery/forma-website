@@ -560,50 +560,50 @@ void main(){
 .tc-hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);padding:8px 16px;border-radius:999px;background:rgba(46,37,41,.72);color:#F7F1EE;font:500 17px/1.3 "Hanken Grotesk","Outfit",system-ui,sans-serif;white-space:nowrap;transition:background .3s}
 .tc-hint.ok{background:rgba(63,107,62,.85)}
 .tc-hint:empty{display:none}
-.tc-st{position:absolute;left:12px;bottom:64px;right:12px;z-index:4;padding:8px 14px;border-radius:14px;background:rgba(251,248,244,.92);color:#3A2631;font:15px/1.4 "Hanken Grotesk","Outfit",system-ui,sans-serif}
+.tc-st{position:absolute;left:12px;bottom:64px;right:12px;z-index:4;padding:8px 14px;border-radius:14px;background:rgba(251,248,244,.92);color:#2E1D27;font:15px/1.4 "Hanken Grotesk","Outfit",system-ui,sans-serif}
 .tc-st:empty{display:none}
 .tc-p{display:flex;flex-direction:column;gap:16px;font-family:"Hanken Grotesk","Outfit",system-ui,sans-serif;color:#2A2026}
 .tc-p h3{margin:0;font:500 15px/1 "Hanken Grotesk","Outfit",system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#6E6168}
 .tc-chips{display:flex;flex-wrap:wrap;gap:8px}
-.tc-chips button{font:inherit;font-size:17px;padding:10px 16px;border-radius:999px;border:1.5px solid #D3C9BC;background:#FBF9F6;color:#3A2631;cursor:pointer;min-height:46px}
-.tc-chips button[aria-pressed=true]{background:#5A3C4C;border-color:#5A3C4C;color:#fff}
+.tc-chips button{font:inherit;font-size:17px;padding:10px 16px;border-radius:999px;border:1.5px solid #D3C9BC;background:#FBF9F6;color:#2E1D27;cursor:pointer;min-height:46px}
+.tc-chips button[aria-pressed=true]{background:#4A3040;border-color:#4A3040;color:#fff}
 .tc-mine{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:18px;background:#FBF1F0;border:1.5px solid #F0DCDA}
 .tc-mine .tc-chips button.tc-x{min-height:46px;min-width:40px;padding:6px 10px;margin-left:-6px;border-color:#EBD9D6;background:#fff;color:#9A7F86;font-size:18px}
 .tc-mine .tc-mc{display:inline-flex;gap:0}
 .tc-mine [hidden]{display:none!important}
 .tc-mine-f{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.tc-mine-f input{font:inherit;font-size:17px;flex:1 1 180px;min-height:46px;padding:8px 14px;border-radius:999px;border:1.5px solid #D3C9BC;background:#fff;color:#3A2631}
-.tc-save{font:inherit;font-size:17px;padding:10px 18px;border-radius:999px;border:0;background:#5A3C4C;color:#fff;cursor:pointer;min-height:46px}
-.tc-save.lite{background:transparent;border:1.5px solid #5A3C4C;color:#5A3C4C}
+.tc-mine-f input{font:inherit;font-size:17px;flex:1 1 180px;min-height:46px;padding:8px 14px;border-radius:999px;border:1.5px solid #D3C9BC;background:#fff;color:#2E1D27}
+.tc-save{font:inherit;font-size:17px;padding:10px 18px;border-radius:999px;border:0;background:#4A3040;color:#fff;cursor:pointer;min-height:46px}
+.tc-save.lite{background:transparent;border:1.5px solid #4A3040;color:#4A3040}
 .tc-mmsg{margin:0;font-size:15px;line-height:1.4;color:#6E6168;min-height:0}
 .tc-mmsg:empty{display:none}
 .tc-sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-radius:18px;background:#FBF9F6;border:1.5px solid #D3C9BC;font-size:18px;cursor:pointer}
-.tc-sw input{width:26px;height:26px;padding:0;flex:0 0 auto;accent-color:#5A3C4C}
+.tc-sw input{width:26px;height:26px;padding:0;flex:0 0 auto;accent-color:#4A3040}
 .tc-p input[type=range]{padding:0;border:0;background:transparent;outline-offset:2px}
 .tc-sl{display:flex;flex-direction:column;gap:4px}
-.tc-sl label{display:flex;justify-content:space-between;font-size:17px;color:#3A2631}
+.tc-sl label{display:flex;justify-content:space-between;font-size:17px;color:#2E1D27}
 .tc-sl label small{color:#6E6168;font-size:15px}
-.tc-sl input[type=range]{width:100%;accent-color:#5A3C4C;height:30px}
+.tc-sl input[type=range]{width:100%;accent-color:#4A3040;height:30px}
 .tc-g{background:#FBF9F6;border:1.5px solid #D3C9BC;border-radius:18px;padding:0 14px}
-.tc-g>summary{list-style:none;cursor:pointer;padding:13px 0;font-size:18px;color:#3A2631;display:flex;justify-content:space-between;align-items:center}
+.tc-g>summary{list-style:none;cursor:pointer;padding:13px 0;font-size:18px;color:#2E1D27;display:flex;justify-content:space-between;align-items:center}
 .tc-g>summary::-webkit-details-marker{display:none}
-.tc-g>summary::after{content:"▾";color:#5A3C4C}.tc-g[open]>summary::after{content:"▴"}
+.tc-g>summary::after{content:"▾";color:#4A3040}.tc-g[open]>summary::after{content:"▴"}
 .tc-gb{display:flex;flex-direction:column;gap:12px;padding:0 0 14px}
 .tc-lips button{display:inline-flex;align-items:center;gap:8px}.tc-lips i{width:16px;height:16px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.12)}
 .tc-more{border-top:1px solid #E4DCD1;padding-top:12px}
-.tc-more>summary{cursor:pointer;font-size:17px;color:#5A3C4C;list-style:none}
+.tc-more>summary{cursor:pointer;font-size:17px;color:#4A3040;list-style:none}
 .tc-more>summary::-webkit-details-marker{display:none}
 .tc-more[open]>summary{margin-bottom:12px}
-.tc-cmp{font:inherit;font-size:17px;padding:12px 18px;border-radius:999px;border:1.5px solid #3A2631;background:transparent;color:#3A2631;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none}
-.tc-cmp.on{background:#3A2631;color:#fff}
+.tc-cmp{font:inherit;font-size:17px;padding:12px 18px;border-radius:999px;border:1.5px solid #2E1D27;background:transparent;color:#2E1D27;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none}
+.tc-cmp.on{background:#2E1D27;color:#fff}
 .tc-dlg{position:fixed;inset:0;z-index:2147483000;background:rgba(46,37,41,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:16px}
 .tc-dlg-in{background:#F5F1EB;border-radius:28px;max-width:1180px;width:100%;padding:18px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:18px;margin:auto 0}
 @media(max-width:820px){.tc-dlg-in{grid-template-columns:1fr}}
 .tc-dlg-h{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:10px}
-.tc-dlg-h b{font:500 30px/1.1 "Cormorant Garamond",Georgia,serif;color:#3A2631}
-.tc-dlg-h button,.tc-btn{font:inherit;font-size:17px;border:1.5px solid #D3C9BC;background:#fff;border-radius:999px;padding:10px 18px;cursor:pointer;color:#3A2631}
-.tc-btn.main{background:#5A3C4C;border-color:#5A3C4C;color:#fff}
-.tc-open{font:inherit;font-size:16px;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;border:1.5px solid #5A3C4C;background:#F7F1EE;color:#5A3C4C;cursor:pointer}
+.tc-dlg-h b{font:500 30px/1.1 "Cormorant Garamond",Georgia,serif;color:#2E1D27}
+.tc-dlg-h button,.tc-btn{font:inherit;font-size:17px;border:1.5px solid #D3C9BC;background:#fff;border-radius:999px;padding:10px 18px;cursor:pointer;color:#2E1D27}
+.tc-btn.main{background:#4A3040;border-color:#4A3040;color:#fff}
+.tc-open{font:inherit;font-size:16px;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;border:1.5px solid #4A3040;background:#F7F1EE;color:#4A3040;cursor:pointer}
 .tc-open b{font-weight:500}
 `;
   function css() { if (document.getElementById('tc-css')) return; const st = document.createElement('style'); st.id = 'tc-css'; st.textContent = CSS; document.head.appendChild(st); }
@@ -821,7 +821,7 @@ void main(){
     css(); opts = opts || {};
     const d = document.createElement('div'); d.className = 'tc-dlg'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
     d.innerHTML = `<div class="tc-dlg-in"><div class="tc-dlg-h"><b>✨ Kamera-Look</b><button type="button" data-x>Fertig</button></div><div><div data-stage class="tc-stage" style="aspect-ratio:16/9"><div class="tc-st">Kamera startet …</div></div>
-<p style="font:16px/1.5 'Hanken Grotesk','Outfit',system-ui,sans-serif;color:#4A3040;margin:10px 4px 0">${opts.note || 'Der Look wird gespeichert und gilt für deine Aufnahmen hier. Hilfslinien siehst nur du, sie sind nie in der Aufnahme.'}</p></div><div data-panel></div></div>`;
+<p style="font:16px/1.5 'Hanken Grotesk','Outfit',system-ui,sans-serif;color:#3A2631;margin:10px 4px 0">${opts.note || 'Der Look wird gespeichert und gilt für deine Aufnahmen hier. Hilfslinien siehst nur du, sie sind nie in der Aufnahme.'}</p></div><div data-panel></div></div>`;
     document.body.appendChild(d); const prevOv = document.body.style.overflow; document.body.style.overflow = 'hidden';
     let tc = null;
     const close = () => { if (tc) tc.destroy(true); d.remove(); document.body.style.overflow = prevOv; if (opts.onClose) opts.onClose(load()); };

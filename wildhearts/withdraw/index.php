@@ -63,7 +63,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 @font-face{font-family:"Italiana";src:url(/fonts/Italiana-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:300 500;src:url(/fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:600 800;src:url(/fonts/Outfit-Bold.woff) format("woff")}
-:root{--cream:#F5F1EB;--wine:#5A3C4C;--wine-deep:#4A3040;--brown:#6E6168;--ink:#2A2026;--line:#D3C9BC}
+:root{--cream:#F5F1EB;--wine:#4A3040;--wine-deep:#3A2631;--brown:#6E6168;--ink:#2A2026;--line:#D3C9BC}
 *{box-sizing:border-box;margin:0}
 body{background:var(--cream);font-family:"Outfit",system-ui,sans-serif;color:var(--ink);font-size:17px;line-height:1.6}
 main{max-width:620px;margin:0 auto;padding:40px 16px 60px}

@@ -66,7 +66,7 @@ try {
 try {
     $rows = array_merge([['Name', $name], ['E-Mail', $email]], $lines('de'));
     $html = '<p>Neue Anfrage für 1:1 Personal Training' . ($en ? ' (auf Englisch)' : '') . ':</p>' . $tbl($rows)
-        . '<p><a href="' . forma_h(forma_site_url() . '/verwaltung/?view=movecia#pt') . '" style="display:inline-block;background:#5A3C4C;color:#F7F1EE;text-decoration:none;padding:12px 22px;border-radius:999px;">In der Verwaltung ansehen</a></p>';
+        . '<p><a href="' . forma_h(forma_site_url() . '/verwaltung/?view=movecia#pt') . '" style="display:inline-block;background:#4A3040;color:#F7F1EE;text-decoration:none;padding:12px 22px;border-radius:999px;">In der Verwaltung ansehen</a></p>';
     mm_mail(natal_notify_email(), 'Personal Training Anfrage: ' . $name, strip_tags(str_replace(['</p>', '</tr>'], ["\n\n", "\n"], $html)), mm_mail_html('Neue Anfrage', $html, 'de'));
 } catch (Throwable $e) { error_log('PT Info: ' . $e->getMessage()); }
 

@@ -251,7 +251,7 @@ function mm_mail_html(string $title, string $html, string $lang = 'en'): string
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#F5F1EB;border-radius:24px;font-family:Helvetica,Arial,sans-serif;color:#2A2026;">'
         . '<tr><td style="padding:24px 30px 0;"><img src="' . forma_h(mm_site()) . '/img/movecia/movecia-mail.png" width="160" height="36" alt="Movecia." style="display:block;border:0;width:160px;height:auto;"></td></tr>'
         . '<tr><td style="padding:18px 30px 26px;font-size:16px;line-height:1.65;">' . $html
-        . '<p style="margin:22px 0 0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:24px;color:#5A3C4C;">' . ($lang === 'de' ? 'alles Liebe, Viv' : 'with love, Viv') . '</p></td></tr></table>'
+        . '<p style="margin:22px 0 0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:24px;color:#4A3040;">' . ($lang === 'de' ? 'alles Liebe, Viv' : 'with love, Viv') . '</p></td></tr></table>'
         . '<p style="max-width:560px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#6E6168;margin:16px auto 0;">Vivien Malonga · Movecia – Personal Fitness · Silvrettastraße 58 · 6562 Mathon · Austria · ' . MM_FROM_EMAIL . '</p>'
         . '</td></tr></table></body></html>';
 }
@@ -289,7 +289,7 @@ function mm_review_mail(string $to, string $name, string $lang, string $what, bo
     $btn = $en ? 'Write a review ★★★★★' : 'Jetzt bewerten ★★★★★';
     $after = $en ? 'Thank you, it really means a lot to me.' : 'Danke dir, das bedeutet mir wirklich viel.';
     $text = implode("\n\n", $lines) . "\n\n$btn: $url\n\n$after";
-    $html = '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#5A3C4C;">' . ($en ? 'thank you ♡' : 'danke ♡') . '</p>';
+    $html = '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#4A3040;">' . ($en ? 'thank you ♡' : 'danke ♡') . '</p>';
     foreach ($lines as $l) $html .= '<p>' . forma_h($l) . '</p>';
     $html .= mm_button($url, $btn) . '<p>' . forma_h($after) . '</p>';
     $subj = ($test ? '[TEST] ' : '') . ($en ? 'Thank you for ' : 'Danke für ') . $thing;
@@ -298,7 +298,7 @@ function mm_review_mail(string $to, string $name, string $lang, string $what, bo
 
 function mm_button(string $href, string $label): string
 {
-    return '<p style="margin:22px 0 4px;text-align:center;"><a href="' . forma_h($href) . '" style="display:inline-block;padding:15px 30px;border-radius:999px;background:#5A3C4C;color:#F5F1EB;text-decoration:none;font-weight:bold;">' . forma_h($label) . '</a></p>';
+    return '<p style="margin:22px 0 4px;text-align:center;"><a href="' . forma_h($href) . '" style="display:inline-block;padding:15px 30px;border-radius:999px;background:#4A3040;color:#F5F1EB;text-decoration:none;font-weight:bold;">' . forma_h($label) . '</a></p>';
 }
 
 /** Verschickt eine Mail als Viv. Mit hinterlegtem Postfach-Passwort per SMTP, sonst per mail(). */
@@ -413,7 +413,7 @@ function mm_mail_signup(array $g, array $s): bool
     $link = mm_room_link($s);
     $when = mm_when($g);
     $text = "Hey $first,\n\nYou're in! I've saved your spot for our Wild Hearts Gathering:\n\n{$g['title']}\n$when\n\nThis is your personal link to the room. It opens 15 minutes before we start, right on my website, no app or Zoom needed:\n$link\n\nI'll send you a little reminder the day before and another one an hour before we start.\n\nWith love, Viv\n\nYou're receiving this email because you signed up for this Gathering on moveciamovement.com.\nVivien Malonga, Movecia – Personal Fitness, Silvrettastraße 58, 6562 Mathon, Austria";
-    $html = '<p style="margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#5A3C4C;">Hey ' . forma_h($first) . ',</p>'
+    $html = '<p style="margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#4A3040;">Hey ' . forma_h($first) . ',</p>'
         . '<p style="margin:14px 0 0;">You\'re in! I\'ve saved your spot for our Wild Hearts Gathering.</p>'
         . '<p style="margin:16px 0 0;padding:16px 18px;background:#E4DCD1;border-radius:16px;"><strong>' . forma_h($g['title']) . '</strong><br>' . forma_h($when) . '</p>'
         . '<p style="margin:16px 0 0;">This is your personal link to the room. It opens 15 minutes before we start, right on my website, no app or Zoom needed.</p>'
@@ -427,7 +427,7 @@ function mm_mail_reminder(array $g, array $s, bool $soon): bool
     $link = mm_room_link($s);
     $intro = $soon ? 'We start in one hour. Grab something warm to drink, find a cosy spot and come as you are.' : 'Tomorrow is our Wild Hearts Gathering, and I\'m so looking forward to seeing you.';
     $text = "Hey $first,\n\n$intro\n\n{$g['title']}\n" . mm_when($g) . "\n\nYour room link (it opens 15 minutes before we start):\n$link\n\nWith love, Viv";
-    $html = '<p style="margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#5A3C4C;">Hey ' . forma_h($first) . ',</p>'
+    $html = '<p style="margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#4A3040;">Hey ' . forma_h($first) . ',</p>'
         . '<p style="margin:14px 0 0;">' . forma_h($intro) . '</p>'
         . '<p style="margin:16px 0 0;padding:16px 18px;background:#E4DCD1;border-radius:16px;"><strong>' . forma_h($g['title']) . '</strong><br>' . forma_h(mm_when($g)) . '</p>'
         . mm_button($link, 'Open my room') . '<p style="margin:10px 0 0;font-size:14px;color:#6E6168;text-align:center;">The room opens 15 minutes before we start.</p>';
@@ -501,7 +501,7 @@ function mm_mail_confirm(array $sub): bool
     $de = ($sub['lang'] ?? 'en') === 'de';
     $first = forma_first_name($sub['name']);
     $link = mm_site() . '/api/wh-confirm.php?t=' . $sub['token'];
-    $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#5A3C4C;';
+    $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#4A3040;';
     if (($sub['source'] ?? '') === 'academy') {
         require_once __DIR__ . '/academy-lib.php';
         return ac_interest_confirm_mail($sub, $link);
@@ -579,7 +579,7 @@ function mm_mail_unfold_info(array $sub): bool
     $out = mm_site() . '/api/wh-unsubscribe.php?t=' . $sub['token'];
     $st = mv_date(mv_ts($c['u_start']), $de ? 'de' : 'en');
     $eu = fn(int $x) => '€ ' . number_format($x / 100, 0, ',', '.');
-    $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#5A3C4C;';
+    $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#4A3040;';
     $img = '<img src="' . mm_site() . '/img/wildhearts/cover.jpg" width="500" alt="" style="display:block;width:100%;max-width:500px;height:auto;max-height:340px;object-fit:cover;border-radius:16px;margin:0 0 20px;">';
     $li = fn(array $xs) => '<ul style="margin:10px 0 0;padding-left:20px;">' . implode('', array_map(fn($x) => '<li style="margin:4px 0;">' . forma_h($x) . '</li>', $xs)) . '</ul>';
     $L = fn(string $d, string $e) => $de ? $d : $e;
@@ -612,7 +612,7 @@ function mm_mail_teacher_info(array $sub): bool
     $page = mm_site() . '/teacher-training/?lang=' . ($de ? 'de' : 'en');
     $reset = mm_site() . '/reset/';
     $out = mm_site() . '/api/wh-unsubscribe.php?t=' . $sub['token'];
-    $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#5A3C4C;';
+    $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#4A3040;';
     $img = '<img src="' . mm_site() . '/img/movecia/fotos/ev-ueber-mich-weit.jpg" width="500" alt="" style="display:block;width:100%;max-width:500px;height:auto;max-height:320px;object-fit:cover;border-radius:16px;margin:0 0 20px;">';
     $p1 = $L('dein Name steht jetzt auf der Liste für das Mindful Becoming Teacher Training. Sobald alle Infos, Termine und Preise feststehen, schreibe ich dir als Erste, noch bevor ich es offiziell ankündige.',
         'your name is now on the list for the Mindful Becoming Teacher Training. As soon as all the details, dates and prices are ready, you\'ll be the first to hear, even before I announce it officially.');
@@ -626,7 +626,7 @@ function mm_mail_teacher_info(array $sub): bool
         . '<p style="margin:16px 0 0;background:#F5F1EB;border-radius:14px;padding:14px 16px;">' . forma_h($p2) . '</p>'
         . '<p style="margin:16px 0 0;">' . forma_h($p3) . '</p>'
         . mm_button($reset, $L('Zu meiner Reset-Routine', 'Get my Reset Routine'))
-        . '<p style="margin:14px 0 0;font-size:14px;color:#6E6168;text-align:center;"><a href="' . forma_h($page) . '" style="color:#5A3C4C;">' . $L('Zur Teacher-Training-Seite', 'Teacher Training page') . '</a></p>'
+        . '<p style="margin:14px 0 0;font-size:14px;color:#6E6168;text-align:center;"><a href="' . forma_h($page) . '" style="color:#4A3040;">' . $L('Zur Teacher-Training-Seite', 'Teacher Training page') . '</a></p>'
         . '<p style="margin:22px 0 0;font-size:12px;color:#6E6168;">' . $L('Du bekommst diese E-Mail, weil du dich auf moveciamovement.com eingetragen hast.', 'You\'re receiving this email because you signed up on moveciamovement.com.') . ' <a href="' . forma_h($out) . '" style="color:#6E6168;">' . $L('Abmelden', 'Unsubscribe') . '</a></p>';
     return mm_mail($sub['email'], $L('Du stehst auf der Liste fürs Teacher Training 🌿', 'You\'re on the list for the Teacher Training 🌿'), $text, mm_mail_html('Mindful Becoming Teacher Training', $html, $de ? 'de' : 'en'));
 }
@@ -637,7 +637,7 @@ function mm_mail_welcome(array $sub): bool
     $first = forma_first_name($sub['name']);
     $dl = mm_site() . '/reset/';
     $out = mm_site() . '/api/wh-unsubscribe.php?t=' . $sub['token'];
-    $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#5A3C4C;';
+    $hand = 'margin:0;font-family:\'Brush Script MT\',\'Segoe Script\',cursive;font-size:26px;color:#4A3040;';
     $img = '<img src="' . mm_site() . '/img/wildhearts/cover.jpg" width="500" alt="" style="display:block;width:100%;max-width:500px;height:auto;max-height:360px;object-fit:cover;border-radius:16px;margin:0 0 20px;">';
     if ($de) {
         $text = "Hallo $first,\n\ndu hast es geschafft, du bist dabei. Willkommen im Wild Hearts Collective.\n\nHier ist mein kleines Geschenk für dich: die Reset-Routine für müde Tage. Zehn stille Minuten für die Abende, an denen du alles gegeben hast.\n\nDownload (Deutsch oder Englisch): $dl\n\nDas Wild Hearts Collective gibt es, damit du nie vergisst, dass auch du zählst, selbst wenn du immer für alle anderen da bist. Hier bist du wichtig, und hier wirst du wahrgenommen.\n\nKomm in unseren kostenlosen Community-Kanal auf Instagram: " . MM_CHANNEL . "\nDort schreiben wir auf Englisch, aber du bist von Herzen willkommen. Unser erstes Live-Gathering findet im Dezember statt.\n\nAlles Liebe, Viv\n\nAbmelden: $out";
@@ -647,7 +647,7 @@ function mm_mail_welcome(array $sub): bool
             . mm_button($dl, 'Zu meiner Reset-Routine')
             . '<p style="margin:8px 0 0;font-size:14px;color:#6E6168;text-align:center;">Auf der Seite wählst du Deutsch oder Englisch.</p>'
             . '<p style="margin:20px 0 0;">Das Wild Hearts Collective gibt es, damit du nie vergisst, dass auch du zählst, selbst wenn du immer für alle anderen da bist. Hier bist du wichtig, und hier wirst du wahrgenommen.</p>'
-            . '<p style="margin:14px 0 0;">Schau vorbei und sag Hallo in unserem kostenlosen <a href="' . MM_CHANNEL . '" style="color:#5A3C4C;">Community-Kanal auf Instagram</a>. Dort schreiben wir auf Englisch, aber du bist von Herzen willkommen. Unser erstes Live-Gathering findet im Dezember statt.</p>'
+            . '<p style="margin:14px 0 0;">Schau vorbei und sag Hallo in unserem kostenlosen <a href="' . MM_CHANNEL . '" style="color:#4A3040;">Community-Kanal auf Instagram</a>. Dort schreiben wir auf Englisch, aber du bist von Herzen willkommen. Unser erstes Live-Gathering findet im Dezember statt.</p>'
             . '<p style="margin:22px 0 0;font-size:12px;color:#6E6168;">Du bekommst diese E-Mail, weil du dich auf moveciamovement.com angemeldet hast. <a href="' . forma_h($out) . '" style="color:#6E6168;">Abmelden</a></p>';
         return mm_mail($sub['email'], 'Deine Reset-Routine für müde Tage 🌙', $text, mm_mail_html('Deine Reset-Routine', $html, 'de'));
     }
@@ -658,7 +658,7 @@ function mm_mail_welcome(array $sub): bool
         . mm_button($dl, 'Get my Reset Routine')
         . '<p style="margin:8px 0 0;font-size:14px;color:#6E6168;text-align:center;">Choose English or German on the page.</p>'
         . '<p style="margin:20px 0 0;">The Wild Hearts Collective exists so you never forget that you matter too, even when you\'re always there for everyone else. We matter. We are here. And we are seen.</p>'
-        . '<p style="margin:14px 0 0;">Come and say hi in our free <a href="' . MM_CHANNEL . '" style="color:#5A3C4C;">community channel on Instagram</a>. Our first live Wild Hearts Gathering is in December.</p>'
+        . '<p style="margin:14px 0 0;">Come and say hi in our free <a href="' . MM_CHANNEL . '" style="color:#4A3040;">community channel on Instagram</a>. Our first live Wild Hearts Gathering is in December.</p>'
         . '<p style="margin:22px 0 0;font-size:12px;color:#6E6168;">You\'re receiving this email because you signed up on moveciamovement.com. <a href="' . forma_h($out) . '" style="color:#6E6168;">Unsubscribe</a></p>';
     return mm_mail($sub['email'], 'Your Reset Routine for Tired Days 🌙', $text, mm_mail_html('Your Reset Routine', $html));
 }
@@ -695,8 +695,8 @@ function mm_page(string $hi, string $title, string $text, string $btnHref = '', 
     echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>' . forma_h($title) . ' · Movecia</title>'
         . '<style>@font-face{font-family:"Italiana";src:url(/fonts/Italiana-Regular.woff) format("woff")}@font-face{font-family:"Outfit";src:url(/fonts/Outfit-Regular.woff) format("woff")}@font-face{font-family:"Hand";src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}'
         . 'body{margin:0;min-height:100vh;display:grid;place-items:center;background:#F5F1EB;color:#2A2026;font:17px/1.6 Outfit,system-ui,sans-serif;text-align:center;padding:24px 16px}main{max-width:520px}'
-        . '.hi{font-family:Hand,cursive;color:#5A3C4C;font-size:22px;transform:rotate(-2deg)}h1{font-family:Italiana,Georgia,serif;font-weight:400;font-size:44px;line-height:1.05;color:#4A3040;margin:8px 0 12px}p{color:#6E6168}'
-        . 'a.b{display:inline-block;margin-top:18px;padding:14px 26px;border-radius:999px;background:#5A3C4C;color:#F5F1EB;text-decoration:none}</style></head><body><main>'
+        . '.hi{font-family:Hand,cursive;color:#4A3040;font-size:22px;transform:rotate(-2deg)}h1{font-family:Italiana,Georgia,serif;font-weight:400;font-size:44px;line-height:1.05;color:#3A2631;margin:8px 0 12px}p{color:#6E6168}'
+        . 'a.b{display:inline-block;margin-top:18px;padding:14px 26px;border-radius:999px;background:#4A3040;color:#F5F1EB;text-decoration:none}</style></head><body><main>'
         . '<p class="hi">' . forma_h($hi) . '</p><h1>' . forma_h($title) . '</h1><p>' . forma_h($text) . '</p>'
         . ($btnHref ? '<a class="b" href="' . forma_h($btnHref) . '">' . forma_h($btnLabel) . '</a>' : '')
         . '</main></body></html>';
@@ -1115,9 +1115,9 @@ function mm_order_check(PDO $pdo, array $o): string
               . "Terms, cancellation policy and the withdrawal form: $site/terms");
         $startNote = (int)($o['bill_start'] ?? 0) > time() ? 'The Inner Circle opens on ' . mm_start_en((int)$o['bill_start']) . '. Nothing has been charged yet, your first payment is taken on that day.' : '';
         $t = "Dear $first,\n\nThank you so much, you're in! Your booking for {$o['title']} ($price) is confirmed." . ($startNote ? "\n\n$startNote" : '') . "\n\nI will write to you personally in the next few days with everything you need for the start. If you have any questions, simply reply to this email.\n\nI am so happy to walk this path with you.\n\n$legal\nWithdraw from the contract: $site/withdraw";
-        $html = '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#5A3C4C;">you are in ♡</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:30px;color:#4A3040;margin:0 0 14px;">' . forma_h($o['title']) . '</h1>'
+        $html = '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#4A3040;">you are in ♡</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:30px;color:#3A2631;margin:0 0 14px;">' . forma_h($o['title']) . '</h1>'
             . '<p>Dear ' . forma_h($first) . ',</p><p>Thank you so much, your booking for <strong>' . forma_h($o['title']) . '</strong> (' . forma_h($price) . ') is confirmed.</p>' . ($startNote ? '<p>' . forma_h($startNote) . '</p>' : '') . '<p>I will write to you personally in the next few days with everything you need for the start. If you have any questions, simply reply to this email.</p><p>I am so happy to walk this path with you.</p>'
-            . '<p style="font-size:13px;color:#6E6168;border-top:1px solid #D3C9BC;padding-top:12px;margin-top:22px;">' . forma_h($legal) . '<br><a href="' . forma_h($site . '/withdraw') . '" style="color:#5A3C4C;">Withdraw from the contract</a></p>';
+            . '<p style="font-size:13px;color:#6E6168;border-top:1px solid #D3C9BC;padding-top:12px;margin-top:22px;">' . forma_h($legal) . '<br><a href="' . forma_h($site . '/withdraw') . '" style="color:#4A3040;">Withdraw from the contract</a></p>';
         if ($email !== '') mm_mail($email, ($o['test'] ? '[TEST] ' : '') . 'You\'re in: ' . $o['title'], $t, mm_mail_html('You are in', $html));
         $v = "Hallo Viv,\n\n" . ($name ?: 'Jemand') . " ($email) hat gerade {$o['title']} gebucht" . ((int)($o['bill_start'] ?? 0) > time() ? ' (Abbuchung ab ' . date('d.m.Y', (int)$o['bill_start']) . ')' : ' und bezahlt') . ": $price" . ($o['special'] ? ' (Gathering-Preis)' : ' (regulärer Preis)') . ".\n" . ($o['test'] ? "\nDas war eine Testbuchung aus dem Testraum.\n" : '') . "\nDu siehst alle Buchungen in der Verwaltung unter Movecia Movement → Angebote.\n";
         mm_mail(MM_FROM_EMAIL, ($o['test'] ? '[TEST] ' : '') . 'Neue Buchung: ' . $o['title'] . ' · ' . ($name ?: $email), $v, mm_mail_html('Neue Buchung', nl2br(forma_h($v)), 'de'));
@@ -1356,7 +1356,7 @@ function mm_send_stay_mails(PDO $pdo): void
             . ($ref ? "\nAnd if a friend would love the circle too, your invitation link still works: $ref\nShe gets her first {$o['intro_months']} months at $sp.\n" : '') . "\nWith love\nViv";
         $html = '<p>Dear ' . forma_h($first) . ',</p><p>I really hope you have enjoyed your first months in The Inner Circle. It means so much to me that you are part of it.</p>'
             . '<p>Your circle price is coming to an end now. If you would like to stay, here is a little gift for you: <strong>' . $months . ' more months at ' . forma_h($sp) . '</strong>, right after your first ones.</p>'
-            . '<p style="font-size:22px;letter-spacing:.08em;color:#4A3040;margin:18px 0 6px;">' . forma_h($code) . '</p>'
+            . '<p style="font-size:22px;letter-spacing:.08em;color:#3A2631;margin:18px 0 6px;">' . forma_h($code) . '</p>'
             . mm_button($link, 'Keep my circle price')
             . '<p style="font-size:14px;color:#6E6168;">The code is only valid for a short time, until ' . forma_h($date) . '. After that, the regular price of ' . forma_h($reg) . ' applies.</p>'
             . ($ref ? '<p>And if a friend would love the circle too, your invitation link still works. She gets her first ' . (int)$o['intro_months'] . ' months at ' . forma_h($sp) . ':</p>' . mm_button($ref, 'Invite a friend') : '');

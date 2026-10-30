@@ -34,7 +34,7 @@ $mail = $h(MM_FROM_EMAIL);
 @font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(/fonts/Outfit-Bold.woff) format("woff")}
 @font-face{font-family:"Hand";font-display:swap;src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
-:root{--cream:#F5F1EB;--wine:#5A3C4C;--wine-deep:#4A3040;--brown:#6E6168;--ink:#2A2026;--blush:#E4DCD1;--line:#D3C9BC;--paper:#FBF9F6}
+:root{--cream:#F5F1EB;--wine:#4A3040;--wine-deep:#3A2631;--brown:#6E6168;--ink:#2A2026;--blush:#E4DCD1;--line:#D3C9BC;--paper:#FBF9F6}
 *{box-sizing:border-box;margin:0}
 html,body{background:var(--cream)}
 body{font-family:"Outfit",system-ui,sans-serif;color:var(--ink);font-size:18px;line-height:1.65;-webkit-font-smoothing:antialiased}
@@ -44,7 +44,7 @@ main{max-width:920px;margin:0 auto;padding:40px 16px 60px}
 h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(38px,7vw,56px);line-height:1.08;color:var(--wine-deep);margin:8px 0 6px}
 h2{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(28px,4vw,34px);color:var(--wine-deep);margin:40px 0 8px;scroll-margin-top:16px}
 h3{font-size:18px;font-weight:600;color:var(--wine-deep);margin:22px 0 4px;scroll-margin-top:16px}
-p,li{color:#3A2631}
+p,li{color:#2E1D27}
 p+p{margin-top:8px}
 ul{padding-left:22px}
 li{margin:5px 0}

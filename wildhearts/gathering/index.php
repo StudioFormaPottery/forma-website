@@ -90,7 +90,7 @@ $h = 'forma_h';
 @font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:600 800;font-display:swap;src:url(/fonts/Outfit-Bold.woff) format("woff")}
 @font-face{font-family:"Hand";font-weight:400;font-display:swap;src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
-:root{--cream:#F5F1EB;--oat:#E8DED2;--blush:#E6DBCF;--rose:#C9B2B8;--wine:#5A3C4C;--wine-deep:#4A3040;--earth:#3A2631;--brown:#6E6168;--ink:#2A2026;--sage-soft:#E4DCD1;--line:#D3C9BC;--blob:58% 42% 47% 53% / 52% 46% 54% 48%;--hand:"Hand","Bradley Hand",cursive}
+:root{--cream:#F5F1EB;--oat:#E8DED2;--blush:#E6DBCF;--rose:#C9B2B8;--wine:#4A3040;--wine-deep:#3A2631;--earth:#2E1D27;--brown:#6E6168;--ink:#2A2026;--sage-soft:#E4DCD1;--line:#D3C9BC;--blob:58% 42% 47% 53% / 52% 46% 54% 48%;--hand:"Hand","Bradley Hand",cursive}
 *{box-sizing:border-box;margin:0}
 [hidden]{display:none!important}
 html,body{background:var(--cream)}

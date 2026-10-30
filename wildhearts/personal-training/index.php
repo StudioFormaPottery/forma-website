@@ -55,7 +55,7 @@ $disc = $prices[PTB_MAX_UNITS]['unit'];
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:normal;src:url(/fonts/CormorantGaramond-VF.woff) format("woff")}
 @font-face{font-family:"Cormorant";font-weight:300 700;font-style:italic;src:url(/fonts/CormorantGaramond-Italic-VF.woff) format("woff")}
 @font-face{font-family:"Hanken";font-weight:300 700;src:url(/fonts/HankenGrotesk-VF.woff) format("woff")}
-:root{--bg:#F5F1EB;--sand:#E8DED2;--card:#FBF9F6;--ink:#2A2026;--muted:#6E6168;--line:#D3C9BC;--plum:#5A3C4C;--plumdeep:#4A3040;--dark:#3A2631;--blush:#E4DCD1;--peach:#E6DBCF;--on:#F7F1EE;--r:24px;
+:root{--bg:#F5F1EB;--sand:#E8DED2;--card:#FBF9F6;--ink:#2A2026;--muted:#6E6168;--line:#D3C9BC;--plum:#4A3040;--plumdeep:#3A2631;--dark:#2E1D27;--blush:#E4DCD1;--peach:#E6DBCF;--on:#F7F1EE;--r:24px;
 --serif:"Cormorant",Georgia,serif;--sans:"Hanken",system-ui,sans-serif}
 html[data-l=de] .en,html[data-l=en] .de{display:none!important}
 *{box-sizing:border-box}

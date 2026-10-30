@@ -3,7 +3,7 @@
    Schriften, Bilder und Styles werden zwischengespeichert und im Hintergrund aktualisiert.
    Buchungen, Zahlungen, Videoräume, Videos und die Verwaltung laufen nie über diesen Zwischenspeicher.
    Bei größeren Bild- oder Style-Änderungen VERSION hochzählen. */
-var VERSION = 'movecia-v21';
+var VERSION = 'movecia-v22';
 var STATIC = /^\/(fonts|img|wildhearts\/assets)\//;
 var SKIP = /^\/(api|verwaltung|video|tools|downloads|natal\/raum|unfold\/call|gathering)(\/|$)/;
 
@@ -23,9 +23,9 @@ self.addEventListener('activate', function (e) {
 var OFFLINE = '<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Movecia · offline</title>' +
   '<body style="margin:0;min-height:100vh;display:grid;place-items:center;font-family:system-ui,sans-serif;background:#F5F1EB;color:#2A2026;text-align:center;padding:40px 24px;box-sizing:border-box">' +
   '<div><img src="/img/movecia/movecia-zeichen-klein.svg" width="64" height="64" alt="">' +
-  '<h1 style="font-family:Georgia,serif;font-weight:400;font-size:2rem;margin:.6em 0 .3em;color:#5A3C4C">Gerade offline</h1>' +
+  '<h1 style="font-family:Georgia,serif;font-weight:400;font-size:2rem;margin:.6em 0 .3em;color:#4A3040">Gerade offline</h1>' +
   '<p style="max-width:22em;margin:0 auto;line-height:1.55;color:#6E6168">Atme kurz durch. Sobald du wieder Internet hast, geht es hier weiter.<br><span style="font-size:.9em">You are offline – Movecia is back as soon as you are connected.</span></p>' +
-  '<button onclick="location.reload()" style="margin-top:1.6em;font:inherit;border:0;border-radius:999px;background:#5A3C4C;color:#F7F1EE;padding:.8em 1.6em">Nochmal versuchen</button></div>';
+  '<button onclick="location.reload()" style="margin-top:1.6em;font:inherit;border:0;border-radius:999px;background:#4A3040;color:#F7F1EE;padding:.8em 1.6em">Nochmal versuchen</button></div>';
 
 self.addEventListener('fetch', function (e) {
   var req = e.request;

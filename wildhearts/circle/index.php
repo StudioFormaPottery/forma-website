@@ -34,7 +34,7 @@ $startTs = mm_circle_start();
 @font-face{font-family:"Outfit";font-weight:300 500;src:url(/fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:600 800;src:url(/fonts/Outfit-Bold.woff) format("woff")}
 @font-face{font-family:"Hand";src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
-:root{--cream:#F5F1EB;--wine:#5A3C4C;--wine-deep:#4A3040;--brown:#6E6168;--ink:#2A2026;--line:#D3C9BC;--sage:#E4DCD1}
+:root{--cream:#F5F1EB;--wine:#4A3040;--wine-deep:#3A2631;--brown:#6E6168;--ink:#2A2026;--line:#D3C9BC;--sage:#E4DCD1}
 *{box-sizing:border-box;margin:0}
 body{background:var(--cream);font-family:"Outfit",system-ui,sans-serif;color:var(--ink);font-size:18px;line-height:1.6;overflow-x:hidden}
 .bg{position:fixed;inset:0;pointer-events:none}.bg span{position:absolute;border-radius:58% 42% 47% 53%/52% 46% 54% 48%}
@@ -47,7 +47,7 @@ h1{font-family:"Italiana",Georgia,serif;font-weight:400;font-size:clamp(42px,9vw
 .lead{color:var(--brown);margin:12px auto 0;max-width:40ch}
 .price{margin-top:22px}.price .reg{color:#A0959A;text-decoration:line-through;margin-right:10px}.price b{font-size:36px;color:var(--wine-deep);font-weight:500}
 .price small{display:block;color:var(--brown);font-size:15px}
-ul{list-style:none;text-align:left;max-width:520px;margin:24px auto 0}li{margin:6px 0;color:#3A2631}li::before{content:"✦  ";color:#B79FA6}
+ul{list-style:none;text-align:left;max-width:520px;margin:24px auto 0}li{margin:6px 0;color:#2E1D27}li::before{content:"✦  ";color:#B79FA6}
 .card{text-align:left;margin:28px auto 0;max-width:560px;padding:24px 22px;border-radius:28px;background:#FBF9F6;border:1.5px solid var(--line);box-shadow:0 18px 40px rgba(70,50,58,.08)}
 label.f{display:flex;flex-direction:column;gap:5px;font-size:14px;color:var(--brown);margin-top:12px}
 input[type=text],input[type=email]{font:inherit;font-size:17px;padding:13px 16px;border-radius:16px;border:1.5px solid var(--line);background:var(--cream)}
@@ -128,7 +128,7 @@ a{color:var(--wine)}
       const j = await r.json();
       if (!j.ok) throw new Error(j.error || '');
       if (j.redirect) { location.href = j.redirect; return; }
-      fs.innerHTML = '<p style="font-family:Hand,cursive;color:#5A3C4C;font-size:22px">thank you ♡</p><p>You are staying! Your circle price continues. A confirmation is on its way to your inbox.</p>';
+      fs.innerHTML = '<p style="font-family:Hand,cursive;color:#4A3040;font-size:22px">thank you ♡</p><p>You are staying! Your circle price continues. A confirmation is on its way to your inbox.</p>';
     } catch (err) { ms.hidden = false; ms.textContent = err.message || 'Something went wrong just now. Please try again.'; b.disabled = false; }
   });
   const f = document.getElementById('f'), m = document.getElementById('m'), t0 = Date.now();

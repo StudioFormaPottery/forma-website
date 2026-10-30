@@ -1,5 +1,5 @@
 # Movecia-Workbook-Icons (viewBox 64): feine Pflaume-Linie, Füllung Pfirsich/Blush/Rosé. Gleicher Stil wie api/natal-icons.inc.php.
-P, F, B, R = '#5A3C4C', '#E6DBCF', '#E4DCD1', '#D9B8B4'
+P, F, B, R = '#4A3040', '#E6DBCF', '#E4DCD1', '#D9B8B4'
 S = f'stroke="{P}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"'
 N = f'fill="none" {S}'
 

@@ -468,7 +468,7 @@ function ptb_checkout(PDO $pdo, array $o): string
         'cancel_url' => ptb_link($o) . '&abgebrochen=1',
     ];
     $branded = $params;
-    $branded['branding_settings'] = ['display_name' => 'Movecia – Personal Fitness', 'background_color' => '#F5F1EB', 'button_color' => '#5A3C4C', 'border_style' => 'rounded', 'font_family' => 'inter'];
+    $branded['branding_settings'] = ['display_name' => 'Movecia – Personal Fitness', 'background_color' => '#F5F1EB', 'button_color' => '#4A3040', 'border_style' => 'rounded', 'font_family' => 'inter'];
     $branded['payment_intent_data']['statement_descriptor_suffix'] = 'MOVECIA';
     try {
         $s = forma_stripe('POST', '/v1/checkout/sessions', $branded, null, '2025-09-30.clover');

@@ -35,9 +35,9 @@
       st.textContent = '.mvnfd-hide body>*:not(.mvnfd){filter:blur(26px)!important}' +
         '.mvnfd{position:fixed;inset:0;z-index:99995;display:grid;place-items:center;padding:24px;background:rgba(46,37,41,.6)}' +
         '.mvnfd>div{max-width:28rem;background:#F5F1EB;color:#2A2026;border-radius:28px;padding:2.1rem 1.8rem;text-align:center;font:400 1.05rem/1.6 "Hanken Grotesk",system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.25)}' +
-        '.mvnfd img{width:56px;height:56px}.mvnfd h2{font:italic 400 1.8rem/1.2 "Cormorant Garamond",Georgia,serif;color:#5A3C4C;margin:.6rem 0 .6rem}' +
-        '.mvnfd .aff{font:italic 400 1.3rem/1.3 "Cormorant Garamond",Georgia,serif;color:#5A3C4C;margin-top:1rem}' +
-        '.mvnfd button{margin-top:1.4rem;font:500 1rem "Hanken Grotesk",system-ui,sans-serif;border:0;border-radius:999px;background:#5A3C4C;color:#F7F1EE;padding:.8em 1.6em;cursor:pointer}';
+        '.mvnfd img{width:56px;height:56px}.mvnfd h2{font:italic 400 1.8rem/1.2 "Cormorant Garamond",Georgia,serif;color:#4A3040;margin:.6rem 0 .6rem}' +
+        '.mvnfd .aff{font:italic 400 1.3rem/1.3 "Cormorant Garamond",Georgia,serif;color:#4A3040;margin-top:1rem}' +
+        '.mvnfd button{margin-top:1.4rem;font:500 1rem "Hanken Grotesk",system-ui,sans-serif;border:0;border-radius:999px;background:#4A3040;color:#F7F1EE;padding:.8em 1.6em;cursor:pointer}';
       document.head.appendChild(st);
       box = document.createElement('div'); box.className = 'mvnfd'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true');
     }

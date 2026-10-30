@@ -4,15 +4,15 @@
 @page{size:A4;margin:16mm 16mm 18mm}
 *{box-sizing:border-box}
 body{margin:0;font-family:Hanken,sans-serif;font-size:10pt;line-height:1.5;color:#2A2026;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-h1,h2,h3,h4{font-family:Cormorant,Georgia,serif;font-weight:500;margin:0;line-height:1.05;color:#3A2631}
+h1,h2,h3,h4{font-family:Cormorant,Georgia,serif;font-weight:500;margin:0;line-height:1.05;color:#2E1D27}
 h1{font-size:54pt}h2{font-size:26pt;margin:.15em 0 .3em}h3{font-size:15pt;margin:1.1em 0 .3em}
 p{margin:.3em 0}
-.k{font-size:7.5pt;letter-spacing:.22em;text-transform:uppercase;color:#5A3C4C;margin:0}
+.k{font-size:7.5pt;letter-spacing:.22em;text-transform:uppercase;color:#4A3040;margin:0}
 .mut{color:#6E6168}.small{font-size:8.5pt}
 .page{page-break-after:always;position:relative}
 .cover{height:257mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
 .cover .logo{width:62px;margin-bottom:20px}
-.cover .sub,.chapter .sub{font-family:Cormorant,serif;font-style:italic;font-size:22pt;color:#5A3C4C;margin-top:.2em}
+.cover .sub,.chapter .sub{font-family:Cormorant,serif;font-style:italic;font-size:22pt;color:#4A3040;margin-top:.2em}
 .facts{display:flex;flex-direction:column;gap:6px;margin-top:28px}
 .facts span{align-self:flex-start;background:#F5F1EB;border-radius:99px;padding:5px 14px}
 .cover .foot{position:absolute;bottom:0;color:#6E6168;font-size:8pt}
@@ -26,22 +26,22 @@ ul{padding-left:1.1em;margin:.3em 0}li{margin:.25em 0}
 table.ov{width:100%;border-collapse:collapse;font-size:8.6pt;margin-top:4mm}
 .ov th{text-align:left;font-weight:500;color:#6E6168;border-bottom:1px solid #D3C9BC;padding:4px}
 .ov td{border-bottom:1px solid #EEE6DD;padding:4px;vertical-align:top}
-.ov tr.a td:first-child{color:#5A3C4C;font-weight:600}
+.ov tr.a td:first-child{color:#4A3040;font-weight:600}
 .ov .box{letter-spacing:.2em;white-space:nowrap}
 .vid{page-break-before:always}
 .vh{display:flex;justify-content:space-between;gap:8mm;align-items:flex-end;border-bottom:1px solid #D3C9BC;padding-bottom:3mm}
-.vh .en{font-family:Cormorant,serif;font-style:italic;font-size:13pt;color:#5A3C4C;margin:0}
+.vh .en{font-family:Cormorant,serif;font-style:italic;font-size:13pt;color:#4A3040;margin:0}
 .meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-size:8.5pt;color:#6E6168;text-align:right;min-width:55mm}
-.ziel{font-family:Cormorant,serif;font-size:13.5pt;line-height:1.35;margin:4mm 0 2mm;color:#3A2631}
+.ziel{font-family:Cormorant,serif;font-size:13.5pt;line-height:1.35;margin:4mm 0 2mm;color:#2E1D27}
 .blk{margin-top:4mm}
-.blk h4{font-size:14pt;color:#5A3C4C;border-bottom:1px dotted #D3C9BC;padding-bottom:1mm;margin-bottom:1.5mm;page-break-after:avoid}
+.blk h4{font-size:14pt;color:#4A3040;border-bottom:1px dotted #D3C9BC;padding-bottom:1mm;margin-bottom:1.5mm;page-break-after:avoid}
 .blk h4 span{font-family:Hanken,sans-serif;font-size:8pt;color:#6E6168;margin-left:6px}
 .ex{padding:1.6mm 0 1.6mm 3mm;border-left:2px solid #E4DCD1;margin:1.4mm 0;page-break-inside:avoid}
 .exh{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
 .exh b{font-weight:600;font-size:10.2pt}
-.dose{margin-left:auto;font-weight:600;color:#3A2631;background:#F5F1EB;border-radius:99px;padding:1px 9px;font-size:8.6pt}
-.tag{font-size:7pt;letter-spacing:.08em;text-transform:uppercase;border-radius:99px;padding:1px 7px;background:#E4DCD1;color:#4A3040}
-.t-yoga{background:#E6DBCF}.t-bodyweight{background:#3A2631;color:#F5F1EB}.t-somatic{background:#E4DCD1}.t-atem{background:#F5F1EB;border:1px solid #D3C9BC}.t-movement{background:#5A3C4C;color:#F7F1EE}
+.dose{margin-left:auto;font-weight:600;color:#2E1D27;background:#F5F1EB;border-radius:99px;padding:1px 9px;font-size:8.6pt}
+.tag{font-size:7pt;letter-spacing:.08em;text-transform:uppercase;border-radius:99px;padding:1px 7px;background:#E4DCD1;color:#3A2631}
+.t-yoga{background:#E6DBCF}.t-bodyweight{background:#2E1D27;color:#F5F1EB}.t-somatic{background:#E4DCD1}.t-atem{background:#F5F1EB;border:1px solid #D3C9BC}.t-movement{background:#4A3040;color:#F7F1EE}
 .ex p{margin:.8mm 0 0;font-size:9.2pt}
-.ex .tip{font-size:8.4pt;color:#3A2631}
-.check{margin-top:5mm;font-size:9pt;color:#5A3C4C}
+.ex .tip{font-size:8.4pt;color:#2E1D27}
+.check{margin-top:5mm;font-size:9pt;color:#4A3040}

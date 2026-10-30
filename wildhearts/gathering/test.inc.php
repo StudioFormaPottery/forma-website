@@ -36,7 +36,7 @@ $offers = $guest ? [] : mm_offers_active();
 @font-face{font-family:"Italiana";font-weight:400;font-display:swap;src:url(/fonts/Italiana-Regular.woff) format("woff")}
 @font-face{font-family:"Outfit";font-weight:300 500;font-display:swap;src:url(/fonts/Outfit-Regular.woff) format("woff")}
 @font-face{font-family:"Hand";font-weight:400;font-display:swap;src:url(/fonts/HomemadeApple-Regular.woff) format("woff")}
-:root{--cream:#F5F1EB;--oat:#E8DED2;--blush:#E6DBCF;--wine:#5A3C4C;--wine-deep:#4A3040;--earth:#3A2631;--brown:#6E6168;--ink:#2A2026;--sage-soft:#E4DCD1;--line:#D3C9BC;--blob:58% 42% 47% 53% / 52% 46% 54% 48%}
+:root{--cream:#F5F1EB;--oat:#E8DED2;--blush:#E6DBCF;--wine:#4A3040;--wine-deep:#3A2631;--earth:#2E1D27;--brown:#6E6168;--ink:#2A2026;--sage-soft:#E4DCD1;--line:#D3C9BC;--blob:58% 42% 47% 53% / 52% 46% 54% 48%}
 *{box-sizing:border-box;margin:0}
 [hidden]{display:none!important}
 html,body{background:var(--cream)}
@@ -89,12 +89,12 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
 .practice{position:fixed;inset:0;z-index:7;background:#1F181B;display:flex;flex-direction:column}
 .practice canvas{flex:1;width:100%;min-height:0;object-fit:contain;background:#1F181B}
 .practice .pbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 16px;color:#C9B2B8;font-size:14px}
-.practice .pbar button{padding:7px 16px;font-size:15px;background:#E4DCD1;color:#4A3040}
+.practice .pbar button{padding:7px 16px;font-size:15px;background:#E4DCD1;color:#3A2631}
 .practice .pbar .recon{background:#93402F;color:#FBF1EA}
 .pask{display:flex;gap:8px;flex-wrap:wrap;padding:10px 16px;background:#1F181B;border-top:1px solid #5A4C52}
 .pask select,.pask input{font:inherit;font-size:16px;padding:9px 12px;border-radius:12px;border:1px solid #5A4C52;background:#2B2226;color:#F5F1EB}
 .pask input{flex:1 1 260px;min-width:0}
-.pask button{padding:9px 16px;font-size:15px;background:#E4DCD1;color:#4A3040}
+.pask button{padding:9px 16px;font-size:15px;background:#E4DCD1;color:#3A2631}
 .pask button.ghost{background:transparent;color:#E4DCD1;border:1px solid #6E6168}
 .ublist{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .ubrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -504,7 +504,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
   // --- Übungsansicht: nur lokal gezeichnet, nichts davon geht in den Whereby-Raum ---
   const UL = $('ublist');
   if (UL) {
-    const SW = ['#5A3C4C', '#B79FA6', '#6E6168', '#C9B2B8', '#4A3040', '#8A8F6E'];
+    const SW = ['#4A3040', '#B79FA6', '#6E6168', '#C9B2B8', '#3A2631', '#8A8F6E'];
     // Namen aus aller Welt: Europa, USA, Lateinamerika, Asien, Afrika, Naher Osten
     const WORLD = ['Anna', 'Sophie', 'Lena', 'Emily', 'Olivia', 'Chloé', 'Giulia', 'Lucía', 'Inês', 'Freya', 'Saoirse', 'Ingrid', 'Zofia', 'Eleni', 'Katarina', 'Madison', 'Ashley', 'Brooke', 'Jasmine', 'Valentina', 'Camila', 'Mariana', 'Yuki', 'Hana', 'Mei', 'Ji-woo', 'Priya', 'Ananya', 'Linh', 'Mai', 'Aiko', 'Siti', 'Leila', 'Yasmin', 'Noa', 'Amara', 'Zara', 'Nia', 'Aisha', 'Ayşe', 'Elif', 'Isla', 'Mia', 'Tamara', 'Rosa'];
     const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -558,7 +558,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     };
     qm.onchange = () => { try { localStorage.setItem('wh-fragen-takt', qm.value); } catch (e) {} if (!PR.hidden) qLoop(); };
     let qList = [], qTimed = [], qMsgs = [], qTimer = 0, qStart = 0, qClock = 0;
-    const NAMECOL = ['#5A3C4C', '#8A5A44', '#3F6B6B', '#7A5C8A', '#A0703A', '#4E6E3A', '#9A4F5F', '#3F5A82', '#6E6168', '#7C7A2F'];
+    const NAMECOL = ['#4A3040', '#8A5A44', '#3F6B6B', '#7A5C8A', '#A0703A', '#4E6E3A', '#9A4F5F', '#3F5A82', '#6E6168', '#7C7A2F'];
     const parseQ = l => {
       let at = -1;
       const tm = l.match(/^(\d{1,3}(?:[.,]\d{1,2})?)\s*(?:min\.?|minute[n]?|m)\s*:?\s*/i);
@@ -608,18 +608,18 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       const h = 120 + list.length * ih + 20, y = H - h - 22 + (1 - ease) * 30;
       g.save(); g.globalAlpha = ease; g.shadowColor = 'rgba(31,22,26,.4)'; g.shadowBlur = 30; g.shadowOffsetY = 12;
       g.fillStyle = '#F5F1EB'; rr(x, y, w, h, 26); g.fill(); g.shadowColor = 'transparent';
-      g.fillStyle = '#5A3C4C'; g.font = '400 19px Hand, cursive'; g.fillText('just for you tonight ♡', x + 24, y + 40);
-      g.fillStyle = '#4A3040'; g.font = '400 34px Italiana, Georgia, serif'; g.fillText('Ways to walk with me', x + 24, y + 82);
-      g.fillStyle = '#E4DCD1'; rr(x + w - 210, y + 22, 186, 32, 16); g.fill(); g.fillStyle = '#4A3040'; g.font = '500 15px Outfit, system-ui, sans-serif';
+      g.fillStyle = '#4A3040'; g.font = '400 19px Hand, cursive'; g.fillText('just for you tonight ♡', x + 24, y + 40);
+      g.fillStyle = '#3A2631'; g.font = '400 34px Italiana, Georgia, serif'; g.fillText('Ways to walk with me', x + 24, y + 82);
+      g.fillStyle = '#E4DCD1'; rr(x + w - 210, y + 22, 186, 32, 16); g.fill(); g.fillStyle = '#3A2631'; g.font = '500 15px Outfit, system-ui, sans-serif';
       g.fillText('Gathering prices · ' + Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'), x + w - 198, y + 43);
       list.forEach(([kk, o], i) => {
         const yy = y + 110 + i * ih, lv = live && o.sp > 0 && o.sp < o.reg, per = o.mon ? '/mo' : '';
         g.strokeStyle = '#D3C9BC'; g.lineWidth = 1; g.beginPath(); g.moveTo(x + 24, yy); g.lineTo(x + w - 24, yy); g.stroke();
-        g.fillStyle = '#4A3040'; g.font = '400 26px Italiana, Georgia, serif'; g.fillText(o.title, x + 24, yy + 34);
+        g.fillStyle = '#3A2631'; g.font = '400 26px Italiana, Georgia, serif'; g.fillText(o.title, x + 24, yy + 34);
         g.font = '400 15px Outfit, system-ui, sans-serif'; g.fillStyle = '#6E6168'; g.fillText((wrap(o.text, w - 48)[0] || '') + ' …', x + 24, yy + 58);
-        if (lv) { g.fillStyle = '#A0959A'; g.font = '400 16px Outfit, system-ui, sans-serif'; const rt = eur(o.reg) + per; g.fillText(rt, x + 24, yy + 94); const rw = g.measureText(rt).width; g.strokeStyle = '#A0959A'; g.beginPath(); g.moveTo(x + 24, yy + 88); g.lineTo(x + 24 + rw, yy + 88); g.stroke(); g.fillStyle = '#4A3040'; g.font = '500 24px Outfit, system-ui, sans-serif'; g.fillText(eur(o.sp) + per, x + 34 + rw, yy + 95); }
-        else { g.fillStyle = '#4A3040'; g.font = '500 24px Outfit, system-ui, sans-serif'; g.fillText(eur(o.reg) + per, x + 24, yy + 95); }
-        g.fillStyle = '#5A3C4C'; rr(x + w - 174, yy + 70, 150, 38, 19); g.fill(); g.fillStyle = '#F5F1EB'; g.font = '500 16px Outfit, system-ui, sans-serif'; g.textAlign = 'center';
+        if (lv) { g.fillStyle = '#A0959A'; g.font = '400 16px Outfit, system-ui, sans-serif'; const rt = eur(o.reg) + per; g.fillText(rt, x + 24, yy + 94); const rw = g.measureText(rt).width; g.strokeStyle = '#A0959A'; g.beginPath(); g.moveTo(x + 24, yy + 88); g.lineTo(x + 24 + rw, yy + 88); g.stroke(); g.fillStyle = '#3A2631'; g.font = '500 24px Outfit, system-ui, sans-serif'; g.fillText(eur(o.sp) + per, x + 34 + rw, yy + 95); }
+        else { g.fillStyle = '#3A2631'; g.font = '500 24px Outfit, system-ui, sans-serif'; g.fillText(eur(o.reg) + per, x + 24, yy + 95); }
+        g.fillStyle = '#4A3040'; rr(x + w - 174, yy + 70, 150, 38, 19); g.fill(); g.fillStyle = '#F5F1EB'; g.font = '500 16px Outfit, system-ui, sans-serif'; g.textAlign = 'center';
         g.fillText((kk === 'year' ? 'Apply · ' : 'Book · ') + eur(lv ? o.sp : o.reg), x + w - 99, yy + 95); g.textAlign = 'start';
       });
       g.restore();
@@ -633,21 +633,21 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       const h = 120 + ls.length * 26 + 70 + (live ? 46 : 0) + 64, y = H - h - 22 + (1 - ease) * 30;
       g.save(); g.globalAlpha = ease; g.shadowColor = 'rgba(31,22,26,.4)'; g.shadowBlur = 30; g.shadowOffsetY = 12;
       g.fillStyle = '#F5F1EB'; rr(x, y, w, h, 26); g.fill(); g.shadowColor = 'transparent';
-      g.fillStyle = '#5A3C4C'; g.font = '400 19px Hand, cursive'; g.fillText(live ? 'just for you tonight ♡' : 'when you are ready ♡', x + 24, y + 40);
-      g.fillStyle = '#4A3040'; g.font = '400 36px Italiana, Georgia, serif'; g.fillText(o.title, x + 24, y + 86);
+      g.fillStyle = '#4A3040'; g.font = '400 19px Hand, cursive'; g.fillText(live ? 'just for you tonight ♡' : 'when you are ready ♡', x + 24, y + 40);
+      g.fillStyle = '#3A2631'; g.font = '400 36px Italiana, Georgia, serif'; g.fillText(o.title, x + 24, y + 86);
       g.fillStyle = '#6E6168'; g.font = '400 18px Outfit, system-ui, sans-serif'; ls.forEach((l, i) => g.fillText(l, x + 24, y + 120 + i * 26));
       let yy = y + 120 + ls.length * 26 + 30;
       const per = o.mon ? ' / month' : '';
       if (live && sec > 0) {
         g.fillStyle = '#A0959A'; g.font = '400 20px Outfit, system-ui, sans-serif'; const rt = eur(o.reg) + per; g.fillText(rt, x + 24, yy); const rw = g.measureText(rt).width;
         g.strokeStyle = '#A0959A'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x + 24, yy - 7); g.lineTo(x + 24 + rw, yy - 7); g.stroke();
-        g.fillStyle = '#4A3040'; g.font = '500 34px Outfit, system-ui, sans-serif'; g.fillText(eur(o.sp) + per, x + 36 + rw, yy + 2);
+        g.fillStyle = '#3A2631'; g.font = '500 34px Outfit, system-ui, sans-serif'; g.fillText(eur(o.sp) + per, x + 36 + rw, yy + 2);
         yy += 30; g.fillStyle = '#E4DCD1'; rr(x + 24, yy, 300, 36, 18); g.fill();
-        g.fillStyle = '#4A3040'; g.font = '500 17px Outfit, system-ui, sans-serif'; g.fillText('Gathering price ends in ' + Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'), x + 40, yy + 24); yy += 46;
+        g.fillStyle = '#3A2631'; g.font = '500 17px Outfit, system-ui, sans-serif'; g.fillText('Gathering price ends in ' + Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'), x + 40, yy + 24); yy += 46;
       } else {
-        g.fillStyle = '#4A3040'; g.font = '500 34px Outfit, system-ui, sans-serif'; g.fillText(eur(o.reg) + per, x + 24, yy + 2); yy += 16;
+        g.fillStyle = '#3A2631'; g.font = '500 34px Outfit, system-ui, sans-serif'; g.fillText(eur(o.reg) + per, x + 24, yy + 2); yy += 16;
       }
-      g.fillStyle = '#5A3C4C'; rr(x + 24, yy + 8, w - 48, 50, 25); g.fill();
+      g.fillStyle = '#4A3040'; rr(x + 24, yy + 8, w - 48, 50, 25); g.fill();
       g.fillStyle = '#F5F1EB'; g.font = '500 19px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('Book now · ' + eur(live && sec > 0 ? o.sp : o.reg), x + w / 2, yy + 40); g.textAlign = 'start';
       g.restore();
     };
@@ -715,9 +715,9 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
       g.fillStyle = '#EDE3DA'; g.fillRect(x0, 0, pw, H);
       g.fillStyle = 'rgba(125,94,104,.07)';
       for (let yy = 70; yy < H; yy += 34) for (let xx = x0 + ((yy / 34) % 2 ? 10 : 27); xx < W; xx += 34) { g.beginPath(); g.arc(xx, yy, 2.2, 0, Math.PI * 2); g.fill(); }
-      g.fillStyle = '#4A3040'; g.fillRect(x0, 0, pw, 64);
+      g.fillStyle = '#3A2631'; g.fillRect(x0, 0, pw, 64);
       g.fillStyle = '#E4DCD1'; g.beginPath(); g.arc(x0 + 34, 32, 18, 0, Math.PI * 2); g.fill();
-      g.fillStyle = '#4A3040'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('♡', x0 + 34, 39); g.textAlign = 'start';
+      g.fillStyle = '#3A2631'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText('♡', x0 + 34, 39); g.textAlign = 'start';
       g.fillStyle = '#F5F1EB'; g.font = '500 20px Outfit, system-ui, sans-serif'; g.fillText('Wild Hearts Chat', x0 + 62, 28);
       const oc = openCount();
       g.fillStyle = '#C9D0B8'; g.font = '400 15px Outfit, system-ui, sans-serif'; g.fillText(oc ? oc + (oc === 1 ? ' Frage offen' : ' Fragen offen') : (rows.length + 1) + ' im Kreis', x0 + 62, 50);
@@ -729,13 +729,13 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
           g.font = '500 18px Outfit, system-ui, sans-serif';
           const ls2 = wrap(m.text, pw - 90), bw2 = Math.min(pw - 40, Math.max(...ls2.map(l => g.measureText(l).width)) + 36), bh2 = 22 + ls2.length * 24, bx2 = x0 + (pw - bw2) / 2; yb -= bh2;
           g.save(); g.globalAlpha = ease; g.translate(bx2 + bw2 / 2, yb + bh2 / 2); g.scale(0.8 + 0.2 * ease, 0.8 + 0.2 * ease); g.translate(-(bx2 + bw2 / 2), -(yb + bh2 / 2));
-          g.fillStyle = '#5A3C4C'; rr(bx2, yb, bw2, bh2, 16); g.fill(); g.fillStyle = '#F5F1EB';
+          g.fillStyle = '#4A3040'; rr(bx2, yb, bw2, bh2, 16); g.fill(); g.fillStyle = '#F5F1EB';
           ls2.forEach((l, j) => g.fillText(l, bx2 + 18, yb + 28 + j * 24)); g.restore(); yb -= 12; continue;
         }
         if (m.who < 0) {
           g.font = '400 16px Outfit, system-ui, sans-serif';
           const tw2 = g.measureText(m.text).width + 28, bx = x0 + (pw - tw2) / 2, bh = 32; yb -= bh;
-          g.fillStyle = '#E1EAC9'; rr(bx, yb, tw2, bh, 10); g.fill(); g.fillStyle = '#4A3040'; g.fillText(m.text, bx + 14, yb + 21); yb -= 10; continue;
+          g.fillStyle = '#E1EAC9'; rr(bx, yb, tw2, bh, 10); g.fill(); g.fillStyle = '#3A2631'; g.fillText(m.text, bx + 14, yb + 21); yb -= 10; continue;
         }
         const name = rows[m.who] ? rows[m.who].name.trim() || 'Gast' : 'Gast', nc = NAMECOL[m.who % NAMECOL.length];
         g.font = '400 20px Outfit, system-ui, sans-serif';
@@ -764,7 +764,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     };
     const nowHM = () => { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
     const drawTop = (W, TOP, n) => {
-      g.fillStyle = '#3A2631'; g.fillRect(0, 0, W, TOP);
+      g.fillStyle = '#2E1D27'; g.fillRect(0, 0, W, TOP);
       g.fillStyle = '#E6DBCF'; g.font = '400 24px Hand, "Bradley Hand", cursive'; g.fillText('welcome, wild heart ♡', 28, 47);
       g.font = '500 26px Outfit, system-ui, sans-serif'; g.fillStyle = '#F5F1EB'; g.textAlign = 'center';
       g.fillText(callTitle(), W / 2, 36);
@@ -791,12 +791,12 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
     };
     const drawBottom = (W, FH, BOT) => {
       const y = FH - BOT;
-      g.fillStyle = '#3A2631'; g.fillRect(0, y, W, BOT);
+      g.fillStyle = '#2E1D27'; g.fillRect(0, y, W, BOT);
       const btns = [['mic', 'Mikro'], ['cam', 'Kamera'], ['share', 'Teilen'], ['chat', 'Chat'], ['hand', 'Melden'], ['more', 'Mehr']];
       const bw = 92, total = btns.length * bw + 140, x0 = (W - total) / 2;
       btns.forEach(([k, lab], i) => {
         const cx = x0 + i * bw + bw / 2, cy = y + 38, active = k === 'chat';
-        g.fillStyle = active ? '#5A3C4C' : 'rgba(242,236,228,.1)'; g.beginPath(); g.arc(cx, cy, 26, 0, Math.PI * 2); g.fill();
+        g.fillStyle = active ? '#4A3040' : 'rgba(242,236,228,.1)'; g.beginPath(); g.arc(cx, cy, 26, 0, Math.PI * 2); g.fill();
         icon(k, cx, cy, '#F5F1EB');
         g.fillStyle = '#C9B2B8'; g.font = '400 14px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText(lab, cx, y + 86); g.textAlign = 'start';
       });
@@ -818,7 +818,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
         const y = (H - (rws * th + (rws - 1) * gap)) / 2 + row * (th + gap);
         if (k === 0) {
           if (cam.videoWidth) cover(cam, cam.videoWidth, cam.videoHeight, x, y, tw, th, true);
-          else { g.fillStyle = '#3A2631'; rr(x, y, tw, th, 14); g.fill(); }
+          else { g.fillStyle = '#2E1D27'; rr(x, y, tw, th, 14); g.fill(); }
           label('Viv', x, y, th, small);
         } else {
           const r = rows[k - 1], im = imgs.get(k - 1);
@@ -826,7 +826,7 @@ textarea{font:inherit;font-size:17px;width:100%;min-height:220px;padding:14px 16
           else { g.fillStyle = r.color; rr(x, y, tw, th, 14); g.fill(); }
           const rad = Math.min(tw, th) * 0.19;
           g.fillStyle = 'rgba(242,236,228,.9)'; g.beginPath(); g.arc(x + tw / 2, y + th / 2 - 8, rad, 0, Math.PI * 2); g.fill();
-          g.fillStyle = '#4A3040'; g.font = '500 ' + Math.round(rad * 0.9) + 'px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+          g.fillStyle = '#3A2631'; g.font = '500 ' + Math.round(rad * 0.9) + 'px Outfit, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
           g.fillText((r.name.trim()[0] || '?').toUpperCase(), x + tw / 2, y + th / 2 - 6); g.textAlign = 'start'; g.textBaseline = 'alphabetic';
           label(r.name.trim() || 'Gast', x, y, th, small);
           if (open.has(k - 1)) {

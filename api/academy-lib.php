@@ -73,14 +73,14 @@ function ac_eur(int $c, string $lang = 'de'): string
 function ac_hours(): array
 {
     return [
-        ['Yoga nach internationalem 200-Std.-Curriculum', 'Yoga, following an international 200-hour curriculum', 200, '#5A3C4C', 'sonne'],
+        ['Yoga nach internationalem 200-Std.-Curriculum', 'Yoga, following an international 200-hour curriculum', 200, '#4A3040', 'sonne'],
         ['Somatic Movement', 'Somatic movement', 80, '#B58C99', 'welle'],
         ['Breathwork & Meditation', 'Breathwork & meditation', 60, '#C8B5BF', 'atem'],
         ['Movecia Movement Method & Bodyweight', 'Movecia Movement Method & bodyweight', 60, '#E8C9B8', 'spirale'],
         ['Anatomie & Body Scanning', 'Anatomy & body scanning', 60, '#9A6F7A', 'herz'],
         ['Achtsame Berührung & Rituale', 'Mindful touch & rituals', 30, '#DDB7A7', 'kerze'],
         ['Mental Load & Nervensystem', 'Mental load & the nervous system', 30, '#E4DCD1', 'kreis'],
-        ['Deine Selbstständigkeit', 'Your own business', 30, '#3A2631', 'bluete'],
+        ['Deine Selbstständigkeit', 'Your own business', 30, '#2E1D27', 'bluete'],
     ];
 }
 
@@ -641,12 +641,12 @@ function ac_mail_html(array $r, string $hand, string $title, array $blocks, stri
 {
     // Academy-Mails mit eigenem Kopf (Pflaume-Band mit Academy-Logo) bzw. Konfetti-Bild (Vivien, 28.10.2026)
     $html = '<p style="margin:0 0 16px;"><img src="' . forma_h(mm_site()) . '/img/movecia/' . ($confetti ? 'mail-academy-konfetti.png' : 'mail-academy-kopf.png') . '?v=4" width="500" alt="Movecia Academy" style="display:block;width:100%;max-width:500px;height:auto;border:0;border-radius:18px;"></p>';
-    $html .= '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#5A3C4C;">' . forma_h($hand) . '</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:28px;line-height:1.2;color:#4A3040;margin:0 0 14px;">' . forma_h($title) . '</h1>';
+    $html .= '<p style="margin:0 0 6px;font-family:\'Brush Script MT\',cursive;font-size:24px;color:#4A3040;">' . forma_h($hand) . '</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:28px;line-height:1.2;color:#3A2631;margin:0 0 14px;">' . forma_h($title) . '</h1>';
     foreach ($blocks as $b) {
-        if (is_array($b) && isset($b['h'])) $html .= '<h2 style="font-family:Georgia,serif;font-weight:400;font-size:21px;color:#4A3040;margin:24px 0 6px;">' . forma_h($b['h']) . '</h2>';
+        if (is_array($b) && isset($b['h'])) $html .= '<h2 style="font-family:Georgia,serif;font-weight:400;font-size:21px;color:#3A2631;margin:24px 0 6px;">' . forma_h($b['h']) . '</h2>';
         elseif (is_array($b) && isset($b['plan'])) {
             $html .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:0 6px;margin:8px 0;">';
-            foreach ($b['plan'] as $x) $html .= '<tr><td style="background:' . ($x['paid'] ? '#E4DCD1' : '#FBF9F6') . ';border-radius:14px 0 0 14px;padding:10px 0 10px 14px;width:26px;font-size:16px;color:#5A3C4C;">' . ($x['paid'] ? '✓' : '○') . '</td><td style="background:' . ($x['paid'] ? '#E4DCD1' : '#FBF9F6') . ';padding:10px 8px;"><b style="font-weight:600;color:#2A2026;">' . forma_h($x['lab']) . '</b><br><span style="font-size:13px;color:#6E6168;">' . forma_h($x['when']) . '</span></td><td align="right" style="background:' . ($x['paid'] ? '#E4DCD1' : '#FBF9F6') . ';border-radius:0 14px 14px 0;padding:10px 14px 10px 8px;white-space:nowrap;font-size:16px;color:#2A2026;">' . forma_h($x['amt']) . '</td></tr>';
+            foreach ($b['plan'] as $x) $html .= '<tr><td style="background:' . ($x['paid'] ? '#E4DCD1' : '#FBF9F6') . ';border-radius:14px 0 0 14px;padding:10px 0 10px 14px;width:26px;font-size:16px;color:#4A3040;">' . ($x['paid'] ? '✓' : '○') . '</td><td style="background:' . ($x['paid'] ? '#E4DCD1' : '#FBF9F6') . ';padding:10px 8px;"><b style="font-weight:600;color:#2A2026;">' . forma_h($x['lab']) . '</b><br><span style="font-size:13px;color:#6E6168;">' . forma_h($x['when']) . '</span></td><td align="right" style="background:' . ($x['paid'] ? '#E4DCD1' : '#FBF9F6') . ';border-radius:0 14px 14px 0;padding:10px 14px 10px 8px;white-space:nowrap;font-size:16px;color:#2A2026;">' . forma_h($x['amt']) . '</td></tr>';
             $html .= '</table><p style="font-size:13px;color:#6E6168;margin:2px 0 10px;">' . forma_h($b['sum']) . '</p>';
         }
         elseif (is_array($b) && isset($b['box'])) $html .= '<div style="background:#FBF9F6;border-radius:16px;padding:14px 18px;margin:12px 0;">' . implode('', array_map(fn($x) => '<p style="margin:4px 0;">' . forma_h($x) . '</p>', $b['box'])) . '</div>';
@@ -1166,7 +1166,7 @@ function ac_pebble(float $cx, float $cy, float $w, string $line, string $soft, s
 function ac_logo_colors(bool $onPlum): array
 {
     return $onPlum ? ['line' => '#F7F1EE', 'soft' => 'rgba(232,214,202,.55)', 'dot' => '#F3E2D8', 'fill' => 'rgba(251,245,247,.10)', 'thin' => 'rgba(251,245,247,.55)', 'text' => '#F7F1EE', 'sub' => '#E4DCD1']
-        : ['line' => '#5A3C4C', 'soft' => '#E6DBCF', 'dot' => '#5A3C4C', 'fill' => '#F6EAE6', 'thin' => '#C9A3AE', 'text' => '#3A2631', 'sub' => '#5A3C4C'];
+        : ['line' => '#4A3040', 'soft' => '#E6DBCF', 'dot' => '#4A3040', 'fill' => '#F6EAE6', 'thin' => '#C9A3AE', 'text' => '#2E1D27', 'sub' => '#4A3040'];
 }
 
 /** Nur das Zeichen (ohne Schrift). Gibt [innerSVG, breite, höhe] zurück. */

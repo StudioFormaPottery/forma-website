@@ -56,7 +56,7 @@ body.auth{min-height:100vh}
 .lc.c-flow .th{background:radial-gradient(circle at 30% 30%,#F3E3D8,#E6DBCF 60%,#DCC3B4)}
 .lc.c-somatic .th{background:radial-gradient(circle at 70% 30%,#F1E6E5,#E4DCD1 55%,#D9C6C7)}
 .lc.c-breath .th{background:radial-gradient(circle at 40% 70%,#F5EFE8,#E6DDD2 60%,#D6CABD)}
-.lc.c-meditation .th{background:radial-gradient(circle at 50% 40%,#8C727B,#4A3040 60%,#3A2631)}.lc.c-meditation .th .ic{color:var(--peach);opacity:.9}
+.lc.c-meditation .th{background:radial-gradient(circle at 50% 40%,#8C727B,#3A2631 60%,#2E1D27)}.lc.c-meditation .th .ic{color:var(--peach);opacity:.9}
 .lc.c-body .th{background:radial-gradient(circle at 30% 70%,#EFD9CC,#E3C7B7 60%,#D2B19F)}
 .lc.c-talk .th{background:radial-gradient(circle at 60% 60%,#E9DCD8,#D8CFC4 60%,#C4A9AE)}
 .lc .min,.lc .dn,.lc .lk,.lc .soon{position:absolute;font-size:.76rem;border-radius:999px;padding:.2em .7em;background:rgba(251,248,244,.92);color:var(--deep)}
@@ -79,7 +79,7 @@ body.auth{min-height:100vh}
 @media(min-width:1100px){.lesson{grid-template-columns:1.6fr 1fr;gap:3rem;align-items:start}}
 .player{position:relative;aspect-ratio:16/9;border-radius:var(--r);overflow:hidden;background:var(--deep)}
 .player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.player .ph{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:1rem;color:var(--on);text-align:center;padding:2rem;background:radial-gradient(circle at 30% 30%,#8C727B,#3A2631)}
+.player .ph{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:1rem;color:var(--on);text-align:center;padding:2rem;background:radial-gradient(circle at 30% 30%,#8C727B,#2E1D27)}
 .player .ph .ic{width:72px;height:72px;color:var(--peach)}
 .ltext .h2{margin:.4rem 0 .2rem}
 .acts{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.4rem}

@@ -447,7 +447,7 @@ function natal_mail_html(string $title, string $inner, string $foot = ''): strin
 
 function natal_btn(string $href, string $label): string
 {
-    return '<p style="margin:22px 0 6px;text-align:center;"><a href="' . forma_h($href) . '" style="display:inline-block;padding:14px 28px;border-radius:999px;background:#5A3C4C;color:#F7F1EE;text-decoration:none;font-weight:bold;">' . forma_h($label) . '</a></p>';
+    return '<p style="margin:22px 0 6px;text-align:center;"><a href="' . forma_h($href) . '" style="display:inline-block;padding:14px 28px;border-radius:999px;background:#4A3040;color:#F7F1EE;text-decoration:none;font-weight:bold;">' . forma_h($label) . '</a></p>';
 }
 
 function natal_h1(string $t): string
@@ -543,7 +543,7 @@ function natal_checkout(PDO $pdo, array $o): string
         'cancel_url' => $site . '/natal/?o=' . $o['id'] . '&k=' . $o['token'] . '&abgebrochen=1',
     ];
     $branded = $params;
-    $branded['branding_settings'] = ['display_name' => 'Movecia – Personal Fitness', 'background_color' => '#F5F1EB', 'button_color' => '#5A3C4C', 'border_style' => 'rounded', 'font_family' => 'inter'];
+    $branded['branding_settings'] = ['display_name' => 'Movecia – Personal Fitness', 'background_color' => '#F5F1EB', 'button_color' => '#4A3040', 'border_style' => 'rounded', 'font_family' => 'inter'];
     $branded['payment_intent_data']['statement_descriptor_suffix'] = 'MOVECIA';
     try {
         $s = forma_stripe('POST', '/v1/checkout/sessions', $branded, null, '2025-09-30.clover');
@@ -785,7 +785,7 @@ function natal_pack_cards(string $base): array
         $html .= '<div style="margin:18px 0 6px;padding:18px 20px;background:' . ($online ? '#E4DCD1' : '#F5F1EB') . ';border-radius:18px;">'
             . '<p style="margin:0 0 8px;font-family:Georgia,\'Times New Roman\',serif;font-size:21px;color:#2A2026;">' . forma_h($label) . '</p>'
             . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.4;color:#2A2026;">' . $rows . '</table>'
-            . '<p style="margin:16px 0 2px;text-align:center;"><a href="' . forma_h($link) . '" style="display:inline-block;padding:12px 24px;border-radius:999px;background:#5A3C4C;color:#F7F1EE;text-decoration:none;font-weight:bold;">' . ($online ? 'Online ansehen &amp; buchen' : 'Studio ansehen &amp; buchen') . '</a></p></div>';
+            . '<p style="margin:16px 0 2px;text-align:center;"><a href="' . forma_h($link) . '" style="display:inline-block;padding:12px 24px;border-radius:999px;background:#4A3040;color:#F7F1EE;text-decoration:none;font-weight:bold;">' . ($online ? 'Online ansehen &amp; buchen' : 'Studio ansehen &amp; buchen') . '</a></p></div>';
     }
     return [$html, $text];
 }

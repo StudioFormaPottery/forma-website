@@ -116,7 +116,7 @@ function mv_next_popup(): void
   </div>
 </div>
 <style>
-.npop{--pl:#5A3C4C;--dp:#3A2631;--cr:#FBF9F6;--pf:#E6DBCF;--bl:#E4DCD1;position:fixed;inset:0;z-index:90;display:flex;overflow-y:auto;padding:24px 16px;background:rgba(46,37,41,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .45s}
+.npop{--pl:#4A3040;--dp:#2E1D27;--cr:#FBF9F6;--pf:#E6DBCF;--bl:#E4DCD1;position:fixed;inset:0;z-index:90;display:flex;overflow-y:auto;padding:24px 16px;background:rgba(46,37,41,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .45s}
 .npop.on{opacity:1}
 .npop[hidden]{display:none}
 .npop-stage{position:relative;margin:auto;width:min(860px,100%);transform:translateY(26px) scale(.96);transition:transform .8s cubic-bezier(.2,1.2,.3,1)}

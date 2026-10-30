@@ -112,7 +112,7 @@ function presse_html(string $brand, string $to): string
     $f = $brand === 'forma';
     $site = $f ? 'https://www.forma-pottery.com' : 'https://moveciamovement.com';
     $ink = $f ? '#33211B' : '#2A2026';
-    $acc = $f ? '#8C2C1D' : '#5A3C4C';
+    $acc = $f ? '#8C2C1D' : '#4A3040';
     $soft = $f ? '#E4D2BF' : '#E4DCD1';
     $serif = $f ? 'Georgia,serif' : 'Georgia,\'Cormorant Garamond\',serif';
     $pics = '';

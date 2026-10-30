@@ -1,5 +1,5 @@
 /* Öffentliche Movecia-Seiten: ruhig, viel Raum, feine große Schrift, weich verschwommene Bilder (Vorbild Mindful Body) */
-:root{--mauve:#8C7480;--mauve-d:#6A5460}
+:root{--mauve:#7E6472;--mauve-d:#5C4552}
 .site-top{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.9);backdrop-filter:blur(10px)}
 .site-top .top{padding-top:16px;padding-bottom:16px}
 .top-r{display:flex;align-items:center;gap:.5rem;margin-left:auto}
@@ -42,7 +42,7 @@ h1,h2{font-weight:400}
 .o-method{--ob:#F1E4DA}
 .o-unfold{--ob:#E4DCD1}
 .o-natal{--ob:#EFE3E0;--oi:#9A6F7A}
-.o-gather{--ob:#3A2631;--oi:#E6DBCF;--ot:#F7F1EE;--om:#D9C9CE}
+.o-gather{--ob:#2E1D27;--oi:#E6DBCF;--ot:#F7F1EE;--om:#D9C9CE}
 .offer .art{aspect-ratio:4/5;border-radius:24px 24px 0 0;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 500' preserveAspectRatio='none'%3E%3Cpath d='M0 0h400v468c-40 22-90 30-140 16S140 446 90 458 20 482 0 476z'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 500' preserveAspectRatio='none'%3E%3Cpath d='M0 0h400v468c-40 22-90 30-140 16S140 446 90 458 20 482 0 476z'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
 .offer .art::after{display:none}
 .onum{position:absolute;z-index:2;top:26px;left:26px;font-family:var(--serif);font-size:1.05rem;letter-spacing:.12em;background:rgba(251,248,244,.86);color:var(--deep);border-radius:999px;padding:.15em .8em;backdrop-filter:blur(4px)}
@@ -155,7 +155,7 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
 .art.wide.soft:hover video{transform:none}
 .vsolo.soft{max-height:92vh;width:min(100%,520px)}
 .vsolo.soft video{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22%,#000 78%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 84%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent 0,#000 22%,#000 78%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 84%,transparent 100%);mask-composite:intersect}
-.vsolo.soft .flow{color:#3A2631}
+.vsolo.soft .flow{color:#2E1D27}
 .vsolo.soft .f-lab{text-shadow:0 0 14px rgba(242,236,228,.95),0 0 4px rgba(242,236,228,.9)}
 .vsolo.soft .f-top{top:9%}.vsolo.soft .f-bot{bottom:6%}
 .vsolo.soft .f-line{top:calc(9% + 2.6rem);bottom:calc(6% + 2.8rem);background:rgba(74,58,65,.55)}

@@ -11,7 +11,7 @@
    oder automatisch für jedes [data-mv-flow]. */
 (function () {
   const CSS = `
-.mvf{--ink:#2A2026;--muted:#6E6168;--line:#E3D8CD;--card:#FBF9F6;--plum:#5A3C4C;--deep:#3A2631;--blush:#E4DCD1;--peach:#E6DBCF;--glow:#F1C9A5;--cream:#FFFCF8;
+.mvf{--ink:#2A2026;--muted:#6E6168;--line:#E3D8CD;--card:#FBF9F6;--plum:#4A3040;--deep:#2E1D27;--blush:#E4DCD1;--peach:#E6DBCF;--glow:#F1C9A5;--cream:#FFFCF8;
   display:flex;flex-direction:column;gap:16px;color:var(--ink);font-family:inherit;font-size:1rem}
 .mvf *{box-sizing:border-box}
 .mvf [hidden]{display:none!important}
@@ -59,7 +59,7 @@
 /* Abspielen */
 .mvf-play,.mvf-done{scroll-margin-top:150px}
 .mvf-play{display:flex;flex-direction:column;gap:14px}
-.mvf-stage{position:relative;aspect-ratio:16/9;width:100%;border-radius:30px;overflow:hidden;background:radial-gradient(circle at 30% 30%,#8C727B,#3A2631)}
+.mvf-stage{position:relative;aspect-ratio:16/9;width:100%;border-radius:30px;overflow:hidden;background:radial-gradient(circle at 30% 30%,#8C727B,#2E1D27)}
 .mvf-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}
 .mvf-ph{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;color:#E4DCD1;font-size:.95rem;text-align:center;padding:1rem}
 .mvf-ph .mk{width:64px;height:64px;opacity:.9}

@@ -31,9 +31,9 @@
 /* Movecia-Handschrift für alle öffentlichen Seiten (27.10.2026): Pastell-Karten mit Icon-Blase und weicher Form in der Ecke */
 .cute-cards>*{position:relative;overflow:hidden;isolation:isolate;border:0!important;transition:transform .4s ease,box-shadow .4s ease}
 .cute-cards>*:hover{transform:translateY(-4px);box-shadow:0 18px 36px -26px rgba(74,58,65,.45)}
-.cute-cards>*::after{content:"";position:absolute;right:-50px;bottom:-60px;width:150px;height:150px;border-radius:46% 54% 60% 40%/50% 42% 58% 50%;background:#5A3C4C;opacity:.06;z-index:-1;pointer-events:none}
+.cute-cards>*::after{content:"";position:absolute;right:-50px;bottom:-60px;width:150px;height:150px;border-radius:46% 54% 60% 40%/50% 42% 58% 50%;background:#4A3040;opacity:.06;z-index:-1;pointer-events:none}
 .cute-cards>*:nth-child(5n+1){background:#FBF9F6!important}.cute-cards>*:nth-child(5n+2){background:#F3E2D8!important}.cute-cards>*:nth-child(5n+3){background:#EEDFE0!important}.cute-cards>*:nth-child(5n+4){background:#F8EFE7!important}.cute-cards>*:nth-child(5n+5){background:#E8D9DD!important}
-.cute-cards>*>svg:first-child,.cute-cards .ib{display:grid;place-items:center;width:60px!important;height:60px!important;padding:12px;border-radius:50%;background:rgba(255,255,255,.75);color:#5A3C4C;margin-bottom:.8rem}
+.cute-cards>*>svg:first-child,.cute-cards .ib{display:grid;place-items:center;width:60px!important;height:60px!important;padding:12px;border-radius:50%;background:rgba(255,255,255,.75);color:#4A3040;margin-bottom:.8rem}
 .cute-faq details{background:#FBF9F6;border:0!important;border-radius:18px;padding:1rem 1.2rem!important;margin-top:.6rem}
 .cute-faq details:nth-child(2n){background:#F8EFE7}
 @media(prefers-reduced-motion:reduce){.cute-cards>*{transition:none}}
