@@ -297,10 +297,11 @@ void main(){
     <div class="sn-row" style="margin-top:8px"><span class="t" data-k="time">0:00 / 0:00</span>
       <button type="button" class="sn-b pl" data-k="play">▶ Abspielen</button>
       <button type="button" class="sn-b" data-k="cut2" title="An der Stelle der Linie schneiden (Taste S)">✂️ Hier schneiden</button>
+      <button type="button" class="sn-b" data-k="ztDel" title="Das markierte Stück löschen" style="color:#9A3B3B">🗑 Stück löschen</button>
       <button type="button" class="sn-b" data-k="cmp" title="Licht & Farbe kurz ausschalten">Vorher zeigen</button></div>
     <div class="sn-zt">
       <div class="sn-zt-sc" data-k="ztsc"><div class="sn-zt-in" data-k="ztin"><div class="sn-zt-tt" data-k="ztt"></div><div class="sn-zt-blocks" data-k="ztb"></div><div class="sn-zt-ph" data-k="ztph"></div></div></div>
-      <div class="sn-zt-bar"><button type="button" class="cut" data-k="ztCut" title="An der Stelle des Strichs schneiden">✂ Hier schneiden</button><button type="button" class="cut del" data-k="ztDel" title="Das markierte Stück löschen">🗑 Stück löschen</button><button type="button" class="zb" data-k="zoomOut" aria-label="Zeitleiste zusammenziehen">－</button><input type="range" min="0" max="100" step="1" value="0" data-k="zoomR" aria-label="Zeitleiste auseinanderziehen"><button type="button" class="zb" data-k="zoomIn" aria-label="Zeitleiste auseinanderziehen">＋</button><span class="t" data-k="ztime">0:00,0</span></div>
+      <div class="sn-zt-bar"><button type="button" class="zb" data-k="zoomOut" aria-label="Zeitleiste zusammenziehen">－</button><input type="range" min="0" max="100" step="1" value="0" data-k="zoomR" aria-label="Zeitleiste auseinanderziehen"><button type="button" class="zb" data-k="zoomIn" aria-label="Zeitleiste auseinanderziehen">＋</button><span class="t" data-k="ztime">0:00,0</span></div>
     </div>
     <div class="sn-ovl" data-k="ovl"></div>
     <p class="sn-zt-hint" data-k="zthint">Tippen = Stelle anspringen · die Griffe <b>⟦ ⟧</b> an den Rändern ziehen = Anfang und Ende länger oder kürzer machen (das schraffierte Stück daneben ist das, was weggeschnitten wurde – da kannst du wieder hineinziehen) · der Griff darf auch über den nächsten Clip hinaus (was doppelt ist, kannst du darunter löschen) · zwei Finger auseinander (oder ＋) = Zeitleiste auseinanderziehen</p>
@@ -728,7 +729,6 @@ void main(){
       if (i < sel) sel--; sel = Math.min(sel, clips.length - 1);
       await saveOrder(); pos = sel >= 0 ? starts()[sel] : 0; ui();
     }
-    K('ztCut').onclick = () => K('split').onclick();
     K('ztDel').onclick = () => K('delClip').onclick();
     K('delClip').onclick = async () => { if (!clips[sel]) return; await delAt(sel); say('🗑 Clip gelöscht.'); };
 
