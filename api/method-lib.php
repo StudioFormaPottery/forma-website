@@ -28,7 +28,7 @@ const MV_ENERGY = [
  * Preise und Termine, so wie sie gespeichert sind (für die Verwaltung).
  * Vivien 25.10.2026: Early-Bird bis zum Start, danach regulär.
  * Method: bis inkl. 1.12.2026 € 29 / 3 Monate € 75 / Jahr € 240, danach € 39 / € 111 (= € 37 im Monat) / € 396 (= € 33 im Monat).
- * Unfold: bis inkl. 11.1.2027 € 450 oder 3 × € 165, danach € 490 oder 3 × € 175.
+ * Unfold (Vivien, 30.10.2026): Early-Bird bis inkl. 29.12.2026 € 450 oder 3 × € 165, ab 30.12.2026 € 550 oder 3 × € 200.
  * Wer zum Early-Bird-Preis bucht, behält ihn, solange das Abo läuft (Preis hängt fest am Stripe-Abo).
  */
 function mv_cfg_raw(): array
@@ -39,8 +39,8 @@ function mv_cfg_raw(): array
         'eb_m1' => 2900, 'eb_m3' => 7500, 'eb_m12' => 24000,        // Method Early-Bird
         'eb_m_until' => '2026-12-01',
         'g_m1' => 1900, 'g_m3' => 6500, 'g_m12' => 19900,           // Method im Gathering (erste Zahlung), Early-Bird-Phase
-        'u_once' => 49000, 'u_inst' => 17500, 'u_n' => 3, 'g_u_once' => 39000,   // Unfold regulär (ab 12.1.2027)
-        'eb_u_once' => 45000, 'eb_u_inst' => 16500, 'eb_u_until' => '2027-01-11',
+        'u_once' => 55000, 'u_inst' => 20000, 'u_n' => 3, 'g_u_once' => 39000,   // Unfold regulär (ab 30.12.2026)
+        'eb_u_once' => 45000, 'eb_u_inst' => 16500, 'eb_u_until' => '2026-12-29',
         'u_seats' => 10, 'u_start' => '2027-01-10', 'u_end' => '2027-04-11', 'u_open' => 1,
         'u_call_de' => 'Sonntag, 19:00 Uhr', 'u_call_en' => 'Sunday, 8:15 pm (Vienna time)',
     ];
@@ -51,6 +51,12 @@ function mv_cfg_raw(): array
     if (empty($c['price_v3'])) {
         foreach (['m1', 'm3', 'm12', 'u_once', 'u_inst'] as $k) unset($c[$k]);
         $c['price_v3'] = 1;
+        mm_save_cfg('method', $c);
+    }
+    // Vivien 30.10.2026: Unfold Early-Bird nur noch bis 29.12.2026, danach € 550 (alte gespeicherte Werte werden einmal ersetzt)
+    if (empty($c['price_v4'])) {
+        foreach (['u_once', 'u_inst', 'eb_u_until'] as $k) unset($c[$k]);
+        $c['price_v4'] = 1;
         mm_save_cfg('method', $c);
     }
     foreach ($def as $k => $v) $def[$k] = is_int($v) ? (int)($c[$k] ?? $v) : (string)($c[$k] ?? $v);

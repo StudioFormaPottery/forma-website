@@ -1,0 +1,34 @@
+{
+ "zip": "Movecia_Advent.zip",
+ "ads": [
+  {"name": "1_Method_Advent", "langs": {
+   "de": {"type": "offer", "advent": true, "advtag": "Im Advent", "icon": "kerze", "photo": "img/movecia/fotos/ev-ueber-mich.jpg", "pos": "50% 35%",
+          "kicker": "On demand · Start am 1. Dezember", "title": "Mindful Movement", "em": "Method",
+          "text": "Schenk dir im Advent jeden Tag ein paar ruhige Minuten: Flows, Somatic Movement, Breathwork und Meditation. Du startest bei Monat 1 und gehst Schritt für Schritt weiter.",
+          "price": "€ 29 im Monat", "deal": "Early-Bird nur bis 1. Dezember, danach € 39. Dein Preis bleibt, solange du dabei bist.",
+          "cta": "Jetzt Platz sichern", "url": "moveciamovement.com/method", "pinbtn": "Mehr erfahren"},
+   "en": {"type": "offer", "advent": true, "advtag": "Advent", "icon": "kerze", "photo": "img/movecia/fotos/ev-ueber-mich.jpg", "pos": "50% 35%",
+          "kicker": "On demand · starts 1 December", "title": "Mindful Movement", "em": "Method",
+          "text": "Give yourself a few quiet minutes every day this Advent: flows, somatic movement, breathwork and meditation. You start at month one and take it one step at a time.",
+          "price": "€29 a month", "deal": "Early-bird price until 1 December, then €39. Your price stays the same for as long as you stay.",
+          "cta": "Save your spot", "url": "moveciamovement.com/method", "pinbtn": "Learn more"}}},
+  {"name": "2_Natal_Advent", "langs": {
+   "de": {"type": "offer", "advent": true, "advtag": "Im Advent", "icon": "nest", "photo": "img/movecia/fotos/ev-natal.jpg", "pos": "50% 30%",
+          "kicker": "1:1 im Studio in Mathon oder online", "title": "Prä- & Postnatal", "em": "Training",
+          "text": "Sanft kräftigen, gut atmen, den Beckenboden spüren: in der Schwangerschaft und nach der Geburt, ganz auf dich abgestimmt. Das Kennenlerngespräch ist kostenlos.",
+          "price": "ab € 44 pro Einheit", "deal": "Einzelstunde € 75 im Studio oder € 65 online. Pakete mit 6, 8 oder 14 Einheiten, gültig bis 6 Monate nach der Geburt.",
+          "cta": "Alle Infos und Buchung", "url": "moveciamovement.com/natal", "pinbtn": "Mehr erfahren",
+          "qr": "img/movecia/qr-natal.svg", "qrtitle": "Scannen", "qrtext": "und kostenloses Kennenlerngespräch buchen"}}},
+  {"name": "3_Unfold_Advent", "langs": {
+   "de": {"type": "offer", "advent": true, "advtag": "Ein Geschenk an dich", "icon": "schmetterling", "photo": "img/movecia/fotos/ev-unfold-karte.jpg", "pos": "50% 70%",
+          "kicker": "3 Monate live online · Start 10. Jänner", "title": "Unfold|", "em": "The Mindful Becoming",
+          "text": "Ein ruhiger Start ins neue Jahr: drei Monate Begleitung mit wöchentlichem Live-Call, Bewegungsvideos und Workbooks. Nur 10 Plätze.",
+          "price": "€ 450", "deal": "Early-Bird bis 29. Dezember, auch in 3 Raten zu € 165. Ab 30. Dezember kostet Unfold € 550.",
+          "cta": "Jetzt Platz sichern", "url": "moveciamovement.com/unfold", "pinbtn": "Mehr erfahren"},
+   "en": {"type": "offer", "advent": true, "advtag": "A gift to yourself", "icon": "schmetterling", "photo": "img/movecia/fotos/ev-unfold-karte.jpg", "pos": "50% 70%",
+          "kicker": "3 months live online · starts 10 January", "title": "Unfold|", "em": "The Mindful Becoming",
+          "text": "A gentle start to the new year: three months of guidance with a weekly live call, movement videos and workbooks. Only 10 spots.",
+          "price": "€450", "deal": "Early-bird price until 29 December, or 3 payments of €165. From 30 December, Unfold is €550.",
+          "cta": "Save your spot", "url": "moveciamovement.com/unfold", "pinbtn": "Learn more"}}}
+ ]
+}

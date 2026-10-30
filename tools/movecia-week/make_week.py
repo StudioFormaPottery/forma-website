@@ -106,6 +106,25 @@ h1 em{font-style:italic;color:#4A3040}.dark h1 em{color:#E6DBCF}
 .phbox{position:relative}
 .chips{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}.chips span{background:rgba(251,248,244,.9);border-radius:99px;padding:12px 22px;font-size:25px;color:#2E1D27}.dark .chips span{background:rgba(251,245,247,.1);color:#E4DCD1}
 .dark .steps div{color:#2A2026}
+/* Advent (Vivien, 30.10.2026): feierlich, aber dezent – Girlande oben, kleine Sterne, Movecia-Farben */
+.garland{position:absolute;left:-10px;right:-10px;top:-4px;width:calc(100% + 20px);height:150px;z-index:3}
+.s .garland{top:70px}
+.garland .g-line{fill:none;stroke:#4A3040;stroke-width:2;opacity:.55}
+.dark .garland .g-line{stroke:#E6DBCF}
+.twinkle{position:absolute;z-index:1;width:30px;height:30px;color:#B58C99;opacity:.8}
+.dark .twinkle{color:#E6DBCF;opacity:.6}
+.adv .top{margin-top:70px}
+.adv-tag{display:inline-flex;align-items:center;gap:10px;font-size:22px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;color:#F7F1EE;background:#4A3040;padding:11px 20px;border-radius:99px}
+.dark .adv-tag{background:#E6DBCF;color:#2E1D27}
+.qrbox{display:flex;align-items:center;gap:20px;background:rgba(251,249,246,.92);border-radius:26px;padding:14px 22px 14px 14px}
+.qrbox img{width:150px;height:150px;border-radius:12px}
+.qrbox span{font-size:23px;line-height:1.35;color:#2A2026;max-width:260px}
+.qrbox b{display:block;font-family:Cormorant,serif;font-weight:500;font-size:34px}
+.f .qrbox img{width:104px;height:104px}.f .qrbox{padding:10px 18px 10px 10px;gap:14px}.f .qrbox span{font-size:20px;max-width:220px}.f .qrbox b{font-size:28px}
+.f.adv .top{margin-top:40px}
+.f.adv.t-offer .ph{height:320px}.f.adv.t-offer .body{margin-top:18px!important}.f.adv.t-offer .text{font-size:26px}
+.pin .garland{top:-4px}.pin.adv .top{margin-top:64px}.pin.adv.t-offer .ph{height:420px}.pin.adv.t-offer .text{font-size:27px}.pin.adv.t-offer h1{font-size:80px}
+.s.adv.t-offer:not(.pin) .ph{height:540px}
 """
 
 def esc(x): return html.escape(x or '')
@@ -120,14 +139,34 @@ def ibubble(p):
     if k not in wbicons.ICONS: k = 'herz'
     return f'<div class="ib">{wbicons.icon(k, 62)}</div>'
 
+STAR = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></svg>'
+
+def garland():
+    # Bogen-Girlande mit Kugeln und Sternchen in Movecia-Farben
+    cols = ['#4A3040', '#E6DBCF', '#B58C99', '#FBF9F6', '#4A3040', '#D3C9BC', '#B58C99', '#E6DBCF', '#4A3040', '#FBF9F6', '#B58C99', '#E6DBCF']
+    g = '<svg class="garland" viewBox="0 0 1100 150" preserveAspectRatio="none"><path class="g-line" d="M0 18 Q 137 92 275 30 T 550 30 T 825 30 T 1100 18"/>'
+    import math
+    for i in range(12):
+        x = 40 + i * 92
+        t = (x % 275) / 275
+        y = 22 + math.sin(t * math.pi) * 40
+        if i % 3 == 1:
+            g += f'<g transform="translate({x-11} {y+4}) scale(.9)"><path fill="{cols[i]}" stroke="#4A3040" stroke-opacity=".25" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z"/></g>'
+        else:
+            g += f'<line x1="{x}" y1="{y}" x2="{x}" y2="{y+12}" stroke="#4A3040" stroke-opacity=".45" stroke-width="1.5"/><circle cx="{x}" cy="{y+24}" r="12" fill="{cols[i]}" stroke="#4A3040" stroke-opacity=".25"/><circle cx="{x-4}" cy="{y+20}" r="3" fill="#fff" opacity=".55"/>'
+    return g + '</svg>'
+
 def page(p, story, pin=False):
     cls = (['pin', 's'] if pin else ['s' if story else 'f']) + ['t-' + p['type']] + (['dark'] if p.get('dark') else [])
     logo = '/img/movecia/movecia-zeichen-hell.svg' if p.get('dark') else '/img/movecia/movecia-zeichen-klein.svg'
     day = f'<span class="day">{esc(p["day"])}</span>' if p.get('day') else ''
+    if p.get('advtag'): day = f'<span class="adv-tag">{STAR.replace("<svg ", "<svg width=\'18\' height=\'18\' ")}{esc(p["advtag"])}</span>'
     top = f'<div class="top"><div class="brand"><img src="{logo}"><span>Movecia<i></i></span></div>{day}</div>'
     foot = ''
     if p.get('cta') or p.get('url'):
-        foot = f'<div class="foot"><div class="url">{esc(p.get("cta",""))}<b>{esc(p.get("url",""))}</b></div><span class="btn">{esc(p.get("btn", "Link in Bio"))} →</span></div>'
+        right = f'<span class="btn">{esc(p.get("btn", "Link in Bio"))} →</span>'
+        if p.get('qr'): right = f'<div class="qrbox"><img src="/{esc(p["qr"])}"><span><b>{esc(p.get("qrtitle", "Scannen"))}</b>{esc(p.get("qrtext", ""))}</span></div>'
+        foot = f'<div class="foot"><div class="url">{esc(p.get("cta",""))}<b>{esc(p.get("url",""))}</b></div>{right}</div>'
     has_photo = p['type'] == 'photo' or bool(p.get('photo'))
     body = ('' if has_photo else ibubble(p)) + f'<p class="k">{esc(p.get("kicker",""))}</p><h1>{title(p)}</h1>'
     if p.get('text'): body += f'<p class="text">{esc(p["text"])}</p>'
@@ -139,8 +178,12 @@ def page(p, story, pin=False):
     if p['type'] == 'offer': body += f'<div class="deal"><b>{esc(p["price"])}</b>{esc(p["deal"])}</div>'
     if p.get('chips'): body += '<div class="chips">' + ''.join(f'<span>{esc(c)}</span>' for c in p['chips']) + '</div>'
     if p.get('sig'): body += f'<p class="sig">{esc(p["sig"])}</p>'
+    if p.get('advent'): cls.append('adv')
     dots = '<span class="dot" style="width:14px;height:14px;left:7%;top:24%"></span><span class="dot" style="width:9px;height:9px;left:62%;top:9%"></span><span class="dot" style="width:11px;height:11px;right:9%;top:58%;background:#E6DBCF;opacity:.9"></span>'
     deco = WAVES + LINES + dots
+    if p.get('advent'):
+        tw = [('8%', '30%', 26), ('88%', '40%', 22), ('14%', '62%', 18), ('92%', '70%', 28), ('50%', '16%', 16)]
+        deco += garland() + ''.join(f'<span class="twinkle" style="left:{x};top:{y};width:{w}px;height:{w}px">{STAR}</span>' for x, y, w in tw)
     if has_photo:
         cls.append('photo')
         pos = f';background-position:{esc(p["pos"])}' if p.get('pos') else ''

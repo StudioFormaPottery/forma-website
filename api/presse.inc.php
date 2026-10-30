@@ -48,7 +48,7 @@ function presse_release(string $brand): array
         ],
         'facts' => [
             'Mindful Movement Method: Start 1. Dezember 2026, Early-Bird bis 1. Dezember € 29 statt € 39 im Monat',
-            'Unfold: Start 10. Jänner 2027, 10 Plätze, Early-Bird bis 11. Jänner € 450 statt € 490',
+            'Unfold: Start 10. Jänner 2027, 10 Plätze, Early-Bird bis 29. Dezember € 450, danach € 550',
             'Prä- und Postnatal-Training: im Studio in Mathon oder online',
             'Infos und Buchung: www.moveciamovement.com · Kontakt: Vivien Malonga, hello@moveciamovement.com, Instagram @movementwithviv',
         ],
