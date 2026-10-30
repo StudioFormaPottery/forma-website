@@ -280,7 +280,7 @@
 
   // CSS-Filter genau wie im Browser (W3C Filter Effects), damit Vorschau und Export gleich aussehen
   const VS = 'attribute vec2 p;varying vec2 uv;void main(){uv=p*.5+.5;gl_Position=vec4(p,0.,1.);}';
-  const FS = `precision highp float;varying vec2 uv;uniform sampler2D t;uniform vec2 so,oo,fo;uniform float br,ct,sa,se,zm,fz,fr,fe,cin,lb;
+  const FS = `precision highp float;varying vec2 uv;uniform sampler2D t;uniform vec2 so,oo,fo;uniform float br,ct,sa,se,zm,fz,fr,fe,cin,lb,bb;uniform sampler2D mk;
 void main(){
  float ra=so.x/so.y, ro=oo.x/oo.y;
  vec2 p=uv-.5;
@@ -288,7 +288,10 @@ void main(){
  p.x*=ro; float cs=cos(fr), sn=sin(fr); p=vec2(cs*p.x-sn*p.y, sn*p.x+cs*p.y); p.x/=ro; vec2 q=.5+p/fz+fo; // eigener Ausschnitt: gerade richten, zoomen, verschieben
  if(ra>ro){float k=ro/ra;q.x=.5+(q.x-.5)*k;}else{float k=ra/ro;q.y=.5+(q.y-.5)*k;} // Mitte ausschneiden (object-fit: cover)
  q=.5+(q-.5)/zm; // sanfter Zoom je Abschnitt
- vec3 c=texture2D(t,clamp(q,vec2(.0005),vec2(.9995))).rgb;
+ vec2 qq=clamp(q,vec2(.0005),vec2(.9995)); vec3 c=texture2D(t,qq).rgb;
+ if(bb>0.){float m=smoothstep(.25,.75,texture2D(mk,qq).r); if(m<.999){vec3 s=c; float n=1.; vec2 rr=vec2(bb*.03/max(ra,1.),bb*.03*min(ra,1.));
+   for(int i=1;i<=24;i++){float fi=float(i); float a=fi*2.39996; vec2 o=vec2(cos(a),sin(a))*sqrt(fi/24.)*rr; s+=texture2D(t,clamp(qq+o,vec2(.0005),vec2(.9995))).rgb; n+=1.;}
+   c=mix(s/n,c,m);}} // Hintergrund weich (Person bleibt scharf)
  c*=br; c=(c-.5)*ct+.5; c=clamp(c,0.,1.);
  float r=c.r,g=c.g,b=c.b;
  c=vec3((.213+.787*sa)*r+(.715-.715*sa)*g+(.072-.072*sa)*b,(.213-.213*sa)*r+(.715+.285*sa)*g+(.072-.072*sa)*b,(.213-.213*sa)*r+(.715-.715*sa)*g+(.072+.928*sa)*b);
@@ -307,6 +310,28 @@ void main(){
     const z = F ? Math.max(1, Math.min(3, +F.z || 1)) : 1, th = F ? (+F.r || 0) * Math.PI / 180 : 0, a = Math.abs(th);
     const kr = th ? Math.cos(a) + Math.max(asp, 1 / asp) * Math.sin(a) : 1, m = (1 - 1 / z) / 2;
     return { Z: z * kr, th, ox: F ? Math.max(-1, Math.min(1, +F.x || 0)) * m : 0, oy: F ? Math.max(-1, Math.min(1, +F.y || 0)) * m : 0, z };
+  }
+  // Hintergrund weich im Nachhinein (Vivien, 30.10.2026): Person per MediaPipe erkennen (wie im Studio), Rest weichzeichnen
+  const MPV = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+  const SEG_B = 'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite';
+  const SEG_S = 'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite';
+  let segP = null, segTs = 0, segPrev = null; const segCv = document.createElement('canvas');
+  function segLoad() {
+    if (!segP) segP = (async () => { const m = await import(MPV + '/vision_bundle.mjs'), files = await m.FilesetResolver.forVisionTasks(MPV + '/wasm');
+      const mk = (path, d) => m.ImageSegmenter.createFromOptions(files, { baseOptions: { modelAssetPath: path, delegate: d }, runningMode: 'VIDEO', outputCategoryMask: false, outputConfidenceMasks: true });
+      let t = null, body = true; for (const [pth, d, b] of [[SEG_B, 'GPU', 1], [SEG_B, 'CPU', 1], [SEG_S, 'GPU', 0], [SEG_S, 'CPU', 0]]) { try { t = await mk(pth, d); body = !!b; break; } catch (e) {} }
+      if (!t) throw new Error('seg'); t._body = body; return t; })().catch(e => { segP = null; throw e; });
+    return segP;
+  }
+  async function segMask(src, sw, shh) {
+    if (window.__snSegTest) return window.__snSegTest(src, sw, shh);
+    const t = await segLoad(), W = 256, H = Math.max(16, Math.round(256 * shh / Math.max(1, sw)));
+    if (segCv.width !== W || segCv.height !== H) { segCv.width = W; segCv.height = H; } segCv.getContext('2d').drawImage(src, 0, 0, W, H);
+    segTs = Math.max(segTs + 1, performance.now()); const r = t.segmentForVideo(segCv, segTs), mk = r.confidenceMasks && r.confidenceMasks[0]; let out = null;
+    if (mk) { const a = mk.getAsFloat32Array(), n = a.length; if (!segPrev || segPrev.length !== n) segPrev = new Float32Array(n); const b = new Uint8Array(n);
+      for (let i = 0; i < n; i++) { const v = t._body ? 1 - a[i] : a[i], d = Math.abs(v - segPrev[i]); segPrev[i] = d > .25 ? v : segPrev[i] * .35 + v * .65; b[i] = segPrev[i] * 255; }
+      out = { data: b, w: mk.width, h: mk.height }; }
+    if (r.close) r.close(); return out;
   }
   const filterCss = L => `brightness(${L.br}) contrast(${L.ct}) saturate(${L.sa}) sepia(${L.se})`;
   const brate = (w, h) => { const p = w * h; return p >= 7e6 ? 40e6 : p >= 3.2e6 ? 20e6 : p >= 1.8e6 ? 12e6 : p >= .8e6 ? 8e6 : 5e6; };
@@ -429,7 +454,7 @@ void main(){
   </div></details>
   <details class="sn-box" open><summary>☀️ Licht &amp; Farbe</summary><div class="bd">
     <div class="sn-chips" data-k="looks"></div>
-    <div data-sl="br"></div><div data-sl="ct"></div><div data-sl="sa"></div><div data-sl="se"></div>
+    <div data-sl="br"></div><div data-sl="ct"></div><div data-sl="sa"></div><div data-sl="se"></div><div data-sl="bb"></div>
     <label class="sn-sw"><input type="checkbox" data-k="lbx"> 🎬 Kino-Balken (schmale schwarze Streifen oben und unten)</label>
     <p class="sn-note">Gilt für alle Clips, damit das Video aus einem Guss ist.</p>
   </div></details>
@@ -459,7 +484,7 @@ void main(){
     let clips = [], sel = -1, closed = false, busy = false, curDraft = null, drList = [];
     let bros = []; const ovV = new Map(); // „Bild darüber“: Clips, die nur ihr Bild über ein Talking Head legen (dessen Stimme läuft weiter)
     let covers = [], cov = null, shAC = null; const elSrcs = new WeakMap(); // Titelbilder · gemeinsamer Ton-Mischer
-    const st = Object.assign({ look: 'natur', br: 1, ct: 1, sa: 1, se: 0, fmt: 'orig' }, ls.get('sn-st', {}));
+    const st = Object.assign({ look: 'natur', br: 1, ct: 1, sa: 1, se: 0, bb: 0, fmt: 'orig' }, ls.get('sn-st', {}));
     const mus = Object.assign({ vol: .18, voice: 1, duck: true, fade: true }, ls.get('sn-mus', {}));
     const auto = Object.assign({ pause: .7, stumbles: true, zoom: true, noise: true }, ls.get('sn-auto', {}));
     let mlist = []; const XF = 2.5; // Musik-Playlist; XF = Sekunden Überblendung (bei kurzen Liedern weniger)
@@ -796,15 +821,16 @@ void main(){
       say('🎞 „' + o.name + '“ liegt als Bild über Clip ' + (sel + 1) + ', ab der Stelle, an der du gerade warst. Die Stimme läuft weiter.', 'ok');
     };
     // Vorschau über WebGL, sobald Kino-Look, Kino-Balken oder Fischauge dabei sind (geht mit CSS nicht) – zeigt genau den Export
-    const glc = document.createElement('canvas'); glc.className = 'sn-glc'; pv.insertBefore(glc, big); let glDraw = null;
-    function needGL() { const c = clips[sel]; return !cmp && !!c && ((st.cin || 0) > 0 || !!st.lb || (c.fe || 0) > 0) && !K('covimg').classList.contains('on'); }
+    const glc = document.createElement('canvas'); glc.className = 'sn-glc'; pv.insertBefore(glc, big); let glDraw = null, glMt = -1, segWarned = false;
+    function needGL() { const c = clips[sel]; return !cmp && !!c && ((st.cin || 0) > 0 || !!st.lb || (c.fe || 0) > 0 || (st.bb || 0) > 0) && !K('covimg').classList.contains('on'); }
     (function glLoop() { if (closed) return; requestAnimationFrame(glLoop);
       if (!needGL()) { if (glc.style.display !== 'none') glc.style.display = 'none'; return; }
       const c = clips[sel], v = vids.get(c.slot); if (!v || v.readyState < 2 || !v.videoWidth) return;
       const W = Math.min(1280, Math.round(pv.clientWidth * (window.devicePixelRatio || 1))), H = Math.round(W * pv.clientHeight / Math.max(1, pv.clientWidth));
       if (glc.width !== W || glc.height !== H) { glc.width = W; glc.height = H; glDraw = null; } if (!glDraw) glDraw = makeGL(glc); if (!glDraw) return;
       const bo = broAt(c, v.currentTime), ov = bo ? ovV.get(bo.id) : null;
-      if (ov && ov.readyState >= 2 && ov.videoWidth) glDraw(ov, ov.videoWidth, ov.videoHeight, 1); else glDraw(v, v.videoWidth, v.videoHeight, zAt(c, Math.max(0, v.currentTime - (c.in || 0))), false, c.fr, c.fe);
+      if ((st.bb || 0) > 0 && !sgBusy && (!v.paused || v.currentTime !== glMt)) { sgBusy = true; glMt = v.currentTime; segMask(v, v.videoWidth, v.videoHeight).then(m => { sgLast = m; sgBusy = false; }).catch(() => { sgBusy = false; if (!segWarned) { segWarned = true; say('„Hintergrund weich“ konnte die Personen-Erkennung nicht laden. Bitte kurz prüfen, ob das Internet da ist.', 'bad'); } }); }
+      if (ov && ov.readyState >= 2 && ov.videoWidth) glDraw(ov, ov.videoWidth, ov.videoHeight, 1); else glDraw(v, v.videoWidth, v.videoHeight, zAt(c, Math.max(0, v.currentTime - (c.in || 0))), false, c.fr, c.fe, sgLast);
       glc.style.display = 'block'; })();
     function vtf(c, off) {
       const z = c.zoom ? zAt(c, off) : 1; if (!c.fr && z === 1) return '';
@@ -1005,7 +1031,7 @@ void main(){
     addEventListener('resize', () => { if (clips.length) ztDraw(); });
 
     // ---- Regler ----
-    const SL = { br: ['Helligkeit', .6, 1.5, .01, x => Math.round((x - 1) * 100) > 0 ? '+' + Math.round((x - 1) * 100) : String(Math.round((x - 1) * 100))], ct: ['Kontrast', .6, 1.5, .01, x => (x > 1 ? '+' : '') + Math.round((x - 1) * 100)], sa: ['Farbe', 0, 1.6, .01, x => Math.round(x * 100) + ' %'], se: ['Wärme', 0, .6, .01, x => x > .02 ? 'wärmer' : 'neutral'],
+    const SL = { br: ['Helligkeit', .6, 1.5, .01, x => Math.round((x - 1) * 100) > 0 ? '+' + Math.round((x - 1) * 100) : String(Math.round((x - 1) * 100))], ct: ['Kontrast', .6, 1.5, .01, x => (x > 1 ? '+' : '') + Math.round((x - 1) * 100)], sa: ['Farbe', 0, 1.6, .01, x => Math.round(x * 100) + ' %'], se: ['Wärme', 0, .6, .01, x => x > .02 ? 'wärmer' : 'neutral'], bb: ['Hintergrund weich (du bleibst scharf)', 0, 1, .01, x => x > .005 ? Math.round(x * 100) + ' %' : 'aus'],
       vol: ['Lautstärke Musik', 0, 1, .01, x => Math.round(x * 100) + ' %'], voice: ['Lautstärke Stimme', 0, 1.5, .01, x => Math.round(x * 100) + ' %'] };
     const inputs = {};
     root.querySelectorAll('[data-sl]').forEach(el => {
@@ -1288,13 +1314,18 @@ void main(){
       const P = gl.createProgram(); gl.attachShader(P, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(P, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(P); gl.useProgram(P);
       const bf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
       const loc = gl.getAttribLocation(P, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      const U = {}; ['t', 'so', 'oo', 'br', 'ct', 'sa', 'se', 'zm', 'fz', 'fr', 'fo', 'fe', 'cin', 'lb'].forEach(n => U[n] = gl.getUniformLocation(P, n));
+      const U = {}; ['t', 'so', 'oo', 'br', 'ct', 'sa', 'se', 'zm', 'fz', 'fr', 'fo', 'fe', 'cin', 'lb', 'bb', 'mk'].forEach(n => U[n] = gl.getUniformLocation(P, n));
       const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
       [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]].forEach(x => gl.texParameteri(gl.TEXTURE_2D, x[0], x[1]));
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-      return (el, sw, shh, z, neutral, F, fe) => { gl.viewport(0, 0, cv.width, cv.height); gl.bindTexture(gl.TEXTURE_2D, tex); try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, el); } catch (e) { return false; }
+      const mtex = gl.createTexture(); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, mtex);
+      [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]].forEach(x => gl.texParameteri(gl.TEXTURE_2D, x[0], x[1]));
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, 1, 1, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, new Uint8Array([255])); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tex);
+      return (el, sw, shh, z, neutral, F, fe, M) => {
+        const useB = !neutral && (st.bb || 0) > 0 && M && M.data;
+        if (useB) { gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, mtex); gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1); gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, M.w, M.h, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, M.data); gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4); gl.activeTexture(gl.TEXTURE0); } gl.viewport(0, 0, cv.width, cv.height); gl.bindTexture(gl.TEXTURE_2D, tex); try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, el); } catch (e) { return false; }
         const L = neutral ? { br: 1, ct: 1, sa: 1, se: 0, cin: 0, lb: 0 } : st;
-        gl.uniform1i(U.t, 0); gl.uniform2f(U.so, sw, shh); gl.uniform2f(U.oo, cv.width, cv.height); gl.uniform1f(U.br, L.br); gl.uniform1f(U.ct, L.ct); gl.uniform1f(U.sa, L.sa); gl.uniform1f(U.se, L.se); const fv = frVals(F, cv.width / cv.height); gl.uniform1f(U.fz, fv.Z); gl.uniform1f(U.fr, fv.th); gl.uniform2f(U.fo, fv.ox, -fv.oy); gl.uniform1f(U.fe, neutral ? 0 : Math.max(0, Math.min(1, +fe || 0))); gl.uniform1f(U.cin, +L.cin || 0); gl.uniform1f(U.lb, L.lb ? 1 : 0); gl.uniform1f(U.zm, z || 1); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); return true; };
+        gl.uniform1i(U.t, 0); gl.uniform2f(U.so, sw, shh); gl.uniform2f(U.oo, cv.width, cv.height); gl.uniform1f(U.br, L.br); gl.uniform1f(U.ct, L.ct); gl.uniform1f(U.sa, L.sa); gl.uniform1f(U.se, L.se); const fv = frVals(F, cv.width / cv.height); gl.uniform1f(U.fz, fv.Z); gl.uniform1f(U.fr, fv.th); gl.uniform2f(U.fo, fv.ox, -fv.oy); gl.uniform1i(U.mk, 1); gl.uniform1f(U.bb, useB ? Math.min(1, st.bb) : 0); gl.uniform1f(U.fe, neutral ? 0 : Math.max(0, Math.min(1, +fe || 0))); gl.uniform1f(U.cin, +L.cin || 0); gl.uniform1f(U.lb, L.lb ? 1 : 0); gl.uniform1f(U.zm, z || 1); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); return true; };
     }
     // ---- Ton der Clips holen (Vivien, 30.10.2026: „beim Exportieren ist der Ton weg. Komplett.“) ----
     // Am iPhone (Safari bis iOS 18) gibt es keinen AudioDecoder/AudioEncoder. Früher wurde die Stimme dann still übersprungen
@@ -1441,10 +1472,11 @@ void main(){
           let el, sw, shh, tsrc, dur; if (direct) { const f = smp.toVideoFrame(); smp.close(); el = f; sw = f.displayWidth; shh = f.displayHeight; tsrc = f.timestamp / 1e6; dur = (f.duration || 0) / 1e6; } else { el = smp.canvas; sw = el.width; shh = el.height; tsrc = smp.timestamp; dur = smp.duration; }
           const ts = x.start + Math.max(0, tsrc - (x.c.in || 0)); const ok2 = ts > lastTs && ts < D;
           const bo = ok2 ? broAt(x.c, tsrc) : null, bf = bo ? await ovFrame(bo, (bo.in || 0) + (tsrc - bo.ost)) : null;
-          if (ok2) { if (bf) draw(bf.canvas, bf.canvas.width, bf.canvas.height, 1); else draw(el, sw, shh, zAt(x.c, tsrc - (x.c.in || 0)), false, x.c.fr, x.c.fe); lastTs = ts; } if (direct) el.close();
+          let msk = null; if (ok2 && !bf && (st.bb || 0) > 0) { try { msk = await segMask(el, sw, shh); } catch (e) { msk = null; } }
+          if (ok2) { if (bf) draw(bf.canvas, bf.canvas.width, bf.canvas.height, 1); else draw(el, sw, shh, zAt(x.c, tsrc - (x.c.in || 0)), false, x.c.fr, x.c.fe, msk); lastTs = ts; } if (direct) el.close();
           if (ok2) await cs.add(ts, Math.max(1 / 60, Math.min(dur || 1 / 30, D - ts)));
           fill.style.width = Math.min(100, ts / D * 100) + '%';
-          const el2 = (performance.now() - W0) / 1000; if (!window.__snFastForce && el2 > 4 && D - ts > 4 && ts / el2 < 1.1) { try { await out.cancel(); } catch (e) {} return null; }
+          const el2 = (performance.now() - W0) / 1000; if (!window.__snFastForce && !((st.bb || 0) > 0) && el2 > 4 && D - ts > 4 && ts / el2 < 1.1) { try { await out.cancel(); } catch (e) {} return null; }
         }
       }
       for (const S of ovS.values()) { try { if (S.it) await S.it.return(); } catch (e) {} }
@@ -1458,6 +1490,7 @@ void main(){
     function sharedAC() { if (!shAC || shAC.state === 'closed') shAC = new (window.AudioContext || window.webkitAudioContext)(); return shAC; }
     function elSource(el) { let s = elSrcs.get(el); if (s) return s; const ac = sharedAC(), src = ac.createMediaElementSource(el), spk = ac.createGain(); src.connect(spk); spk.connect(ac.destination); s = { src, spk }; elSrcs.set(el, s); return s; }
     // Rückfall: in Echtzeit über Canvas + MediaRecorder (alle Browser, dauert so lang wie das Video)
+    let sgBusy = false, sgLast = null;
     async function slowRender(fill) {
       if (!window.MediaRecorder) return null; const v0 = vidFor(clips[0]); if (!v0 || !v0.videoWidth) return null;
       const [W, H] = outSize(v0.videoWidth, v0.videoHeight), cv = document.createElement('canvas'); cv.width = W; cv.height = H; const draw = makeGL(cv); if (!draw) return null;
@@ -1482,7 +1515,8 @@ void main(){
           const bo = broAt(c, v.currentTime), ov = bo ? ovVid(bo) : null;
           ovV.forEach(x => { if (x !== ov && !x.paused) x.pause(); });
           if (ov) { const want = (bo.in || 0) + (v.currentTime - bo.ost); if (Math.abs(ov.currentTime - want) > .3) { try { ov.currentTime = want; } catch (e) {} } if (ov.paused) ov.play().catch(() => {}); }
-          if (ov && ov.readyState >= 2 && ov.videoWidth) draw(ov, ov.videoWidth, ov.videoHeight, 1); else draw(v, v.videoWidth, v.videoHeight, zAt(c, v.currentTime - (c.in || 0)), false, c.fr, c.fe); const t = t0 + (v.currentTime - (c.in || 0));
+          if ((st.bb || 0) > 0 && !sgBusy) { sgBusy = true; segMask(v, v.videoWidth, v.videoHeight).then(m => { sgLast = m; sgBusy = false; }).catch(() => { sgBusy = false; }); }
+          if (ov && ov.readyState >= 2 && ov.videoWidth) draw(ov, ov.videoWidth, ov.videoHeight, 1); else draw(v, v.videoWidth, v.videoHeight, zAt(c, v.currentTime - (c.in || 0)), false, c.fr, c.fe, sgLast); const t = t0 + (v.currentTime - (c.in || 0));
           if (mg) { musDrive(t, true); const g = mus.fade ? Math.max(0, Math.min(1, t / 1.5, (D - t) / 2.5)) : 1; mg.gain.setTargetAtTime(g, ac.currentTime, .2); }
           fill.style.width = Math.min(100, t / D * 100) + '%'; if (v.ended || v.currentTime >= (c.out || c.dur) - .03) { ok(); return; } (v.requestVideoFrameCallback ? v.requestVideoFrameCallback(step) : requestAnimationFrame(step)); }; step(); v.onended = ok; });
         v.pause(); t0 += len(c);
