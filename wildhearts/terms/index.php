@@ -271,6 +271,10 @@ a{color:var(--wine)}
   <details><summary><span class="en">Can my partner or children come to the retreat?</span><span class="de">Können mein Partner oder meine Kinder zum Retreat mitkommen?</span></summary><p><span class="en">Depending on the group, partners and children can sometimes be included, and private retreats are possible too. Just ask me.</span><span class="de">Je nach Gruppe können Partner und Kinder manchmal mit eingebunden werden, und auch private Retreats sind möglich. Frag mich einfach.</span></p></details>
   <details><summary><span class="en">Do I have to turn my camera on in a Gathering?</span><span class="de">Muss ich bei einem Gathering meine Kamera einschalten?</span></summary><p><span class="en">No. Your camera can stay on, but it doesn't have to. Please keep your microphone muted unless you want to speak.</span><span class="de">Nein. Deine Kamera darf an bleiben, muss aber nicht. Bitte lass dein Mikrofon stumm, außer du möchtest etwas sagen.</span></p></details>
 
+  <h2 id="impressum"><span class="en">Legal notice</span><span class="de">Impressum</span></h2>
+  <p><span class="de">Movecia – Personal Fitness<br>Vivien Malonga<br>Silvrettastraße 58, 6562 Mathon, Österreich<br>E-Mail: <a href="mailto:<?= $mail ?>"><?= $mail ?></a><br>UID: ATU83602825</span><span class="en">Movecia – Personal Fitness<br>Vivien Malonga<br>Silvrettastraße 58, 6562 Mathon, Austria<br>Email: <a href="mailto:<?= $mail ?>"><?= $mail ?></a><br>VAT ID: ATU83602825</span></p>
+  <p class="small"><span class="de">Das Studio ist kein Ladengeschäft: Termine nur nach Vereinbarung, Anschrift ausschließlich für Impressum und Rechnungen.</span><span class="en">The studio is not a walk-in business: sessions by appointment only; the address is given for legal and invoicing purposes only.</span></p>
+
   <p class="small" style="margin-top:36px"><span class="en">As of 23 October 2026.</span><span class="de">Stand: 23. Oktober 2026.</span> · <a href="/">moveciamovement.com</a></p>
 </main>
 <script>

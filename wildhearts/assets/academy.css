@@ -565,3 +565,17 @@ body.acad{--blush:#E9E2D8}
           mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20' preserveAspectRatio='none'%3E%3Cpath d='M0 10 Q15 0 30 10 T60 10 T90 10 T120 10 V20 H0Z'/%3E%3C/svg%3E") top/120px 16px repeat-x,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20' preserveAspectRatio='none'%3E%3Cpath d='M0 10 Q15 20 30 10 T60 10 T90 10 T120 10 V0 H0Z'/%3E%3C/svg%3E") bottom/120px 16px repeat-x,linear-gradient(#000,#000) center/100% calc(100% - 30px) no-repeat}
 .ac-head2{margin-top:.4rem}
 @media(max-width:600px){.acc{padding:2rem 1rem 1.9rem}}
+
+/* Handy (Vivien, 30.10.2026: Kopfbereich sah wie Desktop aus, alles links): Text, Chips und Knöpfe mittig, Überschrift kleiner */
+@media(max-width:760px){
+  .ac-hero>div,.ac-hero .ac-hero-tx{text-align:center}
+  .ac-hero h1{font-size:clamp(2.4rem,11vw,3.4rem);line-height:1.02}
+  .ac-hero .sub{font-size:1.15rem;line-height:1.35}
+  .ac-hero .lead{margin-left:auto;margin-right:auto;font-size:1em}
+  .ac-hero .facts,.ac-hero .cta,.ac-hero .ac-kick{justify-content:center}
+  .ac-hero .ac-kick{flex-direction:column;align-items:center;gap:.4rem}
+  .ac-hero .ac-kick small{display:block}
+  .ac-hero .ebird{margin-left:auto;margin-right:auto}
+  .ac-head2{display:flex;justify-content:center}
+  .ac-hero .cta .btn{width:100%;max-width:340px;justify-content:center}
+}
