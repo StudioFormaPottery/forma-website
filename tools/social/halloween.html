@@ -1,0 +1,84 @@
+<!doctype html>
+<!-- FORMA Halloween-Posts (Vivien, 30.10.2026). Aufruf: halloween.html?p=1|2|3&f=feed|story|pin
+     feed = Instagram 4:5 (1080×1350), story = WhatsApp/Instagram-Story 9:16 (1080×1920), pin = Pinterest 2:3 (1000×1500).
+     Gerendert mit tools/social/make_halloween.py gegen den lokalen Server. -->
+<html lang="de"><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Bricolage;src:url(/fonts/BricolageGrotesque-Bold.woff);font-weight:700}
+@font-face{font-family:Bricolage;src:url(/fonts/BricolageGrotesque-Regular.woff);font-weight:400}
+@font-face{font-family:Italiana;src:url(/fonts/Italiana-Regular.woff)}
+@font-face{font-family:Outfit;src:url(/fonts/Outfit-Regular.woff);font-weight:400}
+@font-face{font-family:Outfit;src:url(/fonts/Outfit-Bold.woff);font-weight:700}
+*{box-sizing:border-box;margin:0}
+html,body{background:#1E1411}
+.c{position:relative;width:var(--w);height:var(--h);overflow:hidden;color:#F3E6DA;font-family:Outfit,sans-serif;
+  background:radial-gradient(120% 70% at 70% 12%,#4A2E25 0,#2E1E19 45%,#1A110E 100%)}
+.c::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.16;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.drip{position:absolute;left:0;top:0;width:100%;height:calc(var(--u)*7);z-index:3}
+.moon{position:absolute;right:calc(var(--u)*-4);top:calc(var(--u)*3);width:calc(var(--u)*19);height:calc(var(--u)*19);border-radius:50%;
+  background:radial-gradient(circle at 38% 36%,#FFF6EA 0,#F1DFC9 55%,#D9BFA4 100%);box-shadow:0 0 calc(var(--u)*6) calc(var(--u)*2) rgba(241,223,201,.28),0 0 calc(var(--u)*18) rgba(241,223,201,.15)}
+.moon i{position:absolute;border-radius:50%;background:rgba(190,160,135,.35)}
+.web{position:absolute;left:-2px;top:calc(var(--u)*3);width:calc(var(--u)*30);height:calc(var(--u)*30);opacity:.42;z-index:2}
+.bat{position:absolute;z-index:2}
+.bat svg{width:100%;height:100%;display:block}
+.spider{position:absolute;top:0;z-index:4;width:calc(var(--u)*5)}
+.spider::before{content:"";position:absolute;left:50%;top:0;width:2px;height:var(--l);background:rgba(243,230,218,.5)}
+.spider svg{position:absolute;top:calc(var(--l) - var(--u)*1);left:0;width:calc(var(--u)*5);height:calc(var(--u)*5)}
+.in{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;text-align:center;padding:calc(var(--u)*10) calc(var(--u)*12) calc(var(--u)*5)}
+.eb{font-family:Italiana,serif;font-size:calc(var(--u)*4.6);letter-spacing:.02em;color:#E8CDB4}
+h1{font-family:Bricolage,sans-serif;font-weight:700;font-size:calc(var(--u)*var(--ts));line-height:.95;letter-spacing:-.025em;margin-top:calc(var(--u)*1.4);color:#FBF1EA;
+  text-shadow:0 0 calc(var(--u)*4) rgba(140,44,29,.55)}
+h1 em{font-style:normal;color:#E7B9A6}
+.sub{font-size:calc(var(--u)*3.6);margin-top:calc(var(--u)*1.6);color:#EEE2D4;letter-spacing:.01em}
+.ph{position:relative;flex:1 1 auto;min-height:0;margin:calc(var(--u)*4) 0 calc(var(--u)*3.4);aspect-ratio:4/5;max-width:74%}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:999px 999px calc(var(--u)*4) calc(var(--u)*4);filter:saturate(.88) brightness(.9) contrast(1.04)}
+.ph::before{content:"";position:absolute;inset:calc(var(--u)*-1.6);transform:translate(calc(var(--u)*1.4),calc(var(--u)*1.4));border:2px solid rgba(231,185,166,.55);border-radius:999px 999px calc(var(--u)*5) calc(var(--u)*5)}
+.ph::after{content:"";position:absolute;inset:0;border-radius:999px 999px calc(var(--u)*4) calc(var(--u)*4);box-shadow:inset 0 0 calc(var(--u)*10) rgba(20,10,8,.55)}
+.jk{position:absolute;bottom:calc(var(--u)*-3);width:calc(var(--u)*13);height:calc(var(--u)*13);z-index:2;filter:drop-shadow(0 0 calc(var(--u)*3) rgba(198,72,40,.6))}
+.jk.l{left:calc(var(--u)*-5)}.jk.r{right:calc(var(--u)*-4);width:calc(var(--u)*9);height:calc(var(--u)*9);bottom:calc(var(--u)*-1)}
+.pill{display:inline-block;background:#8C2C1D;color:#FBF1EA;font-weight:700;font-size:calc(var(--u)*3.6);padding:calc(var(--u)*1.4) calc(var(--u)*4);border-radius:999px;box-shadow:0 0 calc(var(--u)*5) rgba(140,44,29,.5)}
+.txt{font-size:calc(var(--u)*3.1);line-height:1.4;color:#E9D9CA;margin-top:calc(var(--u)*2.2);max-width:100%}
+.ft{display:flex;align-items:center;gap:calc(var(--u)*2.2);margin-top:calc(var(--u)*3.6)}
+.ft img{width:calc(var(--u)*9);height:calc(var(--u)*9)}
+.ft span{text-align:left;font-size:calc(var(--u)*2.7);line-height:1.3;color:#E9D9CA;letter-spacing:.08em;text-transform:uppercase}
+.ft b{display:block;font-weight:700;letter-spacing:.04em;text-transform:none;font-size:calc(var(--u)*3.1);color:#FBF1EA}
+</style></head><body>
+<div class="c" id="c">
+  <svg class="drip" viewBox="0 0 1000 70" preserveAspectRatio="none" aria-hidden="true"><path fill="#8C2C1D" d="M0 0H1000V18C980 18 975 26 972 34 969 44 958 44 956 34 953 22 940 20 925 22 905 24 900 30 898 52 896 66 882 66 880 52 878 34 868 24 845 24 820 24 812 30 810 40 808 48 797 48 795 38 792 26 770 22 745 24 720 26 713 32 711 58 709 72 694 72 692 58 690 34 676 24 650 24 625 24 616 28 614 36 612 44 601 44 599 36 596 26 580 22 555 24 530 26 524 30 522 46 520 58 506 58 504 46 502 30 490 24 465 24 438 24 430 30 428 40 426 50 414 50 412 40 409 28 395 22 370 24 345 26 338 32 336 60 334 74 318 74 316 60 314 34 302 24 278 24 252 24 244 28 242 36 240 44 228 44 226 36 224 28 210 22 185 24 160 26 152 30 150 44 148 56 134 56 132 44 130 30 118 24 95 24 72 24 64 28 62 38 60 48 48 48 46 38 43 26 30 18 0 18Z"/></svg>
+  <div class="moon"><i style="left:22%;top:30%;width:18%;height:18%"></i><i style="left:55%;top:52%;width:12%;height:12%"></i><i style="left:40%;top:68%;width:8%;height:8%"></i></div>
+  <svg class="web" viewBox="0 0 64 64" aria-hidden="true"><g stroke="#F3E6DA" stroke-width=".5" fill="none"><path d="M0 0l64 64M0 0l30 64M0 0l64 30M0 0h64M0 0v64M0 0l48 64M0 0l64 48"/><path d="M0 10c4 0 9-2 10-10M0 20c8 0 16-5 20-20M0 32c13 0 24-8 32-32M0 45c19 0 34-11 45-45M0 60c26 0 46-16 60-60"/></g></svg>
+  <div id="bats"></div><div id="spiders"></div>
+  <div class="in">
+    <p class="eb" id="eb"></p>
+    <h1 id="t"></h1>
+    <p class="sub" id="sub"></p>
+    <div class="ph"><img id="img" alt="">
+      <svg class="jk l" viewBox="0 0 64 64"><path d="M31 16c0-5 2-9 6-11" stroke="#674B40" stroke-width="4" stroke-linecap="round" fill="none"/><ellipse cx="20" cy="38" rx="13" ry="17" fill="#8C2C1D"/><ellipse cx="44" cy="38" rx="13" ry="17" fill="#8C2C1D"/><ellipse cx="32" cy="38" rx="12" ry="19" fill="#A23F28"/><path d="M19 32l6-6 5 7zM45 32l-6-6-5 7z" fill="#FFC56B"/><path d="M18 43l4 4 4-4 4 4 4-4 4 4 4-4 4 4c-4 5-9 7-14 7s-11-2-14-7z" fill="#FFC56B"/></svg>
+      <svg class="jk r" viewBox="0 0 64 64"><path d="M31 16c0-5 2-9 6-11" stroke="#674B40" stroke-width="4" stroke-linecap="round" fill="none"/><ellipse cx="20" cy="38" rx="13" ry="17" fill="#8C2C1D"/><ellipse cx="44" cy="38" rx="13" ry="17" fill="#8C2C1D"/><ellipse cx="32" cy="38" rx="12" ry="19" fill="#A23F28"/><path d="M20 30a4 4 0 108 0 4 4 0 10-8 0M36 30a4 4 0 108 0 4 4 0 10-8 0" fill="#FFC56B"/><path d="M24 44c4 4 12 4 16 0" stroke="#FFC56B" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+    </div>
+    <span class="pill" id="pill"></span>
+    <p class="txt" id="txt"></p>
+    <div class="ft"><img src="/img/forma-logo.png" alt=""><span><b>forma-pottery.com</b>Töpferstudio Mathon</span></div>
+  </div>
+</div>
+<script>
+var q=new URLSearchParams(location.search),p=q.get('p')||'1',f=q.get('f')||'feed';
+var F={feed:[1080,1350,9.6],story:[1080,1920,12],pin:[1000,1500,10.4]}[f];
+var c=document.getElementById('c');c.style.setProperty('--w',F[0]+'px');c.style.setProperty('--h',F[1]+'px');c.style.setProperty('--u',(F[0]/100)+'px');c.style.setProperty('--ts',F[2]);if(f==='feed')document.querySelector('.ph').style.aspectRatio='1/1';
+var P={
+ '1':{eb:'Halloween im Atelier',t:'Gruselig <em>schön</em><br>bemalt',sub:'Pottery bemalen ab November',img:'/img/bemalen-hand.jpg',pos:'50% 50%',pill:'Mi & Do · 15–18 Uhr',txt:'Tassen, Bowls und Mugs bemalen, bei Kerzenlicht und Tee. Atelierbeitrag € 15, Stücke ab € 15.'},
+ '2':{eb:'Happy Halloween',t:'Kein Hexenwerk:<br><em>Spin & Go</em>',sub:'Deine erste Tasse an der Töpferscheibe',img:'/img/tassen-henkel.jpg',pos:'50% 60%',pill:'Mi & Fr · 9–11 Uhr',txt:'Zwei Stunden an der Scheibe, ganz ohne Vorkenntnisse. € 70 inklusive eines Werkstücks.'},
+ '3':{eb:'Die Geister ziehen weiter',t:'Die Pinsel<br><em>bleiben</em>',sub:'Ab Mittwoch: Pottery bemalen',img:'/img/schalen.jpg',pos:'50% 50%',pill:'Mi & Do · 15–18 Uhr',txt:'1, 2 oder 3 Stunden, höchstens 6 Personen pro Stunde. Jetzt Platz reservieren.'}
+}[p];
+['eb','sub','pill','txt'].forEach(function(k){document.getElementById(k).textContent=P[k];});
+document.getElementById('t').innerHTML=P.t;var im=document.getElementById('img');im.src=P.img;im.style.objectPosition=P.pos;
+var BAT='<svg viewBox="0 0 64 40"><path d="M32 14c-3 0-4 3-4 3l-2-5-1 6c-6-6-14-8-23-4 5 2 7 6 6 10 4-3 9-2 11 2 2-4 6-5 9-3l4 9 4-9c3-2 7-1 9 3 2-4 7-5 11-2-1-4 1-8 6-10-9-4-17-2-23 4l-1-6-2 5s-1-3-4-3z" fill="#0F0806"/><circle cx="30" cy="19" r="1.1" fill="#E0573C"/><circle cx="34" cy="19" r="1.1" fill="#E0573C"/></svg>';
+var u=F[0]/100,bats=[[74,6,9,-8],[86,21,6,12],[66,17,4.5,6],[6,30,5,-14],[91,36,4.5,8]];
+var bh='';bats.forEach(function(b){bh+='<span class="bat" style="left:'+b[0]+'%;top:'+(b[1]*u)+'px;width:'+(b[2]*u)+'px;height:'+(b[2]*u*.62)+'px;transform:rotate('+b[3]+'deg)">'+BAT+'</span>';});
+document.getElementById('bats').innerHTML=bh;
+var SP='<svg viewBox="0 0 40 40"><g stroke="#F3E6DA" stroke-width="2.2" fill="none" stroke-linecap="round"><path d="M17 18l-8-5-5 3M17 21l-10-1-5 5M17 24l-8 4-3 6M19 27l-5 6-1 5M23 18l8-5 5 3M23 21l10-1 5 5M23 24l8 4 3 6M21 27l5 6 1 5"/></g><ellipse cx="20" cy="23" rx="5.5" ry="7" fill="#F3E6DA"/><circle cx="20" cy="14" r="4" fill="#F3E6DA"/><circle cx="18.6" cy="13.4" r="1" fill="#8C2C1D"/><circle cx="21.4" cy="13.4" r="1" fill="#8C2C1D"/></svg>';
+var sp=[[6,f==='story'?70:52],[95,f==='story'?54:40]],sh='';
+sp.forEach(function(s){sh+='<span class="spider" style="left:calc('+s[0]+'% - '+(2.5*u)+'px);--l:'+(s[1]*u)+'px">'+SP+'</span>';});
+document.getElementById('spiders').innerHTML=sh;
+</script></body></html>
