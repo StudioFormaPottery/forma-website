@@ -155,6 +155,7 @@ body.tponly .pr.top{width:min(680px,94vw)}
 .fmtq button{font:inherit;font-size:15px;padding:7px 14px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer}
 .fmtq button[aria-pressed=true]{background:#7D5E68;border-color:#7D5E68;color:#fff}
 body.recording .fmtq,body.rec-ui .fmtq,body.tponly .fmtq{display:none}
+.cauto{display:flex;gap:10px;align-items:flex-start;margin:8px 0 0;font-size:15.5px;color:#4A3A41;line-height:1.4;cursor:pointer}.cauto input{width:20px;height:20px;accent-color:#7D5E68;flex:none;margin-top:1px}
 body.recording #wide,body.recording .iph,body.recording .iph-help,body.rec-ui .iph,body.rec-ui .iph-help{display:none}
 /* An der Kamera (Vivien, 28.10.2026: „sieht aus, als würde ich nach unten schauen“): während der Aufnahme ganz oben, mittig unter der Linse, schmal, 3 Zeilen */
 body.prtop .pr.top{display:block;position:fixed;top:0;left:50%;right:auto;transform:translateX(-50%);width:min(560px,94vw);height:calc(var(--fs,30px) * 1.4 * 3 + 22px + env(safe-area-inset-top,0px));min-height:0;padding-top:env(safe-area-inset-top,0px);border-radius:0 0 22px 22px;z-index:200;background:rgba(36,28,32,.94);box-shadow:0 8px 24px -10px rgba(0,0,0,.5)}
@@ -451,6 +452,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
   </select>
   <div class="seg" id="langSeg" role="group" aria-label="Sprache"><button type="button" data-lang="de" aria-pressed="<?= $lang === 'de' ? 'true' : 'false' ?>">Deutsch</button><button type="button" data-lang="en" aria-pressed="<?= $lang === 'en' ? 'true' : 'false' ?>">Englisch</button></div>
   <div class="seg" id="modeSeg" role="group" aria-label="Aufnahme-Art"><button type="button" data-mode="ganz">Am Stück</button><button type="button" data-mode="clips">Absatz für Absatz</button></div>
+  <label class="cauto" id="cautoL" hidden><input type="checkbox" id="cauto"> Automatisch weiter: Wenn du einen Absatz fertig gesprochen hast, kommt nach einer kurzen Pause 3-2-1 und der nächste Absatz startet von selbst.</label>
   <a class="seg-f" href="?view=schnitt" title="Videos vom Handy oder Computer schneiden und bearbeiten">✂️ Video vom Gerät schneiden</a><input type="file" id="openF" accept="video/*" hidden>
   <span class="done-l" id="doneL"></span>
 </div>
@@ -957,7 +959,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
   function clipUi(){
     const P=paras(lang),n=P.length,recIng=!!(cs&&cs.rec);
     ['go','stop','up','dl','again','edit','del'].forEach(id=>{if(clipm)$(id).hidden=true});$('cdel').hidden=!clipm||recIng||lastClip<0||!clips[lastClip];if(!$('cdel').hidden)$('cdel').textContent='🗑 Absatz '+(lastClip+1)+' löschen';if(clipm){$('play').hidden=true;$('stage').style.display=''}
-    $('cgo').hidden=!clipm||recIng;$('cnext').hidden=!clipm||!recIng;$('credo').hidden=!clipm||!recIng;$('cend').hidden=!clipm||!recIng;
+    $('cautoL').hidden=!clipm;$('cgo').hidden=!clipm||recIng;$('cnext').hidden=!clipm||!recIng;$('credo').hidden=!clipm||!recIng;$('cend').hidden=!clipm||!recIng;
     if(clipm&&!recIng){const first=clips.findIndex((c,i)=>i<n&&!c);const start=clips.length&&first<0&&clips.filter(Boolean).length>=n?-1:(first<0?Math.min(clips.length,n):first);
       $('cgo').dataset.start=Math.max(0,start);$('cgo').textContent=n?(start<0?'● Alles nochmal ab Absatz 1':'● Absatz '+(start+1)+' von '+n+' aufnehmen'):'● Aufnehmen';if(start<0)$('cgo').dataset.start=0;}
     if(clipm&&recIng)$('cnext').textContent=cs.i+1<n?'✓ Fertig · Absatz '+(cs.i+2)+' ›':'✓ Fertig · letzter Absatz';
@@ -989,6 +991,9 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     try{if(!lock)lock=await navigator.wakeLock.request('screen')}catch(e){}
     (function loop(){if(!cs||cs.rec!==r||r.state!=='recording')return;const t=(performance.now()-st.t0)/1000;$('rt').textContent=fmt(t);
       if(an){an.getFloatTimeDomainData(abuf);let q=0;for(const v of abuf)q+=v*v;const rms=Math.sqrt(q/abuf.length);if(rms>.02){if(st.s==null)st.s=t;st.e=t}}
+      // Automatisch weiter (Vivien, 30.10.2026): fertig gesprochen = mindestens ~70 % der geschätzten Sprechzeit und dann 1,8 s still
+      if($('cauto').checked&&st.s!=null&&t-st.e>1.8){const w=(paras(lang)[cs.i]||'').split(/\s+/).filter(Boolean).length,minD=Math.max(1.5,w*.33*.7);
+        if(st.e-st.s>=minD){$('cnext').click();return}}
       // langer Absatz: Text läuft sanft mit
       if(t>1.2&&prMax()>4&&!pr.hidden&&!run)run=true;
       requestAnimationFrame(loop)})();
@@ -1004,6 +1009,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     if(single||i+1>=n){finish();return}startClip(i+1)};
   $('credo').onclick=()=>{if(!cs)return;const i=cs.i,single=cs.single;stopRec(true);startClip(i,single)};
   $('cend').onclick=()=>finish();
+  $('cauto').checked=ls.get('st-cauto','1')!=='0';$('cauto').onchange=()=>ls.set('st-cauto',$('cauto').checked?'1':'0');
   document.addEventListener('keydown',e=>{if(!clipm||!cs||!cs.rec)return;if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;
     if(e.code==='Space'||e.code==='ArrowRight'||e.code==='Enter'){e.preventDefault();e.stopImmediatePropagation();$('cnext').click()}},true);
   function fileName(c,sub){return baseName+'_'+String(c.i+1).padStart(2,'0')+(sub?'_Untertitel-'+sub.toUpperCase():'')+'.'+c.ext}
