@@ -186,6 +186,12 @@
 .sn-ovl .r{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 .sn-ovl button{font:inherit;font-size:15px;padding:8px 12px;border-radius:12px;border:1.5px solid #D3C9BC;background:#fff;color:#4A3040;cursor:pointer}
 .sn-ovl button.del{border-color:#C9A79A;color:#8C2C1D}
+.sn-fr{background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:18px;padding:12px 14px;margin:10px 0 4px}
+.sn-fr[hidden]{display:none}
+.sn-fr .h{display:flex;flex-direction:column;gap:2px;margin-bottom:4px}.sn-fr .h b{font-weight:500;font-size:17px;color:#4A3A41}.sn-fr .h small{font-size:14px;color:#7D7076}
+.sn-fr label{display:block;margin-top:8px;font-size:15.5px;color:#4A3A41}.sn-fr label span{display:flex;justify-content:space-between}.sn-fr label i{font-style:normal;color:#7D7076}
+.sn-fr input[type=range]{width:100%;accent-color:#7D5E68}
+.sn-pv.frmode video.on{cursor:grab;touch-action:none}
 .sn-zt-hint{font-size:14px;color:#7D7076;margin:6px 2px 0;line-height:1.45}
 .sn-box.dr{background:linear-gradient(135deg,#FBF8F4,#EFEAE2);border-color:#DDD2C6}
 .sn-dr-name{width:100%;font:inherit;font-size:18px;padding:10px 12px;border-radius:14px;border:1.5px solid #DDD2C6;background:#fff;color:#2E2529}
@@ -268,10 +274,11 @@
 
   // CSS-Filter genau wie im Browser (W3C Filter Effects), damit Vorschau und Export gleich aussehen
   const VS = 'attribute vec2 p;varying vec2 uv;void main(){uv=p*.5+.5;gl_Position=vec4(p,0.,1.);}';
-  const FS = `precision highp float;varying vec2 uv;uniform sampler2D t;uniform vec2 so,oo;uniform float br,ct,sa,se,zm;
+  const FS = `precision highp float;varying vec2 uv;uniform sampler2D t;uniform vec2 so,oo,fo;uniform float br,ct,sa,se,zm,fz,fr;
 void main(){
- float ra=so.x/so.y, ro=oo.x/oo.y; vec2 q=uv; // Mitte ausschneiden (object-fit: cover)
- if(ra>ro){float k=ro/ra;q.x=.5+(uv.x-.5)*k;}else{float k=ra/ro;q.y=.5+(uv.y-.5)*k;}
+ float ra=so.x/so.y, ro=oo.x/oo.y;
+ vec2 p=uv-.5; p.x*=ro; float cs=cos(fr), sn=sin(fr); p=vec2(cs*p.x-sn*p.y, sn*p.x+cs*p.y); p.x/=ro; vec2 q=.5+p/fz+fo; // eigener Ausschnitt: gerade richten, zoomen, verschieben
+ if(ra>ro){float k=ro/ra;q.x=.5+(q.x-.5)*k;}else{float k=ra/ro;q.y=.5+(q.y-.5)*k;} // Mitte ausschneiden (object-fit: cover)
  q=.5+(q-.5)/zm; // sanfter Zoom je Abschnitt
  vec3 c=texture2D(t,clamp(q,vec2(.0005),vec2(.9995))).rgb;
  c*=br; c=(c-.5)*ct+.5; c=clamp(c,0.,1.);
@@ -282,6 +289,13 @@ void main(){
  gl_FragColor=vec4(clamp(c,0.,1.),1.);}`;
   const LOOKS = [['natur', 'Natürlich', { br: 1, ct: 1, sa: 1, se: 0 }], ['hell', 'Heller & frisch', { br: 1.08, ct: 1.04, sa: 1.06, se: 0 }], ['warm', 'Warm', { br: 1.03, ct: 1.02, sa: 1.02, se: .22 }], ['weich', 'Weich & ruhig', { br: 1.04, ct: .92, sa: .9, se: .12 }], ['sw', 'Schwarz-Weiß', { br: 1.02, ct: 1.06, sa: 0, se: 0 }]];
   const FMTS = [['orig', 'Wie aufgenommen'], ['9:16', 'Hoch 9:16'], ['4:5', '4:5'], ['1:1', 'Quadrat'], ['16:9', 'Quer 16:9']];
+  // Eigener Bildausschnitt je Clip (Vivien, 30.10.2026: „im Schnitt direkt zoomen, verschieben und gerade stellen“)
+  // F = { z: Zoom 1–3, x/y: -1…1 (wohin der Ausschnitt rückt), r: Grad }. Beim Drehen wird so viel mitgezoomt, dass keine Ecken fehlen.
+  function frVals(F, asp) {
+    const z = F ? Math.max(1, Math.min(3, +F.z || 1)) : 1, th = F ? (+F.r || 0) * Math.PI / 180 : 0, a = Math.abs(th);
+    const kr = th ? Math.cos(a) + Math.max(asp, 1 / asp) * Math.sin(a) : 1, m = (1 - 1 / z) / 2;
+    return { Z: z * kr, th, ox: F ? Math.max(-1, Math.min(1, +F.x || 0)) * m : 0, oy: F ? Math.max(-1, Math.min(1, +F.y || 0)) * m : 0, z };
+  }
   const filterCss = L => `brightness(${L.br}) contrast(${L.ct}) saturate(${L.sa}) sepia(${L.se})`;
   const brate = (w, h) => { const p = w * h; return p >= 7e6 ? 40e6 : p >= 3.2e6 ? 20e6 : p >= 1.8e6 ? 12e6 : p >= .8e6 ? 8e6 : 5e6; };
   function mime() { const ts = ['video/mp4;codecs=avc1.640028,mp4a.40.2', 'video/mp4;codecs=avc1,mp4a', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm']; return ts.find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || ''; }
@@ -297,8 +311,17 @@ void main(){
     <div class="sn-row" style="margin-top:8px"><span class="t" data-k="time">0:00 / 0:00</span>
       <button type="button" class="sn-b pl" data-k="play">▶ Abspielen</button>
       <button type="button" class="sn-b" data-k="cut2" title="An der Stelle der Linie schneiden (Taste S)">✂️ Hier schneiden</button>
+      <button type="button" class="sn-b" data-k="frBtn" aria-expanded="false">🔍 Zoom &amp; Ausschnitt</button>
       <button type="button" class="sn-b" data-k="ztDel" title="Das markierte Stück löschen" style="color:#9A3B3B">🗑 Stück löschen</button>
       <button type="button" class="sn-b" data-k="cmp" title="Licht & Farbe kurz ausschalten">Vorher zeigen</button></div>
+    <div class="sn-fr" data-k="fr" hidden>
+      <div class="h"><b data-k="frT">Bildausschnitt</b><small>Gilt für diesen Clip. Du kannst das Bild auch direkt oben in der Vorschau verschieben.</small></div>
+      <label><span>🔍 Zoom <i data-k="frZv">100 %</i></span><input type="range" min="100" max="300" step="1" value="100" data-fr="z"></label>
+      <label><span>↔ Links / Rechts</span><input type="range" min="-100" max="100" step="1" value="0" data-fr="x"></label>
+      <label><span>↕ Hoch / Runter</span><input type="range" min="-100" max="100" step="1" value="0" data-fr="y"></label>
+      <label><span>📐 Gerade richten <i data-k="frRv">0°</i></span><input type="range" min="-10" max="10" step="0.1" value="0" data-fr="r"></label>
+      <div class="sn-row"><button type="button" class="sn-b sm" data-k="frAll">Für alle Clips übernehmen</button><button type="button" class="sn-b sm" data-k="frReset">Zurücksetzen</button></div>
+    </div>
     <div class="sn-zt">
       <div class="sn-zt-sc" data-k="ztsc"><div class="sn-zt-in" data-k="ztin"><div class="sn-zt-tt" data-k="ztt"></div><div class="sn-zt-blocks" data-k="ztb"></div><div class="sn-zt-ph" data-k="ztph"></div></div></div>
       <div class="sn-zt-bar"><button type="button" class="zb" data-k="zoomOut" aria-label="Zeitleiste zusammenziehen">－</button><input type="range" min="0" max="100" step="1" value="0" data-k="zoomR" aria-label="Zeitleiste auseinanderziehen"><button type="button" class="zb" data-k="zoomIn" aria-label="Zeitleiste auseinanderziehen">＋</button><span class="t" data-k="ztime">0:00,0</span></div>
@@ -439,7 +462,7 @@ void main(){
     const zAt = (c, off) => { if (!c || !c.zoom) return 1; const L = len(c) || 1, p = Math.max(0, Math.min(1, off / L)); return c.zoom[0] + (c.zoom[1] - c.zoom[0]) * p; };
     // MediaRecorder-Dateien kennen ihre Länge oft nicht: einmal ans Ende springen
     async function probeDur(c, v) { try { v.currentTime = 1e7; await new Promise(r => { v.onseeked = r; setTimeout(r, 2500); }); c.dur = isFinite(v.duration) && v.duration > 0 ? v.duration : (v.currentTime || 1); v.currentTime = 0; } catch (e) { c.dur = c.dur || 1; } if (!c.out || c.out > c.dur) c.out = c.dur; dbPut(dbRow(c)); ui(); }
-    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft, src: c.src || null, bro: !!c.bro, osrc: c.osrc || null, ost: c.ost || 0 });
+    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft, src: c.src || null, bro: !!c.bro, osrc: c.osrc || null, ost: c.ost || 0, fr: c.fr || null });
     const len = c => Math.max(0, (c.out || c.dur || 0) - (c.in || 0));
     const total = () => clips.reduce((a, c) => a + len(c), 0);
     const tv = document.createElement('video'); tv.muted = true; tv.playsInline = true; tv.preload = 'auto'; let thumbQ = Promise.resolve();
@@ -530,14 +553,14 @@ void main(){
       vids.forEach(vv => { if (vv !== v) { vv.classList.remove('on'); if (!vv.paused) vv.pause(); } });
       v.classList.add('on'); v.muted = !!c.mute; v.style.filter = cmp ? '' : filterCss(st);
       if (seek !== false) { const t = (c.in || 0) + off; if (Math.abs(v.currentTime - t) > .08) v.currentTime = t; }
-      v.style.transform = c.zoom ? 'scale(' + zAt(c, seek !== false ? off : Math.max(0, v.currentTime - (c.in || 0))).toFixed(4) + ')' : '';
+      v.style.transform = vtf(c, seek !== false ? off : Math.max(0, v.currentTime - (c.in || 0)));
       broSync(c, seek !== false ? (c.in || 0) + off : v.currentTime, false);
     }
     function tick() {
       if (!playing) return;
       const c = clips[sel]; const v = cur(); if (!c || !v) { stop(); return; }
       const off = Math.max(0, v.currentTime - (c.in || 0)); pos = starts()[sel] + off; timeUi(); musDrive(pos + CD(), true);
-      if (c.zoom) v.style.transform = 'scale(' + zAt(c, off).toFixed(4) + ')';
+      if (c.zoom || c.fr) v.style.transform = vtf(c, off);
       broSync(c, v.currentTime, true);
       if (!prepped && (c.out || c.dur) - v.currentTime < 1.2) { prepped = true; prep(sel + 1); }
       if (v.currentTime >= (c.out || c.dur) - .04 || v.ended) {
@@ -645,7 +668,7 @@ void main(){
       K('edT').textContent = 'Clip ' + (sel + 1) + ' von ' + clips.length + ' · ' + c.name;
       K('edD').textContent = 'von ' + fmt1(c.in || 0) + ' bis ' + fmt1(c.out || c.dur || 0) + ' · Länge ' + fmt1(len(c));
       ztDraw();
-      broUi();
+      broUi(); frUi();
       K('mute').textContent = c.mute ? '🔊 Ton an' : '🔇 Ton aus'; K('left').disabled = sel === 0; K('first').disabled = sel === 0; K('right').disabled = sel === clips.length - 1;
       ovlUi();
     }
@@ -722,6 +745,43 @@ void main(){
       o.url = URL.createObjectURL(f); bros.push(o); await dbPut(dbRow(o)); ovVid(o); ui();
       say('🎞 „' + o.name + '“ liegt als Bild über Clip ' + (sel + 1) + ', ab der Stelle, an der du gerade warst. Die Stimme läuft weiter.', 'ok');
     };
+    function vtf(c, off) {
+      const z = c.zoom ? zAt(c, off) : 1; if (!c.fr && z === 1) return '';
+      const f = frVals(c.fr, (pv.clientWidth || 16) / (pv.clientHeight || 9));
+      return 'rotate(' + (f.th * 180 / Math.PI).toFixed(2) + 'deg) scale(' + (f.Z * z).toFixed(4) + ') translate(' + (-f.ox * 100).toFixed(3) + '%,' + (-f.oy * 100).toFixed(3) + '%)';
+    }
+    const frEls = () => [...root.querySelectorAll('[data-fr]')];
+    function frUi() {
+      const c = clips[sel], box = K('fr'); if (!c || box.hidden) return; const F = c.fr || { z: 1, x: 0, y: 0, r: 0 };
+      K('frT').textContent = 'Bildausschnitt · Clip ' + (sel + 1);
+      frEls().forEach(i => { const k = i.dataset.fr; i.value = k === 'z' ? Math.round((F.z || 1) * 100) : k === 'r' ? (F.r || 0) : Math.round((F[k] || 0) * 100); });
+      K('frZv').textContent = Math.round((F.z || 1) * 100) + ' %'; K('frRv').textContent = (+(F.r || 0)).toFixed(1).replace('.', ',') + '°';
+    }
+    let frT = 0;
+    function frSet(c, F, save) {
+      const empty = (F.z || 1) <= 1.001 && !F.x && !F.y && !F.r; c.fr = empty ? null : { z: F.z || 1, x: F.x || 0, y: F.y || 0, r: F.r || 0 };
+      const v = vids.get(c.slot); if (v && clips[sel] === c) v.style.transform = vtf(c, Math.max(0, v.currentTime - (c.in || 0)));
+      clearTimeout(frT); if (save !== false) frT = setTimeout(() => dbPut(dbRow(c)).catch(() => {}), 300);
+    }
+    K('frBtn').onclick = () => { const b = K('fr'); b.hidden = !b.hidden; K('frBtn').setAttribute('aria-expanded', String(!b.hidden)); pv.classList.toggle('frmode', !b.hidden); frUi(); };
+    frEls().forEach(i => i.oninput = () => { const c = clips[sel]; if (!c) return; const F = Object.assign({ z: 1, x: 0, y: 0, r: 0 }, c.fr || {}), k = i.dataset.fr;
+      F[k] = k === 'z' ? +i.value / 100 : k === 'r' ? +i.value : +i.value / 100; frSet(c, F); frUi(); });
+    K('frReset').onclick = () => { const c = clips[sel]; if (!c) return; frSet(c, {}); frUi(); say('Ausschnitt zurückgesetzt.'); };
+    K('frAll').onclick = async () => { const c = clips[sel]; if (!c) return; for (const x of clips) { x.fr = c.fr ? Object.assign({}, c.fr) : null; await dbPut(dbRow(x)); } show(sel, Math.max(0, (cur() ? cur().currentTime : 0) - (c.in || 0)), false); say('✓ Gleicher Ausschnitt für alle ' + clips.length + ' Clips.', 'ok'); };
+    // Bild direkt in der Vorschau verschieben (Ziehen) und zoomen (Mausrad / zwei Finger)
+    { let d = null; const pts = new Map();
+      pv.addEventListener('pointerdown', e => { if (K('fr').hidden || e.target.tagName !== 'VIDEO' || !clips[sel]) return; pts.set(e.pointerId, [e.clientX, e.clientY]); try { pv.setPointerCapture(e.pointerId); } catch (er) {}
+        const c = clips[sel], F = Object.assign({ z: 1, x: 0, y: 0, r: 0 }, c.fr || {}); d = { c, F0: F, x0: e.clientX, y0: e.clientY, dist: 0 };
+        if (pts.size === 2) { const [a, b] = [...pts.values()]; d.dist = Math.hypot(a[0] - b[0], a[1] - b[1]); } e.preventDefault(); });
+      pv.addEventListener('pointermove', e => { if (!d || !pts.has(e.pointerId)) return; pts.set(e.pointerId, [e.clientX, e.clientY]); const F = Object.assign({}, d.F0);
+        if (pts.size >= 2 && d.dist) { const [a, b] = [...pts.values()]; F.z = Math.max(1, Math.min(3, d.F0.z * Math.hypot(a[0] - b[0], a[1] - b[1]) / d.dist)); }
+        else { const fv = frVals(F, pv.clientWidth / pv.clientHeight), m = (1 - 1 / (F.z || 1)) / 2; if (m > .001) {
+          F.x = Math.max(-1, Math.min(1, d.F0.x - (e.clientX - d.x0) / (pv.clientWidth * fv.Z) / m)); F.y = Math.max(-1, Math.min(1, d.F0.y - (e.clientY - d.y0) / (pv.clientHeight * fv.Z) / m)); } }
+        frSet(d.c, F); frUi(); });
+      const up = e => { pts.delete(e.pointerId); if (!pts.size) d = null; else if (d) { const c = d.c; d = { c, F0: Object.assign({ z: 1, x: 0, y: 0, r: 0 }, c.fr || {}), x0: [...pts.values()][0][0], y0: [...pts.values()][0][1], dist: 0 }; } };
+      pv.addEventListener('pointerup', up); pv.addEventListener('pointercancel', up);
+      pv.addEventListener('wheel', e => { if (K('fr').hidden || !clips[sel]) return; e.preventDefault(); const c = clips[sel], F = Object.assign({ z: 1, x: 0, y: 0, r: 0 }, c.fr || {}); F.z = Math.max(1, Math.min(3, F.z * Math.exp(-e.deltaY * .0015))); frSet(c, F); frUi(); }, { passive: false });
+    }
     async function delAt(i) {
       const c = clips[i]; if (!c) return; stop();
       await dbDel(c.id); clips.splice(i, 1); slots(); dropVids();
@@ -1097,7 +1157,7 @@ void main(){
           const r = SA.analyze(F, 16000, { minPause: auto.pause, stumbles: auto.stumbles, noise: auto.noise !== false });
           if (!r.segs.length) { next.push(Object.assign({}, c, { auto: true })); continue; } // nur Stille erkannt → lieber so lassen
           pn += r.pauses.n; psec += r.pauses.sec; const a0 = c.in || 0;
-          r.segs.forEach((sg, k) => next.push({ id: uid(), src: c.src || c.id, blob: c.blob, url: c.url, name: c.name, added: c.added + k, in: a0 + sg.s, out: a0 + sg.e, mute: !!c.mute, dur: c.dur, auto: true, zoom: null, draft: curDraft }));
+          r.segs.forEach((sg, k) => next.push({ id: uid(), fr: c.fr || null, src: c.src || c.id, blob: c.blob, url: c.url, name: c.name, added: c.added + k, in: a0 + sg.s, out: a0 + sg.e, mute: !!c.mute, dur: c.dur, auto: true, zoom: null, draft: curDraft }));
           r.cut.forEach(sg => log.push({ url: c.url, blob: c.blob, name: c.name, dur: c.dur, s: a0 + sg.s, e: a0 + sg.e, why: sg.why }));
         }
         if (!next.length) { say('Da war nichts zu schneiden.'); return; }
@@ -1139,13 +1199,13 @@ void main(){
       const P = gl.createProgram(); gl.attachShader(P, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(P, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(P); gl.useProgram(P);
       const bf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
       const loc = gl.getAttribLocation(P, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      const U = {}; ['t', 'so', 'oo', 'br', 'ct', 'sa', 'se', 'zm'].forEach(n => U[n] = gl.getUniformLocation(P, n));
+      const U = {}; ['t', 'so', 'oo', 'br', 'ct', 'sa', 'se', 'zm', 'fz', 'fr', 'fo'].forEach(n => U[n] = gl.getUniformLocation(P, n));
       const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
       [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]].forEach(x => gl.texParameteri(gl.TEXTURE_2D, x[0], x[1]));
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-      return (el, sw, shh, z, neutral) => { gl.viewport(0, 0, cv.width, cv.height); gl.bindTexture(gl.TEXTURE_2D, tex); try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, el); } catch (e) { return false; }
+      return (el, sw, shh, z, neutral, F) => { gl.viewport(0, 0, cv.width, cv.height); gl.bindTexture(gl.TEXTURE_2D, tex); try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, el); } catch (e) { return false; }
         const L = neutral ? { br: 1, ct: 1, sa: 1, se: 0 } : st;
-        gl.uniform1i(U.t, 0); gl.uniform2f(U.so, sw, shh); gl.uniform2f(U.oo, cv.width, cv.height); gl.uniform1f(U.br, L.br); gl.uniform1f(U.ct, L.ct); gl.uniform1f(U.sa, L.sa); gl.uniform1f(U.se, L.se); gl.uniform1f(U.zm, z || 1); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); return true; };
+        gl.uniform1i(U.t, 0); gl.uniform2f(U.so, sw, shh); gl.uniform2f(U.oo, cv.width, cv.height); gl.uniform1f(U.br, L.br); gl.uniform1f(U.ct, L.ct); gl.uniform1f(U.sa, L.sa); gl.uniform1f(U.se, L.se); const fv = frVals(F, cv.width / cv.height); gl.uniform1f(U.fz, fv.Z); gl.uniform1f(U.fr, fv.th); gl.uniform2f(U.fo, fv.ox, -fv.oy); gl.uniform1f(U.zm, z || 1); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); return true; };
     }
     // ---- Ton der Clips holen (Vivien, 30.10.2026: „beim Exportieren ist der Ton weg. Komplett.“) ----
     // Am iPhone (Safari bis iOS 18) gibt es keinen AudioDecoder/AudioEncoder. Früher wurde die Stimme dann still übersprungen
@@ -1292,7 +1352,7 @@ void main(){
           let el, sw, shh, tsrc, dur; if (direct) { const f = smp.toVideoFrame(); smp.close(); el = f; sw = f.displayWidth; shh = f.displayHeight; tsrc = f.timestamp / 1e6; dur = (f.duration || 0) / 1e6; } else { el = smp.canvas; sw = el.width; shh = el.height; tsrc = smp.timestamp; dur = smp.duration; }
           const ts = x.start + Math.max(0, tsrc - (x.c.in || 0)); const ok2 = ts > lastTs && ts < D;
           const bo = ok2 ? broAt(x.c, tsrc) : null, bf = bo ? await ovFrame(bo, (bo.in || 0) + (tsrc - bo.ost)) : null;
-          if (ok2) { if (bf) draw(bf.canvas, bf.canvas.width, bf.canvas.height, 1); else draw(el, sw, shh, zAt(x.c, tsrc - (x.c.in || 0))); lastTs = ts; } if (direct) el.close();
+          if (ok2) { if (bf) draw(bf.canvas, bf.canvas.width, bf.canvas.height, 1); else draw(el, sw, shh, zAt(x.c, tsrc - (x.c.in || 0)), false, x.c.fr); lastTs = ts; } if (direct) el.close();
           if (ok2) await cs.add(ts, Math.max(1 / 60, Math.min(dur || 1 / 30, D - ts)));
           fill.style.width = Math.min(100, ts / D * 100) + '%';
           const el2 = (performance.now() - W0) / 1000; if (!window.__snFastForce && el2 > 4 && D - ts > 4 && ts / el2 < 1.1) { try { await out.cancel(); } catch (e) {} return null; }
@@ -1333,7 +1393,7 @@ void main(){
           const bo = broAt(c, v.currentTime), ov = bo ? ovVid(bo) : null;
           ovV.forEach(x => { if (x !== ov && !x.paused) x.pause(); });
           if (ov) { const want = (bo.in || 0) + (v.currentTime - bo.ost); if (Math.abs(ov.currentTime - want) > .3) { try { ov.currentTime = want; } catch (e) {} } if (ov.paused) ov.play().catch(() => {}); }
-          if (ov && ov.readyState >= 2 && ov.videoWidth) draw(ov, ov.videoWidth, ov.videoHeight, 1); else draw(v, v.videoWidth, v.videoHeight, zAt(c, v.currentTime - (c.in || 0))); const t = t0 + (v.currentTime - (c.in || 0));
+          if (ov && ov.readyState >= 2 && ov.videoWidth) draw(ov, ov.videoWidth, ov.videoHeight, 1); else draw(v, v.videoWidth, v.videoHeight, zAt(c, v.currentTime - (c.in || 0)), false, c.fr); const t = t0 + (v.currentTime - (c.in || 0));
           if (mg) { musDrive(t, true); const g = mus.fade ? Math.max(0, Math.min(1, t / 1.5, (D - t) / 2.5)) : 1; mg.gain.setTargetAtTime(g, ac.currentTime, .2); }
           fill.style.width = Math.min(100, t / D * 100) + '%'; if (v.ended || v.currentTime >= (c.out || c.dur) - .03) { ok(); return; } (v.requestVideoFrameCallback ? v.requestVideoFrameCallback(step) : requestAnimationFrame(step)); }; step(); v.onended = ok; });
         v.pause(); t0 += len(c);
