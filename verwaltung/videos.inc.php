@@ -167,7 +167,7 @@ if ($view === 'videos') {
       <ol class="exl">
       <?php foreach (mv_lesson_steps($l) as $i => $e): $c = $rows[$i]; $g = (string)$c['guid']; $used = count($usage[$c['ckey']] ?? []);
           $vd = mv_voice_url($id, $i, 'de'); $ve = mv_voice_url($id, $i, 'en'); ?>
-        <li class="ex" data-id="<?= $id ?>" data-i="<?= $i ?>" data-c="<?= (int)$c['id'] ?>" data-name="<?= $h($e['de']) ?>" data-name-en="<?= $h($e['en']) ?>" data-sec="<?= (int)$e['sec'] ?>" data-view="<?= $g !== '' && mv_bunny()['lib'] !== '' ? $h(mv_embed($g) . '&autoplay=true&loop=true&muted=true') : '' ?>">
+        <li class="ex" data-id="<?= $id ?>" data-i="<?= $i ?>" data-c="<?= (int)$c['id'] ?>" data-name="<?= $h($e['de']) ?>" data-name-en="<?= $h($e['en']) ?>" data-sec="<?= (int)$e['sec'] ?>" data-view="<?= $g !== '' && mv_bunny()['lib'] !== '' ? $h(mv_embed($g, true) . '&autoplay=true&loop=true&muted=true') : '' ?>">
           <div class="exh"><span class="n"><b><?= $i + 1 ?>.</b> <?= $h($e['de']) ?><?php if (!$deOnly && $e['en'] !== $e['de']): ?> <small><?= $h($e['en']) ?></small><?php endif; ?></span>
             <label class="dur" data-flow-only<?= $flow ? '' : ' hidden' ?>>Dauer <select data-secsel><?php foreach ([30, 45, 60, 90, 120, 150, 180, 240, 300, 360, 480, 600] as $o): ?><option value="<?= $o ?>"<?= $o === (int)$e['sec'] ? ' selected' : '' ?>><?= $mmss($o) ?> Min.</option><?php endforeach; ?><?php if (!in_array((int)$e['sec'], [30, 45, 60, 90, 120, 150, 180, 240, 300, 360, 480, 600], true)): ?><option value="<?= (int)$e['sec'] ?>" selected><?= $mmss((int)$e['sec']) ?> Min.</option><?php endif; ?></select></label></div>
           <textarea hidden data-tde><?= $h($e['tde']) ?></textarea><textarea hidden data-ten><?= $h($e['ten']) ?></textarea>

@@ -1926,7 +1926,7 @@ function mv_flow_data(array $l, string $lang, bool $preview = false): ?array
     $items = [];
     foreach (mv_lesson_steps($l) as $i => $x) {
         $guid = (string)($rows[$i]['guid'] ?? '');
-        $src = $guid !== '' && $bunny ? mv_embed($guid) . '&autoplay=true&loop=true&muted=true' : '';
+        $src = $guid !== '' && $bunny ? mv_embed($guid, true) . '&autoplay=true&loop=true&muted=true' : '';
         if ($src === '' && !$preview) return null;
         $voice = $mode === 'flow' ? mv_voice_url((int)$l['id'], $i, $g) : '';
         if ($mode === 'flow' && $voice === '' && !$preview) return null;
@@ -2113,11 +2113,11 @@ function mv_bunny_delete(string $guid): void
 }
 
 /** Player-Adresse (mit Token, wenn der Kopierschutz eingeschaltet ist). */
-function mv_embed(string $guid): string
+function mv_embed(string $guid, bool $clip = false): string
 {
     $b = mv_bunny();
     if ($guid === '' || $b['lib'] === '') return '';
-    $u = 'https://iframe.mediadelivery.net/embed/' . rawurlencode($b['lib']) . '/' . rawurlencode($guid) . '?preload=true&responsive=true'; // ohne autoplay=false: sonst gewann das und Übungs-Clips liefen nicht von selbst an (Vivien, 30.10.2026)
+    $u = 'https://iframe.mediadelivery.net/embed/' . rawurlencode($b['lib']) . '/' . rawurlencode($guid) . '?preload=true&responsive=true' . ($clip ? '' : '&autoplay=false'); // Talking Heads: kein Autoplay, sonst startet der Browser sie stumm (Vivien, 30.10.2026: „wieder kein Ton“). Übungs-Clips (clip=true) hängen autoplay/muted selbst an.
     if ($b['token'] !== '') {
         $exp = time() + 4 * 3600;
         $u .= '&token=' . hash('sha256', $b['token'] . $guid . $exp) . '&expires=' . $exp;

@@ -164,7 +164,7 @@ if ($action === 'mm_mv_clip_set') {
     mv_clips_all($pdo, true);
     $uses = mv_clip_usage($pdo)[$c['ckey']] ?? []; $used = count($uses);
     // see = erstes Video mit dieser Übung, für „👁 So sieht es die Teilnehmerin“ gleich nach dem Hochladen
-    $mvJson(['ok' => 1, 'c' => (int)$c['id'], 'view' => mv_embed($guid), 'used' => $used, 'see' => $uses ? (int)array_key_first($uses) : 0]);
+    $mvJson(['ok' => 1, 'c' => (int)$c['id'], 'view' => mv_embed($guid, true), 'used' => $used, 'see' => $uses ? (int)array_key_first($uses) : 0]);
 }
 if ($action === 'mm_mv_clip_clear') {
     $c = $mvClip();
