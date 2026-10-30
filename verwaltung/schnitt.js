@@ -83,6 +83,7 @@
 .sn-pv video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;background:#1E171B;transform-origin:50% 50%;will-change:transform}
 .sn-pv video.on{display:block}
 .sn-pv video.sn-ov{z-index:1}
+.sn-pv .sn-glc{position:absolute;inset:0;width:100%;height:100%;z-index:2;display:none;pointer-events:none}
 .sn-bro{margin-top:10px;display:flex;flex-direction:column;gap:10px}
 .sn-bro:empty{display:none}
 .sn-bo{background:#fff;border:1.5px solid #E6DCD2;border-radius:16px;padding:10px 12px;font-size:15.5px;color:#4A3A41}
@@ -274,10 +275,12 @@
 
   // CSS-Filter genau wie im Browser (W3C Filter Effects), damit Vorschau und Export gleich aussehen
   const VS = 'attribute vec2 p;varying vec2 uv;void main(){uv=p*.5+.5;gl_Position=vec4(p,0.,1.);}';
-  const FS = `precision highp float;varying vec2 uv;uniform sampler2D t;uniform vec2 so,oo,fo;uniform float br,ct,sa,se,zm,fz,fr;
+  const FS = `precision highp float;varying vec2 uv;uniform sampler2D t;uniform vec2 so,oo,fo;uniform float br,ct,sa,se,zm,fz,fr,fe,cin,lb;
 void main(){
  float ra=so.x/so.y, ro=oo.x/oo.y;
- vec2 p=uv-.5; p.x*=ro; float cs=cos(fr), sn=sin(fr); p=vec2(cs*p.x-sn*p.y, sn*p.x+cs*p.y); p.x/=ro; vec2 q=.5+p/fz+fo; // eigener Ausschnitt: gerade richten, zoomen, verschieben
+ vec2 p=uv-.5;
+ if(fe>0.){vec2 pa=vec2(p.x*ro,p.y); float rr=dot(pa,pa)/(.25*(ro*ro+1.)); p*=1.-fe*.42*(1.-rr);} // Fischauge: Mitte gewölbt
+ p.x*=ro; float cs=cos(fr), sn=sin(fr); p=vec2(cs*p.x-sn*p.y, sn*p.x+cs*p.y); p.x/=ro; vec2 q=.5+p/fz+fo; // eigener Ausschnitt: gerade richten, zoomen, verschieben
  if(ra>ro){float k=ro/ra;q.x=.5+(q.x-.5)*k;}else{float k=ra/ro;q.y=.5+(q.y-.5)*k;} // Mitte ausschneiden (object-fit: cover)
  q=.5+(q-.5)/zm; // sanfter Zoom je Abschnitt
  vec3 c=texture2D(t,clamp(q,vec2(.0005),vec2(.9995))).rgb;
@@ -286,8 +289,12 @@ void main(){
  c=vec3((.213+.787*sa)*r+(.715-.715*sa)*g+(.072-.072*sa)*b,(.213-.213*sa)*r+(.715+.285*sa)*g+(.072-.072*sa)*b,(.213-.213*sa)*r+(.715-.715*sa)*g+(.072+.928*sa)*b);
  r=c.r;g=c.g;b=c.b;
  c=vec3((.393+.607*(1.-se))*r+(.769-.769*(1.-se))*g+(.189-.189*(1.-se))*b,(.349-.349*(1.-se))*r+(.686+.314*(1.-se))*g+(.168-.168*(1.-se))*b,(.272-.272*(1.-se))*r+(.534-.534*(1.-se))*g+(.131+.869*(1.-se))*b);
+ if(cin>0.){float l=dot(c,vec3(.299,.587,.114)); c+=cin*(vec3(.07,.015,-.06)*smoothstep(.35,1.,l)+vec3(-.06,.02,.07)*(1.-smoothstep(0.,.55,l))); c=mix(c,c*.93+.035,cin*.6);
+  float vd=length((uv-.5)*vec2(ro/max(ro,1.),1./max(ro,1.))*1.4); c*=1.-cin*.32*smoothstep(.45,1.,vd);} // Kino-Look: Teal & Orange, weiche Schwärzen, Vignette
+ if(fe>0.){float vd=length((uv-.5)*vec2(ro,1.))/(.5*sqrt(ro*ro+1.)); c*=1.-fe*.55*smoothstep(.62,1.,vd);}
+ if(lb>.5){float h=max(ro/2.39,.82)*.5; if(abs(uv.y-.5)>h) c=vec3(0.);} // Kino-Balken
  gl_FragColor=vec4(clamp(c,0.,1.),1.);}`;
-  const LOOKS = [['natur', 'Natürlich', { br: 1, ct: 1, sa: 1, se: 0 }], ['hell', 'Heller & frisch', { br: 1.08, ct: 1.04, sa: 1.06, se: 0 }], ['warm', 'Warm', { br: 1.03, ct: 1.02, sa: 1.02, se: .22 }], ['weich', 'Weich & ruhig', { br: 1.04, ct: .92, sa: .9, se: .12 }], ['sw', 'Schwarz-Weiß', { br: 1.02, ct: 1.06, sa: 0, se: 0 }]];
+  const LOOKS = [['natur', 'Natürlich', { br: 1, ct: 1, sa: 1, se: 0, cin: 0 }], ['hell', 'Heller & frisch', { br: 1.08, ct: 1.04, sa: 1.06, se: 0, cin: 0 }], ['warm', 'Warm', { br: 1.03, ct: 1.02, sa: 1.02, se: .22, cin: 0 }], ['kino', '🎬 Kino', { br: 1.01, ct: 1.07, sa: .88, se: .04, cin: 1 }], ['weich', 'Weich & ruhig', { br: 1.04, ct: .92, sa: .9, se: .12, cin: 0 }], ['sw', 'Schwarz-Weiß', { br: 1.02, ct: 1.06, sa: 0, se: 0, cin: 0 }]];
   const FMTS = [['orig', 'Wie aufgenommen'], ['9:16', 'Hoch 9:16'], ['4:5', '4:5'], ['1:1', 'Quadrat'], ['16:9', 'Quer 16:9']];
   // Eigener Bildausschnitt je Clip (Vivien, 30.10.2026: „im Schnitt direkt zoomen, verschieben und gerade stellen“)
   // F = { z: Zoom 1–3, x/y: -1…1 (wohin der Ausschnitt rückt), r: Grad }. Beim Drehen wird so viel mitgezoomt, dass keine Ecken fehlen.
@@ -320,6 +327,10 @@ void main(){
       <label><span>↔ Links / Rechts</span><input type="range" min="-100" max="100" step="1" value="0" data-fr="x"></label>
       <label><span>↕ Hoch / Runter</span><input type="range" min="-100" max="100" step="1" value="0" data-fr="y"></label>
       <label><span>📐 Gerade richten <i data-k="frRv">0°</i></span><input type="range" min="-10" max="10" step="0.1" value="0" data-fr="r"></label>
+      <div style="margin-top:12px;font-size:15.5px;color:#4A3A41">🎥 Bewegung in diesem Clip</div>
+      <div class="sn-chips" data-k="zmv"><button type="button" data-zm="none">Keine</button><button type="button" data-zm="slow">Langsam rein (Kino-Zoom)</button><button type="button" data-zm="punch">Schnell rein</button><button type="button" data-zm="out">Langsam raus</button></div>
+      <label><span>🐟 Fischauge <i data-k="feV">aus</i></span><input type="range" min="0" max="100" step="1" value="0" data-k="fe"></label>
+      <p class="sn-zt-hint">Soll der Zoom erst später anfangen? Mit ✂ an der Stelle schneiden und nur dem zweiten Teil die Bewegung geben.</p>
       <div class="sn-row"><button type="button" class="sn-b sm" data-k="frAll">Für alle Clips übernehmen</button><button type="button" class="sn-b sm" data-k="frReset">Zurücksetzen</button></div>
     </div>
     <div class="sn-zt">
@@ -411,6 +422,7 @@ void main(){
   <details class="sn-box" open><summary>☀️ Licht &amp; Farbe</summary><div class="bd">
     <div class="sn-chips" data-k="looks"></div>
     <div data-sl="br"></div><div data-sl="ct"></div><div data-sl="sa"></div><div data-sl="se"></div>
+    <label class="sn-sw"><input type="checkbox" data-k="lbx"> 🎬 Kino-Balken (schmale schwarze Streifen oben und unten)</label>
     <p class="sn-note">Gilt für alle Clips, damit das Video aus einem Guss ist.</p>
   </div></details>
   <details class="sn-box"><summary>🖼 Format</summary><div class="bd">
@@ -459,10 +471,12 @@ void main(){
     // Plätze aufräumen, die kein Clip mehr braucht
     function dropVids() { const used = new Set(clips.map(c => c.slot)); [...vids.keys()].forEach(k => { if (!used.has(k)) { const v = vids.get(k); if (v) { v.pause(); v.removeAttribute('src'); v.remove(); } vids.delete(k); } }); }
     // Zoom je Clip: [von, bis] als Faktor, wird über die Clip-Länge gleichmäßig gefahren
-    const zAt = (c, off) => { if (!c || !c.zoom) return 1; const L = len(c) || 1, p = Math.max(0, Math.min(1, off / L)); return c.zoom[0] + (c.zoom[1] - c.zoom[0]) * p; };
+    const zAt = (c, off) => { if (!c || !c.zoom) return 1; const L = len(c) || 1; let p = Math.max(0, Math.min(1, off / L));
+      if (c.zm === 'ease') p = p * p * (3 - 2 * p); else if (c.zm === 'punch') { const q = Math.max(0, Math.min(1, off / .45)); p = 1 - Math.pow(1 - q, 3); }
+      return c.zoom[0] + (c.zoom[1] - c.zoom[0]) * p; };
     // MediaRecorder-Dateien kennen ihre Länge oft nicht: einmal ans Ende springen
     async function probeDur(c, v) { try { v.currentTime = 1e7; await new Promise(r => { v.onseeked = r; setTimeout(r, 2500); }); c.dur = isFinite(v.duration) && v.duration > 0 ? v.duration : (v.currentTime || 1); v.currentTime = 0; } catch (e) { c.dur = c.dur || 1; } if (!c.out || c.out > c.dur) c.out = c.dur; dbPut(dbRow(c)); ui(); }
-    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft, src: c.src || null, bro: !!c.bro, osrc: c.osrc || null, ost: c.ost || 0, fr: c.fr || null });
+    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft, src: c.src || null, bro: !!c.bro, osrc: c.osrc || null, ost: c.ost || 0, fr: c.fr || null, zm: c.zm || null, fe: c.fe || 0 });
     const len = c => Math.max(0, (c.out || c.dur || 0) - (c.in || 0));
     const total = () => clips.reduce((a, c) => a + len(c), 0);
     const tv = document.createElement('video'); tv.muted = true; tv.playsInline = true; tv.preload = 'auto'; let thumbQ = Promise.resolve();
@@ -760,6 +774,17 @@ void main(){
       o.url = URL.createObjectURL(f); bros.push(o); await dbPut(dbRow(o)); ovVid(o); ui();
       say('🎞 „' + o.name + '“ liegt als Bild über Clip ' + (sel + 1) + ', ab der Stelle, an der du gerade warst. Die Stimme läuft weiter.', 'ok');
     };
+    // Vorschau über WebGL, sobald Kino-Look, Kino-Balken oder Fischauge dabei sind (geht mit CSS nicht) – zeigt genau den Export
+    const glc = document.createElement('canvas'); glc.className = 'sn-glc'; pv.insertBefore(glc, big); let glDraw = null;
+    function needGL() { const c = clips[sel]; return !cmp && !!c && ((st.cin || 0) > 0 || !!st.lb || (c.fe || 0) > 0) && !K('covimg').classList.contains('on'); }
+    (function glLoop() { if (closed) return; requestAnimationFrame(glLoop);
+      if (!needGL()) { if (glc.style.display !== 'none') glc.style.display = 'none'; return; }
+      const c = clips[sel], v = vids.get(c.slot); if (!v || v.readyState < 2 || !v.videoWidth) return;
+      const W = Math.min(1280, Math.round(pv.clientWidth * (window.devicePixelRatio || 1))), H = Math.round(W * pv.clientHeight / Math.max(1, pv.clientWidth));
+      if (glc.width !== W || glc.height !== H) { glc.width = W; glc.height = H; glDraw = null; } if (!glDraw) glDraw = makeGL(glc); if (!glDraw) return;
+      const bo = broAt(c, v.currentTime), ov = bo ? ovV.get(bo.id) : null;
+      if (ov && ov.readyState >= 2 && ov.videoWidth) glDraw(ov, ov.videoWidth, ov.videoHeight, 1); else glDraw(v, v.videoWidth, v.videoHeight, zAt(c, Math.max(0, v.currentTime - (c.in || 0))), false, c.fr, c.fe);
+      glc.style.display = 'block'; })();
     function vtf(c, off) {
       const z = c.zoom ? zAt(c, off) : 1; if (!c.fr && z === 1) return '';
       const f = frVals(c.fr, (pv.clientWidth || 16) / (pv.clientHeight || 9));
@@ -770,6 +795,9 @@ void main(){
       const c = clips[sel], box = K('fr'); if (!c || box.hidden) return; const F = c.fr || { z: 1, x: 0, y: 0, r: 0 };
       K('frT').textContent = 'Bildausschnitt · Clip ' + (sel + 1);
       frEls().forEach(i => { const k = i.dataset.fr; i.value = k === 'z' ? Math.round((F.z || 1) * 100) : k === 'r' ? (F.r || 0) : Math.round((F[k] || 0) * 100); });
+      const zmk = !c.zoom ? 'none' : c.zm === 'punch' ? 'punch' : c.zoom[1] < c.zoom[0] ? 'out' : c.zm === 'ease' ? 'slow' : '';
+      K('zmv').querySelectorAll('[data-zm]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.zm === zmk)));
+      K('fe').value = Math.round((c.fe || 0) * 100); K('feV').textContent = c.fe ? Math.round(c.fe * 100) + ' %' : 'aus';
       K('frZv').textContent = Math.round((F.z || 1) * 100) + ' %'; K('frRv').textContent = (+(F.r || 0)).toFixed(1).replace('.', ',') + '°';
     }
     let frT = 0;
@@ -781,8 +809,12 @@ void main(){
     K('frBtn').onclick = () => { const b = K('fr'); b.hidden = !b.hidden; K('frBtn').setAttribute('aria-expanded', String(!b.hidden)); pv.classList.toggle('frmode', !b.hidden); frUi(); };
     frEls().forEach(i => i.oninput = () => { const c = clips[sel]; if (!c) return; const F = Object.assign({ z: 1, x: 0, y: 0, r: 0 }, c.fr || {}), k = i.dataset.fr;
       F[k] = k === 'z' ? +i.value / 100 : k === 'r' ? +i.value : +i.value / 100; frSet(c, F); frUi(); });
-    K('frReset').onclick = () => { const c = clips[sel]; if (!c) return; frSet(c, {}); frUi(); say('Ausschnitt zurückgesetzt.'); };
-    K('frAll').onclick = async () => { const c = clips[sel]; if (!c) return; for (const x of clips) { x.fr = c.fr ? Object.assign({}, c.fr) : null; await dbPut(dbRow(x)); } show(sel, Math.max(0, (cur() ? cur().currentTime : 0) - (c.in || 0)), false); say('✓ Gleicher Ausschnitt für alle ' + clips.length + ' Clips.', 'ok'); };
+    const ZM = { none: [null, null], slow: [[1, 1.15], 'ease'], punch: [[1, 1.25], 'punch'], out: [[1.15, 1], 'ease'] };
+    K('zmv').querySelectorAll('[data-zm]').forEach(b => b.onclick = () => { const c = clips[sel]; if (!c) return; const z = ZM[b.dataset.zm]; c.zoom = z[0] ? z[0].slice() : null; c.zm = z[1]; dbPut(dbRow(c)).catch(() => {}); frUi();
+      if (c.zoom) { stop(); pos = starts()[sel]; show(sel, 0); play(); } else show(sel, 0, false); });
+    K('fe').oninput = () => { const c = clips[sel]; if (!c) return; c.fe = +K('fe').value / 100; frUi(); clearTimeout(frT); frT = setTimeout(() => dbPut(dbRow(c)).catch(() => {}), 300); };
+    K('frReset').onclick = () => { const c = clips[sel]; if (!c) return; c.fe = 0; c.zoom = null; c.zm = null; frSet(c, {}); frUi(); say('Ausschnitt zurückgesetzt.'); };
+    K('frAll').onclick = async () => { const c = clips[sel]; if (!c) return; for (const x of clips) { x.fr = c.fr ? Object.assign({}, c.fr) : null; x.fe = c.fe || 0; x.zoom = c.zoom ? c.zoom.slice() : null; x.zm = c.zm || null; await dbPut(dbRow(x)); } show(sel, Math.max(0, (cur() ? cur().currentTime : 0) - (c.in || 0)), false); say('✓ Gleicher Ausschnitt für alle ' + clips.length + ' Clips.', 'ok'); };
     // Bild direkt in der Vorschau verschieben (Ziehen) und zoomen (Mausrad / zwei Finger)
     { let d = null; const pts = new Map();
       pv.addEventListener('pointerdown', e => { if (K('fr').hidden || e.target.tagName !== 'VIDEO' || !clips[sel]) return; pts.set(e.pointerId, [e.clientX, e.clientY]); try { pv.setPointerCapture(e.pointerId); } catch (er) {}
@@ -946,6 +978,7 @@ void main(){
     function looksUi() { K('looks').innerHTML = LOOKS.map(l => '<button type="button" data-lk="' + l[0] + '" aria-pressed="' + (st.look === l[0]) + '">' + l[1] + '</button>').join('');
       K('looks').querySelectorAll('button').forEach(b => b.onclick = () => { const l = LOOKS.find(x => x[0] === b.dataset.lk); Object.assign(st, l[2]); st.look = l[0]; ls.set('sn-st', st); sync(); looksUi(); apply(); }); }
     looksUi();
+    K('lbx').checked = !!st.lb; K('lbx').onchange = () => { st.lb = K('lbx').checked; ls.set('sn-st', st); };
     K('fmts').innerHTML = FMTS.map(f => '<button type="button" data-f="' + f[0] + '" aria-pressed="' + (st.fmt === f[0]) + '">' + f[1] + '</button>').join('');
     K('fmts').querySelectorAll('button').forEach(b => b.onclick = () => { st.fmt = b.dataset.f; ls.set('sn-st', st); fmtUi(); });
     function fmtUi() { K('fmts').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.f === st.fmt))); pv.className = 'sn-pv' + ({ '9:16': ' p916', '4:5': ' p45', '1:1': ' p11' }[st.fmt] || ''); if (st.fmt === 'orig') { const v = cur(); if (v && v.videoWidth) pv.style.aspectRatio = v.videoWidth + '/' + v.videoHeight; else pv.style.aspectRatio = '16/9'; } else pv.style.aspectRatio = ''; }
@@ -1172,7 +1205,7 @@ void main(){
           const r = SA.analyze(F, 16000, { minPause: auto.pause, stumbles: auto.stumbles, noise: auto.noise !== false });
           if (!r.segs.length) { next.push(Object.assign({}, c, { auto: true })); continue; } // nur Stille erkannt → lieber so lassen
           pn += r.pauses.n; psec += r.pauses.sec; const a0 = c.in || 0;
-          r.segs.forEach((sg, k) => next.push({ id: uid(), fr: c.fr || null, src: c.src || c.id, blob: c.blob, url: c.url, name: c.name, added: c.added + k, in: a0 + sg.s, out: a0 + sg.e, mute: !!c.mute, dur: c.dur, auto: true, zoom: null, draft: curDraft }));
+          r.segs.forEach((sg, k) => next.push({ id: uid(), fr: c.fr || null, fe: c.fe || 0, src: c.src || c.id, blob: c.blob, url: c.url, name: c.name, added: c.added + k, in: a0 + sg.s, out: a0 + sg.e, mute: !!c.mute, dur: c.dur, auto: true, zoom: null, draft: curDraft }));
           r.cut.forEach(sg => log.push({ url: c.url, blob: c.blob, name: c.name, dur: c.dur, s: a0 + sg.s, e: a0 + sg.e, why: sg.why }));
         }
         if (!next.length) { say('Da war nichts zu schneiden.'); return; }
@@ -1214,13 +1247,13 @@ void main(){
       const P = gl.createProgram(); gl.attachShader(P, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(P, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(P); gl.useProgram(P);
       const bf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
       const loc = gl.getAttribLocation(P, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      const U = {}; ['t', 'so', 'oo', 'br', 'ct', 'sa', 'se', 'zm', 'fz', 'fr', 'fo'].forEach(n => U[n] = gl.getUniformLocation(P, n));
+      const U = {}; ['t', 'so', 'oo', 'br', 'ct', 'sa', 'se', 'zm', 'fz', 'fr', 'fo', 'fe', 'cin', 'lb'].forEach(n => U[n] = gl.getUniformLocation(P, n));
       const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
       [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]].forEach(x => gl.texParameteri(gl.TEXTURE_2D, x[0], x[1]));
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-      return (el, sw, shh, z, neutral, F) => { gl.viewport(0, 0, cv.width, cv.height); gl.bindTexture(gl.TEXTURE_2D, tex); try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, el); } catch (e) { return false; }
-        const L = neutral ? { br: 1, ct: 1, sa: 1, se: 0 } : st;
-        gl.uniform1i(U.t, 0); gl.uniform2f(U.so, sw, shh); gl.uniform2f(U.oo, cv.width, cv.height); gl.uniform1f(U.br, L.br); gl.uniform1f(U.ct, L.ct); gl.uniform1f(U.sa, L.sa); gl.uniform1f(U.se, L.se); const fv = frVals(F, cv.width / cv.height); gl.uniform1f(U.fz, fv.Z); gl.uniform1f(U.fr, fv.th); gl.uniform2f(U.fo, fv.ox, -fv.oy); gl.uniform1f(U.zm, z || 1); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); return true; };
+      return (el, sw, shh, z, neutral, F, fe) => { gl.viewport(0, 0, cv.width, cv.height); gl.bindTexture(gl.TEXTURE_2D, tex); try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, el); } catch (e) { return false; }
+        const L = neutral ? { br: 1, ct: 1, sa: 1, se: 0, cin: 0, lb: 0 } : st;
+        gl.uniform1i(U.t, 0); gl.uniform2f(U.so, sw, shh); gl.uniform2f(U.oo, cv.width, cv.height); gl.uniform1f(U.br, L.br); gl.uniform1f(U.ct, L.ct); gl.uniform1f(U.sa, L.sa); gl.uniform1f(U.se, L.se); const fv = frVals(F, cv.width / cv.height); gl.uniform1f(U.fz, fv.Z); gl.uniform1f(U.fr, fv.th); gl.uniform2f(U.fo, fv.ox, -fv.oy); gl.uniform1f(U.fe, neutral ? 0 : Math.max(0, Math.min(1, +fe || 0))); gl.uniform1f(U.cin, +L.cin || 0); gl.uniform1f(U.lb, L.lb ? 1 : 0); gl.uniform1f(U.zm, z || 1); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); return true; };
     }
     // ---- Ton der Clips holen (Vivien, 30.10.2026: „beim Exportieren ist der Ton weg. Komplett.“) ----
     // Am iPhone (Safari bis iOS 18) gibt es keinen AudioDecoder/AudioEncoder. Früher wurde die Stimme dann still übersprungen
@@ -1367,7 +1400,7 @@ void main(){
           let el, sw, shh, tsrc, dur; if (direct) { const f = smp.toVideoFrame(); smp.close(); el = f; sw = f.displayWidth; shh = f.displayHeight; tsrc = f.timestamp / 1e6; dur = (f.duration || 0) / 1e6; } else { el = smp.canvas; sw = el.width; shh = el.height; tsrc = smp.timestamp; dur = smp.duration; }
           const ts = x.start + Math.max(0, tsrc - (x.c.in || 0)); const ok2 = ts > lastTs && ts < D;
           const bo = ok2 ? broAt(x.c, tsrc) : null, bf = bo ? await ovFrame(bo, (bo.in || 0) + (tsrc - bo.ost)) : null;
-          if (ok2) { if (bf) draw(bf.canvas, bf.canvas.width, bf.canvas.height, 1); else draw(el, sw, shh, zAt(x.c, tsrc - (x.c.in || 0)), false, x.c.fr); lastTs = ts; } if (direct) el.close();
+          if (ok2) { if (bf) draw(bf.canvas, bf.canvas.width, bf.canvas.height, 1); else draw(el, sw, shh, zAt(x.c, tsrc - (x.c.in || 0)), false, x.c.fr, x.c.fe); lastTs = ts; } if (direct) el.close();
           if (ok2) await cs.add(ts, Math.max(1 / 60, Math.min(dur || 1 / 30, D - ts)));
           fill.style.width = Math.min(100, ts / D * 100) + '%';
           const el2 = (performance.now() - W0) / 1000; if (!window.__snFastForce && el2 > 4 && D - ts > 4 && ts / el2 < 1.1) { try { await out.cancel(); } catch (e) {} return null; }
@@ -1408,7 +1441,7 @@ void main(){
           const bo = broAt(c, v.currentTime), ov = bo ? ovVid(bo) : null;
           ovV.forEach(x => { if (x !== ov && !x.paused) x.pause(); });
           if (ov) { const want = (bo.in || 0) + (v.currentTime - bo.ost); if (Math.abs(ov.currentTime - want) > .3) { try { ov.currentTime = want; } catch (e) {} } if (ov.paused) ov.play().catch(() => {}); }
-          if (ov && ov.readyState >= 2 && ov.videoWidth) draw(ov, ov.videoWidth, ov.videoHeight, 1); else draw(v, v.videoWidth, v.videoHeight, zAt(c, v.currentTime - (c.in || 0)), false, c.fr); const t = t0 + (v.currentTime - (c.in || 0));
+          if (ov && ov.readyState >= 2 && ov.videoWidth) draw(ov, ov.videoWidth, ov.videoHeight, 1); else draw(v, v.videoWidth, v.videoHeight, zAt(c, v.currentTime - (c.in || 0)), false, c.fr, c.fe); const t = t0 + (v.currentTime - (c.in || 0));
           if (mg) { musDrive(t, true); const g = mus.fade ? Math.max(0, Math.min(1, t / 1.5, (D - t) / 2.5)) : 1; mg.gain.setTargetAtTime(g, ac.currentTime, .2); }
           fill.style.width = Math.min(100, t / D * 100) + '%'; if (v.ended || v.currentTime >= (c.out || c.dur) - .03) { ok(); return; } (v.requestVideoFrameCallback ? v.requestVideoFrameCallback(step) : requestAnimationFrame(step)); }; step(); v.onended = ok; });
         v.pause(); t0 += len(c);
