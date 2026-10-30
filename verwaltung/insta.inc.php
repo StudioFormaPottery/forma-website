@@ -123,7 +123,7 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
     if ($action === 'mm_ig_fill') {
         $start = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST['start'] ?? '')) ? $_POST['start'] : date('Y-m-d');
         $end = date('Y-m-t', strtotime($start)); $lang = ($_POST['lang'] ?? '') === 'de' ? 'de' : 'en';
-        $use = ig_theme_use($pdo); $list = array_values(ig_themes());
+        $use = ig_theme_use($pdo); $list = array_values(array_filter(ig_themes(), fn($x) => empty($x['promo'])));
         usort($list, fn($a, $b) => ($use[$a['id']] ?? 0) <=> ($use[$b['id']] ?? 0));
         $busy = $pdo->prepare('SELECT COUNT(*) FROM mm_insta WHERE day = ?'); $n = 0; $i = 0;
         for ($d = $start; $d <= $end && $list; $d = date('Y-m-d', strtotime($d . ' +1 day'))) {
@@ -429,8 +429,8 @@ main{max-width:1240px}
   const hd=(location.hash.match(/^#d(\d{4}-\d{2}-\d{2})/)||[])[1],days=[...document.querySelectorAll('.dd')].map(b=>b.dataset.day),td=<?= json_encode($today) ?>;
   pickDay(days.includes(hd)?hd:(days.includes(td)?td:days[0]),false);
   // ---- Themen-Auswahl ----
-  function list(){const L=TH.slice().sort((a,b)=>(a.used>0)-(b.used>0));
-    $p('tl').innerHTML=L.map(x=>'<button type="button" class="tc'+(x.used?' used':'')+'" data-t="'+esc(x.id)+'"><span class="chip">'+esc(x.topic)+'</span><b>'+esc(lang==='en'?x.en_t:x.de_t)+'</b><small>'+esc((lang==='en'?x.story_en:x.story_de).split(/\n/)[0].slice(0,120))+' …</small>'+(x.used?'<span class="u">schon '+x.used+'× verwendet</span>':'')+'</button>').join('');
+  function list(){const L=TH.slice().sort((a,b)=>(!a.promo-!b.promo)||((a.used>0)-(b.used>0)));
+    $p('tl').innerHTML=L.map(x=>'<button type="button" class="tc'+(x.used?' used':'')+'" data-t="'+esc(x.id)+'"><span class="chip">'+(x.promo?'🎁 ':'')+esc(x.topic)+'</span><b>'+esc(lang==='en'?x.en_t:x.de_t)+'</b><small>'+esc((lang==='en'?x.story_en:x.story_de).split(/\n/)[0].slice(0,120))+' …</small>'+(x.used?'<span class="u">schon '+x.used+'× verwendet</span>':'')+'</button>').join('');
     $p('tl').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{open=TH.find(x=>x.id===b.dataset.t);tab='reel';view();$p('tv').scrollIntoView({behavior:'smooth',block:'start'})})}
   function view(){const tv=$p('tv');if(!open){tv.hidden=true;return}const x=open,L=lang;
     const parts={reel:x['reel_'+L],story:x['story_'+L],channel:x['channel_'+L]};
