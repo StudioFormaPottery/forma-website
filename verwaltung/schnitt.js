@@ -691,7 +691,12 @@ void main(){
         const old = c.blob, nu = URL.createObjectURL(nb), oldUrl = c.url;
         for (const x of clips.concat(bros)) if (x.blob === old || x.url === oldUrl) { x.blob = nb; x.url = nu; x.fx = 1; x.dur = 0; await dbPut(dbRow(x)); }
         slots(); dropVids(); ui(); show(sel, 0); busy = false; say('✓ „' + c.name + '“ ist repariert und spielt wieder.', 'ok'); rescueUi();
-      } catch (e) { busy = false; console.warn('Schnitt: Reparieren', e); m.className = 'sn-msg bad'; m.textContent = 'Reparieren hat leider nicht geklappt (' + (e && e.message || e) + '). Schau bitte unter „🛟 Gerettete Videos“, ob dort die ursprüngliche Datei liegt.'; }
+      } catch (e) { busy = false; console.warn('Schnitt: Reparieren', e); m.className = 'sn-msg bad'; m.innerHTML = 'Reparieren hat leider nicht geklappt (' + esc(e && e.message || e) + '). <button type="button" class="sn-b sm" data-gor>🛟 Zu den geretteten Videos</button>'; m.querySelector('[data-gor]').onclick = goRescue; }
+    }
+    async function goRescue() {
+      await rescueUi(); const box = K('resc');
+      if (box.hidden) { say('Unter „🛟 Gerettete Videos“ liegt gerade nichts: Von diesem Video ist keine ursprüngliche Datei mehr auf dem Gerät. Schau bitte in deinen Fotos oder in „Downloads“, ob du es dort noch hast.', 'bad'); return; }
+      box.open = true; box.scrollIntoView({ behavior: 'smooth', block: 'start' }); box.style.boxShadow = '0 0 0 3px #7D5E68'; setTimeout(() => box.style.boxShadow = '', 2500);
     }
     async function addFiles(files) {
       let n = 0;
