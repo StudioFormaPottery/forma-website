@@ -426,9 +426,10 @@
 
     // ---- Musik darunter (vom Video, z. B. „Ankommen“): ein oder zwei Lieder, sanft ineinander geblendet ----
     const bgm = data.bgm || []; let bgOn = bgm.length > 0, bgK = 0, bgCur = 0, bgX = false, bgG = null, bgRun = false;
-    try { if (localStorage.getItem('mvf-bgm') === '0') bgOn = false; } catch (e) {}
+    try { localStorage.removeItem('mvf-bgm'); } catch (e) {} // Musik läuft bei jedem Video von Anfang an (früher blieb „aus“ für immer gespeichert)
     const bgA = [new Audio(), new Audio()], bgE = [null, null], BGV = flow ? .16 : .5;
-    bgA.forEach(a => { a.preload = 'auto'; });
+    bgA.forEach(a => { a.preload = 'auto'; a.addEventListener('error', () => { // Lied lässt sich nicht laden: nächstes nehmen
+      if (!bgRun || bgA[bgCur] !== a) return; console.warn('Movecia-Player: Lied nicht ladbar', a.src); a._bad = (a._bad || 0) + 1; if (a._bad < bgm.length) setTimeout(() => bgSong(bgK + 1, bgCur), 300); }); });
     function bgApply() { bgA.forEach((el, k) => { try { el.volume = Math.max(0, Math.min(1, bgG.v * (bgE[k] ? bgE[k].v : 1))); } catch (e) {} }); }
     function bgSetup() { if (bgG) return; if (!IOS) { bgG = { fake: 1, v: 0 }; bgE[0] = { fake: 1, v: 0 }; bgE[1] = { fake: 1, v: 0 }; bgApply(); return; } const a = actx(); if (!a) return; try { bgG = a.createGain(); bgG.gain.value = 0; bgG.connect(a.destination); bgA.forEach((el, k) => { const g = a.createGain(); g.gain.value = 0; a.createMediaElementSource(el).connect(g); g.connect(bgG); bgE[k] = g; }); } catch (e) { bgG = null; } }
     function ramp(g, v, sec) {
@@ -534,7 +535,7 @@
     q('[data-pause]').addEventListener('click', () => run ? stop() : play());
     q('[data-snd]').addEventListener('click', e => { sound = !sound; e.currentTarget.setAttribute('aria-pressed', String(sound)); q('[data-sndl]').textContent = sound ? T('Klang an', 'Chime on') : T('Klang aus', 'Chime off'); });
     q('[data-mus]').addEventListener('click', () => {
-      if (bgm.length) { bgOn = !bgOn; try { localStorage.setItem('mvf-bgm', bgOn ? '1' : '0'); } catch (e) {} if (bgOn && run) bgPlay(); else bgPause(.6); bgUi(); return; }
+      if (bgm.length) { bgOn = !bgOn; if (bgOn && run) bgPlay(); else bgPause(.6); bgUi(); return; }
       const m = q('[data-mu]'); m.open = true; m.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
     root.addEventListener('mvf:own', e => { if (!bgm.length) return; bgOn = !e.detail; if (bgOn && run) bgPlay(); else bgPause(.6); bgUi(); });
     bgUi();
