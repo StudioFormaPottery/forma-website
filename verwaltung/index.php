@@ -21,6 +21,7 @@ unset($_SESSION['flash']);
  */
 // Neu-Boxen: 'b' => 'movecia' erscheint nur auf der Movecia-Übersicht, sonst nur bei FORMA (Vivien, 28.10.2026).
 const FORMA_ADMIN_NEWS = [
+    ['until' => '2026-12-26', 'title' => 'Ab 2. November ist die Website weihnachtlich', 'text' => 'Sterne, Kugeln und Geschenke fliegen durchs Bild, das Christkind schaut immer wieder am Rand herein, der Adventkalender steht im November gleich unter den Kursen, und die Pop-ups wechseln sich ab (Adventkalender bis 30.11., Pottery bemalen bis 23.12.). Am 24. Dezember fliegt das Christkind mit seinem Stern über die Seite, dazu spielt „Stille Nacht“ als Spieluhr. Ausschalten: Pop-up & Deko → Keine Deko.', 'link' => '/?deko=weihnachten&christkind=24'],
     ['b' => 'movecia', 'until' => '2026-11-30', 'title' => 'Schnitt schlägt dir die Musik vor', 'text' => 'Unter „🎵 Musik darunter“ steht jetzt ein fertiger Vorschlag, passend zum Entwurf (Abend, Flow, Reel …). Ein Tipp auf den großen Knopf nimmt genau so viele Lieder, wie dein Video lang ist – sie blenden ineinander. „🎲 andere“ würfelt neu, und die ganze Bibliothek liegt darunter mit Suchfeld', 'link' => '?view=schnitt'],
     ['b' => 'movecia', 'until' => '2026-11-30', 'title' => 'Schnitt: mehrere Lieder hintereinander', 'text' => 'Unter „🎵 Musik darunter“ kannst du jetzt mehrere Lieder nehmen. Ich lege sie hintereinander, blende sie ineinander und schneide alles auf die Länge deines Videos zu – reicht die Musik nicht, fängt sie wieder vorne an. Mit ↑ und ✕ änderst du Reihenfolge und Auswahl', 'link' => '?view=schnitt'],
     ['b' => 'movecia', 'until' => '2026-11-30', 'title' => 'Schnitt: Pausen-Regler und wieder länger ziehen', 'text' => 'Unter „✨ Automatisch schneiden“ stellst du jetzt mit einem Regler selbst ein, ab welcher Länge eine Pause rausfliegt (0,2 bis 2,5 Sekunden) – darunter steht, wie das klingt. Hast du schon geschnitten, kommt „✨ Mit 1,2 s nochmal schneiden“. In der Zeitleiste siehst du neben jedem Clip schraffiert das, was weggeschnitten wurde: Griff ⟦ oder ⟧ einfach hineinziehen, dann ist es wieder da – auch ganz am Anfang und über den nächsten Clip hinaus. Was dadurch doppelt ist, kannst du darunter mit einem Tipp löschen', 'link' => '?view=schnitt'],
@@ -601,7 +602,7 @@ if ($action === 'save_community') {
 
 if ($action === 'save_deko') {
     $m = (string)($_POST['deko'] ?? 'auto');
-    forma_set_setting($pdo, 'deko', in_array($m, ['auto', 'halloween', 'herbst', 'winter', 'fruehling', 'sommer', 'aus'], true) ? $m : 'auto');
+    forma_set_setting($pdo, 'deko', in_array($m, ['auto', 'halloween', 'weihnachten', 'herbst', 'winter', 'fruehling', 'sommer', 'aus'], true) ? $m : 'auto');
     go($self . '?view=popup', 'Die saisonale Deko ist gespeichert.');
 }
 
@@ -2336,11 +2337,11 @@ if ($view === 'popup') {
             <label for="deko">Deko</label>
             <select id="deko" name="deko">
                 <?php $cur = forma_setting($GLOBALS['pdo'], 'deko') ?? 'auto';
-                foreach (['auto' => 'Automatisch nach Jahreszeit', 'halloween' => 'Halloween', 'herbst' => 'Herbst', 'winter' => 'Winter', 'fruehling' => 'Frühling', 'sommer' => 'Sommer', 'aus' => 'Keine Deko'] as $k => $l): ?>
+                foreach (['auto' => 'Automatisch nach Jahreszeit', 'halloween' => 'Halloween', 'weihnachten' => 'Weihnachten', 'herbst' => 'Herbst', 'winter' => 'Winter', 'fruehling' => 'Frühling', 'sommer' => 'Sommer', 'aus' => 'Keine Deko'] as $k => $l): ?>
                 <option value="<?= $k ?>" <?= $cur === $k ? 'selected' : '' ?>><?= $l ?></option>
                 <?php endforeach; ?>
             </select>
-            <p class="muted small">Vorschau: <a href="/?deko=halloween" target="_blank" rel="noopener">Halloween</a> · <a href="/?deko=herbst" target="_blank" rel="noopener">Herbst</a> · <a href="/?deko=winter" target="_blank" rel="noopener">Winter</a> · <a href="/?deko=fruehling" target="_blank" rel="noopener">Frühling</a> · <a href="/?deko=sommer" target="_blank" rel="noopener">Sommer</a></p>
+            <p class="muted small">Vorschau: <a href="/?deko=halloween" target="_blank" rel="noopener">Halloween</a> · <a href="/?deko=weihnachten" target="_blank" rel="noopener">Weihnachten</a> · <a href="/?deko=weihnachten&amp;christkind=24" target="_blank" rel="noopener">Christkind am 24.12.</a> · <a href="/?deko=herbst" target="_blank" rel="noopener">Herbst</a> · <a href="/?deko=winter" target="_blank" rel="noopener">Winter</a> · <a href="/?deko=fruehling" target="_blank" rel="noopener">Frühling</a> · <a href="/?deko=sommer" target="_blank" rel="noopener">Sommer</a></p>
             <button class="btn" type="submit">Speichern</button>
         </form>
     <?php });
