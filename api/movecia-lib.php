@@ -465,6 +465,15 @@ function mm_ml_stats(string $name = MM_ML_GROUP): ?array
 {
     $cfg = forma_mailerlite();
     if (!$cfg) return null;
+    // Nicht bei jedem Öffnen der Übersicht auf MailerLite warten (Vivien, 30.10.2026: „Verwaltung lädt langsam“): 15 Min. merken
+    $cf = forma_data_dir() . '/cache-ml-' . md5($name) . '.json';
+    if (is_file($cf) && filemtime($cf) > time() - 900) { $c = json_decode((string)file_get_contents($cf), true); if (is_array($c)) return $c ?: null; }
+    $r = mm_ml_stats_live($name, $cfg);
+    @file_put_contents($cf, json_encode($r ?? []));
+    return $r;
+}
+function mm_ml_stats_live(string $name, array $cfg): ?array
+{
     try {
         $list = forma_ml_request('GET', '/api/groups?limit=100&filter%5Bname%5D=' . rawurlencode($name), null, $cfg['api_key']);
         foreach ($list['data'] ?? [] as $g) {

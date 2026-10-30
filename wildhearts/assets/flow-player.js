@@ -60,6 +60,7 @@
 .mvf-play,.mvf-done{scroll-margin-top:150px}
 .mvf-play{display:flex;flex-direction:column;gap:14px}
 .mvf-stage{position:relative;aspect-ratio:16/9;width:100%;border-radius:30px;overflow:hidden;background:radial-gradient(circle at 30% 30%,#8C727B,#2E1D27)}
+.mvf-stage{background-size:cover;background-position:center}
 .mvf-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;opacity:0;transition:opacity .35s ease,filter 1.2s ease,transform 1.2s ease}
 .mvf-stage iframe.on{opacity:1}
 /* Einleitung (Vivien, 30.10.2026): Titelbild → Welle mit der ersten Übung, Bild weich verschwommen, 10 Sekunden in der Mitte */
@@ -399,8 +400,14 @@
       slots.forEach((x, j) => { x.f.classList.toggle('on', j === act && !!src); if (j !== act) call(x, 'pause'); });
       const sl = slots[act]; sl.f.title = it.name; call(sl, 'setCurrentTime', 0); if (run) call(sl, 'play');
       q('[data-ph]').hidden = !!src;
-      const n = items[i + 1]; if (n && n.src && n.src !== src) load(slots[1 - act], n.src);
+      // Vorschaubild sofort zeigen, solange der Clip lädt (Vivien, 30.10.2026: „das Bild lädt sehr langsam“)
+      q('[data-st]').style.backgroundImage = it.thumb ? 'url("' + it.thumb.replace(/"/g, '') + '")' : '';
+      // Den nächsten Clip erst laden, wenn der aktuelle schon läuft – sonst teilen sich beide die Leitung
+      clearTimeout(preT); const n = items[i + 1];
+      if (n && n.src && n.src !== src) { const want = i; const tryPre = () => { if (idx !== want) return; if (slots[act].playing || performance.now() - shownAt > 6000) load(slots[1 - act], n.src); else preT = setTimeout(tryPre, 700); }; preT = setTimeout(tryPre, 1200); }
     }
+    let preT = 0;
+    items.forEach(x => { if (x.thumb) { const im = new Image(); im.src = x.thumb; } });
     const vidOk = () => !items[idx].src || slots[act].playing || performance.now() - shownAt > 5000;
 
     // ---- Musik darunter (vom Video, z. B. „Ankommen“): ein oder zwei Lieder, sanft ineinander geblendet ----

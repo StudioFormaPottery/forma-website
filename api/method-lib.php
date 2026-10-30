@@ -1930,7 +1930,7 @@ function mv_flow_data(array $l, string $lang, bool $preview = false): ?array
         if ($src === '' && !$preview) return null;
         $voice = $mode === 'flow' ? mv_voice_url((int)$l['id'], $i, $g) : '';
         if ($mode === 'flow' && $voice === '' && !$preview) return null;
-        $items[] = ['name' => $g === 'en' ? $x['en'] : $x['de'], 'src' => $src, 'sec' => $x['sec'], 'voice' => $voice] + ($preview ? ['text' => $g === 'en' ? $x['ten'] : $x['tde']] : []);
+        $items[] = ['name' => $g === 'en' ? $x['en'] : $x['de'], 'src' => $src, 'thumb' => $guid !== '' ? mv_thumb($guid) : '', 'sec' => $x['sec'], 'voice' => $voice] + ($preview ? ['text' => $g === 'en' ? $x['ten'] : $x['tde']] : []);
     }
     return ['lang' => $g, 'mode' => $mode, 'title' => mv_t($l, 'title', $g), 'items' => $items, 'music' => mv_music_lists(), 'preview' => $preview,
         'bgm' => array_map(fn($r) => ['url' => mv_bgm_url((int)$r['id']), 't' => (string)$r['title'], 'dur' => (float)$r['dur']], mv_bgm_rows($pdo, $l))];
