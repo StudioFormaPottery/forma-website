@@ -750,11 +750,11 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     try{const want=ls.get('st-mic-l','');if(want){const ds=await navigator.mediaDevices.enumerateDevices(),m=ds.find(d=>d.kind==='audioinput'&&d.label===want);if(m){mid=m.deviceId;ls.set('st-mic',mid)}}}catch(e){}
     if(raw)raw.getTracks().forEach(t=>t.stop());if(tc)tc.destroy(false);
     const Q=QUAL[qual()]||QUAL['4k'];const v={width:{ideal:Q[0]},height:{ideal:Q[1]},frameRate:{ideal:30}};if(cid)v.deviceId={exact:cid};
-    const a={echoCancellation:true,noiseSuppression:true,autoGainControl:true};if(mid)a.deviceId={ideal:mid};
+    const a={echoCancellation:true,noiseSuppression:true,autoGainControl:true};if(mid)a.deviceId={exact:mid};
     try{raw=await navigator.mediaDevices.getUserMedia({video:v,audio:a})}
     catch(e){let err=e;
       // Schritt für Schritt einfacher werden: ohne gemerkte Kamera, dann ganz ohne Vorgaben, dann nur Kamera (Vivien, 30.10.2026)
-      for(const c of [{video:true,audio:a},{video:true,audio:true},{video:true}]){try{raw=await navigator.mediaDevices.getUserMedia(c);ls.set('st-cam','');if(!c.audio){ls.set('st-mic','');ls.set('st-mic-l','')}err=null;break}catch(e2){err=e2;if(c.audio)micErr=e2}}
+      for(const c of [{video:true,audio:a},{video:true,audio:true},{video:true}]){try{raw=await navigator.mediaDevices.getUserMedia(c);ls.set('st-cam','');if(c.audio===true)ls.set('st-mic','');err=null;break}catch(e2){err=e2;if(c.audio)micErr=e2}}
       if(err){camErr(err);return}
       if(!raw.getAudioTracks().length)micHelp()}
     if(ls.get('st-wide',''))await wideZoom();
