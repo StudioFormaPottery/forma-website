@@ -533,7 +533,7 @@ void main(){
       if (v) { if (!c.dur && v.readyState >= 1 && isFinite(v.duration) && v.duration > 0) { c.dur = v.duration; if (!c.out) c.out = c.dur; } return v; }
       v = document.createElement('video'); v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.muted = false;
       v.src = c.url; pv.insertBefore(v, big); vids.set(c.slot, v);
-      v.addEventListener('error', () => { const e = v.error; console.warn('Schnitt: Video lässt sich nicht abspielen', c.name, e && e.code, e && e.message); say('„' + c.name + '“ lässt sich in diesem Browser gerade nicht abspielen (Fehler ' + ((e && e.code) || '?') + '). Bitte schreib mir, ob du Safari oder Chrome nutzt.', 'bad'); });
+      v.addEventListener('error', () => { const e = v.error; console.warn('Schnitt: Video lässt sich nicht abspielen', c.name, e && e.code, e && e.message); fixOffer(c, e && e.code); });
       v.addEventListener('loadedmetadata', () => { const d = isFinite(v.duration) && v.duration > 0 ? v.duration : 0; let probe = false; clips.filter(x => x.url === c.url && !x.dur).forEach(x => { x.dur = d; if (!x.out) x.out = d; if (!d) probe = true; }); if (!c.dur) { c.dur = d; if (!c.out) c.out = d; if (!d) probe = true; } if (probe) probeDur(c, v); else ui(); });
       return v;
     }
@@ -667,6 +667,31 @@ void main(){
         }
         if (/vorbereitet/.test(K('msg').textContent)) say('✓ Alle Clips sind fürs Schneiden bereit.', 'ok');
       } finally { prepRun = false; }
+    }
+    // Video lässt sich nicht abspielen (z. B. Fehler 4 = Format): neu kodieren in H.264/AAC (MP4), das kann jeder Browser
+    function fixOffer(c, code) {
+      const m = K('msg'); m.className = 'sn-msg bad'; m.innerHTML = '„' + esc(c.name) + '“ lässt sich gerade nicht abspielen (Fehler ' + (code || '?') + '). <button type="button" class="sn-b sm" data-fix>🔧 Video reparieren</button>';
+      m.querySelector('[data-fix]').onclick = () => repair(c);
+    }
+    async function repair(c) {
+      if (busy) return; busy = true; stop(); const m = K('msg'); m.className = 'sn-msg'; m.textContent = '🔧 „' + c.name + '“ wird repariert … (dauert etwa so lang wie das Video, Seite offen lassen)';
+      try {
+        const M = await loadMB(), input = new M.Input({ source: new M.BlobSource(c.blob), formats: M.ALL_FORMATS });
+        const vt = await input.getPrimaryVideoTrack(); if (!vt) throw new Error('kein Bild in der Datei');
+        const aac = await M.canEncodeAudio('aac', { numberOfChannels: 2, sampleRate: 48000, bitrate: 160000 }).catch(() => false);
+        let parts = [], end = 0;
+        const put = (p, data) => { const bl = new Blob([data]), pe = p + data.byteLength; if (p === end) { parts.push({ p, b: bl }); end = pe; return; } if (p > end) { parts.push({ p: end, b: new Blob([new Uint8Array(p - end)]) }, { p, b: bl }); end = pe; return; }
+          const nx = []; for (const x of parts) { const xs = x.p, xe = x.p + x.b.size; if (xe <= p || xs >= pe) { nx.push(x); continue; } if (xs < p) nx.push({ p: xs, b: x.b.slice(0, p - xs) }); if (xe > pe) nx.push({ p: pe, b: x.b.slice(pe - xs) }); } nx.push({ p, b: bl }); nx.sort((x, y) => x.p - y.p); parts = nx; if (pe > end) end = pe; };
+        const target = new M.StreamTarget(new WritableStream({ write(ch) { put(ch.position, ch.data); } }), { chunked: true, chunkSize: 4 * 1024 * 1024 });
+        const output = new M.Output({ format: aac ? new M.Mp4OutputFormat({ fastStart: false }) : new M.MovOutputFormat({ fastStart: false }), target });
+        const conv = await M.Conversion.init({ input, output, video: { codec: 'avc', forceTranscode: true, bitrate: 8e6 }, audio: aac ? { codec: 'aac', forceTranscode: true, bitrate: 160000 } : { codec: 'pcm-s16', forceTranscode: true } });
+        if (!conv.isValid) throw new Error('Format wird nicht unterstützt');
+        conv.onProgress = pr => { m.textContent = '🔧 „' + c.name + '“ wird repariert … ' + Math.round(pr * 100) + ' %'; };
+        await conv.execute(); const nb = new Blob(parts.map(x => x.b), { type: aac ? 'video/mp4' : 'video/quicktime' });
+        const old = c.blob, nu = URL.createObjectURL(nb), oldUrl = c.url;
+        for (const x of clips.concat(bros)) if (x.blob === old || x.url === oldUrl) { x.blob = nb; x.url = nu; x.fx = 1; x.dur = 0; await dbPut(dbRow(x)); }
+        slots(); dropVids(); ui(); show(sel, 0); busy = false; say('✓ „' + c.name + '“ ist repariert und spielt wieder.', 'ok'); rescueUi();
+      } catch (e) { busy = false; console.warn('Schnitt: Reparieren', e); m.className = 'sn-msg bad'; m.textContent = 'Reparieren hat leider nicht geklappt (' + (e && e.message || e) + '). Schau bitte unter „🛟 Gerettete Videos“, ob dort die ursprüngliche Datei liegt.'; }
     }
     async function addFiles(files) {
       let n = 0;
