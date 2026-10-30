@@ -42,6 +42,11 @@ header('Content-Type: text/html; charset=utf-8');
 .txt .h{display:block;font-size:.5em;letter-spacing:.06em;color:#C9B4BB;margin-top:.7em}
 .ed{display:none;flex:1;padding:12px clamp(10px,2vw,20px)}.ed textarea{width:100%;height:100%;min-height:300px;border-radius:14px;border:0;padding:14px;font:inherit;font-size:1rem;line-height:1.55;background:#F6EFF1;color:var(--ink)}
 .wrap.editing .view{display:none}.wrap.editing .ed{display:block}
+/* Blick in die Kamera (Vivien, 30.10.2026): Text oben unter der Linse, Leiste nach unten */
+.wrap.cam .view{order:1}.wrap.cam .ed{order:2}.wrap.cam .hd{order:3}.wrap.cam .sub{display:none}
+.wrap.cam .view:before{top:4%}
+.wrap.cam .view:after{background:linear-gradient(var(--deep),transparent 3%,transparent 26%,var(--deep) 38%)}
+.wrap.cam .txt{padding:0 max(16px,calc(50% - 330px))}
 .mir .txt{transform-origin:center}.mir .view .txt{scale:-1 1}
 </style></head><body>
 <div class="wrap" id="w">
@@ -52,7 +57,7 @@ header('Content-Type: text/html; charset=utf-8');
     <button type="button" id="play">▶ Start</button><button type="button" id="top" title="Zum Anfang">⟲</button>
     <button type="button" data-sp="-1">−</button><span class="sp" id="spv"></span><button type="button" data-sp="1">+</button>
     <button type="button" data-sz="-1">A−</button><button type="button" data-sz="1">A+</button>
-    <span class="rt"><button type="button" id="mir" title="Spiegeln für einen Teleprompter-Aufsatz">⇋ Spiegeln</button><button type="button" id="edb">✎ Bearbeiten</button></span>
+    <span class="rt"><button type="button" id="cam" class="on">📷 Blick in die Kamera</button><button type="button" id="mir" title="Spiegeln für einen Teleprompter-Aufsatz">⇋ Spiegeln</button><button type="button" id="edb">✎ Bearbeiten</button></span>
   </div>
   <p class="sub"><?= $h($sub) ?> · Leertaste = Start/Pause · Tippen auf den Text = Start/Pause · Zeilen in [Klammern] sind Hinweise für dich</p>
   <div class="view" id="view"><div class="txt" id="txt"></div></div>
@@ -65,7 +70,9 @@ const w=document.getElementById('w'),sel=document.getElementById('sel'),view=doc
 let key=P.key,speed=P.speed,size=Math.max(P.size,34),y=0,run=false,last=0,t=null;
 const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 function render(){txt.innerHTML=esc(P.scripts[key].text.replace(/\{name\}/g,nm.value||'')).replace(/\[([^\]\n]*)\]/g,'<span class="h">$1</span>');txt.style.fontSize=size+'px';spv.textContent=speed.toFixed(1)+'×';place();}
-function place(){txt.style.transform='translateY('+(view.clientHeight*0.30-y)+'px)';}
+function place(){txt.style.transform='translateY('+(view.clientHeight*(w.classList.contains('cam')?0.04:0.30)-y)+'px)';}
+const cb=document.getElementById('cam');function cm(on){w.classList.toggle('cam',on);cb.classList.toggle('on',on);try{localStorage.setItem('tp-cam',on?'1':'0')}catch(e){}place();}
+cb.onclick=()=>cm(!w.classList.contains('cam'));
 function loop(ts){if(run){const dt=last?(ts-last)/1000:0;y+=dt*speed*size*0.9;if(y>txt.scrollHeight){y=txt.scrollHeight;stop();}place();}last=ts;requestAnimationFrame(loop);}
 function start(){run=true;play.textContent='❚❚ Pause';play.classList.add('on');}
 function stop(){run=false;play.textContent='▶ Start';play.classList.remove('on');}
@@ -81,7 +88,7 @@ document.getElementById('edb').onclick=e=>{const on=w.classList.toggle('editing'
 area.oninput=()=>{P.scripts[key].text=area.value;clearTimeout(t);t=setTimeout(()=>save({key,text:area.value}),700);};
 document.getElementById('reset').onclick=()=>{if(!confirm('Deine Änderungen an diesem Skript verwerfen und die Vorlage laden?'))return;P.scripts[key].text=P.scripts[key].def;area.value=P.scripts[key].def;save({reset:key});};
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&document.activeElement!==area&&!['SELECT','INPUT'].includes(document.activeElement.tagName)){e.preventDefault();run?stop():start();}});
-addEventListener('resize',place);render();requestAnimationFrame(loop);
+addEventListener('resize',place);render();let c0=true;try{c0=localStorage.getItem('tp-cam')!=='0'}catch(e){}cm(c0);requestAnimationFrame(loop);
 })();
 </script>
 </body></html>

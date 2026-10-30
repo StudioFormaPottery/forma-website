@@ -633,3 +633,12 @@ body.acad{--blush:#E9E2D8}
 .acad .tint::before{display:none}
 .acad .ac-ribbon+.tint{margin-top:0}
 .acad .tint{margin-top:clamp(1.6rem,3vw,2.4rem)}
+/* Countdown etwas kleiner (Vivien, 30.10.2026 10:51: „nicht mega klein, nicht riesig“) */
+.acc-wrap .acc{gap:1.1rem;padding-top:2rem;padding-bottom:3.6rem}
+.acc-wrap .acc-h{font-size:clamp(1.9rem,3.4vw,2.7rem)}
+.acc-wrap .acc-u{padding:clamp(.7rem,1.4vw,1rem) clamp(.8rem,1.8vw,1.3rem) clamp(.55rem,1.1vw,.8rem)}
+.acc-wrap .acc-u b{font-size:clamp(2.4rem,5vw,4.2rem)}
+.acc-wrap .acc-u small{font-size:.66rem;margin-top:.4rem}
+.acc-wrap .acc-p b{font-size:clamp(1.5rem,2.6vw,2.1rem)}
+.acc-wrap .acc-btn{font-size:.98rem;padding:.7em 1.4em}
+@media(max-width:600px){.acc-wrap .acc{padding-top:1.8rem;padding-bottom:3rem}.acc-wrap .acc-h{font-size:1.8rem}.acc-wrap .acc-u{padding:.6rem .5rem .5rem}.acc-wrap .acc-u b{font-size:2.15rem}.acc-wrap .acc-u small{font-size:.56rem}.acc-wrap .acc-p b{font-size:1.45rem}}

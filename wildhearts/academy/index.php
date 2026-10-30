@@ -22,7 +22,7 @@ $ld = [
      'hasOfferCatalog' => ['@type' => 'OfferCatalog', 'name' => 'Ausbildungen', 'itemListElement' => [['@type' => 'Offer', 'itemOffered' => ['@type' => 'Course', '@id' => $site . '/academy/teacher-training/#course', 'name' => AC_TITLE, 'url' => $site . '/academy/teacher-training/']]]]],
     ['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => [['@type' => 'ListItem', 'position' => 1, 'name' => 'Movecia', 'item' => $site . '/'], ['@type' => 'ListItem', 'position' => 2, 'name' => 'Academy', 'item' => $site . '/academy/']]],
 ];
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=16">';
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=17">';
 mvl_head('Movecia Academy · Yogalehrerausbildung auf Deutsch, Tirol & online', 'Ausbildungen der Movecia Academy mit Vivien Malonga, ausschließlich auf Deutsch, für Österreich, Deutschland, die Schweiz und Südtirol: das Mindful Becoming Teacher Training mit 550 Stunden, inkl. vollständiger 200-Stunden-Yogalehrerausbildung, Somatic Movement und Breathwork. Hybrid, mit Präsenzwochenende in den Tiroler Alpen. Nur 14 Plätze, Start November 2027.', $site . '/academy/', '/img/movecia/og-academy.jpg', $css, $ld);
 ?>
 <body class="acad">
