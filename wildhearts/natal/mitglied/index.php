@@ -416,7 +416,7 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
 
 <?php if ($me): ?>
 <script src="/wildhearts/assets/flow-player.js?v=12"></script>
-<script src="/wildhearts/assets/titelkarte.js?v=1"></script>
+<script src="/wildhearts/assets/titelkarte.js?v=1"></script><script src="/wildhearts/assets/bunny-ton.js?v=1"></script>
 <script>
 (() => {
   const DEMO = <?= json_encode($demo) ?>;
@@ -444,6 +444,7 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
     f.style.cssText = 'width:100%;aspect-ratio:16/9;border:0;border-radius:18px;background:var(--deep)';
     open(b.dataset.t, ''); const fw = document.createElement('div'); fw.style.borderRadius = '18px'; fw.appendChild(f); sb.appendChild(fw);
     if (window.MvTitle) MvTitle(f, { t: b.dataset.t.replace(/ · Vertiefung$/, ''), r: 'natal', l: 'de' });
+    if (window.MvTon) MvTon();
   }));
   document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
     document.getElementById('spot').src = b.dataset.sp;

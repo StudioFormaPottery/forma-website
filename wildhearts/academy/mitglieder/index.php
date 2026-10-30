@@ -177,7 +177,7 @@ mvl_head($L('Teacher Training · Mitgliederbereich', 'Teacher Training · Member
   <div class="acm-col">
     <section class="acm-card acm-video">
       <p class="k"><?= $L('Mein Willkommen an dich', 'My welcome to you') ?></p>
-      <?php if ($embed !== ''): ?><div class="acm-frame"><iframe data-mv-title="<?= $h(json_encode(['t' => (string)($lesson['title_de'] ?? 'Willkommen'), 'r' => 'yoga', 'l' => 'de'], JSON_UNESCAPED_UNICODE)) ?>" src="<?= $h($embed) ?>" loading="lazy" allow="accelerometer; gyroscope; encrypted-media; picture-in-picture" allowfullscreen title="<?= $L('Willkommensvideo', 'Welcome video') ?>"></iframe></div><script src="/wildhearts/assets/titelkarte.js?v=1" defer></script>
+      <?php if ($embed !== ''): ?><div class="acm-frame"><iframe data-mv-title="<?= $h(json_encode(['t' => (string)($lesson['title_de'] ?? 'Willkommen'), 'r' => 'yoga', 'l' => 'de'], JSON_UNESCAPED_UNICODE)) ?>" src="<?= $h($embed) ?>" loading="lazy" allow="accelerometer; gyroscope; encrypted-media; picture-in-picture" allowfullscreen title="<?= $L('Willkommensvideo', 'Welcome video') ?>"></iframe></div><script src="/wildhearts/assets/titelkarte.js?v=1" defer></script><script src="/wildhearts/assets/bunny-ton.js?v=1" defer></script>
       <?php else: ?><div class="acm-ph"><span class="acm-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span><p><b><?= $L('Mein Willkommensvideo kommt bald', 'My welcome video is coming soon') ?></b><br><?= $L('Ich nehme es gerade für dich auf. Sobald es da ist, findest du es genau hier.', 'I am recording it for you right now. As soon as it is ready, you will find it right here.') ?></p></div><?php endif; ?>
     </section>
 

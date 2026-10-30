@@ -2117,7 +2117,7 @@ function mv_embed(string $guid, bool $clip = false): string
 {
     $b = mv_bunny();
     if ($guid === '' || $b['lib'] === '') return '';
-    $u = 'https://iframe.mediadelivery.net/embed/' . rawurlencode($b['lib']) . '/' . rawurlencode($guid) . '?preload=true&responsive=true' . ($clip ? '' : '&autoplay=false'); // Talking Heads: kein Autoplay, sonst startet der Browser sie stumm (Vivien, 30.10.2026: „wieder kein Ton“). Übungs-Clips (clip=true) hängen autoplay/muted selbst an.
+    $u = 'https://iframe.mediadelivery.net/embed/' . rawurlencode($b['lib']) . '/' . rawurlencode($guid) . '?preload=true&responsive=true' . ($clip ? '' : '&autoplay=false&muted=false'); // Talking Heads: kein Autoplay, sonst startet der Browser sie stumm (Vivien, 30.10.2026: „wieder kein Ton“). Übungs-Clips (clip=true) hängen autoplay/muted selbst an.
     if ($b['token'] !== '') {
         $exp = time() + 4 * 3600;
         $u .= '&token=' . hash('sha256', $b['token'] . $guid . $exp) . '&expires=' . $exp;
