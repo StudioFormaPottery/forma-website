@@ -148,6 +148,15 @@ a{color:inherit}
     <p class="lead">Online und in meinem kleinen Studio in Mathon begleite ich Frauen zurück in ihren Körper, mit achtsamer Bewegung, sanfter Kraft und Atem.</p>
   </header>
 
+<?php if (time() <= strtotime('2026-12-20 23:59:59')): // Weihnachts-Gewinnspiel (Vivien, 30.10.2026) ?>
+  <nav class="links" style="margin-top:1.2rem" aria-label="Gewinnspiel">
+    <a class="btn main" href="/gewinnspiel/">
+      <span class="th"><img src="/img/movecia/fotos/ev-ueber-mich.jpg?v=10" alt="" width="120" height="150"></span>
+      <span class="tx"><span class="tag">🎁 Gewinnspiel</span><b>Gewinne Zeit für dich</b><small>3 Monate The Method oder 2 Online-Einheiten Prä-/Postnatal · bis 20. Dezember</small></span>
+      <span class="ar" aria-hidden="true">→</span>
+    </a>
+  </nav>
+<?php endif ?>
 <?php if ($next): ?>
   <p class="nx-t">Als Nächstes</p>
   <div class="next">

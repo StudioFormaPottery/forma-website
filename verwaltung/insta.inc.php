@@ -61,6 +61,8 @@ function ig_seed_mvig(PDO $pdo): void
     if (!$v || (int)forma_setting($pdo, 'ig_mvig_plan') >= $v) return;
     $q = $pdo->prepare("SELECT COUNT(*) FROM mm_insta WHERE acc = 'mvig' AND day = ? AND title = ?");
     $ins = $pdo->prepare("INSERT INTO mm_insta (day, kind, acc, title, text, photo, lang, created_at, updated_at) VALUES (?,?,?,?,?,?,'de',?,?)");
+    // Neuer Plan für einen Zeitraum (Vivien, 30.10.2026): noch nicht aufgenommene/gepostete Einträge darin werden ersetzt
+    if (!empty($d['replace_from']) && !empty($d['replace_to'])) $pdo->prepare("DELETE FROM mm_insta WHERE acc = 'mvig' AND day >= ? AND day <= ? AND status = 'offen' AND file = ''")->execute([$d['replace_from'], $d['replace_to']]);
     // Einträge mit „replaces“ ersetzen einen schon eingetragenen alten Text (nur wenn noch nicht gepostet)
     $upd = $pdo->prepare("UPDATE mm_insta SET title = ?, text = ?, updated_at = ? WHERE acc = 'mvig' AND day = ? AND title = ? AND status <> 'gepostet'");
     foreach ($d['items'] ?? [] as $x) {

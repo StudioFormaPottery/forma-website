@@ -104,6 +104,17 @@ if (isset($_GET['tmvorschau'])) { // Bestätigungsmail an die Gästin ansehen (V
         exit;
     }
 }
+// Weihnachts-Gewinnspiel (Vivien, 30.10.2026): auslosen und Gewinn freischalten
+if ($action === 'mm_gw_draw' || $action === 'mm_gw_grant') {
+    require_once dirname(__DIR__) . '/api/gewinnspiel-lib.php';
+    if ($action === 'mm_gw_draw') {
+        $w = gw_draw($pdo);
+        go($mmBack . '#gewinnspiel', $w ? 'Gewonnen hat ' . $w['name'] . '! Prüf kurz, dann „Gewinn freischalten & Mail schicken“.' : 'Es gibt noch keine bestätigten Teilnahmen.');
+    }
+    $w = gw_winner($pdo);
+    $ok = $w ? gw_grant($pdo, $w) : false;
+    go($mmBack . '#gewinnspiel', $ok ? 'Gewinn freigeschaltet, die Mail ist unterwegs.' : 'Das hat nicht geklappt (schon freigeschaltet oder keine Gewinnerin).');
+}
 if ($action === 'mm_tm_new' || $action === 'mm_tm_reset' || $action === 'mm_tm_del') {
     require_once dirname(__DIR__) . '/api/termin-lib.php';
     tm_schema($pdo);
@@ -464,6 +475,28 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                     <button style="justify-self:start;font-size:16px;padding:.6em 1.2em;border-radius:999px;border:0;background:#7D5E68;color:#FBF5F7;cursor:pointer">Anlegen</button>
                 </form>
             </details>
+        </section>
+        <?php endif; ?>
+        <?php if ($part === '' && date('Y-m-d') <= '2027-01-31'): require_once dirname(__DIR__) . '/api/gewinnspiel-lib.php'; $gwList = gw_list($pdo); $gwOk = array_values(array_filter($gwList, fn($r) => $r['status'] === 'bestaetigt')); $gwWin = gw_winner($pdo); $gwCnt = []; foreach ($gwOk as $r) $gwCnt[$r['prize']] = ($gwCnt[$r['prize']] ?? 0) + 1; ?>
+        <section id="gewinnspiel" style="margin:18px 0;padding:18px 20px;border-radius:22px;background:#FBF8F4;border:1px solid #DDD2C6">
+            <h2 style="margin:0 0 .3rem">🎁 Weihnachts-Gewinnspiel</h2>
+            <p style="margin:0 0 .8rem;color:#7D7076;font-size:16px">Teilnahme über <a href="https://moveciamovement.com/gewinnspiel/" target="_blank">moveciamovement.com/gewinnspiel</a> bis 20. Dezember, 23:59 Uhr. Am 21. Dezember hier auslosen.</p>
+            <p style="margin:0 0 .6rem;font-size:20px"><b><?= count($gwOk) ?></b> im Lostopf<?= count($gwList) > count($gwOk) ? ' · ' . (count($gwList) - count($gwOk)) . ' noch nicht bestätigt' : '' ?></p>
+            <?php if ($gwCnt): ?><p style="margin:0 0 .8rem;font-size:16px;color:#4A3A41"><?php foreach (GW_PRIZES as $k => $p) if (!empty($gwCnt[$k])) echo forma_h($p[0]) . ': ' . (int)$gwCnt[$k] . '<br>'; ?></p><?php endif; ?>
+            <?php if ($gwWin): ?>
+            <div style="background:#fff;border-radius:18px;padding:14px 16px;margin:0 0 10px;border:2px solid #7D5E68">
+                <p style="margin:0;font-size:19px">🏆 <b><?= forma_h($gwWin['name']) ?></b> · <?= forma_h($gwWin['email']) ?></p>
+                <p style="margin:.3rem 0;font-size:16px">Wunschgewinn: <?= forma_h(GW_PRIZES[$gwWin['prize']][0] ?? '') ?></p>
+                <?php if ($gwWin['granted_at'] !== ''): ?><p style="margin:.3rem 0 0;color:#4A6B4A;font-size:16px">✓ Freigeschaltet und benachrichtigt am <?= forma_h(date('j.n.Y', strtotime($gwWin['granted_at']))) ?></p>
+                <?php else: ?><form method="post" style="margin:.5rem 0 0" onsubmit="return confirm('Gewinn jetzt freischalten und die Mail an <?= forma_h($gwWin['name']) ?> schicken?')"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_gw_grant"><button style="font-size:16px;padding:.6em 1.2em;border-radius:999px;border:0;background:#7D5E68;color:#FBF5F7;cursor:pointer">Gewinn freischalten &amp; Mail schicken</button></form><?php endif; ?>
+            </div>
+            <?php endif; ?>
+            <?php if (!gw_open() && (!$gwWin || $gwWin['granted_at'] === '')): ?>
+            <form method="post" style="margin:0 0 .6rem" onsubmit="return confirm('<?= $gwWin ? 'Neu auslosen? Die bisherige Gewinnerin verfällt.' : 'Jetzt die Gewinnerin auslosen?' ?>')"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_gw_draw"><button style="font-size:17px;padding:.7em 1.4em;border-radius:999px;border:0;background:#4A3A41;color:#FBF5F7;cursor:pointer"><?= $gwWin ? '🎲 Neu auslosen (keine Rückmeldung)' : '🎲 Jetzt auslosen' ?></button></form>
+            <?php elseif (gw_open()): ?><p style="margin:0 0 .6rem;font-size:15px;color:#7D7076">Der Knopf zum Auslosen erscheint nach dem Teilnahmeschluss.</p><?php endif; ?>
+            <?php if ($gwList): ?><details><summary style="cursor:pointer;font-size:16px;color:#7D5E68">Alle Teilnahmen ansehen</summary>
+                <div style="margin-top:8px;font-size:15px;line-height:1.6"><?php foreach ($gwList as $r): ?><?= forma_h($r['name']) ?> · <?= forma_h($r['email']) ?> · <?= forma_h(GW_PRIZES[$r['prize']][0] ?? '') ?> · <?= $r['status'] === 'bestaetigt' ? '✓' : 'noch nicht bestätigt' ?><?= (int)$r['news'] ? ' · Post ✓' : '' ?><br><?php endforeach; ?></div>
+            </details><?php endif; ?>
         </section>
         <?php endif; ?>
         <?php $ptList = []; try { $ptList = mm_pt_list($pdo); } catch (Throwable $e) {} ?>
