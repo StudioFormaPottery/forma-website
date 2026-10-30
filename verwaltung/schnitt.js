@@ -150,6 +150,9 @@
 .sn-zt-ph::before{content:"";position:absolute;top:0;left:-8px;border:9px solid transparent;border-top:12px solid #2E2529;border-bottom:0}
 .sn-zt-ph::after{content:"";position:absolute;bottom:0;left:-7px;width:16px;height:16px;border-radius:50%;background:#2E2529}
 .sn-zt-bar{display:flex;align-items:center;gap:8px;padding:6px 8px;border-top:1.5px solid #EFE7DE;background:#FBF8F4;flex-wrap:wrap}
+.sn-zt-bar .cut{font:inherit;font-size:16px;height:38px;padding:0 14px;border-radius:999px;border:1.5px solid #7D5E68;background:#7D5E68;color:#fff;cursor:pointer;white-space:nowrap}
+.sn-zt-bar .cut.del{background:#fff;color:#9A3B3B;border-color:#E2C3C3}
+.sn-zt-bar .cut:disabled{opacity:.45;cursor:default}
 .sn-zt-bar .t{font-size:16px;color:#4A3A41;font-variant-numeric:tabular-nums;margin-left:auto}
 .sn-zt-bar input[type=range]{flex:1;min-width:90px;max-width:220px;accent-color:#7D5E68}
 .sn-zt-bar .zb{font:inherit;font-size:18px;width:36px;height:36px;border-radius:50%;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer}
@@ -297,7 +300,7 @@ void main(){
       <button type="button" class="sn-b" data-k="cmp" title="Licht & Farbe kurz ausschalten">Vorher zeigen</button></div>
     <div class="sn-zt">
       <div class="sn-zt-sc" data-k="ztsc"><div class="sn-zt-in" data-k="ztin"><div class="sn-zt-tt" data-k="ztt"></div><div class="sn-zt-blocks" data-k="ztb"></div><div class="sn-zt-ph" data-k="ztph"></div></div></div>
-      <div class="sn-zt-bar"><button type="button" class="zb" data-k="zoomOut" aria-label="Zeitleiste zusammenziehen">－</button><input type="range" min="0" max="100" step="1" value="0" data-k="zoomR" aria-label="Zeitleiste auseinanderziehen"><button type="button" class="zb" data-k="zoomIn" aria-label="Zeitleiste auseinanderziehen">＋</button><span class="t" data-k="ztime">0:00,0</span></div>
+      <div class="sn-zt-bar"><button type="button" class="cut" data-k="ztCut" title="An der Stelle des Strichs schneiden">✂ Hier schneiden</button><button type="button" class="cut del" data-k="ztDel" title="Das markierte Stück löschen">🗑 Stück löschen</button><button type="button" class="zb" data-k="zoomOut" aria-label="Zeitleiste zusammenziehen">－</button><input type="range" min="0" max="100" step="1" value="0" data-k="zoomR" aria-label="Zeitleiste auseinanderziehen"><button type="button" class="zb" data-k="zoomIn" aria-label="Zeitleiste auseinanderziehen">＋</button><span class="t" data-k="ztime">0:00,0</span></div>
     </div>
     <div class="sn-ovl" data-k="ovl"></div>
     <p class="sn-zt-hint" data-k="zthint">Tippen = Stelle anspringen · die Griffe <b>⟦ ⟧</b> an den Rändern ziehen = Anfang und Ende länger oder kürzer machen (das schraffierte Stück daneben ist das, was weggeschnitten wurde – da kannst du wieder hineinziehen) · der Griff darf auch über den nächsten Clip hinaus (was doppelt ist, kannst du darunter löschen) · zwei Finger auseinander (oder ＋) = Zeitleiste auseinanderziehen</p>
@@ -725,6 +728,8 @@ void main(){
       if (i < sel) sel--; sel = Math.min(sel, clips.length - 1);
       await saveOrder(); pos = sel >= 0 ? starts()[sel] : 0; ui();
     }
+    K('ztCut').onclick = () => K('split').onclick();
+    K('ztDel').onclick = () => K('delClip').onclick();
     K('delClip').onclick = async () => { if (!clips[sel]) return; await delAt(sel); say('🗑 Clip gelöscht.'); };
 
     // ---- Zeitleiste über das ganze Video (Vivien, 30.10.2026: „Cut, Cut, Cut sehen und mit zwei Punkten ziehen“) ----

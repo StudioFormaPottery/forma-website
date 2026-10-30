@@ -151,6 +151,10 @@ body.tponly .pr.top{width:min(680px,94vw)}
 .iph button.on{background:#7D5E68;color:#fff}
 .iph-help{margin-top:10px;padding:14px 16px;border-radius:18px;background:#FBF1F0;border:1.5px solid #F0DCDA;font-size:16px;line-height:1.5;color:#4A3A41}
 .iph-help ol{margin:8px 0 0 20px;padding:0}.iph-help li{margin:4px 0}
+.fmtq{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;font-size:15px;color:#7D7076}
+.fmtq button{font:inherit;font-size:15px;padding:7px 14px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer}
+.fmtq button[aria-pressed=true]{background:#7D5E68;border-color:#7D5E68;color:#fff}
+body.recording .fmtq,body.rec-ui .fmtq,body.tponly .fmtq{display:none}
 body.recording #wide,body.recording .iph,body.recording .iph-help,body.rec-ui .iph,body.rec-ui .iph-help{display:none}
 /* An der Kamera (Vivien, 28.10.2026: „sieht aus, als würde ich nach unten schauen“): während der Aufnahme ganz oben, mittig unter der Linse, schmal, 3 Zeilen */
 body.prtop .pr.top{display:block;position:fixed;top:0;left:50%;right:auto;transform:translateX(-50%);width:min(560px,94vw);height:calc(var(--fs,30px) * 1.4 * 3 + 22px + env(safe-area-inset-top,0px));min-height:0;padding-top:env(safe-area-inset-top,0px);border-radius:0 0 22px 22px;z-index:200;background:rgba(36,28,32,.94);box-shadow:0 8px 24px -10px rgba(0,0,0,.5)}
@@ -459,6 +463,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     <div id="stage" class="tc-stage" style="aspect-ratio:16/9"><div class="tc-st">Kamera startet … Bitte erlaube Kamera und Mikrofon.</div></div>
     <video id="play" controls playsinline hidden></video>
     <div class="iph" id="iph" hidden><button type="button" id="iphBtn">📱 iPhone als Kamera</button><span class="hint" id="iphInfo" style="font-size:15px;color:#7D7076"></span></div>
+    <div class="fmtq" id="fmtq" hidden><span>Format</span><button type="button" data-fa="16:9">Quer 16:9</button><button type="button" data-fa="4:5">Feed 4:5</button><button type="button" data-fa="9:16">Hoch 9:16</button></div>
     <div class="iph-help" id="iphHelp" hidden></div>
     <div class="iph-help" id="wideHelp" hidden></div>
     <div class="bar">
@@ -532,7 +537,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
   <button type="button" data-sheet="more">⚙️ Mehr</button>
 </nav>
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
-<script src="/wildhearts/assets/talkcam.js?v=6"></script>
+<script src="/wildhearts/assets/talkcam.js?v=7"></script>
 <script src="studio-edit.js?v=7"></script>
 <script src="schnitt.js?v=16"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -725,7 +730,10 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     const rd=document.createElement('div');rd.className='recdot';rd.id='rd';rd.hidden=true;rd.innerHTML='<i></i><span id="rt">0:00</span>';$('stage').appendChild(rd);
     $('stage').appendChild(slab);
     tc.on(t=>{if(t==='layout')subPreview()});
-    if(ig&&tc.s&&tc.s.aspect!=='9:16'){tc.set({aspect:'9:16'})}
+    // Format direkt unter dem Bild (Vivien, 30.10.2026: „im Studio das Format 4:5“), gleiche Einstellung wie im Kamera-Look
+    {const fq=$('fmtq'),fUi=()=>fq.querySelectorAll('[data-fa]').forEach(b=>b.setAttribute('aria-pressed',String(tc.s.aspect===b.dataset.fa)));
+     fq.hidden=false;fUi();fq.querySelectorAll('[data-fa]').forEach(b=>b.onclick=()=>{tc.set({aspect:b.dataset.fa});TalkCam.panel(tc,$('panel'));fUi()});tc.on(t=>{if(t==='layout'||t==='change')fUi()})}
+    if(ig&&tc.s&&tc.s.aspect==='16:9'){tc.set({aspect:'9:16'})}
     TalkCam.panel(tc,$('panel'));
     devices();
     try{$('qual').value=qual();$('qual').onchange=()=>{ls.set('st-qual',$('qual').value);startCam()};tc.on(t=>{if(t==='layout')qShow()})}catch(e){}
