@@ -52,6 +52,55 @@ body{background:#F2ECE4}main{max-width:900px}
     exit;
 }
 
+// ✓ Fertig & ansehen (Vivien, 30.10.2026: „Ankommen habe ich schon fertig – ich will sehen, wie es die Teilnehmerin sieht“)
+if ($view === 'videos' && isset($_GET['fertig'])) {
+    require_once dirname(__DIR__) . '/api/method-lib.php';
+    mv_schema($pdo);
+    $groups = [];
+    foreach (['method' => 'The Method', 'unfold' => 'Unfold', 'natal' => 'Prä- & Postnatal', 'academy' => 'Academy'] as $aud => $an) {
+        foreach (mv_programs($pdo, $aud) as $p) {
+            $ls = mv_lessons($pdo, (int)$p['id']); if (!$ls) continue;
+            $rows = []; $n = 0;
+            foreach ($ls as $l) { $s = mv_lesson_status($pdo, $l); if ($s['done']) { $n++; $rows[] = ['l' => $l, 's' => $s]; } }
+            if ($rows) $groups[] = ['an' => $an, 'aud' => $aud, 'p' => $p, 'rows' => $rows, 'n' => $n, 'all' => count($ls)];
+        }
+    }
+    render_page('Fertige Videos', function () use ($self, $groups) {
+        $h = 'forma_h'; $site = mm_site(); ?>
+<style>
+body{background:#F2ECE4}main{max-width:1100px}
+.fv-h h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;color:#4A3A41;font-size:clamp(34px,4vw,46px);margin:6px 0 4px}
+.fv-h p{font-size:19px;color:#6B5658;margin:0 0 16px;max-width:60ch}
+.fv-g{background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:24px;padding:16px 18px;margin:0 0 14px}
+.fv-g h2{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin:0 0 10px;font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:28px;color:#4A3A41}
+.fv-g h2 small{font-family:"Hanken Grotesk","Outfit",sans-serif;font-size:15px;color:#7D7076}
+.fv-g h2 .all{font-family:"Hanken Grotesk","Outfit",sans-serif;font-size:14px;background:#DDE6D6;color:#2F4A2E;border-radius:999px;padding:3px 12px}
+.fv-l{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.fv-i{display:flex;flex-direction:column;gap:8px;background:#fff;border:1.5px solid #E6DCD2;border-radius:18px;padding:12px 14px}
+.fv-i b{font-weight:500;font-size:18px;color:#2E2529;line-height:1.3}.fv-i small{font-size:14px;color:#7D7076}
+.fv-a{display:flex;flex-wrap:wrap;gap:6px}
+.fv-a a{display:inline-flex;align-items:center;min-height:44px;padding:8px 16px;border-radius:999px;text-decoration:none;font-size:16px;background:#7D5E68;color:#fff}
+.fv-a a.l{background:#F2ECE4;color:#4A3A41}
+.fv-e{font-size:18px;color:#7D7076}
+</style>
+<?php mm_subnav('videos'); ?>
+<div class="fv-h"><h1>✓ Fertig &amp; ansehen</h1><p>Alles, was schon ganz fertig ist. Tipp auf „👁 Ansehen“, dann siehst du es genau so wie die Teilnehmerin, mit Einleitung, Timer und Musik.</p>
+  <p><a href="<?= $h($self) ?>?view=videos" style="font-size:18px;color:#6B5658">← zu „Videos hochladen“</a></p></div>
+<?php if (!$groups): ?><p class="fv-e">Noch ist kein Video ganz fertig.</p><?php endif; ?>
+<?php foreach ($groups as $g): $pt = (string)$g['p']['title_de']; ?>
+<section class="fv-g"><h2><?= $h($pt) ?> <small><?= $h($g['an']) ?> · <?= (int)$g['n'] ?> von <?= (int)$g['all'] ?> fertig</small><?= $g['n'] === $g['all'] ? '<span class="all">✓ alles fertig</span>' : '' ?></h2>
+  <div class="fv-l">
+  <?php foreach ($g['rows'] as $r): $l = $r['l']; $id = (int)$l['id']; $clips = mv_lesson_is_clips($l);
+      $kind = !$clips ? 'Talking Head' : (mv_lesson_mode($l) === 'flow' ? 'Flow mit Voice-over' : 'Bewegungsvideo'); $de = !empty($r['s']['deonly']); ?>
+    <div class="fv-i"><span><small><?= $h($kind) ?></small><br><b><?= $h((string)$l['title_de']) ?></b></span>
+      <div class="fv-a"><a href="<?= $h($self) ?>?view=videos&amp;play=<?= $id ?>&amp;lang=de">👁 Ansehen<?= $de ? '' : ' · Deutsch' ?></a><?php if (!$de): ?><a class="l" href="<?= $h($self) ?>?view=videos&amp;play=<?= $id ?>&amp;lang=en">Englisch</a><?php endif; ?>
+      <?php if ($g['aud'] === 'method' || $g['aud'] === 'unfold'): ?><a class="l" href="<?= $h($site) ?>/mitglieder/?demo=1<?= $g['aud'] === 'unfold' ? '&amp;unfold=1' : '' ?>&amp;l=<?= $id ?>" target="_blank" rel="noopener">Im Mitgliederbereich</a><?php endif; ?></div></div>
+  <?php endforeach; ?>
+  </div></section>
+<?php endforeach;
+    });
+    exit;
+}
 if ($view === 'videos') {
     require_once dirname(__DIR__) . '/api/method-lib.php';
     mv_schema($pdo);
@@ -264,6 +313,7 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
   <button type="button" data-f="" aria-pressed="true">Alle</button><button type="button" data-f="method" aria-pressed="false">Method</button><button type="button" data-f="unfold" aria-pressed="false">Unfold</button><button type="button" data-f="natal" aria-pressed="false">Prä- &amp; Postnatal</button>
 </div>
 
+<p><a href="<?= $u('view=videos&fertig=1') ?>" style="display:inline-flex;align-items:center;min-height:50px;padding:10px 20px;border-radius:999px;background:#DDE6D6;color:#2F4A2E;text-decoration:none;font-size:18px">✓ Fertige Videos ansehen · <?= count($done) ?></a></p>
 <h2 class="sec">Als Nächstes dran</h2>
 <?php if (!$open): ?><p class="empty">Alles fertig. Wunderbar!</p><?php endif; ?>
 <div id="lst">

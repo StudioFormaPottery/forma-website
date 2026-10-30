@@ -565,6 +565,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         <section class="qg test">
             <h2><span class="dot"></span>Ansehen &amp; Testen <small>so sehen es deine Kundinnen</small></h2>
             <div class="qa">
+                <a href="<?= forma_h($self) ?>?view=videos&amp;fertig=1"><span class="ic">✓</span><b>Fertige Videos ansehen</b><span>So sieht die Teilnehmerin, was schon fertig ist (z. B. Ankommen)</span></a>
                 <a href="<?= forma_h($self) ?>?view=vorschau"><span class="ic">👁</span><b>Alle Seiten ansehen</b><span>Jede Seite und jeder Mitgliederbereich als Beispiel</span></a>
                 <a href="<?= forma_h($self) ?>?view=method#test"><span class="ic">🧪</span><b>Als Testteilnehmerin einloggen</b><span>Method oder Unfold echt ausprobieren</span></a>
                 <a href="<?= forma_h($self) ?>?view=natal#testkundin"><span class="ic">🧪</span><b>Als Testkundin Prä-/Postnatal</b><span>Testkundin anlegen und Mail bekommen</span></a>
