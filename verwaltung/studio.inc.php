@@ -87,7 +87,7 @@ if ($view === 'studio') {
     $igs = [];
     $s = $pdo->prepare("SELECT * FROM mm_insta WHERE day >= ? AND status <> 'gepostet' AND kind IN ('reel','story') ORDER BY day, kind DESC, id LIMIT 90"); $s->execute([date('Y-m-d', strtotime('-1 day'))]);
     foreach ($s->fetchAll() as $r) $igs[] = ['id' => (int)$r['id'], 'day' => $r['day'], 'kind' => $r['kind'], 'acc' => IG_ACC[$r['acc']] ?? 'Privat', 't' => ig_title($r),
-        'text' => (string)$r['text'], 'music' => (string)$r['music'], 'has' => $r['file'] !== '', 'l' => ig_wd($r['day']) . ' · ' . ($r['kind'] === 'reel' ? '🎬 Reel' : '⭕ Story') . ' · ' . ig_title($r) . ($r['file'] !== '' ? ' ✓' : '')];
+        'text' => trim(preg_split('/\n\s*Caption:/u', (string)$r['text'])[0]), 'music' => (string)$r['music'], 'has' => $r['file'] !== '', 'l' => ig_wd($r['day']) . ' · ' . ($r['kind'] === 'reel' ? '🎬 Reel' : '⭕ Story') . ' · ' . ig_title($r) . ($r['file'] !== '' ? ' ✓' : '')];
     $selI = (int)($_GET['ig'] ?? 0);
     // Kachel-Auswahl (Vivien, 28.10.2026: „nach Tagen zusammengefasst, hübsche Knöpfe statt Liste“)
     $tiles = [];

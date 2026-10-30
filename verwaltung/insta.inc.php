@@ -390,7 +390,7 @@ main{max-width:1240px}
 <?php mm_subnav('insta'); ?>
 <div class="ih"><h1>📱 Instagram</h1>
   <div class="acct" role="tablist"><a href="<?= $h($self) ?>?view=insta&amp;a=mvig&amp;m=<?= $h($m) ?>" class="<?= $mv ? 'on' : '' ?>"><b>🌿 @moveciamovement</b><span>Mindful &amp; Somatic Movement · Deutsch</span></a><a href="<?= $h($self) ?>?view=insta&amp;a=mein&amp;m=<?= $h($m) ?>" class="<?= $mv ? '' : 'on' ?>"><b>🤍 Dein Instagram</b><span>Tagesthemen · Deutsch &amp; Englisch</span></a></div>
-  <?php if ($mv): ?><p>Der Contentplan für dein Movecia-Konto: montags ein Karussell mit Wissen, mittwochs ein Reel, freitags ein Beitrag zu einem Angebot, dazu dienstags und samstags eine Story. Bei Beiträgen kopierst du einfach Folien und Caption, Reels und Storys nimmst du im Studio auf. Link in Bio: <b>moveciamovement.com/bio</b> <button type="button" class="b sm" data-copylink="https://moveciamovement.com/bio">📋 Link kopieren</button></p>
+  <?php if ($mv): ?><p>Der Contentplan für dein Movecia-Konto ist auf Wachstum ausgelegt: montags und mittwochs ein Reel mit einem Satz, bei dem sich Mamas ertappt fühlen, donnerstags ein Karussell zum Speichern, freitags ein Reel oder ein Angebot, dazu Storys am Dienstag und am Wochenende. Das Weihnachts-Gewinnspiel kommt jede Woche vor. Bei Beiträgen kopierst du einfach Folien und Caption, Reels und Storys nimmst du im Studio auf. Link in Bio: <b>moveciamovement.com/bio</b> <button type="button" class="b sm" data-copylink="https://moveciamovement.com/bio">📋 Link kopieren</button></p>
   <?php else: ?><p>Jeden Tag ein Thema aus deinem Leben: dazu ein Reel und eine Story als Talking Head und eine Nachricht für deinen Instagram- und WhatsApp-Kanal mit einer Foto-Idee. Aufnehmen kannst du in Ruhe im Studio, am Tag selbst tippst du nur noch auf „Teilen“ bzw. „Text kopieren“.</p><?php endif; ?></div>
 
 <?php if ($todayList): ?>
@@ -487,7 +487,7 @@ main{max-width:1240px}
   document.querySelectorAll('[data-own]').forEach(b=>b.onclick=()=>{const f=$p('ownF');f.day.value=b.dataset.d;f.kind.value=b.dataset.own;f.studio.value='';f.submit()});
   document.querySelectorAll('[data-copylink]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.copylink)}catch(e){}const o=b.textContent;b.textContent='✓ Kopiert';setTimeout(()=>b.textContent=o,1800)});
   // ---- Text kopieren (Channel-Nachricht oder Caption) ----
-  document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{const el=b.closest('.ig').querySelector('[data-txt]');const t=el?el.innerText.trim():'';const o=b.textContent;
+  document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{const el=b.closest('.ig').querySelector('[data-txt]');let t=el?el.innerText.trim():'';const ci=t.search(/\n\s*Caption:/);if(ci>=0&&!/^Folie/.test(t))t=t.slice(ci).replace(/^\s*Caption:\s*/,'').trim();const o=b.textContent;
     try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}
     b.textContent='✓ Kopiert';setTimeout(()=>b.textContent=o,1800)});
   // ---- Video teilen (erst laden, dann teilen – das iPhone braucht das Teilen direkt nach dem Antippen) ----
