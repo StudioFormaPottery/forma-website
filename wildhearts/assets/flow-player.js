@@ -533,7 +533,8 @@
     });
     q('[data-again]').addEventListener('click', () => { q('[data-done]').hidden = true; q('[data-s]').hidden = false; });
     q('[data-pause]').addEventListener('click', () => run ? stop() : play());
-    q('[data-snd]').addEventListener('click', e => { sound = !sound; e.currentTarget.setAttribute('aria-pressed', String(sound)); q('[data-sndl]').textContent = sound ? T('Klang an', 'Chime on') : T('Klang aus', 'Chime off'); });
+    q('[data-snd]').addEventListener('click', e => { sound = !sound; e.currentTarget.setAttribute('aria-pressed', String(sound)); q('[data-sndl]').textContent = sound ? T('Klang an', 'Sound on') : T('Klang aus', 'Sound off');
+      if (bgm.length) { bgOn = sound; if (bgOn && run) bgPlay(); else bgPause(.6); bgUi(); } }); // Klang aus = Glocke und Musik aus, Klang an = beides wieder an (Vivien, 30.10.2026)
     q('[data-mus]').addEventListener('click', () => {
       if (bgm.length) { bgOn = !bgOn; if (bgOn && run) bgPlay(); else bgPause(.6); bgUi(); return; }
       const m = q('[data-mu]'); m.open = true; m.scrollIntoView({ behavior: 'smooth', block: 'center' }); });

@@ -526,6 +526,7 @@ void main(){
       if (v) { if (!c.dur && v.readyState >= 1 && isFinite(v.duration) && v.duration > 0) { c.dur = v.duration; if (!c.out) c.out = c.dur; } return v; }
       v = document.createElement('video'); v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.muted = false;
       v.src = c.url; pv.insertBefore(v, big); vids.set(c.slot, v);
+      v.addEventListener('error', () => { const e = v.error; console.warn('Schnitt: Video lässt sich nicht abspielen', c.name, e && e.code, e && e.message); say('„' + c.name + '“ lässt sich in diesem Browser gerade nicht abspielen (Fehler ' + ((e && e.code) || '?') + '). Bitte schreib mir, ob du Safari oder Chrome nutzt.', 'bad'); });
       v.addEventListener('loadedmetadata', () => { const d = isFinite(v.duration) && v.duration > 0 ? v.duration : 0; let probe = false; clips.filter(x => x.url === c.url && !x.dur).forEach(x => { x.dur = d; if (!x.out) x.out = d; if (!d) probe = true; }); if (!c.dur) { c.dur = d; if (!c.out) c.out = d; if (!d) probe = true; } if (probe) probeDur(c, v); else ui(); });
       return v;
     }
@@ -563,7 +564,7 @@ void main(){
         clips = objs.filter(r => !r.bro); bros = objs.filter(r => r.bro); bros.forEach(ovVid);
         slots(); if (clips.length) { sel = 0; vidFor(clips[0]); prep(1); }
         await covLoad().catch(() => {});
-        drawDrafts(); ui(); clips.forEach(thumb); trashUi(); prepAll();
+        drawDrafts(); ui(); clips.forEach(thumb); trashUi();
       } catch (e) { say('Die gespeicherten Clips konnten nicht geladen werden.', 'bad'); }
     }
     // ---- Entwürfe ----
@@ -663,7 +664,7 @@ void main(){
     async function addFiles(files) {
       let n = 0;
       for (const f of files) { if (!f || !f.size) continue; const c = { id: uid(), blob: f, name: f.name.replace(/\.\w+$/, ''), added: Date.now() + n, in: 0, out: 0, mute: false, dur: 0, draft: curDraft }; c.src = c.id; c.url = URL.createObjectURL(f); clips.push(c); await dbPut(dbRow(c)); slots(); vidFor(c); thumb(c); n++; }
-      await saveOrder(); await touch(); prepAll(); if (sel < 0 && clips.length) sel = 0; if (n) say('✓ ' + n + (n > 1 ? ' Clips' : ' Clip') + ' dazu. Tipp auf einen Clip, um Anfang und Ende zu setzen.', 'ok'); ui();
+      await saveOrder(); await touch(); if (sel < 0 && clips.length) sel = 0; if (n) say('✓ ' + n + (n > 1 ? ' Clips' : ' Clip') + ' dazu. Tipp auf einen Clip, um Anfang und Ende zu setzen.', 'ok'); ui();
     }
     const saveOrder = () => kvSet(ordKey(curDraft), clips.map(c => c.id)).catch(() => {});
     const touch = async () => { const d = drList.find(x => x.id === curDraft); if (d) { d.at = Date.now(); await draftsSave(drList).catch(() => {}); drawDrafts(); } };
@@ -688,7 +689,7 @@ void main(){
       if (!playing) return;
       const c = clips[sel]; const v = cur(); if (!c || !v) { stop(); return; }
       const off = Math.max(0, v.currentTime - (c.in || 0)); pos = starts()[sel] + off; timeUi();
-      { const now = performance.now(); if (Math.abs(v.currentTime - wd.t) > .01 || v.paused) { wd.t = v.currentTime; wd.at = now; } else if (now - wd.at > 2200) { wd.at = now; heal(sel, true); } } musDrive(pos + CD(), true);
+      musDrive(pos + CD(), true);
       if (c.zoom || c.fr) v.style.transform = vtf(c, off);
       broSync(c, v.currentTime, true);
       if (!prepped && (c.out || c.dur) - v.currentTime < 1.2) { prepped = true; prep(sel + 1); }
@@ -707,7 +708,6 @@ void main(){
       const v = vidFor(c); v.addEventListener('loadeddata', () => { try { v.currentTime = Math.max(c.in || 0, t); } catch (e) {} if (i === sel) { show(i, Math.max(0, t - (c.in || 0)), false); if (run && playing) v.play().catch(() => {}); } }, { once: true });
       console.warn('Schnitt: Vorschau hing, neu geladen');
     }
-    setInterval(() => { if (closed || playing || busy) return; const v = cur(); if (v && v.seeking) { v._sk = v._sk || performance.now(); if (performance.now() - v._sk > 3000) { v._sk = 0; heal(sel, false); } } else if (v) v._sk = 0; }, 1000);
     let ltT = 0; const ltQ = new Set();
     function lazyThumb(c) { ltQ.add(c); clearTimeout(ltT); ltT = setTimeout(function go() { if (playing || busy) { ltT = setTimeout(go, 2500); return; } ltQ.forEach(x => { x.thumb = null; thumb(x); }); ltQ.clear(); }, 2500); }
     const starts = () => { let a = 0; return clips.map(c => { const s = a; a += len(c); return s; }); };
@@ -896,8 +896,8 @@ void main(){
       if (glc.width !== W || glc.height !== H) { glc.width = W; glc.height = H; glDraw = null; } if (!glDraw) glDraw = makeGL(glc); if (!glDraw) return;
       const bo = broAt(c, v.currentTime), ov = bo ? ovV.get(bo.id) : null;
       if ((st.bb || 0) > 0 && !sgBusy && (!v.paused || v.currentTime !== glMt)) { sgBusy = true; glMt = v.currentTime; segMask(v, v.videoWidth, v.videoHeight).then(m => { sgLast = m; sgBusy = false; }).catch(() => { sgBusy = false; if (!segWarned) { segWarned = true; say('„Hintergrund weich“ konnte die Personen-Erkennung nicht laden. Bitte kurz prüfen, ob das Internet da ist.', 'bad'); } }); }
-      if (ov && ov.readyState >= 2 && ov.videoWidth) glDraw(ov, ov.videoWidth, ov.videoHeight, 1); else glDraw(v, v.videoWidth, v.videoHeight, zAt(c, Math.max(0, v.currentTime - (c.in || 0))), false, c.fr, c.fe, sgLast);
-      glc.style.display = 'block'; })();
+      const okD = (ov && ov.readyState >= 2 && ov.videoWidth) ? glDraw(ov, ov.videoWidth, ov.videoHeight, 1) : glDraw(v, v.videoWidth, v.videoHeight, zAt(c, Math.max(0, v.currentTime - (c.in || 0))), false, c.fr, c.fe, sgLast);
+      glc.style.display = okD ? 'block' : 'none'; })();
     function vtf(c, off) {
       const z = c.zoom ? zAt(c, off) : 1; if (!c.fr && z === 1) return '';
       const f = frVals(c.fr, (pv.clientWidth || 16) / (pv.clientHeight || 9));
