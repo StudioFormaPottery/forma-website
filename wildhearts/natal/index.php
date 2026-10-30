@@ -985,5 +985,52 @@ footer summary{cursor:pointer}
   }
 })();
 </script>
+<?php if ($offer): // Willkommens-Karte beim Öffnen des persönlichen Angebots (Vivien, 30.10.2026: „zuerst eine süße Nachricht im Movecia-Stil“)
+  $wName = trim(($offer['salutation'] ?: 'Liebe') . ' ' . $offer['name']);
+  $wTxt = $offer['note'] !== '' ? $offer['note'] : 'Wie schön, dass du dich für mein Prä- & Postnatal Training interessierst. Ich habe dir hier alles zusammengestellt und freu mich so auf dich und dein Baby!';
+  $wSub = $mix ? $mix['name'] . '-Paket · ' . (int)$mix['studio'] . ' im Studio · ' . (int)$mix['online'] . ' online' : 'Dein persönliches Angebot'; ?>
+<style>
+.wlc{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(46,29,39,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .5s ease}
+.wlc.on{opacity:1}.wlc[hidden]{display:none}
+.wlc-c{position:relative;width:min(460px,100%);max-height:calc(100vh - 36px);overflow:auto;border-radius:34px;background:radial-gradient(120% 80% at 100% 0%,#F6E3D6 0%,rgba(246,227,214,0) 60%),radial-gradient(90% 70% at 0% 100%,#F1E3E2 0%,rgba(241,227,226,0) 60%),#FFFCF8;box-shadow:0 30px 70px -30px rgba(46,29,39,.6);text-align:center;padding:0 0 26px;transform:translateY(16px) scale(.98);transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.wlc.on .wlc-c{transform:none}
+.wlc-top{position:relative;width:150px;margin:24px auto 0}
+.wlc-ph{width:150px;height:180px;border-radius:120px 120px 22px 22px;overflow:hidden;background:#E8D6CA}
+.wlc-ph img{width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block}
+.wlc-mk{position:absolute;right:-22px;bottom:-14px;width:52px;height:52px;border-radius:50%;background:#FFFCF8;display:grid;place-items:center;box-shadow:0 8px 18px -10px rgba(46,29,39,.5)}
+.wlc-mk img{width:34px;height:34px}
+.wlc-h{font-family:"Cormorant Garamond","Cormorant",Georgia,serif;font-weight:500;font-style:italic;font-size:2.2rem;line-height:1.05;color:#2E1D27;margin:6px 22px 4px}
+.wlc-s{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:#7D5E68;margin:0 22px 12px}
+.wlc-t{margin:0 26px;color:#4A3A41;line-height:1.65;font-size:1rem}
+.wlc-b{display:inline-flex;align-items:center;gap:10px;margin-top:20px;border:0;border-radius:999px;background:#4A3040;color:#FBF5F7;padding:13px 24px;font:inherit;font-size:1rem;cursor:pointer;box-shadow:0 14px 26px -16px rgba(74,48,64,.8)}
+.wlc-b:hover{background:#7D5E68}
+.wlc-x{position:absolute;right:14px;top:14px;width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.8);color:#4A3A41;font-size:18px;cursor:pointer;z-index:2}
+.wlc-wave{display:block;width:100%;height:40px;margin-top:4px}
+.wlc-sig{font-family:"Cormorant Garamond","Cormorant",Georgia,serif;font-style:italic;font-size:1.25rem;color:#7D5E68;margin:14px 0 0}
+@media(prefers-reduced-motion:reduce){.wlc,.wlc-c{transition:none}}
+</style>
+<div class="wlc" id="wlc" hidden role="dialog" aria-modal="true" aria-labelledby="wlcH">
+  <div class="wlc-c">
+    <button type="button" class="wlc-x" data-wlcx aria-label="Schließen">✕</button>
+    <div class="wlc-top"><div class="wlc-ph"><img src="/img/movecia/fotos/ev-natal.jpg" alt="" draggable="false"></div><span class="wlc-mk"><img src="/img/movecia/movecia-zeichen.svg" alt=""></span></div>
+    <svg class="wlc-wave" viewBox="0 0 460 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 24 C80 4 150 38 240 22 S380 6 460 20" fill="none" stroke="#D9C3C6" stroke-width="1.4"/><path d="M0 32 C90 16 170 42 260 28 S390 14 460 28" fill="none" stroke="#E8D6CA" stroke-width="1.2"/></svg>
+    <h2 class="wlc-h" id="wlcH"><?= $h($wName) ?> 🤍</h2>
+    <p class="wlc-s"><?= $h($wSub) ?></p>
+    <p class="wlc-t"><?= nl2br($h($wTxt)) ?></p>
+    <button type="button" class="wlc-b" data-wlcgo>Mein Paket zusammenstellen <span aria-hidden="true">→</span></button>
+    <p class="wlc-sig">Bis bald, Vivien</p>
+  </div>
+</div>
+<script>
+(function(){var w=document.getElementById('wlc');if(!w)return;var k='mv-wlc-<?= $h(substr((string)$offer['token'], 0, 12)) ?>';
+  try{if(sessionStorage.getItem(k))return}catch(e){}
+  function close(go){w.classList.remove('on');setTimeout(function(){w.hidden=true},450);try{sessionStorage.setItem(k,'1')}catch(e){}
+    if(go){var t=document.querySelector('.mixcard')||document.getElementById('buchen');if(t)t.scrollIntoView({behavior:'smooth',block:'start'})}}
+  setTimeout(function(){w.hidden=false;requestAnimationFrame(function(){w.classList.add('on')})},450);
+  w.querySelector('[data-wlcgo]').onclick=function(){close(true)};w.querySelector('[data-wlcx]').onclick=function(){close(false)};
+  w.addEventListener('click',function(e){if(e.target===w)close(false)});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!w.hidden)close(false)});
+})();
+</script>
+<?php endif; ?>
 </body>
 </html>
