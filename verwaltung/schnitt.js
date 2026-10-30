@@ -139,6 +139,12 @@
 .sn-zt-bar .t{font-size:16px;color:#4A3A41;font-variant-numeric:tabular-nums;margin-left:auto}
 .sn-zt-bar input[type=range]{flex:1;min-width:90px;max-width:220px;accent-color:#7D5E68}
 .sn-zt-bar .zb{font:inherit;font-size:18px;width:36px;height:36px;border-radius:50%;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer}
+.sn-ovl{display:none;margin:8px 2px 0;padding:10px 12px;border-radius:14px;background:#FBF1E8;border:1.5px solid #E2C9B4;font-size:15.5px;color:#4A3040;line-height:1.45}
+.sn-ovl.on{display:block}
+.sn-ovl b{font-weight:600}
+.sn-ovl .r{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.sn-ovl button{font:inherit;font-size:15px;padding:8px 12px;border-radius:12px;border:1.5px solid #D3C9BC;background:#fff;color:#4A3040;cursor:pointer}
+.sn-ovl button.del{border-color:#C9A79A;color:#8C2C1D}
 .sn-zt-hint{font-size:14px;color:#7D7076;margin:6px 2px 0;line-height:1.45}
 .sn-box.dr{background:linear-gradient(135deg,#FBF8F4,#EFEAE2);border-color:#DDD2C6}
 .sn-dr-name{width:100%;font:inherit;font-size:18px;padding:10px 12px;border-radius:14px;border:1.5px solid #DDD2C6;background:#fff;color:#2E2529}
@@ -226,7 +232,8 @@ void main(){
       <div class="sn-zt-sc" data-k="ztsc"><div class="sn-zt-in" data-k="ztin"><div class="sn-zt-tt" data-k="ztt"></div><div class="sn-zt-blocks" data-k="ztb"></div><div class="sn-zt-ph" data-k="ztph"></div></div></div>
       <div class="sn-zt-bar"><button type="button" class="zb" data-k="zoomOut" aria-label="Zeitleiste zusammenziehen">－</button><input type="range" min="0" max="100" step="1" value="0" data-k="zoomR" aria-label="Zeitleiste auseinanderziehen"><button type="button" class="zb" data-k="zoomIn" aria-label="Zeitleiste auseinanderziehen">＋</button><span class="t" data-k="ztime">0:00,0</span></div>
     </div>
-    <p class="sn-zt-hint" data-k="zthint">Tippen = Stelle anspringen · die Griffe <b>⟦ ⟧</b> an den Rändern ziehen = Anfang und Ende länger oder kürzer machen (das schraffierte Stück daneben ist das, was weggeschnitten wurde – da kannst du wieder hineinziehen) · zwei Finger auseinander (oder ＋) = Zeitleiste auseinanderziehen</p>
+    <div class="sn-ovl" data-k="ovl"></div>
+    <p class="sn-zt-hint" data-k="zthint">Tippen = Stelle anspringen · die Griffe <b>⟦ ⟧</b> an den Rändern ziehen = Anfang und Ende länger oder kürzer machen (das schraffierte Stück daneben ist das, was weggeschnitten wurde – da kannst du wieder hineinziehen) · der Griff darf auch über den nächsten Clip hinaus (was doppelt ist, kannst du darunter löschen) · zwei Finger auseinander (oder ＋) = Zeitleiste auseinanderziehen</p>
   </div>
   <h2 style="margin-top:16px" data-k="h2">Deine Clips <span style="font-size:16px;color:#7D7076;font-family:'Hanken Grotesk',sans-serif;font-weight:400" data-k="cnt"></span></h2>
   <div class="sn-clips" data-k="clips"></div>
@@ -467,12 +474,31 @@ void main(){
       q('#snempty').hidden = !!clips.length; big.hidden = !!playing || !clips.length;
       K('done').disabled = !clips.length;
     }
+    // Zeigt an, wenn ein anderer Clip denselben Bereich noch einmal zeigt (nach dem Ziehen über einen Nachbarn)
+    function ovlUi() {
+      const box = K('ovl'), c = clips[sel], list = c ? overlaps(sel) : [];
+      if (!list.length) { box.className = 'sn-ovl'; box.innerHTML = ''; return; }
+      box.className = 'sn-ovl on';
+      box.innerHTML = list.map(o => '<div><b>Clip ' + (o.i + 1) + '</b> zeigt ' + sec1(o.ov) + ' davon noch einmal.'
+        + '<div class="r"><button type="button" class="del" data-ovd="' + o.i + '">🗑 Clip ' + (o.i + 1) + ' löschen</button>'
+        + (o.whole ? '' : '<button type="button" data-ovc="' + o.i + '">✂️ Clip ' + (o.i + 1) + ' kürzen</button>') + '</div></div>').join('');
+      box.querySelectorAll('[data-ovd]').forEach(b => b.onclick = async () => {
+        if (busy) return; const i = +b.dataset.ovd; await delAt(i); say('🗑 Clip ' + (i + 1) + ' gelöscht.', 'ok');
+      });
+      box.querySelectorAll('[data-ovc]').forEach(b => b.onclick = async () => {
+        if (busy) return; const i = +b.dataset.ovc, x = clips[i], c2 = clips[sel]; if (!x || !c2) return; stop();
+        const a = c2.in || 0, e = c2.out || c2.dur || 0;
+        if ((x.in || 0) >= a) x.in = Math.min(e, (x.out || x.dur || 0) - .3); else x.out = Math.max(a, (x.in || 0) + .3);
+        await dbPut(dbRow(x)); x.thumb = null; ui(); thumb(x); say('✂️ Clip ' + (i + 1) + ' gekürzt, jetzt ist nichts mehr doppelt.', 'ok');
+      });
+    }
     function edUi() {
-      const c = clips[sel]; K('ed').hidden = !c; if (!c) return;
+      const c = clips[sel]; K('ed').hidden = !c; if (!c) { K('ovl').className = 'sn-ovl'; K('ovl').innerHTML = ''; return; }
       K('edT').textContent = 'Clip ' + (sel + 1) + ' von ' + clips.length + ' · ' + c.name;
       K('edD').textContent = 'von ' + fmt1(c.in || 0) + ' bis ' + fmt1(c.out || c.dur || 0) + ' · Länge ' + fmt1(len(c));
       ztDraw();
       K('mute').textContent = c.mute ? '🔊 Ton an' : '🔇 Ton aus'; K('left').disabled = sel === 0; K('right').disabled = sel === clips.length - 1;
+      ovlUi();
     }
     function ui() { slots(); dropVids(); renderClips(); edUi(); timeUi(); if (sel >= 0 && clips[sel]) { show(sel, 0, false); prep(sel + 1); } }
     async function change(c) { await dbPut(dbRow(c)); c.thumb = null; ui(); thumb(c); }
@@ -484,7 +510,14 @@ void main(){
     K('left').onclick = async () => { if (sel <= 0) return; [clips[sel - 1], clips[sel]] = [clips[sel], clips[sel - 1]]; sel--; await saveOrder(); ui(); };
     K('right').onclick = async () => { if (sel >= clips.length - 1) return; [clips[sel + 1], clips[sel]] = [clips[sel], clips[sel + 1]]; sel++; await saveOrder(); ui(); };
     K('mute').onclick = () => { const c = clips[sel]; if (!c) return; c.mute = !c.mute; dbPut(dbRow(c)); ui(); };
-    K('delClip').onclick = async () => { const c = clips[sel]; if (!c) return; stop(); await dbDel(c.id); clips.splice(sel, 1); slots(); dropVids(); if (!clips.some(x => x.url === c.url)) URL.revokeObjectURL(c.url); sel = Math.min(sel, clips.length - 1); await saveOrder(); pos = sel >= 0 ? starts()[sel] : 0; ui(); say('🗑 Clip gelöscht.'); };
+    async function delAt(i) {
+      const c = clips[i]; if (!c) return; stop();
+      await dbDel(c.id); clips.splice(i, 1); slots(); dropVids();
+      if (!clips.some(x => x.url === c.url)) URL.revokeObjectURL(c.url);
+      if (i < sel) sel--; sel = Math.min(sel, clips.length - 1);
+      await saveOrder(); pos = sel >= 0 ? starts()[sel] : 0; ui();
+    }
+    K('delClip').onclick = async () => { if (!clips[sel]) return; await delAt(sel); say('🗑 Clip gelöscht.'); };
 
     // ---- Zeitleiste über das ganze Video (Vivien, 30.10.2026: „Cut, Cut, Cut sehen und mit zwei Punkten ziehen“) ----
     // Jeder Clip ist ein Block, dazwischen die Schnittstellen. Die Griffe ⟦ ⟧ an den Rändern machen den Clip länger
@@ -493,14 +526,18 @@ void main(){
     const ztSc = K('ztsc'), ztIn = K('ztin');
     const basePps = () => Math.max(1, ztSc.clientWidth - 4) / Math.max(.4, total());
     const pps = () => basePps() * Z;
-    // Wie weit lässt sich Clip i nach vorne/hinten aufziehen? (Nachbarn aus derselben Datei nicht überschreiben)
-    function room(i) {
-      const c = clips[i]; let lo = 0, hi = c.dur || 0;
-      for (let k = 0; k < clips.length; k++) { const x = clips[k]; if (k === i || x.url !== c.url) continue;
-        const xo = x.out || x.dur || 0, xi = x.in || 0;
-        if (xo <= (c.in || 0) + .001 && xo > lo) lo = xo;
-        if (xi >= (c.out || c.dur || 0) - .001 && xi < hi) hi = xi; }
-      return [lo, hi];
+    // Wie weit lässt sich Clip i aufziehen? Immer bis ans Ende des Ausgangsvideos – auch über einen Nachbarn
+    // hinaus (Vivien, 30.10.2026: „den Regler länger schieben und das Video danach löschen“).
+    // Was sich dabei überschneidet, zeigt die Box darunter zum Löschen oder Kürzen an.
+    function room(i) { const c = clips[i]; return [0, c.dur || 0]; }
+    // Clips aus derselben Datei, die denselben Bereich noch einmal zeigen
+    function overlaps(i) {
+      const c = clips[i]; if (!c) return [];
+      const a = c.in || 0, b = c.out || c.dur || 0, out = [];
+      clips.forEach((x, k) => { if (k === i || x.url !== c.url) return;
+        const xa = x.in || 0, xb = x.out || x.dur || 0, ov = Math.min(b, xb) - Math.max(a, xa);
+        if (ov > .15) out.push({ i: k, ov, whole: xa >= a - .05 && xb <= b + .05, after: xa >= a }); });
+      return out;
     }
     // Wie viel weggeschnittenes Material wird neben dem gewählten Clip gezeigt? (Fenster, damit die Leiste nicht endlos wird)
     let GW = null;
