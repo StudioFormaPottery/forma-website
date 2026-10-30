@@ -503,10 +503,11 @@ void main(){
       const L = drList.slice().sort((a, b) => (b.at || 0) - (a.at || 0));
       K('drList').innerHTML = L.map(d => { const i = info[d.id] || { n: 0, sec: 0 }, on = d.id === curDraft;
         return `<li class="${on ? 'on' : ''}"><span>${esc(d.name || 'Ohne Namen')}<small>${i.n ? i.n + (i.n > 1 ? ' Clips' : ' Clip') + (i.sec > .05 ? ' · ' + fmt(i.sec) : '') : 'noch leer'} · ${when(d.at)}${on ? ' · offen' : ''}</small>${d.up ? '<small class="up">✓ hochgeladen ' + when(d.up.at) + '</small>' : ''}</span>`
-          + (on ? '' : `<button type="button" data-dopen="${d.id}">Öffnen</button>`)
+          + (on ? '' : `<button type="button" data-dopen="${d.id}">Öffnen</button>` + (i.n ? `<button type="button" data-dmerge="${d.id}" title="Alle Clips aus diesem Entwurf hinten an den offenen Entwurf hängen">＋ Anhängen</button>` : ''))
           + `<button type="button" class="x" data-ddel="${d.id}" aria-label="Entwurf löschen" title="Entwurf löschen">🗑</button></li>`; }).join('');
       K('drList').querySelectorAll('[data-dopen]').forEach(b => b.onclick = () => openDraft(b.dataset.dopen));
       K('drList').querySelectorAll('[data-ddel]').forEach(b => b.onclick = () => delDraft(b.dataset.ddel));
+      K('drList').querySelectorAll('[data-dmerge]').forEach(b => b.onclick = () => mergeDraft(b.dataset.dmerge));
       K('h2').firstChild.textContent = (drList.find(d => d.id === curDraft) || {}).name ? 'Clips in „' + drName(curDraft) + '“ ' : 'Deine Clips ';
       tgUi();
     }
@@ -517,6 +518,20 @@ void main(){
       clips = []; broClear(); dropVids(); sel = -1; pos = 0; undoRows = null; autoLog = []; lastSum = null; K('undo').hidden = true; autoResUi(null);
       await kvSet('cur', id).catch(() => {}); K('res').hidden = true; K('coved').hidden = true; covShow(false); result = null;
       await load(); say('📝 „' + drName(id) + '“ ist offen.', 'ok');
+    }
+    // Zwei Entwürfe zu einem (Vivien, 30.10.2026: „den einen Entwurf auf den anderen draufsetzen, damit ich das ganze Video bearbeiten kann“)
+    async function mergeDraft(id) {
+      if (busy || id === curDraft) return; const nm = drName(id), into = drName(curDraft);
+      if (!confirm('Alle Clips aus „' + nm + '“ hinten an „' + into + '“ anhängen? Danach ist es ein Entwurf.')) return; stop();
+      const all = await dbAll(), rows = all.filter(r => r.draft === id), ord = (await kvGet(ordKey(id))) || [];
+      rows.sort((a, b) => (ord.indexOf(a.id) + 1 || 1e9) - (ord.indexOf(b.id) + 1 || 1e9) || a.added - b.added);
+      for (const r of rows) { r.draft = curDraft; await dbPut(r); }
+      const mine = (await kvGet(ordKey(curDraft))) || clips.map(c => c.id);
+      await kvSet(ordKey(curDraft), mine.concat(rows.filter(r => !r.bro).map(r => r.id)));
+      await kvDel(ordKey(id)).catch(() => {}); drList = (await drafts()).filter(d => d.id !== id); await draftsSave(drList);
+      const keep = sel; clips.forEach(c => { if (!clips.some(x => x !== c && x.url === c.url)) URL.revokeObjectURL(c.url); }); broClear(); clips = []; dropVids();
+      await load(); if (keep >= 0 && clips[keep]) { sel = keep; ui(); }
+      say('✓ „' + nm + '“ hängt jetzt hinten an. Alles ist ein Video mit ' + clips.length + ' Clips, du kannst es ganz bearbeiten.', 'ok');
     }
     async function delDraft(id) {
       const nm = drName(id); if (!confirm('Entwurf „' + nm + '“ mit allen Clips von diesem Gerät löschen?')) return;
