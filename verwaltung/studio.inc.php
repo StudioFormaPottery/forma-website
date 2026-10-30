@@ -43,7 +43,7 @@ if ($view === 'studio') {
         foreach (mv_programs($pdo, $aud) as $p) foreach (mv_lessons($pdo, (int)$p['id']) as $l) {
             if (mv_lesson_is_clips($l)) continue;
             $talks[] = ['id' => (int)$l['id'], 'g' => $an, 't' => (string)$l['title_de'], 'te' => (string)($l['title_en'] ?: $l['title_de']),
-                'de' => (string)$l['script_de'], 'en' => (string)$l['script_en'], 'vde' => $l['video_de'] !== '', 'ven' => $aud === 'academy' ? $l['video_de'] !== '' : $l['video_en'] !== '', 'due' => (string)$l['due'],
+                'de' => (string)$l['script_de'], 'en' => (string)$l['script_en'], 'vde' => $l['video_de'] !== '', 'ven' => $aud !== 'method' ? $l['video_de'] !== '' : $l['video_en'] !== '', 'do' => $aud !== 'method', 'due' => (string)$l['due'], // nur Method auf Englisch (Vivien, 30.10.2026)
                 'k' => ['breath' => 'Atem-Video', 'meditation' => 'Meditation'][$l['cat']] ?? 'Talking Head'];
         }
     }
@@ -71,7 +71,7 @@ if ($view === 'studio') {
     $dShort = fn(string $d) => $d === '' ? '' : $wd[(int)date('w', strtotime($d))] . ' ' . date('j.n.', strtotime($d));
     $queue = [];
     foreach ($talks as $t) $queue[] = ['v' => (string)$t['id'], 'ok' => $t['vde'] && $t['ven'], 'due' => $t['due'], 'ico' => '🗣', 'k' => $t['k'], 'n' => $t['t'],
-        'x' => $t['vde'] && $t['ven'] ? '' : ($t['g'] === 'Academy' ? ' (nur Deutsch)' : ($t['vde'] ? ' (Englisch fehlt)' : ($t['ven'] ? ' (Deutsch fehlt)' : ' (DE + EN)'))), 'g' => $t['g']];
+        'x' => $t['vde'] && $t['ven'] ? '' : (!empty($t['do']) ? ' (nur Deutsch)' : ($t['vde'] ? ' (Englisch fehlt)' : ($t['ven'] ? ' (Deutsch fehlt)' : ' (DE + EN)'))), 'g' => $t['g']];
     foreach ($moves as $m) $queue[] = ['v' => 'c' . $m['id'], 'ok' => $m['ok'], 'due' => $m['due'], 'ico' => '🧘', 'k' => $m['k'], 'n' => $m['n'],
         'x' => $m['for'] ? ' · für ' . $m['for'][0] . (count($m['for']) > 1 ? ' +' . (count($m['for']) - 1) : '') : '', 'g' => ''];
     // Academy-Willkommensvideo ganz oben, solange es fehlt (Vivien, 28.10.2026)
@@ -614,7 +614,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
   function choose(){const val=$('what').value;mv=val[0]==='c'?(MOVES.find(m=>m.id===+val.slice(1))||null):null;mvFree=val==='m';
     const wasIg=!!ig;ig=val[0]==='i'?(IGS.find(x=>x.id===+val.slice(1))||null):null;
     const id=+val;cur=(mv||mvFree)?null:(ig?{ig:ig,id:'i'+ig.id,t:ig.l,de:ig.text,en:ig.text,vde:ig.has,ven:ig.has,g:'Instagram',k:ig.kind==='reel'?'Reel':'Story',due:ig.day}:(TALKS.find(t=>t.id===id)||null));$('own').hidden=!!cur;$('ownT').value=ownOf(lang);
-    const isMove=!!(mv||mvFree);$('prBox').hidden=isMove;$('mtPr').hidden=isMove;$('langSeg').hidden=isMove||!!ig;
+    const isMove=!!(mv||mvFree);if(cur&&cur.do&&lang!=='de'){lang='de';$('ownT').value=ownOf(lang)}$('prBox').hidden=isMove;$('mtPr').hidden=isMove;$('langSeg').hidden=isMove||!!ig||!!(cur&&cur.do);
     if(tc&&!isMove&&ig!==null!==wasIg){tc.set({aspect:ig?'9:16':'16:9'});TalkCam.panel(tc,$('panel'))}$('modeSeg').hidden=isMove;if($('tpOnly'))$('tpOnly').hidden=isMove;pr.hidden=isMove||$('prOn').getAttribute('aria-pressed')==='false';
     if(isMove&&clipm)setMode('ganz');
     document.querySelector('.sh h1').textContent=isMove?'🧘 Studio · Übung filmen':'🎥 Talking-Head-Studio';
@@ -668,7 +668,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
     if(mv){el.innerHTML='🧘 <b>'+esc(mv.k)+'</b> · '+dueTxt(mv.due,mv.ok)+'<small>'+(mv.for.length?'Kommt vor in: '+esc(mv.for.join(', '))+'. ':'')+'Einmal filmen, der Clip steckt dann automatisch in allen diesen Videos. '+(/Flow/.test(mv.k)?'Ohne Sprechen filmen, die Stimme sprichst du beim Flow später extra ein.':'Ohne Sprechen filmen, Bewegungsvideos laufen nur mit Timer und Musik.')+'</small>';return}
     if(mvFree){el.innerHTML='🧘 <b>Bewegungs-Clip frei</b><small>Nur Hintergrund weich und Licht. Wird nicht hochgeladen, nur heruntergeladen.</small>';return}
     if(ig){el.innerHTML='📱 <b>'+(ig.kind==='reel'?'🎬 Reel':'⭕ Story')+' für Instagram</b> · '+esc(ig.acc)+' · posten am <b>'+dLong(ig.day)+'</b>'+(ig.music?'<small>🎵 Musik: '+esc(ig.music)+' (in Instagram dazu wählen, oder unter „Bearbeiten“ eine eigene Datei darunterlegen)</small>':'<small>Hochformat 9:16. Nach der Aufnahme auf „💾 Speichern“ tippen, dann am Tag unter „Instagram täglich“ nur noch teilen.</small>');return}
-    if(cur){const ok=cur.vde&&cur.ven;el.innerHTML='🗣 <b>'+esc(cur.k)+'</b> · '+esc(cur.g)+' · '+dueTxt(cur.due,ok)+'<small>Ein ganzes Video je Sprache mit Teleprompter. Deutsch '+(cur.vde?'✓ hochgeladen':'fehlt noch')+' · Englisch '+(cur.ven?'✓ hochgeladen':'fehlt noch')+'.</small>';return}
+    if(cur){const ok=cur.vde&&cur.ven;el.innerHTML='🗣 <b>'+esc(cur.k)+'</b> · '+esc(cur.g)+' · '+dueTxt(cur.due,ok)+(cur.do?'<small>Nur auf Deutsch, mit Teleprompter. Deutsch '+(cur.vde?'✓ hochgeladen':'fehlt noch')+'.</small>':'<small>Ein ganzes Video je Sprache mit Teleprompter. Deutsch '+(cur.vde?'✓ hochgeladen':'fehlt noch')+' · Englisch '+(cur.ven?'✓ hochgeladen':'fehlt noch')+'.</small>');return}
     el.innerHTML='🗣 <b>Talking Head mit eigenem Text</b><small>Für Storys und Reels. Wird nicht hochgeladen, nur heruntergeladen.</small>';}
   document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;choose()});
 
@@ -792,8 +792,8 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count($l), 'i
         onError:()=>{$('msg').textContent='Upload unterbrochen. Tipp nochmal auf „Hochladen“ (oder lade es herunter).';$('up').disabled=false},
         onProgress:(a,t)=>{const p=Math.round(a/t*100);fill.style.width=p+'%';$('msg').textContent='Lädt hoch … '+p+' % (Seite offen lassen)'},
         onSuccess:()=>{post('mm_mv_video_set',{id:id,lang:lg,guid:j.guid}).then(()=>{saved=true;$('up').disabled=false;$('up').hidden=true;
-          if(lg==='de')T.vde=true;else T.ven=true;
-          $('msg').className='msg ok';$('msg').textContent='✓ Hochgeladen. Bunny wandelt es in ein paar Minuten um.'+((T.vde&&T.ven)?' Beide Sprachen sind da, das Video ist fertig.':' Jetzt noch '+(lg==='de'?'Englisch':'Deutsch')+'?');})}});
+          if(lg==='de'){T.vde=true;if(T.do)T.ven=true}else T.ven=true;
+          $('msg').className='msg ok';$('msg').textContent='✓ Hochgeladen. Bunny wandelt es in ein paar Minuten um.'+(T.do?' Das Video ist fertig.':(T.vde&&T.ven)?' Beide Sprachen sind da, das Video ist fertig.':' Jetzt noch '+(lg==='de'?'Englisch':'Deutsch')+'?');})}});
       up.start()}).catch(()=>{$('msg').textContent='Das hat nicht geklappt. Bitte herunterladen und später hochladen.';$('up').disabled=false});
   };
 

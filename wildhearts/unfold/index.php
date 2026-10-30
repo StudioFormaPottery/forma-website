@@ -1,6 +1,7 @@
 <?php
 // moveciamovement.com/unfold – Unfold · The Mindful Becoming (Vivien, 24.10.2026)
-// 3 Monate Begleitung ab 10. Jänner 2027 (erster Live-Call), live online, Deutsch und Englisch. Seit 25.10.2026 sofort buchbar.
+// 3 Monate Begleitung ab 10. Jänner 2027 (erster Live-Call), live online. Seit 25.10.2026 sofort buchbar.
+// Seit 30.10.2026 NUR AUF DEUTSCH (Vivien): englische Texte werden per mv_strip_en entfernt, nur ein Live-Call auf Deutsch.
 declare(strict_types=1);
 require dirname(__DIR__, 2) . '/api/method-lib.php';
 require_once dirname(__DIR__) . '/assets/waves.inc.php';
@@ -17,19 +18,21 @@ $st = mv_ts($c['u_start']);
 $stDe = mv_date($st); $stEn = mv_date($st, 'en');
 // Vorab-Buchung (Vivien, 25.10.2026): Zugang erst ab Start, Rücktrittsfrist 14 Tage ab Start
 $wu = mv_withdraw_until(['kind' => 'unfold', 'paid_at' => date('c'), 'bill_start' => 0]); $wuDe = mv_date($wu); $wuEn = mv_date($wu, 'en');
-$lang = ($_GET['lang'] ?? '') === 'en' ? 'en' : (($_GET['lang'] ?? '') === 'de' ? 'de' : '');
+require_once dirname(__DIR__) . '/assets/layout.inc.php';
+ob_start('mv_strip_en');
+$lang = ($_GET['lang'] ?? '') === 'en' ? 'en' : '';
 ?><!doctype html>
-<html lang="de">
+<html lang="de" data-l="de" class="de-only">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Unfold – 3-Monats-Begleitung für Frauen: Mindful Movement, Mental Load & Selbstwert | Movecia</title>
-<meta name="description" content="Unfold – The Mindful Becoming: dein 3-Monats-Begleiter für Mindful Movement mit Vivien Malonga. Wöchentlicher Live-Call, zwei Bewegungsvideos pro Woche (Yoga, Somatic, Bodyweight), Workbooks für Mental Load und Selbstwert. Online, Deutsch &amp; Englisch, Start 10. Jänner 2027.">
+<meta name="description" content="Unfold – The Mindful Becoming: dein 3-Monats-Begleiter für Mindful Movement mit Vivien Malonga. Wöchentlicher Live-Call, zwei Bewegungsvideos pro Woche (Yoga, Somatic, Bodyweight), Workbooks für Mental Load und Selbstwert. Online auf Deutsch, Start 10. Jänner 2027.">
 <link rel="canonical" href="https://moveciamovement.com/unfold/">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta property="og:type" content="website"><meta property="og:url" content="https://moveciamovement.com/unfold/"><meta name="twitter:card" content="summary_large_image">
 <meta property="og:title" content="Unfold – The Mindful Becoming · 3 Monate Begleitung mit Vivien">
-<meta property="og:description" content="3 months to come back to yourself and begin. Live online with Vivien, in English and German. Starts 10 January 2027.">
+<meta property="og:description" content="3 Monate, um zu dir zurückzufinden und anzufangen. Live online mit Vivien, auf Deutsch. Start 10. Jänner 2027.">
 <meta property="og:image" content="https://moveciamovement.com/img/movecia/og-unfold.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="theme-color" content="#F5F1EB">
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
@@ -43,11 +46,11 @@ $faq = [
  ['Was kostet Unfold?', ($c['eb_u'] ? 'Early-Bird bis ' . mv_date($c['eb_u_end']) . ': ' . $eur($c['u_once']) . ' auf einmal oder ' . (int)$c['u_n'] . ' × ' . $eur($c['u_inst']) . '. Danach ' . $eur($c['r_u_once']) . ' auf einmal oder ' . (int)$c['u_n'] . ' × ' . $eur($c['r_u_inst']) . '.' : $eur($c['u_once']) . ' auf einmal oder ' . (int)$c['u_n'] . ' × ' . $eur($c['u_inst']) . '.')],
  ['Muss ich bei Ratenzahlung jeden Monat neu auf mein Rücktrittsrecht verzichten?', 'Nein. Du entscheidest das einmal bei der Buchung, und es gilt für die ganzen drei Monate. Die Raten sind kein neuer Vertrag.'],
  ['Muss ich sportlich sein?', 'Nein. Die Bewegung ist sanft und achtsam, jede Übung hat leichtere Varianten und es gibt eigene Videos für müde Tage.'],
- ['Gibt es Unfold auf Englisch?', 'Ja. Es gibt immer einen Live-Call auf Deutsch und einen auf Englisch, die Videos gibt es in beiden Sprachen.'],
+ ['Gibt es Unfold auf Englisch?', 'Nein, Unfold findet nur auf Deutsch statt. Auf Englisch gibt es The Mindful Movement Method, die Videobibliothek für zu Hause.'],
 ];
 $ld = [
  ['@context' => 'https://schema.org', '@type' => 'Course', '@id' => $site . '/unfold/#course', 'name' => 'Unfold – The Mindful Becoming', 'description' => '3-Monats-Begleitung für Frauen: Mindful Movement, Live-Calls mit Impulsvortrag, Workbooks für Mental Load und Selbstwert, Journaling, Meditation und Breathwork.',
-  'provider' => ['@type' => 'Organization', 'name' => 'Movecia', 'sameAs' => $site . '/'], 'inLanguage' => ['de', 'en'], 'image' => $site . '/img/movecia/og-unfold.jpg',
+  'provider' => ['@type' => 'Organization', 'name' => 'Movecia', 'sameAs' => $site . '/'], 'inLanguage' => 'de', 'image' => $site . '/img/movecia/og-unfold.jpg',
   'offers' => [['@type' => 'Offer', 'category' => 'Paid', 'price' => number_format($c['u_once'] / 100, 2, '.', ''), 'priceCurrency' => 'EUR'] + ($c['eb_u'] ? ['priceValidUntil' => date('Y-m-d', $c['eb_u_end'])] : []) + ['availability' => $free > 0 ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/SoldOut', 'url' => $site . '/unfold/#buchen']],
   'hasCourseInstance' => [['@type' => 'CourseInstance', 'courseMode' => 'Online', 'startDate' => $c['u_start'], 'endDate' => date('Y-m-d', mv_unfold_end()), 'courseSchedule' => ['@type' => 'Schedule', 'repeatFrequency' => 'P1W', 'repeatCount' => 13], 'instructor' => ['@type' => 'Person', 'name' => 'Vivien Malonga'], 'location' => ['@type' => 'VirtualLocation', 'url' => $site . '/unfold/']]]],
  ['@context' => 'https://schema.org', '@type' => 'FAQPage', 'mainEntity' => array_map(fn($q) => ['@type' => 'Question', 'name' => $q[0], 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $q[1]]], $faq)],
@@ -187,15 +190,16 @@ footer a{color:var(--muted)}
 @media(prefers-reduced-motion:reduce){.mq-in{animation:none}}
 body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .top-r{display:flex;align-items:center;gap:.5rem;margin-left:auto}@media(max-width:899px){header .lang{display:none}}
+.en-note{background:#2E1D27;color:#F7F1EE;text-align:center;font-size:.92rem;padding:.55rem 16px;margin:0}
 </style>
 <script src="/wildhearts/assets/schutz.js?v=3"></script>
 </head>
 <body>
 <header class="w"><div class="in top">
   <a class="brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia</span></a>
-  <div class="top-r"><?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('unfold'); ?>
-  <div class="lang" role="group" aria-label="Sprache / Language"><button type="button" data-l="de">Deutsch</button><button type="button" data-l="en">English</button></div></div>
+  <div class="top-r"><?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('unfold', ['lang' => false]); ?></div>
 </div></header>
+<p class="en-note" id="ennote" hidden>Unfold is held in German only. In English you can join <a href="/method/?lang=en" style="color:inherit">The Mindful Movement Method</a>.</p>
 
 <main>
 <section class="w"><div class="in hero has-hw"><?= mv_waves(false) ?>
@@ -204,7 +208,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
     <h1 style="margin-top:.8rem">Unfold</h1>
     <p class="sub">The Mindful Becoming</p>
     <p class="lead"><span class="de">Für dich, wenn du spürst, dass mehr in dir steckt, und einfach nicht weißt, wo du anfangen sollst. Drei Monate, in denen du zu dir zurückfindest, deinen Wert wieder spürst und Schritt für Schritt ins Tun kommst. In deinem Tempo und mit Frauen an deiner Seite, denen es genauso geht.</span><span class="en">For you, if you can feel there is more inside you and simply don't know where to begin. Three months to come back to yourself, feel your worth again and step by step start doing what matters to you. At your own pace, with women by your side who feel the same.</span></p>
-    <div class="facts"><span><span class="de">Start <?= $stDe ?></span><span class="en">Starts <?= $stEn ?></span></span><span><span class="de">13 Wochen</span><span class="en">13 weeks</span></span><span><span class="de">wöchentlicher Live-Call</span><span class="en">weekly live call</span></span><span><span class="de">2 Bewegungsvideos pro Woche</span><span class="en">2 movement videos a week</span></span><span><span class="de">max. <?= (int)$c['u_seats'] ?> Plätze</span><span class="en">max. <?= (int)$c['u_seats'] ?> spots</span></span><span><span class="de">Deutsch &amp; Englisch</span><span class="en">English &amp; German</span></span></div>
+    <div class="facts"><span><span class="de">Start <?= $stDe ?></span><span class="en">Starts <?= $stEn ?></span></span><span><span class="de">13 Wochen</span><span class="en">13 weeks</span></span><span><span class="de">wöchentlicher Live-Call</span><span class="en">weekly live call</span></span><span><span class="de">2 Bewegungsvideos pro Woche</span><span class="en">2 movement videos a week</span></span><span><span class="de">max. <?= (int)$c['u_seats'] ?> Plätze</span><span class="en">max. <?= (int)$c['u_seats'] ?> spots</span></span><span><span class="de">auf Deutsch</span><span class="en">English &amp; German</span></span></div>
     <div class="cta"><a class="btn" href="#buchen"><?= $open ? '<span class="de">Platz sichern</span><span class="en">Book my spot</span>' : '<span class="de">Auf die Warteliste</span><span class="en">Join the waitlist</span>' ?> →</a><a class="btn line" href="#inhalt"><span class="de">Was dich erwartet</span><span class="en">What's inside</span></a></div>
   </div>
   <div style="position:relative">
@@ -265,7 +269,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
 
   <h2 style="margin-top:clamp(3rem,6vw,5rem)"><span class="de">Das ist <em>dabei</em></span><span class="en">What's <em>included</em></span></h2>
   <div class="grid cute-cards">
-    <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#4A3040" stroke-width="1.6" stroke-linecap="round"><circle cx="17" cy="18" r="6"/><circle cx="31" cy="18" r="6"/><path d="M6 38c1.5-7 6-10 11-10s9.5 3 11 10M24 30c2-1.4 4.4-2 7-2 5 0 9.5 3 11 10"/></svg><b><span class="de">Wöchentlicher Live-Call</span><span class="en">Weekly live call</span></b><p><span class="de">Jede Woche treffen wir uns live in einer kleinen Runde, es gibt höchstens 10 Plätze. Es gibt immer einen Termin auf Deutsch und einen auf Englisch, du wählst einfach.</span><span class="en">Every week we meet live in a small circle, with no more than 10 spots. There is always one call in English and one in German, and you simply choose.</span></p></div>
+    <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#4A3040" stroke-width="1.6" stroke-linecap="round"><circle cx="17" cy="18" r="6"/><circle cx="31" cy="18" r="6"/><path d="M6 38c1.5-7 6-10 11-10s9.5 3 11 10M24 30c2-1.4 4.4-2 7-2 5 0 9.5 3 11 10"/></svg><b><span class="de">Wöchentlicher Live-Call</span><span class="en">Weekly live call</span></b><p><span class="de">Jede Woche treffen wir uns live in einer kleinen Runde, es gibt höchstens 10 Plätze. Unser Termin ist <?= forma_h($c['u_call_de']) ?>, und wenn du einmal nicht kannst, wartet die Aufnahme auf dich.</span><span class="en">Every week we meet live in a small circle, with no more than 10 spots. There is always one call in English and one in German, and you simply choose.</span></p></div>
     <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#4A3040" stroke-width="1.6" stroke-linecap="round"><path d="M6 34c6-10 12-10 18 0s12 10 18 0"/><circle cx="24" cy="13" r="4"/></svg><b><span class="de">Zwei Bewegungsvideos pro Woche</span><span class="en">Two movement videos a week</span></b><p><span class="de">Jeden Montag ein Full-Day-Flow (ca. 30 Min.) und jeden Donnerstag ein sanfter Tired-Day-Flow (ca. 15 Min.), immer ein Mix aus Yoga, Bodyweight, Somatic und freier Bewegung. Du machst sie, wann es dir passt.</span><span class="en">Every Monday a Full Day flow (about 30 min.) and every Thursday a gentle Tired Day flow (about 15 min.), always a mix of yoga, bodyweight, somatic and free movement. You do them whenever it suits you.</span></p></div>
     <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#4A3040" stroke-width="1.6" stroke-linecap="round"><rect x="9" y="7" width="30" height="34" rx="5"/><path d="M16 16h16M16 23h16M16 30h10"/></svg><b><span class="de">Monatliches Workbook</span><span class="en">Monthly workbook</span></b><p><span class="de">Zum Ausdrucken oder am iPad: Übungen zu Mindset, Selbstwert und deinen Ideen, mit Journaling-Fragen für jede Woche.</span><span class="en">Print it or use it on your tablet: exercises for mindset, self-worth and your ideas, with journaling prompts for every week.</span></p></div>
     <div class="it"><svg viewBox="0 0 48 48" fill="none" stroke="#4A3040" stroke-width="1.6" stroke-linecap="round"><circle cx="24" cy="24" r="16"/><path d="M20 17l11 7-11 7z"/></svg><b><span class="de">Impulse von mir</span><span class="en">Short talks from me</span></b><p><span class="de">Kurze Videos, in denen ich dir erzähle, was mir selbst geholfen hat, als ich mein Atelier und meine Arbeit mit Frauen aufgebaut habe.</span><span class="en">Short videos in which I share what helped me when I was building my studio and my work with women.</span></p></div>
@@ -325,8 +329,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
         </div>
       </fieldset>
       <fieldset class="opt"><legend><span class="de">Dein Live-Call</span><span class="en">Your live call</span></legend>
-        <label class="pick"><input type="radio" name="call_lang" value="de"><span><b>Deutsch</b> · <?= forma_h($c['u_call_de']) ?></span></label>
-        <label class="pick"><input type="radio" name="call_lang" value="en"><span><b>English</b> · <?= forma_h($c['u_call_en']) ?></span></label>
+        <label class="pick"><input type="radio" name="call_lang" value="de" checked><span><b>Deutsch</b> · <?= forma_h($c['u_call_de']) ?></span></label>
       </fieldset>
       <fieldset class="opt"><legend><span class="de">Dein Rücktrittsrecht</span><span class="en">Your right of withdrawal</span></legend>
         <label class="pick wr"><input type="radio" name="wr" value="verzicht"><span><b><span class="de">Gleich alles nutzen</span><span class="en">Use everything right away</span></b><small><span class="de">Ich verzichte auf mein Rücktrittsrecht. Das gilt einmal für die ganze Begleitung, auch bei Ratenzahlung muss ich nicht jeden Monat neu verzichten.</span><span class="en">I waive my right of withdrawal. This applies once to the whole programme, so with instalments I don't have to waive it again each month.</span></small></span></label>
@@ -376,7 +379,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
   <h2 style="margin-top:.6rem;margin-bottom:1rem"><span class="de">Gut zu <em>wissen</em></span><span class="en">Good to <em>know</em></span></h2>
   <details class="q"><summary><span class="de">Muss ich schon eine Idee haben?</span><span class="en">Do I need to have an idea already?</span></summary><p><span class="de">Nein. Manche Frauen kommen mit einer klaren Idee, andere nur mit dem Gefühl, dass sich etwas ändern soll. Beides ist ein wunderbarer Anfang.</span><span class="en">No. Some women come with a clear idea, others just with the feeling that something needs to change. Both are a beautiful beginning.</span></p></details>
   <details class="q"><summary><span class="de">Wie viel Zeit brauche ich pro Woche?</span><span class="en">How much time do I need per week?</span></summary><p><span class="de">Rechne mit etwa zwei Stunden: der Live-Call, ein Impuls-Video und ein wenig Zeit mit deinem Workbook. Die zwei Bewegungsvideos pro Woche machst du, wann es dir passt.</span><span class="en">Plan for about two hours: the live call, a short talk video and some time with your workbook. You do the two weekly movement videos whenever it suits you.</span></p></details>
-  <details class="q"><summary><span class="de">Was ist, wenn ich einen Call verpasse?</span><span class="en">What if I miss a call?</span></summary><p><span class="de">Jeder Call wird aufgenommen und steht danach in deinem Mitgliederbereich. Du kannst auch einmal in die andere Sprachgruppe wechseln.</span><span class="en">Every call is recorded and waits for you in your members area. You can also join the other language group now and then.</span></p></details>
+  <details class="q"><summary><span class="de">Was ist, wenn ich einen Call verpasse?</span><span class="en">What if I miss a call?</span></summary><p><span class="de">Jeder Call wird aufgenommen und steht danach in deinem Mitgliederbereich. </span><span class="en">Every call is recorded and waits for you in your members area. You can also join the other language group now and then.</span></p></details>
   <details class="q"><summary><span class="de">Muss ich sportlich sein?</span><span class="en">Do I need to be fit?</span></summary><p><span class="de">Überhaupt nicht. Die Bewegung ist sanft und achtsam, ganz ohne Leistungsdruck. Du machst nur, was sich für dich gut anfühlt.</span><span class="en">Not at all. The movement is gentle and mindful, without any pressure to perform. You only do what feels good to you.</span></p></details>
   <details class="q"><summary><span class="de">Wann beginnt es und wann bekomme ich Zugang?</span><span class="en">When does it start and when do I get access?</span></summary><p><span class="de">Du kannst schon jetzt buchen und dir deinen Platz sichern. Dein Zugang zum Mitgliederbereich schaltet sich am <?= $stDe ?> frei, am selben Tag ist der erste Live-Call, und ab dann kommen jeden Montag und Donnerstag neue Bewegungsvideos. Dein Rücktrittsrecht beginnt erst mit dem Start und läuft bis <?= $wuDe ?>.</span><span class="en">You can book now and save your spot. Your access to the members area unlocks on <?= $stEn ?>, the first live call is that same day, and from then on new movement videos arrive every Monday and Thursday. Your right of withdrawal only begins when the programme starts and runs until <?= $wuEn ?>.</span></p></details>
   <details class="q"><summary><span class="de">Kann ich in Raten zahlen?</span><span class="en">Can I pay in instalments?</span></summary><p><span class="de">Ja. Du zahlst entweder <?= $eur($c['u_once']) ?> auf einmal oder <?= (int)$c['u_n'] ?> monatliche Raten zu je <?= $eur($c['u_inst']) ?>.</span><span class="en">Yes. You can pay <?= $eur($c['u_once']) ?> in full or in <?= (int)$c['u_n'] ?> monthly instalments of <?= $eur($c['u_inst']) ?>.</span></p></details>
@@ -390,24 +393,21 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
 <script>
 (() => {
   const root = document.documentElement;
+  // nur Deutsch (Vivien, 30.10.2026): wer mit Englisch kommt, sieht oben einen kurzen Hinweis auf die Method
   let l = <?= json_encode($lang) ?>;
   try { if (!l) l = localStorage.getItem('wh-lang') || ''; } catch (e) {}
-  if (!l) l = (navigator.language || '').toLowerCase().startsWith('de') ? 'de' : 'en';
-  const set = v => { root.dataset.l = v; root.lang = v; document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.l === v))); try { localStorage.setItem('wh-lang', v); } catch (e) {} };
-  set(l);
-  document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => set(b.dataset.l)));
+  if (!l) l = (navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'de';
+  if (l === 'en') document.getElementById('ennote').hidden = false;
+  root.dataset.l = 'de'; root.lang = 'de';
   const bf = document.getElementById('bf');
   if (bf) {
-    const cl = bf.querySelector('input[name=call_lang][value="' + root.dataset.l + '"]'); if (cl) cl.checked = true;
-    document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => { const x = bf.querySelector('input[name=call_lang][value="' + b.dataset.l + '"]'); if (x && !bf.dataset.touched) x.checked = true; }));
-    bf.querySelectorAll('input[name=call_lang]').forEach(x => x.addEventListener('change', () => bf.dataset.touched = 1));
     const be = document.getElementById('be'), bb = document.getElementById('bb');
     bf.addEventListener('submit', async ev => {
       ev.preventDefault(); be.hidden = true;
       const de = root.dataset.l === 'de';
       if (!bf.name.value.trim() || !bf.email.value.includes('@')) { be.textContent = de ? 'Bitte gib deinen Namen und deine E-Mail an.' : 'Please enter your name and email.'; be.hidden = false; return; }
       if (!bf.querySelector('input[name=wr]:checked')) { be.textContent = de ? 'Bitte wähle, ob du dein Rücktrittsrecht behältst.' : 'Please choose whether you want to keep your right of withdrawal.'; be.hidden = false; return; }
-      const d = Object.fromEntries(new FormData(bf)); d.lang = root.dataset.l;
+      const d = Object.fromEntries(new FormData(bf)); d.lang = 'de';
       bb.disabled = true;
       try {
         const r = await fetch('/api/method.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(d)});
@@ -421,7 +421,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
   const t0 = Date.now(), f = document.getElementById('jf'), e = document.getElementById('je'), b = document.getElementById('jb');
   f.addEventListener('submit', async ev => {
     ev.preventDefault(); e.hidden = true;
-    const d = Object.fromEntries(new FormData(f)); d.source = 'unfold'; d.lang = root.dataset.l; d.elapsed = Date.now() - t0;
+    const d = Object.fromEntries(new FormData(f)); d.source = 'unfold'; d.lang = 'de'; d.elapsed = Date.now() - t0;
     b.disabled = true;
     try {
       const r = await fetch('/api/wh-subscribe.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(d)});

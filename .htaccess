@@ -65,6 +65,9 @@ RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^unfold/call/?$ wildhearts/unfold/call/ [L,QSA]
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^links/?$ wildhearts/index.html [L,QSA]
+# Link in Bio für das Instagram-Konto @moveciamovement (Vivien, 30.10.2026), nur Deutsch
+RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
+RewriteRule ^bio/?$ wildhearts/bio/ [L,QSA]
 # Movecia Academy (Vivien, 28.10.2026): Ausbildungen, erste: Teacher Training
 RewriteCond %{HTTP_HOST} ^(www\.)?moveciamovement\.com$ [NC]
 RewriteRule ^academy/?$ wildhearts/academy/ [L,QSA]

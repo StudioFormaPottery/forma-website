@@ -98,7 +98,6 @@ body{background:#F2ECE4}h1,h2{color:#6B5658}
 <?php
         $tile($m . '?demo=1&nurunfold=1', '🌸', 'Nur Unfold gebucht', 'Wochenplan, Videos, Workbooks, Live-Call');
         $tile($m . '?demo=1&unfold=1', '🌿', 'Unfold und Method', 'Wer beides gebucht hat');
-        $tile($m . '?demo=1&nurunfold=1&lang=en', '🇬🇧', 'Auf Englisch', 'Unfold in englischer Sprache');
         if ($uMove) $tile($m . '?demo=1&unfold=1&l=' . (int)$uMove['id'], '🎬', 'Ein Bewegungsvideo', $h($uMove['title_de']));
         if ($uTalk) $tile($m . '?demo=1&unfold=1&l=' . (int)$uTalk['id'], '🗣', 'Ein Talking Head', $h($uTalk['title_de']));
         $tile($self . '?view=method#test', '🧪', 'Echter Testzugang', 'Testteilnehmerin mit Unfold anlegen, auch „vor dem Start“', false);

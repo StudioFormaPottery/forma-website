@@ -14,10 +14,11 @@ if (preg_match('/^s(\d+)$/', $arg, $m)) {
     $o = $s ? natal_order($pdo, (int)$s['order_id']) : null;
     if ($o) { $key = natal_session_key($pdo, $o, (int)$s['id']); $name = forma_first_name((string)$o['name']); $sub = natal_when($s) . ' · ' . $o['name']; }
 } elseif (isset(NATAL_SCRIPT_TITLES[$arg])) $key = $arg;
+if (str_ends_with($key, '_en')) $key = substr($key, 0, -3); // nur Deutsch
 $pc = natal_prompter_cfg();
 $defs = natal_script_defaults();
 $scripts = [];
-foreach (NATAL_SCRIPT_TITLES as $sk => $st) $scripts[$sk] = ['title' => natal_unit_label($sk) === 'Eigenes Skript' ? $st : ($sk === 'kennenlernen' ? $st : natal_unit_label($sk)), 'text' => (string)($pc['texts'][$sk] ?? $defs[$sk] ?? ''), 'def' => (string)($defs[$sk] ?? ''), 'own' => isset($pc['texts'][$sk])];
+foreach (NATAL_SCRIPT_TITLES as $sk => $st) if (!str_ends_with($sk, '_en')) $scripts[$sk] = ['title' => natal_unit_label($sk) === 'Eigenes Skript' ? $st : ($sk === 'kennenlernen' ? $st : natal_unit_label($sk)), 'text' => (string)($pc['texts'][$sk] ?? $defs[$sk] ?? ''), 'def' => (string)($defs[$sk] ?? ''), 'own' => isset($pc['texts'][$sk])];
 $P = ['scripts' => $scripts, 'key' => $key, 'speed' => $pc['speed'], 'size' => $pc['size'], 'name' => $name, 'csrf' => csrf(), 'save' => $self . '?view=natal'];
 header('Content-Type: text/html; charset=utf-8');
 ?><!doctype html>

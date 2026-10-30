@@ -20,11 +20,11 @@ function mv_menu_items(): array
     return [
         ['/', 'Start', 'Home', 'start', 'Alles über Movecia', 'All about Movecia'],
         ['/method/', 'Method', 'Method', 'method', 'Mindful Movement on demand', 'Mindful movement on demand'],
-        ['/unfold/', 'Unfold', 'Unfold', 'unfold', '3 Monate Begleitung' . ($u[0] ?? ''), '3 months of guidance' . ($u[1] ?? '')],
-        ['/natal/', 'Prä- &amp; Postnatal', 'Pre- &amp; postnatal', 'natal', '1:1 im Studio &amp; online', '1:1 in the studio &amp; online'],
+        ['/unfold/', 'Unfold', 'Unfold', 'unfold', '3 Monate Begleitung' . ($u[0] ?? ''), '3 months of guidance · in German'],
+        ['/natal/', 'Prä- &amp; Postnatal', 'Pre- &amp; postnatal', 'natal', '1:1 im Studio &amp; online', '1:1 in the studio &amp; online · in German'],
         ['/gathering/', 'Gatherings', 'Gatherings', 'gathering', 'Live und kostenlos, einmal im Monat', 'Free and live, once a month'],
         // Movecia Academy (Vivien, 28.10.2026): Ausbildungen, zuerst das Teacher Training
-        ['/academy/', 'Academy', 'Academy', 'academy', 'Für alle, die eine Ausbildung machen möchten', 'For everyone who wants to train as a teacher'],
+        ['/academy/', 'Academy', 'Academy', 'academy', 'Für alle, die eine Ausbildung machen möchten', 'Teacher training · in German'],
         ['/#vivien', 'Über mich', 'About me', 'about', 'Ich bin Vivien', "Hi, I'm Vivien"],
     ];
 }

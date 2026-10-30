@@ -16,7 +16,7 @@ function ig_schema(PDO $pdo): void
     foreach (['theme' => "TEXT NOT NULL DEFAULT ''", 'photo' => "TEXT NOT NULL DEFAULT ''", 'lang' => "TEXT NOT NULL DEFAULT ''"] as $c => $t)
         if (!in_array($c, $cols, true)) $pdo->exec("ALTER TABLE mm_insta ADD COLUMN $c $t");
 }
-const IG_KIND = ['reel' => '🎬 Reel', 'story' => '⭕ Story', 'channel' => '💬 Channel'];
+const IG_KIND = ['reel' => '🎬 Reel', 'story' => '⭕ Story', 'channel' => '💬 Channel', 'post' => '🖼 Beitrag'];
 /** Tagesthemen aus verwaltung/insta-skripte.json */
 function ig_themes(): array
 {
@@ -46,7 +46,27 @@ function ig_theme_use(PDO $pdo): array
 }
 function ig_dir(): string { $d = forma_data_dir() . '/insta'; if (!is_dir($d)) @mkdir($d, 0775, true); return $d; }
 function ig_get(PDO $pdo, int $id): ?array { $s = $pdo->prepare('SELECT * FROM mm_insta WHERE id = ?'); $s->execute([$id]); return $s->fetch() ?: null; }
-const IG_ACC = ['privat' => 'Privat', 'movecia' => 'Movecia', 'forma' => 'FORMA'];
+const IG_ACC = ['privat' => 'Privat', 'movecia' => 'Movecia', 'forma' => 'FORMA', 'mvig' => '@moveciamovement'];
+/**
+ * Zwei getrennte Instagram-Konten (Vivien, 30.10.2026): „mvig“ = neues Konto @moveciamovement (Mindful & Somatic Movement, nur Deutsch,
+ * eigener Contentplan aus verwaltung/insta-studio-plan.json), alles andere = dein bisheriges Instagram mit den Tagesthemen.
+ */
+function ig_tab(): string { $a = (string)($_GET['a'] ?? $_POST['a'] ?? 'mvig'); return $a === 'mein' ? 'mein' : 'mvig'; }
+function ig_acc_sql(string $tab): string { return $tab === 'mvig' ? "acc = 'mvig'" : "acc <> 'mvig'"; }
+/** Contentplan für @moveciamovement einmal eintragen (neue Version = nur fehlende Einträge dazu). */
+function ig_seed_mvig(PDO $pdo): void
+{
+    $d = json_decode((string)@file_get_contents(__DIR__ . '/insta-studio-plan.json'), true);
+    $v = (int)($d['version'] ?? 0);
+    if (!$v || (int)forma_setting($pdo, 'ig_mvig_plan') >= $v) return;
+    $q = $pdo->prepare("SELECT COUNT(*) FROM mm_insta WHERE acc = 'mvig' AND day = ? AND title = ?");
+    $ins = $pdo->prepare("INSERT INTO mm_insta (day, kind, acc, title, text, photo, lang, created_at, updated_at) VALUES (?,?,?,?,?,?,'de',?,?)");
+    foreach ($d['items'] ?? [] as $x) {
+        $q->execute([$x['day'], $x['title']]); if ((int)$q->fetchColumn()) continue;
+        $ins->execute([$x['day'], isset(IG_KIND[$x['kind']]) ? $x['kind'] : 'post', 'mvig', $x['title'], $x['text'], (string)($x['photo'] ?? ''), date('c'), date('c')]);
+    }
+    forma_set_setting($pdo, 'ig_mvig_plan', (string)$v);
+}
 function ig_wd(string $d, bool $long = false): string
 {
     $t = strtotime($d);
@@ -95,7 +115,8 @@ function ig_parse(string $raw, string $start, string $kind): array
 
 if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
     ig_schema($pdo);
-    $igBack = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?') . '?view=insta&m=' . preg_replace('/[^0-9-]/', '', (string)($_POST['m'] ?? date('Y-m')));
+    ig_seed_mvig($pdo);
+    $igBack = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?') . '?view=insta&a=' . ig_tab() . '&m=' . preg_replace('/[^0-9-]/', '', (string)($_POST['m'] ?? date('Y-m')));
     $igJson = function (array $x): void { header('Content-Type: application/json; charset=utf-8'); echo json_encode($x); exit; };
 
     if ($action === 'mm_ig_save') {
@@ -114,7 +135,7 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
         $day = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST['day'] ?? '')) ? $_POST['day'] : date('Y-m-d');
         $th = ig_themes()[(string)($_POST['theme'] ?? '')] ?? null;
         if (!$th) go($igBack . '#d' . $day, 'Thema nicht gefunden.');
-        $ids = ig_take_theme($pdo, $day, $th, ($_POST['lang'] ?? '') === 'de' ? 'de' : 'en');
+        $ids = ig_take_theme($pdo, $day, $th, ($_POST['lang'] ?? '') === 'de' ? 'de' : 'en', 'privat');
         $rec = (string)($_POST['rec'] ?? '');
         if (isset($ids[$rec]) && $rec !== 'channel') go(strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?') . '?view=studio&ig=' . $ids[$rec]);
         go($igBack . '#d' . $day, 'Thema eingetragen: Reel, Story und Channel.');
@@ -125,12 +146,12 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
         $end = date('Y-m-t', strtotime($start)); $lang = ($_POST['lang'] ?? '') === 'de' ? 'de' : 'en';
         $use = ig_theme_use($pdo); $list = array_values(array_filter(ig_themes(), fn($x) => empty($x['promo'])));
         usort($list, fn($a, $b) => ($use[$a['id']] ?? 0) <=> ($use[$b['id']] ?? 0));
-        $busy = $pdo->prepare('SELECT COUNT(*) FROM mm_insta WHERE day = ?'); $n = 0; $i = 0;
+        $busy = $pdo->prepare("SELECT COUNT(*) FROM mm_insta WHERE day = ? AND acc <> 'mvig'"); $n = 0; $i = 0;
         for ($d = $start; $d <= $end && $list; $d = date('Y-m-d', strtotime($d . ' +1 day'))) {
             $busy->execute([$d]); if ((int)$busy->fetchColumn() > 0) continue;
-            ig_take_theme($pdo, $d, $list[$i % count($list)], $lang); $i++; $n++;
+            ig_take_theme($pdo, $d, $list[$i % count($list)], $lang, 'privat'); $i++; $n++;
         }
-        go(strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?') . '?view=insta&m=' . substr($start, 0, 7), $n ? $n . ' Tage mit Themen gefüllt.' : 'Alle Tage haben schon ein Thema.');
+        go(strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?') . '?view=insta&a=mein&m=' . substr($start, 0, 7), $n ? $n . ' Tage mit Themen gefüllt.' : 'Alle Tage haben schon ein Thema.');
     }
     if ($action === 'mm_ig_status') {
         $r = ig_get($pdo, (int)($_POST['id'] ?? 0)); $st = in_array($_POST['st'] ?? '', ['offen', 'aufgenommen', 'gepostet'], true) ? $_POST['st'] : 'offen';
@@ -155,7 +176,7 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
         $ins = $pdo->prepare('INSERT INTO mm_insta (day, kind, acc, title, text, created_at, updated_at) VALUES (?,?,?,?,?,?,?)');
         foreach ($list as $x) $ins->execute([$x['day'], $x['kind'], $acc, $x['title'], $x['text'], date('c'), date('c')]);
         $m = $list ? substr($list[0]['day'], 0, 7) : substr($start, 0, 7);
-        go(strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?') . '?view=insta&m=' . $m, count($list) . ' Talking Heads eingetragen.');
+        go(strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?') . '?view=insta&a=' . ($acc === 'mvig' ? 'mvig' : 'mein') . '&m=' . $m, count($list) . ' Einträge eingetragen.');
     }
     // Video in Stücken (8 MB) hochladen: n = 0 legt neu an, last = 1 schließt ab
     if ($action === 'mm_ig_up') {
@@ -202,11 +223,12 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
         ig_cleanup($pdo);
         $m = preg_match('/^\d{4}-\d{2}$/', (string)($_GET['m'] ?? '')) ? $_GET['m'] : date('Y-m');
         $first = $m . '-01'; $days = (int)date('t', strtotime($first)); $last = $m . '-' . sprintf('%02d', $days);
-        $ord = "CASE kind WHEN 'reel' THEN 0 WHEN 'story' THEN 1 ELSE 2 END, id";
-        $s = $pdo->prepare("SELECT * FROM mm_insta WHERE day BETWEEN ? AND ? ORDER BY day, $ord"); $s->execute([$first, $last]);
+        $tab = ig_tab(); $accW = ig_acc_sql($tab);
+        $ord = "CASE kind WHEN 'post' THEN 0 WHEN 'reel' THEN 1 WHEN 'story' THEN 2 ELSE 3 END, id";
+        $s = $pdo->prepare("SELECT * FROM mm_insta WHERE $accW AND day BETWEEN ? AND ? ORDER BY day, $ord"); $s->execute([$first, $last]);
         $by = []; foreach ($s->fetchAll() as $r) $by[$r['day']][] = $r;
         $today = date('Y-m-d');
-        $ts = $pdo->prepare("SELECT * FROM mm_insta WHERE day = ? ORDER BY $ord"); $ts->execute([$today]); $todayList = $ts->fetchAll();
+        $ts = $pdo->prepare("SELECT * FROM mm_insta WHERE $accW AND day = ? ORDER BY $ord"); $ts->execute([$today]); $todayList = $ts->fetchAll();
         $cnt = ['plan' => 0, 'post' => 0, 'free' => 0];
         foreach ($by as $l) foreach ($l as $r) { $cnt['plan']++; if ($r['status'] === 'gepostet') $cnt['post']++; }
         for ($i = 1; $i <= $days; $i++) { $d = $m . '-' . sprintf('%02d', $i); if ($d >= $today && empty($by[$d])) $cnt['free']++; }
@@ -218,13 +240,13 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
         $TH = [];
         foreach ($themes as $x) $TH[] = $x + ['used' => $use[$x['id']] ?? 0];
         $fillFrom = max($first, $today);
-        render_page('Instagram täglich', function () use ($self, $m, $first, $days, $by, $today, $todayList, $cnt, $mName, $prev, $next, $TH, $themes, $fillFrom, $last) {
-            $h = 'forma_h';
-            $hid = fn(string $a, array $f) => '<input type="hidden" name="csrf" value="' . $h(csrf()) . '"><input type="hidden" name="action" value="' . $a . '"><input type="hidden" name="m" value="' . $h($m) . '">'
+        render_page('Instagram täglich', function () use ($self, $m, $first, $days, $by, $today, $todayList, $cnt, $mName, $prev, $next, $TH, $themes, $fillFrom, $last, $tab) {
+            $h = 'forma_h'; $mv = $tab === 'mvig'; $qa = 'a=' . $tab . '&amp;';
+            $hid = fn(string $a, array $f) => '<input type="hidden" name="csrf" value="' . $h(csrf()) . '"><input type="hidden" name="action" value="' . $a . '"><input type="hidden" name="m" value="' . $h($m) . '"><input type="hidden" name="a" value="' . $h($tab) . '">'
                 . implode('', array_map(fn($k, $v) => '<input type="hidden" name="' . $k . '" value="' . $h((string)$v) . '">', array_keys($f), $f));
             $card = function (array $r, bool $big = false) use ($self, $h, $hid) {
-                $st = $r['status']; $has = $r['file'] !== ''; $ch = $r['kind'] === 'channel';
-                $lab = ['reel' => '🎬 Reel Talking Head', 'story' => '⭕ Story Talking Head', 'channel' => '💬 Channel-Nachricht'][$r['kind']] ?? '⭕ Story';
+                $st = $r['status']; $has = $r['file'] !== ''; $ch = in_array($r['kind'], ['channel', 'post'], true);
+                $lab = ['reel' => '🎬 Reel Talking Head', 'story' => '⭕ Story Talking Head', 'channel' => '💬 Channel-Nachricht', 'post' => '🖼 Beitrag · Karussell'][$r['kind']] ?? '⭕ Story';
                 ob_start(); ?>
 <div class="ig k2-<?= $h($r['kind']) ?><?= $big ? ' big' : '' ?> st-<?= $h($st) ?>" id="e<?= (int)$r['id'] ?>">
   <div class="ig-top"><span class="kind k-<?= $h($r['kind']) ?>"><?= $lab ?></span>
@@ -232,9 +254,10 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
   <?php if ($r['theme'] === ''): ?><b class="tt"><?= $h(ig_title($r)) ?></b><?php endif; ?>
   <?php if ($ch): ?>
     <div class="txt" data-txt><?= nl2br($h($r['text'])) ?></div>
-    <?php if ($r['photo'] !== ''): ?><div class="foto"><span>📷 Foto-Idee</span><?= $h($r['photo']) ?></div><?php endif; ?>
+    <?php if ($r['photo'] !== ''): ?><div class="foto"><span>📷 <?= $r['kind'] === 'post' ? 'Bild-Idee' : 'Foto-Idee' ?></span><?= $h($r['photo']) ?></div><?php endif; ?>
   <?php else: ?>
     <details class="txtd"<?= $big ? ' open' : '' ?>><summary>Text ansehen</summary><div class="txt" data-txt><?= nl2br($h($r['text'])) ?></div></details>
+    <?php if ($r['photo'] !== ''): ?><div class="foto"><span>🎬 Bild-Idee</span><?= $h($r['photo']) ?></div><?php endif; ?>
     <?php if ($r['music'] !== ''): ?><p class="mu">🎵 <?= $h($r['music']) ?></p><?php endif; ?>
     <?php if ($has): ?><video src="<?= $h($self) ?>?view=insta&amp;dl=<?= (int)$r['id'] ?>#t=0.1" controls playsinline preload="metadata"></video><?php endif; ?>
   <?php endif; ?>
@@ -252,9 +275,9 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
   <details class="ed"><summary>✏️ Ändern</summary>
     <form method="post" class="f"><?= $hid('mm_ig_save', ['id' => $r['id'], 'kind' => $r['kind'], 'acc' => $r['acc']]) ?>
       <div class="row"><label>Tag<input type="date" name="day" value="<?= $h($r['day']) ?>"></label><label>Überschrift<input name="title" value="<?= $h($r['title']) ?>"></label></div>
-      <label><?= $ch ? 'Text für den Kanal' : 'Text für den Teleprompter <small>(Leerzeile = neuer Absatz)</small>' ?><textarea name="text" rows="7"><?= $h($r['text']) ?></textarea></label>
-      <?php if ($ch): ?><label>Foto-Idee<input name="photo" value="<?= $h($r['photo']) ?>"></label>
-      <?php else: ?><label>Musik <small>(Liedname, den du in Instagram dazu wählst)</small><input name="music" value="<?= $h($r['music']) ?>"></label><?php endif; ?>
+      <label><?= $r['kind'] === 'post' ? 'Folien und Caption' : ($ch ? 'Text für den Kanal' : 'Text für den Teleprompter <small>(Leerzeile = neuer Absatz)</small>') ?><textarea name="text" rows="7"><?= $h($r['text']) ?></textarea></label>
+      <label><?= $ch ? 'Foto-Idee' : 'Bild-Idee' ?><input name="photo" value="<?= $h($r['photo']) ?>"></label>
+      <?php if (!$ch): ?><label>Musik <small>(Liedname, den du in Instagram dazu wählst)</small><input name="music" value="<?= $h($r['music']) ?>"></label><?php endif; ?>
       <div class="ig-b"><button class="b main">Speichern</button><?php if (!$ch): ?><button class="b" name="studio" value="1">Speichern &amp; aufnehmen</button><?php endif; ?></div>
     </form>
     <div class="ig-b" style="margin-top:8px">
@@ -354,11 +377,16 @@ main{max-width:1240px}
 .tv .txt{background:#FBF8F4;border-radius:14px;padding:12px;max-height:300px}
 .tv .ig-b{margin-top:12px}
 .todayw .dc{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.acct{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 14px}.acct a{flex:1 1 240px;display:flex;flex-direction:column;gap:2px;text-decoration:none;padding:12px 16px;border-radius:20px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41}
+.acct a b{font-size:19px;font-weight:500}.acct a span{font-size:15px;color:#7D7076}.acct a.on{background:#4A3040;border-color:#4A3040;color:#fff}.acct a.on span{color:#E6DBCF}
+.ig.k2-post{border-top:5px solid #7D5E68}.k-post{background:#F1E6EA;color:#4A3040}
 @media(max-width:640px){.dc{grid-template-columns:minmax(0,1fr)}.thead .b{margin-left:0}.tl{grid-template-columns:minmax(0,1fr)}}
 </style>
 <?php mm_subnav('insta'); ?>
-<div class="ih"><h1>📱 Instagram täglich</h1>
-  <p>Jeden Tag ein Thema aus deinem Leben: dazu ein Reel und eine Story als Talking Head und eine Nachricht für deinen Instagram- und WhatsApp-Kanal mit einer Foto-Idee. Aufnehmen kannst du in Ruhe im Studio, am Tag selbst tippst du nur noch auf „Teilen“ bzw. „Text kopieren“.</p></div>
+<div class="ih"><h1>📱 Instagram</h1>
+  <div class="acct" role="tablist"><a href="<?= $h($self) ?>?view=insta&amp;a=mvig&amp;m=<?= $h($m) ?>" class="<?= $mv ? 'on' : '' ?>"><b>🌿 @moveciamovement</b><span>Mindful &amp; Somatic Movement · Deutsch</span></a><a href="<?= $h($self) ?>?view=insta&amp;a=mein&amp;m=<?= $h($m) ?>" class="<?= $mv ? '' : 'on' ?>"><b>🤍 Dein Instagram</b><span>Tagesthemen · Deutsch &amp; Englisch</span></a></div>
+  <?php if ($mv): ?><p>Der Contentplan für dein Movecia-Konto: montags ein Karussell mit Wissen, mittwochs ein Reel, freitags ein Beitrag zu einem Angebot, dazu dienstags und samstags eine Story. Bei Beiträgen kopierst du einfach Folien und Caption, Reels und Storys nimmst du im Studio auf. Link in Bio: <b>moveciamovement.com/bio</b> <button type="button" class="b sm" data-copylink="https://moveciamovement.com/bio">📋 Link kopieren</button></p>
+  <?php else: ?><p>Jeden Tag ein Thema aus deinem Leben: dazu ein Reel und eine Story als Talking Head und eine Nachricht für deinen Instagram- und WhatsApp-Kanal mit einer Foto-Idee. Aufnehmen kannst du in Ruhe im Studio, am Tag selbst tippst du nur noch auf „Teilen“ bzw. „Text kopieren“.</p><?php endif; ?></div>
 
 <?php if ($todayList): ?>
 <div class="box todayw"><h2>Heute · <?= $h(ig_wd($today, true)) ?></h2><?= $dayBlock($today, $todayList, true) ?>
@@ -367,7 +395,7 @@ main{max-width:1240px}
 
 <div class="ical-wrap">
   <div class="ical">
-    <div class="mnav"><a href="<?= $h($self) ?>?view=insta&amp;m=<?= $h($prev) ?>" aria-label="Monat davor">‹</a><b><?= $h($mName) ?></b><a href="<?= $h($self) ?>?view=insta&amp;m=<?= $h($next) ?>" aria-label="nächster Monat">›</a></div>
+    <div class="mnav"><a href="<?= $h($self) ?>?view=insta&amp;<?= $qa ?>m=<?= $h($prev) ?>" aria-label="Monat davor">‹</a><b><?= $h($mName) ?></b><a href="<?= $h($self) ?>?view=insta&amp;<?= $qa ?>m=<?= $h($next) ?>" aria-label="nächster Monat">›</a></div>
     <div class="ical-g">
       <?php foreach (['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'] as $w): ?><span class="wd"><?= $w ?></span><?php endforeach; ?>
       <?php for ($i = 0; $i < ((int)date('N', strtotime($first)) - 1); $i++): ?><span></span><?php endfor; ?>
@@ -377,8 +405,8 @@ main{max-width:1240px}
     </div>
     <div class="ical-leg"><span><i style="background:#C9A9B4"></i>geplant</span><span><i style="background:#7D5E68"></i>aufgenommen</span><span><i style="background:#8FB08A"></i>gepostet</span></div>
     <p class="cnt"><?= $cnt['plan'] ?> geplant · <?= $cnt['post'] ?> gepostet</p>
-    <?php if ($cnt['free'] > 0 && $TH): ?>
-    <form method="post" class="fill"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_fill"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="start" value="<?= $h($fillFrom) ?>">
+    <?php if (!$mv && $cnt['free'] > 0 && $TH): ?>
+    <form method="post" class="fill"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_fill"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="a" value="mein"><input type="hidden" name="start" value="<?= $h($fillFrom) ?>">
       <p>✨ <?= $cnt['free'] ?> Tage haben noch kein Thema. Ich fülle sie mit verschiedenen Themen, die du noch nicht verwendet hast.</p>
       <div class="row2"><select name="lang" data-langsel><option value="en">auf Englisch</option><option value="de">auf Deutsch</option></select><button class="b main">Freie Tage füllen</button></div>
     </form>
@@ -389,24 +417,25 @@ main{max-width:1240px}
     <div class="iday" data-iday="<?= $h($d) ?>" hidden>
       <h2><?= $h(ig_wd($d, true)) ?><?= $d === $today ? ' · heute' : '' ?></h2>
       <?php if ($l): ?><?= $dayBlock($d, $l) ?>
+      <?php elseif ($mv): ?><div class="empty"><p>An diesem Tag ist nichts geplant. Ruhetage sind ausdrücklich erlaubt.</p></div>
       <?php else: ?><div class="empty"><p>Für diesen Tag gibt es noch kein Thema.</p><button type="button" class="b main big" data-pick="<?= $h($d) ?>">✨ Thema für diesen Tag wählen</button></div><?php endif; ?>
-      <div class="own"><button type="button" class="b sm" data-own="reel" data-d="<?= $h($d) ?>">＋ eigenes Reel</button><button type="button" class="b sm" data-own="story" data-d="<?= $h($d) ?>">＋ eigene Story</button><button type="button" class="b sm" data-own="channel" data-d="<?= $h($d) ?>">＋ eigene Channel-Nachricht</button></div>
+      <div class="own"><?php if ($mv): ?><button type="button" class="b sm" data-own="post" data-d="<?= $h($d) ?>">＋ Beitrag</button><?php endif; ?><button type="button" class="b sm" data-own="reel" data-d="<?= $h($d) ?>">＋ <?= $mv ? 'Reel' : 'eigenes Reel' ?></button><button type="button" class="b sm" data-own="story" data-d="<?= $h($d) ?>">＋ <?= $mv ? 'Story' : 'eigene Story' ?></button><?php if (!$mv): ?><button type="button" class="b sm" data-own="channel" data-d="<?= $h($d) ?>">＋ eigene Channel-Nachricht</button><?php endif; ?></div>
     </div>
     <?php endfor; ?>
     <div class="pick" id="pick" hidden>
       <div class="pk-h"><b id="pkT">Welches Thema?</b><div class="seg2"><button type="button" data-lang2="en" aria-pressed="true">Englisch</button><button type="button" data-lang2="de" aria-pressed="false">Deutsch</button></div><button type="button" class="b sm" id="pkX">Schließen</button></div>
       <div class="tv" id="tv" hidden></div>
       <div class="tl" id="tl"></div>
-      <form method="post" id="pkF"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_theme"><input type="hidden" name="m" value="<?= $h($m) ?>">
+      <form method="post" id="pkF"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_theme"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="a" value="mein">
         <input type="hidden" name="day"><input type="hidden" name="theme"><input type="hidden" name="lang"><input type="hidden" name="rec"></form>
-      <form method="post" id="ownF"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_save"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="acc" value="movecia">
+      <form method="post" id="ownF"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_save"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="a" value="<?= $h($tab) ?>"><input type="hidden" name="acc" value="<?= $mv ? 'mvig' : 'privat' ?>">
         <input type="hidden" name="day"><input type="hidden" name="kind"><input type="hidden" name="studio"></form>
     </div>
   </div>
 </div>
 
 <details class="box" style="margin-top:18px"><summary style="cursor:pointer;font:500 22px/1.2 'Cormorant Garamond',Georgia,serif;color:#4A3A41;list-style:none">✍️ Eigene Texte für mehrere Tage einfügen</summary>
-  <form method="post" class="f"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_bulk"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="acc" value="movecia">
+  <form method="post" class="f"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_bulk"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="acc" value="<?= $mv ? 'mvig' : 'privat' ?>">
     <div class="row"><label>Ab Tag<input type="date" name="start" value="<?= $h($fillFrom <= $last ? $fillFrom : $first) ?>"></label>
       <label>Wenn nichts dabei steht<select name="kind"><option value="story">⭕ Story</option><option value="reel">🎬 Reel</option></select></label></div>
     <label>Deine Texte<textarea name="raw" rows="8" placeholder="Hier alle Texte einfügen."></textarea></label>
@@ -451,6 +480,7 @@ main{max-width:1240px}
   document.querySelectorAll('[data-langsel]').forEach(s=>s.onchange=()=>{try{localStorage.setItem('ig-lang',s.value)}catch(e){}});
   $p('pkX').onclick=()=>{$p('pick').hidden=true};
   document.querySelectorAll('[data-own]').forEach(b=>b.onclick=()=>{const f=$p('ownF');f.day.value=b.dataset.d;f.kind.value=b.dataset.own;f.studio.value='';f.submit()});
+  document.querySelectorAll('[data-copylink]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.copylink)}catch(e){}const o=b.textContent;b.textContent='✓ Kopiert';setTimeout(()=>b.textContent=o,1800)});
   // ---- Text kopieren (Channel-Nachricht oder Caption) ----
   document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{const el=b.closest('.ig').querySelector('[data-txt]');const t=el?el.innerText.trim():'';const o=b.textContent;
     try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}

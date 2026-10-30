@@ -84,10 +84,10 @@ details.tx>summary small{font-family:"Outfit",sans-serif;font-size:14px;color:va
 <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
 <a class="tovid" href="<?= forma_h($self) ?>?view=videos"><b>🎬 Videos hochladen</b><span>Clips und Videos für Method, Unfold und Prä-/Postnatal findest du jetzt auf einer eigenen, übersichtlichen Seite.</span></a>
 <input class="tx-search" type="search" id="txs" placeholder="Text suchen, z. B. Atem, Beckenboden, Samhain …" aria-label="Text suchen">
-<details class="tx" id="natal" open><summary>Live · Prä- &amp; Postnatal-Einheiten <small>Teleprompter im Videoraum · DE + EN</small></summary>
-    <div class="ti" data-q="kennenlerngespräch"><span class="t">Kennenlerngespräch<span class="m">30 Min. online, mit Fragen</span></span><span class="b"><a href="<?= $u('view=natal&prompter=kennenlernen') ?>" target="_blank" rel="noopener">Deutsch</a><a href="<?= $u('view=natal&prompter=kennenlernen_en') ?>" target="_blank" rel="noopener">Englisch</a></span></div>
+<details class="tx" id="natal" open><summary>Live · Prä- &amp; Postnatal-Einheiten <small>Teleprompter im Videoraum · nur Deutsch</small></summary>
+    <div class="ti" data-q="kennenlerngespräch"><span class="t">Kennenlerngespräch<span class="m">30 Min. online, mit Fragen</span></span><span class="b"><a href="<?= $u('view=natal&prompter=kennenlernen') ?>" target="_blank" rel="noopener">Teleprompter</a></span></div>
 <?php foreach (NATAL_UNIT_KEYS as $k): ?>
-    <div class="ti" data-q="<?= forma_h(mb_strtolower(natal_unit_label($k))) ?>"><span class="t"><?= forma_h(natal_unit_label($k)) ?><span class="m">Live-Einheit: Impuls, Übungen, Breathwork, Meditation</span></span><span class="b"><a href="<?= $u('view=natal&prompter=' . $k) ?>" target="_blank" rel="noopener">Deutsch</a><a href="<?= $u('view=natal&prompter=' . $k . '_en') ?>" target="_blank" rel="noopener">Englisch</a><a href="<?= $u('view=natal&workbook=' . $k) ?>" target="_blank" rel="noopener">Workbook</a></span></div>
+    <div class="ti" data-q="<?= forma_h(mb_strtolower(natal_unit_label($k))) ?>"><span class="t"><?= forma_h(natal_unit_label($k)) ?><span class="m">Live-Einheit: Impuls, Übungen, Breathwork, Meditation</span></span><span class="b"><a href="<?= $u('view=natal&prompter=' . $k) ?>" target="_blank" rel="noopener">Teleprompter</a><a href="<?= $u('view=natal&workbook=' . $k) ?>" target="_blank" rel="noopener">Workbook</a></span></div>
 <?php endforeach; ?>
 </details>
 

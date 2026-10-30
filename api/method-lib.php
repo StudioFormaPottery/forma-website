@@ -889,6 +889,8 @@ function mv_checkout(PDO $pdo, array $in, bool $special = false, string $source 
         $live = 1;
     }
     $callLang = in_array($in['call_lang'] ?? '', ['de', 'en'], true) ? $in['call_lang'] : $lang;
+    // Unfold gibt es seit 30.10.2026 nur auf Deutsch (Vivien): Mails, Call und Mitgliederbereich immer Deutsch
+    if ($p['kind'] === 'unfold') { $lang = 'de'; $en = false; $callLang = 'de'; }
     if ($p['kind'] === 'unfold') {
         if (!$c['u_open']) throw new RuntimeException($en ? 'Unfold is not open for booking right now.' : 'Unfold ist gerade nicht buchbar.');
         if (mv_unfold_free($pdo) <= 0) throw new RuntimeException($en ? 'Unfold is fully booked. Join the list and I\'ll let you know when the next round starts.' : 'Unfold ist ausgebucht. Trag dich in die Liste ein, dann sage ich dir Bescheid, wenn die nächste Runde startet.');
@@ -1851,22 +1853,38 @@ function mv_voice_url(int $lid, int $i, string $g): string
 }
 
 /** Stand eines Videos: wie viele Clips und Voice-overs fehlen noch? */
+/** Zielgruppe (Programm-audience) einer Lektion: method, unfold, natal, academy … */
+function mv_lesson_aud(PDO $pdo, array $l): string
+{
+    static $cache = [];
+    $pid = (int)($l['program_id'] ?? 0);
+    if (!isset($cache[$pid])) { $q = $pdo->prepare('SELECT audience FROM mv_programs WHERE id = ?'); $q->execute([$pid]); $cache[$pid] = (string)($q->fetchColumn() ?: 'method'); }
+    return $cache[$pid];
+}
+
+/** Nur auf Deutsch (Vivien, 30.10.2026): Englisch gibt es nur noch bei The Method. Unfold, Prä-/Postnatal und Academy brauchen keine englischen Videos, Voice-overs oder Teleprompter-Texte. */
+function mv_lesson_de_only(PDO $pdo, array $l): bool
+{
+    return mv_lesson_aud($pdo, $l) !== 'method';
+}
+
 function mv_lesson_status(PDO $pdo, array $l): array
 {
     $st = mv_lesson_steps($l);
+    $deOnly = mv_lesson_de_only($pdo, $l);
     if (!mv_lesson_is_clips($l)) {
         $d = (string)$l['video_de'] !== ''; $e = (string)$l['video_en'] !== '';
-        return ['n' => 0, 'clips' => 0, 'de' => (int)$d, 'en' => (int)$e, 'flow' => false, 'done' => $d && $e];
+        return ['n' => 0, 'clips' => 0, 'de' => (int)$d, 'en' => (int)$e, 'flow' => false, 'deonly' => $deOnly, 'done' => $d && ($e || $deOnly)];
     }
     $rows = mv_lesson_clip_rows($pdo, $l);
     $flow = mv_lesson_mode($l) === 'flow';
     $c = $d = $e = 0;
     foreach ($st as $i => $x) {
         if (($rows[$i]['guid'] ?? '') !== '') $c++;
-        if ($flow) { if (mv_voice_path((int)$l['id'], $i, 'de')) $d++; if (mv_voice_path((int)$l['id'], $i, 'en')) $e++; }
+        if ($flow) { if (mv_voice_path((int)$l['id'], $i, 'de')) $d++; if (!$deOnly && mv_voice_path((int)$l['id'], $i, 'en')) $e++; }
     }
     $n = count($st);
-    return ['n' => $n, 'clips' => $c, 'de' => $d, 'en' => $e, 'flow' => $flow, 'done' => $n > 0 && $c >= $n && (!$flow || ($d >= $n && $e >= $n))];
+    return ['n' => $n, 'clips' => $c, 'de' => $d, 'en' => $e, 'flow' => $flow, 'deonly' => $deOnly, 'done' => $n > 0 && $c >= $n && (!$flow || ($d >= $n && ($deOnly || $e >= $n)))];
 }
 
 /** Ist das Video fertig? Aus Clips: jede Übung hat einen Clip (Flow: und beide Voice-overs). Talking Head: DE und EN. */
@@ -1890,6 +1908,7 @@ function mv_music_lists(): array
 function mv_flow_data(array $l, string $lang, bool $preview = false): ?array
 {
     if (!mv_lesson_is_clips($l)) return null;
+    if ($lang === 'en' && mv_lesson_de_only(forma_db(), $l)) $lang = 'de'; // Unfold/Prä-/Postnatal nur Deutsch
     $bunny = mv_bunny()['lib'] !== '';
     if (!$bunny && !$preview) return null;
     $pdo = forma_db();

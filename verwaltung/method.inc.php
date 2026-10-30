@@ -42,14 +42,14 @@ if ($action === 'mm_mv_rooms') {
     if (mm_whereby_key() === '') go($vBack . '#unfold', 'Trag zuerst unter Movecia → Einstellungen deinen Whereby-Schlüssel ein.');
     $c = mv_cfg();
     $out = [];
-    foreach (['de', 'en'] as $lg) {
+    foreach (['de'] as $lg) { // nur Deutsch (Vivien, 30.10.2026)
         $r = mm_whereby_request('POST', '/meetings', ['endDate' => gmdate('Y-m-d\TH:i:s.000\Z', mv_unfold_end() + 14 * 86400), 'roomMode' => 'group', 'roomNamePrefix' => 'unfold-' . $lg, 'fields' => ['hostRoomUrl']], mm_whereby_key());
         if (empty($r['roomUrl'])) go($vBack . '#unfold', 'Whereby hat keinen Raum zurückgegeben. Bitte versuch es noch einmal.');
         $out['u_room_' . $lg] = (string)$r['roomUrl'];
         $out['u_host_' . $lg] = (string)($r['hostRoomUrl'] ?? '');
     }
     mv_save_cfg($out);
-    go($vBack . '#unfold', 'Die beiden Unfold-Videoräume (Deutsch und Englisch) sind angelegt. Sie bleiben bis zwei Wochen nach dem Ende offen.');
+    go($vBack . '#unfold', 'Der Unfold-Videoraum ist angelegt. Er bleibt bis zwei Wochen nach dem Ende offen.');
 }
 
 if ($action === 'mm_mv_prog_save') {
@@ -432,7 +432,9 @@ label.inl{display:flex;gap:8px;align-items:center}
 
 <?php if ($lEdit || $newLessonFor):
         $l = $lEdit ?: ['id' => 0, 'program_id' => $newLessonFor['id'], 'title_de' => '', 'title_en' => '', 'text_de' => '', 'text_en' => '', 'cat' => 'flow', 'energy' => 'any', 'minutes' => 15, 'sort' => count(mv_lessons($pdo, (int)$newLessonFor['id'])), 'visible' => 1, 'video_de' => '', 'video_en' => '', 'script_de' => '', 'script_en' => '', 'unlock' => ''];
-        $p = mv_program($pdo, (int)$l['program_id']); ?>
+        $p = mv_program($pdo, (int)$l['program_id']);
+        $deOnly = ($p['audience'] ?? 'method') !== 'method'; // nur Method gibt es auf Englisch (Vivien, 30.10.2026)
+        $LANGS = $deOnly ? ['de' => 'Deutsch'] : ['de' => 'Deutsch', 'en' => 'Englisch']; ?>
         <h1><?= $l['id'] ? forma_h($l['title_de']) : 'Neue Lektion' ?></h1>
         <p class="muted">in <a href="<?= forma_h($self) ?>?view=method&amp;p=<?= (int)$p['id'] ?>"><?= forma_h($p['title_de']) ?></a></p>
         <?php if ($l['id']): ?>
@@ -440,7 +442,7 @@ label.inl{display:flex;gap:8px;align-items:center}
         <?php if (!mv_bunny_ok()): ?><p class="card">Damit du Videos hochladen kannst, trag zuerst unten auf der <a href="<?= forma_h($self) ?>?view=method#bunny">Method-Seite unter „Bunny Stream“</a> deine Library-ID und den API-Schlüssel ein.</p>
         <?php else: ?>
         <div class="g2">
-        <?php foreach (['de' => 'Deutsch', 'en' => 'Englisch'] as $lg => $ln): $g = $l['video_' . $lg]; $info = $g ? mv_bunny_info($g) : null; ?>
+        <?php foreach ($LANGS as $lg => $ln): $g = $l['video_' . $lg]; $info = $g ? mv_bunny_info($g) : null; ?>
             <div class="vbox" data-lang="<?= $lg ?>">
                 <b>Video <?= $ln ?></b>
                 <?php if ($g): ?>
@@ -459,14 +461,14 @@ label.inl{display:flex;gap:8px;align-items:center}
 
         <h2>Angaben</h2>
         <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_lesson_save"><input type="hidden" name="id" value="<?= (int)$l['id'] ?>"><input type="hidden" name="program_id" value="<?= (int)$l['program_id'] ?>">
-            <div class="g2"><label>Titel (Deutsch)<input name="title_de" value="<?= forma_h($l['title_de']) ?>" required></label><label>Titel (Englisch)<input name="title_en" value="<?= forma_h($l['title_en']) ?>"></label></div>
-            <div class="g2"><label>Kurzbeschreibung (Deutsch)<textarea name="text_de" rows="3"><?= forma_h($l['text_de']) ?></textarea></label><label>Kurzbeschreibung (Englisch)<textarea name="text_en" rows="3"><?= forma_h($l['text_en']) ?></textarea></label></div>
+            <div class="g2"><label>Titel (Deutsch)<input name="title_de" value="<?= forma_h($l['title_de']) ?>" required></label><?php if (!$deOnly): ?><label>Titel (Englisch)<input name="title_en" value="<?= forma_h($l['title_en']) ?>"></label><?php endif; ?></div>
+            <div class="g2"><label>Kurzbeschreibung (Deutsch)<textarea name="text_de" rows="3"><?= forma_h($l['text_de']) ?></textarea></label><?php if (!$deOnly): ?><label>Kurzbeschreibung (Englisch)<textarea name="text_en" rows="3"><?= forma_h($l['text_en']) ?></textarea></label><?php endif; ?></div>
             <div class="g3"><label>Art<select name="cat"><?= $catOpt($l['cat']) ?></select></label><label>Energie<select name="energy"><?= $enOpt($l['energy']) ?></select></label><label>Minuten<input name="minutes" type="number" min="0" max="240" value="<?= (int)$l['minutes'] ?>"></label></div>
             <div class="g3"><label>Reihenfolge<input name="sort" type="number" value="<?= (int)$l['sort'] ?>"></label><label>Erscheint am <span class="small muted">(leer = mit dem Programm)</span><input type="date" name="unlock" value="<?= forma_h((string)$l['unlock']) ?>"></label><label class="inl"><input type="checkbox" name="visible" value="1" <?= $l['visible'] ? 'checked' : '' ?>> sichtbar für Mitglieder</label></div>
             <details class="more" <?= ($l['script_de'] . $l['script_en']) !== '' ? 'open' : '' ?>><summary>Sprechtext für Voice-over / Teleprompter</summary>
                 <p class="small muted">Zeitmarken wie „0:45“ am Zeilenanfang werden im Teleprompter hervorgehoben, [Hinweise in eckigen Klammern] erscheinen klein.</p>
-                <div class="g2"><label>Deutsch<textarea class="script" name="script_de"><?= forma_h($l['script_de']) ?></textarea></label><label>Englisch<textarea class="script" name="script_en"><?= forma_h($l['script_en']) ?></textarea></label></div>
-                <?php if ($l['id']): ?><p class="acts"><a class="btn btn-ghost btn-sm" target="_blank" href="<?= forma_h($self) ?>?view=method&amp;prompter=<?= (int)$l['id'] ?>&amp;lang=de">Teleprompter Deutsch</a> <a class="btn btn-ghost btn-sm" target="_blank" href="<?= forma_h($self) ?>?view=method&amp;prompter=<?= (int)$l['id'] ?>&amp;lang=en">Teleprompter Englisch</a></p><?php endif; ?>
+                <div class="g2"><label>Deutsch<textarea class="script" name="script_de"><?= forma_h($l['script_de']) ?></textarea></label><?php if (!$deOnly): ?><label>Englisch<textarea class="script" name="script_en"><?= forma_h($l['script_en']) ?></textarea></label><?php endif; ?></div>
+                <?php if ($l['id']): ?><p class="acts"><a class="btn btn-ghost btn-sm" target="_blank" href="<?= forma_h($self) ?>?view=method&amp;prompter=<?= (int)$l['id'] ?>&amp;lang=de">Teleprompter Deutsch</a> <?php if (!$deOnly): ?><a class="btn btn-ghost btn-sm" target="_blank" href="<?= forma_h($self) ?>?view=method&amp;prompter=<?= (int)$l['id'] ?>&amp;lang=en">Teleprompter Englisch</a><?php endif; ?></p><?php endif; ?>
             </details>
             <button class="btn" type="submit">Speichern</button>
         </form>
@@ -574,11 +576,11 @@ label.inl{display:flex;gap:8px;align-items:center}
             <p>Start <?= forma_h(date('d.m.Y', mv_ts($c['u_start']))) ?> · Ende <?= forma_h(date('d.m.Y', mv_unfold_end())) ?> · <?= $uTaken ?> von <?= (int)$c['u_seats'] ?> Plätzen belegt · <?= $c['u_open'] ? 'buchbar' : 'gerade nicht buchbar' ?></p>
             <?php $cfgRaw = mm_cfg('method') ?? []; ?>
             <?php if (!empty($cfgRaw['u_room_de'])): ?>
-                <p class="small">Videoräume: <a href="<?= forma_h((string)($cfgRaw['u_host_de'] ?? $cfgRaw['u_room_de'])) ?>" target="_blank">Deutsch als Gastgeberin öffnen</a> · <a href="<?= forma_h((string)($cfgRaw['u_host_en'] ?? $cfgRaw['u_room_en'])) ?>" target="_blank">Englisch als Gastgeberin öffnen</a></p>
+                <p class="small">Videoraum: <a href="<?= forma_h((string)($cfgRaw['u_host_de'] ?? $cfgRaw['u_room_de'])) ?>" target="_blank">als Gastgeberin öffnen</a></p>
                 <p class="small muted">Die Teilnehmerinnen kommen über den Knopf „Zum Call“ in ihrem Mitgliederbereich hinein (ab einem Tag vor dem Start sichtbar).</p>
             <?php else: ?>
-                <form method="post"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_rooms"><button class="btn btn-sm" type="submit">Videoräume für die Calls anlegen</button></form>
-                <p class="small muted">Ein Raum für Deutsch, einer für Englisch, gleicher Link für alle Wochen.</p>
+                <form method="post"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_rooms"><button class="btn btn-sm" type="submit">Videoraum für die Calls anlegen</button></form>
+                <p class="small muted">Ein Raum, gleicher Link für alle Wochen. Unfold gibt es nur auf Deutsch.</p>
             <?php endif; ?>
         </div>
 
@@ -597,7 +599,7 @@ label.inl{display:flex;gap:8px;align-items:center}
             <div class="g3"><label>Early-Bird auf einmal €<input name="eb_u_once" value="<?= $eu($raw['eb_u_once']) ?>"></label><label>Early-Bird Rate (3 ×) €<input name="eb_u_inst" value="<?= $eu($raw['eb_u_inst']) ?>"></label><label>Early-Bird bis einschließlich<input type="date" name="eb_u_until" value="<?= forma_h($raw['eb_u_until']) ?>"></label></div>
             <div class="g3"><label>danach auf einmal €<input name="u_once" value="<?= $eu($raw['u_once']) ?>"></label><label>danach Rate (3 ×) €<input name="u_inst" value="<?= $eu($raw['u_inst']) ?>"></label><label>Info-Gathering €<input name="g_u_once" value="<?= $eu($raw['g_u_once']) ?>"></label></div>
             <div class="g3"><label>Start<input type="date" name="u_start" value="<?= forma_h($c['u_start']) ?>"></label><label>Ende<input type="date" name="u_end" value="<?= forma_h($c['u_end']) ?>"></label><label>Plätze<input type="number" name="u_seats" min="1" max="40" value="<?= (int)$c['u_seats'] ?>"></label></div>
-            <div class="g2"><label>Call Deutsch<input name="u_call_de" value="<?= forma_h($c['u_call_de']) ?>"></label><label>Call Englisch<input name="u_call_en" value="<?= forma_h($c['u_call_en']) ?>"></label></div>
+            <label>Live-Call (nur Deutsch)<input name="u_call_de" value="<?= forma_h($c['u_call_de']) ?>"></label><input type="hidden" name="u_call_en" value="<?= forma_h($c['u_call_en']) ?>">
             <label class="inl"><input type="checkbox" name="u_open" value="1" <?= $c['u_open'] ? 'checked' : '' ?>> Unfold ist buchbar</label>
             <button class="btn" type="submit">Speichern</button>
         </form>

@@ -49,7 +49,7 @@ if ($room && $room['host']) {
     $pc = natal_prompter_cfg();
     $defs = natal_script_defaults();
     $scripts = [];
-    foreach (NATAL_SCRIPT_TITLES as $sk => $st) $scripts[$sk] = ['title' => $st, 'text' => (string)($pc['texts'][$sk] ?? $defs[$sk] ?? ''), 'def' => (string)($defs[$sk] ?? ''), 'own' => isset($pc['texts'][$sk])];
+    foreach (NATAL_SCRIPT_TITLES as $sk => $st) if (!str_ends_with($sk, '_en')) $scripts[$sk] = ['title' => $st, 'text' => (string)($pc['texts'][$sk] ?? $defs[$sk] ?? ''), 'def' => (string)($defs[$sk] ?? ''), 'own' => isset($pc['texts'][$sk])];
     $prompter = ['scripts' => $scripts, 'key' => natal_script_key($pdo, $room), 'speed' => $pc['speed'], 'size' => $pc['size'], 'name' => $first];
 }
 // Kleine Nachrichten für die Wartezeit, im Wechsel: Tipp, Affirmation, Baby (Vivien, 23.10.2026)

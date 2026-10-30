@@ -13,8 +13,8 @@ if ($view === 'videos' && isset($_GET['play'])) {
     require_once dirname(__DIR__) . '/api/method-lib.php';
     mv_schema($pdo);
     $l = mv_lesson($pdo, (int)$_GET['play']);
-    $lg = ($_GET['lang'] ?? '') === 'en' ? 'en' : 'de';
     if (!$l) go($self . '?view=videos', 'Video nicht gefunden.');
+    $lg = ($_GET['lang'] ?? '') === 'en' && !mv_lesson_de_only($pdo, $l) ? 'en' : 'de';
     $fd = mv_flow_data($l, $lg, true);
     $st = mv_lesson_status($pdo, $l);
     render_page('Vorschau · ' . $l['title_de'], function () use ($self, $l, $lg, $fd, $st) {
@@ -33,7 +33,7 @@ body{background:#F2ECE4}main{max-width:900px}
 </style>
 <?php mm_subnav('videos'); ?>
 <div class="pv-h"><a href="<?= $h($self) ?>?view=videos#v<?= $id ?>">← zurück zu „Videos hochladen“</a>
-  <span class="pv-l"><a href="?view=videos&amp;play=<?= $id ?>&amp;lang=de"<?= $lg === 'de' ? ' class="on"' : '' ?>>Deutsch</a><a href="?view=videos&amp;play=<?= $id ?>&amp;lang=en"<?= $lg === 'en' ? ' class="on"' : '' ?>>Englisch</a></span></div>
+  <?php if (empty($st['deonly'])): ?><span class="pv-l"><a href="?view=videos&amp;play=<?= $id ?>&amp;lang=de"<?= $lg === 'de' ? ' class="on"' : '' ?>>Deutsch</a><a href="?view=videos&amp;play=<?= $id ?>&amp;lang=en"<?= $lg === 'en' ? ' class="on"' : '' ?>>Englisch</a></span><?php endif; ?></div>
 <h1 class="pv-t"><?= $h(mv_t($l, 'title', $lg)) ?></h1>
 <p class="pv-n">👁 So sieht es die Teilnehmerin im Mitgliederbereich. Nur hier in der Vorschau kannst du mit „Überspringen“ weiterklicken, die Teilnehmerinnen nicht.
 <?php if ($fd && !$st['done']): ?> Noch nicht alles da: Wo ein Clip fehlt, steht „Clip folgt“, wo dein Voice-over fehlt, steht oben im Bild ein kleiner Hinweis. Den Sprechtext sehen Teilnehmerinnen nie.<?php endif; ?></p>
@@ -74,18 +74,21 @@ if ($view === 'videos') {
         $u = fn(string $q) => $h($self) . '?' . $q;
         $mmss = fn(int $s) => intdiv($s, 60) . ':' . str_pad((string)($s % 60), 2, '0', STR_PAD_LEFT);
         $stText = function (array $s, array $l): string {
-            if ($s['n'] === 0) return ($l['video_de'] !== '' ? 'Deutsch ✓' : 'Deutsch fehlt') . ' · ' . ($l['video_en'] !== '' ? 'Englisch ✓' : 'Englisch fehlt');
-            return 'Clips ' . $s['clips'] . '/' . $s['n'] . ($s['flow'] ? ' · Deutsch ' . $s['de'] . '/' . $s['n'] . ' · Englisch ' . $s['en'] . '/' . $s['n'] : '');
+            $do = !empty($s['deonly']);
+            if ($s['n'] === 0) return ($l['video_de'] !== '' ? 'Deutsch ✓' : 'Deutsch fehlt') . ($do ? ' · nur Deutsch' : ' · ' . ($l['video_en'] !== '' ? 'Englisch ✓' : 'Englisch fehlt'));
+            return 'Clips ' . $s['clips'] . '/' . $s['n'] . ($s['flow'] ? ' · Deutsch ' . $s['de'] . '/' . $s['n'] . ($do ? '' : ' · Englisch ' . $s['en'] . '/' . $s['n']) : '');
         };
 
         $card = function (array $x, bool $isOpen) use ($h, $dd, $today, $bunny, $u, $pdo, $usage, $vcount, $mmss, $stText): void {
             $l = $x['l']; $id = (int)$l['id']; $s = $x['s'];
+            $deOnly = !empty($s['deonly']); // Unfold, Prä-/Postnatal: nur Deutsch (Vivien, 30.10.2026)
+            $LANGS = $deOnly ? ['de' => 'Deutsch'] : ['de' => 'Deutsch', 'en' => 'Englisch'];
             $clips = mv_lesson_is_clips($l);
             $flow = $clips && mv_lesson_mode($l) === 'flow';
             $fin = $s['done'];
             $late = !$fin && (string)$l['due'] !== '' && $l['due'] < $today;
             $kind = !$clips ? 'Talking Head' . (['breath' => ' · Breathwork', 'meditation' => ' · Meditation'][$l['cat']] ?? '') : ($flow ? 'Flow · mit Voice-over' : 'Bewegungsvideo · 30/45 Sek.'); ?>
-  <details class="vc<?= $fin ? ' fin' : '' ?><?= $late ? ' late' : '' ?>" id="v<?= $id ?>" data-aud="<?= $h($x['aud']) ?>"<?= $isOpen ? ' open' : '' ?>>
+  <details class="vc<?= $fin ? ' fin' : '' ?><?= $late ? ' late' : '' ?>" id="v<?= $id ?>" data-aud="<?= $h($x['aud']) ?>"<?= $deOnly ? ' data-deonly="1"' : '' ?><?= $isOpen ? ' open' : '' ?>>
     <summary>
       <span class="kind <?= !$clips ? 'k-talk' : ($flow ? 'k-flow' : 'k-move') ?>" data-kind="<?= $id ?>"><?= $kind ?></span>
       <span class="ttl"><?= $h($l['title_de']) ?></span>
@@ -102,13 +105,13 @@ if ($view === 'videos') {
         <a class="see" href="<?= $u('view=videos&play=' . $id) ?>">👁 So sieht es die Teilnehmerin</a>
       </div>
     <?php if ($clips): $rows = mv_lesson_clip_rows($pdo, $l); ?>
-      <p class="how" data-how-flow<?= $flow ? '' : ' hidden' ?>><b>So geht's:</b> 1. Jede Übung kurz filmen und bei <b>„Clip“</b> hochladen. 2. Danach pro Übung auf <b>„Deutsch einsprechen“</b> und <b>„Englisch einsprechen“</b> tippen. Der Text steht dabei groß da, dein Clip läuft daneben. Jede Übung läuft bei den Frauen so lange wie unten angegeben (meist 2 Minuten).</p>
+      <p class="how" data-how-flow<?= $flow ? '' : ' hidden' ?>><b>So geht's:</b> 1. Jede Übung kurz filmen und bei <b>„Clip“</b> hochladen. 2. Danach pro Übung auf <b>„Deutsch einsprechen“</b><?= $deOnly ? '' : ' und <b>„Englisch einsprechen“</b>' ?> tippen. Der Text steht dabei groß da, dein Clip läuft daneben. Jede Übung läuft bei den Frauen so lange wie unten angegeben (meist 2 Minuten).</p>
       <p class="how" data-how-move<?= $flow ? ' hidden' : '' ?>><b>So geht's:</b> Jede Übung kurz filmen (10 Sekunden bis 1 Minute) und bei <b>„Clip“</b> hochladen. Kein Sprechen. Die Frauen wählen 30 oder 45 Sekunden pro Übung. Deine Voice-overs werden hier nicht abgespielt. Tippst du oben auf „Flow“, wird daraus ein Flow mit deiner Stimme, und jede Übung, die du schon in einem anderen Flow eingesprochen hast, ist dann sofort fertig.</p>
       <ol class="exl">
       <?php foreach (mv_lesson_steps($l) as $i => $e): $c = $rows[$i]; $g = (string)$c['guid']; $used = count($usage[$c['ckey']] ?? []);
           $vd = mv_voice_url($id, $i, 'de'); $ve = mv_voice_url($id, $i, 'en'); ?>
         <li class="ex" data-id="<?= $id ?>" data-i="<?= $i ?>" data-c="<?= (int)$c['id'] ?>" data-name="<?= $h($e['de']) ?>" data-name-en="<?= $h($e['en']) ?>" data-sec="<?= (int)$e['sec'] ?>" data-view="<?= $g !== '' && mv_bunny()['lib'] !== '' ? $h(mv_embed($g) . '&autoplay=true&loop=true&muted=true') : '' ?>">
-          <div class="exh"><span class="n"><b><?= $i + 1 ?>.</b> <?= $h($e['de']) ?><?php if ($e['en'] !== $e['de']): ?> <small><?= $h($e['en']) ?></small><?php endif; ?></span>
+          <div class="exh"><span class="n"><b><?= $i + 1 ?>.</b> <?= $h($e['de']) ?><?php if (!$deOnly && $e['en'] !== $e['de']): ?> <small><?= $h($e['en']) ?></small><?php endif; ?></span>
             <label class="dur" data-flow-only<?= $flow ? '' : ' hidden' ?>>Dauer <select data-secsel><?php foreach ([30, 45, 60, 90, 120, 150, 180, 240, 300, 360, 480, 600] as $o): ?><option value="<?= $o ?>"<?= $o === (int)$e['sec'] ? ' selected' : '' ?>><?= $mmss($o) ?> Min.</option><?php endforeach; ?><?php if (!in_array((int)$e['sec'], [30, 45, 60, 90, 120, 150, 180, 240, 300, 360, 480, 600], true)): ?><option value="<?= (int)$e['sec'] ?>" selected><?= $mmss((int)$e['sec']) ?> Min.</option><?php endif; ?></select></label></div>
           <textarea hidden data-tde><?= $h($e['tde']) ?></textarea><textarea hidden data-ten><?= $h($e['ten']) ?></textarea>
           <div class="cols">
@@ -119,7 +122,7 @@ if ($view === 'videos') {
               <a class="up again" style="text-decoration:none" href="<?= $u('view=studio&c=' . (int)$c['id']) ?>">🧘 Im Studio filmen</a>
               <span class="bar" hidden><i></i></span>
             </div>
-            <?php foreach (['de' => [$vd, 'Deutsch'], 'en' => [$ve, 'Englisch']] as $vg => [$vu, $vn]): $own = (bool)glob(mv_voice_dir() . '/L' . $id . '-' . $i . '-' . $vg . '.*'); $nt = (int)($vcount[$c['ckey']][$vg] ?? 0); ?>
+            <?php foreach (array_intersect_key(['de' => [$vd, 'Deutsch'], 'en' => [$ve, 'Englisch']], $LANGS) as $vg => [$vu, $vn]): $own = (bool)glob(mv_voice_dir() . '/L' . $id . '-' . $i . '-' . $vg . '.*'); $nt = (int)($vcount[$c['ckey']][$vg] ?? 0); ?>
             <div class="cell voice<?= $vu ? ' ok' : '' ?>" data-flow-only data-g="<?= $vg ?>" data-takes="<?= $nt ?>"<?= $flow ? '' : ' hidden' ?>>
               <span class="lab">🎙 <?= $vn ?></span>
               <span class="msg"><?= $vu ? ($own ? '✓ eingesprochen' : '✓ aus deiner Bibliothek') : ($nt ? 'fehlt · ♻ ' . $nt . ' gespeicherte Aufnahme' . ($nt > 1 ? 'n' : '') : 'fehlt noch') ?></span>
@@ -134,11 +137,11 @@ if ($view === 'videos') {
     <?php else: ?>
       <div class="steps">
         <div class="step"><span class="no">1</span><div><b>Im Studio aufnehmen</b><p>Du sprichst einmal am Stück in die Kamera, der Text läuft oben im Bild mit. Mit Kamera-Look und Hilfe für deine Position, danach direkt hier hochladen.</p>
-          <p class="btns"><a class="see" href="<?= $u('view=studio&l=' . $id . '&lang=de') ?>">🎥 Im Studio aufnehmen · Deutsch</a><a class="see" href="<?= $u('view=studio&l=' . $id . '&lang=en') ?>">🎥 Im Studio aufnehmen · Englisch</a></p>
-          <p class="btns" style="margin-top:4px!important"><span style="font-size:16px;color:#7D7076;align-self:center">Oder nur der Text, z. B. fürs Handy:</span><?php if (trim((string)$l['script_de']) !== ''): ?><a class="tp" href="<?= $u('view=method&lang=de&prompter=' . $id) ?>" target="_blank" rel="noopener">Teleprompter Deutsch</a><?php endif; ?><?php if (trim((string)$l['script_en']) !== ''): ?><a class="tp" href="<?= $u('view=method&lang=en&prompter=' . $id) ?>" target="_blank" rel="noopener">Teleprompter Englisch</a><?php endif; ?></p></div></div>
-        <div class="step"><span class="no">2</span><div><b>Oder ein fertiges Video hochladen</b><p>Wenn du woanders aufgenommen hast: einmal auf Deutsch und einmal auf Englisch. Schneiden musst du nichts.</p>
+          <p class="btns"><a class="see" href="<?= $u('view=studio&l=' . $id . '&lang=de') ?>">🎥 Im Studio aufnehmen<?= $deOnly ? '' : ' · Deutsch' ?></a><?php if (!$deOnly): ?><a class="see" href="<?= $u('view=studio&l=' . $id . '&lang=en') ?>">🎥 Im Studio aufnehmen · Englisch</a><?php endif; ?></p>
+          <p class="btns" style="margin-top:4px!important"><span style="font-size:16px;color:#7D7076;align-self:center">Oder nur der Text, z. B. fürs Handy:</span><?php if (trim((string)$l['script_de']) !== ''): ?><a class="tp" href="<?= $u('view=method&lang=de&prompter=' . $id) ?>" target="_blank" rel="noopener">Teleprompter Deutsch</a><?php endif; ?><?php if (!$deOnly && trim((string)$l['script_en']) !== ''): ?><a class="tp" href="<?= $u('view=method&lang=en&prompter=' . $id) ?>" target="_blank" rel="noopener">Teleprompter Englisch</a><?php endif; ?></p></div></div>
+        <div class="step"><span class="no">2</span><div><b>Oder ein fertiges Video hochladen</b><p>Wenn du woanders aufgenommen hast: <?= $deOnly ? 'einfach auf Deutsch' : 'einmal auf Deutsch und einmal auf Englisch' ?>. Schneiden musst du nichts.</p>
           <div class="two">
-          <?php foreach (['de' => 'Deutsch', 'en' => 'Englisch'] as $lg => $ln): $g = (string)$l['video_' . $lg]; ?>
+          <?php foreach ($LANGS as $lg => $ln): $g = (string)$l['video_' . $lg]; ?>
             <div class="vbox" data-id="<?= $id ?>" data-lang="<?= $lg ?>">
               <span class="msg <?= $g ? 'ok' : '' ?>"><?= $g ? '✓ ' . $ln . ' ist hochgeladen' : $ln . ': noch kein Video' ?></span>
               <?php if ($bunny): ?><label class="up<?= $g ? ' again' : '' ?>"><input type="file" accept="video/*" class="vfile"><span><?= $g ? 'Neu hochladen' : '📹 ' . $ln . ' hochladen' ?></span></label><?php endif; ?>
@@ -239,7 +242,7 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
 .rm-lvl{height:10px;border-radius:9px;background:#EADFDE;overflow:hidden;max-width:320px}.rm-lvl i{display:block;height:100%;width:0;background:#7D5E68}
 </style>
 <?php mm_subnav('videos'); ?>
-<section class="vh"><h1>🎬 Videos hochladen</h1><p>Oben steht immer, was als Nächstes dran ist. Tipp auf ein Video, dann siehst du jede Übung mit „Clip“, „Deutsch einsprechen“ und „Englisch einsprechen“. Eine Übung, die du einmal gefilmt hast, steckt automatisch in allen Videos mit dieser Übung.</p>
+<section class="vh"><h1>🎬 Videos hochladen</h1><p>Oben steht immer, was als Nächstes dran ist. Tipp auf ein Video, dann siehst du jede Übung mit „Clip“, „Deutsch einsprechen“ und bei The Method zusätzlich „Englisch einsprechen“. Unfold und Prä- &amp; Postnatal gibt es nur noch auf Deutsch. Eine Übung, die du einmal gefilmt hast, steckt automatisch in allen Videos mit dieser Übung.</p>
 </section>
 <?php if ($flash): ?><p class="alert"><?= $h($flash) ?></p><?php endif; ?>
 <?php if (!$bunny): ?><p class="warn">Bevor du Clips hochladen kannst, muss einmal Bunny verbunden werden: <a href="<?= $u('view=method') ?>#bunny">hier verbinden</a>. Einsprechen geht schon jetzt.</p><?php endif; ?>
@@ -295,7 +298,7 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
   const sd=document.getElementById('sd');if(sd)sd.addEventListener('click',()=>{const d=document.getElementById('donel');d.hidden=!d.hidden;sd.textContent=d.hidden?sd.textContent.replace('ausblenden','anzeigen'):sd.textContent.replace('anzeigen','ausblenden')});
   if(location.hash.match(/^#v\d+$/)){const c=document.querySelector(location.hash);if(c){c.open=true;if(c.closest('#donel'))c.closest('#donel').hidden=false;setTimeout(()=>c.scrollIntoView({block:'start'}),50)}}
   document.querySelectorAll('[data-due]').forEach(inp=>inp.addEventListener('change',()=>post('mm_mv_due',{id:inp.dataset.due,due:inp.value})));
-  function status(id,s){const el=document.querySelector('[data-st="'+id+'"]');if(!el||!s)return;el.textContent='Clips '+s.clips+'/'+s.n+(s.flow?' · Deutsch '+s.de+'/'+s.n+' · Englisch '+s.en+'/'+s.n:'');
+  function status(id,s){const el=document.querySelector('[data-st="'+id+'"]');if(!el||!s)return;el.textContent='Clips '+s.clips+'/'+s.n+(s.flow?' · Deutsch '+s.de+'/'+s.n+(s.deonly?'':' · Englisch '+s.en+'/'+s.n):'');
     const c=document.getElementById('v'+id);if(c&&s.done){c.classList.add('fin');c.classList.remove('late')}}
   // Flow oder Bewegungsvideo
   document.querySelectorAll('[data-mode]').forEach(g=>g.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{const id=g.dataset.mode,m=b.dataset.m;
