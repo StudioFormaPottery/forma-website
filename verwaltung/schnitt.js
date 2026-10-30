@@ -53,15 +53,6 @@
 .sn-pv .empty b{font-family:"Cormorant Garamond",Georgia,serif;font-size:30px;font-weight:500;color:#fff}
 .sn-pv .tag{position:absolute;left:12px;top:12px;padding:4px 10px;border-radius:999px;background:rgba(46,37,41,.7);color:#fff;font-size:14px;z-index:2}
 .sn-tl{margin-top:10px}
-.sn-scrub{position:relative;height:46px}
-.sn-scrub .bar{position:absolute;top:17px;height:12px;border-radius:9px;background:#EADFDE;left:0;right:0;overflow:hidden;display:flex}
-.sn-scrub .bar i{display:block;height:100%;border-right:2px solid #F2ECE4}
-.sn-scrub .bar i.sel{background:#B9A2AC}
-.sn-scrub input{position:absolute;inset:0;width:100%;height:46px;margin:0;padding:0;background:transparent;-webkit-appearance:none;appearance:none;cursor:pointer}
-.sn-scrub input::-webkit-slider-runnable-track{background:transparent;height:46px}
-.sn-scrub input::-moz-range-track{background:transparent}
-.sn-scrub input::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;margin-top:10px;border-radius:50%;background:#4A3A41;border:3px solid #fff;box-shadow:0 1px 4px rgba(46,37,41,.4)}
-.sn-scrub input::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#4A3A41;border:3px solid #fff}
 .sn-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
 .sn-row .t{font-size:17px;color:#4A3A41;font-variant-numeric:tabular-nums;margin-right:auto}
 .sn-b{font:inherit;font-size:17px;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:9px 16px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer;text-decoration:none}
@@ -87,10 +78,33 @@
 .sn-ed{background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:18px;padding:12px 14px;margin-top:4px}
 .sn-ed .h{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between}
 .sn-ed .h b{font-weight:500;font-size:17px;color:#4A3A41}.sn-ed .h span{color:#7D7076;font-size:15px}
-.sn-ed .cut{position:relative;height:40px;margin-top:8px}
-.sn-ed .cut .bg{position:absolute;top:14px;left:0;right:0;height:12px;border-radius:9px;background:#EADFDE}
-.sn-ed .cut .in{position:absolute;top:14px;height:12px;border-radius:9px;background:#7D5E68}
-.sn-ed .cut .ph{position:absolute;top:8px;width:3px;height:24px;background:#2E2529;border-radius:2px;transform:translateX(-1px)}
+.sn-zt{position:relative;margin-top:10px;border-radius:16px;background:#fff;border:1.5px solid #E6DCD2;overflow:hidden}
+.sn-zt-sc{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;overscroll-behavior-x:contain;touch-action:pan-x pinch-zoom;cursor:crosshair}
+.sn-zt-in{position:relative;height:104px;min-width:100%;user-select:none;-webkit-user-select:none;touch-action:pan-x}
+.sn-zt-tt{position:absolute;left:0;right:0;top:0;height:20px}
+.sn-zt-blocks{position:absolute;left:0;right:0;top:20px;bottom:0}
+.sn-zt-bl{position:absolute;top:6px;bottom:8px;border-radius:10px;background:linear-gradient(#EFE3E6,#E3D4D9);border:1.5px solid #CBB6BE;overflow:hidden;cursor:pointer}
+.sn-zt-bl.on{border-color:#7D5E68;background:linear-gradient(#E7D7DC,#D8C2CA);box-shadow:0 0 0 2px rgba(125,94,104,.35)}
+.sn-zt-bl .lb{position:absolute;left:7px;top:5px;right:7px;font-size:12.5px;color:#4A3A41;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.sn-zt-bl .ln{position:absolute;left:7px;bottom:5px;font-size:12px;color:#6E6168;font-variant-numeric:tabular-nums;pointer-events:none}
+.sn-zt-bl.mu .lb::after{content:" 🔇"}
+.sn-zt-cut{position:absolute;top:6px;bottom:8px;width:16px;margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#8C2C1D;background:rgba(140,44,29,.10);border-left:1.5px dashed #C08C82;border-right:1.5px dashed #C08C82;border-radius:4px;pointer-events:none;z-index:1}
+.sn-zt-h{position:absolute;top:6px;bottom:8px;width:16px;border-radius:8px;background:#7D5E68;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:ew-resize;touch-action:none;box-shadow:0 1px 4px rgba(46,37,41,.35);z-index:2}
+.sn-zt-h.a{border-top-right-radius:2px;border-bottom-right-radius:2px}
+.sn-zt-h.b{border-top-left-radius:2px;border-bottom-left-radius:2px;margin-left:-16px}
+.sn-zt-h.off{background:#B9A2AC}
+.sn-zt-tk{position:absolute;top:0;bottom:0;width:1px;background:#EADFDE}
+.sn-zt-tk.big{background:#D3C4CB}
+.sn-zt-tk span{position:absolute;top:4px;left:4px;font-size:11px;color:#9A8C93;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sn-zt-ph{position:absolute;top:0;bottom:0;width:2px;background:#2E2529;transform:translateX(-1px);z-index:3;pointer-events:none}
+.sn-zt-ph::before{content:"";position:absolute;top:0;left:-8px;border:9px solid transparent;border-top:12px solid #2E2529;border-bottom:0}
+.sn-zt-ph::after{content:"";position:absolute;bottom:0;left:-7px;width:16px;height:16px;border-radius:50%;background:#2E2529}
+.sn-zt-bar{display:flex;align-items:center;gap:8px;padding:6px 8px;border-top:1.5px solid #EFE7DE;background:#FBF8F4;flex-wrap:wrap}
+.sn-zt-bar .t{font-size:16px;color:#4A3A41;font-variant-numeric:tabular-nums;margin-left:auto}
+.sn-zt-bar input[type=range]{flex:1;min-width:90px;max-width:220px;accent-color:#7D5E68}
+.sn-zt-bar .zb{font:inherit;font-size:18px;width:36px;height:36px;border-radius:50%;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer}
+.sn-zt-hint{font-size:14px;color:#7D7076;margin:6px 2px 0;line-height:1.45}
+@media(max-width:980px){.sn-zt-in{height:92px}.sn-zt-hint{font-size:13px}}
 .sn-r{display:flex;flex-direction:column;gap:14px;min-width:0}
 .sn-box{background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:22px;padding:14px 16px}
 .sn-box summary{cursor:pointer;font-weight:500;font-size:19px;color:#4A3A41;list-style:none;display:flex;justify-content:space-between;align-items:center}
@@ -154,10 +168,14 @@ void main(){
     root.innerHTML = `<div class="sn-l">
   <div class="sn-pv" id="snpv"><div class="empty" id="snempty"><b>Noch keine Clips</b>Tipp unten auf „＋ Clips“ und wähl Videos vom iPhone oder Computer, oder nimm im Studio auf.</div><button type="button" class="big" data-k="big" hidden aria-label="Abspielen">▶</button><span class="tag" data-k="tag"></span></div>
   <div class="sn-tl">
-    <div class="sn-scrub"><div class="bar" data-k="bar"></div><input type="range" min="0" max="1000" step="1" value="0" data-k="scrub" aria-label="Stelle im Video"></div>
-    <div class="sn-row"><span class="t" data-k="time">0:00 / 0:00</span>
+    <div class="sn-row" style="margin-top:8px"><span class="t" data-k="time">0:00 / 0:00</span>
       <button type="button" class="sn-b pl" data-k="play">▶ Abspielen</button>
       <button type="button" class="sn-b" data-k="cmp" title="Licht & Farbe kurz ausschalten">Vorher zeigen</button></div>
+    <div class="sn-zt">
+      <div class="sn-zt-sc" data-k="ztsc"><div class="sn-zt-in" data-k="ztin"><div class="sn-zt-tt" data-k="ztt"></div><div class="sn-zt-blocks" data-k="ztb"></div><div class="sn-zt-ph" data-k="ztph"></div></div></div>
+      <div class="sn-zt-bar"><button type="button" class="zb" data-k="zoomOut" aria-label="Zeitleiste zusammenziehen">－</button><input type="range" min="0" max="100" step="1" value="0" data-k="zoomR" aria-label="Zeitleiste auseinanderziehen"><button type="button" class="zb" data-k="zoomIn" aria-label="Zeitleiste auseinanderziehen">＋</button><span class="t" data-k="ztime">0:00,0</span></div>
+    </div>
+    <p class="sn-zt-hint" data-k="zthint">Tippen = Stelle anspringen · die Griffe <b>⟦ ⟧</b> an den Rändern ziehen = Anfang und Ende länger oder kürzer machen · zwei Finger auseinander (oder ＋) = Zeitleiste auseinanderziehen</p>
   </div>
   <h2 style="margin-top:16px">Deine Clips <span style="font-size:16px;color:#7D7076;font-family:'Hanken Grotesk',sans-serif;font-weight:400" data-k="cnt"></span></h2>
   <div class="sn-clips" data-k="clips"></div>
@@ -168,7 +186,6 @@ void main(){
   </div>
   <div class="sn-ed" data-k="ed" hidden>
     <div class="h"><b data-k="edT"></b><span data-k="edD"></span></div>
-    <div class="cut"><div class="bg"></div><div class="in" data-k="edIn"></div><div class="ph" data-k="edPh"></div></div>
     <div class="sn-row">
       <button type="button" class="sn-b sm" data-k="setA">⟦ Anfang hier</button>
       <button type="button" class="sn-b sm" data-k="setB">Ende hier ⟧</button>
@@ -201,10 +218,11 @@ void main(){
 </div>
 <div class="sn-r">
   <details class="sn-box auto" open><summary>✨ Automatisch schneiden</summary><div class="bd">
-    <p class="sn-note" style="color:#4A3A41">Ein Tipp, und ich schneide Pausen raus, erkenne Stellen, an denen du neu angesetzt hast, und lege einen sanften Zoom über die Abschnitte, damit es sich flüssig und lebendig anschaut.</p>
+    <p class="sn-note" style="color:#4A3A41">Ein Tipp, und ich schneide Pausen raus, nehme heraus, wo du dich erst zurechtsetzt oder neu angesetzt hast, und lege einen sanften Zoom über die Abschnitte, damit es sich flüssig und lebendig anschaut. Danach siehst du jeden Schnitt in der Zeitleiste und kannst ihn mit den Griffen länger oder kürzer ziehen.</p>
     <button type="button" class="sn-b main" data-k="auto" style="font-size:18px;min-height:52px">✨ Jetzt automatisch schneiden</button>
     <div><div style="font-size:16px;color:#4A3A41;margin-bottom:6px">Pausen rausschneiden ab</div><div class="sn-chips" data-k="pauses"></div></div>
     <label class="sn-sw"><input type="checkbox" data-k="stumbles"> Versprecher erkennen (wenn du neu ansetzt)</label>
+    <label class="sn-sw"><input type="checkbox" data-k="noisefx"> Stellen ohne Sprechen rausnehmen (in Position gehen, rascheln)</label>
     <label class="sn-sw"><input type="checkbox" data-k="zoomfx"> Sanfter Zoom hinein und heraus</label>
     <div class="sn-auto-res" data-k="autoRes" hidden></div>
     <button type="button" class="sn-b sm" data-k="undo" hidden>↩ Automatischen Schnitt rückgängig</button>
@@ -229,14 +247,14 @@ void main(){
   <p class="sn-note">Deine Clips bleiben auf diesem Gerät gespeichert (auch nach dem Schließen), bis du sie hier löschst. Die Vorschau zeigt alles so, wie es nachher gespeichert wird.</p>
 </div>`;
     const q = s => root.querySelector(s), K = k => root.querySelector('[data-k="' + k + '"]');
-    const pv = q('#snpv'), msg = K('msg'), big = K('big'), scrub = K('scrub');
+    const pv = q('#snpv'), msg = K('msg'), big = K('big');
     const say = (t, c) => { msg.className = 'sn-msg' + (c ? ' ' + c : ''); msg.textContent = t; };
 
     // ---- Zustand ----
     let clips = [], sel = -1, closed = false, busy = false;
     const st = Object.assign({ look: 'natur', br: 1, ct: 1, sa: 1, se: 0, fmt: 'orig' }, ls.get('sn-st', {}));
     const mus = Object.assign({ vol: .18, voice: 1, duck: true, fade: true }, ls.get('sn-mus', {}));
-    const auto = Object.assign({ pause: .7, stumbles: true, zoom: true }, ls.get('sn-auto', {}));
+    const auto = Object.assign({ pause: .7, stumbles: true, zoom: true, noise: true }, ls.get('sn-auto', {}));
     let mfile = null;
     const vids = new Map(); // Quelldatei (url) → <video>, von allen Clips/Abschnitten aus dieser Datei geteilt
     function vidFor(c) {
@@ -306,7 +324,7 @@ void main(){
       const off = Math.max(0, v.currentTime - (c.in || 0)); pos = starts()[sel] + off; timeUi();
       if (c.zoom) v.style.transform = 'scale(' + zAt(c, off).toFixed(4) + ')';
       if (v.currentTime >= (c.out || c.dur) - .04 || v.ended) {
-        if (sel < clips.length - 1) { sel++; const n = clips[sel], nv = vids.get(n.url); show(sel, 0); nv.play().catch(() => {}); renderClips(false); edUi(); }
+        if (sel < clips.length - 1) { sel++; const n = clips[sel], nv = vids.get(n.url); show(sel, 0); nv.play().catch(() => {}); renderClips(false); edUi(); ztDraw(); }
         else { stop(); pos = 0; sel = 0; show(0, 0); renderClips(false); edUi(); timeUi(); return; }
       }
       raf = requestAnimationFrame(tick);
@@ -323,11 +341,8 @@ void main(){
     function stop() { playing = false; cancelAnimationFrame(raf); const v = cur(); if (v) v.pause(); if (au) au.pause(); big.hidden = !clips.length; K('play').textContent = '▶ Abspielen'; }
     K('play').onclick = () => playing ? stop() : play(); big.onclick = play;
     K('cmp').onclick = () => { cmp = !cmp; K('cmp').textContent = cmp ? 'Nachher zeigen' : 'Vorher zeigen'; K('cmp').setAttribute('aria-pressed', String(cmp)); K('tag').textContent = cmp ? 'Vorher' : ''; const v = cur(); if (v) v.style.filter = cmp ? '' : filterCss(st); };
-    let scrubbing = false;
-    scrub.oninput = () => { scrubbing = true; if (playing) stop(); const T = total() || 1; pos = +scrub.value / 1000 * T; const L = locate(pos); if (L.i !== sel) { sel = L.i; renderClips(false); edUi(); } show(L.i, L.off); timeUi(); };
-    scrub.onchange = () => { scrubbing = false; };
-    function timeUi() { K('time').textContent = fmt(pos) + ' / ' + fmt(total()); if (!scrubbing) scrub.value = Math.round(pos / (total() || 1) * 1000); if (sel >= 0 && clips[sel]) { const c = clips[sel]; K('edPh').style.left = (Math.min(1, Math.max(0, ((cur() ? cur().currentTime : 0)) / (c.dur || 1))) * 100) + '%'; } }
-    function barUi() { const T = total() || 1; K('bar').innerHTML = clips.map((c, i) => '<i style="width:' + (len(c) / T * 100) + '%" class="' + (i === sel ? 'sel' : '') + '"></i>').join(''); }
+    function timeUi() { K('time').textContent = fmt(pos) + ' / ' + fmt(total()); if (clips.length) ztPh(); }
+    const barUi = () => { if (clips.length) ztDraw(); };
 
     // ---- Clip-Liste ----
     function renderClips(full) {
@@ -345,7 +360,7 @@ void main(){
       const c = clips[sel]; K('ed').hidden = !c; if (!c) return;
       K('edT').textContent = 'Clip ' + (sel + 1) + ' von ' + clips.length + ' · ' + c.name;
       K('edD').textContent = 'von ' + fmt1(c.in || 0) + ' bis ' + fmt1(c.out || c.dur || 0) + ' · Länge ' + fmt1(len(c));
-      const D = c.dur || 1; K('edIn').style.left = ((c.in || 0) / D * 100) + '%'; K('edIn').style.width = (len(c) / D * 100) + '%';
+      ztDraw();
       K('mute').textContent = c.mute ? '🔊 Ton an' : '🔇 Ton aus'; K('left').disabled = sel === 0; K('right').disabled = sel === clips.length - 1;
     }
     function ui() { renderClips(); edUi(); barUi(); timeUi(); if (sel >= 0 && clips[sel]) show(sel, 0, false); }
@@ -359,6 +374,95 @@ void main(){
     K('right').onclick = async () => { if (sel >= clips.length - 1) return; [clips[sel + 1], clips[sel]] = [clips[sel], clips[sel + 1]]; sel++; await saveOrder(); ui(); };
     K('mute').onclick = () => { const c = clips[sel]; if (!c) return; c.mute = !c.mute; dbPut(dbRow(c)); ui(); };
     K('delClip').onclick = async () => { const c = clips[sel]; if (!c) return; stop(); await dbDel(c.id); clips.splice(sel, 1); dropVid(c.url); if (!clips.some(x => x.url === c.url)) URL.revokeObjectURL(c.url); sel = Math.min(sel, clips.length - 1); await saveOrder(); pos = sel >= 0 ? starts()[sel] : 0; ui(); say('🗑 Clip gelöscht.'); };
+
+    // ---- Zeitleiste über das ganze Video (Vivien, 30.10.2026: „Cut, Cut, Cut sehen und mit zwei Punkten ziehen“) ----
+    // Jeder Clip ist ein Block, dazwischen die Schnittstellen. Die Griffe ⟦ ⟧ an den Rändern machen den Clip länger
+    // oder kürzer (holen also weggeschnittenes Material zurück), solange im Ausgangsvideo noch etwas übrig ist.
+    let Z = 1, ztDrag = null, pinch = null; const ZMAX = 80;
+    const ztSc = K('ztsc'), ztIn = K('ztin');
+    const basePps = () => Math.max(1, ztSc.clientWidth - 4) / Math.max(.4, total());
+    const pps = () => basePps() * Z;
+    // Wie weit lässt sich Clip i nach vorne/hinten aufziehen? (Nachbarn aus derselben Datei nicht überschreiben)
+    function room(i) {
+      const c = clips[i]; let lo = 0, hi = c.dur || 0;
+      for (let k = 0; k < clips.length; k++) { const x = clips[k]; if (k === i || x.url !== c.url) continue;
+        const xo = x.out || x.dur || 0, xi = x.in || 0;
+        if (xo <= (c.in || 0) + .001 && xo > lo) lo = xo;
+        if (xi >= (c.out || c.dur || 0) - .001 && xi < hi) hi = xi; }
+      return [lo, hi];
+    }
+    function ztDraw() {
+      const T = total(), W = Math.max(ztSc.clientWidth, Math.round(basePps() * Z * T)); ztIn.style.width = W + 'px';
+      const p = W / Math.max(.4, T), st2 = [.2, .5, 1, 2, 5, 10, 15, 30, 60, 120, 300, 600].find(x => x * p >= 64) || 900;
+      let h = ''; for (let t = 0; t <= T + 1e-6; t += st2) h += '<div class="sn-zt-tk big" style="left:' + (t * p) + 'px"><span>' + (st2 < 1 ? fmt1(t) : fmt(t)) + '</span></div>';
+      K('ztt').innerHTML = h;
+      const S = starts(); let b2 = '';
+      clips.forEach((c, i) => {
+        const x = S[i] * p, w = Math.max(3, len(c) * p), on = i === sel, r = room(i);
+        b2 += '<div class="sn-zt-bl' + (on ? ' on' : '') + (c.mute ? ' mu' : '') + '" data-bl="' + i + '" style="left:' + x + 'px;width:' + w + 'px">'
+          + (w > 54 ? '<span class="lb">' + (i + 1) + ' · ' + esc(c.name) + '</span><span class="ln">' + fmt1(len(c)) + '</span>' : '') + '</div>';
+        if (on) { const canA = (c.in || 0) - r[0] > .05, canB = r[1] - (c.out || c.dur || 0) > .05;
+          b2 += '<div class="sn-zt-h a' + (canA ? '' : ' off') + '" data-h="a" data-i="' + i + '" style="left:' + x + 'px" title="Anfang ziehen">⟦</div>'
+            + '<div class="sn-zt-h b' + (canB ? '' : ' off') + '" data-h="b" data-i="' + i + '" style="left:' + (x + w) + 'px" title="Ende ziehen">⟧</div>'; }
+        // Schnittstelle: hier wurde etwas herausgeschnitten (gleiche Datei, Lücke) oder zwei Aufnahmen stoßen aneinander
+        if (i < clips.length - 1) { const n2 = clips[i + 1];
+          const gap = n2.url === c.url ? Math.max(0, (n2.in || 0) - (c.out || c.dur || 0)) : 0;
+          b2 += '<div class="sn-zt-cut" style="left:' + (x + w) + 'px" title="' + (gap > .05 ? fmt1(gap) + ' herausgeschnitten' : 'Schnitt') + '">✂</div>'; }
+      });
+      K('ztb').innerHTML = b2;
+      K('ztb').querySelectorAll('[data-bl]').forEach(el => el.onclick = e => { if (ztDrag) return; const i = +el.dataset.bl; if (i !== sel) { stop(); sel = i; pos = starts()[sel]; show(sel, 0); renderClips(false); edUi(); } });
+      K('zoomR').value = Math.round(Math.log(Z) / Math.log(ZMAX) * 100); ztPh();
+    }
+    function ztPh() { const p = pps(); K('ztph').style.left = (pos * p) + 'px'; K('ztime').textContent = fmt1(pos) + ' / ' + fmt1(total());
+      if (!ztDrag) { const x = pos * p, l = ztSc.scrollLeft, w = ztSc.clientWidth; if (x < l + 8 || x > l + w - 8) ztSc.scrollLeft = Math.max(0, x - w * (playing ? .3 : .5)); } }
+    function setZ(z, anchorT) { // anchorT = Zeit, die beim Zoomen an Ort und Stelle bleibt
+      z = Math.max(1, Math.min(ZMAX, z)); if (anchorT == null) anchorT = pos;
+      const before = anchorT * pps() - ztSc.scrollLeft; Z = z; ztDraw(); ztSc.scrollLeft = Math.max(0, anchorT * pps() - before);
+    }
+    K('zoomIn').onclick = () => setZ(Z * 1.7); K('zoomOut').onclick = () => setZ(Z / 1.7);
+    K('zoomR').oninput = () => setZ(Math.pow(ZMAX, +K('zoomR').value / 100));
+    // Stelle im Gesamtvideo anspringen
+    let seekRaf = 0, seekT = 0;
+    function seekTo(t) {
+      const T = total(); seekT = Math.max(0, Math.min(T, t)); const L = locate(seekT);
+      if (L.i >= 0 && L.i !== sel) { sel = L.i; renderClips(false); edUi(); }
+      pos = seekT; if (seekRaf) return;
+      seekRaf = requestAnimationFrame(() => { seekRaf = 0; const L2 = locate(pos); if (L2.i >= 0) show(L2.i, L2.off); K('time').textContent = fmt(pos) + ' / ' + fmt(total()); ztPh(); });
+    }
+    const ptrs = new Map();
+    ztIn.addEventListener('pointerdown', e => {
+      if (busy || !clips.length) return; ptrs.set(e.pointerId, e.clientX);
+      if (ptrs.size === 2) { const [x1, x2] = [...ptrs.values()], r = ztIn.getBoundingClientRect(); pinch = { d: Math.abs(x1 - x2), z: Z, t: ((x1 + x2) / 2 - r.left) / pps() }; ztDrag = null; return; }
+      const hEl = e.target.closest('[data-h]'); if (playing) stop();
+      const r = ztIn.getBoundingClientRect(), x = e.clientX - r.left;
+      if (hEl) { const i = +hEl.dataset.i, c = clips[i]; ztDrag = { h: hEl.dataset.h, i, x0: e.clientX, in0: c.in || 0, out0: c.out || c.dur || 0, id: e.pointerId, moved: false }; }
+      else ztDrag = { h: 'ph', id: e.pointerId, moved: false };
+      ztIn.setPointerCapture(e.pointerId); if (ztDrag.h === 'ph') seekTo(x / pps()); e.preventDefault();
+    });
+    ztIn.addEventListener('pointermove', e => {
+      if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, e.clientX);
+      if (pinch && ptrs.size === 2) { const [x1, x2] = [...ptrs.values()], d = Math.abs(x1 - x2); if (pinch.d > 12) setZ(pinch.z * d / pinch.d, pinch.t); return; }
+      if (!ztDrag || ztDrag.id !== e.pointerId) return; ztDrag.moved = true;
+      const r = ztIn.getBoundingClientRect(), p = pps();
+      if (ztDrag.h === 'ph') { seekTo((e.clientX - r.left) / p); }
+      else {
+        const c = clips[ztDrag.i], rm = room(ztDrag.i), d = (e.clientX - ztDrag.x0) / p;
+        if (ztDrag.h === 'a') { c.in = Math.max(rm[0], Math.min(ztDrag.in0 + d, (c.out || c.dur) - .3)); ztDraw(); seekTo(starts()[ztDrag.i] + .02); }
+        else { c.out = Math.min(rm[1], Math.max(ztDrag.out0 + d, (c.in || 0) + .3)); ztDraw(); seekTo(starts()[ztDrag.i] + len(c) - .05); }
+        K('edD').textContent = 'von ' + fmt1(c.in || 0) + ' bis ' + fmt1(c.out || c.dur || 0) + ' · Länge ' + fmt1(len(c));
+      }
+      const l = ztSc.scrollLeft; if (e.clientX > ztSc.getBoundingClientRect().right - 26) ztSc.scrollLeft = l + 10; else if (e.clientX < ztSc.getBoundingClientRect().left + 26) ztSc.scrollLeft = l - 10;
+    });
+    const ztUp = async e => {
+      ptrs.delete(e.pointerId); if (pinch && ptrs.size < 2) pinch = null;
+      if (!ztDrag || ztDrag.id !== e.pointerId) return; const d = ztDrag; ztDrag = null;
+      if (d.h === 'ph' || !d.moved) return; const c = clips[d.i]; if (!c) return;
+      await dbPut(dbRow(c)); c.thumb = null; renderClips(); edUi(); barUi(); ztDraw(); thumb(c);
+      say(d.h === 'a' ? '⟦ Anfang von Clip ' + (d.i + 1) + ': ' + fmt1(c.in || 0) + (c.in < d.in0 ? ' (länger)' : ' (kürzer)') : 'Ende von Clip ' + (d.i + 1) + ': ' + fmt1(c.out) + (c.out > d.out0 ? ' (länger)' : ' (kürzer)') + ' ⟧');
+    };
+    ztIn.addEventListener('pointerup', ztUp); ztIn.addEventListener('pointercancel', ztUp);
+    ztSc.addEventListener('wheel', e => { if (e.ctrlKey || e.metaKey) { e.preventDefault(); const r = ztIn.getBoundingClientRect(); setZ(Z * (e.deltaY < 0 ? 1.15 : 1 / 1.15), (e.clientX - r.left) / pps()); } }, { passive: false });
+    addEventListener('resize', () => { if (clips.length) ztDraw(); });
 
     // ---- Regler ----
     const SL = { br: ['Helligkeit', .6, 1.5, .01, x => Math.round((x - 1) * 100) > 0 ? '+' + Math.round((x - 1) * 100) : String(Math.round((x - 1) * 100))], ct: ['Kontrast', .6, 1.5, .01, x => (x > 1 ? '+' : '') + Math.round((x - 1) * 100)], sa: ['Farbe', 0, 1.6, .01, x => Math.round(x * 100) + ' %'], se: ['Wärme', 0, .6, .01, x => x > .02 ? 'wärmer' : 'neutral'],
@@ -408,13 +512,14 @@ void main(){
     function autoUi() {
       K('pauses').innerHTML = PAUSES.map(p => `<button type="button" data-p="${p[0]}" aria-pressed="${auto.pause === p[0]}">${p[1]}</button>`).join('');
       K('pauses').querySelectorAll('button').forEach(b => b.onclick = () => { auto.pause = +b.dataset.p; ls.set('sn-auto', auto); autoUi(); });
-      K('stumbles').checked = auto.stumbles; K('zoomfx').checked = auto.zoom;
+      K('stumbles').checked = auto.stumbles; K('zoomfx').checked = auto.zoom; K('noisefx').checked = auto.noise !== false;
     }
     autoUi();
     K('stumbles').onchange = () => { auto.stumbles = K('stumbles').checked; ls.set('sn-auto', auto); };
+    K('noisefx').onchange = () => { auto.noise = K('noisefx').checked; ls.set('sn-auto', auto); };
     K('zoomfx').onchange = async () => { auto.zoom = K('zoomfx').checked; ls.set('sn-auto', auto); if (clips.some(c => c.auto)) { assignZoom(clips, auto.zoom); for (const c of clips) await dbPut(dbRow(c)); ui(); say(auto.zoom ? '✓ Sanfter Zoom liegt wieder über allen Abschnitten.' : 'Zoom ist aus.'); } };
     function assignZoom(list, on) { list.forEach((c, i) => c.zoom = on ? ZOOMS[i % ZOOMS.length].slice() : null); }
-    function loadAuto() { if (window.SchnittAuto) return Promise.resolve(window.SchnittAuto); if (!autoP) autoP = new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = 'schnitt-auto.js?v=1'; sc.onload = () => window.SchnittAuto ? ok(window.SchnittAuto) : no(new Error('auto')); sc.onerror = () => { autoP = null; no(new Error('auto')); }; document.head.appendChild(sc); }); return autoP; }
+    function loadAuto() { if (window.SchnittAuto) return Promise.resolve(window.SchnittAuto); if (!autoP) autoP = new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = 'schnitt-auto.js?v=2'; sc.onload = () => window.SchnittAuto ? ok(window.SchnittAuto) : no(new Error('auto')); sc.onerror = () => { autoP = null; no(new Error('auto')); }; document.head.appendChild(sc); }); return autoP; }
     // Ton eines Clips (nur in/out) stückweise in die Analyse füttern
     async function clipFrames(M, SA, c, onProg) {
       const input = new M.Input({ source: new M.BlobSource(c.blob), formats: M.ALL_FORMATS });
@@ -426,10 +531,21 @@ void main(){
         if (s1 > s0) f.push(SA.toMono16k(chans.map(ch => ch.subarray(s0, s1)), ab.sampleRate)); got += s1 - s0; onProg && onProg(Math.min(1, (x.timestamp + ab.duration - a) / Math.max(.1, b - a))); }
       return got ? f.done() : null;
     }
+    // Zweiter Weg (Safari ohne WebCodecs-Ton usw.): ganze Datei mit decodeAudioData, direkt als Mono 16 kHz (OfflineAudioContext mit 16000 Hz rechnet beim Dekodieren um)
+    async function clipFramesDecode(SA, c, onProg) {
+      const ab = await c.blob.arrayBuffer(); if (closed) return null;
+      const ctx = new OfflineAudioContext(1, 16000, 16000);
+      const buf = await new Promise((ok, no) => { const p = ctx.decodeAudioData(ab, ok, no); if (p && p.then) p.then(ok, no); });
+      const a = c.in || 0, b = Math.min(buf.duration, c.out || c.dur || buf.duration), ch = buf.getChannelData(0);
+      const s0 = Math.max(0, Math.round(a * buf.sampleRate)), s1 = Math.max(s0, Math.round(b * buf.sampleRate)); if (s1 - s0 < 1600) return null;
+      const f = SA.framer(); const step = 16000 * 30; for (let i = s0; i < s1; i += step) { f.push(ch.subarray(i, Math.min(s1, i + step))); onProg && onProg((i - s0) / (s1 - s0)); await new Promise(r => setTimeout(r, 0)); if (closed) return null; }
+      return f.done();
+    }
     function autoResUi(sum) {
       const box = K('autoRes'); if (!sum) { box.hidden = true; return; } box.hidden = false;
       let h = `<b style="font-weight:500">✨ ${esc(sum.text)}</b>`;
-      if (autoLog.length) h += `<div style="margin-top:6px">Rausgeschnitten, weil es nach einem Versprecher klingt (du hast kurz danach neu angesetzt). Hör rein, und hol es zurück, wenn ich mich geirrt habe:</div><ul>` + autoLog.map((e, i) => `<li><button type="button" class="sn-b sm" data-au="${i}">▶ Anhören</button><span>${esc(e.name)}<small> · ${fmt1(e.s)} bis ${fmt1(e.e)} (${fmt1(e.e - e.s)})</small></span><button type="button" class="sn-b sm" data-keep="${i}">Doch behalten</button></li>`).join('') + '</ul>';
+      const WHY = { versprecher: 'neu angesetzt', geraeusch: 'kein Sprechen (z. B. in Position gehen)' };
+      if (autoLog.length) h += `<div style="margin-top:6px">Diese Stellen habe ich herausgenommen. Hör rein und hol sie zurück, wenn ich mich geirrt habe:</div><ul>` + autoLog.map((e, i) => `<li><button type="button" class="sn-b sm" data-au="${i}">▶ Anhören</button><span>${esc(WHY[e.why] || 'Schnitt')}<small> · ${fmt1(e.s)} bis ${fmt1(e.e)} (${fmt1(e.e - e.s)})</small></span><button type="button" class="sn-b sm" data-keep="${i}">Doch behalten</button></li>`).join('') + '</ul>';
       box.innerHTML = h;
       box.querySelectorAll('[data-au]').forEach(b => b.onclick = () => audition(autoLog[+b.dataset.au]));
       box.querySelectorAll('[data-keep]').forEach(b => b.onclick = () => keepBack(+b.dataset.keep));
@@ -452,32 +568,40 @@ void main(){
     K('auto').onclick = async () => {
       if (busy || !clips.length) return; stop(); busy = true; root.classList.add('sn-busy'); K('auto').disabled = K('done').disabled = true;
       const bar = K('prog'), fill = bar.querySelector('i'); bar.hidden = false; fill.style.width = '0%'; say('Ich höre mir deine Clips an …');
-      const before = total(), snap = { rows: clips.map(dbRow), order: clips.map(c => c.id) };
+      const before = total(), snap = { rows: clips.map(dbRow), order: clips.map(c => c.id) }; let lastErr = null;
       try {
-        const [M, SA] = await Promise.all([loadMB(), loadAuto()]);
+        const SA = await loadAuto(); const M = await loadMB().catch(e => { console.warn('mediabunny', e); return null; });
         const next = [], log = []; let pn = 0, psec = 0, noAudio = 0;
         for (let i = 0; i < clips.length; i++) {
           const c = clips[i]; say('Ich höre mir Clip ' + (i + 1) + ' von ' + clips.length + ' an …');
-          let F = null; try { F = await clipFrames(M, SA, c, p => { fill.style.width = ((i + p) / clips.length * 100) + '%'; }); } catch (e) { console.warn('auto audio', e); F = null; }
+          const prog = p => { fill.style.width = ((i + p) / clips.length * 100) + '%'; };
+          let F = null; try { F = M ? await clipFrames(M, SA, c, prog) : null; } catch (e) { console.warn('auto audio (webcodecs)', e); F = null; }
+          if (closed) return;
+          if (!F) { try { F = await clipFramesDecode(SA, c, prog); } catch (e) { console.warn('auto audio (decode)', e); lastErr = e; F = null; } }
           if (closed) return;
           if (!F) { noAudio++; next.push(Object.assign({}, c, { auto: true })); continue; }
-          const r = SA.analyze(F, 16000, { minPause: auto.pause, stumbles: auto.stumbles });
+          const r = SA.analyze(F, 16000, { minPause: auto.pause, stumbles: auto.stumbles, noise: auto.noise !== false });
           if (!r.segs.length) { next.push(Object.assign({}, c, { auto: true })); continue; } // nur Stille erkannt → lieber so lassen
           pn += r.pauses.n; psec += r.pauses.sec; const a0 = c.in || 0;
           r.segs.forEach((sg, k) => next.push({ id: uid(), blob: c.blob, url: c.url, name: c.name, added: c.added + k, in: a0 + sg.s, out: a0 + sg.e, mute: !!c.mute, dur: c.dur, auto: true, zoom: null }));
-          r.cut.forEach(sg => log.push({ url: c.url, blob: c.blob, name: c.name, dur: c.dur, s: a0 + sg.s, e: a0 + sg.e }));
+          r.cut.forEach(sg => log.push({ url: c.url, blob: c.blob, name: c.name, dur: c.dur, s: a0 + sg.s, e: a0 + sg.e, why: sg.why }));
         }
         if (!next.length) { say('Da war nichts zu schneiden.'); return; }
+        if (noAudio === clips.length) { say('Ich konnte den Ton nicht lesen' + (lastErr ? ' (' + String(lastErr.message || lastErr).slice(0, 100) + ')' : '') + '. Hat das Video Ton? Wenn ja, schick mir bitte diesen Text.', 'bad'); return; }
         // Übernehmen: alte Zeilen raus, neue rein
         for (const c of clips) await dbDel(c.id);
         clips = next; assignZoom(clips, auto.zoom); for (const c of clips) await dbPut(dbRow(c)); await saveOrder();
         undoRows = snap; autoLog = log; sel = 0; pos = 0; clips.forEach(c => vidFor(c)); ui(); clips.forEach(thumb);
         const after = total(), saved = before - after;
-        const parts = []; if (pn) parts.push(pn + (pn === 1 ? ' Pause' : ' Pausen') + ' rausgeschnitten'); if (log.length) parts.push(log.length + (log.length === 1 ? ' Versprecher' : ' Versprecher') + ' entfernt'); if (auto.zoom) parts.push('sanfter Zoom liegt über ' + clips.length + ' Abschnitten');
+        const nV = log.filter(x => x.why === 'versprecher').length, nG = log.filter(x => x.why === 'geraeusch').length;
+        const parts = []; if (pn) parts.push(pn + (pn === 1 ? ' Pause' : ' Pausen') + ' rausgeschnitten');
+        if (nV) parts.push(nV + (nV === 1 ? ' Stelle' : ' Stellen') + ', wo du neu angesetzt hast');
+        if (nG) parts.push(nG + (nG === 1 ? ' Stelle ohne Sprechen' : ' Stellen ohne Sprechen') + ' (Vorbereiten, Rascheln)');
+        if (auto.zoom) parts.push('sanfter Zoom liegt über ' + clips.length + ' Abschnitten');
         lastSum = { text: (parts.length ? parts.join(', ') : 'nichts zu kürzen gefunden') + '. Vorher ' + fmt(before) + ', jetzt ' + fmt(after) + (saved > .5 ? ' (−' + fmt(saved) + ')' : '') + '.' + (noAudio ? ' ' + noAudio + (noAudio === 1 ? ' Clip hat' : ' Clips haben') + ' keinen Ton und blieb' + (noAudio === 1 ? '' : 'en') + ' wie ' + (noAudio === 1 ? 'er ist' : 'sie sind') + '.' : '') };
         autoResUi(lastSum); K('undo').hidden = false;
         say('✓ Fertig geschnitten. Mit ▶ anschauen – jeder Abschnitt ist jetzt ein eigener Clip, du kannst alles noch anpassen.', 'ok');
-      } catch (e) { console.warn('auto', e); say('Das automatische Schneiden hat nicht geklappt. Bitte nochmal versuchen (am besten in Safari oder Chrome).', 'bad'); }
+      } catch (e) { console.warn('auto', e); lastErr = e; say('Das automatische Schneiden hat nicht geklappt (' + String((e && e.message) || e).slice(0, 120) + '). Bitte nochmal versuchen, am besten in Safari oder Chrome. Wenn es wieder nicht geht, schick mir bitte diesen Text.', 'bad'); }
       finally { busy = false; root.classList.remove('sn-busy'); K('auto').disabled = false; K('done').disabled = !clips.length; bar.hidden = true; }
     };
     K('undo').onclick = async () => {

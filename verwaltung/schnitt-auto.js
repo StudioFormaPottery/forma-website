@@ -1,7 +1,8 @@
 /* ✨ Automatisch schneiden (Vivien, 30.10.2026: „ein Knopf, der Stille entfernt und Versprecher ausbessert“)
  * Reine Rechenfunktionen auf dem Ton eines Clips (Mono, 16 kHz). Wird von schnitt.js bei Bedarf nachgeladen.
  * - Hüllkurve je 20 ms → Sprechen/Pause mit Schwelle aus dem Grundrauschen des Clips (Hysterese).
- * - Segmente = Sprechen mit etwas Luft davor/danach; Pausen länger als „minPause“ fallen weg.
+ * - Schwelle laut/leise per Otsu auf dem Pegel-Histogramm; Abschnitte ohne Silbenrhythmus (2–8 Hz) gelten als Geräusch
+ *   (hinsetzen, Kamera richten, rascheln) und fallen ebenfalls weg.
  * - Versprecher = Neustart: Klingt der Anfang eines Abschnitts wie der Anfang des nächsten (gleiche Wörter),
  *   wird der erste als Versprecher vorgeschlagen (Spektral-Vergleich mit DTW, kein Internet, kein Spracherkenner).
  * SchnittAuto.analyze(samples | framer().done(), sr, {minPause, stumbles}) → {segs:[{s,e}], cut:[{s,e,why}], pauses:{n,sec}, dur}
@@ -33,38 +34,102 @@
 
   // Je Frame: Pegel (dB) und Spektrum (Mel-Log, mittelwertfrei, normiert). Stückweise fütterbar (lange Videos ohne riesigen Speicher).
   function framer() {
-    let carry = new Float32Array(0), dbs = [], spec = [], cnt = 0; const re = new Float32Array(N), im = new Float32Array(N), pw = new Float32Array(N / 2);
-    let dbBuf = new Float32Array(4096);
+    let carry = new Float32Array(0), spec = [], cnt = 0; const re = new Float32Array(N), im = new Float32Array(N), pw = new Float32Array(N / 2);
+    let dbBuf = new Float32Array(4096), vcBuf = new Float32Array(4096);
+    const re2 = new Float32Array(N), im2 = new Float32Array(N);
+    const LAG0 = Math.round(SR / 350), LAG1 = Math.round(SR / 70); // Tonhöhe 70–350 Hz
+    // Stimmhaftigkeit: Autokorrelation = inverse Fourier des Leistungsspektrums; höchster Wert im Tonhöhenbereich / Gesamtenergie
+    function voicing() {
+      for (let k = 0; k < N / 2; k++) { re2[k] = pw[k]; im2[k] = 0; if (k) { re2[N - k] = pw[k]; im2[N - k] = 0; } }
+      re2[N / 2] = pw[N / 2 - 1]; im2[N / 2] = 0;
+      fft(re2, im2); const r0 = re2[0]; if (!(r0 > 0)) return 0;
+      let best = 0; for (let L = LAG0; L <= LAG1; L++) if (re2[L] > best) best = re2[L];
+      return Math.max(0, Math.min(1, best / r0));
+    }
     function run(x) {
       const n = Math.max(0, Math.floor((x.length - N) / HOP) + 1);
       for (let f = 0; f < n; f++) {
         const o = f * HOP; let e = 0; for (let i = 0; i < N; i++) { const v = x[o + i]; e += v * v; re[i] = v * WIN[i]; im[i] = 0; }
-        if (cnt >= dbBuf.length) { const nb = new Float32Array(dbBuf.length * 2); nb.set(dbBuf); dbBuf = nb; }
-        dbBuf[cnt++] = 10 * Math.log10(e / N + 1e-10); fft(re, im); for (let k = 0; k < N / 2; k++) pw[k] = re[k] * re[k] + im[k] * im[k];
+        if (cnt >= dbBuf.length) { const nb = new Float32Array(dbBuf.length * 2); nb.set(dbBuf); dbBuf = nb; const nv = new Float32Array(vcBuf.length * 2); nv.set(vcBuf); vcBuf = nv; }
+        dbBuf[cnt] = 10 * Math.log10(e / N + 1e-10); fft(re, im); for (let k = 0; k < N / 2; k++) pw[k] = re[k] * re[k] + im[k] * im[k];
+        vcBuf[cnt++] = voicing();
         const v = new Float32Array(NB); let mean = 0; for (let b = 0; b < NB; b++) { let s = 0; for (const [k, w] of MEL[b]) s += pw[k] * w; v[b] = Math.log(s + 1e-9); mean += v[b]; } mean /= NB; let nrm = 0; for (let b = 0; b < NB; b++) { v[b] -= mean; nrm += v[b] * v[b]; } nrm = Math.sqrt(nrm) || 1; for (let b = 0; b < NB; b++) v[b] /= nrm; spec.push(v);
       }
       return n * HOP;
     }
     return {
       push(x) { const all = new Float32Array(carry.length + x.length); all.set(carry); all.set(x, carry.length); const used = run(all); carry = all.slice(used); },
-      done() { return { db: dbBuf.subarray(0, cnt), spec, n: cnt }; }
+      done() { return { db: dbBuf.subarray(0, cnt), vc: vcBuf.subarray(0, cnt), spec, n: cnt }; }
     };
   }
   function frames(x) { const f = framer(); f.push(x); return f.done(); }
   const pct = (arr, p) => { const a = Array.from(arr).sort((x, y) => x - y); return a.length ? a[Math.min(a.length - 1, Math.floor(a.length * p))] : 0; };
 
+  // Schwelle zwischen „leise“ und „Sprechen“ aus dem Histogramm der Pegel (Otsu). Robuster als feste Perzentile:
+  // funktioniert auch, wenn fast durchgehend oder nur ganz kurz gesprochen wird.
+  function otsu(db) {
+    let lo = Infinity, hi = -Infinity; for (let i = 0; i < db.length; i++) { if (db[i] < lo) lo = db[i]; if (db[i] > hi) hi = db[i]; }
+    if (!(hi > lo)) return { thr: lo + 6, sep: 0, lo, hi };
+    const B = 96, h = new Float32Array(B), k = (B - 1) / (hi - lo);
+    for (let i = 0; i < db.length; i++) h[Math.round((db[i] - lo) * k)]++;
+    let tot = db.length, sum = 0; for (let i = 0; i < B; i++) sum += i * h[i];
+    let wB = 0, sumB = 0, best = -1, at = 0;
+    for (let i = 0; i < B; i++) { wB += h[i]; if (!wB) continue; const wF = tot - wB; if (!wF) break; sumB += i * h[i];
+      const mB = sumB / wB, mF = (sum - sumB) / wF, v = wB * wF * (mB - mF) * (mB - mF); if (v > best) { best = v; at = i; } }
+    const thr = lo + at / k;
+    // Trennschärfe: Abstand der beiden Mittelwerte in dB (klein = kaum Unterschied zwischen laut und leise)
+    let nB = 0, sB = 0, nF = 0, sF = 0; for (let i = 0; i < db.length; i++) { if (db[i] <= thr) { nB++; sB += db[i]; } else { nF++; sF += db[i]; } }
+    return { thr, sep: (nB && nF) ? (sF / nF - sB / nB) : 0, lo, hi, quiet: nB ? sB / nB : lo };
+  }
+  // Silbenrhythmus: Sprache schwankt 2–8× pro Sekunde. Rascheln, Stühlerücken, Brummen oder „in Position sitzen“ nicht.
+  function modulation(db, i0, i1) {
+    const n = i1 - i0; if (n < 12) return 0;
+    const env = new Float32Array(n); let m = 0;
+    for (let i = 0; i < n; i++) { env[i] = Math.pow(10, db[i0 + i] / 20); m += env[i]; } m /= n;
+    let ac = 0; for (let i = 0; i < n; i++) { env[i] -= m; ac += env[i] * env[i]; } if (ac <= 0) return 0;
+    const fs = SR / HOP; let band = 0; // 2–8 Hz
+    for (let f = 2; f <= 8; f += .5) { let re = 0, im = 0; const w = 2 * Math.PI * f / fs; for (let i = 0; i < n; i++) { re += env[i] * Math.cos(w * i); im += env[i] * Math.sin(w * i); } band += (re * re + im * im) / n; }
+    return Math.min(1, band / ac * 2);
+  }
+
   // Sprechen/Pause → Sprech-Abschnitte („runs“, mit Luft davor/danach) in Sekunden, noch nicht verschmolzen
-  function speechRuns(db, opt) {
-    const hop = HOP / SR, n = db.length; if (!n) return [];
-    const floor = pct(db, .15), top = pct(db, .92);
-    const thr = top - floor < 12 ? floor + 6 : Math.max(floor + 10, top - 24); // Schwelle aus dem Grundrauschen
-    const loose = thr - 6;
+  function speechRuns(db, vc, opt) {
+    const hop = HOP / SR, n = db.length; if (!n) return { runs: [], info: null };
+    const o = otsu(db);
+    // Kaum Unterschied zwischen laut und leise (durchgehend gesprochen oder durchgehend still): lieber nichts wegschneiden
+    const thr = o.sep < 6 ? Infinity : Math.max(o.thr, o.quiet + 5), loose = thr - 6;
     const on = new Uint8Array(n); for (let i = 0; i < n; i++) on[i] = db[i] > loose ? 1 : 0;
     // lose Abschnitte nur behalten, wenn irgendwo drin die strenge Schwelle erreicht wird (Hysterese)
     let runs = []; for (let i = 0; i < n;) { if (!on[i]) { i++; continue; } let j = i; let strong = false; while (j < n && on[j]) { if (db[j] > thr) strong = true; j++; } if (strong) runs.push([i, j]); i = j; }
     runs = runs.filter(r => (r[1] - r[0]) * hop >= .2); // winzige Geräusche (< 0,2 s) weg
-    const pre = opt.pre ?? .12, post = opt.post ?? .25, dur = n * hop;
-    return runs.map(r => ({ s: Math.max(0, r[0] * hop - pre), e: Math.min(dur, r[1] * hop + post), raw: r[0] * hop }));
+    const pre = opt.pre ?? .12, post = opt.post ?? .25, dur = n * hop, modThr = opt.modThr ?? .08;
+    const vThr = opt.voiceThr ?? .3, vFrac = opt.voiceFrac ?? .16, win = Math.round(.5 / hop);
+    // Ein lauter Abschnitt kann Sprechen UND Geräusch enthalten (z. B. gleich nach dem letzten Satz aufstehen).
+    // Deshalb je Bild schauen, ob ringsum Stimme zu hören ist, und den Abschnitt an diesen Grenzen teilen.
+    const out = [];
+    for (const r of runs) {
+      const m = r[1] - r[0], sp = new Uint8Array(m);
+      if (vc) for (let i = 0; i < m; i++) { let v = 0, n2 = 0; for (let j = Math.max(r[0], r[0] + i - win); j < Math.min(r[1], r[0] + i + win); j++) { if (vc[j] > vThr) v++; n2++; } sp[i] = (v / Math.max(1, n2)) >= vFrac ? 1 : 0; }
+      else sp.fill(1);
+      const piece = (i0, i1, speech) => { const long = (i1 - i0) * hop;
+        if (!speech && long < .45) return; // kurze Lücke mitten im Sprechen bleibt drin
+        if (speech && long < .25) return;
+        out.push({ i0: r[0] + i0, i1: r[0] + i1, speech, long }); };
+      let i = 0; while (i < m) { const k = sp[i]; let j = i; while (j < m && sp[j] === k) j++; piece(i, j, !!k); i = j; }
+      // nichts erkannt (z. B. kein Ton-Spektrum): ganzen Abschnitt als Sprechen nehmen
+      if (!out.length || out[out.length - 1].i1 <= r[0]) out.push({ i0: r[0], i1: r[1], speech: true, long: m * hop });
+    }
+    // kurze Stücke an die Nachbarn angleichen (keine Schnipsel)
+    const parts = [];
+    for (const p of out) { const last = parts[parts.length - 1];
+      if (last && last.speech === p.speech && p.i0 - last.i1 <= 1) { last.i1 = p.i1; continue; }
+      if (!p.speech && p.long < .45 && last) { last.i1 = p.i1; continue; }
+      parts.push(Object.assign({}, p)); }
+    return { info: o, runs: parts.map(p => {
+      const mod = modulation(db, p.i0, p.i1); let v = 0; if (vc) { for (let i = p.i0; i < p.i1; i++) if (vc[i] > vThr) v++; v /= Math.max(1, p.i1 - p.i0); }
+      const noise = opt.noise !== false && !p.speech && (p.i1 - p.i0) * hop >= .45;
+      return { s: Math.max(0, p.i0 * hop - (noise ? 0 : pre)), e: Math.min(dur, p.i1 * hop + (noise ? 0 : post)), raw: p.i0 * hop, mod, voiced: v, why: noise ? 'geraeusch' : '' };
+    }) };
   }
   // Abschnitte verschmelzen, wenn die Pause dazwischen kürzer als minPause ist
   function merge(runs, minP) { const segs = []; for (const r of runs) { const last = segs[segs.length - 1]; if (last && r.s - last.e < minP) last.e = Math.max(last.e, r.e); else segs.push({ s: r.s, e: r.e }); } return segs; }
@@ -82,7 +147,13 @@
     opt = opt || {}; let F;
     if (x && x.spec) F = x; else { if (sr !== SR) x = toMono16k([x], sr); F = frames(x); }
     const hop = HOP / SR, dur = F.n * hop;
-    const runs = speechRuns(F.db, opt), cut = [];
+    const sr2 = speechRuns(F.db, F.vc, opt), runs = sr2.runs, cut = [];
+    // Geräusch-Stücke nicht in die Nachbarn hineinragen lassen (die Luft vor/nach dem Sprechen hat Vorrang)
+    for (let i = 0; i < runs.length; i++) { const r = runs[i]; if (r.why !== 'geraeusch') continue;
+      const p = runs[i - 1], n2 = runs[i + 1];
+      if (p && !p.why) r.s = Math.max(r.s, p.e); if (n2 && !n2.why) r.e = Math.min(r.e, n2.s);
+      if (r.e - r.s < .3) { r.why = ''; continue; }
+      cut.push({ s: r.s, e: r.e, why: 'geraeusch', mod: r.mod, voiced: r.voiced }); }
     if (opt.stumbles !== false && runs.length > 1) {
       // Neustart: klingt der Anfang eines Abschnitts wie der Anfang des nächsten, ist der erste ein Versprecher
       const fr = t => Math.max(0, Math.min(F.n, Math.round(t / hop)));
@@ -98,10 +169,10 @@
     let pauseSec = dur, pn = 0; for (const s of segs) pauseSec -= (s.e - s.s); for (const c of cut) pauseSec -= (c.e - c.s);
     for (let i = 1; i < segs.length; i++) if (segs[i].s - segs[i - 1].e > .01) pn++;
     if (segs.length && segs[0].s > .3) pn++; if (segs.length && dur - segs[segs.length - 1].e > .3) pn++;
-    return { segs, cut, pauses: { n: pn, sec: Math.max(0, pauseSec) }, dur };
+    return { segs, cut, pauses: { n: pn, sec: Math.max(0, pauseSec) }, dur, info: sr2.info };
   }
 
   const G = typeof window !== 'undefined' ? window : globalThis;
-  G.SchnittAuto = { analyze, toMono16k, framer, _frames: frames, _dtw: dtwSim };
+  G.SchnittAuto = { analyze, toMono16k, framer, _frames: frames, _dtw: dtwSim, _otsu: otsu, _mod: modulation };
   if (typeof module !== 'undefined') module.exports = G.SchnittAuto;
 })();
