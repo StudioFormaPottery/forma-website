@@ -69,7 +69,10 @@
 .mvf-name{position:absolute;left:0;bottom:0;width:70cqw;height:24cqw;max-height:190px;color:#F7F1EE;pointer-events:none;opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
 .mvf-name.on{opacity:1;transform:none}
 .mvf-name svg{position:absolute;inset:0;width:100%;height:100%}
-.mvf-name .in{position:absolute;left:4.2cqw;bottom:4cqw;display:flex;align-items:center;gap:2.2cqw}
+.mvf-name .in{position:absolute;left:max(16px,4.2cqw);right:14cqw;top:38%;bottom:6%;display:flex;align-items:center;gap:max(10px,2.2cqw)}
+.mvf-name .in>div{min-width:0}
+.mvf-name .in b{font-size:clamp(1.2rem,4.2cqw,2.3rem);line-height:1.05;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-wrap:balance}
+@container (max-width:560px){.mvf-name{width:88cqw;height:44cqw}.mvf-name .in{left:14px;right:30cqw;top:40%;bottom:8%;gap:9px}.mvf-name small{font-size:.54rem;letter-spacing:.16em;margin-bottom:2px}.mvf-name .in b{font-size:clamp(.98rem,5.2cqw,1.3rem)}.mvf-name .in img{width:26px;height:26px}}
 .mvf-name .in img{width:clamp(28px,7.2cqw,58px);height:clamp(28px,7.2cqw,58px)}
 .mvf-name small{display:block;font-size:clamp(.56rem,1.7cqw,.78rem);letter-spacing:.22em;text-transform:uppercase;opacity:.85;margin-bottom:.8cqw}
 .mvf-name b{display:block;font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(1.25rem,5.4cqw,2.6rem);line-height:1}
