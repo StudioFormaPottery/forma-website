@@ -64,9 +64,16 @@
 .mvf-ph{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;color:#E4DCD1;font-size:.95rem;text-align:center;padding:1rem}
 .mvf-ph .mk{width:64px;height:64px;opacity:.9}
 .mvf-shade{position:absolute;left:0;right:0;bottom:0;height:55%;background:linear-gradient(to top,rgba(46,37,41,.62),rgba(46,37,41,0));pointer-events:none}
-.mvf-name{position:absolute;left:clamp(14px,3vw,26px);bottom:clamp(12px,3vw,24px);right:clamp(110px,24vw,170px);color:#F7F1EE}
-.mvf-name small{display:block;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;opacity:.85;margin-bottom:2px}
-.mvf-name b{display:block;font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(1.35rem,3.6vw,2.2rem);line-height:1.08;text-shadow:0 1px 10px rgba(0,0,0,.25)}
+.mvf-stage{container-type:inline-size}
+/* Übungsname als Welle mit Logo links unten (Vivien, 30.10.2026): läuft rechts in einer Spitze aus, gleitet beim Start herein, nach 6 s weg, Tippen zeigt sie wieder */
+.mvf-name{position:absolute;left:0;bottom:0;width:70cqw;height:24cqw;max-height:190px;color:#F7F1EE;pointer-events:none;opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+.mvf-name.on{opacity:1;transform:none}
+.mvf-name svg{position:absolute;inset:0;width:100%;height:100%}
+.mvf-name .in{position:absolute;left:4.2cqw;bottom:4cqw;display:flex;align-items:center;gap:2.2cqw}
+.mvf-name .in img{width:clamp(28px,7.2cqw,58px);height:clamp(28px,7.2cqw,58px)}
+.mvf-name small{display:block;font-size:clamp(.56rem,1.7cqw,.78rem);letter-spacing:.22em;text-transform:uppercase;opacity:.85;margin-bottom:.8cqw}
+.mvf-name b{display:block;font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(1.25rem,5.4cqw,2.6rem);line-height:1}
+@media(prefers-reduced-motion:reduce){.mvf-name{transition:none}}
 .mvf-flag{position:absolute;left:14px;top:14px;font-size:.78rem;border-radius:999px;padding:5px 12px;background:rgba(251,248,244,.9);color:var(--deep)}
 .mvf-ring{position:absolute;right:clamp(12px,2.6vw,22px);bottom:clamp(12px,2.6vw,22px);width:clamp(84px,18vw,128px);aspect-ratio:1}
 .mvf-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
@@ -311,7 +318,7 @@
     <div class="mvf-sun"></div>
     <div class="mvf-shade"></div>
     ${pv && flow ? `<span class="mvf-flag" data-vflag hidden>${T('Vorschau · Voice-over fehlt noch', 'Preview · voice-over still missing')}</span>` : ''}
-    <div class="mvf-name"><small data-tag></small><b data-nm></b></div>
+    <div class="mvf-name" data-nmw><svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="mvfwg" x1="0" x2="1"><stop offset="0" stop-color="#4A3040" stop-opacity=".94"/><stop offset=".62" stop-color="#4A3040" stop-opacity=".9"/><stop offset="1" stop-color="#4A3040" stop-opacity="0"/></linearGradient><linearGradient id="mvfwl" x1="0" x2="1"><stop offset="0" stop-color="#B58C99" stop-opacity=".75"/><stop offset=".7" stop-color="#B58C99" stop-opacity=".5"/><stop offset="1" stop-color="#B58C99" stop-opacity="0"/></linearGradient></defs><path d="M0 64 C110 30 210 98 310 84 S470 66 540 150 C572 188 600 222 620 240 H0Z" fill="url(#mvfwg)"/><path d="M0 46 C120 14 220 80 320 66 S480 48 560 138 C588 172 606 200 618 222" fill="none" stroke="url(#mvfwl)" stroke-width="2"/></svg><div class="in"><img src="/img/movecia/movecia-zeichen-hell.svg" alt="" draggable="false"><div><small data-tag></small><b data-nm></b></div></div></div>
     <div class="mvf-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="t" cx="60" cy="60" r="52"></circle><circle class="p" data-pr cx="60" cy="60" r="52"></circle></svg><div class="n"><b data-sec>30</b><span data-unit>${T('Sek.', 'sec')}</span></div></div>
     <div class="mvf-pausey"><span>${T('Pausiert', 'Paused')}</span></div>
     <div class="mvf-next" data-nx><small>${T('Als Nächstes', 'Up next')}</small><b data-nxn></b></div>
@@ -340,9 +347,13 @@
     }
     root.querySelectorAll('[data-d]').forEach(b => b.addEventListener('click', () => { dur = +b.dataset.d; try { localStorage.setItem('mvf-dur', String(dur)); } catch (e) {} seg(); }));
     seg();
+    let nmT = 0;
+    function nameShow() { const w = q('[data-nmw]'); if (!w) return; w.classList.remove('on'); void w.offsetWidth; w.classList.add('on'); clearTimeout(nmT); nmT = setTimeout(() => w.classList.remove('on'), 6000); }
+    q('[data-st]').addEventListener('click', nameShow);
     function show(i) {
       const it = items[i];
-      q('[data-tag]').textContent = T(`Übung ${i + 1}`, `Exercise ${i + 1}`);
+      q('[data-tag]').textContent = T(`Übung ${i + 1} von ${items.length}`, `Exercise ${i + 1} of ${items.length}`);
+      nameShow();
       q('[data-nm]').textContent = it.name;
       q('[data-pos]').textContent = T(`Übung ${i + 1} von ${items.length}`, `Exercise ${i + 1} of ${items.length}`);
       const f = q('[data-if]'); f.title = it.name;
