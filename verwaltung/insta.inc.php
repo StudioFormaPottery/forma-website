@@ -61,7 +61,10 @@ function ig_seed_mvig(PDO $pdo): void
     if (!$v || (int)forma_setting($pdo, 'ig_mvig_plan') >= $v) return;
     $q = $pdo->prepare("SELECT COUNT(*) FROM mm_insta WHERE acc = 'mvig' AND day = ? AND title = ?");
     $ins = $pdo->prepare("INSERT INTO mm_insta (day, kind, acc, title, text, photo, lang, created_at, updated_at) VALUES (?,?,?,?,?,?,'de',?,?)");
+    // Einträge mit „replaces“ ersetzen einen schon eingetragenen alten Text (nur wenn noch nicht gepostet)
+    $upd = $pdo->prepare("UPDATE mm_insta SET title = ?, text = ?, updated_at = ? WHERE acc = 'mvig' AND day = ? AND title = ? AND status <> 'gepostet'");
     foreach ($d['items'] ?? [] as $x) {
+        if (!empty($x['replaces'])) $upd->execute([$x['title'], $x['text'], date('c'), $x['day'], $x['replaces']]);
         $q->execute([$x['day'], $x['title']]); if ((int)$q->fetchColumn()) continue;
         $ins->execute([$x['day'], isset(IG_KIND[$x['kind']]) ? $x['kind'] : 'post', 'mvig', $x['title'], $x['text'], (string)($x['photo'] ?? ''), date('c'), date('c')]);
     }
