@@ -83,6 +83,11 @@
 .sn-pv video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;background:#1E171B;transform-origin:50% 50%;will-change:transform}
 .sn-pv video.on{display:block}
 .sn-pv video.sn-ov{z-index:1}
+.sn-trash{margin-top:12px;background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:18px;padding:10px 14px}
+.sn-trash summary{cursor:pointer;font-size:17px;color:#4A3A41;font-weight:500}
+.sn-trash li{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 0;border-top:1px solid #EFE7DE;font-size:15.5px;color:#4A3A41}
+.sn-trash li span{flex:1;min-width:160px}.sn-trash li small{display:block;color:#7D7076;font-size:13.5px}
+.sn-trash ul{list-style:none;margin:6px 0 0;padding:0}
 .sn-pv .sn-glc{position:absolute;inset:0;width:100%;height:100%;z-index:2;display:none;pointer-events:none}
 .sn-bro{margin-top:10px;display:flex;flex-direction:column;gap:10px}
 .sn-bro:empty{display:none}
@@ -355,6 +360,9 @@ void main(){
     ${o.studioUrl ? `<a class="sn-b" href="${esc(o.studioUrl)}">● Im Studio aufnehmen</a>` : ''}
     <button type="button" class="sn-b sm del" data-k="clearAll">Clips dieses Entwurfs löschen</button>
   </div>
+  <details class="sn-trash" data-k="trash" hidden><summary>🗑 Papierkorb <span data-k="trN"></span></summary><div data-k="trL"></div>
+    <div class="sn-row"><button type="button" class="sn-b sm del" data-k="trEmpty">Papierkorb leeren (endgültig)</button></div>
+    <p class="sn-zt-hint">Gelöschte Clips bleiben hier 30 Tage auf diesem Gerät, dann werden sie endgültig gelöscht.</p></details>
   <div class="sn-ed" data-k="ed" hidden>
     <div class="h"><b data-k="edT"></b><span data-k="edD"></span></div>
     <div class="sn-row">
@@ -476,7 +484,7 @@ void main(){
       return c.zoom[0] + (c.zoom[1] - c.zoom[0]) * p; };
     // MediaRecorder-Dateien kennen ihre Länge oft nicht: einmal ans Ende springen
     async function probeDur(c, v) { try { v.currentTime = 1e7; await new Promise(r => { v.onseeked = r; setTimeout(r, 2500); }); c.dur = isFinite(v.duration) && v.duration > 0 ? v.duration : (v.currentTime || 1); v.currentTime = 0; } catch (e) { c.dur = c.dur || 1; } if (!c.out || c.out > c.dur) c.out = c.dur; dbPut(dbRow(c)); ui(); }
-    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft, src: c.src || null, bro: !!c.bro, osrc: c.osrc || null, ost: c.ost || 0, fr: c.fr || null, zm: c.zm || null, fe: c.fe || 0 });
+    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft, src: c.src || null, bro: !!c.bro, osrc: c.osrc || null, ost: c.ost || 0, fr: c.fr || null, zm: c.zm || null, fe: c.fe || 0, trash: c.trash || 0, tpos: c.tpos || 0 });
     const len = c => Math.max(0, (c.out || c.dur || 0) - (c.in || 0));
     const total = () => clips.reduce((a, c) => a + len(c), 0);
     const tv = document.createElement('video'); tv.muted = true; tv.playsInline = true; tv.preload = 'auto'; let thumbQ = Promise.resolve();
@@ -496,13 +504,13 @@ void main(){
     async function load() {
       try {
         curDraft = await ensureDraft(); drList = await drafts();
-        const all = await dbAll(), rows = all.filter(r => r.draft === curDraft), order = (await kvGet(ordKey(curDraft))) || [];
+        const all = await dbAll(), rows = all.filter(r => r.draft === curDraft && !r.trash), order = (await kvGet(ordKey(curDraft))) || [];
         rows.sort((a, b) => (order.indexOf(a.id) + 1 || 1e9) - (order.indexOf(b.id) + 1 || 1e9) || a.added - b.added);
         const urls = new Map(); const objs = rows.map(r => { let u = urls.get(r.blob); if (!u) { u = URL.createObjectURL(r.blob); urls.set(r.blob, u); } return Object.assign({}, r, { url: u }); });
         clips = objs.filter(r => !r.bro); bros = objs.filter(r => r.bro); bros.forEach(ovVid);
         slots(); if (clips.length) { sel = 0; vidFor(clips[0]); prep(1); }
         await covLoad().catch(() => {});
-        drawDrafts(); ui(); clips.forEach(thumb);
+        drawDrafts(); ui(); clips.forEach(thumb); trashUi();
       } catch (e) { say('Die gespeicherten Clips konnten nicht geladen werden.', 'bad'); }
     }
     // ---- Entwürfe ----
@@ -511,7 +519,7 @@ void main(){
       if (closed) return;
       const inp = K('drName'); if (document.activeElement !== inp) inp.value = (drList.find(d => d.id === curDraft) || {}).name || '';
       const all = await dbAll().catch(() => []);
-      const info = {}; all.forEach(c => { const k = c.draft; if (!k || c.bro) return; const i = info[k] || (info[k] = { n: 0, sec: 0 }); i.n++; i.sec += Math.max(0, (c.out || c.dur || 0) - (c.in || 0)); });
+      const info = {}; all.forEach(c => { const k = c.draft; if (!k || c.bro || c.trash) return; const i = info[k] || (info[k] = { n: 0, sec: 0 }); i.n++; i.sec += Math.max(0, (c.out || c.dur || 0) - (c.in || 0)); });
       const when = t => { const d = new Date(t || 0), h = new Date(), s2 = x => String(x).padStart(2, '0');
         return (d.toDateString() === h.toDateString() ? 'heute' : d.getDate() + '.' + (d.getMonth() + 1) + '.') + ' ' + s2(d.getHours()) + ':' + s2(d.getMinutes()); };
       const L = drList.slice().sort((a, b) => (b.at || 0) - (a.at || 0));
@@ -548,13 +556,13 @@ void main(){
       say('✓ „' + nm + '“ hängt jetzt hinten an. Alles ist ein Video mit ' + clips.length + ' Clips, du kannst es ganz bearbeiten.', 'ok');
     }
     async function delDraft(id) {
-      const nm = drName(id); if (!confirm('Entwurf „' + nm + '“ mit allen Clips von diesem Gerät löschen?')) return;
-      const all = await dbAll(); for (const c of all) if (c.draft === id) await dbDel(c.id);
+      const nm = drName(id); if (!confirm('Entwurf „' + nm + '“ löschen? Die Clips kommen in den Papierkorb.')) return;
+      const all = await dbAll(), tt = Date.now(); for (const c of all) if (c.draft === id && !c.trash) { c.trash = tt; c.tname = nm; await dbPut(c); }
       await kvDel(ordKey(id)).catch(() => {});
       drList = (await drafts()).filter(d => d.id !== id); await draftsSave(drList);
       if (id === curDraft) { clips.forEach(c => URL.revokeObjectURL(c.url)); clips = []; dropVids(); sel = -1; pos = 0; await kvDel('cur').catch(() => {}); await load(); }
       else drawDrafts();
-      say('🗑 „' + nm + '“ gelöscht.');
+      trashUi(); say('🗑 „' + nm + '“ gelöscht, die Clips liegen im Papierkorb.');
     }
     K('drNew').onclick = async () => {
       if (busy) return; const d = { id: uid(), name: '', at: Date.now() };
@@ -569,7 +577,7 @@ void main(){
     const saveOrder = () => kvSet(ordKey(curDraft), clips.map(c => c.id)).catch(() => {});
     const touch = async () => { const d = drList.find(x => x.id === curDraft); if (d) { d.at = Date.now(); await draftsSave(drList).catch(() => {}); drawDrafts(); } };
     K('file').onchange = e => { addFiles([...e.target.files]); e.target.value = ''; };
-    K('clearAll').onclick = async () => { if (!clips.length || !confirm('Wirklich alle ' + clips.length + ' Clips von diesem Gerät löschen?')) return; stop(); for (const c of clips) { await dbDel(c.id); } for (const o of bros) { await dbDel(o.id); } broClear(); const urls = new Set(clips.map(c => c.url)); clips = []; dropVids(); urls.forEach(u => URL.revokeObjectURL(u)); sel = -1; await saveOrder(); undoRows = null; K('undo').hidden = true; K('autoRes').hidden = true; drawDrafts(); ui(); say('Alle Clips in „' + drName(curDraft) + '“ gelöscht.'); };
+    K('clearAll').onclick = async () => { if (!clips.length || !confirm('Alle ' + clips.length + ' Clips in den Papierkorb legen?')) return; stop(); const tt = Date.now(); for (const [i, c] of clips.entries()) { c.trash = tt; c.tpos = i; await dbPut(dbRow(c)); } for (const o of bros) { o.trash = tt; await dbPut(dbRow(o)); } broClear(); const urls = new Set(clips.map(c => c.url)); clips = []; dropVids(); urls.forEach(u => URL.revokeObjectURL(u)); sel = -1; await saveOrder(); undoRows = null; K('undo').hidden = true; K('autoRes').hidden = true; drawDrafts(); ui(); trashUi(); say('Alle Clips aus „' + drName(curDraft) + '“ liegen im Papierkorb.'); };
 
     // ---- Vorschau: Clips nacheinander abspielen ----
     let playing = false, pos = 0, raf = 0, cmp = false, prepped = false; // pos = Stelle im Gesamtvideo
@@ -588,7 +596,8 @@ void main(){
     function tick() {
       if (!playing) return;
       const c = clips[sel]; const v = cur(); if (!c || !v) { stop(); return; }
-      const off = Math.max(0, v.currentTime - (c.in || 0)); pos = starts()[sel] + off; timeUi(); musDrive(pos + CD(), true);
+      const off = Math.max(0, v.currentTime - (c.in || 0)); pos = starts()[sel] + off; timeUi();
+      { const now = performance.now(); if (Math.abs(v.currentTime - wd.t) > .01 || v.paused) { wd.t = v.currentTime; wd.at = now; } else if (now - wd.at > 2200) { wd.at = now; heal(sel, true); } } musDrive(pos + CD(), true);
       if (c.zoom || c.fr) v.style.transform = vtf(c, off);
       broSync(c, v.currentTime, true);
       if (!prepped && (c.out || c.dur) - v.currentTime < 1.2) { prepped = true; prep(sel + 1); }
@@ -598,6 +607,18 @@ void main(){
       }
       raf = requestAnimationFrame(tick);
     }
+    // Hängt die Vorschau (am Mac mit großen 4K-Dateien ab und zu nach ein paar Schnitten), wird das Video-Element
+    // still neu geladen und läuft an derselben Stelle weiter – kein Neuladen der Seite mehr (Vivien, 30.10.2026)
+    const wd = { t: -1, at: 0 };
+    function heal(i, run) {
+      const c = clips[i]; if (!c) return; const old = vids.get(c.slot), t = old ? old.currentTime : (c.in || 0);
+      if (old) { try { old.pause(); old.removeAttribute('src'); old.load(); } catch (e) {} old.remove(); vids.delete(c.slot); }
+      const v = vidFor(c); v.addEventListener('loadeddata', () => { try { v.currentTime = Math.max(c.in || 0, t); } catch (e) {} if (i === sel) { show(i, Math.max(0, t - (c.in || 0)), false); if (run && playing) v.play().catch(() => {}); } }, { once: true });
+      console.warn('Schnitt: Vorschau hing, neu geladen');
+    }
+    setInterval(() => { if (closed || playing || busy) return; const v = cur(); if (v && v.seeking) { v._sk = v._sk || performance.now(); if (performance.now() - v._sk > 3000) { v._sk = 0; heal(sel, false); } } else if (v) v._sk = 0; }, 1000);
+    let ltT = 0; const ltQ = new Set();
+    function lazyThumb(c) { ltQ.add(c); clearTimeout(ltT); ltT = setTimeout(function go() { if (playing || busy) { ltT = setTimeout(go, 2500); return; } ltQ.forEach(x => { x.thumb = null; thumb(x); }); ltQ.clear(); }, 2500); }
     const starts = () => { let a = 0; return clips.map(c => { const s = a; a += len(c); return s; }); };
     async function play() {
       if (busy || !clips.length) return; if (sel < 0) sel = 0; const c = clips[sel], v = vidFor(c); prepped = false; prep(sel + 1);
@@ -707,7 +728,7 @@ void main(){
     K('setB').onclick = () => { const c = clips[sel], v = cur(); if (!c || !v) return; c.out = Math.max(v.currentTime, (c.in || 0) + .3); change(c); say('Ende gesetzt bei ' + fmt1(c.out) + ' ⟧.'); };
     K('resetCut').onclick = () => { const c = clips[sel]; if (!c) return; c.in = 0; c.out = c.dur; change(c); };
     K('split').onclick = async () => { const L = locate(pos); if (L.i >= 0) sel = L.i; const c = clips[sel], v = cur(); if (!c || !v) return; const t = L.i >= 0 ? (c.in || 0) + L.off : v.currentTime; if (t <= (c.in || 0) + .3 || t >= (c.out || c.dur) - .3) { say('Zum Teilen die Stelle etwas weiter in die Mitte schieben.'); return; }
-      const n = Object.assign({}, c, { id: uid(), in: t, added: c.added + 1, thumb: null, url: c.url }); c.out = t; clips.splice(sel + 1, 0, n); await dbPut(dbRow(c)); await dbPut(dbRow(n)); await saveOrder(); c.thumb = null; ui(); thumb(c); thumb(n); say('✂ Geteilt bei ' + fmt1(t) + '. Der zweite Teil ist jetzt Clip ' + (sel + 2) + '.', 'ok'); };
+      const n = Object.assign({}, c, { id: uid(), in: t, added: c.added + 1, thumb: c.thumb || null, url: c.url }); c.out = t; clips.splice(sel + 1, 0, n); await dbPut(dbRow(c)); await dbPut(dbRow(n)); await saveOrder(); ui(); lazyThumb(n); say('✂ Geteilt bei ' + fmt1(t) + '. Der zweite Teil ist jetzt Clip ' + (sel + 2) + '.', 'ok'); };
     K('cut2').onclick = () => { if (busy || !clips[sel]) return; stop(); K('split').onclick(); };
     document.addEventListener('keydown', e => { if (closed || busy || e.metaKey || e.ctrlKey || e.altKey || (e.key !== 's' && e.key !== 'S')) return; const t = e.target; if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return; if (!root.isConnected || !clips[sel]) return; e.preventDefault(); K('cut2').click(); });
     K('left').onclick = async () => { if (sel <= 0) return; [clips[sel - 1], clips[sel]] = [clips[sel], clips[sel - 1]]; sel--; await saveOrder(); ui(); };
@@ -756,7 +777,7 @@ void main(){
         el.querySelectorAll('input').forEach(i => i.onchange = () => { dbPut(dbRow(o)); schedCache = null; });
         el.querySelector('[data-bp]').onclick = () => { stop(); const off = Math.max(0, o.ost - a - 1.5); pos = starts()[sel] + off; show(sel, off); play(); };
         el.querySelector('[data-bb]').onclick = async () => { stop(); bros = bros.filter(x => x !== o); const v = ovV.get(o.id); if (v) { v.pause(); v.remove(); ovV.delete(o.id); } o.bro = false; o.osrc = null; o.ost = 0; o.mute = false; clips.splice(sel + 1, 0, o); await dbPut(dbRow(o)); await saveOrder(); sel++; ui(); thumb(o); say('↩ „' + o.name + '“ ist wieder ein eigener Clip (Clip ' + (sel + 1) + ').', 'ok'); };
-        el.querySelector('[data-bx]').onclick = async () => { stop(); bros = bros.filter(x => x !== o); const v = ovV.get(o.id); if (v) { v.pause(); v.remove(); ovV.delete(o.id); } await dbDel(o.id); if (!clips.some(c2 => c2.url === o.url) && !bros.some(x => x.url === o.url)) URL.revokeObjectURL(o.url); ui(); say('🗑 Bild darüber entfernt.'); };
+        el.querySelector('[data-bx]').onclick = async () => { stop(); bros = bros.filter(x => x !== o); const v = ovV.get(o.id); if (v) { v.pause(); v.remove(); ovV.delete(o.id); } o.trash = Date.now(); await dbPut(dbRow(o)); if (!clips.some(c2 => c2.url === o.url) && !bros.some(x => x.url === o.url)) URL.revokeObjectURL(o.url); ui(); trashUi(); say('🗑 Bild darüber liegt im Papierkorb.'); };
       });
     }
     K('broMk').onclick = async () => {
@@ -829,15 +850,35 @@ void main(){
       pv.addEventListener('pointerup', up); pv.addEventListener('pointercancel', up);
       pv.addEventListener('wheel', e => { if (K('fr').hidden || !clips[sel]) return; e.preventDefault(); const c = clips[sel], F = Object.assign({ z: 1, x: 0, y: 0, r: 0 }, c.fr || {}); F.z = Math.max(1, Math.min(3, F.z * Math.exp(-e.deltaY * .0015))); frSet(c, F); frUi(); }, { passive: false });
     }
+    // ---- Papierkorb (Vivien, 30.10.2026: „gelöschte Clips erst endgültig weg, wenn ich endgültig löschen sage“) ----
+    async function trashUi() {
+      if (closed) return; const all = await dbAll().catch(() => []), now = Date.now(), T = [];
+      for (const r of all) { if (!r.trash) continue; if (now - r.trash > 30 * 864e5) { await dbDel(r.id).catch(() => {}); continue; } T.push(r); }
+      T.sort((a, b) => b.trash - a.trash); const box = K('trash'); box.hidden = !T.length; K('trN').textContent = T.length ? '· ' + T.length : '';
+      const when = t => { const d = new Date(t); return d.getDate() + '.' + (d.getMonth() + 1) + '. ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+      K('trL').innerHTML = '<ul>' + T.map(r => '<li><span>' + (r.bro ? '🎞 ' : '🎬 ') + esc(r.name || 'Clip') + '<small>' + fmt1(Math.max(0, (r.out || r.dur || 0) - (r.in || 0))) + ' · gelöscht ' + when(r.trash) + (r.draft !== curDraft ? ' · aus „' + esc(r.tname || drName(r.draft)) + '“' : '') + '</small></span>'
+        + '<button type="button" class="sn-b sm" data-tr="' + r.id + '">↩ Zurückholen</button><button type="button" class="sn-b sm del" data-tx="' + r.id + '">Endgültig löschen</button></li>').join('') + '</ul>';
+      K('trL').querySelectorAll('[data-tr]').forEach(b => b.onclick = () => trashBack(b.dataset.tr));
+      K('trL').querySelectorAll('[data-tx]').forEach(b => b.onclick = async () => { if (!confirm('Diesen Clip endgültig löschen? Das geht nicht mehr rückgängig.')) return; await dbDel(b.dataset.tx); trashUi(); drawDrafts(); say('Endgültig gelöscht.'); });
+    }
+    async function trashBack(id) {
+      if (busy) return; stop(); const r = (await dbAll()).find(x => x.id === id); if (!r) return;
+      const same = r.draft === curDraft; r.trash = 0; r.draft = curDraft; await dbPut(r);
+      if (!r.bro) { const ord = clips.map(c => c.id), at = same ? Math.min(r.tpos || 0, ord.length) : ord.length; ord.splice(at, 0, r.id); await kvSet(ordKey(curDraft), ord); }
+      clips.forEach(c => { if (!clips.some(x => x !== c && x.url === c.url)) URL.revokeObjectURL(c.url); }); broClear(); clips = []; dropVids(); await load();
+      const k = clips.findIndex(c => c.id === id); if (k >= 0) { sel = k; pos = starts()[k]; ui(); }
+      say('↩ „' + (r.name || 'Clip') + '“ ist zurück' + (k >= 0 ? ' (Clip ' + (k + 1) + ')' : '') + '.', 'ok');
+    }
+    K('trEmpty').onclick = async () => { const all = await dbAll(), T = all.filter(r => r.trash); if (!T.length || !confirm('Papierkorb mit ' + T.length + ' Clips endgültig leeren? Das geht nicht mehr rückgängig.')) return; for (const r of T) await dbDel(r.id); trashUi(); drawDrafts(); say('Papierkorb geleert.'); };
     async function delAt(i) {
       const c = clips[i]; if (!c) return; stop();
-      await dbDel(c.id); clips.splice(i, 1); slots(); dropVids();
+      c.trash = Date.now(); c.tpos = i; await dbPut(dbRow(c)); clips.splice(i, 1); slots(); dropVids();
       if (!clips.some(x => x.url === c.url)) URL.revokeObjectURL(c.url);
       if (i < sel) sel--; sel = Math.min(sel, clips.length - 1);
       await saveOrder(); pos = sel >= 0 ? starts()[sel] : 0; ui();
     }
     K('ztDel').onclick = () => K('delClip').onclick();
-    K('delClip').onclick = async () => { if (!clips[sel]) return; await delAt(sel); say('🗑 Clip gelöscht.'); };
+    K('delClip').onclick = async () => { if (!clips[sel]) return; await delAt(sel); trashUi(); say('🗑 Clip liegt im Papierkorb. Von dort kannst du ihn zurückholen.'); };
 
     // ---- Zeitleiste über das ganze Video (Vivien, 30.10.2026: „Cut, Cut, Cut sehen und mit zwei Punkten ziehen“) ----
     // Jeder Clip ist ein Block, dazwischen die Schnittstellen. Die Griffe ⟦ ⟧ an den Rändern machen den Clip länger
