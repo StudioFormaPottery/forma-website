@@ -495,7 +495,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     <div class="box" id="clipBox" hidden><h2>🎬 Deine Clips</h2>
       <p class="tip" id="clipInfo"></p>
       <div class="clips" id="clips"></div>
-      <div class="cl-all" id="clAll" hidden><button type="button" class="main" id="shareAll" hidden>📲 Alle in Fotos sichern</button><button type="button" id="zipAll">⬇ Alle als ZIP</button><button type="button" id="zipSub" hidden>⬇ Alle mit Untertitel (ZIP)</button></div>
+      <div class="cl-all" id="clAll" hidden><button type="button" class="main" id="snAll">✂️ Alle zusammen schneiden</button><button type="button" class="main" id="shareAll" hidden>📲 Alle in Fotos sichern</button><button type="button" id="zipAll">⬇ Alle als ZIP</button><button type="button" id="zipSub" hidden>⬇ Alle mit Untertitel (ZIP)</button></div>
     </div>
     <div class="box subs" id="subBox" hidden><h2>💬 Untertitel</h2>
       <p class="tip">Für Social Media: Der Text wird passend zu deiner Stimme ins Video eingebrannt. Die Clips ohne Untertitel bleiben daneben erhalten.</p>
@@ -541,7 +541,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
 <script src="/wildhearts/assets/talkcam.js?v=7"></script>
 <script src="studio-edit.js?v=7"></script>
-<script src="schnitt.js?v=28"></script>
+<script src="schnitt.js?v=30"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
@@ -1007,7 +1007,9 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
       const type=(r.mimeType||mt||'video/webm').split(';')[0],b=new Blob(ch,{type}),ext=type.includes('mp4')?'mp4':'webm';
       const old=clips[me.i];if(old){URL.revokeObjectURL(old.url);if(old.sub)URL.revokeObjectURL(old.sub.url)}
       clips[me.i]={i:me.i,blob:b,url:URL.createObjectURL(b),ext:ext,dur:dur,s:st.s==null?.2:Math.max(0,st.s-.15),e:st.e==null?dur-.2:Math.min(dur,st.e+.25),lang:lang,text:paras(lang)[me.i]||'',sub:null,saved:false};
-      lastClip=me.i;renderClips();clipUi();};
+      lastClip=me.i;renderClips();clipUi();
+      // jeder Absatz liegt sofort auch im Schnitt (geht nie verloren); der ersetzte alte Take wandert dort in den Papierkorb
+      if(typeof Schnitt!=='undefined'){const nc=clips[me.i];nc.snP=Schnitt.addTake(b,'Absatz '+(me.i+1),{draft:draftName()+' · Absätze',target:snTarget()}).then(id=>{nc.snId=id;nc.saved=true;if(old&&old.snId)Schnitt.trashTake(old.snId);return id}).catch(()=>null)}};
     r._cs=cs;cs.rec=r;r.start(1000);st.t0=performance.now();$('rd').hidden=false;document.body.classList.add('recording');clipUi();
     try{if(!lock)lock=await navigator.wakeLock.request('screen')}catch(e){}
     (function loop(){if(!cs||cs.rec!==r||r.state!=='recording')return;const t=(performance.now()-st.t0)/1000;$('rt').textContent=fmt(t);
@@ -1021,7 +1023,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
   }
   let lastClip=-1;
   function stopRec(discard){if(cs&&cs.rec&&cs.rec.state==='recording'){cs.rec._cs.discard=!!discard;cs.rec.stop()}$('rd').hidden=true;run=false;document.body.classList.remove('recording')}
-  function delClip(i){const c=clips[i];if(!c)return;if($('play').src===c.url||($('play').src&&c.sub&&$('play').src===c.sub.url))stopPlay();URL.revokeObjectURL(c.url);if(c.sub)URL.revokeObjectURL(c.sub.url);clips[i]=null;if(lastClip===i)lastClip=-1;renderClips();clipUi();$('msg').className='msg';$('msg').textContent='🗑 Absatz '+(i+1)+' gelöscht. Nimm ihn einfach neu auf.'}
+  function delClip(i){const c=clips[i];if(!c)return;if(c.snId&&typeof Schnitt!=='undefined')Schnitt.trashTake(c.snId).catch(()=>{});if($('play').src===c.url||($('play').src&&c.sub&&$('play').src===c.sub.url))stopPlay();URL.revokeObjectURL(c.url);if(c.sub)URL.revokeObjectURL(c.sub.url);clips[i]=null;if(lastClip===i)lastClip=-1;renderClips();clipUi();$('msg').className='msg';$('msg').textContent='🗑 Absatz '+(i+1)+' gelöscht. Nimm ihn einfach neu auf.'}
   $('cdel').onclick=()=>{if(cs&&cs.rec)return;delClip(lastClip)};
   function finish(){stopRec(false);prTop(false);cs=null;slab.hidden=false;showSlide();slab.textContent='Fertig ✓';if(lock){lock.release().catch(()=>{});lock=null}clipUi();
     const n=clips.filter(Boolean).length;$('msg').className='msg ok';$('msg').textContent=n?'✓ '+n+' Clip'+(n>1?'s':'')+' fertig. Rechts kannst du sie ansehen, neu aufnehmen, sichern oder Untertitel dazu machen.':'';}
@@ -1062,6 +1064,12 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
     $('msg').className='msg';$('msg').textContent='ZIP wird gepackt …';const b=await z.generateAsync({type:'blob',compression:'STORE'});
     const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=baseName+(sub?'_Untertitel':'')+'.zip';document.body.appendChild(a);a.click();a.remove();
     clips.forEach(c=>{if(c)c.saved=true});$('msg').textContent='✓ ZIP ist in deinen Downloads.';}
+  // Alle Absätze auf einmal in den Schnitt (Vivien, 30.10.2026: „alle Abschnitte in einem schneiden, nicht jedes einzelne“)
+  $('snAll').onclick=async()=>{const L=clips.filter(Boolean).sort((a,b)=>a.i-b.i);if(!L.length||typeof Schnitt==='undefined')return;$('snAll').disabled=true;$('snAll').textContent='⏳ Kommt in den Schnitt …';
+    try{const dn=draftName()+' · Absätze';for(const c of L){if(!c.snId&&c.snP)await c.snP;if(!c.snId)c.snId=await Schnitt.addTake(c.blob,'Absatz '+(c.i+1),{draft:dn,target:snTarget()})}
+      await Schnitt.orderTakes(dn,L.map(c=>c.snId));await Schnitt.setDraft(dn,snTarget());
+      L.forEach(c=>c.saved=true);saved=true;location.href='?view=schnitt'}
+    catch(e){$('snAll').disabled=false;$('snAll').textContent='✂️ Alle zusammen schneiden';$('msg').className='msg bad';$('msg').textContent='Konnte die Absätze nicht in den Schnitt legen. Bitte nochmal tippen.'}};
   $('zipAll').onclick=()=>zip(false);$('zipSub').onclick=()=>zip(true);
   window.addEventListener('beforeunload',e=>{if(clips.some(c=>c&&!c.saved)){e.preventDefault();e.returnValue=''}});
 

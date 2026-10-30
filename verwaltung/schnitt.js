@@ -47,6 +47,12 @@
   async function kvGet(k) { const d = await idb(); return new Promise((ok, no) => { const r = d.transaction('kv').objectStore('kv').get(k); r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error); }); }
   async function kvSet(k, v) { const d = await idb(); return new Promise((ok, no) => { const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = ok; t.onerror = () => no(t.error); }); }
   async function kvDel(k) { const d = await idb(); return new Promise((ok, no) => { const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').delete(k); t.oncomplete = ok; t.onerror = () => no(t.error); }); }
+  // Kleine Rückfrage im Movecia-Stil statt der großen Browser-Fenster (Vivien, 30.10.2026: „riesige Pop-ups will ich nicht“)
+  function ask(text) { return new Promise(ok => { const w = document.createElement('div');
+    w.style.cssText = 'position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99999;width:min(380px,calc(100% - 32px));background:#fff;border:1.5px solid #E6DCD2;border-radius:18px;box-shadow:0 18px 40px -18px rgba(46,37,41,.45);padding:14px 16px;font:15.5px/1.45 "Hanken Grotesk",system-ui,sans-serif;color:#2E2529';
+    w.innerHTML = '<div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button type="button" data-n style="font:inherit;padding:8px 16px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer">Abbrechen</button><button type="button" data-y style="font:inherit;padding:8px 16px;border-radius:999px;border:0;background:#7D5E68;color:#fff;cursor:pointer">Ja</button></div>';
+    w.firstChild.textContent = text; document.body.appendChild(w); const done = v => { w.remove(); ok(v); };
+    w.querySelector('[data-y]').onclick = () => done(true); w.querySelector('[data-n]').onclick = () => done(false); w.querySelector('[data-y]').focus(); }); }
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   const fmt = s => { s = Math.max(0, s || 0); return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'); };
   const fmt1 = s => fmt(s) + ',' + Math.floor((Math.max(0, s || 0) % 1) * 10);
@@ -384,7 +390,7 @@ void main(){
       <div style="margin-top:12px;font-size:15.5px;color:#4A3A41">🎥 Bewegung in diesem Clip</div>
       <div class="sn-chips" data-k="zmv"><button type="button" data-zm="none">Keine</button><button type="button" data-zm="slow">Langsam rein (Kino-Zoom)</button><button type="button" data-zm="punch">Schnell rein</button><button type="button" data-zm="out">Langsam raus</button></div>
       <label><span>🐟 Fischauge <i data-k="feV">aus</i></span><input type="range" min="0" max="100" step="1" value="0" data-k="fe"></label>
-      <p class="sn-zt-hint">Soll der Zoom erst später anfangen? Mit ✂ an der Stelle schneiden und nur dem zweiten Teil die Bewegung geben.</p>
+      <div class="sn-zt-hint">Soll der Zoom erst später anfangen? Mit ✂ an der Stelle schneiden und nur dem zweiten Teil die Bewegung geben.</div>
       <div class="sn-row"><button type="button" class="sn-b sm" data-k="frAll">Für alle Clips übernehmen</button><button type="button" class="sn-b sm" data-k="frReset">Zurücksetzen</button></div>
     </div>
     <div class="sn-zt">
@@ -392,17 +398,17 @@ void main(){
       <div class="sn-zt-bar"><button type="button" class="zb" data-k="zoomOut" aria-label="Zeitleiste zusammenziehen">－</button><input type="range" min="0" max="100" step="1" value="0" data-k="zoomR" aria-label="Zeitleiste auseinanderziehen"><button type="button" class="zb" data-k="zoomIn" aria-label="Zeitleiste auseinanderziehen">＋</button><span class="t" data-k="ztime">0:00,0</span></div>
     </div>
     <div class="sn-ovl" data-k="ovl"></div>
-    <p class="sn-zt-hint" data-k="zthint">Tippen = Stelle anspringen · die Griffe <b>⟦ ⟧</b> an den Rändern ziehen = Anfang und Ende länger oder kürzer machen (das schraffierte Stück daneben ist das, was weggeschnitten wurde – da kannst du wieder hineinziehen) · der Griff darf auch über den nächsten Clip hinaus (was doppelt ist, kannst du darunter löschen) · zwei Finger auseinander (oder ＋) = Zeitleiste auseinanderziehen</p>
+    <div class="sn-zt-hint" data-k="zthint">Tippen = Stelle anspringen · die Griffe <b>⟦ ⟧</b> an den Rändern ziehen = Anfang und Ende länger oder kürzer machen (das schraffierte Stück daneben ist das, was weggeschnitten wurde – da kannst du wieder hineinziehen) · der Griff darf auch über den nächsten Clip hinaus (was doppelt ist, kannst du darunter löschen) · zwei Finger auseinander (oder ＋) = Zeitleiste auseinanderziehen</div>
   </div>
   <h2 style="margin-top:16px" data-k="h2">Deine Clips <span style="font-size:16px;color:#7D7076;font-family:'Hanken Grotesk',sans-serif;font-weight:400" data-k="cnt"></span></h2>
-  <p class="sn-zt-hint" style="margin:0 2px 4px">Reihenfolge ändern: Kachel nehmen und an die neue Stelle ziehen (am Handy kurz drauf halten, dann ziehen).</p>
+  <div class="sn-zt-hint" style="margin:0 2px 4px">Reihenfolge ändern: Kachel nehmen und an die neue Stelle ziehen (am Handy kurz drauf halten, dann ziehen).</div>
   <div class="sn-clips" data-k="clips"></div>
   <div class="sn-cov" data-k="coved" hidden>
     <div class="h"><b>🖼 Titelbild ganz am Anfang</b><button type="button" class="sn-b sm" data-k="covX">Schließen</button></div>
     <label class="sn-sw"><input type="checkbox" data-k="covOn"> Titelbild vor dem ersten Clip zeigen</label>
     <div class="ths" data-k="covThs"></div>
     <div><div style="font-size:16px;color:#4A3A41;margin-bottom:4px">Wie lange?</div><div class="sn-chips" data-k="covDur"></div></div>
-    <p class="sn-note">Das Bild steht ganz vorne, noch vor deinem ersten Clip, und ist auch das Vorschaubild, wenn das Video hochgeladen wird. Die Musik läuft schon darunter. Dein zuletzt gewähltes Titelbild nehme ich für die nächsten Talking Heads automatisch wieder.</p>
+    <div class="sn-note">Das Bild steht ganz vorne, noch vor deinem ersten Clip, und ist auch das Vorschaubild, wenn das Video hochgeladen wird. Die Musik läuft schon darunter. Dein zuletzt gewähltes Titelbild nehme ich für die nächsten Talking Heads automatisch wieder.</div>
   </div>
   <div class="sn-row" style="margin-top:0">
     <label class="sn-b pl" style="cursor:pointer">＋ Clips vom Gerät<input type="file" accept="video/*,.mov,.mp4,.m4v,.webm" multiple hidden data-k="file"></label>
@@ -411,7 +417,8 @@ void main(){
   </div>
   <details class="sn-trash" data-k="trash" hidden><summary>🗑 Papierkorb <span data-k="trN"></span></summary><div data-k="trL"></div>
     <div class="sn-row"><button type="button" class="sn-b sm del" data-k="trEmpty">Papierkorb leeren (endgültig)</button></div>
-    <p class="sn-zt-hint">Gelöschte Clips bleiben hier 30 Tage auf diesem Gerät, dann werden sie endgültig gelöscht.</p></details>
+    <div class="sn-zt-hint">Gelöschte Clips bleiben hier 30 Tage auf diesem Gerät, dann werden sie endgültig gelöscht.</div></details>
+  <details class="sn-trash" data-k="resc" hidden open><summary>🛟 Gerettete Videos <span data-k="rsN"></span></summary><div class="sn-zt-hint">Diese Videodateien liegen noch auf deinem Gerät, gehören aber zu keinem Clip mehr (z. B. die ursprüngliche Fassung einer Aufnahme). Ansehen und bei Bedarf zurückholen.</div><div data-k="rsL"></div></details>
   <div class="sn-ed" data-k="ed" hidden>
     <div class="h"><b data-k="edT"></b><span data-k="edD"></span></div>
     <div class="sn-row">
@@ -431,14 +438,14 @@ void main(){
       <button type="button" class="sn-b sm" data-k="broMk">🎞 Nur als Bild über das Video davor (Stimme läuft weiter)</button>
       <label class="sn-b sm" style="cursor:pointer">＋ Bild darüber legen (Video vom Gerät)<input type="file" accept="video/*,.mov,.mp4,.m4v,.webm" hidden data-k="broFile"></label>
     </div>
-    <p class="sn-hint" data-k="broHint"></p>
+    <div class="sn-hint" data-k="broHint"></div>
     <div class="sn-bro" data-k="bro"></div>
   </div>
   <div class="sn-row" style="margin-top:14px">
     <button type="button" class="sn-b main" data-k="done">✓ Fertig stellen</button>
   </div>
   <div class="sn-prog" data-k="prog" hidden><i></i></div>
-  <p class="sn-msg" data-k="msg"></p>
+  <div class="sn-msg" data-k="msg"></div>
   <div class="sn-res" data-k="res" hidden>
     <h2>Dein fertiges Video</h2>
     <div class="sn-up" data-k="up" hidden></div>
@@ -449,25 +456,25 @@ void main(){
       ${o.upload ? '<button type="button" class="sn-b dk" data-k="upBtn">⬆ Hochladen</button>' : ''}
       <button type="button" class="sn-b sm" data-k="resX">Schließen</button>
     </div>
-    <p class="sn-note" style="margin-top:8px" data-k="resN"></p>
+    <div class="sn-note" style="margin-top:8px" data-k="resN"></div>
   </div>
 </div>
 <div class="sn-r">
   <details class="sn-box dr" open><summary>📝 Entwürfe</summary><div class="bd">
     <div><label style="display:block;font-size:16px;color:#4A3A41;margin-bottom:4px">Woran arbeitest du gerade?</label>
       <input type="text" class="sn-dr-name" maxlength="60" placeholder="z. B. The Method · Morgen-Flow" data-k="drName"></div>
-    <p class="sn-note">Jede Aufnahme und jeder Schnitt gehört zu einem Entwurf. So kannst du zuerst alle Videos aufnehmen und später in Ruhe eines nach dem anderen fertig schneiden. Alles bleibt auf diesem Gerät gespeichert.</p>
+    <div class="sn-note">Jede Aufnahme und jeder Schnitt gehört zu einem Entwurf. So kannst du zuerst alle Videos aufnehmen und später in Ruhe eines nach dem anderen fertig schneiden. Alles bleibt auf diesem Gerät gespeichert.</div>
     <ul class="sn-dr-list" data-k="drList"></ul>
     <button type="button" class="sn-b" data-k="drNew">＋ Neuer Entwurf</button>
   </div></details>
   <details class="sn-box auto" open><summary>✨ Automatisch schneiden</summary><div class="bd">
-    <p class="sn-note" style="color:#4A3A41">Ein Tipp, und ich schneide Pausen raus, nehme heraus, wo du dich erst zurechtsetzt oder neu angesetzt hast, und lege einen sanften Zoom über die Abschnitte, damit es sich flüssig und lebendig anschaut. Danach siehst du jeden Schnitt in der Zeitleiste und kannst ihn mit den Griffen länger oder kürzer ziehen.</p>
+    <div class="sn-note" style="color:#4A3A41">Ein Tipp, und ich schneide Pausen raus, nehme heraus, wo du dich erst zurechtsetzt oder neu angesetzt hast, und lege einen sanften Zoom über die Abschnitte, damit es sich flüssig und lebendig anschaut. Danach siehst du jeden Schnitt in der Zeitleiste und kannst ihn mit den Griffen länger oder kürzer ziehen.</div>
     <button type="button" class="sn-b main" data-k="auto" style="font-size:18px;min-height:52px">✨ Jetzt automatisch schneiden</button>
     <div class="sn-pz">
       <div class="lb">Pausen rausschneiden ab <b data-k="pauseV">0,7 s</b></div>
       <input type="range" min="20" max="250" step="5" value="70" data-k="pauseR" aria-label="Pausen rausschneiden ab">
       <div class="sc"><span>jede Atempause</span><span>nur lange Pausen</span></div>
-      <p class="sn-note" data-k="pauseH"></p>
+      <div class="sn-note" data-k="pauseH"></div>
       <button type="button" class="sn-b sm" data-k="pauseGo" hidden>✨ Mit dieser Einstellung nochmal schneiden</button>
     </div>
     <label class="sn-sw"><input type="checkbox" data-k="stumbles"> Versprecher erkennen (wenn du neu ansetzt)</label>
@@ -480,25 +487,25 @@ void main(){
     <div class="sn-chips" data-k="looks"></div>
     <div data-sl="br"></div><div data-sl="ct"></div><div data-sl="sa"></div><div data-sl="se"></div><div data-sl="bb"></div>
     <label class="sn-sw"><input type="checkbox" data-k="lbx"> 🎬 Kino-Balken (schmale schwarze Streifen oben und unten)</label>
-    <p class="sn-note">Gilt für alle Clips, damit das Video aus einem Guss ist.</p>
+    <div class="sn-note">Gilt für alle Clips, damit das Video aus einem Guss ist.</div>
   </div></details>
   <details class="sn-box"><summary>🖼 Format</summary><div class="bd">
     <div class="sn-chips" data-k="fmts"></div>
-    <p class="sn-note">Bei einem anderen Format wird die Mitte ausgeschnitten. Für Reels und Storys „Hoch 9:16“.</p>
+    <div class="sn-note">Bei einem anderen Format wird die Mitte ausgeschnitten. Für Reels und Storys „Hoch 9:16“.</div>
   </div></details>
   <details class="sn-box"><summary>🎵 Musik darunter</summary><div class="bd">
     <div class="sn-ml" data-k="mlist"></div>
     <div class="sn-sug" data-k="sug"></div>
     <details class="sn-all"><summary data-k="allsum">Alle Lieder durchsuchen</summary>
       <input type="search" data-k="msearch" placeholder="Lied oder Künstlerin suchen …" aria-label="Lied suchen">
-      <div class="sn-lib" data-k="lib"><p class="sn-note">Deine Musik wird geladen …</p></div>
+      <div class="sn-lib" data-k="lib"><div class="sn-note">Deine Musik wird geladen …</div></div>
     </details>
     <label class="sn-b" style="width:max-content;cursor:pointer">📁 Lieder vom Gerät<input type="file" accept="audio/*,.mp3,.m4a,.wav,.aac" multiple hidden data-k="mfile"></label>
     <div data-sl="vol"></div><div data-sl="voice"></div>
     <label class="sn-sw"><input type="checkbox" data-k="duck"> Musik leiser, wenn ich spreche</label>
     <label class="sn-sw"><input type="checkbox" data-k="fade"> Musik sanft ein- und ausblenden</label>
   </div></details>
-  <p class="sn-note">Deine Clips bleiben auf diesem Gerät gespeichert (auch nach dem Schließen), bis du sie hier löschst. Die Vorschau zeigt alles so, wie es nachher gespeichert wird.</p>
+  <div class="sn-note">Deine Clips bleiben auf diesem Gerät gespeichert (auch nach dem Schließen), bis du sie hier löschst. Die Vorschau zeigt alles so, wie es nachher gespeichert wird.</div>
 </div>`;
     const q = s => root.querySelector(s), K = k => root.querySelector('[data-k="' + k + '"]');
     const pv = q('#snpv'), msg = K('msg'), big = K('big');
@@ -558,13 +565,13 @@ void main(){
     async function load() {
       try {
         curDraft = await ensureDraft(); drList = await drafts();
-        const all = await dbAll(), rows = all.filter(r => r.draft === curDraft && !r.trash), order = (await kvGet(ordKey(curDraft))) || [];
+        const all = await dbAll(), rows = all.filter(r => r.draft === curDraft && !r.trash && r.blob), order = (await kvGet(ordKey(curDraft))) || [];
         rows.sort((a, b) => (order.indexOf(a.id) + 1 || 1e9) - (order.indexOf(b.id) + 1 || 1e9) || a.added - b.added);
         const urls = new Map(); const objs = rows.map(r => { let u = urls.get(r.blob); if (!u) { u = URL.createObjectURL(r.blob); urls.set(r.blob, u); } return Object.assign({}, r, { url: u }); });
         clips = objs.filter(r => !r.bro); bros = objs.filter(r => r.bro); bros.forEach(ovVid);
         slots(); if (clips.length) { sel = 0; vidFor(clips[0]); prep(1); }
         await covLoad().catch(() => {});
-        drawDrafts(); ui(); clips.forEach(thumb); trashUi();
+        drawDrafts(); ui(); clips.forEach(thumb); trashUi(); rescueUi();
       } catch (e) { say('Die gespeicherten Clips konnten nicht geladen werden.', 'bad'); }
     }
     // ---- Entwürfe ----
@@ -598,7 +605,7 @@ void main(){
     // Zwei Entwürfe zu einem (Vivien, 30.10.2026: „den einen Entwurf auf den anderen draufsetzen, damit ich das ganze Video bearbeiten kann“)
     async function mergeDraft(id) {
       if (busy || id === curDraft) return; const nm = drName(id), into = drName(curDraft);
-      if (!confirm('Alle Clips aus „' + nm + '“ hinten an „' + into + '“ anhängen? Danach ist es ein Entwurf.')) return; stop();
+      if (!await ask('Alle Clips aus „' + nm + '“ hinten an „' + into + '“ anhängen? Danach ist es ein Entwurf.')) return; stop();
       const all = await dbAll(), rows = all.filter(r => r.draft === id), ord = (await kvGet(ordKey(id))) || [];
       rows.sort((a, b) => (ord.indexOf(a.id) + 1 || 1e9) - (ord.indexOf(b.id) + 1 || 1e9) || a.added - b.added);
       for (const r of rows) { r.draft = curDraft; await dbPut(r); }
@@ -610,7 +617,7 @@ void main(){
       say('✓ „' + nm + '“ hängt jetzt hinten an. Alles ist ein Video mit ' + clips.length + ' Clips, du kannst es ganz bearbeiten.', 'ok');
     }
     async function delDraft(id) {
-      const nm = drName(id); if (!confirm('Entwurf „' + nm + '“ löschen? Die Clips kommen in den Papierkorb.')) return;
+      const nm = drName(id); if (!await ask('Entwurf „' + nm + '“ löschen? Die Clips kommen in den Papierkorb.')) return;
       const all = await dbAll(), tt = Date.now(); for (const c of all) if (c.draft === id && !c.trash) { c.trash = tt; c.tname = nm; await dbPut(c); }
       await kvDel(ordKey(id)).catch(() => {});
       drList = (await drafts()).filter(d => d.id !== id); await draftsSave(drList);
@@ -669,7 +676,7 @@ void main(){
     const saveOrder = () => kvSet(ordKey(curDraft), clips.map(c => c.id)).catch(() => {});
     const touch = async () => { const d = drList.find(x => x.id === curDraft); if (d) { d.at = Date.now(); await draftsSave(drList).catch(() => {}); drawDrafts(); } };
     K('file').onchange = e => { addFiles([...e.target.files]); e.target.value = ''; };
-    K('clearAll').onclick = async () => { if (!clips.length || !confirm('Alle ' + clips.length + ' Clips in den Papierkorb legen?')) return; stop(); const tt = Date.now(); for (const [i, c] of clips.entries()) { c.trash = tt; c.tpos = i; await dbPut(dbRow(c)); } for (const o of bros) { o.trash = tt; await dbPut(dbRow(o)); } broClear(); const urls = new Set(clips.map(c => c.url)); clips = []; dropVids(); urls.forEach(u => URL.revokeObjectURL(u)); sel = -1; await saveOrder(); undoRows = null; K('undo').hidden = true; K('autoRes').hidden = true; drawDrafts(); ui(); trashUi(); say('Alle Clips aus „' + drName(curDraft) + '“ liegen im Papierkorb.'); };
+    K('clearAll').onclick = async () => { if (!clips.length || !await ask('Alle ' + clips.length + ' Clips in den Papierkorb legen?')) return; stop(); const tt = Date.now(); for (const [i, c] of clips.entries()) { c.trash = tt; c.tpos = i; await dbPut(dbRow(c)); } for (const o of bros) { o.trash = tt; await dbPut(dbRow(o)); } broClear(); const urls = new Set(clips.map(c => c.url)); clips = []; dropVids(); urls.forEach(u => URL.revokeObjectURL(u)); sel = -1; await saveOrder(); undoRows = null; K('undo').hidden = true; K('autoRes').hidden = true; drawDrafts(); ui(); trashUi(); say('Alle Clips aus „' + drName(curDraft) + '“ liegen im Papierkorb.'); };
 
     // ---- Vorschau: Clips nacheinander abspielen ----
     let playing = false, pos = 0, raf = 0, cmp = false, prepped = false; // pos = Stelle im Gesamtvideo
@@ -951,7 +958,15 @@ void main(){
       K('trL').innerHTML = '<ul>' + T.map(r => '<li><span>' + (r.bro ? '🎞 ' : '🎬 ') + esc(r.name || 'Clip') + '<small>' + fmt1(Math.max(0, (r.out || r.dur || 0) - (r.in || 0))) + ' · gelöscht ' + when(r.trash) + (r.draft !== curDraft ? ' · aus „' + esc(r.tname || drName(r.draft)) + '“' : '') + '</small></span>'
         + '<button type="button" class="sn-b sm" data-tr="' + r.id + '">↩ Zurückholen</button><button type="button" class="sn-b sm del" data-tx="' + r.id + '">Endgültig löschen</button></li>').join('') + '</ul>';
       K('trL').querySelectorAll('[data-tr]').forEach(b => b.onclick = () => trashBack(b.dataset.tr));
-      K('trL').querySelectorAll('[data-tx]').forEach(b => b.onclick = async () => { if (!confirm('Diesen Clip endgültig löschen? Das geht nicht mehr rückgängig.')) return; await dbDel(b.dataset.tx); trashUi(); drawDrafts(); say('Endgültig gelöscht.'); });
+      K('trL').querySelectorAll('[data-tx]').forEach(b => b.onclick = async () => { if (!await ask('Diesen Clip endgültig löschen? Das geht nicht mehr rückgängig.')) return; await dbDel(b.dataset.tx); trashUi(); drawDrafts(); say('Endgültig gelöscht.'); });
+    }
+    async function rescueUi() {
+      if (closed) return; let L = []; try { L = await orphanFiles(); } catch (e) {} const box = K('resc'); box.hidden = !L.length; K('rsN').textContent = L.length ? '· ' + L.length : '';
+      K('rsL').innerHTML = '<ul>' + L.map((x, i) => '<li><span>🎬 Video ' + (i + 1) + '<small>' + (x.blob.size / 1048576).toFixed(0) + ' MB · ' + esc((x.blob.type || '').replace('video/', '') || 'Video') + '</small><video controls playsinline preload="metadata" style="width:100%;max-width:320px;border-radius:12px;margin-top:6px;display:block" data-rv="' + i + '"></video></span><button type="button" class="sn-b sm" data-rb="' + i + '">↩ In diesen Entwurf holen</button></li>').join('') + '</ul>';
+      K('rsL').querySelectorAll('[data-rv]').forEach(v => { v.src = URL.createObjectURL(L[+v.dataset.rv].blob); });
+      K('rsL').querySelectorAll('[data-rb]').forEach(b => b.onclick = async () => { const x = L[+b.dataset.rb]; stop(); fidOf.set(x.blob, x.fid);
+        const c = { id: uid(), blob: x.blob, name: 'Gerettetes Video ' + (+b.dataset.rb + 1), added: Date.now(), in: 0, out: 0, mute: false, dur: 0, draft: curDraft, fx: 1 }; c.src = c.id; c.url = URL.createObjectURL(x.blob);
+        clips.push(c); await dbPut(dbRow(c)); await saveOrder(); slots(); vidFor(c); thumb(c); sel = clips.length - 1; ui(); rescueUi(); say('↩ Das Video ist zurück (Clip ' + clips.length + ').', 'ok'); });
     }
     async function trashBack(id) {
       if (busy) return; stop(); const r = (await dbAll()).find(x => x.id === id); if (!r) return;
@@ -961,7 +976,7 @@ void main(){
       const k = clips.findIndex(c => c.id === id); if (k >= 0) { sel = k; pos = starts()[k]; ui(); }
       say('↩ „' + (r.name || 'Clip') + '“ ist zurück' + (k >= 0 ? ' (Clip ' + (k + 1) + ')' : '') + '.', 'ok');
     }
-    K('trEmpty').onclick = async () => { const all = await dbAll(), T = all.filter(r => r.trash); if (!T.length || !confirm('Papierkorb mit ' + T.length + ' Clips endgültig leeren? Das geht nicht mehr rückgängig.')) return; for (const r of T) await dbDel(r.id); trashUi(); drawDrafts(); say('Papierkorb geleert.'); };
+    K('trEmpty').onclick = async () => { const all = await dbAll(), T = all.filter(r => r.trash); if (!T.length || !await ask('Papierkorb mit ' + T.length + ' Clips endgültig leeren? Das geht nicht mehr rückgängig.')) return; for (const r of T) await dbDel(r.id); trashUi(); drawDrafts(); say('Papierkorb geleert.'); };
     async function delAt(i) {
       const c = clips[i]; if (!c) return; stop();
       c.trash = Date.now(); c.tpos = i; await dbPut(dbRow(c)); clips.splice(i, 1); slots(); dropVids();
@@ -1158,13 +1173,13 @@ void main(){
     const musStop = () => [auA, auB].forEach(a => a.pause());
     function mlUi() {
       const box = K('mlist'), D = total() + CD();
-      if (!mlist.length) { box.innerHTML = '<p class="sn-note">Noch keine Musik. Nimm unten ein oder mehrere Lieder – ich schneide sie auf die Länge deines Videos zu und blende sie ineinander.</p>'; return; }
+      if (!mlist.length) { box.innerHTML = '<div class="sn-note">Noch keine Musik. Nimm unten ein oder mehrere Lieder – ich schneide sie auf die Länge deines Videos zu und blende sie ineinander.</div>'; return; }
       const ges = mlist.reduce((a, m) => a + (m.dur || 0), 0);
       box.innerHTML = '<ul>' + mlist.map((m, i) => '<li><b class="n">' + (i + 1) + '</b><span>' + esc(m.name) + '<small>' + (m.dur ? fmt(m.dur) : '') + '</small></span>'
         + (i ? '<button type="button" data-mup="' + i + '" aria-label="nach oben">↑</button>' : '')
         + '<button type="button" data-mx="' + i + '" aria-label="entfernen">✕</button></li>').join('') + '</ul>'
-        + '<p class="sn-note">' + (mlist.length > 1 ? 'Die Lieder laufen in dieser Reihenfolge und blenden ineinander. ' : '')
-        + (ges < D - .5 ? 'Zusammen ' + fmt(ges) + ' – dein Video ist ' + fmt(D) + ' lang, danach fange ich wieder vorne an.' : 'Reicht für dein ganzes Video (' + fmt(D) + ').') + '</p>';
+        + '<div class="sn-note">' + (mlist.length > 1 ? 'Die Lieder laufen in dieser Reihenfolge und blenden ineinander. ' : '')
+        + (ges < D - .5 ? 'Zusammen ' + fmt(ges) + ' – dein Video ist ' + fmt(D) + ' lang, danach fange ich wieder vorne an.' : 'Reicht für dein ganzes Video (' + fmt(D) + ').') + '</div>';
       box.querySelectorAll('[data-mx]').forEach(b => b.onclick = () => { const i = +b.dataset.mx; URL.revokeObjectURL(mlist[i].url); mlist.splice(i, 1); schedCache = null; musStop(); mlUi(); libUi(); sugUi(); });
       box.querySelectorAll('[data-mup]').forEach(b => b.onclick = () => { const i = +b.dataset.mup; mlist.splice(i - 1, 0, mlist.splice(i, 1)[0]); schedCache = null; musStop(); mlUi(); });
     }
@@ -1223,14 +1238,14 @@ void main(){
     K('duck').onchange = () => { mus.duck = K('duck').checked; ls.set('sn-mus', mus); }; K('fade').onchange = () => { mus.fade = K('fade').checked; ls.set('sn-mus', mus); };
     function libUi() {
       const box = K('lib'); if (!o.musicUrl) { box.innerHTML = ''; K('allsum').textContent = ''; return; }
-      if (!lib.length) { box.innerHTML = '<p class="sn-note">Noch keine Lieder im Musik-Ordner.</p>'; K('allsum').textContent = 'Alle Lieder'; return; }
+      if (!lib.length) { box.innerHTML = '<div class="sn-note">Noch keine Lieder im Musik-Ordner.</div>'; K('allsum').textContent = 'Alle Lieder'; return; }
       const f2 = s2 => s2 > 0 ? fmt(s2) : '', drin = id => mlist.some(m => m.id === id);
       const qs = String(K('msearch').value || '').trim().toLowerCase();
       const hit = qs ? lib.filter(x => x.t.toLowerCase().includes(qs)) : lib;
       const show = hit.slice(0, 60);
       K('allsum').textContent = 'Alle Lieder durchsuchen (' + lib.length + ')';
-      box.innerHTML = (hit.length ? '' : '<p class="sn-note">Nichts gefunden.</p>') + '<ul>' + show.map(x => '<li class="' + (drin(x.id) ? 'on' : '') + '"><button type="button" data-pv="' + x.id + '" aria-label="Reinhören">' + (preId === x.id ? '❚❚' : '▶') + '</button><span>' + esc(x.t) + '<small>' + f2(x.dur) + '</small></span><button type="button" class="pk" data-take="' + x.id + '">' + (drin(x.id) ? '✓ drin · nochmal' : '＋ Nehmen') + '</button></li>').join('') + '</ul>'
-        + (hit.length > show.length ? '<p class="sn-note">… und ' + (hit.length - show.length) + ' weitere. Tipp den Namen oben ein, um sie zu finden.</p>' : '');
+      box.innerHTML = (hit.length ? '' : '<div class="sn-note">Nichts gefunden.</div>') + '<ul>' + show.map(x => '<li class="' + (drin(x.id) ? 'on' : '') + '"><button type="button" data-pv="' + x.id + '" aria-label="Reinhören">' + (preId === x.id ? '❚❚' : '▶') + '</button><span>' + esc(x.t) + '<small>' + f2(x.dur) + '</small></span><button type="button" class="pk" data-take="' + x.id + '">' + (drin(x.id) ? '✓ drin · nochmal' : '＋ Nehmen') + '</button></li>').join('') + '</ul>'
+        + (hit.length > show.length ? '<div class="sn-note">… und ' + (hit.length - show.length) + ' weitere. Tipp den Namen oben ein, um sie zu finden.</div>' : '');
       box.querySelectorAll('[data-pv]').forEach(b => b.onclick = () => { const id = +b.dataset.pv; if (preId === id) { pre.pause(); preId = 0; } else { pre.src = o.musicUrl + id; pre.volume = .6; pre.play().catch(() => {}); preId = id; } libUi(); sugUi(); });
       box.querySelectorAll('[data-take]').forEach(b => b.onclick = async () => { const x = lib.find(y => y.id === +b.dataset.take); b.disabled = true; b.textContent = 'Lädt …'; if (await takeSong(x)) say('🎵 „' + x.t + '“ liegt jetzt darunter.', 'ok'); });
     }
@@ -1630,7 +1645,7 @@ void main(){
         + '<label class="new"><b>＋</b>Neues Bild<input type="file" accept="image/*" hidden></label>';
       box.querySelector('.new input').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) covAdd(f); };
       box.querySelectorAll('[data-cth]').forEach(b => b.onclick = async e => { if (e.target.closest('[data-cdel]')) return; cov = Object.assign(cov || {}, { id: b.dataset.cth, on: true, dur: (cov && cov.dur) || 2 }); await covSave(); covRemember(); covChanged(true); });
-      box.querySelectorAll('[data-cdel]').forEach(b => b.onclick = async e => { e.stopPropagation(); if (!confirm('Dieses Titelbild von diesem Gerät löschen?')) return; const id = b.dataset.cdel, i = covers.findIndex(x => x.id === id);
+      box.querySelectorAll('[data-cdel]').forEach(b => b.onclick = async e => { e.stopPropagation(); if (!await ask('Dieses Titelbild von diesem Gerät löschen?')) return; const id = b.dataset.cdel, i = covers.findIndex(x => x.id === id);
         if (i >= 0) { URL.revokeObjectURL(covers[i].url); covers.splice(i, 1); } await covsSave(); if (cov && cov.id === id) { cov.id = covers[0] ? covers[0].id : null; if (!cov.id) cov.on = false; await covSave(); } covChanged(); });
       K('covDur').innerHTML = [1, 1.5, 2, 3, 4].map(s => '<button type="button" data-cd="' + s + '" aria-pressed="' + (!!cov && +cov.dur === s) + '">' + String(s).replace('.', ',') + ' s</button>').join('');
       K('covDur').querySelectorAll('button').forEach(b => b.onclick = async () => { if (!cov) cov = { on: false, id: covers[0] ? covers[0].id : null, dur: 2 }; cov.dur = +b.dataset.cd; ls.set('sn-cov-dur', cov.dur); await covSave(); covChanged(true); });
@@ -1746,5 +1761,10 @@ void main(){
   async function setDraft(name, target) { const id = await draftFor(name); await kvSet('cur', id);
     if (target) { const l = await drafts(), d = l.find(x => x.id === id); if (d) { d.tg = target; d.up = null; await draftsSave(l); } }
     return id; }
-  window.Schnitt = { open, addTake, takeResult, draftFor, setDraft, drafts };
+  // Für das Studio: ersetzte/gelöschte Absatz-Takes in den Papierkorb, Reihenfolge der Absätze festlegen
+  async function trashTake(id) { const r = (await dbAll()).find(x => x.id === id); if (r && !r.trash) { r.trash = Date.now(); await dbPut(r); } }
+  async function orderTakes(name, ids) { const did = await draftFor(name), cur = (await kvGet(ordKey(did))) || []; await kvSet(ordKey(did), ids.concat(cur.filter(x => !ids.includes(x)))); return did; }
+  async function orphanFiles() { const d = await idb(), t = d.transaction(['clips', 'files']), rows = (await req(t.objectStore('clips').getAll())) || [], used = new Set(rows.map(r => r.fid).filter(Boolean));
+    const keys = (await req(t.objectStore('files').getAllKeys())) || [], out = []; for (const k of keys) if (!used.has(k)) { const b = await req(d.transaction('files').objectStore('files').get(k)); if (b) out.push({ fid: k, blob: b }); } return out; }
+  window.Schnitt = { open, addTake, takeResult, draftFor, setDraft, drafts, trashTake, orderTakes };
 })();
