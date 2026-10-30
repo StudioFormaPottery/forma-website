@@ -103,8 +103,8 @@ function natal_member_view(PDO $pdo, array $o): array
         $units[] = ['key' => $k, 'nr' => $i + 1, 'label' => natal_unit_label($k), 'title' => $u['title'], 'theme' => $u['theme'], 'state' => $state,
             'when' => $s ? natal_when($s) : '', 'wb' => $wb, 'pdf' => $pdf, 'rec' => $rec, 'talk' => $talk, 'move' => $move];
     }
-    $online = natal_is_online($o);
-    $room = $next && $online ? natal_room_link('s', (int)$next['id']) : '';
+    $online = natal_is_online($o) || natal_is_mix($o);
+    $room = $next && natal_sess_online($o, $next) ? natal_room_link('s', (int)$next['id']) : '';
     return ['id' => (int)$o['id'], 'title' => (string)$o['title'], 'phase' => natal_member_phase($o), 'full' => $full, 'fullFrom' => natal_member_full_from($o),
         'until' => natal_order_until($pdo, $o), 'finished' => natal_order_finished($pdo, $o), 'units' => $units, 'done' => $done, 'total' => count($units),
         'next' => $next ? natal_when($next) : '', 'room' => $room, 'online' => $online, 'link' => natal_link($o), 'home' => $lastKey];

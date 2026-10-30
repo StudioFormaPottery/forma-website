@@ -41,6 +41,18 @@ if ($action === 'buy') {
     if ($loaded > 0 && ((int)(microtime(true) * 1000) - $loaded) < 3000) forma_json(['ok' => false, 'error' => 'Bitte versuch es in ein paar Sekunden noch einmal.'], 429);
     $packs = natal_packages();
     $key = (string)($in['package'] ?? '');
+    // Mix & Match (Vivien, 30.10.2026): nur über ein persönliches Angebot, Zusammensetzung und Preis kommen vom Server
+    $mixOffer = null;
+    if (str_starts_with($key, 'x_') && ($in['a'] ?? '') !== '') {
+        $q = $pdo->prepare('SELECT * FROM mm_natal_offers WHERE token = ?');
+        $q->execute([(string)$in['a']]);
+        $mixOffer = ($q->fetch() ?: null);
+        // Sie wählt die Aufteilung selbst (Vivien, 30.10.2026): Gesamtzahl bleibt, Online-Anzahl aus dem Formular
+        $mx0 = $mixOffer ? natal_offer_mix($mixOffer) : null;
+        $mx = $mx0 ? natal_mix_calc($mx0['base'], $mx0['units'] - max(0, min($mx0['units'], (int)($in['mix_online'] ?? $mx0['online']))), max(0, min($mx0['units'], (int)($in['mix_online'] ?? $mx0['online'])))) : null;
+        if ($mx && $mx['package'] === $key) $packs[$key] = $mx + ['unit_cents' => $mx['studio'] ? $mx['unit_studio'] : $mx['unit_online'], 'mode' => 'mix'];
+        else $mixOffer = null;
+    }
     $name = forma_clean((string)($in['name'] ?? ''), 120);
     $email = strtolower(forma_clean((string)($in['email'] ?? ''), 160));
     $phone = forma_clean((string)($in['phone'] ?? ''), 40);
@@ -64,9 +76,11 @@ if ($action === 'buy') {
     $p = $packs[$key];
     // Kennenlern-Bonus: Preis pro Einheit bestimmt der Server
     $bonusCall = ($in['bonus'] ?? '') !== '' ? natal_bonus_valid($pdo, (string)$in['bonus']) : null;
-    $bp = $bonusCall ? (natal_bonus_prices(natal_bonus_cfg()['percent'])[$key] ?? null) : null;
+    $bp = $bonusCall && !$mixOffer ? (natal_bonus_prices(natal_bonus_cfg()['percent'])[$key] ?? null) : null;
     if ($bp) { $p['unit_cents'] = $bp['unit']; $p['title'] .= ' · Kennenlern-Bonus'; }
-    $wishes = array_slice(natal_clean_wishes((string)($in['wishes'] ?? '[]')), 0, $p['units']);
+    $wishes = natal_clean_wishes((string)($in['wishes'] ?? '[]'));
+    $wishes = $mixOffer ? natal_wishes_fit($wishes, ['studio' => $p['studio'], 'online' => $p['online']]) : array_slice($wishes, 0, $p['units']);
+    $amount = $mixOffer ? (int)$p['cents'] : $p['unit_cents'] * $p['units'];
     $offerId = null;
     if (($in['a'] ?? '') !== '') {
         $q = $pdo->prepare('SELECT id FROM mm_natal_offers WHERE token = ?');
@@ -74,8 +88,8 @@ if ($action === 'buy') {
         $offerId = ($q->fetchColumn() ?: null);
     }
     $tok = bin2hex(random_bytes(16));
-    $pdo->prepare('INSERT INTO mm_natal_orders (offer_id, package, title, units, unit_cents, amount_cents, name, email, phone, due_date, note, wishes, token, ip_hash, consent_start, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?)')
-        ->execute([$offerId, $key, $p['title'], $p['units'], $p['unit_cents'], $p['unit_cents'] * $p['units'], $name, $email, $phone, $due, $note, json_encode($wishes), $tok, $ipHash, date('c')]);
+    $pdo->prepare('INSERT INTO mm_natal_orders (offer_id, package, title, units, unit_cents, amount_cents, name, email, phone, due_date, note, wishes, token, ip_hash, consent_start, created_at, mix_online) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?,?)')
+        ->execute([$offerId, $key, $p['title'], $p['units'], $p['unit_cents'], $amount, $name, $email, $phone, $due, $note, json_encode($wishes), $tok, $ipHash, date('c'), $mixOffer ? (int)$p['online'] : 0]);
     $o = natal_order($pdo, (int)$pdo->lastInsertId());
     natal_health_save($pdo, (int)$o['id'], $health);
     if ($bp) { $pdo->prepare('UPDATE mm_natal_orders SET bonus_call_id = ? WHERE id = ?')->execute([$bonusCall['id'], $o['id']]); $o['bonus_call_id'] = $bonusCall['id']; }

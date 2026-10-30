@@ -26,16 +26,25 @@ if ($action === 'mm_natal_offer') {
     $name = forma_clean((string)($_POST['name'] ?? ''), 80);
     $note = trim(mb_substr((string)($_POST['note'] ?? ''), 0, 600));
     if (mb_strlen($name) < 2) go($nBack . '#angebot', 'Bitte gib den Namen ein.');
-    $mode = ($_POST['mode'] ?? '') === 'online' ? 'online' : 'studio';
+    $mode = in_array($_POST['mode'] ?? '', ['online', 'mix'], true) ? (string)$_POST['mode'] : 'studio';
     $email = trim((string)($_POST['email'] ?? ''));
     if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) go($nBack . '#angebot', 'Die E-Mail-Adresse stimmt nicht ganz. Bitte nochmal prüfen.');
-    $grp = $mode === 'beide' ? bin2hex(random_bytes(6)) : '';
-    $ins = $pdo->prepare('INSERT INTO mm_natal_offers (salutation, name, note, token, mode, email, grp, created_at) VALUES (?,?,?,?,?,?,?,?)');
-    $first = 0;
-    foreach ($mode === 'beide' ? ['studio', 'online'] : [$mode] as $m) {
-        $ins->execute([$sal, $name, $note, bin2hex(random_bytes(10)), $m, $email, $grp, date('c')]);
-        $first = $first ?: (int)$pdo->lastInsertId();
+    // Mix & Match (Vivien, 30.10.2026): z. B. Pränatal 4 × im Studio + 2 × online, Preise je Art aus dem jeweiligen Paket
+    $pack = ''; $ms = 0; $mo = 0; $packs0 = natal_packages();
+    if ($mode === 'mix') {
+        // Gesamtzahl = Einheiten des Pakets, die Aufteilung ist nur ein Vorschlag: sie wählt selbst auf der Seite
+        $bk = in_array($_POST['pack'] ?? '', ['prae', 'post', 'kombi'], true) ? (string)$_POST['pack'] : 'prae';
+        $tot = (int)$packs0[$bk]['units'];
+        $on = max(0, min($tot, (int)($_POST['mix_online'] ?? 0)));
+        $mx = natal_mix_calc($bk, $tot - $on, $on);
+        if (!$mx) go($nBack . '#angebot', 'Bitte gib bei Mix & Match mindestens eine Einheit an.');
+        [$pack, $ms, $mo] = [$mx['base'], $mx['studio'], $mx['online']];
+        $mode = $ms ? 'studio' : 'online';
     }
+    $grp = '';
+    $ins = $pdo->prepare('INSERT INTO mm_natal_offers (salutation, name, note, token, mode, email, grp, created_at, pack, mix_studio, mix_online) VALUES (?,?,?,?,?,?,?,?,?,?,?)');
+    $ins->execute([$sal, $name, $note, bin2hex(random_bytes(10)), $mode, $email, $grp, date('c'), $pack, $ms, $mo]);
+    $first = (int)$pdo->lastInsertId();
     go($nBack . '&neu=' . $first . '#angebot', 'Das Angebot für ' . $name . ' ist fertig. ' . ($email !== '' ? 'Schau dir die Mail in der Vorschau an und schick sie dann ab.' : 'Kopier die Nachricht oder schick sie direkt per WhatsApp.'));
 }
 if ($action === 'mm_natal_offer_mail') {
@@ -76,7 +85,13 @@ if ($action === 'mm_natal_add') {
     $date = (string)($_POST['date'] ?? '');
     if (!$o || $o['status'] !== 'bezahlt' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) go($nBack . '#kundinnen', 'Bitte ein Datum wählen.');
     if (natal_left($pdo, $o) <= 0) go($nBack . '&k=' . $o['id'] . '#k' . $o['id'], 'Alle Einheiten dieses Pakets sind schon verplant.');
-    $pdo->prepare("INSERT INTO mm_natal_sessions (order_id, date, status, created_at) VALUES (?,?,'angefragt',?)")->execute([$o['id'], $date, date('c')]);
+    $sm = '';
+    if (natal_is_mix($o)) {
+        $ml = natal_mix_left($pdo, $o);
+        $sm = ($_POST['smode'] ?? '') === 'online' ? 'online' : 'studio';
+        if ($ml[$sm] <= 0) go($nBack . '&k=' . $o['id'] . '#k' . $o['id'], 'Für ' . ($sm === 'online' ? 'online' : 'das Studio') . ' sind keine Einheiten mehr frei.');
+    }
+    $pdo->prepare("INSERT INTO mm_natal_sessions (order_id, date, status, created_at, mode) VALUES (?,?,'angefragt',?,?)")->execute([$o['id'], $date, date('c'), $sm]);
     $s = natal_confirm($pdo, (int)$pdo->lastInsertId(), $date, (string)($_POST['time'] ?? ''), !empty($_POST['mail']));
     if (!$s) { $pdo->prepare("DELETE FROM mm_natal_sessions WHERE order_id = ? AND start = '' AND date = ? AND status = 'angefragt'")->execute([$o['id'], $date]); go($nBack . '&k=' . $o['id'] . '#k' . $o['id'], 'Bitte auch eine Uhrzeit angeben.'); }
     go($nBack . '&k=' . $o['id'] . '#k' . $o['id'], 'Eingetragen: ' . natal_when($s) . '.');
@@ -321,10 +336,10 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <div class="card rq">
                 <div class="booking-head"><span><span class="chip wait">Wunsch</span> <strong><?= forma_h($r['name']) ?></strong> <span class="muted small">· <?= forma_h($r['title']) ?></span></span>
                     <span class="acts small"><?php if ($r['phone'] !== ''): ?><a href="tel:<?= forma_h($r['phone']) ?>">Anrufen</a> · <a href="<?= forma_h(natal_wa((string)$r['phone'])) ?>" target="_blank" rel="noopener">WhatsApp</a><?php endif; ?></span></div>
-                <p class="when"><?= forma_h(natal_when($r)) ?></p>
+                <p class="when"><?= forma_h(natal_when($r)) ?><?php if ($o && natal_is_mix($o)): ?> <span class="chip<?= ($r['mode'] ?? '') === 'online' ? ' ok' : '' ?>"><?= ($r['mode'] ?? '') === 'online' ? '💻 online' : '🏡 im Studio' ?></span><?php endif; ?></p>
                 <?php if ($ph || $r['note'] !== ''): ?><p class="muted small"><?= forma_h(trim($ph . ($r['note'] !== '' ? ' · „' . $r['note'] . '“' : ''), ' ·')) ?></p><?php endif; ?>
                 <form method="post" class="stack"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_confirm"><input type="hidden" name="sid" value="<?= (int)$r['id'] ?>">
-                    <div class="tm"><div class="stack"><label>Datum</label><input type="date" name="date" value="<?= forma_h($r['date']) ?>" required></div><div class="stack"><label>Uhrzeit</label><input type="time" name="time" value="<?= natal_daypart_time((string)$r['daypart']) ?>" step="900" required></div></div>
+                    <div class="tm"><div class="stack"><label>Datum</label><input type="date" name="date" value="<?= forma_h($r['date']) ?>" required></div><div class="stack"><label>Uhrzeit</label><input type="time" name="time" value="<?= forma_h((string)($r['wish_time'] ?? '') !== '' ? (string)$r['wish_time'] : natal_daypart_time((string)$r['daypart'])) ?>" step="900" required></div></div>
                     <label class="check"><input type="checkbox" name="mail" value="1" checked> Bestätigung mit Kalenderdatei an sie schicken</label>
                     <button class="btn" type="submit">Termin bestätigen</button>
                 </form>
@@ -342,7 +357,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
         <?php if ($future): ?><div class="card">
             <?php foreach ($future as $s): ?>
                 <?php $so = natal_order($pdo, (int)$s['order_id']); $uk = $so ? natal_session_key($pdo, $so, (int)$s['id']) : 'frei'; ?>
-                <div class="ln"><span><strong><?= forma_h(natal_when($s)) ?></strong><br><span class="muted small"><?= forma_h($s['name']) ?> · <?= forma_h($s['title']) ?></span><br><span class="chip"><?= forma_h(natal_unit_label($uk)) ?></span></span>
+                <div class="ln"><span><strong><?= forma_h(natal_when($s)) ?></strong><br><span class="muted small"><?= forma_h($s['name']) ?> · <?= forma_h($s['title']) ?></span><br><span class="chip"><?= forma_h(natal_unit_label($uk)) ?></span><?php if ($so && natal_is_mix($so)): ?> <span class="chip"><?= natal_sess_online($so, $s) ? '💻 online' : '🏡 im Studio' ?></span><?php endif; ?></span>
                     <span class="acts small"><a class="btn btn-ghost btn-sm" href="<?= forma_h($self) ?>?view=natal&amp;prompter=s<?= (int)$s['id'] ?>" target="_blank" rel="noopener">Teleprompter</a><?php if (natal_is_online($s)): ?><a class="btn btn-sm" href="<?= forma_h(natal_room_link('s', (int)$s['id'], true)) ?>" target="_blank" rel="noopener">Zum Videoraum</a><?php endif; ?><?php if ($s['phone'] !== ''): ?><a href="<?= forma_h(natal_wa((string)$s['phone'])) ?>" target="_blank" rel="noopener">WhatsApp</a><?php endif; ?>
                     <details class="more"><summary>ändern / absagen</summary>
                         <form method="post" class="stack" style="margin-top:6px"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_confirm"><input type="hidden" name="sid" value="<?= (int)$s['id'] ?>">
@@ -373,7 +388,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
                             <?php foreach (natal_health_lines($hd) as $ln): ?><br><span class="muted"><?= forma_h($ln) ?></span><?php endforeach; ?></div>
                     <?php elseif ($o['status'] === 'bezahlt' && !$o['purged_at']): ?><p class="small" style="color:#A0463A">Gesundheitsfragebogen fehlt noch. Sie kann ihn auf ihrer persönlichen Seite ausfüllen.</p><?php endif; ?>
                     <?php foreach ($ss as $s): $uk = natal_session_key($pdo, $o, (int)$s['id']); $rec = natal_rec_for($pdo, (int)$s['id']); $past = natal_session_done($s); ?>
-                        <div class="ln small"><span><?= forma_h(natal_when($s)) ?><?php if ($s['status'] !== 'abgesagt'): ?><br><span class="muted"><?= forma_h(natal_unit_label($uk)) ?></span><?php endif; ?></span>
+                        <div class="ln small"><span><?= forma_h(natal_when($s)) ?><?= natal_is_mix($o) ? ' · ' . natal_mode_label($o, $s) : '' ?><?php if ($s['status'] !== 'abgesagt'): ?><br><span class="muted"><?= forma_h(natal_unit_label($uk)) ?></span><?php endif; ?></span>
                             <span class="acts"><span class="chip<?= $s['status'] === 'bestaetigt' ? ' ok' : ($s['status'] === 'angefragt' ? ' wait' : '') ?>"><?= forma_h(natal_status_label((string)$s['status'])) ?></span>
                             <?php if ($s['status'] !== 'abgesagt' && natal_order_is_member($o)): ?>
                                 <?php if ($rec): ?><a href="/api/natal-rec.php?id=<?= (int)$rec['id'] ?>&amp;k=<?= forma_h(natal_rec_admin_key((int)$rec['id'])) ?>" target="_blank" rel="noopener">▶ Aufnahme (<?= (int)round($rec['bytes'] / 1e6) ?> MB)</a>
@@ -408,6 +423,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
                         <form method="post" class="stack" style="border-top:1px solid var(--line);padding-top:10px"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_add"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>">
                             <label>Termin selbst eintragen (z. B. am Telefon ausgemacht)</label>
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input type="date" name="date" required><input type="time" name="time" step="900" required></div>
+                            <?php if (natal_is_mix($o)): $ml = natal_mix_left($pdo, $o); ?><div class="wdays"><label class="check"><input type="radio" name="smode" value="studio"<?= $ml['studio'] ? ' checked' : ' disabled' ?>> im Studio (noch <?= $ml['studio'] ?>)</label><label class="check"><input type="radio" name="smode" value="online"<?= !$ml['studio'] && $ml['online'] ? ' checked' : '' ?><?= $ml['online'] ? '' : ' disabled' ?>> online (noch <?= $ml['online'] ?>)</label></div><?php endif; ?>
                             <label class="check"><input type="checkbox" name="mail" value="1" checked> Bestätigung mit Kalenderdatei schicken</label>
                             <button class="btn btn-sm" type="submit">Eintragen</button></form>
                     <?php endif; ?>
@@ -460,7 +476,13 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
         <h2 id="angebot">Angebot verschicken</h2>
         <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_offer">
             <p class="small muted">Du bekommst einen persönlichen Link zu einer Seite mit Studio und Online: Die Seite begrüßt sie mit Namen, ihr Name ist beim Buchen schon eingetragen. Die fertige Nachricht kannst du kopieren oder direkt per WhatsApp schicken.</p>
-            <div class="stack"><label>Die Seite zeigt zuerst</label><div class="wdays"><label class="check"><input type="radio" name="mode" value="studio" checked> Im Studio</label><label class="check"><input type="radio" name="mode" value="online"> Online</label></div><span class="small muted">Sie kann oben jederzeit zwischen Studio und Online wechseln und sieht beide Preise.</span></div>
+            <div class="stack"><label>Was soll sie sehen?</label><div class="wdays"><label class="check"><input type="radio" name="mode" value="studio" checked> Alle Pakete, zuerst Studio</label><label class="check"><input type="radio" name="mode" value="online"> Alle Pakete, zuerst Online</label><label class="check"><input type="radio" name="mode" value="mix"> <b>Mix &amp; Match</b> (Studio + Online gemischt)</label></div><span class="small muted" id="mixhint">Sie kann oben jederzeit zwischen Studio und Online wechseln und sieht beide Preise.</span></div>
+            <div class="card stack" id="mixbox" hidden style="background:#F2ECE4;border:0">
+                <p class="small muted" style="margin:0">Sie wählt auf ihrer Seite selbst, wie viele Einheiten im Studio und wie viele online sind. Studio-Einheiten kosten den Studio-Paketpreis, Online-Einheiten den Online-Paketpreis, der Preis passt sich live an. Dann bestätigt sie, wählt Wunschtag + Wunschuhrzeit, zahlt und kommt direkt in ihren Mitgliederbereich.</p>
+                <div class="row"><div class="stack"><label for="mxp">Paket</label><select id="mxp" name="pack"><?php foreach (['prae', 'post', 'kombi'] as $bk): $bs = $packs[$bk]; $bo = $packs['o_' . $bk]; ?><option value="<?= $bk ?>" data-s="<?= (int)$bs['unit_cents'] ?>" data-o="<?= (int)$bo['unit_cents'] ?>" data-u="<?= (int)$bs['units'] ?>"><?= forma_h(preg_replace('/-Paket$/', '', $bs['title'])) ?> · <?= (int)$bs['units'] ?> Einheiten</option><?php endforeach; ?></select></div></div>
+                <div class="row"><div class="stack"><label for="mxo">Vorschlag: davon online (sie kann es ändern)</label><input id="mxo" name="mix_online" type="number" min="0" max="14" value="2" inputmode="numeric"></div></div>
+                <p id="mxsum" style="margin:0;font-size:17px"></p>
+            </div>
             <div class="row"><div class="stack"><label for="nsal">Anrede</label><select id="nsal" name="salutation"><option>Liebe</option><option>Lieber</option><option>Hallo</option></select></div>
                 <div class="stack"><label for="nnm">Vorname</label><input id="nnm" name="name" required maxlength="80" placeholder="z. B. Anna"></div></div>
             <label for="nem">E-Mail (optional, dann kannst du das Angebot auch als schöne Mail mit den Flyern schicken)</label><input id="nem" name="email" type="email" maxlength="160" placeholder="name@beispiel.at">
@@ -476,7 +498,8 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             $isNew = in_array($newId, array_map(fn($r) => (int)$r['id'], $grpRows), true);
             $msg = natal_offer_message($a, $grpRows); ?>
             <div class="card stack<?= $isNew ? ' is-new' : '' ?>">
-                <div class="booking-head"><strong><?= forma_h($a['salutation'] . ' ' . $a['name']) ?> <span class="chip">Studio + online</span></strong><span class="muted small">erstellt <?= forma_h(date('d. m.', strtotime((string)$a['created_at']))) ?> · <?= (int)$a['booked'] ? '<span class="chip ok">gebucht</span>' : ($a['opened_at'] ? 'angesehen am ' . forma_h(date('d. m., H:i', strtotime((string)$a['opened_at']))) : 'noch nicht geöffnet') ?></span></div>
+                <?php $amx = natal_offer_mix($a); ?>
+                <div class="booking-head"><strong><?= forma_h($a['salutation'] . ' ' . $a['name']) ?> <span class="chip"><?= $amx ? 'Mix &amp; Match · ' . forma_h($amx['title']) . ' · ' . forma_h(forma_euro($amx['cents'])) : 'Studio + online' ?></span></strong><span class="muted small">erstellt <?= forma_h(date('d. m.', strtotime((string)$a['created_at']))) ?> · <?= (int)$a['booked'] ? '<span class="chip ok">gebucht</span>' : ($a['opened_at'] ? 'angesehen am ' . forma_h(date('d. m., H:i', strtotime((string)$a['opened_at']))) : 'noch nicht geöffnet') ?></span></div>
                 <?php if ($isNew): ?><textarea class="msg" readonly><?= forma_h($msg) ?></textarea><?php endif; ?>
                 <?php if ((string)($a['email'] ?? '') !== ''): ?>
                 <div class="acts" style="padding:10px 12px;border-radius:12px;background:#EEF0E8"><span class="small">✉ <?= forma_h($a['email']) ?><?= $a['mailed_at'] ? ' · <b>Mail verschickt am ' . forma_h(date('d. m., H:i', strtotime((string)$a['mailed_at']))) . '</b>' : '' ?></span>
@@ -527,6 +550,22 @@ document.querySelectorAll('input[data-up]').forEach(inp => inp.addEventListener(
   st.textContent = j.ok ? '✓ gespeichert' : 'Speichern hat nicht geklappt.';
   if (j.ok) setTimeout(() => location.reload(), 900);
 }));
+// Angebot: Mix & Match ein-/ausblenden und Summe live rechnen (verbindlich rechnet der Server)
+(() => {
+  const box = document.getElementById('mixbox'); if (!box) return;
+  const p = document.getElementById('mxp'), on = document.getElementById('mxo'), out = document.getElementById('mxsum'), hint = document.getElementById('mixhint');
+  const eur = c => '€ ' + (c % 100 ? (c / 100).toFixed(2).replace('.', ',') : String(c / 100));
+  function upd() {
+    const mix = document.querySelector('input[name=mode][value=mix]').checked;
+    box.hidden = !mix; hint.hidden = mix;
+    const o = p.selectedOptions[0], u = +o.dataset.u; on.max = u;
+    const n = Math.min(u, Math.max(0, +on.value || 0)), s = u - n;
+    out.innerHTML = '<b>Vorschlag: ' + s + ' im Studio + ' + n + ' online = ' + eur(s * +o.dataset.s + n * +o.dataset.o) + '</b> <span class="small muted">(alles im Studio ' + eur(u * +o.dataset.s) + ', alles online ' + eur(u * +o.dataset.o) + ')</span>';
+  }
+  document.querySelectorAll('input[name=mode]').forEach(r => r.addEventListener('change', upd));
+  [p, on].forEach(x => x.addEventListener('input', upd));
+  upd();
+})();
 document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
   const t = b.dataset.copy, old = b.textContent;
   try { await navigator.clipboard.writeText(t); } catch (e) { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); document.execCommand('copy'); a.remove(); }

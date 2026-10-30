@@ -31,6 +31,10 @@ if (!$order && ($_GET['bonus'] ?? '') !== '') {
 }
 $bonusGone = !$order && ($_GET['bonus'] ?? '') !== '' && !$bonus;
 $online = $order ? natal_is_online($order) : (in_array($_GET['m'] ?? '', ['studio', 'online'], true) ? $_GET['m'] === 'online' : ($offer && ($offer['mode'] ?? 'studio') === 'online'));
+// Mix & Match (Vivien, 30.10.2026): persönliches Paket mit Einheiten im Studio UND online, nur per Angebots-Link
+$mix = $offer ? natal_offer_mix($offer) : null;
+if ($mix) { $bonus = null; $bonusP = []; }
+$orderMix = $order && natal_is_mix($order);
 $packs = natal_packages_for($online ? 'online' : 'studio');
 // Was in den einzelnen Einheiten passiert (aus dem Curriculum, Vivien 23.10.2026)
 $units = [
@@ -65,7 +69,8 @@ $where = $online ? 'live per Video' : 'im Studio';
 $sessions = $order ? natal_sessions($pdo, (int)$order['id']) : [];
 $left = $order ? natal_left($pdo, $order) : 0;
 $taken = array_values(array_map(fn($s) => $s['date'], array_filter($sessions, fn($s) => in_array($s['status'], ['angefragt', 'bestaetigt'], true))));
-$cal = ['weekdays' => natal_weekdays(), 'dayparts' => NATAL_DAYPARTS, 'min' => date('Y-m-d', strtotime('+1 day')), 'max' => date('Y-m-d', strtotime('+9 months')), 'taken' => $taken, 'due' => $order['due_date'] ?? ''];
+$cal = ['weekdays' => natal_weekdays(), 'dayparts' => NATAL_DAYPARTS, 'min' => date('Y-m-d', strtotime('+1 day')), 'max' => date('Y-m-d', strtotime('+9 months')), 'taken' => $taken, 'due' => $order['due_date'] ?? '',
+    'mix' => $mix ? ['studio' => $mix['studio'], 'online' => $mix['online']] : ($orderMix ? natal_mix_left($pdo, $order) : null)];
 $euro = fn(int $c) => forma_euro($c);
 $callFree = [];
 if (!$order) {
@@ -335,12 +340,36 @@ footer summary{cursor:pointer}
 .slotb button{border:0;background:var(--bg);color:var(--ink);font:inherit;font-size:.95rem;padding:.75em 1.3em;border-radius:999px;cursor:pointer}
 .slotb button[aria-pressed=true]{background:var(--plum);color:var(--on)}
 .slotb button:disabled{opacity:.4;cursor:default;text-decoration:line-through}
+/* Mix & Match */
+.mixcard{background:var(--card);border-radius:26px;padding:1.4rem 1.5rem 1.3rem;margin-top:1.6rem;max-width:36rem;box-shadow:0 22px 44px -32px rgba(74,58,65,.55);position:relative;overflow:hidden}
+.mixcard::after{content:"";position:absolute;width:150px;height:140px;right:-55px;top:-60px;border-radius:62% 38% 46% 54%/55% 45% 55% 45%;background:var(--blush);opacity:.8}
+.mixcard>*{position:relative;z-index:1}
+.mixcard .mt{font-family:var(--serif);font-size:1.75rem;font-weight:500;line-height:1.1;margin-top:.35rem}
+.mixcard .mr{display:flex;justify-content:space-between;gap:1rem;align-items:baseline;border-top:1px solid var(--line);padding:.75rem 0}
+.mixcard .mr:first-of-type{margin-top:.9rem}
+.mixcard .mr small{display:block;color:var(--muted);font-size:.85rem}
+.mixcard .mr b{font-weight:500;white-space:nowrap}
+.mixcard .tot{display:flex;justify-content:space-between;align-items:baseline;border-top:2px solid var(--plum);padding-top:.8rem}
+.mixcard .tot b{font-family:var(--serif);font-size:2.4rem;font-weight:500;line-height:1}
+.mixcard .fine{font-size:.82rem;color:var(--muted);margin-top:.6rem}
+.mm{display:flex;gap:6px;flex-wrap:wrap}
+.mm button{border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:.82rem;padding:.4em .9em;border-radius:999px;cursor:pointer}
+.mm button[aria-pressed=true]{background:var(--plumdeep);border-color:var(--plumdeep);color:var(--on)}
+.mm button:disabled{opacity:.4;cursor:default}
+.wt{display:flex;align-items:center;gap:.6rem;font-size:.82rem;color:var(--muted)}
+.wt input{width:auto;padding:.45em .7em;font-size:.9rem;background:var(--card)}
+.mixleft{font-size:.84rem;color:var(--muted);margin-top:.3rem}
+.mixcard .mr{align-items:center}
+.stp{display:inline-flex;align-items:center;gap:.5rem;background:var(--bg);border-radius:999px;padding:4px}
+.stp button{width:38px;height:38px;border-radius:50%;border:0;background:var(--card);color:var(--plum);font:inherit;font-size:1.3rem;line-height:1;cursor:pointer}
+.stp button:disabled{opacity:.35;cursor:default}
+.stp b{min-width:1.6em;text-align:center;font-family:var(--serif);font-size:1.6rem;font-weight:500}
 <?= NATAL_HEALTH_CSS ?>
 </style>
 <script src="/wildhearts/assets/schutz.js?v=3"></script>
 </head>
-<body data-mode="<?= $online ? 'online' : 'studio' ?>">
-<header class="top w"><a class="brand" href="<?= $order ? $h(natal_link($order)) : '/' ?>"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia</a><span class="top-r"><span class="tag">1:1 <?= $order ? ($online ? 'online' : 'im Studio') : 'im Studio &amp; online' ?> · Prä- &amp; Postnatal</span><?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('natal', ['lang' => false]); ?></span></header>
+<body data-mode="<?= $mix || $orderMix ? 'mix' : ($online ? 'online' : 'studio') ?>">
+<header class="top w"><a class="brand" href="<?= $order ? $h(natal_link($order)) : '/' ?>"><img class="mk" src="/img/movecia/movecia-zeichen-klein.svg" alt="">Movecia</a><span class="top-r"><span class="tag">1:1 <?= $order && !$orderMix ? ($online ? 'online' : 'im Studio') : 'im Studio &amp; online' ?> · Prä- &amp; Postnatal</span><?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('natal', ['lang' => false]); ?></span></header>
 <div class="w"><?php if ($bonus): $bc = natal_bonus_cfg(); ?><p class="bonusbox"><b>Dein Kennenlern-Bonus, <?= $h(forma_first_name((string)$bonus['name'])) ?></b>Danke für unser Gespräch! Jedes Paket ist für dich <?= (int)$bc['percent'] ?> % günstiger, im Studio und online. Der Bonus gilt bis <?= $h(natal_date_de((string)$bonus['bonus_until'])) ?> und ist unten schon eingerechnet.</p>
     <?php elseif ($bonusGone): ?><p class="bonusbox gone"><b>Dieser Bonus ist leider nicht mehr gültig</b>Er ist abgelaufen oder wurde schon eingelöst. Die Pakete kannst du unten natürlich trotzdem buchen, und bei Fragen schreib mir einfach.</p><?php endif; ?></div>
 
@@ -368,7 +397,7 @@ footer summary{cursor:pointer}
   <div class="two" style="margin-top:0">
     <div class="card">
       <p class="k">Deine Einheiten</p>
-      <div class="units" style="margin-top:.6rem"><span class="big"><?= $left ?></span><span class="mut" style="padding-bottom:.6rem">von <?= (int)$order['units'] ?> noch frei zum Anfragen</span></div>
+      <div class="units" style="margin-top:.6rem"><span class="big"><?= $left ?></span><span class="mut" style="padding-bottom:.6rem">von <?= (int)$order['units'] ?> noch frei zum Anfragen<?php if ($orderMix): $ml = natal_mix_left($pdo, $order); ?><br><?= (int)$ml['studio'] ?> im Studio · <?= (int)$ml['online'] ?> online<?php endif; ?></span></div>
       <div class="ud" aria-hidden="true"><?php foreach ($sessions as $s) if ($s['status'] !== 'abgesagt') echo '<i class="' . ($s['status'] === 'bestaetigt' ? 'c' : ($s['status'] === 'erledigt' ? 'e' : 'a')) . '"></i>'; for ($i = 0; $i < $left; $i++) echo '<i></i>'; ?></div>
       <p class="legend"><span><i></i>bestätigt</span><span><i class="d"></i>angefragt</span><span><i style="background:var(--line)"></i>noch frei</span></p>
       <?php if ($order['due_date']): ?><p class="mut" style="margin-top:1rem;font-size:.9rem">Geburtstermin: <?= $h(natal_date_de((string)$order['due_date'])) ?> · gültig bis 6 Monate nach der Geburt</p><?php endif; ?>
@@ -378,8 +407,9 @@ footer summary{cursor:pointer}
       <?php if (!$sessions): ?><p class="mut" style="margin-top:.6rem">Noch keine Termine. Such dir unten deine Wunschtage aus.</p><?php endif; ?>
       <div class="sl" style="margin-top:.8rem">
         <?php foreach ($sessions as $s): ?>
-          <div class="si"><span><b><?= $h(natal_when($s)) ?></b><?php $ph = natal_phase($order, (string)$s['date']); if ($ph): ?><br><span class="mut" style="font-size:.84rem"><?= $h($ph) ?></span><?php endif; ?></span>
-            <span style="display:flex;gap:.6rem;align-items:center"><?php if ($online && $s['status'] === 'bestaetigt' && $s['start'] !== '' && $s['date'] >= date('Y-m-d')): ?><a class="btn" style="padding:.45em 1em;font-size:.82rem" href="<?= $h(natal_room_link('s', (int)$s['id'])) ?>">Videoraum</a><?php endif; ?><?php if ($s['status'] === 'bestaetigt' && $s['start'] !== ''): ?><a href="<?= $h(natal_gcal($s, $online)) ?>" target="_blank" rel="noopener" style="font-size:.84rem">Google Kalender</a><?php endif; ?><span class="chip <?= $h($s['status']) ?>"><?= $h(natal_status_label((string)$s['status'])) ?></span></span></div>
+          <?php $sOn = natal_sess_online($order, $s); ?>
+          <div class="si"><span><b><?= $h(natal_when($s)) ?></b><?= $orderMix ? ' <span class="mut" style="font-size:.84rem">· ' . ($sOn ? 'online' : 'im Studio') . '</span>' : '' ?><?php $ph = natal_phase($order, (string)$s['date']); if ($ph): ?><br><span class="mut" style="font-size:.84rem"><?= $h($ph) ?></span><?php endif; ?></span>
+            <span style="display:flex;gap:.6rem;align-items:center"><?php if ($sOn && $s['status'] === 'bestaetigt' && $s['start'] !== '' && $s['date'] >= date('Y-m-d')): ?><a class="btn" style="padding:.45em 1em;font-size:.82rem" href="<?= $h(natal_room_link('s', (int)$s['id'])) ?>">Videoraum</a><?php endif; ?><?php if ($s['status'] === 'bestaetigt' && $s['start'] !== ''): ?><a href="<?= $h(natal_gcal($s, $sOn)) ?>" target="_blank" rel="noopener" style="font-size:.84rem">Google Kalender</a><?php endif; ?><span class="chip <?= $h($s['status']) ?>"><?= $h(natal_status_label((string)$s['status'])) ?></span></span></div>
         <?php endforeach; ?>
       </div>
       <?php if ($conf): ?><p style="margin-top:1rem"><a class="btn line" href="/api/natal.php?ics=1&amp;o=<?= (int)$order['id'] ?>&amp;k=<?= $h($order['token']) ?>">Alle Termine in meinen Kalender</a></p><?php endif; ?>
@@ -388,7 +418,7 @@ footer summary{cursor:pointer}
 </section>
 <?php if (natal_order_is_member($order)): $hasM = natal_member_by_email($pdo, (string)$order['email']); ?>
 <section class="w" style="padding-top:0"><div class="card" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;align-items:center;background:var(--plum);color:var(--on)">
-  <p><b style="font-family:var(--serif);font-size:1.6rem;font-weight:500">Dein Mitgliederbereich</b><br><span style="opacity:.85">Workbooks, Übungsabfolgen<?= $online ? ', Aufnahmen' : '' ?> und Musik nach jeder Einheit.</span></p>
+  <p><b style="font-family:var(--serif);font-size:1.6rem;font-weight:500">Dein Mitgliederbereich</b><br><span style="opacity:.85">Workbooks, Übungsabfolgen<?= $online || $orderMix ? ', Aufnahmen' : '' ?> und Musik nach jeder Einheit.</span></p>
   <a class="btn" style="background:var(--peach);color:var(--ink);border-color:var(--peach)" href="<?= $h($hasM ? natal_member_link() : natal_member_start_link($order)) ?>"><?= $hasM ? 'Zu meinem Bereich' : 'Passwort wählen und los' ?></a>
 </div></section>
 <?php endif; ?>
@@ -409,7 +439,7 @@ footer summary{cursor:pointer}
   <div class="panel">
     <p class="k">Neue Wunschtermine</p>
     <h3>Wann passt es dir?</h3>
-    <p class="mut">Tipp auf die Tage, die dir passen, und wähl die Tageszeit. Du kannst bis zu <?= $left === 1 ? '1 Termin' : $left . ' Termine' ?> auf einmal anfragen. Ich bestätige dir jeden Termin mit Uhrzeit per E-Mail.</p>
+    <p class="mut">Tipp auf die Tage, die dir passen, wähl die Tageszeit und gern deine Wunschuhrzeit<?= $orderMix ? ', und sag mir, ob du ins Studio kommst oder wir uns online sehen' : '' ?>. Du kannst bis zu <?= $left === 1 ? '1 Termin' : $left . ' Termine' ?> auf einmal anfragen. Ich bestätige dir jeden Termin mit Uhrzeit per E-Mail.</p>
     <div id="calbox"></div>
     <label class="f">Nachricht an Vivien (optional)<textarea id="wnote" maxlength="400" placeholder="z. B. lieber früh am Vormittag, oder: das Baby ist da!"></textarea></label>
     <div><button class="btn" type="button" id="sendw">Termine anfragen</button></div>
@@ -436,6 +466,22 @@ footer summary{cursor:pointer}
     <p class="k">Prä- &amp; Postnatal Training · 1:1 im Studio oder online</p>
     <h1 style="margin-top:.8rem">Bewegt durch die <em>Schwangerschaft</em> &amp; das Wochenbett</h1>
     <p class="script">für dich und dein Baby</p>
+    <?php if ($mix): ?>
+    <p class="hello"><b><?= $h(($offer['salutation'] ?: 'Liebe') . ' ' . $offer['name']) ?>,</b>schön, dass du da bist. Wie besprochen kannst du dein Paket ganz frei mischen: Du entscheidest selbst, wie viele Einheiten du bei mir im Studio machst und wie viele online, live per Video. Unten bestätigst du es, suchst dir deine Wunschtermine aus und bezahlst direkt.<?= $offer['note'] !== '' ? '<br><br>' . nl2br($h((string)$offer['note'])) : '' ?></p>
+    <div class="mixcard">
+      <p class="k">Dein persönliches Angebot · Mix &amp; Match</p>
+      <p class="mt"><?= $h($mix['name']) ?>-Paket · <?= (int)$mix['units'] ?> <?= $mix['units'] === 1 ? 'Einheit' : 'Einheiten' ?></p>
+      <p class="mut" style="font-size:.9rem;margin-top:.3rem">Wie viele davon möchtest du im Studio und wie viele online?</p>
+      <?php foreach ([['studio', '🏡 Im Studio in Mathon', $mix['unit_studio']], ['online', '💻 Online, live per Video', $mix['unit_online']]] as [$mk, $ml, $mu]): ?>
+      <div class="mr mxr" data-k="<?= $mk ?>" data-u="<?= (int)$mu ?>"><span><?= $ml ?><small class="mxsum"><?= $h($euro($mu)) ?> pro Einheit</small></span>
+        <span class="stp"><button type="button" data-d="-1" aria-label="weniger <?= $mk === 'online' ? 'online' : 'im Studio' ?>">−</button><b class="mxn"><?= (int)$mix[$mk] ?></b><button type="button" data-d="1" aria-label="mehr <?= $mk === 'online' ? 'online' : 'im Studio' ?>">+</button></span></div>
+      <?php endforeach; ?>
+      <div class="tot"><span>Zusammen</span><b><?= $h($euro($mix['cents'])) ?></b></div>
+      <p class="fine">Jede Einheit 60 Minuten · gültig bis 6 Monate nach der Geburt · inkl. 20 % USt.</p>
+      <input type="radio" name="package" value="<?= $h($mix['package']) ?>" checked hidden data-units="<?= (int)$mix['units'] ?>" data-cents="<?= (int)$mix['cents'] ?>" data-title="<?= $h($mix['title']) ?>" data-unit="<?= (int)($mix['studio'] ? $mix['unit_studio'] : $mix['unit_online']) ?>" data-unitlabel="<?= $h(trim(($mix['studio'] ? $euro($mix['unit_studio']) . ' Studio' : '') . ($mix['studio'] && $mix['online'] ? ' · ' : '') . ($mix['online'] ? $euro($mix['unit_online']) . ' online' : ''))) ?>">
+    </div>
+    <div class="cta"><a class="btn" href="#buchen">Angebot bestätigen &amp; buchen <span aria-hidden="true">→</span></a></div>
+    <?php else: ?>
     <div class="modes" role="group" aria-label="Im Studio oder online">
       <?php foreach (['studio' => ['Im Studio', 'in Mathon'], 'online' => ['Online', 'live per Video']] as $md => [$lb, $sb]): ?><button type="button" data-mode="<?= $md ?>" aria-pressed="<?= ($online ? 'online' : 'studio') === $md ? 'true' : 'false' ?>"><b><?= $lb ?></b><span><?= $sb ?></span><span class="pr">Einzelstunde <?= $h($euro($modeInfo[$md]['single'])) ?><br>Paket ab <?= $h($euro($modeInfo[$md]['min'])) ?> pro Einheit</span></button><?php endforeach; ?>
     </div>
@@ -443,6 +489,7 @@ footer summary{cursor:pointer}
     <p class="lead">Prä- und postnatales Training, ganz auf dich abgestimmt: ruhig, kräftigend und mit viel Raum für das, was dein Körper gerade braucht. Nur du und ich, bei mir im Studio oder live per Video bequem von zu Hause aus. Wähl einfach, was besser zu dir passt.</p>
 
     <div class="cta"><a class="btn" href="#pakete">Paket wählen <span aria-hidden="true">→</span></a><a class="btn line" href="#kennenlernen">Kostenlos kennenlernen</a></div>
+    <?php endif; ?>
   </div>
   <figure class="hv"><div class="b1 blob" aria-hidden="true"></div><div class="b3" aria-hidden="true"></div><img src="/img/movecia/fotos/ev-natal.jpg?v=10" alt="Vivien in ihrer Schwangerschaft im lichten Studio" width="640" height="794"><figcaption class="q">„Dein Körper leistet gerade Großes. Lass uns ihn gut begleiten.“<small>Vivien</small></figcaption></figure>
 </section>
@@ -476,6 +523,7 @@ footer summary{cursor:pointer}
   </div>
 </section>
 
+<?php if (!$mix): ?>
 <section class="w" id="kennenlernen" style="padding-top:0">
   <div class="panel kl">
     <div class="klh">
@@ -503,6 +551,7 @@ footer summary{cursor:pointer}
     <p class="ok" id="klok" hidden></p>
   </div>
 </section>
+<?php endif; ?>
 
 <section class="w" id="einheiten" style="padding-top:0">
   <p class="k">Deine Einheiten</p>
@@ -536,6 +585,7 @@ footer summary{cursor:pointer}
   <p class="mut" style="margin-top:1.2rem;font-size:.92rem"><b style="font-weight:500;color:var(--ink)">Einzelstunde:</b> Wir wählen gemeinsam das Thema, das du gerade am meisten brauchst.</p>
 </section>
 
+<?php if (!$mix): ?>
 <section class="w" id="pakete" style="padding-top:0">
   <p class="k">Preise &amp; Pakete</p>
   <h2 style="margin-top:.6rem">Je mehr Einheiten, desto <em>günstiger</em></h2>
@@ -559,11 +609,12 @@ footer summary{cursor:pointer}
   <?php endforeach; ?>
   <p class="mut" style="margin-top:1rem;font-size:.9rem">Kommt dein Baby früher, nutzt du offene Einheiten einfach nach der Geburt. Alle Pakete gelten bis 6 Monate nach der Geburt.</p>
 </section>
+<?php endif; ?>
 
 <section class="w" id="buchen" style="padding-top:0">
   <form class="book" id="bookf" novalidate>
     <div class="panel">
-      <p class="k">Buchen</p>
+      <p class="k"><?= $mix ? 'Angebot bestätigen' : 'Buchen' ?></p>
       <h3>Deine Angaben</h3>
       <div class="grid2">
         <label class="f">Vor- und Nachname<input type="text" name="name" autocomplete="name" required maxlength="120" value="<?= $offer ? $h((string)$offer['name']) : ($bonus ? $h((string)$bonus['name']) : '') ?>"></label>
@@ -574,7 +625,7 @@ footer summary{cursor:pointer}
       <label class="f">Möchtest du mir vorab etwas sagen? (optional)<textarea name="note" maxlength="1000" placeholder="z. B. wie es dir gerade geht oder was dir wichtig ist"></textarea></label>
       <?= natal_health_form() ?>
       <h3 style="margin-top:.6rem">Deine Wunschtermine <span class="mut" style="font-family:var(--sans);font-size:.9rem">(optional)</span></h3>
-      <p class="mut" style="font-size:.92rem">Tipp auf die Tage, die dir passen, und wähl die Tageszeit. Du kannst die Termine auch erst nach der Zahlung auf deiner persönlichen Seite aussuchen.</p>
+      <p class="mut" style="font-size:.92rem"><?= $mix ? 'Tipp auf die Tage, die dir passen, wähl die Tageszeit und gern deine Wunschuhrzeit. Bei jedem Termin sagst du mir, ob du ins Studio kommst oder wir uns online sehen.' : 'Tipp auf die Tage, die dir passen, wähl die Tageszeit und gern deine Wunschuhrzeit.' ?> Du kannst die Termine auch erst nach der Zahlung auf deiner persönlichen Seite aussuchen. Ich bestätige dir jeden Termin persönlich.</p>
       <div id="calbox"></div>
       <label class="chk"><input type="checkbox" name="start_now" value="1" required><span>Ich möchte ausdrücklich, dass die Einheiten schon innerhalb der 14-tägigen Rücktrittsfrist stattfinden können. Trete ich zurück, zahle ich nur die Einheiten, die bereits stattgefunden haben. Mir ist bewusst, dass mein Rücktrittsrecht erlischt, sobald alle gebuchten Einheiten stattgefunden haben (<a href="/terms?lang=de#withdrawal" target="_blank" rel="noopener">Rücktrittsrecht &amp; Bedingungen</a>).</span></label>
       <label class="chk"><input type="checkbox" name="consent" value="1" required><span>Meine Angaben werden nur für meine Buchung und die Terminplanung verwendet (Datenschutz siehe unten).</span></label>
@@ -595,6 +646,7 @@ footer summary{cursor:pointer}
   </form>
 </section>
 
+<?php if (!$mix): ?>
 <section class="w" id="newsletter" style="padding-top:0">
   <div class="panel nl">
     <div>
@@ -622,6 +674,7 @@ footer summary{cursor:pointer}
     <div class="card pl"><h3>Online, wo immer du bist</h3><p style="margin-top:.6rem">Du wohnst weiter weg, in Innsbruck, Vorarlberg, Deutschland oder der Schweiz, oder willst nach der Geburt einfach nicht aus dem Haus? Dann trainieren wir live per Video. Ich sehe dich, leite dich an und korrigiere dich wie im Studio. Dein Baby kann einfach neben dir liegen.</p></div>
   </div>
 </section>
+<?php endif; ?>
 
 <section class="w faq cute-faq" style="padding-top:0">
   <p class="k">Gut zu wissen</p>
@@ -701,22 +754,44 @@ footer summary{cursor:pointer}
       grid.querySelectorAll('button.ok, button.sel').forEach(b => b.addEventListener('click', () => toggle(b.dataset.d)));
       drawList();
     }
+    // Mix & Match: wie viele Termine je Art noch frei sind (CAL.mix = {studio, online})
+    const freeOf = (m, skip) => CAL.mix[m] - picked.filter((p, j) => j !== skip && p.mode === m).length;
     function toggle(s) {
       const i = picked.findIndex(p => p.date === s);
       if (i >= 0) picked.splice(i, 1);
-      else { if (picked.length >= getMax()) { flash(getMax() === 1 ? 'Du kannst 1 Termin auswählen.' : 'Du kannst bis zu ' + getMax() + ' Termine auswählen.'); return; } picked.push({date: s, daypart: 'vormittag'}); picked.sort((a, b) => a.date < b.date ? -1 : 1); }
+      else {
+        if (picked.length >= getMax()) { flash(getMax() === 1 ? 'Du kannst 1 Termin auswählen.' : 'Du kannst bis zu ' + getMax() + ' Termine auswählen.'); return; }
+        const p = {date: s, daypart: 'vormittag', time: ''};
+        if (CAL.mix) p.mode = freeOf('studio') > 0 ? 'studio' : 'online';
+        picked.push(p); picked.sort((a, b) => a.date < b.date ? -1 : 1);
+      }
       draw(); onChange && onChange(picked);
     }
     function drawList() {
       if (!picked.length) { list.innerHTML = '<p class="mut" style="font-size:.9rem;padding:.6rem 0">Noch keine Tage ausgewählt.</p>'; return; }
-      list.innerHTML = picked.map((p, i) => '<div class="pk"><div class="row"><b>' + nice(p.date) + '</b><button type="button" class="x" data-i="' + i + '" aria-label="Entfernen">×</button></div><div class="dp">'
-        + Object.entries(CAL.dayparts).map(([k, l]) => '<button type="button" data-i="' + i + '" data-p="' + k + '" aria-pressed="' + (p.daypart === k) + '">' + l + '</button>').join('') + '</div></div>').join('');
+      list.innerHTML = picked.map((p, i) => '<div class="pk"><div class="row"><b>' + nice(p.date) + '</b><button type="button" class="x" data-i="' + i + '" aria-label="Entfernen">×</button></div>'
+        + (CAL.mix ? '<div class="mm">' + [['studio', '🏡 im Studio'], ['online', '💻 online']].map(([k, l]) => '<button type="button" data-i="' + i + '" data-m="' + k + '" aria-pressed="' + (p.mode === k) + '"' + (p.mode !== k && freeOf(k, i) <= 0 ? ' disabled' : '') + '>' + l + '</button>').join('') + '</div>' : '')
+        + '<div class="dp">' + Object.entries(CAL.dayparts).map(([k, l]) => '<button type="button" data-i="' + i + '" data-p="' + k + '" aria-pressed="' + (p.daypart === k) + '">' + l + '</button>').join('') + '</div>'
+        + '<label class="wt">Wunschuhrzeit (optional) <input type="time" step="900" min="07:00" max="20:00" data-i="' + i + '" value="' + (p.time || '') + '"></label></div>').join('')
+        + (CAL.mix ? '<p class="mixleft">Noch frei: ' + freeOf('studio') + ' im Studio · ' + freeOf('online') + ' online</p>' : '');
       list.querySelectorAll('.x').forEach(b => b.addEventListener('click', () => { picked.splice(+b.dataset.i, 1); draw(); onChange && onChange(picked); }));
       list.querySelectorAll('.dp button').forEach(b => b.addEventListener('click', () => { picked[+b.dataset.i].daypart = b.dataset.p; drawList(); }));
+      list.querySelectorAll('.mm button').forEach(b => b.addEventListener('click', () => { picked[+b.dataset.i].mode = b.dataset.m; drawList(); onChange && onChange(picked); }));
+      list.querySelectorAll('.wt input').forEach(t => t.addEventListener('input', () => {
+        const p = picked[+t.dataset.i]; p.time = t.value;
+        const hh = parseInt(t.value, 10);
+        if (!isNaN(hh)) { p.daypart = hh < 12 ? 'vormittag' : (hh < 17 ? 'nachmittag' : 'abend'); t.closest('.pk').querySelectorAll('.dp button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.p === p.daypart))); }
+      }));
     }
     function flash(t) { const p = document.createElement('p'); p.className = 'err'; p.textContent = t; list.prepend(p); setTimeout(() => p.remove(), 2600); }
     draw();
-    return { get: () => picked.slice(), trim: () => { const m = getMax(); if (picked.length > m) { picked = picked.slice(0, m); draw(); onChange && onChange(picked); } } };
+    return { get: () => picked.slice(), trim: () => {
+      const m = getMax(); if (picked.length > m) picked = picked.slice(0, m);
+      if (CAL.mix) { // Aufteilung geändert: Termine einer vollen Art auf die andere umstellen
+        ['studio', 'online'].forEach(k => { let over = -freeOf(k); for (let j = picked.length - 1; j >= 0 && over > 0; j--) if (picked[j].mode === k) { picked[j].mode = k === 'studio' ? 'online' : 'studio'; over--; } });
+      }
+      draw(); onChange && onChange(picked);
+    } };
   }
 
   async function post(data) {
@@ -811,7 +886,7 @@ footer summary{cursor:pointer}
       document.getElementById('sumtitle').textContent = p.dataset.title;
       document.getElementById('sumamt').textContent = euro(+p.dataset.cents);
       document.getElementById('sumunits').textContent = p.dataset.units;
-      document.getElementById('sumunit').textContent = euro(+p.dataset.unit);
+      document.getElementById('sumunit').textContent = p.dataset.unitlabel || euro(+p.dataset.unit);
       document.getElementById('sumwish').textContent = w ? w + (w === 1 ? ' Tag' : ' Tage') : 'später';
       btn.textContent = 'Weiter zur Zahlung · ' + euro(+p.dataset.cents);
     }
@@ -829,11 +904,36 @@ footer summary{cursor:pointer}
       cal.trim(); sum();
     }
     document.querySelectorAll('.modes button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+    // Mix & Match: sie wählt die Aufteilung, Preis rechnet live (verbindlich rechnet der Server)
+    const rows = document.querySelectorAll('.mxr');
+    if (rows.length && CAL.mix) {
+      const tot = CAL.mix.studio + CAL.mix.online, radio = cur(), base = radio.dataset.title.split(' · ')[0];
+      function mixDraw() {
+        let cents = 0, parts = [], ul = [];
+        rows.forEach(r => {
+          const k = r.dataset.k, n = CAL.mix[k], u = +r.dataset.u; cents += n * u;
+          r.querySelector('.mxn').textContent = n;
+          r.querySelector('.mxsum').textContent = n ? n + ' × ' + euro(u) + ' = ' + euro(n * u) : euro(u) + ' pro Einheit · keine';
+          r.querySelector('[data-d="-1"]').disabled = n <= 0; r.querySelector('[data-d="1"]').disabled = n >= tot;
+          if (n) { parts.push(n + ' × ' + (k === 'online' ? 'online' : 'im Studio')); ul.push(euro(u) + (k === 'online' ? ' online' : ' Studio')); }
+        });
+        document.querySelector('.mixcard .tot b').textContent = euro(cents);
+        radio.dataset.cents = cents; radio.dataset.title = base + ' · ' + parts.join(' + '); radio.dataset.unitlabel = ul.join(' · ');
+        cal.trim(); sum();
+      }
+      rows.forEach(r => r.querySelectorAll('.stp button').forEach(b => b.addEventListener('click', () => {
+        const k = r.dataset.k, o = k === 'studio' ? 'online' : 'studio', d = +b.dataset.d;
+        if (CAL.mix[k] + d < 0 || CAL.mix[o] - d < 0) return;
+        CAL.mix[k] += d; CAL.mix[o] -= d; mixDraw();
+      })));
+      mixDraw();
+    }
     sum();
     f.addEventListener('submit', async e => {
       e.preventDefault(); err.hidden = true;
       const d = Object.fromEntries(new FormData(f));
       d.package = cur().value; d.action = 'buy'; d.t = loaded; d.a = OFFER; d.bonus = BONUS;
+      if (CAL.mix) d.mix_online = CAL.mix.online;
       d.wishes = JSON.stringify(cal.get());
       if (!d.name || !d.email || !d.phone) { err.textContent = 'Bitte füll Name, E-Mail und Telefon aus.'; err.hidden = false; return; }
       const hqe = HQ ? HQ.check() : ''; if (hqe) { err.textContent = hqe; err.hidden = false; return; }
