@@ -1036,6 +1036,27 @@ void main(){
       let dec = null; for (const t of sorted) { try { if (await t.canDecode()) { dec = t; break; } } catch (e) {} }
       return { dec, raw: sorted.find(t => rank(t) < 9) || sorted[0] };
     }
+    // Mikrofon-Ton aufräumen (Vivien, 30.10.2026: „Ton über mein Rode-Mikrofon, am MacBook ging es, hochgeladen war er weg“):
+    // Externe Mikros liefern oft zwei Kanäle, bei denen einer leer ist oder beide gegenläufig sind (dann löscht sich die Stimme
+    // aus, sobald ein Handy oder Player auf Mono zusammenrechnet). Deshalb: Stimme je Clip auf einen sauberen Mono-Kanal bringen
+    // (lauter Kanal, oder Mittel der aktiven Kanäle; gegenläufig → nur einer) und auf beide Seiten legen.
+    function voiceMode(pieces) {
+      let nch = 0; pieces.forEach(p => nch = Math.max(nch, p.buffer.numberOfChannels));
+      const sq = new Float64Array(Math.max(1, nch)); let xy = 0, n = 0;
+      pieces.forEach(p => { const b = p.buffer, L = b.length, step = Math.max(1, Math.floor(L / 4000)), ch = []; for (let k = 0; k < b.numberOfChannels; k++) ch.push(b.getChannelData(k));
+        for (let i = 0; i < L; i += step) { for (let k = 0; k < ch.length; k++) sq[k] += ch[k][i] * ch[k][i]; if (ch.length > 1) xy += ch[0][i] * ch[1][i]; n++; } });
+      const rms = [...sq].map(v => Math.sqrt(v / Math.max(1, n))), mx = Math.max(...rms);
+      if (nch < 2 || mx < 1e-6) return { use: [0], rms: mx };
+      const act = rms.map((r, k) => r >= mx * .15 ? k : -1).filter(k => k >= 0);
+      const corr = (rms[0] && rms[1]) ? (xy / Math.max(1, n)) / (rms[0] * rms[1]) : 0;
+      if (act.includes(0) && act.includes(1) && corr < -.3) return { use: [0], inv: true, rms: mx };
+      return { use: act, rms: mx, one: act.length === 1 };
+    }
+    function toMono(b, use) {
+      const out = new AudioBuffer({ numberOfChannels: 1, length: b.length, sampleRate: b.sampleRate }), d = out.getChannelData(0), ks = use.filter(k => k < b.numberOfChannels);
+      if (!ks.length) ks.push(0); const f = 1 / ks.length; for (const k of ks) { const s0 = b.getChannelData(k); for (let i = 0; i < d.length; i++) d[i] += s0[i] * f; }
+      return out;
+    }
     async function voicePieces(M, input, c, SR, whole) { // → { pieces: [{buffer, ts}], fail } · ts = Startzeit im Ausgangsvideo
       const a = c.in || 0, b = c.out || c.dur || 0;
       const pk = await pickAudio(input), at = pk.raw;
@@ -1055,14 +1076,18 @@ void main(){
       try { let buf = whole.get(c.blob); if (!buf && c.blob.size < 450e6) { buf = await decodeAB(await c.blob.arrayBuffer(), SR); whole.set(c.blob, buf); } if (buf) return { pieces: [{ buffer: buf, ts: 0 }] }; } catch (e) { console.warn('Ton (ganze Datei)', e); }
       return { pieces: [], fail: true };
     }
+    let lastVoice = null; // { quiet, none, fixed } vom letzten Fertigstellen
     async function mixAudio(M, inputs, D, SR) { // inputs: [{input, c, start}] → { buf: AudioBuffer|null } oder { fail } oder null (abgebrochen)
-      const N = Math.max(1, Math.ceil(D * SR)), segs = [], whole = new Map(); let fail = 0, k = 0;
+      const N = Math.max(1, Math.ceil(D * SR)), segs = [], whole = new Map(); let fail = 0, k = 0, voiceN = 0, voiceMax = 0, voiceFix = 0;
       for (const x of inputs) { k++; if (x.c.mute) continue; if (inputs.length > 1) say('Ton wird vorbereitet … ' + k + ' von ' + inputs.length);
         const r = await voicePieces(M, x.input, x.c, SR, whole); if (r === null) return null; if (r.fail) { fail++; continue; }
+        if (r.pieces.length) { const vm = voiceMode(r.pieces); voiceN++; if ((vm.rms || 0) > voiceMax) voiceMax = vm.rms || 0; if (vm.inv || vm.one) voiceFix++;
+          r.pieces = r.pieces.map(p => ({ buffer: toMono(p.buffer, vm.use), ts: p.ts })); }
         const a = x.c.in || 0, e = x.c.out || x.c.dur || 0;
         r.pieces.forEach(p => { const s0 = Math.max(p.ts, a), s1 = Math.min(p.ts + p.buffer.duration, e);
           if (s1 - s0 > .001) segs.push({ buffer: p.buffer, when: x.start + (s0 - a), off: s0 - p.ts, dur: s1 - s0, cs: x.start, ce: x.start + (e - a) }); }); }
       if (fail) return { fail };
+      lastVoice = { quiet: voiceN > 0 && voiceMax < .004, none: !voiceN && inputs.some(x => !x.c.mute), fixed: voiceFix };
       if (!segs.length && !mlist.length) return { buf: null };
       const place = (ctx, dst) => { const gains = new Map(); segs.forEach(sg => { let g = gains.get(sg.cs); if (!g) { // je Clip 20 ms ein-/ausblenden, damit die Schnitte nicht knacken
           g = new GainNode(ctx, { gain: 0 }); g.connect(dst); const f = Math.min(.02, (sg.ce - sg.cs) / 4); g.gain.setValueAtTime(0, sg.cs); g.gain.linearRampToValueAtTime(1, sg.cs + f); g.gain.setValueAtTime(1, Math.max(sg.cs + f, sg.ce - f)); g.gain.linearRampToValueAtTime(0, sg.ce); gains.set(sg.cs, g); }
@@ -1268,7 +1293,7 @@ void main(){
     K('done').onclick = async () => {
       if (busy || !clips.length) return; stop(); covShow(false); busy = true; root.classList.add('sn-busy'); K('done').disabled = true; K('res').hidden = true;
       const bar = K('prog'), fill = bar.querySelector('i'); bar.hidden = false; fill.style.width = '0%'; say('Wird vorbereitet …');
-      let nb = null, fast = true;
+      let nb = null, fast = true; lastVoice = null;
       try { nb = await fastRender(fill); } catch (e) { console.warn('schnitt fast', e); nb = null; }
       if (nb === 'x' || closed) { busy = false; return; }
       if (!nb || nb.size < 1000) { fast = false; fill.style.width = '0%'; try { nb = await slowRender(fill); } catch (e) { console.warn('schnitt slow', e); nb = null; } }
@@ -1283,8 +1308,12 @@ void main(){
       K('share').hidden = !canSh; K('dl').className = 'sn-b' + (canSh ? '' : ' pl');
       K('resN').textContent = fmt(total() + CD()) + ' · ' + clips.length + (clips.length > 1 ? ' Clips' : ' Clip') + (CD() ? ' · mit Titelbild' : '') + (mlist.length ? ' · mit Musik' : '') + (fast ? '' : ' · in Echtzeit gespeichert');
       try { await kvSet('result', { blob: nb, at: Date.now(), draft: drName(curDraft) }); } catch (e) {}
+      // Ton-Check: Stimme fehlt oder ist kaum hörbar → deutlich sagen (und nicht still hochladen)
+      const lv = fast ? lastVoice : null, warnV = lv && (lv.none || lv.quiet);
+      if (warnV) { K('up').hidden = false; K('up').className = 'sn-up bad'; K('up').innerHTML = '<b>🎙 In deinen Clips ist ' + (lv.none ? 'kein Ton' : 'kaum Ton') + ' zu hören</b>War beim Aufnehmen das richtige Mikrofon gewählt (z. B. dein Rode)? Hör dir das Video unten kurz an. Ich lade es erst hoch, wenn du auf „⬆ Hochladen“ tippst.'; }
+      else if (lv && lv.fixed) K('resN').textContent += ' · Mikrofon-Ton auf beide Seiten gelegt';
       K('res').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      if (tg && o.upload) await doUpload();
+      if (tg && o.upload && !warnV) await doUpload();
       else say(canSh ? '✓ Fertig. Schau es dir an, dann „In Fotos sichern“ (landet direkt in deiner Galerie)' + (o.upload ? ' oder „⬆ Hochladen“.' : '.') : '✓ Fertig. Schau es dir an, dann herunterladen' + (o.upload ? ' oder „⬆ Hochladen“.' : '.'), 'ok');
     };
     async function doUpload() {
