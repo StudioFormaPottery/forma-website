@@ -660,7 +660,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
   // ---- 📤 Direkt aus dem Kalender hochladen (Vivien, 30.10.2026: „im Kalender draufdrücken, Video hochladen, schneiden, und es ist direkt drin“) ----
   // Das Video landet im ✂️ Schnitt im Entwurf dieses Videos, mit Ziel. „Fertig stellen & hochladen“ lädt es dann genau hierhin.
   function upTargets(v){const out=[];
-    if(/^\d+$/.test(v)&&v!=='0'){const T=TALKS.find(x=>x.id===+v);if(!T)return out;(T.g==='Academy'?['de']:['de','en']).forEach(lg=>out.push({done:lg==='de'?T.vde:T.ven,lab:lg==='de'?'Deutsch':'Englisch',name:T.t+(lg==='en'?' (EN)':''),tg:{k:'talk',id:T.id,lang:lg,n:T.t,g:T.g,due:T.due||''}}))}
+    if(/^\d+$/.test(v)&&v!=='0'){const T=TALKS.find(x=>x.id===+v);if(!T)return out;(T.do?['de']:['de','en']).forEach(lg=>out.push({done:lg==='de'?T.vde:T.ven,lab:lg==='de'?'Deutsch':'Englisch',name:T.t+(lg==='en'?' (EN)':''),tg:{k:'talk',id:T.id,lang:lg,n:T.t,g:T.g,due:T.due||''}}))}
     else if(v[0]==='c'){const M=MOVES.find(x=>x.id===+v.slice(1));if(M)out.push({done:M.ok,lab:'Clip',name:'Übung · '+M.n,tg:{k:'clip',c:M.id,n:M.n,due:M.due||''}})}
     else if(v[0]==='i'){const G=IGS.find(x=>x.id===+v.slice(1));if(G)out.push({done:G.has,lab:'Video',name:(G.kind==='reel'?'Reel ':'Story ')+G.day,tg:{k:'ig',id:G.id,n:G.t,due:G.day,kind:G.kind}})}
     return out}

@@ -49,7 +49,7 @@ function sn_targets(PDO $pdo): array
     foreach (['academy' => 'Academy', 'method' => 'Method', 'unfold' => 'Unfold', 'natal' => 'Prä- & Postnatal'] as $aud => $an) {
         foreach (mv_programs($pdo, $aud) as $p) foreach (mv_lessons($pdo, (int)$p['id']) as $l) {
             if (mv_lesson_is_clips($l)) continue;
-            foreach ($aud === 'academy' ? ['de'] : ['de', 'en'] as $lg) {
+            foreach ($aud === 'method' ? ['de', 'en'] : ['de'] as $lg) { // Englisch nur noch bei The Method
                 $out[] = ['k' => 'talk', 'id' => (int)$l['id'], 'lang' => $lg, 'n' => (string)$l['title_de'], 'g' => $an, 'due' => (string)$l['due'], 'done' => (string)$l['video_' . $lg] !== ''];
             }
         }
