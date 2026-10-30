@@ -22,7 +22,7 @@ $ld = [
      'hasOfferCatalog' => ['@type' => 'OfferCatalog', 'name' => 'Ausbildungen', 'itemListElement' => [['@type' => 'Offer', 'itemOffered' => ['@type' => 'Course', '@id' => $site . '/academy/teacher-training/#course', 'name' => AC_TITLE, 'url' => $site . '/academy/teacher-training/']]]]],
     ['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => [['@type' => 'ListItem', 'position' => 1, 'name' => 'Movecia', 'item' => $site . '/'], ['@type' => 'ListItem', 'position' => 2, 'name' => 'Academy', 'item' => $site . '/academy/']]],
 ];
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=15">';
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=16">';
 mvl_head('Movecia Academy · Yogalehrerausbildung auf Deutsch, Tirol & online', 'Ausbildungen der Movecia Academy mit Vivien Malonga, ausschließlich auf Deutsch, für Österreich, Deutschland, die Schweiz und Südtirol: das Mindful Becoming Teacher Training mit 550 Stunden, inkl. vollständiger 200-Stunden-Yogalehrerausbildung, Somatic Movement und Breathwork. Hybrid, mit Präsenzwochenende in den Tiroler Alpen. Nur 14 Plätze, Start November 2027.', $site . '/academy/', '/img/movecia/og-academy.jpg', $css, $ld);
 ?>
 <body class="acad">
@@ -40,7 +40,7 @@ mvl_head('Movecia Academy · Yogalehrerausbildung auf Deutsch, Tirol & online', 
     <div class="cta"><a class="btn" href="/academy/teacher-training/"><span class="de">Zum Teacher Training</span><span class="en">See the teacher training</span> →</a><a class="btn line" href="#ausbildungen"><span class="de">Alle Ausbildungen</span><span class="en">All trainings</span></a></div>
   </div>
 </div></section>
-<div class="ac-ribbon" aria-hidden="true"><div class="rb-in"><?php for ($i = 0; $i < 2; $i++): ?><span><span class="de">nur 14 Plätze</span><span class="en">only 14 places</span></span><i>✦</i><span><?= AC_HOURS ?> <span class="de">Stunden</span><span class="en">hours</span></span><i>✦</i><span><span class="de">inkl. 200-Std.-Yogalehrerausbildung</span><span class="en">incl. 200-hour yoga teacher training</span></span><i>✦</i><?php endfor; ?></div></div>
+<div class="ac-ribbon" aria-hidden="true"><div class="rb-in"><?php for ($i = 0; $i < 4; $i++): ?><span><span class="de">nur 14 Plätze</span><span class="en">only 14 places</span></span><i>✦</i><span><?= AC_HOURS ?> <span class="de">Stunden</span><span class="en">hours</span></span><i>✦</i><span><span class="de">inkl. 200-Std.-Yogalehrerausbildung</span><span class="en">incl. 200-hour yoga teacher training</span></span><i>✦</i><?php endfor; ?></div></div>
 
 <section class="w sec tint t1" id="ausbildungen"><div class="in">
   <div class="sec-h rv"><div><p class="k"><span class="de">Ausbildungen</span><span class="en">Trainings</span></p><h2 style="margin-top:.6rem"><span class="de">Dein nächster <em>Schritt</em></span><span class="en">Your next <em>step</em></span></h2></div>

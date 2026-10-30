@@ -215,7 +215,7 @@ html[data-l=en] .hb.star .t::after{content:"Close to my heart"}
 @media(max-width:999px){.ac-photo{max-width:420px}.ac-photo .ac-seal.big{width:92px;height:92px;left:-8px;top:auto;bottom:110px}}
 /* Band mit Laufschrift */
 .ac-ribbon{background:linear-gradient(90deg,#E4DCD1,#F3E2D8 50%,#E4DCD1);overflow:hidden;white-space:nowrap;padding:.85rem 0;border-top:1px solid #E2D2D4;border-bottom:1px solid #E2D2D4;margin-top:clamp(1rem,3vw,2rem)}
-.ac-ribbon .rb-in{display:inline-flex;gap:1.6rem;align-items:center;animation:mq 46s linear infinite;font-family:var(--serif);font-style:italic;font-size:clamp(1.25rem,2vw,1.6rem);color:var(--plumdeep)}
+.ac-ribbon .rb-in{display:inline-flex;gap:1.6rem;align-items:center;animation:mq 92s linear infinite;font-family:var(--serif);font-style:italic;font-size:clamp(1.25rem,2vw,1.6rem);color:var(--plumdeep)}
 .ac-ribbon i{font-style:normal;color:#B58C99;font-size:.9em}
 @keyframes mq{to{transform:translateX(-50%)}}
 /* Early-Bird mit Vögelchen */
@@ -600,3 +600,36 @@ body.acad{--blush:#E9E2D8}
 .acband{background:#4A3040!important}
 .acc-wrap .acc{background:#4A3040}
 .acc-wrap .acc::after{background:rgba(247,241,238,.06)}
+
+/* Countdown „Bäm“ (Vivien, 30.10.2026: Schrift viel größer, Timer cuter und verspielter) */
+.acc-wrap .acc{flex-direction:column;align-items:center;text-align:center;gap:1.4rem;padding-top:2.4rem;padding-bottom:4.2rem}
+.acc-wrap .acc-lab{align-items:center}
+.acc-wrap .acc-k{display:inline-flex;align-items:center;gap:.7rem;font-size:.82rem;letter-spacing:.32em;color:#E6DBCF}
+.acc-wrap .acc-k .birds{display:inline-flex;color:#E6DBCF}
+.acc-wrap .acc-k .bird{width:26px;height:20px}
+.acc-wrap .acc-h{font-size:clamp(2.2rem,4.6vw,3.6rem);margin-top:.15rem;line-height:1}
+.acc-wrap .acc-t{gap:clamp(.5rem,1.6vw,1.2rem);align-items:center}
+.acc-wrap .acc-u{min-width:0;padding:clamp(.9rem,2vw,1.4rem) clamp(.9rem,2.4vw,1.8rem) clamp(.7rem,1.6vw,1.1rem);
+  background:rgba(247,241,238,.09);border:1px solid rgba(247,241,238,.16);
+  border-radius:58% 42% 52% 48% / 46% 54% 46% 54%;animation:accBlob 9s ease-in-out infinite alternate}
+.acc-wrap .acc-u:nth-child(3){animation-delay:-3s}.acc-wrap .acc-u:nth-child(5){animation-delay:-5s}.acc-wrap .acc-u:nth-child(7){animation-delay:-7s}
+.acc-wrap .acc-u b{font-size:clamp(3.2rem,8vw,6.4rem);line-height:.95;display:inline-block}
+.acc-wrap .acc-u b.hop{animation:accHop .45s cubic-bezier(.3,1.6,.5,1)}
+.acc-wrap .acc-u small{font-size:.72rem;letter-spacing:.24em;margin-top:.55rem}
+.acc-wrap .acc-sep{font-size:0;width:9px;height:9px;border-radius:50%;background:#E6DBCF;opacity:.55;animation:accDot 2s ease-in-out infinite}
+.acc-wrap .acc-side{flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center;gap:.9rem 1.4rem;margin-top:.3rem}
+.acc-wrap .acc-p b{font-size:clamp(1.8rem,3.4vw,2.6rem)}
+.acc-wrap .acc-p s{font-size:1.05rem}
+.acc-wrap .acc-btn{font-size:1.05rem;padding:.8em 1.6em}
+@keyframes accBlob{to{border-radius:44% 56% 46% 54% / 56% 44% 56% 44%}}
+@keyframes accHop{0%{transform:translateY(-.18em) scale(.92);opacity:.4}100%{transform:none;opacity:1}}
+@keyframes accDot{50%{opacity:.15;transform:scale(.7)}}
+@media(max-width:600px){.acc-wrap .acc-t{gap:.35rem}.acc-wrap .acc-u{padding:.7rem .55rem .55rem}.acc-wrap .acc-u b{font-size:2.6rem}.acc-wrap .acc-u small{font-size:.58rem;letter-spacing:.16em}.acc-wrap .acc-sep{width:6px;height:6px}}
+@media(prefers-reduced-motion:reduce){.acc-wrap .acc-u,.acc-wrap .acc-u b.hop,.acc-wrap .acc-sep{animation:none}}
+
+/* Weniger Leerraum unter dem Kopf, keine bewegte Welle über den Abschnitten (Vivien, 30.10.2026) */
+.acad .ac-hero{padding-bottom:clamp(1rem,2.4vw,1.8rem)}
+.acad .ac-ribbon{margin-top:0}
+.acad .tint::before{display:none}
+.acad .ac-ribbon+.tint{margin-top:0}
+.acad .tint{margin-top:clamp(1.6rem,3vw,2.4rem)}

@@ -1248,7 +1248,7 @@ function ac_countdown(): string
     $eu = fn(int $x) => '€&nbsp;' . number_format($x / 100, 0, ',', '.');
     $u = fn(string $k, string $l) => '<span class="acc-u"><b data-k="' . $k . '">00</b><small>' . $l . '</small></span>';
     $sep = '<i class="acc-sep" aria-hidden="true">:</i>';
-    $head = $eb ? '<span class="acc-k">Early Bird</span><span class="acc-h">endet in</span>' : '<span class="acc-k">Teacher Training</span><span class="acc-h">startet in</span>';
+    $head = $eb ? '<span class="acc-k">' . ac_birds() . 'Early Bird</span><span class="acc-h">endet in</span>' : '<span class="acc-k">Teacher Training</span><span class="acc-h">startet in</span>';
     $side = $eb ? '<span class="acc-p"><b>' . $eu($c['eb_total']) . '</b><s>' . $eu($c['r_total']) . '</s></span>' : '<span class="acc-p"><b>' . mv_date($c['start_ts']) . '</b></span>';
     return '<div class="acc" data-to="' . (int)$to . '" data-now="' . $now . '" role="timer">'
         . '<svg class="acc-arc" viewBox="0 0 200 120" aria-hidden="true"><path d="M20 120V70a80 80 0 0 1 160 0v50" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M44 120V74a56 56 0 0 1 112 0v46" fill="none" stroke="currentColor" stroke-width="1"/></svg>'
@@ -1258,7 +1258,7 @@ function ac_countdown(): string
         . '</div>'
         . '<script>(function(){var e=document.currentScript.previousElementSibling,to=+e.dataset.to*1000,sk=Date.now()-e.dataset.now*1000,q=function(k){return e.querySelector(\'[data-k="\'+k+\'"]\')};'
         . 'function t(){var ms=Math.max(0,to-(Date.now()-sk)),x=Math.floor(ms/1000),p=function(n){return n<10?"0"+n:""+n};'
-        . 'q("d").textContent=Math.floor(x/86400);q("h").textContent=p(Math.floor(x%86400/3600));q("m").textContent=p(Math.floor(x%3600/60));q("s").textContent=p(x%60);if(ms>0)setTimeout(t,1000-(Date.now()%1000))}t()})();</script>';
+        . 'var v={d:""+Math.floor(x/86400),h:p(Math.floor(x%86400/3600)),m:p(Math.floor(x%3600/60)),s:p(x%60)};for(var k in v){var el=q(k);if(el.textContent!==v[k]){el.textContent=v[k];el.classList.remove("hop");void el.offsetWidth;el.classList.add("hop")}}if(ms>0)setTimeout(t,1000-(Date.now()%1000))}t()})();</script>';
 }
 
 /** Kleine handgezeichnete Vögel fürs Early-Bird-Abzeichen. */
