@@ -12,6 +12,14 @@ if (isset($_GET['t'])) {
     if (!$f || !is_file($f)) { http_response_code(404); exit; }
     goto serve;
 }
+if (isset($_GET['m'])) {
+    // Musik darunter für Bewegungsvideos und Flows (Vivien, 30.10.2026), signiert je Lied (mv_bgm_url)
+    $mid = (int)$_GET['m'];
+    if (!hash_equals(mv_bgm_sig($mid), (string)($_GET['k'] ?? ''))) { http_response_code(403); exit; }
+    $f = null; foreach (mv_bgm_all(forma_db()) as $r) if ((int)$r['id'] === $mid) $f = forma_data_dir() . '/musik/' . basename((string)$r['file']);
+    if (!$f || !is_file($f)) { http_response_code(404); exit; }
+    goto serve;
+}
 $lid = (int)($_GET['l'] ?? 0);
 $i = (int)($_GET['i'] ?? -1);
 $g = ($_GET['g'] ?? '') === 'en' ? 'en' : 'de';
@@ -20,7 +28,7 @@ $f = mv_voice_path($lid, $i, $g);
 if (!$f || !is_file($f)) { http_response_code(404); exit; }
 serve:
 $ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
-$type = ['webm' => 'audio/webm', 'ogg' => 'audio/ogg', 'mp4' => 'audio/mp4', 'm4a' => 'audio/mp4', 'mp3' => 'audio/mpeg', 'wav' => 'audio/wav', 'aac' => 'audio/aac'][$ext] ?? 'application/octet-stream';
+$type = ['webm' => 'audio/webm', 'mpeg' => 'audio/mpeg', 'ogg' => 'audio/ogg', 'mp4' => 'audio/mp4', 'm4a' => 'audio/mp4', 'mp3' => 'audio/mpeg', 'wav' => 'audio/wav', 'aac' => 'audio/aac'][$ext] ?? 'application/octet-stream';
 $size = filesize($f);
 header('Content-Type: ' . $type);
 header('Accept-Ranges: bytes');

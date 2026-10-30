@@ -132,7 +132,7 @@ main{max-width:1200px}
         headers:{AuthorizationSignature:j.sig,AuthorizationExpire:String(j.expire),VideoId:j.guid,LibraryId:String(j.lib)},metadata:{filetype:f.type,title:f.name},
         onError:()=>{msg.textContent='Upload unterbrochen. Bitte nochmal auswählen.';inp.disabled=false},
         onProgress:(a,t)=>{const p=Math.round(a/t*100);fill.style.width=p+'%';msg.textContent='Lädt hoch … '+p+' %'},
-        onSuccess:()=>{post('mm_mv_clip_set',{c:c.dataset.c,guid:j.guid}).then(r=>{inp.disabled=false;bar.hidden=true;c.classList.add('ok');c.dataset.have='1';msg.textContent='✓ gefilmt · in '+r.used+(r.used===1?' Video':' Videos');lab.textContent='Neu hochladen';lab.parentNode.classList.add('again');
+        onSuccess:()=>{post('mm_mv_clip_set',{c:c.dataset.c,guid:j.guid}).then(r=>{inp.disabled=false;bar.hidden=true;c.classList.add('ok');c.dataset.have='1';msg.textContent='✓ gefilmt · in '+r.used+(r.used===1?' Video':' Videos');if(r.see)msg.insertAdjacentHTML('beforeend',' <a class="see1" href="?view=videos&amp;play='+r.see+'" style="display:inline-flex;margin:6px 0 0 6px;padding:8px 16px;border-radius:999px;background:#4A3A41;color:#fff;text-decoration:none;font-size:16px">👁 So sieht es die Teilnehmerin</a>');lab.textContent='Neu hochladen';lab.parentNode.classList.add('again');
           c.querySelector('.v').innerHTML='<iframe src="'+r.view+'&autoplay=true&loop=true&muted=true" allow="autoplay"></iframe>'})}}).start()});}));
 })();
 </script>

@@ -1330,7 +1330,7 @@ void main(){
       const dd = drList.find(x => x.id === curDraft); if (dd) { dd.up = { at: Date.now(), guid: r.guid || '' }; await draftsSave(drList).catch(() => {}); drawDrafts(); }
       if (targets) { const tt = targets.find(x => tgKey(x) === tgKey(tg)); if (tt) tt.done = true; }
       box.className = 'sn-up'; box.innerHTML = '<b>✓ Ist drin!</b>' + esc(tgLabel(tg)) + ' ist hochgeladen.' + (r.note ? ' ' + esc(r.note) : '')
-        + (o.calUrl ? '<div class="sn-row"><a class="sn-b pl" href="' + esc(o.calUrl) + '">📅 Zurück zum Kalender</a></div>' : '');
+        + '<div class="sn-row">' + (o.seeUrl && o.seeUrl(tg, r) ? '<a class="sn-b dk" href="' + esc(o.seeUrl(tg, r)) + '">👁 So sieht es die Teilnehmerin</a>' : '') + (o.calUrl ? '<a class="sn-b pl" href="' + esc(o.calUrl) + '">📅 Zurück zum Kalender</a>' : '') + '</div>';
       say('✓ Hochgeladen: ' + tgLabel(tg), 'ok');
     }
     if (K('upBtn')) K('upBtn').onclick = () => { if (!result) return; if (curTg()) { doUpload(); return; } upWanted = true; tgOpen(true); K('tg').scrollIntoView({ behavior: 'smooth', block: 'start' }); say('Wähl oben aus, wohin das Video kommt, dann lade ich es gleich hoch.'); };

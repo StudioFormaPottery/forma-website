@@ -16,6 +16,8 @@ if ($view === 'videos' && isset($_GET['play'])) {
     if (!$l) go($self . '?view=videos', 'Video nicht gefunden.');
     $lg = ($_GET['lang'] ?? '') === 'en' && !mv_lesson_de_only($pdo, $l) ? 'en' : 'de';
     $fd = mv_flow_data($l, $lg, true);
+    // gleich wie im Mitgliederbereich: Titelbild + Beschreibung für die Einleitung
+    if ($fd) { $fd['intro'] = mv_t($l, 'text', $lg); $fd['photo'] = '/img/movecia/fotos/' . ($fd['mode'] === 'move' ? 'ev-method-karte.jpg' : 'ev-ueber-mich.jpg'); }
     $st = mv_lesson_status($pdo, $l);
     render_page('Vorschau · ' . $l['title_de'], function () use ($self, $l, $lg, $fd, $st) {
         $h = 'forma_h'; $id = (int)$l['id'];
@@ -40,7 +42,7 @@ body{background:#F2ECE4}main{max-width:900px}
 <div class="pv-w">
 <?php if ($fd): ?>
   <div data-mv-flow="<?= $h(json_encode($fd, JSON_UNESCAPED_UNICODE)) ?>"></div>
-  <script src="/wildhearts/assets/flow-player.js?v=8"></script>
+  <script src="/wildhearts/assets/flow-player.js?v=9"></script>
 <?php else: ?>
   <div class="pv-v"><?php if ($vid !== '' && mv_bunny()['lib'] !== ''): ?><iframe src="<?= $h(mv_embed($vid)) ?>" allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe><?php else: ?><div class="pv-e">Das Video ist noch nicht hochgeladen. Sobald es da ist, läuft es hier.</div><?php endif; ?></div>
 <?php endif; ?>
@@ -107,6 +109,12 @@ if ($view === 'videos') {
     <?php if ($clips): $rows = mv_lesson_clip_rows($pdo, $l); ?>
       <p class="how" data-how-flow<?= $flow ? '' : ' hidden' ?>><b>So geht's:</b> 1. Jede Übung kurz filmen und bei <b>„Clip“</b> hochladen. 2. Danach pro Übung auf <b>„Deutsch einsprechen“</b><?= $deOnly ? '' : ' und <b>„Englisch einsprechen“</b>' ?> tippen. Der Text steht dabei groß da, dein Clip läuft daneben. Jede Übung läuft bei den Frauen so lange wie unten angegeben (meist 2 Minuten).</p>
       <p class="how" data-how-move<?= $flow ? ' hidden' : '' ?>><b>So geht's:</b> Jede Übung kurz filmen (10 Sekunden bis 1 Minute) und bei <b>„Clip“</b> hochladen. Kein Sprechen. Die Frauen wählen 30 oder 45 Sekunden pro Übung. Deine Voice-overs werden hier nicht abgespielt. Tippst du oben auf „Flow“, wird daraus ein Flow mit deiner Stimme, und jede Übung, die du schon in einem anderen Flow eingesprochen hast, ist dann sofort fertig.</p>
+      <?php $bgR = mv_bgm_rows($pdo, $l); $bgM = trim((string)$l['bgm']) === '' ? 'auto' : ((string)$l['bgm'] === 'off' ? 'off' : 'set'); ?>
+      <div class="bgm" data-bgm="<?= $id ?>" data-bgmode="<?= $bgM ?>" data-list="<?= $h(json_encode(array_map(fn($r) => ['id' => (int)$r['id'], 't' => (string)$r['title'], 'dur' => (float)$r['dur']], $bgR), JSON_UNESCAPED_UNICODE)) ?>" data-need="<?= mv_bgm_need($l) ?>">
+        <div class="bgm-h"><b>🎵 Musik darunter</b><small data-bgn></small></div>
+        <div class="bgm-c" data-bgc></div>
+        <div class="bgm-a"><button type="button" data-bgdo="next">🎲 Anderer Vorschlag</button><select data-bgadd aria-label="Lied selbst wählen"><option value="">＋ Lied selbst wählen …</option></select><button type="button" data-bgdo="off">Keine Musik</button><button type="button" data-bgdo="auto" hidden>Wieder automatisch</button></div>
+      </div>
       <ol class="exl">
       <?php foreach (mv_lesson_steps($l) as $i => $e): $c = $rows[$i]; $g = (string)$c['guid']; $used = count($usage[$c['ckey']] ?? []);
           $vd = mv_voice_url($id, $i, 'de'); $ve = mv_voice_url($id, $i, 'en'); ?>
@@ -185,6 +193,11 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
 .seg button{font:inherit;display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:10px 18px;border-radius:18px;border:1.5px solid #DDD2C6;background:#FBF8F4;color:#4A3A41;cursor:pointer;text-align:left}
 .seg button b{font-size:18px;font-weight:500}.seg button span{font-size:15px;color:#7D7076}
 .seg button[aria-pressed=true]{border-color:#7D5E68;background:#EADFDE}
+.bgm{background:#FBF5F7;border:1.5px solid #E2CBD2;border-radius:18px;padding:12px 14px;margin:10px 0;display:flex;flex-direction:column;gap:8px}.bgm.busy{opacity:.55;pointer-events:none}
+.bgm-h{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}.bgm-h b{font-weight:500;font-size:19px;color:#4A3A41}.bgm-h small{font-size:15px;color:#7D7076}
+.bgm-c{display:flex;flex-wrap:wrap;gap:6px}.bgm-s{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid #E6DCD2;border-radius:999px;padding:6px 6px 6px 14px;font-size:16px}.bgm-s small{color:#7D7076}
+.bgm-s button{width:30px;height:30px;border-radius:50%;border:0;background:#F2ECE4;color:#8C2C1D;cursor:pointer}.bgm-o{font-size:16px;color:#7D7076}
+.bgm-a{display:flex;flex-wrap:wrap;gap:8px}.bgm-a button,.bgm-a select{font:inherit;font-size:16px;min-height:44px;padding:8px 14px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer;max-width:100%}
 .see{display:inline-flex;align-items:center;min-height:50px;padding:10px 20px;border-radius:999px;background:#7D5E68;color:#fff;text-decoration:none;font-size:18px;font-weight:500}
 .how{font-size:19px;line-height:1.5;margin:16px 0 8px;color:#2E2529}
 .exl{list-style:none;margin:0;padding:0}
@@ -300,6 +313,19 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
   document.querySelectorAll('[data-due]').forEach(inp=>inp.addEventListener('change',()=>post('mm_mv_due',{id:inp.dataset.due,due:inp.value})));
   function status(id,s){const el=document.querySelector('[data-st="'+id+'"]');if(!el||!s)return;el.textContent='Clips '+s.clips+'/'+s.n+(s.flow?' · Deutsch '+s.de+'/'+s.n+(s.deonly?'':' · Englisch '+s.en+'/'+s.n):'');
     const c=document.getElementById('v'+id);if(c&&s.done){c.classList.add('fin');c.classList.remove('late')}}
+  // ---- Musik darunter je Video (Vivien, 30.10.2026) ----
+  const SONGS=<?= json_encode(array_map(fn($r) => ['id' => (int)$r['id'], 't' => (string)$r['title'], 'dur' => (float)$r['dur']], mv_bgm_all($pdo)), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+  const fmm=s=>Math.floor(s/60)+':'+String(Math.round(s%60)).padStart(2,'0');
+  function bgmDraw(box){const list=JSON.parse(box.dataset.list||'[]'),m=box.dataset.bgmode,need=+box.dataset.need||0,sum=list.reduce((a,x)=>a+(x.dur||150),0);
+    box.querySelector('[data-bgc]').innerHTML=m==='off'?'<span class="bgm-o">Keine Musik – nur '+(box.closest('.vc').querySelector('[data-m=flow][aria-pressed=true]')?'deine Stimme':'der Timer-Klang')+'.</span>':
+      (list.length?list.map(x=>'<span class="bgm-s">'+esc(x.t)+' <small>'+fmm(x.dur||0)+'</small><button type="button" data-bgx="'+x.id+'" aria-label="entfernen">✕</button></span>').join(''):'<span class="bgm-o">Noch keine Lieder im Musik-Ordner.</span>');
+    box.querySelector('[data-bgn]').textContent=m==='off'?'aus':(m==='auto'?'automatisch passend gewählt':'von dir gewählt')+(list.length?' · reicht für '+(sum+5>=need?'das ganze Video':fmm(sum)+' von '+fmm(need)+', danach von vorne'):'');
+    box.querySelector('[data-bgdo=auto]').hidden=m==='auto';box.querySelector('[data-bgdo=off]').hidden=m==='off';
+    box.querySelectorAll('[data-bgx]').forEach(b=>b.onclick=()=>{const ids=list.map(x=>x.id).filter(i=>i!==+b.dataset.bgx);bgmSet(box,ids.length?{do:'set',ids:ids.join(',')}:{do:'off'})});}
+  function bgmSet(box,d){box.classList.add('busy');post('mm_mv_bgm',Object.assign({id:box.dataset.bgm},d)).then(r=>{box.classList.remove('busy');if(r.error){alert(r.error);return}box.dataset.bgmode=r.mode;box.dataset.list=JSON.stringify(r.list);bgmDraw(box)}).catch(()=>box.classList.remove('busy'))}
+  document.querySelectorAll('.bgm').forEach(box=>{const sel=box.querySelector('[data-bgadd]');sel.innerHTML+=SONGS.map(x=>'<option value="'+x.id+'">'+esc(x.t)+' · '+fmm(x.dur||0)+'</option>').join('');
+    sel.onchange=()=>{const id=+sel.value;sel.value='';if(!id)return;const cur=box.dataset.bgmode==='set'?JSON.parse(box.dataset.list||'[]').map(x=>x.id):[];if(!cur.includes(id))cur.push(id);bgmSet(box,{do:'set',ids:cur.join(',')})};
+    box.querySelectorAll('[data-bgdo]').forEach(b=>b.onclick=()=>bgmSet(box,{do:b.dataset.bgdo}));bgmDraw(box)});
   // Flow oder Bewegungsvideo
   document.querySelectorAll('[data-mode]').forEach(g=>g.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{const id=g.dataset.mode,m=b.dataset.m;
     g.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));const c=document.getElementById('v'+id);
@@ -326,9 +352,10 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
       // gleiche Übung in anderen Videos auf dieser Seite gleich mit als „da“ zeigen
       document.querySelectorAll('.ex[data-c="'+li.dataset.c+'"]').forEach(x=>{const cb=x.querySelector('.cell.clip');cb.classList.add('ok');cb.querySelector('.msg').textContent='✓ da'+(r.used>1?' · steckt in '+r.used+' Videos':'');x.dataset.view=r.view+'&autoplay=true&loop=true&muted=true';});
       const id=li.dataset.id;const cnt=document.querySelectorAll('#v'+id+' .cell.clip.ok').length,n=document.querySelectorAll('#v'+id+' .ex').length;
-      const s=document.querySelector('[data-st="'+id+'"]');if(s)s.textContent=s.textContent.replace(/Clips \d+\/\d+/,'Clips '+cnt+'/'+n);});});});
+      const s=document.querySelector('[data-st="'+id+'"]');if(s)s.textContent=s.textContent.replace(/Clips \d+\/\d+/,'Clips '+cnt+'/'+n);
+      msg.insertAdjacentHTML('beforeend',' <a class="see1" href="?view=videos&amp;play='+id+'" style="display:inline-flex;margin:6px 0 0 6px;padding:8px 16px;border-radius:999px;background:#4A3A41;color:#fff;text-decoration:none;font-size:16px">👁 So sieht es die Teilnehmerin</a>');});});});
   document.querySelectorAll('.vbox').forEach(box=>{const inp=box.querySelector('.vfile');if(!inp)return;inp.addEventListener('change',()=>{const f=inp.files[0];if(!f)return;const id=box.dataset.id,lg=box.dataset.lang;
-    upload(box,f,'mm_mv_video_new',{id:id,lang:lg},'mm_mv_video_set',{id:id,lang:lg},(r,msg)=>{msg.className='msg ok';msg.textContent='✓ '+(lg==='de'?'Deutsch':'Englisch')+' ist hochgeladen';});});});
+    upload(box,f,'mm_mv_video_new',{id:id,lang:lg},'mm_mv_video_set',{id:id,lang:lg},(r,msg)=>{msg.className='msg ok';msg.textContent='✓ '+(lg==='de'?'Deutsch':'Englisch')+' ist hochgeladen';msg.insertAdjacentHTML('beforeend',' <a class="see1" href="?view=videos&amp;play='+id+'&amp;lang='+lg+'" style="display:inline-flex;margin:6px 0 0 6px;padding:8px 16px;border-radius:999px;background:#4A3A41;color:#fff;text-decoration:none;font-size:16px">👁 So sieht es die Teilnehmerin</a>');});});});
 
   // --- Einsprechen: Text groß, Clip läuft daneben, Uhr zählt bis zur Übungsdauer ---------------------------
   const rm=document.getElementById('rm'),$=id=>document.getElementById(id);

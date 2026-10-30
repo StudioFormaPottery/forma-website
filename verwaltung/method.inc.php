@@ -162,8 +162,9 @@ if ($action === 'mm_mv_clip_set') {
     if ($c['guid'] !== '' && $c['guid'] !== $guid) mv_bunny_delete((string)$c['guid']);
     $pdo->prepare('UPDATE mv_clips SET guid = ?, updated_at = ? WHERE id = ?')->execute([$guid, date('c'), $c['id']]);
     mv_clips_all($pdo, true);
-    $used = count(mv_clip_usage($pdo)[$c['ckey']] ?? []);
-    $mvJson(['ok' => 1, 'c' => (int)$c['id'], 'view' => mv_embed($guid), 'used' => $used]);
+    $uses = mv_clip_usage($pdo)[$c['ckey']] ?? []; $used = count($uses);
+    // see = erstes Video mit dieser Übung, für „👁 So sieht es die Teilnehmerin“ gleich nach dem Hochladen
+    $mvJson(['ok' => 1, 'c' => (int)$c['id'], 'view' => mv_embed($guid), 'used' => $used, 'see' => $uses ? (int)array_key_first($uses) : 0]);
 }
 if ($action === 'mm_mv_clip_clear') {
     $c = $mvClip();
@@ -244,6 +245,20 @@ if ($action === 'mm_mv_step') {
     else $mvJson(['error' => 'Fehlt.']);
     mv_lesson_steps_save($pdo, (int)$l['id'], $st);
     $mvJson(['ok' => 1]);
+}
+// Musik darunter je Video (Vivien, 30.10.2026): do = auto | next (anderer Vorschlag) | off | set (ids „3,7“)
+if ($action === 'mm_mv_bgm') {
+    $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
+    if (!$l) $mvJson(['error' => 'Video nicht gefunden.']);
+    $do = (string)($_POST['do'] ?? 'auto');
+    $v = '';
+    if ($do === 'off') $v = 'off';
+    elseif ($do === 'next') $v = implode(',', array_map(fn($r) => (int)$r['id'], mv_bgm_auto($pdo, $l, random_int(1, 99999))));
+    elseif ($do === 'set') $v = implode(',', array_slice(array_values(array_unique(array_filter(array_map('intval', explode(',', (string)($_POST['ids'] ?? '')))))), 0, 6));
+    $pdo->prepare('UPDATE mv_lessons SET bgm = ? WHERE id = ?')->execute([$v, $l['id']]);
+    $l['bgm'] = $v;
+    $rows = mv_bgm_rows($pdo, $l);
+    $mvJson(['ok' => 1, 'mode' => $v === '' ? 'auto' : ($v === 'off' ? 'off' : 'set'), 'list' => array_map(fn($r) => ['id' => (int)$r['id'], 't' => (string)$r['title'], 'dur' => (float)$r['dur']], $rows), 'need' => mv_bgm_need($l)]);
 }
 if ($action === 'mm_mv_mode') {
     $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));

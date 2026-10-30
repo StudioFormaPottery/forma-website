@@ -60,14 +60,31 @@
 .mvf-play,.mvf-done{scroll-margin-top:150px}
 .mvf-play{display:flex;flex-direction:column;gap:14px}
 .mvf-stage{position:relative;aspect-ratio:16/9;width:100%;border-radius:30px;overflow:hidden;background:radial-gradient(circle at 30% 30%,#8C727B,#2E1D27)}
-.mvf-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}
+.mvf-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;opacity:0;transition:opacity .35s ease,filter 1.2s ease,transform 1.2s ease}
+.mvf-stage iframe.on{opacity:1}
+/* Einleitung (Vivien, 30.10.2026): Titelbild → Welle mit der ersten Übung, Bild weich verschwommen, 10 Sekunden in der Mitte */
+.mvf-stage.ready iframe.on{filter:blur(18px) saturate(.9);transform:scale(1.1)}
+.mvf-stage.ready .mvf-ring,.mvf-stage.ready .mvf-ph{opacity:0}
+.mvf-ring{transition:opacity .6s}
+.mvf-cd{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#FFFCF8;text-align:center;opacity:0;pointer-events:none;transition:opacity .6s;text-shadow:0 2px 18px rgba(46,29,39,.45)}
+.mvf-stage.ready .mvf-cd{opacity:1}
+.mvf-cd b{font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(4.5rem,16cqw,9rem);line-height:1;font-variant-numeric:tabular-nums}
+.mvf-cd span{font-size:clamp(.8rem,2.2cqw,1.05rem);letter-spacing:.18em;text-transform:uppercase;opacity:.9}
+@container (max-width:560px){.mvf-cd{align-items:flex-end;justify-content:flex-start;padding:5% 7% 0 0;text-align:right}.mvf-cd b{font-size:26cqw}.mvf-cd span{font-size:.62rem;letter-spacing:.14em}}
+.mvf-tc{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:6%;color:#FFFCF8;background:#4A3040 center/cover no-repeat;opacity:0;pointer-events:none;transition:opacity .8s ease}
+.mvf-tc::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(46,29,39,.15),rgba(46,29,39,.55))}
+.mvf-tc>*{position:relative}
+.mvf-tc.on{opacity:1}
+.mvf-tc small{font-size:clamp(.66rem,1.8cqw,.9rem);letter-spacing:.24em;text-transform:uppercase;opacity:.9}
+.mvf-tc b{font-family:"Cormorant","Cormorant Garamond",Georgia,serif;font-weight:500;font-style:italic;font-size:clamp(1.8rem,6.5cqw,3.6rem);line-height:1.05;max-width:16em}
+.mvf-tc img{width:clamp(40px,8cqw,70px);height:auto}
 .mvf-ph{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;color:#E4DCD1;font-size:.95rem;text-align:center;padding:1rem}
 .mvf-ph .mk{width:64px;height:64px;opacity:.9}
 .mvf-shade{position:absolute;left:0;right:0;bottom:0;height:55%;background:linear-gradient(to top,rgba(46,37,41,.62),rgba(46,37,41,0));pointer-events:none}
 .mvf-stage{container-type:inline-size}
 /* Übungsname als Welle mit Logo links unten (Vivien, 30.10.2026): läuft rechts in einer Spitze aus, blendet bei jeder neuen Übung kurz ein und nach 3,5 s wieder aus */
 .mvf-name{position:absolute;left:0;bottom:0;width:70cqw;height:24cqw;max-height:190px;color:#F7F1EE;pointer-events:none;opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
-.mvf-name.on{opacity:1;transform:none}
+.mvf-name.on,.mvf-stage.ready .mvf-name{opacity:1;transform:none}
 .mvf-name svg{position:absolute;inset:0;width:100%;height:100%}
 .mvf-name .in{position:absolute;left:max(16px,4.2cqw);right:14cqw;top:38%;bottom:6%;display:flex;align-items:center;gap:max(10px,2.2cqw)}
 .mvf-name .in>div{min-width:0}
@@ -179,7 +196,7 @@
   const WAVE = '<svg class="mvf-wave" viewBox="0 0 800 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60 C120 30 220 85 360 58 S600 20 800 52 V90 H0z" fill="#F1E3E2"/><path d="M0 72 C150 52 260 92 420 70 S650 46 800 68" fill="none" stroke="#D9C3C6" stroke-width="1.2"/></svg>';
 
   // Sonnenaufgang: weicher Akkord, der aufblüht und warm ausklingt, am Ende ein zarter Glockenton
-  let ac = null;
+  let ac = null, pjP = null;
   function actx() { if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; } } if (ac && ac.state === 'suspended') ac.resume(); return ac; }
   function sunrise(len) {
     const a = actx(); if (!a) return;
@@ -316,13 +333,16 @@
 </div>
 <div class="mvf-play" data-p hidden>
   <div class="mvf-stage" data-st>
-    <iframe data-if title="" allow="autoplay;encrypted-media;picture-in-picture" loading="eager"></iframe>
+    <iframe data-if="0" title="" allow="autoplay;encrypted-media;picture-in-picture" loading="eager"></iframe>
+    <iframe data-if="1" title="" allow="autoplay;encrypted-media;picture-in-picture" loading="eager" aria-hidden="true"></iframe>
     <div class="mvf-ph" data-ph hidden>${MARK}<span>${T('Clip folgt', 'Clip coming soon')}</span></div>
     <div class="mvf-sun"></div>
     <div class="mvf-shade"></div>
     ${pv && flow ? `<span class="mvf-flag" data-vflag hidden>${T('Vorschau · Voice-over fehlt noch', 'Preview · voice-over still missing')}</span>` : ''}
     <div class="mvf-name" data-nmw><svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="mvfwg" x1="0" x2="1"><stop offset="0" stop-color="#4A3040" stop-opacity=".94"/><stop offset=".62" stop-color="#4A3040" stop-opacity=".9"/><stop offset="1" stop-color="#4A3040" stop-opacity="0"/></linearGradient><linearGradient id="mvfwl" x1="0" x2="1"><stop offset="0" stop-color="#B58C99" stop-opacity=".75"/><stop offset=".7" stop-color="#B58C99" stop-opacity=".5"/><stop offset="1" stop-color="#B58C99" stop-opacity="0"/></linearGradient></defs><path d="M0 64 C110 30 210 98 310 84 S470 66 540 150 C572 188 600 222 620 240 H0Z" fill="url(#mvfwg)"/><path d="M0 46 C120 14 220 80 320 66 S480 48 560 138 C588 172 606 200 618 222" fill="none" stroke="url(#mvfwl)" stroke-width="2"/></svg><div class="in"><img src="/img/movecia/movecia-zeichen-hell.svg" alt="" draggable="false"><div><small data-tag></small><b data-nm></b></div></div></div>
     <div class="mvf-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="t" cx="60" cy="60" r="52"></circle><circle class="p" data-pr cx="60" cy="60" r="52"></circle></svg><div class="n"><b data-sec>30</b><span data-unit>${T('Sek.', 'sec')}</span></div></div>
+    <div class="mvf-cd" aria-live="polite"><span>${T('Gleich geht’s los', 'Get ready')}</span><b data-cd>10</b><span data-cdn hidden></span></div>
+    <div class="mvf-tc" data-tc${data.photo ? ` style="background-image:url('${esc(data.photo)}')"` : ''}><img src="/img/movecia/movecia-zeichen-hell.svg" alt="" draggable="false"><small>${flow ? T('Dein Flow', 'Your flow') : T('Dein Bewegungsvideo', 'Your movement session')}</small>${data.title ? `<b>${esc(data.title)}</b>` : ''}</div>
     <div class="mvf-pausey"><span>${T('Pausiert', 'Paused')}</span></div>
     <div class="mvf-next" data-nx><small>${T('Als Nächstes', 'Up next')}</small><b data-nxn></b></div>
   </div>
@@ -351,16 +371,60 @@
     root.querySelectorAll('[data-d]').forEach(b => b.addEventListener('click', () => { dur = +b.dataset.d; try { localStorage.setItem('mvf-dur', String(dur)); } catch (e) {} seg(); }));
     seg();
     let nmT = 0;
-    function nameShow() { const w = q('[data-nmw]'); if (!w) return; w.classList.remove('on'); void w.offsetWidth; w.classList.add('on'); clearTimeout(nmT); nmT = setTimeout(() => w.classList.remove('on'), 3500); }
+    function nameShow(keep) { const w = q('[data-nmw]'); if (!w) return; w.classList.remove('on'); void w.offsetWidth; w.classList.add('on'); clearTimeout(nmT); if (!keep) nmT = setTimeout(() => w.classList.remove('on'), 3500); }
+    // ---- Clips: zwei Bunny-Player im Wechsel (Vivien, 30.10.2026: „das Video startet nicht von selbst, der Timer läuft trotzdem“) ----
+    // Der nächste Clip lädt schon während der aktuellen Übung, beim Wechsel startet er sofort. Jeder Clip läuft stumm in Schleife,
+    // egal wie kurz er ist. Der Timer zählt erst, wenn das Video wirklich läuft (spätestens nach 5 Sekunden).
+    const slots = [0, 1].map(k => ({ f: q('[data-if="' + k + '"]'), src: '', pl: null, playing: false }));
+    let act = 0, shownAt = 0;
+    function pj() { if (window.playerjs) return Promise.resolve(window.playerjs); if (!pjP) pjP = new Promise(ok => { const sc = document.createElement('script'); sc.src = 'https://assets.mediadelivery.net/playerjs/player-0.1.0.min.js'; sc.onload = () => ok(window.playerjs || null); sc.onerror = () => ok(null); document.head.appendChild(sc); setTimeout(() => ok(window.playerjs || null), 6000); }); return pjP; }
+    function call(sl, fn, ...a) { try { if (sl.pl) sl.pl[fn](...a); } catch (e) {} }
+    function load(sl, src) {
+      if (sl.src === src) return; sl.src = src; sl.playing = false; sl.pl = null;
+      if (!src) { sl.f.removeAttribute('src'); return; }
+      sl.f.src = src;
+      const mine = src; sl.f.onload = () => { if (sl.src === mine && !window.playerjs) setTimeout(() => { if (sl.src === mine) sl.playing = true; }, 1500); };
+      pj().then(P => { if (!P || sl.src !== mine) { if (sl.src === mine) sl.playing = true; return; }
+        let pl; try { pl = new P.Player(sl.f); } catch (e) { sl.playing = true; return; } sl.pl = pl;
+        pl.on('ready', () => { if (sl.src !== mine) return; call(sl, 'mute'); call(sl, 'setLoop', true);
+          if (slots[act] === sl && run) call(sl, 'play'); else call(sl, 'pause');
+          pl.on('play', () => { if (sl.src === mine) sl.playing = true; }); pl.on('timeupdate', () => { if (sl.src === mine) sl.playing = true; });
+          pl.on('ended', () => { call(sl, 'setCurrentTime', 0); call(sl, 'play'); }); }); });
+    }
+    function clipOn(i) { // Clip der Übung i zeigen und starten, den nächsten schon vorladen
+      const it = items[i], src = it.src || '';
+      let k = slots.findIndex(x => x.src === src && src);
+      if (k < 0) { k = slots[act].src === '' || !run ? act : 1 - act; if (slots[k] === slots[act] && i > 0) k = 1 - act; load(slots[k], src); }
+      act = k; shownAt = performance.now();
+      slots.forEach((x, j) => { x.f.classList.toggle('on', j === act && !!src); if (j !== act) call(x, 'pause'); });
+      const sl = slots[act]; sl.f.title = it.name; call(sl, 'setCurrentTime', 0); if (run) call(sl, 'play');
+      q('[data-ph]').hidden = !!src;
+      const n = items[i + 1]; if (n && n.src && n.src !== src) load(slots[1 - act], n.src);
+    }
+    const vidOk = () => !items[idx].src || slots[act].playing || performance.now() - shownAt > 5000;
+
+    // ---- Musik darunter (vom Video, z. B. „Ankommen“): ein oder zwei Lieder, sanft ineinander geblendet ----
+    const bgm = data.bgm || []; let bgOn = bgm.length > 0, bgK = 0, bgCur = 0, bgX = false, bgG = null, bgRun = false;
+    try { if (localStorage.getItem('mvf-bgm') === '0') bgOn = false; } catch (e) {}
+    const bgA = [new Audio(), new Audio()], bgE = [null, null], BGV = flow ? .16 : .5;
+    bgA.forEach(a => { a.preload = 'auto'; });
+    function bgSetup() { const a = actx(); if (!a || bgG) return; try { bgG = a.createGain(); bgG.gain.value = 0; bgG.connect(a.destination); bgA.forEach((el, k) => { const g = a.createGain(); g.gain.value = 0; a.createMediaElementSource(el).connect(g); g.connect(bgG); bgE[k] = g; }); } catch (e) { bgG = null; } }
+    function ramp(g, v, sec) { if (!g || !ac) return; const t = ac.currentTime; try { g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(v, t + sec); } catch (e) {} }
+    function bgSong(k, slot) { const el = bgA[slot], m = bgm[k % bgm.length]; bgK = k; if (el.getAttribute('src') !== m.url) el.src = m.url; try { el.currentTime = 0; } catch (e) {} el.play().catch(() => {}); if (bgE[slot]) ramp(bgE[slot], 1, k ? 2.4 : .2); else el.volume = 1; }
+    bgA.forEach((el, k) => el.addEventListener('timeupdate', () => {
+      if (!bgRun || k !== bgCur || bgX || !isFinite(el.duration) || el.duration - el.currentTime > 2.6) return;
+      bgX = true; const o = bgCur; bgCur = 1 - bgCur; if (bgE[o]) ramp(bgE[o], 0, 2.4); setTimeout(() => { bgA[o].pause(); bgX = false; }, 2700); bgSong(bgK + 1, bgCur); }));
+    function bgPlay() { if (!bgm.length || !bgOn) return; bgSetup(); if (!bgRun) { bgRun = true; if (!bgA[bgCur].getAttribute('src')) bgSong(0, bgCur); else bgA[bgCur].play().catch(() => {}); } else bgA[bgCur].play().catch(() => {}); if (bgG) ramp(bgG, BGV, 1.5); else bgA.forEach(a => a.volume = BGV); }
+    function bgPause(fade) { if (!bgm.length) return; if (bgG && fade) { ramp(bgG, 0, fade); setTimeout(() => bgA.forEach(a => a.pause()), fade * 1000 + 100); } else bgA.forEach(a => a.pause()); }
+    function bgUi() { const b = q('[data-mus]'); if (!bgm.length || !b) return; b.setAttribute('aria-pressed', String(bgOn)); b.querySelector('span:last-child').textContent = bgOn ? T('Musik an', 'Music on') : T('Musik aus', 'Music off'); }
+
     function show(i) {
       const it = items[i];
       q('[data-tag]').textContent = T(`Übung ${i + 1} von ${items.length}`, `Exercise ${i + 1} of ${items.length}`);
-      nameShow();
       q('[data-nm]').textContent = it.name;
+      if (phase === 'run') nameShow();
       q('[data-pos]').textContent = T(`Übung ${i + 1} von ${items.length}`, `Exercise ${i + 1} of ${items.length}`);
-      const f = q('[data-if]'); f.title = it.name;
-      if (it.src) { f.hidden = false; q('[data-ph]').hidden = true; if (f.getAttribute('src') !== it.src) f.src = it.src; }
-      else { f.hidden = true; f.removeAttribute('src'); q('[data-ph]').hidden = false; }
+      clipOn(i);
       const n = items[i + 1];
       q('[data-af]').innerHTML = n ? T('Als Nächstes: ', 'Up next: ') + '<b>' + esc(n.name) + '</b>' : T('Das ist deine letzte Übung.', 'This is your last exercise.');
       total = secOf(i); left = total; chimed = false; q('[data-st]').classList.remove('end');
@@ -370,7 +434,7 @@
         // Ist das Voice-over länger als die Übung, läuft der Timer so lange wie die Stimme (plus kurzer Ausklang)
         voice.onloadedmetadata = () => { if (isFinite(voice.duration) && voice.duration + 4 > total) { const add = voice.duration + 4 - total; total += add; left += add; draw(); } };
         voice.src = it.voice;
-        if (run) voice.play().catch(() => {});
+        if (run && phase === 'run') voice.play().catch(() => {});
       } else voice.removeAttribute('src');
       draw();
     }
@@ -384,10 +448,21 @@
       q('[data-rest]').textContent = r >= 60 ? T(`noch ${Math.ceil(r / 60)} Min.`, `${Math.ceil(r / 60)} min left`) : T(`noch ${Math.ceil(r)} Sek.`, `${Math.ceil(r)} sec left`);
       q('[data-trk]').style.width = Math.min(100, 100 * (1 - r / all)) + '%';
     }
+    // Ablauf: title (Titelbild, 3 s) → ready (verschwommen, Welle mit Übung 1, 10 Sekunden in der Mitte) → run
+    let phase = 'run', phT = 0; const READY = 10, TITLE = (data.photo || data.title) ? 3 : 0;
+    function setPhase(p) {
+      phase = p; const st = q('[data-st]'), tc = q('[data-tc]');
+      tc.classList.toggle('on', p === 'title'); st.classList.toggle('ready', p === 'ready');
+      if (p === 'title') phT = TITLE;
+      if (p === 'ready') { phT = READY; q('[data-cd]').textContent = String(READY); q('[data-cdn]').textContent = T('Erste Übung: ', 'First up: ') + items[0].name; nameShow(true); }
+      if (p === 'run') { nameShow(); last = performance.now(); if (flow && voice.getAttribute('src')) voice.play().catch(() => {}); }
+    }
     function tick(now) {
       if (!run) return;
       const dt = Math.min(1, (now - last) / 1000); last = now;
-      if (!sw) {
+      if (phase === 'title') { phT -= dt; if (phT <= 0) setPhase('ready'); }
+      else if (phase === 'ready') { if (vidOk()) phT -= dt; q('[data-cd]').textContent = String(Math.max(1, Math.ceil(phT))); if (phT <= 0) setPhase('run'); }
+      else if (!sw && vidOk()) {
         left -= dt;
         if (left <= 5 && !chimed) { chimed = true; q('[data-st]').classList.add('end'); if (sound) sunrise(5); }
         if (left <= 0) { left = 0; draw(); advance(); } else draw();
@@ -402,36 +477,43 @@
     function play() {
       run = true; last = performance.now(); q('[data-st]').classList.remove('paused');
       q('[data-pi]').innerHTML = ICON.pause; q('[data-pl]').textContent = 'Pause';
-      if (flow && voice.getAttribute('src') && !sw) voice.play().catch(() => {});
+      call(slots[act], 'play'); bgPlay();
+      if (flow && phase === 'run' && voice.getAttribute('src') && !sw) voice.play().catch(() => {});
       cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
     }
     function stop() {
-      run = false; voice.pause(); q('[data-st]').classList.add('paused');
+      run = false; voice.pause(); call(slots[act], 'pause'); bgPause(.4); q('[data-st]').classList.add('paused');
       q('[data-pi]').innerHTML = ICON.resume; q('[data-pl]').textContent = T('Weiter', 'Resume');
     }
     // Tab im Hintergrund: Timer anhalten, damit die Zeit nicht ohne sie verstreicht
     document.addEventListener('visibilitychange', () => { if (document.hidden && run && !pv) stop(); });
     document.addEventListener('mvdev:hold', () => { if (run) stop(); });
+    function clearClips() { slots.forEach(x => { x.src = ''; x.pl = null; x.playing = false; x.f.classList.remove('on'); x.f.src = 'about:blank'; }); }
     function finish() {
-      stop(); q('[data-st]').classList.remove('paused'); q('[data-p]').hidden = true; q('[data-done]').hidden = false; q('[data-if]').src = 'about:blank';
+      stop(); bgPause(2); bgRun = false; q('[data-st]').classList.remove('paused'); q('[data-p]').hidden = true; q('[data-done]').hidden = false; clearClips();
       q('[data-dt]').textContent = T(`Etwa ${mins(sum())} Minuten nur für dich.`, `About ${mins(sum())} minutes just for you.`);
       q('[data-done]').scrollIntoView({ behavior: 'smooth', block: 'center' });
       if (!ended) { ended = true; root.dispatchEvent(new CustomEvent('mvflow:done', { bubbles: true })); }
     }
     q('[data-go]').addEventListener('click', () => {
-      actx(); q('[data-s]').hidden = true; q('[data-done]').hidden = true; q('[data-p]').hidden = false; idx = 0; run = true; show(0); play();
+      actx(); bgSetup(); q('[data-s]').hidden = true; q('[data-done]').hidden = true; q('[data-p]').hidden = false; idx = 0; run = true;
+      bgK = 0; bgCur = 0; bgRun = false; bgA.forEach(a => { a.pause(); a.removeAttribute('src'); }); bgE.forEach(g => { if (g) g.gain.value = 0; });
+      phase = TITLE ? 'title' : 'ready'; show(0); setPhase(phase); play();
       q('[data-p]').scrollIntoView({ behavior: 'smooth', block: 'start' });
       try { navigator.wakeLock && navigator.wakeLock.request('screen').catch(() => {}); } catch (e) {}
     });
     q('[data-again]').addEventListener('click', () => { q('[data-done]').hidden = true; q('[data-s]').hidden = false; });
     q('[data-pause]').addEventListener('click', () => run ? stop() : play());
     q('[data-snd]').addEventListener('click', e => { sound = !sound; e.currentTarget.setAttribute('aria-pressed', String(sound)); q('[data-sndl]').textContent = sound ? T('Klang an', 'Chime on') : T('Klang aus', 'Chime off'); });
-    q('[data-mus]').addEventListener('click', () => { const m = q('[data-mu]'); m.open = true; m.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+    q('[data-mus]').addEventListener('click', () => {
+      if (bgm.length) { bgOn = !bgOn; try { localStorage.setItem('mvf-bgm', bgOn ? '1' : '0'); } catch (e) {} if (bgOn && run) bgPlay(); else bgPause(.6); bgUi(); return; }
+      const m = q('[data-mu]'); m.open = true; m.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+    bgUi();
     if (pv) {
-      q('[data-skip]').addEventListener('click', () => { if (sw) return; if (idx < items.length - 1) { idx++; show(idx); } else finish(); });
+      q('[data-skip]').addEventListener('click', () => { if (sw) return; if (phase !== 'run') { setPhase('run'); return; } if (idx < items.length - 1) { idx++; show(idx); } else finish(); });
       q('[data-prev]').addEventListener('click', () => { if (sw) return; idx = Math.max(0, idx - 1); show(idx); });
     }
-    return { stop: () => { stop(); q('[data-if]').src = 'about:blank'; } };
+    return { stop: () => { stop(); clearClips(); } };
   }
   window.MvFlow = MvFlow;
   function auto() { document.querySelectorAll('[data-mv-flow]').forEach(el => { if (el.dataset.mvfOn) return; el.dataset.mvfOn = '1'; try { MvFlow(el, JSON.parse(el.dataset.mvFlow)); } catch (e) {} }); }

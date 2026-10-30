@@ -275,6 +275,8 @@ function mv_schema(PDO $pdo): void
         $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN steps TEXT NOT NULL DEFAULT ''");
         $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN mode TEXT NOT NULL DEFAULT ''");
     }
+    // Musik darunter je Video (Vivien, 30.10.2026: „pro Video ein oder zwei Lieder, nicht pro Clip“): '' = automatisch, 'off' = keine, sonst Lied-IDs „3,7“
+    if (!in_array('bgm', $lc, true)) $pdo->exec("ALTER TABLE mv_lessons ADD COLUMN bgm TEXT NOT NULL DEFAULT ''");
     // Voice-over-Bibliothek (Vivien, 26.10.2026): jede eingesprochene Übung bleibt mit Text gespeichert und wird in
     // neuen Flows wiederverwendet, sobald dort derselbe Text zur selben Übung steht (text_hash)
     $pdo->exec("CREATE TABLE IF NOT EXISTS mv_voices (
@@ -1924,14 +1926,61 @@ function mv_flow_data(array $l, string $lang, bool $preview = false): ?array
     $items = [];
     foreach (mv_lesson_steps($l) as $i => $x) {
         $guid = (string)($rows[$i]['guid'] ?? '');
-        $src = $guid !== '' && $bunny ? mv_embed($guid) . '&autoplay=true&loop=true&muted=true&preload=true' : '';
+        $src = $guid !== '' && $bunny ? mv_embed($guid) . '&autoplay=true&loop=true&muted=true' : '';
         if ($src === '' && !$preview) return null;
         $voice = $mode === 'flow' ? mv_voice_url((int)$l['id'], $i, $g) : '';
         if ($mode === 'flow' && $voice === '' && !$preview) return null;
         $items[] = ['name' => $g === 'en' ? $x['en'] : $x['de'], 'src' => $src, 'sec' => $x['sec'], 'voice' => $voice] + ($preview ? ['text' => $g === 'en' ? $x['ten'] : $x['tde']] : []);
     }
-    return ['lang' => $g, 'mode' => $mode, 'title' => mv_t($l, 'title', $g), 'items' => $items, 'music' => mv_music_lists(), 'preview' => $preview];
+    return ['lang' => $g, 'mode' => $mode, 'title' => mv_t($l, 'title', $g), 'items' => $items, 'music' => mv_music_lists(), 'preview' => $preview,
+        'bgm' => array_map(fn($r) => ['url' => mv_bgm_url((int)$r['id']), 't' => (string)$r['title'], 'dur' => (float)$r['dur']], mv_bgm_rows($pdo, $l))];
 }
+
+// --- Musik darunter je Video (Vivien, 30.10.2026) ------------------------------------------------------------
+// Clips sind stumm. Für das ganze Bewegungsvideo / den ganzen Flow laufen ein oder zwei Lieder aus dem Musik-Ordner
+// (Verwaltung → Movecia → Musik) im Hintergrund, beim Flow leise unter dem Voice-over. Ohne Auswahl wählt der Server
+// selbst passend zum Video (stabil je Video), damit Vivien nichts tun muss.
+function mv_bgm_all(PDO $pdo): array
+{
+    static $all = null;
+    if ($all !== null) return $all;
+    try { $all = $pdo->query('SELECT id, title, file, dur, tags FROM mm_music ORDER BY id')->fetchAll(); } catch (Throwable $e) { $all = []; }
+    return $all;
+}
+/** Wie lange läuft das Video ungefähr (Sekunden)? Bewegungsvideo mit 45 s je Übung gerechnet. */
+function mv_bgm_need(array $l): int
+{
+    $n = 0; $sum = 0;
+    foreach (mv_lesson_steps($l) as $x) { $n++; $sum += max(20, (int)($x['sec'] ?? 120)); }
+    return mv_lesson_mode($l) === 'move' ? $n * 46 + 20 : $sum + 20;
+}
+/** Automatischer Vorschlag: passende Ordner, stabil gemischt je Video ($seed = andere Mischung). */
+function mv_bgm_auto(PDO $pdo, array $l, int $seed = 0): array
+{
+    $t = mb_strtolower((string)$l['title_de'] . ' ' . (string)$l['title_en']);
+    $want = mv_lesson_mode($l) === 'move' ? ['flow', 'lebendig', 'morgen'] : ['meditation', 'flow', 'abend'];
+    if (preg_match('/abend|nacht|schlaf|ruhe|loslassen|evening|sleep|savasana|schwere/u', $t)) $want = ['abend', 'meditation', 'flow'];
+    elseif (preg_match('/morgen|morning|aufwachen|wach|energie|kraft|stark/u', $t)) $want = ['morgen', 'flow', 'lebendig'];
+    $all = array_values(array_filter(mv_bgm_all($pdo), fn($r) => is_file(forma_data_dir() . '/musik/' . basename((string)$r['file']))));
+    if (!$all) return [];
+    $score = function ($r) use ($want) { $tg = explode(',', (string)$r['tags']); foreach ($want as $i => $w) if (in_array($w, $tg, true)) return $i; return 9; };
+    usort($all, fn($a, $b) => [$score($a), crc32($l['id'] . ':' . $seed . ':' . $a['id'])] <=> [$score($b), crc32($l['id'] . ':' . $seed . ':' . $b['id'])]);
+    $need = mv_bgm_need($l); $out = []; $t2 = 0;
+    foreach ($all as $r) { $out[] = $r; $t2 += max(30, (float)$r['dur'] > 0 ? (float)$r['dur'] : 150) - 2.5; if ($t2 >= $need || count($out) >= 4) break; }
+    return $out;
+}
+/** Die Lieder dieses Videos (gewählt oder automatisch), [] = keine Musik. */
+function mv_bgm_rows(PDO $pdo, array $l): array
+{
+    $v = trim((string)($l['bgm'] ?? ''));
+    if ($v === 'off') return [];
+    if ($v === '') return mv_bgm_auto($pdo, $l);
+    $by = []; foreach (mv_bgm_all($pdo) as $r) $by[(int)$r['id']] = $r;
+    $out = []; foreach (explode(',', $v) as $id) if (isset($by[(int)$id])) $out[] = $by[(int)$id];
+    return $out ?: mv_bgm_auto($pdo, $l);
+}
+function mv_bgm_sig(int $id): string { return substr(hash_hmac('sha256', 'bgm:' . $id, mv_secret()), 0, 24); }
+function mv_bgm_url(int $id): string { return '/api/method-voice.php?m=' . $id . '&k=' . mv_bgm_sig($id); }
 
 /** Prä-/Postnatal-Videos einer Einheit: ['talk' => Lektion|null, 'move' => Lektion|null] */
 function mv_natal_videos(PDO $pdo, string $unit): array
@@ -2068,7 +2117,7 @@ function mv_embed(string $guid): string
 {
     $b = mv_bunny();
     if ($guid === '' || $b['lib'] === '') return '';
-    $u = 'https://iframe.mediadelivery.net/embed/' . rawurlencode($b['lib']) . '/' . rawurlencode($guid) . '?autoplay=false&preload=true&responsive=true';
+    $u = 'https://iframe.mediadelivery.net/embed/' . rawurlencode($b['lib']) . '/' . rawurlencode($guid) . '?preload=true&responsive=true'; // ohne autoplay=false: sonst gewann das und Übungs-Clips liefen nicht von selbst an (Vivien, 30.10.2026)
     if ($b['token'] !== '') {
         $exp = time() + 4 * 3600;
         $u .= '&token=' . hash('sha256', $b['token'] . $guid . $exp) . '&expires=' . $exp;

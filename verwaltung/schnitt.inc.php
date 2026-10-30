@@ -121,7 +121,7 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 </div>
 <div id="sn"></div>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
-<script src="schnitt.js?v=12"></script>
+<script src="schnitt.js?v=13"></script>
 <script>
 (function(){
   const csrf=<?= json_encode(csrf()) ?>, BUNNY=<?= $bunny ? 'true' : 'false' ?>;
@@ -156,6 +156,7 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
       if(tg.k==='clip')return bunny(blob,'mm_mv_clip_new',{c:tg.c},'mm_mv_clip_set',{c:tg.c},'Übung · '+tg.n,prog).then(r=>(r.error?r:Object.assign(r,{note:'Der Clip steckt jetzt in '+(r.used||1)+(r.used===1||!r.used?' Video':' Videos')+'.'})));
       if(tg.k==='ig')return igUp(blob,tg.id,ext,prog);
       return Promise.resolve({error:'Unbekanntes Ziel.'});},
+    seeUrl:(tg,r)=>tg.k==='talk'?'?view=videos&play='+tg.id+'&lang='+tg.lang:(tg.k==='clip'&&r.see?'?view=videos&play='+r.see:''),
     thumb:(guid,img)=>post('mm_sn_thumb',{guid:guid},['img',img,'titelbild.jpg'])});
 })();
 </script>

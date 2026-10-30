@@ -532,7 +532,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
 <div class="msheet" id="msheet" hidden><div class="msh-h"><b id="mshT"></b><button type="button" id="mshX">Fertig ✓</button></div><div class="msh-b" id="mshB"></div></div>
 <script src="/wildhearts/assets/talkcam.js?v=5"></script>
 <script src="studio-edit.js?v=7"></script>
-<script src="schnitt.js?v=12"></script>
+<script src="schnitt.js?v=13"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
@@ -811,7 +811,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
           onError:()=>{$('msg').textContent='Upload unterbrochen. Tipp nochmal auf „Hochladen“ (oder lade es herunter).';$('up').disabled=false},
           onProgress:(a,t)=>{const p=Math.round(a/t*100);fill2.style.width=p+'%';$('msg').textContent='Lädt hoch … '+p+' % (Seite offen lassen)'},
           onSuccess:()=>{post('mm_mv_clip_set',{c:C.id,guid:j.guid}).then(r=>{saved=true;C.ok=true;$('up').disabled=false;$('up').hidden=true;$('prog').hidden=true;
-            $('msg').className='msg ok';$('msg').textContent='✓ Clip hochgeladen. Er steckt jetzt in '+(r.used||1)+(r.used===1?' Video':' Videos')+'. Nächste Übung oben auswählen.';})}}).start()})
+            $('msg').className='msg ok';$('msg').textContent='✓ Clip hochgeladen. Er steckt jetzt in '+(r.used||1)+(r.used===1?' Video':' Videos')+'. Nächste Übung oben auswählen.';if(r.see)$('msg').insertAdjacentHTML('beforeend',' <a class="see1" href="?view=videos&amp;play='+r.see+'" style="display:inline-flex;margin:6px 0 0 6px;padding:8px 16px;border-radius:999px;background:#4A3A41;color:#fff;text-decoration:none;font-size:16px">👁 So sieht es die Teilnehmerin</a>');})}}).start()})
         .catch(()=>{$('msg').textContent='Das hat nicht geklappt. Bitte herunterladen und später hochladen.';$('up').disabled=false});return}
     const T=tgt.t,id=T.id,lg=tgt.lang,fill=$('prog').querySelector('i');
     post('mm_mv_video_new',{id:id,lang:lg}).then(j=>{if(j.error){$('msg').textContent=j.error;$('up').disabled=false;return}
@@ -821,7 +821,7 @@ $calMeta = []; foreach ($calBy as $d => $l) $calMeta[$d] = ['n' => count(array_f
         onProgress:(a,t)=>{const p=Math.round(a/t*100);fill.style.width=p+'%';$('msg').textContent='Lädt hoch … '+p+' % (Seite offen lassen)'},
         onSuccess:()=>{post('mm_mv_video_set',{id:id,lang:lg,guid:j.guid}).then(()=>{saved=true;$('up').disabled=false;$('up').hidden=true;
           if(lg==='de'){T.vde=true;if(T.do)T.ven=true}else T.ven=true;
-          $('msg').className='msg ok';$('msg').textContent='✓ Hochgeladen. Bunny wandelt es in ein paar Minuten um.'+(T.do?' Das Video ist fertig.':(T.vde&&T.ven)?' Beide Sprachen sind da, das Video ist fertig.':' Jetzt noch '+(lg==='de'?'Englisch':'Deutsch')+'?');})}});
+          $('msg').className='msg ok';$('msg').textContent='✓ Hochgeladen. Bunny wandelt es in ein paar Minuten um.'+(T.do?' Das Video ist fertig.':(T.vde&&T.ven)?' Beide Sprachen sind da, das Video ist fertig.':' Jetzt noch '+(lg==='de'?'Englisch':'Deutsch')+'?');$('msg').insertAdjacentHTML('beforeend',' <a class="see1" href="?view=videos&amp;play='+id+'&amp;lang='+lg+'" style="display:inline-flex;margin:6px 0 0 6px;padding:8px 16px;border-radius:999px;background:#4A3A41;color:#fff;text-decoration:none;font-size:16px">👁 So sieht es die Teilnehmerin</a>');})}});
       up.start()}).catch(()=>{$('msg').textContent='Das hat nicht geklappt. Bitte herunterladen und später hochladen.';$('up').disabled=false});
   };
 
