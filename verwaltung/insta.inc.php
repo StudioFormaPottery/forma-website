@@ -1,5 +1,5 @@
 <?php
-// „📱 Instagram täglich“ (Vivien, 28.10.2026): Talking Heads für Storys und Reels für den ganzen Monat planen,
+// „📱 Instagram täglich“ (Vivien, 28.10.2026; seit 30.10.2026 je Tag ein Thema mit Reel, Story, Channel-Nachricht + Foto-Idee): Talking Heads für Storys und Reels für den ganzen Monat planen,
 // im Studio in Ruhe vorab aufnehmen (9:16, Teleprompter, Look, Musik im Bearbeiten-Schritt), am Tag selbst am Handy
 // nur noch „Teilen → Instagram“. Videos liegen bis 30 Tage nach dem Tag in ../forma-data/insta/ (nie im Repo).
 // ?view=insta[&m=JJJJ-MM]. Aktionen mm_ig_*.
@@ -11,6 +11,38 @@ function ig_schema(PDO $pdo): void
     $pdo->exec("CREATE TABLE IF NOT EXISTS mm_insta (id INTEGER PRIMARY KEY AUTOINCREMENT, day TEXT NOT NULL, kind TEXT NOT NULL DEFAULT 'story',
         acc TEXT NOT NULL DEFAULT 'privat', title TEXT NOT NULL DEFAULT '', text TEXT NOT NULL DEFAULT '', music TEXT NOT NULL DEFAULT '',
         status TEXT NOT NULL DEFAULT 'offen', file TEXT NOT NULL DEFAULT '', size INTEGER NOT NULL DEFAULT 0, created_at TEXT, updated_at TEXT)");
+    // Tagesthemen (Vivien, 30.10.2026): je Tag ein Thema mit Reel, Story und Channel-Nachricht (+ Foto-Idee)
+    $cols = array_column($pdo->query('PRAGMA table_info(mm_insta)')->fetchAll(), 'name');
+    foreach (['theme' => "TEXT NOT NULL DEFAULT ''", 'photo' => "TEXT NOT NULL DEFAULT ''", 'lang' => "TEXT NOT NULL DEFAULT ''"] as $c => $t)
+        if (!in_array($c, $cols, true)) $pdo->exec("ALTER TABLE mm_insta ADD COLUMN $c $t");
+}
+const IG_KIND = ['reel' => '🎬 Reel', 'story' => '⭕ Story', 'channel' => '💬 Channel'];
+/** Tagesthemen aus verwaltung/insta-skripte.json */
+function ig_themes(): array
+{
+    static $t = null;
+    if ($t === null) { $t = []; foreach (json_decode((string)@file_get_contents(__DIR__ . '/insta-skripte.json'), true)['themes'] ?? [] as $x) $t[$x['id']] = $x; }
+    return $t;
+}
+/** Legt für einen Tag die drei Einträge eines Themas an (vorhandene, noch nicht aufgenommene Themen-Einträge des Tages werden ersetzt). */
+function ig_take_theme(PDO $pdo, string $day, array $th, string $lang, string $acc = 'movecia'): array
+{
+    $en = $lang === 'en';
+    $pdo->prepare("DELETE FROM mm_insta WHERE day = ? AND theme <> '' AND file = '' AND status <> 'gepostet'")->execute([$day]);
+    $ins = $pdo->prepare('INSERT INTO mm_insta (day, kind, acc, title, text, photo, theme, lang, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?)');
+    $ids = [];
+    foreach (['reel', 'story', 'channel'] as $k) {
+        $ins->execute([$day, $k, $acc, $en ? $th['en_t'] : $th['de_t'], (string)($th[$k . '_' . $lang] ?? ''), $k === 'channel' ? (string)($th['foto'] ?? '') : '', $th['id'], $lang, date('c'), date('c')]);
+        $ids[$k] = (int)$pdo->lastInsertId();
+    }
+    return $ids;
+}
+/** Wie oft jedes Thema schon verwendet wurde */
+function ig_theme_use(PDO $pdo): array
+{
+    $u = [];
+    foreach ($pdo->query("SELECT theme, COUNT(DISTINCT day) n FROM mm_insta WHERE theme <> '' GROUP BY theme")->fetchAll() as $r) $u[$r['theme']] = (int)$r['n'];
+    return $u;
 }
 function ig_dir(): string { $d = forma_data_dir() . '/insta'; if (!is_dir($d)) @mkdir($d, 0775, true); return $d; }
 function ig_get(PDO $pdo, int $id): ?array { $s = $pdo->prepare('SELECT * FROM mm_insta WHERE id = ?'); $s->execute([$id]); return $s->fetch() ?: null; }
@@ -69,13 +101,36 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
     if ($action === 'mm_ig_save') {
         $id = (int)($_POST['id'] ?? 0);
         $day = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST['day'] ?? '')) ? $_POST['day'] : date('Y-m-d');
-        $kind = ($_POST['kind'] ?? '') === 'reel' ? 'reel' : 'story';
+        $kind = isset(IG_KIND[$_POST['kind'] ?? '']) ? $_POST['kind'] : 'story';
         $acc = isset(IG_ACC[$_POST['acc'] ?? '']) ? $_POST['acc'] : 'privat';
-        $vals = [$day, $kind, $acc, trim((string)($_POST['title'] ?? '')), trim((string)($_POST['text'] ?? '')), trim((string)($_POST['music'] ?? '')), date('c')];
-        if ($id && ig_get($pdo, $id)) { $pdo->prepare('UPDATE mm_insta SET day=?, kind=?, acc=?, title=?, text=?, music=?, updated_at=? WHERE id=?')->execute([...$vals, $id]); }
-        else { $pdo->prepare('INSERT INTO mm_insta (day, kind, acc, title, text, music, updated_at, created_at) VALUES (?,?,?,?,?,?,?,?)')->execute([...$vals, date('c')]); $id = (int)$pdo->lastInsertId(); }
+        $vals = [$day, $kind, $acc, trim((string)($_POST['title'] ?? '')), trim((string)($_POST['text'] ?? '')), trim((string)($_POST['music'] ?? '')), trim((string)($_POST['photo'] ?? '')), date('c')];
+        if ($id && ig_get($pdo, $id)) { $pdo->prepare('UPDATE mm_insta SET day=?, kind=?, acc=?, title=?, text=?, music=?, photo=?, updated_at=? WHERE id=?')->execute([...$vals, $id]); }
+        else { $pdo->prepare('INSERT INTO mm_insta (day, kind, acc, title, text, music, photo, updated_at, created_at) VALUES (?,?,?,?,?,?,?,?,?)')->execute([...$vals, date('c')]); $id = (int)$pdo->lastInsertId(); }
         if (!empty($_POST['studio'])) go(strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?') . '?view=studio&ig=' . $id);
         go($igBack . '#d' . $day, 'Gespeichert.');
+    }
+    // Thema für einen Tag nehmen (Reel + Story + Channel auf einmal)
+    if ($action === 'mm_ig_theme') {
+        $day = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST['day'] ?? '')) ? $_POST['day'] : date('Y-m-d');
+        $th = ig_themes()[(string)($_POST['theme'] ?? '')] ?? null;
+        if (!$th) go($igBack . '#d' . $day, 'Thema nicht gefunden.');
+        $ids = ig_take_theme($pdo, $day, $th, ($_POST['lang'] ?? '') === 'de' ? 'de' : 'en');
+        $rec = (string)($_POST['rec'] ?? '');
+        if (isset($ids[$rec]) && $rec !== 'channel') go(strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?') . '?view=studio&ig=' . $ids[$rec]);
+        go($igBack . '#d' . $day, 'Thema eingetragen: Reel, Story und Channel.');
+    }
+    // Alle freien Tage bis Monatsende mit verschiedenen Themen füllen (zuerst die noch nie verwendeten)
+    if ($action === 'mm_ig_fill') {
+        $start = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_POST['start'] ?? '')) ? $_POST['start'] : date('Y-m-d');
+        $end = date('Y-m-t', strtotime($start)); $lang = ($_POST['lang'] ?? '') === 'de' ? 'de' : 'en';
+        $use = ig_theme_use($pdo); $list = array_values(ig_themes());
+        usort($list, fn($a, $b) => ($use[$a['id']] ?? 0) <=> ($use[$b['id']] ?? 0));
+        $busy = $pdo->prepare('SELECT COUNT(*) FROM mm_insta WHERE day = ?'); $n = 0; $i = 0;
+        for ($d = $start; $d <= $end && $list; $d = date('Y-m-d', strtotime($d . ' +1 day'))) {
+            $busy->execute([$d]); if ((int)$busy->fetchColumn() > 0) continue;
+            ig_take_theme($pdo, $d, $list[$i % count($list)], $lang); $i++; $n++;
+        }
+        go(strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?') . '?view=insta&m=' . substr($start, 0, 7), $n ? $n . ' Tage mit Themen gefüllt.' : 'Alle Tage haben schon ein Thema.');
     }
     if ($action === 'mm_ig_status') {
         $r = ig_get($pdo, (int)($_POST['id'] ?? 0)); $st = in_array($_POST['st'] ?? '', ['offen', 'aufgenommen', 'gepostet'], true) ? $_POST['st'] : 'offen';
@@ -147,139 +202,167 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
         ig_cleanup($pdo);
         $m = preg_match('/^\d{4}-\d{2}$/', (string)($_GET['m'] ?? '')) ? $_GET['m'] : date('Y-m');
         $first = $m . '-01'; $days = (int)date('t', strtotime($first)); $last = $m . '-' . sprintf('%02d', $days);
-        $s = $pdo->prepare('SELECT * FROM mm_insta WHERE day BETWEEN ? AND ? ORDER BY day, kind DESC, id'); $s->execute([$first, $last]);
+        $ord = "CASE kind WHEN 'reel' THEN 0 WHEN 'story' THEN 1 ELSE 2 END, id";
+        $s = $pdo->prepare("SELECT * FROM mm_insta WHERE day BETWEEN ? AND ? ORDER BY day, $ord"); $s->execute([$first, $last]);
         $by = []; foreach ($s->fetchAll() as $r) $by[$r['day']][] = $r;
         $today = date('Y-m-d');
-        $ts = $pdo->prepare("SELECT * FROM mm_insta WHERE day = ? ORDER BY kind DESC, id"); $ts->execute([$today]); $todayList = $ts->fetchAll();
-        $cnt = ['plan' => 0, 'auf' => 0, 'post' => 0];
-        foreach ($by as $l) foreach ($l as $r) { $cnt['plan']++; if ($r['status'] === 'aufgenommen') $cnt['auf']++; if ($r['status'] === 'gepostet') $cnt['post']++; }
+        $ts = $pdo->prepare("SELECT * FROM mm_insta WHERE day = ? ORDER BY $ord"); $ts->execute([$today]); $todayList = $ts->fetchAll();
+        $cnt = ['plan' => 0, 'post' => 0, 'free' => 0];
+        foreach ($by as $l) foreach ($l as $r) { $cnt['plan']++; if ($r['status'] === 'gepostet') $cnt['post']++; }
+        for ($i = 1; $i <= $days; $i++) { $d = $m . '-' . sprintf('%02d', $i); if ($d >= $today && empty($by[$d])) $cnt['free']++; }
         $mon = ['Jänner', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
         $mName = $mon[(int)substr($m, 5, 2) - 1] . ' ' . substr($m, 0, 4);
         $prev = date('Y-m', strtotime($first . ' -1 month')); $next = date('Y-m', strtotime($first . ' +1 month'));
         $self = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?');
-        // Fertige Texte (verwaltung/insta-skripte.json) + welche schon verwendet sind
-        $sk = json_decode((string)@file_get_contents(__DIR__ . '/insta-skripte.json'), true)['list'] ?? [];
-        $usedT = array_map('mb_strtolower', $pdo->query("SELECT title FROM mm_insta WHERE title <> ''")->fetchAll(PDO::FETCH_COLUMN));
-        foreach ($sk as &$x) $x['used'] = in_array(mb_strtolower($x['de_t']), $usedT, true) || in_array(mb_strtolower($x['en_t']), $usedT, true);
-        unset($x);
-        render_page('Instagram täglich', function () use ($self, $m, $first, $days, $by, $today, $todayList, $cnt, $mName, $prev, $next, $sk) {
+        $themes = ig_themes(); $use = ig_theme_use($pdo);
+        $TH = [];
+        foreach ($themes as $x) $TH[] = $x + ['used' => $use[$x['id']] ?? 0];
+        $fillFrom = max($first, $today);
+        render_page('Instagram täglich', function () use ($self, $m, $first, $days, $by, $today, $todayList, $cnt, $mName, $prev, $next, $TH, $themes, $fillFrom, $last) {
             $h = 'forma_h';
-            $card = function (array $r, bool $big = false) use ($self, $h, $m) {
-                $st = $r['status']; $has = $r['file'] !== '';
+            $hid = fn(string $a, array $f) => '<input type="hidden" name="csrf" value="' . $h(csrf()) . '"><input type="hidden" name="action" value="' . $a . '"><input type="hidden" name="m" value="' . $h($m) . '">'
+                . implode('', array_map(fn($k, $v) => '<input type="hidden" name="' . $k . '" value="' . $h((string)$v) . '">', array_keys($f), $f));
+            $card = function (array $r, bool $big = false) use ($self, $h, $hid) {
+                $st = $r['status']; $has = $r['file'] !== ''; $ch = $r['kind'] === 'channel';
+                $lab = ['reel' => '🎬 Reel Talking Head', 'story' => '⭕ Story Talking Head', 'channel' => '💬 Channel-Nachricht'][$r['kind']] ?? '⭕ Story';
                 ob_start(); ?>
-<div class="ig<?= $big ? ' big' : '' ?> st-<?= $h($st) ?>" id="e<?= (int)$r['id'] ?>">
-  <div class="ig-top"><span class="kind k-<?= $h($r['kind']) ?>"><?= $r['kind'] === 'reel' ? '🎬 Reel' : '⭕ Story' ?></span><span class="acc"><?= $h(IG_ACC[$r['acc']] ?? 'Privat') ?></span>
-    <span class="stt"><?= $st === 'gepostet' ? '✓ gepostet' : ($has ? '🎥 aufgenommen' : ($r['text'] === '' ? '✍️ Text fehlt' : '○ noch aufnehmen')) ?></span></div>
-  <b class="tt"><?= $h(ig_title($r)) ?></b>
-  <?php if ($r['music'] !== ''): ?><p class="mu">🎵 <?= $h($r['music']) ?></p><?php endif; ?>
-  <?php if ($has): ?><video src="<?= $h($self) ?>?view=insta&amp;dl=<?= (int)$r['id'] ?>#t=0.1" controls playsinline preload="metadata"></video><?php endif; ?>
+<div class="ig k2-<?= $h($r['kind']) ?><?= $big ? ' big' : '' ?> st-<?= $h($st) ?>" id="e<?= (int)$r['id'] ?>">
+  <div class="ig-top"><span class="kind k-<?= $h($r['kind']) ?>"><?= $lab ?></span>
+    <span class="stt"><?= $st === 'gepostet' ? '✓ gepostet' : ($ch ? '○ noch posten' : ($has ? '🎥 aufgenommen' : ($r['text'] === '' ? '✍️ Text fehlt' : '○ noch aufnehmen'))) ?></span></div>
+  <?php if ($r['theme'] === ''): ?><b class="tt"><?= $h(ig_title($r)) ?></b><?php endif; ?>
+  <?php if ($ch): ?>
+    <div class="txt" data-txt><?= nl2br($h($r['text'])) ?></div>
+    <?php if ($r['photo'] !== ''): ?><div class="foto"><span>📷 Foto-Idee</span><?= $h($r['photo']) ?></div><?php endif; ?>
+  <?php else: ?>
+    <details class="txtd"<?= $big ? ' open' : '' ?>><summary>Text ansehen</summary><div class="txt" data-txt><?= nl2br($h($r['text'])) ?></div></details>
+    <?php if ($r['music'] !== ''): ?><p class="mu">🎵 <?= $h($r['music']) ?></p><?php endif; ?>
+    <?php if ($has): ?><video src="<?= $h($self) ?>?view=insta&amp;dl=<?= (int)$r['id'] ?>#t=0.1" controls playsinline preload="metadata"></video><?php endif; ?>
+  <?php endif; ?>
   <div class="ig-b">
-    <?php if ($has): ?>
-      <button type="button" class="b main" data-share="<?= (int)$r['id'] ?>">📲 Teilen → Instagram</button>
-      <a class="b" href="<?= $h($self) ?>?view=insta&amp;dl=<?= (int)$r['id'] ?>&amp;save=1">⬇ Laden</a>
+    <?php if ($ch): ?>
+      <button type="button" class="b main" data-copy>📋 Text kopieren</button>
+    <?php else: ?>
+      <?php if ($has): ?><button type="button" class="b main" data-share="<?= (int)$r['id'] ?>">📲 Teilen → Instagram</button><?php endif; ?>
+      <a class="b <?= $has ? '' : 'rec' ?>" href="<?= $h($self) ?>?view=studio&amp;ig=<?= (int)$r['id'] ?>"><?= $has ? '↺ Neu aufnehmen' : '🎥 Aufnehmen' ?></a>
+      <button type="button" class="b sm" data-copy title="Text als Bildunterschrift kopieren">📋 Caption</button>
     <?php endif; ?>
-    <a class="b <?= $has ? '' : 'rec' ?>" href="<?= $h($self) ?>?view=studio&amp;ig=<?= (int)$r['id'] ?>"><?= $has ? '↺ Neu aufnehmen' : '🎥 Im Studio aufnehmen' ?></a>
-    <?php if ($st !== 'gepostet'): ?><form method="post"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_status"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="id" value="<?= (int)$r['id'] ?>"><input type="hidden" name="st" value="gepostet"><button class="b">✓ Gepostet</button></form>
-    <?php else: ?><form method="post"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_status"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="id" value="<?= (int)$r['id'] ?>"><input type="hidden" name="st" value="<?= $has ? 'aufgenommen' : 'offen' ?>"><button class="b sm">doch nicht gepostet</button></form><?php endif; ?>
+    <?php if ($st !== 'gepostet'): ?><form method="post"><?= $hid('mm_ig_status', ['id' => $r['id'], 'st' => 'gepostet']) ?><button class="b sm">✓ Gepostet</button></form>
+    <?php else: ?><form method="post"><?= $hid('mm_ig_status', ['id' => $r['id'], 'st' => $has ? 'aufgenommen' : 'offen']) ?><button class="b sm">doch nicht gepostet</button></form><?php endif; ?>
   </div>
-  <details class="ed"><summary>✏️ Text, Art, Musik ändern</summary>
-    <form method="post" class="f"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_save"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
-      <div class="row"><label>Tag<input type="date" name="day" value="<?= $h($r['day']) ?>"></label>
-        <label>Art<select name="kind"><option value="story"<?= $r['kind'] === 'story' ? ' selected' : '' ?>>⭕ Story</option><option value="reel"<?= $r['kind'] === 'reel' ? ' selected' : '' ?>>🎬 Reel</option></select></label>
-        <label>Konto<select name="acc"><?php foreach (IG_ACC as $k => $n): ?><option value="<?= $k ?>"<?= $r['acc'] === $k ? ' selected' : '' ?>><?= $n ?></option><?php endforeach; ?></select></label></div>
-      <label>Überschrift (nur für dich, optional)<input name="title" value="<?= $h($r['title']) ?>"></label>
-      <label>Text für den Teleprompter <small>(Leerzeile = neuer Absatz)</small><textarea name="text" rows="6"><?= $h($r['text']) ?></textarea></label>
-      <label>Musik <small>(Liedname, den du in Instagram dazu wählst)</small><input name="music" value="<?= $h($r['music']) ?>" placeholder="z. B. Ludovico Einaudi – Experience"></label>
-      <div class="ig-b"><button class="b main">Speichern</button><button class="b" name="studio" value="1">Speichern &amp; aufnehmen</button></div>
+  <details class="ed"><summary>✏️ Ändern</summary>
+    <form method="post" class="f"><?= $hid('mm_ig_save', ['id' => $r['id'], 'kind' => $r['kind'], 'acc' => $r['acc']]) ?>
+      <div class="row"><label>Tag<input type="date" name="day" value="<?= $h($r['day']) ?>"></label><label>Überschrift<input name="title" value="<?= $h($r['title']) ?>"></label></div>
+      <label><?= $ch ? 'Text für den Kanal' : 'Text für den Teleprompter <small>(Leerzeile = neuer Absatz)</small>' ?><textarea name="text" rows="7"><?= $h($r['text']) ?></textarea></label>
+      <?php if ($ch): ?><label>Foto-Idee<input name="photo" value="<?= $h($r['photo']) ?>"></label>
+      <?php else: ?><label>Musik <small>(Liedname, den du in Instagram dazu wählst)</small><input name="music" value="<?= $h($r['music']) ?>"></label><?php endif; ?>
+      <div class="ig-b"><button class="b main">Speichern</button><?php if (!$ch): ?><button class="b" name="studio" value="1">Speichern &amp; aufnehmen</button><?php endif; ?></div>
     </form>
     <div class="ig-b" style="margin-top:8px">
-      <?php if ($has): ?><form method="post" onsubmit="return confirm('Video löschen? Der Text bleibt.')"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_delvid"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="id" value="<?= (int)$r['id'] ?>"><button class="b sm">Video löschen</button></form><?php endif; ?>
-      <form method="post" onsubmit="return confirm('Diesen Eintrag ganz löschen?')"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_del"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="id" value="<?= (int)$r['id'] ?>"><button class="b sm">Eintrag löschen</button></form>
+      <?php if ($has): ?><form method="post" onsubmit="return confirm('Video löschen? Der Text bleibt.')"><?= $hid('mm_ig_delvid', ['id' => $r['id']]) ?><button class="b sm">Video löschen</button></form><?php endif; ?>
+      <form method="post" onsubmit="return confirm('Diesen Eintrag löschen?')"><?= $hid('mm_ig_del', ['id' => $r['id']]) ?><button class="b sm">Eintrag löschen</button></form>
     </div>
   </details>
 </div>
 <?php return ob_get_clean(); };
+            // Kopf eines Tages: Thema + drei Karten
+            $dayBlock = function (string $d, array $l, bool $big = false) use ($card, $h, $themes) {
+                $th = ''; $top = '';
+                foreach ($l as $r) if ($r['theme'] !== '') { $th = $r['theme']; $top = $r['title']; break; }
+                ob_start();
+                if ($th !== ''): ?>
+<div class="thead"><span class="chip"><?= $h($themes[$th]['topic'] ?? 'Thema') ?></span><b><?= $h($top) ?></b>
+  <button type="button" class="b sm" data-pick="<?= $h($d) ?>">↺ Anderes Thema</button></div>
+<?php endif;
+                if ($l): ?><div class="dc"><?php foreach ($l as $r) echo $card($r, $big); ?></div><?php endif;
+                return ob_get_clean();
+            };
             ?>
 <style>
 body{background:#F2ECE4}
-main{max-width:1180px}
+main{max-width:1240px}
 .ih h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;color:#4A3A41;font-size:clamp(34px,4vw,46px);margin:6px 0 4px}
-.ih p{margin:0 0 16px;color:#6B5658;font-size:19px;max-width:72ch;line-height:1.5}
+.ih p{margin:0 0 16px;color:#6B5658;font-size:19px;max-width:76ch;line-height:1.5}
 .box{background:#FBF8F4;border:1.5px solid #DDD2C6;border-radius:24px;padding:16px;margin-bottom:16px}
 .box>h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:28px;color:#4A3A41;margin:0 0 10px}
 .mnav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 14px}
 .mnav b{font:500 30px/1.1 "Cormorant Garamond",Georgia,serif;color:#4A3A41;margin:0 6px}
 .mnav a{font-size:20px;text-decoration:none;color:#4A3A41;border:1.5px solid #DDD2C6;background:#fff;border-radius:999px;padding:6px 16px}
-.cnt{font-size:17px;color:#6B5658;margin-left:auto}
 .b{font:inherit;font-size:17px;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:9px 16px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer;text-decoration:none}
 .b.main{background:#7D5E68;border-color:#7D5E68;color:#fff}.b.rec{background:#A0413B;border-color:#A0413B;color:#fff}.b.sm{min-height:40px;font-size:15px;color:#7D7076}
-.days{display:flex;flex-direction:column;gap:10px}
-.day{display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;align-items:start;padding:12px;border-radius:20px;background:#FBF8F4;border:1.5px solid #DDD2C6;scroll-margin-top:80px}
-.day.today{border-color:#7D5E68;box-shadow:0 0 0 2px #7D5E68 inset}
-.day.past{opacity:.65}
-.dl{font-size:18px;color:#4A3A41;line-height:1.25}.dl b{display:block;font:500 30px/1 "Cormorant Garamond",Georgia,serif}.dl small{color:#7D7076;font-size:14px}
-.dc{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start}
-.add{display:flex;gap:6px;flex-wrap:wrap;align-self:center}.add .b{min-height:40px;font-size:15px;border-style:dashed}
-.ig{flex:1 1 300px;max-width:520px;background:#fff;border:1.5px solid #DDD2C6;border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.b.big{min-height:56px;font-size:19px;padding:12px 22px}
+.dc{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;align-items:start}
+.ig{min-width:0;background:#fff;border:1.5px solid #DDD2C6;border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.ig.k2-reel{border-top:5px solid #4A3A41}.ig.k2-story{border-top:5px solid #C9A9B4}.ig.k2-channel{border-top:5px solid #B7C4AE;background:#FBFCF8}
 .ig.st-gepostet{background:#F3F7F1;border-color:#C8D8C3}
 .ig-top{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:15px}
-.kind{padding:3px 10px;border-radius:999px;font-weight:500}.k-story{background:#EADFDE;color:#6B5658}.k-reel{background:#4A3A41;color:#fff}
-.acc{padding:3px 10px;border-radius:999px;background:#F2ECE4;color:#6B5658}.stt{margin-left:auto;color:#6B5658}
+.kind{padding:4px 12px;border-radius:999px;font-weight:500;font-size:16px}.k-story{background:#EADFDE;color:#6B5658}.k-reel{background:#4A3A41;color:#fff}.k-channel{background:#E3EBDD;color:#4E5E45}
+.stt{margin-left:auto;color:#6B5658}
 .tt{font-weight:500;font-size:18px;color:#2E2529;line-height:1.35}
+.txt{font-size:16px;line-height:1.6;color:#2E2529;max-height:330px;overflow:auto;padding-right:4px}
+.txtd>summary{cursor:pointer;color:#7D5E68;font-size:16px}
+.txtd .txt{margin-top:8px}
+.foto{background:#F6F1EA;border-radius:14px;padding:10px 12px;font-size:16px;line-height:1.5;color:#4A3A41}.foto span{display:block;font-size:14px;color:#7D5E68;margin-bottom:2px}
 .mu{margin:0;font-size:16px;color:#7D5E68}
 .ig video{width:100%;max-width:170px;aspect-ratio:9/16;object-fit:cover;border-radius:14px;background:#2E2529}
-.ig.big video{max-width:240px}
 .ig-b{display:flex;flex-wrap:wrap;gap:8px}.ig-b form{margin:0}
-.ed>summary{cursor:pointer;color:#7D5E68;font-size:16px;list-style:none}.ed>summary::-webkit-details-marker{display:none}
+.ed>summary{cursor:pointer;color:#7D7076;font-size:15px;list-style:none}.ed>summary::-webkit-details-marker{display:none}
 .f{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 .f label{display:flex;flex-direction:column;gap:4px;font-size:16px;color:#6B5658}.f label small{color:#7D7076;font-size:14px}
 .f input,.f select,.f textarea{font:inherit;font-size:17px;padding:10px 12px;border:1.5px solid #DDD2C6;border-radius:12px;background:#fff;color:#2E2529}
 .f textarea{line-height:1.5}
-.f .row{display:flex;flex-wrap:wrap;gap:10px}.f .row label{flex:1 1 140px}
+.f .row{display:flex;flex-wrap:wrap;gap:10px}.f .row label{flex:1 1 160px}
 .tip{font-size:16px;color:#7D7076;line-height:1.5;margin:6px 0 0}
-/* Kalender (Vivien, 28.10.2026) */
-.ical-wrap{display:grid;grid-template-columns:minmax(300px,400px) minmax(0,1fr);gap:20px;align-items:start}
-@media(max-width:860px){.ical-wrap{grid-template-columns:minmax(0,1fr)}}
-.iday-w,.ical{min-width:0}.iday .dc .ig{min-width:0;max-width:100%}
+.thead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 12px}
+.thead b{font:500 26px/1.15 "Cormorant Garamond",Georgia,serif;color:#4A3A41}.thead .b{margin-left:auto}
+.chip{display:inline-block;padding:4px 12px;border-radius:999px;background:#EADFDE;color:#6B5658;font-size:14px;letter-spacing:.02em}
+/* Kalender */
+.ical-wrap{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:20px;align-items:start}
+@media(max-width:900px){.ical-wrap{grid-template-columns:minmax(0,1fr)}}
+.iday-w,.ical{min-width:0}
 .ical{background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:24px;padding:12px;position:sticky;top:70px}
-@media(max-width:860px){.ical{position:static}}
+@media(max-width:900px){.ical{position:static}}
 .ical .mnav{margin:0 0 8px;justify-content:space-between}.ical .mnav b{font-size:24px}
 .ical-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
 .ical-g .wd{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#7D7076;text-align:center;padding-bottom:2px}
 .dd{aspect-ratio:1/1.1;min-width:0;border-radius:14px;border:1.5px solid #EFE6E1;background:#fff;font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:4px 2px;gap:2px;color:#4A3A41}
 .dd .n{font-size:15px}.dd.past{opacity:.55}.dd.today{border-color:#7D5E68}.dd.sel{background:#7D5E68;border-color:#7D5E68;color:#fff}
-.dd .dots{display:flex;flex-wrap:wrap;justify-content:center;gap:1px}.dd .dots i{font-style:normal;font-size:10px;line-height:16px;width:16px;border-radius:50%;text-align:center}
-.dots i.e{background:#F3EAEE}.dots i.o{background:#E3CFD7}.dots i.a{background:#9B7B87}.dots i.p{background:#CFE0C9}
-.ical-leg{display:flex;flex-wrap:wrap;gap:4px 12px;margin:10px 2px 0;font-size:12px;color:#7D7076}.ical-leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
-.ical-leg .o{background:#E3CFD7}.ical-leg .a{background:#9B7B87}.ical-leg .p{background:#CFE0C9}
-.ical .cnt{margin:8px 2px 0;font-size:14px}
-@media(max-width:640px){.ig.big video{max-width:150px}.ig video{max-width:130px}}
-.iday h2{font:500 28px/1.15 "Cormorant Garamond",Georgia,serif;color:#4A3A41;margin:0 0 12px}
-.iday .add{margin-top:12px}.iday .add .b{border-style:solid;min-height:48px;font-size:17px}
-.pick-sk{margin-top:14px;background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:24px;padding:14px}
-.psk-h{display:flex;justify-content:space-between;align-items:center;gap:10px}.psk-h b{font:500 23px/1.2 "Cormorant Garamond",Georgia,serif;color:#4A3A41}
-.psk-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
+.dd.has{background:#F6EEF1}.dd.has.sel{background:#7D5E68}
+.dd .dots{display:flex;gap:2px}.dd .dots i{width:7px;height:7px;border-radius:50%;background:#C9A9B4}.dd .dots i.p{background:#8FB08A}.dd .dots i.a{background:#7D5E68}
+.dd.sel .dots i{background:#fff}.dd.sel .dots i.p{background:#CFE0C9}
+.ical-leg{display:flex;flex-wrap:wrap;gap:4px 12px;margin:10px 2px 0;font-size:12px;color:#7D7076}.ical-leg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:0}
+.ical .cnt{margin:8px 2px 0;font-size:14px;color:#6B5658}
+.fill{margin-top:12px;padding:12px;border-radius:18px;background:#fff;border:1.5px dashed #C9A9B4}
+.fill p{margin:0 0 8px;font-size:15px;color:#6B5658;line-height:1.45}.fill .row2{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fill select{font:inherit;font-size:16px;padding:8px 10px;border-radius:12px;border:1.5px solid #DDD2C6;background:#fff}
+.iday h2{font:500 30px/1.15 "Cormorant Garamond",Georgia,serif;color:#4A3A41;margin:0 0 12px}
+.empty{background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:22px;padding:18px;text-align:center}
+.empty p{margin:0 0 12px;color:#6B5658;font-size:17px}
+.own{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+/* Themen-Auswahl */
+.pick{margin-top:14px;background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:24px;padding:14px}
+.pk-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.pk-h b{font:500 25px/1.2 "Cormorant Garamond",Georgia,serif;color:#4A3A41}
 .seg2{display:flex;gap:6px}.seg2 button{font:inherit;font-size:16px;padding:8px 14px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer;min-height:42px}
 .seg2 button[aria-pressed=true]{background:#7D5E68;border-color:#7D5E68;color:#fff}
-.chk2{display:flex;align-items:center;gap:8px;font-size:15px;color:#6B5658}.chk2 input{width:20px;height:20px;accent-color:#7D5E68}
-.psk-list{display:flex;flex-direction:column;gap:10px;max-height:62vh;overflow:auto;padding-right:2px}
-.sk{background:#fff;border:1.5px solid #E6DCD2;border-radius:18px;padding:12px}
-.sk.used{opacity:.7}
-.sk-h{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:#7D5E68}.sk-u{color:#7D7076}
-.sk b{display:block;font:500 21px/1.2 "Cormorant Garamond",Georgia,serif;color:#4A3A41;margin:4px 0 6px}
-.sk p{margin:0 0 6px;font-size:15px;line-height:1.5;color:#4A3A41}
-#pskOwn{margin-top:10px}
-.todayw{display:flex;flex-wrap:wrap;gap:12px}
-pre.ex{white-space:pre-wrap;background:#fff;border:1px dashed #DDD2C6;border-radius:12px;padding:10px;font-size:15px;color:#6B5658;margin:6px 0}
-@media(max-width:640px){.day{grid-template-columns:1fr}.dl b{display:inline;font-size:26px;margin-right:6px}}
+.tl{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:12px}
+.tc{font:inherit;text-align:left;cursor:pointer;background:#fff;border:1.5px solid #E6DCD2;border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:6px;color:#2E2529}
+.tc:hover{border-color:#C9A9B4}.tc.used{opacity:.62}.tc b{font:500 21px/1.2 "Cormorant Garamond",Georgia,serif;color:#4A3A41}
+.tc small{font-size:14px;line-height:1.45;color:#6B5658}.tc .u{font-size:12px;color:#7D7076}
+.tv{margin-top:12px;background:#fff;border:1.5px solid #C9A9B4;border-radius:22px;padding:14px}
+.tv-h{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}.tv-h b{font:500 26px/1.15 "Cormorant Garamond",Georgia,serif;color:#4A3A41;margin-right:auto}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.tabs button{font:inherit;font-size:16px;padding:8px 14px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer;min-height:42px}
+.tabs button[aria-pressed=true]{background:#4A3A41;border-color:#4A3A41;color:#fff}
+.tv .txt{background:#FBF8F4;border-radius:14px;padding:12px;max-height:300px}
+.tv .ig-b{margin-top:12px}
+.todayw .dc{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+@media(max-width:640px){.dc{grid-template-columns:minmax(0,1fr)}.thead .b{margin-left:0}.tl{grid-template-columns:minmax(0,1fr)}}
 </style>
 <?php mm_subnav('insta'); ?>
 <div class="ih"><h1>📱 Instagram täglich</h1>
-  <p>Plane hier die Talking Heads für deine Storys und Reels für den ganzen Monat. Aufnehmen kannst du sie in Ruhe im Studio, auch schon für Tage im Voraus. Am Tag selbst öffnest du diese Seite am Handy und tippst nur noch auf „Teilen → Instagram“.</p></div>
+  <p>Jeden Tag ein Thema aus deinem Leben: dazu ein Reel und eine Story als Talking Head und eine Nachricht für deinen Instagram- und WhatsApp-Kanal mit einer Foto-Idee. Aufnehmen kannst du in Ruhe im Studio, am Tag selbst tippst du nur noch auf „Teilen“ bzw. „Text kopieren“.</p></div>
 
 <?php if ($todayList): ?>
-<div class="box"><h2>Heute · <?= $h(ig_wd($today, true)) ?></h2><div class="todayw"><?php foreach ($todayList as $r) echo $card($r, true); ?></div>
-  <p class="tip">„Teilen“ öffnet am iPhone das Teilen-Menü: dort Instagram wählen, dann Story oder Reel. Musik fügst du in Instagram dazu (die Musik dort ist für dein Konto erlaubt).</p></div>
+<div class="box todayw"><h2>Heute · <?= $h(ig_wd($today, true)) ?></h2><?= $dayBlock($today, $todayList, true) ?>
+  <p class="tip">„Teilen“ öffnet am iPhone das Teilen-Menü: dort Instagram wählen, dann Story oder Reel. Musik wählst du in Instagram dazu.</p></div>
 <?php endif; ?>
 
 <div class="ical-wrap">
@@ -289,63 +372,90 @@ pre.ex{white-space:pre-wrap;background:#fff;border:1px dashed #DDD2C6;border-rad
       <?php foreach (['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'] as $w): ?><span class="wd"><?= $w ?></span><?php endforeach; ?>
       <?php for ($i = 0; $i < ((int)date('N', strtotime($first)) - 1); $i++): ?><span></span><?php endfor; ?>
       <?php for ($i = 1; $i <= $days; $i++): $d = $m . '-' . sprintf('%02d', $i); $l = $by[$d] ?? []; ?>
-      <button type="button" class="dd<?= $d === $today ? ' today' : '' ?><?= $d < $today ? ' past' : '' ?>" data-day="<?= $h($d) ?>"><span class="n"><?= $i ?></span><span class="dots"><?php foreach ($l as $r): ?><i class="<?= $h($r['status'] === 'gepostet' ? 'p' : ($r['file'] !== '' ? 'a' : ($r['text'] === '' ? 'e' : 'o'))) ?>"><?= $r['kind'] === 'reel' ? '🎬' : '⭕' ?></i><?php endforeach; ?></span></button>
+      <button type="button" class="dd<?= $d === $today ? ' today' : '' ?><?= $d < $today ? ' past' : '' ?><?= $l ? ' has' : '' ?>" data-day="<?= $h($d) ?>"><span class="n"><?= $i ?></span><span class="dots"><?php foreach ($l as $r): ?><i class="<?= $r['status'] === 'gepostet' ? 'p' : ($r['file'] !== '' ? 'a' : '') ?>" title="<?= $h(IG_KIND[$r['kind']] ?? '') ?>"></i><?php endforeach; ?></span></button>
       <?php endfor; ?>
     </div>
-    <div class="ical-leg"><span><i class="o"></i>Text da, noch aufnehmen</span><span><i class="a"></i>aufgenommen</span><span><i class="p"></i>gepostet</span></div>
-    <p class="cnt"><?= $cnt['plan'] ?> geplant · <?= $cnt['auf'] ?> aufgenommen · <?= $cnt['post'] ?> gepostet</p>
+    <div class="ical-leg"><span><i style="background:#C9A9B4"></i>geplant</span><span><i style="background:#7D5E68"></i>aufgenommen</span><span><i style="background:#8FB08A"></i>gepostet</span></div>
+    <p class="cnt"><?= $cnt['plan'] ?> geplant · <?= $cnt['post'] ?> gepostet</p>
+    <?php if ($cnt['free'] > 0 && $TH): ?>
+    <form method="post" class="fill"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_fill"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="start" value="<?= $h($fillFrom) ?>">
+      <p>✨ <?= $cnt['free'] ?> Tage haben noch kein Thema. Ich fülle sie mit verschiedenen Themen, die du noch nicht verwendet hast.</p>
+      <div class="row2"><select name="lang" data-langsel><option value="en">auf Englisch</option><option value="de">auf Deutsch</option></select><button class="b main">Freie Tage füllen</button></div>
+    </form>
+    <?php endif; ?>
   </div>
   <div class="iday-w">
     <?php for ($i = 1; $i <= $days; $i++): $d = $m . '-' . sprintf('%02d', $i); $l = $by[$d] ?? []; ?>
     <div class="iday" data-iday="<?= $h($d) ?>" hidden>
       <h2><?= $h(ig_wd($d, true)) ?><?= $d === $today ? ' · heute' : '' ?></h2>
-      <?php if ($l): ?><div class="dc"><?php foreach ($l as $r) echo $card($r); ?></div><?php else: ?><p class="tip">Für diesen Tag ist noch nichts geplant.</p><?php endif; ?>
-      <div class="add"><button type="button" class="b main" data-new="story" data-d="<?= $h($d) ?>">＋ Story</button><button type="button" class="b main" data-new="reel" data-d="<?= $h($d) ?>">＋ Reel</button></div>
+      <?php if ($l): ?><?= $dayBlock($d, $l) ?>
+      <?php else: ?><div class="empty"><p>Für diesen Tag gibt es noch kein Thema.</p><button type="button" class="b main big" data-pick="<?= $h($d) ?>">✨ Thema für diesen Tag wählen</button></div><?php endif; ?>
+      <div class="own"><button type="button" class="b sm" data-own="reel" data-d="<?= $h($d) ?>">＋ eigenes Reel</button><button type="button" class="b sm" data-own="story" data-d="<?= $h($d) ?>">＋ eigene Story</button><button type="button" class="b sm" data-own="channel" data-d="<?= $h($d) ?>">＋ eigene Channel-Nachricht</button></div>
     </div>
     <?php endfor; ?>
-    <div class="pick-sk" id="pickSk" hidden>
-      <div class="psk-h"><b id="pskT">Welcher Text?</b><button type="button" class="b sm" id="pskX">Schließen</button></div>
-      <div class="psk-tools"><div class="seg2"><button type="button" data-lang2="de" aria-pressed="true">Deutsch</button><button type="button" data-lang2="en" aria-pressed="false">Englisch</button></div>
-        <label class="chk2"><input type="checkbox" id="pskAll"> auch die anderen Texte zeigen</label></div>
-      <div class="psk-list" id="pskList"></div>
-      <form method="post" id="pskF"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_save"><input type="hidden" name="m" value="<?= $h($m) ?>">
-        <input type="hidden" name="day"><input type="hidden" name="kind"><input type="hidden" name="title"><input type="hidden" name="text"><input type="hidden" name="studio"></form>
-      <button type="button" class="b" id="pskOwn">✍️ Eigenen Text schreiben</button>
+    <div class="pick" id="pick" hidden>
+      <div class="pk-h"><b id="pkT">Welches Thema?</b><div class="seg2"><button type="button" data-lang2="en" aria-pressed="true">Englisch</button><button type="button" data-lang2="de" aria-pressed="false">Deutsch</button></div><button type="button" class="b sm" id="pkX">Schließen</button></div>
+      <div class="tv" id="tv" hidden></div>
+      <div class="tl" id="tl"></div>
+      <form method="post" id="pkF"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_theme"><input type="hidden" name="m" value="<?= $h($m) ?>">
+        <input type="hidden" name="day"><input type="hidden" name="theme"><input type="hidden" name="lang"><input type="hidden" name="rec"></form>
+      <form method="post" id="ownF"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_save"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="acc" value="movecia">
+        <input type="hidden" name="day"><input type="hidden" name="kind"><input type="hidden" name="studio"></form>
     </div>
   </div>
 </div>
 
-<details class="box" style="margin-top:18px"><summary style="cursor:pointer;font:500 24px/1.2 'Cormorant Garamond',Georgia,serif;color:#4A3A41;list-style:none">✍️ Ganzen Monat auf einmal einfügen</summary>
-  <form method="post" class="f"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_bulk"><input type="hidden" name="m" value="<?= $h($m) ?>">
-    <div class="row"><label>Ab Tag<input type="date" name="start" value="<?= $h(max($first, date('Y-m-d')) <= date('Y-m-d', strtotime($first . ' +' . ($days - 1) . ' days')) ? max($first, date('Y-m-d')) : $first) ?>"></label>
-      <label>Wenn nichts dabei steht<select name="kind"><option value="story">⭕ Story</option><option value="reel">🎬 Reel</option></select></label>
-      <label>Konto<select name="acc"><?php foreach (IG_ACC as $k => $n): ?><option value="<?= $k ?>"><?= $n ?></option><?php endforeach; ?></select></label></div>
-    <label>Deine Texte<textarea name="raw" rows="10" placeholder="Hier alle Texte einfügen."></textarea></label>
-    <p class="tip">Jeder Text beginnt mit einer Zeile mit Datum, dahinter Story oder Reel und gern eine Überschrift, z. B. „2.11. Reel: Mein Morgen“. Ohne Datum: Texte mit einer Zeile „---“ trennen, sie kommen dann Tag für Tag ab dem gewählten Tag.</p>
+<details class="box" style="margin-top:18px"><summary style="cursor:pointer;font:500 22px/1.2 'Cormorant Garamond',Georgia,serif;color:#4A3A41;list-style:none">✍️ Eigene Texte für mehrere Tage einfügen</summary>
+  <form method="post" class="f"><input type="hidden" name="csrf" value="<?= $h(csrf()) ?>"><input type="hidden" name="action" value="mm_ig_bulk"><input type="hidden" name="m" value="<?= $h($m) ?>"><input type="hidden" name="acc" value="movecia">
+    <div class="row"><label>Ab Tag<input type="date" name="start" value="<?= $h($fillFrom <= $last ? $fillFrom : $first) ?>"></label>
+      <label>Wenn nichts dabei steht<select name="kind"><option value="story">⭕ Story</option><option value="reel">🎬 Reel</option></select></label></div>
+    <label>Deine Texte<textarea name="raw" rows="8" placeholder="Hier alle Texte einfügen."></textarea></label>
+    <p class="tip">Jeder Text beginnt mit einer Zeile mit Datum, dahinter Story oder Reel, z. B. „2.11. Reel: Mein Morgen“. Ohne Datum: Texte mit einer Zeile „---“ trennen, sie kommen dann Tag für Tag.</p>
     <div class="ig-b"><button class="b main">Eintragen</button></div>
   </form></details>
 <script>
 (function(){
-  const csrf=<?= json_encode(csrf()) ?>, cache={};
-  // ---- Kalender: Tag antippen → rechts (am Handy darunter) die Einträge ----
-  const SK=<?= json_encode(array_values($sk), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;let skLang='de',skKind='story',skDay='';
+  const csrf=<?= json_encode(csrf()) ?>, cache={}, $p=id=>document.getElementById(id);
+  const TH=<?= json_encode(array_values($TH), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
   const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const para=t=>'<p>'+esc(t).replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>')+'</p>';
+  let lang='en',pDay='',open=null,tab='reel';
+  try{lang=localStorage.getItem('ig-lang')==='de'?'de':'en'}catch(e){}
+  document.querySelectorAll('[data-langsel]').forEach(s=>s.value=lang);
+  // ---- Kalender ----
   function pickDay(d,scroll){document.querySelectorAll('.dd').forEach(b=>b.classList.toggle('sel',b.dataset.day===d));document.querySelectorAll('.iday').forEach(x=>x.hidden=x.dataset.iday!==d);
-    $p('pickSk').hidden=true;try{history.replaceState(null,'','#d'+d)}catch(e){}if(scroll&&matchMedia('(max-width:860px)').matches){const x=document.querySelector('.iday:not([hidden])');if(x)x.scrollIntoView({behavior:'smooth',block:'start'})}}
-  const $p=id=>document.getElementById(id);
+    $p('pick').hidden=true;try{history.replaceState(null,'','#d'+d)}catch(e){}if(scroll&&matchMedia('(max-width:900px)').matches){const x=document.querySelector('.iday:not([hidden])');if(x)x.scrollIntoView({behavior:'smooth',block:'start'})}}
   document.querySelectorAll('.dd').forEach(b=>b.onclick=()=>pickDay(b.dataset.day,true));
-  const hd=(location.hash.match(/^#d(\d{4}-\d{2}-\d{2})/)||[])[1],days=[...document.querySelectorAll('.dd')].map(b=>b.dataset.day),td=new Date().toISOString().slice(0,10);
+  const hd=(location.hash.match(/^#d(\d{4}-\d{2}-\d{2})/)||[])[1],days=[...document.querySelectorAll('.dd')].map(b=>b.dataset.day),td=<?= json_encode($today) ?>;
   pickDay(days.includes(hd)?hd:(days.includes(td)?td:days[0]),false);
-  function skList(){const all=$p('pskAll').checked,L=SK.filter(x=>all||x.kind===skKind);
-    $p('pskList').innerHTML=L.map((x,i)=>{const t=skLang==='en'?x.en_t:x.de_t,tx=skLang==='en'?x.en:x.de;return '<div class="sk'+(x.used?' used':'')+'"><div class="sk-h"><span class="sk-k">'+(x.kind==='reel'?'🎬 Reel':'⭕ Story')+' · '+esc(x.topic)+'</span>'+(x.used?'<span class="sk-u">schon verwendet</span>':'')+'</div><b>'+esc(t)+'</b><p>'+esc(tx).replace(/\n\n/g,'</p><p>')+'</p>'
-      +'<div class="ig-b"><button type="button" class="b main" data-take="'+SK.indexOf(x)+'" data-rec="1">🎥 Nehmen &amp; aufnehmen</button><button type="button" class="b" data-take="'+SK.indexOf(x)+'">Nur eintragen</button></div></div>'}).join('')||'<p class="tip">Keine passenden Texte. Hake „auch die anderen Texte zeigen“ an.</p>';
-    $p('pskList').querySelectorAll('[data-take]').forEach(b=>b.onclick=()=>{const x=SK[+b.dataset.take],f=$p('pskF');f.day.value=skDay;f.kind.value=skKind;f.title.value=skLang==='en'?x.en_t:x.de_t;f.text.value=skLang==='en'?x.en:x.de;f.studio.value=b.dataset.rec?'1':'';f.submit()})}
-  document.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>{skKind=b.dataset.new;skDay=b.dataset.d;const ps=$p('pickSk');b.closest('.iday').appendChild(ps);ps.hidden=false;
-    $p('pskT').textContent=(skKind==='reel'?'🎬 Reel':'⭕ Story')+' am '+b.closest('.iday').querySelector('h2').textContent.replace(' · heute','')+': welcher Text?';skList();ps.scrollIntoView({behavior:'smooth',block:'start'})});
-  document.querySelectorAll('[data-lang2]').forEach(b=>b.onclick=()=>{skLang=b.dataset.lang2;document.querySelectorAll('[data-lang2]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));skList()});
-  $p('pskAll').onchange=skList;$p('pskX').onclick=()=>{$p('pickSk').hidden=true};
-  $p('pskOwn').onclick=()=>{const f=$p('pskF');f.day.value=skDay;f.kind.value=skKind;f.title.value='';f.text.value='';f.studio.value='';f.submit()};
-  // Erst laden, dann teilen (das iPhone braucht das Teilen direkt nach dem Antippen)
+  // ---- Themen-Auswahl ----
+  function list(){const L=TH.slice().sort((a,b)=>(a.used>0)-(b.used>0));
+    $p('tl').innerHTML=L.map(x=>'<button type="button" class="tc'+(x.used?' used':'')+'" data-t="'+esc(x.id)+'"><span class="chip">'+esc(x.topic)+'</span><b>'+esc(lang==='en'?x.en_t:x.de_t)+'</b><small>'+esc((lang==='en'?x.story_en:x.story_de).split(/\n/)[0].slice(0,120))+' …</small>'+(x.used?'<span class="u">schon '+x.used+'× verwendet</span>':'')+'</button>').join('');
+    $p('tl').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{open=TH.find(x=>x.id===b.dataset.t);tab='reel';view();$p('tv').scrollIntoView({behavior:'smooth',block:'start'})})}
+  function view(){const tv=$p('tv');if(!open){tv.hidden=true;return}const x=open,L=lang;
+    const parts={reel:x['reel_'+L],story:x['story_'+L],channel:x['channel_'+L]};
+    tv.innerHTML='<div class="tv-h"><span class="chip">'+esc(x.topic)+'</span><b>'+esc(L==='en'?x.en_t:x.de_t)+'</b></div>'
+      +'<div class="tabs">'+[['reel','🎬 Reel'],['story','⭕ Story'],['channel','💬 Channel & Foto']].map(([k,n])=>'<button type="button" data-tab="'+k+'" aria-pressed="'+(tab===k)+'">'+n+'</button>').join('')+'</div>'
+      +'<div class="txt">'+para(parts[tab]||'')+'</div>'+(tab==='channel'&&x.foto?'<div class="foto" style="margin-top:10px"><span>📷 Foto-Idee</span>'+esc(x.foto)+'</div>':'')
+      +'<div class="ig-b"><button type="button" class="b main big" data-take>✓ Dieses Thema nehmen</button><button type="button" class="b" data-take="reel">🎥 Nehmen &amp; Reel aufnehmen</button><button type="button" class="b sm" data-back>Andere Themen</button></div>'
+      +'<p class="tip">Du bekommst für den Tag alle drei: Reel, Story und Channel-Nachricht mit Foto-Idee.</p>';
+    tv.hidden=false;
+    tv.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;view()});
+    tv.querySelector('[data-back]').onclick=()=>{open=null;view()};
+    tv.querySelectorAll('[data-take]').forEach(b=>b.onclick=()=>{const f=$p('pkF');f.day.value=pDay;f.theme.value=x.id;f.lang.value=lang;f.rec.value=b.dataset.take||'';b.disabled=true;f.submit()})}
+  function openPick(d,host){pDay=d;open=null;const ps=$p('pick');host.appendChild(ps);ps.hidden=false;
+    $p('pkT').textContent='Thema für '+host.querySelector('h2').textContent.replace(' · heute','');list();view();ps.scrollIntoView({behavior:'smooth',block:'start'})}
+  document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>openPick(b.dataset.pick,document.querySelector('.iday[data-iday="'+b.dataset.pick+'"]')||b.closest('.box')));
+  document.querySelectorAll('[data-lang2]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.lang2===lang));b.onclick=()=>{lang=b.dataset.lang2;try{localStorage.setItem('ig-lang',lang)}catch(e){}
+    document.querySelectorAll('[data-lang2]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));document.querySelectorAll('[data-langsel]').forEach(s=>s.value=lang);list();view()}});
+  document.querySelectorAll('[data-langsel]').forEach(s=>s.onchange=()=>{try{localStorage.setItem('ig-lang',s.value)}catch(e){}});
+  $p('pkX').onclick=()=>{$p('pick').hidden=true};
+  document.querySelectorAll('[data-own]').forEach(b=>b.onclick=()=>{const f=$p('ownF');f.day.value=b.dataset.d;f.kind.value=b.dataset.own;f.studio.value='';f.submit()});
+  // ---- Text kopieren (Channel-Nachricht oder Caption) ----
+  document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{const el=b.closest('.ig').querySelector('[data-txt]');const t=el?el.innerText.trim():'';const o=b.textContent;
+    try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}
+    b.textContent='✓ Kopiert';setTimeout(()=>b.textContent=o,1800)});
+  // ---- Video teilen (erst laden, dann teilen – das iPhone braucht das Teilen direkt nach dem Antippen) ----
   document.querySelectorAll('[data-share]').forEach(b=>b.onclick=async()=>{const id=b.dataset.share;
     if(!navigator.share||!navigator.canShare){location.href='?view=insta&dl='+id+'&save=1';return}
     if(cache[id]){try{await navigator.share({files:[cache[id]]});const f=new FormData();f.append('csrf',csrf);f.append('action','mm_ig_status');f.append('id',id);f.append('st','gepostet');f.append('ajax','1');

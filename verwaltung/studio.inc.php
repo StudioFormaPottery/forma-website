@@ -85,7 +85,7 @@ if ($view === 'studio') {
     // Instagram täglich (Storys & Reels, ?view=insta): alles ab gestern, was noch nicht gepostet ist
     ig_schema($pdo);
     $igs = [];
-    $s = $pdo->prepare("SELECT * FROM mm_insta WHERE day >= ? AND status <> 'gepostet' ORDER BY day, kind DESC, id LIMIT 90"); $s->execute([date('Y-m-d', strtotime('-1 day'))]);
+    $s = $pdo->prepare("SELECT * FROM mm_insta WHERE day >= ? AND status <> 'gepostet' AND kind IN ('reel','story') ORDER BY day, kind DESC, id LIMIT 90"); $s->execute([date('Y-m-d', strtotime('-1 day'))]);
     foreach ($s->fetchAll() as $r) $igs[] = ['id' => (int)$r['id'], 'day' => $r['day'], 'kind' => $r['kind'], 'acc' => IG_ACC[$r['acc']] ?? 'Privat', 't' => ig_title($r),
         'text' => (string)$r['text'], 'music' => (string)$r['music'], 'has' => $r['file'] !== '', 'l' => ig_wd($r['day']) . ' · ' . ($r['kind'] === 'reel' ? '🎬 Reel' : '⭕ Story') . ' · ' . ig_title($r) . ($r['file'] !== '' ? ' ✓' : '')];
     $selI = (int)($_GET['ig'] ?? 0);
