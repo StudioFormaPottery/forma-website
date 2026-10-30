@@ -106,7 +106,7 @@ a{color:inherit}
 <main class="page">
   <header class="head has-hw">
     <?= mv_waves(false, 'calm bio') ?>
-    <div class="logo"><img src="/img/movecia/movecia-profilbild-1080.png" alt="Movecia" width="132" height="132"></div>
+    <div class="logo"><img src="/img/movecia/insta-profil-320.png?v=1" alt="Movecia" width="132" height="132"></div>
     <p class="k">Online · im Studio in Mathon</p>
     <h1>Movecia</h1>
     <p class="sub">Mindful &amp; Somatic Movement</p>
