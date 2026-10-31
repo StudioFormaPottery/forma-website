@@ -65,7 +65,16 @@ function ig_seed_mvig(PDO $pdo): void
     if (!empty($d['replace_from']) && !empty($d['replace_to'])) $pdo->prepare("DELETE FROM mm_insta WHERE acc = 'mvig' AND day >= ? AND day <= ? AND status = 'offen' AND file = ''")->execute([$d['replace_from'], $d['replace_to']]);
     // Einträge mit „replaces“ ersetzen einen schon eingetragenen alten Text (nur wenn noch nicht gepostet)
     $upd = $pdo->prepare("UPDATE mm_insta SET title = ?, text = ?, updated_at = ? WHERE acc = 'mvig' AND day = ? AND title = ? AND status <> 'gepostet'");
+    // Nur Überschrift umbenennen (Vivien, 31.10.2026): „old_title“ → neue Überschrift, auch wenn schon aufgenommen; Text bleibt, außer er ist noch unverändert („old_text“)
+    $ren = $pdo->prepare("UPDATE mm_insta SET title = ?, updated_at = ? WHERE acc = 'mvig' AND day = ? AND title = ? AND status <> 'gepostet'");
+    $rtx = $pdo->prepare("UPDATE mm_insta SET text = ? WHERE acc = 'mvig' AND day = ? AND title = ? AND text = ? AND status <> 'gepostet'");
+    $rph = $pdo->prepare("UPDATE mm_insta SET photo = ? WHERE acc = 'mvig' AND day = ? AND title = ? AND photo LIKE '%Der erste Satz steht groß als Text im Bild.%'");
     foreach ($d['items'] ?? [] as $x) {
+        if (!empty($x['old_title']) && $x['old_title'] !== $x['title']) {
+            $ren->execute([$x['title'], date('c'), $x['day'], $x['old_title']]);
+            if (!empty($x['old_text'])) $rtx->execute([$x['text'], $x['day'], $x['title'], $x['old_text']]);
+            $rph->execute([(string)($x['photo'] ?? ''), $x['day'], $x['title']]);
+        }
         if (!empty($x['replaces'])) $upd->execute([$x['title'], $x['text'], date('c'), $x['day'], $x['replaces']]);
         $q->execute([$x['day'], $x['title']]); if ((int)$q->fetchColumn()) continue;
         $ins->execute([$x['day'], isset(IG_KIND[$x['kind']]) ? $x['kind'] : 'post', 'mvig', $x['title'], $x['text'], (string)($x['photo'] ?? ''), date('c'), date('c')]);
