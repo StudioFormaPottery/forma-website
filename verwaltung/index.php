@@ -2,6 +2,7 @@
 // Verwaltung für Kurse und Anmeldungen – nur für Vivien.
 declare(strict_types=1);
 require dirname(__DIR__) . '/api/lib.php';
+require __DIR__ . '/zweistufen.inc.php';
 
 $secure = (($_SERVER['HTTPS'] ?? '') !== '' && ($_SERVER['HTTPS'] ?? '') !== 'off');
 session_set_cookie_params(['lifetime' => 0, 'path' => '/verwaltung/', 'secure' => $secure, 'httponly' => true, 'samesite' => 'Lax']);
@@ -21,6 +22,8 @@ unset($_SESSION['flash']);
  */
 // Neu-Boxen: 'b' => 'movecia' erscheint nur auf der Movecia-Übersicht, sonst nur bei FORMA (Vivien, 28.10.2026).
 const FORMA_ADMIN_NEWS = [
+    ['until' => '2026-12-15', 'title' => '🔐 Zwei-Stufen-Anmeldung', 'text' => 'Deine Verwaltung kann jetzt zusätzlich zum Passwort einen 6-stelligen Code aus Duo verlangen. So kommt niemand hinein, auch wenn er dein Passwort kennt. Einschalten unter Einstellungen, ganz oben. Pro Gerät musst du den Code nur alle 30 Tage eingeben.', 'link' => '?view=einstellungen#zweistufen'],
+    ['b' => 'movecia', 'until' => '2026-12-15', 'title' => '🔐 Zwei-Stufen-Anmeldung', 'text' => 'Deine Verwaltung kann jetzt zusätzlich zum Passwort einen 6-stelligen Code aus Duo verlangen. Einschalten unter Einstellungen (FORMA-Verwaltung), ganz oben.', 'link' => '?view=einstellungen#zweistufen'],
     ['b' => 'movecia', 'until' => '2026-12-15', 'title' => '☁️ Entwürfe auf allen Geräten', 'text' => 'Deine Entwürfe im ✂️ Schnitt werden jetzt automatisch auf deinem Server gesichert. Auf dem iPhone, am MacBook und in jedem Browser siehst du dieselben Entwürfe. Oben neben „📝 Meine Entwürfe“ steht, ob noch etwas hochlädt. Öffnest du einen Entwurf auf einem anderen Gerät zum ersten Mal, lädt er die Videos einmal herunter.', 'link' => '?view=schnitt'],
     ['b' => 'movecia', 'until' => '2026-12-15', 'title' => 'Reel oder Story mit einem Tipp', 'text' => 'Unter „📱 Instagram täglich“ ganz oben: „🎬 Reel jetzt aufnehmen“ oder „⭕ Story jetzt aufnehmen“. Das Studio öffnet sofort im Hochformat für heute, den Text fügst du direkt beim Teleprompter ein. Daneben „📝 Meine Entwürfe“, bei jedem Eintrag „✂️ Entwurf im Schnitt“.', 'link' => '?view=insta'],
     ['b' => 'movecia', 'until' => '2026-12-15', 'title' => 'Absätze alle zusammen schneiden', 'text' => 'Jeder Absatz aus „Absatz für Absatz“ landet jetzt sofort auch im ✂️ Schnitt (Entwurf „… · Absätze“) und geht nie verloren. Mit „✂️ Alle zusammen schneiden“ öffnest du alle Absätze auf einmal in der richtigen Reihenfolge. Im Schnitt zeigt „🛟 Gerettete Videos“ Dateien, die zu keinem Clip mehr gehören.', 'link' => '?view=studio'],
@@ -274,6 +277,11 @@ if (isset($_GET['token']) || $action === 'set_password') {
             $verNew = (string)((int)(forma_setting($pdo, 'admin_ver') ?? '0') + 1);
             forma_set_setting($pdo, 'admin_ver', $verNew);
             session_regenerate_id(true);
+            // Mit Zwei-Stufen-Anmeldung reicht der Mail-Link allein nicht: danach noch der Code aus Duo
+            if (tf_on($pdo)) {
+                $_SESSION['tf_pending'] = time();
+                go($self, 'Dein Passwort ist gespeichert. Jetzt noch der Code aus Duo.');
+            }
             $_SESSION['admin'] = true;
             $_SESSION['seen'] = time();
             $_SESSION['ver'] = $verNew;
@@ -316,6 +324,11 @@ if ($action === 'login') {
     if ($hash && password_verify((string)($_POST['password'] ?? ''), $hash)) {
         $pdo->prepare('DELETE FROM admin_login_fail WHERE ip_hash = ?')->execute([$ipH]);
         session_regenerate_id(true);
+        // Zwei-Stufen-Anmeldung: auf neuen Geräten erst nach dem Code aus Duo hinein
+        if (tf_on($pdo) && !tf_trusted($pdo)) {
+            $_SESSION['tf_pending'] = time();
+            go($self);
+        }
         $_SESSION['admin'] = true;
         $_SESSION['seen'] = time();
         $_SESSION['ver'] = (string)(forma_setting($pdo, 'admin_ver') ?? '0');
@@ -324,6 +337,57 @@ if ($action === 'login') {
     $pdo->prepare('INSERT INTO admin_login_fail (ip_hash, at) VALUES (?, ?)')->execute([$ipH, time()]);
     usleep(400000);
     go($self, 'Das Passwort stimmt nicht.');
+}
+
+// Zweiter Schritt: Code aus Duo (oder Ersatzcode)
+if ($action === 'login_cancel') {
+    check_csrf();
+    unset($_SESSION['tf_pending']);
+    go($self);
+}
+if ($action === 'login2') {
+    check_csrf();
+    if (time() - (int)($_SESSION['tf_pending'] ?? 0) > 600) { unset($_SESSION['tf_pending']); go($self, 'Bitte melde dich noch einmal mit deinem Passwort an.'); }
+    $pdo->exec('CREATE TABLE IF NOT EXISTS admin_login_fail (ip_hash TEXT NOT NULL, at INTEGER NOT NULL)');
+    $ipH = hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? '') . 'forma-admin');
+    $q = $pdo->prepare('SELECT COUNT(*) FROM admin_login_fail WHERE ip_hash = ? AND at >= ?');
+    $q->execute([$ipH, time() - 900]);
+    if ((int)$q->fetchColumn() >= 5) { unset($_SESSION['tf_pending']); go($self, 'Zu viele Fehlversuche. Bitte warte 15 Minuten.'); }
+    $code = (string)($_POST['code'] ?? '');
+    $ok = tf_check((string)forma_setting($pdo, 'tf_secret'), $code, $pdo);
+    $usedBackup = false;
+    if (!$ok && tf_use_backup($pdo, $code)) { $ok = true; $usedBackup = true; }
+    if (!$ok) {
+        $pdo->prepare('INSERT INTO admin_login_fail (ip_hash, at) VALUES (?, ?)')->execute([$ipH, time()]);
+        usleep(400000);
+        go($self, 'Der Code stimmt nicht. Nimm den aktuellen Code aus Duo (er wechselt alle 30 Sekunden).');
+    }
+    $pdo->prepare('DELETE FROM admin_login_fail WHERE ip_hash = ?')->execute([$ipH]);
+    unset($_SESSION['tf_pending']);
+    session_regenerate_id(true);
+    $_SESSION['admin'] = true;
+    $_SESSION['seen'] = time();
+    $_SESSION['ver'] = (string)(forma_setting($pdo, 'admin_ver') ?? '0');
+    if (!empty($_POST['remember'])) tf_trust_set($pdo, $secure);
+    go($self, $usedBackup ? 'Du hast einen Ersatzcode benutzt. Noch ' . tf_backup_left($pdo) . ' übrig – unter Einstellungen kannst du neue erzeugen.' : null);
+}
+
+if (!$loggedIn && !empty($_SESSION['tf_pending'])) {
+    render_page('Code eingeben', function () use ($flash) { ?>
+        <h1>Kursverwaltung</h1>
+        <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
+        <form method="post" class="card stack">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
+            <input type="hidden" name="action" value="login2">
+            <p>🔐 Öffne <strong>Duo</strong> auf deinem Handy und tippe den 6-stelligen Code von „FORMA Verwaltung“ ein.</p>
+            <label for="code">Code</label>
+            <input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" required autofocus style="font-size:1.6rem;letter-spacing:.3em;text-align:center" maxlength="9">
+            <label class="check"><input type="checkbox" name="remember" value="1" checked> Dieses Gerät 30 Tage merken</label>
+            <button class="btn" type="submit">Weiter</button>
+            <p class="muted small">Handy nicht da? Tippe einen deiner Ersatzcodes ein (z. B. ABCD-EFGH).</p>
+        </form>
+        <form method="post" class="center"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="login_cancel"><button class="link" type="submit">Abbrechen</button></form>
+    <?php });
 }
 
 if (!$loggedIn) {
@@ -359,6 +423,44 @@ if (!$loggedIn) {
 // --- Ab hier nur angemeldet -------------------------------------------------
 if ($action !== '') {
     check_csrf();
+}
+// --- Zwei-Stufen-Anmeldung einrichten (Einstellungen) ---
+if ($action === 'tf_start') {
+    $_SESSION['tf_new'] = tf_new_secret();
+    go($self . '?view=einstellungen&tf=1#zweistufen');
+}
+if ($action === 'tf_enable') {
+    $sec = (string)($_SESSION['tf_new'] ?? '');
+    if ($sec === '' || !tf_check($sec, (string)($_POST['code'] ?? ''))) {
+        go($self . '?view=einstellungen&tf=1#zweistufen', 'Der Code passt noch nicht. Nimm den aktuellen Code von „FORMA Verwaltung“ in Duo und tippe ihn ein, solange er angezeigt wird.');
+    }
+    forma_set_setting($pdo, 'tf_secret', $sec);
+    forma_set_setting($pdo, 'tf_on', '1');
+    forma_set_setting($pdo, 'tf_last', (string)intdiv(time(), 30));
+    unset($_SESSION['tf_new']);
+    $_SESSION['tf_codes'] = tf_new_backup($pdo);
+    tf_trust_set($pdo, $secure);
+    go($self . '?view=einstellungen#zweistufen', 'Zwei-Stufen-Anmeldung ist an. Bitte schreib dir jetzt die Ersatzcodes auf.');
+}
+if ($action === 'tf_newcodes' || $action === 'tf_off') {
+    $code = (string)($_POST['code'] ?? '');
+    if (!tf_check((string)forma_setting($pdo, 'tf_secret'), $code, $pdo) && !tf_use_backup($pdo, $code)) {
+        go($self . '?view=einstellungen#zweistufen', 'Der Code stimmt nicht.');
+    }
+    if ($action === 'tf_off') {
+        forma_set_setting($pdo, 'tf_on', null);
+        forma_set_setting($pdo, 'tf_secret', null);
+        forma_set_setting($pdo, 'tf_backup', null);
+        tf_forget_devices($pdo);
+        go($self . '?view=einstellungen#zweistufen', 'Zwei-Stufen-Anmeldung ist ausgeschaltet. Lösche den Eintrag „FORMA Verwaltung“ in Duo.');
+    }
+    $_SESSION['tf_codes'] = tf_new_backup($pdo);
+    go($self . '?view=einstellungen#zweistufen', 'Neue Ersatzcodes erstellt. Die alten gelten nicht mehr.');
+}
+if ($action === 'tf_forget') {
+    tf_forget_devices($pdo);
+    tf_trust_set($pdo, $secure);
+    go($self . '?view=einstellungen#zweistufen', 'Alle anderen gemerkten Geräte müssen jetzt wieder den Code eingeben.');
 }
 if ($action === 'news_hide') {
     $k = (string)($_POST['k'] ?? '');
@@ -2241,12 +2343,60 @@ if ($view === 'series') {
     <?php });
 }
 
+function admin_tf_box(PDO $pdo, string $self): void
+{
+    $on = tf_on($pdo);
+    $codes = $_SESSION['tf_codes'] ?? null; unset($_SESSION['tf_codes']);
+    $new = !$on && !empty($_GET['tf']) ? (string)($_SESSION['tf_new'] ?? '') : ''; ?>
+    <h2 id="zweistufen">🔐 Zwei-Stufen-Anmeldung</h2>
+    <div class="card stack">
+    <?php if ($codes): ?>
+        <p><strong>Deine Ersatzcodes</strong> – jeder gilt genau einmal, falls dein Handy einmal weg ist. Schreib sie auf oder mach ein Foto und leg es an einen sicheren Ort. Sie werden nur jetzt angezeigt.</p>
+        <pre style="font-size:1.15rem;line-height:1.7;background:#F7F2EC;border-radius:12px;padding:12px 16px;columns:2"><?= forma_h(implode("\n", $codes)) ?></pre>
+        <button class="btn btn-sm" type="button" onclick="navigator.clipboard&&navigator.clipboard.writeText(<?= forma_h(json_encode(implode("\n", $codes))) ?>).then(()=>this.textContent='✓ Kopiert')">Codes kopieren</button>
+    <?php endif; ?>
+    <?php if ($on): ?>
+        <p><span class="pill pill-ok">An</span> Beim Anmelden auf einem neuen Gerät fragt die Verwaltung nach dem Code aus Duo. Gemerkte Geräte fragen alle <?= TF_TRUST_DAYS ?> Tage. Noch <?= tf_backup_left($pdo) ?> Ersatzcodes übrig.</p>
+        <details><summary>Ersatzcodes neu · Geräte vergessen · ausschalten</summary>
+            <form method="post" class="stack" style="margin-top:10px">
+                <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
+                <label for="tfc">Aktueller Code aus Duo</label>
+                <input id="tfc" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="9" required>
+                <p class="row-actions"><button class="btn btn-sm" name="action" value="tf_newcodes">Neue Ersatzcodes</button> <button class="link" name="action" value="tf_off">Ausschalten</button></p>
+            </form>
+            <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="tf_forget"><button class="link" type="submit">Alle anderen Geräte abmelden (z. B. wenn ein Handy verloren ist)</button></form>
+        </details>
+    <?php elseif ($new !== ''): ?>
+        <ol class="steps">
+            <li>Öffne <strong>Duo</strong> → „+“ bzw. „Konto hinzufügen“ → <strong>„Anderes Konto“</strong> (oder „Use QR code“).</li>
+            <li>Scanne diesen QR-Code. Am Handy selbst: „Code von Hand eingeben“ und den Schlüssel unten abtippen.</li>
+            <li>Duo zeigt dann „FORMA Verwaltung“ mit einem 6-stelligen Code. Tippe ihn hier ein.</li>
+        </ol>
+        <div id="tfqr" data-url="<?= forma_h(tf_uri($new)) ?>" style="width:220px;max-width:100%;background:#fff;padding:8px;border-radius:12px"></div>
+        <p class="muted small">Schlüssel zum Abtippen: <code style="user-select:all;word-break:break-all"><?= forma_h(trim(chunk_split($new, 4, ' '))) ?></code></p>
+        <form method="post" class="stack">
+            <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
+            <input type="hidden" name="action" value="tf_enable">
+            <label for="tfe">Code aus Duo</label>
+            <input id="tfe" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="7" required style="font-size:1.4rem;letter-spacing:.25em">
+            <button class="btn" type="submit">Prüfen und einschalten</button>
+        </form>
+        <script src="qrcode.js"></script>
+        <script>(function(){var b=document.getElementById('tfqr');if(b&&window.qrcode){var q=qrcode(0,'M');q.addData(b.dataset.url);q.make();b.innerHTML=q.createSvgTag(5,2);var s=b.querySelector('svg');if(s){s.style.width='100%';s.style.height='auto';}}})();</script>
+    <?php else: ?>
+        <p>Zusätzlich zum Passwort fragt die Verwaltung nach einem 6-stelligen Code aus <strong>Duo</strong> (oder einer anderen Authenticator-App). Selbst wer dein Passwort kennt, kommt dann nicht hinein. Auf deinen eigenen Geräten musst du den Code nur alle <?= TF_TRUST_DAYS ?> Tage eingeben.</p>
+        <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="tf_start"><button class="btn" type="submit">Jetzt einrichten</button></form>
+    <?php endif; ?>
+    </div>
+<?php }
+
 if ($view === 'einstellungen') {
-    render_page('Einstellungen', function () use ($self, $flash) { $key = forma_stripe_key(); ?>
+    render_page('Einstellungen', function () use ($self, $flash, $pdo) { $key = forma_stripe_key(); ?>
         <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Einstellungen</h1>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <p class="row-actions"><a class="btn btn-sm" href="<?= forma_h($self) ?>?view=tests">🧪 Testbuchungen · jedes Angebot ausprobieren</a> <a class="btn btn-sm" href="<?= forma_h($self) ?>?view=liste">💌 E-Mail-Liste</a></p>
+        <?php admin_tf_box($pdo, $self); ?>
         <h2>Online-Bezahlung mit Stripe</h2>
         <?php if ($key): ?>
             <div class="card stack">
