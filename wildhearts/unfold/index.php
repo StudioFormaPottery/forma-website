@@ -336,6 +336,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
         <label class="pick wr"><input type="radio" name="wr" value="behalten"><span><b><span class="de">Rücktrittsrecht behalten</span><span class="en">Keep my right of withdrawal</span></b><small><span class="de">bis <?= $wuDe ?>, danach öffnen sich die Workbooks.</span><span class="en">until <?= $wuEn ?>; the workbooks unlock after that.</span></small></span></label>
         <p class="mut" style="margin:.2rem 0 0;font-size:.84rem"><span class="de">Alle Details stehen in den</span><span class="en">All details are in the</span> <a href="/terms/#unfold" target="_blank"><span class="de">Bedingungen</span><span class="en">terms</span></a>.</p>
       </fieldset>
+      <?php require_once dirname(__DIR__) . '/assets/gutschein-feld.inc.php'; echo mv_voucher_field(); ?>
       <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div><button class="btn" type="submit" id="bb"><span class="de">Weiter zur Zahlung</span><span class="en">Continue to payment</span> →</button></div>
       <p class="err" id="be" hidden></p>

@@ -58,6 +58,14 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     header('Content-Type: application/json; charset=utf-8');
     $in = $_POST ?: (json_decode((string)file_get_contents('php://input'), true) ?: []);
     if (!empty($in['website'])) { echo json_encode(['error' => 'Nope.']); exit; }
+    // Gutscheincode prüfen (Vivien, 31.10.2026: Movecia-Gutscheine gelten für alle Programme)
+    if (!empty($in['voucher_check'])) {
+        require_once __DIR__ . '/natal-lib.php';
+        $vr = mv_voucher_lookup($pdo, (string)($in['gutschein'] ?? ''));
+        if (!$vr['ok']) { http_response_code(400); echo json_encode(['error' => $vr['error']]); exit; }
+        echo json_encode(['ok' => true, 'code' => $vr['voucher']['code'], 'nr' => $vr['voucher']['nr'], 'balance' => $vr['balance']]);
+        exit;
+    }
     try {
         echo json_encode(['url' => mv_checkout($pdo, $in)]);
     } catch (Throwable $e) {

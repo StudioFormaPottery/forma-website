@@ -80,6 +80,7 @@ mvl_head('Mindful Movement Method · Online Yoga, Somatic Movement & Breathwork 
           <label class="wro"><input type="radio" name="wr" value="behalten"><span><b><span class="de">Rücktrittsrecht behalten</span><span class="en">Keep my right of withdrawal</span></b><small><span class="de">14 Tage lang, bis dahin ist das Ankommen-Modul offen, danach dein Monat 1.</span><span class="en">For 14 days. Until then the welcome module is open, and after that your month 1.</span></small></span></label>
           <small class="wrn"><span class="de">Alle Details stehen in den</span><span class="en">All details are in the</span> <a href="/terms/#method" target="_blank"><span class="de">Bedingungen</span><span class="en">terms</span></a>.</small>
         </fieldset>
+        <?php require_once dirname(__DIR__) . '/assets/gutschein-feld.inc.php'; echo mv_voucher_field(); ?>
         <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
         <div><button class="btn" type="submit" id="mb"><span class="de">Weiter zur Zahlung</span><span class="en">Continue to payment</span> →</button></div>
         <p class="err" id="me" hidden></p>

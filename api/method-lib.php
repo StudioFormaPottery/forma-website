@@ -312,6 +312,10 @@ function mv_schema(PDO $pdo): void
     if (!in_array('open_from', $sc, true)) $pdo->exec('ALTER TABLE mv_subs ADD COLUMN open_from INTEGER NOT NULL DEFAULT 0');
     // Monat für Monat ab dem eigenen Starttag (Vivien, 25.10.2026): bis zu welchem Monat die Mail schon raus ist
     if (!in_array('month_mailed', $sc, true)) $pdo->exec('ALTER TABLE mv_subs ADD COLUMN month_mailed INTEGER NOT NULL DEFAULT 1');
+    // Movecia-Gutschein beim Buchen (Vivien, 31.10.2026): eingelöster Betrag, eigene Rechnung mit Vermerk
+    if (!in_array('voucher_id', $sc, true)) { $pdo->exec('ALTER TABLE mv_subs ADD COLUMN voucher_id INTEGER NOT NULL DEFAULT 0'); $pdo->exec('ALTER TABLE mv_subs ADD COLUMN voucher_cents INTEGER NOT NULL DEFAULT 0'); }
+    $pc = array_column($pdo->query('PRAGMA table_info(mv_payments)')->fetchAll(), 'name');
+    if (!in_array('note', $pc, true)) $pdo->exec("ALTER TABLE mv_payments ADD COLUMN note TEXT NOT NULL DEFAULT ''");
     // E-Mail zuerst bestätigen (Vivien, 25.10.2026): erst danach Willkommensmail und alle Infos
     $mc = array_column($pdo->query('PRAGMA table_info(mv_members)')->fetchAll(), 'name');
     if (!in_array('email_ok', $mc, true)) {
@@ -910,6 +914,15 @@ function mv_checkout(PDO $pdo, array $in, bool $special = false, string $source 
     }
     $special = $special && $p['g'] > 0 && $p['g'] < $p['cents'];
     $first = $special ? $p['g'] : $p['cents'];
+    // Movecia-Gutschein (Vivien, 31.10.2026): gilt für alle Programme, wird von der ersten Zahlung abgezogen
+    $vrow = null;
+    $vcode = trim((string)($in['gutschein'] ?? ''));
+    if ($vcode !== '' && !$fromRoom) {
+        require_once __DIR__ . '/natal-lib.php';
+        $vr = mv_voucher_lookup($pdo, $vcode);
+        if (!$vr['ok']) throw new RuntimeException($vr['error']);
+        $vrow = $vr['voucher'];
+    }
     $tok = bin2hex(random_bytes(16));
     $pdo->prepare('INSERT INTO mv_subs (kind, plan, email, name, lang, call_lang, amount_cents, first_cents, special, token, consent_digital, consent_live, source, test, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
         ->execute([$p['kind'], $plan, $email, $name, $lang, $p['kind'] === 'unfold' ? $callLang : '', $p['cents'], $first, $special ? 1 : 0, $tok, $digital, $live, $source, forma_stripe_test_mode() ? 1 : 0, date('c')]);
@@ -917,6 +930,25 @@ function mv_checkout(PDO $pdo, array $in, bool $special = false, string $source 
     $site = mm_site();
     $title = $p['kind'] === 'unfold' ? 'Unfold – The Mindful Becoming' : 'Movecia Mindful Movement Method';
     $sub = $p['kind'] === 'method' || $plan === 'u3';
+    $vc = 0;
+    if ($vrow) {
+        // in einer Transaktion reservieren, damit derselbe Restwert nicht zweimal gleichzeitig eingelöst wird
+        $pdo->exec('BEGIN IMMEDIATE');
+        try {
+            $vc = mv_voucher_use($pdo, (int)$vrow['id'], $first, 'mv', $sid);
+            $pdo->prepare('UPDATE mv_subs SET voucher_id = ?, voucher_cents = ? WHERE id = ?')->execute([(int)$vrow['id'], $vc, $sid]);
+            $pdo->exec('COMMIT');
+        } catch (Throwable $e) { try { $pdo->exec('ROLLBACK'); } catch (Throwable $e2) {} error_log('MV Gutschein: ' . $e->getMessage()); throw new RuntimeException($en ? 'The gift card could not be applied. Please try again.' : 'Der Gutschein ließ sich gerade nicht einlösen. Bitte versuch es noch einmal.'); }
+        if ($vc <= 0) { $pdo->prepare("UPDATE mv_subs SET status = 'abgebrochen' WHERE id = ?")->execute([$sid]); throw new RuntimeException($en ? 'This gift card has already been used.' : 'Dieser Gutschein ist schon vollständig eingelöst.'); }
+        // Einmalzahlung ganz mit Gutschein bezahlt: ohne Stripe freischalten
+        if (!$sub && $vc >= $first) {
+            $pdo->prepare("UPDATE mv_subs SET status = 'aktiv', paid_at = ? WHERE id = ? AND status = 'offen'")->execute([date('c'), $sid]);
+            $r = mv_sub($pdo, $sid);
+            mv_voucher_paid($pdo, $r);
+            mv_after_paid($pdo, $r);
+            return $site . '/api/method.php?paid=' . $sid . '&k=' . $tok;
+        }
+    }
     $price = ['currency' => 'eur', 'unit_amount' => $p['cents'], 'product_data' => ['name' => $title . ' · ' . ($en ? $p['en'] : $p['de']), 'description' => 'Movecia – Personal Fitness, Vivien Malonga']];
     if ($sub) $price['recurring'] = $plan === 'm12' ? ['interval' => 'year'] : ['interval' => 'month', 'interval_count' => $plan === 'm3' ? 3 : 1];
     $terms = ($en ? 'Terms and cancellation: ' : 'Bedingungen und Rücktritt: ') . $site . '/terms';
@@ -944,7 +976,13 @@ function mv_checkout(PDO $pdo, array $in, bool $special = false, string $source 
         $params['custom_text']['submit']['message'] = ($en ? 'You won\'t be charged today. The Method opens on ' . mv_date($launch, 'en') . ', and your first payment will be taken then. ' : 'Heute wird nichts abgebucht. Die Method startet am ' . mv_date($launch) . ', dann wird die erste Zahlung eingezogen. ') . $terms;
         $pdo->prepare('UPDATE mv_subs SET bill_start = ? WHERE id = ?')->execute([$launch, $sid]);
     }
-    if ($special) $params['discounts'] = [['coupon' => mv_coupon_once($p['cents'] - $p['g'])]];
+    if ($vc > 0) {
+        // ein einmaliger Rabatt für genau diese Buchung (Gathering-Preis + Gutschein zusammen, Stripe nimmt nur einen)
+        $cp = forma_stripe('POST', '/v1/coupons', ['amount_off' => ($special ? $p['cents'] - $p['g'] : 0) + $vc, 'currency' => 'eur', 'duration' => 'once', 'max_redemptions' => 1,
+            'name' => 'Movecia Gutschein', 'metadata' => ['mv_sub' => (string)$sid]]);
+        $params['discounts'] = [['coupon' => (string)$cp['id']]];
+    }
+    elseif ($special) $params['discounts'] = [['coupon' => mv_coupon_once($p['cents'] - $p['g'])]];
     else $params['allow_promotion_codes'] = 'true';
     try {
         $s = forma_stripe('POST', '/v1/checkout/sessions', $params, null, '2025-09-30.clover');
@@ -979,6 +1017,7 @@ function mv_check_paid(PDO $pdo, array $r): string
         try { forma_stripe('POST', '/v1/subscriptions/' . rawurlencode($r['sub_id']), ['cancel_at' => strtotime('+' . (mv_cfg()['u_n'] - 1) . ' months +10 days')]); }
         catch (Throwable $e) { error_log('MV unfold cancel_at: ' . $e->getMessage()); }
     }
+    mv_voucher_paid($pdo, $r);
     if ($r['sub_id'] === '') {
         // Einmalzahlung: gleich als Zahlung mit Rechnung erfassen
         mv_payment($pdo, $r, 'cs:' . $r['stripe_session'], (int)($s['amount_total'] ?? $r['first_cents']), time(), 0);
@@ -989,12 +1028,23 @@ function mv_check_paid(PDO $pdo, array $r): string
     return 'aktiv';
 }
 
+/** Gutschein-Anteil nach der Zahlung: Einlösung festschreiben und eigene Rechnung (Mehrzweckgutschein, USt. bei Einlösung). */
+function mv_voucher_paid(PDO $pdo, array $r): void
+{
+    if ((int)($r['voucher_cents'] ?? 0) <= 0) return;
+    require_once __DIR__ . '/natal-lib.php';
+    mv_voucher_finalize($pdo, (int)$r['id'], 'mv');
+    $v = $pdo->query('SELECT nr FROM mm_vouchers WHERE id = ' . (int)$r['voucher_id'])->fetch();
+    mv_payment($pdo, $r, 'gs:' . $r['id'], (int)$r['voucher_cents'], max(time(), mv_open_at($r)), 0, 'Der Betrag ist bereits bezahlt: eingelöst mit dem Movecia-Gutschein Nr. ' . ($v['nr'] ?? '') . '.');
+}
+
 /** Zahlung erfassen und Rechnung ausstellen (je Zahlung einmal). */
-function mv_payment(PDO $pdo, array $r, string $ref, int $cents, int $start, int $end): void
+function mv_payment(PDO $pdo, array $r, string $ref, int $cents, int $start, int $end, string $note = ''): void
 {
     if ($cents <= 0) return;
-    $ins = $pdo->prepare('INSERT OR IGNORE INTO mv_payments (sub_row, ref, cents, period_start, period_end, paid_at) VALUES (?,?,?,?,?,?)');
-    $ins->execute([$r['id'], $ref, $cents, $start, $end, date('c')]);
+    // note: eigener Zahlungsvermerk (z. B. mit Gutschein bzw. Guthaben bezahlt, Vivien 31.10.2026)
+    $ins = $pdo->prepare('INSERT OR IGNORE INTO mv_payments (sub_row, ref, cents, period_start, period_end, paid_at, note) VALUES (?,?,?,?,?,?,?)');
+    $ins->execute([$r['id'], $ref, $cents, $start, $end, date('c'), $note]);
     if ($ins->rowCount() !== 1) return;
     require_once __DIR__ . '/invoices.php';
     // Stripe-Testmodus: Rechnung nur zeigen, keine Nummer verbrauchen
@@ -1169,7 +1219,7 @@ function mv_notify_viv(PDO $pdo, array $r): void
     $open = mv_open_at($r);
     $pre = $open > time();
     $pfx = (int)$r['test'] === 1 ? '[TEST] ' : '';
-    $v = 'Hallo Viv,' . "\n\n" . ($r['name'] ?: 'Jemand') . ' (' . $r['email'] . ') hat gerade ' . $title . ' gebucht: ' . $p['de'] . ', ' . mv_eur((int)$r['first_cents']) . ((int)$r['special'] ? ' (Gathering-Preis)' : '')
+    $v = 'Hallo Viv,' . "\n\n" . ($r['name'] ?: 'Jemand') . ' (' . $r['email'] . ') hat gerade ' . $title . ' gebucht: ' . $p['de'] . ', ' . mv_eur((int)$r['first_cents']) . ((int)$r['special'] ? ' (Gathering-Preis)' : '') . ((int)($r['voucher_cents'] ?? 0) > 0 ? ', davon ' . mv_eur((int)$r['voucher_cents']) . ' mit Movecia-Gutschein' : '')
         . ((int)$r['bill_start'] > time() ? ', Abbuchung ab ' . date('d.m.Y', (int)$r['bill_start']) : '') . ($isU ? ', Call auf ' . ($r['call_lang'] === 'en' ? 'Englisch' : 'Deutsch') . '. Noch ' . mv_unfold_free($pdo) . ' von ' . $c['u_seats'] . ' Plätzen frei' : '')
         . ($pre ? '. Zugang öffnet sich automatisch am ' . date('d.m.Y', $open) . ' (dann geht die Freischalt-Mail raus), Rücktritt möglich bis ' . date('d.m.Y', mv_withdraw_until($r)) : '') . ".\n\nAlle Mitglieder: " . forma_site_url() . "/verwaltung/?view=method\n";
     mm_mail(MM_FROM_EMAIL, $pfx . 'Neue Buchung: ' . ($isU ? 'Unfold' : 'Method') . ' · ' . ($r['name'] ?: $r['email']), $v, mm_mail_html('Neue Buchung', nl2br(forma_h($v)), 'de'));
@@ -1271,7 +1321,7 @@ function mv_invoice_source(PDO $pdo, string $kind, int $payId): ?array
     return ['name' => $p['name'], 'email' => $p['email'], 'session' => '', 'address' => $p['address'], 'country' => $p['country'] ?: 'AT', 'service' => $service,
         'items' => [['text' => $text, 'detail' => $detail, 'qty' => 1, 'unit' => (int)$p['cents']]],
         'gross' => (int)$p['cents'], 'paid' => $p['paid_at'], 'type' => 'Movecia',
-        'pay_note' => 'Der Betrag wurde am ' . date('d.m.Y', strtotime((string)$p['paid_at'])) . ' online bezahlt (Kartenzahlung über Stripe, gemeinsames Konto FORMA & Movecia). Buchungsvermerk: Leistung von Movecia – Personal Fitness.'];
+        'pay_note' => (string)($p['note'] ?? '') !== '' ? (string)$p['note'] : 'Der Betrag wurde am ' . date('d.m.Y', strtotime((string)$p['paid_at'])) . ' online bezahlt (Kartenzahlung über Stripe, gemeinsames Konto FORMA & Movecia). Buchungsvermerk: Leistung von Movecia – Personal Fitness.'];
 }
 
 // --- Monat für Monat ab dem eigenen Starttag -------------------------------------------------------

@@ -103,6 +103,17 @@ if ($action === 'mm_natal_wd') {
     $w = $r['ok'] ? $r['wd'] : null;
     go($nBack . '&k=' . $oid . '#k' . $oid, $r['ok'] ? 'Rücktritt abgewickelt: ' . forma_euro((int)$w['back_cents']) . ($w['choice'] === 'gutschein' ? ' als Gutschein (' . implode(', ', array_column($r['vouchers'], 'nr')) . ')' : ' zurück') . '. Sie hat die Bestätigung bekommen' . ($w['status'] === 'fehler' ? '. ⚠ Die Erstattung über Stripe ging nicht, bitte unten erneut versuchen.' : '.') : $r['error']);
 }
+// Offene Einheiten umwandeln (Vivien, 31.10.2026): in The Method (Rest als Wertgutschein) oder ganz in einen Wertgutschein
+if ($action === 'mm_natal_convert') {
+    $oid = (int)($_POST['oid'] ?? 0);
+    $r = natal_convert($pdo, $oid, (string)($_POST['target'] ?? ''), (int)($_POST['design'] ?? 1));
+    go($nBack . '&k=' . $oid . '#k' . $oid, $r['ok'] ? 'Umgewandelt: ' . forma_euro($r['back']) . ' → ' . $r['text'] . '. Sie hat eine Mail mit allem bekommen.' : $r['error']);
+}
+// Gutschein von Hand einlösen (z. B. Personal Training, das ihr direkt ausmacht)
+if ($action === 'mm_mv_voucher_hand') {
+    $r = mv_voucher_redeem_hand($pdo, (int)($_POST['vid'] ?? 0), (int)round((float)str_replace(',', '.', (string)($_POST['eur'] ?? '0')) * 100), (string)($_POST['what'] ?? ''));
+    go($nBack . '#gutscheine', $r['ok'] ? forma_euro($r['used']) . ' eingelöst, Rechnung ist erstellt. Rest auf dem Gutschein: ' . forma_euro($r['rest']) . '.' : $r['error']);
+}
 if ($action === 'mm_natal_wd_retry') {
     $w = natal_wd_row($pdo, (int)($_POST['oid'] ?? 0));
     if ($w && $w['status'] === 'fehler') $w = natal_wd_refund($pdo, $w);
@@ -232,7 +243,7 @@ if ($view === 'natal' && isset($_GET['mailvorschau'])) {
 }
 
 if ($view === 'natal') {
-    $orders = $pdo->query("SELECT * FROM mm_natal_orders WHERE status IN ('bezahlt','offen','widerrufen') ORDER BY CASE status WHEN 'bezahlt' THEN 0 WHEN 'offen' THEN 1 ELSE 2 END, id DESC LIMIT 80")->fetchAll();
+    $orders = $pdo->query("SELECT * FROM mm_natal_orders WHERE status IN ('bezahlt','offen','widerrufen','umgewandelt') ORDER BY CASE status WHEN 'bezahlt' THEN 0 WHEN 'offen' THEN 1 ELSE 2 END, id DESC LIMIT 80")->fetchAll();
     $byId = [];
     foreach ($orders as $o) $byId[(int)$o['id']] = $o;
     $reqs = $pdo->query("SELECT s.*, o.name, o.title, o.phone, o.email, o.due_date, o.units FROM mm_natal_sessions s JOIN mm_natal_orders o ON o.id = s.order_id WHERE s.status = 'angefragt' ORDER BY s.date, s.id")->fetchAll();
@@ -394,7 +405,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
         <?php foreach ($orders as $o): $ss = natal_sessions($pdo, (int)$o['id']); $used = natal_used($pdo, (int)$o['id']); $done = count(array_filter($ss, fn($s) => in_array($s['status'], ['bestaetigt', 'erledigt'], true))); ?>
             <details class="card" id="k<?= (int)$o['id'] ?>" <?= $openK === (int)$o['id'] ? 'open' : '' ?>>
                 <summary style="cursor:pointer;list-style:none"><div class="booking-head"><span><strong><?= forma_h($o['name']) ?></strong> <span class="muted small">· <?= forma_h($o['title']) ?></span><?php if (!empty($o['is_test'])): ?> <span class="chip" style="background:#EADFDE;color:#6B5658">TEST</span><?php endif; ?></span>
-                    <?php $hd0 = natal_health_get($o); if ($hd0 && array_filter(natal_health_flags($hd0), fn($x) => $x[0] === 'rot')): ?><span class="chip" style="background:#F6E7E4;color:#A0463A">⚠ Freigabe</span> <?php endif; ?><?php if ($o['status'] === 'widerrufen'): ?><span class="chip" style="background:#F6E7E4;color:#A0463A">zurückgetreten</span> <?php elseif ($o['status'] === 'bezahlt' && empty($o['confirm_at'])): ?><span class="chip wait" title="Start-Häkchen aus der Mail noch nicht gesetzt (beim Buchen hat sie es schon bestätigt)">Start offen</span> <?php endif; ?><span class="chip <?= $o['status'] === 'bezahlt' ? 'ok' : 'wait' ?>"><?= $o['status'] === 'bezahlt' ? 'bezahlt ' . forma_h(forma_euro((int)$o['amount_cents'])) : 'Zahlung offen' ?></span></div>
+                    <?php $hd0 = natal_health_get($o); if ($hd0 && array_filter(natal_health_flags($hd0), fn($x) => $x[0] === 'rot')): ?><span class="chip" style="background:#F6E7E4;color:#A0463A">⚠ Freigabe</span> <?php endif; ?><?php if ($o['status'] === 'widerrufen'): ?><span class="chip" style="background:#F6E7E4;color:#A0463A">zurückgetreten</span> <?php elseif ($o['status'] === 'umgewandelt'): ?><span class="chip" style="background:#E4DCD1;color:#4A3040">umgewandelt</span> <?php elseif ($o['status'] === 'bezahlt' && empty($o['confirm_at'])): ?><span class="chip wait" title="Start-Häkchen aus der Mail noch nicht gesetzt (beim Buchen hat sie es schon bestätigt)">Start offen</span> <?php endif; ?><span class="chip <?= $o['status'] === 'bezahlt' ? 'ok' : 'wait' ?>"><?= $o['status'] === 'bezahlt' ? 'bezahlt ' . forma_h(forma_euro((int)$o['amount_cents'])) : 'Zahlung offen' ?></span></div>
                     <?php if ($o['status'] === 'bezahlt'): ?><p class="small muted" style="margin:6px 0 4px"><?= $done ?> bestätigt · <?= $used - $done ?> angefragt · <?= (int)$o['units'] - $used ?> noch frei von <?= (int)$o['units'] ?></p><div class="bar"><i style="width:<?= (int)round($used / max(1, (int)$o['units']) * 100) ?>%"></i></div><?php endif; ?></summary>
                 <div class="stack" style="margin-top:12px">
                     <p class="small"><a href="mailto:<?= forma_h($o['email']) ?>"><?= forma_h($o['email']) ?></a><?php if ($o['phone'] !== ''): ?> · <a href="tel:<?= forma_h($o['phone']) ?>"><?= forma_h($o['phone']) ?></a> · <a href="<?= forma_h(natal_wa((string)$o['phone'])) ?>" target="_blank" rel="noopener">WhatsApp</a><?php endif; ?><br>
@@ -434,7 +445,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
                         <?php endif; ?>
                     <?php endif; ?>
                     <?php $wdr = natal_wd_row($pdo, (int)$o['id']); if ($wdr): $wvs = $pdo->query('SELECT * FROM mm_vouchers WHERE wd_id = ' . (int)$wdr['id'])->fetchAll(); ?>
-                        <div class="small" style="background:#F6E7E4;border-radius:12px;padding:8px 12px"><strong>Rücktritt am <?= forma_h(date('d. m. Y, H:i', strtotime((string)$wdr['created_at']))) ?></strong> (<?= $wdr['source'] === 'verwaltung' ? 'von dir' : 'von ihr im Mitgliederbereich' ?>)<br>
+                        <div class="small" style="background:<?= $wdr['choice'] === 'umwandlung' ? '#EFE8E0' : '#F6E7E4' ?>;border-radius:12px;padding:8px 12px"><strong><?= $wdr['choice'] === 'umwandlung' ? '🔄 Umgewandelt' : 'Rücktritt' ?> am <?= forma_h(date('d. m. Y, H:i', strtotime((string)$wdr['created_at']))) ?></strong> (<?= $wdr['source'] === 'verwaltung' ? 'von dir' : 'von ihr im Mitgliederbereich' ?>)<?= $wdr['choice'] === 'umwandlung' ? ': ' . forma_h(preg_replace('/^umgewandelt in /', '', (string)$wdr['note'])) : '' ?><br>
                             Gesamt <?= forma_h(forma_euro((int)$wdr['total_cents'])) ?> · stattgefunden <?= forma_h($wdr['used_text']) ?> · zurück <?= forma_h(forma_euro((int)$wdr['back_cents'])) ?><br>
                             <?php if ((int)$wdr['refund_cents'] > 0): ?>Erstattung <?= forma_h(forma_euro((int)$wdr['refund_cents'])) ?>: <?= $wdr['status'] === 'erledigt' ? '✓ ' . ($wdr['refund_id'] !== '' ? 'über Stripe' : forma_h($wdr['note'])) : '<b style="color:#A0463A">⚠ ' . forma_h($wdr['note']) . '</b>' ?><br><?php endif; ?>
                             <?php foreach ($wvs as $gv): ?>Gutschein <?= forma_h($gv['nr']) ?> · <?= forma_h(forma_euro((int)$gv['amount_cents'])) ?> · <a href="<?= forma_h(mv_voucher_pdf_link($gv)) ?>" target="_blank" rel="noopener">PDF</a><br><?php endforeach; ?>
@@ -449,6 +460,16 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
                                 <div class="wdays"><label class="check"><input type="radio" name="count" value="1" checked> 1 Gutschein</label><label class="check"><input type="radio" name="count" value="2"> 2 Gutscheine (50/50)</label>
                                     <?php foreach (MV_VOUCHER_DESIGNS as $dn => $dl): ?><label class="check"><input type="radio" name="design" value="<?= $dn ?>"<?= $dn === 1 ? ' checked' : '' ?>> Design <?= forma_h($dl) ?></label><?php endforeach; ?></div>
                                 <button class="btn btn-ghost btn-sm" type="submit">Rücktritt abwickeln</button></form></details>
+                        <?php $cv = natal_convert_calc($pdo, $o); if ($cv['back'] > 0): ?>
+                        <details class="more"><summary>🔄 Offene Einheiten umwandeln</summary>
+                            <form method="post" class="stack" style="margin-top:8px" onsubmit="return confirm('Jetzt verbindlich umwandeln? Offene Termine werden abgesagt und sie bekommt eine Mail mit allem.')"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_convert"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>">
+                                <p class="small">Zum Beispiel, wenn das Baby früher kam und sie lieber mit The Method weitermacht. Schon gemacht: <?= forma_h($cv['used_text']) ?> · <b>offen: <?= forma_h(forma_euro($cv['back'])) ?></b> (Paketpreis pro Einheit)</p>
+                                <label class="check"><input type="radio" name="target" value="method"<?= $cv['months'] > 0 ? ' checked' : ' disabled' ?>> <span><b>The Method</b>: <?= $cv['months'] > 0 ? $cv['months'] . ' ' . ($cv['months'] === 1 ? 'Monat' : 'Monate') . ' à ' . forma_h(forma_euro($cv['month'])) . ($cv['rest'] > 0 ? ' + Gutschein über ' . forma_h(forma_euro($cv['rest'])) : '') : 'reicht nicht für einen Monat (' . forma_h(forma_euro($cv['month'])) . ')' ?></span></label>
+                                <label class="check"><input type="radio" name="target" value="gutschein"<?= $cv['months'] > 0 ? '' : ' checked' ?>> <span><b>Wertgutschein</b> über <?= forma_h(forma_euro($cv['back'])) ?>, einlösbar für alles bei Movecia</span></label>
+                                <div class="wdays"><?php foreach (MV_VOUCHER_DESIGNS as $dn => $dl): ?><label class="check"><input type="radio" name="design" value="<?= $dn ?>"<?= $dn === 1 ? ' checked' : '' ?>> Gutschein-Design <?= forma_h($dl) ?></label><?php endforeach; ?></div>
+                                <p class="small muted">Es läuft alles automatisch: Termine absagen, Zugang zur Method freischalten (ohne Abo, nichts wird abgebucht), Gutschein-PDF, Mail an sie, Stornorechnung und neue Rechnung.</p>
+                                <button class="btn btn-sm" type="submit">Umwandeln</button></form></details>
+                        <?php endif; ?>
                     <?php endif; ?>
                     <p class="small">Ihre persönliche Seite: <span class="sel"><?= forma_h(natal_link($o)) ?></span> <button type="button" class="link small" data-copy="<?= forma_h(natal_link($o)) ?>">kopieren</button></p>
                     <?php if ($o['status'] === 'offen'): ?>
@@ -468,12 +489,18 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
 
         <?php $mvv = $pdo->query('SELECT * FROM mm_vouchers ORDER BY id DESC LIMIT 60')->fetchAll(); ?>
         <h2 id="gutscheine">Gutscheine</h2>
-        <?php if (!$mvv): ?><p class="card muted small">Noch keine Movecia-Gutscheine. Sie entstehen automatisch, wenn eine Kundin beim Rücktritt „Als Gutschein“ wählt (oder du es in der Verwaltung so abwickelst). Eingelöst werden sie auf der Buchungsseite mit dem Code, der Restwert bleibt.</p><?php else: ?>
+        <?php if (!$mvv): ?><p class="card muted small">Noch keine Movecia-Gutscheine. Sie entstehen beim Rücktritt („Als Gutschein“) oder wenn du offene Einheiten umwandelst. Sie gelten für alles bei Movecia: Method, Unfold und Prä-/Postnatal lösen sie online beim Buchen ein, alles andere löst du hier von Hand ein. Der Restwert bleibt.</p><?php else: ?>
         <div class="card">
-            <?php foreach ($mvv as $gv): $bal = mv_voucher_balance($pdo, $gv); ?>
-            <div class="ln"><span><strong><?= forma_h($gv['nr']) ?></strong> · <?= forma_h(forma_euro((int)$gv['amount_cents'])) ?><?= $gv['status'] === 'aktiv' && $bal < (int)$gv['amount_cents'] ? ' · Rest ' . forma_h(forma_euro($bal)) : '' ?><br>
-                <span class="small muted"><?= forma_h($gv['note']) ?> · <?= forma_h(date('d. m. Y', strtotime((string)$gv['created_at']))) ?> · Code <?= forma_h($gv['code']) ?></span></span>
-                <span class="acts small"><span class="chip<?= $gv['status'] === 'aktiv' ? ' ok' : '' ?>"><?= $gv['status'] === 'aktiv' ? 'gültig' : ($gv['status'] === 'eingeloest' ? 'eingelöst' : 'Test') ?></span><a href="<?= forma_h(mv_voucher_pdf_link($gv)) ?>" target="_blank" rel="noopener">PDF</a><a href="<?= forma_h($self) ?>?view=natal&amp;k=<?= (int)$gv['order_id'] ?>#k<?= (int)$gv['order_id'] ?>">Buchung</a></span></div>
+            <?php foreach ($mvv as $gv): $bal = mv_voucher_balance($pdo, $gv); $gu = $pdo->query("SELECT * FROM mm_voucher_uses WHERE voucher_id = " . (int)$gv['id'] . " AND status IN ('reserviert','eingeloest') ORDER BY id")->fetchAll(); ?>
+            <div class="ln" style="flex-wrap:wrap"><span><strong><?= forma_h($gv['nr']) ?></strong> · <?= forma_h(forma_euro((int)$gv['amount_cents'])) ?><?= $gv['status'] === 'aktiv' && $bal < (int)$gv['amount_cents'] ? ' · Rest ' . forma_h(forma_euro($bal)) : '' ?> <span class="chip"><?= forma_h(MV_VOUCHER_ORIGINS[$gv['origin']] ?? $gv['origin']) ?></span><br>
+                <span class="small muted"><?= forma_h($gv['note']) ?> · <?= forma_h(date('d. m. Y', strtotime((string)$gv['created_at']))) ?> · Code <?= forma_h($gv['code']) ?></span>
+                <?php foreach ($gu as $u): ?><br><span class="small">↳ <?= forma_h(forma_euro((int)$u['cents'])) ?> <?= $u['status'] === 'reserviert' ? 'reserviert' : 'eingelöst' ?> am <?= forma_h(date('d. m. Y', strtotime((string)$u['created_at']))) ?>: <?= forma_h($u['kind'] === 'hand' ? $u['what'] . ' (von dir)' : ($u['kind'] === 'mv' ? 'Method/Unfold, Buchung #' . $u['order_id'] : 'Prä-/Postnatal, Buchung #' . $u['order_id'])) ?></span><?php endforeach; ?></span>
+                <span class="acts small"><span class="chip<?= $gv['status'] === 'aktiv' ? ' ok' : '' ?>"><?= $gv['status'] === 'aktiv' ? 'gültig' : ($gv['status'] === 'eingeloest' ? 'eingelöst' : 'Test') ?></span><a href="<?= forma_h(mv_voucher_pdf_link($gv)) ?>" target="_blank" rel="noopener">PDF</a><?php if ((int)$gv['order_id']): ?><a href="<?= forma_h($self) ?>?view=natal&amp;k=<?= (int)$gv['order_id'] ?>#k<?= (int)$gv['order_id'] ?>">Buchung</a><?php endif; ?></span>
+                <?php if ($gv['status'] === 'aktiv' && $bal > 0): ?><details class="more" style="flex-basis:100%"><summary>Von Hand einlösen</summary>
+                    <form method="post" class="stack" style="margin-top:8px"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_voucher_hand"><input type="hidden" name="vid" value="<?= (int)$gv['id'] ?>">
+                        <p class="small muted">Für alles, was ihr direkt ausmacht, z. B. Personal Training. Es entsteht automatisch eine Rechnung über den eingelösten Betrag. Online (Method, Unfold, Prä-/Postnatal) löst sie den Code selbst beim Buchen ein.</p>
+                        <div style="display:grid;grid-template-columns:120px 1fr;gap:8px"><input name="eur" inputmode="decimal" value="<?= forma_h(number_format($bal / 100, 2, ',', '')) ?>" aria-label="Betrag in Euro"><input name="what" maxlength="140" placeholder="wofür, z. B. Personal Training 75 Min. am 12.11." required></div>
+                        <button class="btn btn-sm" type="submit">Einlösen</button></form></details><?php endif; ?></div>
             <?php endforeach; ?>
         </div><?php endif; ?>
 

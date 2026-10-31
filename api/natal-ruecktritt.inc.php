@@ -13,7 +13,7 @@
 declare(strict_types=1);
 
 const NATAL_WD_DAYS = 14;
-const MV_VOUCHER_TERMS = 'Wertgutschein ohne Ablaufdatum, einlösbar für alle Pakete und Einzelstunden des Prä- & Postnatal Trainings bei Movecia, im Studio oder online. Einfach bei der Buchung auf moveciamovement.com/natal den Gutscheincode eingeben. Ein Restwert bleibt erhalten. Keine Barauszahlung. Wer den Code kennt, kann ihn einlösen, bitte gut aufbewahren.';
+const MV_VOUCHER_TERMS = 'Wertgutschein ohne Ablaufdatum, einlösbar für alle Angebote bei Movecia: The Mindful Movement Method, Unfold, Prä- & Postnatal Training und Personal Training, im Studio oder online. Einfach beim Buchen auf moveciamovement.com den Gutscheincode eingeben oder mir schreiben. Ein Restwert bleibt erhalten. Keine Barauszahlung. Wer den Code kennt, kann ihn einlösen, bitte gut aufbewahren.';
 const MV_VOUCHER_DESIGNS = [1 => 'Bogen', 2 => 'Zart'];
 
 function natal_wd_schema(PDO $pdo): void
@@ -70,6 +70,10 @@ function natal_wd_schema(PDO $pdo): void
         status TEXT NOT NULL DEFAULT \'reserviert\',
         created_at TEXT NOT NULL
     )');
+    // Seit 31.10.2026 gilt der Gutschein für alles: kind = natal (mm_natal_orders), mv (mv_subs: Method/Unfold), hand (von Hand in der Verwaltung)
+    $uc = array_column($pdo->query('PRAGMA table_info(mm_voucher_uses)')->fetchAll(), 'name');
+    if ($uc && !in_array('kind', $uc, true)) $pdo->exec("ALTER TABLE mm_voucher_uses ADD COLUMN kind TEXT NOT NULL DEFAULT 'natal'");
+    if ($uc && !in_array('what', $uc, true)) $pdo->exec("ALTER TABLE mm_voucher_uses ADD COLUMN what TEXT NOT NULL DEFAULT ''");
     $pdo->exec('CREATE TABLE IF NOT EXISTS mm_voucher_tries (ip_hash TEXT NOT NULL, at INTEGER NOT NULL)');
 }
 
@@ -320,16 +324,17 @@ function mv_voucher_norm(string $code): string
 }
 
 /** Legt einen Gutschein an (innerhalb einer Transaktion aufrufen). Nummer MV-JJJJ-001 fortlaufend. */
-function mv_voucher_create(PDO $pdo, int $cents, int $design, array $o, int $wid, string $part): array
+function mv_voucher_create(PDO $pdo, int $cents, int $design, array $o, int $wid, string $part, string $origin = 'ruecktritt', string $note = ''): array
 {
     natal_wd_schema($pdo);
     $year = date('Y');
     $n = (int)$pdo->query("SELECT COUNT(*) FROM mm_vouchers WHERE nr LIKE 'MV-$year-%'")->fetchColumn() + 1;
     $nr = sprintf('MV-%s-%03d', $year, $n);
     do { $code = mv_voucher_code(); $q = $pdo->prepare('SELECT COUNT(*) FROM mm_vouchers WHERE code = ?'); $q->execute([$code]); } while ((int)$q->fetchColumn());
-    $note = 'aus Rücktritt Buchung #' . (int)$o['id'] . ' (' . $o['title'] . ', ' . $o['name'] . ')' . ($part !== '' ? ', Teil ' . $part : '') . ((int)($o['is_test'] ?? 0) ? ' · TEST' : '');
+    if ($note === '') $note = 'aus Rücktritt Buchung #' . (int)$o['id'] . ' (' . $o['title'] . ', ' . $o['name'] . ')' . ($part !== '' ? ', Teil ' . $part : '');
+    $note .= (int)($o['is_test'] ?? 0) ? ' · TEST' : '';
     $pdo->prepare('INSERT INTO mm_vouchers (nr, code, amount_cents, design, origin, order_id, wd_id, part, name, email, token, status, note, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
-        ->execute([$nr, $code, $cents, $design, 'ruecktritt', $o['id'], $wid, $part, $o['name'], $o['email'], bin2hex(random_bytes(16)), (int)($o['is_test'] ?? 0) ? 'test' : 'aktiv', $note, date('c')]);
+        ->execute([$nr, $code, $cents, $design, $origin, $o['id'], $wid, $part, $o['name'], $o['email'], bin2hex(random_bytes(16)), (int)($o['is_test'] ?? 0) ? 'test' : 'aktiv', $note, date('c')]);
     $q = $pdo->prepare('SELECT * FROM mm_vouchers WHERE id = ?');
     $q->execute([(int)$pdo->lastInsertId()]);
     return $q->fetch();
@@ -376,8 +381,11 @@ function mv_voucher_lookup(PDO $pdo, string $code): array
 function mv_voucher_sweep(PDO $pdo): void
 {
     natal_wd_schema($pdo);
-    foreach ($pdo->query("SELECT u.*, o.status AS ost, o.stripe_session AS osess FROM mm_voucher_uses u LEFT JOIN mm_natal_orders o ON o.id = u.order_id WHERE u.status = 'reserviert'")->fetchAll() as $u) {
-        if (in_array($u['ost'], ['bezahlt', 'widerrufen'], true)) mv_voucher_finalize($pdo, (int)$u['order_id']);
+    $mv = (bool)$pdo->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'mv_subs'")->fetchColumn();
+    $sql = "SELECT u.*, o.status AS ost, o.stripe_session AS osess FROM mm_voucher_uses u LEFT JOIN mm_natal_orders o ON o.id = u.order_id WHERE u.status = 'reserviert' AND u.kind = 'natal'";
+    if ($mv) $sql .= " UNION ALL SELECT u.*, CASE m.status WHEN 'aktiv' THEN 'bezahlt' WHEN 'beendet' THEN 'bezahlt' ELSE m.status END AS ost, m.stripe_session AS osess FROM mm_voucher_uses u LEFT JOIN mv_subs m ON m.id = u.order_id WHERE u.status = 'reserviert' AND u.kind = 'mv'";
+    foreach ($pdo->query($sql)->fetchAll() as $u) {
+        if (in_array($u['ost'], ['bezahlt', 'widerrufen'], true)) mv_voucher_finalize($pdo, (int)$u['order_id'], (string)$u['kind']);
         // Sicherheit (31.10.2026): eine noch offene Bestellung erst nach 2 Tagen freigeben (Stripe-Sitzungen laufen spätestens nach 24 Std. ab),
         // sonst wäre der Gutscheinwert nach einem kurzen Stripe-Ausfall doppelt einlösbar
         elseif ($u['ost'] === null || $u['ost'] === 'abgebrochen' || (($u['ost'] !== 'offen' || (string)$u['osess'] === '') && strtotime((string)$u['created_at']) < time() - 40 * 60) || strtotime((string)$u['created_at']) < time() - 2 * 86400)
@@ -386,12 +394,12 @@ function mv_voucher_sweep(PDO $pdo): void
 }
 
 /** Nach der Zahlung: Reservierung wird zur Einlösung, voll eingelöste Gutscheine bekommen den Status „eingelöst“. */
-function mv_voucher_finalize(PDO $pdo, int $oid): void
+function mv_voucher_finalize(PDO $pdo, int $oid, string $kind = 'natal'): void
 {
     natal_wd_schema($pdo);
     // auch „frei“: falls die Zahlung erst nach Ablauf der Reservierung bestätigt wurde
-    $q = $pdo->prepare("SELECT * FROM mm_voucher_uses WHERE order_id = ? AND status IN ('reserviert','frei')");
-    $q->execute([$oid]);
+    $q = $pdo->prepare("SELECT * FROM mm_voucher_uses WHERE order_id = ? AND kind = ? AND status IN ('reserviert','frei')");
+    $q->execute([$oid, $kind]);
     foreach ($q->fetchAll() as $u) {
         $pdo->prepare("UPDATE mm_voucher_uses SET status = 'eingeloest' WHERE id = ?")->execute([$u['id']]);
         $v = $pdo->query('SELECT * FROM mm_vouchers WHERE id = ' . (int)$u['voucher_id'])->fetch();
@@ -449,7 +457,7 @@ function mv_voucher_pdf(array $v): string
     $pdf->SetTextColor(...$plum); $pdf->SetFont('Cormorant', '', 58);
     $pdf->SetXY($x, $y + 26); $pdf->Cell($w, 24, $t((int)$v['amount_cents'] < 0 ? 'dein Betrag' : forma_euro((int)$v['amount_cents'])), 0, 0, 'C'); // < 0 nur für die Vorschaubilder
     $pdf->SetTextColor(...$soft); $pdf->SetFont('Inter', '', 10.5);
-    $pdf->SetXY($x + 10, $y + 55); $pdf->MultiCell($w - 20, 5.6, $t('für das Prä- & Postnatal Training bei Movecia, 1:1 im Studio in Mathon oder online'), 0, 'C');
+    $pdf->SetXY($x + 10, $y + 55); $pdf->MultiCell($w - 20, 5.6, $t('für alles bei Movecia: The Method, Unfold, Prä- & Postnatal oder Personal Training, im Studio in Mathon oder online'), 0, 'C');
     // Code-Feld
     $cy = $y + 78;
     $pdf->SetDrawColor(...$plum); $pdf->SetLineWidth(.3);
@@ -458,7 +466,163 @@ function mv_voucher_pdf(array $v): string
     $pdf->SetFont('Inter', 'B', 13.5); $pdf->SetTextColor(...$plum);
     $pdf->Cell($w - 48, 10, $t((string)$v['code']), 'TB', 0, 'C');
     $pdf->SetFont('Inter', '', 7.6); $pdf->SetTextColor(...$soft);
-    $pdf->SetXY($x + 8, $cy + 21); $pdf->MultiCell($w - 16, 4, $t('Einlösen: auf moveciamovement.com/natal bei der Buchung den Code eingeben. Ohne Ablaufdatum, Restwert bleibt erhalten, keine Barauszahlung.'), 0, 'C');
+    $pdf->SetXY($x + 8, $cy + 21); $pdf->MultiCell($w - 16, 4, $t('Einlösen: auf moveciamovement.com beim Buchen den Code eingeben oder einfach Vivien schreiben. Ohne Ablaufdatum, Restwert bleibt erhalten, keine Barauszahlung.'), 0, 'C');
     $pdf->SetXY($x, $cy + 33); $pdf->Cell($w, 4, $t('Nr. ' . $v['nr'] . ' · ausgestellt am ' . date('d.m.Y', strtotime((string)$v['created_at'])) . ' · Vivien Malonga, Movecia'), 0, 0, 'C');
     return $pdf->Output('S');
+}
+
+// --- 4. Gutschein für alles, von Hand einlösen, offene Einheiten umwandeln (Vivien, 31.10.2026) ---------------
+// „Es ist einfach ein Wertgutschein, der auf alle Programme einlösbar ist.“ Woher er kommt, steht immer in origin/note,
+// jede Einlösung in mm_voucher_uses (kind natal | mv | hand), damit nie doppelt ausgezahlt wird.
+
+const MV_VOUCHER_ORIGINS = ['ruecktritt' => 'Rücktritt', 'umwandlung' => 'Umwandlung', 'kauf' => 'gekauft', 'hand' => 'von dir ausgestellt'];
+
+/** Reserviert (bzw. löst ein) einen Teil eines Gutscheins. In einer Transaktion aufrufen. Gibt den tatsächlich genutzten Betrag zurück. */
+function mv_voucher_use(PDO $pdo, int $vid, int $want, string $kind, int $oid, string $status = 'reserviert', string $what = ''): int
+{
+    $v = $pdo->query('SELECT * FROM mm_vouchers WHERE id = ' . $vid)->fetch();
+    if (!$v || $v['status'] !== 'aktiv') return 0;
+    $c = min(mv_voucher_balance($pdo, $v), max(0, $want));
+    if ($c <= 0) return 0;
+    $pdo->prepare('INSERT INTO mm_voucher_uses (voucher_id, order_id, cents, status, created_at, kind, what) VALUES (?,?,?,?,?,?,?)')->execute([$vid, $oid, $c, $status, date('c'), $kind, $what]);
+    if ($status === 'eingeloest' && mv_voucher_balance($pdo, $v) <= 0) $pdo->prepare("UPDATE mm_vouchers SET status = 'eingeloest', redeemed_at = ? WHERE id = ?")->execute([date('c'), $vid]);
+    return $c;
+}
+
+/** Von Hand einlösen (z. B. Personal Training, das sie direkt mit ihr ausmacht). Mit Rechnung über den eingelösten Betrag. */
+function mv_voucher_redeem_hand(PDO $pdo, int $vid, int $cents, string $what): array
+{
+    natal_wd_schema($pdo);
+    $what = forma_clean($what, 140);
+    if ($what === '') return ['ok' => false, 'error' => 'Bitte schreib kurz dazu, wofür sie den Gutschein einlöst.'];
+    $pdo->exec('BEGIN IMMEDIATE');
+    try {
+        $used = mv_voucher_use($pdo, $vid, $cents, 'hand', 0, 'eingeloest', $what);
+        $uid = (int)$pdo->lastInsertId();
+        $pdo->exec('COMMIT');
+    } catch (Throwable $e) { try { $pdo->exec('ROLLBACK'); } catch (Throwable $e2) {} error_log('MV Gutschein von Hand: ' . $e->getMessage()); return ['ok' => false, 'error' => 'Das hat gerade nicht geklappt.']; }
+    if ($used <= 0) return ['ok' => false, 'error' => 'Auf diesem Gutschein ist nichts mehr offen.'];
+    $v = $pdo->query('SELECT * FROM mm_vouchers WHERE id = ' . $vid)->fetch();
+    if ($v['status'] !== 'test') { require_once __DIR__ . '/invoices.php'; forma_invoice_for($pdo, 'mv_gs', $uid); }
+    return ['ok' => true, 'used' => $used, 'rest' => mv_voucher_balance($pdo, $v), 'voucher' => $v];
+}
+
+/** Rechnung für eine Einlösung von Hand (Mehrzweckgutschein: Umsatzsteuer erst bei der Einlösung). */
+function mv_voucher_invoice_source(PDO $pdo, int $useId): ?array
+{
+    natal_wd_schema($pdo);
+    $u = $pdo->query("SELECT u.*, v.nr, v.name, v.email FROM mm_voucher_uses u JOIN mm_vouchers v ON v.id = u.voucher_id WHERE u.id = $useId AND u.kind = 'hand' AND u.status = 'eingeloest'")->fetch();
+    if (!$u || (int)$u['cents'] <= 0) return null;
+    $day = date('d.m.Y', strtotime((string)$u['created_at']));
+    return ['name' => $u['name'], 'email' => $u['email'], 'session' => '', 'address' => '', 'country' => 'AT', 'service' => $day,
+        'items' => [['text' => $u['what'], 'detail' => 'Movecia – Personal Fitness, Vivien Malonga', 'qty' => 1, 'unit' => (int)$u['cents']]],
+        'gross' => (int)$u['cents'], 'paid' => $u['created_at'], 'type' => 'Movecia',
+        'pay_note' => 'Der Betrag ist bereits bezahlt: eingelöst mit dem Movecia-Gutschein Nr. ' . $u['nr'] . ' am ' . $day . '.'];
+}
+
+/** Was eine Buchung mit offenen Einheiten noch wert ist (gleiche Rechnung wie beim Rücktritt). */
+function natal_convert_calc(PDO $pdo, array $o): array
+{
+    $c = natal_wd_calc($pdo, $o);
+    require_once __DIR__ . '/method-lib.php';
+    mv_schema($pdo);
+    $month = (int)mv_cfg()['m1'];
+    $n = $month > 0 ? intdiv($c['back'], $month) : 0;
+    $c['month'] = $month;
+    $c['months'] = $n;
+    $c['rest'] = $c['back'] - $n * $month;
+    $c['open_n'] = (int)$o['units'] - $c['used_n'];
+    return $c;
+}
+
+/**
+ * Offene Einheiten umwandeln: in Monate The Method (Rest als Wertgutschein) oder ganz in einen Wertgutschein.
+ * Genau einmal pro Buchung (mm_natal_wd, UNIQUE order_id), Termine werden abgesagt, Stornorechnung über den offenen Wert,
+ * neue Rechnung über die Method-Monate (bezahlt mit dem Guthaben), der Gutschein wird bei der Einlösung verrechnet.
+ */
+function natal_convert(PDO $pdo, int $oid, string $target, int $design): array
+{
+    natal_wd_schema($pdo);
+    require_once __DIR__ . '/method-lib.php';
+    mv_schema($pdo);
+    $target = $target === 'method' ? 'method' : 'gutschein';
+    $design = isset(MV_VOUCHER_DESIGNS[$design]) ? $design : 1;
+    $pdo->exec('BEGIN IMMEDIATE');
+    try {
+        $o = natal_order($pdo, $oid);
+        if (!$o || $o['status'] !== 'bezahlt') { $pdo->exec('ROLLBACK'); return ['ok' => false, 'error' => 'Diese Buchung ist nicht (mehr) aktiv.']; }
+        if (natal_wd_row($pdo, $oid)) { $pdo->exec('ROLLBACK'); return ['ok' => false, 'error' => 'Diese Buchung wurde schon umgewandelt oder zurückgetreten.']; }
+        $c = natal_convert_calc($pdo, $o);
+        if ($c['back'] <= 0) { $pdo->exec('ROLLBACK'); return ['ok' => false, 'error' => 'Es sind keine offenen Einheiten mehr da.']; }
+        $months = $target === 'method' ? $c['months'] : 0;
+        $mcents = $months * $c['month'];
+        $email = strtolower((string)$o['email']);
+        $sub = null;
+        if ($months > 0) {
+            foreach (mv_subs_of($pdo, $email) as $s) if ($s['kind'] === 'method' && $s['sub_id'] !== '' && $s['status'] === 'aktiv') { $pdo->exec('ROLLBACK'); return ['ok' => false, 'error' => 'Sie hat schon ein laufendes Method-Abo. Wandle lieber in einen Wertgutschein um.']; }
+        }
+        $now = date('c');
+        $text = $months > 0 ? $months . ' ' . ($months === 1 ? 'Monat' : 'Monate') . ' The Method' . ($c['rest'] > 0 ? ' + ' . forma_euro($c['rest']) . ' Gutschein' : '') : 'Wertgutschein';
+        $pdo->prepare('INSERT INTO mm_natal_wd (order_id, choice, total_cents, used_cents, used_text, back_cents, refund_cents, voucher_cents, status, source, note, created_at, done_at) VALUES (?,?,?,?,?,?,0,?,?,?,?,?,?)')
+            ->execute([$oid, 'umwandlung', $c['total'], $c['used'], $c['used_text'], $c['back'], $c['back'] - $mcents, 'erledigt', 'verwaltung', 'umgewandelt in ' . $text, $now, $now]);
+        $wid = (int)$pdo->lastInsertId();
+        $pdo->prepare("UPDATE mm_natal_orders SET status = 'umgewandelt', withdrawn_at = ? WHERE id = ?")->execute([$now, $oid]);
+        foreach (natal_sessions($pdo, $oid) as $s) {
+            if (in_array($s['status'], ['angefragt', 'bestaetigt'], true) && !natal_session_done($s))
+                $pdo->prepare("UPDATE mm_natal_sessions SET status = 'abgesagt', note = TRIM(note || ' [umgewandelt]') WHERE id = ?")->execute([$s['id']]);
+        }
+        if ($months > 0) {
+            $m = mv_member_ensure($pdo, $email, (string)$o['name'], 'de');
+            $pdo->prepare('UPDATE mv_members SET email_ok = 1 WHERE id = ?')->execute([$m['id']]);
+            // Läuft schon eine Mitgliedschaft ohne Abo (z. B. Gewinn, frühere Umwandlung)? Dann hinten anhängen.
+            $from = max(mv_launch(), time());
+            foreach (mv_subs_of($pdo, $email) as $s) if ($s['kind'] === 'method' && $s['sub_id'] === '' && $s['status'] === 'aktiv' && (int)$s['period_end'] > $from) $from = (int)$s['period_end'];
+            $end = strtotime('+' . $months . ' months', $from);
+            $pdo->prepare("INSERT INTO mv_subs (kind, plan, email, name, lang, call_lang, amount_cents, first_cents, status, token, consent_digital, consent_live, source, test, created_at, paid_at, period_end, bill_start, open_from, open_mailed, review_sent, mailed) VALUES ('method','m1',?,?,'de','de',?,?,'aktiv',?,1,1,'umwandlung',?,?,?,?,?,?,1,1,1)")
+                ->execute([$email, $o['name'], $mcents, $mcents, bin2hex(random_bytes(16)), (int)($o['is_test'] ?? 0), $now, $now, $end, $from, $from]);
+            $sub = mv_sub($pdo, (int)$pdo->lastInsertId());
+        }
+        $vouchers = [];
+        $vc = $c['back'] - $mcents;
+        if ($vc > 0) $vouchers[] = mv_voucher_create($pdo, $vc, $design, $o, $wid, '', 'umwandlung', 'aus Umwandlung Buchung #' . $oid . ' (' . $o['title'] . ', ' . $o['name'] . ')' . ($months > 0 ? ', Rest nach ' . $months . ' Monaten The Method' : ''));
+        $pdo->exec('COMMIT');
+    } catch (Throwable $e) {
+        try { $pdo->exec('ROLLBACK'); } catch (Throwable $e2) {}
+        error_log('Natal Umwandlung: ' . $e->getMessage());
+        return ['ok' => false, 'error' => 'Das hat gerade nicht geklappt. Bitte noch einmal versuchen.'];
+    }
+    $isTest = $c['test'];
+    if (!$isTest) {
+        require_once __DIR__ . '/invoices.php';
+        try { forma_invoice_storno($pdo, 'natal', $oid, $c['back'], 'offene Einheiten umgewandelt in ' . $text . ($vouchers ? ' (Gutschein ' . $vouchers[0]['nr'] . ')' : '')); }
+        catch (Throwable $e) { error_log('Natal Umwandlung Storno: ' . $e->getMessage()); }
+        if ($sub) mv_payment($pdo, $sub, 'um:' . $oid, $mcents, (int)$sub['bill_start'], (int)$sub['period_end'], 'Der Betrag ist bereits bezahlt: verrechnet mit dem Guthaben aus der Buchung ' . $o['title'] . ' (offene Einheiten umgewandelt).');
+    }
+    natal_convert_mail($pdo, natal_order($pdo, $oid), $c, $months, $sub, $vouchers);
+    return ['ok' => true, 'months' => $months, 'vouchers' => $vouchers, 'text' => $text, 'back' => $c['back']];
+}
+
+function natal_convert_mail(PDO $pdo, array $o, array $c, int $months, ?array $sub, array $vouchers): void
+{
+    $first = forma_first_name((string)$o['name']);
+    $p = ["Hallo $first,", 'wie besprochen habe ich deine offenen Einheiten umgewandelt. Hier ist alles auf einen Blick:',
+        ['Deine Buchung: ' . $o['title'], 'Schon gemacht: ' . $c['used_text'], 'Offen und umgewandelt: ' . forma_euro($c['back'])]];
+    $btn = null;
+    if ($months > 0 && $sub) {
+        $m = mv_member_by_email($pdo, (string)$o['email']);
+        $hasPw = $m && (string)$m['pass_hash'] !== '';
+        $link = $hasPw ? mv_area() : mv_pw_link($pdo, $m, 24 * 14);
+        $p[] = 'Du bekommst ' . $months . ' ' . ($months === 1 ? 'Monat' : 'Monate') . ' The Mindful Movement Method (' . forma_euro($c['month']) . ' pro Monat), freigeschaltet ab ' . date('j.n.Y', (int)$sub['bill_start']) . ' bis ' . date('j.n.Y', (int)$sub['period_end'] - 1) . '. Es verlängert sich nichts und es wird nichts abgebucht.';
+        $p[] = $hasPw ? 'Melde dich einfach mit deiner E-Mail und deinem Passwort im Mitgliederbereich an.' : 'Leg über den Knopf einmal dein Passwort fest, danach meldest du dich auf jedem Gerät mit deiner E-Mail an. Du startest mit dem Ankommen-Modul.';
+        $btn = [$link, $hasPw ? 'Zum Mitgliederbereich' : 'Passwort festlegen & loslegen'];
+    }
+    $att = [];
+    if ($vouchers) {
+        $v = $vouchers[0];
+        $p[] = ($months > 0 ? 'Was übrig bleibt, bekommst du als Wertgutschein' : 'Den ganzen Betrag bekommst du als Wertgutschein') . ': ' . $v['nr'] . ' über ' . forma_euro((int)$v['amount_cents']) . ' · Code: ' . $v['code'] . '. Er hängt als PDF an dieser E-Mail.';
+        $p[] = MV_VOUCHER_TERMS;
+        $att[] = ['Movecia_Gutschein_' . $v['nr'] . '.pdf', mv_voucher_pdf($v), 'application/pdf'];
+    }
+    $p[] = 'Offene Termine aus deinem Paket habe ich abgesagt. Ich freue mich, dass wir weiter miteinander in Bewegung bleiben.';
+    natal_mail((string)$o['email'], $months > 0 ? 'Deine Einheiten sind jetzt The Method' : 'Dein Gutschein für deine offenen Einheiten', 'Umgewandelt', $p, $btn, $att);
 }
