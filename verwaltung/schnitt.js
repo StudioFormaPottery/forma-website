@@ -373,6 +373,63 @@
 .sn-up.run{background:#FBF8F4;border-color:#E6DCD2;color:#4A3A41}.sn-up.bad{background:#FBF1EF;border-color:#E8C9C2;color:#7A3A2E}
 .sn-up .sn-row{margin-top:10px}
 .sn-dr-list li small.up{color:#3F6B3E}
+/* Neue, ruhige Oberfläche (Vivien, 31.10.2026: „weniger Text, übersichtlicher“) */
+.sn-hd{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;background:#FBF8F4;border:1px solid #DDD2C6;border-radius:20px;padding:10px 12px 10px 16px}
+.sn-back{display:inline-flex;align-items:center;gap:6px;color:#7D7076;text-decoration:none;font-size:17px;min-height:44px;padding-right:10px;border-right:1px solid #DDD2C6}
+.sn-dn{display:inline-flex;align-items:center;gap:8px;border:0;background:transparent;font:inherit;cursor:pointer;color:#2E2529;padding:6px 8px;border-radius:12px;min-height:44px;min-width:0;max-width:100%}
+.sn-dn:hover{background:#F2ECE4}
+.sn-dn span{font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sn-dn small{font-size:14px;color:#7D7076;white-space:nowrap}
+.sn-sy{font-size:13.5px;color:#9A8C93}
+.sn-hd .sn-tg{margin:0 0 0 auto;padding:0;background:none;border:0;font-size:15.5px;color:#7D7076;flex:0 1 auto;gap:4px 10px}
+.sn-hd .sn-tg>span{min-width:0;flex:0 1 auto}.sn-hd .sn-tg>span b{color:#2E2529;font-weight:600}
+.sn-hd .sn-tg select{flex:1 1 100%;min-width:260px}
+.sn-lk{font:inherit;font-size:15px;border:0;background:none;color:#6B5658;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px 2px}
+.sn-lk.lt{color:#EADFDE;font-size:16px}
+.sn-go{font:inherit;font-size:18px;font-weight:500;min-height:52px;padding:0 26px;border-radius:26px;border:0;background:#6B5658;color:#F7F1EE;cursor:pointer}
+.sn-go:disabled{opacity:.45;cursor:default}
+.sn-ctl{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.sn-ctl .t{font-size:19px;font-variant-numeric:tabular-nums;color:#2E2529;margin-right:auto}
+.sn-pl{width:58px;height:58px;border-radius:50%;border:0;background:#6B5658;color:#F7F1EE;font-size:20px;cursor:pointer;flex:none}
+.sn-ctl .sn-b{min-height:50px;padding:0 20px;background:#FBF8F4}
+.sn-ctl .sn-b svg,.sn-back svg,.sn-dn svg{flex:none}
+.sn-ch{font-family:"Hanken Grotesk",sans-serif!important;font-size:15px!important;color:#7D7076!important;font-weight:500!important;margin:14px 2px 4px!important}
+.sn-ch span{font-weight:400}
+.sn .sn-clips .sn-c{width:104px}.sn .sn-clips .sn-c img,.sn .sn-clips .sn-c .ph{height:60px}.sn .sn-clips .sn-add{width:104px;height:104px}
+.sn-r{background:#FBF8F4;border:1px solid #DDD2C6;border-radius:22px;gap:0!important;overflow:hidden;position:sticky;top:12px}
+.sn-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-bottom:1px solid #DDD2C6}
+.sn-tabs button{border:0;border-bottom:3px solid transparent;background:transparent;font:inherit;font-size:14px;color:#7D7076;padding:14px 0 10px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;min-height:64px}
+.sn-tabs button[aria-pressed=true]{color:#2E2529;font-weight:600;border-bottom-color:#6B5658}
+.sn-pan{padding:20px 20px 22px;display:flex;flex-direction:column;gap:16px}
+.sn-pan[hidden]{display:none}
+.sn [hidden]{display:none!important}
+.sn-pv .tag:empty{display:none}
+.sn-l>.sn-pv{margin-left:auto;margin-right:auto}
+.sn-pan h3{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:28px;color:#2E2529;line-height:1.1}
+.sn-pan h3.sub{font-size:22px;margin-top:8px}
+.sn-pan .sn-row{margin-top:0}
+.sn-pan .sn-b.main{background:#6B5658;border-color:#6B5658;font-size:18px}
+.sn-pan .sn-fr{background:none;border:0;padding:0;margin:4px 0 0;display:flex;flex-direction:column;gap:12px}
+.sn-pan .sn-fr label{margin-top:0}
+.sn-more>summary{cursor:pointer;list-style:none;font-size:16px;color:#6B5658;padding:4px 0}
+.sn-more>summary::-webkit-details-marker{display:none}
+.sn-more>summary::after{content:" ▾";color:#9A8C93}
+.sn-more[open]>summary::after{content:" ▴"}
+.sn-more .bd{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+.sn-more .lbl{font-size:15.5px;color:#4A3A41}
+.sn-looks{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px!important}
+.sn-looks button{border-radius:14px!important;padding:12px 6px!important;font-size:14.5px!important;min-height:52px}
+.sn-pan .sn-ed{background:none;border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+.sn-pan .sn-ed h3{font-size:22px}
+.sn-pan .sn-ed[hidden]{display:none}
+@media(max-width:980px){
+ .sn-hd{position:relative}.sn-dn span{font-size:21px}.sn-back span{display:none}.sn-back{border:0;padding:0}
+ .sn-hd .sn-tg{order:5;margin:0;flex:1 1 100%;font-size:14.5px}
+ .sn-go{min-height:46px;padding:0 18px;font-size:16px;margin-left:auto}
+ .sn-ctl .sn-b span{display:none}.sn-ctl .sn-b{width:50px;padding:0}.sn-pl{width:52px;height:52px}
+ .sn-r{position:static;margin-bottom:84px}
+ .sn-tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#FBF8F4;border-top:1px solid #DDD2C6;border-bottom:0;padding-bottom:env(safe-area-inset-bottom)}
+}
 `;
   function css() { if (document.getElementById('sn-css')) return; const s = document.createElement('style'); s.id = 'sn-css'; s.textContent = CSS; document.head.appendChild(s); }
 
@@ -445,84 +502,49 @@ void main(){
   const brate = (w, h) => { const p = w * h; return p >= 7e6 ? 40e6 : p >= 3.2e6 ? 20e6 : p >= 1.8e6 ? 12e6 : p >= .8e6 ? 8e6 : 5e6; };
   function mime() { const ts = ['video/mp4;codecs=avc1.640028,mp4a.40.2', 'video/mp4;codecs=avc1,mp4a', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm']; return ts.find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || ''; }
 
+  const SV = (d, w) => '<svg width="' + (w || 22) + '" height="' + (w || 22) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+  const IC = { back: SV('<path d="M15 18l-6-6 6-6"/>'), down: SV('<path d="M6 9l6 6 6-6"/>', 18),
+    cut: SV('<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12"/>', 20),
+    del: SV('<path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 002 2h8a2 2 0 002-2l1-12M9 7V4h6v3"/>', 20),
+    auto: SV('<path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>', 24),
+    bild: SV('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 5v14M16 5v14"/>', 24),
+    licht: SV('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>', 24),
+    musik: SV('<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>', 24),
+    mehr: SV('<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>', 24) };
+
   function open(o) {
     css();
     const mount = o.mount; mount.innerHTML = '';
     const root = document.createElement('div'); root.className = 'sn'; mount.appendChild(root);
-    root.innerHTML = `<div class="sn-l">
-  <div class="sn-top"><button type="button" class="sn-b" data-k="drJump">📝 Meine Entwürfe <span data-k="drCnt"></span></button><span class="sn-cur" data-k="drCur"></span><span class="sn-cur" data-k="syS"></span></div>
-  <div class="sn-tg" data-k="tg"><span data-k="tgT"></span><button type="button" class="sn-b sm" data-k="tgBtn">Ändern</button><select data-k="tgSel" hidden aria-label="Wohin kommt das Video?"></select></div>
-  <div class="sn-pv" id="snpv"><div class="empty" id="snempty"><b>Noch keine Clips</b>Tipp unten auf „＋ Clips“ und wähl Videos vom iPhone oder Computer, oder nimm im Studio auf.</div><img class="sn-covimg" data-k="covimg" alt=""><button type="button" class="big" data-k="big" hidden aria-label="Abspielen">▶</button><span class="tag" data-k="tag"></span></div>
-  <div class="sn-tl">
-    <div class="sn-row" style="margin-top:8px"><span class="t" data-k="time">0:00 / 0:00</span>
-      <button type="button" class="sn-b pl" data-k="play">▶ Abspielen</button>
-      <button type="button" class="sn-b" data-k="cut2" title="An der Stelle der Linie schneiden (Taste S)">✂️ Hier schneiden</button>
-      <button type="button" class="sn-b" data-k="frBtn" aria-expanded="false">🔍 Zoom &amp; Ausschnitt</button>
-      <button type="button" class="sn-b" data-k="ztDel" title="Das markierte Stück löschen" style="color:#9A3B3B">🗑 Stück löschen</button>
-      <button type="button" class="sn-b" data-k="cmp" title="Licht & Farbe kurz ausschalten">Vorher zeigen</button></div>
-    <div class="sn-fr" data-k="fr" hidden>
-      <div class="h"><b data-k="frT">Bildausschnitt</b><small>Gilt für diesen Clip. Du kannst das Bild auch direkt oben in der Vorschau verschieben.</small></div>
-      <label><span>🔍 Zoom <i data-k="frZv">100 %</i></span><input type="range" min="30" max="300" step="1" value="100" data-fr="z"></label>
-      <div class="sn-row" style="margin-top:8px"><button type="button" class="sn-b sm" data-k="frFit" title="Das ganze Bild zeigen, der Rand wird weich gefüllt">🖼 Ganz zeigen</button><button type="button" class="sn-b sm" data-k="frFill" title="Bild füllt das Format, Ränder werden abgeschnitten">⬛ Format füllen</button></div>
-      <label><span>↔ Links / Rechts</span><input type="range" min="-100" max="100" step="1" value="0" data-fr="x"></label>
-      <label><span>↕ Hoch / Runter</span><input type="range" min="-100" max="100" step="1" value="0" data-fr="y"></label>
-      <label><span>📐 Gerade richten <i data-k="frRv">0°</i></span><input type="range" min="-10" max="10" step="0.1" value="0" data-fr="r"></label>
-      <div style="margin-top:12px;font-size:15.5px;color:#4A3A41">🎥 Bewegung in diesem Clip</div>
-      <div class="sn-chips" data-k="zmv"><button type="button" data-zm="none">Keine</button><button type="button" data-zm="slow">Langsam rein (Kino-Zoom)</button><button type="button" data-zm="punch">Schnell rein</button><button type="button" data-zm="out">Langsam raus</button></div>
-      <label><span>🐟 Fischauge <i data-k="feV">aus</i></span><input type="range" min="0" max="100" step="1" value="0" data-k="fe"></label>
-      <div class="sn-zt-hint">Soll der Zoom erst später anfangen? Mit ✂ an der Stelle schneiden und nur dem zweiten Teil die Bewegung geben.</div>
-      <div class="sn-row"><button type="button" class="sn-b sm" data-k="frAll">Für alle Clips übernehmen</button><button type="button" class="sn-b sm" data-k="frReset">Zurücksetzen</button></div>
-    </div>
-    <div class="sn-zt">
-      <div class="sn-zt-sc" data-k="ztsc"><div class="sn-zt-in" data-k="ztin"><div class="sn-zt-tt" data-k="ztt"></div><div class="sn-zt-blocks" data-k="ztb"></div><div class="sn-zt-ph" data-k="ztph"></div></div></div>
-      <div class="sn-zt-bar"><button type="button" class="zb" data-k="zoomOut" aria-label="Zeitleiste zusammenziehen">－</button><input type="range" min="0" max="100" step="1" value="0" data-k="zoomR" aria-label="Zeitleiste auseinanderziehen"><button type="button" class="zb" data-k="zoomIn" aria-label="Zeitleiste auseinanderziehen">＋</button><span class="t" data-k="ztime">0:00,0</span></div>
-    </div>
-    <div class="sn-ovl" data-k="ovl"></div>
-    <div class="sn-zt-hint" data-k="zthint">Tippen = Stelle anspringen · die Griffe <b>⟦ ⟧</b> an den Rändern ziehen = Anfang und Ende länger oder kürzer machen (das schraffierte Stück daneben ist das, was weggeschnitten wurde – da kannst du wieder hineinziehen) · der Griff darf auch über den nächsten Clip hinaus (was doppelt ist, kannst du darunter löschen) · zwei Finger auseinander (oder ＋) = Zeitleiste auseinanderziehen</div>
+    root.innerHTML = `<div class="sn-hd">
+  ${o.calUrl ? `<a class="sn-back" href="${esc(o.calUrl)}" aria-label="Zurück zum Kalender">${IC.back}<span>Kalender</span></a>` : ''}
+  <button type="button" class="sn-dn" data-k="drJump" title="Entwürfe"><span data-k="drCur"></span><small data-k="drCnt"></small>${IC.down}</button>
+  <span class="sn-sy" data-k="syS"></span>
+  <div class="sn-tg" data-k="tg"><span data-k="tgT"></span><button type="button" class="sn-lk" data-k="tgBtn">Ändern</button><select data-k="tgSel" hidden aria-label="Wohin kommt das Video?"></select></div>
+  <button type="button" class="sn-go" data-k="done">Fertig</button>
+</div>
+<div class="sn-l">
+  <div class="sn-pv" id="snpv"><div class="empty" id="snempty"><b>Noch keine Clips</b><label class="sn-b pl" style="cursor:pointer">＋ Videos holen<input type="file" accept="video/*,.mov,.mp4,.m4v,.webm" multiple hidden data-k="file"></label>${o.studioUrl ? `<a class="sn-lk lt" href="${esc(o.studioUrl)}">oder im Studio aufnehmen</a>` : ''}</div><img class="sn-covimg" data-k="covimg" alt=""><button type="button" class="big" data-k="big" hidden aria-label="Abspielen">▶</button><span class="tag" data-k="tag"></span></div>
+  <div class="sn-ctl">
+    <button type="button" class="sn-pl" data-k="play" aria-label="Abspielen">▶</button>
+    <span class="t" data-k="time">0:00 / 0:00</span>
+    <button type="button" class="sn-b" data-k="cut2" title="An der Linie schneiden (Taste S)">${IC.cut}<span>Schneiden</span></button>
+    <button type="button" class="sn-b" data-k="ztDel" title="Das markierte Stück löschen">${IC.del}<span>Löschen</span></button>
+    <button type="button" data-k="frBtn" hidden></button>
   </div>
-  <h2 style="margin-top:16px" data-k="h2">Deine Clips <span style="font-size:16px;color:#7D7076;font-family:'Hanken Grotesk',sans-serif;font-weight:400" data-k="cnt"></span></h2>
-  <div class="sn-zt-hint" style="margin:0 2px 4px">Reihenfolge ändern: Kachel nehmen und an die neue Stelle ziehen (am Handy kurz drauf halten, dann ziehen).</div>
+  <div class="sn-zt">
+    <div class="sn-zt-sc" data-k="ztsc"><div class="sn-zt-in" data-k="ztin"><div class="sn-zt-tt" data-k="ztt"></div><div class="sn-zt-blocks" data-k="ztb"></div><div class="sn-zt-ph" data-k="ztph"></div></div></div>
+    <div class="sn-zt-bar"><button type="button" class="zb" data-k="zoomOut" aria-label="Zeitleiste zusammenziehen">－</button><input type="range" min="0" max="100" step="1" value="0" data-k="zoomR" aria-label="Zeitleiste auseinanderziehen"><button type="button" class="zb" data-k="zoomIn" aria-label="Zeitleiste auseinanderziehen">＋</button><span class="t" data-k="ztime">0:00,0</span></div>
+  </div>
+  <div class="sn-ovl" data-k="ovl"></div>
+  <div class="sn-zt-hint" data-k="zthint" hidden></div>
+  <h2 class="sn-ch" data-k="h2">Clips <span data-k="cnt"></span></h2>
   <div class="sn-clips" data-k="clips"></div>
   <div class="sn-cov" data-k="coved" hidden>
-    <div class="h"><b>🖼 Titelbild ganz am Anfang</b><button type="button" class="sn-b sm" data-k="covX">Schließen</button></div>
-    <label class="sn-sw"><input type="checkbox" data-k="covOn"> Titelbild vor dem ersten Clip zeigen</label>
+    <div class="h"><b>Titelbild am Anfang</b><button type="button" class="sn-b sm" data-k="covX">Schließen</button></div>
+    <label class="sn-sw"><input type="checkbox" data-k="covOn"> Titelbild zeigen</label>
     <div class="ths" data-k="covThs"></div>
-    <div><div style="font-size:16px;color:#4A3A41;margin-bottom:4px">Wie lange?</div><div class="sn-chips" data-k="covDur"></div></div>
-    <div class="sn-note">Das Bild steht ganz vorne, noch vor deinem ersten Clip, und ist auch das Vorschaubild, wenn das Video hochgeladen wird. Die Musik läuft schon darunter. Dein zuletzt gewähltes Titelbild nehme ich für die nächsten Talking Heads automatisch wieder.</div>
-  </div>
-  <div class="sn-row" style="margin-top:0">
-    <label class="sn-b pl" style="cursor:pointer">＋ Clips vom Gerät<input type="file" accept="video/*,.mov,.mp4,.m4v,.webm" multiple hidden data-k="file"></label>
-    ${o.studioUrl ? `<a class="sn-b" href="${esc(o.studioUrl)}">● Im Studio aufnehmen</a>` : ''}
-    <button type="button" class="sn-b sm del" data-k="clearAll">Clips dieses Entwurfs löschen</button>
-  </div>
-  <details class="sn-trash" data-k="trash" hidden><summary>🗑 Papierkorb <span data-k="trN"></span></summary><div data-k="trL"></div>
-    <div class="sn-row"><button type="button" class="sn-b sm del" data-k="trEmpty">Papierkorb leeren (endgültig)</button></div>
-    <div class="sn-zt-hint">Gelöschte Clips bleiben hier 30 Tage auf diesem Gerät, dann werden sie endgültig gelöscht.</div></details>
-  <details class="sn-trash" data-k="resc" hidden open><summary>🛟 Gerettete Videos <span data-k="rsN"></span></summary><div class="sn-zt-hint">Diese Videodateien liegen noch auf deinem Gerät, gehören aber zu keinem Clip mehr (z. B. die ursprüngliche Fassung einer Aufnahme). Ansehen und bei Bedarf zurückholen.</div><div data-k="rsL"></div></details>
-  <div class="sn-ed" data-k="ed" hidden>
-    <div class="h"><b data-k="edT"></b><span data-k="edD"></span></div>
-    <div class="sn-row">
-      <button type="button" class="sn-b sm" data-k="setA">⟦ Anfang hier</button>
-      <button type="button" class="sn-b sm" data-k="setB">Ende hier ⟧</button>
-      <button type="button" class="sn-b sm" data-k="split">✂ Hier teilen</button>
-      <button type="button" class="sn-b sm" data-k="resetCut">Schnitt zurück</button>
-    </div>
-    <div class="sn-row">
-      <button type="button" class="sn-b sm" data-k="first">⇤ Ganz nach vorne</button>
-      <button type="button" class="sn-b sm" data-k="left">← Nach vorne</button>
-      <button type="button" class="sn-b sm" data-k="right">Nach hinten →</button>
-      <button type="button" class="sn-b sm" data-k="mute">🔇 Ton aus</button>
-      <button type="button" class="sn-b sm del" data-k="delClip">🗑 Clip löschen</button>
-    </div>
-    <div class="sn-row">
-      <button type="button" class="sn-b sm" data-k="broMk">🎞 Nur als Bild über das Video davor (Stimme läuft weiter)</button>
-      <label class="sn-b sm" style="cursor:pointer">＋ Bild darüber legen (Video vom Gerät)<input type="file" accept="video/*,.mov,.mp4,.m4v,.webm" hidden data-k="broFile"></label>
-    </div>
-    <div class="sn-hint" data-k="broHint"></div>
-    <div class="sn-bro" data-k="bro"></div>
-  </div>
-  <div class="sn-row" style="margin-top:14px">
-    <button type="button" class="sn-b main" data-k="done">✓ Fertig stellen</button>
+    <div class="sn-chips" data-k="covDur"></div>
   </div>
   <div class="sn-prog" data-k="prog" hidden><i></i></div>
   <div class="sn-msg" data-k="msg"></div>
@@ -532,69 +554,135 @@ void main(){
     <video controls playsinline data-k="resv" style="margin-top:10px"></video>
     <div class="sn-row" style="margin-top:12px">
       <button type="button" class="sn-b pl" data-k="share" hidden>📲 In Fotos sichern</button>
-      <a class="sn-b" data-k="dl" download>⬇ Als Datei herunterladen</a>
-      ${o.upload ? '<button type="button" class="sn-b dk" data-k="upBtn">⬆ Hochladen</button>' : ''}
+      <a class="sn-b" data-k="dl" download>Als Datei laden</a>
+      ${o.upload ? '<button type="button" class="sn-b dk" data-k="upBtn">Hochladen</button>' : ''}
       <button type="button" class="sn-b sm" data-k="resX">Schließen</button>
     </div>
     <div class="sn-note" style="margin-top:8px" data-k="resN"></div>
   </div>
 </div>
 <div class="sn-r">
-  <details class="sn-box dr" open data-k="drBox"><summary>📝 Entwürfe</summary><div class="bd">
-    <div><label style="display:block;font-size:16px;color:#4A3A41;margin-bottom:4px">Woran arbeitest du gerade?</label>
-      <input type="text" class="sn-dr-name" maxlength="60" placeholder="z. B. The Method · Morgen-Flow" data-k="drName"></div>
-    <div class="sn-note">Jede Aufnahme und jeder Schnitt gehört zu einem Entwurf. So kannst du zuerst alle Videos aufnehmen und später in Ruhe eines nach dem anderen fertig schneiden. Alles bleibt auf diesem Gerät gespeichert.</div>
+  <nav class="sn-tabs" aria-label="Werkzeuge">
+    <button type="button" data-tab="auto">${IC.auto}<span>Auto</span></button>
+    <button type="button" data-tab="bild">${IC.bild}<span>Bild</span></button>
+    <button type="button" data-tab="licht">${IC.licht}<span>Licht</span></button>
+    <button type="button" data-tab="musik">${IC.musik}<span>Musik</span></button>
+    <button type="button" data-tab="mehr">${IC.mehr}<span>Mehr</span></button>
+  </nav>
+  <section class="sn-pan" data-pan="dr" data-k="drBox" hidden>
+    <h3>Entwürfe</h3>
+    <input type="text" class="sn-dr-name" maxlength="60" placeholder="Name dieses Videos" aria-label="Name dieses Videos" data-k="drName">
     <ul class="sn-dr-list" data-k="drList"></ul>
     <button type="button" class="sn-b" data-k="drNew">＋ Neuer Entwurf</button>
-  </div></details>
-  <details class="sn-box tpl" open><summary>🎬 Vorlagen</summary><div class="bd">
-    <div class="sn-note" style="color:#4A3A41">Lade 1 bis 8 kurze Clips hoch (z. B. du im Outfit von vorne, von der Seite, beim Drehen, Details). Dann eine Vorlage antippen: Ich schneide im Takt, wechsle zwischen ganzem Bild und Details, zoome und lege Musik darunter.</div>
+  </section>
+  <section class="sn-pan" data-pan="auto" hidden>
+    <h3>Automatisch schneiden</h3>
+    <button type="button" class="sn-b main" data-k="auto">Pausen rausschneiden</button>
+    <div class="sn-auto-res" data-k="autoRes" hidden></div>
+    <button type="button" class="sn-b sm" data-k="undo" hidden>↩ Rückgängig</button>
+    <details class="sn-more"><summary>Feiner einstellen</summary><div class="bd">
+      <div class="sn-pz">
+        <div class="lb">Pausen ab <b data-k="pauseV">0,7 s</b></div>
+        <input type="range" min="20" max="250" step="5" value="70" data-k="pauseR" aria-label="Pausen rausschneiden ab">
+        <div class="sc"><span>jede Atempause</span><span>nur lange</span></div>
+        <div class="sn-note" data-k="pauseH" hidden></div>
+        <button type="button" class="sn-b sm" data-k="pauseGo" hidden>Nochmal schneiden</button>
+      </div>
+      <label class="sn-sw"><input type="checkbox" data-k="stumbles"> Versprecher erkennen</label>
+      <label class="sn-sw"><input type="checkbox" data-k="noisefx"> Stellen ohne Sprechen raus</label>
+      <label class="sn-sw"><input type="checkbox" data-k="zoomfx"> Sanfter Zoom</label>
+    </div></details>
+    <h3 class="sub">Vorlagen</h3>
     <div class="sn-tpl" data-k="tpls"></div>
     <button type="button" class="sn-b sm" data-k="tplUndo" hidden>↩ Vorlage rückgängig</button>
-  </div></details>
-  <details class="sn-box auto" open><summary>✨ Automatisch schneiden</summary><div class="bd">
-    <div class="sn-note" style="color:#4A3A41">Ein Tipp, und ich schneide Pausen raus, nehme heraus, wo du dich erst zurechtsetzt oder neu angesetzt hast, und lege einen sanften Zoom über die Abschnitte, damit es sich flüssig und lebendig anschaut. Danach siehst du jeden Schnitt in der Zeitleiste und kannst ihn mit den Griffen länger oder kürzer ziehen.</div>
-    <button type="button" class="sn-b main" data-k="auto" style="font-size:18px;min-height:52px">✨ Jetzt automatisch schneiden</button>
-    <div class="sn-pz">
-      <div class="lb">Pausen rausschneiden ab <b data-k="pauseV">0,7 s</b></div>
-      <input type="range" min="20" max="250" step="5" value="70" data-k="pauseR" aria-label="Pausen rausschneiden ab">
-      <div class="sc"><span>jede Atempause</span><span>nur lange Pausen</span></div>
-      <div class="sn-note" data-k="pauseH"></div>
-      <button type="button" class="sn-b sm" data-k="pauseGo" hidden>✨ Mit dieser Einstellung nochmal schneiden</button>
-    </div>
-    <label class="sn-sw"><input type="checkbox" data-k="stumbles"> Versprecher erkennen (wenn du neu ansetzt)</label>
-    <label class="sn-sw"><input type="checkbox" data-k="noisefx"> Stellen ohne Sprechen rausnehmen (in Position gehen, rascheln)</label>
-    <label class="sn-sw"><input type="checkbox" data-k="zoomfx"> Sanfter Zoom hinein und heraus</label>
-    <div class="sn-auto-res" data-k="autoRes" hidden></div>
-    <button type="button" class="sn-b sm" data-k="undo" hidden>↩ Automatischen Schnitt rückgängig</button>
-  </div></details>
-  <details class="sn-box" open><summary>☀️ Licht &amp; Farbe</summary><div class="bd">
-    <div class="sn-chips" data-k="looks"></div>
-    <div data-sl="br"></div><div data-sl="ct"></div><div data-sl="sa"></div><div data-sl="se"></div><div data-sl="bb"></div>
-    <label class="sn-sw"><input type="checkbox" data-k="lbx"> 🎬 Kino-Balken (schmale schwarze Streifen oben und unten)</label>
-    <div class="sn-note">Gilt für alle Clips, damit das Video aus einem Guss ist.</div>
-  </div></details>
-  <details class="sn-box"><summary>🖼 Format</summary><div class="bd">
+  </section>
+  <section class="sn-pan" data-pan="bild" hidden>
+    <h3>Format</h3>
     <div class="sn-chips" data-k="fmts"></div>
-    <div class="sn-row" style="margin-top:10px"><button type="button" class="sn-b" data-k="fitAll">🖼 Mich überall ganz zeigen</button><button type="button" class="sn-b" data-k="fillAll">⬛ Überall Format füllen</button></div>
-    <div class="sn-note">„Format füllen“ schneidet die Ränder ab. „Ganz zeigen“ macht das Bild so groß, dass es genau hineinpasst, und füllt den Rand weich mit demselben Bild, wie bei Instagram. Das passt sich bei jedem Format von selbst an. Für Reels und Storys „Hoch 9:16“.</div>
-  </div></details>
-  <details class="sn-box"><summary>🎵 Musik darunter</summary><div class="bd">
+    <div class="sn-row"><button type="button" class="sn-b sm" data-k="fitAll">Mich überall ganz zeigen</button><button type="button" class="sn-b sm" data-k="fillAll">Überall füllen</button></div>
+    <div class="sn-fr" data-k="fr">
+      <h3 class="sub" data-k="frT">Dieser Clip</h3>
+      <div class="sn-row"><button type="button" class="sn-b sm" data-k="frFit">Ganz zeigen</button><button type="button" class="sn-b sm" data-k="frFill">Format füllen</button></div>
+      <label><span>Zoom <i data-k="frZv">100 %</i></span><input type="range" min="30" max="300" step="1" value="100" data-fr="z"></label>
+      <details class="sn-more"><summary>Feiner einstellen</summary><div class="bd">
+        <label><span>Links / Rechts</span><input type="range" min="-100" max="100" step="1" value="0" data-fr="x"></label>
+        <label><span>Hoch / Runter</span><input type="range" min="-100" max="100" step="1" value="0" data-fr="y"></label>
+        <label><span>Gerade richten <i data-k="frRv">0°</i></span><input type="range" min="-10" max="10" step="0.1" value="0" data-fr="r"></label>
+        <div class="lbl">Bewegung</div>
+        <div class="sn-chips" data-k="zmv"><button type="button" data-zm="none">Keine</button><button type="button" data-zm="slow">Langsam rein</button><button type="button" data-zm="punch">Schnell rein</button><button type="button" data-zm="out">Langsam raus</button></div>
+        <label><span>Fischauge <i data-k="feV">aus</i></span><input type="range" min="0" max="100" step="1" value="0" data-k="fe"></label>
+        <div class="sn-row"><button type="button" class="sn-b sm" data-k="frAll">Für alle Clips</button><button type="button" class="sn-b sm" data-k="frReset">Zurücksetzen</button></div>
+      </div></details>
+    </div>
+  </section>
+  <section class="sn-pan" data-pan="licht" hidden>
+    <h3>Licht &amp; Farbe</h3>
+    <div class="sn-chips sn-looks" data-k="looks"></div>
+    <div data-sl="br"></div><div data-sl="bb"></div>
+    <details class="sn-more"><summary>Feiner einstellen</summary><div class="bd">
+      <div data-sl="ct"></div><div data-sl="sa"></div><div data-sl="se"></div>
+      <label class="sn-sw"><input type="checkbox" data-k="lbx"> Kino-Balken</label>
+      <button type="button" class="sn-b sm" data-k="cmp">Vorher zeigen</button>
+    </div></details>
+  </section>
+  <section class="sn-pan" data-pan="musik" hidden>
+    <h3>Musik</h3>
     <div class="sn-ml" data-k="mlist"></div>
     <div class="sn-sug" data-k="sug"></div>
-    <details class="sn-all"><summary data-k="allsum">Alle Lieder durchsuchen</summary>
-      <input type="search" data-k="msearch" placeholder="Lied oder Künstlerin suchen …" aria-label="Lied suchen">
-      <div class="sn-lib" data-k="lib"><div class="sn-note">Deine Musik wird geladen …</div></div>
-    </details>
-    <label class="sn-b" style="width:max-content;cursor:pointer">📁 Lieder vom Gerät<input type="file" accept="audio/*,.mp3,.m4a,.wav,.aac" multiple hidden data-k="mfile"></label>
-    <div data-sl="vol"></div><div data-sl="voice"></div>
-    <label class="sn-sw"><input type="checkbox" data-k="duck"> Musik leiser, wenn ich spreche</label>
-    <label class="sn-sw"><input type="checkbox" data-k="fade"> Musik sanft ein- und ausblenden</label>
-  </div></details>
-  <div class="sn-note">Deine Clips bleiben auf diesem Gerät gespeichert (auch nach dem Schließen), bis du sie hier löschst. Die Vorschau zeigt alles so, wie es nachher gespeichert wird.</div>
+    <div data-sl="vol"></div>
+    <details class="sn-more"><summary>Feiner einstellen</summary><div class="bd">
+      <div data-sl="voice"></div>
+      <label class="sn-sw"><input type="checkbox" data-k="duck"> Leiser, wenn ich spreche</label>
+      <label class="sn-sw"><input type="checkbox" data-k="fade"> Ein- und ausblenden</label>
+      <details class="sn-all"><summary data-k="allsum">Alle Lieder</summary>
+        <input type="search" data-k="msearch" placeholder="Lied suchen …" aria-label="Lied suchen">
+        <div class="sn-lib" data-k="lib"></div>
+      </details>
+      <label class="sn-b sm" style="width:max-content;cursor:pointer">Lieder vom Gerät<input type="file" accept="audio/*,.mp3,.m4a,.wav,.aac" multiple hidden data-k="mfile"></label>
+    </div></details>
+  </section>
+  <section class="sn-pan" data-pan="mehr" hidden>
+    <div class="sn-ed" data-k="ed" hidden>
+      <h3 data-k="edT"></h3><div class="sn-note" data-k="edD"></div>
+      <div class="sn-row">
+        <button type="button" class="sn-b sm" data-k="setA">Anfang hier</button>
+        <button type="button" class="sn-b sm" data-k="setB">Ende hier</button>
+        <button type="button" class="sn-b sm" data-k="split" hidden>Teilen</button>
+        <button type="button" class="sn-b sm" data-k="resetCut">Schnitt zurück</button>
+        <button type="button" class="sn-b sm" data-k="mute">Ton aus</button>
+      </div>
+      <div class="sn-row">
+        <button type="button" class="sn-b sm" data-k="first">Ganz nach vorne</button>
+        <button type="button" class="sn-b sm" data-k="left">← Vor</button>
+        <button type="button" class="sn-b sm" data-k="right">Zurück →</button>
+        <button type="button" class="sn-b sm del" data-k="delClip">Clip löschen</button>
+      </div>
+      <details class="sn-more"><summary>Bild über das Video legen</summary><div class="bd">
+        <div class="sn-row">
+          <button type="button" class="sn-b sm" data-k="broMk">Diesen Clip als Bild darüber</button>
+          <label class="sn-b sm" style="cursor:pointer">Video vom Gerät<input type="file" accept="video/*,.mov,.mp4,.m4v,.webm" hidden data-k="broFile"></label>
+        </div>
+        <div class="sn-hint" data-k="broHint"></div>
+      </div></details>
+      <div class="sn-bro" data-k="bro"></div>
+    </div>
+    <h3 class="sub">Clips</h3>
+    <div class="sn-row">
+      ${o.studioUrl ? `<a class="sn-b sm" href="${esc(o.studioUrl)}">Im Studio aufnehmen</a>` : ''}
+      <button type="button" class="sn-b sm del" data-k="clearAll">Alle Clips löschen</button>
+    </div>
+    <details class="sn-trash" data-k="trash" hidden><summary>Papierkorb <span data-k="trN"></span></summary><div data-k="trL"></div>
+      <div class="sn-row"><button type="button" class="sn-b sm del" data-k="trEmpty">Papierkorb leeren</button></div></details>
+    <details class="sn-trash" data-k="resc" hidden open><summary>Gerettete Videos <span data-k="rsN"></span></summary><div data-k="rsL"></div></details>
+  </section>
 </div>`;
     const q = s => root.querySelector(s), K = k => root.querySelector('[data-k="' + k + '"]');
     const pv = q('#snpv'), msg = K('msg'), big = K('big');
+    const TABS = ['auto', 'bild', 'licht', 'musik', 'mehr']; let tabNow = '';
+    function setTab(t) { tabNow = t; root.querySelectorAll('.sn-pan').forEach(p => p.hidden = p.dataset.pan !== t); root.querySelectorAll('.sn-tabs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tab === t)));
+      pv.classList.toggle('frmode', t === 'bild'); if (t !== 'dr') { try { localStorage.setItem('sn-tab', t); } catch (e) {} } if (t === 'bild') { try { frUi(); } catch (e) {} } }
+    root.querySelectorAll('.sn-tabs button').forEach(b => b.onclick = () => { setTab(b.dataset.tab); if (innerWidth <= 980) root.querySelector('.sn-r').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+    { let t0 = 'auto'; try { t0 = localStorage.getItem('sn-tab') || 'auto'; } catch (e) {} setTab(TABS.includes(t0) ? t0 : 'auto'); }
     const say = (t, c) => { msg.className = 'sn-msg' + (c ? ' ' + c : ''); msg.textContent = t; };
 
     // ---- Zustand ----
@@ -681,7 +769,7 @@ void main(){
       K('drList').querySelectorAll('[data-dopen]').forEach(b => b.onclick = () => openDraft(b.dataset.dopen));
       K('drList').querySelectorAll('[data-ddel]').forEach(b => b.onclick = () => delDraft(b.dataset.ddel));
       K('drList').querySelectorAll('[data-dmerge]').forEach(b => b.onclick = () => mergeDraft(b.dataset.dmerge));
-      { const n = drList.length, cn = (drList.find(d => d.id === curDraft) || {}).name; K('drCnt').textContent = n ? '(' + n + ')' : ''; K('drCur').textContent = 'Offen: ' + (cn || 'Ohne Namen'); }
+      { const n = drList.length, cn = (drList.find(d => d.id === curDraft) || {}).name; K('drCnt').textContent = n > 1 ? n + ' Entwürfe' : ''; K('drCur').textContent = cn || 'Ohne Namen'; }
       K('h2').firstChild.textContent = (drList.find(d => d.id === curDraft) || {}).name ? 'Clips in „' + drName(curDraft) + '“ ' : 'Deine Clips ';
       tgUi();
     }
@@ -717,7 +805,7 @@ void main(){
       trashUi(); say('🗑 „' + nm + '“ gelöscht, die Clips liegen im Papierkorb.');
     }
     SY.status = (k, n, p) => { if (closed) return; K('syS').textContent = k === 'done' ? '· ☁️ auf allen Geräten' : '· ☁️ wird für deine anderen Geräte gesichert … noch ' + n + (n > 1 ? ' Dateien' : ' Datei') + ' (' + Math.round(p * 100) + ' %)'; };
-    function drJump() { const b = K('drBox'); b.open = true; b.scrollIntoView({ behavior: 'smooth', block: 'start' }); b.style.boxShadow = '0 0 0 3px #7D5E68'; setTimeout(() => b.style.boxShadow = '', 2200); }
+    function drJump() { if (tabNow === 'dr') { let t = 'auto'; try { t = localStorage.getItem('sn-tab') || 'auto'; } catch (e) {} setTab(t); return; } setTab('dr'); root.querySelector('.sn-r').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
     K('drJump').onclick = drJump; if (location.hash === '#entwuerfe') setTimeout(drJump, 600);
     K('drNew').onclick = async () => {
       if (busy) return; const d = { id: uid(), name: '', at: Date.now() };
@@ -790,7 +878,7 @@ void main(){
     async function goRescue() {
       await rescueUi(); const box = K('resc');
       if (box.hidden) { say('Unter „🛟 Gerettete Videos“ liegt gerade nichts: Von diesem Video ist keine ursprüngliche Datei mehr auf dem Gerät. Schau bitte in deinen Fotos oder in „Downloads“, ob du es dort noch hast.', 'bad'); return; }
-      box.open = true; box.scrollIntoView({ behavior: 'smooth', block: 'start' }); box.style.boxShadow = '0 0 0 3px #7D5E68'; setTimeout(() => box.style.boxShadow = '', 2500);
+      setTab('mehr'); box.open = true; box.scrollIntoView({ behavior: 'smooth', block: 'start' }); box.style.boxShadow = '0 0 0 3px #7D5E68'; setTimeout(() => box.style.boxShadow = '', 2500);
     }
     async function addFiles(files) {
       let n = 0;
@@ -853,10 +941,10 @@ void main(){
       if (shAC && shAC.state === 'suspended') shAC.resume().catch(() => {});
       // Titelbild: von ganz vorne abgespielt, steht es zuerst ein paar Sekunden (Musik läuft schon darunter)
       const wantCov = CD() && sel === 0 && pos < .05 && !covRun && !covSkip; covSkip = false;
-      if (wantCov) { show(0, 0); playing = true; big.hidden = true; K('play').textContent = '❚❚ Pause'; covPlay(); return; }
+      if (wantCov) { show(0, 0); playing = true; big.hidden = true; K('play').textContent = '❚❚'; covPlay(); return; }
       if (v.currentTime < (c.in || 0) || v.currentTime >= (c.out || c.dur) - .05) show(sel, 0); else show(sel, 0, false);
-      playing = true; big.hidden = true; K('play').textContent = '❚❚ Pause'; covShow(false);
-      try { await v.play(); } catch (e) { playing = false; big.hidden = false; K('play').textContent = '▶ Abspielen'; say('Abspielen klappt nicht. Bitte nochmal auf ▶ tippen.'); return; }
+      playing = true; big.hidden = true; K('play').textContent = '❚❚'; covShow(false);
+      try { await v.play(); } catch (e) { playing = false; big.hidden = false; K('play').textContent = '▶'; say('Abspielen klappt nicht. Bitte nochmal auf ▶ tippen.'); return; }
       musDrive(pos + CD(), true);
       cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
     }
@@ -868,7 +956,7 @@ void main(){
         if (t >= D0) { covRun = 0; covShow(false); pos = 0; covSkip = true; playing = false; play(); return; } covRun = requestAnimationFrame(step); };
       covRun = requestAnimationFrame(step);
     }
-    function stop() { playing = false; cancelAnimationFrame(raf); ovV.forEach(x => { if (!x.paused) x.pause(); }); if (covRun) { cancelAnimationFrame(covRun); covRun = 0; covShow(false); } const v = cur(); if (v) v.pause(); musStop(); big.hidden = !clips.length; K('play').textContent = '▶ Abspielen'; }
+    function stop() { playing = false; cancelAnimationFrame(raf); ovV.forEach(x => { if (!x.paused) x.pause(); }); if (covRun) { cancelAnimationFrame(covRun); covRun = 0; covShow(false); } const v = cur(); if (v) v.pause(); musStop(); big.hidden = !clips.length; K('play').textContent = '▶'; }
     K('play').onclick = () => playing ? stop() : play(); big.onclick = play;
     K('cmp').onclick = () => { cmp = !cmp; K('cmp').textContent = cmp ? 'Nachher zeigen' : 'Vorher zeigen'; K('cmp').setAttribute('aria-pressed', String(cmp)); K('tag').textContent = cmp ? 'Vorher' : ''; const v = cur(); if (v) v.style.filter = cmp ? '' : filterCss(st); };
     function timeUi() { K('time').textContent = fmt(pos) + ' / ' + fmt(total()); if (clips.length) ztPh(); }
@@ -1872,12 +1960,11 @@ void main(){
     const dShort = d => { if (!d) return ''; const x = new Date(d + 'T12:00:00'); return isNaN(x) ? '' : ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][x.getDay()] + ' ' + x.getDate() + '.' + (x.getMonth() + 1) + '.'; };
     function tgLabel(t) { if (!t) return ''; return t.k === 'talk' ? '„' + t.n + '“ · ' + (LGN[t.lang] || '') : t.k === 'clip' ? 'Übung „' + t.n + '“' : (t.kind === 'reel' ? 'Reel' : 'Story') + ' für ' + dShort(t.due) + ' · „' + t.n + '“'; }
     const tgKey = t => t ? (t.k === 'talk' ? 't' + t.id + t.lang : t.k === 'clip' ? 'c' + t.c : 'i' + t.id) : '';
-    function doneLbl() { K('done').textContent = curTg() && o.upload ? '✓ Fertig stellen & hochladen' : '✓ Fertig stellen'; }
+    function doneLbl() { K('done').textContent = curTg() && o.upload ? 'Fertig & hochladen' : 'Fertig'; }
     function tgUi() {
       const box = K('tg'); if (!o.upload) { box.hidden = true; return; } const t = curTg(); box.classList.toggle('on', !!t);
-      K('tgT').innerHTML = t ? '📤 Kommt hinein in: <b>' + esc(tgLabel(t)) + '</b><small>' + (t.due ? 'fertig bis ' + esc(dShort(t.due)) + ' · ' : '') + '„Fertig stellen“ lädt es gleich dorthin hoch.</small>'
-        : '📤 <b>Wohin kommt das Video?</b><small>Auswählen, dann lädt „Fertig stellen“ es gleich an die richtige Stelle. Ohne Auswahl kannst du es nur sichern oder herunterladen.</small>';
-      K('tgBtn').textContent = t ? 'Ändern' : 'Auswählen'; doneLbl();
+      K('tgT').innerHTML = t ? 'Kommt in: <b>' + esc(tgLabel(t)) + '</b>' : 'Noch kein Ziel';
+      K('tgBtn').textContent = t ? 'Ändern' : 'Ziel wählen'; doneLbl();
     }
     let targets = null, upWanted = false;
     async function tgOpen(force) {

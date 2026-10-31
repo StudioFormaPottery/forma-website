@@ -165,16 +165,9 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 @media(max-width:760px){.how{display:none}}
 </style>
 <?php mm_subnav('schnitt'); ?>
-<div class="sh"><div><h1>✂️ Video-Schnitt</h1><p>Video vom iPhone oder aus dem Studio holen, schneiden, Titelbild und Musik dazu, fertig stellen – und es landet direkt dort, wo es hingehört.</p></div>
-  <a href="<?= $h($self) ?>?view=studio&amp;kal=1">📅 Zum Kalender</a></div>
-<div class="how">
-  <div><b>1 · Video holen</b>Im 📅 Kalender beim Video auf „📤 hochladen“ tippen, oder hier „＋ Clips vom Gerät“. Alles bleibt auf diesem Gerät, bis du es löschst.</div>
-  <div><b>2 · Schneiden, Titelbild, Musik</b>✨ Automatisch schneiden oder selbst, 🖼 Titelbild ganz vorne, 🎵 Musik darunter.</div>
-  <div><b>3 · Fertig stellen &amp; hochladen</b>Ein Tipp: das Video wird gespeichert und gleich in die richtige Lektion hochgeladen. Dann steht „✓ Ist drin“.</div>
-</div>
 <div id="sn"></div>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
-<script src="schnitt.js?v=38"></script>
+<script src="schnitt.js?v=39"></script>
 <script>
 (function(){
   const csrf=<?= json_encode(csrf()) ?>, BUNNY=<?= $bunny ? 'true' : 'false' ?>;window.SN_CSRF=csrf;
