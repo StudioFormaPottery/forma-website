@@ -174,7 +174,7 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 </div>
 <div id="sn"></div>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
-<script src="schnitt.js?v=37"></script>
+<script src="schnitt.js?v=38"></script>
 <script>
 (function(){
   const csrf=<?= json_encode(csrf()) ?>, BUNNY=<?= $bunny ? 'true' : 'false' ?>;window.SN_CSRF=csrf;

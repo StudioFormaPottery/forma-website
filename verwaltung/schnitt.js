@@ -404,7 +404,7 @@ void main(){
  if(fe>0.){float vd=length((uv-.5)*vec2(ro,1.))/(.5*sqrt(ro*ro+1.)); c*=1.-fe*.55*smoothstep(.62,1.,vd);}
  if(lb>.5){float h=max(ro/2.39,.82)*.5; if(abs(uv.y-.5)>h) c=vec3(0.);} // Kino-Balken
  gl_FragColor=vec4(clamp(c,0.,1.),1.);}`;
-  const LOOKS = [['natur', 'Natürlich', { br: 1, ct: 1, sa: 1, se: 0, cin: 0 }], ['hell', 'Heller & frisch', { br: 1.08, ct: 1.04, sa: 1.06, se: 0, cin: 0 }], ['warm', 'Warm', { br: 1.03, ct: 1.02, sa: 1.02, se: .22, cin: 0 }], ['kino', '🎬 Kino', { br: 1.01, ct: 1.07, sa: .88, se: .04, cin: 1 }], ['weich', 'Weich & ruhig', { br: 1.04, ct: .92, sa: .9, se: .12, cin: 0 }], ['sw', 'Schwarz-Weiß', { br: 1.02, ct: 1.06, sa: 0, se: 0, cin: 0 }]];
+  const LOOKS = [['natur', 'Ohne Filter', { br: 1, ct: 1, sa: 1, se: 0, cin: 0 }], ['hell', 'Heller & frisch', { br: 1.08, ct: 1.04, sa: 1.06, se: 0, cin: 0 }], ['warm', 'Warm', { br: 1.03, ct: 1.02, sa: 1.02, se: .22, cin: 0 }], ['kino', '🎬 Kino', { br: 1.01, ct: 1.07, sa: .88, se: .04, cin: 1 }], ['weich', 'Weich & ruhig', { br: 1.04, ct: .92, sa: .9, se: .12, cin: 0 }], ['sw', 'Schwarz-Weiß', { br: 1.02, ct: 1.06, sa: 0, se: 0, cin: 0 }]];
   const FMTS = [['orig', 'Wie aufgenommen'], ['9:16', 'Hoch 9:16'], ['4:5', '4:5'], ['1:1', 'Quadrat'], ['16:9', 'Quer 16:9']];
   // Eigener Bildausschnitt je Clip (Vivien, 30.10.2026: „im Schnitt direkt zoomen, verschieben und gerade stellen“)
   // F = { z: Zoom 1–3, x/y: -1…1 (wohin der Ausschnitt rückt), r: Grad }. Beim Drehen wird so viel mitgezoomt, dass keine Ecken fehlen.
@@ -1705,7 +1705,7 @@ void main(){
     async function fastRender(fill) {
       if (!window.VideoEncoder || !window.VideoDecoder || !window.OfflineAudioContext) return null;
       const M = await loadMB(); const C0 = CD(), D = total() + C0, SR = 48000;
-      const ins = []; let start = C0; for (const c of clips) { const input = new M.Input({ source: new M.BlobSource(c.blob), formats: M.ALL_FORMATS }); const vt = await input.getPrimaryVideoTrack(); if (!vt || !(await vt.canDecode())) return null; const rot = (await vt.getRotation?.()) ?? vt.rotation ?? 0; ins.push({ input, vt, rot, c, start }); start += len(c); }
+      const ins = []; let start = C0; for (const c of clips) { const input = new M.Input({ source: new M.BlobSource(c.blob), formats: M.ALL_FORMATS }); const vt = await input.getPrimaryVideoTrack(); if (!vt || !(await vt.canDecode())) return null; const rot = (await vt.getRotation?.()) ?? vt.rotation ?? 0; let hdr = false; try { hdr = !!(await vt.hasHighDynamicRange?.()); } catch (e) {} ins.push({ input, vt, rot, hdr, c, start }); start += len(c); }
       // Ausgabegröße nach dem ersten Clip (Drehung beachten)
       const f0 = ins[0]; let w0 = f0.vt.displayWidth || f0.vt.codedWidth, h0 = f0.vt.displayHeight || f0.vt.codedHeight; if (f0.rot % 180) [w0, h0] = [h0, w0];
       const [W, H] = outSize(w0, h0), cv = document.createElement('canvas'); cv.width = W; cv.height = H; const draw = makeGL(cv); if (!draw) return null;
@@ -1745,7 +1745,7 @@ void main(){
         return S.cur;
       };
       for (const x of ins) {
-        const eOut = x.c.out || x.c.dur, direct = !x.rot, vs = direct ? new M.VideoSampleSink(x.vt) : new M.CanvasSink(x.vt, { poolSize: 2 });
+        const eOut = x.c.out || x.c.dur, direct = !x.rot && !x.hdr, vs = direct ? new M.VideoSampleSink(x.vt) : new M.CanvasSink(x.vt, { poolSize: 2 });
         const it = direct ? vs.samples(x.c.in || 0, eOut) : vs.canvases(x.c.in || 0, eOut);
         for await (const smp of it) {
           if (closed) { try { await out.cancel(); } catch (e) {} return 'x'; }
