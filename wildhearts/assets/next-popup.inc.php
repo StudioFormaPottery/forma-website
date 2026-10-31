@@ -57,14 +57,16 @@ function mv_next_popup(): void
             'h' => ['Jeden Tag ein paar <em>ruhige Minuten</em> für dich', 'A few <em>quiet minutes</em> for you, every day'],
             't' => ['Kurze Videos aus Yoga, Somatic Movement und Bodyweight, dazu Breathwork und Meditation. Du beginnst bei Monat 1 und gehst Schritt für Schritt weiter.', 'Short videos of yoga, somatic movement and bodyweight training, plus breathwork and meditation. You begin with month 1 and go step by step.'],
             'price' => $c['eb_m'] ? ['Early-Bird bis ' . $short($c['eb_m_end'], 'de') . ': ' . $eu($c['m1']) . ' statt ' . $eu($c['r_m1']) . ' im Monat', 'Early bird until ' . $short($c['eb_m_end'], 'en') . ': ' . $eu($c['m1']) . ' instead of ' . $eu($c['r_m1']) . ' a month'] : [$eu($c['m1']) . ' im Monat', $eu($c['m1']) . ' a month'],
-            'btn' => ['Mehr erfahren', 'Find out more']];
+            'btn' => ['Mehr erfahren', 'Find out more'],
+            'tag' => ['Mitgliedschaft · On-Demand · Video-Mediathek', 'Membership · on demand · video library']];
     } elseif ($ph === 'unfold') {
         $p = ['img' => '/img/movecia/fotos/ev-unfold.jpg', 'pos' => '50% 22%', 'href' => '/unfold/',
             'k' => ['Unfold · Start ' . $short($us, 'de') . ' · nur ' . (int)$c['u_seats'] . ' Plätze', 'Unfold · starts ' . $short($us, 'en') . ' · only ' . (int)$c['u_seats'] . ' spots'],
             'h' => ['Unfold · <em>The Mindful Becoming</em>', 'Unfold · <em>The Mindful Becoming</em>'],
             't' => ['Drei Monate, in denen du zu dir zurückfindest: wöchentliche Live-Calls, Bewegungsvideos und Workbooks gegen den Mental Load.', 'Three months to come back to yourself: weekly live calls, movement videos and workbooks for your mental load.'],
             'price' => $c['eb_u'] ? ['Early-Bird bis ' . $short($c['eb_u_end'], 'de') . ': ' . $eu($c['u_once']) . ' statt ' . $eu($c['r_u_once']), 'Early bird until ' . $short($c['eb_u_end'], 'en') . ': ' . $eu($c['u_once']) . ' instead of ' . $eu($c['r_u_once'])] : [$eu($c['u_once']) . ' oder ' . (int)$c['u_n'] . ' × ' . $eu($c['u_inst']), $eu($c['u_once']) . ' or ' . (int)$c['u_n'] . ' × ' . $eu($c['u_inst'])],
-            'btn' => ['Platz sichern', 'Save my spot']];
+            'btn' => ['Platz sichern', 'Save my spot'],
+            'tag' => ['3 Monate Begleitung · live & online', '3 months of guidance · live & online']];
     } else {
         // Movecia Academy (Vivien, 28.10.2026): echte Seite /academy/teacher-training/, Preise aus ac_cfg(), nur Deutsch; ausgebucht → Warteliste
         $a = ac_cfg();
@@ -74,6 +76,7 @@ function mv_next_popup(): void
         $p = ['img' => '/img/movecia/fotos/ev-lunge.jpg', 'pos' => '42% 55%', 'href' => $full ? '/academy/teacher-training/#liste' : '/academy/teacher-training/',
             'k' => [$kde, $kde . ' · in German'],
             'h' => ['The Mindful Becoming <em>Teacher Training</em>', 'The Mindful Becoming <em>Teacher Training</em>'],
+            'tag' => ['Ausbildung · ' . AC_HOURS . ' Stunden · 11 Monate', 'Teacher training · ' . AC_HOURS . ' hours · 11 months'],
             't' => ['Andere begleiten und dabei bei dir selbst bleiben: ' . AC_HOURS . ' Stunden inklusive vollständiger 200-Stunden-Yogalehrerausbildung, 11 Monate hybrid, nur vierzehn Plätze.', 'A ' . AC_HOURS . '-hour Mindful Becoming Teacher Training including a full 200-hour yoga teacher training. Held in German only.'],
             'price' => $full ? null : ($a['eb'] ? ['Early Bird ' . $eua($a['eb_total']) . ' statt ' . $eua($a['r_total']), 'Early bird ' . $eua($a['eb_total']) . ' instead of ' . $eua($a['r_total'])] : [$eua($a['r_total']), $eua($a['r_total'])]),
             'btn' => $full ? ['Auf die Warteliste', 'Join the waiting list'] : ['Zur Ausbildung', 'See the training']];
@@ -103,12 +106,13 @@ function mv_next_popup(): void
 <!-- Pop-up „mit Bäm“ (Vivien, 29.10.2026: Box war „mega langweilig“, mehr Movement, Icons, Weiblichkeit, Zyklus, Jahreskreis):
      Pflaume-Seite mit treibenden Wellen, Foto im Torbogen, ringsum ein langsam kreisender Ring aus Mondphasen (heutige Phase leuchtet),
      gezeichnete Welle unter dem Titel, drei Icons zum Angebot. -->
-<div class="npop" id="npop" data-ph="<?= forma_h($ver) ?>" data-force="<?= $force ? '1' : '' ?>" data-start="<?= (int)$startTs ?>" role="dialog" aria-modal="true" aria-labelledby="npop-h" hidden>
+<div class="npop npop-<?= forma_h($ph) ?>" id="npop" data-ph="<?= forma_h($ver) ?>" data-force="<?= $force ? '1' : '' ?>" data-start="<?= (int)$startTs ?>" role="dialog" aria-modal="true" aria-labelledby="npop-h" hidden>
   <div class="npop-stage">
     <div class="npop-card" tabindex="-1">
       <button class="npop-x" type="button" aria-label="Schließen / Close">✕</button>
       <div class="npop-side">
         <div class="npop-orb">
+          <?php if ($ph === 'teacher'): ?><span class="npop-stamp" aria-hidden="true"><i>Movecia<br>Academy</i><b>2027</b></span><?php endif; ?>
           <div class="npop-pic">
             <div class="npop-ph" style="background-image:url(<?= forma_h($p['img']) ?>);background-position:<?= forma_h($p['pos']) ?>"></div>
           </div>
@@ -116,6 +120,7 @@ function mv_next_popup(): void
         </div>
       </div>
       <div class="npop-tx">
+        <p class="npop-tag"><span class="de"><?= forma_h($p['tag'][0]) ?></span><span class="en"><?= forma_h($p['tag'][1]) ?></span></p>
         <p class="k"><span class="de"><?= forma_h($p['k'][0]) ?></span><span class="en"><?= forma_h($p['k'][1]) ?></span></p>
         <h2 id="npop-h"><span class="de"><?= $p['h'][0] ?></span><span class="en"><?= $p['h'][1] ?></span></h2>
         <svg class="npop-line" viewBox="0 0 220 14" aria-hidden="true"><path d="M2 8 C 20 1, 38 1, 56 8 S 92 15, 110 8 S 146 1, 164 8 S 200 15, 218 7"/></svg>
@@ -189,6 +194,72 @@ function mv_next_popup(): void
 }
 @media(prefers-reduced-motion:reduce){
   .npop-stage,.npop-ph,.npop-line path,.npop-f li{transition:none}
+}
+/* Jedes Angebot eine eigene Form (Vivien, 31.10.2026: „man kann nicht erkennen, dass das ein Unterschied ist“):
+   The Method = klares Quadrat, Unfold = Kiesel wie im Logo (mit versetzter Linie), Teacher Training = alte Postkarte
+   mit gewelltem Rand in Dunkellila. */
+.npop-tag{margin:0;align-self:flex-start;font-size:.78rem;letter-spacing:.06em;font-weight:600;padding:.45em 1em;border-radius:999px;background:var(--bl);color:var(--dp)}
+/* The Method: Quadrat */
+.npop-method .npop-card{border-radius:6px}
+.npop-method .npop-tag{border-radius:4px;background:var(--dp);color:var(--cr)}
+/* Unfold: Kiesel */
+.npop-unfold .npop-stage{padding:14px 18px 0 0}
+.npop-unfold .npop-card{border-radius:200px 90px 220px 110px/150px 180px 110px 200px;overflow:visible;background:#F3ECE4}
+.npop-unfold .npop-card::before{content:"";position:absolute;inset:0;border:2px solid var(--pl);border-radius:inherit;transform:translate(14px,-12px);pointer-events:none}
+.npop-unfold .npop-side{border-radius:200px 0 0 110px/150px 0 0 200px;background:var(--pf)}
+.npop-unfold .npop-tx{padding:3rem 3.6rem 2.8rem 2.4rem}
+.npop-unfold .npop-pr,.npop-method .npop-pr{max-width:100%}
+.npop-unfold .npop-tag{background:var(--pl);color:var(--cr);font-size:.86rem}
+.npop-unfold .npop-x{right:46px;top:30px}
+/* Teacher Training: Postkarte */
+.npop-teacher .npop-stage{filter:drop-shadow(0 30px 50px rgba(20,8,16,.45))}
+.npop-teacher .npop-card{--r:11px;border-radius:0;box-shadow:none;background:radial-gradient(130% 120% at 0% 0%,#5E3B50 0%,var(--pl) 45%,var(--dp) 100%);color:var(--cr);
+  -webkit-mask:radial-gradient(var(--r) at var(--r) var(--r),#000 calc(100% - 1px),#0000) 0 0/calc(2*var(--r)) calc(2*var(--r)) round,linear-gradient(#000 0 0) 50%/calc(100% - 2*var(--r)) calc(100% - 2*var(--r)) no-repeat;
+  mask:radial-gradient(var(--r) at var(--r) var(--r),#000 calc(100% - 1px),#0000) 0 0/calc(2*var(--r)) calc(2*var(--r)) round,linear-gradient(#000 0 0) 50%/calc(100% - 2*var(--r)) calc(100% - 2*var(--r)) no-repeat}
+.npop-teacher .npop-card::after{content:"";position:absolute;inset:22px;border:1px dashed rgba(247,241,238,.35);pointer-events:none}
+.npop-teacher .npop-side{background:none;padding:40px 10px 40px 40px;min-height:540px;overflow:visible}
+.npop-teacher .npop-orb{position:relative;inset:auto;height:100%}
+.npop-teacher .npop-pic{inset:0;background:var(--cr);padding:12px 12px 46px;transform:rotate(-2.5deg);box-shadow:0 14px 30px rgba(0,0,0,.35)}
+.npop-teacher .npop-pic::after{display:none}
+.npop-teacher .npop-ph{height:100%}
+.npop-teacher .npop-dot{bottom:12px;background:none;box-shadow:none;color:var(--dp);transform:translateX(-50%) rotate(-2.5deg)}
+.npop-teacher .npop-tx{padding:3.2rem 3rem 2.6rem 2.2rem;color:var(--cr)}
+.npop-teacher .npop-tx h2{font-size:clamp(2.3rem,4.4vw,3.3rem);line-height:1.02;color:var(--cr)}
+.npop-teacher .npop-tx h2 em{color:#F0C9B8;font-style:italic}
+.npop-teacher .npop-tx .k{color:#E9C4B4}
+.npop-teacher .npop-tag{background:#F0C9B8;color:var(--dp)}
+.npop-teacher .npop-t{color:rgba(247,241,238,.86)}
+.npop-teacher .npop-line path{stroke:#F0C9B8}
+.npop-teacher .npop-f li{color:var(--cr)}
+.npop-teacher .npop-f .fi,.npop-teacher .npop-f li:nth-child(2) .fi,.npop-teacher .npop-f li:nth-child(3) .fi{background:rgba(247,241,238,.14)}
+.npop-teacher .npop-f svg{stroke:var(--cr)}
+.npop-teacher .npop-pr{background:var(--cr);color:var(--dp)}
+.npop-teacher .npop-pr .star{color:var(--pl)}
+.npop-teacher .npop-go{background:#F0C9B8;color:var(--dp);border-color:#F0C9B8}
+.npop-teacher .npop-later{color:rgba(247,241,238,.75)}
+.npop-teacher .npop-x{background:rgba(247,241,238,.14);border-color:rgba(247,241,238,.35);color:var(--cr);right:34px;top:30px}
+.npop-stamp{position:absolute;z-index:4;right:-16px;top:-14px;width:84px;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;background:#F0C9B8;color:var(--dp);transform:rotate(6deg);
+  --q:5px;-webkit-mask:radial-gradient(var(--q) at var(--q) var(--q),#0000 97%,#000) calc(-1*var(--q)) calc(-1*var(--q))/calc(2*var(--q)) calc(2*var(--q)) round,linear-gradient(#000 0 0) 50%/calc(100% - 2*var(--q)) calc(100% - 2*var(--q)) no-repeat;mask:radial-gradient(var(--q) at var(--q) var(--q),#0000 97%,#000) calc(-1*var(--q)) calc(-1*var(--q))/calc(2*var(--q)) calc(2*var(--q)) round,linear-gradient(#000 0 0) 50%/calc(100% - 2*var(--q)) calc(100% - 2*var(--q)) no-repeat}
+.npop-stamp::before{content:"";position:absolute;inset:9px;border:1px solid rgba(46,29,39,.35)}
+.npop-stamp i{font-style:normal;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;line-height:1.3}
+.npop-stamp b{font-family:var(--serif);font-weight:500;font-size:1.5rem;line-height:1}
+@media(max-width:759px){
+  .npop-tag{align-self:center}
+  .npop-unfold .npop-stage{padding:12px 12px 0 0}
+  .npop-unfold .npop-card{border-radius:150px 70px 160px 80px/110px 130px 80px 140px}
+  .npop-unfold .npop-card::before{transform:translate(10px,-10px)}
+  .npop-unfold .npop-side{border-radius:150px 70px 0 0/110px 130px 0 0}
+  .npop-unfold .npop-tx{padding:1.6rem 1.8rem 2.6rem}
+  .npop-unfold .npop-x{right:24px;top:22px}
+  .npop-unfold .npop-dot{left:50%;top:auto;bottom:14px;transform:translateX(-50%)}
+  .npop-teacher .npop-side{padding:30px 30px 6px;height:auto;min-height:0}
+  .npop-teacher .npop-orb{height:min(38vh,300px)}
+  .npop-teacher .npop-tx{padding:1.4rem 1.6rem 2rem}
+  .npop-teacher .npop-tx h2{font-size:2.2rem}
+  .npop-teacher .npop-dot{left:50%;top:auto;bottom:12px;transform:translateX(-50%) rotate(-2.5deg)}
+  .npop-teacher .npop-x{right:auto;left:26px;top:26px;z-index:6;background:var(--cr);color:var(--dp);border-color:var(--cr)}
+  .npop-stamp{right:-10px;top:-12px;width:64px;height:76px}
+  .npop-stamp b{font-size:1.15rem}
 }
 </style>
 <script>

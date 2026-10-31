@@ -148,7 +148,10 @@ $mvClip = function () use ($pdo): ?array {
     $l = mv_lesson($pdo, (int)($_POST['id'] ?? 0));
     $st = $l ? mv_lesson_steps($l) : [];
     $i = (int)($_POST['i'] ?? -1);
-    return isset($st[$i]) ? mv_clip_ensure($pdo, $st[$i]['de'], $st[$i]['en']) : null;
+    if (!isset($st[$i])) return null;
+    // eigener Clip für die linke Seite (sonst wird der rechte gespiegelt)
+    if (($_POST['side'] ?? '') === 'l') return mv_clip_ensure($pdo, $st[$i]['de'] . ' · links', $st[$i]['en'] . ' · left');
+    return mv_clip_ensure($pdo, $st[$i]['de'], $st[$i]['en']);
 };
 if ($action === 'mm_mv_clip_new') {
     $c = $mvClip();
@@ -207,7 +210,7 @@ if ($action === 'mm_mv_voice_takes') {
     $g = ($_POST['g'] ?? '') === 'en' ? 'en' : 'de';
     if (!isset($st[$i])) $mvJson(['error' => 'Fehlt.']);
     $out = [];
-    foreach (mv_voice_takes($pdo, mv_clip_key($st[$i]['de']), $g) as $t) {
+    foreach (mv_voice_takes($pdo, mv_step_vkey($st[$i]), $g) as $t) {
         $src = mv_lesson($pdo, (int)$t['lesson_id']);
         $out[] = ['id' => (int)$t['id'], 'url' => mv_take_url((int)$t['id']), 'text' => (string)$t['text'], 'from' => $src ? (string)$src['title_de'] : '', 'at' => date('d.m.Y', strtotime((string)$t['created_at']))];
     }
@@ -220,7 +223,7 @@ if ($action === 'mm_mv_voice_use') {
     $g = ($_POST['g'] ?? '') === 'en' ? 'en' : 'de';
     $q = $pdo->prepare('SELECT * FROM mv_voices WHERE id = ?'); $q->execute([(int)($_POST['take'] ?? 0)]); $t = $q->fetch();
     $st = $l ? mv_lesson_steps($l) : [];
-    if (!$t || !isset($st[$i]) || $t['lang'] !== $g || $t['ckey'] !== mv_clip_key($st[$i]['de'])) $mvJson(['error' => 'Diese Aufnahme passt nicht zu dieser Übung.']);
+    if (!$t || !isset($st[$i]) || $t['lang'] !== $g || $t['ckey'] !== mv_step_vkey($st[$i])) $mvJson(['error' => 'Diese Aufnahme passt nicht zu dieser Übung.']);
     $st[$i][$g === 'en' ? 'ten' : 'tde'] = (string)$t['text'];
     mv_lesson_steps_save($pdo, (int)$l['id'], $st);
     foreach (glob(mv_voice_dir() . '/L' . (int)$l['id'] . '-' . $i . '-' . $g . '.*') ?: [] as $old) @unlink($old);
@@ -271,7 +274,7 @@ if ($action === 'mm_mv_mode') {
         $st = mv_lesson_steps($l); $ch = false;
         foreach ($st as $i => $x) foreach (['de' => 'tde', 'en' => 'ten'] as $g => $k) {
             if (trim($x[$k]) !== '') continue;
-            $t = mv_voice_takes($pdo, mv_clip_key($x['de']), $g)[0] ?? null;
+            $t = mv_voice_takes($pdo, mv_step_vkey($x), $g)[0] ?? null;
             if ($t) { $st[$i][$k] = (string)$t['text']; $ch = true; }
         }
         if ($ch) { mv_lesson_steps_save($pdo, (int)$l['id'], $st); $l = mv_lesson($pdo, (int)$l['id']); }

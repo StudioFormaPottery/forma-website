@@ -1709,19 +1709,21 @@ function mv_lesson_steps(array $l): array
     $out = [];
     $s = json_decode((string)($l['steps'] ?? ''), true);
     if (is_array($s) && $s) {
-        foreach ($s as $x) $out[] = ['de' => (string)$x[0], 'en' => (string)(($x[1] ?? '') ?: $x[0]), 'tde' => (string)($x[2] ?? ''), 'ten' => (string)($x[3] ?? ''), 'sec' => max(20, min(900, (int)($x[4] ?? 120)))];
+        foreach ($s as $x) $out[] = ['de' => (string)$x[0], 'en' => (string)(($x[1] ?? '') ?: $x[0]), 'tde' => (string)($x[2] ?? ''), 'ten' => (string)($x[3] ?? ''), 'sec' => max(20, min(900, (int)($x[4] ?? 120))), 'side' => in_array($x[5] ?? '', ['r', 'l'], true) ? (string)$x[5] : ''];
         return $out;
     }
     $e = json_decode((string)($l['ex'] ?? ''), true);
-    if (is_array($e)) foreach ($e as $x) if (is_array($x) && ($x[0] ?? '') !== '') $out[] = ['de' => (string)$x[0], 'en' => (string)(($x[1] ?? '') ?: $x[0]), 'tde' => '', 'ten' => '', 'sec' => 120];
+    if (is_array($e)) foreach ($e as $x) if (is_array($x) && ($x[0] ?? '') !== '') $out[] = ['de' => (string)$x[0], 'en' => (string)(($x[1] ?? '') ?: $x[0]), 'tde' => '', 'ten' => '', 'sec' => 120, 'side' => ''];
     return $out;
 }
 
 /**
- * Voice-over-Texte der Flows (Vivien, 31.10.2026): je Übung 2:10 (10 s Vorbereitung + exakt 2 Min.),
- * mittlere Übungen themenneutral (eine Aufnahme gilt in allen Flows), erste/letzte Übung mit dem Thema des Flows.
- * Quelle api/seed/flow-voice.json {v, flows: {Titel oder k:ukey: [[name_de, text_de, text_en], …]}}.
- * Ist für eine Übung schon eine Stimme aufgenommen, bleibt deren Text unverändert.
+ * Voice-over-Texte und Reihenfolge der Flows (Vivien, 31.10.2026).
+ * Quelle api/seed/flow-voice.json {v, flows: {Titel oder k:ukey: [[name_de, name_en, seite, text_de, text_en, sek], …]}}
+ * (erzeugt von tools/produktion/flows.py aus dem Übungskatalog: Gruppen Ankommen → Stand → Sitz → Seitlage → Bauch → Rücken,
+ * Übungen mit zwei Seiten als eigene Schritte rechts/links mit je 1 Minute).
+ * Eine neue Version ersetzt die Schritte ganz. Schon eingesprochene Aufnahmen bleiben in der Voice-over-Bibliothek
+ * und sind überall dort sofort wieder da, wo derselbe Text steht.
  */
 function mv_flow_voice_sync(PDO $pdo): void
 {
@@ -1731,21 +1733,25 @@ function mv_flow_voice_sync(PDO $pdo): void
     if ((int)($c['v'] ?? 0) >= (int)$j['v']) return;
     if ((int)$pdo->query('SELECT COUNT(*) FROM mv_lessons')->fetchColumn() === 0) return;
     $n = 0;
+    $alt = mv_voice_dir() . '/alt';
     foreach ($j['flows'] as $ref => $list) {
         $isK = str_starts_with($ref, 'k:');
         $st = $pdo->prepare($isK ? 'SELECT * FROM mv_lessons WHERE ukey = ?' : "SELECT * FROM mv_lessons WHERE title_de = ? AND ukey = ''");
         $st->execute([$isK ? substr($ref, 2) : $ref]);
         foreach ($st->fetchAll() as $l) {
-            $steps = mv_lesson_steps($l); if (!$steps) continue;
-            $ch = false;
-            foreach ($steps as $i => &$x) {
-                $t = $list[$i] ?? null; if (!$t || $t[0] !== $x['de']) continue; // nur wenn an dieser Stelle noch dieselbe Übung steht
-                if (mv_lesson_mode($l) === 'flow' && $x['sec'] !== 120) { $x['sec'] = 120; $ch = true; }
-                if ($t[1] !== '' && $x['tde'] !== $t[1] && !mv_voice_path((int)$l['id'], $i, 'de')) { $x['tde'] = $t[1]; $ch = true; }
-                if (($t[2] ?? '') !== '' && $x['ten'] !== $t[2] && !mv_voice_path((int)$l['id'], $i, 'en')) { $x['ten'] = $t[2]; $ch = true; }
+            $lid = (int)$l['id'];
+            // eigene Aufnahmen dieser Lektion zuerst in die Bibliothek, dann weglegen (die Stellen verschieben sich)
+            foreach (glob(mv_voice_dir() . '/L' . $lid . '-*-*.*') ?: [] as $f) {
+                if (!preg_match('/^L\d+-(\d+)-(de|en)\./', basename($f), $m)) continue;
+                try { mv_voice_take_add($pdo, $lid, (int)$m[1], $m[2], $f); } catch (Throwable $e) {}
+                if (!is_dir($alt)) @mkdir($alt, 0775, true);
+                @rename($f, $alt . '/' . date('Ymd') . '-' . basename($f));
             }
-            unset($x);
-            if ($ch) { mv_lesson_steps_save($pdo, (int)$l['id'], $steps); $n++; }
+            $steps = [];
+            foreach ($list as $x) $steps[] = ['de' => (string)$x[0], 'en' => (string)($x[1] ?: $x[0]), 'side' => (string)($x[2] ?? ''), 'tde' => (string)($x[3] ?? ''), 'ten' => (string)($x[4] ?? ''), 'sec' => (int)($x[5] ?? 120)];
+            mv_lesson_steps_save($pdo, $lid, $steps);
+            foreach ($steps as $x) mv_clip_ensure($pdo, $x['de'], $x['en']);
+            $n++;
         }
     }
     $c['v'] = (int)$j['v']; $c['n'] = $n; $c['at'] = date('c');
@@ -1755,8 +1761,32 @@ function mv_flow_voice_sync(PDO $pdo): void
 /** Schritte speichern (Form [[de, en, text_de, text_en, sek], …]) und Übungsliste mitziehen. */
 function mv_lesson_steps_save(PDO $pdo, int $id, array $steps): void
 {
-    $raw = array_map(fn($x) => [$x['de'], $x['en'], $x['tde'], $x['ten'], (int)$x['sec']], $steps);
+    $raw = array_map(fn($x) => array_merge([$x['de'], $x['en'], $x['tde'], $x['ten'], (int)$x['sec']], ($x['side'] ?? '') !== '' ? [$x['side']] : []), $steps);
     $pdo->prepare('UPDATE mv_lessons SET steps = ?, ex = ? WHERE id = ?')->execute([json_encode($raw, JSON_UNESCAPED_UNICODE), json_encode(array_map(fn($x) => [$x[0], $x[1]], $raw), JSON_UNESCAPED_UNICODE), $id]);
+}
+
+/**
+ * Rechte und linke Seite (Vivien, 31.10.2026): Übungen mit zwei Seiten sind zwei Schritte mit eigenem Voice-over
+ * (je 10 s Vorbereitung + 1 Min.). Ein Clip je Übung; die linke Seite spielt ihn gespiegelt ab, außer es gibt in der
+ * Mediathek einen eigenen Clip „<Name> · links“.
+ */
+function mv_side_label(string $side, string $g = 'de'): string
+{
+    if ($side === 'r') return $g === 'en' ? 'right side' : 'rechte Seite';
+    if ($side === 'l') return $g === 'en' ? 'left side' : 'linke Seite';
+    return '';
+}
+function mv_step_name(array $x, string $g = 'de'): string
+{
+    $n = $g === 'en' ? $x['en'] : $x['de'];
+    $s = mv_side_label((string)($x['side'] ?? ''), $g);
+    return $s !== '' ? $n . ' · ' . $s : $n;
+}
+/** Schlüssel für die Voice-over-Bibliothek: Übung + Seite (rechts und links sind verschiedene Aufnahmen) */
+function mv_step_vkey(array $x): string
+{
+    $s = (string)($x['side'] ?? '');
+    return mv_clip_key($x['de']) . ($s !== '' ? '~' . $s : '');
 }
 
 /** Übungsliste einer Lektion: [[de, en], …] */
@@ -1844,7 +1874,16 @@ function mv_clip_set(PDO $pdo, string $de, string $en, string $guid): void
 function mv_lesson_clip_rows(PDO $pdo, array $l): array
 {
     $out = [];
-    foreach (mv_lesson_steps($l) as $i => $x) $out[$i] = mv_clips_all($pdo)[mv_clip_key($x['de'])] ?? mv_clip_ensure($pdo, $x['de'], $x['en']);
+    foreach (mv_lesson_steps($l) as $i => $x) {
+        $base = mv_clips_all($pdo)[mv_clip_key($x['de'])] ?? mv_clip_ensure($pdo, $x['de'], $x['en']);
+        $base['mirror'] = 0;
+        if (($x['side'] ?? '') === 'l') {
+            $own = mv_clips_all($pdo)[mv_clip_key($x['de'] . ' · links')] ?? null;
+            if ($own && (string)$own['guid'] !== '') { $own['mirror'] = 0; $own['own_left'] = 1; $out[$i] = $own; continue; }
+            $base['mirror'] = 1;
+        }
+        $out[$i] = $base;
+    }
     return $out;
 }
 
@@ -1895,7 +1934,7 @@ function mv_voice_take_for(int $lid, int $i, string $g): ?array
     if (!$x || trim($txt) === '') return $cache[$k] = null;
     try {
         $q = $pdo->prepare('SELECT * FROM mv_voices WHERE ckey = ? AND lang = ? AND text_hash = ? ORDER BY id DESC');
-        $q->execute([mv_clip_key($x['de']), $g, mv_text_hash($txt)]);
+        $q->execute([mv_step_vkey($x), $g, mv_text_hash($txt)]);
         foreach ($q->fetchAll() as $r) { $f = mv_voice_dir() . '/' . $r['file']; if (is_file($f)) return $cache[$k] = $r + ['path' => $f]; }
     } catch (Throwable $e) {}
     return $cache[$k] = null;
@@ -1911,7 +1950,7 @@ function mv_voice_take_add(PDO $pdo, int $lid, int $i, string $g, string $src): 
     $name = 'T' . bin2hex(random_bytes(6)) . '.' . strtolower(pathinfo($src, PATHINFO_EXTENSION));
     if (!@copy($src, mv_voice_dir() . '/' . $name)) return;
     $pdo->prepare('INSERT INTO mv_voices (ckey, lang, text_hash, text, file, lesson_id, step, created_at) VALUES (?,?,?,?,?,?,?,?)')
-        ->execute([mv_clip_key($x['de']), $g, mv_text_hash($txt), $txt, $name, $lid, $i, date('c')]);
+        ->execute([mv_step_vkey($x), $g, mv_text_hash($txt), $txt, $name, $lid, $i, date('c')]);
 }
 
 /** Alle gespeicherten Aufnahmen einer Übung in einer Sprache (neueste zuerst) */
@@ -2024,7 +2063,7 @@ function mv_flow_data(array $l, string $lang, bool $preview = false): ?array
         if ($src === '' && !$preview) return null;
         $voice = $mode === 'flow' ? mv_voice_url((int)$l['id'], $i, $g) : '';
         if ($mode === 'flow' && $voice === '' && !$preview) return null;
-        $items[] = ['name' => $g === 'en' ? $x['en'] : $x['de'], 'src' => $src, 'thumb' => $guid !== '' ? mv_thumb($guid) : '', 'sec' => $x['sec'], 'voice' => $voice] + ($preview ? ['text' => $g === 'en' ? $x['ten'] : $x['tde']] : []);
+        $items[] = ['name' => $g === 'en' ? $x['en'] : $x['de'], 'side' => mv_side_label((string)$x['side'], $g), 'mirror' => (int)($rows[$i]['mirror'] ?? 0), 'src' => $src, 'thumb' => $guid !== '' ? mv_thumb($guid) : '', 'sec' => $x['sec'], 'voice' => $voice] + ($preview ? ['text' => $g === 'en' ? $x['ten'] : $x['tde']] : []);
     }
     return ['lang' => $g, 'mode' => $mode, 'title' => mv_t($l, 'title', $g), 'items' => $items, 'music' => mv_music_lists(), 'preview' => $preview,
         'bgm' => array_map(fn($r) => ['url' => mv_bgm_url((int)$r['id']), 't' => (string)$r['title'], 'dur' => (float)$r['dur']], mv_bgm_rows($pdo, $l))];
@@ -2046,8 +2085,9 @@ function mv_bgm_need(array $l): int
 {
     $n = 0; $sum = 0;
     foreach (mv_lesson_steps($l) as $x) $n++;
-    // je Übung 10 s Vorbereitung; Flow exakt 2 Min., Bewegungsvideo 30/45 s (Vivien, 31.10.2026)
-    return mv_lesson_mode($l) === 'move' ? $n * 55 + 20 : $n * 130 + 20;
+    // je Übung 10 s Vorbereitung; Flow 2 Min. (eine Seite 1 Min.), Bewegungsvideo 30/45 s (Vivien, 31.10.2026)
+    foreach (mv_lesson_steps($l) as $x) $sum += 10 + (int)$x['sec'];
+    return mv_lesson_mode($l) === 'move' ? $n * 55 + 20 : $sum + 20;
 }
 /** Automatischer Vorschlag: passende Ordner, stabil gemischt je Video ($seed = andere Mischung). */
 function mv_bgm_auto(PDO $pdo, array $l, int $seed = 0): array

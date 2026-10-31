@@ -325,7 +325,8 @@
   function MvFlow(root, data) {
     css();
     const en = data.lang === 'en', T = (de, e) => en ? e : de;
-    const items = data.items || [];
+    // rechte/linke Seite (Vivien, 31.10.2026): Name mit Seite, linke Seite wird gespiegelt, wenn es keinen eigenen Clip gibt
+    const items = (data.items || []).map(x => Object.assign({}, x, { name: x.side ? x.name + ' · ' + x.side : x.name }));
     const flow = data.mode !== 'move';
     const pv = !!data.preview;
     let dur = 30; try { dur = +(localStorage.getItem('mvf-dur') || 30) === 45 ? 45 : 30; } catch (e) {}
@@ -333,7 +334,7 @@
     const voice = new Audio(); voice.preload = 'auto';
     const C = 2 * Math.PI * 52;
     // Flow: jede Übung exakt 2 Minuten; vor JEDER Übung 10 Sekunden Vorbereitung (Vivien, 31.10.2026)
-    const secOf = i => flow ? 120 : dur;
+    const secOf = i => flow ? (+items[i].sec || 120) : dur;
     const sum = () => items.reduce((a, _, i) => a + secOf(i) + 10, 0);
     const mins = s => Math.max(1, Math.round(s / 60));
     root.classList.add('mvf');
@@ -422,7 +423,7 @@
       if (k < 0) { k = slots[act].src === '' || !run ? act : 1 - act; if (slots[k] === slots[act] && i > 0) k = 1 - act; load(slots[k], src); }
       act = k; shownAt = performance.now();
       slots.forEach((x, j) => { x.f.classList.toggle('on', j === act && !!src); if (j !== act) call(x, 'pause'); });
-      const sl = slots[act]; sl.f.title = it.name; call(sl, 'setCurrentTime', 0); if (run) call(sl, 'play');
+      const sl = slots[act]; sl.f.title = it.name; sl.f.style.transform = it.mirror ? 'scaleX(-1)' : ''; call(sl, 'setCurrentTime', 0); if (run) call(sl, 'play');
       q('[data-ph]').hidden = !!src;
       // Vorschaubild sofort zeigen, solange der Clip lädt (Vivien, 30.10.2026: „das Bild lädt sehr langsam“)
       q('[data-st]').style.backgroundImage = it.thumb ? 'url("' + it.thumb.replace(/"/g, '') + '")' : '';

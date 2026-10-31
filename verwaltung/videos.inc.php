@@ -42,7 +42,7 @@ body{background:#F2ECE4}main{max-width:900px}
 <div class="pv-w">
 <?php if ($fd): ?>
   <div data-mv-flow="<?= $h(json_encode($fd, JSON_UNESCAPED_UNICODE)) ?>"></div>
-  <script src="/wildhearts/assets/flow-player.js?v=19"></script>
+  <script src="/wildhearts/assets/flow-player.js?v=20"></script>
 <?php else: ?>
   <div class="pv-v"><?php if ($vid !== '' && mv_bunny()['lib'] !== ''): ?><iframe src="<?= $h(mv_embed($vid)) ?>" allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe><?php else: ?><div class="pv-e">Das Video ist noch nicht hochgeladen. Sobald es da ist, läuft es hier.</div><?php endif; ?></div>
   <script src="/wildhearts/assets/bunny-ton.js?v=1"></script>
@@ -168,16 +168,23 @@ if ($view === 'videos') {
       <ol class="exl">
       <?php foreach (mv_lesson_steps($l) as $i => $e): $c = $rows[$i]; $g = (string)$c['guid']; $used = count($usage[$c['ckey']] ?? []);
           $vd = mv_voice_url($id, $i, 'de'); $ve = mv_voice_url($id, $i, 'en'); ?>
-        <li class="ex" data-id="<?= $id ?>" data-i="<?= $i ?>" data-c="<?= (int)$c['id'] ?>" data-name="<?= $h($e['de']) ?>" data-name-en="<?= $h($e['en']) ?>" data-sec="<?= (int)$e['sec'] ?>" data-view="<?= $g !== '' && mv_bunny()['lib'] !== '' ? $h(mv_embed($g, true) . '&autoplay=true&loop=true&muted=true') : '' ?>">
-          <div class="exh"><span class="n"><b><?= $i + 1 ?>.</b> <?= $h($e['de']) ?><?php if (!$deOnly && $e['en'] !== $e['de']): ?> <small><?= $h($e['en']) ?></small><?php endif; ?></span>
-            <span class="dur" data-flow-only<?= $flow ? '' : ' hidden' ?>>10 Sek. Vorbereitung + 2 Min.</span></div>
+        <li class="ex" data-id="<?= $id ?>" data-i="<?= $i ?>" data-c="<?= (int)$c['id'] ?>" data-name="<?= $h(mv_step_name($e)) ?>" data-name-en="<?= $h(mv_step_name($e, 'en')) ?>" data-sec="<?= (int)$e['sec'] ?>"<?= !empty($c['mirror']) ? ' data-mirror="1"' : '' ?> data-view="<?= $g !== '' && mv_bunny()['lib'] !== '' ? $h(mv_embed($g, true) . '&autoplay=true&loop=true&muted=true') : '' ?>">
+          <div class="exh"><span class="n"><b><?= $i + 1 ?>.</b> <?= $h($e['de']) ?><?php if ($e['side'] !== ''): ?> <span class="side side-<?= $e['side'] ?>"><?= $e['side'] === 'r' ? 'rechte Seite' : 'linke Seite' ?></span><?php endif; ?><?php if (!$deOnly && $e['en'] !== $e['de']): ?> <small><?= $h($e['en']) ?></small><?php endif; ?></span>
+            <span class="dur" data-flow-only<?= $flow ? '' : ' hidden' ?>>10 Sek. Vorbereitung + <?= (int)$e['sec'] % 60 === 0 ? ((int)$e['sec'] / 60) . ' Min.' : (int)$e['sec'] . ' Sek.' ?></span></div>
           <textarea hidden data-tde><?= $h($e['tde']) ?></textarea><textarea hidden data-ten><?= $h($e['ten']) ?></textarea>
           <div class="cols">
+            <?php if ($e['side'] === 'l'): $mir = !empty($c['mirror']); ?>
+            <div class="cell clip<?= $g ? ' ok' : '' ?>" data-left="1">
+              <span class="lab">📹 Clip</span>
+              <span class="msg"><?= !$g ? 'kommt vom Clip der rechten Seite' : ($mir ? '✓ gespiegelt vom rechten Clip' : '✓ eigener Clip für links') ?></span>
+              <?php if ($bunny): ?><label class="up again"><input type="file" accept="video/*" class="vfile"><span><?= $mir || !$g ? 'Eigenen Clip für links' : 'Neu hochladen' ?></span></label><?php endif; ?>
+            <?php else: ?>
             <div class="cell clip<?= $g ? ' ok' : '' ?>">
               <span class="lab">📹 Clip</span>
               <span class="msg"><?= $g ? '✓ da' . ($used > 1 ? ' · steckt in ' . $used . ' Videos' : '') : 'fehlt noch' ?></span>
               <?php if ($bunny): ?><label class="up<?= $g ? ' again' : '' ?>"><input type="file" accept="video/*" class="vfile"><span><?= $g ? 'Neu hochladen' : 'Clip hochladen' ?></span></label><?php endif; ?>
               <a class="up again" style="text-decoration:none" href="<?= $u('view=studio&c=' . (int)$c['id']) ?>">🧘 Im Studio filmen</a>
+            <?php endif; ?>
               <span class="bar" hidden><i></i></span>
             </div>
             <?php foreach (array_intersect_key(['de' => [$vd, 'Deutsch'], 'en' => [$ve, 'Englisch']], $LANGS) as $vg => [$vu, $vn]): $own = (bool)glob(mv_voice_dir() . '/L' . $id . '-' . $i . '-' . $vg . '.*'); $nt = (int)($vcount[$c['ckey']][$vg] ?? 0); ?>
@@ -253,7 +260,7 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
 .exl{list-style:none;margin:0;padding:0}
 .ex{padding:16px 0;border-top:1px dashed #DDD2C6}
 .exh{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between}
-.exh .n{font-size:22px;line-height:1.35;color:#2E2529}.exh .n small{font-size:16px;color:#7D7076}
+.exh .n{font-size:22px;line-height:1.35;color:#2E2529}.side{display:inline-block;font-size:15px;padding:2px 12px;border-radius:999px;vertical-align:2px;margin-left:4px}.side-r{background:#EADFDE;color:#4A3A41}.side-l{background:#E4DCD1;color:#4A3A41}.exh .n small{font-size:16px;color:#7D7076}
 .dur{font-size:16px;color:#6B5658;display:flex;gap:8px;align-items:center}.dur select{font:inherit;font-size:16px;padding:6px 10px;width:auto}
 .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}
 .cell{display:flex;flex-direction:column;gap:8px;background:#FBF8F4;border:1.5px solid #DDD2C6;border-radius:18px;padding:14px}
@@ -401,9 +408,10 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
       up.start()}).catch(()=>{msg.textContent='Das hat nicht geklappt. Bitte Seite neu laden.';inp.disabled=false});
   }
   document.querySelectorAll('.cell.clip').forEach(box=>{const inp=box.querySelector('.vfile');if(!inp)return;inp.addEventListener('change',()=>{const f=inp.files[0];if(!f)return;const li=box.closest('.ex');
+    if(box.dataset.left){upload(box,f,'mm_mv_clip_new',{id:li.dataset.id,i:li.dataset.i,side:'l'},'mm_mv_clip_set',{id:li.dataset.id,i:li.dataset.i,side:'l'},(r,msg)=>{msg.textContent='✓ eigener Clip für links';box.classList.add('ok');li.dataset.view=r.view+'&autoplay=true&loop=true&muted=true';});return}
     upload(box,f,'mm_mv_clip_new',{c:li.dataset.c},'mm_mv_clip_set',{c:li.dataset.c},(r,msg)=>{
       // gleiche Übung in anderen Videos auf dieser Seite gleich mit als „da“ zeigen
-      document.querySelectorAll('.ex[data-c="'+li.dataset.c+'"]').forEach(x=>{const cb=x.querySelector('.cell.clip');cb.classList.add('ok');cb.querySelector('.msg').textContent='✓ da'+(r.used>1?' · steckt in '+r.used+' Videos':'');x.dataset.view=r.view+'&autoplay=true&loop=true&muted=true';});
+      document.querySelectorAll('.ex[data-c="'+li.dataset.c+'"]').forEach(x=>{const cb=x.querySelector('.cell.clip');cb.classList.add('ok');cb.querySelector('.msg').textContent=cb.dataset.left?'✓ gespiegelt vom rechten Clip':'✓ da'+(r.used>1?' · steckt in '+r.used+' Videos':'');x.dataset.view=r.view+'&autoplay=true&loop=true&muted=true';});
       const id=li.dataset.id;const cnt=document.querySelectorAll('#v'+id+' .cell.clip.ok').length,n=document.querySelectorAll('#v'+id+' .ex').length;
       const s=document.querySelector('[data-st="'+id+'"]');if(s)s.textContent=s.textContent.replace(/Clips \d+\/\d+/,'Clips '+cnt+'/'+n);
       msg.insertAdjacentHTML('beforeend',' <a class="see1" href="?view=videos&amp;play='+id+'" style="display:inline-flex;margin:6px 0 0 6px;padding:8px 16px;border-radius:999px;background:#4A3A41;color:#fff;text-decoration:none;font-size:16px">👁 So sieht es die Teilnehmerin</a>');});});});
@@ -431,10 +439,10 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
     w.forEach(x=>{if(!x.seg&&has1){x.t=PREP*c0/Math.max(1,a0);c0+=x.wt}else{x.t=PREP+(END-PREP)*c1/Math.max(1,a1);c1+=x.wt}});
     plan=w;return h}
   function openRec(li,g){
-    cur={li:li,g:g,id:li.dataset.id,i:li.dataset.i,sec:130}; // Flow: Stimme beginnt in den 10 s Vorbereitung, Übung exakt 2 Min. (Vivien, 31.10.2026)
+    cur={li:li,g:g,id:li.dataset.id,i:li.dataset.i,sec:(+li.dataset.sec||120)+10}; // Flow: Stimme beginnt in den 10 s Vorbereitung, Übung 2 Min., eine Seite 1 Min. (Vivien, 31.10.2026)
     $('rmK').textContent='Übung '+(+li.dataset.i+1)+' · '+(g==='de'?'Deutsch':'Englisch')+' einsprechen';
     $('rmT').textContent=g==='de'?li.dataset.name:li.dataset.nameEn;
-    $('rmV').innerHTML=li.dataset.view?'<iframe src="'+esc(li.dataset.view)+'" allow="autoplay"></iframe>':'<div class="e">Noch kein Clip. Du kannst trotzdem schon einsprechen.</div>';
+    $('rmV').innerHTML=li.dataset.view?'<iframe src="'+esc(li.dataset.view)+'" allow="autoplay"'+(li.dataset.mirror?' style="transform:scaleX(-1)"':'')+'></iframe>':'<div class="e">Noch kein Clip. Du kannst trotzdem schon einsprechen.</div>';
     const tx=li.querySelector(g==='de'?'[data-tde]':'[data-ten]').value;
     $('rmTx').innerHTML=tx?readHtml(tx):'<span class="hint">Für diese Übung gibt es noch keinen Text. Tipp auf „Text bearbeiten“, um einen zu schreiben.</span>';
     $('rmEd').value=tx;$('rmEd').hidden=true;$('rmTx').hidden=false;$('rmEdit').textContent='Text bearbeiten';
