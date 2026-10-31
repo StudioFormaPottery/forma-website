@@ -2926,7 +2926,6 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
             <a class="stat" href="#neu"><b><?= $newBookings ?></b><span>neue Buchungen in 7 Tagen</span></a>
             <a class="stat" href="<?= forma_h($self) ?>?view=liste"><b><?= $subCount ?></b><span>Kontakte im Newsletter</span></a>
         </div>
-        <form method="post" class="logout"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="logout"><button class="link small" type="submit">Abmelden</button></form>
     </section>
     <?php // Diese Woche (Vivien, 29.10.2026): nur Termine mit Anmeldungen, Mo–So der laufenden Woche, gleich unter den Zahlen
     require_once dirname(__DIR__) . '/api/belegt.inc.php';
@@ -3363,12 +3362,14 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 @media (min-width:1200px){
   form.card.stack{display:grid;grid-template-columns:minmax(0,1fr);max-width:900px}
 }
+.out{flex:none;margin:0}.out button{display:flex;align-items:center;gap:7px;background:#FBF6F0;border:1px solid var(--line);border-radius:999px;padding:9px 16px 9px 12px;font:inherit;font-size:15px;color:var(--clay);cursor:pointer;min-height:44px}.out button:hover{border-color:var(--clay)}.out svg{width:18px;height:18px}
+@media (max-width:560px){.out button{padding:9px;min-height:42px}.out span{display:none}.sw .sw-t small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}.sw .sw-t{min-width:0}}
 </style>
 </head>
 <body>
 <main>
 <?php $swSelf = strtok($_SERVER['REQUEST_URI'] ?? '/verwaltung/', '?') ?: '/verwaltung/'; $swMm = in_array((string)($GLOBALS['view'] ?? ''), ['movecia', 'natal', 'method', 'texte', 'presse', 'vorschau', 'videos', 'mediathek', 'studio', 'schnitt', 'insta', 'musik'], true); $swReq = 0; if (isset($GLOBALS['pdo'])) { try { $swReq = (int)$GLOBALS['pdo']->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} } ?>
-<header class="head"><nav class="sw" aria-label="Bereich wechseln"><a class="sw-f<?= $swMm ? '' : ' on' ?>" href="<?= forma_h($swSelf) ?>"<?= $swMm ? '' : ' aria-current="page"' ?>><span class="sw-ic"><img src="/img/forma-logo.png" alt=""></span><span class="sw-t"><b>FORMA</b><small>🏺 Atelierverwaltung</small></span></a><a class="sw-m<?= $swMm ? ' on' : '' ?>" href="<?= forma_h($swSelf) ?>?view=movecia"<?= $swMm ? ' aria-current="page"' : '' ?>><span class="sw-ic"><img src="/img/movecia/movecia-zeichen.svg" alt=""></span><span class="sw-t"><b>Movecia</b><small>🌿 Studioverwaltung</small></span><?php if ($swReq): ?><i class="sw-badge" title="Terminanfragen"><?= $swReq ?></i><?php endif; ?></a></nav><span class="head-deco"><span class="deco-slot"></span><span class="deco-slot"></span><span class="deco-slot"></span></span></header>
+<header class="head"><nav class="sw" aria-label="Bereich wechseln"><a class="sw-f<?= $swMm ? '' : ' on' ?>" href="<?= forma_h($swSelf) ?>"<?= $swMm ? '' : ' aria-current="page"' ?>><span class="sw-ic"><img src="/img/forma-logo.png" alt=""></span><span class="sw-t"><b>FORMA</b><small>🏺 Atelierverwaltung</small></span></a><a class="sw-m<?= $swMm ? ' on' : '' ?>" href="<?= forma_h($swSelf) ?>?view=movecia"<?= $swMm ? ' aria-current="page"' : '' ?>><span class="sw-ic"><img src="/img/movecia/movecia-zeichen.svg" alt=""></span><span class="sw-t"><b>Movecia</b><small>🌿 Studioverwaltung</small></span><?php if ($swReq): ?><i class="sw-badge" title="Terminanfragen"><?= $swReq ?></i><?php endif; ?></a></nav><span class="head-deco"><span class="deco-slot"></span><span class="deco-slot"></span><span class="deco-slot"></span></span><?php if (!empty($_SESSION['admin'])): ?><form method="post" class="out"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="logout"><button type="submit" title="Abmelden"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v8M6.6 6.6a8 8 0 1 0 10.8 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Abmelden</span></button></form><?php endif; ?></header>
 <?php $body(); ?>
 </main>
 <script src="deko.js?v=1" defer></script>
