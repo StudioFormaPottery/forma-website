@@ -180,7 +180,6 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
 @media(max-width:600px){.mc a small{display:none}.mc a{min-height:46px}}
 .legend{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 </style>
-        <p><a href="<?= forma_h($self) ?>?view=movecia">← Movecia</a> · <a href="<?= forma_h($self) ?>">FORMA</a></p>
         <?php mm_subnav('training'); ?>
         <section class="nh"><p class="eyebrow">Movecia · allein oder zu zweit im Studio in Mathon</p><h1>Personal Training</h1><p>Anfragen von Hotelgästen bestätigen, Ersatztermine vorschlagen, alles im Kalender.</p></section>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>

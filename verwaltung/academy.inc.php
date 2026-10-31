@@ -27,7 +27,7 @@ if ($action === 'mm_ac_callprice') {
 }
 if ($action === 'mm_popup_mode') {
     mm_save_cfg('popup', ['mode' => ($_POST['mode'] ?? '') === 'off' ? 'off' : 'auto']);
-    go($self . '?view=movecia', ($_POST['mode'] ?? '') === 'off' ? 'Das Pop-up auf der Startseite ist aus.' : 'Das Pop-up zeigt automatisch das nächste Angebot.');
+    go($self . '?view=movecia&p=einst', ($_POST['mode'] ?? '') === 'off' ? 'Das Pop-up auf der Startseite ist aus.' : 'Das Pop-up zeigt automatisch das nächste Angebot.');
 }
 if ($action === 'mm_ac_cancel') {
     $r = ac_booking($pdo, (int)($_POST['id'] ?? 0));

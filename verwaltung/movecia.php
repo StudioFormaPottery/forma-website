@@ -13,23 +13,27 @@ function mm_subnav(string $active): void
     $req = 0; try { $req = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {}
     $acReq = 0; try { $acReq = (int)$pdo->query("SELECT COUNT(*) FROM ac_calls WHERE status = 'angefragt'")->fetchColumn(); require_once dirname(__DIR__) . '/api/academy-lib.php'; $acReq += ac_unanswered($pdo); } catch (Throwable $e) {}
     $ptReq = 0; try { $ptReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); } catch (Throwable $e) {}
-    // Aufgeräumt (Vivien, 28.10.2026: „viele Buttons doppelt, zu viele Reiter“): 8 Hauptreiter, Video-Sachen und Einstellungen mit kleiner zweiter Reihe.
-    $groups = ['videos' => 'content', 'studio' => 'content', 'schnitt' => 'content', 'insta' => 'content', 'mediathek' => 'content', 'musik' => 'content', 'texte' => 'content', 'presse' => 'einst', 'liste' => 'einst'];
+    // Fünf Hauptreiter (Vivien, 31.10.2026: „weniger Text, übersichtlicher“): Heute · Videos · Kurse · Ansehen · Einstellungen.
+    $groups = ['videos' => 'content', 'studio' => 'content', 'schnitt' => 'content', 'insta' => 'content', 'mediathek' => 'content', 'musik' => 'content', 'texte' => 'content',
+        'method' => 'kurse', 'natal' => 'kurse', 'training' => 'kurse', 'academy' => 'kurse', 'gatherings' => 'kurse', 'presse' => 'einst', 'liste' => 'einst'];
     $main = $groups[$active] ?? $active;
-    $tabs = [['movecia', '?view=movecia', '🏡 Übersicht'], ['content', '?view=videos', '🎬 Videos &amp; Content'], ['gatherings', '?view=movecia&amp;p=gatherings', '✨ Gatherings'], ['method', '?view=method', '🌱 Method &amp; Unfold'], ['natal', '?view=natal', '🤰 Prä- &amp; Postnatal' . ($req ? ' <i>' . $req . '</i>' : '')], ['training', '?view=training', '🏔️ Personal Training' . ($ptReq ? ' <i>' . $ptReq . '</i>' : '')], ['academy', '?view=academy', '🎓 Academy' . ($acReq ? ' <i>' . $acReq . '</i>' : '')], ['vorschau', '?view=vorschau', '👁 Ansehen &amp; Testen'], ['einst', '?view=movecia&amp;p=einst', '⚙️ Einstellungen']];
+    $bd = fn(int $n) => $n ? ' <i>' . $n . '</i>' : '';
+    $tabs = [['movecia', '?view=movecia', 'Heute'], ['content', '?view=studio', 'Videos'], ['kurse', '?view=method', 'Kurse' . $bd($req + $ptReq + $acReq)], ['vorschau', '?view=vorschau', 'Ansehen'], ['einst', '?view=movecia&amp;p=einst', 'Einstellungen']];
     $subs = [
-        'content' => [['videos', '?view=videos', '🎬 Zu filmen'], ['studio', '?view=studio', '🎥 Studio'], ['schnitt', '?view=schnitt', '✂️ Schnitt'], ['insta', '?view=insta', '📱 Instagram täglich'], ['mediathek', '?view=mediathek', '📚 Mediathek'], ['musik', '?view=musik', '🎵 Musik'], ['texte', '?view=texte', '🎙️ Live-Texte']],
-        'einst' => [['einst', '?view=movecia&amp;p=einst', '⚙️ Verbindungen &amp; Mails'], ['liste', '?view=movecia&amp;p=einst#liste', '💌 E-Mail-Liste'], ['presse', '?view=presse', '📰 Presse']],
-    ][$main] ?? []; ?><style>
-.mvsub{position:sticky;top:0;z-index:40;margin:-8px -16px 16px;padding:10px 16px;background:rgba(242,236,228,.96);border-bottom:1px solid #DDD2C6;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+        'content' => [['studio', '?view=studio', 'Aufnehmen'], ['schnitt', '?view=schnitt', 'Schneiden'], ['insta', '?view=insta', 'Instagram'], ['videos', '?view=videos', 'Zu filmen'], ['mediathek', '?view=mediathek', 'Mediathek'], ['musik', '?view=musik', 'Musik'], ['texte', '?view=texte', 'Live-Texte']],
+        'kurse' => [['method', '?view=method', 'Method &amp; Unfold'], ['natal', '?view=natal', 'Prä- &amp; Postnatal' . $bd($req)], ['training', '?view=training', 'Personal Training' . $bd($ptReq)], ['academy', '?view=academy', 'Academy' . $bd($acReq)], ['gatherings', '?view=movecia&amp;p=gatherings', 'Gatherings']],
+        'einst' => [['einst', '?view=movecia&amp;p=einst', 'Verbindungen &amp; Mails'], ['liste', '?view=movecia&amp;p=einst#liste', 'E-Mail-Liste'], ['presse', '?view=presse', 'Presse']],
+][$main] ?? []; ?><style>
+.mvsub{position:sticky;top:0;z-index:40;margin:-8px -16px 8px;padding:10px 16px;background:rgba(242,236,228,.96);border-bottom:1px solid #DDD2C6;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .mvsub::-webkit-scrollbar{display:none}
-.mvsub a{flex:0 0 auto;padding:10px 16px;border-radius:999px;border:1px solid #DDD2C6;background:#FBF8F4;color:#6B5658;text-decoration:none;font-size:17px;white-space:nowrap}
+.mvsub a{flex:0 0 auto;padding:10px 20px;border-radius:999px;border:0;background:transparent;color:#2E2529;text-decoration:none;font-size:17px;white-space:nowrap}
 <?= !in_array($active, ['videos', 'mediathek', 'studio', 'schnitt'], true) ? '@media(min-width:900px){main{zoom:1.12}}' : '' ?>
-.mvsub a.on{background:#7D5E68;border-color:#7D5E68;color:#FBF5F7}
-.mvsub2{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:-6px 0 16px;padding:2px 0}
+.mvsub a.on{background:#6B5658;color:#F7F1EE}
+.mvsub2{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:0 0 18px;padding:2px 0;border-bottom:1px solid #E6DCD2}
 .mvsub2::-webkit-scrollbar{display:none}
-.mvsub2 a{flex:0 0 auto;padding:7px 14px;border-radius:999px;background:transparent;border:1px solid transparent;color:#7D7076;text-decoration:none;font-size:16px;white-space:nowrap}
-.mvsub2 a.on{background:#EADFDE;color:#4A3A41;border-color:#DDD2C6}
+.mvsub2 a{flex:0 0 auto;padding:9px 14px 10px;background:transparent;border-bottom:3px solid transparent;color:#7D7076;text-decoration:none;font-size:16px;white-space:nowrap}
+.mvsub2 a.on{color:#2E2529;font-weight:600;border-bottom-color:#6B5658}
+.mvsub2 i{font-style:normal;display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:999px;background:#B5544A;color:#fff;font-size:12px;text-align:center;font-weight:400}
 .mvsub a.fo{background:transparent;border-color:transparent;color:#8C2C1D;padding-left:4px}
 .mvsub i{font-style:normal;display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:999px;background:#B5544A;color:#fff;font-size:12px;text-align:center}
 /* Movecia-Verwaltung einheitlich und ruhiger (Vivien, 28.10.2026): Überschriften in Cormorant statt fetter Grotesk,
@@ -37,8 +41,7 @@ function mm_subnav(string $active): void
 body{background:#F2ECE4}
 .mvsub{background:rgba(242,236,228,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .mvsub a{transition:background .15s,border-color .15s,color .15s,box-shadow .15s}
-.mvsub a:hover{border-color:#C9B0B8;color:#4A3A41}
-.mvsub a.on{box-shadow:0 8px 18px -12px rgba(74,58,65,.7)}
+.mvsub a:not(.on):hover{background:#EADFDE}
 main h1,main h2,main h3{font-family:"Cormorant Garamond",Georgia,serif!important;font-weight:500!important;color:#4A3A41;letter-spacing:0}
 main h1{font-size:clamp(34px,3.6vw,46px)}
 main h2{font-size:clamp(26px,2.6vw,32px)}
@@ -47,6 +50,9 @@ main .card{background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:24px;box-
 main input[type=text],main input[type=email],main input[type=number],main input[type=date],main input[type=time],main input[type=url],main input[type=password],main input:not([type]),main select,main textarea{border-radius:14px;border:1.5px solid #DDD2C6;background:#fff}
 main input:focus,main select:focus,main textarea:focus{outline:2px solid #C9B0B8;outline-offset:1px;border-color:#7D5E68}
 main b,main strong{font-weight:500}
+/* Weniger Text (Vivien, 31.10.2026): Erklärsätze unter den Seitentiteln weg, das Menü zeigt schon, wo du bist */
+.nh>p,.sh>div>p,.vh>p,.mh>p,.sh>a{display:none!important}
+.nh h1,.sh h1,.vh h1,.mh h1{margin-bottom:10px}
 </style>
 <nav class="mvsub" aria-label="Movecia"><?php foreach ($tabs as [$k, $q, $t]): ?><a href="<?= forma_h($self) . $q ?>"<?= $k === $main ? ' class="on" aria-current="page"' : '' ?>><?= $t ?></a><?php endforeach; ?></nav>
 <?php if ($subs): ?><nav class="mvsub2" aria-label="Unterbereich"><?php foreach ($subs as [$k, $q, $t]): ?><a href="<?= forma_h($self) . $q ?>"<?= $k === $active ? ' class="on"' : '' ?>><?= $t ?></a><?php endforeach; ?></nav><?php endif; ?><script>document.querySelectorAll('.mvsub a.on,.mvsub2 a.on').forEach(function(a){var n=a.parentNode;n.scrollLeft=a.offsetLeft-(n.clientWidth-a.offsetWidth)/2;});</script>
@@ -396,30 +402,55 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 </style>
         <?php $h = (int)date('G'); $hello = $h < 11 ? 'Guten Morgen' : ($h < 17 ? 'Hallo' : 'Guten Abend'); $natalReq = 0; try { $natalReq = (int)$pdo->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} ?>
         <?php if ($part === ''): ?>
-        <section class="mm-hero">
-            <img class="mm-hero-sign" src="/img/movecia/movecia-zeichen-hell.svg" alt="">
-            <div class="mm-hero-text">
-                <p class="eyebrow"><?= forma_h(forma_de_date(date('Y-m-d'))) ?></p>
-                <h1><?= $hello ?>, Vivien!</h1>
-                <p>Schön, dass du hier bist. Bereit für Bewegung? Hier ist alles, was in deinem Studio gerade los ist.</p>
-            </div>
-            <div class="mm-hero-stats">
-                <a href="<?= forma_h($self) ?>?view=natal"><b><?= $natalReq ?></b><span>Anfragen Prä- &amp; Postnatal</span></a>
-                <?php $ptAll = 0; try { $ptAll = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); $ptAll += count(array_filter(mm_pt_list($pdo), fn($r) => $r['status'] === 'neu')); } catch (Throwable $e) {} ?>
-                <a href="<?= forma_h($self) ?>?view=training"><b><?= $ptAll ?></b><span>Anfragen Personal Training</span></a>
-                <a href="<?= forma_h($self) ?>?view=movecia&amp;p=einst#liste"><b><?= $subOk ?></b><span>auf der E-Mail-Liste</span></a>
-            </div>
-        </section>
+        <?php $ptAll = 0; try { $ptAll = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); $ptAll += count(array_filter(mm_pt_list($pdo), fn($r) => $r['status'] === 'neu')); } catch (Throwable $e) {}
+        $acReq = 0; try { require_once dirname(__DIR__) . '/api/academy-lib.php'; $acReq = (int)$pdo->query("SELECT COUNT(*) FROM ac_calls WHERE status = 'angefragt'")->fetchColumn() + ac_unanswered($pdo); } catch (Throwable $e) {} ?>
+        <?php $igN = 0; try { $igN = (int)$pdo->query("SELECT COUNT(*) FROM mm_insta WHERE day = '" . date('Y-m-d') . "' AND status <> 'gepostet'")->fetchColumn(); } catch (Throwable $e) {} ?>
+        <h1 class="hi"><?= $hello ?>, Vivien</h1>
         <?php else: ?>
         <h1 style="margin:14px 0 10px"><?= $part === 'gatherings' ? '✨ Gatherings' : '⚙️ Einstellungen' ?></h1>
         <?php endif; ?>
         <?php mm_subnav($part ?: 'movecia'); ?>
+        <?php if ($part === ''): ?>
+<style>
+h1.hi{margin:18px 0 6px}
+.big3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:8px 0 22px}
+.big3 a{display:flex;flex-direction:column;gap:10px;min-height:150px;padding:24px;border-radius:24px;text-decoration:none;color:#2E2529;box-sizing:border-box}
+.big3 a b{font-size:24px;font-weight:500}.big3 a span{font-size:16px;color:#6B5658}
+.big3 a:nth-child(1){background:#6B5658;color:#F7F1EE}.big3 a:nth-child(1) span{color:#EADFDE}
+.big3 a:nth-child(2){background:#EADFDE}.big3 a:nth-child(3){background:#E8D6CA}
+.big3 svg{width:32px;height:32px}
+.krs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:10px 0 22px}
+.krs a{display:block;padding:16px 18px;border-radius:18px;background:#FBF8F4;border:1px solid #DDD2C6;color:#2E2529;text-decoration:none;font-size:18px}
+.krs a span{display:block;font-size:15px;color:#7D7076;margin-top:2px}.krs a span.on{color:#A0463A;font-weight:600}
+.more{margin:12px 0;border-radius:20px;background:#FBF8F4;border:1px solid #DDD2C6}
+.more>summary{cursor:pointer;list-style:none;padding:16px 20px;font-size:18px;color:#2E2529;display:flex;justify-content:space-between}
+.more>summary::-webkit-details-marker{display:none}.more>summary::after{content:"▾";color:#9A8C93}.more[open]>summary::after{content:"▴"}
+.more>section{margin:0!important;border:0!important;background:none!important;padding-top:0!important}
+@media(max-width:760px){.big3,.krs{grid-template-columns:1fr}.big3 a{min-height:0;padding:18px 20px;flex-direction:row;align-items:center;gap:14px}.big3 a b{font-size:20px}.big3 a span{display:none}}
+</style>
+        <div class="big3">
+            <a href="<?= forma_h($self) ?>?view=studio&amp;kal=1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg><b>Aufnehmen</b><span>Was als Nächstes dran ist</span></a>
+            <a href="<?= forma_h($self) ?>?view=schnitt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12"/></svg><b>Schneiden</b><span>Deine Entwürfe</span></a>
+            <a href="<?= forma_h($self) ?>?view=insta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg><b>Instagram heute</b><span><?= $igN ? $igN . ($igN > 1 ? ' Beiträge offen' : ' Beitrag offen') : 'Alles gepostet' ?></span></a>
+        </div>
+        <?php endif; ?>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <?php if ($part === '') { require_once __DIR__ . '/woche.inc.php'; mm_week_box($pdo, $self); } // Diese Woche (Vivien, 29.10.2026) ?>
-        <?php if ($part === '') admin_news_render($pdo, 'movecia', $self, '?view=movecia'); ?>
+        <?php if ($part === ''): ?>
+        <script>document.addEventListener('DOMContentLoaded',function(){var t=location.hash&&document.querySelector(location.hash);var d=t&&t.closest('details');if(d)d.open=true});</script>
+        <h2>Kurse</h2>
+        <div class="krs">
+            <a href="<?= forma_h($self) ?>?view=method">Method &amp; Unfold<span>Programme, Mitglieder</span></a>
+            <a href="<?= forma_h($self) ?>?view=natal">Prä- &amp; Postnatal<?= $natalReq ? '<span class="on">' . $natalReq . ' Anfrage' . ($natalReq > 1 ? 'n' : '') . ' offen</span>' : '<span>nichts offen</span>' ?></a>
+            <a href="<?= forma_h($self) ?>?view=training">Personal Training<?= $ptAll ? '<span class="on">' . $ptAll . ' Anfrage' . ($ptAll > 1 ? 'n' : '') . ' offen</span>' : '<span>nichts offen</span>' ?></a>
+            <a href="<?= forma_h($self) ?>?view=academy">Academy<?= ($acReq ?? 0) ? '<span class="on">' . (int)$acReq . ' neu</span>' : '<span>nichts offen</span>' ?></a>
+            <a href="<?= forma_h($self) ?>?view=movecia&amp;p=gatherings">Gatherings<span><?= $next ? 'nächstes ' . forma_h(date('j.n.', strtotime((string)$next['starts_at']))) : 'keins geplant' ?></span></a>
+        </div>
+        <?php endif; ?>
+        <?php if ($part === '' && ($mnN = count(admin_news_list($pdo, 'movecia')))): ?><details class="more"><summary>Neu in deiner Verwaltung · <?= $mnN ?></summary><div style="padding:0 14px 6px"><?php admin_news_render($pdo, 'movecia', $self, '?view=movecia'); ?></div></details><?php endif; ?>
         <?php if ($part === '') { require_once __DIR__ . '/ac-wunsch.inc.php'; ac_wish_popup($pdo, '?view=movecia'); } ?>
         <?php $acOpenM = 0; try { require_once dirname(__DIR__) . '/api/academy-lib.php'; $acOpenM = ac_unanswered($pdo); } catch (Throwable $e) {} ?>
-        <?php if ($part === ''): require_once dirname(__DIR__) . '/api/method-lib.php'; require_once dirname(__DIR__) . '/wildhearts/assets/next-popup.inc.php'; $puMode = (string)((mm_cfg('popup') ?? [])['mode'] ?? 'auto'); $puNow = implode(' → ', array_map(fn($x) => ['method' => 'The Mindful Movement Method', 'unfold' => 'Unfold', 'teacher' => 'Teacher Training'][$x] ?? $x, mv_next_popup_phases())) ?: 'nichts'; ?>
+        <?php if ($part === 'einst'): require_once dirname(__DIR__) . '/api/method-lib.php'; require_once dirname(__DIR__) . '/wildhearts/assets/next-popup.inc.php'; $puMode = (string)((mm_cfg('popup') ?? [])['mode'] ?? 'auto'); $puNow = implode(' → ', array_map(fn($x) => ['method' => 'The Mindful Movement Method', 'unfold' => 'Unfold', 'teacher' => 'Teacher Training'][$x] ?? $x, mv_next_popup_phases())) ?: 'nichts'; ?>
         <form method="post" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0;padding:14px 18px;border-radius:20px;background:#FBF8F4;border:1px solid #E6DCD2;font-size:17px"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_popup_mode">
           <span>🪟 <b>Pop-up auf der Startseite</b>: <?= $puMode === 'off' ? 'aus' : 'automatisch im Wechsel (bei jedem Besuch das nächste): <b>' . forma_h($puNow) . '</b>' ?></span>
           <button class="btn btn-ghost" name="mode" value="<?= $puMode === 'off' ? 'auto' : 'off' ?>" type="submit"><?= $puMode === 'off' ? 'Wieder automatisch' : 'Ausschalten' ?></button>
@@ -439,6 +470,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .qa .main{background:#7D5E68;border-color:#7D5E68}.qa .main b,.qa .main span{color:#FBF5F7}
 </style>
         <?php if ($part === ''): require_once dirname(__DIR__) . '/api/termin-lib.php'; $tmList = []; try { $tmList = tm_list($pdo); } catch (Throwable $e) {} ?>
+        <details class="more" id="termine-w"><summary>Termin-Links für Videogespräche</summary>
         <section id="termine" style="margin:18px 0;padding:18px 20px;border-radius:22px;background:#FBF8F4;border:1px solid #DDD2C6">
             <h2 style="margin:0 0 .3rem">📅 Termin-Links für Videogespräche</h2>
             <p style="margin:0 0 .8rem;color:#7D7076;font-size:16px">Link schicken, die Person tippt eine Uhrzeit an, der Termin ist sofort fix. Du bekommst eine Mail mit deinem Gastgeberinnen-Fenster (Teleprompter mit Gesprächsleitfaden).</p>
@@ -477,8 +509,10 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                 </form>
             </details>
         </section>
+        </details>
         <?php endif; ?>
         <?php if ($part === '' && date('Y-m-d') <= '2027-01-31'): require_once dirname(__DIR__) . '/api/gewinnspiel-lib.php'; $gwList = gw_list($pdo); $gwOk = array_values(array_filter($gwList, fn($r) => $r['status'] === 'bestaetigt')); $gwWin = gw_winner($pdo); $gwCnt = []; foreach ($gwOk as $r) $gwCnt[$r['prize']] = ($gwCnt[$r['prize']] ?? 0) + 1; ?>
+        <details class="more"><summary>Weihnachts-Gewinnspiel</summary>
         <section id="gewinnspiel" style="margin:18px 0;padding:18px 20px;border-radius:22px;background:#FBF8F4;border:1px solid #DDD2C6">
             <h2 style="margin:0 0 .3rem">🎁 Weihnachts-Gewinnspiel</h2>
             <p style="margin:0 0 .8rem;color:#7D7076;font-size:16px">Teilnahme über <a href="https://moveciamovement.com/gewinnspiel/" target="_blank">moveciamovement.com/gewinnspiel</a> bis 20. Dezember, 23:59 Uhr. Am 21. Dezember hier auslosen.</p>
@@ -499,6 +533,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
                 <div style="margin-top:8px;font-size:15px;line-height:1.6"><?php foreach ($gwList as $r): ?><?= forma_h($r['name']) ?> · <?= forma_h($r['email']) ?> · <?= forma_h(GW_PRIZES[$r['prize']][0] ?? '') ?> · <?= $r['status'] === 'bestaetigt' ? '✓' : 'noch nicht bestätigt' ?><?= (int)$r['news'] ? ' · Post ✓' : '' ?><br><?php endforeach; ?></div>
             </details><?php endif; ?>
         </section>
+        </details>
         <?php endif; ?>
         <?php $ptList = []; try { $ptList = mm_pt_list($pdo); } catch (Throwable $e) {} ?>
         <?php if ($part === '' && $ptList): ?>
@@ -541,50 +576,6 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .qg.test .qa a,.qg.test .qa button{background:#F3E7DA;border-color:#E2CDB7}.qg.test b{color:#5A4434}.qg.test .qa span{color:#86705E}.qg.test .dot{background:#C9A27E}
 .qg .qa .soon{opacity:.75}
 </style>
-        <?php if (date('Y-m-d') <= '2026-11-21'): ?>
-        <a href="<?= forma_h($self) ?>?view=natal#gutscheine" style="display:block;margin:16px 0 4px;padding:14px 18px;border-radius:20px;background:#FBF8F4;border:1.5px dashed #7D5E68;color:#2E2529;text-decoration:none">
-            <b style="font-size:16px;color:#4A3A41">✨ Neu bei Prä- &amp; Postnatal</b><span style="display:block;font-size:14px;color:#7D7076;margin-top:2px">Kundinnen bestätigen den Start per Häkchen aus der Mail (auf Wunsch mit Sofortzugang) und können im Mitgliederbereich zurücktreten: Rückerstattung oder Gutschein, alles automatisch. Neu: Gutscheine gelten für alles (Method, Unfold, Prä-/Postnatal online, Personal Training von Hand), und offene Einheiten wandelst du bei der Kundin mit „🔄 Offene Einheiten umwandeln“ in The Method um, der Rest wird automatisch ein Gutschein. Und: Gutscheine verschenken ist live auf moveciamovement.com/gutscheine, Käufe siehst du hier unter Gutscheine.</span></a>
-        <?php endif; ?>
-        <section class="qg tag">
-            <h2><span class="dot"></span>Jeden Tag <small>aufnehmen, posten, sammeln</small></h2>
-            <div class="qa">
-                <a href="<?= forma_h($self) ?>?view=studio"><span class="ic">🎥</span><b>Studio</b><span>Aufnehmen mit Kamera-Look und Teleprompter</span></a>
-                <a href="<?= forma_h($self) ?>?view=insta"><span class="ic">📱</span><b>Instagram täglich</b><span>Story und Reel für heute</span></a>
-                <a href="<?= forma_h($self) ?>?view=mediathek"><span class="ic">📚</span><b>Mediathek</b><span>Alle Übungen nach Jahreszeit und Stil</span></a>
-                <a href="<?= forma_h($self) ?>?view=videos"><span class="ic">🎬</span><b>Zu filmen</b><span>Was als Nächstes dran ist</span></a>
-                <a href="<?= forma_h($self) ?>?view=musik"><span class="ic">🎵</span><b>Musik</b><span>Deine Lieder für die Videos</span></a>
-                <a href="<?= forma_h($self) ?>?view=texte"><span class="ic">🎙️</span><b>Live-Texte</b><span>Teleprompter für Live-Einheiten</span></a>
-            </div>
-        </section>
-        <section class="qg kurs">
-            <h2><span class="dot"></span>Kurse &amp; Programme</h2>
-            <div class="qa">
-                <a href="<?= forma_h($self) ?>?view=method#programme"><span class="ic">🌱</span><b>Method</b><span>Monatsprogramme, Mitglieder, Preise</span></a>
-                <a href="<?= forma_h($self) ?>?view=method#unfold"><span class="ic">🌸</span><b>Unfold</b><span>3-Monats-Programm, Plätze, Live-Calls</span></a>
-                <a href="<?= forma_h($self) ?>?view=natal"><span class="ic">🤰</span><b>Prä- &amp; Postnatal<?= $natalReq ? ' · ' . $natalReq . ' neu' : '' ?></b><span>Anfragen, Termine, Pakete</span></a>
-                <a href="<?= forma_h($self) ?>?view=training"><span class="ic">🏔️</span><b>Personal Training<?= $ptAll ? ' · ' . $ptAll . ' neu' : '' ?></b><span>Hotelgäste und 1:1-Anfragen</span></a>
-                <a href="<?= forma_h($self) ?>?view=movecia&amp;p=gatherings"><span class="ic">✨</span><b>Gatherings</b><span><?= $next ? 'Nächstes: ' . forma_h(date('d. m.', strtotime((string)$next['starts_at']))) . ' · ' . $nextSign . ' angemeldet' : 'Anlegen und Angebot einblenden' ?></span></a>
-                <a href="<?= forma_h($self) ?>?view=academy"><span class="ic">🎓</span><b>Academy<?= ($acReq ?? 0) ? ' · ' . $acReq . ' neu' : '' ?></b><span>Mindful Becoming Teacher Training: Buchungen, Zahlungen, Chat</span></a>
-            </div>
-        </section>
-        <section class="qg test">
-            <h2><span class="dot"></span>Ansehen &amp; Testen <small>so sehen es deine Kundinnen</small></h2>
-            <div class="qa">
-                <a href="<?= forma_h($self) ?>?view=videos&amp;fertig=1"><span class="ic">✓</span><b>Fertige Videos ansehen</b><span>So sieht die Teilnehmerin, was schon fertig ist (z. B. Ankommen)</span></a>
-                <a href="<?= forma_h($self) ?>?view=vorschau"><span class="ic">👁</span><b>Alle Seiten ansehen</b><span>Jede Seite und jeder Mitgliederbereich als Beispiel</span></a>
-                <a href="<?= forma_h($self) ?>?view=method#test"><span class="ic">🧪</span><b>Als Testteilnehmerin einloggen</b><span>Method oder Unfold echt ausprobieren</span></a>
-                <a href="<?= forma_h($self) ?>?view=natal#testkundin"><span class="ic">🧪</span><b>Als Testkundin Prä-/Postnatal</b><span>Testkundin anlegen und Mail bekommen</span></a>
-                <a href="<?= forma_h(mm_site()) ?>/mitglieder/" target="_blank" rel="noopener"><span class="ic">🔑</span><b>Login Method &amp; Unfold</b><span>moveciamovement.com/mitglieder</span></a>
-                <a href="<?= forma_h(mm_site()) ?>/natal/mitglied/" target="_blank" rel="noopener"><span class="ic">🔑</span><b>Login Prä- &amp; Postnatal</b><span>moveciamovement.com/natal/mitglied</span></a>
-                <form method="post" target="_blank"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="mm_testroom"><button type="submit"><span class="ic">🎙️</span><b>Kamera &amp; Mikro testen</b><span>Technik-Check vor einem Live-Termin</span></button></form>
-            </div>
-        </section>
-        <div class="mm-links">
-            <a href="https://moveciamovement.com/" target="_blank" rel="noopener">Website</a>
-            <a href="https://moveciamovement.com/links/" target="_blank" rel="noopener">Link in Bio</a>
-            <a href="https://moveciamovement.com/reset/" target="_blank" rel="noopener">Reset Routine Download</a>
-            <a href="https://dashboard.mailerlite.com/automations" target="_blank" rel="noopener">MailerLite</a>
-        </div>
         <?php endif; ?>
         <?php if ($part === 'gatherings'): ?>
         <div class="mm-stats" style="margin-top:0">
@@ -745,6 +736,12 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 
         <?php endif; ?>
         <?php if ($part === 'einst'): ?>
+        <div class="mm-links" style="margin:0 0 16px">
+            <a href="https://moveciamovement.com/" target="_blank" rel="noopener">Website</a>
+            <a href="https://moveciamovement.com/links/" target="_blank" rel="noopener">Link in Bio</a>
+            <a href="https://moveciamovement.com/reset/" target="_blank" rel="noopener">Reset Routine</a>
+            <a href="https://dashboard.mailerlite.com/automations" target="_blank" rel="noopener">MailerLite</a>
+        </div>
         <div class="card stack" style="margin-bottom:12px"><p class="small" style="margin:0">Hier ist alles an einem Ort: Videoraum (Whereby), Google-Bewertungslink, Postfach, E-Mail-Liste und die letzten Mails. <b>Bunny (Videos)</b> verbindest du unter <a href="<?= forma_h($self) ?>?view=method#bunny">Method &amp; Unfold → Bunny</a> <?= function_exists('mv_bunny_ok') && mv_bunny_ok() ? '(✓ verbunden)' : '(noch nicht verbunden)' ?>.</p></div>
         <h2 id="einstellungen">Einstellungen für Movecia</h2>
         <div class="card stack">
