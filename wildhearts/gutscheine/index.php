@@ -125,6 +125,22 @@ input:focus,textarea:focus{outline:2px solid var(--plum);outline-offset:1px}
 .how b{font-family:var(--serif);font-weight:500;font-size:2.6rem;line-height:1;color:var(--rose);display:block}
 .how h4{font-family:var(--serif);font-weight:500;font-size:1.4rem;margin:.4rem 0 .2rem}
 .how p{font-size:.92rem;color:var(--muted)}
+/* Handy: Schritte zum Aufklappen, damit es keine lange Wurst wird */
+.sh{display:flex;align-items:center;gap:.6rem;width:100%;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:default}
+.sh h3{margin:0;flex:1}.sh .cv{display:none}.sh .pk{display:none}
+.nx{display:none}
+@media(max-width:899px){
+  .step{padding:1rem 1.1rem}.step+.step{margin-top:10px}
+  .sh{cursor:pointer}.sh h3{font-size:1.45rem}
+  .sh .pk{display:block;font-size:.82rem;color:var(--muted);margin-top:.15rem;font-family:var(--sans)}
+  .sh .cv{display:block;width:12px;height:12px;border:solid var(--plum);border-width:0 2px 2px 0;transform:rotate(45deg);margin:0 .4rem .3rem 0;transition:transform .25s;flex:0 0 auto}
+  .step.open .sh .cv{transform:rotate(225deg);margin-bottom:-.2rem}
+  .step:not(.open) .sb{display:none}
+  .step.open .sh .pk{display:none}
+  .nx{display:flex;width:100%;margin-top:1.1rem}
+  .how{grid-template-columns:1fr 1fr 1fr;gap:8px}.how div{padding:.8rem .7rem}.how b{font-size:1.8rem}.how h4{font-size:1.1rem}.how p{display:none}
+  .sum .small{display:none}.sum .ln:nth-of-type(3){display:none}
+}
 .preview{background:var(--plum);color:var(--on);text-align:center;font-size:.85rem;padding:.5rem}
 footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);text-align:center}
 </style>
@@ -153,8 +169,9 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
 
 <section class="w sec" id="auswahl"><div class="in steps">
   <div>
-    <div class="step">
-      <h3><span class="n">1</span>Was möchtest du schenken?</h3>
+    <div class="step open">
+      <button type="button" class="sh"><span style="flex:1"><h3><span class="n">1</span>Was möchtest du schenken?</h3><span class="pk" id="pk1"></span></span><span class="cv"></span></button>
+      <div class="sb">
       <div class="offers" role="radiogroup">
         <?php foreach ($offers as $ok => [$t, $d, $img, $vars]): $min = min(array_column($vars, 1)); ?>
         <div class="of<?= $ok === 'pt_online' ? ' on' : '' ?>" role="radio" tabindex="0" aria-checked="<?= $ok === 'pt_online' ? 'true' : 'false' ?>" data-o="<?= $h($ok) ?>" data-vars="<?= $h(json_encode($vars, JSON_UNESCAPED_UNICODE)) ?>" data-t="<?= $h($t) ?>">
@@ -170,18 +187,24 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
       </div>
       <div class="vars" id="vars"></div>
       <label class="own" id="own" hidden>Betrag in Euro <input type="number" id="ownv" min="20" max="1000" step="5" value="50" inputmode="numeric"></label>
-    </div>
-
-    <div class="step">
-      <h3><span class="n">2</span>Wähl das Design</h3>
-      <div class="dz">
-        <label><input type="radio" name="design" value="1" checked><img src="/img/movecia/gutschein-1.jpg?v=2" alt="Design Bogen" draggable="false"><span>Bogen</span></label>
-        <label><input type="radio" name="design" value="2"><img src="/img/movecia/gutschein-2.jpg?v=2" alt="Design Zart" draggable="false"><span>Zart</span></label>
+      <button type="button" class="btn nx">Weiter zum Design</button>
       </div>
     </div>
 
     <div class="step">
-      <h3><span class="n">3</span>Mach ihn persönlich <span class="mut" style="font-family:var(--sans);font-size:.9rem">(optional)</span></h3>
+      <button type="button" class="sh"><span style="flex:1"><h3><span class="n">2</span>Wähl das Design</h3><span class="pk" id="pk2">Bogen</span></span><span class="cv"></span></button>
+      <div class="sb">
+      <div class="dz">
+        <label><input type="radio" name="design" value="1" checked><img src="/img/movecia/gutschein-1.jpg?v=3" alt="Design Bogen" draggable="false"><span>Bogen</span></label>
+        <label><input type="radio" name="design" value="2"><img src="/img/movecia/gutschein-2.jpg?v=3" alt="Design Zart" draggable="false"><span>Zart</span></label>
+      </div>
+      <button type="button" class="btn nx">Weiter</button>
+      </div>
+    </div>
+
+    <div class="step">
+      <button type="button" class="sh"><span style="flex:1"><h3><span class="n">3</span>Mach ihn persönlich</h3><span class="pk" id="pk3">Für wen, liebe Worte, deine E-Mail</span></span><span class="cv"></span></button>
+      <div class="sb">
       <div class="grid2">
         <label class="f">Für<input type="text" id="to" maxlength="60" placeholder="z. B. Lena"></label>
         <label class="f">Von<input type="text" id="from" maxlength="60" placeholder="z. B. deine Schwester"></label>
@@ -190,6 +213,8 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
       <div class="grid2">
         <label class="f">Dein Name<input type="text" autocomplete="name" maxlength="80"></label>
         <label class="f">Deine E-Mail (dorthin kommt das PDF)<input type="email" autocomplete="email" maxlength="160"></label>
+      </div>
+      <button type="button" class="btn nx">Zur Übersicht</button>
       </div>
     </div>
   </div>
@@ -237,6 +262,7 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
     const cents = cur.dataset.o === 'wert' ? Math.max(2000, Math.min(100000, Math.round((+ov.value || 0) * 100))) : vars[v][1];
     document.getElementById('st').textContent = cur.dataset.t + (v && Object.keys(vars).length > 1 ? ' · ' + vars[v][0] : (v ? ' · ' + vars[v][0] : ''));
     document.getElementById('sa').textContent = euro(cents);
+    document.getElementById('pk1').textContent = document.getElementById('st').textContent + ' · ' + euro(cents);
     document.getElementById('pay').textContent = 'Weiter zur Zahlung · ' + euro(cents);
   }
   cards.forEach(c => { c.addEventListener('click', () => pick(c)); c.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(c); } }); });
@@ -244,6 +270,16 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
   document.querySelectorAll('input[name=design]').forEach(r => r.addEventListener('change', () => { document.getElementById('sd').textContent = r.value === '2' ? 'Zart' : 'Bogen'; }));
   document.getElementById('to').addEventListener('input', e => { document.getElementById('sto').textContent = e.target.value || '–'; });
   document.getElementById('pay').onclick = () => alert('Vorschau: Das Bezahlen schließe ich an, sobald dir die Seite gefällt.');
+  // Handy: Schritte auf- und zuklappen
+  const steps = [...document.querySelectorAll('.step')], mob = matchMedia('(max-width:899px)');
+  function openStep(i, scroll) { steps.forEach((s, j) => s.classList.toggle('open', j === i)); if (scroll && mob.matches && steps[i]) steps[i].scrollIntoView({behavior: 'smooth', block: 'start'}); }
+  steps.forEach((s, i) => {
+    s.querySelector('.sh').onclick = () => { if (mob.matches) openStep(s.classList.contains('open') ? -1 : i, false); };
+    s.querySelector('.nx').onclick = () => { if (i + 1 < steps.length) openStep(i + 1, true); else { openStep(-1); document.querySelector('.sum').scrollIntoView({behavior: 'smooth', block: 'start'}); } };
+  });
+  const p3 = () => { const t = document.getElementById('to').value.trim(); document.getElementById('pk3').textContent = t ? 'Für ' + t : 'Für wen, liebe Worte, deine E-Mail'; };
+  document.getElementById('to').addEventListener('input', p3);
+  document.querySelectorAll('input[name=design]').forEach(r => r.addEventListener('change', () => { document.getElementById('pk2').textContent = r.value === '2' ? 'Zart' : 'Bogen'; }));
   pick(document.querySelector('.of.on'));
 })();
 </script>
