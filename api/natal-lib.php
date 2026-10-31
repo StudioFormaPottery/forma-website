@@ -114,6 +114,7 @@ function natal_schema(PDO $pdo): void
         $pdo->exec("ALTER TABLE mm_natal_sessions ADD COLUMN wish_time TEXT NOT NULL DEFAULT ''");
     }
     natal_member_schema($pdo);
+    natal_wd_schema($pdo);
 }
 
 // --- Einstellungen (Preise, Wochentage, Bankverbindung für die Rechnung) -------------------
@@ -542,6 +543,8 @@ function natal_checkout(PDO $pdo, array $o): string
         'success_url' => $site . '/api/natal-bezahlt.php?o=' . $o['id'] . '&k=' . $o['token'],
         'cancel_url' => $site . '/natal/?o=' . $o['id'] . '&k=' . $o['token'] . '&abgebrochen=1',
     ];
+    // Movecia-Gutschein (Vivien, 31.10.2026): Betrag als einmaliger Rabatt, Rechnung zeigt den Gutschein
+    if ((int)($o['voucher_cents'] ?? 0) > 0) $params['discounts'] = [['coupon' => mv_voucher_coupon($o)]];
     $branded = $params;
     $branded['branding_settings'] = ['display_name' => 'Movecia – Personal Fitness', 'background_color' => '#F5F1EB', 'button_color' => '#4A3040', 'border_style' => 'rounded', 'font_family' => 'inter'];
     $branded['payment_intent_data']['statement_descriptor_suffix'] = 'MOVECIA';
@@ -614,9 +617,16 @@ function natal_check_paid(PDO $pdo, array $o): string
         if (($s['status'] ?? '') === 'expired') $pdo->prepare("UPDATE mm_natal_orders SET stripe_session = '' WHERE id = ? AND status = 'offen'")->execute([$o['id']]);
         return 'offen';
     }
+    return natal_paid_now($pdo, $o);
+}
+
+/** Zahlung ist da (Stripe oder komplett mit Gutschein): genau einmal Termine anlegen, Mails, Rechnung. */
+function natal_paid_now(PDO $pdo, array $o): string
+{
     $u = $pdo->prepare("UPDATE mm_natal_orders SET status = 'bezahlt', paid_at = ? WHERE id = ? AND status = 'offen'");
     $u->execute([date('c'), $o['id']]);
     if ($u->rowCount() !== 1) return 'bezahlt';
+    mv_voucher_finalize($pdo, (int)$o['id']);
     $o = natal_order($pdo, (int)$o['id']);
     $wishes = natal_wishes_fit(natal_clean_wishes((string)$o['wishes']), natal_mix_left($pdo, $o));
     $ins = $pdo->prepare("INSERT INTO mm_natal_sessions (order_id, date, daypart, status, created_at, mode, wish_time) VALUES (?,?,?,'angefragt',?,?,?)");
@@ -639,7 +649,7 @@ function natal_paid_mails(PDO $pdo, array $o, array $wishes): void
     $mix = natal_is_mix($o);
     $wl = array_map(fn($w) => natal_wish_text($o, $w), $wishes);
     $paras = ["Hallo $first,", 'danke für deine Buchung! Deine Zahlung ist angekommen, damit ist alles fix.',
-        [($mix ? natal_mix_parts($o)['name'] . ' · ' . natal_mix_line($o) : $o['title']) . ' · ' . ((int)$o['units'] === 1 ? '1 Einheit' : $o['units'] . ' Einheiten') . ' à 60 Minuten, 1:1', 'Bezahlt: ' . forma_euro((int)$o['amount_cents']) . ' (inkl. 20 % USt.)', 'Gültig bis 6 Monate nach der Geburt']];
+        [($mix ? natal_mix_parts($o)['name'] . ' · ' . natal_mix_line($o) : $o['title']) . ' · ' . ((int)$o['units'] === 1 ? '1 Einheit' : $o['units'] . ' Einheiten') . ' à 60 Minuten, 1:1', 'Bezahlt: ' . forma_euro((int)$o['amount_cents']) . ' (inkl. 20 % USt.' . ((int)($o['voucher_cents'] ?? 0) > 0 ? ', davon ' . forma_euro((int)$o['voucher_cents']) . ' mit Gutschein' : '') . ')', 'Gültig bis 6 Monate nach der Geburt']];
     $paras[] = $wl
         ? "Deine Wunschtermine habe ich bekommen:\n– " . implode("\n– ", $wl) . "\n\nIch schaue sie mir an und bestätige dir jeden Termin mit Uhrzeit per E-Mail."
         : 'Deine Termine wählst du ganz einfach über deine persönliche Seite aus. Ich bestätige dir jeden Termin mit Uhrzeit per E-Mail.';
@@ -648,18 +658,20 @@ function natal_paid_mails(PDO $pdo, array $o, array $wishes): void
         : (natal_is_online($o)
         ? 'Bitte sprich das Training vorher mit deiner Ärztin oder Hebamme ab. Für unsere Online-Einheiten brauchst du nur eine Matte, etwas Platz und dein Handy oder Laptop, am besten so aufgestellt, dass ich dich ganz sehe. Den Link zum Videoraum findest du in jeder Terminbestätigung.'
         : 'Bitte sprich das Training vorher mit deiner Ärztin oder Hebamme ab. Komm in bequemer Kleidung und bring eine Flasche Wasser mit. Matten und alles andere habe ich im Studio.');
-    $paras[] = 'Die Rechnung bekommst du in einer eigenen E-Mail. Du hast ein 14-tägiges Rücktrittsrecht. Bei der Buchung hast du ausdrücklich gewünscht, dass die Einheiten schon in dieser Zeit stattfinden können, und bestätigt, dass dein Rücktrittsrecht erlischt, sobald alle gebuchten Einheiten stattgefunden haben. Trittst du vorher zurück, zahlst du nur die Einheiten, die schon stattgefunden haben. Die vollständige Widerrufsbelehrung und das Muster-Formular findest du unten in dieser E-Mail, zurücktreten kannst du jederzeit hier: ' . mm_site() . '/withdraw?v=' . (natal_is_online($o) ? 'natal_online' : 'natal') . '&lang=de';
+    $paras[] = 'Die Rechnung bekommst du in einer eigenen E-Mail. Du hast ein 14-tägiges Rücktrittsrecht. Bei der Buchung hast du ausdrücklich gewünscht, dass die Einheiten schon in dieser Zeit stattfinden können, und bestätigt, dass dein Rücktrittsrecht erlischt, sobald alle gebuchten Einheiten stattgefunden haben. Trittst du vorher zurück, zahlst du nur die Einheiten, die schon stattgefunden haben. Die vollständige Widerrufsbelehrung und das Muster-Formular findest du unten in dieser E-Mail. Zurücktreten kannst du ' . (natal_order_is_member($o) ? 'ganz unten in deinem Mitgliederbereich (dort wählst du auch, ob du den Betrag zurück oder als Gutschein möchtest) oder ' : '') . 'hier: ' . mm_site() . '/withdraw?v=' . (natal_is_online($o) ? 'natal_online' : 'natal') . '&lang=de';
     $btn = [natal_link($o), 'Meine Termine ansehen'];
     if (natal_order_is_member($o)) {
         // Mitgliederbereich (Vivien, 24.10.2026): Konto mit E-Mail + Passwort, Termine weiterhin über die persönliche Seite
         $paras[] = 'In deinem Mitgliederbereich findest du nach jeder Einheit dein Workbook mit allem, was wir gemacht haben' . (natal_is_online($o) || $mix ? ', und bei Online-Einheiten die Aufnahme der Einheit' : '') . '. Du meldest dich mit deiner E-Mail-Adresse und einem Passwort an, das du dir über den Knopf unten aussuchst. Deine Termine und Wunschtermine findest du hier: ' . natal_link($o);
-        $btn = [natal_member_by_email($pdo, (string)$o['email']) ? natal_member_link() : natal_member_start_link($o), 'Zu meinem Mitgliederbereich'];
     }
+    // Start bestätigen (Vivien, 31.10.2026): Knopf führt zu den Häkchen, danach direkt weiter in den Mitgliederbereich
+    $paras[] = 'Ich freue mich so, dass wir uns bald zu unserer ersten Einheit sehen! Bitte tipp noch kurz auf „Start bestätigen“ und setz dort dein Häkchen, dass wir schon in deiner Rücktrittsfrist loslegen dürfen. Dort kannst du auch wählen, ob du deinen Mitgliederbereich gleich vollständig öffnen möchtest.' . (natal_order_is_member($o) ? ' Danach geht es direkt weiter zu deinem Mitgliederbereich.' : '');
+    $btn = [natal_start_link($o), 'Start bestätigen'];
     natal_mail((string)$o['email'], 'Deine Buchung bei Movecia: ' . $o['title'], 'Schön, dass du dabei bist', $paras, $btn, [], natal_legal_text(natal_is_online($o)));
 
     $v = ["Neue Buchung Prä- & Postnatal Training:", [
         $o['name'] . ' · ' . $o['email'] . ($o['phone'] !== '' ? ' · ' . $o['phone'] : ''),
-        $o['title'] . ' · ' . forma_euro((int)$o['amount_cents']) . ' (online bezahlt)' . ($mix ? ' · Mix & Match' : ''),
+        $o['title'] . ' · ' . forma_euro((int)$o['amount_cents']) . ((int)($o['voucher_cents'] ?? 0) > 0 ? ' (davon ' . forma_euro((int)$o['voucher_cents']) . ' mit Movecia-Gutschein)' : ' (online bezahlt)') . ($mix ? ' · Mix & Match' : ''),
         'Geburtstermin: ' . ($o['due_date'] !== '' ? natal_date_de((string)$o['due_date']) : 'nicht angegeben'),
     ]];
     if ($o['note'] !== '') $v[] = 'Ihre Nachricht: ' . $o['note'];
@@ -891,7 +903,19 @@ function natal_invoice_source(PDO $pdo, int $id): ?array
     return ['name' => $o['name'], 'email' => $o['email'], 'session' => (string)$o['stripe_session'], 'service' => 'nach Vereinbarung',
         'items' => $items,
         'gross' => (int)$o['amount_cents'], 'paid' => $o['paid_at'], 'type' => 'Movecia',
-        'pay_note' => 'Der Betrag wurde am ' . date('d.m.Y', strtotime((string)$o['paid_at'])) . ' online bezahlt (Kartenzahlung über Stripe, gemeinsames Konto FORMA & Movecia). Buchungsvermerk: Leistung von Movecia – Personal Fitness.'];
+        'pay_note' => natal_invoice_paynote($pdo, $o)];
+}
+
+/** Zahlungsvermerk, bei Movecia-Gutschein mit Nummer und Aufteilung. */
+function natal_invoice_paynote(PDO $pdo, array $o): string
+{
+    $d = date('d.m.Y', strtotime((string)$o['paid_at']));
+    $vc = (int)($o['voucher_cents'] ?? 0);
+    if ($vc <= 0) return 'Der Betrag wurde am ' . $d . ' online bezahlt (Kartenzahlung über Stripe, gemeinsames Konto FORMA & Movecia). Buchungsvermerk: Leistung von Movecia – Personal Fitness.';
+    $nr = '';
+    if (!empty($o['voucher_id'])) { $q = $pdo->prepare('SELECT nr FROM mm_vouchers WHERE id = ?'); $q->execute([(int)$o['voucher_id']]); $nr = (string)$q->fetchColumn(); }
+    $cash = (int)$o['amount_cents'] - $vc;
+    return 'Bezahlt am ' . $d . ': ' . forma_cents_de($vc) . ' mit Movecia-Gutschein ' . $nr . ($cash > 0 ? ' und ' . forma_cents_de($cash) . ' online (Kartenzahlung über Stripe, gemeinsames Konto FORMA & Movecia)' : '') . '. Buchungsvermerk: Leistung von Movecia – Personal Fitness.';
 }
 
 function natal_invoice_pdf(array $inv): string
@@ -1029,7 +1053,7 @@ function natal_invoice_mail(array $inv, string $pdf): void
     } elseif (trim((string)$inv['email']) !== '') {
         $storno = (int)$inv['gross_cents'] < 0;
         natal_mail((string)$inv['email'], ($storno ? 'Deine Stornorechnung ' : 'Deine Rechnung ') . $inv['nr'] . ' von Movecia', $storno ? 'Deine Stornorechnung' : 'Deine Rechnung',
-            ["Hallo $first,", $storno ? 'im Anhang findest du die Stornorechnung ' . $inv['nr'] . ' für deine Unterlagen. Der Betrag von ' . forma_cents_de(-(int)$inv['gross_cents']) . ' wird dir zurückerstattet.'
+            ["Hallo $first,", $storno ? 'im Anhang findest du die Stornorechnung ' . $inv['nr'] . ' für deine Unterlagen. Der Betrag von ' . forma_cents_de(-(int)$inv['gross_cents']) . (str_contains((string)($inv['items'] ?? ''), 'als Movecia-Gutschein') ? ' ist dein Gutschein, den du schon bekommen hast.' : (str_contains((string)($inv['items'] ?? ''), 'als Gutschein') ? ' geht teils als Erstattung, teils als Gutschein an dich zurück.' : ' wird dir zurückerstattet.'))
                 : 'im Anhang findest du deine Rechnung ' . $inv['nr'] . ' als PDF. Rechnungsbetrag: ' . forma_cents_de((int)$inv['gross_cents']) . ' (bereits bezahlt).', 'Bei Fragen antworte einfach auf diese E-Mail.'],
             null, [[$file, $pdf, 'application/pdf']]);
     }
@@ -1377,6 +1401,7 @@ function natal_bonus_tick(PDO $pdo): void
 require_once __DIR__ . '/natal-units.inc.php';
 require_once __DIR__ . '/natal-health.inc.php';
 require_once __DIR__ . '/natal-member.inc.php';
+require_once __DIR__ . '/natal-ruecktritt.inc.php';
 
 // --- Google & KI-Suche (Vivien, 24.10.2026) -------------------------------------------------
 // Strukturierte Daten für moveciamovement.com/natal: Ort nur als Gemeinde (keine Straße, Adresse steht nur im Impressum).

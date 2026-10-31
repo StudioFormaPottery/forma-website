@@ -36,6 +36,13 @@ if ($action === 'subscribe') {
     forma_json(natal_news_subscribe($pdo, $name, $email, $mode, $source, $ipHash));
 }
 
+// Movecia-Gutschein prüfen (Vivien, 31.10.2026): zeigt den Restwert, abgerechnet wird erst beim Buchen
+if ($action === 'voucher') {
+    $r = mv_voucher_lookup($pdo, (string)($in['code'] ?? ''));
+    if (!$r['ok']) forma_json(['ok' => false, 'error' => $r['error']], 422);
+    forma_json(['ok' => true, 'code' => $r['voucher']['code'], 'nr' => $r['voucher']['nr'], 'balance' => $r['balance']]);
+}
+
 if ($action === 'buy') {
     $loaded = (int)($in['t'] ?? 0);
     if ($loaded > 0 && ((int)(microtime(true) * 1000) - $loaded) < 3000) forma_json(['ok' => false, 'error' => 'Bitte versuch es in ein paar Sekunden noch einmal.'], 429);
@@ -69,7 +76,9 @@ if ($action === 'buy') {
     $err = array_merge($err, $hErr);
     if (empty($in['start_now'])) $err[] = 'Bitte bestätige, dass die Termine schon in der Rücktrittsfrist beginnen dürfen.';
     if ($err) forma_json(['ok' => false, 'error' => implode(' ', $err)], 422);
-    if (!forma_stripe_key()) forma_json(['ok' => false, 'error' => 'Die Online-Zahlung ist gerade nicht erreichbar. Bitte schreib mir an ' . MM_FROM_EMAIL . '.'], 503);
+    $code = trim((string)($in['code'] ?? ''));
+    $vr = $code !== '' ? mv_voucher_lookup($pdo, $code) : null;
+    if ($vr && !$vr['ok']) forma_json(['ok' => false, 'error' => $vr['error']], 422);
     $c = $pdo->prepare('SELECT COUNT(*) FROM mm_natal_orders WHERE ip_hash = ? AND created_at >= ?');
     $c->execute([$ipHash, date('c', time() - 3600)]);
     if ((int)$c->fetchColumn() >= 8) forma_json(['ok' => false, 'error' => 'Bitte versuch es später noch einmal oder ruf mich an: ' . NATAL_COMPANY['phone']], 429);
@@ -93,6 +102,25 @@ if ($action === 'buy') {
     $o = natal_order($pdo, (int)$pdo->lastInsertId());
     natal_health_save($pdo, (int)$o['id'], $health);
     if ($bp) { $pdo->prepare('UPDATE mm_natal_orders SET bonus_call_id = ? WHERE id = ?')->execute([$bonusCall['id'], $o['id']]); $o['bonus_call_id'] = $bonusCall['id']; }
+    if ($vr) {
+        // Gutschein reservieren (in einer Transaktion, damit derselbe Restwert nicht zweimal verwendet wird)
+        $pdo->exec('BEGIN IMMEDIATE');
+        $v = $pdo->query('SELECT * FROM mm_vouchers WHERE id = ' . (int)$vr['voucher']['id'])->fetch();
+        $vc = min(mv_voucher_balance($pdo, $v), $amount);
+        if ($vc > 0) {
+            $pdo->prepare("INSERT INTO mm_voucher_uses (voucher_id, order_id, cents, status, created_at) VALUES (?,?,?,'reserviert',?)")->execute([$v['id'], $o['id'], $vc, date('c')]);
+            $pdo->prepare('UPDATE mm_natal_orders SET voucher_id = ?, voucher_cents = ? WHERE id = ?')->execute([$v['id'], $vc, $o['id']]);
+        }
+        $pdo->exec('COMMIT');
+        if ($vc <= 0) { $pdo->prepare("UPDATE mm_natal_orders SET status = 'abgebrochen' WHERE id = ?")->execute([$o['id']]); forma_json(['ok' => false, 'error' => 'Dieser Gutschein ist gerade schon vollständig verwendet.'], 422); }
+        $o = natal_order($pdo, (int)$o['id']);
+        // Deckt der Gutschein alles, ist die Buchung sofort fix, ganz ohne Stripe
+        if ($vc >= $amount) {
+            natal_paid_now($pdo, $o);
+            forma_json(['ok' => true, 'redirect' => mm_site() . '/api/natal-bezahlt.php?o=' . $o['id'] . '&k=' . $o['token']]);
+        }
+    }
+    if (!forma_stripe_key()) forma_json(['ok' => false, 'error' => 'Die Online-Zahlung ist gerade nicht erreichbar. Bitte schreib mir an ' . MM_FROM_EMAIL . '.'], 503);
     try {
         forma_json(['ok' => true, 'redirect' => natal_checkout($pdo, $o)]);
     } catch (Throwable $e) {

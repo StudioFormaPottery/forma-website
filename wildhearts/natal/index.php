@@ -158,6 +158,11 @@ section{padding-block:clamp(3.5rem,8vw,7rem)}
 .hero{display:grid;gap:2.5rem;align-items:center;padding-block:clamp(2rem,5vw,4.5rem) clamp(3rem,6vw,5rem)}
 @media(min-width:1000px){.hero{grid-template-columns:1.25fr 1fr;gap:4rem}}
 .script{font-family:var(--serif);font-style:italic;font-size:clamp(1.5rem,2.4vw,2.1rem);color:var(--plum);margin-top:.6rem}
+.vcbox{font-size:.9rem}.vcbox summary{cursor:pointer;color:var(--peach)}
+.vcrow{display:flex;gap:.5rem;margin-top:.5rem}.vcrow input{flex:1;min-width:0;font:inherit;font-size:16px;letter-spacing:.03em;text-transform:uppercase;padding:.6em .8em;border-radius:12px;border:1px solid rgba(251,245,247,.3);background:rgba(251,245,247,.08);color:var(--on)}
+.vcrow input::placeholder{color:rgba(251,245,247,.45)}
+.side .vcrow .btn{padding:.55em 1em;font-size:.88rem;background:transparent;color:var(--on);border-color:rgba(251,245,247,.6)}
+#vcmsg{margin-top:.5rem}
 .bonusbox{display:block;margin-left:0;margin-right:0;max-width:none!important;background:var(--plum);color:var(--on);border-radius:18px;padding:1rem 1.25rem;margin-top:1.4rem;max-width:34em;font-size:1rem;box-shadow:0 20px 40px -28px var(--plum)}
 .bonusbox b{font-family:var(--serif);font-size:1.45rem;font-weight:500;display:block}
 .bonusbox.gone{background:var(--card);color:var(--ink);box-shadow:none}
@@ -639,6 +644,10 @@ footer summary{cursor:pointer}
       <div class="ln"><span>Einheiten à 60 Min.</span><span id="sumunits"></span></div>
       <div class="ln"><span>pro Einheit</span><span id="sumunit"></span></div>
       <div class="ln"><span>Wunschtermine</span><span id="sumwish">später</span></div>
+      <div class="ln" id="vcline" hidden><span id="vclabel">Gutschein</span><span id="vcamt"></span></div>
+      <details class="vcbox" id="vcbox"><summary>Hast du einen Gutschein?</summary>
+        <div class="vcrow"><input type="text" id="vccode" placeholder="MOVECIA-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40" aria-label="Gutscheincode"><button type="button" class="btn line" id="vcgo">Einlösen</button></div>
+        <p class="small" id="vcmsg" hidden></p></details>
       <button class="btn" type="submit" id="paybtn">Weiter zur Zahlung</button>
       <p class="err" id="err" hidden></p>
       <p class="small">Sichere Zahlung über Stripe (Karte, Apple Pay, Google Pay, EPS). Auf der Bezahlseite steht Movecia. Abgerechnet wird über das gemeinsame Konto von FORMA &amp; Movecia, deine Rechnung kommt im Movecia-Design per E-Mail.</p>
@@ -885,15 +894,30 @@ footer summary{cursor:pointer}
     const due = document.getElementById('due');
     due.min = CAL.min.slice(0, 8) + '01';
     due.addEventListener('change', () => { CAL.due = due.value; });
+    let VC = null; // eingelöster Movecia-Gutschein {code, nr, balance}
     function sum() {
-      const p = cur(), w = cal.get().length;
+      const p = cur(), w = cal.get().length, cents = +p.dataset.cents, vc = VC ? Math.min(VC.balance, cents) : 0, pay = cents - vc;
+      document.getElementById('vcline').hidden = !vc;
+      if (vc) { document.getElementById('vclabel').textContent = 'Gutschein ' + VC.nr; document.getElementById('vcamt').textContent = '− ' + euro(vc); }
       document.getElementById('sumtitle').textContent = p.dataset.title;
-      document.getElementById('sumamt').textContent = euro(+p.dataset.cents);
+      document.getElementById('sumamt').textContent = euro(pay);
       document.getElementById('sumunits').textContent = p.dataset.units;
       document.getElementById('sumunit').textContent = p.dataset.unitlabel || euro(+p.dataset.unit);
       document.getElementById('sumwish').textContent = w ? w + (w === 1 ? ' Tag' : ' Tage') : 'später';
-      btn.textContent = 'Weiter zur Zahlung · ' + euro(+p.dataset.cents);
+      btn.textContent = pay > 0 ? 'Weiter zur Zahlung · ' + euro(pay) : 'Mit Gutschein verbindlich buchen';
     }
+    const vcm = document.getElementById('vcmsg'), vci = document.getElementById('vccode');
+    const vcCheck = async () => {
+      const code = vci.value.trim(); if (!code) return;
+      vcm.hidden = false; vcm.textContent = 'Einen Moment …';
+      const j = await post({action: 'voucher', code});
+      if (j.ok) { VC = j; vcm.textContent = '✓ Gutschein ' + j.nr + ' mit ' + euro(j.balance) + ' wird abgezogen.'; }
+      else { VC = null; vcm.textContent = j.error || 'Der Code hat nicht geklappt.'; }
+      sum();
+    };
+    document.getElementById('vcgo').addEventListener('click', vcCheck);
+    vci.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); vcCheck(); } });
+    try { const pc = new URLSearchParams(location.search).get('gutschein'); if (pc) { vci.value = pc; document.getElementById('vcbox').open = true; vcCheck(); } } catch (e) {}
     document.querySelectorAll('input[name=package]').forEach(r => r.addEventListener('change', () => { cal.trim(); sum(); }));
     // Umschalter Studio / Online: gleiches Paket in der anderen Variante wählen, Preise sofort sichtbar
     function setMode(m) {
@@ -936,7 +960,7 @@ footer summary{cursor:pointer}
     f.addEventListener('submit', async e => {
       e.preventDefault(); err.hidden = true;
       const d = Object.fromEntries(new FormData(f));
-      d.package = cur().value; d.action = 'buy'; d.t = loaded; d.a = OFFER; d.bonus = BONUS;
+      d.package = cur().value; d.action = 'buy'; d.t = loaded; d.a = OFFER; d.bonus = BONUS; if (VC) d.code = VC.code;
       if (CAL.mix) d.mix_online = CAL.mix.online;
       d.wishes = JSON.stringify(cal.get());
       if (!d.name || !d.email || !d.phone) { err.textContent = 'Bitte füll Name, E-Mail und Telefon aus.'; err.hidden = false; return; }

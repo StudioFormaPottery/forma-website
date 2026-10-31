@@ -335,6 +335,8 @@ function natal_member_full_from(array $o): int
 
 function natal_member_full(array $o): bool
 {
+    // Sofortzugang (Vivien, 31.10.2026): hat sie auf das Rücktrittsrecht für die digitalen Inhalte verzichtet, ist gleich alles offen
+    if ((int)($o['consent_digital'] ?? 0) === 1) return true;
     return time() >= natal_member_full_from($o);
 }
 

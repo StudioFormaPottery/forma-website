@@ -96,6 +96,22 @@ if ($action === 'mm_natal_add') {
     if (!$s) { $pdo->prepare("DELETE FROM mm_natal_sessions WHERE order_id = ? AND start = '' AND date = ? AND status = 'angefragt'")->execute([$o['id'], $date]); go($nBack . '&k=' . $o['id'] . '#k' . $o['id'], 'Bitte auch eine Uhrzeit angeben.'); }
     go($nBack . '&k=' . $o['id'] . '#k' . $o['id'], 'Eingetragen: ' . natal_when($s) . '.');
 }
+// Rücktritt abwickeln (Vivien, 31.10.2026): z. B. nach dem allgemeinen Widerrufsformular oder bei einer Einzelstunde
+if ($action === 'mm_natal_wd') {
+    $oid = (int)($_POST['oid'] ?? 0);
+    $r = natal_wd_execute($pdo, $oid, (string)($_POST['choice'] ?? ''), (int)($_POST['count'] ?? 1), (int)($_POST['design'] ?? 1), 'verwaltung');
+    $w = $r['ok'] ? $r['wd'] : null;
+    go($nBack . '&k=' . $oid . '#k' . $oid, $r['ok'] ? 'Rücktritt abgewickelt: ' . forma_euro((int)$w['back_cents']) . ($w['choice'] === 'gutschein' ? ' als Gutschein (' . implode(', ', array_column($r['vouchers'], 'nr')) . ')' : ' zurück') . '. Sie hat die Bestätigung bekommen' . ($w['status'] === 'fehler' ? '. ⚠ Die Erstattung über Stripe ging nicht, bitte unten erneut versuchen.' : '.') : $r['error']);
+}
+if ($action === 'mm_natal_wd_retry') {
+    $w = natal_wd_row($pdo, (int)($_POST['oid'] ?? 0));
+    if ($w && $w['status'] === 'fehler') $w = natal_wd_refund($pdo, $w);
+    go($nBack . '&k=' . (int)($_POST['oid'] ?? 0) . '#k' . (int)($_POST['oid'] ?? 0), $w && $w['status'] === 'erledigt' ? 'Erstattet über Stripe.' : 'Hat wieder nicht geklappt. Bitte in Stripe von Hand erstatten und dann „erledigt“ tippen.');
+}
+if ($action === 'mm_natal_wd_done') {
+    $pdo->prepare("UPDATE mm_natal_wd SET status = 'erledigt', done_at = ?, note = 'von Hand in Stripe erstattet' WHERE order_id = ? AND status = 'fehler'")->execute([date('c'), (int)($_POST['oid'] ?? 0)]);
+    go($nBack . '&k=' . (int)($_POST['oid'] ?? 0) . '#k' . (int)($_POST['oid'] ?? 0), 'Als erledigt markiert.');
+}
 if ($action === 'mm_natal_recheck') {
     $o = natal_order($pdo, (int)($_POST['oid'] ?? 0));
     $st = $o ? natal_check_paid($pdo, $o) : 'offen';
@@ -216,7 +232,7 @@ if ($view === 'natal' && isset($_GET['mailvorschau'])) {
 }
 
 if ($view === 'natal') {
-    $orders = $pdo->query("SELECT * FROM mm_natal_orders WHERE status IN ('bezahlt','offen') ORDER BY CASE status WHEN 'bezahlt' THEN 0 ELSE 1 END, id DESC LIMIT 80")->fetchAll();
+    $orders = $pdo->query("SELECT * FROM mm_natal_orders WHERE status IN ('bezahlt','offen','widerrufen') ORDER BY CASE status WHEN 'bezahlt' THEN 0 WHEN 'offen' THEN 1 ELSE 2 END, id DESC LIMIT 80")->fetchAll();
     $byId = [];
     foreach ($orders as $o) $byId[(int)$o['id']] = $o;
     $reqs = $pdo->query("SELECT s.*, o.name, o.title, o.phone, o.email, o.due_date, o.units FROM mm_natal_sessions s JOIN mm_natal_orders o ON o.id = s.order_id WHERE s.status = 'angefragt' ORDER BY s.date, s.id")->fetchAll();
@@ -285,6 +301,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <a href="#testkundin">Als Kundin testen</a>
             <a href="#skripte">Skripte &amp; Workbooks</a>
             <a href="#angebot">Angebot verschicken</a>
+            <a href="#gutscheine">Gutscheine</a>
             <a href="<?= forma_h($self) ?>?view=rechnungen">Rechnungen</a>
             <a href="#einstellungen">Preise &amp; Einstellungen</a>
         </div>
@@ -377,7 +394,7 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
         <?php foreach ($orders as $o): $ss = natal_sessions($pdo, (int)$o['id']); $used = natal_used($pdo, (int)$o['id']); $done = count(array_filter($ss, fn($s) => in_array($s['status'], ['bestaetigt', 'erledigt'], true))); ?>
             <details class="card" id="k<?= (int)$o['id'] ?>" <?= $openK === (int)$o['id'] ? 'open' : '' ?>>
                 <summary style="cursor:pointer;list-style:none"><div class="booking-head"><span><strong><?= forma_h($o['name']) ?></strong> <span class="muted small">· <?= forma_h($o['title']) ?></span><?php if (!empty($o['is_test'])): ?> <span class="chip" style="background:#EADFDE;color:#6B5658">TEST</span><?php endif; ?></span>
-                    <?php $hd0 = natal_health_get($o); if ($hd0 && array_filter(natal_health_flags($hd0), fn($x) => $x[0] === 'rot')): ?><span class="chip" style="background:#F6E7E4;color:#A0463A">⚠ Freigabe</span> <?php endif; ?><span class="chip <?= $o['status'] === 'bezahlt' ? 'ok' : 'wait' ?>"><?= $o['status'] === 'bezahlt' ? 'bezahlt ' . forma_h(forma_euro((int)$o['amount_cents'])) : 'Zahlung offen' ?></span></div>
+                    <?php $hd0 = natal_health_get($o); if ($hd0 && array_filter(natal_health_flags($hd0), fn($x) => $x[0] === 'rot')): ?><span class="chip" style="background:#F6E7E4;color:#A0463A">⚠ Freigabe</span> <?php endif; ?><?php if ($o['status'] === 'widerrufen'): ?><span class="chip" style="background:#F6E7E4;color:#A0463A">zurückgetreten</span> <?php elseif ($o['status'] === 'bezahlt' && empty($o['confirm_at'])): ?><span class="chip wait" title="Start-Häkchen aus der Mail noch nicht gesetzt (beim Buchen hat sie es schon bestätigt)">Start offen</span> <?php endif; ?><span class="chip <?= $o['status'] === 'bezahlt' ? 'ok' : 'wait' ?>"><?= $o['status'] === 'bezahlt' ? 'bezahlt ' . forma_h(forma_euro((int)$o['amount_cents'])) : 'Zahlung offen' ?></span></div>
                     <?php if ($o['status'] === 'bezahlt'): ?><p class="small muted" style="margin:6px 0 4px"><?= $done ?> bestätigt · <?= $used - $done ?> angefragt · <?= (int)$o['units'] - $used ?> noch frei von <?= (int)$o['units'] ?></p><div class="bar"><i style="width:<?= (int)round($used / max(1, (int)$o['units']) * 100) ?>%"></i></div><?php endif; ?></summary>
                 <div class="stack" style="margin-top:12px">
                     <p class="small"><a href="mailto:<?= forma_h($o['email']) ?>"><?= forma_h($o['email']) ?></a><?php if ($o['phone'] !== ''): ?> · <a href="tel:<?= forma_h($o['phone']) ?>"><?= forma_h($o['phone']) ?></a> · <a href="<?= forma_h(natal_wa((string)$o['phone'])) ?>" target="_blank" rel="noopener">WhatsApp</a><?php endif; ?><br>
@@ -416,6 +433,23 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
                                     <button class="btn btn-sm" type="submit">Eintragen</button></form></details>
                         <?php endif; ?>
                     <?php endif; ?>
+                    <?php $wdr = natal_wd_row($pdo, (int)$o['id']); if ($wdr): $wvs = $pdo->query('SELECT * FROM mm_vouchers WHERE wd_id = ' . (int)$wdr['id'])->fetchAll(); ?>
+                        <div class="small" style="background:#F6E7E4;border-radius:12px;padding:8px 12px"><strong>Rücktritt am <?= forma_h(date('d. m. Y, H:i', strtotime((string)$wdr['created_at']))) ?></strong> (<?= $wdr['source'] === 'verwaltung' ? 'von dir' : 'von ihr im Mitgliederbereich' ?>)<br>
+                            Gesamt <?= forma_h(forma_euro((int)$wdr['total_cents'])) ?> · stattgefunden <?= forma_h($wdr['used_text']) ?> · zurück <?= forma_h(forma_euro((int)$wdr['back_cents'])) ?><br>
+                            <?php if ((int)$wdr['refund_cents'] > 0): ?>Erstattung <?= forma_h(forma_euro((int)$wdr['refund_cents'])) ?>: <?= $wdr['status'] === 'erledigt' ? '✓ ' . ($wdr['refund_id'] !== '' ? 'über Stripe' : forma_h($wdr['note'])) : '<b style="color:#A0463A">⚠ ' . forma_h($wdr['note']) . '</b>' ?><br><?php endif; ?>
+                            <?php foreach ($wvs as $gv): ?>Gutschein <?= forma_h($gv['nr']) ?> · <?= forma_h(forma_euro((int)$gv['amount_cents'])) ?> · <a href="<?= forma_h(mv_voucher_pdf_link($gv)) ?>" target="_blank" rel="noopener">PDF</a><br><?php endforeach; ?>
+                            <?php if ($wdr['status'] === 'fehler'): ?><span class="acts" style="margin-top:6px"><form method="post"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_wd_retry"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>"><button class="btn btn-sm" type="submit">Erstattung erneut versuchen</button></form>
+                                <form method="post" onsubmit="return confirm('Hast du in Stripe schon von Hand erstattet?')"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_wd_done"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>"><button class="link small" type="submit">von Hand erstattet ✓</button></form></span><?php endif; ?>
+                        </div>
+                    <?php elseif ($o['status'] === 'bezahlt'): $wc = natal_wd_calc($pdo, $o); ?>
+                        <details class="more"><summary>↩︎ Rücktritt abwickeln</summary>
+                            <form method="post" class="stack" style="margin-top:8px" onsubmit="return confirm('Rücktritt jetzt verbindlich abwickeln? Termine werden abgesagt und sie bekommt die Bestätigung.')"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_wd"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>">
+                                <p class="small muted">Zum Beispiel, wenn sie über das allgemeine Widerrufsformular oder per Nachricht zurückgetreten ist. Gesamt <?= forma_h(forma_euro($wc['total'])) ?> · stattgefunden <?= forma_h($wc['used_text']) ?> · <b>zurück <?= forma_h(forma_euro($wc['back'])) ?></b><?= time() > $wc['until'] ? ' · Frist war bis ' . forma_h(date('d. m.', $wc['until'])) . ' (du kannst trotzdem kulant sein)' : '' ?><?= $wc['test'] ? ' · TEST: keine echte Erstattung' : '' ?></p>
+                                <div class="wdays"><label class="check"><input type="radio" name="choice" value="erstattung" checked> Rückerstattung über Stripe</label><label class="check"><input type="radio" name="choice" value="gutschein"> Gutschein</label></div>
+                                <div class="wdays"><label class="check"><input type="radio" name="count" value="1" checked> 1 Gutschein</label><label class="check"><input type="radio" name="count" value="2"> 2 Gutscheine (50/50)</label>
+                                    <?php foreach (MV_VOUCHER_DESIGNS as $dn => $dl): ?><label class="check"><input type="radio" name="design" value="<?= $dn ?>"<?= $dn === 1 ? ' checked' : '' ?>> Design <?= forma_h($dl) ?></label><?php endforeach; ?></div>
+                                <button class="btn btn-ghost btn-sm" type="submit">Rücktritt abwickeln</button></form></details>
+                    <?php endif; ?>
                     <p class="small">Ihre persönliche Seite: <span class="sel"><?= forma_h(natal_link($o)) ?></span> <button type="button" class="link small" data-copy="<?= forma_h(natal_link($o)) ?>">kopieren</button></p>
                     <?php if ($o['status'] === 'offen'): ?>
                         <form method="post"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_recheck"><input type="hidden" name="oid" value="<?= (int)$o['id'] ?>"><button class="btn btn-ghost btn-sm" type="submit">Zahlung bei Stripe prüfen</button></form>
@@ -431,6 +465,17 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             </details>
         <?php endforeach; ?>
         </div>
+
+        <?php $mvv = $pdo->query('SELECT * FROM mm_vouchers ORDER BY id DESC LIMIT 60')->fetchAll(); ?>
+        <h2 id="gutscheine">Gutscheine</h2>
+        <?php if (!$mvv): ?><p class="card muted small">Noch keine Movecia-Gutscheine. Sie entstehen automatisch, wenn eine Kundin beim Rücktritt „Als Gutschein“ wählt (oder du es in der Verwaltung so abwickelst). Eingelöst werden sie auf der Buchungsseite mit dem Code, der Restwert bleibt.</p><?php else: ?>
+        <div class="card">
+            <?php foreach ($mvv as $gv): $bal = mv_voucher_balance($pdo, $gv); ?>
+            <div class="ln"><span><strong><?= forma_h($gv['nr']) ?></strong> · <?= forma_h(forma_euro((int)$gv['amount_cents'])) ?><?= $gv['status'] === 'aktiv' && $bal < (int)$gv['amount_cents'] ? ' · Rest ' . forma_h(forma_euro($bal)) : '' ?><br>
+                <span class="small muted"><?= forma_h($gv['note']) ?> · <?= forma_h(date('d. m. Y', strtotime((string)$gv['created_at']))) ?> · Code <?= forma_h($gv['code']) ?></span></span>
+                <span class="acts small"><span class="chip<?= $gv['status'] === 'aktiv' ? ' ok' : '' ?>"><?= $gv['status'] === 'aktiv' ? 'gültig' : ($gv['status'] === 'eingeloest' ? 'eingelöst' : 'Test') ?></span><a href="<?= forma_h(mv_voucher_pdf_link($gv)) ?>" target="_blank" rel="noopener">PDF</a><a href="<?= forma_h($self) ?>?view=natal&amp;k=<?= (int)$gv['order_id'] ?>#k<?= (int)$gv['order_id'] ?>">Buchung</a></span></div>
+            <?php endforeach; ?>
+        </div><?php endif; ?>
 
         <h2 id="testkundin">Als Kundin testen</h2>
         <form method="post" class="card stack"><?= $csrf ?><input type="hidden" name="action" value="mm_natal_testkundin">

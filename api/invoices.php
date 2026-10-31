@@ -229,7 +229,7 @@ function forma_invoice_source(PDO $pdo, string $kind, int $refId): ?array
 
 /** Legt die Rechnung an (einmalig pro Buchung), erzeugt das PDF und verschickt es. Fehler stören die Buchung nie. */
 /** Storno-Rechnung (Gutschrift) zu einer bereits ausgestellten Rechnung, z. B. wenn ein Kurs nicht stattfindet. */
-function forma_invoice_storno(PDO $pdo, string $kind, int $refId, int $cents): void
+function forma_invoice_storno(PDO $pdo, string $kind, int $refId, int $cents, string $detail = ''): void
 {
     forma_invoice_schema($pdo);
     $st = $pdo->prepare('SELECT * FROM invoices WHERE kind = ? AND ref_id = ? ORDER BY id LIMIT 1');
@@ -251,7 +251,7 @@ function forma_invoice_storno(PDO $pdo, string $kind, int $refId, int $cents): v
     $pdo->prepare('INSERT INTO invoices (nr, year, seq, kind, ref_id, issued_at, service_date, name, email, address, country, items, vat_rate, vat_note, net_cents, vat_cents, gross_cents, token, created_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
         ->execute([$nr, $year, $seq, $kind . '_storno', $refId, date('Y-m-d'), $orig['service_date'], $orig['name'], $orig['email'], $orig['address'], $orig['country'],
-            json_encode([['text' => 'Storno zu Rechnung ' . $orig['nr'], 'detail' => $first . (str_starts_with($kind, 'ptb') ? ' · eine Einheit abgesagt, Betrag erstattet' : (str_starts_with($kind, 'ac_') ? ' · Rücktritt/Storno, Betrag erstattet' : ' · Kurs hat nicht stattgefunden, Betrag erstattet')), 'qty' => 1, 'unit' => $gross]], JSON_UNESCAPED_UNICODE),
+            json_encode([['text' => 'Storno zu Rechnung ' . $orig['nr'], 'detail' => $first . ($detail !== '' ? ' · ' . $detail : (str_starts_with($kind, 'ptb') ? ' · eine Einheit abgesagt, Betrag erstattet' : (str_starts_with($kind, 'ac_') ? ' · Rücktritt/Storno, Betrag erstattet' : ' · Kurs hat nicht stattgefunden, Betrag erstattet'))), 'qty' => 1, 'unit' => $gross]], JSON_UNESCAPED_UNICODE),
             $rate, trim('Stornorechnung zu Rechnung ' . $orig['nr'] . ' vom ' . date('d.m.Y', strtotime((string)$orig['issued_at'])) . '. ' . (string)$orig['vat_note']), $net, $vat, $gross, bin2hex(random_bytes(16)), date('c')]);
     $id = (int)$pdo->lastInsertId();
     $pdo->exec('COMMIT');

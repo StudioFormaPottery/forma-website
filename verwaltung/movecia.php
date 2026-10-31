@@ -540,6 +540,10 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .qg.test .qa a,.qg.test .qa button{background:#F3E7DA;border-color:#E2CDB7}.qg.test b{color:#5A4434}.qg.test .qa span{color:#86705E}.qg.test .dot{background:#C9A27E}
 .qg .qa .soon{opacity:.75}
 </style>
+        <?php if (date('Y-m-d') <= '2026-11-21'): ?>
+        <a href="<?= forma_h($self) ?>?view=natal#gutscheine" style="display:block;margin:16px 0 4px;padding:14px 18px;border-radius:20px;background:#FBF8F4;border:1.5px dashed #7D5E68;color:#2E2529;text-decoration:none">
+            <b style="font-size:16px;color:#4A3A41">✨ Neu bei Prä- &amp; Postnatal</b><span style="display:block;font-size:14px;color:#7D7076;margin-top:2px">Kundinnen bestätigen den Start per Häkchen aus der Mail (auf Wunsch mit Sofortzugang) und können im Mitgliederbereich zurücktreten: Rückerstattung oder Gutschein, alles automatisch. Gutscheine lösen sie beim Buchen mit dem Code ein.</span></a>
+        <?php endif; ?>
         <section class="qg tag">
             <h2><span class="dot"></span>Jeden Tag <small>aufnehmen, posten, sammeln</small></h2>
             <div class="qa">

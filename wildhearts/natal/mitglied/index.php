@@ -22,6 +22,7 @@ $pwOk = fn(string $p) => mb_strlen($p) >= 8;
 // --- Aktionen ---------------------------------------------------------------------------------
 $err = '';
 $note = '';
+$wdDone = null;
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $a = (string)($_POST['a'] ?? '');
     if (!empty($_POST['website'])) $go();
@@ -44,6 +45,19 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         elseif (!$pwOk($pw)) $err = 'Bitte wähl ein Passwort mit mindestens 8 Zeichen.';
         elseif ($pw !== (string)($_POST['pw2'] ?? '')) $err = 'Die beiden Passwörter sind nicht gleich.';
         else { natal_member_login(natal_member_set_password($pdo, (string)$o['email'], (string)$o['name'], $pw), $pdo); $go('?willkommen=1'); }
+    }
+    // Rücktritt mit Rückerstattung oder Gutschein (Vivien, 31.10.2026)
+    if ($a === 'withdraw') {
+        $me0 = natal_member_current($pdo);
+        $o0 = natal_order($pdo, (int)($_POST['o'] ?? 0));
+        if (!$me0 || !$o0 || strtolower((string)$o0['email']) !== strtolower((string)$me0['email'])) $err = 'Bitte melde dich noch einmal an.';
+        elseif (!natal_wd_open($pdo, $o0)) $err = 'Ein Rücktritt ist für diese Buchung hier nicht mehr möglich. Schreib mir einfach, dann finden wir eine Lösung.';
+        elseif (empty($_POST['sure'])) $err = 'Bitte bestätige den Rücktritt mit dem zweiten Knopf.';
+        else {
+            $r = natal_wd_execute($pdo, (int)$o0['id'], (string)($_POST['choice'] ?? ''), (int)($_POST['count'] ?? 1), (int)($_POST['design'] ?? 1), 'mitglied');
+            if ($r['ok']) { $wdDone = $r + ['first' => forma_first_name((string)$o0['name'])]; mm_dev_logout($pdo); natal_member_logout(); }
+            else $err = $r['error'];
+        }
     }
     if ($a === 'reset_req') {
         if (!natal_member_throttled($pdo, $ipHash)) { natal_member_fail($pdo, $ipHash); natal_member_send_reset($pdo, (string)($_POST['email'] ?? '')); }
@@ -133,7 +147,7 @@ function natal_member_demo(string $v): array
 }
 
 $demo = in_array($_GET['demo'] ?? '', ['prae', 'post', 'vorschau'], true) ? (string)$_GET['demo'] : '';
-$me = $demo ? ['name' => 'Anna Beispiel', 'email' => 'anna@example.com'] : natal_member_current($pdo);
+$me = $demo ? ['name' => 'Anna Beispiel', 'email' => 'anna@example.com'] : ($wdDone ? null : natal_member_current($pdo));
 $views = [];
 if ($demo) $views = [natal_member_demo($demo)];
 elseif ($me) foreach (natal_member_orders($pdo, (string)$me['email']) as $o) $views[] = natal_member_view($pdo, $o);
@@ -255,6 +269,15 @@ input[type=email],input[type=password]{font:inherit;font-size:1rem;color:var(--i
 input:focus{outline:2px solid var(--plum);outline-offset:1px}
 .err{color:#A0463A;font-size:.92rem;margin-top:.8rem}.ok{background:var(--blush);border-radius:14px;padding:.8rem 1rem;margin-top:.8rem;font-size:.95rem}
 .demo{background:var(--deep);color:var(--on);text-align:center;font-size:.85rem;padding:.5rem}
+.wdbox summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;flex-wrap:wrap}.wdbox summary::-webkit-details-marker{display:none}
+.wdsum{display:grid;gap:8px;margin-top:1rem}@media(min-width:700px){.wdsum{grid-template-columns:repeat(3,1fr)}}
+.wdsum div{background:var(--bg);border-radius:16px;padding:.8rem 1rem;display:flex;flex-direction:column}.wdsum span{font-size:.82rem;color:var(--muted)}.wdsum b{font-family:var(--serif);font-weight:500;font-size:1.8rem;line-height:1.1;font-variant-numeric:lining-nums}.wdsum small{font-size:.8rem;color:var(--muted)}
+.wdsum .tot{background:var(--plum);color:var(--on)}.wdsum .tot span{color:var(--peach)}
+.wdch{display:grid;gap:8px;margin-top:.6rem}@media(min-width:700px){.wdch{grid-template-columns:1fr 1fr}}
+.wdch label{display:flex;gap:.7rem;align-items:flex-start;background:var(--bg);border-radius:16px;padding:.8rem 1rem;cursor:pointer;font-size:.92rem;color:var(--muted);border:1.5px solid transparent}
+.wdch label:has(input:checked){border-color:var(--plum)}.wdch input{accent-color:var(--plum);width:20px;height:20px;flex:0 0 20px;margin-top:.15rem}.wdch b{display:block;color:var(--ink);font-size:1rem}
+.wdd{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:.6rem;max-width:620px}.wdd label{cursor:pointer;display:flex;flex-direction:column;gap:.3rem;font-size:.88rem;color:var(--muted);text-align:center}
+.wdd input{position:absolute;opacity:0}.wdd img{width:100%;aspect-ratio:297/210;object-fit:cover;border-radius:12px;border:2px solid var(--line);-webkit-touch-callout:none;user-select:none}.wdd label:has(input:checked) img{border-color:var(--plum);box-shadow:0 0 0 2px var(--plum)}
 footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);text-align:center}
 </style>
 <?= natal_workbook_assets() ?>
@@ -267,7 +290,21 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
   <?php if ($me && !$demo): ?><form method="post"><input type="hidden" name="a" value="logout"><button type="submit">Abmelden</button></form><?php endif; ?>
 </div></header>
 
-<?php if (!$me): /* ---------------- Anmeldung ---------------- */ ?>
+<?php if ($wdDone): /* ---------------- Rücktritt eingegangen ---------------- */ $wd = $wdDone['wd']; ?>
+<main class="w"><div class="in auth">
+  <div class="card" style="width:min(620px,100%)">
+    <p class="k">Rücktritt eingegangen</p>
+    <h2 style="margin-top:.5rem">Danke, <em><?= $h($wdDone['first']) ?></em></h2>
+    <p class="mut" style="margin-top:.6rem">Dein Rücktritt ist am <?= $h(date('d.m.Y \u\m H:i', strtotime((string)$wd['created_at']))) ?> Uhr bei mir angekommen. Die Bestätigung mit allen Angaben ist per E-Mail an dich unterwegs.</p>
+    <p class="ok"><?php if ((int)$wd['refund_cents'] > 0): ?><?= $h(forma_euro((int)$wd['refund_cents'])) ?> gehen zurück auf dasselbe Zahlungsmittel, mit dem du bezahlt hast. Je nach Bank dauert das ein paar Tage.<?php endif; ?>
+      <?php if ($wdDone['vouchers']): ?><?= count($wdDone['vouchers']) === 2 ? 'Deine zwei Gutscheine sind fertig' : 'Dein Gutschein ist fertig' ?>. Du findest <?= count($wdDone['vouchers']) === 2 ? 'sie' : 'ihn' ?> auch als PDF in deiner E-Mail.<?php endif; ?></p>
+    <?php foreach ($wdDone['vouchers'] as $gv): ?>
+      <p style="margin-top:.8rem;display:flex;flex-wrap:wrap;gap:.6rem;align-items:center"><a class="btn" href="<?= $h(mv_voucher_pdf_link($gv)) ?>" target="_blank" rel="noopener">Gutschein <?= $h(forma_euro((int)$gv['amount_cents'])) ?> als PDF</a><span class="mut" style="font-size:.85rem">Code <?= $h((string)$gv['code']) ?></span></p>
+    <?php endforeach; ?>
+    <p class="hand" style="font-family:var(--serif);font-style:italic;font-size:1.5rem;margin-top:1.2rem">Alles Liebe für dich. Vivien</p>
+  </div>
+</div></main>
+<?php elseif (!$me): /* ---------------- Anmeldung ---------------- */ ?>
 <main class="w"><div class="in auth">
   <div class="card">
     <span style="position:absolute;right:18px;top:-26px"><?= natal_icon('mond', 64) ?></span>
@@ -344,6 +381,12 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
 </div></div></section>
 <?php endif; ?>
 
+<?php $vo = !$demo && $v['id'] ? natal_order($pdo, (int)$v['id']) : null; if ($vo && !$vo['confirm_at']): ?>
+<section class="w" style="margin-top:16px"><div class="in"><div class="card" style="display:flex;flex-wrap:wrap;gap:.8rem 1.4rem;align-items:center;justify-content:space-between;box-shadow:inset 0 0 0 1.5px var(--peach)">
+  <p style="flex:1 1 20rem"><b style="font-family:var(--serif);font-size:1.4rem;font-weight:500">Bitte bestätig noch kurz den Start</b><br><span class="mut" style="font-size:.95rem">Ein Häkchen, dass wir schon in deinen ersten 14 Tagen loslegen dürfen. Dort kannst du auch deinen Bereich sofort ganz öffnen.</span></p>
+  <a class="btn" href="<?= $h(natal_start_link($vo)) ?>">Start bestätigen</a>
+</div></div></section>
+<?php endif; ?>
 <section class="w" style="margin-top:16px"><div class="in grid two">
   <div class="card dark">
     <p class="k"><?= $v['next'] ? 'Dein nächster Termin' : 'Deine Termine' ?></p>
@@ -405,6 +448,52 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
     <p style="display:flex;flex-wrap:wrap;gap:.6rem;margin-top:auto"><a class="btn" href="<?= $h($wa) ?>" target="_blank" rel="noopener">WhatsApp</a><a class="btn line" href="mailto:<?= $h(NATAL_COMPANY['email']) ?>">E-Mail</a></p>
   </div>
 </div></section>
+
+<?php
+// Rücktritt ganz unten (Vivien, 31.10.2026): Betrag rechnet der Server, Wahl Rückerstattung oder Gutschein (1 oder 2, Design)
+$wdc = null;
+if ($demo) $wdc = ['total' => 72800, 'used' => 10400, 'used_n' => 2, 'used_text' => '2 × im Studio à € 52', 'back' => 62400, 'cash_back' => 62400, 'voucher_back' => 0, 'until' => strtotime('+9 days')];
+elseif ($vo && natal_wd_open($pdo, $vo)) $wdc = natal_wd_calc($pdo, $vo);
+if ($wdc): ?>
+<section class="w" id="ruecktritt" style="margin-top:clamp(2rem,5vw,3.5rem)"><div class="in"><details class="card wdbox"<?= $err !== '' && ($_POST['a'] ?? '') === 'withdraw' ? ' open' : '' ?>>
+  <summary><span><span class="k">Rücktrittsrecht</span><br><b style="font-family:var(--serif);font-size:1.5rem;font-weight:500">Vertrag widerrufen</b></span><span class="mut" style="font-size:.9rem">möglich bis <?= $h(date('d.m.Y', $wdc['until'])) ?></span></summary>
+  <form method="post" class="wdf" id="wdf">
+    <input type="hidden" name="a" value="withdraw"><input type="hidden" name="o" value="<?= (int)$v['id'] ?>">
+    <p class="mut" style="margin-top:.8rem">Du kannst bis <?= $h(date('d.m.Y', $wdc['until'])) ?> ohne Angabe von Gründen zurücktreten. Einheiten, die schon stattgefunden haben, werden zum Paketpreis abgezogen, alles andere bekommst du zurück.</p>
+    <div class="wdsum">
+      <div><span>Deine Buchung</span><b><?= $h(forma_euro($wdc['total'])) ?></b></div>
+      <div><span>Schon stattgefunden</span><b><?= $wdc['used'] ? '− ' . $h(forma_euro($wdc['used'])) : '€ 0' ?></b><small><?= $h($wdc['used_text']) ?></small></div>
+      <div class="tot"><span>Für dich zurück</span><b><?= $h(forma_euro($wdc['back'])) ?></b></div>
+    </div>
+    <?php if ($wdc['back'] > 0): ?>
+    <p style="margin-top:1.2rem;font-weight:600">Wie möchtest du den Betrag?</p>
+    <div class="wdch">
+      <label><input type="radio" name="choice" value="erstattung" checked><span><b>Zurück aufs Konto</b>auf dasselbe Zahlungsmittel, mit dem du bezahlt hast<?= $wdc['voucher_back'] > 0 ? ' (' . $h(forma_euro($wdc['cash_back'])) . ', den mit Gutschein bezahlten Teil von ' . $h(forma_euro($wdc['voucher_back'])) . ' bekommst du wieder als Gutschein)' : '' ?></span></label>
+      <label><input type="radio" name="choice" value="gutschein"><span><b>Als Gutschein</b>zum Ausdrucken, für dich oder zum Verschenken, ohne Ablaufdatum</span></label>
+    </div>
+    <div class="wdv" id="wdv" hidden>
+      <p style="margin-top:1rem;font-weight:600">Wähl dein Design</p>
+      <div class="wdd">
+        <?php foreach (MV_VOUCHER_DESIGNS as $dn => $dl): ?><label><input type="radio" name="design" value="<?= $dn ?>"<?= $dn === 1 ? ' checked' : '' ?>><img src="/img/movecia/gutschein-<?= $dn ?>.jpg" alt="Design <?= $h($dl) ?>" loading="lazy" draggable="false"><span><?= $h($dl) ?></span></label><?php endforeach; ?>
+      </div>
+      <p style="margin-top:1rem;font-weight:600">Ein Gutschein oder zwei?</p>
+      <div class="wdch two">
+        <label><input type="radio" name="count" value="1" checked><span><b>Einer</b><?= $h(forma_euro($wdc['back'])) ?></span></label>
+        <label><input type="radio" name="count" value="2"<?= $wdc['back'] < 2 ? ' disabled' : '' ?>><span><b>Zwei</b><?php $sp = natal_wd_split($wdc['back'], 2); ?>je <?= $h(forma_euro($sp[0])) ?><?= $sp[0] !== ($sp[1] ?? $sp[0]) ? ' und ' . $h(forma_euro($sp[1])) : '' ?>, z. B. einen zum Verschenken</span></label>
+      </div>
+      <p class="mut" style="font-size:.88rem;margin-top:.6rem">Der Betrag steht fest auf dem Gutschein. Du bekommst ihn sofort als PDF mit eigener Gutscheinnummer und Code, einlösbar für alle Prä- &amp; Postnatal-Pakete im Studio und online.</p>
+    </div>
+    <?php else: ?><input type="hidden" name="choice" value="erstattung"><?php endif; ?>
+    <?php if ($err !== '' && ($_POST['a'] ?? '') === 'withdraw'): ?><p class="err"><?= $h($err) ?></p><?php endif; ?>
+    <p style="margin-top:1.2rem"><button class="btn line" type="button" id="wd1">Vertrag widerrufen</button></p>
+    <div id="wd2" hidden style="margin-top:1rem;background:var(--blush);border-radius:16px;padding:1rem">
+      <p>Bitte prüf deine Auswahl. Mit dem nächsten Klick ist dein Rücktritt verbindlich, offene Termine werden abgesagt und dein Bereich schließt sich.</p>
+      <input type="hidden" name="sure" value="1">
+      <p style="margin-top:.8rem;display:flex;flex-wrap:wrap;gap:.6rem"><button class="btn" type="submit">Widerruf bestätigen</button><button class="btn line" type="button" id="wd0">Zurück</button></p>
+    </div>
+  </form>
+</details></div></section>
+<?php endif; ?>
 </main>
 
 <div class="sheet" id="sheet" hidden><div class="box"><div class="bar"><p class="k" id="sht"></p><button class="x" type="button" id="shx" aria-label="Schließen">×</button></div><div id="shb"></div></div></div>
@@ -450,6 +539,14 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
     document.getElementById('spot').src = b.dataset.sp;
     document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
   }));
+  const wdf = document.getElementById('wdf');
+  if (wdf) {
+    const vv = document.getElementById('wdv'), s1 = document.getElementById('wd1'), s2 = document.getElementById('wd2');
+    const upd = () => { const c = wdf.querySelector('input[name=choice]:checked'); if (vv) vv.hidden = !c || c.value !== 'gutschein'; };
+    wdf.querySelectorAll('input[name=choice]').forEach(r => r.addEventListener('change', upd)); upd();
+    s1.onclick = () => { if (DEMO) { alert('In der Vorschau ohne Funktion.'); return; } s1.hidden = true; s2.hidden = false; };
+    document.getElementById('wd0').onclick = () => { s1.hidden = false; s2.hidden = true; };
+  }
   if (DEMO) document.querySelectorAll('a[href="#demo"]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); alert('In der Vorschau ohne Funktion.'); }));
 })();
 </script>
