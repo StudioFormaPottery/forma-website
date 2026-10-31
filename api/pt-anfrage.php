@@ -43,7 +43,7 @@ $lines = function (string $l) use ($goals, $places, $times, $msg, $phone): array
     if ($p = mm_pt_labels($places, MM_PT_PLACES, $l)) $r[] = [$l === 'en' ? 'Where' : 'Wo', implode(', ', $p)];
     if ($t = mm_pt_labels($times, MM_PT_TIMES, $l)) $r[] = [$l === 'en' ? 'When' : 'Wann', implode(', ', $t)];
     if ($phone !== '') $r[] = [$l === 'en' ? 'Phone' : 'Telefon', $phone];
-    if ($msg !== '') $r[] = [$l === 'en' ? 'Your message' : 'Deine Nachricht', $msg];
+    if ($msg !== '' && $l === 'de-viv') $r[] = ['Nachricht', $msg];
     return $r;
 };
 $tbl = function (array $rows): string {
@@ -53,8 +53,10 @@ $tbl = function (array $rows): string {
 };
 $first = trim((string)strtok($name, ' '));
 
-// Eingangsbestätigung an die Interessentin
-try {
+// Eingangsbestätigung an die Interessentin (Sicherheit 31.10.2026: ohne den frei getippten Text,
+// und höchstens 30 Bestätigungen pro Stunde insgesamt, damit niemand das Formular für Spam an fremde Adressen nutzt)
+$recent = (int)$pdo->query("SELECT COUNT(*) FROM mm_pt_requests WHERE created_at >= '" . date('c', time() - 3600) . "'")->fetchColumn();
+if ($recent <= 30) try {
     $html = $en
         ? '<p>Hi ' . forma_h($first) . ',</p><p>thank you so much for reaching out about 1:1 personal training. Your request has arrived safely, and I’ll get back to you personally in the next few days so we can figure out together what’s right for you.</p>' . $tbl($lines('en')) . '<p>If anything else comes to mind, just reply to this email.</p>'
         : '<p>Hallo ' . forma_h($first) . ',</p><p>danke dir von Herzen für deine Anfrage zum 1:1 Personal Training. Sie ist gut bei mir angekommen, und ich melde mich in den nächsten Tagen persönlich bei dir, damit wir gemeinsam schauen, was für dich passt.</p>' . $tbl($lines('de')) . '<p>Wenn dir noch etwas einfällt, antworte einfach auf diese Mail.</p>';
@@ -64,7 +66,7 @@ try {
 
 // Info an Vivien
 try {
-    $rows = array_merge([['Name', $name], ['E-Mail', $email]], $lines('de'));
+    $rows = array_merge([['Name', $name], ['E-Mail', $email]], $lines('de'), $msg !== '' ? [['Nachricht', $msg]] : []);
     $html = '<p>Neue Anfrage für 1:1 Personal Training' . ($en ? ' (auf Englisch)' : '') . ':</p>' . $tbl($rows)
         . '<p><a href="' . forma_h(forma_site_url() . '/verwaltung/?view=movecia#pt') . '" style="display:inline-block;background:#4A3040;color:#F7F1EE;text-decoration:none;padding:12px 22px;border-radius:999px;">In der Verwaltung ansehen</a></p>';
     mm_mail(natal_notify_email(), 'Personal Training Anfrage: ' . $name, strip_tags(str_replace(['</p>', '</tr>'], ["\n\n", "\n"], $html)), mm_mail_html('Neue Anfrage', $html, 'de'));

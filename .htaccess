@@ -5,13 +5,36 @@ Options -Indexes
 <FilesMatch "\.(md|sqlite|log)$">
   Require all denied
 </FilesMatch>
-<FilesMatch "^(lib|movecia-lib|natal-lib|method-lib|ptb-lib|academy-lib|movecia)\.php$|\.inc\.php$">
+<FilesMatch "^(lib|movecia-lib|natal-lib|method-lib|ptb-lib|academy-lib|movecia|gewinnspiel-lib|termin-lib|invoices|kasse|minimum|testbuchung)\.php$|\.inc\.php$">
   Require all denied
 </FilesMatch>
+# Sicherheit (31.10.2026): versteckte Dateien (.git, .env, .gitignore …) und Sicherungskopien nie ausliefern
+<FilesMatch "^\.|\.(bak|old|orig|swp|sql|env|ini|sh|py)$|~$">
+  Require all denied
+</FilesMatch>
+
+# Sicherheits-Header für beide Websites (31.10.2026)
+<IfModule mod_headers.c>
+Header always set X-Content-Type-Options "nosniff"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set X-Frame-Options "SAMEORIGIN"
+Header always set Content-Security-Policy "frame-ancestors 'self'; base-uri 'self'; object-src 'none'"
+Header always set Strict-Transport-Security "max-age=31536000"
+Header always set Permissions-Policy "geolocation=(), usb=(), payment=()"
+Header always unset X-Powered-By
+Header unset X-Powered-By
+</IfModule>
 
 # Interne Dateien für die Gutscheine
 <IfModule mod_rewrite.c>
 RewriteEngine On
+# Sicherheit (31.10.2026): immer verschlüsselt (https), auch Verwaltung und Bezahlseiten
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteCond %{HTTP_HOST} (forma-pottery\.com|moveciamovement\.com)$ [NC]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+# Git-Ordner und andere versteckte Pfade sperren (nur .well-known bleibt offen)
+RewriteRule (^|/)\.(?!well-known/) - [F,L]
 # Movecia-Videos und -Fotos nicht direkt im Browser-Tab öffnen/speichern (Vivien, 26.10.2026); auf den Seiten laufen sie normal
 RewriteCond %{HTTP:Sec-Fetch-Dest} ^document$ [NC]
 RewriteRule ^(video/movecia/.+\.mp4|img/movecia/fotos/.+\.(jpe?g|webp|png))$ - [F,L]
@@ -93,6 +116,7 @@ RewriteCond %{REQUEST_URI} !^/(api|verwaltung)/
 RewriteRule ^(.*)$ https://www.forma-pottery.com/$1 [R=301,L]
 RewriteRule ^api/(fpdf|gutschein|seed)/ - [F,L]
 RewriteRule ^tools/ - [F,L]
+RewriteRule ^wildhearts/shots/ - [F,L]
 </IfModule>
 
 # Web-App: Manifest richtig ausliefern, sw.js nie lange zwischenspeichern

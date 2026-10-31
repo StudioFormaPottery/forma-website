@@ -83,7 +83,7 @@ if ($view === 'musik' || str_starts_with((string)$action, 'mm_mu_')) {
         $file = 'mu-' . bin2hex(random_bytes(6)) . '.mp3'; $dest = mu_dir() . '/' . $file; $okDl = false;
         if (function_exists('curl_init')) {
             $fh = fopen($dest, 'wb'); $ch = curl_init($url);
-            curl_setopt_array($ch, [CURLOPT_FILE => $fh, CURLOPT_FOLLOWLOCATION => true, CURLOPT_TIMEOUT => 150, CURLOPT_CONNECTTIMEOUT => 15, CURLOPT_FAILONERROR => true]);
+            curl_setopt_array($ch, [CURLOPT_FILE => $fh, CURLOPT_FOLLOWLOCATION => true, CURLOPT_MAXREDIRS => 3, CURLOPT_PROTOCOLS => CURLPROTO_HTTPS, CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS, CURLOPT_TIMEOUT => 150, CURLOPT_CONNECTTIMEOUT => 15, CURLOPT_FAILONERROR => true]);
             $okDl = curl_exec($ch) !== false && curl_getinfo($ch, CURLINFO_HTTP_CODE) < 400; curl_close($ch); fclose($fh);
         } else {
             $data = @file_get_contents($url, false, stream_context_create(['http' => ['timeout' => 150]]));

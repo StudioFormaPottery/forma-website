@@ -225,6 +225,18 @@ function store_upload(string $field, string $kind, string $prefix): string
 
 $hash = forma_setting($pdo, 'admin_hash');
 $loggedIn = !empty($_SESSION['admin']);
+// Sicherheit (31.10.2026): nach 12 Std. ohne Nutzung abmelden; nach Passwortänderung alle anderen Geräte abmelden.
+if ($loggedIn) {
+    $verNow = (string)(forma_setting($pdo, 'admin_ver') ?? '0');
+    if (time() - (int)($_SESSION['seen'] ?? time()) > 43200 || (isset($_SESSION['ver']) && $_SESSION['ver'] !== $verNow)) {
+        $_SESSION = [];
+        session_regenerate_id(true);
+        $loggedIn = false;
+    } else {
+        $_SESSION['seen'] = time();
+        $_SESSION['ver'] = $verNow;
+    }
+}
 $action = $_POST['action'] ?? '';
 $view = $_GET['view'] ?? 'start';
 
@@ -259,8 +271,12 @@ if (isset($_GET['token']) || $action === 'set_password') {
             forma_set_setting($pdo, 'setup_token', null);
             forma_set_setting($pdo, 'setup_expires', null);
             forma_set_setting($pdo, 'login_fails', '0');
+            $verNew = (string)((int)(forma_setting($pdo, 'admin_ver') ?? '0') + 1);
+            forma_set_setting($pdo, 'admin_ver', $verNew);
             session_regenerate_id(true);
             $_SESSION['admin'] = true;
+            $_SESSION['seen'] = time();
+            $_SESSION['ver'] = $verNew;
             go($self, 'Dein Passwort ist gespeichert. Willkommen in deiner Kursverwaltung!');
         }
     }
@@ -283,22 +299,30 @@ if (isset($_GET['token']) || $action === 'set_password') {
 
 if ($action === 'login') {
     check_csrf();
-    $lockUntil = (int)(forma_setting($pdo, 'lock_until') ?? 0);
-    if (time() < $lockUntil) {
+    // Sicherheit (31.10.2026): Sperre je Gerät/IP statt für alle, damit Fremde Vivien nicht aussperren können.
+    $pdo->exec('CREATE TABLE IF NOT EXISTS admin_login_fail (ip_hash TEXT NOT NULL, at INTEGER NOT NULL)');
+    $ipH = hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? '') . 'forma-admin');
+    $pdo->prepare('DELETE FROM admin_login_fail WHERE at < ?')->execute([time() - 86400]);
+    $q = $pdo->prepare('SELECT COUNT(*) FROM admin_login_fail WHERE ip_hash = ? AND at >= ?');
+    $q->execute([$ipH, time() - 900]);
+    if ((int)$q->fetchColumn() >= 5) {
         go($self, 'Zu viele Fehlversuche. Bitte warte 15 Minuten.');
     }
+    // Viele Fehlversuche von überall her: nur bremsen, nie ganz sperren.
+    $all = (int)$pdo->query('SELECT COUNT(*) FROM admin_login_fail WHERE at >= ' . (time() - 3600))->fetchColumn();
+    if ($all >= 30) {
+        sleep(2);
+    }
     if ($hash && password_verify((string)($_POST['password'] ?? ''), $hash)) {
-        forma_set_setting($pdo, 'login_fails', '0');
+        $pdo->prepare('DELETE FROM admin_login_fail WHERE ip_hash = ?')->execute([$ipH]);
         session_regenerate_id(true);
         $_SESSION['admin'] = true;
+        $_SESSION['seen'] = time();
+        $_SESSION['ver'] = (string)(forma_setting($pdo, 'admin_ver') ?? '0');
         go($self);
     }
-    $fails = (int)(forma_setting($pdo, 'login_fails') ?? 0) + 1;
-    forma_set_setting($pdo, 'login_fails', (string)$fails);
-    if ($fails >= 5) {
-        forma_set_setting($pdo, 'lock_until', (string)(time() + 900));
-        forma_set_setting($pdo, 'login_fails', '0');
-    }
+    $pdo->prepare('INSERT INTO admin_login_fail (ip_hash, at) VALUES (?, ?)')->execute([$ipH, time()]);
+    usleep(400000);
     go($self, 'Das Passwort stimmt nicht.');
 }
 
