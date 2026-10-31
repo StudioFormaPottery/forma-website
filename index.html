@@ -2326,8 +2326,18 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
     return loaded;
   }
 
+  // Ausgebuchte Pottery Pause: kein Kalender, sondern direkt „Informiere mich“ (Warteliste/FORMA Post)
+  function waitOnly(g){return !g.nextFree&&norm(g.title).indexOf('pottery pause')===0&&!!document.getElementById('pp-wait-open');}
+  function openWait(){if(dlg.open)hide(dlg);var o=document.getElementById('pp-wait-open');if(o)setTimeout(function(){o.click();},dlg.open?0:60);}
   function tile(g,big){
     var b=el('button','tile');b.type='button';
+    if(waitOnly(g)){
+      b.appendChild(el('h4',null,g.title));
+      b.appendChild(el('p','next','Gerade ausgebucht. Trag dich ein, dann sag ich dir als Erste Bescheid, wenn der nächste Kurs startet.'));
+      var rw=el('div','row');rw.appendChild(el('p','price',''));rw.appendChild(el('span','go','Informiere mich'));b.appendChild(rw);
+      b.addEventListener('click',openWait);
+      return b;
+    }
     b.appendChild(el('h4',null,g.title));
     if(big&&g.description)b.appendChild(el('p','next',g.description));
     b.appendChild(el('p','next',g.nextFree?('Nächster freier Termin: '+g.nextFree.date_text):'Gerade alles ausgebucht'));
@@ -2365,6 +2375,7 @@ a.more{font-size:15.5px;font-weight:500;color:var(--clay);text-underline-offset:
 
   // Schritt 2: Termin im Kalender
   function chooseGroup(g){
+    if(waitOnly(g)){openWait();return;}
     group=g;current=null;
     $('cal-title').textContent=g.title;
     var meta=[];if(g.price_text)meta.push(g.price_text);if(g.min>1)meta.push('findet ab '+g.min+' Personen statt');
