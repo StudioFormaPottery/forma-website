@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8">
+<style>
+@font-face{font-family:"Bricolage";font-weight:400;src:url(../../fonts/BricolageGrotesque-Regular.woff)}
+@font-face{font-family:"Outfit";font-weight:400;src:url(../../fonts/Outfit-Regular.woff)}
+@font-face{font-family:"Outfit";font-weight:600;src:url(../../fonts/Outfit-Bold.woff)}
+@font-face{font-family:"Apple";src:url(../../fonts/HomemadeApple-Regular.woff)}
+:root{--paper:#EEE2D4;--card:#F6ECE3;--clay:#8C2C1D;--ink:#33211B;--soft:#674B40;--line:#CDB59F;--blush:#DDBFA8}
+*{box-sizing:border-box;margin:0}
+html,body{width:1080px;height:1920px;background:var(--paper);font-family:"Outfit";color:var(--ink);overflow:hidden}
+.page{position:relative;width:1080px;height:1920px;padding:66px 60px 0}
+.head{display:flex;align-items:center;gap:22px}
+.head img{width:92px;height:92px;border-radius:50%}
+.brand{font-size:30px;letter-spacing:.06em;line-height:1.15}
+.brand small{display:block;font-size:17px;letter-spacing:.16em;color:var(--soft)}
+.spark{position:absolute;color:var(--clay);opacity:.55;font-size:40px}
+.photo{margin-top:36px;height:640px;border-radius:30px;overflow:hidden;position:relative}
+.photo img{width:100%;height:100%;object-fit:cover;object-position:50% 58%}
+
+.kicker{margin-top:36px;font-size:21px;letter-spacing:.18em;color:var(--clay);text-transform:uppercase}
+h1{font-family:"Bricolage";font-weight:400;font-size:92px;line-height:1.02;color:var(--clay);margin-top:12px}
+.script{font-family:"Apple";font-size:38px;color:var(--soft);margin:6px 0 0 4px}
+.lead{font-size:28px;line-height:1.45;color:var(--soft);margin-top:22px}
+.dates{display:flex;gap:22px;margin-top:28px}
+.d{flex:1;background:var(--card);border-radius:24px;padding:26px 28px;position:relative}
+.d .wd{font-size:20px;letter-spacing:.16em;text-transform:uppercase;color:var(--soft)}
+.d .dt{font-family:"Bricolage";font-size:52px;line-height:1.1;margin-top:6px}
+.d.out{background:transparent;border:2px dashed var(--line)}
+.d.out .dt,.d.out .wd{color:#A99282}
+.d.out .dt{text-decoration:line-through;text-decoration-thickness:3px;text-decoration-color:var(--clay)}
+.stamp{position:absolute;right:18px;top:20px;transform:rotate(-8deg);border:2.5px solid var(--clay);color:var(--clay);font-size:17px;letter-spacing:.14em;padding:5px 12px;border-radius:8px;text-transform:uppercase;font-weight:600}
+.free{position:absolute;right:20px;top:22px;background:var(--clay);color:#FBF1EA;font-size:17px;letter-spacing:.12em;padding:6px 14px;border-radius:30px;text-transform:uppercase;font-weight:600}
+.cta{margin-top:30px;background:var(--clay);color:#FBF1EA;border-radius:30px;padding:36px 42px}
+.cta b{display:block;font-family:"Bricolage";font-weight:400;font-size:44px;line-height:1.15}
+.cta p{font-size:25px;line-height:1.45;margin-top:10px;opacity:.92}
+.cta .url{margin-top:16px;font-size:28px;font-weight:600;letter-spacing:.02em}
+.foot{position:absolute;left:60px;right:60px;bottom:44px;display:flex;justify-content:space-between;font-size:19px;color:var(--soft)}
+</style></head><body><div class="page">
+<span class="spark" style="right:150px;top:70px">✳</span>
+<span class="spark" style="right:76px;top:120px;font-size:54px">✻</span>
+<span class="spark" style="right:190px;top:150px;font-size:26px">✦</span>
+<div class="head"><img src="../../img/forma-logo.png"><div class="brand">STUDIO FORMA<small>TÖPFERATELIER IM PAZNAUN</small></div></div>
+<div class="photo"><img src="../../img/popup-advent.jpg"></div>
+<div class="kicker">Special im Advent</div>
+<h1>Pottery bemalen</h1>
+<div class="script">neue Termine frei!</div>
+<p class="lead">Die ersten beiden Termine sind schon ausgebucht, danke euch von Herzen! Wer noch bemalen möchte, kann sich gleich die nächsten Termine sichern.</p>
+<div class="dates">
+  <div class="d out"><div class="wd">Mi &amp; Do</div><div class="dt">4. &amp; 5. Nov</div><span class="stamp">ausgebucht</span></div>
+</div>
+<div class="dates" style="margin-top:20px">
+  <div class="d"><div class="wd">Mittwoch</div><div class="dt">11. November</div></div>
+  <div class="d"><div class="wd">Donnerstag</div><div class="dt">12. November</div></div>
+</div>
+<div class="cta"><b>Am besten früh reservieren</b><p>Die Plätze sind begrenzt. Termin und Stunden wählst du ganz einfach online.</p><div class="url">forma-pottery.com</div></div>
+<div class="foot"><span>Studio FORMA · Mathon, Paznaun</span><span>hello@forma-pottery.com</span></div>
+</div></body></html>
