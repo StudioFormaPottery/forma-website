@@ -476,7 +476,7 @@ if ($wdc): ?>
     <div class="wdv" id="wdv" hidden>
       <p style="margin-top:1rem;font-weight:600">Wähl dein Design</p>
       <div class="wdd">
-        <?php foreach (MV_VOUCHER_DESIGNS as $dn => $dl): ?><label><input type="radio" name="design" value="<?= $dn ?>"<?= $dn === 1 ? ' checked' : '' ?>><img src="/img/movecia/gutschein-<?= $dn ?>.jpg" alt="Design <?= $h($dl) ?>" loading="lazy" draggable="false"><span><?= $h($dl) ?></span></label><?php endforeach; ?>
+        <?php foreach (MV_VOUCHER_DESIGNS as $dn => $dl): ?><label><input type="radio" name="design" value="<?= $dn ?>"<?= $dn === 1 ? ' checked' : '' ?>><img src="/img/movecia/gutschein-<?= $dn ?>.jpg?v=2" alt="Design <?= $h($dl) ?>" loading="lazy" draggable="false"><span><?= $h($dl) ?></span></label><?php endforeach; ?>
       </div>
       <p style="margin-top:1rem;font-weight:600">Ein Gutschein oder zwei?</p>
       <div class="wdch two">
