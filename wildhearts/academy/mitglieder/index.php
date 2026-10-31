@@ -67,7 +67,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     }
     if ($me && $a === 'logout') { mm_dev_logout($pdo); mv_logout(); $go('?bye=1'); }
 }
-$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=17">';
+$css = '<link rel="stylesheet" href="/wildhearts/assets/academy.css?v=18">';
 
 // --- Nicht angemeldet ---------------------------------------------------------------------------
 if (!$r && !$demo) {
