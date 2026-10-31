@@ -2922,7 +2922,19 @@ $minCourses = $pdo->query("SELECT * FROM courses WHERE min_status = 'gemeldet' A
 render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive, $voucherOpen, $voucherUnpaid, $kasseUnpaid, $privateOpen, $offerOpen, $offerUnpaid, $agenda, $toPlan, $newBookings, $minCourses) {
     $h = (int)date('G');
     $hello = $h < 11 ? 'Guten Morgen' : ($h < 17 ? 'Hallo' : 'Guten Abend'); ?>
-    <h1 class="hi"><?= $hello ?>, Vivien</h1>
+    <section class="hero">
+        <span class="deco-slot d1"></span><span class="deco-slot d2"></span><span class="deco-slot d3"></span><span class="deco-slot d4"></span>
+        <div class="hero-text">
+            <p class="eyebrow"><?= forma_h(forma_de_date(date('Y-m-d'))) ?></p>
+            <h1><?= $hello ?>, Vivien!</h1>
+            <p class="muted">Schön, dass du da bist. Hier ist alles, was in deinem Atelier gerade los ist.</p>
+        </div>
+        <div class="stats">
+            <a class="stat" href="<?= forma_h($self) ?>?view=kalender"><b><?= $toPlan ?></b><span>Private Pottery zum Einplanen</span></a>
+            <a class="stat" href="#neu"><b><?= $newBookings ?></b><span>neue Buchungen in 7 Tagen</span></a>
+            <a class="stat" href="<?= forma_h($self) ?>?view=liste"><b><?= $subCount ?></b><span>Kontakte im Newsletter</span></a>
+        </div>
+    </section>
     <style>
     h1.hi{margin:14px 0 4px;font-size:clamp(30px,3.4vw,40px)}
     .dash{display:block!important}

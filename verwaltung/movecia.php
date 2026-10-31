@@ -405,12 +405,25 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
         <?php $ptAll = 0; try { $ptAll = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); $ptAll += count(array_filter(mm_pt_list($pdo), fn($r) => $r['status'] === 'neu')); } catch (Throwable $e) {}
         $acReq = 0; try { require_once dirname(__DIR__) . '/api/academy-lib.php'; $acReq = (int)$pdo->query("SELECT COUNT(*) FROM ac_calls WHERE status = 'angefragt'")->fetchColumn() + ac_unanswered($pdo); } catch (Throwable $e) {} ?>
         <?php $igN = 0; try { $igN = (int)$pdo->query("SELECT COUNT(*) FROM mm_insta WHERE day = '" . date('Y-m-d') . "' AND status <> 'gepostet'")->fetchColumn(); } catch (Throwable $e) {} ?>
-        <h1 class="hi"><?= $hello ?>, Vivien</h1>
         <?php else: ?>
         <h1 style="margin:14px 0 10px"><?= $part === 'gatherings' ? '✨ Gatherings' : '⚙️ Einstellungen' ?></h1>
         <?php endif; ?>
         <?php mm_subnav($part ?: 'movecia'); ?>
         <?php if ($part === ''): ?>
+        <section class="mm-hero">
+            <img class="mm-hero-sign" src="/img/movecia/movecia-zeichen-hell.svg" alt="">
+            <div class="mm-hero-text">
+                <p class="eyebrow"><?= forma_h(forma_de_date(date('Y-m-d'))) ?></p>
+                <h1><?= $hello ?>, Vivien!</h1>
+                <p>Schön, dass du hier bist. Bereit für Bewegung? Hier ist alles, was in deinem Studio gerade los ist.</p>
+            </div>
+            <div class="mm-hero-stats">
+                <a href="<?= forma_h($self) ?>?view=natal"><b><?= $natalReq ?></b><span>Anfragen Prä- &amp; Postnatal</span></a>
+                <?php $ptAll = 0; try { $ptAll = (int)$pdo->query("SELECT COUNT(*) FROM mm_ptb_orders WHERE status = 'anfrage'")->fetchColumn(); $ptAll += count(array_filter(mm_pt_list($pdo), fn($r) => $r['status'] === 'neu')); } catch (Throwable $e) {} ?>
+                <a href="<?= forma_h($self) ?>?view=training"><b><?= $ptAll ?></b><span>Anfragen Personal Training</span></a>
+                <a href="<?= forma_h($self) ?>?view=movecia&amp;p=einst#liste"><b><?= $subOk ?></b><span>auf der E-Mail-Liste</span></a>
+            </div>
+        </section>
 <style>
 h1.hi{margin:18px 0 6px}
 .big3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:8px 0 22px}
