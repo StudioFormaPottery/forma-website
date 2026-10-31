@@ -70,7 +70,7 @@ function forma_pp_text(string $name, array $course): string
     foreach (forma_pp_dates($course) as $i => $ts) $lines[] = forma_pp_short($ts) . ' · ' . FORMA_PP_WEEKS[$i];
     $lines[] = ($span ? 'Jeweils ' . $span . ' im Atelier in Mathon.' : 'Im Atelier in Mathon.');
     array_push($lines, '', 'Hast du schon eine Idee für ein Herzensprojekt? Trag sie im Handbuch ins Ideen-Feld ein oder antworte einfach auf diese Mail.', '',
-        'Gut zu wissen: Nimm dir in jeder Einheit die letzten 20 bis 25 Minuten Zeit, um deine Werkstücke vom vorigen Mal fertigzumachen und zu bemalen.', '',
+        'Gut zu wissen: Auf meinem großen Tisch stehen immer Farben bereit, und du entscheidest selbst, wann du bemalst. Ratsam ist, dir ab der zweiten Einheit etwa 20 bis 25 Minuten für deine Stücke vom vorigen Mal zu nehmen, sonst bleibt am letzten Abend kaum Zeit zum Töpfern.', '',
         'Komm am besten in bequemer Kleidung, die ruhig etwas Ton abbekommen darf.', '', 'Bis bald, ich freue mich auf dich!', 'Vivien');
     return implode("\n", $lines);
 }
@@ -105,7 +105,7 @@ function forma_pp_html(string $name, array $course): string
         . $p('Im Kurs geht es wirklich ums Drehen an der Töpferscheibe: Ich bringe dir die Basics bei, damit du sicher wirst und Freude am Arbeiten hast. Natürlich bleibt auch Zeit für deine kleinen Herzensprojekte. Wenn du schon eine Vorstellung hast, was du gerne machen möchtest, trag sie im Handbuch ins Ideen-Feld ein oder antworte mir einfach auf diese Mail.')
         . '</td></tr>'
         . '<tr><td style="padding:10px 40px 6px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:2px dashed #DDBFA8;border-radius:18px;"><tr><td style="padding:18px 22px;font-size:15px;line-height:1.65;">'
-        . '<b style="color:#8C2C1D;">Gut zu wissen:</b> Nimm dir in jeder Einheit die letzten 20 bis 25 Minuten Zeit, um deine Werkstücke vom vorigen Mal fertigzumachen und zu bemalen. So sammelt sich nichts an, und du hast in der letzten Stunde keinen Stress.'
+        . '<b style="color:#8C2C1D;">Gut zu wissen:</b> Auf meinem großen Tisch stehen immer Farben für dich bereit, und du entscheidest selbst, wann du bemalst. Du musst in einer Einheit auch gar nichts bemalen. Ratsam ist es trotzdem: Nimm dir ab der zweiten Einheit gern etwa 20 bis 25 Minuten für deine Stücke vom vorigen Mal, sonst geht am letzten Abend viel Zeit fürs Malen drauf und es bleibt wenig Zeit zum Töpfern.'
         . '</td></tr></table></td></tr>'
         . '<tr><td style="padding:22px 40px 4px;">' . $p('Komm am besten in bequemer Kleidung, die ruhig etwas Ton abbekommen darf. Alles andere liegt im Atelier für dich bereit.') . $p('Bis bald, ich freue mich auf dich!', 0) . '</td></tr>'
         . '<tr><td style="padding:6px 40px 34px;"><img src="' . FORMA_SITE_URL . '/img/signatur-liebe-zum-ton.png" width="230" alt="Mit ganz viel Liebe zum Ton" style="display:block;border:0;"></td></tr>'
