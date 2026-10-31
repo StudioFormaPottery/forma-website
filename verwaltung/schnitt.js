@@ -56,7 +56,7 @@
     w.firstChild.textContent = text; document.body.appendChild(w); const done = v => { w.remove(); ok(v); };
     w.querySelector('[data-y]').onclick = () => done(true); w.querySelector('[data-n]').onclick = () => done(false); w.querySelector('[data-y]').focus(); }); }
   // ---- ☁️ Abgleich mit dem Server: Entwürfe auf allen Geräten (Vivien, 31.10.2026) ----
-  const SY = { rows: new Map(), kv: {}, t: 0, files: [], upRun: false, have: null, pulled: false, status: null };
+  const SY = { rows: new Map(), kv: {}, t: 0, files: [], upRun: false, have: null, pulled: false, status: null, busy: null };
   const syUrl = () => (location.pathname.indexOf('/verwaltung') >= 0 ? location.pathname : '/verwaltung/');
   const syCsrf = () => window.SN_CSRF || '';
   function syncRow(r) { if (!syCsrf()) return; const x = Object.assign({}, r); delete x.blob; delete x.url; delete x.thumb; delete x.slot; SY.rows.set(x.id, x); syFlushSoon(); }
@@ -68,6 +68,8 @@
     try { const r = await fetch(syUrl(), { method: 'POST', body: f, credentials: 'same-origin' }).then(x => x.json()); if (!r || r.error) throw 0; }
     catch (e) { rows.forEach(x => { if (!SY.rows.has(x.id)) SY.rows.set(x.id, x); }); for (const k in kv) if (!SY.kv[k]) SY.kv[k] = kv[k]; clearTimeout(SY.t); SY.t = setTimeout(syFlush, 15000); }
   }
+  // Sichern nur, wenn gerade nicht abgespielt/bearbeitet wird – Safari liest Video und Upload aus derselben Datei, gleichzeitig hängt dann die Vorschau (Vivien, 31.10.2026)
+  async function syIdle() { for (let k = 0; k < 2400 && SY.busy && SY.busy(); k++) await new Promise(r => setTimeout(r, 1500)); }
   function syncFile(fid, blob) { if (!syCsrf() || !blob || SY.files.some(x => x.fid === fid)) return; SY.files.push({ fid, blob }); syUpload(); }
   async function syUpload() {
     if (SY.upRun) return; SY.upRun = true;
@@ -76,7 +78,7 @@
       while (SY.files.length) {
         const { fid, blob } = SY.files[0]; if (SY.have.has(fid)) { SY.files.shift(); continue; }
         const CH = 1536 * 1024, n = Math.max(1, Math.ceil(blob.size / CH)); let ok = true;
-        for (let i = 0; i < n && ok; i++) { const f = new FormData(); f.append('csrf', syCsrf()); f.append('action', 'mm_sn_up'); f.append('fid', fid); f.append('n', i); f.append('off', i * CH); if (i === n - 1) f.append('last', '1'); f.append('b', blob.slice(i * CH, (i + 1) * CH), 'teil');
+        for (let i = 0; i < n && ok; i++) { await syIdle(); const f = new FormData(); f.append('csrf', syCsrf()); f.append('action', 'mm_sn_up'); f.append('fid', fid); f.append('n', i); f.append('off', i * CH); if (i === n - 1) f.append('last', '1'); f.append('b', blob.slice(i * CH, (i + 1) * CH), 'teil');
           let j = null; for (let t = 0; t < 4 && !j; t++) { try { j = await fetch(syUrl(), { method: 'POST', body: f, credentials: 'same-origin' }).then(r => r.json()); if (j && j.error) j = null; } catch (e) {} if (!j) await new Promise(r => setTimeout(r, 2500 * (t + 1))); }
           if (!j) ok = false; if (SY.status) SY.status('up', SY.files.length, (i + 1) / n); }
         if (!ok) { await new Promise(r => setTimeout(r, 30000)); continue; }
@@ -781,6 +783,8 @@ void main(){
 
     // ---- Vorschau: Clips nacheinander abspielen ----
     let playing = false, pos = 0, raf = 0, cmp = false, prepped = false; // pos = Stelle im Gesamtvideo
+    let lastAct = Date.now(); ['pointerdown', 'keydown', 'input', 'wheel'].forEach(ev => root.addEventListener(ev, () => { lastAct = Date.now(); }, { passive: true, capture: true }));
+    SY.busy = () => !closed && !document.hidden && (playing || busy || Date.now() - lastAct < 20000);
     const cur = () => (sel >= 0 && clips[sel]) ? vids.get(clips[sel].slot) : null;
     // den nächsten Abschnitt still an seine Anfangsstelle setzen, solange der aktuelle noch läuft
     function prep(i) { const c = clips[i]; if (!c) return; const v = vidFor(c), t = c.in || 0; if (v !== cur() && Math.abs(v.currentTime - t) > .08) { try { v.currentTime = t; } catch (e) {} } }
@@ -799,6 +803,10 @@ void main(){
       const off = Math.max(0, v.currentTime - (c.in || 0)); pos = starts()[sel] + off; timeUi();
       musDrive(pos + CD(), true);
       if (c.zoom || c.fr) v.style.transform = vtf(c, off);
+      // Steht das Bild beim Abspielen länger als 3 s, nicht still hängen lassen: Knopf zum Neuladen nur dieses Videos (kein Browser-Neuladen nötig)
+      if (v.currentTime !== wd.t) { wd.t = v.currentTime; wd.at = performance.now(); wd.shown = false; }
+      else if (!wd.shown && performance.now() - wd.at > 3000) { wd.shown = true; msg.className = 'sn-msg bad'; msg.innerHTML = 'Das Video hängt gerade. ';
+        const hb = document.createElement('button'); hb.type = 'button'; hb.className = 'sn-b sm'; hb.textContent = '🔄 Weiter abspielen'; hb.onclick = () => { say('Einen Moment …'); wd.at = performance.now(); wd.shown = false; heal(sel, true); setTimeout(() => { if (!wd.shown) say(''); }, 2500); }; msg.appendChild(hb); }
       broSync(c, v.currentTime, true);
       if (!prepped && (c.out || c.dur) - v.currentTime < 1.2) { prepped = true; prep(sel + 1); }
       if (v.currentTime >= (c.out || c.dur) - .04 || v.ended) {
@@ -820,7 +828,7 @@ void main(){
     function lazyThumb(c) { ltQ.add(c); clearTimeout(ltT); ltT = setTimeout(function go() { if (playing || busy) { ltT = setTimeout(go, 2500); return; } ltQ.forEach(x => { x.thumb = null; thumb(x); }); ltQ.clear(); }, 2500); }
     const starts = () => { let a = 0; return clips.map(c => { const s = a; a += len(c); return s; }); };
     async function play() {
-      if (busy || !clips.length) return; if (sel < 0) sel = 0; const c = clips[sel], v = vidFor(c); prepped = false; prep(sel + 1);
+      if (busy || !clips.length) return; if (sel < 0) sel = 0; const c = clips[sel], v = vidFor(c); prepped = false; wd.t = -1; wd.shown = false; prep(sel + 1);
       if (shAC && shAC.state === 'suspended') shAC.resume().catch(() => {});
       // Titelbild: von ganz vorne abgespielt, steht es zuerst ein paar Sekunden (Musik läuft schon darunter)
       const wantCov = CD() && sel === 0 && pos < .05 && !covRun && !covSkip; covSkip = false;
