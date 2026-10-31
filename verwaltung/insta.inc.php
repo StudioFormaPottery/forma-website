@@ -37,6 +37,18 @@ function ig_take_theme(PDO $pdo, string $day, array $th, string $lang, string $a
     }
     return $ids;
 }
+/** Neue Fassung der Tagesthemen (Vivien, 31.10.2026: „wie ein Telefonat mit der besten Freundin“) auch in schon eingetragene, noch nicht aufgenommene Einträge übernehmen */
+function ig_refresh_themes(PDO $pdo): void
+{
+    $v = (int)(json_decode((string)@file_get_contents(__DIR__ . '/insta-skripte.json'), true)['version'] ?? 0);
+    if (!$v || (int)forma_setting($pdo, 'ig_theme_ver') >= $v) return;
+    $th = ig_themes(); $up = $pdo->prepare("UPDATE mm_insta SET text = ?, updated_at = ? WHERE id = ?");
+    foreach ($pdo->query("SELECT id, kind, lang, theme FROM mm_insta WHERE theme <> '' AND file = '' AND status = 'offen'")->fetchAll() as $r) {
+        $t = (string)($th[$r['theme']][$r['kind'] . '_' . ($r['lang'] === 'de' ? 'de' : 'en')] ?? '');
+        if ($t !== '') $up->execute([$t, date('c'), $r['id']]);
+    }
+    forma_set_setting($pdo, 'ig_theme_ver', (string)$v);
+}
 /** Wie oft jedes Thema schon verwendet wurde */
 function ig_theme_use(PDO $pdo): array
 {
@@ -141,6 +153,7 @@ function ig_parse(string $raw, string $start, string $kind): array
 if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
     ig_schema($pdo);
     ig_seed_mvig($pdo);
+    ig_refresh_themes($pdo);
     $igBack = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?') . '?view=insta&a=' . ig_tab() . '&m=' . preg_replace('/[^0-9-]/', '', (string)($_POST['m'] ?? date('Y-m')));
     $igJson = function (array $x): void { header('Content-Type: application/json; charset=utf-8'); echo json_encode($x); exit; };
 
