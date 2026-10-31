@@ -85,7 +85,7 @@
 .mvf-stage{container-type:inline-size}
 /* Übungsname als Welle mit Logo links unten (Vivien, 30.10.2026): läuft rechts in einer Spitze aus, blendet bei jeder neuen Übung kurz ein und nach 3,5 s wieder aus */
 .mvf-name{position:absolute;left:0;bottom:0;width:70cqw;height:24cqw;max-height:190px;color:#F7F1EE;pointer-events:none;opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
-.mvf-name.on,.mvf-stage.ready .mvf-name{opacity:1;transform:none}
+.mvf-name.on{opacity:1;transform:none}
 .mvf-name svg{position:absolute;inset:0;width:100%;height:100%}
 .mvf-name .in{position:absolute;left:max(16px,4.2cqw);right:14cqw;top:38%;bottom:6%;display:flex;align-items:center;gap:max(10px,2.2cqw)}
 .mvf-name .in>div{min-width:0}
@@ -387,6 +387,7 @@
     root.querySelectorAll('[data-d]').forEach(b => b.addEventListener('click', () => { dur = +b.dataset.d; try { localStorage.setItem('mvf-dur', String(dur)); } catch (e) {} seg(); }));
     seg();
     let nmT = 0;
+    function nameHide() { const w = q('[data-nmw]'); clearTimeout(nmT); if (w) w.classList.remove('on'); }
     function nameShow(keep) { const w = q('[data-nmw]'); if (!w) return; w.classList.remove('on'); void w.offsetWidth; w.classList.add('on'); clearTimeout(nmT); if (!keep) nmT = setTimeout(() => w.classList.remove('on'), 3500); }
     // ---- Clips: zwei Bunny-Player im Wechsel (Vivien, 30.10.2026: „das Video startet nicht von selbst, der Timer läuft trotzdem“) ----
     // Der nächste Clip lädt schon während der aktuellen Übung, beim Wechsel startet er sofort. Jeder Clip läuft stumm in Schleife,
@@ -449,7 +450,6 @@
       const it = items[i];
       q('[data-tag]').textContent = T(`Übung ${i + 1} von ${items.length}`, `Exercise ${i + 1} of ${items.length}`);
       q('[data-nm]').textContent = it.name;
-      if (phase === 'run') nameShow();
       q('[data-pos]').textContent = T(`Übung ${i + 1} von ${items.length}`, `Exercise ${i + 1} of ${items.length}`);
       clipOn(i);
       const n = items[i + 1];
@@ -482,7 +482,7 @@
       tc.classList.toggle('on', p === 'title'); st.classList.toggle('ready', p === 'ready');
       if (p === 'title') phT = TITLE;
       if (p === 'ready') { phT = READY; cdBeep = 99; q('[data-cd]').textContent = String(READY); q('[data-cdn]').textContent = (idx ? T('Nächste Übung: ', 'Next up: ') : T('Erste Übung: ', 'First up: ')) + items[idx].name; nameShow(true); voiceGo(); }
-      if (p === 'run') { nameShow(); last = performance.now(); voiceGo(); }
+      if (p === 'run') { nameHide(); last = performance.now(); voiceGo(); } // Welle mit dem Namen nur in den ersten 6 s der Vorbereitung, nie über der Übung (Vivien, 31.10.2026)
     }
     // Voice-over startet mit der Vorbereitung, sobald der Clip bereit ist (Timer und Stimme laufen gemeinsam los)
     function voiceGo() { if (!flow || !run || vStarted || !voice.getAttribute('src') || !vidOk()) return; vStarted = true; voice.play().catch(() => {}); }
@@ -495,7 +495,7 @@
       if (!run) return;
       const dt = Math.min(1, (now - last) / 1000); last = now;
       if (phase === 'title') { phT -= dt; if (phT <= 0) setPhase('ready'); }
-      else if (phase === 'ready') { if (vidOk()) { voiceGo(); phT -= dt; } const c = Math.ceil(phT); q('[data-cd]').textContent = String(Math.max(1, c));
+      else if (phase === 'ready') { if (vidOk()) { voiceGo(); phT -= dt; } if (phT <= READY - 6) nameHide(); const c = Math.ceil(phT); q('[data-cd]').textContent = String(Math.max(1, c));
         if (sound && c <= 3 && c >= 1 && c !== cdBeep) { cdBeep = c; bell(false); } // Ton in den letzten 3 Sekunden der Vorbereitung
         if (phT <= 0) { if (sound) bell(true); setPhase('run'); } draw(); }
       else if (!sw && vidOk()) {

@@ -42,7 +42,7 @@ body{background:#F2ECE4}main{max-width:900px}
 <div class="pv-w">
 <?php if ($fd): ?>
   <div data-mv-flow="<?= $h(json_encode($fd, JSON_UNESCAPED_UNICODE)) ?>"></div>
-  <script src="/wildhearts/assets/flow-player.js?v=16"></script>
+  <script src="/wildhearts/assets/flow-player.js?v=17"></script>
 <?php else: ?>
   <div class="pv-v"><?php if ($vid !== '' && mv_bunny()['lib'] !== ''): ?><iframe src="<?= $h(mv_embed($vid)) ?>" allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe><?php else: ?><div class="pv-e">Das Video ist noch nicht hochgeladen. Sobald es da ist, läuft es hier.</div><?php endif; ?></div>
   <script src="/wildhearts/assets/bunny-ton.js?v=1"></script>
