@@ -506,7 +506,7 @@ if ($wdc): ?>
 </div></footer>
 
 <?php if ($me): ?>
-<script src="/wildhearts/assets/flow-player.js?v=18"></script>
+<script src="/wildhearts/assets/flow-player.js?v=19"></script>
 <script src="/wildhearts/assets/titelkarte.js?v=1"></script><script src="/wildhearts/assets/bunny-ton.js?v=1"></script>
 <script>
 (() => {

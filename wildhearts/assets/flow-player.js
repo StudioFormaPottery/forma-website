@@ -216,12 +216,20 @@
     if (SND.ready) return; SND.ready = 1;
     const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if (!OC) return;
     const mk = (k, len, fn) => { try { const oc = new OC(1, Math.ceil(44100 * len), 44100); fn(oc); const r = oc.startRendering(); const done = buf => { SND[k] = wavUrl(buf); }; if (r && r.then) r.then(done); else oc.oncomplete = e => done(e.renderedBuffer); } catch (e) {} };
-    mk('lo', 1.1, oc => bellOn(oc, 0, false)); mk('hi', 1.8, oc => bellOn(oc, 0, true)); mk('sun', 7.8, oc => sunriseOn(oc, 0, 5));
+    mk('tief', 7.2, oc => tiefOn(oc, 0)); mk('lo', 1.1, oc => bellOn(oc, 0, false)); mk('hi', 1.8, oc => bellOn(oc, 0, true)); mk('sun', 7.8, oc => sunriseOn(oc, 0, 5));
     SND.el = [new Audio(), new Audio(), new Audio()]; SND.k = 0;
   }
   function sndUnlock() { sndPrep(); (SND.el || []).forEach(el => { try { el.muted = true; el.src = SND.sil || (SND.sil = wavUrl({ getChannelData: () => new Float32Array(2205), sampleRate: 44100 })); const p = el.play(); if (p && p.then) p.then(() => { el.pause(); el.muted = false; }).catch(() => { el.muted = false; }); else el.muted = false; } catch (e) {} }); }
   function sndPlay(k) { if (!SND.el || !SND[k]) return false; const el = SND.el[SND.k++ % SND.el.length]; try { el.muted = false; el.volume = 1; el.src = SND[k]; el.currentTime = 0; const p = el.play(); if (p && p.catch) p.catch(() => {}); return true; } catch (e) { return false; } }
   // Countdown-Klang (Vivien, 30.10.2026: „in den letzten Sekunden hört man den Timer nicht“): klare, weiche Glocke bei 3, 2, 1, heller bei 0
+  // Timer-Klang (Vivien, 31.10.2026: „der dreimal angeschlagene Ton ist ganz schlimm“, gewählt: „Ein tiefer Ton“):
+  // ein einziger tiefer, summender Ton, startet 3 s vor dem Wechsel, ist beim Wechsel am vollsten und klingt weich aus
+  function tief() { if (!IOS && sndPlay('tief')) return; const a = actx(); if (a) tiefOn(a, a.currentTime); }
+  function tiefOn(a, t) {
+    const out = a.createGain(); out.gain.setValueAtTime(.0001, t); out.gain.exponentialRampToValueAtTime(.45, t + 2.8); out.gain.exponentialRampToValueAtTime(.0001, t + 7); out.connect(a.destination);
+    const lfo = a.createOscillator(), lg = a.createGain(); lfo.frequency.value = .9; lg.gain.value = .06; lfo.connect(lg).connect(out.gain); lfo.start(t); lfo.stop(t + 7);
+    [[110, 1], [110.6, .7], [165, .22], [220, .18]].forEach(([f, v]) => { const o = a.createOscillator(), g = a.createGain(); o.type = 'sine'; o.frequency.value = f; g.gain.value = v * .6; o.connect(g).connect(out); o.start(t); o.stop(t + 7.1); });
+  }
   function bell(hi) { if (!IOS && sndPlay(hi ? 'hi' : 'lo')) return; const a = actx(); if (a) bellOn(a, a.currentTime, hi); }
   function sunrise(len) { if (!IOS && sndPlay('sun')) return; const a = actx(); if (a) sunriseOn(a, a.currentTime, len); }
   function bellOn(a, t, hi) {
@@ -496,13 +504,13 @@
       const dt = Math.min(1, (now - last) / 1000); last = now;
       if (phase === 'title') { phT -= dt; if (phT <= 0) setPhase('ready'); }
       else if (phase === 'ready') { if (vidOk()) { voiceGo(); phT -= dt; } if (phT <= READY - 6) nameHide(); const c = Math.ceil(phT); q('[data-cd]').textContent = String(Math.max(1, c));
-        if (sound && c <= 3 && c >= 1 && c !== cdBeep) { cdBeep = c; bell(false); } // Ton in den letzten 3 Sekunden der Vorbereitung
-        if (phT <= 0) { if (sound) bell(true); setPhase('run'); } draw(); }
+        if (sound && phT <= 3 && cdBeep !== 1) { cdBeep = 1; tief(); } // tiefer Ton in den letzten 3 Sekunden der Vorbereitung
+        if (phT <= 0) setPhase('run'); draw(); }
       else if (!sw && vidOk()) {
         left -= dt;
-        if (left <= 5 && !chimed) { chimed = true; q('[data-st]').classList.add('end'); if (sound) sunrise(5); if (bgG && bgRun && bgOn) ramp(bgG, BGV * .3, .6); }
-        const sec = Math.ceil(left); if (sound && sec <= 3 && sec >= 0 && sec !== lastBeep && left > -0.2) { lastBeep = sec; bell(sec === 0); }
-        if (left <= 0) { left = 0; if (sound && lastBeep !== 0) { lastBeep = 0; bell(true); } draw(); toReady(); } else draw();
+        if (left <= 5 && !chimed) { chimed = true; q('[data-st]').classList.add('end'); if (bgG && bgRun && bgOn) ramp(bgG, BGV * .3, .6); }
+        if (sound && left <= 3 && lastBeep !== 1) { lastBeep = 1; tief(); } // tiefer Ton holt sie aus der Übung
+        if (left <= 0) { left = 0; draw(); toReady(); } else draw();
       }
       raf = requestAnimationFrame(tick);
     }
