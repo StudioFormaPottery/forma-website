@@ -331,7 +331,7 @@ textarea{width:100%;min-height:84px;border-radius:16px;border:1px solid var(--li
   document.querySelectorAll('.step button').forEach(function(b){b.addEventListener('click',function(){
     var i=b.dataset.i,inp=document.getElementById('kids-'+i);inp.value=Math.max(0,Math.min(max,get(i)+ +b.dataset.s));upd();});});
   document.querySelectorAll('.step input').forEach(function(i){i.addEventListener('input',upd);});
-  var org=<?= json_encode((string)$o['org'], JSON_UNESCAPED_UNICODE) ?>, who=<?= json_encode((string)$o['contact'], JSON_UNESCAPED_UNICODE) ?>;
+  var org=<?= json_encode((string)$o['org'], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>, who=<?= json_encode((string)$o['contact'], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
   document.querySelectorAll('input[name=bill_to]').forEach(function(r){r.addEventListener('change',function(){
     var n=document.getElementById('bill_name'),a=document.getElementById('bill_attn');
     if(r.value==='schule'){n.value=org;a.value=who;}else if(r.value==='person'){n.value=who;a.value='';}else{n.value='';a.value='';n.focus();}

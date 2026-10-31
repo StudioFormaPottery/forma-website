@@ -24,6 +24,7 @@ try {
     $hours = forma_private_planned($pdo, $id);
     if (!$sessions || $hours <= 0) $go('fehler');
     $amount = (int)round($hours * FORMA_PRIVATE_HOUR);
+    if ($reuse = forma_stripe_reuse((string)$b['stripe_session'], $amount)) { header('Location: ' . $reuse, true, 303); exit; }
     $dates = implode(', ', array_map(fn($x) => date('d.m.', strtotime((string)$x['date'])) . ' ' . forma_de_time((string)$x['start']), $sessions));
     $session = forma_stripe('POST', '/v1/checkout/sessions', [
         'mode' => 'payment',

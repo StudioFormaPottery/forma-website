@@ -37,6 +37,7 @@ try {
         $done('Link nicht mehr gültig', 'Diese Verlängerung ist nicht mehr offen. Melde dich gern bei mir, wenn du noch Stunden dazubuchen möchtest.');
     }
     $amount = (int)round((float)$x['hours'] * FORMA_PRIVATE_HOUR);   // Preis immer hier am Server berechnet
+    if ($reuse = forma_stripe_reuse((string)$x['stripe_session'], $amount)) { header('Location: ' . $reuse, true, 303); exit; }
     $session = forma_stripe('POST', '/v1/checkout/sessions', [
         'mode' => 'payment',
         'locale' => 'de',

@@ -1098,6 +1098,63 @@ function forma_mail_theme(?int $ts = null): string
 }
 
 /** Schlichte HTML-Fassung einer Text-Mail: Links klickbar, Zeilen nur mit Link werden zum Button. */
+/** Meldung, die Gästen gezeigt werden darf (alle anderen Fehler bleiben intern). */
+class FormaUserError extends RuntimeException {}
+
+/**
+ * Sicherheit (31.10.2026): Ist die zuletzt angelegte Stripe-Bezahlseite noch offen und über denselben Betrag,
+ * dorthin zurückschicken statt eine zweite anzulegen. Sonst könnte eine Zahlung im ersten Tab unbemerkt bleiben
+ * und doppelt kassiert werden. Gibt die URL zurück oder null.
+ */
+function forma_stripe_reuse(string $sessionId, int $cents): ?string
+{
+    if ($sessionId === '' || $cents <= 0) return null;
+    try {
+        $old = forma_stripe('GET', '/v1/checkout/sessions/' . rawurlencode($sessionId));
+        if (($old['status'] ?? '') === 'open' && (int)($old['amount_total'] ?? -1) === $cents && !empty($old['url'])
+            && (int)($old['expires_at'] ?? 0) > time() + 120) {
+            return (string)$old['url'];
+        }
+    } catch (Throwable $e) {
+        error_log('FORMA stripe reuse: ' . $e->getMessage());
+    }
+    return null;
+}
+
+/** Summe der Positionen einer Checkout-Session in Cent. */
+function forma_line_total(array $lineItems): int
+{
+    $t = 0;
+    foreach ($lineItems as $li) $t += (int)($li['quantity'] ?? 1) * (int)($li['price_data']['unit_amount'] ?? 0);
+    return $t;
+}
+
+/**
+ * Sicherheit (31.10.2026): Knöpfe in Mails nur für eigene Adressen und bekannte Dienste.
+ * Fremde Links (z. B. aus einem Anfrage-Text) werden nie zu einem FORMA-Knopf.
+ */
+function forma_mail_link_ok(string $url): bool
+{
+    $host = strtolower((string)parse_url($url, PHP_URL_HOST));
+    if ($host === '' || !preg_match('~^https://~i', $url)) {
+        return str_starts_with($url, forma_site_url()) || (function_exists('mm_site_url') && str_starts_with($url, mm_site_url()));
+    }
+    $ok = ['forma-pottery.com', 'moveciamovement.com', 'checkout.stripe.com', 'calendar.google.com', 'www.google.com', 'g.page', 'search.google.com', 'maps.google.com', 'maps.app.goo.gl', 'chat.whatsapp.com', 'wa.me', 'instagram.com', 'pinterest.at', 'whereby.com'];
+    foreach ($ok as $d) {
+        if ($host === $d || str_ends_with($host, '.' . $d)) return true;
+    }
+    $own = strtolower((string)parse_url(forma_site_url(), PHP_URL_HOST));
+    return $own !== '' && $host === $own;
+}
+
+/** Freitext von Gästen, der in Mails an die eingegebene Adresse zurückgeht: eine Zeile, ohne Links. */
+function forma_echo_text(string $t, int $max = 300): string
+{
+    $t = preg_replace('~(https?://|www\.)\S+~iu', '[Link]', $t);
+    $t = trim((string)preg_replace('/\s+/u', ' ', (string)$t));
+    return mb_strlen($t) > $max ? mb_substr($t, 0, $max) . ' …' : $t;
+}
+
 function forma_mail_html(string $text): string
 {
     $label = function (string $url): string {
@@ -1117,7 +1174,7 @@ function forma_mail_html(string $text): string
     foreach (preg_split("/\r?\n/", rtrim($text)) as $line) {
         $t = trim($line);
         // Kalender-Links als kleine Buttons nebeneinander
-        if (preg_match('~^(Apple Kalender[^:]*|Google Kalender[^:]*): (https?://\S+)$~u', $t, $cm)) {
+        if (preg_match('~^(Apple Kalender[^:]*|Google Kalender[^:]*): (https?://\S+)$~u', $t, $cm) && forma_mail_link_ok($cm[2])) {
             $isApple = str_starts_with($cm[1], 'Apple');
             $lbl = '+ ' . ($isApple ? 'Apple Kalender' : (str_contains($cm[1], ',') ? 'Google · ' . trim(explode(',', $cm[1], 2)[1]) : 'Google Kalender'));
             if (!$calRow) { $out .= '<div style="margin:8px 0 2px">'; $calRow = true; }
@@ -1127,7 +1184,7 @@ function forma_mail_html(string $text): string
             continue;
         }
         if ($calRow) { $out .= '</div>'; $calRow = false; }
-        if (preg_match('~^https?://\S+$~', $t)) {
+        if (preg_match('~^https?://\S+$~', $t) && forma_mail_link_ok($t)) {
             $u = htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
             $out .= '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:6px 0 4px"><tr><td style="border-radius:999px;background:#8C2C1D">'
                 . '<a href="' . $u . '" style="display:inline-block;padding:13px 28px;font-family:Arial,Helvetica,sans-serif;font-size:16px;color:#FBF1EA;text-decoration:none;border-radius:999px">' . htmlspecialchars($label($t), ENT_QUOTES, 'UTF-8') . '</a></td></tr></table>'
@@ -1856,7 +1913,10 @@ function forma_voucher_sweep(PDO $pdo): void
         if ($paid) {
             $pdo->prepare("UPDATE voucher_uses SET status = 'eingeloest' WHERE id = ?")->execute([$u['id']]);
             forma_voucher_after_use($pdo, (int)$u['voucher_id']);
-        } elseif ($s === false || strtotime((string)$u['created_at']) < time() - 40 * 60) {
+        } elseif ($s === false || (!in_array($s, ['offen', 'anfrage'], true) && strtotime((string)$u['created_at']) < time() - 40 * 60)
+            || strtotime((string)$u['created_at']) < time() - 2 * 86400) {
+            // Sicherheit (31.10.2026): nur freigeben, wenn die Buchung wirklich abgebrochen ist (nicht, nur weil Stripe
+            // gerade nicht erreichbar war); sonst könnte derselbe Gutscheinwert zweimal eingelöst werden.
             $pdo->prepare("UPDATE voucher_uses SET status = 'frei' WHERE id = ?")->execute([$u['id']]);
         }
     }
@@ -1874,13 +1934,22 @@ function forma_paid_text(int $cash, int $voucher): string
 function forma_voucher_gift(PDO $pdo, int $cents, string $name, string $email, string $note): array
 {
     $year = date('Y');
-    $n = (int)$pdo->query("SELECT COUNT(*) FROM vouchers WHERE nr LIKE 'FORMA-$year-%'")->fetchColumn() + 1;
-    $nr = sprintf('FORMA-%s-%04d', $year, $n);
     $code = forma_voucher_new_code();
-    $pdo->prepare("INSERT INTO vouchers (nr, product, qty, amount_cents, recipient, sender, message, design, buyer_name, buyer_email, status, token, mailed, note, created_at, paid_at, code, kind)
-        VALUES (?, 'spin', 1, ?, ?, 'Vivien', '', 1, ?, ?, 'bezahlt', ?, 1, ?, ?, ?, ?, 'geschenk')")
-        ->execute([$nr, $cents, $name, $name, $email, bin2hex(random_bytes(16)), $note, date('c'), date('c'), $code]);
-    return ['id' => (int)$pdo->lastInsertId(), 'nr' => $nr, 'code' => $code];
+    $own = !$pdo->inTransaction();
+    if ($own) $pdo->exec('BEGIN IMMEDIATE');   // Sicherheit (31.10.2026): Nummer nie doppelt vergeben
+    try {
+        $n = (int)$pdo->query("SELECT COUNT(*) FROM vouchers WHERE nr LIKE 'FORMA-$year-%'")->fetchColumn() + 1;
+        $nr = sprintf('FORMA-%s-%04d', $year, $n);
+        $pdo->prepare("INSERT INTO vouchers (nr, product, qty, amount_cents, recipient, sender, message, design, buyer_name, buyer_email, status, token, mailed, note, created_at, paid_at, code, kind)
+            VALUES (?, 'spin', 1, ?, ?, 'Vivien', '', 1, ?, ?, 'bezahlt', ?, 1, ?, ?, ?, ?, 'geschenk')")
+            ->execute([$nr, $cents, $name, $name, $email, bin2hex(random_bytes(16)), $note, date('c'), date('c'), $code]);
+        $id = (int)$pdo->lastInsertId();
+        if ($own) $pdo->exec('COMMIT');
+    } catch (Throwable $e) {
+        if ($own) $pdo->exec('ROLLBACK');
+        throw $e;
+    }
+    return ['id' => $id, 'nr' => $nr, 'code' => $code];
 }
 
 /**
@@ -1895,18 +1964,18 @@ function forma_old_voucher_booking(PDO $pdo, array $d): array
     $st = $pdo->prepare('SELECT * FROM courses WHERE id = ?');
     $st->execute([(int)$d['course_id']]);
     $c = $st->fetch();
-    if (!$c) throw new RuntimeException('Diesen Termin gibt es nicht mehr.');
+    if (!$c) throw new FormaUserError('Diesen Termin gibt es nicht mehr.');
     $persons = max(1, (int)$d['persons']);
     $unit = (int)$c['price_cents'] > 0 ? (int)$c['price_cents'] : (int)FORMA_SERIES['spin']['price_cents'];
     $full = $unit * $persons;
     $value = max(0, (int)$d['value_cents']);
-    if ($value <= 0) throw new RuntimeException('Bitte gib den Wert des Gutscheins an.');
+    if ($value <= 0) throw new FormaUserError('Bitte gib den Wert des Gutscheins an.');
     $use = min($value, $full);
 
     $pdo->exec('BEGIN IMMEDIATE');
     try {
         if (forma_booked($pdo, (int)$c['id']) + $persons > (int)$c['capacity']) {
-            throw new RuntimeException(!empty($d['via_link'])
+            throw new FormaUserError(!empty($d['via_link'])
                 ? 'An diesem Termin sind leider nicht mehr genug Plätze frei. Bitte such dir einen anderen Tag aus.'
                 : 'An diesem Termin sind nicht mehr genug Plätze frei (' . max(0, (int)$c['capacity'] - forma_booked($pdo, (int)$c['id'])) . ' frei). Du kannst die Platzanzahl beim Termin erhöhen.');
         }
@@ -1916,7 +1985,7 @@ function forma_old_voucher_booking(PDO $pdo, array $d): array
             if (!preg_match('/^(ALT|FORMA)-/i', $nr)) $nr = 'ALT-' . $nr;
             $chk = $pdo->prepare('SELECT COUNT(*) FROM vouchers WHERE nr = ?');
             $chk->execute([$nr]);
-            if ((int)$chk->fetchColumn() > 0) throw new RuntimeException('Die Gutscheinnummer ' . $nr . ' gibt es schon. Lass das Feld leer, dann vergebe ich eine neue.');
+            if ((int)$chk->fetchColumn() > 0) throw new FormaUserError('Die Gutscheinnummer ' . $nr . ' gibt es schon. Lass das Feld leer, dann vergebe ich eine neue.');
         } else {
             $year = date('Y');
             $n = (int)$pdo->query("SELECT COUNT(*) FROM vouchers WHERE nr LIKE 'ALT-$year-%'")->fetchColumn() + 1;
@@ -2081,7 +2150,7 @@ function forma_private_mails(PDO $pdo, int $id): void
     $planUrl = $site . '/verwaltung/?view=kalender&assign=' . (int)$b['id'];
     if ($b['kind'] === 'anfrage') {
         forma_mail($b['email'], $isTeam ? 'Deine Anfrage für ein Teambuilding-Event' : 'Deine Anfrage für Private Pottery', "Hallo $first,\n\nvielen Dank für deine Nachricht! Ich sehe mir " . ($isTeam ? 'eure Idee' : 'dein Projekt') . " an und melde mich so bald wie möglich " . ($viaPhone ? 'telefonisch' . ($callTime !== '' ? " ($callTime)" : '') : 'per E-Mail') . " bei dir.\n\n"
-            . "Dein Projekt: {$b['project']}\nWunschtermin: $wish\n\nWenn dir noch etwas einfällt, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nBis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
+            . "Dein Projekt: " . forma_echo_text((string)$b['project']) . "\nWunschtermin: $wish\n\nWenn dir noch etwas einfällt, antworte einfach auf diese E-Mail oder ruf mich an: $phone\n\nBis bald,\nVivien\nFORMA Earth & Art\nwww.forma-pottery.com\n");
         forma_mail(FORMA_NOTIFY_EMAIL, ($isTeam ? 'Anfrage Teambuilding/Event (' : 'Anfrage Private Pottery (') . $b['name'] . ')', "Neue Anfrage für " . ($isTeam ? 'Teambuilding/Event' : 'Private Pottery (noch nicht gebucht)') . "\n$contactLine\n\nName: {$b['name']}\nE-Mail: {$b['email']}\nTelefon: {$b['phone']}\nPersonen: $persons\n\nProjekt:\n{$b['project']}\n\nWunschtermin: $wish\n\nIm Kalender einplanen: $planUrl\n", $b['email']);
         return;
     }

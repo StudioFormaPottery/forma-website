@@ -43,6 +43,7 @@ try {
         'cancel_url' => $site . $self . '&abbruch=1',
     ];
     if (trim((string)$o['email']) !== '') $params['customer_email'] = (string)$o['email'];
+    if ($reuse = forma_stripe_reuse((string)$o['stripe_session'], forma_line_total($lineItems))) { header('Location: ' . $reuse, true, 303); exit; }
     $session = forma_stripe('POST', '/v1/checkout/sessions', $params);
     $pdo->prepare("UPDATE offers SET stripe_session = ? WHERE id = ? AND status = 'bestaetigt'")->execute([(string)$session['id'], (int)$o['id']]);
     header('Location: ' . (string)$session['url'], true, 303);

@@ -51,7 +51,7 @@ try {
     ]);
 } catch (Throwable $e) {
     $pdo->prepare("UPDATE voucher_links SET status = 'offen', used_at = NULL WHERE id = ?")->execute([$link['id']]);
-    forma_json(['ok' => false, 'error' => $e instanceof RuntimeException ? $e->getMessage() : 'Das hat leider nicht geklappt. Bitte versuch es noch einmal oder ruf mich an: ' . FORMA_PHONE]);
+    forma_json(['ok' => false, 'error' => $e instanceof FormaUserError ? $e->getMessage() : 'Das hat leider nicht geklappt. Bitte versuch es noch einmal oder ruf mich an: ' . FORMA_PHONE]);
 }
 $pdo->prepare('UPDATE voucher_links SET booking_id = ? WHERE id = ?')->execute([$r['booking'], $link['id']]);
 $st = $pdo->prepare('SELECT date_text FROM courses WHERE id = ?');
