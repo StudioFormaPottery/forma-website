@@ -23,6 +23,7 @@ unset($_SESSION['flash']);
  */
 // Neu-Boxen: 'b' => 'movecia' erscheint nur auf der Movecia-Übersicht, sonst nur bei FORMA (Vivien, 28.10.2026).
 const FORMA_ADMIN_NEWS = [
+    ['until' => '2026-12-15', 'title' => '💌 Pottery Pause: Erinnerung geht automatisch raus', 'text' => '5 Tage vor jedem Pottery-Pause-Kurs bekommen alle Angemeldeten um 9 Uhr automatisch die Erinnerungs-Mail mit den Terminen und dem Handbuch (PDF). Du musst nichts tun. Beim Kurs siehst du, wann sie rausgeht, und kannst sie dir ansehen oder eine Probemail schicken.', 'link' => '?view=start'],
     ['until' => '2026-12-15', 'title' => '🙂 Anmelden mit Face ID', 'text' => 'Du kannst dich jetzt mit Face ID (Passkey) anmelden, ganz ohne Passwort. Einrichten unter Einstellungen, ganz oben – am besten auf iPhone und MacBook.', 'link' => '?view=einstellungen#passkey'],
     ['until' => '2026-12-15', 'title' => '🔐 Zwei-Stufen-Anmeldung', 'text' => 'Deine Verwaltung kann jetzt zusätzlich zum Passwort einen 6-stelligen Code aus Duo verlangen. So kommt niemand hinein, auch wenn er dein Passwort kennt. Einschalten unter Einstellungen, ganz oben. Pro Gerät musst du den Code nur alle 30 Tage eingeben.', 'link' => '?view=einstellungen#zweistufen'],
     ['b' => 'movecia', 'until' => '2026-12-15', 'title' => '🔐 Zwei-Stufen-Anmeldung', 'text' => 'Deine Verwaltung kann jetzt zusätzlich zum Passwort einen 6-stelligen Code aus Duo verlangen. Einschalten unter Einstellungen (FORMA-Verwaltung), ganz oben.', 'link' => '?view=einstellungen#zweistufen'],
@@ -538,6 +539,21 @@ if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 
 if ($view === 'winter' || $view === 'winter_mm' || $action === 'winter_upload' || $action === 'winter_delete') {
     if ($view === 'winter_mm' || ($_POST['b'] ?? '') === 'movecia') require_once __DIR__ . '/movecia.php';
     require __DIR__ . '/winter.inc.php';
+}
+
+// Pottery Pause: Erinnerung mit Handbuch (5 Tage vorher automatisch, api/pottery-pause.inc.php)
+if ($action === 'pp_test' || $view === 'pp_mail') {
+    $cid = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
+    $st = $pdo->prepare('SELECT * FROM courses WHERE id = ?');
+    $st->execute([$cid]);
+    $c = $st->fetch();
+    if (!$c || !forma_pp_is($c)) go($self, 'Diesen Kurs gibt es nicht mehr.');
+    if ($view === 'pp_mail') {
+        header('Content-Type: text/html; charset=utf-8');
+        exit(forma_pp_html('Vivien', $c));
+    }
+    $ok = forma_pp_send(FORMA_NOTIFY_EMAIL, 'Vivien', $c, '[Probe] ');
+    go($self . '?view=course&id=' . $cid, $ok ? 'Die Probemail ist an ' . FORMA_NOTIFY_EMAIL . ' unterwegs.' : 'Die Probemail konnte nicht verschickt werden.');
 }
 
 if ($action === 'save_course') {
@@ -2713,6 +2729,21 @@ if ($view === 'course') {
         <p class="muted"><?= forma_h($c['date_text']) ?> · <?= forma_slot_hours($c) ? 'Belegt pro Stunde: ' . forma_h(forma_slots_overview($GLOBALS['pdo'], $c)) : $booked . ' von ' . (int)$c['capacity'] . ' Plätzen belegt' ?><?= $c['visible'] ? '' : ' · <strong>auf der Website ausgeblendet</strong>' ?></p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <p class="row-actions"><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=edit&amp;id=<?= (int)$c['id'] ?>">Termin bearbeiten</a><?php if ($c['title'] === FORMA_SERIES['bemalen']['title']): ?> <a class="btn" href="<?= forma_h($self) ?>?view=kasse&amp;c=<?= (int)$c['id'] ?>">Kasse öffnen</a><?php endif; ?></p>
+        <?php if (forma_pp_is($c)): $ppAt = forma_pp_send_at($c);
+            $q = $GLOBALS['pdo']->prepare("SELECT COUNT(*) FROM bookings WHERE course_id = ? AND status = 'bestaetigt' AND reminder_sent IS NOT NULL"); $q->execute([(int)$c['id']]); $ppDone = (int)$q->fetchColumn();
+            $q = $GLOBALS['pdo']->prepare("SELECT COUNT(*) FROM bookings WHERE course_id = ? AND status = 'bestaetigt' AND reminder_sent IS NULL"); $q->execute([(int)$c['id']]); $ppOpen = (int)$q->fetchColumn(); ?>
+        <div class="card notice" style="margin:12px 0">
+            <div class="stack">
+                <strong>💌 Erinnerung mit Handbuch</strong>
+                <span class="small"><?php if ($c['start_date'] < date('Y-m-d')): ?>Der Kurs hat schon begonnen.<?php elseif ($ppOpen === 0 && $ppDone > 0): ?>✓ An alle verschickt (<?= $ppDone ?>).<?php elseif ($ppAt && time() >= $ppAt): ?>Geht in den nächsten Minuten raus<?= $ppDone ? ' (' . $ppDone . ' schon verschickt)' : '' ?>.<?php else: ?>Geht am <strong><?= forma_h(forma_de_date(date('Y-m-d', (int)$ppAt), false)) ?> um <?= FORMA_PP_HOUR ?> Uhr</strong> automatisch an alle Angemeldeten, mit den Terminen dieses Kurses und dem Handbuch. Wer sich später anmeldet, bekommt sie gleich danach.<?php endif; ?></span>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+                    <a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=pp_mail&amp;id=<?= (int)$c['id'] ?>" target="_blank">Mail ansehen</a>
+                    <a class="btn btn-ghost" href="<?= forma_h(FORMA_PP_HANDBOOK) ?>" target="_blank">Handbuch ansehen</a>
+                    <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="pp_test"><input type="hidden" name="id" value="<?= (int)$c['id'] ?>"><button class="btn btn-ghost" type="submit">Probemail an mich</button></form>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
         <?php $ms = (string)($c['min_status'] ?? ''); if ((int)$c['min_participants'] > 1 && $booked > 0 && $booked < (int)$c['min_participants'] && in_array($ms, ['', 'gemeldet', 'gast_informiert'], true) && $c['start_date'] >= date('Y-m-d')): ?>
         <div class="card notice minbox">
             <span class="ic"><?= admin_icon('kalender') ?></span>

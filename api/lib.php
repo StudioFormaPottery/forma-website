@@ -173,6 +173,7 @@ function forma_migrate(PDO $pdo): void
     forma_add_column($pdo, 'templates', 'file_en', "TEXT NOT NULL DEFAULT ''");
     forma_add_column($pdo, 'private_bookings', 'contact', "TEXT NOT NULL DEFAULT 'email'");
     forma_add_column($pdo, 'bookings', 'review_sent', 'TEXT');
+    forma_add_column($pdo, 'bookings', 'reminder_sent', 'TEXT');
     forma_add_column($pdo, 'private_bookings', 'review_sent', 'TEXT');
     forma_add_column($pdo, 'private_bookings', 'wish_date', "TEXT NOT NULL DEFAULT ''");
     forma_add_column($pdo, 'private_bookings', 'wish_time', "TEXT NOT NULL DEFAULT ''");
@@ -2903,3 +2904,4 @@ require_once __DIR__ . '/invoices.php';
 require_once __DIR__ . '/kasse.php';
 require_once __DIR__ . '/angebote.inc.php';
 require_once __DIR__ . '/minimum.php';
+require_once __DIR__ . '/pottery-pause.inc.php';

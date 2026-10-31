@@ -36,6 +36,7 @@ try {
         try { forma_confirm_reminders($pdo); } catch (Throwable $e) { error_log('FORMA reminders: ' . $e->getMessage()); }
         try { forma_min_check($pdo); } catch (Throwable $e) { error_log('FORMA min: ' . $e->getMessage()); }
         try { forma_review_mails($pdo); } catch (Throwable $e) { error_log('FORMA reviews: ' . $e->getMessage()); }
+        try { forma_pp_reminders($pdo); } catch (Throwable $e) { error_log('FORMA Pottery Pause: ' . $e->getMessage()); }
     });
     // Pottery bemalen: wie viele Stücke je Sorte gerade buchbar sind (null = unbegrenzt)
     $stock = null;
