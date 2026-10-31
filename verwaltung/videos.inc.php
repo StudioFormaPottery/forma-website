@@ -42,7 +42,7 @@ body{background:#F2ECE4}main{max-width:900px}
 <div class="pv-w">
 <?php if ($fd): ?>
   <div data-mv-flow="<?= $h(json_encode($fd, JSON_UNESCAPED_UNICODE)) ?>"></div>
-  <script src="/wildhearts/assets/flow-player.js?v=15"></script>
+  <script src="/wildhearts/assets/flow-player.js?v=16"></script>
 <?php else: ?>
   <div class="pv-v"><?php if ($vid !== '' && mv_bunny()['lib'] !== ''): ?><iframe src="<?= $h(mv_embed($vid)) ?>" allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe><?php else: ?><div class="pv-e">Das Video ist noch nicht hochgeladen. Sobald es da ist, läuft es hier.</div><?php endif; ?></div>
   <script src="/wildhearts/assets/bunny-ton.js?v=1"></script>
@@ -170,7 +170,7 @@ if ($view === 'videos') {
           $vd = mv_voice_url($id, $i, 'de'); $ve = mv_voice_url($id, $i, 'en'); ?>
         <li class="ex" data-id="<?= $id ?>" data-i="<?= $i ?>" data-c="<?= (int)$c['id'] ?>" data-name="<?= $h($e['de']) ?>" data-name-en="<?= $h($e['en']) ?>" data-sec="<?= (int)$e['sec'] ?>" data-view="<?= $g !== '' && mv_bunny()['lib'] !== '' ? $h(mv_embed($g, true) . '&autoplay=true&loop=true&muted=true') : '' ?>">
           <div class="exh"><span class="n"><b><?= $i + 1 ?>.</b> <?= $h($e['de']) ?><?php if (!$deOnly && $e['en'] !== $e['de']): ?> <small><?= $h($e['en']) ?></small><?php endif; ?></span>
-            <label class="dur" data-flow-only<?= $flow ? '' : ' hidden' ?>>Dauer <select data-secsel><?php foreach ([30, 45, 60, 90, 120, 150, 180, 240, 300, 360, 480, 600] as $o): ?><option value="<?= $o ?>"<?= $o === (int)$e['sec'] ? ' selected' : '' ?>><?= $mmss($o) ?> Min.</option><?php endforeach; ?><?php if (!in_array((int)$e['sec'], [30, 45, 60, 90, 120, 150, 180, 240, 300, 360, 480, 600], true)): ?><option value="<?= (int)$e['sec'] ?>" selected><?= $mmss((int)$e['sec']) ?> Min.</option><?php endif; ?></select></label></div>
+            <span class="dur" data-flow-only<?= $flow ? '' : ' hidden' ?>>10 Sek. Vorbereitung + 2 Min.</span></div>
           <textarea hidden data-tde><?= $h($e['tde']) ?></textarea><textarea hidden data-ten><?= $h($e['ten']) ?></textarea>
           <div class="cols">
             <div class="cell clip<?= $g ? ' ok' : '' ?>">
@@ -415,7 +415,7 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
   const TIP='Tipp: Der Clip läuft links mit. Sprich ruhig und langsam, so wie du es den Frauen zeigst.';
   function textHtml(t){return esc(t||'').replace(/\[([^\]]+)\]/g,'<span class="hint">[$1]</span>')}
   function openRec(li,g){
-    cur={li:li,g:g,id:li.dataset.id,i:li.dataset.i,sec:+li.dataset.sec};
+    cur={li:li,g:g,id:li.dataset.id,i:li.dataset.i,sec:130}; // Flow: Stimme beginnt in den 10 s Vorbereitung, Übung exakt 2 Min. (Vivien, 31.10.2026)
     $('rmK').textContent='Übung '+(+li.dataset.i+1)+' · '+(g==='de'?'Deutsch':'Englisch')+' einsprechen';
     $('rmT').textContent=g==='de'?li.dataset.name:li.dataset.nameEn;
     $('rmV').innerHTML=li.dataset.view?'<iframe src="'+esc(li.dataset.view)+'" allow="autoplay"></iframe>':'<div class="e">Noch kein Clip. Du kannst trotzdem schon einsprechen.</div>';
@@ -446,7 +446,7 @@ h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:
     try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume();const src=actx.createMediaStreamSource(stream);an=actx.createAnalyser();an.fftSize=512;src.connect(an);}catch(e){an=null}
     rec.start(1000);t0=performance.now();$('rmGo').hidden=true;$('rmStop').hidden=false;$('rmSave').hidden=true;$('rmAgain').hidden=true;$('rmA').hidden=true;$('rmM').textContent='Aufnahme läuft …';
     const buf=new Uint8Array(512);const sc=$('rmTx');
-    (function loop(){const s=(performance.now()-t0)/1000;$('rmC').innerHTML=fmt(s)+' <small>von '+fmt(cur.sec)+' Min.'+(s>cur.sec?' · etwas länger, das passt sich an':'')+'</small>';
+    (function loop(){const s=(performance.now()-t0)/1000;$('rmC').innerHTML=fmt(s)+' <small>von '+fmt(cur.sec)+' Min. · '+(s<10?'Vorbereitung':s<cur.sec?'Übung':'etwas länger, das passt sich an')+'</small>';
       if(an){an.getByteTimeDomainData(buf);let m=0;for(const v of buf)m=Math.max(m,Math.abs(v-128));$('rmL').style.width=Math.min(100,m*1.6)+'%'}
       // Text läuft sanft mit, damit du nicht scrollen musst
       sc.scrollTop=Math.max(0,(sc.scrollHeight-sc.clientHeight)*Math.min(1,s/Math.max(20,cur.sec*.9)));

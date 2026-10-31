@@ -339,6 +339,7 @@ function mv_schema(PDO $pdo): void
     }
     mv_scripts_sync($pdo);
     mv_prod_sync($pdo);
+    mv_flow_voice_sync($pdo);
     mv_voice_migrate($pdo);
     mv_lektorat_sync($pdo);
     mv_nopilates_migrate($pdo);
@@ -1714,6 +1715,41 @@ function mv_lesson_steps(array $l): array
     return $out;
 }
 
+/**
+ * Voice-over-Texte der Flows (Vivien, 31.10.2026): je Übung 2:10 (10 s Vorbereitung + exakt 2 Min.),
+ * mittlere Übungen themenneutral (eine Aufnahme gilt in allen Flows), erste/letzte Übung mit dem Thema des Flows.
+ * Quelle api/seed/flow-voice.json {v, flows: {Titel oder k:ukey: [[name_de, text_de, text_en], …]}}.
+ * Ist für eine Übung schon eine Stimme aufgenommen, bleibt deren Text unverändert.
+ */
+function mv_flow_voice_sync(PDO $pdo): void
+{
+    $j = json_decode((string)@file_get_contents(__DIR__ . '/seed/flow-voice.json'), true);
+    if (!$j || empty($j['flows'])) return;
+    $c = mm_cfg('flowvoice') ?? [];
+    if ((int)($c['v'] ?? 0) >= (int)$j['v']) return;
+    if ((int)$pdo->query('SELECT COUNT(*) FROM mv_lessons')->fetchColumn() === 0) return;
+    $n = 0;
+    foreach ($j['flows'] as $ref => $list) {
+        $isK = str_starts_with($ref, 'k:');
+        $st = $pdo->prepare($isK ? 'SELECT * FROM mv_lessons WHERE ukey = ?' : "SELECT * FROM mv_lessons WHERE title_de = ? AND ukey = ''");
+        $st->execute([$isK ? substr($ref, 2) : $ref]);
+        foreach ($st->fetchAll() as $l) {
+            $steps = mv_lesson_steps($l); if (!$steps) continue;
+            $ch = false;
+            foreach ($steps as $i => &$x) {
+                $t = $list[$i] ?? null; if (!$t || $t[0] !== $x['de']) continue; // nur wenn an dieser Stelle noch dieselbe Übung steht
+                if (mv_lesson_mode($l) === 'flow' && $x['sec'] !== 120) { $x['sec'] = 120; $ch = true; }
+                if ($t[1] !== '' && $x['tde'] !== $t[1] && !mv_voice_path((int)$l['id'], $i, 'de')) { $x['tde'] = $t[1]; $ch = true; }
+                if (($t[2] ?? '') !== '' && $x['ten'] !== $t[2] && !mv_voice_path((int)$l['id'], $i, 'en')) { $x['ten'] = $t[2]; $ch = true; }
+            }
+            unset($x);
+            if ($ch) { mv_lesson_steps_save($pdo, (int)$l['id'], $steps); $n++; }
+        }
+    }
+    $c['v'] = (int)$j['v']; $c['n'] = $n; $c['at'] = date('c');
+    mm_save_cfg('flowvoice', $c);
+}
+
 /** Schritte speichern (Form [[de, en, text_de, text_en, sek], …]) und Übungsliste mitziehen. */
 function mv_lesson_steps_save(PDO $pdo, int $id, array $steps): void
 {
@@ -2007,8 +2043,9 @@ function mv_bgm_all(PDO $pdo): array
 function mv_bgm_need(array $l): int
 {
     $n = 0; $sum = 0;
-    foreach (mv_lesson_steps($l) as $x) { $n++; $sum += max(20, (int)($x['sec'] ?? 120)); }
-    return mv_lesson_mode($l) === 'move' ? $n * 46 + 20 : $sum + 20;
+    foreach (mv_lesson_steps($l) as $x) $n++;
+    // je Übung 10 s Vorbereitung; Flow exakt 2 Min., Bewegungsvideo 30/45 s (Vivien, 31.10.2026)
+    return mv_lesson_mode($l) === 'move' ? $n * 55 + 20 : $n * 130 + 20;
 }
 /** Automatischer Vorschlag: passende Ordner, stabil gemischt je Video ($seed = andere Mischung). */
 function mv_bgm_auto(PDO $pdo, array $l, int $seed = 0): array

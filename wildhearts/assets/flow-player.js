@@ -324,8 +324,9 @@
     let idx = 0, left = 0, total = 30, run = false, last = 0, chimed = false, sound = true, raf = 0, sw = false, ended = false;
     const voice = new Audio(); voice.preload = 'auto';
     const C = 2 * Math.PI * 52;
-    const secOf = i => flow ? Math.max(20, +items[i].sec || 120) : dur;
-    const sum = () => items.reduce((a, _, i) => a + secOf(i), 0);
+    // Flow: jede Übung exakt 2 Minuten; vor JEDER Übung 10 Sekunden Vorbereitung (Vivien, 31.10.2026)
+    const secOf = i => flow ? 120 : dur;
+    const sum = () => items.reduce((a, _, i) => a + secOf(i) + 10, 0);
     const mins = s => Math.max(1, Math.round(s / 60));
     root.classList.add('mvf');
     root.innerHTML = `
@@ -458,13 +459,13 @@
       voice.pause(); voice.onloadedmetadata = null;
       if (flow && it.voice) {
         // Ist das Voice-over länger als die Übung, läuft der Timer so lange wie die Stimme (plus kurzer Ausklang)
-        voice.onloadedmetadata = () => { if (isFinite(voice.duration) && voice.duration + 4 > total) { const add = voice.duration + 4 - total; total += add; left += add; draw(); } };
-        voice.src = it.voice;
-        if (run && phase === 'run') voice.play().catch(() => {});
+        // Voice-over beginnt schon in den 10 Sekunden Vorbereitung (10 s + 2 Min.); ist es länger, läuft die Übung so lange mit
+        voice.onloadedmetadata = () => { const need = isFinite(voice.duration) ? voice.duration - READY + 1 : 0; if (need > total) { const add = need - total; total += add; left += add; draw(); } };
+        voice.src = it.voice; vStarted = false;
       } else voice.removeAttribute('src');
       draw();
     }
-    function rest() { let r = Math.max(0, left); for (let j = idx + 1; j < items.length; j++) r += secOf(j); return r; }
+    function rest() { let r = Math.max(0, left) + (phase === 'ready' ? Math.max(0, phT) : 0); for (let j = idx + 1; j < items.length; j++) r += secOf(j) + READY; return r; }
     function draw() {
       const b = q('[data-sec]'), mm = left >= 60;
       b.textContent = fmt(left); b.classList.toggle('mm', mm);
@@ -475,24 +476,33 @@
       q('[data-trk]').style.width = Math.min(100, 100 * (1 - r / all)) + '%';
     }
     // Ablauf: title (Titelbild, 3 s) → ready (verschwommen, Welle mit Übung 1, 10 Sekunden in der Mitte) → run
-    let phase = 'run', phT = 0, lastBeep = 99; const READY = 10, TITLE = (data.photo || data.title) ? 3 : 0;
+    let phase = 'run', phT = 0, lastBeep = 99, cdBeep = 99, vStarted = false; const READY = 10, TITLE = (data.photo || data.title) ? 3 : 0;
     function setPhase(p) {
       phase = p; const st = q('[data-st]'), tc = q('[data-tc]');
       tc.classList.toggle('on', p === 'title'); st.classList.toggle('ready', p === 'ready');
       if (p === 'title') phT = TITLE;
-      if (p === 'ready') { phT = READY; q('[data-cd]').textContent = String(READY); q('[data-cdn]').textContent = T('Erste Übung: ', 'First up: ') + items[0].name; nameShow(true); }
-      if (p === 'run') { nameShow(); last = performance.now(); if (flow && voice.getAttribute('src')) voice.play().catch(() => {}); }
+      if (p === 'ready') { phT = READY; cdBeep = 99; q('[data-cd]').textContent = String(READY); q('[data-cdn]').textContent = (idx ? T('Nächste Übung: ', 'Next up: ') : T('Erste Übung: ', 'First up: ')) + items[idx].name; nameShow(true); voiceGo(); }
+      if (p === 'run') { nameShow(); last = performance.now(); voiceGo(); }
+    }
+    // Voice-over startet mit der Vorbereitung, sobald der Clip bereit ist (Timer und Stimme laufen gemeinsam los)
+    function voiceGo() { if (!flow || !run || vStarted || !voice.getAttribute('src') || !vidOk()) return; vStarted = true; voice.play().catch(() => {}); }
+    function voiceOn() { if (flow && run && vStarted && voice.getAttribute('src') && voice.paused && !voice.ended) voice.play().catch(() => {}); }
+    function toReady() {
+      if (idx >= items.length - 1) { finish(); return; }
+      idx++; show(idx); setPhase('ready'); last = performance.now();
     }
     function tick(now) {
       if (!run) return;
       const dt = Math.min(1, (now - last) / 1000); last = now;
       if (phase === 'title') { phT -= dt; if (phT <= 0) setPhase('ready'); }
-      else if (phase === 'ready') { if (vidOk()) phT -= dt; q('[data-cd]').textContent = String(Math.max(1, Math.ceil(phT))); if (phT <= 0) setPhase('run'); }
+      else if (phase === 'ready') { if (vidOk()) { voiceGo(); phT -= dt; } const c = Math.ceil(phT); q('[data-cd]').textContent = String(Math.max(1, c));
+        if (sound && c <= 3 && c >= 1 && c !== cdBeep) { cdBeep = c; bell(false); } // Ton in den letzten 3 Sekunden der Vorbereitung
+        if (phT <= 0) { if (sound) bell(true); setPhase('run'); } draw(); }
       else if (!sw && vidOk()) {
         left -= dt;
         if (left <= 5 && !chimed) { chimed = true; q('[data-st]').classList.add('end'); if (sound) sunrise(5); if (bgG && bgRun && bgOn) ramp(bgG, BGV * .3, .6); }
         const sec = Math.ceil(left); if (sound && sec <= 3 && sec >= 0 && sec !== lastBeep && left > -0.2) { lastBeep = sec; bell(sec === 0); }
-        if (left <= 0) { left = 0; if (sound && lastBeep !== 0) { lastBeep = 0; bell(true); } draw(); advance(); } else draw();
+        if (left <= 0) { left = 0; if (sound && lastBeep !== 0) { lastBeep = 0; bell(true); } draw(); toReady(); } else draw();
       }
       raf = requestAnimationFrame(tick);
     }
@@ -505,7 +515,7 @@
       run = true; last = performance.now(); q('[data-st]').classList.remove('paused');
       q('[data-pi]').innerHTML = ICON.pause; q('[data-pl]').textContent = 'Pause';
       call(slots[act], 'play'); bgPlay();
-      if (flow && phase === 'run' && voice.getAttribute('src') && !sw) voice.play().catch(() => {});
+      if (!sw) { if (vStarted) voiceOn(); else if (phase === 'ready' || phase === 'run') voiceGo(); }
       cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
     }
     function stop() {
@@ -541,8 +551,8 @@
     root.addEventListener('mvf:own', e => { if (!bgm.length) return; bgOn = !e.detail; if (bgOn && run) bgPlay(); else bgPause(.6); bgUi(); });
     bgUi();
     if (pv) {
-      q('[data-skip]').addEventListener('click', () => { if (sw) return; if (phase !== 'run') { setPhase('run'); return; } if (idx < items.length - 1) { idx++; show(idx); } else finish(); });
-      q('[data-prev]').addEventListener('click', () => { if (sw) return; idx = Math.max(0, idx - 1); show(idx); });
+      q('[data-skip]').addEventListener('click', () => { if (sw) return; if (phase !== 'run') { setPhase('run'); return; } toReady(); });
+      q('[data-prev]').addEventListener('click', () => { if (sw) return; idx = Math.max(0, idx - 1); show(idx); setPhase('ready'); });
     }
     return { stop: () => { stop(); clearClips(); } };
   }
