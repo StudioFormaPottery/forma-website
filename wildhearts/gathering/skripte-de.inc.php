@@ -634,7 +634,7 @@ Unser nächstes Gathering kommt bald, und natürlich ist es kostenlos. Das Datum
 
 Und für die Frauen, die tiefer gehen möchten, gibt es Unfold, meine dreimonatige Begleitung ab dem 10. Jänner: ein wöchentlicher Live-Call, zwei Bewegungsvideos pro Woche und Workbooks für deinen Mental Load, deinen Selbstwert und deine Ideen. Es gibt nur zehn Plätze.
 
-Und jetzt verrate ich euch noch etwas, weil ihr heute Abend da seid: Meine Mindful Movement Method öffnet am 1. Dezember. Yoga-Flows, somatische Bewegung, Atemarbeit und Meditation zum Abrufen, von fünf bis dreißig Minuten, für volle und für müde Tage, und jeden Monat ein neues Programm mit Workbook. Genau rechtzeitig zum neuen Jahr, damit du mit deinen Vorsätzen nicht allein bist.
+Und jetzt verrate ich euch noch etwas, weil ihr heute Abend da seid: Meine Movecia Daily Method öffnet am 1. Dezember. Yoga-Flows, somatische Bewegung, Atemarbeit und Meditation zum Abrufen, von fünf bis dreißig Minuten, für volle und für müde Tage, und jeden Monat ein neues Programm mit Workbook. Genau rechtzeitig zum neuen Jahr, damit du mit deinen Vorsätzen nicht allein bist.
 
 Heute Abend kannst du dir deinen Platz schon zum Gathering-Preis sichern, deinen ersten Monat für 19 statt 29 Euro. Heute wird nichts abgebucht. Die erste Zahlung kommt erst am 1. Dezember, wenn die Method öffnet.
 
@@ -755,7 +755,7 @@ Dann nimm dir eine Minute. Vier Runden Box Breathing dauern ungefähr eine Minut
 
 Wenn sich dieser Morgen gut angefühlt hat, komm beim nächsten Mal wieder. Dann atmen wir wieder gemeinsam.
 
-Und wenn du dir für jeden Tag ein bisschen Unterstützung wünschst: Meine Reset Routine für müde Tage gibt es kostenlos auf moveciamovement.com, und meine Mindful Movement Method öffnet am 1. Dezember, mit kurzen Morgeneinheiten wie dieser, wann immer es dir passt. Du kannst dir deinen Platz schon jetzt sichern.
+Und wenn du dir für jeden Tag ein bisschen Unterstützung wünschst: Meine Reset Routine für müde Tage gibt es kostenlos auf moveciamovement.com, und meine Movecia Daily Method öffnet am 1. Dezember, mit kurzen Morgeneinheiten wie dieser, wann immer es dir passt. Du kannst dir deinen Platz schon jetzt sichern.
 
 [Wenn du heute Morgen ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir etwas eingeblendet. Schau es dir an, wann immer es dir passt.
 
@@ -926,7 +926,7 @@ Genau das sollen diese Morgen für dich sein. Ein Ort, an dem jemand auf dich wa
 
 Wenn du immer wieder zu Morgen wie diesem zurückkommen möchtest, sei beim nächsten Gathering dabei. Die Gatherings sind kostenlos, und das Datum findest du immer auf moveciamovement.com.
 
-Und wenn du das als Teil deines Lebens möchtest, mit Atemarbeit, kurzen Bewegungseinheiten und jeden Monat einem neuen Programm, dann öffnet meine Mindful Movement Method am 1. Dezember, und du kannst dir deinen Platz schon jetzt sichern.
+Und wenn du das als Teil deines Lebens möchtest, mit Atemarbeit, kurzen Bewegungseinheiten und jeden Monat einem neuen Programm, dann öffnet meine Movecia Daily Method am 1. Dezember, und du kannst dir deinen Platz schon jetzt sichern.
 
 [Wenn du heute Morgen ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir jetzt etwas eingeblendet. Schau es dir in Ruhe an.
 
@@ -1037,7 +1037,7 @@ Es ist schön, etwas zu wählen, dessen Duft du magst. Rosmarin, Lavendel, ein w
 
 Wenn dir der heutige Abend geholfen hat, deinen Tag abzuschließen, komm beim nächsten Mal wieder. Dann machen wir das wieder gemeinsam.
 
-Und wenn du dir solche Rituale jeden Monat wünschst, für die Morgen, für die Abende und für die schweren Tage dazwischen, dann öffnet meine Mindful Movement Method am 1. Dezember, und du kannst dir deinen Platz schon jetzt sichern.
+Und wenn du dir solche Rituale jeden Monat wünschst, für die Morgen, für die Abende und für die schweren Tage dazwischen, dann öffnet meine Movecia Daily Method am 1. Dezember, und du kannst dir deinen Platz schon jetzt sichern.
 
 [Wenn du heute Abend ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir etwas eingeblendet. Lies es in Ruhe, es eilt nicht.
 
@@ -1226,7 +1226,7 @@ Und wenn du noch einmal aufstehen musst, roll dich zuerst auf die Seite, bleib d
 
 Wenn dir der heutige Abend gutgetan hat, komm zum nächsten Gathering. Die Gatherings sind kostenlos, und das Datum findest du auf moveciamovement.com.
 
-Und wenn du solche Abende als Teil deines Lebens möchtest, mit tiefer Ruhe, Atemarbeit und sanfter Bewegung, immer dann, wenn du sie brauchst, dann öffnet meine Mindful Movement Method am 1. Dezember, und du kannst dir deinen Platz schon jetzt sichern.
+Und wenn du solche Abende als Teil deines Lebens möchtest, mit tiefer Ruhe, Atemarbeit und sanfter Bewegung, immer dann, wenn du sie brauchst, dann öffnet meine Movecia Daily Method am 1. Dezember, und du kannst dir deinen Platz schon jetzt sichern.
 
 [Wenn du heute Abend ein Angebot einblendest, dann jetzt und sag dazu:] Ich habe dir etwas eingeblendet. Schau es dir morgen an, wenn du ausgeruht bist. Es eilt nicht.
 

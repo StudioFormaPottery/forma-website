@@ -13,7 +13,7 @@
 declare(strict_types=1);
 
 const NATAL_WD_DAYS = 14;
-const MV_VOUCHER_TERMS = 'Wertgutschein ohne Ablaufdatum, einlösbar für alle Angebote bei Movecia: The Mindful Movement Method, Unfold, Prä- & Postnatal Training und Personal Training, im Studio oder online. Einfach beim Buchen auf moveciamovement.com den Gutscheincode eingeben oder mir schreiben. Ein Restwert bleibt erhalten. Keine Barauszahlung. Wer den Code kennt, kann ihn einlösen, bitte gut aufbewahren.';
+const MV_VOUCHER_TERMS = 'Wertgutschein ohne Ablaufdatum, einlösbar für alle Angebote bei Movecia: The Movecia Daily Method, Unfold, Prä- & Postnatal Training und Personal Training, im Studio oder online. Einfach beim Buchen auf moveciamovement.com den Gutscheincode eingeben oder mir schreiben. Ein Restwert bleibt erhalten. Keine Barauszahlung. Wer den Code kennt, kann ihn einlösen, bitte gut aufbewahren.';
 const MV_VOUCHER_DESIGNS = [1 => 'Bogen', 2 => 'Zart'];
 
 function natal_wd_schema(PDO $pdo): void
@@ -622,7 +622,7 @@ function natal_convert_mail(PDO $pdo, array $o, array $c, int $months, ?array $s
         $m = mv_member_by_email($pdo, (string)$o['email']);
         $hasPw = $m && (string)$m['pass_hash'] !== '';
         $link = $hasPw ? mv_area() : mv_pw_link($pdo, $m, 24 * 14);
-        $p[] = 'Du bekommst ' . $months . ' ' . ($months === 1 ? 'Monat' : 'Monate') . ' The Mindful Movement Method (' . forma_euro($c['month']) . ' pro Monat), freigeschaltet ab ' . date('j.n.Y', (int)$sub['bill_start']) . ' bis ' . date('j.n.Y', (int)$sub['period_end'] - 1) . '. Es verlängert sich nichts und es wird nichts abgebucht.';
+        $p[] = 'Du bekommst ' . $months . ' ' . ($months === 1 ? 'Monat' : 'Monate') . ' The Movecia Daily Method (' . forma_euro($c['month']) . ' pro Monat), freigeschaltet ab ' . date('j.n.Y', (int)$sub['bill_start']) . ' bis ' . date('j.n.Y', (int)$sub['period_end'] - 1) . '. Es verlängert sich nichts und es wird nichts abgebucht.';
         $p[] = $hasPw ? 'Melde dich einfach mit deiner E-Mail und deinem Passwort im Mitgliederbereich an.' : 'Leg über den Knopf einmal dein Passwort fest, danach meldest du dich auf jedem Gerät mit deiner E-Mail an. Du startest mit dem Ankommen-Modul.';
         $btn = [$link, $hasPw ? 'Zum Mitgliederbereich' : 'Passwort festlegen & loslegen'];
     }

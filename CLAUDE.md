@@ -225,7 +225,7 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - Eingebaut: /natal und Videoraum (Kopf mit Zeichen), Favicon + Apple-Icon auf allen moveciamovement.com-Seiten, Link in Bio Fußzeile, alle Movecia-Mails (`natal_mail_html`, `mm_mail_html` mit Logo-Kopf), Rechnungen, Flyer (Studio + Online, PDFs in `wildhearts/natal/files/`), Verwaltung (Movecia-Tür). Erzeugt per Playwright aus HTML (Skript außerhalb des Repos), bei Änderungen alle Dateien neu erzeugen.
 
 ## Unfold · The Mindful Becoming (Vivien, 24.10.2026)
-- Seite moveciamovement.com/unfold (= `wildhearts/unfold/index.php`, DE/EN-Umschalter wie Link in Bio, Sprache `?lang=` bzw. localStorage `wh-lang`). 3 Monate Begleitung, Start 1. Februar 2027 (zweimal im Jahr: Q1 und Q3), höchstens 10 Plätze, wöchentlicher Live-Call (je ein Termin DE und EN), monatliches Workbook, Impuls-Videos, 3 Monate Mindful Movement Method, Aufnahmen.
+- Seite moveciamovement.com/unfold (= `wildhearts/unfold/index.php`, DE/EN-Umschalter wie Link in Bio, Sprache `?lang=` bzw. localStorage `wh-lang`). 3 Monate Begleitung, Start 1. Februar 2027 (zweimal im Jahr: Q1 und Q3), höchstens 10 Plätze, wöchentlicher Live-Call (je ein Termin DE und EN), monatliches Workbook, Impuls-Videos, 3 Monate Movecia Daily Method, Aufnahmen.
 - Preise (Vivien): € 450 einmal oder 3 × € 160. Kostenloses 30-Minuten-Info-Gathering vor dem Start, nur dort € 390 (Angebot gilt 20 Minuten). Noch NICHT buchbar: nur Infoliste.
 - Infoliste: `api/wh-subscribe.php` mit source `unfold` → eigene Bestätigungsmail („bitte zuerst bestätigen, dann kommen alle Infos, bevor ich es offiziell poste“, `mm_mail_confirm`) → nach Bestätigung `mm_mail_unfold_info` (statt Reset-Willkommensmail) + Info an Viv (`mm_notify_interest`) → Weiterleitung /unfold/?ok=1#infos. Verwaltung zeigt Quelle „Interesse Unfold“.
 - Teaser-Bilder: Vorlage `tools/unfold-teaser/teaser.html?f=feed|story&l=en|de` (1080×1350 / 1080×1920), per Playwright gegen den lokalen Server gerendert.
@@ -647,7 +647,7 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 
 ## Winter-Vögelchen & Pop-up im Wechsel (Vivien, 30.10.2026)
 - Vom 1. November bis 15. Jänner (`ac_winter()` in academy-lib) tragen die Early-Bird-Vögelchen Strickmütze und Schal: `ac_birds()` (Academy-Seiten) und `mv_perch_birds($cls)` (Klassen `l` = links, `s` = klein; Styles `.mvb` in cute.css) auf den Early-Bird-Kästchen von Method (`.ebb`), Unfold (Preiskarte), Startseite (Academy-Karte, `.acad-eb`), Link in Bio (Skript über `.price[data-until]`) und im Pop-up am Preis. Außerhalb der Winterzeit nur auf den Academy-Seiten (ohne Mütze). Vorschau: `?winter=1`.
-- Startseiten-Pop-up im Wechsel: `mv_next_popup_phases()` = alle gerade buchbaren Angebote in Reihenfolge The Mindful Movement Method → Unfold → Teacher Training. Cookie `mvpop` zählt die Besuche (beim Zeigen +1), jeder neue Besuch (Browser-Sitzung, sessionStorage `mv-npop-s`) zeigt das nächste. `mv_next_popup_phase()` ohne Argument = erstes (Verwaltung zeigt die ganze Reihe). Name im Pop-up: „The Mindful Movement Method“.
+- Startseiten-Pop-up im Wechsel: `mv_next_popup_phases()` = alle gerade buchbaren Angebote in Reihenfolge The Movecia Daily Method → Unfold → Teacher Training. Cookie `mvpop` zählt die Besuche (beim Zeigen +1), jeder neue Besuch (Browser-Sitzung, sessionStorage `mv-npop-s`) zeigt das nächste. `mv_next_popup_phase()` ohne Argument = erstes (Verwaltung zeigt die ganze Reihe). Name im Pop-up: „The Movecia Daily Method“.
 - Advent-Posts: Vögelchen mit Mütze und Schal auf dem Preiskästchen (`birds: true` in advent.json, `winter_birds()` in make_week.py).
 
 ## Weihnachten auf forma-pottery.com (Vivien, 30.10.2026; jedes Jahr 2.11.–6.1.)
@@ -657,7 +657,7 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 - `main{overflow-x:clip}`: Deko-Icons am Rand machten die Seite am Handy 3 px zu breit.
 
 ## Nur noch The Method auf Englisch (Vivien, 30.10.2026)
-- Englisch gibt es nur noch bei The Mindful Movement Method (keine Live-Stunden). Unfold, Prä- & Postnatal und Academy sind nur Deutsch. Social Media bleibt zweisprachig.
+- Englisch gibt es nur noch bei The Movecia Daily Method (keine Live-Stunden). Unfold, Prä- & Postnatal und Academy sind nur Deutsch. Social Media bleibt zweisprachig.
 - /unfold: `ob_start('mv_strip_en')`, kein DE/EN-Umschalter, nur ein Live-Call (Deutsch), Hinweis `#ennote` für Englisch-Besucherinnen mit Link zur Method. `mv_order_checkout`: Unfold-Buchungen immer `lang = call_lang = 'de'`. /terms, Unfold-Info-Mail, Link in Bio (/links) und Startseite (Chips „auf Deutsch“/„in German“, EN-Knopf im Kopf führt zur Method, Menü-Untertitel „in German“) angepasst.
 - Verwaltung: `mv_lesson_aud()` / `mv_lesson_de_only()` (audience ≠ method) in method-lib. `mv_lesson_status` zählt Englisch dort nicht (fertig = Deutsch da, `deonly`). Videos hochladen, Studio, Lektions-Formular, Live-Texte, Prä-/Postnatal-Teleprompter (`_en`-Skripte ausgeblendet, Daten bleiben), Unfold nur ein Videoraum, Vorschau-Kachel „Unfold auf Englisch“ entfernt. `mv_flow_data` nimmt bei Deutsch-only-Lektionen immer Deutsch.
 - Gatherings sind (noch) englisch: Seite /gathering und Mails unverändert, Vivien fragen, ob sie auch auf Deutsch sollen.
@@ -676,7 +676,7 @@ Website des FORMA Töpferstudios (Vivien Malonga) unter www.forma-pottery.com.
 
 
 ## Movecia · Weihnachts-Gewinnspiel 2026 (Vivien, 30.10.2026)
-- Seite moveciamovement.com/gewinnspiel (= `wildhearts/gewinnspiel/index.php`, noindex, nur Deutsch), Rewrite in `.htaccess`. Gewinn nach Wahl: 3 Monate The Mindful Movement Method (regulär € 111) oder 2 Online-Einheiten Prä- oder Postnatal (2 × € 54), Online-Einheiten einlösbar bis 30.4.2027. Teilnahme bis 20.12.2026 23:59, Auslosung 21.12.2026. Keine Verlosung mehr unter Unfold-Teilnehmerinnen, keine Rückzahlungen.
+- Seite moveciamovement.com/gewinnspiel (= `wildhearts/gewinnspiel/index.php`, noindex, nur Deutsch), Rewrite in `.htaccess`. Gewinn nach Wahl: 3 Monate The Movecia Daily Method (regulär € 111) oder 2 Online-Einheiten Prä- oder Postnatal (2 × € 54), Online-Einheiten einlösbar bis 30.4.2027. Teilnahme bis 20.12.2026 23:59, Auslosung 21.12.2026. Keine Verlosung mehr unter Unfold-Teilnehmerinnen, keine Rückzahlungen.
 - `api/gewinnspiel-lib.php` (Tabelle `mm_gewinnspiel`, `GW_*`-Konstanten), `api/gewinnspiel.php` (POST Teilnahme, GET ?t= Bestätigung → /gewinnspiel/?dabei=1). Double-Opt-in; Newsletter nur über eigenes, freiwilliges Häkchen (`gw_newsletter` → mm_subscribers source `gewinnspiel` + MailerLite). Nach dem 31.1.2027 werden Nicht-Gewinnerinnen gelöscht.
 - Verwaltung → Movecia → Übersicht `#gewinnspiel`: Zahl im Lostopf, Liste, nach Teilnahmeschluss „Jetzt auslosen“ (`gw_draw`, zufällig aus bestätigten), dann „Gewinn freischalten & Mail schicken“ (`gw_grant`: Method = mv_subs plan m3, source `gewinnspiel`, 92 Tage ohne Verlängerung; Prä/Post = mm_natal_orders o_prae/o_post mit 2 Einheiten, € 0). „Neu auslosen“, wenn sich niemand meldet.
 - Link in Bio /bio: Karte „Gewinne Zeit für dich“ bis 20.12. Datenschutz /terms: Absatz Gewinnspiel.

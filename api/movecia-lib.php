@@ -819,7 +819,7 @@ function mm_offers(): array
     require_once __DIR__ . '/method-lib.php';
     $mc = mv_cfg();
     $def = [
-        'method' => ['price' => $mc['m1'], 'special' => $mc['g_m1'], 'title' => 'Movecia Mindful Movement Method', 'billing' => 'monthly', 'intro' => 1, 'text' => 'Your on-demand library: gentle flows, somatic movement, breathwork, meditation and a new programme with a workbook every month. In English and German.'],
+        'method' => ['price' => $mc['m1'], 'special' => $mc['g_m1'], 'title' => 'Movecia Daily Method', 'billing' => 'monthly', 'intro' => 1, 'text' => 'Your on-demand library: gentle flows, somatic movement, breathwork, meditation and a new programme with a workbook every month. In English and German.'],
         'unfold' => ['price' => $mc['u_once'], 'special' => $mc['g_u_once'], 'plans' => [[$mc['u_n'], $mc['u_inst'], 0]], 'title' => 'Unfold – The Mindful Becoming', 'billing' => 'once', 'text' => '13 weeks for you: a weekly live call, two movement videos a week, workbooks, rituals and recordings. Starts ' . mv_date(mv_ts($mc['u_start']), 'en') . '.'],
         'circle' => ['price' => 3900, 'special' => 2900, 'periods' => [[6, 17400], [12, 31200]], 'title' => 'The Inner Circle', 'billing' => 'monthly', 'text' => 'Your monthly circle: live gatherings, breathwork, gentle movement and a members area with rituals and affirmations. A space where women support each other and come back to themselves.'],
         'year' => ['price' => 240000, 'special' => 199000, 'plans' => [[3, 80000, 66400], [6, 40000, 33200]], 'title' => 'The Year Circle', 'billing' => 'once', 'text' => 'Twelve months together: The Inner Circle plus 1:1 mentoring for the idea that is close to your heart. Like a best friend who walks the whole year with you.'],

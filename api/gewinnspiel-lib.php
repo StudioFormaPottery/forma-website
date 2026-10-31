@@ -1,7 +1,7 @@
 <?php
 // Movecia Weihnachts-Gewinnspiel (Vivien, 30.10.2026).
 // Teilnahme über moveciamovement.com/gewinnspiel: Vorname + E-Mail + Wunschgewinn, Double-Opt-in.
-// Gewinn nach Wahl: 3 Monate The Mindful Movement Method (regulär € 111) oder 2 Online-Einheiten
+// Gewinn nach Wahl: 3 Monate The Movecia Daily Method (regulär € 111) oder 2 Online-Einheiten
 // Prä- oder Postnatal (2 × € 54 = € 108, Postnatal-Paketpreis). Auslosung in der Verwaltung → Movecia → Übersicht.
 declare(strict_types=1);
 require_once __DIR__ . '/movecia-lib.php';
@@ -10,7 +10,7 @@ const GW_END = '2026-12-20 23:59:59';   // Teilnahmeschluss (Wien)
 const GW_DRAW = '2026-12-21';          // Auslosung
 const GW_SHOW_UNTIL = '2027-01-31';    // so lange steht der Bereich in der Verwaltung; danach werden Nicht-Gewinnerinnen gelöscht
 const GW_PRIZES = [
-    'method' => ['3 Monate The Mindful Movement Method', 'Meine Videobibliothek für zu Hause: Flows für volle Tage, kurze Einheiten für müde Tage, Atem und Meditation.'],
+    'method' => ['3 Monate The Movecia Daily Method', 'Meine Videobibliothek für zu Hause: Flows für volle Tage, kurze Einheiten für müde Tage, Atem und Meditation.'],
     'prae'   => ['2 Online-Einheiten Pränatal', 'Zwei Einheiten 1:1 mit mir per Video, für dich und dein Baby in der Schwangerschaft.'],
     'post'   => ['2 Online-Einheiten Postnatal', 'Zwei Einheiten 1:1 mit mir per Video, für deinen Weg zurück in deinen Körper nach der Geburt.'],
 ];

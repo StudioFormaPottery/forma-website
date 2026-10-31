@@ -81,7 +81,7 @@ body{background:#F2ECE4}h1,h2{color:#6B5658}
 ?>
 </div></section>
 
-<section class="grp" id="method"><h2>Mindful Movement Method</h2><p>Der Mitgliederbereich, wie eine Method-Teilnehmerin ihn sieht.</p><div class="qa">
+<section class="grp" id="method"><h2>Movecia Daily Method</h2><p>Der Mitgliederbereich, wie eine Method-Teilnehmerin ihn sieht.</p><div class="qa">
 <?php
         $tile($m . '?demo=1', '📚', 'Mitgliederbereich', 'Bibliothek mit dem aktuellen Monat, Journal, Konto');
         $tile($m . '?demo=1&lang=en', '🇬🇧', 'Auf Englisch', 'Derselbe Bereich in englischer Sprache');

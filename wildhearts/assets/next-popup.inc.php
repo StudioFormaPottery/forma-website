@@ -1,6 +1,6 @@
 <?php
 // Pop-up auf der Movecia-Hauptseite (Vivien, 28.10.2026, Wechsel seit 30.10.2026):
-// alle Angebote, die gerade buchbar sind, in fester Reihenfolge: The Mindful Movement Method (bis zum Start),
+// alle Angebote, die gerade buchbar sind, in fester Reihenfolge: The Movecia Daily Method (bis zum Start),
 // Unfold (bis zum Start, solange offen und Plätze frei), Teacher Training (Movecia Academy, bis zum Start).
 // Wer öfter kommt, sieht bei jedem Besuch (Browser-Sitzung) das nächste: Zähler im Cookie mvpop (1 Jahr).
 // Einmal pro Browser-Sitzung, nach ein paar Sekunden. Vorschau: /?popup=method|unfold|teacher.
@@ -53,8 +53,8 @@ function mv_next_popup(): void
     };
     if ($ph === 'method') {
         $p = ['img' => '/img/movecia/fotos/ev-ueber-mich.jpg', 'pos' => '45% 55%', 'href' => '/method/',
-            'k' => ['The Mindful Movement Method · Start ' . $short($ml, 'de'), 'The Mindful Movement Method · starts ' . $short($ml, 'en')],
-            'h' => ['Jeden Tag ein paar <em>ruhige Minuten</em> für dich', 'A few <em>quiet minutes</em> for you, every day'],
+            'k' => ['The Movecia Daily Method · Start ' . $short($ml, 'de'), 'The Movecia Daily Method · starts ' . $short($ml, 'en')],
+            'h' => ['Jeden Tag ein paar <em>Minuten Bewegung</em>, on demand', 'A few <em>minutes of movement</em> every day, on demand'],
             't' => ['Kurze Videos aus Yoga, Somatic Movement und Bodyweight, dazu Breathwork und Meditation. Du beginnst bei Monat 1 und gehst Schritt für Schritt weiter.', 'Short videos of yoga, somatic movement and bodyweight training, plus breathwork and meditation. You begin with month 1 and go step by step.'],
             'price' => $c['eb_m'] ? ['Early-Bird bis ' . $short($c['eb_m_end'], 'de') . ': ' . $eu($c['m1']) . ' statt ' . $eu($c['r_m1']) . ' im Monat', 'Early bird until ' . $short($c['eb_m_end'], 'en') . ': ' . $eu($c['m1']) . ' instead of ' . $eu($c['r_m1']) . ' a month'] : [$eu($c['m1']) . ' im Monat', $eu($c['m1']) . ' a month'],
             'btn' => ['Mehr erfahren', 'Find out more'],

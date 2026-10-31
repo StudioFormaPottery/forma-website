@@ -42,12 +42,12 @@ function presse_release(string $brand): array
         'title' => 'Bewegung beginnt bei dir: Paznaunerin startet Online-Programm für Frauen mit vollem Kopf',
         'paras' => [
             'Mathon, Oktober 2026. Familie, Arbeit, der ganze unsichtbare Mental Load: Viele Frauen kommen im Alltag selbst zu kurz. Die Bewegungstrainerin Vivien Malonga aus Mathon im Paznaun bringt deshalb mit Movecia ihr Wissen aus Yoga, Bodyweight-Training, Somatic Movement und Breathwork online, damit Frauen zu Hause in wenigen Minuten am Tag wieder bei sich ankommen.',
-            'Am 1. Dezember startet die Mindful Movement Method, eine Online-Mitgliedschaft mit Videos für müde und für volle Tage. Jede Teilnehmerin beginnt bei Monat 1 und bekommt jeden Monat ein neues Programm mit Workbook, auf Deutsch und Englisch. Am 10. Jänner 2027 beginnt außerdem „Unfold – The Mindful Becoming“, eine dreimonatige Begleitung in kleiner Runde mit höchstens zehn Frauen, wöchentlichem Live-Call, Bewegungsvideos und Workbooks zu Mental Load und Organisation.',
+            'Am 1. Dezember startet die Movecia Daily Method, eine Online-Mitgliedschaft mit Videos für müde und für volle Tage. Jede Teilnehmerin beginnt bei Monat 1 und bekommt jeden Monat ein neues Programm mit Workbook, auf Deutsch und Englisch. Am 10. Jänner 2027 beginnt außerdem „Unfold – The Mindful Becoming“, eine dreimonatige Begleitung in kleiner Runde mit höchstens zehn Frauen, wöchentlichem Live-Call, Bewegungsvideos und Workbooks zu Mental Load und Organisation.',
             'Vor Ort im Studio und online bietet Vivien Malonga zudem Prä- und Postnatal-Training an, also Begleitung durch die Schwangerschaft und die Rückbildung danach.',
             '„Ich habe selbst vier Kinder und weiß, wie schnell man sich vergisst. Bewegung muss nicht anstrengend sein, sie darf sich gut anfühlen“, sagt die Gründerin.',
         ],
         'facts' => [
-            'Mindful Movement Method: Start 1. Dezember 2026, Early-Bird bis 1. Dezember € 29 statt € 39 im Monat',
+            'Movecia Daily Method: Start 1. Dezember 2026, Early-Bird bis 1. Dezember € 29 statt € 39 im Monat',
             'Unfold: Start 10. Jänner 2027, 10 Plätze, Early-Bird bis 20. Dezember € 450, danach € 550',
             'Prä- und Postnatal-Training: im Studio in Mathon oder online',
             'Infos und Buchung: www.moveciamovement.com · Kontakt: Vivien Malonga, hello@moveciamovement.com, Instagram @movementwithviv',

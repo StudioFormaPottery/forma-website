@@ -1,5 +1,5 @@
 <?php
-// moveciamovement.com/method – Verkaufsseite der Movecia Mindful Movement Method (On-Demand-Mitgliedschaft).
+// moveciamovement.com/method – Verkaufsseite der Movecia Daily Method (On-Demand-Mitgliedschaft).
 // Buchung direkt hier (Stripe-Abo über api/method.php). Vor dem Start: Karte hinterlegen, erste Abbuchung am Starttag.
 declare(strict_types=1);
 require dirname(__DIR__, 2) . '/api/method-lib.php';
@@ -16,10 +16,10 @@ $pre = !mv_launched();
 $site = mm_site();
 $eb = $c['eb_m'];
 $ebEnd = $c['eb_m_end'];
-$prod = ['@context' => 'https://schema.org', '@type' => 'Product', 'name' => 'Movecia Mindful Movement Method', 'brand' => ['@type' => 'Brand', 'name' => 'Movecia'], 'image' => $site . '/img/movecia/og-method.jpg',
+$prod = ['@context' => 'https://schema.org', '@type' => 'Product', 'name' => 'Movecia Daily Method', 'brand' => ['@type' => 'Brand', 'name' => 'Movecia'], 'image' => $site . '/img/movecia/og-method.jpg',
     'description' => 'On-Demand-Mitgliedschaft mit Videos für Mindful Movement, Yoga-Flows, Somatic Movement, Breathwork und Meditation, jeden Monat ein neues Programm mit Workbook. Auf Deutsch und Englisch.',
     'offers' => array_map(fn($k, $n) => ['@type' => 'Offer', 'name' => $n, 'price' => number_format($c[$k] / 100, 2, '.', ''), 'priceCurrency' => 'EUR', 'availability' => 'https://schema.org/InStock', 'url' => $site . '/method/#buchen'] + ($eb ? ['priceValidUntil' => date('Y-m-d', $ebEnd)] : []), ['m1', 'm3', 'm12'], ['Monatlich', '3 Monate', '1 Jahr'])];
-mvl_head('Mindful Movement Method · Online Yoga, Somatic Movement & Breathwork on demand | Movecia', 'Online-Mitgliedschaft mit Vivien Malonga: Yoga-Flows, Somatic Movement, Breathwork und Meditation on demand, 5–30 Minuten, für volle und müde Tage. Jeden Monat ein neues Programm mit Workbook. ' . ($eb ? 'Early-Bird bis ' . mv_date($ebEnd) . ': € ' . round($c['m1'] / 100) . ' statt € ' . round($c['r_m1'] / 100) . ' im Monat.' : 'Ab € ' . round($c['m12'] / 1200) . ' im Monat.'), $site . '/method/', '/img/movecia/og-method.jpg', '', [$prod]);
+mvl_head('Movecia Daily Method · Online Yoga, Somatic Movement & Breathwork on demand | Movecia', 'Online-Mitgliedschaft mit Vivien Malonga: Yoga-Flows, Somatic Movement, Breathwork und Meditation on demand, 5–30 Minuten, für volle und müde Tage. Jeden Monat ein neues Programm mit Workbook. ' . ($eb ? 'Early-Bird bis ' . mv_date($ebEnd) . ': € ' . round($c['m1'] / 100) . ' statt € ' . round($c['r_m1'] / 100) . ' im Monat.' : 'Ab € ' . round($c['m12'] / 1200) . ' im Monat.'), $site . '/method/', '/img/movecia/og-method.jpg', '', [$prod]);
 ?>
 <body>
 <?php mvl_top('method'); ?>
@@ -28,8 +28,8 @@ mvl_head('Mindful Movement Method · Online Yoga, Somatic Movement & Breathwork 
   <?= mv_waves(true, 'pb-desk') ?>
   <div>
     <p class="k"><span class="de">On demand · Deutsch &amp; Englisch</span><span class="en">On demand · English &amp; German</span></p>
-    <h1><span class="de">Mindful<br><em>Movement</em> Method</span><span class="en">Mindful<br><em>Movement</em> Method</span></h1>
-    <p class="sub"><span class="de">Ein paar ruhige Minuten für dich, jeden Tag.</span><span class="en">A few quiet minutes for you, every day.</span></p>
+    <h1><span class="de">The Movecia<br><em>Daily</em> Method</span><span class="en">The Movecia<br><em>Daily</em> Method</span></h1>
+    <p class="sub"><span class="de">Jeden Tag ein paar Minuten Bewegung, on demand.</span><span class="en">A few minutes of movement every day, on demand.</span></p>
     <p class="lead"><span class="de">Deine Videobibliothek für zu Hause: sanfte Flows, Somatic Movement, Breathwork, Meditation und Kraft ohne Erschöpfung. Du wählst nach Zeit und Tagesform, und jeden Monat kommt ein neues Programm mit Workbook dazu.</span><span class="en">Your video library at home: gentle flows, somatic movement, breathwork, meditation and strength without exhaustion. You choose by time and how you feel, and a new programme with a workbook arrives every month.</span></p>
     <div class="cta"><a class="btn" href="#buchen"><span class="de">Mitglied werden</span><span class="en">Become a member</span> →</a><a class="btn line" href="#inhalt"><span class="de">Was dich erwartet</span><span class="en">What's inside</span></a></div>
     <?php if ($pre): ?><div class="facts"><span><span class="de">Start am <?= mv_date($launch) ?></span><span class="en">Opens on <?= mv_date($launch, 'en') ?></span></span><span><span class="de">jetzt buchen, bezahlt wird erst ab dem Start</span><span class="en">book now, pay once it opens</span></span></div><?php endif; ?>

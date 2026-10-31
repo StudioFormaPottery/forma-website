@@ -1,14 +1,14 @@
 {
   "key": "method-ankommen",
   "lang": "de",
-  "eyebrow": "Mindful Movement Method · Ankommen",
+  "eyebrow": "Movecia Daily Method · Ankommen",
   "title": "Ankommen",
   "subtitle": "Deine ersten Schritte, dein Platz und deine ersten kleinen Rituale",
   "icon": "nest",
   "letter": [
     "Wie schön, dass du hier bist. Wenn du dieses Workbook gerade aufschlägst, hast du dich bereits für etwas entschieden, das im Alltag vieler Frauen viel zu kurz kommt, nämlich für ein bisschen Zeit, die ganz dir gehört. Vielleicht liegt neben dir noch die Einkaufsliste, vielleicht wartet ein Wäschekorb oder ein Kind, das gleich etwas von dir möchte. Das darf alles da sein, und trotzdem lade ich dich ein, für die nächsten Minuten einmal tief auszuatmen und bei dir anzukommen.",
     "Ich lebe mit meinem Mann und unseren vier Kindern in den Bergen, und ich weiß, wie voll ein Tag werden kann und wie leise dabei die eigene Stimme manchmal wird. Zu mir selbst zurückgefunden habe ich über die Bewegung, und zwar über die ruhige Art, bei der man sich nichts beweisen muss. Ein paar langsame Minuten auf der Matte und ein bewusster Atemzug mit der Hand auf dem Bauch haben oft gereicht, damit wieder Raum in mir entstanden ist. Genau diese Erfahrung möchte ich mit dir teilen.",
-    "Die Mindful Movement Method ist so gebaut, dass sie dich begleitet, statt dich zu überfordern. Du beginnst mit dem Ankommen, danach öffnet sich Monat für Monat ein neues Programm mit seinem eigenen Thema. Du bewegst dich in deinem Tempo, und du musst dich mit niemandem vergleichen, auch nicht mit der Version von dir, die du vor ein paar Jahren warst.",
+    "Die Movecia Daily Method ist so gebaut, dass sie dich begleitet, statt dich zu überfordern. Du beginnst mit dem Ankommen, danach öffnet sich Monat für Monat ein neues Programm mit seinem eigenen Thema. Du bewegst dich in deinem Tempo, und du musst dich mit niemandem vergleichen, auch nicht mit der Version von dir, die du vor ein paar Jahren warst.",
     "Dieses Workbook ist dein Begleiter für die ersten Tage. Du findest darin Erklärungen, wie die Method funktioniert, Ideen für deinen Platz zu Hause, die wichtigsten Grundlagen für achtsame Bewegung und Seiten, auf denen du für dich festhalten kannst, wo du gerade stehst und wohin du möchtest. Schreib hinein, streich durch, mal an den Rand. Es ist dein Buch, und es muss nicht schön aussehen, um dir gutzutun.",
     "Ich freue mich sehr, dass wir diesen Weg gemeinsam gehen. Nimm dir eine Tasse Tee, setz dich bequem hin, und dann fangen wir einfach an. Deine Vivien"
   ],
@@ -30,7 +30,7 @@
       "title": "So funktioniert die Method",
       "intro": "Bevor du loslegst, möchte ich dir in Ruhe erklären, wie die Method aufgebaut ist. Wenn du weißt, was dich erwartet, fällt es dir leichter, dranzubleiben und dir dabei treu zu bleiben.",
       "blocks": [
-        {"t": "p", "text": "Die Mindful Movement Method ist eine Mitgliedschaft, die dich Monat für Monat begleitet. Alle beginnen mit dem Modul „Ankommen“, das aus drei Videos besteht und sofort für dich offen ist. Danach öffnet sich dein erster Monat mit einem eigenen Programm aus zwölf Videos, und jeder weitere Monat bringt ein neues Thema, das zur Jahreszeit und zu dem passt, was viele Frauen in dieser Zeit beschäftigt. Der erste Monat heißt „Rückzug & Ruhe“ und begleitet dich durch die dunkle Winterzeit."},
+        {"t": "p", "text": "Die Movecia Daily Method ist eine Mitgliedschaft, die dich Monat für Monat begleitet. Alle beginnen mit dem Modul „Ankommen“, das aus drei Videos besteht und sofort für dich offen ist. Danach öffnet sich dein erster Monat mit einem eigenen Programm aus zwölf Videos, und jeder weitere Monat bringt ein neues Thema, das zur Jahreszeit und zu dem passt, was viele Frauen in dieser Zeit beschäftigt. Der erste Monat heißt „Rückzug & Ruhe“ und begleitet dich durch die dunkle Winterzeit."},
         {"t": "h", "text": "Schritt für Schritt durch dein Programm"},
         {"t": "steps", "items": [
           "Du startest mit dem Video „Willkommen in der Method“. Darin erzähle ich dir, warum es diesen Ort gibt und wie du dich hier zurechtfindest.",

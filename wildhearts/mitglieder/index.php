@@ -1,5 +1,5 @@
 <?php
-// moveciamovement.com/mitglieder/ – Mitgliederbereich Movecia Mindful Movement Method + Unfold (Vivien, 25.10.2026)
+// moveciamovement.com/mitglieder/ – Mitgliederbereich Movecia Daily Method + Unfold (Vivien, 25.10.2026)
 // Anmeldung mit E-Mail + Passwort, Bibliothek mit Monatsprogrammen, Filter nach Dauer/Energie/Art, sanfter Fortschritt,
 // privates Journal, Workbooks, Unfold-Bereich mit Live-Calls, Konto mit Kündigung. Deutsch und Englisch.
 // ?demo=1 zeigt eine Beispielansicht ohne Konto (für Vivien und Screenshots).
@@ -370,7 +370,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
     <p class="k"><?= $h($hello) ?>, <?= $h($first) ?></p>
     <h1 class="h"><?= $L('Schön, dass du da bist.', 'So lovely to have you here.') ?></h1>
     <p class="mut lead"><?= $L('Gerade bereite ich noch alles für dich vor. Dein Zugang schaltet sich am ', 'I am still preparing everything for you. Your access unlocks on ') . '<strong>' . $h(mv_date($oa, $lang)) . '</strong>' . $L(' frei, dann bekommst du eine E-Mail und alles ist für dich offen.', '. You will get an email that day, and everything will be open for you.') ?></p>
-    <ul class="mut" style="margin-top:1rem;padding-left:1.1rem"><?php foreach ($acc['pending'] as $ps): ?><li><?= $ps['kind'] === 'unfold' ? 'Unfold – The Mindful Becoming' : 'Mindful Movement Method' ?> · <?= $L('Start', 'Start') ?> <?= $h(mv_date(mv_open_at($ps), $lang)) ?> · <?= $L('Rücktritt möglich bis', 'You can withdraw until') ?> <?= $h(mv_date(mv_withdraw_until($ps), $lang)) ?></li><?php endforeach; ?></ul>
+    <ul class="mut" style="margin-top:1rem;padding-left:1.1rem"><?php foreach ($acc['pending'] as $ps): ?><li><?= $ps['kind'] === 'unfold' ? 'Unfold – The Mindful Becoming' : 'Movecia Daily Method' ?> · <?= $L('Start', 'Start') ?> <?= $h(mv_date(mv_open_at($ps), $lang)) ?> · <?= $L('Rücktritt möglich bis', 'You can withdraw until') ?> <?= $h(mv_date(mv_withdraw_until($ps), $lang)) ?></li><?php endforeach; ?></ul>
   </div>
   <div class="soon card"><p class="k"><?= $L('Dein Start', 'Your start') ?></p><h3><?= $h(mv_date($oa, $lang)) ?></h3><p class="count" data-t="<?= $oa ?>"></p></div></section>
 
@@ -442,7 +442,7 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
     <?php if (isset($_GET['fehler'])): ?><p class="err"><?= $L('Das hat gerade nicht geklappt. Bitte versuch es noch einmal oder schreib mir.', 'Something went wrong just now. Please try again or write to me.') ?></p><?php endif; ?>
     <div class="kgrid">
     <?php if ($s): $pl = mv_plans()[$s['plan']] ?? null; $end = max((int)$s['period_end'], (int)$s['bill_start']); ?>
-      <div class="card"><h3>Mindful Movement Method</h3>
+      <div class="card"><h3>Movecia Daily Method</h3>
         <p><?= $h($pl ? ($lang === 'en' ? $pl['en'] : $pl['de']) : '') ?> · <?= mv_eur((int)$s['amount_cents']) ?> <?= $h($pl ? ($lang === 'en' ? $pl['per_en'] : $pl['per_de']) : '') ?></p>
         <?php if ((int)$s['bill_start'] > time()): ?><p class="mut"><?= $L('Start und erste Zahlung am', 'Start and first payment on') ?> <?= $h(mv_date((int)$s['bill_start'], $lang)) ?></p>
         <?php elseif ((int)$s['cancel_end']): ?><p class="mut"><?= $L('Gekündigt, Zugang bis', 'Cancelled, access until') ?> <?= $h(mv_date((int)$s['cancel_end'], $lang)) ?></p>

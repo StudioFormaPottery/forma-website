@@ -46,7 +46,7 @@ $faq = [
  ['Was kostet Unfold?', ($c['eb_u'] ? 'Early-Bird bis ' . mv_date($c['eb_u_end']) . ': ' . $eur($c['u_once']) . ' auf einmal oder ' . (int)$c['u_n'] . ' × ' . $eur($c['u_inst']) . '. Danach ' . $eur($c['r_u_once']) . ' auf einmal oder ' . (int)$c['u_n'] . ' × ' . $eur($c['r_u_inst']) . '.' : $eur($c['u_once']) . ' auf einmal oder ' . (int)$c['u_n'] . ' × ' . $eur($c['u_inst']) . '.')],
  ['Muss ich bei Ratenzahlung jeden Monat neu auf mein Rücktrittsrecht verzichten?', 'Nein. Du entscheidest das einmal bei der Buchung, und es gilt für die ganzen drei Monate. Die Raten sind kein neuer Vertrag.'],
  ['Muss ich sportlich sein?', 'Nein. Die Bewegung ist sanft und achtsam, jede Übung hat leichtere Varianten und es gibt eigene Videos für müde Tage.'],
- ['Gibt es Unfold auf Englisch?', 'Nein, Unfold findet nur auf Deutsch statt. Auf Englisch gibt es The Mindful Movement Method, die Videobibliothek für zu Hause.'],
+ ['Gibt es Unfold auf Englisch?', 'Nein, Unfold findet nur auf Deutsch statt. Auf Englisch gibt es The Movecia Daily Method, die Videobibliothek für zu Hause.'],
 ];
 $ld = [
  ['@context' => 'https://schema.org', '@type' => 'Course', '@id' => $site . '/unfold/#course', 'name' => 'Unfold – The Mindful Becoming', 'description' => '3-Monats-Begleitung für Frauen: Mindful Movement, Live-Calls mit Impulsvortrag, Workbooks für Mental Load und Selbstwert, Journaling, Meditation und Breathwork.',
@@ -199,7 +199,7 @@ body>header.w{position:sticky;top:0;z-index:30;background:rgba(242,236,228,.94);
   <a class="brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia</span></a>
   <div class="top-r"><?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('unfold', ['lang' => false]); ?></div>
 </div></header>
-<p class="en-note" id="ennote" hidden>Unfold is held in German only. In English you can join <a href="/method/?lang=en" style="color:inherit">The Mindful Movement Method</a>.</p>
+<p class="en-note" id="ennote" hidden>Unfold is held in German only. In English you can join <a href="/method/?lang=en" style="color:inherit">The Movecia Daily Method</a>.</p>
 
 <main>
 <section class="w"><div class="in hero has-hw"><?= mv_waves(false) ?>

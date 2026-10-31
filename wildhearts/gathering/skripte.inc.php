@@ -100,7 +100,7 @@ Then take one minute. Four rounds of box breathing take about one minute. That\'
 
 If this morning felt good, come back next time. We\'ll breathe together again.
 
-And if you want a little support for every day, my Reset Routine for Tired Days is free on moveciamovement.com, and my Mindful Movement Method opens on the 1st of December, with short morning sessions just like this one, whenever you have time. You can already book your place.
+And if you want a little support for every day, my Reset Routine for Tired Days is free on moveciamovement.com, and my Movecia Daily Method opens on the 1st of December, with short morning sessions just like this one, whenever you have time. You can already book your place.
 
 [If you show an offer this morning: show it now, and say:] I\'ve put something on your screen for you. Have a look whenever it suits you.
 
@@ -271,7 +271,7 @@ That\'s what I want these mornings to be for you. A place where someone is waiti
 
 If you\'d like to keep coming back to mornings like this, join the next Gathering. They\'re free, and you\'ll always find the date on moveciamovement.com.
 
-And if you want this as part of your life, with breathwork, short movement sessions and a new programme every month, my Mindful Movement Method opens on the 1st of December, and you can already book your place.
+And if you want this as part of your life, with breathwork, short movement sessions and a new programme every month, my Movecia Daily Method opens on the 1st of December, and you can already book your place.
 
 [If you show an offer this morning: show it now, and say:] I\'ve put something on your screen for you now. Take a look in your own time.
 
@@ -382,7 +382,7 @@ It\'s lovely to choose something you like the smell of. Rosemary, lavender, a li
 
 If tonight helped you close your day, come back next time. We\'ll do this together again.
 
-And if you\'d like rituals like this every month, for the mornings, the evenings and the hard days in between, my Mindful Movement Method opens on the 1st of December, and you can already book your place.
+And if you\'d like rituals like this every month, for the mornings, the evenings and the hard days in between, my Movecia Daily Method opens on the 1st of December, and you can already book your place.
 
 [If you show an offer tonight: show it now, and say:] I\'ve put something on your screen for you. Read it whenever you\'re ready, there\'s no rush.
 
@@ -571,7 +571,7 @@ And if you need to get up again, roll onto your side first, rest there for a bre
 
 If tonight was good for you, come back to the next Gathering. They\'re free, and you\'ll find the date on moveciamovement.com.
 
-And if you want evenings like this as part of your life, with deep rest, breathwork and gentle movement whenever you need it, my Mindful Movement Method opens on the 1st of December, and you can already book your place.
+And if you want evenings like this as part of your life, with deep rest, breathwork and gentle movement whenever you need it, my Movecia Daily Method opens on the 1st of December, and you can already book your place.
 
 [If you show an offer tonight: show it now, and say:] I\'ve put something on your screen. Look at it tomorrow, when you\'re rested. There\'s no rush.
 
@@ -702,7 +702,7 @@ Our next Gathering is coming up soon, and of course it\'s free. You\'ll always f
 
 And for the women who want to go deeper, there is Unfold, my three months of guidance from the 10th of January: a weekly live call, two movement videos a week and workbooks for your mental load, your worth and your ideas. There are only ten places.
 
-And now a little secret, because you are here tonight: my Mindful Movement Method opens on the 1st of December. Yoga flows, somatic movement, breathwork and meditation on demand, from five to thirty minutes, for full days and for tired days, and every month a new programme with a workbook. Just in time for the new year, so you\'re not on your own with your New Year\'s intentions.
+And now a little secret, because you are here tonight: my Movecia Daily Method opens on the 1st of December. Yoga flows, somatic movement, breathwork and meditation on demand, from five to thirty minutes, for full days and for tired days, and every month a new programme with a workbook. Just in time for the new year, so you\'re not on your own with your New Year\'s intentions.
 
 Tonight you can already book your place at the Gathering price, your first month for 19 euros instead of 29. Nothing is charged today. Your first payment is only taken on the 1st of December, when the Method opens.
 

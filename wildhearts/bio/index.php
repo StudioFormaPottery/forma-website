@@ -200,7 +200,7 @@ a{color:inherit}
       </a>
       <a class="btn" href="/method/">
         <span class="th"><img src="/img/movecia/fotos/ev-method-foto.jpg?v=3" alt="" width="120" height="150"></span>
-        <span class="tx"><span class="tag"><?= $mLaunch > time() ? 'Ab ' . $h(mv_date($mLaunch)) : 'On demand' ?></span><b>The Mindful Movement Method</b><small>Deine Videobibliothek für zu Hause<?= $c['eb_m'] ? ' · Early Bird ' . $eu($c['m1']) . ' im Monat' : ' · ab ' . $eu((int)round($c['m12'] / 12)) . ' im Monat' ?> · auch auf Englisch</small></span>
+        <span class="tx"><span class="tag"><?= $mLaunch > time() ? 'Ab ' . $h(mv_date($mLaunch)) : 'On demand' ?></span><b>The Movecia Daily Method</b><small>Jeden Tag ein paar Minuten Bewegung, on demand<?= $c['eb_m'] ? ' · Early Bird ' . $eu($c['m1']) . ' im Monat' : ' · ab ' . $eu((int)round($c['m12'] / 12)) . ' im Monat' ?> · auch auf Englisch</small></span>
         <span class="ar" aria-hidden="true">→</span>
       </a>
     </nav>

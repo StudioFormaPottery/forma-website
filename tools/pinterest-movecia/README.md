@@ -22,7 +22,7 @@ Yoga für müde Tage · Mental Load & Selbstfürsorge für Mamas · Schwangersch
    Journaling-Frage, Gedanke) und verlinken trotzdem auf die passende Seite. Ideen gern aus `tools/movecia-week/*.json`.
    | Thema | Link | Pinnwand |
    |---|---|---|
-   | Mindful Movement Method (Start 1.12.2026, Early-Bird bis 1.12. € 29 statt € 39, danach € 39) | https://moveciamovement.com/method/ | Mindful Movement für zu Hause |
+   | Movecia Daily Method (Start 1.12.2026, Early-Bird bis 1.12. € 29 statt € 39, danach € 39) | https://moveciamovement.com/method/ | Mindful Movement für zu Hause |
    | Unfold (Start 10.1.2027, 10 Plätze, Early-Bird bis 11.1. € 450 statt € 490) | https://moveciamovement.com/unfold/ | Mental Load & Selbstfürsorge für Mamas |
    | Prä- & Postnatal Training (Studio Mathon oder online, kostenloses Kennenlerngespräch) | https://moveciamovement.com/natal/ | Schwangerschaft & Rückbildung |
    | Breathwork-Übung | https://moveciamovement.com/method/ | Breathwork & Atemübungen |

@@ -1,5 +1,5 @@
 <?php
-// Movecia Mindful Movement Method (On-Demand-Mitgliedschaft) und Unfold – The Mindful Becoming.
+// Movecia Daily Method (On-Demand-Mitgliedschaft) und Unfold – The Mindful Becoming.
 // Eigenes Modul (Vivien, 25.10.2026): Mitgliedschaften über Stripe, Konten, Bibliothek mit Monatsprogrammen,
 // Videos bei Bunny Stream, Fortschritt, Journal, Workbooks, Rechnungen im Movecia-Design.
 // Schlüssel (Stripe, Bunny, Postfach) liegen nur im Datenordner, nie im Repo.
@@ -591,7 +591,7 @@ function mv_send_confirm(PDO $pdo, array $m, array $r, bool $reminder = false): 
 {
     $en = ($r['lang'] ?? $m['lang']) === 'en';
     $first = forma_first_name((string)($r['name'] ?: $m['name']) ?: ($en ? 'friend' : 'meine Liebe'));
-    $title = $r['kind'] === 'unfold' ? 'Unfold – The Mindful Becoming' : 'Movecia Mindful Movement Method';
+    $title = $r['kind'] === 'unfold' ? 'Unfold – The Mindful Becoming' : 'Movecia Daily Method';
     $lines = $en ? [
         "Dear $first,",
         ($reminder ? 'a gentle reminder: ' : '') . "thank you for booking $title! Your payment has come through.",
@@ -929,7 +929,7 @@ function mv_checkout(PDO $pdo, array $in, bool $special = false, string $source 
         ->execute([$p['kind'], $plan, $email, $name, $lang, $p['kind'] === 'unfold' ? $callLang : '', $p['cents'], $first, $special ? 1 : 0, $tok, $digital, $live, $source, forma_stripe_test_mode() ? 1 : 0, date('c')]);
     $sid = (int)$pdo->lastInsertId();
     $site = mm_site();
-    $title = $p['kind'] === 'unfold' ? 'Unfold – The Mindful Becoming' : 'Movecia Mindful Movement Method';
+    $title = $p['kind'] === 'unfold' ? 'Unfold – The Mindful Becoming' : 'Movecia Daily Method';
     $sub = $p['kind'] === 'method' || $plan === 'u3';
     $vc = 0;
     if ($vrow) {
@@ -1169,7 +1169,7 @@ function mv_welcome(PDO $pdo, array $r): void
     $price = mv_eur((int)$r['first_cents']) . ($r['plan'] === 'u1' ? '' : ' ' . ($en ? $p['per_en'] : $p['per_de']));
     if ((int)$r['special'] === 1 && $r['plan'] !== 'u1') $price .= $en ? ' (first payment at the Gathering price, then ' . mv_eur((int)$r['amount_cents']) . ')' : ' (erste Zahlung zum Gathering-Preis, danach ' . mv_eur((int)$r['amount_cents']) . ')';
     $isU = $r['kind'] === 'unfold';
-    $title = $isU ? 'Unfold – The Mindful Becoming' : 'Movecia Mindful Movement Method';
+    $title = $isU ? 'Unfold – The Mindful Becoming' : 'Movecia Daily Method';
     $open = mv_open_at($r);
     $pre = $open > time();
     $call = $isU ? ($r['call_lang'] === 'en' ? $c['u_call_en'] . ($en ? ' (English)' : ' (Englisch)') : $c['u_call_de'] . ($en ? ' (German)' : ' (Deutsch)')) : '';
@@ -1218,7 +1218,7 @@ function mv_notify_viv(PDO $pdo, array $r): void
     $c = mv_cfg();
     $p = mv_plans()[$r['plan']];
     $isU = $r['kind'] === 'unfold';
-    $title = $isU ? 'Unfold – The Mindful Becoming' : 'Movecia Mindful Movement Method';
+    $title = $isU ? 'Unfold – The Mindful Becoming' : 'Movecia Daily Method';
     $open = mv_open_at($r);
     $pre = $open > time();
     $pfx = (int)$r['test'] === 1 ? '[TEST] ' : '';
@@ -1252,7 +1252,7 @@ function mv_open_mail(PDO $pdo, array $r): void
     $m = mv_member_ensure($pdo, (string)$r['email'], (string)$r['name'], (string)$r['lang']);
     $first = forma_first_name((string)$r['name'] ?: ($en ? 'friend' : 'meine Liebe'));
     $isU = $r['kind'] === 'unfold';
-    $title = $isU ? 'Unfold – The Mindful Becoming' : 'Movecia Mindful Movement Method';
+    $title = $isU ? 'Unfold – The Mindful Becoming' : 'Movecia Daily Method';
     $hasPw = $m['pass_hash'] !== '';
     $link = $hasPw ? mv_area() : mv_pw_link($pdo, $m, 24 * 14);
     $btn = $hasPw ? ($en ? 'Open my members area' : 'Zum Mitgliederbereich') : ($en ? 'Choose my password' : 'Passwort festlegen');
@@ -1317,7 +1317,7 @@ function mv_invoice_source(PDO $pdo, string $kind, int $payId): ?array
         $detail = '3-monatige Online-Begleitung ' . date('d.m.Y', mv_ts($c['u_start'])) . ' bis ' . date('d.m.Y', mv_unfold_end()) . ': wöchentliche Live-Calls per Video, Workbooks, Impuls-Videos, Bewegungsvideos' . ((int)$p['special'] && $p['plan'] === 'u1' ? ' · Gathering-Preis' : '');
         $service = date('d.m.Y', mv_ts($c['u_start']));
     } else {
-        $text = 'Movecia Mindful Movement Method · Mitgliedschaft ' . $pl['de'];
+        $text = 'Movecia Daily Method · Mitgliedschaft ' . $pl['de'];
         $detail = 'On-Demand-Videobibliothek (Movement Flows, Somatic Movement, Breathwork, Meditation), Monatsprogramme mit Workbooks' . $per;
         $service = date('d.m.Y', $from);
     }
@@ -1486,7 +1486,7 @@ function mv_month_run(PDO $pdo): void
             'Fang einfach mit dem ersten Video an. Ein kleiner Schritt reicht.',
         ];
         $pfx = (int)$s['test'] === 1 ? '[TEST] ' : '';
-        try { mv_send_member_mail($s, $pfx . ($en ? 'Your month ' . $mm['n'] . ' is open' : 'Dein Monat ' . $mm['n'] . ' ist offen'), $en ? 'something new for you ♡' : 'etwas Neues für dich ♡', 'Movecia Mindful Movement Method', $lines, mv_area(), $en ? 'Open my month' : 'Zu meinem Monat', ''); }
+        try { mv_send_member_mail($s, $pfx . ($en ? 'Your month ' . $mm['n'] . ' is open' : 'Dein Monat ' . $mm['n'] . ' ist offen'), $en ? 'something new for you ♡' : 'etwas Neues für dich ♡', 'Movecia Daily Method', $lines, mv_area(), $en ? 'Open my month' : 'Zu meinem Monat', ''); }
         catch (Throwable $e) { error_log('MV month mail: ' . $e->getMessage()); }
     }
 }

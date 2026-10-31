@@ -19,12 +19,12 @@ $days = max(0, (int)ceil(($end - time()) / 86400));
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Weihnachts-Gewinnspiel · Movecia</title>
-<meta name="description" content="Gewinne Zeit für dich: 3 Monate The Mindful Movement Method oder 2 Online-Einheiten Prä- oder Postnatal Training mit Vivien. Mitmachen bis 20. Dezember.">
+<meta name="description" content="Gewinne Zeit für dich: 3 Monate The Movecia Daily Method oder 2 Online-Einheiten Prä- oder Postnatal Training mit Vivien. Mitmachen bis 20. Dezember.">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://moveciamovement.com/gewinnspiel/">
 <meta name="theme-color" content="#F5F1EB">
 <meta property="og:title" content="Weihnachts-Gewinnspiel · Movecia">
-<meta property="og:description" content="Gewinne 3 Monate The Mindful Movement Method oder 2 Online-Einheiten Prä- oder Postnatal Training.">
+<meta property="og:description" content="Gewinne 3 Monate The Movecia Daily Method oder 2 Online-Einheiten Prä- oder Postnatal Training.">
 <meta property="og:image" content="https://moveciamovement.com/img/movecia/og-start.jpg">
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
@@ -117,7 +117,7 @@ details.rules ul{margin:.8rem 0 0;padding-left:1.1rem;font-size:.92rem;color:var
     <div class="pz a">
       <div class="ph"><img src="/img/movecia/fotos/ev-method-foto.jpg?v=10" alt="" width="640" height="400" loading="lazy"></div>
       <small>Online · für zu Hause</small>
-      <h3>3 Monate The Mindful Movement Method</h3>
+      <h3>3 Monate The Movecia Daily Method</h3>
       <p>Meine Videobibliothek: sanfte Flows für volle Tage, kurze Einheiten für müde Tage, Atem und Meditation, Monat für Monat in deinem Tempo.</p>
     </div>
     <p class="or">oder</p>
@@ -163,7 +163,7 @@ details.rules ul{margin:.8rem 0 0;padding-left:1.1rem;font-size:.92rem;color:var
     <ul>
       <li>Veranstalterin ist Vivien Malonga, Movecia (Kontakt und Impressum unter <a href="/terms/#impressum">moveciamovement.com/terms</a>).</li>
       <li>Teilnahme kostenlos und ohne Kauf, ab 18 Jahren, nur einmal pro Person und E-Mail-Adresse. Mitmachen kannst du bis 20. Dezember 2026 um 23:59 Uhr; deine Teilnahme zählt, sobald du sie per E-Mail bestätigt hast.</li>
-      <li>Gewinn nach Wahl der Gewinnerin: 3 Monate Zugang zu The Mindful Movement Method (ohne automatische Verlängerung) oder 2 Online-Einheiten Prä- oder Postnatal Training 1:1 per Video (einzulösen bis 30. April 2027, nach Absprache mit Ärztin oder Hebamme). Der Gewinn kann nicht in bar ausgezahlt oder getauscht werden.</li>
+      <li>Gewinn nach Wahl der Gewinnerin: 3 Monate Zugang zu The Movecia Daily Method (ohne automatische Verlängerung) oder 2 Online-Einheiten Prä- oder Postnatal Training 1:1 per Video (einzulösen bis 30. April 2027, nach Absprache mit Ärztin oder Hebamme). Der Gewinn kann nicht in bar ausgezahlt oder getauscht werden.</li>
       <li>Die Gewinnerin wird am 21. Dezember 2026 per Zufall aus allen bestätigten Teilnahmen gezogen und per E-Mail benachrichtigt; ihr Vorname kann in der Instagram-Story von @moveciamovement genannt werden. Meldet sie sich nicht innerhalb von 7 Tagen, lose ich neu aus. Ich frage nie nach Bankdaten oder Passwörtern.</li>
       <li>Deine Angaben (Vorname, E-Mail, Wunschgewinn) werden nur für das Gewinnspiel verwendet und spätestens am 31. Jänner 2027 gelöscht, außer du hast dich zusätzlich freiwillig für die Post angemeldet.</li>
       <li>Dieses Gewinnspiel steht in keiner Verbindung zu Instagram oder Meta und wird von Instagram weder gesponsert noch unterstützt oder organisiert.</li>

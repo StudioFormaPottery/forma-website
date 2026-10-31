@@ -42,7 +42,7 @@ function mm_week_items(PDO $pdo): array
         }
     } catch (Throwable $e) {}
     // Neue Buchungen dieser Woche
-    $lab = ['unfold' => 'Unfold', 'method' => 'Mindful Movement Method'];
+    $lab = ['unfold' => 'Unfold', 'method' => 'Movecia Daily Method'];
     try {
         $st = $pdo->prepare("SELECT kind, name, COALESCE(NULLIF(paid_at,''), created_at) AS d FROM mv_subs WHERE status IN ('aktiv','beendet') AND substr(COALESCE(NULLIF(paid_at,''), created_at),1,10) BETWEEN ? AND ? AND (source IS NULL OR source <> 'test')");
         $st->execute([$from, $to]);
