@@ -60,6 +60,8 @@ function natal_wd_schema(PDO $pdo): void
         created_at TEXT NOT NULL,
         redeemed_at TEXT
     )');
+    $vc = array_column($pdo->query('PRAGMA table_info(mm_vouchers)')->fetchAll(), 'name');
+    foreach (['recipient', 'sender', 'message'] as $c) if ($vc && !in_array($c, $vc, true)) $pdo->exec("ALTER TABLE mm_vouchers ADD COLUMN $c TEXT NOT NULL DEFAULT ''");
     $pdo->exec('CREATE TABLE IF NOT EXISTS mm_voucher_uses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         voucher_id INTEGER NOT NULL,
@@ -425,6 +427,18 @@ function mv_voucher_pdf(array $v): string
     $bg = __DIR__ . "/gutschein/movecia$d.jpg";
     if (is_file($bg)) $pdf->Image($bg, 0, 0, 297, 210);
     $plum = [74, 48, 64]; $ink = [42, 32, 38]; $soft = [110, 97, 104];
+    if ($d === 1) {
+        // Persönlicher Text im Bogen (Vivien, 31.10.2026): oben Zeichen, unten Movecia Movement, dazwischen die lieben Worte
+        $to = trim((string)($v['recipient'] ?? '')); $from = trim((string)($v['sender'] ?? '')); $msg = trim((string)($v['message'] ?? ''));
+        if ($msg === '') $msg = 'Ein Moment nur für dich. Zum Atmen, Bewegen und Ankommen.';
+        if (mb_strlen($msg) > 200) $msg = rtrim(mb_substr($msg, 0, 197)) . '…'; // passt sicher in den Bogen
+        $ax = 30; $aw = 82; $ay = 70;
+        if ($to !== '') { $pdf->SetTextColor(125, 94, 104); $pdf->SetFont('Inter', 'B', 7.5); $pdf->SetXY($ax, $ay); $pdf->Cell($aw, 5, $t('F Ü R'), 0, 0, 'C');
+            $pdf->SetTextColor(...$plum); $pdf->SetFont('Cormorant', '', 22); $pdf->SetXY($ax, $ay + 5); $pdf->Cell($aw, 10, $t($to), 0, 0, 'C'); $ay += 20; }
+        $pdf->SetTextColor(...$ink); $pdf->SetFont('Cormorant', 'I', mb_strlen($msg) > 110 ? 14 : 16.5);
+        $pdf->SetXY($ax + 2, $ay); $pdf->MultiCell($aw - 4, mb_strlen($msg) > 110 ? 6.4 : 7.4, $t('„' . $msg . '“'), 0, 'C');
+        if ($from !== '') { $pdf->SetTextColor(125, 94, 104); $pdf->SetFont('Inter', '', 9); $pdf->SetXY($ax, $pdf->GetY() + 4); $pdf->Cell($aw, 5, $t('von ' . $from), 0, 0, 'C'); }
+    }
     // Textblock rechts (Design 1: neben dem Bogen) bzw. mittig (Design 2)
     [$x, $w] = $d === 1 ? [140, 138] : [48, 201];
     $y = $d === 1 ? 46 : 50;
