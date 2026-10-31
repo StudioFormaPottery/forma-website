@@ -60,7 +60,9 @@ function ig_seed_mvig(PDO $pdo): void
     $v = (int)($d['version'] ?? 0);
     if (!$v || (int)forma_setting($pdo, 'ig_mvig_plan') >= $v) return;
     $q = $pdo->prepare("SELECT COUNT(*) FROM mm_insta WHERE acc = 'mvig' AND day = ? AND title = ?");
-    $ins = $pdo->prepare("INSERT INTO mm_insta (day, kind, acc, title, text, photo, lang, created_at, updated_at) VALUES (?,?,?,?,?,?,'de',?,?)");
+    $ins = $pdo->prepare("INSERT INTO mm_insta (day, kind, acc, title, text, photo, lang, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?)");
+    // Neuer Text für noch nicht aufgenommene Einträge (Vivien, 31.10.2026: Storys kürzer, „wie bei der besten Freundin auskotzen“)
+    $stx = $pdo->prepare("UPDATE mm_insta SET text = ?, photo = ?, updated_at = ? WHERE acc = 'mvig' AND day = ? AND title = ? AND status = 'offen' AND file = ''");
     // Neuer Plan für einen Zeitraum (Vivien, 30.10.2026): noch nicht aufgenommene/gepostete Einträge darin werden ersetzt
     if (!empty($d['replace_from']) && !empty($d['replace_to'])) $pdo->prepare("DELETE FROM mm_insta WHERE acc = 'mvig' AND day >= ? AND day <= ? AND status = 'offen' AND file = ''")->execute([$d['replace_from'], $d['replace_to']]);
     // Einträge mit „replaces“ ersetzen einen schon eingetragenen alten Text (nur wenn noch nicht gepostet)
@@ -77,8 +79,9 @@ function ig_seed_mvig(PDO $pdo): void
             $rph->execute([(string)($x['photo'] ?? ''), $x['day'], $x['title']]);
         }
         if (!empty($x['replaces'])) $upd->execute([$x['title'], $x['text'], date('c'), $x['day'], $x['replaces']]);
+        if (!empty($x['set_text'])) $stx->execute([$x['text'], (string)($x['photo'] ?? ''), date('c'), $x['day'], $x['title']]);
         $q->execute([$x['day'], $x['title']]); if ((int)$q->fetchColumn()) continue;
-        $ins->execute([$x['day'], isset(IG_KIND[$x['kind']]) ? $x['kind'] : 'post', 'mvig', $x['title'], $x['text'], (string)($x['photo'] ?? ''), date('c'), date('c')]);
+        $ins->execute([$x['day'], isset(IG_KIND[$x['kind']]) ? $x['kind'] : 'post', 'mvig', $x['title'], $x['text'], (string)($x['photo'] ?? ''), ($x['lang'] ?? 'de') === 'en' ? 'en' : 'de', date('c'), date('c')]);
     }
     forma_set_setting($pdo, 'ig_mvig_plan', (string)$v);
 }
