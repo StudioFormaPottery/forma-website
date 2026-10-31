@@ -11,9 +11,10 @@ try { mm_send_reminders($pdo); } catch (Throwable $e) { error_log('MM reminders:
 // Technik-Test: nur mit dem geheimen Token aus der Verwaltung
 $testTok = (string)($_GET['test'] ?? '');
 if ($testTok !== '') {
+    $role = mm_testroom_auth($testTok);
+    if ($role === '') { http_response_code(404); exit('Not found'); }
     $tr = mm_cfg('testroom') ?? [];
-    if (empty($tr['token']) || !hash_equals((string)$tr['token'], $testTok)) { http_response_code(404); exit('Not found'); }
-    $guest = !empty($_GET['gast']);
+    $guest = $role === 'guest' || !empty($_GET['gast']);
     // Teleprompter-Text speichern (nur Gastgeberin, liegt im Datenordner)
     if (!$guest && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $in = json_decode((string)file_get_contents('php://input'), true);

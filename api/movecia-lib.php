@@ -147,6 +147,7 @@ function mm_whereby_room(PDO $pdo, int $gid): bool
  */
 function mm_testroom(bool $renew = false): array
 {
+    mm_testroom_auth('');
     $t = mm_cfg('testroom') ?? [];
     if (empty($t['token'])) $t['token'] = bin2hex(random_bytes(12));
     $valid = !empty($t['room_url']) && (int)($t['ends'] ?? 0) > time() + 3600;
@@ -171,7 +172,35 @@ function mm_testroom(bool $renew = false): array
 
 function mm_testroom_link(array $t, bool $guest = false): string
 {
-    return mm_site() . '/gathering/?test=' . rawurlencode((string)$t['token']) . ($guest ? '&gast=1' : '');
+    if ($guest) {
+        mm_testroom_auth('');   // legt das eigene Gast-Token an, falls es fehlt
+        $g = (string)((mm_cfg('testroom') ?? [])['guest_token'] ?? '');
+        return mm_site() . '/gathering/?test=' . rawurlencode($g) . '&gast=1';
+    }
+    mm_testroom_auth('');
+    return mm_site() . '/gathering/?test=' . rawurlencode((string)((mm_cfg('testroom') ?? [])['token'] ?? $t['token']));
+}
+
+/**
+ * Sicherheit (31.10.2026): Gastgeberin und Testgäste haben getrennte Schlüssel.
+ * Früher war der Gast-Link nur der Gastgeberinnen-Link mit &gast=1 – wer das wegließ, war Gastgeberin.
+ * Beim ersten Aufruf wird der alte (evtl. weitergegebene) Schlüssel einmal ersetzt.
+ * Gibt 'host', 'guest' oder '' zurück.
+ */
+function mm_testroom_auth(string $tok): string
+{
+    $t = mm_cfg('testroom') ?? [];
+    if (empty($t['sec_v2'])) {
+        $t['token'] = bin2hex(random_bytes(16));
+        $t['guest_token'] = bin2hex(random_bytes(16));
+        $t['sec_v2'] = 1;
+        mm_save_cfg('testroom', $t);
+    }
+    if (empty($t['guest_token'])) { $t['guest_token'] = bin2hex(random_bytes(16)); mm_save_cfg('testroom', $t); }
+    if ($tok === '') return '';
+    if (hash_equals((string)$t['token'], $tok)) return 'host';
+    if (hash_equals((string)$t['guest_token'], $tok)) return 'guest';
+    return '';
 }
 
 // --- Gatherings -------------------------------------------------------------------------
@@ -987,6 +1016,8 @@ function mm_spotlight_show(PDO $pdo, string $scope, string $offer, int $special,
     if ($regular > 0) $o['price_cents'] = $regular;
     if ($o['price_cents'] <= 0) throw new RuntimeException('Bitte gib zuerst den regulären Preis ein.');
     if ($special >= $o['price_cents']) throw new RuntimeException('Der Gathering-Preis muss unter dem regulären Preis liegen.');
+    if ($special < 100) throw new RuntimeException('Bitte gib einen Gathering-Preis von mindestens € 1 ein.');
+    if (!isset(mm_offers_active()[$offer])) throw new RuntimeException('Dieses Angebot gibt es nicht mehr.');
     $minutes = max(1, min(180, $minutes));
     $pdo->prepare('UPDATE mm_spotlights SET active = 0 WHERE scope = ?')->execute([$scope]);
     $pdo->prepare('INSERT INTO mm_spotlights (scope, offer, title, text, billing, regular_cents, special_cents, shown_at, until) VALUES (?,?,?,?,?,?,?,?,?)')
@@ -1085,7 +1116,7 @@ function mm_order_check(PDO $pdo, array $o): string
 {
     if ($o['status'] !== 'offen' || $o['stripe_session'] === '') return (string)$o['status'];
     $s = forma_stripe('GET', '/v1/checkout/sessions/' . rawurlencode($o['stripe_session']));
-    if (($s['payment_status'] ?? '') !== 'paid' && ($s['status'] ?? '') !== 'complete') {
+    if (($s['status'] ?? '') !== 'complete' || !in_array(($s['payment_status'] ?? ''), ['paid', 'no_payment_required'], true)) { // Sicherheit 31.10.2026: nur wenn das Geld wirklich da ist (nicht schon bei „complete“ einer Lastschrift)
         if (($s['status'] ?? '') === 'expired') { $pdo->prepare("UPDATE mm_orders SET status = 'abgebrochen' WHERE id = ?")->execute([$o['id']]); return 'abgebrochen'; }
         return 'offen';
     }

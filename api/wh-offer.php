@@ -26,9 +26,9 @@ if ($k !== '') {
     if (!$me) $out(['ok' => false], 403);
     $scope = 'g:' . (int)$me['gathering_id'];
 } elseif ($t !== '') {
-    $tr = mm_cfg('testroom') ?? [];
-    if (empty($tr['token']) || !hash_equals((string)$tr['token'], $t)) $out(['ok' => false], 403);
-    $host = empty($in['gast']);
+    $role = mm_testroom_auth($t);
+    if ($role === '') $out(['ok' => false], 403);
+    $host = $role === 'host' && empty($in['gast']);
     $gid = (int)($in['g'] ?? 0);
     $scope = $gid ? 'g:' . $gid : 'test';
     if ($gid && !$host) $scope = 'test';

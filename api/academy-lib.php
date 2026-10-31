@@ -495,7 +495,7 @@ function ac_check_part(PDO $pdo, array $r, int $n): bool
         if ($n === 1) $pdo->prepare("UPDATE ac_bookings SET status = 'abgebrochen' WHERE id = ? AND status = 'offen'")->execute([$r['id']]);
         return false;
     }
-    if (($s['status'] ?? '') !== 'complete' && ($s['payment_status'] ?? '') !== 'paid') return false;
+    if (($s['payment_status'] ?? '') !== 'paid') return false; // Sicherheit 31.10.2026: nur wenn das Geld wirklich da ist (nicht schon bei „complete“ einer Lastschrift)
     $parts[$i]['paid'] = date('c');
     $parts[$i]['ref'] = (string)($s['payment_intent'] ?? $s['id']);
     $first = $n === 1;

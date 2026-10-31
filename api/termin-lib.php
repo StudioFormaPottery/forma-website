@@ -135,6 +135,7 @@ function tm_link(array $t): string { return mm_site() . '/termin/?t=' . $t['toke
 function tm_host_link(array $t): string
 {
     if ((int)$t['gid'] <= 0) return '';
+    mm_testroom_auth('');
     $tr = mm_cfg('testroom') ?? [];
     if (empty($tr['token'])) { try { $tr = mm_testroom(); } catch (Throwable $e) { $tr = mm_cfg('testroom') ?? []; } }
     return empty($tr['token']) ? '' : mm_site() . '/gathering/?test=' . rawurlencode((string)$tr['token']) . '&g=' . (int)$t['gid'];

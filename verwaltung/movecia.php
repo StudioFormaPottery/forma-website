@@ -340,6 +340,7 @@ if ($view === 'movecia') {
     $edit = $editId ? mm_gathering($pdo, $editId) : null;
     $openG = (int)($_GET['g'] ?? ($next['id'] ?? 0));
     $hasWhereby = mm_whereby_key() !== '';
+    mm_testroom_auth('');
     $trTok = (string)((mm_cfg('testroom') ?? [])['token'] ?? '');
     if ($trTok === '') { $tmp = mm_cfg('testroom') ?? []; $tmp['token'] = $trTok = bin2hex(random_bytes(12)); mm_save_cfg('testroom', $tmp); }
     $GLOBALS['mmHostLink'] = fn(int $gid) => mm_site() . '/gathering/?test=' . rawurlencode($trTok) . '&g=' . $gid;

@@ -162,6 +162,8 @@ if (isset($_GET['wb'])) {
         if ($vw['id'] !== $oid) continue;
         foreach ($vw['units'] as $u) {
             if ($u['key'] !== $key || $u['wb'] < 1) continue;
+            // Sicherheit (31.10.2026): Beispielansicht ohne Konto zeigt nur die Vorschau-Seiten, nie das ganze Workbook
+            if ($demo) { $u['wb'] = min((int)$u['wb'], natal_workbook_preview_count(count(natal_workbook_pages($key)))); $vw['full'] = false; }
             $lock = $vw['full'] ? '' : 'Das ist eine Vorschau. Das ganze Workbook mit allen Übungen und dem Download ist ab ' . $h(natal_date_de(date('Y-m-d', $vw['fullFrom']), false)) . ' für dich da, nach deinen ersten 14 Tagen.';
             header('Content-Type: text/html; charset=utf-8');
             echo natal_workbook_html($key, $u['wb'], $lock);

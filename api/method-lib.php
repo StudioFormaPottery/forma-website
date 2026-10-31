@@ -963,7 +963,7 @@ function mv_check_paid(PDO $pdo, array $r): string
     if ($r['status'] !== 'offen' || $r['stripe_session'] === '') return (string)$r['status'];
     $s = forma_stripe('GET', '/v1/checkout/sessions/' . rawurlencode($r['stripe_session']));
     if (($s['status'] ?? '') === 'expired') { $pdo->prepare("UPDATE mv_subs SET status = 'abgebrochen' WHERE id = ? AND status = 'offen'")->execute([$r['id']]); return 'abgebrochen'; }
-    if (($s['status'] ?? '') !== 'complete' && ($s['payment_status'] ?? '') !== 'paid') return 'offen';
+    if (($s['status'] ?? '') !== 'complete' || !in_array(($s['payment_status'] ?? ''), ['paid', 'no_payment_required'], true)) return 'offen'; // Sicherheit 31.10.2026: nur wenn das Geld wirklich da ist (nicht schon bei „complete“ einer Lastschrift)
     $cd = $s['customer_details'] ?? [];
     $a = $cd['address'] ?? [];
     $country = strtoupper((string)($a['country'] ?? 'AT')) ?: 'AT';
@@ -1014,14 +1014,20 @@ function mv_sync(PDO $pdo, array $r, bool $force = false): array
         $end = (int)($s['current_period_end'] ?? $s['items']['data'][0]['current_period_end'] ?? 0);
         $cancelEnd = !empty($s['cancel_at_period_end']) ? $end : (int)($s['cancel_at'] ?? 0);
         $status = in_array($st, ['active', 'trialing', 'past_due'], true) ? 'aktiv' : ($st === 'incomplete' ? 'aktiv' : 'beendet');
-        if ($r['kind'] === 'unfold' && $status === 'beendet') $status = 'aktiv'; // Unfold bleibt bis zum Ende der Begleitung, auch wenn die Raten fertig sind
-        $pdo->prepare('UPDATE mv_subs SET period_end = ?, cancel_end = ?, status = ?, synced_at = ? WHERE id = ?')->execute([$end, $cancelEnd, $status, time(), $r['id']]);
         $inv = forma_stripe('GET', '/v1/invoices', ['subscription' => $r['sub_id'], 'status' => 'paid', 'limit' => 24]);
         foreach (array_reverse($inv['data'] ?? []) as $i) {
             if ((int)($i['amount_paid'] ?? 0) <= 0) continue;
             $line = $i['lines']['data'][0]['period'] ?? [];
             mv_payment($pdo, $r, 'in:' . $i['id'], (int)$i['amount_paid'], (int)($line['start'] ?? 0), (int)($line['end'] ?? 0));
         }
+        // Unfold bleibt bis zum Ende der Begleitung, wenn die Raten fertig sind – aber nur, wenn wirklich alle Raten bezahlt sind
+        // (Sicherheit 31.10.2026: sonst bliebe der Zugang nach der ersten Rate und gesperrter Karte offen).
+        if ($r['kind'] === 'unfold' && $status === 'beendet') {
+            $np = $pdo->prepare('SELECT COUNT(*) FROM mv_payments WHERE sub_row = ?');
+            $np->execute([$r['id']]);
+            if ((int)$np->fetchColumn() >= max(1, (int)mv_cfg()['u_n'])) $status = 'aktiv';
+        }
+        $pdo->prepare('UPDATE mv_subs SET period_end = ?, cancel_end = ?, status = ?, synced_at = ? WHERE id = ?')->execute([$end, $cancelEnd, $status, time(), $r['id']]);
     } catch (Throwable $e) {
         error_log('MV sync: ' . $e->getMessage());
     }

@@ -13,8 +13,14 @@ $in = json_decode((string)file_get_contents('php://input'), true) ?: [];
 if (!empty($in['website'])) $out(['ok' => true]);
 // Bleibe-Code einlösen (Mail „A little gift, if you would like to stay“)
 if (($in['action'] ?? '') === 'stay') {
+    // Sicherheit (31.10.2026): Bleibe-Codes nicht durchprobieren lassen (höchstens 8 Fehlversuche pro Stunde und IP)
+    $pdo->exec('CREATE TABLE IF NOT EXISTS mm_stay_tries (ip_hash TEXT NOT NULL, at INTEGER NOT NULL)');
+    $ipS = hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? '') . 'stay');
+    $ct = $pdo->prepare('SELECT COUNT(*) FROM mm_stay_tries WHERE ip_hash = ? AND at >= ?');
+    $ct->execute([$ipS, time() - 3600]);
+    if ((int)$ct->fetchColumn() >= 8) $out(['ok' => false, 'error' => 'Too many attempts. Please try again later or write to ' . MM_FROM_EMAIL . '.'], 429);
     $r = mm_stay_order($pdo, (string)($in['stay'] ?? ''));
-    if (!$r) $out(['ok' => false, 'error' => 'This code is no longer valid. You can still join at the regular price.'], 400);
+    if (!$r) { $pdo->prepare('INSERT INTO mm_stay_tries (ip_hash, at) VALUES (?, ?)')->execute([$ipS, time()]); $out(['ok' => false, 'error' => 'This code is no longer valid. You can still join at the regular price.'], 400); }
     if (!forma_stripe_key()) $out(['ok' => false, 'error' => 'Please write to ' . MM_FROM_EMAIL . '.'], 400);
     try {
         $res = mm_stay_redeem($pdo, $r, empty($in['consent']) ? 0 : 1, empty($in['digital']) ? 0 : 1);
@@ -24,6 +30,8 @@ if (($in['action'] ?? '') === 'stay') {
         $out(['ok' => false, 'error' => 'Something went wrong just now. Please try again in a moment.'], 502);
     }
 }
+// Sicherheit (31.10.2026): Inner Circle wird nicht mehr angeboten – keine neuen Buchungen mehr (bestehende Bleibe-Codes oben gelten weiter)
+if (in_array('circle', MM_OFFER_RETIRED, true)) $out(['ok' => false, 'error' => 'The Inner Circle is no longer open for new members. Take a look at moveciamovement.com for what is coming next.'], 410);
 if ((int)($in['elapsed'] ?? 0) < 2500) $out(['ok' => false, 'error' => 'One moment please, then try again.'], 400);
 $name = trim(mb_substr((string)($in['name'] ?? ''), 0, 80));
 $email = strtolower(trim(mb_substr((string)($in['email'] ?? ''), 0, 160)));

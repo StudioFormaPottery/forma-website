@@ -382,6 +382,11 @@ mv_head($L('Mitgliederbereich', 'Members area'), $lang);
 <?php elseif ($lesson): $l = $lesson['l']; $p = $lesson['p']; $vid = mv_video_for($l, $lang); $flow = $lesson['lock'] ? null : mv_flow_data($l, $lang);
     // Beispielansicht: Player auch zeigen, wenn noch Clips/Stimmen fehlen (Platzhalter, „weiter“ nur für Vivien), nie Sprechtexte
     if (!$flow && $demo && !$lesson['lock']) $flow = mv_flow_data($l, $lang, true);
+    // Sicherheit (31.10.2026): Die öffentliche Beispielansicht zeigt nie echte (bezahlte) Videos, Clips, Stimmen oder Musik, nur Platzhalter.
+    if ($demo) {
+        $vid = '';
+        if ($flow) { foreach ($flow['items'] as &$fi) { $fi['src'] = ''; $fi['voice'] = ''; } unset($fi); $flow['bgm'] = []; $flow['preview'] = true; }
+    }
     if ($flow) { foreach ($flow['items'] as &$fi) unset($fi['text']); unset($fi); $flow['intro'] = mv_t($l, 'text', $lang); $flow['photo'] = '/img/movecia/fotos/' . ($flow['mode'] === 'move' ? 'ev-method-karte.jpg' : 'ev-ueber-mich.jpg'); }
     $isFav = in_array((int)$l['id'], $favs, true);
     $sib = array_values(array_filter($all, fn($x) => (int)$x['p']['id'] === (int)$p['id'])); $next = null;
