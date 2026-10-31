@@ -336,6 +336,10 @@
 .sn-pz input[type=range]{width:100%;accent-color:#7D5E68;height:36px;margin:0}
 .sn-pz .sc{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:#9A8C93;margin-top:-6px}
 .sn-pz .sn-note{margin:4px 0 0}
+.sn-tpl{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.sn-tpl button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;background:#FBF8F4;border:1.5px solid #E6DCD2;border-radius:16px;padding:10px 12px;font:inherit;color:#4A3A41;cursor:pointer;min-height:84px}
+.sn-tpl button:hover,.sn-tpl button.on{border-color:#7D5E68;background:#F3EAE6}
+.sn-tpl b{font-size:17px;font-weight:500}.sn-tpl small{font-size:14px;color:#7D7076;line-height:1.35}
 .sn-auto-res{background:#fff;border:1.5px solid #E6DCD2;border-radius:16px;padding:10px 12px;font-size:16px;color:#4A3A41;line-height:1.5}
 .sn-auto-res ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
 .sn-auto-res li{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#FBF8F4;border-radius:12px;padding:6px 8px}
@@ -532,6 +536,11 @@ void main(){
     <ul class="sn-dr-list" data-k="drList"></ul>
     <button type="button" class="sn-b" data-k="drNew">＋ Neuer Entwurf</button>
   </div></details>
+  <details class="sn-box tpl" open><summary>🎬 Vorlagen</summary><div class="bd">
+    <div class="sn-note" style="color:#4A3A41">Lade 1 bis 8 kurze Clips hoch (z. B. du im Outfit von vorne, von der Seite, beim Drehen, Details). Dann eine Vorlage antippen: Ich schneide im Takt, wechsle zwischen ganzem Bild und Details, zoome und lege Musik darunter.</div>
+    <div class="sn-tpl" data-k="tpls"></div>
+    <button type="button" class="sn-b sm" data-k="tplUndo" hidden>↩ Vorlage rückgängig</button>
+  </div></details>
   <details class="sn-box auto" open><summary>✨ Automatisch schneiden</summary><div class="bd">
     <div class="sn-note" style="color:#4A3A41">Ein Tipp, und ich schneide Pausen raus, nehme heraus, wo du dich erst zurechtsetzt oder neu angesetzt hast, und lege einen sanften Zoom über die Abschnitte, damit es sich flüssig und lebendig anschaut. Danach siehst du jeden Schnitt in der Zeitleiste und kannst ihn mit den Griffen länger oder kürzer ziehen.</div>
     <button type="button" class="sn-b main" data-k="auto" style="font-size:18px;min-height:52px">✨ Jetzt automatisch schneiden</button>
@@ -610,7 +619,7 @@ void main(){
       return c.zoom[0] + (c.zoom[1] - c.zoom[0]) * p; };
     // MediaRecorder-Dateien kennen ihre Länge oft nicht: einmal ans Ende springen
     async function probeDur(c, v) { try { v.currentTime = 1e7; await new Promise(r => { v.onseeked = r; setTimeout(r, 2500); }); c.dur = isFinite(v.duration) && v.duration > 0 ? v.duration : (v.currentTime || 1); v.currentTime = 0; } catch (e) { c.dur = c.dur || 1; } if (!c.out || c.out > c.dur) c.out = c.dur; dbPut(dbRow(c)); ui(); }
-    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft, src: c.src || null, bro: !!c.bro, osrc: c.osrc || null, ost: c.ost || 0, fr: c.fr || null, zm: c.zm || null, fe: c.fe || 0, trash: c.trash || 0, tpos: c.tpos || 0, fx: c.fx || 0, rec: c.rec || 0 });
+    const dbRow = c => ({ id: c.id, blob: c.blob, name: c.name, added: c.added, in: c.in, out: c.out, mute: !!c.mute, dur: c.dur || 0, zoom: c.zoom || null, auto: !!c.auto, draft: c.draft || curDraft, src: c.src || null, bro: !!c.bro, osrc: c.osrc || null, ost: c.ost || 0, fr: c.fr || null, zm: c.zm || null, fe: c.fe || 0, trash: c.trash || 0, tpos: c.tpos || 0, fx: c.fx || 0, rec: c.rec || 0, tpl: c.tpl || '' });
     const len = c => Math.max(0, (c.out || c.dur || 0) - (c.in || 0));
     const total = () => clips.reduce((a, c) => a + len(c), 0);
     const tv = document.createElement('video'); tv.muted = true; tv.playsInline = true; tv.preload = 'auto'; let thumbQ = Promise.resolve();
@@ -1295,6 +1304,7 @@ void main(){
     // ---- Vorschlag (Vivien, 30.10.2026: „ich horche mir die nicht an, ich klicke die ersten 4, 5, 6 an“) ----
     // Welche Ordner passen zu diesem Entwurf? (gleiche Logik wie im Studio)
     function wishTags() {
+      if (tplTags) return tplTags;
       const t = String(drName(curDraft) || '').toLowerCase(), d = new Date();
       const wi = (d.getMonth() === 10 && d.getDate() >= 15) || d.getMonth() === 11;
       if (/reel|story|insta/.test(t)) return wi ? ['winter', 'reel', 'lebendig'] : ['reel', 'lebendig', 'morgen'];
@@ -1394,6 +1404,66 @@ void main(){
     K('stumbles').onchange = () => { auto.stumbles = K('stumbles').checked; ls.set('sn-auto', auto); };
     K('noisefx').onchange = () => { auto.noise = K('noisefx').checked; ls.set('sn-auto', auto); };
     K('zoomfx').onchange = async () => { auto.zoom = K('zoomfx').checked; ls.set('sn-auto', auto); if (clips.some(c => c.auto)) { assignZoom(clips, auto.zoom); for (const c of clips) await dbPut(dbRow(c)); ui(); say(auto.zoom ? '✓ Sanfter Zoom liegt wieder über allen Abschnitten.' : 'Zoom ist aus.'); } };
+    // Clips austauschen (Auto-Schnitt, Vorlagen, Rückgängig): zuerst alle neuen Zeilen speichern, dann die alten löschen.
+    // Umgekehrt würde dbDel beim letzten alten Clip die Videodatei selbst wegräumen (Vivien, 31.10.2026: Clips fehlten nach dem Neuladen).
+    async function swapRows(oldIds) { const keep = new Set(clips.map(c => c.id)); for (const c of clips) await dbPut(dbRow(c)); for (const id of oldIds) if (!keep.has(id)) await dbDel(id); }
+    // ---- Vorlagen (Vivien, 31.10.2026: „wie bei Instagram Edits, Fashion-Videos: angezogen dastehen, Bild wechselt, zoomt rein“) ----
+    // Jeder Schnitt bekommt ein Bild: ganz (full), Detail oben/unten/Mitte (Ausschnitt c.fr), Zoom-Stoß (punch) oder langsam hinein (slow).
+    const SHOT = {
+      full: () => ({ zoom: null, zm: null, fr: null }),
+      top: () => ({ zoom: null, zm: null, fr: { z: 1.7, x: 0, y: -.7, r: 0 } }),
+      bottom: () => ({ zoom: null, zm: null, fr: { z: 1.7, x: 0, y: .75, r: 0 } }),
+      mid: () => ({ zoom: null, zm: null, fr: { z: 1.5, x: 0, y: .1, r: 0 } }),
+      punch: () => ({ zoom: [1, 1.28], zm: 'punch', fr: null }),
+      slow: () => ({ zoom: [1, 1.14], zm: 'ease', fr: null }),
+      out: () => ({ zoom: [1.18, 1], zm: 'ease', fr: null })
+    };
+    const TPLS = [
+      { k: 'fashion', t: '👗 Schau, was ich trage', d: 'Ganzes Outfit, dann nah ans Detail, schnelle Wechsel', len: 13, cuts: [[.75, 'full'], [.55, 'top'], [.55, 'bottom'], [.7, 'punch'], [.6, 'full'], [.55, 'mid'], [1.4, 'slow']] },
+      { k: 'takt', t: '⚡ Schnell im Takt', d: 'Sehr kurze Schnitte, Zoom-Stöße, viel Energie', len: 9, cuts: [[.42, 'full'], [.42, 'punch'], [.42, 'top'], [.42, 'full'], [.42, 'bottom'], [.42, 'punch']] },
+      { k: 'outfits', t: '🔁 Outfit-Wechsel', d: 'Jeder Clip ein Look, Zoom-Stoß beim Wechsel, am Ende ruhig', len: 0, per: true, cuts: [[1.1, 'punch'], [.7, 'full']] },
+      { k: 'details', t: '🔍 Details zeigen', d: 'Langsam vom Ganzen ins Detail, wie ein Lookbook', len: 14, cuts: [[1.6, 'slow'], [1.1, 'top'], [1.1, 'mid'], [1.1, 'bottom'], [1.6, 'out']] },
+      { k: 'elegant', t: '🕊 Ruhig & elegant', d: 'Längere, weiche Bilder mit langsamem Zoom', len: 14, cuts: [[2.2, 'slow'], [2.2, 'out']] }
+    ];
+    let tplSnap = null, tplTags = null;
+    function tplBuild(T, src) {
+      const out = [], cur = src.map(c => c.in || 0), end = src.map(c => (c.out || c.dur || 0));
+      const add = (si, L, shot, k) => { const c = src[si], a = c.in || 0, b = end[si]; if (b - a < .3) return;
+        const l = Math.min(L, b - a); if (cur[si] + l > b) cur[si] = a + Math.min(.4, (b - a - l) / 2);
+        const st = SHOT[shot](); out.push(Object.assign({ id: uid(), src: c.src || c.id, blob: c.blob, url: c.url, name: c.name, added: Date.now() + out.length, in: cur[si], out: cur[si] + l, mute: true, dur: c.dur, fe: 0, auto: true, tpl: T.k, draft: curDraft }, st));
+        cur[si] += l + .35; };
+      if (T.per) { // Outfit-Wechsel: je Clip ein Bild, zweimal durch, zum Schluss ruhig auf dem ersten
+        for (let r = 0; r < 2; r++) src.forEach((c, si) => add(si, T.cuts[r === 0 ? 0 : 1][0], r === 0 ? 'punch' : (si % 2 ? 'top' : 'full')));
+        add(0, 1.6, 'slow'); return out; }
+      let t = 0, i = 0; while (t < T.len && i < 80) { const [L, shot] = T.cuts[i % T.cuts.length]; const n0 = out.length; add(i % src.length, L, shot); if (out.length > n0) t += out[out.length - 1].out - out[out.length - 1].in; i++; if (i > 3 && out.length === 0) break; }
+      return out;
+    }
+    function tplUi() {
+      K('tpls').innerHTML = TPLS.map(T => '<button type="button" data-tpl="' + T.k + '"><b>' + T.t + '</b><small>' + T.d + '</small></button>').join('');
+      K('tpls').querySelectorAll('[data-tpl]').forEach(b => b.onclick = () => tplApply(TPLS.find(T => T.k === b.dataset.tpl)));
+    }
+    async function tplApply(T) {
+      if (busy) return; const base = tplSnap ? tplSnap.rows.map(r => clips.find(c => c.id === r.id) || r) : clips;
+      const src = (tplSnap ? tplSnap.src : clips.filter(c => !c.tpl)).filter(c => (c.out || c.dur || 0) - (c.in || 0) >= .3);
+      if (!src.length) { say('Lade zuerst ein paar Clips hoch (oben „＋ Clips vom Gerät“). Am schönsten sind 3 bis 6 kurze Clips von dir im Outfit.', 'bad'); return; }
+      stop(); busy = true;
+      try {
+        if (!tplSnap) tplSnap = { rows: clips.map(dbRow), order: clips.map(c => c.id), src: src.map(c => Object.assign({}, c)) };
+        const next = tplBuild(T, tplSnap.src); if (!next.length) { say('Die Clips sind zu kurz für diese Vorlage.', 'bad'); return; }
+        const oldIds = clips.map(c => c.id); clips = next; slots(); await swapRows(oldIds); await saveOrder();
+        sel = 0; pos = 0; ui(); clips.forEach(thumb); K('tplUndo').hidden = false;
+        K('tpls').querySelectorAll('[data-tpl]').forEach(b => b.classList.toggle('on', b.dataset.tpl === T.k));
+        let msg = '🎬 „' + T.t.replace(/^\S+\s/, '') + '“: ' + clips.length + ' Schnitte, ' + sec1(total()) + '. Der Originalton ist aus, damit die Musik trägt.';
+        if (!mlist.length && o.musicUrl && lib.length) { tplTags = ['reel', 'lebendig', 'morgen']; sugSeed++; try { const list = suggest(); if (list[0]) { await takeSong(list[0]); msg += ' Ein passendes Lied liegt darunter.'; } } catch (e) {} tplTags = null; sugUi(); }
+        msg += ' Andere Vorlage antippen = neu mischen, mit denselben Clips.'; say(msg, 'ok');
+      } finally { busy = false; }
+    }
+    K('tplUndo').onclick = async () => { if (busy || !tplSnap) return; stop(); busy = true;
+      try { const urls = new Map(clips.map(c => [c.blob, c.url])), oldIds = clips.map(c => c.id);
+        clips = tplSnap.rows.map(r => { let u = urls.get(r.blob); if (!u) u = URL.createObjectURL(r.blob); return Object.assign({}, r, { url: u }); });
+        slots(); await swapRows(oldIds); await saveOrder(); tplSnap = null; K('tplUndo').hidden = true; K('tpls').querySelectorAll('.on').forEach(b => b.classList.remove('on'));
+        sel = 0; pos = 0; ui(); clips.forEach(thumb); say('↩ Zurück zu deinen Clips wie vorher.'); } finally { busy = false; } };
+    tplUi();
     function assignZoom(list, on) { list.forEach((c, i) => c.zoom = on ? ZOOMS[i % ZOOMS.length].slice() : null); }
     function loadAuto() { if (window.SchnittAuto) return Promise.resolve(window.SchnittAuto); if (!autoP) autoP = new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = 'schnitt-auto.js?v=2'; sc.onload = () => window.SchnittAuto ? ok(window.SchnittAuto) : no(new Error('auto')); sc.onerror = () => { autoP = null; no(new Error('auto')); }; document.head.appendChild(sc); }); return autoP; }
     // Ton eines Clips (nur in/out) stückweise in die Analyse füttern
@@ -1468,8 +1538,8 @@ void main(){
         if (!next.length) { say('Da war nichts zu schneiden.'); return; }
         if (noAudio === clips.length) { say('Ich konnte den Ton nicht lesen' + (lastErr ? ' (' + String(lastErr.message || lastErr).slice(0, 100) + ')' : '') + '. Hat das Video Ton? Wenn ja, schick mir bitte diesen Text.', 'bad'); return; }
         // Übernehmen: alte Zeilen raus, neue rein
-        for (const c of clips) await dbDel(c.id);
-        clips = next; assignZoom(clips, auto.zoom); for (const c of clips) await dbPut(dbRow(c)); await saveOrder();
+        const oldIds = clips.map(c => c.id);
+        clips = next; assignZoom(clips, auto.zoom); await swapRows(oldIds); await saveOrder();
         undoRows = snap; autoLog = log; lastPause = auto.pause; sel = 0; pos = 0; ui(); clips.forEach(thumb);
         const after = total(), saved = before - after;
         const nV = log.filter(x => x.why === 'versprecher').length, nG = log.filter(x => x.why === 'geraeusch').length;
@@ -1485,10 +1555,9 @@ void main(){
     };
     K('undo').onclick = async () => {
       if (busy || !undoRows) return; stop();
-      const urls = new Map(clips.map(c => [c.blob, c.url]));
-      for (const c of clips) await dbDel(c.id);
+      const urls = new Map(clips.map(c => [c.blob, c.url])), oldIds = clips.map(c => c.id);
       clips = undoRows.rows.map(r => { let u = urls.get(r.blob); if (!u) u = URL.createObjectURL(r.blob); return Object.assign({}, r, { url: u }); });
-      for (const c of clips) await dbPut(dbRow(c)); await kvSet('order', undoRows.order).catch(() => {});
+      await swapRows(oldIds); await saveOrder();
       undoRows = null; autoLog = []; lastSum = null; lastPause = null; K('undo').hidden = true; autoResUi(null);
       sel = 0; pos = 0; ui(); clips.forEach(thumb); say('↩ Zurück auf den Stand vor dem automatischen Schnitt.');
     };
