@@ -25,6 +25,8 @@ function mv_menu_items(): array
         ['/gathering/', 'Gatherings', 'Gatherings', 'gathering', 'Live und kostenlos, einmal im Monat', 'Free and live, once a month'],
         // Movecia Academy (Vivien, 28.10.2026): Ausbildungen, zuerst das Teacher Training
         ['/academy/', 'Academy', 'Academy', 'academy', 'Für alle, die eine Ausbildung machen möchten', 'Teacher training · in German'],
+        // Gutscheine (Vivien, 31.10.2026): nur in der Seitenleiste, als kleines eigenes Feld unter der Academy
+        ['/gutscheine/', 'Gutscheine', 'Gift cards', 'gutscheine', 'Schenke Me-Time', 'Give the gift of me-time'],
         ['/#vivien', 'Über mich', 'About me', 'about', 'Ich bin Vivien', "Hi, I'm Vivien"],
     ];
 }
@@ -37,7 +39,7 @@ function mv_menu(string $active = '', array $o = []): void
     $links = $o['links'] ?? true;
     $items = mv_menu_items();
     if ($links): ?>
-<nav class="mvm-bar" aria-label="Menü"><?php foreach ($items as [$href, $de, $en, $k]) if (!in_array($k, ['start', 'gathering'], true)): ?><a href="<?= $href ?>"<?= $k === $active ? ' class="on' . ($k === 'academy' ? ' mvm-ac' : '') . '" aria-current="page"' : ($k === 'academy' ? ' class="mvm-ac"' : '') ?>><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></a><?php endif; ?><a class="lg" href="/mitglieder/"><span class="de">Login</span><span class="en">Log in</span></a></nav>
+<nav class="mvm-bar" aria-label="Menü"><?php foreach ($items as [$href, $de, $en, $k]) if (!in_array($k, ['start', 'gathering', 'gutscheine'], true)): ?><a href="<?= $href ?>"<?= $k === $active ? ' class="on' . ($k === 'academy' ? ' mvm-ac' : '') . '" aria-current="page"' : ($k === 'academy' ? ' class="mvm-ac"' : '') ?>><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></a><?php endif; ?><a class="lg" href="/mitglieder/"><span class="de">Login</span><span class="en">Log in</span></a></nav>
 <?php endif; ?>
 <button class="mvm-btn" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mvm-panel"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14"/></svg></button>
 <?php if ($assets) return; $assets = true; ?>
@@ -48,7 +50,7 @@ function mv_menu(string $active = '', array $o = []): void
     <button class="mvm-x" type="button" aria-label="Menü schließen"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg></button>
   </div>
   <nav class="mvm-list" aria-label="Seiten">
-    <?php foreach ($items as [$href, $de, $en, $k, $sde, $sen]): ?><a href="<?= $href ?>"<?= $k === $active ? ' class="on' . ($k === 'academy' ? ' mvm-ac' : '') . '" aria-current="page"' : ($k === 'academy' ? ' class="mvm-ac"' : '') ?>><b><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></b><small><span class="de"><?= $sde ?></span><span class="en"><?= $sen ?></span></small><svg class="ar" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4l6 6-6 6"/></svg></a>
+    <?php foreach ($items as [$href, $de, $en, $k, $sde, $sen]): $xc = $k === 'academy' ? ' mvm-ac' : ($k === 'gutscheine' ? ' mvm-gs' : ''); ?><a href="<?= $href ?>"<?= $k === $active ? ' class="on' . $xc . '" aria-current="page"' : ($xc !== '' ? ' class="' . trim($xc) . '"' : '') ?>><b><span class="de"><?= $de ?></span><span class="en"><?= $en ?></span></b><small><span class="de"><?= $sde ?></span><span class="en"><?= $sen ?></span></small><svg class="ar" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4l6 6-6 6"/></svg></a>
     <?php endforeach; ?>
   </nav>
   <div class="mvm-foot">
@@ -93,6 +95,9 @@ html:not([data-l=en]):not([lang=en]) .mvm .en,html:not([data-l=en]):not([lang=en
 .mvm-list a.mvm-ac .ar{color:#F7F1EE}
 .mvm-list a.mvm-ac.on b::after{background:#E6DBCF}
 .mvm-bar a.mvm-ac{background:#3A2631;color:#F7F1EE}
+/* Gutscheine: kleines helles Feld unter der Academy (Vivien, 31.10.2026) */
+.mvm-list a.mvm-gs{background:#E4DCD1;border:0;border-radius:18px;padding:14px 18px;margin-top:8px}
+.mvm-list a.mvm-gs small{color:#7D5E68}
 .mvm-foot{margin-top:auto;padding-top:24px;display:flex;flex-direction:column;gap:14px;align-items:flex-start}
 .mvm-login{display:inline-flex;align-items:center;justify-content:center;width:100%;background:#4A3040;color:#F7F1EE;border-radius:999px;padding:.9em 1.4em;text-decoration:none;font-weight:500}
 .mvm-app{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:10px 14px;border:1px solid #D3C9BC;border-radius:18px;background:#FBF9F6;color:#2A2026;text-decoration:none}
