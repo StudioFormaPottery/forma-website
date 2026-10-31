@@ -14,11 +14,11 @@ function mv_voucher_field(): string
 </details>
 <style>.gsf{font-size:.92rem}.gsf summary{cursor:pointer;color:var(--plum,#4A3040);text-decoration:underline;text-underline-offset:3px;list-style:none}.gsf summary::-webkit-details-marker{display:none}
 .gsf-r{display:flex;gap:8px;margin-top:.6rem}.gsf-r input{flex:1;min-width:0;font:inherit;font-size:16px;padding:.7em .9em;border-radius:14px;border:1px solid #D3C9BC;background:#FBF9F6;color:inherit;text-transform:uppercase;letter-spacing:.04em}
-.gsf-b{font:inherit;font-size:.9rem;border:1px solid #4A3040;background:transparent;color:#4A3040;border-radius:999px;padding:0 1.1em;cursor:pointer}.gsf-m{margin:.5rem 0 0;font-size:.88rem}.gsf-m.ok{color:#3F6B45}.gsf-m.no{color:#A0463A}</style>
+.gsf-b{font:inherit;font-size:.9rem;border:1px solid #4A3040;background:transparent;color:#4A3040;border-radius:999px;padding:0 1.1em;cursor:pointer}.gsf-m{margin:.5rem 0 0;font-size:.88rem}.gsf-m.gsf-ok{color:#3F6B45}.gsf-m.gsf-no{color:#A0463A}</style>
 <script>(function(){var w=document.getElementById(<?= json_encode($id) ?>),i=w.querySelector('input'),m=w.querySelector('.gsf-m'),en=function(){return document.documentElement.dataset.l==='en'};
 function eur(c){return '€ '+(c%100?(c/100).toFixed(2).replace('.',','):String(c/100))}
 async function chk(){var c=i.value.trim();m.hidden=true;if(!c)return;try{var r=await fetch('/api/method.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({voucher_check:1,gutschein:c})});var j=await r.json();
-m.className='gsf-m '+(j.ok?'ok':'no');m.textContent=j.ok?(en()?'✓ Gift card '+j.nr+' · '+eur(j.balance)+' will be taken off your first payment.':'✓ Gutschein '+j.nr+' · '+eur(j.balance)+' werden von deiner ersten Zahlung abgezogen.'):(j.error||'…');if(j.ok)i.value=j.code;m.hidden=false;}catch(e){}}
+m.className='gsf-m '+(j.ok?'gsf-ok':'gsf-no');m.textContent=j.ok?(en()?'✓ Gift card '+j.nr+' with '+eur(j.balance)+' credit. It is taken off your first payment, any rest stays on the card.':'✓ Gutschein '+j.nr+' mit '+eur(j.balance)+' Guthaben. Er wird von deiner ersten Zahlung abgezogen, ein Rest bleibt dir erhalten.'):(j.error||'…');if(j.ok)i.value=j.code;m.hidden=false;}catch(e){}}
 w.querySelector('.gsf-b').onclick=chk;i.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();chk();}});if(i.value)chk();})();</script>
 <?php return (string)ob_get_clean();
 }
