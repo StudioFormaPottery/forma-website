@@ -28,3 +28,6 @@ Jeden **Sonntag** kommt das Paket für die **kommende Woche Montag bis Sonntag**
 ## Look (Vivien, 27.10.2026: alles cute, modern, eine Movecia-Handschrift)
 - `make_week.page()` ist die eine Vorlage für Wochenbilder, Pins (`tools/pinterest-movecia/make_pin.py`) und Werbung (`tools/movecia-ads/make_ads.py`): weicher Farbverlauf, drei Wellen unten, feine Pflaume-Linien, Kiesel-Zeichen, Themen-Icon in der runden Blase (Feld `icon`, Namen aus `tools/workbooks/icons.py`, sonst passend zum Typ), Listen als Pastell-Karten (`bullets: true` = Herzchen statt Zahlen), Fotos im Bogen mit Wellenkante (`pos` = Bildausschnitt, z. B. "50% 22%"), `chips` = kleine Infos.
 - Nach jedem Bauen alle Bilder ansehen: nichts darf unten abgeschnitten sein oder in die Fußzeile laufen.
+
+## Ton der Texte (Vivien, 31.10.2026, Pflicht)
+Captions und WhatsApp-Texte klingen wie ein Telefonat mit der besten Freundin: ungeniert, ehrlich, mitten rein ins Problem aus dem Mama-Alltag, im Gespräch der Shift zu Selbstliebe und „sich selbst nicht vergessen“, Bewegung als Ventil (egal welche, nie Leistungssport), klare Haltung. Movecia nur unterschwellig, nie direkt verkaufen, kein „deshalb gibt es Movecia“. Angebots-Posts nennen die Fakten, erzählen aber trotzdem wie eine Freundin. Slogan „Bewegung beginnt bei dir.“ sparsam. Schönes Hochdeutsch, kein Dialekt.
