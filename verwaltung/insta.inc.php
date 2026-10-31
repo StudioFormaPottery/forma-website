@@ -70,9 +70,10 @@ function ig_seed_mvig(PDO $pdo): void
     $rtx = $pdo->prepare("UPDATE mm_insta SET text = ? WHERE acc = 'mvig' AND day = ? AND title = ? AND text = ? AND status <> 'gepostet'");
     $rph = $pdo->prepare("UPDATE mm_insta SET photo = ? WHERE acc = 'mvig' AND day = ? AND title = ? AND photo LIKE '%Der erste Satz steht groß als Text im Bild.%'");
     foreach ($d['items'] ?? [] as $x) {
-        if (!empty($x['old_title']) && $x['old_title'] !== $x['title']) {
-            $ren->execute([$x['title'], date('c'), $x['day'], $x['old_title']]);
-            if (!empty($x['old_text'])) $rtx->execute([$x['text'], $x['day'], $x['title'], $x['old_text']]);
+        $ots = array_values(array_filter(array_merge((array)($x['old_titles'] ?? []), [(string)($x['old_title'] ?? '')]), fn($t) => $t !== '' && $t !== $x['title']));
+        if ($ots) {
+            foreach ($ots as $ot) $ren->execute([$x['title'], date('c'), $x['day'], $ot]);
+            foreach (array_merge((array)($x['old_texts'] ?? []), [(string)($x['old_text'] ?? '')]) as $otx) if ($otx !== '' && $otx !== $x['text']) $rtx->execute([$x['text'], $x['day'], $x['title'], $otx]);
             $rph->execute([(string)($x['photo'] ?? ''), $x['day'], $x['title']]);
         }
         if (!empty($x['replaces'])) $upd->execute([$x['title'], $x['text'], date('c'), $x['day'], $x['replaces']]);
@@ -80,6 +81,13 @@ function ig_seed_mvig(PDO $pdo): void
         $ins->execute([$x['day'], isset(IG_KIND[$x['kind']]) ? $x['kind'] : 'post', 'mvig', $x['title'], $x['text'], (string)($x['photo'] ?? ''), date('c'), date('c')]);
     }
     forma_set_setting($pdo, 'ig_mvig_plan', (string)$v);
+}
+/** Text für die Bildunterschrift: bei Reels/Storys alles nach „Caption:“, sonst der ganze Text (Vivien, 31.10.2026: Kopieren kam am iPhone leer an) */
+function ig_caption(string $t): string
+{
+    $t = str_replace("\r", '', $t);
+    if (preg_match('/\n\s*Caption:\s*(.*)$/su', $t, $m) && !preg_match('/^\s*Folie/u', $t)) return trim($m[1]);
+    return trim($t);
 }
 function ig_wd(string $d, bool $long = false): string
 {
@@ -274,9 +282,11 @@ if ($view === 'insta' || str_starts_with((string)$action, 'mm_ig_')) {
   <?php if ($r['theme'] === ''): ?><b class="tt"><?= $h(ig_title($r)) ?></b><?php endif; ?>
   <?php if ($ch): ?>
     <div class="txt" data-txt><?= nl2br($h($r['text'])) ?></div>
+    <textarea hidden data-cap><?= $h((string)$r['text']) ?></textarea>
     <?php if ($r['photo'] !== ''): ?><div class="foto"><span>📷 <?= $r['kind'] === 'post' ? 'Bild-Idee' : 'Foto-Idee' ?></span><?= $h($r['photo']) ?></div><?php endif; ?>
   <?php else: ?>
     <details class="txtd"<?= $big ? ' open' : '' ?>><summary>Text ansehen</summary><div class="txt" data-txt><?= nl2br($h($r['text'])) ?></div></details>
+    <textarea hidden data-cap><?= $h(ig_caption((string)$r['text'])) ?></textarea>
     <?php if ($r['photo'] !== ''): ?><div class="foto"><span>🎬 Bild-Idee</span><?= $h($r['photo']) ?></div><?php endif; ?>
     <?php if ($r['music'] !== ''): ?><p class="mu">🎵 <?= $h($r['music']) ?></p><?php endif; ?>
     <?php if ($has): ?><video src="<?= $h($self) ?>?view=insta&amp;dl=<?= (int)$r['id'] ?>#t=0.1" controls playsinline preload="metadata"></video><?php endif; ?>
@@ -504,9 +514,13 @@ main{max-width:1240px}
   document.querySelectorAll('[data-own]').forEach(b=>b.onclick=()=>{const f=$p('ownF');f.day.value=b.dataset.d;f.kind.value=b.dataset.own;f.studio.value='';f.submit()});
   document.querySelectorAll('[data-copylink]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.copylink)}catch(e){}const o=b.textContent;b.textContent='✓ Kopiert';setTimeout(()=>b.textContent=o,1800)});
   // ---- Text kopieren (Channel-Nachricht oder Caption) ----
-  document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{const el=b.closest('.ig').querySelector('[data-txt]');let t=el?el.innerText.trim():'';const ci=t.search(/\n\s*Caption:/);if(ci>=0&&!/^Folie/.test(t))t=t.slice(ci).replace(/^\s*Caption:\s*/,'').trim();const o=b.textContent;
-    try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}
-    b.textContent='✓ Kopiert';setTimeout(()=>b.textContent=o,1800)});
+  // Kopieren, das auch am iPhone ankommt (Text kommt aus <textarea data-cap>, nicht aus dem zugeklappten Feld)
+  const igLegacy=t=>{const a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.cssText='position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px';document.body.appendChild(a);a.focus();a.select();try{a.setSelectionRange(0,t.length)}catch(e){}let ok=false;try{ok=document.execCommand('copy')}catch(e){}a.remove();return ok};
+  const igCopy=t=>{if(navigator.clipboard&&window.isSecureContext){return navigator.clipboard.writeText(t).then(()=>true,()=>igLegacy(t))}return Promise.resolve(igLegacy(t))};
+  document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{const card=b.closest('.ig');const ta=card.querySelector('[data-cap]');const t=(ta?ta.value:'').trim();const o=b.textContent;
+    igCopy(t).then(ok=>{if(ok&&t){b.textContent='✓ Kopiert';setTimeout(()=>b.textContent=o,1800);return}
+      let box=card.querySelector('.cpbox');if(!box){box=document.createElement('textarea');box.className='cpbox';box.readOnly=true;box.style.cssText='width:100%;min-height:140px;margin-top:8px;font:inherit;font-size:16px;border-radius:12px;padding:10px';b.closest('.ig-b').after(box)}
+      box.value=t;box.focus();box.select();b.textContent='Text markiert: lang drücken → Kopieren';setTimeout(()=>b.textContent=o,4000)})});
   // ---- Video teilen (erst laden, dann teilen – das iPhone braucht das Teilen direkt nach dem Antippen) ----
   document.querySelectorAll('[data-share]').forEach(b=>b.onclick=async()=>{const id=b.dataset.share;
     if(!navigator.share||!navigator.canShare){location.href='?view=insta&dl='+id+'&save=1';return}
