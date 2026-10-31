@@ -6,6 +6,9 @@ require_once dirname(__DIR__) . '/api/natal-lib.php';
 natal_schema($pdo);
 natal_bonus_tick($pdo);
 $nBack = $self . '?view=natal';
+// Gutschein-Käufe nachprüfen (falls jemand das Fenster nach der Zahlung geschlossen hat)
+require_once dirname(__DIR__) . '/api/mv-geschenk.inc.php';
+try { mv_gift_tick($pdo); } catch (Throwable $e) { error_log('MV gift tick: ' . $e->getMessage()); }
 
 function natal_wa(string $phone): string
 {
@@ -108,6 +111,12 @@ if ($action === 'mm_natal_convert') {
     $oid = (int)($_POST['oid'] ?? 0);
     $r = natal_convert($pdo, $oid, (string)($_POST['target'] ?? ''), (int)($_POST['design'] ?? 1));
     go($nBack . '&k=' . $oid . '#k' . $oid, $r['ok'] ? 'Umgewandelt: ' . forma_euro($r['back']) . ' → ' . $r['text'] . '. Sie hat eine Mail mit allem bekommen.' : $r['error']);
+}
+// Rücktritt vom Gutscheinkauf: erstatten und sperren
+if ($action === 'mm_mv_gift_refund') {
+    require_once dirname(__DIR__) . '/api/mv-geschenk.inc.php';
+    $r = mv_gift_refund($pdo, (int)($_POST['vid'] ?? 0));
+    go($nBack . '#gutscheine', $r['ok'] ? forma_euro($r['cents']) . ' erstattet, der Gutschein ist gesperrt. Sie hat eine Bestätigung bekommen.' : $r['error']);
 }
 // Gutschein von Hand einlösen (z. B. Personal Training, das ihr direkt ausmacht)
 if ($action === 'mm_mv_voucher_hand') {
@@ -495,12 +504,13 @@ details.more summary{cursor:pointer;color:#7D5E68;font-size:15px}
             <div class="ln" style="flex-wrap:wrap"><span><strong><?= forma_h($gv['nr']) ?></strong> · <?= forma_h(forma_euro((int)$gv['amount_cents'])) ?><?= $gv['status'] === 'aktiv' && $bal < (int)$gv['amount_cents'] ? ' · Rest ' . forma_h(forma_euro($bal)) : '' ?> <span class="chip"><?= forma_h(MV_VOUCHER_ORIGINS[$gv['origin']] ?? $gv['origin']) ?></span><br>
                 <span class="small muted"><?= forma_h($gv['note']) ?> · <?= forma_h(date('d. m. Y', strtotime((string)$gv['created_at']))) ?> · Code <?= forma_h($gv['code']) ?></span>
                 <?php foreach ($gu as $u): ?><br><span class="small">↳ <?= forma_h(forma_euro((int)$u['cents'])) ?> <?= $u['status'] === 'reserviert' ? 'reserviert' : 'eingelöst' ?> am <?= forma_h(date('d. m. Y', strtotime((string)$u['created_at']))) ?>: <?= forma_h($u['kind'] === 'hand' ? $u['what'] . ' (von dir)' : ($u['kind'] === 'mv' ? 'Method/Unfold, Buchung #' . $u['order_id'] : 'Prä-/Postnatal, Buchung #' . $u['order_id'])) ?></span><?php endforeach; ?></span>
-                <span class="acts small"><span class="chip<?= $gv['status'] === 'aktiv' ? ' ok' : '' ?>"><?= $gv['status'] === 'aktiv' ? 'gültig' : ($gv['status'] === 'eingeloest' ? 'eingelöst' : 'Test') ?></span><a href="<?= forma_h(mv_voucher_pdf_link($gv)) ?>" target="_blank" rel="noopener">PDF</a><?php if ((int)$gv['order_id']): ?><a href="<?= forma_h($self) ?>?view=natal&amp;k=<?= (int)$gv['order_id'] ?>#k<?= (int)$gv['order_id'] ?>">Buchung</a><?php endif; ?></span>
+                <span class="acts small"><span class="chip<?= $gv['status'] === 'aktiv' ? ' ok' : '' ?>"><?= $gv['status'] === 'aktiv' ? 'gültig' : ($gv['status'] === 'eingeloest' ? 'eingelöst' : ($gv['status'] === 'storniert' ? 'storniert' : 'Test')) ?></span><a href="<?= forma_h(mv_voucher_pdf_link($gv)) ?>" target="_blank" rel="noopener">PDF</a><?php if ((int)$gv['order_id']): ?><a href="<?= forma_h($self) ?>?view=natal&amp;k=<?= (int)$gv['order_id'] ?>#k<?= (int)$gv['order_id'] ?>">Buchung</a><?php endif; ?></span>
                 <?php if ($gv['status'] === 'aktiv' && $bal > 0): ?><details class="more" style="flex-basis:100%"><summary>Von Hand einlösen</summary>
                     <form method="post" class="stack" style="margin-top:8px"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_voucher_hand"><input type="hidden" name="vid" value="<?= (int)$gv['id'] ?>">
                         <p class="small muted">Für alles, was ihr direkt ausmacht, z. B. Personal Training. Es entsteht automatisch eine Rechnung über den eingelösten Betrag. Online (Method, Unfold, Prä-/Postnatal) löst sie den Code selbst beim Buchen ein.</p>
                         <div style="display:grid;grid-template-columns:120px 1fr;gap:8px"><input name="eur" inputmode="decimal" value="<?= forma_h(number_format($bal / 100, 2, ',', '')) ?>" aria-label="Betrag in Euro"><input name="what" maxlength="140" placeholder="wofür, z. B. Personal Training 75 Min. am 12.11." required></div>
-                        <button class="btn btn-sm" type="submit">Einlösen</button></form></details><?php endif; ?></div>
+                        <button class="btn btn-sm" type="submit">Einlösen</button></form></details><?php endif; ?>
+                <?php if ($gv['origin'] === 'kauf' && in_array($gv['status'], ['aktiv', 'test'], true) && !$gu): ?><form method="post" style="flex-basis:100%" onsubmit="return confirm('Rücktritt vom Gutscheinkauf: Betrag über Stripe erstatten und Gutschein sperren?')"><?= $csrf ?><input type="hidden" name="action" value="mm_mv_gift_refund"><input type="hidden" name="vid" value="<?= (int)$gv['id'] ?>"><button class="link small" type="submit">↩︎ Rücktritt: erstatten &amp; sperren</button></form><?php endif; ?></div>
             <?php endforeach; ?>
         </div><?php endif; ?>
 

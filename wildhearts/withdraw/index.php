@@ -13,9 +13,9 @@ $pdo->exec('CREATE TABLE IF NOT EXISTS mm_withdrawals (
 $h = 'forma_h';
 $lang = (($_POST['lang'] ?? $_GET['lang'] ?? '') === 'de') ? 'de' : (($_POST['lang'] ?? $_GET['lang'] ?? '') === 'en' ? 'en' : '');
 $done = null; $err = '';
-$contracts = ['method' => 'Movecia Mindful Movement Method (Mitgliedschaft)', 'unfold' => 'Unfold – The Mindful Becoming', 'teacher' => 'The Mindful Becoming Teacher Training (Movecia Academy)', 'natal' => 'Prä- & Postnatal Training (Studio)', 'natal_online' => 'Prä- & Postnatal Training (Online)', 'retreat' => 'Wild Hearts Alpine Retreat', 'circle' => 'The Inner Circle (frühere Buchung)', 'year' => 'The Year Circle / Jahreskreis (frühere Buchung)', 'other' => 'Sonstiges / Other'];
+$contracts = ['method' => 'Movecia Mindful Movement Method (Mitgliedschaft)', 'unfold' => 'Unfold – The Mindful Becoming', 'teacher' => 'The Mindful Becoming Teacher Training (Movecia Academy)', 'natal' => 'Prä- & Postnatal Training (Studio)', 'natal_online' => 'Prä- & Postnatal Training (Online)', 'retreat' => 'Wild Hearts Alpine Retreat', 'gutschein' => 'Movecia-Gutschein (Kauf)', 'circle' => 'The Inner Circle (frühere Buchung)', 'year' => 'The Year Circle / Jahreskreis (frühere Buchung)', 'other' => 'Sonstiges / Other'];
 $sel = (string)($_POST['contract'] ?? ($_GET['v'] ?? ''));
-if ($lang === '' && in_array($sel, ['natal', 'natal_online'], true)) $lang = 'de';
+if ($lang === '' && in_array($sel, ['natal', 'natal_online', 'gutschein'], true)) $lang = 'de';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $L = ($_POST['lang'] ?? 'en') === 'de' ? 'de' : 'en';

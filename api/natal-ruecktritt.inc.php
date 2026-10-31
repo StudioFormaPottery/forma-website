@@ -445,7 +445,7 @@ function mv_voucher_pdf(array $v): string
             $pdf->SetTextColor(...$plum); $pdf->SetFont('Cormorant', '', 22); $pdf->SetXY($ax, $ay + 5); $pdf->Cell($aw, 10, $t($to), 0, 0, 'C'); $ay += 20; }
         $pdf->SetTextColor(...$ink); $pdf->SetFont('Cormorant', 'I', mb_strlen($msg) > 110 ? 14 : 16.5);
         $pdf->SetXY($ax + 2, $ay); $pdf->MultiCell($aw - 4, mb_strlen($msg) > 110 ? 6.4 : 7.4, $t('„' . $msg . '“'), 0, 'C');
-        if ($from !== '') { $pdf->SetTextColor(125, 94, 104); $pdf->SetFont('Inter', '', 9); $pdf->SetXY($ax, $pdf->GetY() + 4); $pdf->Cell($aw, 5, $t('von ' . $from), 0, 0, 'C'); }
+        if ($from !== '') { $pdf->SetTextColor(125, 94, 104); $pdf->SetFont('Inter', '', 9); $pdf->SetXY($ax, $pdf->GetY() + 4); $pdf->Cell($aw, 5, $t('– ' . $from), 0, 0, 'C'); }
     }
     // Textblock rechts (Design 1: neben dem Bogen) bzw. mittig (Design 2)
     [$x, $w] = $d === 1 ? [140, 138] : [48, 201];
@@ -453,11 +453,12 @@ function mv_voucher_pdf(array $v): string
     $pdf->SetTextColor(...$plum); $pdf->SetFont('Inter', 'B', 8.5);
     $pdf->SetXY($x, $y); $pdf->Cell($w, 5, $t('G U T S C H E I N'), 0, 0, 'C');
     $pdf->SetTextColor(...$ink); $pdf->SetFont('Cormorant', 'I', 30);
-    $pdf->SetXY($x, $y + 9); $pdf->Cell($w, 12, $t('Zeit für dich'), 0, 0, 'C');
+    $to2 = $d === 2 ? trim((string)($v['recipient'] ?? '')) : '';
+    $pdf->SetXY($x, $y + 9); $pdf->Cell($w, 12, $t('Zeit für dich' . ($to2 !== '' ? ', ' . $to2 : '')), 0, 0, 'C');
     $pdf->SetTextColor(...$plum); $pdf->SetFont('Cormorant', '', 58);
     $pdf->SetXY($x, $y + 26); $pdf->Cell($w, 24, $t((int)$v['amount_cents'] < 0 ? 'dein Betrag' : forma_euro((int)$v['amount_cents'])), 0, 0, 'C'); // < 0 nur für die Vorschaubilder
     $pdf->SetTextColor(...$soft); $pdf->SetFont('Inter', '', 10.5);
-    $pdf->SetXY($x + 10, $y + 55); $pdf->MultiCell($w - 20, 5.6, $t('für alles bei Movecia: The Method, Unfold, Prä- & Postnatal oder Personal Training, im Studio in Mathon oder online'), 0, 'C');
+    $pdf->SetXY($x + 10, $y + 55); $pdf->MultiCell($w - 20, 5.6, $t(trim((string)($v['label'] ?? '')) !== '' ? 'gedacht für ' . $v['label'] . ', einlösbar für alles bei Movecia, im Studio in Mathon oder online' : 'für alles bei Movecia: The Method, Unfold, Prä- & Postnatal oder Personal Training, im Studio in Mathon oder online'), 0, 'C');
     // Code-Feld
     $cy = $y + 78;
     $pdf->SetDrawColor(...$plum); $pdf->SetLineWidth(.3);
@@ -468,6 +469,15 @@ function mv_voucher_pdf(array $v): string
     $pdf->SetFont('Inter', '', 7.6); $pdf->SetTextColor(...$soft);
     $pdf->SetXY($x + 8, $cy + 21); $pdf->MultiCell($w - 16, 4, $t('Einlösen: auf moveciamovement.com beim Buchen den Code eingeben oder einfach Vivien schreiben. Ohne Ablaufdatum, Restwert bleibt erhalten, keine Barauszahlung.'), 0, 'C');
     $pdf->SetXY($x, $cy + 33); $pdf->Cell($w, 4, $t('Nr. ' . $v['nr'] . ' · ausgestellt am ' . date('d.m.Y', strtotime((string)$v['created_at'])) . ' · Vivien Malonga, Movecia'), 0, 0, 'C');
+    // Design „Zart“: persönliche Worte unten (Vivien, 31.10.2026)
+    if ($d === 2) {
+        $m2 = trim((string)($v['message'] ?? '')); $f2 = trim((string)($v['sender'] ?? ''));
+        if (mb_strlen($m2) > 200) $m2 = rtrim(mb_substr($m2, 0, 197)) . '…';
+        if ($m2 !== '' || $f2 !== '') {
+            $pdf->SetTextColor(...$ink); $pdf->SetFont('Cormorant', 'I', 14);
+            $pdf->SetXY($x + 30, $cy + 41); $pdf->MultiCell($w - 60, 6, $t(($m2 !== '' ? '„' . $m2 . '“' : '') . ($f2 !== '' ? ($m2 !== '' ? '  – ' : '– ') . $f2 : '')), 0, 'C');
+        }
+    }
     return $pdf->Output('S');
 }
 

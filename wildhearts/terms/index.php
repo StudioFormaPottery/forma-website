@@ -183,6 +183,14 @@ a{color:var(--wine)}
     <li><span class="en">If I have to cancel the retreat (for example too few participants, illness or force majeure), you get the full price back. Travel costs cannot be refunded.</span><span class="de">Muss ich das Retreat absagen (zum Beispiel bei zu wenigen Teilnehmerinnen, Krankheit oder höherer Gewalt), bekommst du den vollen Preis zurück. Reisekosten können nicht erstattet werden.</span></li>
   </ul>
 
+  <h2 id="gutscheine"><span class="en">Gift cards</span><span class="de">Gutscheine</span></h2>
+  <ul>
+    <li><span class="en">Movecia gift cards are value vouchers with no expiry date. They can be redeemed for everything at Movecia (The Method, Unfold, prenatal and postnatal training, personal training). The offer chosen when buying is only a suggestion. Any remaining balance stays on the card; it cannot be exchanged for cash.</span><span class="de">Movecia-Gutscheine sind Wertgutscheine ohne Ablaufdatum. Sie gelten für alles bei Movecia (The Method, Unfold, Prä- &amp; Postnatal, Personal Training), das beim Kauf gewählte Angebot ist nur ein Vorschlag. Ein Restwert bleibt erhalten, eine Barauszahlung ist nicht möglich.</span></li>
+    <li><span class="en">You receive the gift card as a PDF straight after payment. Payment is handled securely by Stripe. There is no invoice for the purchase; the invoice is issued when the card is redeemed.</span><span class="de">Den Gutschein bekommst du direkt nach der Zahlung als PDF. Bezahlt wird sicher über Stripe. Für den Kauf gibt es keine Rechnung, sie entsteht erst beim Einlösen.</span></li>
+    <li><span class="en">Withdrawal: as long as the gift card has not been redeemed, you can withdraw within 14 days of purchase without giving reasons and get the full amount back (<a href="/withdraw?v=gutschein&amp;lang=en">“Withdraw from the contract”</a>).</span><span class="de">Rücktritt: Solange der Gutschein nicht eingelöst ist, kannst du innerhalb von 14 Tagen ab dem Kauf ohne Angabe von Gründen zurücktreten und bekommst den vollen Betrag zurück (<a href="/withdraw?v=gutschein&amp;lang=de">„Vertrag widerrufen“</a>).</span></li>
+    <li><span class="en">Anyone who knows the code can redeem it, so please keep it safe.</span><span class="de">Wer den Code kennt, kann ihn einlösen, bitte gut aufbewahren.</span></li>
+  </ul>
+
   <h2 id="free"><span class="en">Free offers</span><span class="de">Kostenlose Angebote</span></h2>
   <ul>
     <li><span class="en"><strong>Wild Hearts Gatherings:</strong> our online gatherings are free. You can sign up and cancel at any time, with no costs and no obligations.</span><span class="de"><strong>Wild Hearts Gatherings:</strong> Unsere Online-Gatherings sind kostenlos. Du kannst dich jederzeit an- und wieder abmelden, ohne Kosten und ohne Verpflichtung.</span></li>
