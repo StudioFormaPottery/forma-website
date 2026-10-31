@@ -1018,6 +1018,8 @@ function mv_check_paid(PDO $pdo, array $r): string
         try { forma_stripe('POST', '/v1/subscriptions/' . rawurlencode($r['sub_id']), ['cancel_at' => strtotime('+' . (mv_cfg()['u_n'] - 1) . ' months +10 days')]); }
         catch (Throwable $e) { error_log('MV unfold cancel_at: ' . $e->getMessage()); }
     }
+    // Konto vor der Rechnung anlegen: so wartet die Rechnung, bis die E-Mail-Adresse bestätigt ist (sonst ging sie bei Neukundinnen sofort raus)
+    mv_member_ensure($pdo, (string)$r['email'], (string)$r['name'], (string)$r['lang']);
     mv_voucher_paid($pdo, $r);
     if ($r['sub_id'] === '') {
         // Einmalzahlung: gleich als Zahlung mit Rechnung erfassen
