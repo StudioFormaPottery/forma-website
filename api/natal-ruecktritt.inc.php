@@ -374,9 +374,11 @@ function mv_voucher_lookup(PDO $pdo, string $code): array
 function mv_voucher_sweep(PDO $pdo): void
 {
     natal_wd_schema($pdo);
-    foreach ($pdo->query("SELECT u.*, o.status AS ost FROM mm_voucher_uses u LEFT JOIN mm_natal_orders o ON o.id = u.order_id WHERE u.status = 'reserviert'")->fetchAll() as $u) {
+    foreach ($pdo->query("SELECT u.*, o.status AS ost, o.stripe_session AS osess FROM mm_voucher_uses u LEFT JOIN mm_natal_orders o ON o.id = u.order_id WHERE u.status = 'reserviert'")->fetchAll() as $u) {
         if (in_array($u['ost'], ['bezahlt', 'widerrufen'], true)) mv_voucher_finalize($pdo, (int)$u['order_id']);
-        elseif ($u['ost'] === null || $u['ost'] === 'abgebrochen' || strtotime((string)$u['created_at']) < time() - 40 * 60)
+        // Sicherheit (31.10.2026): eine noch offene Bestellung erst nach 2 Tagen freigeben (Stripe-Sitzungen laufen spätestens nach 24 Std. ab),
+        // sonst wäre der Gutscheinwert nach einem kurzen Stripe-Ausfall doppelt einlösbar
+        elseif ($u['ost'] === null || $u['ost'] === 'abgebrochen' || (($u['ost'] !== 'offen' || (string)$u['osess'] === '') && strtotime((string)$u['created_at']) < time() - 40 * 60) || strtotime((string)$u['created_at']) < time() - 2 * 86400)
             $pdo->prepare("UPDATE mm_voucher_uses SET status = 'frei' WHERE id = ?")->execute([$u['id']]);
     }
 }
