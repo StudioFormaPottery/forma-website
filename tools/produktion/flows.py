@@ -38,6 +38,12 @@ for f, v in FV.items():
     for x in v:
         cnt[x[0]][(x[1], x[2])] += 1
 NEUTRAL = {n: c.most_common(1)[0][0] for n, c in cnt.items()}
+# für The Method (Englisch nötig): häufigster Text mit englischer Fassung
+NEUTRAL_EN = {}
+for n, c in cnt.items():
+    for (de, en), _ in c.most_common():
+        if en:
+            NEUTRAL_EN[n] = (de, en); break
 for n in ATEM:  # Atemübungen: Fassung im Fersensitz
     t = THEMA.get('E:' + n)
     if t and n in NEUTRAL:
@@ -81,7 +87,7 @@ for ref, v in FV.items():
         if side:
             de, en = side_text(n, side)
         else:
-            de, en = own.get(n) or NEUTRAL.get(n, ('', ''))
+            de, en = own.get(n) or ((ref in METHOD and NEUTRAL_EN.get(n)) or NEUTRAL.get(n, ('', '')))
             if ('C:%s:%s' % (ref, n)) in THEMA:                 # Themen-Text steht jetzt mitten im Flow
                 t = THEMA['C:%s:%s' % (ref, n)]; de, en = t['de'], t['en'] or en
             elif n in ATEM and own.get(n) and own[n][0] == cnt[n].most_common(1)[0][0][0]:
