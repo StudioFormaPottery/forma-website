@@ -3,6 +3,7 @@
 declare(strict_types=1);
 require dirname(__DIR__) . '/api/lib.php';
 require __DIR__ . '/zweistufen.inc.php';
+require __DIR__ . '/passkey.inc.php';
 
 $secure = (($_SERVER['HTTPS'] ?? '') !== '' && ($_SERVER['HTTPS'] ?? '') !== 'off');
 session_set_cookie_params(['lifetime' => 0, 'path' => '/verwaltung/', 'secure' => $secure, 'httponly' => true, 'samesite' => 'Lax']);
@@ -22,6 +23,7 @@ unset($_SESSION['flash']);
  */
 // Neu-Boxen: 'b' => 'movecia' erscheint nur auf der Movecia-Übersicht, sonst nur bei FORMA (Vivien, 28.10.2026).
 const FORMA_ADMIN_NEWS = [
+    ['until' => '2026-12-15', 'title' => '🙂 Anmelden mit Face ID', 'text' => 'Du kannst dich jetzt mit Face ID (Passkey) anmelden, ganz ohne Passwort. Einrichten unter Einstellungen, ganz oben – am besten auf iPhone und MacBook.', 'link' => '?view=einstellungen#passkey'],
     ['until' => '2026-12-15', 'title' => '🔐 Zwei-Stufen-Anmeldung', 'text' => 'Deine Verwaltung kann jetzt zusätzlich zum Passwort einen 6-stelligen Code aus Duo verlangen. So kommt niemand hinein, auch wenn er dein Passwort kennt. Einschalten unter Einstellungen, ganz oben. Pro Gerät musst du den Code nur alle 30 Tage eingeben.', 'link' => '?view=einstellungen#zweistufen'],
     ['b' => 'movecia', 'until' => '2026-12-15', 'title' => '🔐 Zwei-Stufen-Anmeldung', 'text' => 'Deine Verwaltung kann jetzt zusätzlich zum Passwort einen 6-stelligen Code aus Duo verlangen. Einschalten unter Einstellungen (FORMA-Verwaltung), ganz oben.', 'link' => '?view=einstellungen#zweistufen'],
     ['b' => 'movecia', 'until' => '2026-12-15', 'title' => '☁️ Entwürfe auf allen Geräten', 'text' => 'Deine Entwürfe im ✂️ Schnitt werden jetzt automatisch auf deinem Server gesichert. Auf dem iPhone, am MacBook und in jedem Browser siehst du dieselben Entwürfe. Oben neben „📝 Meine Entwürfe“ steht, ob noch etwas hochlädt. Öffnest du einen Entwurf auf einem anderen Gerät zum ersten Mal, lädt er die Videos einmal herunter.', 'link' => '?view=schnitt'],
@@ -339,6 +341,29 @@ if ($action === 'login') {
     go($self, 'Das Passwort stimmt nicht.');
 }
 
+// Anmeldung mit Passkey / Face ID (zählt als beide Stufen)
+if ($action === 'pk_login_opts' || $action === 'pk_login_done') {
+    check_csrf();
+    header('Content-Type: application/json');
+    if ($action === 'pk_login_opts') exit(json_encode(pk_login_options()));
+    $pdo->exec('CREATE TABLE IF NOT EXISTS admin_login_fail (ip_hash TEXT NOT NULL, at INTEGER NOT NULL)');
+    $ipH = hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? '') . 'forma-admin');
+    $q = $pdo->prepare('SELECT COUNT(*) FROM admin_login_fail WHERE ip_hash = ? AND at >= ?');
+    $q->execute([$ipH, time() - 900]);
+    if ((int)$q->fetchColumn() >= 5) exit(json_encode(['ok' => false, 'msg' => 'Zu viele Fehlversuche. Bitte warte 15 Minuten.']));
+    if (!pk_login($pdo, $_POST)) {
+        $pdo->prepare('INSERT INTO admin_login_fail (ip_hash, at) VALUES (?, ?)')->execute([$ipH, time()]);
+        exit(json_encode(['ok' => false, 'msg' => 'Dieser Passkey passt nicht. Melde dich mit dem Passwort an.']));
+    }
+    $pdo->prepare('DELETE FROM admin_login_fail WHERE ip_hash = ?')->execute([$ipH]);
+    unset($_SESSION['tf_pending']);
+    session_regenerate_id(true);
+    $_SESSION['admin'] = true;
+    $_SESSION['seen'] = time();
+    $_SESSION['ver'] = (string)(forma_setting($pdo, 'admin_ver') ?? '0');
+    exit(json_encode(['ok' => true, 'go' => $self]));
+}
+
 // Zweiter Schritt: Code aus Duo (oder Ersatzcode)
 if ($action === 'login_cancel') {
     check_csrf();
@@ -411,6 +436,14 @@ if (!$loggedIn) {
                 <input id="password" name="password" type="password" autocomplete="current-password" required autofocus>
                 <button class="btn" type="submit">Anmelden</button>
             </form>
+            <?php if (pk_here($GLOBALS['pdo'])): ?>
+                <div class="card stack center" id="pkbox" hidden>
+                    <button class="btn" type="button" id="pkgo" style="font-size:1.15rem">🙂 Mit Face ID anmelden</button>
+                    <p class="muted small" id="pkmsg">Mit dem Passkey auf deinem iPhone oder MacBook (Face ID, Touch ID oder Geräte-Code).</p>
+                </div>
+                <?= pk_js() ?>
+                <script>(function(){if(!PK.ok())return;var b=document.getElementById('pkbox');b.hidden=false;document.getElementById('pkgo').onclick=function(){PK.login(<?= json_encode(csrf()) ?>,function(t){document.getElementById('pkmsg').textContent=t;});};})();</script>
+            <?php endif; ?>
             <form method="post" class="center">
                 <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
                 <input type="hidden" name="action" value="send_link">
@@ -423,6 +456,19 @@ if (!$loggedIn) {
 // --- Ab hier nur angemeldet -------------------------------------------------
 if ($action !== '') {
     check_csrf();
+}
+if ($action === 'pk_reg_opts') {
+    header('Content-Type: application/json');
+    exit(json_encode(pk_register_options($pdo)));
+}
+if ($action === 'pk_reg_done') {
+    header('Content-Type: application/json');
+    $err = pk_register($pdo, $_POST);
+    exit(json_encode($err === '' ? ['ok' => true] : ['ok' => false, 'msg' => $err]));
+}
+if ($action === 'pk_remove') {
+    pk_remove($pdo, (string)($_POST['id'] ?? ''));
+    go($self . '?view=einstellungen#passkey', 'Der Passkey ist entfernt. Lösche ihn auch auf dem Gerät (iPhone: Einstellungen → Passwörter).');
 }
 // --- Zwei-Stufen-Anmeldung einrichten (Einstellungen) ---
 if ($action === 'tf_start') {
@@ -2343,6 +2389,31 @@ if ($view === 'series') {
     <?php });
 }
 
+function admin_pk_box(PDO $pdo): void
+{
+    $keys = pk_here($pdo); ?>
+    <h2 id="passkey">🙂 Anmelden mit Face ID (Passkey)</h2>
+    <div class="card stack">
+        <p>Mit einem Passkey meldest du dich ohne Passwort an: einfach Face ID (oder Touch ID bzw. den Geräte-Code). Das ist sicherer als Passwort + Code, weil der Schlüssel dein Gerät nie verlässt und auf gefälschten Seiten gar nicht funktioniert. Mach das am besten auf dem iPhone <em>und</em> am MacBook.</p>
+        <?php if ($keys): ?>
+            <ul class="plain">
+            <?php foreach ($keys as $k): ?>
+                <li style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid #EEE4D8">
+                    <span>🔑 <strong><?= forma_h($k['name']) ?></strong> <span class="muted small">· seit <?= date('j.n.Y', (int)$k['at']) ?><?= $k['last'] ? ' · zuletzt ' . date('j.n.Y H:i', (int)$k['last']) : '' ?></span></span>
+                    <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="pk_remove"><input type="hidden" name="id" value="<?= forma_h($k['id']) ?>"><button class="link" type="submit">entfernen</button></form>
+                </li>
+            <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+        <label for="pkname">Name für dieses Gerät</label>
+        <input id="pkname" maxlength="40" placeholder="z. B. iPhone">
+        <button class="btn" type="button" id="pkadd"><?= $keys ? '＋ Dieses Gerät auch hinzufügen' : 'Face ID für dieses Gerät einrichten' ?></button>
+        <p class="muted small" id="pkmsg2">Das Gerät fragt dann nach Face ID. Der Passkey wird im iCloud-Schlüsselbund gesichert und ist so auch auf deinen anderen Apple-Geräten da.</p>
+    </div>
+    <?= pk_js() ?>
+    <script>(function(){var n=document.getElementById('pkname');var ua=navigator.userAgent;n.value=/iPhone/.test(ua)?'iPhone':/iPad/.test(ua)?'iPad':/Mac/.test(ua)?'MacBook':'';document.getElementById('pkadd').onclick=function(){PK.add(<?= json_encode(csrf()) ?>,function(t){document.getElementById('pkmsg2').textContent=t;},n.value);};})();</script>
+<?php }
+
 function admin_tf_box(PDO $pdo, string $self): void
 {
     $on = tf_on($pdo);
@@ -2396,7 +2467,7 @@ if ($view === 'einstellungen') {
         <h1>Einstellungen</h1>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <p class="row-actions"><a class="btn btn-sm" href="<?= forma_h($self) ?>?view=tests">🧪 Testbuchungen · jedes Angebot ausprobieren</a> <a class="btn btn-sm" href="<?= forma_h($self) ?>?view=liste">💌 E-Mail-Liste</a></p>
-        <?php admin_tf_box($pdo, $self); ?>
+        <?php admin_pk_box($pdo); admin_tf_box($pdo, $self); ?>
         <h2>Online-Bezahlung mit Stripe</h2>
         <?php if ($key): ?>
             <div class="card stack">
