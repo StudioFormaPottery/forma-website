@@ -1209,9 +1209,7 @@ if ($view === 'tests' || $action === 'test_run') {
         if (isset(FORMA_TEST_OFFERS[$offer])) $result = forma_test_run($pdo, $offer, isset($_POST['send']));
     }
     render_page('Testbuchungen', function () use ($self, $result) { ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Testbuchungen</h1>
-        <p class="muted">Ein Klick spielt eine Buchung komplett durch: freier Termin, Stripe-Bezahlseite, alle E-Mails, Rechnung, Terminbestätigung und Bewertungs-Mail. Danach wird alles wieder gelöscht. Die Testbuchung taucht nirgends auf, es wird nichts abgebucht und keine Rechnungsnummer verbraucht.</p>
         <?php if ($result): ?>
         <div class="card tres">
             <h2 style="margin-top:0">Ergebnis: <?= forma_h($result['title']) ?></h2>
@@ -1247,10 +1245,8 @@ if ($action === 'bestand_save') {
 if ($view === 'bestand') {
     $stock = forma_bemalen_stock($pdo);
     render_page('Bestand', function () use ($self, $flash, $stock) { ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <p class="eyebrow">Pottery bemalen</p>
         <h1>Bestand im Atelier</h1>
-        <p class="muted">Trag ein, wie viele Stücke du gerade im Atelier hast. Auf der Website kann dann nur gebucht werden, was noch frei ist. Online gebuchte Stücke für kommende Termine sind dafür reserviert. Ist ein Termin vorbei oder verkaufst du etwas über die Kasse, ziehe ich es automatisch ab. Zählst du nach, trag einfach die neue Zahl ein. Feld leer lassen heißt: keine Grenze.</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <form method="post" class="bs-form">
             <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="bestand_save">
@@ -1518,11 +1514,9 @@ if ($view === 'kasse') {
                 <?php endif; ?>
             </div>
         <?php }; ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <p class="eyebrow">Pottery bemalen</p>
         <h1>Kasse</h1>
         <p class="row-actions"><a class="btn btn-sm" href="<?= forma_h($self) ?>?view=gutschein_kasse">🎟 Gutschein ausstellen</a> <a class="link small" href="<?= forma_h($self) ?>?view=bestand">Bestand ansehen und nachtragen →</a></p>
-        <p class="muted">Tipp an, was sie bemalt hat, dann bar kassieren oder einen Bezahl-Link schicken. Die Rechnung kommt automatisch, als Workshop-Leistung mit Fertigstellung. Wer spontan ohne Anmeldung kommt: Atelierbeitrag mit antippen, Name und E-Mail eingeben, dann wird sie gleich im Termin eingetragen.</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <?php if ($courses): ?>
         <form class="k-course" method="get"><input type="hidden" name="view" value="kasse">
@@ -1614,10 +1608,8 @@ if ($view === 'angebote') {
     $neu = !empty($_GET['neu']) || !$offers;
     render_page('Angebote', function () use ($self, $flash, $offers, $sel, $neu, $pdo) {
         $openN = count(array_filter($offers, fn($o) => $o['status'] === 'offen')); ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <div class="seg"><a href="<?= forma_h($self) ?>?view=rechnungen">Rechnungen</a><a class="on" href="<?= forma_h($self) ?>?view=angebote">Angebote<?= $openN ? ' · ' . $openN . ' offen' : '' ?></a></div>
         <h1>Angebote</h1>
-        <p class="muted">Unverbindliche Angebote für Gruppen, z. B. Schulklassen beim Pottery bemalen. Du schickst den Link per WhatsApp, die Gruppe trägt pro Termin die Anzahl Kinder ein und bestätigt. Dann stehen die Termine im Kalender und die Vorabrechnung geht raus. Die fertige Rechnung entsteht erst nach der Zahlung (online automatisch, bar mit „Bar bezahlt“).</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
 
         <details class="card" <?= $neu ? 'open' : '' ?> id="neu">
@@ -1745,12 +1737,10 @@ if ($view === 'rechnungen') {
     $gkey = forma_google_key();
     $cfg = ['prefix' => forma_setting($pdo, 'invoice_prefix') ?? '', 'oss' => forma_setting($pdo, 'oss_active') === '1', 'sheet' => forma_setting($pdo, 'sheet_id') ?? '', 'err' => forma_setting($pdo, 'sheet_error') ?? ''];
     render_page('Rechnungen', function () use ($self, $flash, $rows, $sum, $gkey, $cfg) { ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <?php $offOpen = (function () { try { forma_offer_schema($GLOBALS['pdo']); return (int)$GLOBALS['pdo']->query("SELECT COUNT(*) FROM offers WHERE status = 'offen'")->fetchColumn(); } catch (Throwable $e) { return 0; } })(); ?>
         <div class="seg"><a class="on" href="<?= forma_h($self) ?>?view=rechnungen">Rechnungen</a><a href="<?= forma_h($self) ?>?view=angebote">Angebote<?= $offOpen ? ' · ' . $offOpen . ' offen' : '' ?></a></div>
         <style>.seg{display:inline-flex;gap:4px;background:#EAD8C6;border-radius:999px;padding:4px;margin:4px 0 6px}.seg a{padding:7px 16px;border-radius:999px;text-decoration:none;color:var(--clay)}.seg a.on{background:var(--clay);color:#FBF1EA}</style>
         <h1>Rechnungen</h1>
-        <p class="muted">Nach jeder Online-Zahlung (Kurs, Private Pottery, Template) und jedem Verkauf an der Atelier-Kasse wird automatisch eine Rechnung erstellt und als PDF an die Kundin und an dich geschickt. Eigener Nummernkreis für Online-Verkäufe, lückenlos pro Jahr.</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <p><a class="btn" href="<?= forma_h($self) ?>?view=rechnungen_export">Liste herunterladen (CSV für die Buchhaltung)</a></p>
         <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="invoice_sample"><button class="link" type="submit">Testmail mit Muster-Rechnung an mich schicken</button></form>
@@ -1863,7 +1853,6 @@ if ($view === 'templates') {
     $tpls = $pdo->query('SELECT t.*, (SELECT COUNT(*) FROM template_orders o WHERE o.template_id = t.id AND o.status = \'bezahlt\') AS sold FROM templates t ORDER BY t.visible DESC, t.sort, t.id DESC')->fetchAll();
     $orders = $pdo->query("SELECT * FROM template_orders WHERE status = 'bezahlt' ORDER BY id DESC LIMIT 50")->fetchAll();
     render_page('Templates & Maker Club', function () use ($self, $flash, $m, $makers, $tpls, $orders, $pdo) { ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Templates &amp; Maker Club</h1>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <form method="post" class="card" style="display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap">
@@ -1968,7 +1957,6 @@ if ($view === 'kalender') {
         $startW = ((int)date('N', strtotime($first))) - 1;
         $days = (int)date('t', strtotime($first));
         $today = date('Y-m-d'); ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <div class="top"><h1>Kalender</h1><a class="link" href="<?= forma_h($self) ?>?view=private">Alle Private-Pottery-Buchungen</a></div>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <?php if ($assign): ?>
@@ -2220,9 +2208,7 @@ if ($view === 'private') {
     forma_reconcile_payments($pdo, true);
     $rows = $pdo->query("SELECT * FROM private_bookings WHERE status IN ('bezahlt','anfrage') ORDER BY done, id DESC")->fetchAll();
     render_page('Private Pottery', function () use ($self, $flash, $rows, $pdo) { ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Private Pottery</h1>
-        <p class="muted">Bezahlte Buchungen und Anfragen. Mach mit jeder Person den Termin aus, trag ihn im Kalender ein und schick ihr die Bestätigung. Nach dem letzten Termin geht die Bitte um eine Google-Bewertung automatisch raus.</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <div class="list">
         <?php foreach ($rows as $b): $paid = $b['status'] === 'bezahlt'; ?>
@@ -2261,7 +2247,6 @@ if ($view === 'gutscheine') {
         $vs = $pdo->query("SELECT * FROM vouchers WHERE status IN ('bezahlt','eingeloest') ORDER BY id DESC")->fetchAll();
     }
     render_page('Gutscheine', function () use ($self, $flash, $vs, $sum, $links, $neu, $unpaid) { ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Gutscheine</h1>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <div class="card stack">
@@ -2357,10 +2342,8 @@ if ($view === 'gutscheine') {
 
 if ($view === 'series') {
     render_page('Serientermine', function () use ($self, $flash) { ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Neuer Termin</h1>
         <p class="seg"><a href="<?= forma_h($self) ?>?view=edit">Einzeltermin</a> <span class="on">Serientermine (z. B. jeden Mi &amp; Fr)</span></p>
-        <p class="muted">Legt für jeden gewählten Wochentag im Zeitraum einen eigenen Termin an. Termine, die es schon gibt, werden übersprungen.</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <form method="post" class="card stack" id="series">
             <input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>">
@@ -2480,10 +2463,8 @@ function admin_tf_box(PDO $pdo, string $self): void
 
 if ($view === 'einstellungen') {
     render_page('Einstellungen', function () use ($self, $flash, $pdo) { $key = forma_stripe_key(); ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Einstellungen</h1>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
-        <p class="row-actions"><a class="btn btn-sm" href="<?= forma_h($self) ?>?view=tests">🧪 Testbuchungen · jedes Angebot ausprobieren</a> <a class="btn btn-sm" href="<?= forma_h($self) ?>?view=liste">💌 E-Mail-Liste</a></p>
         <?php admin_pk_box($pdo); admin_tf_box($pdo, $self); ?>
         <h2>Online-Bezahlung mit Stripe</h2>
         <?php if ($key): ?>
@@ -2575,9 +2556,7 @@ if ($view === 'einstellungen') {
 if ($view === 'popup') {
     $p = forma_popup($pdo);
     render_page('Saison-Pop-up', function () use ($self, $flash, $p) { $live = forma_popup_live($p); ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>Saison-Pop-up</h1>
-        <p class="muted">Ein kleines Fenster, das beim Besuch der Website einmal aufgeht, z. B. für Specials im Advent oder in den Ferien. Besucherinnen können sich dort für deine E-Mail-Liste eintragen.</p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <p><span class="pill<?= $live ? ' pill-ok' : '' ?>"><?= $live ? 'Gerade auf der Website sichtbar' : ($p['active'] ? 'Eingeschaltet, aber außerhalb des Zeitraums' : 'Ausgeschaltet') ?></span>
            · <a href="/?popup=vorschau" target="_blank" rel="noopener">Vorschau ansehen</a></p>
@@ -2630,7 +2609,6 @@ if ($view === 'liste') {
     $subs = $pdo->query("SELECT * FROM subscribers ORDER BY status = 'bestaetigt' DESC, created_at DESC")->fetchAll();
     $confirmed = count(array_filter($subs, fn($s) => $s['status'] === 'bestaetigt'));
     render_page('E-Mail-Liste', function () use ($self, $flash, $subs, $confirmed) { ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1>E-Mail-Liste</h1>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
         <div class="card stack">
@@ -2669,7 +2647,6 @@ if ($view === 'edit') {
         $c = $stmt->fetch() ?: $c;
     }
     render_page($id ? 'Termin bearbeiten' : 'Neuer Termin', function () use ($c, $self, $flash) { ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1><?= $c['id'] ? 'Termin bearbeiten' : 'Neuer Termin' ?></h1>
         <?php if (!$c['id']): ?><p class="seg"><span class="on">Einzeltermin</span> <a href="<?= forma_h($self) ?>?view=series">Serientermine (z. B. jeden Mi &amp; Fr)</a></p><?php endif; ?>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
@@ -2725,7 +2702,6 @@ if ($view === 'course') {
     $st->execute([$id]);
     $kOpen = $st->fetchAll();
     render_page($c['title'], function () use ($c, $bookings, $booked, $self, $flash, $kOpen) { ?>
-        <p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p>
         <h1><?= forma_h($c['title']) ?></h1>
         <p class="muted"><?= forma_h($c['date_text']) ?> · <?= forma_slot_hours($c) ? 'Belegt pro Stunde: ' . forma_h(forma_slots_overview($GLOBALS['pdo'], $c)) : $booked . ' von ' . (int)$c['capacity'] . ' Plätzen belegt' ?><?= $c['visible'] ? '' : ' · <strong>auf der Website ausgeblendet</strong>' ?></p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
@@ -2946,19 +2922,23 @@ $minCourses = $pdo->query("SELECT * FROM courses WHERE min_status = 'gemeldet' A
 render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $pdo, $subCount, $popupLive, $voucherOpen, $voucherUnpaid, $kasseUnpaid, $privateOpen, $offerOpen, $offerUnpaid, $agenda, $toPlan, $newBookings, $minCourses) {
     $h = (int)date('G');
     $hello = $h < 11 ? 'Guten Morgen' : ($h < 17 ? 'Hallo' : 'Guten Abend'); ?>
-    <section class="hero">
-        <span class="deco-slot d1"></span><span class="deco-slot d2"></span><span class="deco-slot d3"></span><span class="deco-slot d4"></span>
-        <div class="hero-text">
-            <p class="eyebrow"><?= forma_h(forma_de_date(date('Y-m-d'))) ?></p>
-            <h1><?= $hello ?>, Vivien!</h1>
-            <p class="muted">Schön, dass du da bist. Hier ist alles, was in deinem Atelier gerade los ist.</p>
-        </div>
-        <div class="stats">
-            <a class="stat" href="<?= forma_h($self) ?>?view=kalender"><b><?= $toPlan ?></b><span>Private Pottery zum Einplanen</span></a>
-            <a class="stat" href="#neu"><b><?= $newBookings ?></b><span>neue Buchungen in 7 Tagen</span></a>
-            <a class="stat" href="<?= forma_h($self) ?>?view=liste"><b><?= $subCount ?></b><span>Kontakte im Newsletter</span></a>
-        </div>
-    </section>
+    <h1 class="hi"><?= $hello ?>, Vivien</h1>
+    <style>
+    h1.hi{margin:14px 0 4px;font-size:clamp(30px,3.4vw,40px)}
+    .dash{display:block!important}
+    .big3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:8px 0 18px}
+    .big3 a{display:flex;flex-direction:column;gap:10px;min-height:140px;padding:22px 24px;border-radius:24px;text-decoration:none;color:var(--ink);box-sizing:border-box}
+    .big3 a b{font-size:23px;font-weight:600}.big3 a span{font-size:16px;color:#7a5a48}
+    .big3 a:nth-child(1){background:#8C2C1D;color:#FBF1EA}.big3 a:nth-child(1) span{color:#F1D9CC}
+    .big3 a:nth-child(2){background:#DDBFA8}.big3 a:nth-child(3){background:#E4D2BF}
+    .big3 svg{width:30px;height:30px}
+    @media(max-width:760px){.big3{grid-template-columns:1fr}.big3 a{min-height:0;padding:16px 20px;flex-direction:row;align-items:center;gap:14px}.big3 a b{font-size:19px}.big3 a span{margin-left:auto;font-size:14px}}
+    </style>
+    <div class="big3">
+        <a href="<?= forma_h($self) ?>?view=kalender"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><b>Kalender</b><span><?= $toPlan ? $toPlan . ' Private Pottery zum Einplanen' : 'Kurse &amp; Private Pottery' ?></span></a>
+        <a href="<?= forma_h($self) ?>?view=kasse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M7 8V4h10v4M7 13h2M11 13h2M15 13h2M7 16h10"/></svg><b>Kasse</b><span><?= $kasseUnpaid ? $kasseUnpaid . ' noch nicht bezahlt' : 'Pottery bemalen &amp; Gutscheine' ?></span></a>
+        <a href="<?= forma_h($self) ?>?view=edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><b>Neuer Termin</b><span>einzeln oder als Serie</span></a>
+    </div>
     <?php // Diese Woche (Vivien, 29.10.2026): nur Termine mit Anmeldungen, Mo–So der laufenden Woche, gleich unter den Zahlen
     require_once dirname(__DIR__) . '/api/belegt.inc.php';
     $wkFrom = date('Y-m-d', strtotime('monday this week')); $wkTo = date('Y-m-d', strtotime('sunday this week'));
@@ -3025,21 +3005,9 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
             <?php endforeach; ?>
             <a class="link small" href="<?= forma_h($self) ?>?view=kalender">Ganzen Kalender öffnen →</a>
         </section>
-        <nav class="tiles">
-            <a class="tile hl" href="<?= forma_h($self) ?>?view=kalender"><span class="ic"><?= admin_icon('kalender') ?></span><strong>Kalender</strong><span class="muted small">Kurse &amp; Private Pottery</span></a>
-            <a class="tile hl" href="<?= forma_h($self) ?>?view=kasse"><span class="ic"><?= admin_icon('kasse') ?></span><strong>Kasse</strong><span class="muted small">Pottery bemalen, Gutscheine &amp; Bestand<?= $kasseUnpaid ? ' · <b style="color:#8C2C1D">' . $kasseUnpaid . ' Bezahl-Link' . ($kasseUnpaid === 1 ? '' : 's') . ' offen</b>' : '' ?></span></a>
-            <a class="tile hl" href="<?= forma_h($self) ?>?view=winter"><span class="ic"><?= admin_icon('winter') ?></span><strong>Wintersaison 26/27</strong><span class="muted small">Hotel-Flyer &amp; Buchungsseite</span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=private"><span class="ic"><?= admin_icon('private') ?></span><strong>Private Pottery</strong><span class="muted small"><?= $privateOpen ?> offen</span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=edit"><span class="ic"><?= admin_icon('plus') ?></span><strong>Neuer Termin</strong><span class="muted small">einzeln oder als Serie</span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=templates"><span class="ic"><?= admin_icon('template') ?></span><strong>Templates</strong><span class="muted small">&amp; Maker Club</span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=gutscheine"><span class="ic"><?= admin_icon('gutschein') ?></span><strong>Gutscheine</strong><span class="muted small"><?= $voucherOpen ?> offen<?= $voucherUnpaid ? ' · <b style="color:#8C2C1D">' . $voucherUnpaid . ' noch nicht bezahlt</b>' : '' ?></span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=rechnungen"><span class="ic"><?= admin_icon('rechnung') ?></span><strong>Rechnungen</strong><span class="muted small">automatisch nach Zahlung</span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=angebote"><span class="ic"><?= admin_icon('angebot') ?></span><strong>Angebote</strong><span class="muted small"><?= $offerOpen ? $offerOpen . ' noch nicht bestätigt' : 'für Gruppen &amp; Schulen' ?><?= $offerUnpaid ? ' · <b style="color:#8C2C1D">' . $offerUnpaid . ' noch nicht bezahlt</b>' : '' ?></span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=popup"><span class="ic"><?= admin_icon('popup') ?></span><strong>Pop-up &amp; Deko</strong><span class="muted small"><?= $popupLive ? 'gerade sichtbar' : 'ausgeschaltet' ?> · Deko</span></a>
-            <a class="tile" href="<?= forma_h($self) ?>?view=einstellungen"><span class="ic"><?= admin_icon('settings') ?></span><strong>Einstellungen</strong><span class="muted small">Stripe, Mails, Testbuchungen</span></a>
-        </nav>
     </div>
-    <h2 id="termine">Alle kommenden Kurstermine</h2>
+    <details class="card allc" id="termine"><summary>Alle kommenden Kurstermine</summary>
+    <style>.allc{margin:16px 0}.allc>summary{cursor:pointer;font-size:18px;list-style:none;display:flex;justify-content:space-between}.allc>summary::-webkit-details-marker{display:none}.allc>summary::after{content:"▾";color:#9a7a68}.allc[open]>summary::after{content:"▴"}</style>
     <?php if (!$groups): ?><p class="muted">Gerade sind keine Termine eingetragen.</p><?php endif; ?>
     <?php foreach ($groups as $title => $list): $bookedSum = array_sum(array_column($list, 'booked')); ?>
     <details class="group" <?= count($list) <= 3 || $bookedSum > 0 ? 'open' : '' ?>>
@@ -3075,6 +3043,7 @@ render_page('Kursverwaltung', function () use ($groups, $past, $self, $flash, $p
         </div>
     </details>
     <?php endif; ?>
+    </details>
 <?php });
 
 /** Bilder für die Kasse, dieselben wie auf der Website (Pottery bemalen). */
@@ -3113,6 +3082,45 @@ function admin_icon(string $k): string
         'settings' => '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
     ][$k] ?? '';
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $p . '</svg>';
+}
+
+/** FORMA-Menü (Vivien, 31.10.2026: „weniger Text, übersichtlicher“): fünf Hauptreiter wie bei Movecia, darunter eine ruhige zweite Reihe. */
+function forma_subnav(string $view): void
+{
+    $pdo = $GLOBALS['pdo'] ?? null; $self = strtok((string)($_SERVER['REQUEST_URI'] ?? '/verwaltung/'), '?') ?: '/verwaltung/';
+    $grp = ['' => 'heute', 'start' => 'heute', 'kalender' => 'kal', 'course' => 'kal', 'edit' => 'kal', 'series' => 'kal', 'private' => 'kal', 'pp_mail' => 'kal',
+        'kasse' => 'verk', 'bestand' => 'verk', 'gutscheine' => 'verk', 'gutschein_kasse' => 'verk', 'angebote' => 'verk', 'angebot_vorab' => 'verk', 'rechnungen' => 'verk',
+        'templates' => 'web', 'template_edit' => 'web', 'popup' => 'web', 'winter' => 'web', 'einstellungen' => 'einst', 'tests' => 'einst', 'liste' => 'einst'];
+    $main = $grp[$view] ?? 'heute';
+    $nPriv = 0; $nVerk = 0;
+    if ($pdo) {
+        try { $nPriv = (int)$pdo->query("SELECT COUNT(*) FROM private_bookings WHERE status = 'anfrage' AND done = 0")->fetchColumn(); } catch (Throwable $e) {}
+        try { $nVerk = (int)$pdo->query("SELECT COUNT(*) FROM vouchers WHERE via = 'kasse' AND status = 'offen'")->fetchColumn(); } catch (Throwable $e) {}
+    }
+    $bd = fn(int $n) => $n ? ' <i>' . $n . '</i>' : '';
+    $tabs = [['heute', '', 'Heute'], ['kal', '?view=kalender', 'Kalender' . $bd($nPriv)], ['verk', '?view=kasse', 'Verkauf' . $bd($nVerk)], ['web', '?view=templates', 'Shop &amp; Website'], ['einst', '?view=einstellungen', 'Einstellungen']];
+    $subs = [
+        'kal' => [['kalender', '?view=kalender', 'Kalender'], ['edit', '?view=edit', 'Neuer Termin'], ['private', '?view=private', 'Private Pottery' . $bd($nPriv)]],
+        'verk' => [['kasse', '?view=kasse', 'Kasse'], ['gutscheine', '?view=gutscheine', 'Gutscheine' . $bd($nVerk)], ['angebote', '?view=angebote', 'Angebote'], ['rechnungen', '?view=rechnungen', 'Rechnungen']],
+        'web' => [['templates', '?view=templates', 'Templates &amp; Maker Club'], ['popup', '?view=popup', 'Pop-up &amp; Deko'], ['winter', '?view=winter', 'Wintersaison']],
+        'einst' => [['einstellungen', '?view=einstellungen', 'Einstellungen'], ['liste', '?view=liste', 'E-Mail-Liste'], ['tests', '?view=tests', 'Testbuchungen']],
+    ][$main] ?? [];
+    $subOn = ['course' => 'kalender', 'series' => 'edit', 'pp_mail' => 'kalender', 'bestand' => 'kasse', 'gutschein_kasse' => 'gutscheine', 'angebot_vorab' => 'angebote', 'template_edit' => 'templates'][$view] ?? $view; ?>
+<style>
+.fsub{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:4px -4px 8px;padding:6px 4px;border-bottom:1px solid var(--line)}
+.fsub::-webkit-scrollbar,.fsub2::-webkit-scrollbar{display:none}
+.fsub a{flex:0 0 auto;padding:10px 20px;border-radius:999px;color:var(--ink);text-decoration:none;font-size:17px;white-space:nowrap}
+.fsub a:not(.on):hover{background:#E4D2BF}
+.fsub a.on{background:#8C2C1D;color:#FBF1EA}
+.fsub2{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:0 0 18px;border-bottom:1px solid var(--line)}
+.fsub2 a{flex:0 0 auto;padding:9px 14px 10px;border-bottom:3px solid transparent;color:#7a5a48;text-decoration:none;font-size:16px;white-space:nowrap}
+.fsub2 a.on{color:var(--ink);font-weight:600;border-bottom-color:#8C2C1D}
+.fsub i,.fsub2 i{font-style:normal;display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:999px;background:#B5544A;color:#fff;font-size:12px;text-align:center;font-weight:400}
+.fsub a.on i{background:#FBF1EA;color:#8C2C1D}
+</style>
+<nav class="fsub" aria-label="FORMA"><?php foreach ($tabs as [$k, $q, $t]): ?><a href="<?= forma_h($self) . $q ?>"<?= $k === $main ? ' class="on" aria-current="page"' : '' ?>><?= $t ?></a><?php endforeach; ?></nav>
+<?php if ($subs): ?><nav class="fsub2" aria-label="Unterbereich"><?php foreach ($subs as [$k, $q, $t]): ?><a href="<?= forma_h($self) . $q ?>"<?= $k === $subOn ? ' class="on"' : '' ?>><?= $t ?></a><?php endforeach; ?></nav><?php endif; ?>
+<?php
 }
 
 function render_page(string $title, callable $body): void
@@ -3400,8 +3408,9 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 </head>
 <body>
 <main>
-<?php $swSelf = strtok($_SERVER['REQUEST_URI'] ?? '/verwaltung/', '?') ?: '/verwaltung/'; $swMm = in_array((string)($GLOBALS['view'] ?? ''), ['movecia', 'natal', 'method', 'texte', 'presse', 'vorschau', 'videos', 'mediathek', 'studio', 'schnitt', 'insta', 'musik'], true); $swReq = 0; if (isset($GLOBALS['pdo'])) { try { $swReq = (int)$GLOBALS['pdo']->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} } ?>
+<?php $swSelf = strtok($_SERVER['REQUEST_URI'] ?? '/verwaltung/', '?') ?: '/verwaltung/'; $swMm = in_array((string)($GLOBALS['view'] ?? ''), ['movecia', 'natal', 'method', 'texte', 'presse', 'vorschau', 'videos', 'mediathek', 'studio', 'schnitt', 'insta', 'musik', 'training', 'academy', 'winter_mm'], true); $swReq = 0; if (isset($GLOBALS['pdo'])) { try { $swReq = (int)$GLOBALS['pdo']->query("SELECT COUNT(*) FROM mm_natal_sessions WHERE status = 'angefragt'")->fetchColumn(); } catch (Throwable $e) {} } ?>
 <header class="head"><nav class="sw" aria-label="Bereich wechseln"><a class="sw-f<?= $swMm ? '' : ' on' ?>" href="<?= forma_h($swSelf) ?>"<?= $swMm ? '' : ' aria-current="page"' ?>><span class="sw-ic"><img src="/img/forma-logo.png" alt=""></span><span class="sw-t"><b>FORMA</b><small>🏺 Atelierverwaltung</small></span></a><a class="sw-m<?= $swMm ? ' on' : '' ?>" href="<?= forma_h($swSelf) ?>?view=movecia"<?= $swMm ? ' aria-current="page"' : '' ?>><span class="sw-ic"><img src="/img/movecia/movecia-zeichen.svg" alt=""></span><span class="sw-t"><b>Movecia</b><small>🌿 Studioverwaltung</small></span><?php if ($swReq): ?><i class="sw-badge" title="Terminanfragen"><?= $swReq ?></i><?php endif; ?></a></nav><span class="head-deco"><span class="deco-slot"></span><span class="deco-slot"></span><span class="deco-slot"></span></span><?php if (!empty($_SESSION['admin'])): ?><form method="post" class="out"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="logout"><button type="submit" title="Abmelden"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v8M6.6 6.6a8 8 0 1 0 10.8 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Abmelden</span></button></form><?php endif; ?></header>
+<?php $fvw = (string)($GLOBALS['view'] ?? ''); if (!$swMm && !empty($_SESSION['admin']) && empty($_SESSION['tf_pending']) && !in_array($fvw, ['kv_status', 'rechnung_pdf', 'export', 'gutscheine_export', 'rechnungen_export', 'templates_export'], true)) forma_subnav($fvw); ?>
 <?php $body(); ?>
 </main>
 <script src="deko.js?v=1" defer></script>

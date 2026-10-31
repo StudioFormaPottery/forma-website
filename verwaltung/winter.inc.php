@@ -153,10 +153,9 @@ if ($view === 'winter' || $view === 'winter_mm') {
 @media(min-width:900px){.ws .grid{grid-template-columns:1.3fr 1fr}}
 </style>
 <div class="ws">
-    <?php if ($isMm) { mm_subnav('training'); ?><p><a href="<?= forma_h($self) ?>?view=training">← Zurück zu Personal Training</a></p><?php } else { ?><p><a href="<?= forma_h($self) ?>">← Zur Übersicht</a></p><?php } ?>
+    <?php if ($isMm) { mm_subnav('training'); ?><p><a href="<?= forma_h($self) ?>?view=training">← Zurück zu Personal Training</a></p><?php } ?>
     <p class="eyebrow">❄️ <?= WINTER_SEASON ?> · <?= $isMm ? 'Movecia' : 'FORMA' ?></p>
     <h1><?= forma_h($title) ?></h1>
-    <p class="muted">Buchungsseite und Flyer für die Hotels an einem Ort. Die Seite ist nur über den Link bzw. den QR-Code auf dem Flyer erreichbar, Google zeigt sie nicht an.</p>
     <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
 
     <div class="grid">
