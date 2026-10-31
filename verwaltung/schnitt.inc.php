@@ -87,6 +87,59 @@ if ($action === 'mm_sn_thumb') {
     exit;
 }
 
+// ☁️ Entwürfe auf allen Geräten (Vivien, 31.10.2026: „ich will es direkt auf allen Geräten sehen“)
+// Videodateien liegen in ../forma-data/schnitt/files/<fid> (nie im Repo), die Clip-Angaben in state.json.
+// Jede Zeile hat 'at' (letzte Änderung); bei zwei Geräten gewinnt die neuere. Gelöschte Zeilen bleiben als {gone:1}.
+function sn_dir(): string { $d = forma_data_dir() . '/schnitt'; if (!is_dir($d . '/files')) @mkdir($d . '/files', 0775, true); return $d; }
+function sn_fid(string $f): string { return preg_replace('/[^A-Za-z0-9_-]/', '', $f); }
+function sn_state_load(): array { $p = sn_dir() . '/state.json'; $j = is_file($p) ? json_decode((string)file_get_contents($p), true) : null; return is_array($j) ? $j + ['rows' => [], 'kv' => []] : ['rows' => [], 'kv' => []]; }
+if (in_array($action, ['mm_sn_put', 'mm_sn_up', 'mm_sn_del'], true) || ($view === 'schnitt' && (isset($_GET['state']) || isset($_GET['f']) || isset($_GET['has'])))) {
+    $J = function (array $x): void { header('Content-Type: application/json; charset=utf-8'); header('Cache-Control: no-store'); echo json_encode($x, JSON_UNESCAPED_UNICODE); exit; };
+    if ($view === 'schnitt' && isset($_GET['state'])) $J(sn_state_load());
+    if ($view === 'schnitt' && isset($_GET['has'])) { $out = []; foreach (glob(sn_dir() . '/files/*') ?: [] as $f) if (!str_ends_with($f, '.part')) $out[] = basename($f); $J(['files' => $out]); }
+    if ($view === 'schnitt' && isset($_GET['f'])) {
+        $p = sn_dir() . '/files/' . sn_fid((string)$_GET['f']);
+        if (!is_file($p)) { http_response_code(404); exit('Datei fehlt.'); }
+        $size = filesize($p); $from = 0; $to = $size - 1; $type = (string)($_GET['t'] ?? '');
+        header('Content-Type: ' . (preg_match('#^video/[a-z0-9.+-]+$#', $type) ? $type : 'application/octet-stream'));
+        header('Accept-Ranges: bytes'); header('Cache-Control: private, max-age=86400');
+        if (preg_match('/bytes=(\d*)-(\d*)/', (string)($_SERVER['HTTP_RANGE'] ?? ''), $m)) {
+            if ($m[1] !== '') $from = (int)$m[1]; if ($m[2] !== '') $to = min($to, (int)$m[2]); if ($m[1] === '' && $m[2] !== '') { $from = $size - (int)$m[2]; $to = $size - 1; }
+            http_response_code(206); header("Content-Range: bytes $from-$to/$size");
+        }
+        header('Content-Length: ' . ($to - $from + 1));
+        $fh = fopen($p, 'rb'); fseek($fh, $from); $left = $to - $from + 1;
+        while ($left > 0 && !feof($fh)) { $c = fread($fh, min(1 << 20, $left)); echo $c; $left -= strlen($c); flush(); }
+        exit;
+    }
+    if ($action === 'mm_sn_up') { // Datei in 1,5-MB-Stücken (Server-Grenzen)
+        $fid = sn_fid((string)($_POST['fid'] ?? '')); $f = $_FILES['b'] ?? null;
+        if ($fid === '' || !$f || $f['error'] !== UPLOAD_ERR_OK) $J(['error' => 'Stück fehlt']);
+        $tmp = sn_dir() . '/files/' . $fid . '.part';
+        if ((int)($_POST['n'] ?? 0) === 0) @unlink($tmp);
+        elseif (!is_file($tmp) || filesize($tmp) !== (int)($_POST['off'] ?? -1)) $J(['error' => 'Reihenfolge', 'have' => is_file($tmp) ? filesize($tmp) : 0]);
+        file_put_contents($tmp, file_get_contents($f['tmp_name']), FILE_APPEND);
+        if (!empty($_POST['last'])) rename($tmp, sn_dir() . '/files/' . $fid);
+        $J(['ok' => 1]);
+    }
+    if ($action === 'mm_sn_put') { // Änderungen zusammenführen
+        $in = json_decode((string)($_POST['data'] ?? ''), true); if (!is_array($in)) $J(['error' => 'Daten fehlen']);
+        $fp = fopen(sn_dir() . '/state.lock', 'c'); flock($fp, LOCK_EX);
+        $st = sn_state_load();
+        foreach ((array)($in['rows'] ?? []) as $r) { if (!is_array($r) || empty($r['id'])) continue; $id = (string)$r['id']; unset($r['blob'], $r['url'], $r['thumb'], $r['slot']);
+            if (!isset($st['rows'][$id]) || (float)($st['rows'][$id]['at'] ?? 0) <= (float)($r['at'] ?? 0)) $st['rows'][$id] = $r; }
+        foreach ((array)($in['kv'] ?? []) as $k => $v) { if (!is_string($k) || !is_array($v)) continue;
+            if (!isset($st['kv'][$k]) || (float)($st['kv'][$k]['at'] ?? 0) <= (float)($v['at'] ?? 0)) $st['kv'][$k] = $v; }
+        // Dateien, die kein Clip mehr braucht (Zeile endgültig gelöscht), nach 1 Tag wegräumen
+        $used = []; foreach ($st['rows'] as $r) if (empty($r['gone']) && !empty($r['fid'])) $used[(string)$r['fid']] = 1;
+        foreach (glob(sn_dir() . '/files/*') ?: [] as $f) { $b = basename($f); if (str_ends_with($b, '.part')) { if (filemtime($f) < time() - 86400) @unlink($f); continue; } if (!isset($used[$b]) && filemtime($f) < time() - 86400) @unlink($f); }
+        $st['at'] = microtime(true) * 1000;
+        file_put_contents(sn_dir() . '/state.json.tmp', json_encode($st, JSON_UNESCAPED_UNICODE)); rename(sn_dir() . '/state.json.tmp', sn_dir() . '/state.json');
+        flock($fp, LOCK_UN); fclose($fp);
+        $J(['ok' => 1, 'at' => $st['at']]);
+    }
+}
+
 if ($view === 'schnitt') {
     require_once dirname(__DIR__) . '/api/method-lib.php';
     mv_schema($pdo);
@@ -121,10 +174,10 @@ main{max-width:none;padding-left:clamp(12px,2.4vw,32px);padding-right:clamp(12px
 </div>
 <div id="sn"></div>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
-<script src="schnitt.js?v=33"></script>
+<script src="schnitt.js?v=34"></script>
 <script>
 (function(){
-  const csrf=<?= json_encode(csrf()) ?>, BUNNY=<?= $bunny ? 'true' : 'false' ?>;
+  const csrf=<?= json_encode(csrf()) ?>, BUNNY=<?= $bunny ? 'true' : 'false' ?>;window.SN_CSRF=csrf;
   function post(a,d,file){const f=new FormData();f.append('csrf',csrf);f.append('action',a);for(const k in d)f.append(k,d[k]);if(file)f.append(file[0],file[1],file[2]);
     return fetch(location.pathname,{method:'POST',body:f,credentials:'same-origin'}).then(r=>r.json())}
   // Direkt zu Bunny (gleiche Aktionen wie „Videos hochladen“ und das Studio)

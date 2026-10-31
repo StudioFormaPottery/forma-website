@@ -34,18 +34,20 @@
     const d = await idb(), row = Object.assign({}, c); let newFile = null;
     if (row.blob) { let f = fidOf.get(row.blob); if (!f) { f = 'f' + uid(); newFile = [f, row.blob]; } row.fid = f; }
     delete row.blob; delete row.url; delete row.thumb; delete row.slot;
+    row.at = Date.now(); if (c.blob && c.blob.type) row.ft = c.blob.type;
     return new Promise((ok, no) => { const t = d.transaction(['clips', 'files'], 'readwrite'); if (newFile) t.objectStore('files').put(newFile[1], newFile[0]); t.objectStore('clips').put(row);
-      t.oncomplete = () => { if (newFile) fidOf.set(newFile[1], newFile[0]); ok(); }; t.onerror = () => no(t.error); });
+      t.oncomplete = () => { if (newFile) fidOf.set(newFile[1], newFile[0]); syncRow(row); if (row.fid) syncFile(row.fid, newFile ? newFile[1] : c.blob); ok(); }; t.onerror = () => no(t.error); });
   }
   async function dbDel(id) {
     const d = await idb(); const t0 = d.transaction('clips'), row = await req(t0.objectStore('clips').get(id)).catch(() => null);
     await new Promise((ok, no) => { const t = d.transaction('clips', 'readwrite'); t.objectStore('clips').delete(id); t.oncomplete = ok; t.onerror = () => no(t.error); });
+    if (!dbDel._pulled) syncRow({ id, gone: 1, at: Date.now() });
     const f = row && row.fid; if (!f) return;
     const rest = (await req(d.transaction('clips').objectStore('clips').getAll())) || [];
     if (!rest.some(r => r.fid === f)) await new Promise(ok => { const t = d.transaction('files', 'readwrite'); t.objectStore('files').delete(f); t.oncomplete = ok; t.onerror = ok; });
   }
   async function kvGet(k) { const d = await idb(); return new Promise((ok, no) => { const r = d.transaction('kv').objectStore('kv').get(k); r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error); }); }
-  async function kvSet(k, v) { const d = await idb(); return new Promise((ok, no) => { const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = ok; t.onerror = () => no(t.error); }); }
+  async function kvSet(k, v, pulled) { if (!pulled && (k === 'drafts' || /^order:/.test(k))) syncKv(k, v); const d = await idb(); return new Promise((ok, no) => { const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = ok; t.onerror = () => no(t.error); }); }
   async function kvDel(k) { const d = await idb(); return new Promise((ok, no) => { const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').delete(k); t.oncomplete = ok; t.onerror = () => no(t.error); }); }
   // Kleine Rückfrage im Movecia-Stil statt der großen Browser-Fenster (Vivien, 30.10.2026: „riesige Pop-ups will ich nicht“)
   function ask(text) { return new Promise(ok => { const w = document.createElement('div');
@@ -53,6 +55,65 @@
     w.innerHTML = '<div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button type="button" data-n style="font:inherit;padding:8px 16px;border-radius:999px;border:1.5px solid #DDD2C6;background:#fff;color:#4A3A41;cursor:pointer">Abbrechen</button><button type="button" data-y style="font:inherit;padding:8px 16px;border-radius:999px;border:0;background:#7D5E68;color:#fff;cursor:pointer">Ja</button></div>';
     w.firstChild.textContent = text; document.body.appendChild(w); const done = v => { w.remove(); ok(v); };
     w.querySelector('[data-y]').onclick = () => done(true); w.querySelector('[data-n]').onclick = () => done(false); w.querySelector('[data-y]').focus(); }); }
+  // ---- ☁️ Abgleich mit dem Server: Entwürfe auf allen Geräten (Vivien, 31.10.2026) ----
+  const SY = { rows: new Map(), kv: {}, t: 0, files: [], upRun: false, have: null, pulled: false, status: null };
+  const syUrl = () => (location.pathname.indexOf('/verwaltung') >= 0 ? location.pathname : '/verwaltung/');
+  const syCsrf = () => window.SN_CSRF || '';
+  function syncRow(r) { if (!syCsrf()) return; const x = Object.assign({}, r); delete x.blob; delete x.url; delete x.thumb; delete x.slot; SY.rows.set(x.id, x); syFlushSoon(); }
+  async function syncKv(k, v) { if (!syCsrf()) return; const at = Date.now(); SY.kv[k] = { v, at }; try { const m = (await kvGet('kvAt').catch(() => null)) || {}; m[k] = at; await kvSet('kvAt', m, true); } catch (e) {} syFlushSoon(); }
+  function syFlushSoon() { clearTimeout(SY.t); SY.t = setTimeout(syFlush, 1200); }
+  async function syFlush() {
+    if (!SY.rows.size && !Object.keys(SY.kv).length) return; const rows = [...SY.rows.values()], kv = SY.kv; SY.rows = new Map(); SY.kv = {};
+    const f = new FormData(); f.append('csrf', syCsrf()); f.append('action', 'mm_sn_put'); f.append('data', JSON.stringify({ rows, kv }));
+    try { const r = await fetch(syUrl(), { method: 'POST', body: f, credentials: 'same-origin' }).then(x => x.json()); if (!r || r.error) throw 0; }
+    catch (e) { rows.forEach(x => { if (!SY.rows.has(x.id)) SY.rows.set(x.id, x); }); for (const k in kv) if (!SY.kv[k]) SY.kv[k] = kv[k]; clearTimeout(SY.t); SY.t = setTimeout(syFlush, 15000); }
+  }
+  function syncFile(fid, blob) { if (!syCsrf() || !blob || SY.files.some(x => x.fid === fid)) return; SY.files.push({ fid, blob }); syUpload(); }
+  async function syUpload() {
+    if (SY.upRun) return; SY.upRun = true;
+    try {
+      if (!SY.have) { try { SY.have = new Set(((await fetch(syUrl() + '?view=schnitt&has=1', { credentials: 'same-origin' }).then(r => r.json())).files) || []); } catch (e) { SY.have = new Set(); } }
+      while (SY.files.length) {
+        const { fid, blob } = SY.files[0]; if (SY.have.has(fid)) { SY.files.shift(); continue; }
+        const CH = 1536 * 1024, n = Math.max(1, Math.ceil(blob.size / CH)); let ok = true;
+        for (let i = 0; i < n && ok; i++) { const f = new FormData(); f.append('csrf', syCsrf()); f.append('action', 'mm_sn_up'); f.append('fid', fid); f.append('n', i); f.append('off', i * CH); if (i === n - 1) f.append('last', '1'); f.append('b', blob.slice(i * CH, (i + 1) * CH), 'teil');
+          let j = null; for (let t = 0; t < 4 && !j; t++) { try { j = await fetch(syUrl(), { method: 'POST', body: f, credentials: 'same-origin' }).then(r => r.json()); if (j && j.error) j = null; } catch (e) {} if (!j) await new Promise(r => setTimeout(r, 2500 * (t + 1))); }
+          if (!j) ok = false; if (SY.status) SY.status('up', SY.files.length, (i + 1) / n); }
+        if (!ok) { await new Promise(r => setTimeout(r, 30000)); continue; }
+        SY.have.add(fid); SY.files.shift();
+      }
+      if (SY.status) SY.status('done', 0, 1);
+    } finally { SY.upRun = false; }
+  }
+  // Vom Server holen: neuere Clip-Angaben und Entwürfe übernehmen
+  async function syncPull() {
+    if (!syCsrf()) return false;
+    let st = null; try { st = await Promise.race([fetch(syUrl() + '?view=schnitt&state=1', { credentials: 'same-origin' }).then(r => r.json()), new Promise(r => setTimeout(() => r(null), 6000))]); } catch (e) {}
+    if (!st || !st.rows) return false;
+    const d = await idb(), local = new Map(((await req(d.transaction('clips').objectStore('clips').getAll())) || []).map(r => [r.id, r]));
+    for (const id in st.rows) { const r = st.rows[id], l = local.get(id); if (l && (l.at || 0) >= (r.at || 0)) continue;
+      if (r.gone) { if (l) { dbDel._pulled = true; try { await dbDel(id); } finally { dbDel._pulled = false; } } continue; }
+      if (l && l.blob && !l.fid) continue; // altes Gerät hat die Datei noch direkt im Clip: das lädt erst hoch
+      await new Promise((ok, no) => { const t = d.transaction('clips', 'readwrite'); t.objectStore('clips').put(r); t.oncomplete = ok; t.onerror = () => no(t.error); }); }
+    const kvAt = (await kvGet('kvAt').catch(() => null)) || {};
+    for (const k in (st.kv || {})) { const x = st.kv[k]; if ((kvAt[k] || 0) >= (x.at || 0)) continue; await kvSet(k, x.v, true); kvAt[k] = x.at; }
+    await kvSet('kvAt', kvAt, true);
+    // Erstes Mal auf diesem Gerät: alles Vorhandene einmal hochschicken
+    if (!localStorage.getItem('sn-sync1')) { try { localStorage.setItem('sn-sync1', '1'); } catch (e) {}
+      const all = await dbAll(); for (const r of all) { if (!r.at) r.at = 1; if (r.blob && !fidOf.get(r.blob)) { await dbPut(r); continue; } syncRow(Object.assign({}, r, { fid: r.fid || fidOf.get(r.blob) })); if (r.fid && r.blob) syncFile(r.fid, r.blob); }
+      for (const k of ['drafts']) { const v = await kvGet(k); if (v) syncKv(k, v); }
+      for (const dd of ((await kvGet('drafts')) || [])) { const v = await kvGet('order:' + dd.id); if (v) syncKv('order:' + dd.id, v); } }
+    return true;
+  }
+  // Datei, die es auf diesem Gerät noch nicht gibt, vom Server laden
+  async function syncFetch(fid, type, onProg) {
+    const r = await fetch(syUrl() + '?view=schnitt&f=' + encodeURIComponent(fid) + '&t=' + encodeURIComponent(type || ''), { credentials: 'same-origin' }); if (!r.ok) throw new Error('Datei fehlt am Server');
+    const len = +r.headers.get('Content-Length') || 0, rd = r.body.getReader(), parts = []; let got = 0;
+    for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); got += value.length; if (onProg && len) onProg(got / len); }
+    const blob = new Blob(parts, { type: type || 'video/mp4' }), d = await idb();
+    await new Promise((ok, no) => { const t = d.transaction('files', 'readwrite'); t.objectStore('files').put(blob, fid); t.oncomplete = ok; t.onerror = () => no(t.error); });
+    fidOf.set(blob, fid); return blob;
+  }
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   const fmt = s => { s = Math.max(0, s || 0); return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'); };
   const fmt1 = s => fmt(s) + ',' + Math.floor((Math.max(0, s || 0) % 1) * 10);
@@ -373,7 +434,7 @@ void main(){
     const mount = o.mount; mount.innerHTML = '';
     const root = document.createElement('div'); root.className = 'sn'; mount.appendChild(root);
     root.innerHTML = `<div class="sn-l">
-  <div class="sn-top"><button type="button" class="sn-b" data-k="drJump">📝 Meine Entwürfe <span data-k="drCnt"></span></button><span class="sn-cur" data-k="drCur"></span></div>
+  <div class="sn-top"><button type="button" class="sn-b" data-k="drJump">📝 Meine Entwürfe <span data-k="drCnt"></span></button><span class="sn-cur" data-k="drCur"></span><span class="sn-cur" data-k="syS"></span></div>
   <div class="sn-tg" data-k="tg"><span data-k="tgT"></span><button type="button" class="sn-b sm" data-k="tgBtn">Ändern</button><select data-k="tgSel" hidden aria-label="Wohin kommt das Video?"></select></div>
   <div class="sn-pv" id="snpv"><div class="empty" id="snempty"><b>Noch keine Clips</b>Tipp unten auf „＋ Clips“ und wähl Videos vom iPhone oder Computer, oder nimm im Studio auf.</div><img class="sn-covimg" data-k="covimg" alt=""><button type="button" class="big" data-k="big" hidden aria-label="Abspielen">▶</button><span class="tag" data-k="tag"></span></div>
   <div class="sn-tl">
@@ -566,8 +627,12 @@ void main(){
     // ---- Laden ----
     async function load() {
       try {
+        if (!SY.pulled) { SY.pulled = true; await syncPull().catch(() => false); }
         curDraft = await ensureDraft(); drList = await drafts();
-        const all = await dbAll(), rows = all.filter(r => r.draft === curDraft && !r.trash && r.blob), order = (await kvGet(ordKey(curDraft))) || [];
+        let all0 = await dbAll(); const miss = new Map(); all0.forEach(r => { if (r.draft === curDraft && !r.trash && r.fid && !r.blob) miss.set(r.fid, r); });
+        let k0 = 0; for (const [fid, r] of miss) { k0++; try { await syncFetch(fid, r.ft, pr => say('☁️ „' + (r.name || 'Clip') + '“ kommt von deinem anderen Gerät … ' + k0 + ' von ' + miss.size + ' · ' + Math.round(pr * 100) + ' %')); } catch (e) { console.warn('Schnitt: Datei vom Server', e); } }
+        if (miss.size) say('✓ Alles da.', 'ok');
+        const all = miss.size ? await dbAll() : all0, rows = all.filter(r => r.draft === curDraft && !r.trash && r.blob), order = (await kvGet(ordKey(curDraft))) || [];
         rows.sort((a, b) => (order.indexOf(a.id) + 1 || 1e9) - (order.indexOf(b.id) + 1 || 1e9) || a.added - b.added);
         const urls = new Map(); const objs = rows.map(r => { let u = urls.get(r.blob); if (!u) { u = URL.createObjectURL(r.blob); urls.set(r.blob, u); } return Object.assign({}, r, { url: u }); });
         clips = objs.filter(r => !r.bro); bros = objs.filter(r => r.bro); bros.forEach(ovVid);
@@ -628,6 +693,7 @@ void main(){
       else drawDrafts();
       trashUi(); say('🗑 „' + nm + '“ gelöscht, die Clips liegen im Papierkorb.');
     }
+    SY.status = (k, n, p) => { if (closed) return; K('syS').textContent = k === 'done' ? '· ☁️ auf allen Geräten' : '· ☁️ wird für deine anderen Geräte gesichert … noch ' + n + (n > 1 ? ' Dateien' : ' Datei') + ' (' + Math.round(p * 100) + ' %)'; };
     function drJump() { const b = K('drBox'); b.open = true; b.scrollIntoView({ behavior: 'smooth', block: 'start' }); b.style.boxShadow = '0 0 0 3px #7D5E68'; setTimeout(() => b.style.boxShadow = '', 2200); }
     K('drJump').onclick = drJump; if (location.hash === '#entwuerfe') setTimeout(drJump, 600);
     K('drNew').onclick = async () => {
