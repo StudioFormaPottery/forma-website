@@ -23,6 +23,7 @@ unset($_SESSION['flash']);
  */
 // Neu-Boxen: 'b' => 'movecia' erscheint nur auf der Movecia-Übersicht, sonst nur bei FORMA (Vivien, 28.10.2026).
 const FORMA_ADMIN_NEWS = [
+    ['b' => 'movecia', 'until' => '2026-12-31', 'title' => '✨ KI-Filter für deine Fotos', 'text' => 'Foto wählen, Look antippen (Dunkel & verträumt, Hell & luftig oder Hell & verspielt) und „KI-Filter generieren“. Danach direkt in deine Fotos sichern. Einmal deinen Google-Schlüssel eintragen, die Anleitung steht auf der Seite.', 'link' => '?view=kifilter'],
     ['until' => '2026-12-15', 'title' => '🙂 Anmelden mit Face ID', 'text' => 'Du kannst dich jetzt mit Face ID (Passkey) anmelden, ganz ohne Passwort. Einrichten unter Einstellungen, ganz oben – am besten auf iPhone und MacBook.', 'link' => '?view=einstellungen#passkey'],
     ['until' => '2026-12-15', 'title' => '🔐 Zwei-Stufen-Anmeldung', 'text' => 'Deine Verwaltung kann jetzt zusätzlich zum Passwort einen 6-stelligen Code aus Duo verlangen. So kommt niemand hinein, auch wenn er dein Passwort kennt. Einschalten unter Einstellungen, ganz oben. Pro Gerät musst du den Code nur alle 30 Tage eingeben.', 'link' => '?view=einstellungen#zweistufen'],
     ['b' => 'movecia', 'until' => '2026-12-15', 'title' => '🔐 Zwei-Stufen-Anmeldung', 'text' => 'Deine Verwaltung kann jetzt zusätzlich zum Passwort einen 6-stelligen Code aus Duo verlangen. Einschalten unter Einstellungen (FORMA-Verwaltung), ganz oben.', 'link' => '?view=einstellungen#zweistufen'],
@@ -531,7 +532,7 @@ if ($action === 'logout') {
 }
 
 // Movecia Movement / Wild Hearts: eigener Bereich (verwaltung/movecia.php)
-if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 'natal' || $view === 'method' || $view === 'texte' || $view === 'presse' || $view === 'vorschau' || $view === 'videos' || $view === 'mediathek' || $view === 'studio' || $view === 'schnitt' || $view === 'insta' || $view === 'musik' || $view === 'training' || $view === 'academy') {
+if (str_starts_with((string)$action, 'mm_') || $view === 'movecia' || $view === 'natal' || $view === 'method' || $view === 'texte' || $view === 'presse' || $view === 'vorschau' || $view === 'videos' || $view === 'mediathek' || $view === 'studio' || $view === 'schnitt' || $view === 'insta' || $view === 'musik' || $view === 'kifilter' || $view === 'training' || $view === 'academy') {
     require __DIR__ . '/movecia.php';
 }
 // Wintersaison 2026/27: Hotel-Flyer + Buchungsseiten (FORMA ?view=winter, Movecia ?view=winter_mm)
