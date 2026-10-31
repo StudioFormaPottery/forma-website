@@ -1,33 +1,24 @@
 <?php
 // moveciamovement.com/gutscheine – Movecia-Gutscheine verschenken (Vivien, 31.10.2026)
-// VORSCHAU: Seite und Auswahl stehen, Bezahlen ist noch nicht angeschlossen (erst nach Viviens Okay).
 // Angebote mit festem Preis (Unfold, Method, Personal Training online/Studio, Prä- & Postnatal) oder eigener Betrag.
-// Alle Preise kommen vom Server aus den jeweiligen Angeboten.
+// Preise kommen vom Server (mv_gift_offers), Kauf über api/mv-gutschein-kauf.php (Stripe), Gutschein = Wertgutschein für alles.
 declare(strict_types=1);
-require dirname(__DIR__, 2) . '/api/ptb-lib.php';
-require_once dirname(__DIR__, 2) . '/api/method-lib.php';
+require dirname(__DIR__, 2) . '/api/mv-geschenk.inc.php';
 header('Cache-Control: no-store');
 $h = 'forma_h';
 $eur = fn(int $c) => '€ ' . ($c % 100 ? number_format($c / 100, 2, ',', '.') : number_format($c / 100, 0, ',', '.'));
-$mp = mv_plans();
-$np = natal_packages();
-$pt = ptb_price_table(1);
-$ptOn = (int)$np['o_einzel']['unit_cents']; // Personal Training online = Preis wie 1:1 Prä-/Postnatal online (Vivien, 31.10.2026)
-
-// Angebote: key => [Titel, Untertitel, Bild, Varianten [key => [Label, Cent]]]
-$offers = [
-    'unfold' => ['Unfold', 'The Mindful Becoming · 3 Monate Begleitung mit Live-Calls, Bewegung und Workbooks', 'ev-unfold-karte.jpg',
-        ['u1' => ['3 Monate', (int)$mp['u1']['cents']]]],
-    'method' => ['The Method', 'Mindful Movement on demand · Flows für jeden Tag, wann immer sie Zeit hat', 'ev-method-karte.jpg',
-        ['m1' => ['1 Monat', (int)$mp['m1']['cents']], 'm3' => ['3 Monate', (int)$mp['m3']['cents']], 'm12' => ['1 Jahr', (int)$mp['m12']['cents']]]],
-    'pt_online' => ['Personal Training online', '1:1 live per Video, ganz auf sie abgestimmt, von zu Hause aus', 'ev-gathering.jpg',
-        array_combine(['o1', 'o2', 'o3', 'o4'], array_map(fn($n) => [$n === 1 ? '1 Einheit' : $n . ' Einheiten', $ptOn * $n], [1, 2, 3, 4]))],
-    'pt_studio' => ['Personal Training im Studio', '1:1 in meinem kleinen Studio in Mathon, ' . PTB_MINUTES . ' Minuten nur für sie', 'pt-baum.jpg',
-        array_combine(['s1', 's2', 's3', 's4'], array_map(fn($n) => [$n === 1 ? '1 Einheit' : $n . ' Einheiten', (int)$pt[$n]['total']], [1, 2, 3, 4]))],
-    'natal' => ['Prä- & Postnatal', '1:1 durch Schwangerschaft und Rückbildung, im Studio oder online', 'ev-post-baby.jpg',
-        ['einzel' => ['Einzelstunde', (int)$np['einzel']['unit_cents']], 'prae' => ['Pränatal · 6 Einheiten', (int)$np['prae']['unit_cents'] * 6],
-         'post' => ['Postnatal · 8 Einheiten', (int)$np['post']['unit_cents'] * 8], 'kombi' => ['Kombi · 14 Einheiten', (int)$np['kombi']['unit_cents'] * 14]]],
-];
+$pdo = forma_db();
+mv_gift_schema($pdo);
+mv_gift_tick($pdo);
+$offers = mv_gift_offers();
+// Danke-Seite nach der Zahlung
+$done = null; $dv = null;
+if (isset($_GET['danke'])) {
+    $done = mv_gift_order($pdo, (int)$_GET['danke']);
+    if (!$done || !hash_equals((string)$done['token'], (string)($_GET['k'] ?? ''))) $done = null;
+    if ($done && $done['status'] === 'offen') { try { mv_gift_check($pdo, $done); } catch (Throwable $e) {} $done = mv_gift_order($pdo, (int)$done['id']); }
+    if ($done && (int)$done['voucher_id']) $dv = $pdo->query('SELECT * FROM mm_vouchers WHERE id = ' . (int)$done['voucher_id'])->fetch();
+}
 ?><!doctype html>
 <html lang="de">
 <head>
@@ -35,7 +26,11 @@ $offers = [
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Gutscheine · Schenke Me-Time · Movecia</title>
 <meta name="description" content="Schenke Me-Time: Gutscheine für Personal Training online oder im Studio in Mathon, Unfold, The Method und Prä- & Postnatal Training bei Movecia. Sofort als PDF zum Ausdrucken.">
-<meta name="robots" content="noindex">
+<meta name="robots" content="<?= isset($_GET['danke']) ? 'noindex' : 'index, follow' ?>">
+<link rel="canonical" href="https://moveciamovement.com/gutscheine/">
+<meta property="og:title" content="Gutscheine · Schenke Me-Time · Movecia">
+<meta property="og:description" content="Gutscheine für Personal Training, The Method, Unfold und Prä- & Postnatal. Sofort als PDF.">
+<meta property="og:image" content="https://moveciamovement.com/img/movecia/fotos/ev-gathering.jpg">
 <meta name="theme-color" content="#F5F1EB">
 <link rel="icon" href="/img/movecia/movecia-favicon-64.png">
 <link rel="apple-touch-icon" href="/img/movecia/movecia-app-180.png">
@@ -141,19 +136,45 @@ input:focus,textarea:focus{outline:2px solid var(--plum);outline-offset:1px}
   .how{grid-template-columns:1fr 1fr 1fr;gap:8px}.how div{padding:.8rem .7rem}.how b{font-size:1.8rem}.how h4{font-size:1.1rem}.how p{display:none}
   .sum .small{display:none}.sum .ln:nth-of-type(3){display:none}
 }
-.preview{background:var(--plum);color:var(--on);text-align:center;font-size:.85rem;padding:.5rem}
+.thx{background:var(--deep);color:var(--on);border-radius:var(--r);padding:clamp(1.4rem,4vw,2.4rem);display:grid;gap:18px;align-items:center}
+@media(min-width:900px){.thx{grid-template-columns:1.1fr .9fr}}
+.thx .k{color:var(--peach)}.thx h2{color:var(--on);margin:.4rem 0 .6rem}.thx p{color:#E8DCDF}
+.thx .code{font-family:var(--sans);font-weight:600;letter-spacing:.06em;background:rgba(247,241,238,.1);border-radius:14px;padding:.7rem 1rem;display:inline-block;margin:.4rem 0}
+.thx img{width:100%;border-radius:14px;display:block}
+.thx .btn{background:var(--on);color:var(--deep);border-color:var(--on)}
+.terms{display:flex;gap:.6rem;align-items:flex-start;font-size:.8rem;color:rgba(251,245,247,.8);margin-top:.9rem;cursor:pointer}.terms input{width:18px;height:18px;flex:0 0 18px;margin-top:.1rem;accent-color:var(--peach)}.terms a{color:var(--peach)}
+.perr{color:#F4C7C0;font-size:.88rem;margin:.6rem 0 0}
+.hp{position:absolute;left:-9999px;opacity:0}
 footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);text-align:center}
 </style>
 <script src="/wildhearts/assets/schutz.js?v=3"></script>
 </head>
 <body>
-<p class="preview">Vorschau · Bezahlen ist noch nicht angeschlossen</p>
 <header class="w"><div class="in top">
   <a class="brand" href="/"><img src="/img/movecia/movecia-zeichen-klein.svg" alt=""><span>Movecia</span></a>
   <?php require_once dirname(__DIR__) . '/assets/menu.inc.php'; mv_menu('gutscheine', ['lang' => false]); ?>
 </div></header>
 
 <main>
+<?php if ($done): ?>
+<section class="w" style="padding-top:clamp(1rem,3vw,2rem)"><div class="in thx">
+  <div>
+    <?php if ($dv): ?>
+    <p class="k">Danke von Herzen</p>
+    <h2>Dein Gutschein ist da</h2>
+    <p><?= $h($done['label']) ?> · <?= $h($eur((int)$dv['amount_cents'])) ?><?= $done['recipient'] !== '' ? ' · für ' . $h($done['recipient']) : '' ?></p>
+    <p class="code"><?= $h($dv['code']) ?></p>
+    <p>Das PDF ist auch per E-Mail an <?= $h($done['email']) ?> unterwegs. <?= $h(mv_gift_howto((string)$done['offer'])) ?></p>
+    <a class="btn" href="<?= $h(mv_voucher_pdf_link($dv)) ?>" target="_blank" rel="noopener">Gutschein als PDF öffnen</a>
+    <?php else: ?>
+    <p class="k">Fast geschafft</p>
+    <h2>Deine Zahlung wird gerade bestätigt</h2>
+    <p>Sobald Stripe die Zahlung meldet, kommt dein Gutschein als PDF an <?= $h($done['email']) ?>. Das dauert meistens nur einen Moment. <a href="" style="color:var(--peach)">Seite neu laden</a></p>
+    <?php endif; ?>
+  </div>
+  <?php if ($dv): ?><img src="/img/movecia/gutschein-<?= (int)$dv['design'] === 2 ? 2 : 1 ?>.jpg?v=4" alt="" draggable="false"><?php endif; ?>
+</div></section>
+<?php endif; ?>
 <section class="w"><div class="in hero">
   <div>
     <p class="k">Gutscheine · Schenke Me-Time</p>
@@ -195,8 +216,8 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
       <button type="button" class="sh"><span style="flex:1"><h3><span class="n">2</span>Wähl das Design</h3><span class="pk" id="pk2">Bogen</span></span><span class="cv"></span></button>
       <div class="sb">
       <div class="dz">
-        <label><input type="radio" name="design" value="1" checked><img src="/img/movecia/gutschein-1.jpg?v=3" alt="Design Bogen" draggable="false"><span>Bogen</span></label>
-        <label><input type="radio" name="design" value="2"><img src="/img/movecia/gutschein-2.jpg?v=3" alt="Design Zart" draggable="false"><span>Zart</span></label>
+        <label><input type="radio" name="design" value="1" checked><img src="/img/movecia/gutschein-1.jpg?v=4" alt="Design Bogen" draggable="false"><span>Bogen</span></label>
+        <label><input type="radio" name="design" value="2"><img src="/img/movecia/gutschein-2.jpg?v=4" alt="Design Zart" draggable="false"><span>Zart</span></label>
       </div>
       <button type="button" class="btn nx">Weiter</button>
       </div>
@@ -206,13 +227,14 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
       <button type="button" class="sh"><span style="flex:1"><h3><span class="n">3</span>Mach ihn persönlich</h3><span class="pk" id="pk3">Für wen, liebe Worte, deine E-Mail</span></span><span class="cv"></span></button>
       <div class="sb">
       <div class="grid2">
-        <label class="f">Für<input type="text" id="to" maxlength="60" placeholder="z. B. Lena"></label>
-        <label class="f">Von<input type="text" id="from" maxlength="60" placeholder="z. B. deine Schwester"></label>
+        <label class="f">Für<input type="text" id="to" maxlength="40" placeholder="z. B. Lena"></label>
+        <label class="f">Von<input type="text" id="from" maxlength="40" placeholder="z. B. Anna"></label>
       </div>
       <label class="f" style="margin-top:12px">Ein paar Worte auf dem Gutschein<textarea id="msg" maxlength="160" placeholder="z. B. Für dich, weil du immer für alle anderen da bist."></textarea></label>
       <div class="grid2">
-        <label class="f">Dein Name<input type="text" autocomplete="name" maxlength="80"></label>
-        <label class="f">Deine E-Mail (dorthin kommt das PDF)<input type="email" autocomplete="email" maxlength="160"></label>
+        <label class="f">Dein Name<input type="text" id="bn" autocomplete="name" maxlength="80"></label>
+        <label class="f">Deine E-Mail (dorthin kommt das PDF)<input type="email" id="be" autocomplete="email" maxlength="160"></label>
+        <input class="hp" type="text" id="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       </div>
       <button type="button" class="btn nx">Zur Übersicht</button>
       </div>
@@ -227,7 +249,10 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
     <div class="ln"><span>Design</span><span id="sd">Bogen</span></div>
     <div class="ln"><span>Für</span><span id="sto">–</span></div>
     <div class="ln"><span>Gültig</span><span>ohne Ablaufdatum</span></div>
+    <label class="terms"><input type="checkbox" id="tm"><span>Ich habe die <a href="/terms#gutscheine" target="_blank" rel="noopener">Bedingungen</a> gelesen. Rücktritt innerhalb von 14 Tagen, solange der Gutschein nicht eingelöst ist.</span></label>
     <button class="btn" type="button" id="pay">Weiter zur Zahlung</button>
+    <p class="perr" id="perr" hidden></p>
+    <?php if (isset($_GET['abbruch'])): ?><p class="small">Die Zahlung wurde abgebrochen, es wurde nichts abgebucht.</p><?php endif; ?>
     <p class="small">Sichere Zahlung über Stripe. Danach bekommst du den Gutschein sofort als PDF zum Ausdrucken, mit eigener Nummer und Code. Wertgutschein, einlösbar für alle Angebote bei Movecia, ein Restwert bleibt erhalten.</p>
   </aside>
 </div></section>
@@ -269,7 +294,25 @@ footer{padding-top:3rem;padding-bottom:2rem;font-size:.85rem;color:var(--muted);
   ov.addEventListener('input', sum);
   document.querySelectorAll('input[name=design]').forEach(r => r.addEventListener('change', () => { document.getElementById('sd').textContent = r.value === '2' ? 'Zart' : 'Bogen'; }));
   document.getElementById('to').addEventListener('input', e => { document.getElementById('sto').textContent = e.target.value || '–'; });
-  document.getElementById('pay').onclick = () => alert('Vorschau: Das Bezahlen schließe ich an, sobald dir die Seite gefällt.');
+  const t0 = Date.now(), pay = document.getElementById('pay'), perr = document.getElementById('perr');
+  const err = (m, step) => { perr.textContent = m; perr.hidden = false; if (step !== undefined) openStep(step, true); };
+  pay.onclick = async () => {
+    perr.hidden = true;
+    const bn = document.getElementById('bn').value.trim(), be = document.getElementById('be').value.trim();
+    if (bn.length < 2 || !be.includes('@')) return err('Bitte gib deinen Namen und deine E-Mail an, dorthin kommt der Gutschein.', 2);
+    if (!document.getElementById('tm').checked) return err('Bitte bestätige kurz die Bedingungen.');
+    const d = {offer: cur.dataset.o, variant: v || '', amount: ov.value, design: (document.querySelector('input[name=design]:checked') || {}).value || 1,
+      to: document.getElementById('to').value, from: document.getElementById('from').value, msg: document.getElementById('msg').value,
+      name: bn, email: be, terms: 1, website: document.getElementById('hp').value, t: Date.now() - t0};
+    const lbl = pay.textContent; pay.disabled = true; pay.textContent = 'Einen Moment …';
+    try {
+      const r = await fetch('/api/mv-gutschein-kauf.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(d)});
+      const j = await r.json();
+      if (j.url) { location.href = j.url; return; }
+      err(j.error || 'Das hat gerade nicht geklappt. Bitte versuch es noch einmal.');
+    } catch (e) { err('Das hat gerade nicht geklappt. Bitte versuch es noch einmal.'); }
+    pay.disabled = false; pay.textContent = lbl;
+  };
   // Handy: Schritte auf- und zuklappen
   const steps = [...document.querySelectorAll('.step')], mob = matchMedia('(max-width:899px)');
   function openStep(i, scroll) { steps.forEach((s, j) => s.classList.toggle('open', j === i)); if (scroll && mob.matches && steps[i]) steps[i].scrollIntoView({behavior: 'smooth', block: 'start'}); }
