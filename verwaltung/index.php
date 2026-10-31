@@ -586,7 +586,11 @@ if ($action === 'save_course') {
 if ($action === 'toggle_visible') {
     $id = (int)($_POST['id'] ?? 0);
     $pdo->prepare('UPDATE courses SET visible = 1 - visible WHERE id = ?')->execute([$id]);
-    go($self, 'Gespeichert.');
+    $st = $pdo->prepare('SELECT visible FROM courses WHERE id = ?'); $st->execute([$id]);
+    $msg = (int)$st->fetchColumn() === 1 ? 'Der Termin ist wieder auf der Website zu sehen.' : 'Der Termin ist auf der Website ausgeblendet.';
+    // zurück dorthin, wo sie getippt hat (Kalender-Tag oder Kurs), nur Verwaltungsadressen
+    $back = (string)($_POST['back'] ?? '');
+    go(preg_match('/^\?view=[a-z_]+(&[A-Za-z0-9_=%.-]*)*(#[a-z0-9_-]+)?$/', $back) ? $self . $back : $self, $msg);
 }
 
 if ($action === 'delete_course') {
@@ -2024,7 +2028,10 @@ if ($view === 'kalender') {
                 <div class="list day-list">
                 <?php foreach ($ev as $e): ?>
                     <?php if ($e['type'] === 'kurs'): ?>
-                        <a class="day-item kurs" href="<?= forma_h($self) ?>?view=course&amp;id=<?= $e['id'] ?>"><strong><?= forma_h($e['time'] ? $e['time'] . ' Uhr' : '') ?></strong> <?= forma_h($e['title']) ?> <span class="muted small">· <?= $e['booked'] ?>/<?= $e['cap'] ?> belegt<?= $e['visible'] ? '' : ' · ausgeblendet' ?></span></a>
+                        <div class="day-kurs<?= $e['visible'] ? '' : ' off' ?>">
+                            <a class="day-item kurs" href="<?= forma_h($self) ?>?view=course&amp;id=<?= $e['id'] ?>"><strong><?= forma_h($e['time'] ? $e['time'] . ' Uhr' : '') ?></strong> <?= forma_h($e['title']) ?> <span class="muted small">· <?= $e['booked'] ?>/<?= $e['cap'] ?> belegt<?= $e['visible'] ? '' : ' · auf der Website ausgeblendet' ?></span></a>
+                            <form method="post"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="toggle_visible"><input type="hidden" name="id" value="<?= (int)$e['id'] ?>"><input type="hidden" name="back" value="<?= forma_h('?view=kalender&m=' . $month . '&d=' . $sel . '#tag') ?>"><button class="btn btn-ghost vis-btn" type="submit"><?= $e['visible'] ? 'Ausblenden' : 'Wieder anzeigen' ?></button></form>
+                        </div>
                     <?php elseif ($e['type'] === 'private'): $s = $e['s']; ?>
                         <div class="day-item private">
                             <div><strong><?= forma_h(forma_de_time((string)$s['start'])) ?></strong> Private Pottery · <strong><?= forma_h($s['name']) ?></strong> <span class="muted small">· <?= forma_h(forma_hours_text((float)$s['hours'])) ?></span></div>
@@ -2705,7 +2712,7 @@ if ($view === 'course') {
         <h1><?= forma_h($c['title']) ?></h1>
         <p class="muted"><?= forma_h($c['date_text']) ?> · <?= forma_slot_hours($c) ? 'Belegt pro Stunde: ' . forma_h(forma_slots_overview($GLOBALS['pdo'], $c)) : $booked . ' von ' . (int)$c['capacity'] . ' Plätzen belegt' ?><?= $c['visible'] ? '' : ' · <strong>auf der Website ausgeblendet</strong>' ?></p>
         <?php if ($flash): ?><p class="alert"><?= forma_h($flash) ?></p><?php endif; ?>
-        <p class="row-actions"><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=edit&amp;id=<?= (int)$c['id'] ?>">Termin bearbeiten</a><?php if ($c['title'] === FORMA_SERIES['bemalen']['title']): ?> <a class="btn" href="<?= forma_h($self) ?>?view=kasse&amp;c=<?= (int)$c['id'] ?>">Kasse öffnen</a><?php endif; ?></p>
+        <p class="row-actions"><a class="btn btn-ghost" href="<?= forma_h($self) ?>?view=edit&amp;id=<?= (int)$c['id'] ?>">Termin bearbeiten</a> <form method="post" style="display:inline"><input type="hidden" name="csrf" value="<?= forma_h(csrf()) ?>"><input type="hidden" name="action" value="toggle_visible"><input type="hidden" name="id" value="<?= (int)$c['id'] ?>"><input type="hidden" name="back" value="?view=course&amp;id=<?= (int)$c['id'] ?>"><button class="btn btn-ghost" type="submit"><?= $c['visible'] ? 'Auf der Website ausblenden' : 'Auf der Website wieder anzeigen' ?></button></form><?php if ($c['title'] === FORMA_SERIES['bemalen']['title']): ?> <a class="btn" href="<?= forma_h($self) ?>?view=kasse&amp;c=<?= (int)$c['id'] ?>">Kasse öffnen</a><?php endif; ?></p>
         <?php if (forma_pp_is($c)): $ppAt = forma_pp_send_at($c);
             $q = $GLOBALS['pdo']->prepare("SELECT COUNT(*) FROM bookings WHERE course_id = ? AND status = 'bestaetigt' AND reminder_sent IS NOT NULL"); $q->execute([(int)$c['id']]); $ppDone = (int)$q->fetchColumn();
             $q = $GLOBALS['pdo']->prepare("SELECT COUNT(*) FROM bookings WHERE course_id = ? AND status = 'bestaetigt' AND reminder_sent IS NULL"); $q->execute([(int)$c['id']]); $ppOpen = (int)$q->fetchColumn(); ?>
@@ -3285,6 +3292,7 @@ select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius
 .cal-wd{text-align:center;font-size:13px;color:var(--soft);text-transform:uppercase;letter-spacing:.08em;padding:4px 0}
 .cal-day{min-height:74px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:5px;display:flex;flex-direction:column;gap:3px;text-decoration:none;color:var(--ink);min-width:0;overflow:hidden}
 .cal-day.empty{background:transparent;border:0}
+.day-kurs{display:flex;flex-direction:column;gap:6px}.day-kurs form{display:flex;justify-content:flex-end}.day-kurs .vis-btn{white-space:nowrap;padding:6px 16px;min-height:0;font-size:15px;border-radius:999px;width:auto}.day-kurs.off>.day-item{opacity:.6}
 .cal-day.past{opacity:.55}
 .cal-day.today .num{background:var(--clay);color:#FBF1EA;border-radius:999px;padding:0 7px}
 .cal-day.sel{outline:3px solid var(--clay);outline-offset:-1px}
