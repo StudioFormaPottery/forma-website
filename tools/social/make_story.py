@@ -25,7 +25,8 @@ STAR = 'M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6
 HEART = 'M12 20.5c-1.2-1.1-8.5-6.2-8.5-11.4C3.5 6 5.6 4 8 4c1.9 0 3.2 1.1 4 2.6C12.8 5.1 14.1 4 16 4c2.4 0 4.5 2 4.5 5.1 0 5.2-7.3 10.3-8.5 11.4z'
 VERBOTEN = {'vivien-toepfern.jpg', 'drehen.jpg', 'vivien.jpg', 'vivien-mit-tochter.jpg'}
 _src = (REPO / 'index.html').read_text(encoding='utf-8')
-HOUSE = re.search(r'<svg class="adv-house".*?</svg>', _src, re.S).group(0)
+_m = re.search(r'<svg class="adv-house".*?</svg>', _src, re.S)
+HOUSE = _m.group(0) if _m else ''
 
 THEMES = {
     # Hintergrund, Muster, Überschrift, Text, Handschrift, Sticker-Hintergrund, Sticker-Text, Kritzel 1, Kritzel 2, Blob
