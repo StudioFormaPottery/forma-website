@@ -42,7 +42,7 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
   <h1><span class="de"><em>Ich bin Movecia.</em></span><span class="en"><em>I am Movecia.</em></span></h1>
   <p class="sub"><span class="de">Bewegung beginnt bei dir.</span><span class="en">Movement begins with you.</span></p>
   <p class="lead"><span class="de">Movecia heißt „in Bewegung“. Ich begleite Frauen zurück in ihren Körper, mit sanfter, achtsamer Bewegung, mit Atem und mit Raum für das, was sie wirklich beschäftigt. Online, wann immer du magst, live in kleinen Runden und persönlich bei mir in den Tiroler Bergen.</span><span class="en">Movecia means “in motion”. I guide women back into their bodies with gentle, mindful movement, with breath and with room for whatever is really on their minds. Online whenever you like, live in small circles and in person with me in the Tyrolean mountains.</span></p>
-  <div class="cta"><a class="btn" href="#angebote"><span class="de">So begleite ich dich</span><span class="en">Ways to move with me</span> →</a><a class="btn line de" href="/unfold/">Unfold · Start <?= mv_date($st) ?></a><a class="btn line en" href="/method/">The Method · in English</a></div>
+  <div class="cta"><a class="btn" href="#einstieg"><span class="de">Wo fange ich an?</span><span class="en">Where do I start?</span> →</a><a class="btn line de" href="/unfold/">Unfold · Start <?= mv_date($st) ?></a><a class="btn line en" href="/method/">The Method · in English</a></div>
 </div>
 <div class="in"><div class="art wide clean rv"><video src="/video/movecia/start.mp4?v=10" poster="/img/movecia/fotos/ev-start.jpg?v=10" autoplay muted loop playsinline preload="metadata" aria-label="Vivien bewegt sich langsam in ihrem lichten Studio mit Blick auf die Berge"></video></div></div></section>
 
@@ -72,6 +72,61 @@ mvl_head('Movecia · Mindful Movement, Yoga & Somatic Movement mit Vivien Malong
     <figcaption><span class="de">Bewegung beginnt bei dir.</span><span class="en">Movement begins with you.</span></figcaption>
   </figure>
   </div>
+</div></section>
+
+<!-- Wo fange ich an? (Vivien, 31.10.2026): Zeitleiste Unfold → Daily Method → Academy, Prä-/Postnatal als eigener Weg -->
+<section class="w sec" id="einstieg"><div class="in">
+  <div class="rv" style="text-align:center"><p class="k"><span class="de">Wo fange ich an?</span><span class="en">Where do I start?</span></p><h2 style="margin-top:.6rem"><span class="de">Finde deinen <em>Einstieg</em></span><span class="en">Find your <em>way in</em></span></h2>
+    <p class="ein-lead"><span class="de">Bewegung beginnt bei dir. Aber womit? Hier siehst du auf einen Blick, welches Programm gerade zu dir passt.</span><span class="en">Movement begins with you. But where exactly? Here you can see at a glance which programme fits where you are right now.</span></p></div>
+  <ol class="ein rv">
+    <li><span class="ein-dot"><?= mv_icons(['knospe','blatt'], 'si', 0) ?></span><div class="ein-card">
+      <p class="ein-tag"><span class="de">Dein Einstieg</span><span class="en">Your starting point</span></p>
+      <h3>Unfold <em>· The Mindful Becoming</em></h3>
+      <p class="ein-who"><span class="de">Du möchtest wieder in Bewegung finden, weißt aber nicht, wo oder wie du anfangen sollst. Eigentlich fehlt dir die Zeit, manchmal auch die Lust, und du bist dir noch gar nicht sicher, was dir guttut.</span><span class="en">You want to find your way back into movement but don't know where or how to begin. Time is short, motivation comes and goes, and you're not even sure yet what would feel good.</span></p>
+      <p><span class="de">Dann ist Unfold dein Einstieg: Drei Monate begleite ich dich Schritt für Schritt, live und in einer kleinen Runde.</span><span class="en">Then Unfold is where you begin: for three months I'll walk you through it step by step, live and in a small group.</span></p>
+      <div class="ein-f"><a class="btn" href="/unfold/"><span class="de">Zu Unfold</span><span class="en">See Unfold</span> →</a><span class="chip"><span class="de">Start <?= mv_date($st) ?> · auf Deutsch</span><span class="en">Starts <?= mv_date($st, 'en') ?> · in German</span></span></div></div></li>
+    <li><span class="ein-dot"><?= mv_icons(['sonne','welle'], 'si', 1) ?></span><div class="ein-card">
+      <p class="ein-tag"><span class="de">Deine Routine</span><span class="en">Your routine</span></p>
+      <h3>The Movecia <em>Daily Method</em></h3>
+      <p class="ein-who"><span class="de">Du hast deine Routine und wünschst dir eine sanfte, strukturierte Ergänzung, bei der du wirklich dranbleibst.</span><span class="en">You already have a routine and want a gentle, structured addition that you'll actually stick with.</span></p>
+      <p><span class="de">Jeden Tag ein paar Minuten Bewegung, on demand. Die Method führt dich Schritt für Schritt durchs Programm, und wenn du einmal einen Tag aussetzt, wartet sie einfach auf dich.</span><span class="en">A few minutes of movement every day, on demand. The Method guides you through the programme step by step, and if you miss a day, it simply waits for you.</span></p>
+      <div class="ein-f"><a class="btn" href="/method/"><span class="de">Zur Daily Method</span><span class="en">See the Daily Method</span> →</a><span class="chip">DE · EN</span></div></div></li>
+    <li><span class="ein-dot"><?= mv_icons(['bluete','spirale'], 'si', 2) ?></span><div class="ein-card">
+      <p class="ein-tag"><span class="de">Weitergeben</span><span class="en">Passing it on</span></p>
+      <h3>Movecia <em>Academy</em></h3>
+      <p class="ein-who"><span class="de">Du bist in deiner Praxis längst zu Hause, möchtest andere Menschen zurück in ihre Routine begleiten und findest dich in der Movecia-Haltung wieder.</span><span class="en">Your practice already feels like home, you'd love to guide others back into their own routine, and the Movecia way speaks to you.</span></p>
+      <p><span class="de">Dann ist dein Platz in der Academy, beim Mindful Becoming Teacher Training.</span><span class="en">Then your place is in the Academy, on the Mindful Becoming Teacher Training.</span></p>
+      <div class="ein-f"><a class="btn" href="/academy/teacher-training/"><span class="de">Zum Teacher Training</span><span class="en">See the teacher training</span> →</a><span class="chip"><span class="de">ab <?= mv_date($acc['start_ts']) ?></span><span class="en">from <?= mv_date($acc['start_ts'], 'en') ?></span></span></div></div></li>
+  </ol>
+  <a class="ein-side rv" href="/natal/"><span class="ein-dot"><?= mv_icons(['mond','herz'], 'si', 3) ?></span><span class="ein-sx">
+    <span class="ein-tag"><span class="de">Jederzeit dein eigener Weg</span><span class="en">Your own path, any time</span></span>
+    <b><span class="de">Prä- &amp; Postnatal</span><span class="en">Pre- &amp; postnatal</span></b>
+    <span class="ein-who"><span class="de">Du bist schwanger, hast gerade ein Baby bekommen oder planst eines? Dann starte mit Prä- &amp; Postnatal, 1:1 im Studio oder online. Das gilt auch, wenn du noch nicht schwanger bist und deinen Körper schon gut vorbereiten möchtest.</span><span class="en">Pregnant, just had a baby, or hoping for one? Then start with pre- &amp; postnatal training, one-to-one in the studio or online. That goes for planning a pregnancy too, if you'd like to prepare your body early.</span></span>
+    <span class="ein-more"><span class="de">Mehr erfahren</span><span class="en">Learn more</span> →</span></span></a>
+  <style>
+  .ein-lead{max-width:40rem;margin:1rem auto 0;color:var(--muted)}
+  .ein{list-style:none;margin:2.6rem auto 0;padding:0;max-width:52rem;position:relative}
+  .ein:before{content:"";position:absolute;left:27px;top:28px;bottom:28px;width:2px;background:linear-gradient(var(--line),var(--plum) 50%,var(--line));opacity:.55;border-radius:2px}
+  .ein>li{position:relative;display:grid;grid-template-columns:56px 1fr;gap:1.1rem;align-items:start}
+  .ein>li+li{margin-top:1.4rem}
+  .ein-dot{position:relative;z-index:1;display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:var(--bg);border:1px solid var(--plum);color:var(--plum)}
+  .ein-dot svg{width:28px;height:28px}
+  .ein-card{background:rgba(255,255,255,.55);border:1px solid var(--line);border-radius:26px;padding:1.4rem 1.5rem 1.5rem;box-shadow:0 14px 34px -26px rgba(74,48,64,.45)}
+  .ein-tag{margin:0;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mauve,#7E6472);font-weight:500}
+  .ein-card h3{margin:.35rem 0 .7rem;font-family:var(--serif);font-weight:400;font-size:clamp(1.6rem,4.6vw,2.1rem);line-height:1.1;color:var(--ink)}
+  .ein-card h3 em{color:var(--plum)}
+  .ein-card p{margin:.5rem 0 0;color:var(--muted);line-height:1.6}
+  .ein-card .ein-who{color:var(--ink)}
+  .ein-f{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center;margin-top:1.1rem}
+  .ein-f .chip{display:inline-block;padding:.4em .9em;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:.85rem}
+  .ein-side{display:grid;grid-template-columns:56px 1fr;gap:1.1rem;max-width:52rem;margin:2rem auto 0;padding:1.4rem 1.5rem;border-radius:26px;background:#EFE3E0;color:var(--ink);text-decoration:none;border:1px dashed rgba(74,48,64,.35)}
+  .ein-sx{display:block}.ein-sx>span{display:block}
+  .ein-side b{display:block;margin:.3rem 0 .5rem;font-family:var(--serif);font-weight:400;font-size:clamp(1.5rem,4.4vw,1.9rem);color:var(--plum)}
+  .ein-side .ein-who{color:var(--muted);line-height:1.6}
+  .ein-more{margin-top:.8rem;color:var(--plum);font-weight:500}
+  @media(max-width:600px){.ein>li,.ein-side{grid-template-columns:40px 1fr;gap:.75rem}.ein-dot{width:40px;height:40px}.ein-dot svg{width:22px;height:22px}.ein:before{left:19px}.ein-card,.ein-side{padding:1.2rem 1.15rem 1.3rem}}
+  @media(min-width:900px){.ein-card{padding:1.8rem 2rem 1.9rem}.ein>li{gap:1.6rem}.ein-side{gap:1.6rem;padding:1.6rem 2rem}}
+  </style>
 </div></section>
 
 <section class="w sec" id="angebote"><div class="in">
