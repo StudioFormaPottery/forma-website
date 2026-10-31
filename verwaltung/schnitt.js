@@ -378,7 +378,7 @@
 
   // CSS-Filter genau wie im Browser (W3C Filter Effects), damit Vorschau und Export gleich aussehen
   const VS = 'attribute vec2 p;varying vec2 uv;void main(){uv=p*.5+.5;gl_Position=vec4(p,0.,1.);}';
-  const FS = `precision highp float;varying vec2 uv;uniform sampler2D t;uniform vec2 so,oo,fo;uniform float br,ct,sa,se,zm,fz,fr,fe,cin,lb,bb;uniform sampler2D mk;
+  const FS = `precision highp float;varying vec2 uv;uniform sampler2D t;uniform vec2 so,oo,fo;uniform float br,ct,sa,se,zm,fz,fr,fe,cin,lb,bb,fit;uniform sampler2D mk;
 void main(){
  float ra=so.x/so.y, ro=oo.x/oo.y;
  vec2 p=uv-.5;
@@ -387,6 +387,10 @@ void main(){
  if(ra>ro){float k=ro/ra;q.x=.5+(q.x-.5)*k;}else{float k=ra/ro;q.y=.5+(q.y-.5)*k;} // Mitte ausschneiden (object-fit: cover)
  q=.5+(q-.5)/zm; // sanfter Zoom je Abschnitt
  vec2 qq=clamp(q,vec2(.0005),vec2(.9995)); vec3 c=texture2D(t,qq).rgb;
+ if(fit>0.){float dd=min(min(q.x,1.-q.x),min(q.y,1.-q.y)); if(dd<.004){ // Ganz zeigen: Rand mit weichem Hintergrund aus demselben Bild füllen (wie Instagram)
+   vec2 qb=uv; if(ra>ro){qb.x=.5+(qb.x-.5)*ro/ra;}else{qb.y=.5+(qb.y-.5)*ra/ro;} vec3 g=texture2D(t,qb).rgb; float gn=1.; vec2 gr=vec2(.16/max(ra,1.),.16*min(ra,1.));
+   for(int i=1;i<=32;i++){float fi=float(i); float a=fi*2.39996; vec2 o=vec2(cos(a),sin(a))*sqrt(fi/32.)*gr; g+=texture2D(t,clamp(qb+o,vec2(.0005),vec2(.9995))).rgb; gn+=1.;}
+   c=mix(g/gn*.82,c,smoothstep(0.,.004,dd));}}
  if(bb>0.){float m=smoothstep(.25,.75,texture2D(mk,qq).r); if(m<.999){vec3 s=c; float n=1.; vec2 rr=vec2(bb*.03/max(ra,1.),bb*.03*min(ra,1.));
    for(int i=1;i<=24;i++){float fi=float(i); float a=fi*2.39996; vec2 o=vec2(cos(a),sin(a))*sqrt(fi/24.)*rr; s+=texture2D(t,clamp(qq+o,vec2(.0005),vec2(.9995))).rgb; n+=1.;}
    c=mix(s/n,c,m);}} // Hintergrund weich (Person bleibt scharf)
@@ -404,10 +408,16 @@ void main(){
   const FMTS = [['orig', 'Wie aufgenommen'], ['9:16', 'Hoch 9:16'], ['4:5', '4:5'], ['1:1', 'Quadrat'], ['16:9', 'Quer 16:9']];
   // Eigener Bildausschnitt je Clip (Vivien, 30.10.2026: „im Schnitt direkt zoomen, verschieben und gerade stellen“)
   // F = { z: Zoom 1–3, x/y: -1…1 (wohin der Ausschnitt rückt), r: Grad }. Beim Drehen wird so viel mitgezoomt, dass keine Ecken fehlen.
-  function frVals(F, asp) {
-    const z = F ? Math.max(1, Math.min(3, +F.z || 1)) : 1, th = F ? (+F.r || 0) * Math.PI / 180 : 0, a = Math.abs(th);
-    const kr = th ? Math.cos(a) + Math.max(asp, 1 / asp) * Math.sin(a) : 1, m = (1 - 1 / z) / 2;
-    return { Z: z * kr, th, ox: F ? Math.max(-1, Math.min(1, +F.x || 0)) * m : 0, oy: F ? Math.max(-1, Math.min(1, +F.y || 0)) * m : 0, z };
+  // Ganz zeigen (Vivien, 31.10.2026: „egal in welchem Format gefilmt, auf jedes Format perfekt umwandeln, dass man mich ganz sieht“):
+  // F.fit = Bild wird so klein, dass es ganz hineinpasst (rechnet sich bei jedem Format neu), z < 1 = kleiner als füllend, Rand wird weich gefüllt.
+  const fitZ = (ra, asp) => (ra > 0 && asp > 0) ? Math.min(ra, asp) / Math.max(ra, asp) : 1;
+  function frVals(F, asp, ra) {
+    const z = F ? (F.fit && ra ? fitZ(ra, asp) : Math.max(.2, Math.min(3, +F.z || 1))) : 1, th = F ? (+F.r || 0) * Math.PI / 180 : 0, a = Math.abs(th);
+    const kr = th && z >= 1 ? Math.cos(a) + Math.max(asp, 1 / asp) * Math.sin(a) : 1;
+    // Verschieben geht auch ohne Zoom, wenn das Format etwas abschneidet (z. B. 4:5 gefilmt, 16:9 gewählt: hoch/runter) – Vivien, 31.10.2026
+    const kx = ra && ra > asp ? asp / ra : 1, ky = ra && ra < asp ? ra / asp : 1;
+    const mx = Math.abs(.5 / kx - .5 / z), my = Math.abs(.5 / ky - .5 / z);
+    return { Z: z * kr, th, ox: F ? Math.max(-1, Math.min(1, +F.x || 0)) * mx : 0, oy: F ? Math.max(-1, Math.min(1, +F.y || 0)) * my : 0, z, mx, my };
   }
   // Hintergrund weich im Nachhinein (Vivien, 30.10.2026): Person per MediaPipe erkennen (wie im Studio), Rest weichzeichnen
   const MPV = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
@@ -452,7 +462,8 @@ void main(){
       <button type="button" class="sn-b" data-k="cmp" title="Licht & Farbe kurz ausschalten">Vorher zeigen</button></div>
     <div class="sn-fr" data-k="fr" hidden>
       <div class="h"><b data-k="frT">Bildausschnitt</b><small>Gilt für diesen Clip. Du kannst das Bild auch direkt oben in der Vorschau verschieben.</small></div>
-      <label><span>🔍 Zoom <i data-k="frZv">100 %</i></span><input type="range" min="100" max="300" step="1" value="100" data-fr="z"></label>
+      <label><span>🔍 Zoom <i data-k="frZv">100 %</i></span><input type="range" min="30" max="300" step="1" value="100" data-fr="z"></label>
+      <div class="sn-row" style="margin-top:8px"><button type="button" class="sn-b sm" data-k="frFit" title="Das ganze Bild zeigen, der Rand wird weich gefüllt">🖼 Ganz zeigen</button><button type="button" class="sn-b sm" data-k="frFill" title="Bild füllt das Format, Ränder werden abgeschnitten">⬛ Format füllen</button></div>
       <label><span>↔ Links / Rechts</span><input type="range" min="-100" max="100" step="1" value="0" data-fr="x"></label>
       <label><span>↕ Hoch / Runter</span><input type="range" min="-100" max="100" step="1" value="0" data-fr="y"></label>
       <label><span>📐 Gerade richten <i data-k="frRv">0°</i></span><input type="range" min="-10" max="10" step="0.1" value="0" data-fr="r"></label>
@@ -565,7 +576,8 @@ void main(){
   </div></details>
   <details class="sn-box"><summary>🖼 Format</summary><div class="bd">
     <div class="sn-chips" data-k="fmts"></div>
-    <div class="sn-note">Bei einem anderen Format wird die Mitte ausgeschnitten. Für Reels und Storys „Hoch 9:16“.</div>
+    <div class="sn-row" style="margin-top:10px"><button type="button" class="sn-b" data-k="fitAll">🖼 Mich überall ganz zeigen</button><button type="button" class="sn-b" data-k="fillAll">⬛ Überall Format füllen</button></div>
+    <div class="sn-note">„Format füllen“ schneidet die Ränder ab. „Ganz zeigen“ macht das Bild so groß, dass es genau hineinpasst, und füllt den Rand weich mit demselben Bild, wie bei Instagram. Das passt sich bei jedem Format von selbst an. Für Reels und Storys „Hoch 9:16“.</div>
   </div></details>
   <details class="sn-box"><summary>🎵 Musik darunter</summary><div class="bd">
     <div class="sn-ml" data-k="mlist"></div>
@@ -1013,7 +1025,10 @@ void main(){
     };
     // Vorschau über WebGL, sobald Kino-Look, Kino-Balken oder Fischauge dabei sind (geht mit CSS nicht) – zeigt genau den Export
     const glc = document.createElement('canvas'); glc.className = 'sn-glc'; pv.insertBefore(glc, big); let glDraw = null, glMt = -1, segWarned = false;
-    function needGL() { const c = clips[sel]; return !cmp && !!c && ((st.cin || 0) > 0 || !!st.lb || (c.fe || 0) > 0 || (st.bb || 0) > 0) && !K('covimg').classList.contains('on'); }
+    const srcAsp = c => { const v = vids.get(c.slot); return v && v.videoWidth ? v.videoWidth / v.videoHeight : (c.w && c.h ? c.w / c.h : 0); };
+    const pvAsp = () => (pv.clientWidth || 16) / (pv.clientHeight || 9);
+    const frSmall = c => !!c.fr && frVals(c.fr, pvAsp(), srcAsp(c)).z < .999;
+    function needGL() { const c = clips[sel]; return !cmp && !!c && (frSmall(c) || (st.cin || 0) > 0 || !!st.lb || (c.fe || 0) > 0 || (st.bb || 0) > 0) && !K('covimg').classList.contains('on'); }
     (function glLoop() { if (closed) return; requestAnimationFrame(glLoop);
       if (!needGL()) { if (glc.style.display !== 'none') glc.style.display = 'none'; return; }
       const c = clips[sel], v = vids.get(c.slot); if (!v || v.readyState < 2 || !v.videoWidth) return;
@@ -1025,28 +1040,34 @@ void main(){
       glc.style.display = okD ? 'block' : 'none'; })();
     function vtf(c, off) {
       const z = c.zoom ? zAt(c, off) : 1; if (!c.fr && z === 1) return '';
-      const f = frVals(c.fr, (pv.clientWidth || 16) / (pv.clientHeight || 9));
+      const f = frVals(c.fr, pvAsp(), srcAsp(c));
       return 'rotate(' + (f.th * 180 / Math.PI).toFixed(2) + 'deg) scale(' + (f.Z * z).toFixed(4) + ') translate(' + (-f.ox * 100).toFixed(3) + '%,' + (-f.oy * 100).toFixed(3) + '%)';
     }
     const frEls = () => [...root.querySelectorAll('[data-fr]')];
     function frUi() {
       const c = clips[sel], box = K('fr'); if (!c || box.hidden) return; const F = c.fr || { z: 1, x: 0, y: 0, r: 0 };
       K('frT').textContent = 'Bildausschnitt · Clip ' + (sel + 1);
-      frEls().forEach(i => { const k = i.dataset.fr; i.value = k === 'z' ? Math.round((F.z || 1) * 100) : k === 'r' ? (F.r || 0) : Math.round((F[k] || 0) * 100); });
+      const zmin = Math.max(.2, Math.min(1, fitZ(srcAsp(c), pvAsp()) || .3)), zNow = frVals(F, pvAsp(), srcAsp(c)).z; root.querySelector('[data-fr="z"]').min = Math.floor(zmin * 100);
+      frEls().forEach(i => { const k = i.dataset.fr; i.value = k === 'z' ? Math.round(zNow * 100) : k === 'r' ? (F.r || 0) : Math.round((F[k] || 0) * 100); });
       const zmk = !c.zoom ? 'none' : c.zm === 'punch' ? 'punch' : c.zoom[1] < c.zoom[0] ? 'out' : c.zm === 'ease' ? 'slow' : '';
       K('zmv').querySelectorAll('[data-zm]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.zm === zmk)));
       K('fe').value = Math.round((c.fe || 0) * 100); K('feV').textContent = c.fe ? Math.round(c.fe * 100) + ' %' : 'aus';
-      K('frZv').textContent = Math.round((F.z || 1) * 100) + ' %'; K('frRv').textContent = (+(F.r || 0)).toFixed(1).replace('.', ',') + '°';
+      K('frZv').textContent = F.fit ? 'ganz' : Math.round((F.z || 1) * 100) + ' %'; K('frFit').setAttribute('aria-pressed', String(!!F.fit)); K('frFill').setAttribute('aria-pressed', String(!F.fit && (F.z || 1) === 1)); K('frRv').textContent = (+(F.r || 0)).toFixed(1).replace('.', ',') + '°';
     }
     let frT = 0;
     function frSet(c, F, save) {
-      const empty = (F.z || 1) <= 1.001 && !F.x && !F.y && !F.r; c.fr = empty ? null : { z: F.z || 1, x: F.x || 0, y: F.y || 0, r: F.r || 0 };
+      const empty = !F.fit && Math.abs((F.z || 1) - 1) < .001 && !F.x && !F.y && !F.r; c.fr = empty ? null : { z: F.z || 1, x: F.x || 0, y: F.y || 0, r: F.r || 0, fit: F.fit ? 1 : 0 };
       const v = vids.get(c.slot); if (v && clips[sel] === c) v.style.transform = vtf(c, Math.max(0, v.currentTime - (c.in || 0)));
       clearTimeout(frT); if (save !== false) frT = setTimeout(() => dbPut(dbRow(c)).catch(() => {}), 300);
     }
     K('frBtn').onclick = () => { const b = K('fr'); b.hidden = !b.hidden; K('frBtn').setAttribute('aria-expanded', String(!b.hidden)); pv.classList.toggle('frmode', !b.hidden); frUi(); };
     frEls().forEach(i => i.oninput = () => { const c = clips[sel]; if (!c) return; const F = Object.assign({ z: 1, x: 0, y: 0, r: 0 }, c.fr || {}), k = i.dataset.fr;
-      F[k] = k === 'z' ? +i.value / 100 : k === 'r' ? +i.value : +i.value / 100; frSet(c, F); frUi(); });
+      F[k] = k === 'z' ? +i.value / 100 : k === 'r' ? +i.value : +i.value / 100; if (k === 'z') F.fit = 0; frSet(c, F); frUi(); });
+    K('frFit').onclick = () => { const c = clips[sel]; if (!c) return; frSet(c, Object.assign({}, c.fr || {}, { z: 1, x: 0, y: 0, fit: 1 })); show(sel, Math.max(0, (cur() ? cur().currentTime : 0) - (c.in || 0)), false); frUi(); };
+    K('frFill').onclick = () => { const c = clips[sel]; if (!c) return; frSet(c, Object.assign({}, c.fr || {}, { z: 1, x: 0, y: 0, fit: 0 })); show(sel, Math.max(0, (cur() ? cur().currentTime : 0) - (c.in || 0)), false); frUi(); };
+    async function fitEvery(on) { for (const x of clips) { const F = Object.assign({ z: 1, x: 0, y: 0, r: 0 }, x.fr || {}, { z: 1, x: 0, y: 0, fit: on ? 1 : 0 }); const empty = !on && !F.r; x.fr = empty ? null : F; await dbPut(dbRow(x)).catch(() => {}); }
+      if (clips[sel]) show(sel, Math.max(0, (cur() ? cur().currentTime : 0) - (clips[sel].in || 0)), false); frUi(); say(on ? '✓ Du bist in allen ' + clips.length + ' Clips ganz zu sehen, der Rand ist weich gefüllt.' : '✓ Alle Clips füllen das Format.', 'ok'); }
+    K('fitAll').onclick = () => fitEvery(true); K('fillAll').onclick = () => fitEvery(false);
     const ZM = { none: [null, null], slow: [[1, 1.15], 'ease'], punch: [[1, 1.25], 'punch'], out: [[1.15, 1], 'ease'] };
     K('zmv').querySelectorAll('[data-zm]').forEach(b => b.onclick = () => { const c = clips[sel]; if (!c) return; const z = ZM[b.dataset.zm]; c.zoom = z[0] ? z[0].slice() : null; c.zm = z[1]; dbPut(dbRow(c)).catch(() => {}); frUi();
       if (c.zoom) { stop(); pos = starts()[sel]; show(sel, 0); play(); } else show(sel, 0, false); });
@@ -1059,13 +1080,13 @@ void main(){
         const c = clips[sel], F = Object.assign({ z: 1, x: 0, y: 0, r: 0 }, c.fr || {}); d = { c, F0: F, x0: e.clientX, y0: e.clientY, dist: 0 };
         if (pts.size === 2) { const [a, b] = [...pts.values()]; d.dist = Math.hypot(a[0] - b[0], a[1] - b[1]); } e.preventDefault(); });
       pv.addEventListener('pointermove', e => { if (!d || !pts.has(e.pointerId)) return; pts.set(e.pointerId, [e.clientX, e.clientY]); const F = Object.assign({}, d.F0);
-        if (pts.size >= 2 && d.dist) { const [a, b] = [...pts.values()]; F.z = Math.max(1, Math.min(3, d.F0.z * Math.hypot(a[0] - b[0], a[1] - b[1]) / d.dist)); }
-        else { const fv = frVals(F, pv.clientWidth / pv.clientHeight), m = (1 - 1 / (F.z || 1)) / 2; if (m > .001) {
-          F.x = Math.max(-1, Math.min(1, d.F0.x - (e.clientX - d.x0) / (pv.clientWidth * fv.Z) / m)); F.y = Math.max(-1, Math.min(1, d.F0.y - (e.clientY - d.y0) / (pv.clientHeight * fv.Z) / m)); } }
+        if (pts.size >= 2 && d.dist) { const [a, b] = [...pts.values()]; F.z = Math.max(fitZ(srcAsp(d.c), pvAsp()) || .3, Math.min(3, frVals(d.F0, pvAsp(), srcAsp(d.c)).z * Math.hypot(a[0] - b[0], a[1] - b[1]) / d.dist)); F.fit = 0; }
+        else { const fv = frVals(F, pvAsp(), srcAsp(d.c));
+          if (fv.mx > .001) F.x = Math.max(-1, Math.min(1, d.F0.x - (e.clientX - d.x0) / (pv.clientWidth * fv.Z) / fv.mx)); if (fv.my > .001) F.y = Math.max(-1, Math.min(1, d.F0.y - (e.clientY - d.y0) / (pv.clientHeight * fv.Z) / fv.my)); }
         frSet(d.c, F); frUi(); });
       const up = e => { pts.delete(e.pointerId); if (!pts.size) d = null; else if (d) { const c = d.c; d = { c, F0: Object.assign({ z: 1, x: 0, y: 0, r: 0 }, c.fr || {}), x0: [...pts.values()][0][0], y0: [...pts.values()][0][1], dist: 0 }; } };
       pv.addEventListener('pointerup', up); pv.addEventListener('pointercancel', up);
-      pv.addEventListener('wheel', e => { if (K('fr').hidden || !clips[sel]) return; e.preventDefault(); const c = clips[sel], F = Object.assign({ z: 1, x: 0, y: 0, r: 0 }, c.fr || {}); F.z = Math.max(1, Math.min(3, F.z * Math.exp(-e.deltaY * .0015))); frSet(c, F); frUi(); }, { passive: false });
+      pv.addEventListener('wheel', e => { if (K('fr').hidden || !clips[sel]) return; e.preventDefault(); const c = clips[sel], F = Object.assign({ z: 1, x: 0, y: 0, r: 0 }, c.fr || {}); F.z = Math.max(fitZ(srcAsp(c), pvAsp()) || .3, Math.min(3, frVals(F, pvAsp(), srcAsp(c)).z * Math.exp(-e.deltaY * .0015))); F.fit = 0; frSet(c, F); frUi(); }, { passive: false });
     }
     // ---- Papierkorb (Vivien, 30.10.2026: „gelöschte Clips erst endgültig weg, wenn ich endgültig löschen sage“) ----
     async function trashUi() {
@@ -1573,7 +1594,7 @@ void main(){
       const P = gl.createProgram(); gl.attachShader(P, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(P, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(P); gl.useProgram(P);
       const bf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
       const loc = gl.getAttribLocation(P, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      const U = {}; ['t', 'so', 'oo', 'br', 'ct', 'sa', 'se', 'zm', 'fz', 'fr', 'fo', 'fe', 'cin', 'lb', 'bb', 'mk'].forEach(n => U[n] = gl.getUniformLocation(P, n));
+      const U = {}; ['t', 'so', 'oo', 'br', 'ct', 'sa', 'se', 'zm', 'fz', 'fr', 'fo', 'fe', 'cin', 'lb', 'bb', 'mk', 'fit'].forEach(n => U[n] = gl.getUniformLocation(P, n));
       const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
       [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]].forEach(x => gl.texParameteri(gl.TEXTURE_2D, x[0], x[1]));
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -1584,7 +1605,7 @@ void main(){
         const useB = !neutral && (st.bb || 0) > 0 && M && M.data;
         if (useB) { gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, mtex); gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1); gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, M.w, M.h, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, M.data); gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4); gl.activeTexture(gl.TEXTURE0); } gl.viewport(0, 0, cv.width, cv.height); gl.bindTexture(gl.TEXTURE_2D, tex); try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, el); } catch (e) { return false; }
         const L = neutral ? { br: 1, ct: 1, sa: 1, se: 0, cin: 0, lb: 0 } : st;
-        gl.uniform1i(U.t, 0); gl.uniform2f(U.so, sw, shh); gl.uniform2f(U.oo, cv.width, cv.height); gl.uniform1f(U.br, L.br); gl.uniform1f(U.ct, L.ct); gl.uniform1f(U.sa, L.sa); gl.uniform1f(U.se, L.se); const fv = frVals(F, cv.width / cv.height); gl.uniform1f(U.fz, fv.Z); gl.uniform1f(U.fr, fv.th); gl.uniform2f(U.fo, fv.ox, -fv.oy); gl.uniform1i(U.mk, 1); gl.uniform1f(U.bb, useB ? Math.min(1, st.bb) : 0); gl.uniform1f(U.fe, neutral ? 0 : Math.max(0, Math.min(1, +fe || 0))); gl.uniform1f(U.cin, +L.cin || 0); gl.uniform1f(U.lb, L.lb ? 1 : 0); gl.uniform1f(U.zm, z || 1); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); return true; };
+        gl.uniform1i(U.t, 0); gl.uniform2f(U.so, sw, shh); gl.uniform2f(U.oo, cv.width, cv.height); gl.uniform1f(U.br, L.br); gl.uniform1f(U.ct, L.ct); gl.uniform1f(U.sa, L.sa); gl.uniform1f(U.se, L.se); const fv = frVals(F, cv.width / cv.height, sw / shh); gl.uniform1f(U.fz, fv.Z); gl.uniform1f(U.fit, fv.z < .999 ? 1 : 0); gl.uniform1f(U.fr, fv.th); gl.uniform2f(U.fo, fv.ox, -fv.oy); gl.uniform1i(U.mk, 1); gl.uniform1f(U.bb, useB ? Math.min(1, st.bb) : 0); gl.uniform1f(U.fe, neutral ? 0 : Math.max(0, Math.min(1, +fe || 0))); gl.uniform1f(U.cin, +L.cin || 0); gl.uniform1f(U.lb, L.lb ? 1 : 0); gl.uniform1f(U.zm, z || 1); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); return true; };
     }
     // ---- Ton der Clips holen (Vivien, 30.10.2026: „beim Exportieren ist der Ton weg. Komplett.“) ----
     // Am iPhone (Safari bis iOS 18) gibt es keinen AudioDecoder/AudioEncoder. Früher wurde die Stimme dann still übersprungen
